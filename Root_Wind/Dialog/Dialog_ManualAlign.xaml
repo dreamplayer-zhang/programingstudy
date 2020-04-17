@@ -1,0 +1,17 @@
+﻿<Window x:Class="Root_Wind.Dialog_ManualAlign"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Converter="clr-namespace:Dialog_ManualJobConverter"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        Background="#FF2D2D30"
+        Title="Dialog_ManualJob"
+        Height="620"
+        Width="1000">
+    <Grid>
+        <tools:ImageViewer DataContext="{Binding p_ImageViewer}"
+                           Width="{PriorityBinding}"
+                           Height="{PriorityBinding}" />
+    </Grid>
+</Window>

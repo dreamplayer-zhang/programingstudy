@@ -1,0 +1,732 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CE787353-5E00-4574-9F49-7CEE7F087A86}</ProjectGuid>
+    <OutputType>library</OutputType>
+    <RootNamespace>RootTools</RootNamespace>
+    <AssemblyName>RootTools</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Basler.Pylon">
+      <HintPath>..\Lib\Basler.Pylon.dll</HintPath>
+    </Reference>
+    <Reference Include="CyUSB">
+      <HintPath>CyUSB\CyUSB.dll</HintPath>
+    </Reference>
+    <Reference Include="DALSA.SaperaLT.SapClassBasic, Version=8.40.0.1937, Culture=neutral, PublicKeyToken=4d8604101dcb6b58, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Camera\Dalsa\DLL\DALSA.SaperaLT.SapClassBasic.dll</HintPath>
+    </Reference>
+    <Reference Include="DataMatrix.net">
+      <HintPath>RTC5s\DLL\DataMatrix.net.dll</HintPath>
+    </Reference>
+    <Reference Include="EasyModbus">
+      <HintPath>..\packages\OpenLib\EasyModbus.dll</HintPath>
+    </Reference>
+    <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf">
+      <HintPath>..\Lib\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.6.7\lib\net45\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="QRCoder, Version=1.3.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\QRCoder.1.3.6\lib\net40\QRCoder.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>Inspects\DLL\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.4.5.0\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="XGem300Pro_Net40_01_64">
+      <HintPath>Gem\XGem\DLL\XGem300Pro_Net40_01_64.dll</HintPath>
+    </Reference>
+    <Reference Include="ZedGraph, Version=5.1.7.430, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZedGraph.5.1.7\lib\net35-Client\ZedGraph.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
+    <Compile Include="Camera\BaslerPylon\Camera_basler_Classes.cs" />
+    <Compile Include="Camera\BaslerPylon\Camera_Basler_UI.xaml.cs">
+      <DependentUpon>Camera_Basler_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Camera\CameraSet.cs" />
+    <Compile Include="Camera\CameraSet_UI.xaml.cs">
+      <DependentUpon>CameraSet_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Camera\ToolSetCamera.cs" />
+    <Compile Include="Camera\ToolSetCamera_UI.xaml.cs">
+      <DependentUpon>ToolSetCamera_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Camera\CognexOCR\Camera_CognexOCR.cs" />
+    <Compile Include="Camera\CognexOCR\Camera_CognexOCR_UI.xaml.cs">
+      <DependentUpon>Camera_CognexOCR_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Camera\Dalsa\Camera_Dalsa.cs" />
+    <Compile Include="Camera\Dalsa\Camera_Dalsa_UI.xaml.cs">
+      <DependentUpon>Camera_Dalsa_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Camera\Dalsa\Camera_Dalse_Classes.cs" />
+    <Compile Include="Control\Axis.cs" />
+    <Compile Include="Control\AxisXY.cs" />
+    <Compile Include="Control\IAxis.cs" />
+    <Compile Include="Comm\CommLog.cs" />
+    <Compile Include="Comm\CommLog_UI.xaml.cs">
+      <DependentUpon>CommLog_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Comm\IComm.cs" />
+    <Compile Include="Control\Ajin\Ajin.cs" />
+    <Compile Include="Control\Ajin\AjinAxis.cs" />
+    <Compile Include="Control\Ajin\AjinAxis_UI.xaml.cs">
+      <DependentUpon>AjinAxis_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Ajin\AjinBitDO.cs" />
+    <Compile Include="Control\Ajin\AjinDIO.cs" />
+    <Compile Include="Control\Ajin\AjinDIO_UI.xaml.cs">
+      <DependentUpon>AjinDIO_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Ajin\AjinLib\AXA.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXD.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXDev.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXHD.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXHS.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXL.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXM.cs" />
+    <Compile Include="Control\Ajin\AjinListAxis.cs" />
+    <Compile Include="Control\Ajin\AjinListAxis_UI.xaml.cs">
+      <DependentUpon>AjinListAxis_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Ajin\AjinListDIO.cs" />
+    <Compile Include="Control\Ajin\Ajin_UI.xaml.cs">
+      <DependentUpon>Ajin_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DMC\DMCAxis_UI.xaml.cs">
+      <DependentUpon>DMCAxis_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DMC\CoreMon.cs" />
+    <Compile Include="DMC\DMCAxis.cs" />
+    <Compile Include="DMC\DMCControl.cs" />
+    <Compile Include="DMC\DMCControl_UI.xaml.cs">
+      <DependentUpon>DMCControl_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DMC\DMCDIO.cs" />
+    <Compile Include="DMC\DMCListDIO.cs" />
+    <Compile Include="DMC\DMCListDIO_UI.xaml.cs">
+      <DependentUpon>DMCListDIO_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DrawData.cs" />
+    <Compile Include="GAFs\ALID.cs" />
+    <Compile Include="GAFs\ALIDList.cs" />
+    <Compile Include="GAFs\ALIDList_UI.xaml.cs">
+      <DependentUpon>ALIDList_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GAFs\CEID.cs" />
+    <Compile Include="GAFs\CEIDList.cs" />
+    <Compile Include="GAFs\CEIDList_UI.xaml.cs">
+      <DependentUpon>CEIDList_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GAFs\GAF.cs" />
+    <Compile Include="GAFs\GAF_UI.xaml.cs">
+      <DependentUpon>GAF_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GAFs\SVID.cs" />
+    <Compile Include="GAFs\SVIDList.cs" />
+    <Compile Include="GAFs\SVIDList_UI.xaml.cs">
+      <DependentUpon>SVIDList_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Gem\GemCarrierBase.cs" />
+    <Compile Include="Gem\GemSlotBase.cs" />
+    <Compile Include="Gem\XGem\XGem.cs" />
+    <Compile Include="Gem\XGem\XGem_UI.xaml.cs">
+      <DependentUpon>XGem_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="IHandler.cs" />
+    <Compile Include="Image\CRect.cs" />
+    <Compile Include="Comm\CyUSBTool.cs" />
+    <Compile Include="Comm\CyUSBTool_UI.xaml.cs">
+      <DependentUpon>CyUSBTool_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\DIO_I.cs" />
+    <Compile Include="Control\DIO_I2O2.cs" />
+    <Compile Include="Control\DIO_IO.cs" />
+    <Compile Include="Control\DIO_O.cs" />
+    <Compile Include="Control\DIO_Os.cs" />
+    <Compile Include="Control\IDIO.cs" />
+    <Compile Include="Gem\GemCJ.cs" />
+    <Compile Include="Gem\GemPJ.cs" />
+    <Compile Include="Gem\IGem.cs" />
+    <Compile Include="Image\ImageViewer_ViewModel.cs" />
+    <Compile Include="Image\ImageViewer.xaml.cs">
+      <DependentUpon>ImageViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Image\ImageData.cs" />
+    <Compile Include="Inspects\Inspection.cs" />
+    <Compile Include="Inspects\InspectionManager.cs" />
+    <Compile Include="Inspects\InspectTool.cs" />
+    <Compile Include="Inspects\InspectToolSet.cs" />
+    <Compile Include="Inspects\InspectToolSet_UI.xaml.cs">
+      <DependentUpon>InspectToolSet_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Inspects\InspectTool_UI.xaml.cs">
+      <DependentUpon>InspectTool_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Inspects\Recipe.cs" />
+    <Compile Include="Inspects\RecipeManager.cs" />
+    <Compile Include="Inspects\Singleton.cs" />
+    <Compile Include="Inspects\SqliteDataDB.cs" />
+    <Compile Include="Inspects\VSDBManager.cs" />
+    <Compile Include="Memory\MemoryViewer.cs" />
+    <Compile Include="Memory\MemoryViewer_UI.xaml.cs">
+      <DependentUpon>MemoryViewer_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\ModuleBase.cs" />
+    <Compile Include="Module\ModuleBase_UI.xaml.cs">
+      <DependentUpon>ModuleBase_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\ModuleList.cs" />
+    <Compile Include="Module\ModuleList_UI.xaml.cs">
+      <DependentUpon>ModuleList_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\ModuleRunBase.cs" />
+    <Compile Include="Module\ModuleRunList.cs" />
+    <Compile Include="OHT\OHTBase.cs" />
+    <Compile Include="OHT\OHTHistory_UI.xaml.cs">
+      <DependentUpon>OHTHistory_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OHT\Semi\OHT_Semi.cs" />
+    <Compile Include="OHT\Semi\OHT_Semi_UI.xaml.cs">
+      <DependentUpon>OHT_Semi_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OHT\SSEM\OHT_SSEM.cs" />
+    <Compile Include="OHT\SSEM\OHT_SSEM_UI.xaml.cs">
+      <DependentUpon>OHT_SSEM_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RTC5s\DataList.cs" />
+    <Compile Include="RTC5s\DesignBase.cs" />
+    <Compile Include="RTC5s\DesignOutline.cs" />
+    <Compile Include="RTC5s\Design_Circle.cs" />
+    <Compile Include="RTC5s\Design_DataMatrix.cs" />
+    <Compile Include="RTC5s\Design_DXF.cs" />
+    <Compile Include="RTC5s\Design_Line.cs" />
+    <Compile Include="RTC5s\Design_QRcode.cs" />
+    <Compile Include="RTC5s\Design_Rectangle.cs" />
+    <Compile Include="RTC5s\Design_String.cs" />
+    <Compile Include="RTC5s\Design_StringDot.cs" />
+    <Compile Include="RTC5s\Design_StringLine.cs" />
+    <Compile Include="RTC5s\LaserBright\Laser_Bright.cs" />
+    <Compile Include="RTC5s\LaserBright\Laser_Bright_UI.xaml.cs">
+      <DependentUpon>Laser_Bright_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RTC5s\LaserParameter.cs" />
+    <Compile Include="RTC5s\RTC5.cs" />
+    <Compile Include="RTC5s\RTC5Design.cs" />
+    <Compile Include="RTC5s\RTC5Design_UI.xaml.cs">
+      <DependentUpon>RTC5Design_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RTC5s\RTC5Mark.cs" />
+    <Compile Include="RTC5s\RTC5Setting.cs" />
+    <Compile Include="RTC5s\RTC5Wrap.cs" />
+    <Compile Include="RTC5s\RTC5_UI.xaml.cs">
+      <DependentUpon>RTC5_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToolBoxs\StringTable.cs" />
+    <Compile Include="ToolBoxs\StringTable_UI.xaml.cs">
+      <DependentUpon>StringTable_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToolBoxs\ToolBox.cs" />
+    <Compile Include="ToolBoxs\ToolBox_UI.xaml.cs">
+      <DependentUpon>ToolBox_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToolBoxs\ToolSet.cs" />
+    <Compile Include="ToolBoxs\ToolSet_UI.xaml.cs">
+      <DependentUpon>ToolSet_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Trees\ITreeItem.cs" />
+    <Compile Include="Trees\TreeGroup.cs" />
+    <Compile Include="Trees\TreeRoot.cs" />
+    <Compile Include="ViewModelHelper\DragDrop\DragDrop.cs" />
+    <Compile Include="ViewModelHelper\DragDrop\DragDropEventArgs.cs" />
+    <Compile Include="ViewModelHelper\DragDrop\DragDropPreviewBase.cs" />
+    <Compile Include="ViewModelHelper\DragDrop\DropState.cs" />
+    <Compile Include="ViewModelHelper\EnumBinginSource.cs" />
+    <Compile Include="ViewModelHelper\ObservableQueue.cs" />
+    <Compile Include="ViewModelHelper\DialogCloseRequestedEventArgs.cs" />
+    <Compile Include="ViewModelHelper\DialogService.cs" />
+    <Compile Include="ViewModelHelper\GridViewColumnResize.cs" />
+    <Compile Include="Camera\ICamera.cs" />
+    <Compile Include="InfoList.cs" />
+    <Compile Include="InfoList_UI.xaml.cs">
+      <DependentUpon>InfoList_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ITool.cs" />
+    <Compile Include="IToolSet.cs" />
+    <Compile Include="Control\BitDI.cs" />
+    <Compile Include="Image\CPoint.cs" />
+    <Compile Include="EQ.cs" />
+    <Compile Include="IRFID.cs" />
+    <Compile Include="IToolDIO.cs" />
+    <Compile Include="Job.cs" />
+    <Compile Include="Light\ILightTool.cs" />
+    <Compile Include="Light\LightBase_UI.xaml.cs">
+      <DependentUpon>LightBase_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Light\Light.cs" />
+    <Compile Include="Light\LightBase.cs" />
+    <Compile Include="Light\LightSet.cs" />
+    <Compile Include="Light\LightSet_UI.xaml.cs">
+      <DependentUpon>LightSet_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Light\LightToolSet.cs" />
+    <Compile Include="Light\LightToolSet_UI.xaml.cs">
+      <DependentUpon>LightToolSet_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Light\LightTool_12ch.cs" />
+    <Compile Include="Light\LightTool_12ch_UI.xaml.cs">
+      <DependentUpon>LightTool_12ch_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Light\LightTool_4ch.cs" />
+    <Compile Include="Light\LightTool_4ch_UI.xaml.cs">
+      <DependentUpon>LightTool_4ch_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Light\LightTool_Kwangwoo.cs" />
+    <Compile Include="Light\LightTool_Kwangwoo_UI.xaml.cs">
+      <DependentUpon>LightTool_Kwangwoo_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Light\LightTool_LVS.cs" />
+    <Compile Include="Light\LightTool_LVS_UI.xaml.cs">
+      <DependentUpon>LightTool_LVS_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Login.cs" />
+    <Compile Include="Login_UI.xaml.cs">
+      <DependentUpon>Login_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Log\LogMars.cs" />
+    <Compile Include="Log\LogWriter.cs" />
+    <Compile Include="Memory\MemoryData.cs" />
+    <Compile Include="Memory\MemoryGroup.cs" />
+    <Compile Include="Memory\MemoryPool.cs" />
+    <Compile Include="Memory\MemoryPool_UI.xaml.cs">
+      <DependentUpon>MemoryPool_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Memory\MemoryTool.cs" />
+    <Compile Include="Memory\MemoryTool_UI.xaml.cs">
+      <DependentUpon>MemoryTool_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MMFBase.cs" />
+    <Compile Include="Comm\NamedPipe.cs" />
+    <Compile Include="Comm\NamedPipe_UI.xaml.cs">
+      <DependentUpon>NamedPipe_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Registry.cs" />
+    <Compile Include="IEngineer.cs" />
+    <Compile Include="Log\LogView.cs" />
+    <Compile Include="ViewModelHelper\NotifyProperty.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Comm\RFID_Brooks.cs" />
+    <Compile Include="Image\RPoint.cs" />
+    <Compile Include="Comm\RS232.cs" />
+    <Compile Include="Comm\RS232_UI.xaml.cs">
+      <DependentUpon>RS232_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="StopWatch.cs" />
+    <Compile Include="Comm\TCPIPServer.cs" />
+    <Compile Include="Comm\TCPIPClient.cs" />
+    <Compile Include="Comm\TCPIPClient_UI.xaml.cs">
+      <DependentUpon>TCPIPClient_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Comm\TCPIPServer_UI.xaml.cs">
+      <DependentUpon>TCPIPServer_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Comm\TK4SGroup.cs" />
+    <Compile Include="Control\BitDO.cs" />
+    <Compile Include="Control\ListDIO.cs" />
+    <Compile Include="Control\ListDIO_LongID_UI.xaml.cs">
+      <DependentUpon>ListDIO_LongID_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\ListDIO_ShortID_UI.xaml.cs">
+      <DependentUpon>ListDIO_ShortID_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Log\UI_LogView.xaml.cs">
+      <DependentUpon>UI_LogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Trees\Tree.cs" />
+    <Compile Include="Trees\TreeItem_bool.cs" />
+    <Compile Include="Trees\TreeItem_CPoint.cs" />
+    <Compile Include="Trees\TreeItem_double.cs" />
+    <Compile Include="Trees\TreeItem_FileName.cs" />
+    <Compile Include="Trees\TreeItem_ICommand.cs" />
+    <Compile Include="Trees\TreeItem_int.cs" />
+    <Compile Include="Trees\TreeItem_long.cs" />
+    <Compile Include="Trees\TreeItem_Password.cs" />
+    <Compile Include="Trees\TreeItem_RPoint.cs" />
+    <Compile Include="Trees\TreeItem_string.cs" />
+    <Compile Include="Trees\TreeItem_stringList.cs" />
+    <Compile Include="Trees\TreeListview.cs" />
+    <Compile Include="Trees\TreeUI.xaml.cs">
+      <DependentUpon>TreeUI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModelHelper\IDialog.cs" />
+    <Compile Include="ViewModelHelper\IDialogRequestClose.cs" />
+    <Compile Include="ViewModelHelper\IDialogService.cs" />
+    <Compile Include="ViewModelHelper\MouseBehavior.cs" />
+    <Compile Include="ViewModelHelper\ObservableObject.cs" />
+    <Compile Include="ViewModelHelper\PropertySupport.cs" />
+    <Compile Include="ViewModelHelper\RelayCommand.cs" />
+    <Compile Include="ViewModelHelper\ScrollViewHelper.cs" />
+    <Compile Include="ViewModelHelper\vmConverter.cs" />
+    <Compile Include="Image\Dialog_ImageOpen.xaml.cs">
+      <DependentUpon>Dialog_ImageOpen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Image\Dialog_ImageOpenViewModel.cs" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Camera\BaslerPylon\Camera_Basler_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Camera\CameraSet_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Camera\ToolSetCamera_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Camera\CognexOCR\Camera_CognexOCR_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Camera\Dalsa\Camera_Dalsa_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Comm\CommLog_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\CyUSBTool_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Ajin\AjinAxis_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Ajin\AjinDIO_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Ajin\AjinListAxis_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Ajin\Ajin_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DMC\DMCAxis_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DMC\DMCControl_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DMC\DMCListDIO_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GAFs\ALIDList_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GAFs\CEIDList_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GAFs\GAF_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GAFs\SVIDList_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Gem\XGem\XGem_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Image\ImageViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InfoList_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Inspects\InspectToolSet_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Inspects\InspectTool_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Light\LightBase_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Light\LightSet_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Light\LightToolSet_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Light\LightTool_12ch_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Light\LightTool_4ch_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Light\LightTool_Kwangwoo_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Light\LightTool_LVS_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Login_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\ListDIO_LongID_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\ListDIO_ShortID_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Memory\MemoryPool_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Memory\MemoryTool_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\NamedPipe_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\RS232_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Comm\TCPIPClient_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Comm\TCPIPServer_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Log\UI_LogView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Memory\MemoryViewer_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\ModuleBase_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\ModuleList_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OHT\OHTHistory_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OHT\Semi\OHT_Semi_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OHT\SSEM\OHT_SSEM_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RTC5s\LaserBright\Laser_Bright_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RTC5s\RTC5Design_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RTC5s\RTC5_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ToolBoxs\StringTable_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ToolBoxs\ToolBox_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ToolBoxs\ToolSet_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Trees\TreeUI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Image\Dialog_ImageOpen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="License-LGPL.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
+      <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
+      <Name>RootTools_CLR</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\OHT_Semi.JPG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\OHT_SSEM.JPG" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets'))" />
+  </Target>
+</Project>

@@ -1,0 +1,1087 @@
+﻿<UserControl x:Class="Root_Vega._1_Main"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:MainConverter ="clr-namespace:MainViewerConverter"
+             mc:Ignorable="d" 
+             d:DesignHeight="840" d:DesignWidth="1912"
+             Background="#FF2D2D30">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="87*"/>
+            <ColumnDefinition Width="13*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" Margin="15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="45*"/>
+                <ColumnDefinition Width="55*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Margin="7.5, 7.5, 0, 7.5"
+                  Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Border BorderThickness="3"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            Background="{StaticResource Purple}">
+                    <TextBlock Text="OVERVIEW"
+                               FontWeight="Bold"
+                               Style="{StaticResource BasicTb}"
+                               FontSize="15"
+                               TextAlignment="Left"
+                               Margin="10,0,0,0"/>
+                </Border>
+                <Border Grid.Row="1"
+                            BorderThickness="3,0,3,3"
+                            BorderBrush="{StaticResource BorderBrush}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="6*"/>
+                            <ColumnDefinition Width="4*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Margin="30,30,15,30"
+                              Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="9*"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Background="{DynamicResource BtnMouseOver}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="50"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="50"/>
+                                    <RowDefinition/>
+                                    <RowDefinition Height="50"/>
+                                </Grid.RowDefinitions>
+                                <Grid Margin="10"
+                                  Grid.Column="1"
+                                  Grid.Row="1"
+                                  Background="Black"/>
+                                <Grid Grid.Column="1"
+                                  Margin="10,10,10,0"
+                                  Background="Black"/>
+                                <Grid Grid.Column="1"
+                                  Margin="10,0,10,10"
+                                  Grid.Row="2"
+                                  Background="Black"/>
+                                <Grid Margin="10,10,0,10"
+                                  Grid.Column="0"
+                                  Grid.Row="1"
+                                  Background="Black"/>
+                                <Grid Margin="0,10,10,10"
+                                  Grid.Column="2"
+                                  Grid.Row="1"
+                                  Background="Black"/>
+                            </Grid>
+                            <Grid Grid.Row="1"
+                                  Margin="0,30,0,0">
+                                <ProgressBar Value="33"
+                                             Background="{StaticResource DarkGray}"
+                                             Foreground="{StaticResource Green}"/>
+                                <TextBlock Text="33%"
+                                           Style="{StaticResource BasicTb}"
+                                           FontWeight="Black"/>
+                            </Grid>
+
+                        </Grid>
+
+                        <Grid Grid.Column="1" Margin="15,30,30,40">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="3*"/>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="3*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="0,0,0,10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Border>
+                                    <TextBlock Text="INFORMATION"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                </Border>
+                                <Grid Grid.Row="1"
+                                        Background="{StaticResource TextForeGround}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.RowSpan="4"
+                                          Background="{StaticResource LightGray}"/>
+                                    <TextBlock Text="LOADPORT"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="POD ID"
+                                               Grid.Row="1"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="LOT ID"
+                                               Grid.Row="2"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="RETICLE ID"
+                                               Grid.Row="3"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+
+                                    <TextBlock Text="LOADPORT 1"
+                                               Grid.Column="1"
+                                               Grid.Row="0"
+                                               Style="{StaticResource BasicTb}"
+                                               Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="LotID"
+                                               Grid.Column="1"
+                                               Grid.Row="1"
+                                               Style="{StaticResource BasicTb}"
+                                               Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="CstID"
+                                               Grid.Column="1"
+                                               Grid.Row="2"
+                                               Style="{StaticResource BasicTb}"
+                                               Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="WaferID"
+                                               Grid.Column="1"
+                                               Grid.Row="3"
+                                               Style="{StaticResource BasicTb}"
+                                               Foreground="{StaticResource Black}"/>
+                                </Grid>
+                            </Grid>
+                            <Grid Grid.Row="1" Margin="0,0,0,10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Border>
+                                    <TextBlock Text="RETICLE LOCATION"
+                                               FontSize="15"
+                                               FontWeight="Black"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                </Border>
+                                <Grid Grid.Row="1"
+                                        Background="{StaticResource TextForeGround}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0"
+                                          Grid.ColumnSpan="2"
+                                          Margin="6"
+                                          Background="{DynamicResource Yellow}">
+                                        <TextBlock Text="MAIN VISION"
+                                                   FontWeight="Black"
+                                                   Foreground="{StaticResource Black}"
+                                                   Style="{StaticResource BasicTb}"/>
+                                    </Grid>
+                                    <Grid Grid.Row="1"
+                                          Grid.ColumnSpan="2"
+                                          Margin="6"
+                                          Background="{DynamicResource DarkGray}">
+                                        <TextBlock Text="SIDE VISION"
+                                                   Foreground="{StaticResource Black}"
+                                                    Style="{StaticResource BasicTb}"/>
+                                    </Grid>
+                                    <Grid Grid.Row="2"
+                                          Grid.ColumnSpan="2"
+                                          Margin="6"
+                                          Background="{DynamicResource DarkGray}">
+                                        <TextBlock Text="RTR"
+                                                   Foreground="{StaticResource Black}"
+                                                     Style="{StaticResource BasicTb}"/>
+                                    </Grid>
+                                    <Grid Grid.Row="3"
+                                             Margin="6"
+                                             Background="{DynamicResource DarkGray}">
+                                        <TextBlock Text="LOADPORT 1"
+                                                   Foreground="{StaticResource Black}"
+                                                    Style="{StaticResource BasicTb}"/>
+                                    </Grid>
+                                    <Grid Grid.Row="3"
+                                              Grid.Column="1"
+                                              Margin="6"
+                                              Background="{DynamicResource DarkGray}">
+                                        <TextBlock Text="LOADPORT 2"
+                                                   Foreground="{StaticResource Black}"
+                                                   Style="{StaticResource BasicTb}"/>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                            <Grid Grid.Row="2" Margin="0,0,0,10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Border>
+                                    <TextBlock Text="INSPECTION INFO"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                </Border>
+                                <Grid Grid.Row="1"
+                                        Background="{StaticResource TextForeGround}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.RowSpan="3"
+                                          Background="{StaticResource LightGray}"/>
+                                    <TextBlock Text="Required Time"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="Elapsed Time"
+                                               Grid.Row="1"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="Defect Cnt"
+                                               Grid.Row="2"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="00:00:00"
+                                               Grid.Column="1"
+                                               Grid.Row="0"
+                                               Style="{StaticResource BasicTb}"
+                                               Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="00:00:00"
+                                               Grid.Column="1"
+                                               Grid.Row="1"
+                                               Style="{StaticResource BasicTb}"
+                                               Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="0"
+                                               Grid.Column="1"
+                                               Grid.Row="2"
+                                               Style="{StaticResource BasicTb}"
+                                               Foreground="{StaticResource Black}"/>
+                                </Grid>
+                            </Grid>
+                            <Grid Grid.Row="3" Margin="0,0,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Border>
+                                    <TextBlock Text="FDC"
+                                               FontSize="15"
+                                               FontWeight="Black"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                </Border>
+                                <Grid Grid.Row="1"
+                                        Background="{StaticResource TextForeGround}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.RowSpan="6"
+                                          Background="{StaticResource LightGray}"/>
+                                    <TextBlock Text="CDA"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="Vaccum"
+                                               Grid.Row="1"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="EFEM Pressure"
+                                               Grid.Row="2"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="Vision Pressure"
+                                               Grid.Row="3"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="Electrostatic"
+                                               Grid.Row="4"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                            Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="Temp"
+                                               Grid.Row="5"
+                                            Style="{StaticResource BasicTb}"
+                                            FontWeight="Bold"
+                                               Foreground="{StaticResource Black}"/>
+
+
+                                    <TextBlock Text="0.000 (Mpa)"
+                                               Grid.Column="1"
+                                               Grid.Row="0"
+                                               Style="{StaticResource BasicTb}"
+                                               Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="0.000 (Kpa)"
+                                               Foreground="{StaticResource Red}"
+                                               Grid.Column="1"
+                                               Grid.Row="1"
+                                               Style="{StaticResource BasicTb}"/>
+                                    <TextBlock Text="0.000 (inWG)"
+                                               Grid.Column="1"
+                                               Grid.Row="2"
+                                               Foreground="{StaticResource Black}"
+                                               Style="{StaticResource BasicTb}"/>
+                                    <TextBlock Text="0.000 (inWG)"
+                                               Grid.Column="1"
+                                               Grid.Row="3"
+                                               Foreground="{StaticResource Black}"
+                                               Style="{StaticResource BasicTb}"/>
+                                    <TextBlock Text="0.000 (%)"
+                                               Grid.Column="1"
+                                               Grid.Row="4"
+                                               Style="{StaticResource BasicTb}"
+                                               Foreground="{StaticResource Black}"/>
+                                    <TextBlock Text="0.000 (℃)"
+                                               Grid.Column="1"
+                                               Grid.Row="5"
+                                               Style="{StaticResource BasicTb}"
+                                               Foreground="{StaticResource Black}"/>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+            <Grid Margin="7.5"
+                  Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="7*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Margin="7.5,0,7.5,7.5"
+                          Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Border BorderThickness="3"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            Background="{StaticResource Purple}">
+                            <TextBlock Text="VISION"
+                               FontWeight="Bold"
+                               Style="{StaticResource BasicTb}"
+                               FontSize="15"
+                               TextAlignment="Left"
+                               Margin="10,0,0,0"/>
+                        </Border>
+                        <Border Grid.Row="1"
+                            BorderThickness="3,0,3,3"
+                            BorderBrush="{StaticResource BorderBrush}">
+                            <Grid Margin="15">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="5*"/>
+                                    <RowDefinition Height="5*"/>
+                                </Grid.RowDefinitions>
+                               
+                                <Grid Grid.Row="0" Margin="0,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="Green"/>
+                                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="{StaticResource Red}"/>
+                                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="Green"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="Alarm"
+                                               Margin="0,1,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                                        <TextBlock Text="InPos."
+                                               Margin="0,11,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                                        <TextBlock Text="Reticle Exist"
+                                               Margin="0,11,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Grid.Row="1" Margin="0,0,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Border>
+                                        <TextBlock Text="STATE"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                    </Border>
+                                    <Grid Grid.Row="1" Background="{StaticResource LightGray}">
+                                        <TextBlock Text="RUN"
+                                                   Foreground="{StaticResource Black}"
+                                                   Style="{StaticResource BasicTb}"/>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    
+                    <Grid Margin="7.5,0,7.5,7.5"
+                          Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Border BorderThickness="3"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            Background="{StaticResource Purple}">
+                            <TextBlock Text="SIDE VISION"
+                               FontWeight="Bold"
+                               Style="{StaticResource BasicTb}"
+                               FontSize="15"
+                               TextAlignment="Left"
+                               Margin="10,0,0,0"/>
+                        </Border>
+                        <Border Grid.Row="1"
+                            BorderThickness="3,0,3,3"
+                            BorderBrush="{StaticResource BorderBrush}">
+                            <Grid Margin="15">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="5*"/>
+                                    <RowDefinition Height="5*"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0" Margin="0,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="Green"/>
+                                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="Green"/>
+                                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="{StaticResource Red}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="Alarm"
+                                               Margin="0,1,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                                        <TextBlock Text="InPos"
+                                               Margin="0,11,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                                        <TextBlock Text="Reticle Exist"
+                                               Margin="0,11,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Grid.Row="1" Margin="0,0,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Border>
+                                        <TextBlock Text="STATE"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                    </Border>
+                                    <Grid Grid.Row="1" Background="{StaticResource LightGray}">
+                                        <TextBlock Text="RUN"
+                                                   Foreground="{StaticResource Black}"
+                                                   Style="{StaticResource BasicTb}"/>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    
+                    <Grid Margin="7.5,0,7.5,7.5"
+                          Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Border BorderThickness="3"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            Background="{StaticResource Purple}">
+                            <TextBlock Text="RTR"
+                               FontWeight="Bold"
+                               Style="{StaticResource BasicTb}"
+                               FontSize="15"
+                               TextAlignment="Left"
+                               Margin="10,0,0,0"/>
+                        </Border>
+                        <Border Grid.Row="1"
+                            BorderThickness="3,0,3,3"
+                            BorderBrush="{StaticResource BorderBrush}">
+                            <Grid Margin="15">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="5*"/>
+                                    <RowDefinition Height="5*"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0" Margin="0,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="Green"/>
+                                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="Green"/>
+                                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="{StaticResource Red}"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="Alarm"
+                                               Margin="0,1,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                                        <TextBlock Text="InPos"
+                                               Margin="0,11,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                                        <TextBlock Text="Reticle Exist"
+                                               Margin="0,11,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Grid.Row="1" Margin="0,0,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Border>
+                                        <TextBlock Text="STATE"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                    </Border>
+                                    <Grid Grid.Row="1" Background="{StaticResource LightGray}">
+                                        <TextBlock Text="RUN"
+                                                   Foreground="{StaticResource Black}"
+                                                   Style="{StaticResource BasicTb}"/>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    
+                </Grid>
+                
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Grid Grid.Column="0" Margin="7.5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Border BorderThickness="3"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            Background="{StaticResource Purple}">
+                            <TextBlock Text="LOADPORT 1"
+                               FontWeight="Bold"
+                               Style="{StaticResource BasicTb}"
+                               FontSize="15"
+                               TextAlignment="Left"
+                               Margin="10,0,0,0"/>
+                        </Border>
+
+                        <Border Grid.Row="1"
+                            BorderThickness="3,0,3,3"
+                            BorderBrush="{StaticResource BorderBrush}">
+                            <Grid Margin="15,15,15,15">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2.5*"/>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="1.5*"/>
+                                    <RowDefinition Height="4*"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Border>
+                                        <TextBlock Text="INFORMATION"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                    </Border>
+                                    <Grid Grid.Row="1"
+                                        Background="{StaticResource TextForeGround}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.RowSpan="4"
+                                          Background="{StaticResource LightGray}"/>
+                                        <TextBlock Text="POD ID"
+                                           Grid.Row="0"
+                                           Style="{StaticResource BasicTb}"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource Black}"/>
+                                        <TextBlock Text="LOT ID"
+                                           Grid.Row="1"
+                                           Style="{StaticResource BasicTb}"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource Black}"/>
+                                        <TextBlock Text="RETICLE ID"
+                                           Grid.Row="2"
+                                           Style="{StaticResource BasicTb}"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource Black}"/>
+                                        <TextBlock Text="RECIPE"
+                                           Grid.Row="3"
+                                           Style="{StaticResource BasicTb}"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource Black}"/>
+
+                                        <TextBlock Text="LotID"
+                                           Grid.Column="1"
+                                           Grid.Row="0"
+                                           Style="{StaticResource BasicTb}"
+                                           Foreground="{StaticResource Black}"/>
+                                        <TextBlock Text="CstID"
+                                           Grid.Column="1"
+                                           Grid.Row="1"
+                                           Style="{StaticResource BasicTb}"
+                                           Foreground="{StaticResource Black}"/>
+                                        <TextBlock Text="WaferID"
+                                           Grid.Column="1"
+                                           Grid.Row="2"
+                                           Style="{StaticResource BasicTb}"
+                                           Foreground="{StaticResource Black}"/>
+                                        <TextBlock Text="Recipe.rcp"
+                                           Grid.Column="1"
+                                           Grid.Row="3"
+                                           Style="{StaticResource BasicTb}"
+                                           Foreground="{StaticResource Black}"/>
+
+                                    </Grid>
+                                </Grid>
+                                <Grid Grid.Row="1" Margin="0,0,0,10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Border>
+                                        <TextBlock Text="LOADPORT STATE"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                    </Border>
+                                    <Grid Grid.Row="1" Background="{StaticResource LightGray}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0"
+                                                Margin="5"
+                                                Background="{DynamicResource Green}">
+                                            <TextBlock Text="PRESENT"
+                                               Foreground="{StaticResource Black}"
+                                               Style="{StaticResource BasicTb}"/>
+                                        </Border>
+                                        <Border Grid.Column="1"
+                                                Margin="5"
+                                        Background="{DynamicResource Green}">
+                                            <TextBlock Text="PLACED"
+                                               Foreground="{StaticResource Black}"
+                                               Style="{StaticResource BasicTb}"/>
+                                        </Border>
+                                        <Border Grid.Column="2"
+                                                Margin="5"
+                                        Background="{DynamicResource Green}">
+                                            <TextBlock Text="OPEN"
+                                               Foreground="{StaticResource Black}"
+                                               Style="{StaticResource BasicTb}"/>
+                                        </Border>
+                                        <Border Grid.Column="3"
+                                                Margin="5"
+                                        Background="{DynamicResource DarkGray}">
+                                            <TextBlock Text="ALARM"
+                                               Foreground="{StaticResource Black}"
+                                               Style="{StaticResource BasicTb}"/>
+                                        </Border>
+
+                                    </Grid>
+                                </Grid>
+                                <Grid Grid.Row="2" Margin="0,0,0,10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Border>
+                                        <TextBlock Text="ACCESS MODE"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                    </Border>
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <ToggleButton Content="Auto"
+                                              Margin="5"
+                                              Style="{StaticResource LoadPortToggle}"/>
+                                        <ToggleButton Content="Manual"
+                                              Grid.Column="1"
+                                              Margin="5"
+                                              Style="{StaticResource LoadPortToggle}"/>
+
+                                    </Grid>
+                                </Grid>
+                                <Grid Grid.Row="3" Margin="0,0,0,10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Border>
+                                        <TextBlock Text="조작"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                    </Border>
+                                    <Grid Grid.Row="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Button Content="로드"
+                                                Grid.Row="0"
+                                                Margin="5"
+                                                Style="{StaticResource LoadPortBtn}"/>
+                                        <Button Content="언로드"
+                                                Grid.Row="1"
+                                                Margin="5"
+                                                Style="{StaticResource LoadPortBtn}"/>
+                                        <Button Content="언로드 요청"
+                                                Grid.Row="2"
+                                                Margin="5"
+                                                Style="{StaticResource LoadPortBtn}"/>
+                                    </Grid>
+                                </Grid>
+
+
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <Grid Margin="7.5"
+                          Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Border BorderThickness="3"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            Background="{StaticResource Purple}">
+                            <TextBlock Text="LOADPORT 2"
+                               FontWeight="Bold"
+                               Style="{StaticResource BasicTb}"
+                               FontSize="15"
+                               TextAlignment="Left"
+                               Margin="10,0,0,0"/>
+                        </Border>
+                        <Border Grid.Row="1"
+                            BorderThickness="3,0,3,3"
+                            BorderBrush="{StaticResource BorderBrush}">
+                            <Border Grid.Row="1"
+                            BorderBrush="{StaticResource BorderBrush}">
+                                <Grid Margin="15,15,15,15">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="2.5*"/>
+                                        <RowDefinition Height="2*"/>
+                                        <RowDefinition Height="1.5*"/>
+                                        <RowDefinition Height="4*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Border>
+                                            <TextBlock Text="INFORMATION"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                        </Border>
+                                        <Grid Grid.Row="1"
+                                        Background="{StaticResource TextForeGround}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.RowSpan="4"
+                                          Background="{StaticResource LightGray}"/>
+                                            <TextBlock Text="POD ID"
+                                           Grid.Row="0"
+                                           Style="{StaticResource BasicTb}"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource Black}"/>
+                                            <TextBlock Text="LOT ID"
+                                           Grid.Row="1"
+                                           Style="{StaticResource BasicTb}"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource Black}"/>
+                                            <TextBlock Text="RETICLE ID"
+                                           Grid.Row="2"
+                                           Style="{StaticResource BasicTb}"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource Black}"/>
+                                            <TextBlock Text="RECIPE"
+                                           Grid.Row="3"
+                                           Style="{StaticResource BasicTb}"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource Black}"/>
+
+                                            <TextBlock Text="LotID"
+                                           Grid.Column="1"
+                                           Grid.Row="0"
+                                           Style="{StaticResource BasicTb}"
+                                           Foreground="{StaticResource Black}"/>
+                                            <TextBlock Text="CstID"
+                                           Grid.Column="1"
+                                           Grid.Row="1"
+                                           Style="{StaticResource BasicTb}"
+                                           Foreground="{StaticResource Black}"/>
+                                            <TextBlock Text="WaferID"
+                                           Grid.Column="1"
+                                           Grid.Row="2"
+                                           Style="{StaticResource BasicTb}"
+                                           Foreground="{StaticResource Black}"/>
+                                            <TextBlock Text="Recipe.rcp"
+                                           Grid.Column="1"
+                                           Grid.Row="3"
+                                           Style="{StaticResource BasicTb}"
+                                           Foreground="{StaticResource Black}"/>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Border>
+                                            <TextBlock Text="LOADPORT STATE"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                        </Border>
+                                        <Grid Grid.Row="1" Background="{StaticResource LightGray}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0"
+                                                Margin="5"
+                                                Background="{DynamicResource DarkGray}">
+                                                <TextBlock Text="PRESENT"
+                                               Foreground="{StaticResource Black}"
+                                               Style="{StaticResource BasicTb}"/>
+                                            </Border>
+                                            <Border Grid.Column="1"
+                                                Margin="5"
+                                        Background="{DynamicResource DarkGray}">
+                                                <TextBlock Text="PLACED"
+                                               Foreground="{StaticResource Black}"
+                                               Style="{StaticResource BasicTb}"/>
+                                            </Border>
+                                            <Border Grid.Column="2"
+                                                Margin="5"
+                                        Background="{DynamicResource DarkGray}">
+                                                <TextBlock Text="OPEN"
+                                               Foreground="{StaticResource Black}"
+                                               Style="{StaticResource BasicTb}"/>
+                                            </Border>
+                                            <Border Grid.Column="3"
+                                                Margin="5"
+                                        Background="{DynamicResource DarkGray}">
+                                                <TextBlock Text="ALARM"
+                                               Foreground="{StaticResource Black}"
+                                               Style="{StaticResource BasicTb}"/>
+                                            </Border>
+
+                                        </Grid>
+                                    </Grid>
+                                    <Grid Grid.Row="2" Margin="0,0,0,10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Border>
+                                            <TextBlock Text="ACCESS MODE"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                        </Border>
+                                        <Grid Grid.Row="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <ToggleButton Content="Auto"
+                                              Margin="5"
+                                              Style="{StaticResource LoadPortToggle}"/>
+                                            <ToggleButton Content="Manual"
+                                              Grid.Column="1"
+                                              Margin="5"
+                                              Style="{StaticResource LoadPortToggle}"/>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid Grid.Row="3" Margin="0,0,0,10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Border>
+                                            <TextBlock Text="조작"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                                        </Border>
+                                        <Grid Grid.Row="1">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <Button Content="로드"
+                                              Margin="5"
+                                              Style="{StaticResource LoadPortBtn}"/>
+                                            <Button Content="언로드"
+                                                Grid.Row="1"
+                                              Margin="5"
+                                              Style="{StaticResource LoadPortBtn}"/>
+                                            <Button Content="언로드 요청"
+                                                Grid.Row="2"
+                                              Margin="5"
+                                              Style="{StaticResource LoadPortBtn}"/>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </Grid>       
+        </Grid>
+        <Grid Grid.Column="1" >
+            <StackPanel Margin="0,45,15,15">
+                <Button Content="Start"
+                        Style="{StaticResource BasicBtn}"
+                        Margin="0,0,0,10"/>
+                <Button Content="Stop"
+                        Style="{StaticResource BasicBtn}"
+                        Margin="0,0,0,10"/>
+                <Button Content="Pause"
+                        Style="{StaticResource BasicBtn}"
+                        Margin="0,0,0,10"/>
+                <Button Content="Initialization"
+                        Style="{StaticResource BasicBtn}"
+                        Command="{Binding InitializeCommand}"
+                        Margin="0,0,0,10"/>
+                <Button Content="Recovery"
+                        Style="{StaticResource BasicBtn}"
+                        Margin="0,0,0,10"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>
+

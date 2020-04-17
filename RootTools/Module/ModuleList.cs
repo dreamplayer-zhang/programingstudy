@@ -1,0 +1,195 @@
+﻿using System.Collections.Generic;
+using System.Threading;
+using System.Windows.Controls;
+
+namespace RootTools.Module
+{
+    /// <summary> ModuleList : Module List 관리, Module들의 ModuleRun을 순차적으로 실행 가능 (when EQ.p_eState.Ready) </summary>
+    public class ModuleList : NotifyProperty
+    {
+        #region Property
+        bool _bEnableRun = false; 
+        public bool p_bEnableRun
+        {
+            get { return _bEnableRun; }
+            set
+            {
+                if (_bEnableRun == value) return;
+                _bEnableRun = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        string _sRun = "Initialize";
+        public string p_sRun
+        {
+            get { return _sRun; }
+            set
+            {
+                if (_sRun == value) return;
+                _sRun = value;
+                OnPropertyChanged();
+            }
+        }
+
+        string _sRunStep = "RunStep";
+        public string p_sRunStep
+        {
+            get { return _sRunStep; }
+            set
+            {
+                if (_sRunStep == value) return;
+                _sRunStep = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public InfoList m_infoList = new InfoList();
+        string _sInfo = "Info";
+        public string p_sInfo
+        {
+            get { return _sInfo; }
+            set
+            {
+                if (value == _sInfo) return;
+                _sInfo = value;
+                OnPropertyChanged();
+                if (value == "OK") return;
+                m_log.Info(m_id + " Info : " + value.ToString());
+                m_infoList.Add(_sInfo);
+            }
+        }
+        #endregion
+
+        #region List ModuleBase
+        /// <summary> m_asModule : Module들의 m_id List </summary>
+        public List<string> m_asModule = new List<string>();
+        /// <summary> m_aModule : Modulebase와 해당하는 UI 모음 (UI를 TabControl에 표시하기 위함) </summary>
+        public Dictionary<ModuleBase, UserControl> m_aModule = new Dictionary<ModuleBase, UserControl>();
+        public void AddModule(ModuleBase module, UserControl uc)
+        {
+            m_aModule.Add(module, uc);
+            m_asModule.Add(module.p_id);
+        }
+
+        public ModuleBase GetModule(string id)
+        {
+            foreach (ModuleBase module in m_aModule.Keys)
+            {
+                if (module.p_id == id) return module;
+            }
+            return null;
+        }
+        #endregion
+
+        #region Thread
+        bool m_bThread = false;
+        Thread m_thread;
+        void StartThread()
+        {
+            m_thread = new Thread(new ThreadStart(RunThread));
+            m_thread.Start();
+        }
+
+        void RunThread()
+        {
+            m_bThread = true;
+            Thread.Sleep(2000);
+            while (m_bThread)
+            {
+                Thread.Sleep(10);
+                p_bEnableRun = (EQ.p_eState == EQ.eState.Ready); 
+                switch (EQ.p_eState)
+                {
+                    case EQ.eState.Init: p_sRun = "Home"; break;
+                    case EQ.eState.Home: p_sRun = "Stop"; break;
+                    case EQ.eState.Ready:
+                        p_sRun = (m_qModuleRun.Count == 0) ? "Run" : "Stop";
+                        if (m_qModuleRun.Count > 0)
+                        {
+                            ModuleRunBase moduleRun = m_qModuleRun.Dequeue();
+                            moduleRun.StartRun();
+                            while (moduleRun.m_moduleBase.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+                        }
+                        break;
+                    case EQ.eState.Error: p_sRun = "Reset"; break;
+                }
+            }
+        }
+        #endregion
+
+        #region StateRun
+        /// <summary> m_qModuleRun : if (EQ.p_eState == Ready) 일 때 RunThread()에서 순차적으로 실행 </summary>
+        Queue<ModuleRunBase> m_qModuleRun = new Queue<ModuleRunBase>();
+
+        public string ClickRun()
+        {
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Init:
+                    EQ.p_eState = EQ.eState.Home; 
+                    break;
+                case EQ.eState.Home:
+                    EQ.p_bStop = true;
+                    EQ.p_eState = EQ.eState.Init;
+                    break;
+                case EQ.eState.Ready:
+                    if (m_qModuleRun.Count == 0) StartModuleRuns();
+                    else
+                    {
+                        m_qModuleRun.Clear();
+                        EQ.p_bStop = true;
+                    }
+                    break;
+                case EQ.eState.Error: m_handler.Reset(); break;
+            }
+            return "OK";
+        }
+
+        public void StartModuleRuns()
+        {
+            EQ.p_bStop = false;
+            foreach (ModuleRunBase moduleRun in m_moduleRunList.m_aModuleRun) m_qModuleRun.Enqueue(moduleRun);
+            EQ.p_eState = EQ.eState.Run;
+        }
+
+        public string ClickRunStep()
+        {
+            if (EQ.p_eState != EQ.eState.Ready) return "EQ p_eSrate Not Ready";
+            EQ.p_bStop = false;
+            foreach (ModuleRunBase moduleRun in m_moduleRunList.m_aModuleRun)
+            {
+                if (moduleRun.p_id == p_sRunStep) m_qModuleRun.Enqueue(moduleRun);
+            }
+            EQ.p_eState = EQ.eState.Run;
+            return "OK";
+        }
+        #endregion
+
+        string m_id;
+        IEngineer m_engineer;
+        IHandler m_handler;
+        LogWriter m_log;
+        /// <summary> m_moduleRunList : ModuleRun 편집용 -> m_qModuleRun 으로 실행 </summary>
+        public ModuleRunList m_moduleRunList;
+        public ModuleList(IEngineer engineer, string sLogGroup = "")
+        {
+            m_id = EQ.m_sModel;
+            m_engineer = engineer;
+            m_handler = engineer.ClassHandler();
+            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, m_id, sLogGroup);
+            m_moduleRunList = new ModuleRunList(m_id, engineer);
+
+            StartThread();
+        }
+
+        public void ThreadStop()
+        {
+            if (m_bThread)
+            {
+                m_bThread = false;
+                m_thread.Join();
+            }
+        }
+    }
+}

@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="RootTools.Light.LightBase_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RootTools.Light"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" Orientation="Vertical">
+            <TextBlock Text="{Binding p_id}"/>
+            <CheckBox IsChecked="{Binding p_bOn}" Content="Light On"/>
+            <TextBlock Text="Get Power"/>
+            <TextBox Text="{Binding p_fGetPower}" TextAlignment="Center" IsEnabled="False"/>
+            <TextBlock Text="Set Power"/>
+            <TextBox Text="{Binding p_fSetPower}" TextAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+            <TextBlock Text="Max Power"/>
+            <TextBox Text="{Binding p_fMaxPower}" TextAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+            <TextBlock Text="Power Scale"/>
+            <TextBox Text="{Binding p_fScalePower}" TextAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

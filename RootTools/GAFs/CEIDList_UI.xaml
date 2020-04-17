@@ -1,0 +1,28 @@
+﻿<UserControl x:Class="RootTools.GAFs.CEIDList_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RootTools.GAFs"
+             xmlns:tree="clr-namespace:RootTools.Trees"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <CheckBox x:Name="checkBoxSetup" Content="Setup" Margin="3" VerticalAlignment="Center" Click="CheckBoxSetup_Click"/>
+            <Button x:Name="buttonSave" Content="Save" Margin="3" Width="50" Click="ButtonSave_Click"/>
+        </StackPanel>
+        <tree:TreeUI Grid.Row="1" x:Name="treeUI" Margin="3" Visibility="Hidden"/>
+        <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding p_aCEID}" IsReadOnly="True" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Module" Binding="{Binding p_sModule}"/>
+                <DataGridTextColumn Header="Name" Binding="{Binding p_id}"/>
+                <DataGridTextColumn Header="CEID" Binding="{Binding p_nID}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

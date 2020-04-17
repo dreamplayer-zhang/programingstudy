@@ -1,0 +1,1325 @@
+﻿<UserControl x:Class="Root_Vega._8_1_Optic_MainVision"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:Tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
+             xmlns:Axis="clr-namespace:RootTools.Control.Ajin;assembly=RootTools"
+             mc:Ignorable="d"
+             d:DesignHeight="726"
+             d:DesignWidth="1602">
+    <UserControl.Resources>
+        <Converter:InverseBooleanConverter x:Key="InverseBooleanConverters" />
+        <Converter:AjinAxisToIAxis x:Key="AjinAxisToIAxiss" />
+        <Converter:DictionaryItemKeysConverter x:Key="DictionaryItemKeysConverters" />
+        <LinearGradientBrush x:Key="TabitemBackground"
+                             StartPoint="0,0"
+                             EndPoint="0,1">
+            <GradientStop Color="#FF3C3C3C"
+                          Offset="0" />
+            <GradientStop Color="#FF6E6E6E"
+                          Offset="1" />
+        </LinearGradientBrush>
+        <Converter:TabSizeConverter x:Key="tabSizeConverter" />
+        <Style TargetType="{x:Type TabItem}"
+               x:Key="SizeableTabItem">
+            <Setter Property="Background"
+                    Value="{StaticResource TabitemBackground}"></Setter>
+            <Setter Property="Width">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource tabSizeConverter}">
+                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
+                                AncestorType={x:Type TabControl}}" />
+                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
+                                AncestorType={x:Type TabControl}}"
+                                 Path="ActualWidth" />
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver"
+                         Value="True">
+                    <Setter Property="TextElement.Foreground">
+                        <Setter.Value>
+                            <SolidColorBrush Color="Black" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="Selector.IsSelected"
+                         Value="False">
+                    <Setter Property="Foreground"
+                            Value="White"></Setter>
+                    <Setter Property="TextElement.Foreground">
+                        <Setter.Value>
+                            <SolidColorBrush Color="White" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type TabControl}"
+               x:Key="GridTabControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid UseLayoutRounding="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="70" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="1"
+                                    Margin="0"
+                                    BorderThickness="2"
+                                    BorderBrush="{StaticResource BorderBrush}">
+                                <ContentPresenter ContentSource="SelectedContent" />
+                            </Border>
+                            <Border Grid.Row="0"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="2"
+                                    x:Name="Navi_panel">
+                                <Grid IsItemsHost="True"
+                                      Panel.ZIndex="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TabItem}"
+               x:Key="GridTabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Panel"
+                                Margin="10"
+                                BorderBrush="{StaticResource BorderBrush}">
+                            <TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontFamily="Arial"
+                                       FontWeight="Bold"
+                                       FontSize="25"
+                                       Name="tb">
+                                <ContentPresenter VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected"
+                                     Value="False">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabBackGround}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabMouseOver}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabSelected}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TabControl x:Name="CameraTab"
+                            Style="{StaticResource OpticPylonTab}">
+                    <TabItem Header="MainVision"
+                             DataContext="{Binding p_CamMain}"
+                             Style="{StaticResource OpticPylonTabItem}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="70"></RowDefinition>
+                                <RowDefinition Height="0"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Style="{StaticResource BasicBtn}"
+                                        Command="{Binding ConnectCommand}"
+                                        Margin="5">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <material:PackIcon Kind="LanConnect"
+                                                               Foreground="White"
+                                                               Width="30"
+                                                               Height="30"></material:PackIcon>
+                                            <TextBlock Text="Connect"
+                                                       Style="{StaticResource BasicTb}"></TextBlock>
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                                <Button Style="{StaticResource BasicBtn}"
+                                        Command="{Binding DisConnectCommand}"
+                                        Margin="5">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <material:PackIcon Kind="LanDisconnect"
+                                                               Foreground="White"
+                                                               Width="30"
+                                                               Height="30"></material:PackIcon>
+                                            <TextBlock Text="DisConnect"
+                                                       Style="{StaticResource BasicTb}"></TextBlock>
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                                <Button Style="{StaticResource BasicBtn}"
+                                        IsEnabled="False"
+                                        Margin="5">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <material:PackIcon Kind="CreditCard"
+                                                               Foreground="White"
+                                                               Width="30"
+                                                               Height="30"></material:PackIcon>
+                                            <TextBlock Text="One Shot"
+                                                       Style="{StaticResource BasicTb}"></TextBlock>
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                                <Button Style="{StaticResource BasicBtn}"
+                                        Margin="5">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <material:PackIcon Kind="CreditCardMultiple"
+                                                               Foreground="White"
+                                                               Width="30"
+                                                               Height="30"></material:PackIcon>
+                                            <TextBlock Text="Cont. Shot"
+                                                       Style="{StaticResource BasicTb}"></TextBlock>
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                                <Button Style="{StaticResource BasicBtn}"
+                                        Margin="5">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <material:PackIcon Kind="StopCircleOutline"
+                                                               Foreground="White"
+                                                               Width="30"
+                                                               Height="30"></material:PackIcon>
+                                            <TextBlock Text="Stop"
+                                                       Style="{StaticResource BasicTb}"></TextBlock>
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                            </StackPanel>
+                            <GridSplitter Grid.Row="2"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Center"
+                                          Background="{StaticResource BorderBrush}"
+                                          ShowsPreview="True"
+                                          Margin="0,-2,0,0"
+                                          Height="2" />
+                            <Grid Grid.Row="3">
+                                <tools:ImageViewer Height="{PriorityBinding}"
+                                                   Width="{PriorityBinding}"
+                                                   DataContext="{Binding p_ImageViewer}"
+                                                   Margin="20,10,20,10"></tools:ImageViewer>
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="VRS"
+                             Grid.Column="1"
+                             DataContext="{Binding p_CamVRS}"
+                             Style="{StaticResource OpticPylonTabItem}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="70"></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0"
+                                    BorderThickness="2"
+                                    BorderBrush="{StaticResource BorderBrush}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._OpenStatus, Converter={StaticResource InverseBooleanConverters}}"
+                                            Command="{Binding ConnectCommand}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="LanConnect"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="Connect"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._OpenStatus }"
+                                            Command="{Binding ConnectCommand}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="LanDisconnect"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="DisConnect"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="CreditCard"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="One Shot"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="CreditCardMultiple"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="Cont. Shot"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._IsCanGrab, Converter={StaticResource InverseBooleanConverters}}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="StopCircleOutline"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="Stop"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Row="2"
+                                    BorderThickness="2"
+                                    BorderBrush="{StaticResource BorderBrush}">
+                                <Grid>
+                                    <tools:ImageViewer Height="{PriorityBinding}"
+                                                       Width="{PriorityBinding}"
+                                                       DataContext="{Binding p_ImageViewer}"
+                                                       Margin="20,10,20,10"></tools:ImageViewer>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Align1"
+                             Grid.Column="2"
+                             DataContext="{Binding p_CamAlign1}"
+                             Style="{StaticResource OpticPylonTabItem}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="70"></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0"
+                                    BorderThickness="2"
+                                    BorderBrush="{StaticResource BorderBrush}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._OpenStatus, Converter={StaticResource InverseBooleanConverters}}"
+                                            Command="{Binding ConnectCommand}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="LanConnect"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="Connect"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._OpenStatus }"
+                                            Command="{Binding ConnectCommand}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="LanDisconnect"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="DisConnect"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="CreditCard"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="One Shot"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="CreditCardMultiple"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="Cont. Shot"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._IsCanGrab, Converter={StaticResource InverseBooleanConverters}}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="StopCircleOutline"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="Stop"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Row="2"
+                                    BorderThickness="2"
+                                    BorderBrush="{StaticResource BorderBrush}">
+                                <Grid>
+                                    <tools:ImageViewer Height="{PriorityBinding}"
+                                                       Width="{PriorityBinding}"
+                                                       DataContext="{Binding p_ImageViewer}"
+                                                       Margin="20,10,20,10"></tools:ImageViewer>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Align2"
+                             Grid.Column="3"
+                             DataContext="{Binding p_CamAlign2}"
+                             Style="{StaticResource OpticPylonTabItem}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="70"></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0"
+                                    BorderThickness="2"
+                                    BorderBrush="{StaticResource BorderBrush}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._OpenStatus, Converter={StaticResource InverseBooleanConverters}}"
+                                            Command="{Binding ConnectCommand}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="LanConnect"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="Connect"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._OpenStatus }"
+                                            Command="{Binding ConnectCommand}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="LanDisconnect"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="DisConnect"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="CreditCard"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="One Shot"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="CreditCardMultiple"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="Cont. Shot"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Style="{StaticResource BasicBtn}"
+                                            IsEnabled="{Binding p_CamInfo._IsCanGrab, Converter={StaticResource InverseBooleanConverters}}"
+                                            Margin="5">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Horizontal">
+                                                <material:PackIcon Kind="StopCircleOutline"
+                                                                   Foreground="White"
+                                                                   Width="30"
+                                                                   Height="30"></material:PackIcon>
+                                                <TextBlock Text="Stop"
+                                                           Style="{StaticResource BasicTb}"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Row="2"
+                                    BorderThickness="2"
+                                    BorderBrush="{StaticResource BorderBrush}">
+                                <Grid>
+                                    <tools:ImageViewer Height="{PriorityBinding}"
+                                                       Width="{PriorityBinding}"
+                                                       DataContext="{Binding p_ImageViewer}"
+                                                       Margin="20,10,20,10" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+            <TabControl  Style="{StaticResource OpticPylonTab}"
+                         Grid.Column="1">
+                <!--<TabItem Header="Motion"
+                         Grid.Column="1"
+                         Style="{StaticResource OpticPylonTabItem}">
+                    <TabControl>
+                        <TabItem Style ="{StaticResource SizeableTabItem}"
+                                 Header="Axis X">
+                            <Axis:AjinAxis_UI DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}" />
+                        </TabItem>
+                        <TabItem Style="{StaticResource SizeableTabItem}"
+                                 Header="Axis Y">
+                            <Axis:AjinAxis_UI></Axis:AjinAxis_UI>
+                        </TabItem>
+                        <TabItem Style="{StaticResource SizeableTabItem}"
+                                 Header="Axis Z">
+                            <Axis:AjinAxis_UI></Axis:AjinAxis_UI>
+                        </TabItem>
+                    </TabControl>
+                </TabItem>-->
+                <TabItem Header="Control"
+                         Grid.Column="2"
+                         Style="{StaticResource OpticPylonTabItem}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="4*" />
+                            <RowDefinition Height="7*" />
+                        </Grid.RowDefinitions>
+                        <GroupBox Header="조명"
+                                  Margin="10,0,10,10"
+                                  Foreground="{StaticResource BtnForeGround}"
+                                  FontSize="20">
+                            <StackPanel>
+                                <Grid Height="50" Margin="10,0,10,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="150"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            Value="{Binding p_LightMain}"
+                                            x:Name="slider1"></Slider>
+                                    <TextBlock Grid.Column="1"
+                                               Style="{StaticResource BasicTb}"
+                                               Text="{Binding ElementName=slider1, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="2"
+                                               Style="{StaticResource BasicTb}"
+                                               Text="Main Coax"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                                <Grid Height="50"
+                                      Margin="10,0,10,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="150"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            x:Name="Slider2"
+                                            Value="{Binding p_LightVRS}"></Slider>
+                                    <TextBlock Grid.Column="1"
+                                               Style="{StaticResource BasicTb}"
+                                               Text="{Binding ElementName=Slider2, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="2"
+                                               Style="{StaticResource BasicTb}"
+                                               Text="VRS"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                                <Grid Height="50"
+                                      Margin="10,0,10,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="150"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            x:Name="Slider3"
+                                            Value="{Binding p_LightAlign1}"></Slider>
+                                    <TextBlock Grid.Column="1"
+                                               Style="{StaticResource BasicTb}"
+                                               Text="{Binding ElementName=Slider3, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="2"
+                                               Style="{StaticResource BasicTb}"
+                                               Text="Align1"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                                <Grid Height="50"
+                                      Margin="10,0,10,0"> 
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="150"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            x:Name="Slider4"
+                                            Value="{Binding p_LightAlign2}"></Slider>
+                                    <TextBlock Grid.Column="1"
+                                               Style="{StaticResource BasicTb}"
+                                               Text="{Binding ElementName=Slider4, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="2"
+                                               Style="{StaticResource BasicTb}"
+                                               Text="Align2"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="40" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Canvas x:Name="Test">
+                                <Canvas.Background>
+                                    <VisualBrush TileMode="Tile"
+                                                 Viewport="0 0 30 30"
+                                                 ViewportUnits="Absolute"
+                                                 Viewbox="0 0 30 30"
+                                                 ViewboxUnits="Absolute">
+                                        <VisualBrush.Visual>
+                                            <Rectangle Width="30"
+                                                       Height="30"
+                                                       Stroke="Darkgray"
+                                                       StrokeThickness="1"
+                                                       StrokeDashArray="2 2" />
+                                        </VisualBrush.Visual>
+                                    </VisualBrush>
+                                </Canvas.Background>
+                                <Rectangle Fill="YellowGreen"
+                                           Opacity="0.2"
+                                           Canvas.Left="0"
+                                           Canvas.Top="135"
+                                           Height="70"
+                                           Width="{Binding ElementName=Test, Path=ActualWidth}"></Rectangle>
+                                <Rectangle Fill="White"
+                                           Opacity="0.5"
+                                           Canvas.Left="164"
+                                           Canvas.Top="147"
+                                           Height="50"
+                                           Width="50"></Rectangle>
+                                <material:PackIcon Kind="Camera"
+                                                   Foreground="White"
+                                                   Height="50"
+                                                   Width="50"
+                                                   Opacity="0.7"
+                                                   Canvas.Left="143"
+                                                   Canvas.Top="31"></material:PackIcon>
+                                <!--<Ellipse Fill="Black"
+                                         Opacity="0.3"
+                                         Canvas.Left="170"
+                                         Canvas.Top="135"
+                                         Height="50"
+                                         Width="50"></Ellipse>-->
+                            </Canvas>
+                            <Canvas Grid.Column="1"
+                                    x:Name="CanvasZ">
+                                <Rectangle Width="40"
+                                           Height="20"
+                                           Fill="HotPink"></Rectangle>
+                                <material:PackIcon Kind="Camera"
+                                                   Foreground="White"
+                                                   Canvas.Top="150"
+                                                   HorizontalAlignment="Center"
+                                                   Canvas.Left="5"
+                                                   Height="30"
+                                                   Width="30"></material:PackIcon>
+                            </Canvas>
+                            <Grid Grid.Column="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="80"></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Border BorderThickness="2"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        Margin="-0.1,0,0,-2">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <Button Grid.Column="0"
+                                                Margin="5"
+                                                Style="{StaticResource BasicBtn}">
+                                            <Button.Content>
+                                                <StackPanel Orientation="Vertical">
+                                                    <material:PackIcon Kind="Home"
+                                                                       Width="25"
+                                                                       HorizontalAlignment="Center"
+                                                                       Height="25"
+                                                                       Foreground="White"></material:PackIcon>
+                                                    <TextBlock Style="{StaticResource BasicTb}"
+                                                               Text="AllHome"
+                                                               FontSize="15"></TextBlock>
+                                                </StackPanel>
+                                            </Button.Content>
+                                        </Button>
+                                        <Button Grid.Column="1"
+                                                Margin="5"
+                                                Style="{StaticResource BasicBtn}">
+                                            <Button.Content>
+                                                <StackPanel Orientation="Vertical">
+                                                    <material:PackIcon Kind="StopCircleOutline"
+                                                                       Width="25"
+                                                                       HorizontalAlignment="Center"
+                                                                       Height="25"
+                                                                       Foreground="White"></material:PackIcon>
+                                                    <TextBlock Style="{StaticResource BasicTb}"
+                                                               Text="Stop"
+                                                               FontSize="15"></TextBlock>
+                                                </StackPanel>
+                                            </Button.Content>
+                                        </Button>
+                                        <Button Grid.Column="2"
+                                                Margin="5"
+                                                Style="{StaticResource BasicBtn}">
+                                            <Button.Content>
+                                                <StackPanel Orientation="Vertical">
+                                                    <material:PackIcon Kind="Camera"
+                                                                       Width="25"
+                                                                       HorizontalAlignment="Center"
+                                                                       Height="25"
+                                                                       Foreground="White"></material:PackIcon>
+                                                    <TextBlock Style="{StaticResource BasicTb}"
+                                                               Text="Scan"
+                                                               FontSize="15"></TextBlock>
+                                                </StackPanel>
+                                            </Button.Content>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                                <TabControl Grid.Row="1"
+                                            Style="{StaticResource OpticPylonTab}">
+                                    <TabItem Style="{StaticResource OpticPylonTabItem}"
+                                             Header="Move">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="2*"></RowDefinition>
+                                                <RowDefinition Height="2*"></RowDefinition>
+                                                <RowDefinition Height="4*"></RowDefinition>
+                                                <RowDefinition Height="4*"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                           FontSize="25"
+                                                           Text="Axis X"></TextBlock>
+                                                <TextBlock Grid.Column="1"
+                                                           Style="{StaticResource BasicTb}"
+                                                           FontSize="25"
+                                                           Text="Axis Y"></TextBlock>
+                                                <TextBlock Grid.Column="2"
+                                                           Style="{StaticResource BasicTb}"
+                                                           FontSize="25"
+                                                           Text="Axis Z"></TextBlock>
+                                            </Grid>
+                                            <Grid Grid.Row="1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                           DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                           Text="{Binding p_posActual}"
+                                                           FontSize="15" />
+                                                <TextBlock Grid.Column="1"
+                                                           Style="{StaticResource BasicTb}"
+                                                           DataContext="{Binding p_PatternVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                           Text="{Binding p_posActual}"
+                                                           FontSize="15" />
+                                                <TextBlock Grid.Column="2"
+                                                           Style="{StaticResource BasicTb}"
+                                                           DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                           Text="{Binding p_posActual}"
+                                                           FontSize="15" />
+                                            </Grid>
+                                            <Grid Grid.Row="2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <Button Grid.Column="1"
+                                                        Margin="5"
+                                                        Style="{StaticResource BasicBtn}">
+                                                    <Button.Content>
+                                                        <material:PackIcon Kind="ArrowUpBox"
+                                                                           Width="{PriorityBinding}"
+                                                                           Height="{PriorityBinding}"
+                                                                           Foreground="White"></material:PackIcon>
+                                                    </Button.Content>
+                                                </Button>
+                                                <Button Grid.Column="3"
+                                                        Margin="5"
+                                                        Style="{StaticResource BasicBtn}">
+                                                    <Button.Content>
+                                                        <material:PackIcon Kind="ArrowUpBox"
+                                                                           Width="{PriorityBinding}"
+                                                                           Height="{PriorityBinding}"
+                                                                           Foreground="Green"></material:PackIcon>
+                                                    </Button.Content>
+                                                </Button>
+                                            </Grid>
+                                            <Grid Grid.Row="3">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <Button Grid.Column="0"
+                                                        Margin="5"
+                                                        Style="{StaticResource BasicBtn}">
+                                                    <Button.Content>
+                                                        <material:PackIcon Kind="ArrowLeftBox"
+                                                                           Width="{PriorityBinding}"
+                                                                           Height="{PriorityBinding}"
+                                                                           Foreground="White"></material:PackIcon>
+                                                    </Button.Content>
+                                                </Button>
+                                                <Button Grid.Column="1"
+                                                        Margin="5"
+                                                        Style="{StaticResource BasicBtn}">
+                                                    <Button.Content>
+                                                        <material:PackIcon Kind="ArrowDownBox"
+                                                                           Width="{PriorityBinding}"
+                                                                           Height="{PriorityBinding}"
+                                                                           Foreground="White"></material:PackIcon>
+                                                    </Button.Content>
+                                                </Button>
+                                                <Button Grid.Column="2"
+                                                        Margin="5"
+                                                        Style="{StaticResource BasicBtn}">
+                                                    <Button.Content>
+                                                        <material:PackIcon Kind="ArrowRightBox"
+                                                                           Width="{PriorityBinding}"
+                                                                           Height="{PriorityBinding}"
+                                                                           Foreground="White"></material:PackIcon>
+                                                    </Button.Content>
+                                                </Button>
+                                                <Button Grid.Column="3"
+                                                        Margin="5"
+                                                        Style="{StaticResource BasicBtn}">
+                                                    <Button.Content>
+                                                        <material:PackIcon Kind="ArrowDownBox"
+                                                                           Width="{PriorityBinding}"
+                                                                           Height="{PriorityBinding}"
+                                                                           Foreground="Green"></material:PackIcon>
+                                                    </Button.Content>
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Grid.Column="1"
+                                             Style="{StaticResource OpticPylonTabItem}"
+                                             Header="Pos.">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="1*"></RowDefinition>
+                                                <RowDefinition Height="4*"></RowDefinition>
+                                                <RowDefinition Height="1*"></RowDefinition>
+                                                <RowDefinition Height="4*"></RowDefinition>
+                                                <RowDefinition Height="1*"></RowDefinition>
+                                                <RowDefinition Height="4*"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                           FontSize="20"
+                                                           Text="Axis X" />
+                                                <TextBlock  Grid.Column="1"
+                                                            Style="{StaticResource BasicTb}"
+                                                            FontSize="15"
+                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            Text="{Binding p_posActual}" />
+                                            </Grid>
+                                            <Grid Grid.Row="1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <ComboBox Margin="10"
+                                                          Grid.Column="0"
+                                                          SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
+                                                          ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                                <TextBlock  Grid.Column="1"
+                                                            Style="{StaticResource BasicTb}"
+                                                            FontSize="15"
+                                                            Text="1010101010" />
+                                                <Button Grid.Column="2"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="ArrowRightBox"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="30"
+                                                                               Height="30"></material:PackIcon>
+                                                            <TextBlock Text="Move"
+                                                                       Style="{StaticResource BasicTb}"></TextBlock>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                                <Button Grid.Column="3"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="File"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="30"
+                                                                               Height="30"></material:PackIcon>
+                                                            <TextBlock Text="Save"
+                                                                       Style="{StaticResource BasicTb}"></TextBlock>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                            </Grid>
+                                            <Grid Grid.Row="2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                           FontSize="20"
+                                                           Text="Axis Y" />
+                                                <TextBlock  Grid.Column="1"
+                                                            Style="{StaticResource BasicTb}"
+                                                            FontSize="15"
+                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            Text="{Binding p_posActual}" />
+                                            </Grid>
+                                            <Grid Grid.Row="3">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <ComboBox Margin="10"
+                                                          Grid.Column="0"
+                                                          SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
+                                                          ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                                <TextBlock  Grid.Column="1"
+                                                            Style="{StaticResource BasicTb}"
+                                                            FontSize="15"
+                                                            Text="1010101010" />
+                                                <Button Grid.Column="2"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="ArrowRightBox"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="30"
+                                                                               Height="30"></material:PackIcon>
+                                                            <TextBlock Text="Move"
+                                                                       Style="{StaticResource BasicTb}"></TextBlock>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                                <Button Grid.Column="3"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="File"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="30"
+                                                                               Height="30"></material:PackIcon>
+                                                            <TextBlock Text="Save"
+                                                                       Style="{StaticResource BasicTb}"></TextBlock>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                            </Grid>
+                                            <Grid Grid.Row="4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                           FontSize="20"
+                                                           Text="Axis Z" />
+                                                <TextBlock  Grid.Column="1"
+                                                            Style="{StaticResource BasicTb}"
+                                                            FontSize="15"
+                                                            DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            Text="{Binding p_posActual}" />
+                                            </Grid>
+                                            <Grid Grid.Row="5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <ComboBox Margin="10"
+                                                          Grid.Column="0"
+                                                          SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
+                                                          ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                                <TextBlock  Grid.Column="1"
+                                                            Style="{StaticResource BasicTb}"
+                                                            FontSize="15"
+                                                            Text="1010101010" />
+                                                <Button Grid.Column="2"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="ArrowRightBox"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="30"
+                                                                               Height="30"></material:PackIcon>
+                                                            <TextBlock Text="Move"
+                                                                       Style="{StaticResource BasicTb}"></TextBlock>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                                <Button Grid.Column="3"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="File"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="30"
+                                                                               Height="30"></material:PackIcon>
+                                                            <TextBlock Text="Save"
+                                                                       Style="{StaticResource BasicTb}"></TextBlock>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Grid.Column="2"
+                                             Style="{StaticResource OpticPylonTabItem}"
+                                             Header="Rel.">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="1*"></RowDefinition>
+                                                <RowDefinition Height="4*"></RowDefinition>
+                                                <RowDefinition Height="1*"></RowDefinition>
+                                                <RowDefinition Height="4*"></RowDefinition>
+                                                <RowDefinition Height="1*"></RowDefinition>
+                                                <RowDefinition Height="4*"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                           FontSize="20"
+                                                           Text="Axis X" />
+                                                <TextBlock  Grid.Column="1"
+                                                            Style="{StaticResource BasicTb}"
+                                                            FontSize="15"
+                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            Text="{Binding p_posActual}" />
+                                            </Grid>
+                                            <Grid Grid.Row="1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <Button Grid.Column="0"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="ArrowLeftBox"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="50"
+                                                                               Height="50"></material:PackIcon>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                                <Border Grid.Column="1">
+                                                    <TextBox VerticalAlignment="Center"
+                                                             Background="{PriorityBinding}"
+                                                             Text="111111"
+                                                             Foreground="White"
+                                                             HorizontalAlignment="Center"
+                                                             FontSize="20" />
+                                                </Border>
+                                                <Button Grid.Column="2"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="ArrowRightBox"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="50"
+                                                                               Height="50"></material:PackIcon>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                            </Grid>
+                                            <Grid Grid.Row="2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                           FontSize="20"
+                                                           Text="Axis Y" />
+                                                <TextBlock  Grid.Column="1"
+                                                            Style="{StaticResource BasicTb}"
+                                                            FontSize="15"
+                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            Text="{Binding p_posActual}" />
+                                            </Grid>
+                                            <Grid Grid.Row="3">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <Button Grid.Column="0"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="ArrowLeftBox"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="50"
+                                                                               Height="50"></material:PackIcon>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                                <Border Grid.Column="1">
+                                                    <TextBox VerticalAlignment="Center"
+                                                             Background="{PriorityBinding}"
+                                                             Text="111111"
+                                                             Foreground="White"
+                                                             HorizontalAlignment="Center"
+                                                             FontSize="20" />
+                                                </Border>
+                                                <Button Grid.Column="2"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="ArrowRightBox"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="50"
+                                                                               Height="50"></material:PackIcon>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                            </Grid>
+                                            <Grid Grid.Row="4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                           FontSize="20"
+                                                           Text="Axis Z" />
+                                                <TextBlock  Grid.Column="1"
+                                                            Style="{StaticResource BasicTb}"
+                                                            FontSize="15"
+                                                            DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            Text="{Binding p_posActual}" />
+                                            </Grid>
+                                            <Grid Grid.Row="5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                    <ColumnDefinition></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <Button Grid.Column="0"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="ArrowLeftBox"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="50"
+                                                                               Height="50"></material:PackIcon>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                                <Border Grid.Column="1">
+                                                    <TextBox VerticalAlignment="Center"
+                                                             Background="{PriorityBinding}"
+                                                             Text="111111"
+                                                             Foreground="White"
+                                                             HorizontalAlignment="Center"
+                                                             FontSize="20" />
+                                                </Border>
+                                                <Button Grid.Column="2"
+                                                        Style="{StaticResource BasicBtn}"
+                                                        Margin="5">
+                                                    <Button.Content>
+                                                        <StackPanel Orientation="Vertical">
+                                                            <material:PackIcon Kind="ArrowRightBox"
+                                                                               Foreground="White"
+                                                                               HorizontalAlignment="Center"
+                                                                               Width="50"
+                                                                               Height="50"></material:PackIcon>
+                                                        </StackPanel>
+                                                    </Button.Content>
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </TabItem>
+                                </TabControl>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Camera Setting"
+                         Grid.Column="3"
+                         DataContext="{Binding ElementName=CameraTab, Path=SelectedItem.DataContext}"
+                         Style="{StaticResource OpticPylonTabItem}">
+                    <Tree:TreeUI  Grid.Row="1"
+                                  Background="White"
+                                  DataContext="{Binding p_treeRoot}"></Tree:TreeUI>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Grid>
+</UserControl>

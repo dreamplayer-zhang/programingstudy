@@ -1,0 +1,265 @@
+﻿<UserControl x:Class="Root_Vega._7_Alarm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="756" d:DesignWidth="1876">
+    <UserControl.Resources>
+        <DataTemplate x:Key="test">
+            <TextBlock Text="{Binding}" Foreground="White" Margin="3,0,0,0"/>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="87*"/>
+            <ColumnDefinition Width="13*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="7*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="15,15,15,7.5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="16*"/>
+                    <ColumnDefinition Width="28*"/>
+                    <ColumnDefinition Width="28*"/>
+                    <ColumnDefinition Width="28*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" 
+                        Margin="0,0,15,0"
+                        BorderThickness="3"
+                        BorderBrush="{StaticResource BorderBrush}">
+                    <Viewbox Margin="5">
+                        <Calendar DisplayMode="Month"
+                                      SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Viewbox>
+                </Border>
+                <Border Grid.Column="1"
+                        BorderThickness="3"
+                        Margin="0,0,7.5,0"
+                        BorderBrush="{StaticResource BorderBrush}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="12*"/>
+                            <RowDefinition Height="88*"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Background="{StaticResource TitleBackGround}"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="0,0,0,3">
+                            <TextBlock Text="Summary"
+                                       Style="{StaticResource BasicTb}"
+                                       TextAlignment="Left"
+                                       Margin="5,0,0,0"
+                                       FontWeight="Bold"/>
+                        </Border>
+                        <Grid Grid.Row="1" Margin="30">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="UPTIME"
+                                       Style="{StaticResource BasicTb}"
+                                       FontWeight="Bold"
+                                       FontSize="30"/>
+                            <TextBlock Text="DOWNTIME" Grid.Row="1"
+                                       Style="{StaticResource BasicTb}"
+                                       FontWeight="Bold"
+                                       FontSize="20"/>
+                            <TextBlock Text="{Binding Uptime}" Grid.Column="1"
+                                       Style="{StaticResource BasicTb}"
+                                       FontWeight="Bold"
+                                       FontSize="30"/>
+                            <TextBlock Text="{Binding Downtime}" Grid.Column="1" Grid.Row="1"
+                                       Style="{StaticResource BasicTb}"
+                                       FontWeight="Bold"
+                                       FontSize="20"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border Grid.Column="2"
+                        BorderThickness="3"
+                        Margin="7.5,0,7.5,0"
+                        BorderBrush="{StaticResource BorderBrush}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="12*"/>
+                            <RowDefinition Height="88*"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Background="{StaticResource TitleBackGround}"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="0,0,0,3">
+                            <TextBlock Text="Alarm Info"
+                                       Style="{StaticResource BasicTb}"
+                                       TextAlignment="Left"
+                                       Margin="5,0,0,0"
+                                       FontWeight="Bold"/>
+                        </Border>
+                        <Grid Grid.Row="1" Margin="30">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="Most Often"
+                                       Style="{StaticResource BasicTb}"
+                                       FontWeight="Bold"
+                                       FontSize="30"/>
+                            <TextBlock Text="Alarm Count" Grid.Row="1"
+                                       Style="{StaticResource BasicTb}"
+                                       FontWeight="Bold"
+                                       FontSize="20"/>
+                            <TextBlock Text="{Binding MostOften}" Grid.Column="1"
+                                       Style="{StaticResource BasicTb}"
+                                       TextAlignment="Center"
+                                       FontWeight="Bold"
+                                       FontSize="30"/>
+                            <TextBlock Text="{Binding AlarmCount}" Grid.Column="1" Grid.Row="1"
+                                       Style="{StaticResource BasicTb}"
+                                       TextAlignment="Center"
+                                       FontWeight="Bold"
+                                       FontSize="20"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border Grid.Column="3"
+                        BorderThickness="3"
+                        Margin="7.5,0,0,0"
+                        BorderBrush="{StaticResource BorderBrush}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="12*"/>
+                            <RowDefinition Height="88*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Border Background="{StaticResource TitleBackGround}"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="0,0,0,3">
+                            <TextBlock Text="Operating Rate"
+                                       Style="{StaticResource BasicTb}"
+                                       TextAlignment="Left"
+                                       Margin="5,0,0,0"
+                                       FontWeight="Bold"/>
+                        </Border>
+                        <Grid Grid.Row="1">
+                            <TextBlock Text="{Binding StrRate}"
+                                       Style="{StaticResource BasicTb}"
+                                       VerticalAlignment="Top"
+                                       HorizontalAlignment="Right"
+                                       Margin="0,20,20,0"
+                                       FontWeight="Black"
+                                       FontSize="40"/>
+                        <lvc:Gauge Margin="15,25,170,15"
+                                   From="0" To="100"
+                                   InnerRadius="50"
+                                   LabelsVisibility="Hidden"
+                                   Foreground="Transparent"
+                                   LabelFormatter="{Binding GaugeFormatter}"
+                                   HighFontSize="40"
+                                   GaugeActiveFill="#FF3399FF"
+                                   Value="{Binding OperatingRate}">
+                        </lvc:Gauge>
+                        </Grid>
+                    </Grid>
+                    
+                </Border>
+                
+                
+            </Grid>
+            <Grid Grid.Row="1" Margin="15,7.5,15,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="7*"/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0"
+                        Margin="0,0,15,0"
+                        BorderBrush="Gray"
+                        BorderThickness="3">
+                    <ListView Margin="-2"
+                              Foreground="{StaticResource TextForeGround}"
+                              ItemsSource="{Binding AlarmDatas}"
+                              Background="Transparent">
+                        <ListView.View>
+                            <GridView ColumnHeaderContainerStyle="{StaticResource ResourceKey=BasicGridViewColumn}">
+                                <GridViewColumn Header="Date" Width="Auto" 
+                                                DisplayMemberBinding="{Binding m_sDate}"
+                                                HeaderTemplate="{StaticResource test}"/>
+                                <GridViewColumn Header="Code" Width="Auto"
+                                                DisplayMemberBinding="{Binding m_sCode}"
+                                                HeaderTemplate="{StaticResource test}"/>
+                                <GridViewColumn Header="State" Width="Auto"
+                                                DisplayMemberBinding="{Binding m_sState}"
+                                                HeaderTemplate="{StaticResource test}"/>
+                                <GridViewColumn Header="Alarm Name" Width="Auto"
+                                                DisplayMemberBinding="{Binding m_sAlarmName}"
+                                                HeaderTemplate="{StaticResource test}"/>
+                                <GridViewColumn Header="Class" Width="Auto"
+                                                DisplayMemberBinding="{Binding m_sClassName}"
+                                                HeaderTemplate="{StaticResource test}"/>
+
+
+
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Border>
+                <Border Grid.Column="1"
+                        BorderBrush="{StaticResource BorderBrush}" BorderThickness="3">
+                    <lvc:CartesianChart LegendLocation="Left"
+                                        Foreground="{StaticResource TextForeGround}"
+                                        DisableAnimations="True"
+                                        Series="{Binding Series}">
+                        <lvc:CartesianChart.DataTooltip>
+                            <lvc:DefaultTooltip SelectionMode="OnlySender"/>
+                        </lvc:CartesianChart.DataTooltip>
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis MinValue="{Binding Min}"
+                                  MaxValue="{Binding Max}"
+                                  Title="{Binding SelectedDate.DayOfWeek}"
+                                  
+                                  FontWeight="Bold"  
+                                  LabelFormatter="{Binding Formatter}">
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator Step="{Binding Step}"
+                                               StrokeThickness="1"
+                                               Stroke="Gray"
+                                               StrokeDashArray="5"/>
+                                </lvc:Axis.Separator>
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis ShowLabels="False">
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator StrokeThickness="0"/>
+                                </lvc:Axis.Separator>
+                            </lvc:Axis>
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <StackPanel Grid.Column="1" Margin="0,45,15,15">
+            <Button Content="Test1"
+                    Style="{StaticResource BasicBtn}"
+                    Margin="0,0,0,10"/>
+            <Button Content="Test2"
+                    Style="{StaticResource BasicBtn}"
+                    Margin="0,0,0,10"
+                    />
+        </StackPanel>
+    </Grid>
+</UserControl>

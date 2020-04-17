@@ -1,0 +1,71 @@
+﻿using System.Collections.Generic;
+using System.Windows.Controls;
+
+namespace RootTools.Camera
+{
+    public class CameraSet : ITool
+    {
+        public delegate void dgOnChangeTool();
+        public event dgOnChangeTool OnChangeTool;
+
+        #region List Camera
+        public List<ICamera> m_aCamera = new List<ICamera>(); 
+        public List<string> p_asCamera
+        {
+            get
+            {
+                List<string> asCamera = new List<string>();
+                foreach (ICamera camera in m_aCamera) asCamera.Add(camera.p_id);
+                return asCamera; 
+            }
+        }
+
+        public void Add(ICamera camera)
+        {
+            ICamera cam = Get(camera.p_id);
+            if (cam != null) return;
+            m_aCamera.Add(camera);
+            m_toolSetCamera.Add(camera); 
+            if (OnChangeTool != null) OnChangeTool(); 
+        }
+
+        public ICamera Get(string id)
+        {
+            foreach (ICamera camera in m_aCamera)
+            {
+                if (camera.p_id.Contains(id)) return camera;
+            }
+            return null;
+        }
+        #endregion
+
+        #region UI
+        public UserControl p_ui
+        {
+            get
+            {
+                CameraSet_UI ui = new CameraSet_UI();
+                ui.Init(this);
+                return (UserControl)ui;
+            }
+        }
+        #endregion
+
+        public string p_id { get { return m_id; } }
+        string m_id;
+        public string m_sModule; 
+        ToolSetCamera m_toolSetCamera;
+        LogWriter m_log; 
+        public CameraSet(ToolSetCamera toolSetCamera, string sModule, LogWriter log)
+        {
+            m_id = "Camera";
+            m_sModule = sModule; 
+            m_toolSetCamera = toolSetCamera;
+            m_log = log;
+        }
+
+        public void ThreadStop()
+        {
+        }
+    }
+}

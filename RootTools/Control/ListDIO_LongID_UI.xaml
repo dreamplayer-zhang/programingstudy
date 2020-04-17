@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="RootTools.Control.ListDIO_LongID_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RootTools.Control"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <ListView x:Name="listView" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListView.View>
+            <GridView>
+                <GridViewColumn Header="{Binding p_sHeader}">
+                    <GridViewColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding p_sLongID}" Foreground="{Binding p_bColor}" PreviewMouseUp="TextBlock_PreviewMouseUp"/>
+                        </DataTemplate>
+                    </GridViewColumn.CellTemplate>
+                </GridViewColumn>
+            </GridView>
+        </ListView.View>
+    </ListView>
+</UserControl>

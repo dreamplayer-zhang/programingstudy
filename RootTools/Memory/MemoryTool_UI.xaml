@@ -1,0 +1,107 @@
+﻿<UserControl x:Class="RootTools.Memory.MemoryTool_UI"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:RootTools.Memory" 
+        xmlns:tool="clr-namespace:RootTools" 
+        xmlns:tree="clr-namespace:RootTools.Trees"
+        xmlns:comm="clr-namespace:RootTools.Comm"
+        mc:Ignorable="d" d:DesignHeight="450"
+        d:DesignWidth="800">
+    <UserControl.Resources>
+        <local:TestConverter x:Key="TestConverters"></local:TestConverter>
+        <local:TestConverter2 x:Key="TestConverter2s"></local:TestConverter2>
+    </UserControl.Resources>
+    <Grid>
+        <TabControl x:Name="tabControlTool">
+            <TabItem Header="Memory Pool">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"></RowDefinition>
+                        <RowDefinition Height="40"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <TextBlock VerticalAlignment="Center" x:Name="tbText">
+                        <Run Text="MMF 사용가능 " />
+                        <Run Text="{Binding Path=p_fAvailPageFile, StringFormat=F3}" />
+                        <Run Text=" GB /" />
+                        <Run Text="{Binding Path=p_fTotalPageFile , StringFormat=F3}" />
+                        <Run Text=" GB" /></TextBlock>
+                    <Border Grid.Row="1" BorderThickness="1" BorderBrush="#FF877CC9">
+                        <WrapPanel Panel.ZIndex="0" Background="#FFDEE8E1">
+                            <Rectangle Height="40" Fill="#FFE6888B" ToolTip="System"
+                                    Stroke="#FF877CC9">
+                                <Rectangle.Width>
+                                    <MultiBinding Converter='{StaticResource TestConverter2s }'>
+                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor, 
+                                                AncestorType={x:Type WrapPanel}}" Path="ActualWidth" />
+                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
+                                                AncestorType={x:Type UserControl}}" />
+                                    </MultiBinding>
+                                </Rectangle.Width>
+                            </Rectangle>
+                            <ItemsControl ItemsSource="{Binding p_aPool}" Panel.ZIndex="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Background="#FFDEE8E1" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Rectangle Height="40" Fill="#FF88DBA3" Stroke="#FF877CC9"
+                                                StrokeThickness="1">
+                                            <Rectangle.ToolTip>
+                                                <TextBlock >
+                                                    <Run Text="{Binding p_id}"></Run>
+                                                    <Run Text="("></Run>
+                                                    <Run Text="{Binding p_gbPool}" ></Run>
+                                                    <Run Text="GB)"></Run></TextBlock>
+                                            </Rectangle.ToolTip>
+                                            <Rectangle.Width>
+                                                <MultiBinding
+                                                        Converter='{StaticResource TestConverters }'>
+                                                    <Binding Path="p_gbPool"></Binding>
+                                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, 
+                                                AncestorType={x:Type Grid}}" Path="ActualWidth" />
+                                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
+                                                AncestorType={x:Type UserControl}}" />
+                                                </MultiBinding>
+                                            </Rectangle.Width>
+                                        </Rectangle>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </WrapPanel>
+                    </Border>
+                    <!--<Rectangle Grid.Row="1"
+                               Fill="LightGray"></Rectangle>
+                    <Rectangle Grid.Row="1" Fill="Lime" Width="100" Panel.ZIndex="2"
+                            HorizontalAlignment="Left"></Rectangle>
+                    <TextBlock Text="Pool 3GB" Grid.Row="1" Panel.ZIndex="10" VerticalAlignment="Center"></TextBlock>-->
+                    <TabControl Grid.Row="2" x:Name="tabControlPool" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Run">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <Button x:Name="buttonRun" Content="{Binding p_eRun}" Width="100" Margin="3"
+                                Click="ButtonRun_Click" />
+                        <TextBlock Text="{Binding p_sInfo}" Margin="3" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="NamedPipe">
+                <comm:NamedPipe_UI x:Name="namedPipeUI" />
+            </TabItem>
+            <TabItem Header="Setup" Visibility="Hidden">
+                <tree:TreeUI x:Name="treeRootSetupUI" />
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

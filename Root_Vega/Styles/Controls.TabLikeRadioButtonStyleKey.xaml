@@ -1,0 +1,82 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<Style x:Key="TabLikeRadioButtonStyleKey"
+				   TargetType="{x:Type RadioButton}">
+		<Setter Property="OverridesDefaultStyle"
+						Value="True" />
+		<Setter Property="Background"
+						Value="{DynamicResource SemiactiveBackgroundBrushKey}" />
+		<Setter Property="Foreground"
+						Value="{DynamicResource ForegroundBrushKey}" />
+		<Setter Property="FontFamily"
+						Value="Segoe UI Light" />
+		<Setter Property="Margin"
+						Value="0,0,0,15" />
+		<Setter Property="FocusVisualStyle"
+						Value="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="{x:Type RadioButton}">
+					<Grid Background="Transparent"
+								  SnapsToDevicePixels="True">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+						<Rectangle Grid.Row="0"
+										   Fill="{TemplateBinding Background}" />
+						<Path x:Name="Arrow"
+									  Grid.Column="1"
+									  Data="M 0,0 0,10 30,5 z"
+									  Width="20"
+									  Fill="{TemplateBinding Background}"
+									  Stretch="Fill" />
+						<ContentPresenter Grid.Column="0"
+												  Margin="15,8,10,8"
+												  Focusable="False"
+												  RecognizesAccessKey="True"
+												  TextElement.FontFamily="{TemplateBinding FontFamily}" />
+					</Grid>
+					<ControlTemplate.Triggers>
+						<MultiTrigger>
+							<MultiTrigger.Conditions>
+								<Condition Property="IsChecked"
+												   Value="False" />
+								<Condition Property="IsMouseOver"
+												   Value="False" />
+								<Condition Property="IsPressed"
+												   Value="False" />
+							</MultiTrigger.Conditions>
+							<Setter TargetName="Arrow"
+											Property="Visibility"
+											Value="Hidden" />
+						</MultiTrigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+		<Style.Triggers>
+			<Trigger Property="IsMouseOver"
+							 Value="True">
+				<Setter Property="Background"
+								Value="{DynamicResource ActiveBackgroundBrushKey}" />
+				<Setter Property="TextElement.Foreground"
+								Value="{DynamicResource ActiveForegroundBrushKey}" />
+			</Trigger>
+			<Trigger Property="IsPressed"
+							 Value="True">
+				<Setter Property="Background"
+								Value="{DynamicResource AccentHighlightBrushKey}" />
+				<Setter Property="TextElement.Foreground"
+								Value="{DynamicResource AccentForegroundBrushKey}" />
+			</Trigger>
+			<Trigger Property="IsChecked"
+							 Value="True">
+				<Setter Property="Background"
+								Value="{DynamicResource AccentBrushKey}" />
+				<Setter Property="TextElement.Foreground"
+								Value="{DynamicResource AccentForegroundBrushKey}" />
+			</Trigger>
+		</Style.Triggers>
+	</Style>
+</ResourceDictionary>

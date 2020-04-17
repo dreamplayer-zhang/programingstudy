@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="Root.Root_Engineer_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+             xmlns:toolBox="clr-namespace:RootTools.ToolBoxs;assembly=RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <tools:Login_UI x:Name="loginUI"/>
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <local:Root_Handler_UI Grid.Column="0" x:Name="handlerUI" Margin="2"/>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+            <toolBox:ToolBox_UI Grid.Column="2" x:Name="toolBoxUI" Margin="2"/>
+            <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+            <tools:UI_LogView Grid.Column="4" x:Name="logViewUI" Margin="2"/>
+        </Grid>
+    </Grid>
+</UserControl>

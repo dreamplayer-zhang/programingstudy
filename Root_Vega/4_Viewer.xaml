@@ -1,0 +1,320 @@
+﻿<UserControl x:Class="Root_Vega._4_Viewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"            
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
+             xmlns:mouse="clr-namespace:mousebehavior;assembly=RootTools"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             mc:Ignorable="d"
+             d:DesignHeight="756"
+             d:DesignWidth="1876"
+             Background="#FF2D2D30">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="87*" />
+            <ColumnDefinition Width="13*" />
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10*" />
+                <ColumnDefinition Width="90*" />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0"
+                      Margin="15,15,0,15">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="0"
+                                Background="{StaticResource TitleBackGround}"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="3,3,3,3">
+                        <TextBlock Text="Pool ID"
+                                   FontWeight="Bold"
+                                   Style="{StaticResource BasicTb}"
+                                   FontSize="15" />
+                    </Border>
+                    <Border Grid.Row="1"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="3,0,3,3"
+                            DataContext="{Binding p_MemoryModule}">
+                        <ListBox HorizontalContentAlignment="Stretch"
+                                 Background="{PriorityBinding}"
+                                 SelectedItem="{Binding Path = DataContext.p_SelectedMemPool, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                                 ItemsSource="{Binding p_aPool}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="0"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border x:Name="ItemBorder"
+                                            Background="{StaticResource BtnBackGround}"
+                                            BorderBrush="{StaticResource BorderBrush}"
+                                            BorderThickness="1"
+                                            HorizontalAlignment="Stretch">
+                                        <Label Content="{Binding p_id}"
+                                               Style="{StaticResource BasicLabel}"/>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver"
+                                                     Value="true">
+                                            <Setter TargetName="ItemBorder"
+                                                    Property="Background"
+                                                    Value="{StaticResource ResourceKey=BackGround}"/>
+                                        </Trigger>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}"
+                                                     Value="True">
+                                            <Setter TargetName="ItemBorder"
+                                                    Property="Background"
+                                                    Value="{StaticResource ResourceKey=Blue}"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource TitleBackGround}"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="3,0,3,3">
+                        <TextBlock Text="Group ID"
+                                   FontWeight="Bold"
+                                   Style="{StaticResource BasicTb}"
+                                   FontSize="15" />
+                    </Border>
+                    <Border Grid.Row="1"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="3,0,3,3"
+                                DataContext="{Binding p_SelectedMemPool, Mode=TwoWay}">
+                        <ListBox HorizontalContentAlignment="Stretch"
+                                 Background="{PriorityBinding}"
+                                 SelectedItem="{Binding Path = DataContext.p_SelectedMemGroup, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                                 ItemsSource="{Binding p_aGroup}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="0"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border x:Name="ItemBorder"
+                                            Background="{StaticResource BtnBackGround}"
+                                            BorderBrush="{StaticResource BorderBrush}"
+                                            BorderThickness="1"
+                                            HorizontalAlignment="Stretch">
+                                        <Label Content="{Binding p_id}"
+                                               Style="{StaticResource BasicLabel}"/>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver"
+                                                     Value="true">
+                                            <Setter TargetName="ItemBorder"
+                                                    Property="Background"
+                                                    Value="{StaticResource ResourceKey=BtnMouseOver}"/>
+                                        </Trigger>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}"
+                                                     Value="True">
+                                            <Setter TargetName="ItemBorder"
+                                                    Property="Background"
+                                                    Value="{StaticResource ResourceKey=Blue}"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource TitleBackGround}"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="3,0,3,3">
+                        <TextBlock Text="Memory ID"
+                                   FontWeight="Bold"
+                                   Style="{StaticResource BasicTb}"
+                                   FontSize="15" />
+                    </Border>
+                    <Border Grid.Row="1"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                BorderThickness="3,0,3,3"
+                                DataContext="{Binding p_SelectedMemGroup, Mode=TwoWay}">
+                        <ListBox HorizontalContentAlignment="Stretch"
+                                     Background="{PriorityBinding}"
+                                     SelectedItem="{Binding Path = DataContext.p_SelectedMemData, Mode=TwoWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                                     ItemsSource="{Binding p_aMemory}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDoubleClick">
+                                    <i:InvokeCommandAction Command="{Binding Path = DataContext.CommandMemorySelect, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="0"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border x:Name="ItemBorder"
+                                            Background="{StaticResource BtnBackGround}"
+                                            BorderBrush="{StaticResource BorderBrush}"
+                                            BorderThickness="1"
+                                            HorizontalAlignment="Stretch">
+                                        <Label Content="{Binding p_id}"
+                                               Style="{StaticResource BasicLabel}"/>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver"
+                                                     Value="true">
+                                            <Setter TargetName="ItemBorder"
+                                                    Property="Background"
+                                                    Value="{StaticResource ResourceKey=BackGround}"/>
+                                        </Trigger>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}"
+                                                     Value="True">
+                                            <Setter TargetName="ItemBorder"
+                                                    Property="Background"
+                                                    Value="{StaticResource ResourceKey=Blue}"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+                </Grid>
+            </Grid>
+            <Border Grid.Column="1"
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="3"
+                    Margin="15">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="85*"/>
+                        <ColumnDefinition Width="15*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0"
+                      Margin="15"
+                      Background="Black">
+                        <tools:ImageViewer DataContext="{Binding p_ImageViewer}"
+                                       Width="{PriorityBinding}"
+                                       Height="{PriorityBinding}" />
+                    </Grid>
+                    <Grid Grid.Column="1"
+                      Margin="0,15,15,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="200" ></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Canvas Grid.Row="0"
+                            Focusable="True"
+                            obs:SizeObserver.Observe="true"
+                            obs:SizeObserver.ObservedWidth="{Binding p_ImageViewer.p_ThumbWidth, Mode=OneWayToSource}"
+                            obs:SizeObserver.ObservedHeight="{Binding p_ImageViewer.p_ThumbHeight, Mode=OneWayToSource}"
+                            Background="Black">
+                            <Image Source="{Binding Path= p_ImageViewer.p_ThumNailImgSource}" />
+                            <Rectangle Margin="{Binding Path = p_ImageViewer.p_TumbnailImgMargin}"
+                                   Width="{Binding p_ImageViewer.p_TumbnailImg_Rect.Width}"
+                                   Height="{Binding p_ImageViewer.p_TumbnailImg_Rect.Height}"
+                                   Stroke="Blue"
+                                   StrokeThickness="4" />
+                            <i:Interaction.Behaviors>
+                                <mouse:MouseBehaviour MouseEvent="{Binding MouseEvent, Mode=OneWayToSource}" />
+                                <mouse:MouseBehaviour MouseX="{Binding p_ImageViewer.p_TumbMouseX, Mode=OneWayToSource}"
+                                                  MouseY="{Binding p_ImageViewer.p_TumbMouseY, Mode=OneWayToSource}" />
+                            </i:Interaction.Behaviors>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding p_ImageViewer.TumbNailMouseLeftDown}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseMove">
+                                    <i:InvokeCommandAction Command="{Binding p_ImageViewer.TumbNailMouseMove}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeave">
+                                    <i:InvokeCommandAction Command="{Binding p_ImageViewer.TumbNailMouseLeave}" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding p_ImageViewer.TumbNailMouseLeftUp}" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                    </Grid>
+                </Grid>
+            </Border>
+
+        </Grid>
+        <StackPanel Grid.Column="1"
+                    Margin="0,45,15,15">
+            <Button Content="Image Load"
+                    Style="{StaticResource BasicBtn}"
+                    Margin="0,0,0,10"
+                    Command="{Binding p_ImageViewer.btnClickOpenImage}" />
+            <Button Content="Image Save"
+                    Style="{StaticResource BasicBtn}"
+                    Command="{Binding p_ImageViewer.btnClickSaveImage}" 
+                    Margin="0,0,0,10"/>
+            <Button Content="Image Clear" 
+                    Style="{StaticResource BasicBtn}"
+                    Margin="0,0,0,10"
+                    Command="{Binding p_ImageViewer.CommandImageClear}"/>
+            <Button Content="Home"
+                    Style="{StaticResource BasicBtn}"
+                    Margin="0,0,0,10"
+                    Command="{Binding CommandVisionHome}" />
+            <Button Content="Scan"
+                    Style="{StaticResource BasicBtn}"
+                    Margin="0,0,0,10"
+                    Command="{Binding CommandScan}" />
+            <Button Content="Inspection"
+                    Style="{StaticResource BasicBtn}"
+                    Margin="0,0,0,10"
+                    Command="{Binding CommandInspection}" />
+            <Button Content="Stop"
+                    Style="{StaticResource BasicBtn}"
+                    Margin="0,0,0,10"
+                    Command="{Binding CommandStop}" />
+            <Button Content="Manual Align"
+                    Style="{StaticResource BasicBtn}"
+                    Margin="0,0,0,10"
+                    Command="{Binding CommandManualAlign}"/>
+            <Button Content="Test"
+                    Style="{StaticResource BasicBtn}"
+                    Margin="0,0,0,10"
+                    Command="{Binding CommandTest}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

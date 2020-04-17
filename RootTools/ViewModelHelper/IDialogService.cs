@@ -1,0 +1,11 @@
+﻿using System;
+namespace RootTools
+{
+    public interface IDialogService
+    {
+        void Register<TViewModel, TView>() where TViewModel : IDialogRequestClose
+                                           where TView : IDialog;
+
+        Nullable<bool> ShowDialog<TViewModel>(TViewModel viewModel) where TViewModel : IDialogRequestClose;
+    }
+}

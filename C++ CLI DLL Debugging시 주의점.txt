@@ -1,0 +1,4 @@
+시작 프로젝트로 설정된 C# 프로젝트의 Properties에서 디버그->디버거 엔진의 네이티브 코드 디버깅 사용이 Check되어있어야 합니다.
+개인 설정에 포함되는 내용이어서 Commit이 되지 않으므로 이미지를 첨부합니다
+
+출처 : https://stackoverflow.com/questions/58295498/debugging-c-static-lib-from-c-sharp

@@ -1,0 +1,270 @@
+﻿<Window x:Class="Root_Wind.Dialog_ManualJob"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Converter ="clr-namespace:Dialog_ManualJobConverter"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        Background="#FF2D2D30"
+        Title="Dialog_ManualJob" Height="620" Width="1000">
+    <Window.Resources>
+        <Converter:ShortRecipeNameConverter x:Key="ShortRecipeNameConverters" />
+        <Converter:ListBoxontentsHeightConverter x:Key="ListBoxontentsHeightConverters" />
+        <Converter:InfoWaferReverseConverter x:Key="InfoWaferReverseConverters" />
+        <Style x:Key="MyBtn"
+               TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="0"
+                                Background="#FF1B1B1C"
+                                BorderBrush="Gray"
+                                BorderThickness="0"
+                                x:Name="Bdr"
+                                Margin="0,0,0,0">
+                            <TextBlock FontSize="15"
+                                       FontFamily="Arial"
+                                       Foreground="White"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="5" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="#FF3E3E40" />
+                                <Setter Property="Cursor"
+                                        Value="Hand" />
+                            </Trigger>
+                            <Trigger Property="Button.IsPressed"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="#FF43437A" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            </Style> 
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"></ColumnDefinition>
+            <ColumnDefinition Width="4*"></ColumnDefinition>
+            <ColumnDefinition Width="2*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"></RowDefinition>
+                <RowDefinition Height="4*"></RowDefinition>
+                <RowDefinition Height="5*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <GroupBox Header="Infomation" Margin="5,0,5,5"
+                      TextElement.Foreground="White">
+            <StackPanel Margin="10">
+                <TextBlock Height="20"
+                           FontSize="15"
+                           FontFamily="Arial"
+                           Foreground="White">
+                    <Run Text="Casette ID = "></Run>
+                </TextBlock>
+                <TextBlock Height="20"
+                           FontSize="15"
+                           FontFamily="Arial"
+                           Foreground="White">
+                    <Run Text="Lot ID = "></Run></TextBlock>
+            </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Row="1"
+                      Margin="5"
+                      Header="Recipe List"
+                      BorderThickness="1"
+                      TextElement.Foreground="White">
+                <ListBox HorizontalContentAlignment="Stretch"
+                    Background="{PriorityBinding}"
+                         SelectedItem="{Binding p_sSelectedRecipe}"
+                     ItemsSource="{Binding p_sRecipeName}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel></StackPanel>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="Black"
+                                BorderThickness="1" x:Name="ItemBorder2"
+                                HorizontalAlignment="Stretch">
+                                <Label Content="{Binding}"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   HorizontalAlignment="Stretch"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalAlignment="Stretch"
+                                   Height="30">
+                                </Label>
+                            </Border>
+                            <DataTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="true">
+                                <Setter TargetName="ItemBorder2"
+                                        Property="Background"
+                                        Value="#FF3E3E40"></Setter>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}"
+                                         Value="True">
+                                <Setter TargetName="ItemBorder2"
+                                        Property="Background"
+                                        Value="#FF43437A"></Setter>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </GroupBox>
+            <GroupBox Grid.Row="2"
+                      Margin="5"
+                      Header="Seqeucne"
+                      BorderThickness="1"
+                      TextElement.Foreground="White">
+            <ListBox HorizontalContentAlignment="Stretch"
+                     DataContext="{Binding p_Process}"
+                     Background="{PriorityBinding}"
+                     Focusable="False"
+                     ItemsSource="{Binding p_aFullSequence}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel></StackPanel>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Black"
+                                BorderThickness="1"
+                                HorizontalAlignment="Stretch">
+                            <Label Content="{Binding p_id}"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   HorizontalAlignment="Stretch"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalAlignment="Stretch"
+                                   Height="30">
+                            </Label>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            </GroupBox>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition Height="70"></RowDefinition>
+            </Grid.RowDefinitions>
+            <ListBox ItemsSource="{Binding p_InfoCarrier.p_aInfoWafer}"
+                     Margin="0,7,0,0"
+                     SelectedItem="{Binding p_SelectedInfoWafer}"
+                     Background="{PriorityBinding}"
+                     BorderBrush="Black"
+                     ScrollViewer.CanContentScroll="True"
+                     BorderThickness="0">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.Template>
+                    <ControlTemplate>
+                        <Border  BorderBrush="White"
+                                 BorderThickness="2"
+                                 Background="#FF2D2D30"
+                                 CornerRadius="5">
+                            <ItemsPresenter />
+                        </Border>
+                    </ControlTemplate>
+                </ListBox.Template>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border  BorderThickness="2"
+                                 x:Name="ItemBorder"
+                                 BorderBrush="#FF1B1B1C"
+                                 Background="#FF1B1B1C"
+                                 Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}, Path=ActualWidth}"
+                                 CornerRadius="5">
+                            <Border.Height>
+                                <MultiBinding Converter="{StaticResource ListBoxontentsHeightConverters}">
+                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}" />
+                                </MultiBinding>
+                            </Border.Height>
+                            <TextBlock HorizontalAlignment="Center"
+                                       Height="Auto"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"
+                                       FontSize="13"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       TextAlignment="Center">
+                                <Run Text="{Binding p_id}"></Run>
+                                <Run Text=" - "></Run>
+                                <Run Text="{Binding p_sRecipe, Converter={StaticResource ShortRecipeNameConverters}}" /></TextBlock>
+                        </Border>
+                        <DataTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="true">
+                                <Setter TargetName="ItemBorder"
+                                        Property="Background"
+                                        Value="#FF3E3E40"></Setter>
+                            </Trigger>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}"
+                                         Value="True">
+                                <Setter TargetName="ItemBorder"
+                                        Property="Background"
+                                        Value="#FF43437A"></Setter>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="2">
+                <Button Height="{PriorityBinding}"
+                        Command="{Binding SetRecipeCommand}"
+                        Width="95" Margin="2"
+                        Style="{StaticResource MyBtn}"  Content="Set Recipe"/>
+                <Button Height="{PriorityBinding}"
+                        Command="{Binding WaferAddCommand}"
+                        Width="95" Margin="2"
+                        Style="{StaticResource MyBtn}"  Content="Add"/>
+                <Button Height="{PriorityBinding}"
+                        Command="{Binding SeqeuneceClearCommand}"
+                        Width="95"
+                        Margin="2"
+                        Style="{StaticResource MyBtn}"
+                        Content="Clear" />
+                <Button Height="{PriorityBinding}"
+                        Width="95"
+                        Margin="2"
+                        Style="{StaticResource MyBtn}"
+                        />
+                <Button Height="{PriorityBinding}"
+                        Width="95"
+                        Margin="2"
+                        Style="{StaticResource MyBtn}"
+                         />
+            </StackPanel>
+        </Grid>
+        <StackPanel Grid.Column="2" Margin="5">
+            <Button Style="{StaticResource MyBtn}"
+                    Margin="5" Height="100"
+                    Command="{Binding OkCommand}"
+                    Content="Run"></Button>
+            <Button Style="{StaticResource MyBtn}"
+                    Command="{Binding CancelCommand}"
+                    Margin="5"
+                    Height="100"
+                    Content="Cancel"></Button>
+        </StackPanel>
+    </Grid>
+</Window>

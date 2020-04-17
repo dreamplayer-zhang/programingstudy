@@ -1,0 +1,59 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<SolidColorBrush x:Key="BdrBackGround" Color="White"/>
+	<SolidColorBrush x:Key="BorderBrush" Color="Gray" />
+	<SolidColorBrush x:Key="BackGround" Color="#FF2D2D30" />
+
+
+	<SolidColorBrush x:Key="TbForeGround" Color="Black"/>
+	<SolidColorBrush x:Key="TbBackGround" Color="#FF919191"/>
+
+	<SolidColorBrush x:Key="TabBorderBrush" Color="Gray"/>
+	<SolidColorBrush x:Key="TabBackGround" Color="White"/>
+	<SolidColorBrush x:Key="TabSelected" Color="#FF43437A" />
+	<SolidColorBrush x:Key="TabMouseOver" Color="#FF3E3E40"/>
+	<SolidColorBrush x:Key="TabForeGround" Color="Black" />
+
+	<SolidColorBrush x:Key="BtnBorderBrush" Color="Gray" />
+	<SolidColorBrush x:Key="BtnBackGround" Color="DimGray" />
+	<SolidColorBrush x:Key="BtnMouseOver" Color="LightGray" />
+	<SolidColorBrush x:Key="BtnPressed" Color="LightGray" />
+	<SolidColorBrush x:Key="BtnForeGround" Color="White" />
+	<Style TargetType="{x:Type TabItem}" x:Key="MainTabItem">
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="TabItem">
+					<Border Name="Panel"
+                                Margin="10"
+                                BorderBrush="{StaticResource BorderBrush}">
+						<TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontFamily="Arial"
+                                       FontWeight="Bold"
+                                       FontSize="25"
+                                       Name="tb">
+                                <ContentPresenter VerticalAlignment="Center"
+                                              HorizontalAlignment="Center"
+                                              ContentSource="Header"/>
+						</TextBlock>
+					</Border>
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsSelected" Value="False">
+							<Setter TargetName="Panel" Property="Background" Value="{StaticResource ResourceKey=TabBackGround}"/>
+							<Setter TargetName="tb" Property="Foreground" Value="{StaticResource ResourceKey=TabForeGround}"/>
+						</Trigger>
+						<Trigger Property="IsMouseOver" Value="True">
+							<Setter TargetName="Panel" Property="Background" Value="{StaticResource ResourceKey=TabMouseOver}"/>
+							<Setter TargetName="tb" Property="Foreground" Value="{StaticResource ResourceKey=TabForeGround}"/>
+						</Trigger>
+						<Trigger Property="IsSelected" Value="True">
+							<Setter TargetName="Panel" Property="Background" Value="{StaticResource ResourceKey=TabSelected}"/>
+							<Setter TargetName="tb" Property="Foreground" Value="{StaticResource ResourceKey=TabForeGround}"/>
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+</ResourceDictionary>

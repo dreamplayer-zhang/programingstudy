@@ -1,0 +1,45 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<SolidColorBrush x:Key="BdrBackGround" Color="White"/>
+	<SolidColorBrush x:Key="BorderBrush" Color="Gray" />
+	<SolidColorBrush x:Key="BackGround" Color="#FF2D2D30" />
+
+
+	<SolidColorBrush x:Key="TbForeGround" Color="Black"/>
+	<SolidColorBrush x:Key="TbBackGround" Color="#FF919191"/>
+
+	<SolidColorBrush x:Key="TabBorderBrush" Color="Gray"/>
+	<SolidColorBrush x:Key="TabBackGround" Color="White"/>
+	<SolidColorBrush x:Key="TabSelected" Color="#FF43437A" />
+	<SolidColorBrush x:Key="TabMouseOver" Color="#FF3E3E40"/>
+	<SolidColorBrush x:Key="TabForeGround" Color="Black" />
+
+	<SolidColorBrush x:Key="BtnBorderBrush" Color="Gray" />
+	<SolidColorBrush x:Key="BtnBackGround" Color="DimGray" />
+	<SolidColorBrush x:Key="BtnMouseOver" Color="LightGray" />
+	<SolidColorBrush x:Key="BtnPressed" Color="LightGray" />
+	<SolidColorBrush x:Key="BtnForeGround" Color="White" />
+
+	<!--<Style TargetType="{x:Type TextBlock}">
+		<Setter Property="TextBlock.FontFamily"
+                    Value="Arial" />
+		<Setter Property="TextBlock.Foreground"
+                    Value="{StaticResource TbForeGround}" />
+		<Setter Property="TextBlock.VerticalAlignment"
+                    Value="Center" />
+		<Setter Property="TextBlock.TextAlignment"
+                    Value="Center" />
+	</Style>-->
+	<!--<Style TargetType="{x:Type TextBlock}">
+		<Setter Property="TextBlock.FontFamily" Value="Arial"/>
+		<Setter Property="TextBlock.Foreground" Value="{StaticResource TbForeGround}"/>
+		<Setter Property="TextBlock.VerticalAlignment" Value="Center"/>
+		<Setter Property="TextBlock.TextAlignment" Value="Center"/>
+		--><!--<Setter Property="TextBlock.BitmapEffect">
+                <Setter.Value>
+                    <DropShadowBitmapEffect Color="LightGray"/>
+                </Setter.Value>
+            </Setter>--><!--
+	</Style>-->
+</ResourceDictionary>

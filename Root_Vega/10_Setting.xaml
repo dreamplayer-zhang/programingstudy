@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="Root_Vega._10_Setting"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local ="clr-namespace:Root_Vega"
+             mc:Ignorable="d"
+             d:DesignHeight="756"
+             d:DesignWidth="1876">
+    <TabControl Margin="15"
+                Style="{StaticResource RcpTabControl}">
+        <TabItem Header="Input / Output"
+                 Margin="0,50,0,0"
+                 Style="{StaticResource RcptabItem}">
+            <Border BorderBrush="Gray"
+                    BorderThickness="3">
+                <local:AjinInOutSetting DataContext="{Binding p_AjinViewModel}"></local:AjinInOutSetting>
+            </Border>
+        </TabItem>
+    </TabControl>
+</UserControl>

@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="RootTools.Memory.MemoryViewer_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RootTools.Memory"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Visibility="{Binding p_visibleMenu}" Orientation="Horizontal" VerticalAlignment="Center" Background="AliceBlue">
+            <StackPanel Orientation="Horizontal" Margin="0,0,12,0">
+                <TextBlock Text="{Binding p_sMemoryData}" Margin="2" MinWidth="20"/>
+                <TextBlock Text="{Binding p_nMemoryIndex}" Margin="2"/>
+            </StackPanel>
+            <Menu VerticalAlignment="Center">
+                <MenuItem Header="File">
+                    <MenuItem x:Name="menuOpen" Header="Open" Click="menuOpen_Click"/>
+                    <MenuItem x:Name="memuSave" Header="Save" Click="memuSave_Click"/>
+                </MenuItem>
+            </Menu>
+            <Label Content="{Binding p_fZoom}" ToolTip="Zoom" VerticalAlignment="Center"/>
+            <Label Content="{Binding p_cpWindow}" MinWidth="50" ToolTip="Window Position" VerticalAlignment="Center"/>
+            <Label Content="{Binding p_cpImage}" MinWidth="50" ToolTip="Image Position" VerticalAlignment="Center"/>
+            <Label Content="{Binding p_sGV}" ToolTip="GV or RGB" VerticalAlignment="Center"/>
+        </StackPanel>
+        <Canvas Grid.Row="1" x:Name="gridBitmapSource" Background="Gray"
+              SizeChanged="gridBitmapSource_SizeChanged"
+              PreviewMouseMove="gridBitmapSource_PreviewMouseMove"
+              PreviewMouseWheel="gridBitmapSource_PreviewMouseWheel"
+              PreviewMouseLeftButtonDown="gridBitmapSource_PreviewMouseLeftButtonDown"
+              PreviewMouseLeftButtonUp="gridBitmapSource_PreviewMouseLeftButtonUp"
+              MouseLeave="gridBitmapSource_MouseLeave">
+            <Image x:Name="imageBitmapSource" Source="{Binding p_bitmapSrc}"/>
+        </Canvas>
+    </Grid>
+</UserControl>

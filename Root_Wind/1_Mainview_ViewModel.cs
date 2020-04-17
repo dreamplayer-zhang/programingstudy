@@ -1,0 +1,327 @@
+﻿using System;
+using RootTools;
+using System.Windows.Data;
+using System.Windows.Media;
+using System.Collections.ObjectModel;
+using Root_Wind.Module;
+using RootTools.Module;
+
+namespace Root_Wind
+{
+    class _1_Mainview_ViewModel : ObservableObject
+    {
+        Wind_Engineer m_Engineer;
+        public Wind_Handler p_Handler
+        {
+            get;
+            set;
+        }
+        Wind_Process m_Process;
+        public Wind_Process p_Process
+        {
+            get
+            {
+                return m_Process;
+            }
+            set
+            {
+                SetProperty(ref m_Process, value);
+            }
+        }
+        private readonly IDialogService m_DialogService;
+
+        public _1_Mainview_ViewModel(Wind_Engineer engineer, IDialogService dialogService)
+        {
+            m_DialogService = dialogService;
+            m_Engineer = engineer;
+            p_Handler = (Wind_Handler)engineer.ClassHandler();
+            p_Process = p_Handler.m_process;
+            InitAlarmData();
+        }
+
+        void HandlerInitialize()
+        {
+            EQ.p_bStop = false;
+        //    if (EQ.p_eState != EQ.eState.Run)
+                EQ.p_eState = EQ.eState.Home;
+        }
+
+        void LoadLp1()
+        {
+            Loadport_RND.Run_Undocking run = (Loadport_RND.Run_Undocking)p_Handler.p_aLoadport[1].CloneModuleRun("Unload");
+            p_Handler.p_aLoadport[1].StartRun(run);
+        }
+
+        void LoadLp2()
+        {
+            Loadport_RND.Run_Docking run = (Loadport_RND.Run_Docking)p_Handler.p_aLoadport[1].CloneModuleRun("Load");
+            p_Handler.p_aLoadport[1].StartRun(run);
+        }
+
+        enum eAlarm
+        {
+            State_ChangeFail,
+            NotConnected,
+        }
+
+        public void InitAlarmData()
+        {
+            //((GAF_Manager)m_Engineer.ClassGAFManager()).GetALID(this.ToString(), eAlarm.State_ChangeFail, "Test Alarm 1", "이건 Test용으로 하는거라구");
+            //((GAF_Manager)m_Engineer.ClassGAFManager()).GetALID(this.ToString(), eAlarm.NotConnected, "Test Alarm 2", "1. 공압이 떨어졌습니다. \n 2.선연결 확인해 보실래요?.");
+        }
+
+        void TestFunction()
+        {
+            //((GAF_Manager)m_Engineer.ClassGAFManager()).SetAlarm(this.ToString(), eAlarm.State_ChangeFail);
+            
+            //if (EQ.p_eState == EQ.eState.Init)
+            //    EQ.p_eState = EQ.eState.Error;
+            //else
+            //    EQ.p_eState = EQ.eState.Init;
+        }
+        void TestFunction2()
+        {  
+            //((GAF_Manager)m_Engineer.ClassGAFManager()).SetAlarm(this.ToString(), eAlarm.NotConnected);
+            //if (EQ.p_eState == EQ.eState.Init)
+            //    EQ.p_eState = EQ.eState.Error;
+            //else
+            //    EQ.p_eState = EQ.eState.Init;
+        }
+
+        public RelayCommand TestCommand
+        {
+            get
+            {
+                return new RelayCommand(TestFunction);
+            }
+        }
+        public RelayCommand TestCommand2
+        {
+            get
+            {
+                return new RelayCommand(TestFunction2);
+            }
+        }
+
+        public RelayCommand InitializeCommand
+        {
+            get
+            {
+                return new RelayCommand(HandlerInitialize);
+            }
+        }
+
+        public RelayCommand LoadCommandLP1
+        {
+            get
+            {
+                return new RelayCommand(LoadLp1);
+            }
+        }
+
+        public RelayCommand LoadCommandLP2
+        {
+            get
+            {
+                return new RelayCommand(LoadLp2);
+            }
+        }
+
+        
+    }
+}
+
+namespace MainViewerConverter
+{
+    public class ProcessColorConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter,
+            System.Globalization.CultureInfo culture)
+        {  
+            BrushConverter bc = new BrushConverter();
+            System.Windows.Media.Brush Color_ProcessDone = System.Windows.Media.Brushes.SeaGreen;
+            System.Windows.Media.Brush Color_Processing = (Brush)bc.ConvertFrom("#FFF3CD6E");
+            System.Windows.Media.Brush Color_ProcessWait = System.Windows.Media.Brushes.DimGray;
+
+            ModuleRunBase data = (ModuleRunBase)values[0];
+            ObservableCollection<ModuleRunBase> datalist = (ObservableCollection<ModuleRunBase>)values[1];
+
+            int nIndex = datalist.IndexOf(data);
+            if (nIndex == 0)
+                return Color_Processing;
+            else if (nIndex > 0)
+                return Color_ProcessWait;
+            else
+                return Color_ProcessDone;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+    public class StringToModuleStateConverter : IValueConverter
+    {
+        #region IValueConverter Members
+
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            ModuleBase.eState state = (ModuleBase.eState)value;
+            return state.ToString();
+    
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
+
+    public class VisibleLoadToLPStateConverter : IValueConverter
+    {
+            #region IValueConverter Members
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            bool result = true;
+            ModuleBase.eState state = (ModuleBase.eState)value;
+            switch (state)
+            {
+                case ModuleBase.eState.Init:
+                case ModuleBase.eState.Home:
+                case ModuleBase.eState.Run:
+                case ModuleBase.eState.Error:
+                    result = false;
+                    break;
+                case ModuleBase.eState.Ready:
+                    result = true;
+                    break;
+                default:
+                    result = false;
+                    break;
+            }
+            return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+#endregion
+    }
+
+    public class ColorLoadToLPStateConverter : IValueConverter
+    {
+        #region IValueConverter Members
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            System.Windows.Media.Brush result = System.Windows.Media.Brushes.SeaGreen;
+            ModuleBase.eState state = (ModuleBase.eState)value;
+            switch (state)
+            {
+                case ModuleBase.eState.Init:
+                case ModuleBase.eState.Home:
+                case ModuleBase.eState.Run:
+                case ModuleBase.eState.Error:
+                    result = Brushes.DarkGray;
+                    break;
+                case ModuleBase.eState.Ready:
+                    result = Brushes.SeaGreen;
+                    break;
+                default:
+                    result = Brushes.DimGray;
+                    break;
+            }
+            return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+    }
+
+    public class ColorToEQStateConverter : IValueConverter
+    {
+        #region IValueConverter Members
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            System.Windows.Media.Brush result = System.Windows.Media.Brushes.SeaGreen;
+            EQ.eState state = (EQ.eState)value;
+
+            switch (state)
+            {
+                case EQ.eState.Init:
+                    result = Brushes.Yellow;
+                    break;
+                case EQ.eState.Home:
+                    result = Brushes.MediumPurple;
+                    break;
+                case EQ.eState.Ready:
+                    result = Brushes.Salmon;
+                    break;
+                case EQ.eState.Run:
+                    result = Brushes.SeaGreen;
+                    break;
+                case EQ.eState.Error:
+                    result = Brushes.Red;
+                    break;
+                default:
+                    result = Brushes.Red;
+                    break;
+            }
+            return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+    }
+
+    public class ColorToModuleStateConverter : IValueConverter
+    {
+        #region IValueConverter Members
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            BrushConverter bc = new BrushConverter();
+            System.Windows.Media.Brush result = System.Windows.Media.Brushes.DimGray;
+            ModuleBase.eState state = (ModuleBase.eState)value;
+
+            switch(state)
+            {
+                case ModuleBase.eState.Init:
+                    result = Brushes.Yellow;
+                    break;
+                case ModuleBase.eState.Home:
+                    result = Brushes.MediumPurple;
+                    break;
+                case ModuleBase.eState.Ready:
+                    result = Brushes.Salmon;
+                    break;
+                case ModuleBase.eState.Run:
+                    result = Brushes.SeaGreen;
+                    break;
+                case ModuleBase.eState.Error:
+                    result = Brushes.Red;
+                    break;
+                default:
+                    break;
+            }
+                    return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
+    
+}

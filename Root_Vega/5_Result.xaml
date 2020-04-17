@@ -1,0 +1,191 @@
+﻿<UserControl x:Class="Root_Vega._5_Result"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:controls="clr-namespace:Root_Vega.Controls"
+			 xmlns:metro="clr-namespace:MetroTrilithon.UI.Controls"
+			 xmlns:dialogs="clr-namespace:Root_Vega.Dialog"
+             mc:Ignorable="d" 
+             d:DesignHeight="756" d:DesignWidth="1800"
+             Background="Transparent">
+	<!--#region UserControl.Resources-->
+	<UserControl.Resources>
+		<ResourceDictionary Source="pack://application:,,,/Root_Vega;component/Styles/Controls.xaml" />
+	</UserControl.Resources>
+	<!--#endregion-->
+	<Grid Margin="10">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+
+		<!--Mode Select Start-->
+		<StackPanel TextOptions.TextFormattingMode="Ideal">
+			<RadioButton x:Name="CurrentInspData"
+						 IsChecked="True"
+						 Style="{StaticResource TabLikeRadioButtonStyleKey}">
+				<TextBlock Text="CurrentData"
+						   FontSize="16"
+						   Foreground="{Binding RelativeSource={RelativeSource AncestorType={x:Type RadioButton}}, Path=Foreground}" />
+			</RadioButton>
+			<RadioButton x:Name="SearchInspData"
+						 Style="{StaticResource TabLikeRadioButtonStyleKey}">
+				<TextBlock Text="Search DB"
+						   FontSize="16"
+						   Foreground="{Binding RelativeSource={RelativeSource AncestorType={x:Type RadioButton}}, Path=Foreground}" />
+			</RadioButton>
+		</StackPanel>
+		<!--Mode Select End-->
+		
+		<!--Current Result View Start-->
+		<controls:InspResultView Grid.Column="1"
+								 Width="950"
+								 HorizontalAlignment="Left"
+								 DataContext="{Binding CurrentResultViewModel}"
+								 Visibility="{Binding ElementName=CurrentInspData, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+		<!--Current Result View End-->
+
+		<!--Search Result List Start-->
+		<Grid Grid.Row="0"
+			  Grid.Column="1"
+			  Visibility="{Binding ElementName=SearchInspData, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+
+			<Grid Grid.Row="0"
+				  Margin="5,0,5,5">
+				<!--Search Bar Start-->
+				<GroupBox Header="Search Options" 
+						  Margin="5">
+					<Grid x:Name="SearchBarGrid">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto"/>
+								<RowDefinition Height="Auto"/>
+							</Grid.RowDefinitions>
+							<TextBlock Text="Inspection Time"
+							   VerticalAlignment="Center"/>
+							<StackPanel Orientation="Horizontal"
+								Grid.Row="1"
+								VerticalAlignment="Center"
+								Margin="0,0,0,15">
+								<CheckBox Content="Start Time"
+								  VerticalAlignment="Center"
+								  IsChecked="{Binding IsDateSearch}"/>
+								<controls:DateTimePicker SelectedDate="{Binding StartDate, Mode=TwoWay}"
+												 Width="150"
+												 Margin="10,0,0,0"
+												 IsEnabled="{Binding IsDateSearch}"
+												 VerticalAlignment="Center"/>
+								<TextBlock Text="End Time"
+								   Margin="10,0,0,0"
+								   VerticalAlignment="Center"/>
+								<controls:DateTimePicker SelectedDate="{Binding EndDate, Mode=TwoWay}"
+												 Width="150"
+												 Margin="10,0,0,0"
+												 IsEnabled="{Binding IsDateSearch}"
+												 VerticalAlignment="Center"/>
+							</StackPanel>
+						</Grid>
+						<StackPanel Grid.Row="1"
+							Orientation="Horizontal"
+							VerticalAlignment="Center">
+							<CheckBox Content="Reticle ID"
+							  VerticalAlignment="Center"
+							  IsChecked="{Binding IsReticleIDSearch}"/>
+							<TextBox x:Name="ReticleIDBox" 
+							 Width="200"
+							 Text="{Binding ReticleID, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+							 IsEnabled="{Binding IsReticleIDSearch}"
+							 Margin="10,0,0,0" KeyDown="TextBox_KeyDown"/>
+							<CheckBox Content="Recipe Name"
+							  Margin="30,0,0,0"
+							  VerticalAlignment="Center"
+							  IsChecked="{Binding IsRecipeNameSearch}"/>
+							<TextBox x:Name="RecipeNameBox" 
+							 Width="200"
+							 Text="{Binding RecipeName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+							 IsEnabled="{Binding IsRecipeNameSearch}"
+							 Margin="10,0,0,0" KeyDown="TextBox_KeyDown"/>
+							<CheckBox Content="Defect Count"
+							  Margin="80,0,0,0"
+							  VerticalAlignment="Center"
+							  IsChecked="{Binding IsDefectCountSearch}"/>
+							<StackPanel Orientation="Horizontal"
+								IsEnabled="{Binding IsDefectCountSearch}">
+								<TextBox x:Name="DefectCountFirstBox" 
+								 Width="80"
+								 Text="{Binding DefectCountFirst, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+								 Margin="10,0,0,0" KeyDown="TextBox_KeyDown"/>
+								<ComboBox Margin="10,0,0,0"
+								  ItemsSource="{Binding DefectCountSelectList}"
+								  SelectedIndex="{Binding SelectedDefectCountFirst}"
+								  Width="50"/>
+								<TextBox x:Name="DefectCountSecondBox" 
+								 Width="80"
+								 Text="{Binding DefectCountSecond, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+								 Margin="30,0,0,0" KeyDown="TextBox_KeyDown"/>
+								<ComboBox Margin="10,0,0,0"
+								  ItemsSource="{Binding DefectCountSelectList}"
+								  SelectedIndex="{Binding SelectedDefectCountSecond}"
+								  Width="50"/>
+							</StackPanel>
+						</StackPanel>
+						<Grid Grid.Column="1"
+					  Grid.RowSpan="2">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto"/>
+							</Grid.ColumnDefinitions>
+							<metro:CallMethodButton FontSize="22"
+											   VerticalAlignment="Stretch"
+											   MethodName="StartSearch">
+								<Label Foreground="White" Padding="30,0">_Search</Label>
+							</metro:CallMethodButton>
+							<!--여기서부터는 설정 관련 경로가 확실히 정해지면 없애는것으로 합니다-->
+							<Grid Grid.Column="1">
+								<Grid.RowDefinitions>
+									<RowDefinition/>
+									<RowDefinition/>
+								</Grid.RowDefinitions>
+								<metro:CallMethodButton Margin="3,0,0,3"
+												   MethodName="ChangeDBFilePath">
+									<Label Foreground="White" Padding="15,0">Select _DB</Label>
+								</metro:CallMethodButton>
+								<metro:CallMethodButton Margin="3,0,0,0"
+												   Grid.Row="1"
+												   MethodName="RefreshList">
+									<Label Foreground="White" Padding="15,0">_Refresh</Label>
+								</metro:CallMethodButton>
+							</Grid>
+							<!--여기까지입니다-->
+						</Grid>
+					</Grid>
+				</GroupBox>
+				<!--Search Bar End-->
+			</Grid>
+			<DataGrid AutoGenerateColumns="True"
+					  Grid.Row="1"
+					  SelectedItem="{Binding SelectedDataTable}"
+					  ItemsSource="{Binding ResultDataTable}"
+					  MouseDoubleClick="DataGrid_MouseDoubleClick"
+					  CanUserAddRows="false"
+					  SelectionMode="Single">
+
+			</DataGrid>
+			<!--Search Result List End-->
+		</Grid>
+	</Grid>
+</UserControl>

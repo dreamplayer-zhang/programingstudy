@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="RootTools.RTC5s.RTC5_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RootTools.RTC5s"
+             xmlns:tree="clr-namespace:RootTools.Trees"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <TabControl>
+        <TabItem Header="Run">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Vertical">
+                    <Label Content="{Binding p_eState}"/>
+                    <Button x:Name="buttonMarkClear" Content="Clear" Margin="3" Click="buttonMarkClear_Click"/>
+                    <Button x:Name="buttonMarkAdd" Content="Add" Margin="3" Click="buttonMarkAdd_Click"/>
+                    <Button x:Name="buttonMark" Content="Mark" Margin="3" Click="buttonMark_Click"/>
+                    <Button x:Name="buttonLaserOn" Content="{Binding p_sLaserOnContext}"  Margin="3,23,3,3" Click="buttonLaserOn_Click"/>
+                </StackPanel>
+                <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+                <tree:TreeUI Grid.Column="2" x:Name="treeRootUI"/>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Design">
+            <local:RTC5Design_UI x:Name="rtc5DesignUI"/>
+        </TabItem>
+    </TabControl>
+</UserControl>
