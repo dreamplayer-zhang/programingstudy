@@ -11,8 +11,8 @@ void InspectionBase::CloseDB()
 	string str(ch);
 	//pDataBase->InsertData(str);
 
-	//pDataBase->CommitAndClose();
-	pDataBase->Commit();
+	pDataBase->CommitAndClose();
+	//pDataBase->Commit();
 }
 
 

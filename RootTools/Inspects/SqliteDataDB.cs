@@ -61,7 +61,7 @@ namespace ATI
 				else
 				{
 #if DEBUG
-					Debug.WriteLine(string.Format("SqliteDataDB() - Some file is not exist"));
+					Debug.WriteLine(string.Format("SqliteDataDB() - Some file is not exist : {0}", this.DbFilePath));
 #endif
 					IsDBInitialized = false;
 				}
@@ -83,7 +83,7 @@ namespace ATI
 				else
 				{
 #if DEBUG
-					Debug.WriteLine(string.Format("SqliteDataDB() - Some file is not exist"));
+					Debug.WriteLine(string.Format("SqliteDataDB() - Some file is not exist : {0}", this.ConfigPath));
 #endif
 					IsConfigInitialized = false;
 				}

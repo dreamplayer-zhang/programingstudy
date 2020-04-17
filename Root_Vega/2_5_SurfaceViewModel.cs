@@ -41,6 +41,10 @@ namespace Root_Vega
             Init(engineer, dialogService);
             p_ImageViewer.m_AfterLoaded += ReDrawRect;
 
+            m_Engineer.m_InspManager.InspectionComplete += () =>
+            {
+                m_Engineer.m_InspManager.EndInspection();
+            };
         }
 
         void Init(Vega_Engineer engineer, IDialogService dialogService)
@@ -960,12 +964,9 @@ namespace Root_Vega
                 m_DD.AddRectData(inspblock, System.Drawing.Color.Orange);
 
             }
-            
 
-            //    
             m_Engineer.m_InspManager.PreInspection();
-            m_Engineer.m_InspManager.StartInspection();           
-            //m_Engineer.m_InspManager.EndInspection();
+            m_Engineer.m_InspManager.StartInspection(); 
 
 
 

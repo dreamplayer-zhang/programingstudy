@@ -13,6 +13,14 @@ namespace RootTools.Inspects
         int nThreadNum = 4;
         int nInspectionCount = 0;
 
+        #region EventHandler
+        /// <summary>
+        /// 이벤트 핸들러
+        /// </summary>
+        public delegate void EventHandler();
+        public EventHandler InspectionComplete;
+        #endregion
+
         public void StartInspection()
         {
             if (0 < GetWaitQueue())
@@ -38,7 +46,7 @@ namespace RootTools.Inspects
             for (int i = 0; i < nThreadNum; i++)
             {
                 string dbtemp_path = @"C:/vsdb\VSTEMP" + i.ToString() + ".sqlite";
-                string dbtemp_configpath = @"C:/vsdb/init/vstempdb.txt";
+                string dbtemp_configpath = @"C:/vsdb/init/vsdb.txt";
 
                 if (!File.Exists(dbtemp_path))
                 {
@@ -68,7 +76,7 @@ namespace RootTools.Inspects
             //DATA 출력 TEST
             string time = System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
             VSDB_path = @"C:/vsdb/TestData" + time + ".sqlite";
-            VSDB_configpath = @"C:\vsdb\init/vsdb.txt";
+            VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
 
 
             SqliteDataDB VSDBManager = new SqliteDataDB(VSDB_path, VSDB_configpath);
@@ -82,8 +90,11 @@ namespace RootTools.Inspects
             //VS data
             for (int i = 0; i < nThreadNum; i++)
             {
-                string dbtemp_path = @"C:/vsdb\VSTEMP" + i.ToString() + ".sqlite";
-                string dbtemp_configpath = @"C:/vsdb/init/vstempdb.txt";
+                string dbtemp_path = @"C:/vsdb/VSTEMP" + i.ToString() + ".sqlite";
+                string dbtemp_configpath = @"C:/vsdb/init/vsdb.txt";
+
+                dbtemp_path =  dbtemp_path.Replace("/", "\\");
+                dbtemp_configpath = dbtemp_configpath.Replace("/", "\\");
 
                 SqliteDataDB VSDBTempManager = new SqliteDataDB(dbtemp_path, dbtemp_configpath);
 
@@ -132,6 +143,12 @@ namespace RootTools.Inspects
 
                     VSDataDT.Rows.Add(DataRow);
                     datacount++;
+                }
+
+                VSDBTempManager.Disconnect();
+                if(File.Exists(dbtemp_path))
+                {
+                    File.Delete(dbtemp_path);
                 }
             }
             VSDBManager.SaveDataTable(VSDataDT);
@@ -221,10 +238,15 @@ namespace RootTools.Inspects
                     }
                 }
             }
+            //여기서 완료 이벤트 발생
         }
 
         public void InspectionDone()
         {
+            if(InspectionComplete!=null)
+            {
+                InspectionComplete();
+            }
         }
 
         public void SetThread(int threadNum)  //(in int threadNum)  //2013 in 안됨
