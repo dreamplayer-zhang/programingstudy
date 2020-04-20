@@ -1,22 +1,22 @@
 #include "pch.h"
 #include "InspectionSurface.h"
 
-bool InspectionSurface::Inspection()
-{
-	CheckConditions();
-	
-	if (GetDarkInspection())
-	{
-		CopyImageToBuffer();//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
-		InspectionDark();
-	}
-	else
-	{
-		InspectionBright();
-	}
-
-	return GetResult();
-}
+//bool InspectionSurface::Inspection()
+//{
+//	CheckConditions();
+//	
+//	if (GetDarkInspection())
+//	{
+//		CopyImageToBuffer();//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
+//		InspectionDark();
+//	}
+//	else
+//	{
+//		InspectionBright();
+//	}
+//
+//	return GetResult();
+//}
 void InspectionSurface::EndInspection(int threadidx)
 {
 	EraseDB(threadidx);
@@ -35,9 +35,12 @@ void InspectionSurface::SetParams(byte* buffer, int bufferwidth, int bufferheigh
 	SetIsDarkInspection(bDarkInspection);
 	OpenDB(threadindex);
 }
-void InspectionSurface::InspectionDark()
+vector<DefectInfo> InspectionSurface::Inspection(bool nAbsolute, bool bIsDartInsp)
 {
-	bool bDarkResut = true;
+	vector<DefectInfo> vResult;
+
+	bool bDarkResut = bIsDartInsp;
+	bool bInspResult = false;
 	RECT rt;
 	RECT rtROI = GetROI();
 	RECT rtinspROI = GetInspbufferROI();
@@ -62,7 +65,13 @@ void InspectionSurface::InspectionDark()
 		//for (int x = rtROI.left; x < rtROI.right; x++, pPos++)
 		for (int x = rtinspROI.left; x < rtinspROI.right; x++, pPos++)
 		{
-			if (*pPos < nGrayLevel)
+			bool bCheckPoint = *pPos < nGrayLevel;
+			if (!bDarkResut)
+			{
+				bCheckPoint = *pPos > nGrayLevel;
+			}
+
+			if (bCheckPoint)
 			{
 				//ret = GetPitsizer()->GetPitSize(pPos, x, y, 10000, nGrayLevel, nGrayLevel, 1, false);
 				int col = sizeof(inspbuffer[0]) / sizeof(byte);
@@ -73,29 +82,23 @@ void InspectionSurface::InspectionDark()
 					rt = GetPitsizer()->GetPitRect();
 					if (Functions::GetWidth(rt) >= GetDefectSize() || Functions::GetHeight(rt) >= GetDefectSize())
 					{
-						AddDefect(rt, ptDefectPos, ret);
+						vResult.push_back(GetDefectInfo(rt, ptDefectPos, ret));
+						bInspResult = true;
 					}
 				}
 				else if (ret >= GetDefectSize())
 				{
 					rt = GetPitsizer()->GetPitRect();
 
-					AddDefect(rt, ptDefectPos, ret);
+					vResult.push_back(GetDefectInfo(rt, ptDefectPos, ret));
+					bInspResult = true;
 				}
 			}
 		}
 	}
 
-	// 임시
-	CloseDB();
-	SetResult(bDarkResut);
-}
-
-void InspectionSurface::InspectionBright()
-{
-	bool bBrightResult = false;
-
-	SetResult(bBrightResult);
+	SetResult(bInspResult);
+	return vResult;
 }
 
 InspectionSurface::InspectionSurface()

@@ -11,19 +11,19 @@
 #include "..\RootTools_Cpp\\InspectionSurface.h"
 //#include "InspSurface_Reticle.h"
 
-
-typedef struct _defectData
-{
-	int NONE = -1;
-	POINT ptPos; // Center 
-	double dArea; // Count of points 
-	POINT ptUnit; // chip die
-	POINT ptSize; // w h 
-	int nClusterID = NONE; // 이웃
-	RECT rtArea;  //외각
-	string sDefectName;
-	int sDCode;
-}DefectData;
+//
+//typedef struct _defectData
+//{
+//	int NONE = -1;
+//	POINT ptPos; // Center 
+//	double dArea; // Count of points 
+//	POINT ptUnit; // chip die
+//	POINT ptSize; // w h 
+//	int nClusterID = NONE; // 이웃
+//	RECT rtArea;  //외각
+//	string sDefectName;
+//	int sDCode;
+//}DefectData;
 
 namespace RootTools_CLR
 {
@@ -64,10 +64,10 @@ namespace RootTools_CLR
 			m_pDemo->SetMemory(nCount, nByte, xSize, ySize, nAddress); 
 		}
 
-		void SendDefectData(DefectData* pStruct)
+		/*void SendDefectData(DefectData* pStruct)
 		{
 
-		}
+		}*/
 
 		int Test()
 		{
@@ -82,6 +82,8 @@ namespace RootTools_CLR
 		int Test_strip(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark)
 		{
 			RECT testrect;
+			vector<DefectInfo> vResult;
+
 			testrect.left = RoiLeft;
 			testrect.right = RoiRight;
 			testrect.top = RoiTop;
@@ -95,7 +97,20 @@ namespace RootTools_CLR
 			//PaintOutline(testrect.left, testrect.top, testrect.right, testrect.bottom, 10000, 5, m_InspConn->GetBuffer(), 10000);
 			//pInspSurface->SetParams(m_InspConn->GetBuffer(), testrect, 1, 70, 10, true);
 			pInspSurface->SetParams(m_InspConn->GetBuffer(), bufferwidth, bufferheight, testrect, 1, GV, DefectSize, bDark, threadindex);
-			pInspSurface->Inspection();
+			
+			//TODO 여기서 이벤트를 올리는 방식으로 변경한다
+			//여기 들어올때 이미 한 블럭에 대한 정보가 통째로 넘어오는 것이므로 구조 자체를 변경하여 AddDefect이 발생하는 순간을 여기서 포착하도록 수정한다
+			//pInspSurface->Inspection();
+
+			pInspSurface->CheckConditions();
+
+			pInspSurface->CopyImageToBuffer(bDark);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
+			vResult = pInspSurface->Inspection(true, bDark);//TODO : absolute GV 구현해야함
+			
+			bool bDebugPoint = vResult.size() > 0;
+
+			//return GetResult();
+
 			//m_InspConn->PrepareRun();
 			//m_InspConn->StripRun(testrect, 1);
 			//m_InspConn->EndRun();

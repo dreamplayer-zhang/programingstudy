@@ -43,7 +43,7 @@ namespace Root_Vega
 
 			m_Engineer.m_InspManager.InspectionComplete += () =>
 			{
-				m_Engineer.m_InspManager.EndInspection();
+				//m_Engineer.m_InspManager.EndInspection();
 			};
 		}
 

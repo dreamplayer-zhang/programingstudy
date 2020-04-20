@@ -82,6 +82,19 @@ void InspectionBase::AddDefect(RECT rt, POINT ptDPos, float fSize)
 
 	return WriteDB(rt, fSize);
 }
+DefectInfo InspectionBase::GetDefectInfo(RECT rt, POINT ptDPos, float fSize)
+{
+	DefectInfo data;
+
+	data.nWidth= rt.right - rt.left;
+	data.nHeight = rt.bottom - rt.top;
+	data.fPosX = rt.left + (data.nWidth * (double)0.5);// TODO : 해상도 hard-coding 0.5. 나중에 값 가져오도록 수정 필요
+	data.fPosY = rt.left + (data.nHeight * (double)0.5);// TODO : 해상도 hard-coding 0.5. 나중에 값 가져오도록 수정 필요
+	data.fSize = fSize;
+	data.nClassifyCode = GetDefectCode();
+
+	return data;
+}
 void InspectionBase::CheckConditions() const
 {
 	//assert(!IsRectEmpty(&rtROI));
@@ -159,7 +172,7 @@ RECT InspectionBase::GetInspbufferROI() const
 {
 	return inspbufferROI;
 }
-void InspectionBase::CopyImageToBuffer()//byte* mem, int nW, RECT rt, int nBackGround, BOOL bInterpolation)
+void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, int nBackGround, BOOL bInterpolation)
 {
 	//opencv 전의 test용으로 interpolation 내용 미구현
 
@@ -167,6 +180,10 @@ void InspectionBase::CopyImageToBuffer()//byte* mem, int nW, RECT rt, int nBackG
 	int nW = nBufferW;//80000;
 	RECT rt = rtROI;
 	int nBackGround = 255;
+	if (!bDark)
+	{
+		nBackGround = 0;
+	}
 
 	
 	int nWidth = (int)(Functions::GetWidth(rt) + m_nInspOffset);

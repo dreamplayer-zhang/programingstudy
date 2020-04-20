@@ -192,18 +192,14 @@ namespace RootTools.Inspects
 		public void PreInspection()
 		{
 			CreateVSTempDB();
-
-
-
-
 		}
 		public void EndInspection()
 		{
-			CollectVSTempDB();
-
-
-
-
+			if(CollectVSTempDB())
+			{
+				//TODO : DB가 정상적으로 생성되었으면 해당 DB정보를 읽어 Add defect event를 발생시킨다?
+				//실시간으로 defect 정보가 추가되는것이 바람직한데....
+			}
 		}
 
 		public void DoInspection()
