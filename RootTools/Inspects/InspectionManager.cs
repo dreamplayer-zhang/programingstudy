@@ -200,7 +200,7 @@ namespace RootTools.Inspects
 		}
 		public void EndInspection()
 		{
-			if(CollectVSTempDB())
+			if (CollectVSTempDB())
 			{
 				//TODO : DB가 정상적으로 생성되었으면 해당 DB정보를 읽어 Add defect event를 발생시킨다?
 				//실시간으로 defect 정보가 추가되는것이 바람직한데....
@@ -279,7 +279,7 @@ namespace RootTools.Inspects
 #endif
 			#endregion
 
-			if(AddDefectToUI != null)
+			if (AddDefectToUI != null)
 			{
 				AddDefectToUI(source, args);
 			}
