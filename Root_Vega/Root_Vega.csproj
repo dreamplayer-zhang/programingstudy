@@ -497,8 +497,15 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(SolutionDir)\Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
-copy /Y "$(SolutionDir)\SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
-copy /Y "$(SolutionDir)\Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
+copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
+
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>
