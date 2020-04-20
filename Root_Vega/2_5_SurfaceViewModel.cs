@@ -41,10 +41,15 @@ namespace Root_Vega
 			Init(engineer, dialogService);
 			p_ImageViewer.m_AfterLoaded += ReDrawRect;
 
-			m_Engineer.m_InspManager.InspectionComplete += () =>
+			m_Engineer.m_InspManager.AddDefectToUI += M_InspManager_AddDefectToUI;
+		}
+
+		private void M_InspManager_AddDefectToUI(DefectData[] source, EventArgs args)
+		{
+			foreach (var item in source)
 			{
-				//m_Engineer.m_InspManager.EndInspection();
-			};
+				p_ImageViewer.DrawDefect(item);
+			}
 		}
 
 		void Init(Vega_Engineer engineer, IDialogService dialogService)

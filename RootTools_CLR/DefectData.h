@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+#include <stdarg.h>
+
 public ref class DefectData
 {
 public:

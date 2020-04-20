@@ -5,21 +5,26 @@ using System.Data;
 using ATI;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
+using System;
 
 namespace RootTools.Inspects
 {
 	public class InspectionManager : Singleton<InspectionManager>, INotifyPropertyChanged
 	{
-		int nThreadNum = 4;
-		int nInspectionCount = 0;
-
 		#region EventHandler
 		/// <summary>
 		/// 이벤트 핸들러
 		/// </summary>
 		public delegate void EventHandler();
+		public EventHandler InspectionStart;
 		public EventHandler InspectionComplete;
+		public delegate void ChangeDefectInfoEventHander(DefectData[] source, EventArgs args);
+		public event ChangeDefectInfoEventHander AddDefectToUI;
 		#endregion
+
+		int nThreadNum = 4;
+		int nInspectionCount = 0;
 
 		public void StartInspection()
 		{
@@ -210,6 +215,7 @@ namespace RootTools.Inspects
 			for (int i = 0; i < nThreadNum; i++)
 			{
 				inspection[i] = new Inspection();
+				inspection[i].AddDefect += InspectionManager_AddDefect;
 			}
 
 			while (true)
@@ -248,13 +254,40 @@ namespace RootTools.Inspects
 			}
 			//여기서 완료 이벤트 발생
 		}
+		/// <summary>
+		/// Add Defect 이벤트가 발생할 때 실행될 메소드
+		/// </summary>
+		/// <param name="source">DefectData array</param>
+		/// <param name="args">추후 arguments가 필요하면 사용할것</param>
+		private void InspectionManager_AddDefect(DefectData[] source, System.EventArgs args)
+		{
+			#region DEBUG
+
+#if DEBUG
+			foreach (DefectData data in source)
+			{
+				StringBuilder stbr = new StringBuilder();
+				stbr.Append(data.nIdx);
+				stbr.Append(",");
+				stbr.Append(data.fSize);
+				stbr.Append(",");
+				stbr.Append(data.fPosX);
+				stbr.Append(",");
+				stbr.Append(data.fPosY);
+				System.Diagnostics.Debug.WriteLine(stbr.ToString());
+			}
+#endif
+			#endregion
+
+			if(AddDefectToUI != null)
+			{
+				AddDefectToUI(source, args);
+			}
+		}
 
 		public void InspectionDone()
 		{
-			if (InspectionComplete != null)
-			{
-				InspectionComplete();
-			}
+			//TODO : 해당 Queue로 들어온 검사가 완전 종료되었을때 발동. 여기서 DB를 닫으면 될 것으로 보임
 		}
 
 		public void SetThread(int threadNum)  //(in int threadNum)  //2013 in 안됨

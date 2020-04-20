@@ -44,7 +44,12 @@ namespace RootTools
              }
          }
 
-        private ImageData m_ImageData;
+		public void DrawDefect(DefectData item)
+		{
+
+		}
+
+		private ImageData m_ImageData;
         public ImageData p_ImageData
         {
             get
