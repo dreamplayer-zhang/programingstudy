@@ -71,7 +71,7 @@ namespace RootTools.Inspects
 		/// <summary>
 		/// Temp DB에 저장된 data를 꺼내 VSData DB file에 담는 매소드
 		/// </summary>
-		public void CollectVSTempDB()
+		public bool CollectVSTempDB()
 		{
 			//DATA 출력 TEST
 			string time = System.DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
@@ -80,94 +80,106 @@ namespace RootTools.Inspects
 
 
 			SqliteDataDB VSDBManager = new SqliteDataDB(VSDB_path, VSDB_configpath);
-			VSDBManager.Connect();
-			VSDBManager.CreateTable("Datainfo");
-			VSDBManager.CreateTable("Data");
-			DataTable VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
-			DataTable VSDataDT = VSDBManager.GetDataTable("Data");
-			int datacount = 0;
-
-			//VS data
-			for (int i = 0; i < nThreadNum; i++)
+			if (VSDBManager.Connect())
 			{
-				string dbtemp_path = @"C:/vsdb/VSTEMP" + i.ToString() + ".sqlite";
-				string dbtemp_configpath = @"C:/vsdb/init/vsdb.txt";
+				//추후에 Try/Catch 구성으로 예외처리 진행 예정
+				VSDBManager.CreateTable("Datainfo");
+				VSDBManager.CreateTable("Data");
+				DataTable VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
+				DataTable VSDataDT = VSDBManager.GetDataTable("Data");
+				int datacount = 0;
 
-				dbtemp_path = dbtemp_path.Replace("/", "\\");
-				dbtemp_configpath = dbtemp_configpath.Replace("/", "\\");
-
-				SqliteDataDB VSDBTempManager = new SqliteDataDB(dbtemp_path, dbtemp_configpath);
-
-				VSDBTempManager.Connect();
-				DataTable TempDT = VSDBTempManager.GetDataTable("Tempdata");
-
-				for (int j = 0; j < TempDT.Rows.Count; j++)
+				//VS data
+				for (int i = 0; i < nThreadNum; i++)
 				{
-					//object temp = TempDT.Rows[j].ItemArray;
+					string dbtemp_path = @"C:/vsdb/VSTEMP" + i.ToString() + ".sqlite";
+					string dbtemp_configpath = @"C:/vsdb/init/vsdb.txt";
 
-					DataRow DataRow;
-					DataRow = VSDataDT.NewRow();
+					dbtemp_path = dbtemp_path.Replace("/", "\\");
+					dbtemp_configpath = dbtemp_configpath.Replace("/", "\\");
 
-					string temp;
-					//temp = "No";
-					//DataRow[temp] = datacount;
-					temp = "DCode";
-					DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
-					temp = "Size";
-					DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
-					temp = "Width";
-					object w = ReadData(temp, TempDT.Rows[j]);
-					DataRow[temp] = w;
-					temp = "Height";
-					object h = ReadData(temp, TempDT.Rows[j]);
-					DataRow[temp] = h;
+					SqliteDataDB VSDBTempManager = new SqliteDataDB(dbtemp_path, dbtemp_configpath);
 
-					int l = System.Convert.ToInt32(w);
-					//int l = (int)w;
-					if (l < System.Convert.ToInt32(h))
-						l = System.Convert.ToInt32(h);
-					temp = "Length";
-					DataRow[temp] = l;
+					VSDBTempManager.Connect();
+					DataTable TempDT = VSDBTempManager.GetDataTable("Tempdata");
 
-					/*
-                    temp = "InspMode";
-                    DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
-                    temp = "FOV";
-                    DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
-                    temp = "PosX";
-                    DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
-                    temp = "PosY";
-                    DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
-                    */
-					//Data,*No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+					for (int j = 0; j < TempDT.Rows.Count; j++)
+					{
+						//object temp = TempDT.Rows[j].ItemArray;
 
-					VSDataDT.Rows.Add(DataRow);
-					datacount++;
+						DataRow DataRow;
+						DataRow = VSDataDT.NewRow();
+
+						string temp;
+						//temp = "No";
+						//DataRow[temp] = datacount;
+						temp = "DCode";
+						DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
+						temp = "Size";
+						DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
+						temp = "Width";
+						object w = ReadData(temp, TempDT.Rows[j]);
+						DataRow[temp] = w;
+						temp = "Height";
+						object h = ReadData(temp, TempDT.Rows[j]);
+						DataRow[temp] = h;
+
+						int l = System.Convert.ToInt32(w);
+						//int l = (int)w;
+						if (l < System.Convert.ToInt32(h))
+							l = System.Convert.ToInt32(h);
+						temp = "Length";
+						DataRow[temp] = l;
+
+						/*
+                        temp = "InspMode";
+                        DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
+                        temp = "FOV";
+                        DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
+                        temp = "PosX";
+                        DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
+                        temp = "PosY";
+                        DataRow[temp] = ReadData(temp, TempDT.Rows[j]);
+                        */
+						//Data,*No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+
+						VSDataDT.Rows.Add(DataRow);
+						datacount++;
+					}
+
+					VSDBTempManager.Disconnect();
+					if (File.Exists(dbtemp_path))
+					{
+						File.Delete(dbtemp_path);
+					}
 				}
+				VSDBManager.SaveDataTable(VSDataDT);
 
-				VSDBTempManager.Disconnect();
-				if (File.Exists(dbtemp_path))
-				{
-					File.Delete(dbtemp_path);
-				}
+
+				//VSdatainfo
+				DataRow DatainfoRow;
+				DatainfoRow = VSDataInfoDT.NewRow();
+				string infotemp;
+				infotemp = "BCRID";
+				DatainfoRow[infotemp] = "ABCD1234";
+				infotemp = "RCPID";
+				DatainfoRow[infotemp] = "TestRecipe";
+				infotemp = "DataSaveTime";
+				DatainfoRow[infotemp] = time;
+				infotemp = "DefectCount";
+				DatainfoRow[infotemp] = datacount;
+
+				VSDataInfoDT.Rows.Add(DatainfoRow);
+				VSDBManager.SaveDataTable(VSDataInfoDT);
+
+				VSDBManager.Disconnect();
+
+				return true;
 			}
-			VSDBManager.SaveDataTable(VSDataDT);
-
-
-			//VSdatainfo
-			DataRow DatainfoRow;
-			DatainfoRow = VSDataInfoDT.NewRow();
-			string infotemp;
-			infotemp = "BCRID";
-			DatainfoRow[infotemp] = "ABCD1234";
-			infotemp = "RCPID";
-			DatainfoRow[infotemp] = "TestRecipe";
-			infotemp = "DataSaveTime";
-			DatainfoRow[infotemp] = time;
-			infotemp = "DefectCount";
-			DatainfoRow[infotemp] = datacount;
-
-			VSDataInfoDT.Rows.Add(DatainfoRow);
+			else
+			{
+				return false;
+			}
 		}
 
 		public object ReadData(string column, DataRow row)
