@@ -263,7 +263,11 @@ namespace Root_Vega.Module
             while (m_bThreadCheck)
             {
                 Thread.Sleep(m_msInterval);
-                SendQuery(m_iData, 1000); 
+                if (m_aData.Count > 0)
+                {
+                    SendQuery(m_iData, 1000);
+                    m_iData = (m_iData + 1) % m_aData.Count;
+                }
             }
         }
 
@@ -288,8 +292,8 @@ namespace Root_Vega.Module
             p_id = id;
             base.InitBase(id, engineer, sLogGroup);
 
-            m_threadCheck = new Thread(new ThreadStart(CheckThread));
-            m_threadCheck.Start();
+//            m_threadCheck = new Thread(new ThreadStart(CheckThread));
+//            m_threadCheck.Start();
         }
 
         public override void ThreadStop()

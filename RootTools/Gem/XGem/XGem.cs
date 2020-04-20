@@ -1116,6 +1116,7 @@ namespace RootTools.Gem.XGem
             foreach (Process process in ProcessList) process.Kill();
         }
 
+        bool m_bStart = false; 
         string m_sPathConfig = "C:\\ATI\\GEM300.cfg";
         void XGemConfigFile()
         {
@@ -1123,6 +1124,7 @@ namespace RootTools.Gem.XGem
             {
                 long nError = m_xGem.Initialize(m_sPathConfig);
                 LogSend(nError, "Initialize", m_sPathConfig);
+                if (nError == 0) m_bStart = true; 
             }
             catch { p_sInfo = "Initialize File Open Error : " + m_sPathConfig; }
         }
@@ -1283,11 +1285,12 @@ namespace RootTools.Gem.XGem
             if (m_bThread)
             {
                 m_bThread = false;
-                m_thread.Join(); 
+                m_thread.Join();
             }
             if (m_xGem == null) return;
             try
             {
+                if (m_bStart == false) return;
                 m_xGem.Stop();
                 m_xGem.Close();
             }
