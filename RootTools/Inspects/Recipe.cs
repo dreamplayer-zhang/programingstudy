@@ -24,20 +24,20 @@ namespace RootTools.Inspects
     {
         //DateTime m_StartTime;
         //DateTime m_EndTime;
-        DefectData[] m_DD;
+        DefectInfo[] m_DD;
 
         Result(int nCnt = 100000)
         {
-            m_DD = new DefectData[nCnt];
+            m_DD = new DefectInfo[nCnt];
         }
 
-        public void MakeCluster(List<DefectData> DD, int nRange = 10)
+        public void MakeCluster(List<DefectInfo> DD, int nRange = 10)
         {
             int cid = 0;
             for (int n = 0; n < DD.Count; n++)
             {
-                DefectData Curr = DD[n];
-                if (Curr.nClusterID != DefectData.NONE)
+                DefectInfo Curr = DD[n];
+                if (Curr.nClusterID != DefectInfo.NONE)
                 {
                     Curr.nClusterID = cid++;
                     for (int m = 0; m < DD.Count; m++)
@@ -54,7 +54,7 @@ namespace RootTools.Inspects
     }
 
 
-    public class DefectData
+    public class DefectInfo
     {
         public const int NONE = -1;
         public RPoint ptPos; // Center 

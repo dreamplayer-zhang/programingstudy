@@ -1,29 +1,6 @@
 #include "pch.h"
 #include "InspectionSurface.h"
 
-//bool InspectionSurface::Inspection()
-//{
-//	CheckConditions();
-//	
-//	if (GetDarkInspection())
-//	{
-//		CopyImageToBuffer();//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
-//		InspectionDark();
-//	}
-//	else
-//	{
-//		InspectionBright();
-//	}
-//
-//	return GetResult();
-//}
-void InspectionSurface::EndInspection(int threadidx)
-{
-	EraseDB(threadidx);
-
-
-}
-
 void InspectionSurface::SetParams(byte* buffer, int bufferwidth, int bufferheight, RECT roi, int defectCode, int grayLevel, int defectSize, bool bDarkInspection,int threadindex)
 {
 	SetBuffer(buffer);
@@ -33,11 +10,10 @@ void InspectionSurface::SetParams(byte* buffer, int bufferwidth, int bufferheigh
 	SetGrayLevel(grayLevel);
 	SetDefectSize(defectSize);
 	SetIsDarkInspection(bDarkInspection);
-	OpenDB(threadindex);
 }
-vector<DefectInfo> InspectionSurface::Inspection(bool nAbsolute, bool bIsDartInsp)
+std::vector<DefectDataStruct> InspectionSurface::Inspection(bool nAbsolute, bool bIsDartInsp)
 {
-	vector<DefectInfo> vResult;
+	std::vector<DefectDataStruct> vResult;
 
 	bool bDarkResut = bIsDartInsp;
 	bool bInspResult = false;
@@ -82,7 +58,7 @@ vector<DefectInfo> InspectionSurface::Inspection(bool nAbsolute, bool bIsDartIns
 					rt = GetPitsizer()->GetPitRect();
 					if (Functions::GetWidth(rt) >= GetDefectSize() || Functions::GetHeight(rt) >= GetDefectSize())
 					{
-						vResult.push_back(GetDefectInfo(rt, ptDefectPos, ret));
+						vResult.push_back(GetDefectData(rt, ptDefectPos, ret));
 						bInspResult = true;
 					}
 				}
@@ -90,7 +66,7 @@ vector<DefectInfo> InspectionSurface::Inspection(bool nAbsolute, bool bIsDartIns
 				{
 					rt = GetPitsizer()->GetPitRect();
 
-					vResult.push_back(GetDefectInfo(rt, ptDefectPos, ret));
+					vResult.push_back(GetDefectData(rt, ptDefectPos, ret));
 					bInspResult = true;
 				}
 			}

@@ -5,12 +5,11 @@
 #include <assert.h>
 #include "Constants.h"
 #include "PitSizer.h"
-#include "Cpp_DB.h"
+//#include "Cpp_DB.h"
 #include "Functions.h"
 #include "TypeDefines.h"
 #include <vector>
 
-using namespace std;
 
 class InspectionBase
 {
@@ -27,12 +26,7 @@ protected:
 	byte inspbuffer2[16000000];
 	RECT inspbufferROI;
 	RECT GetInspbufferROI() const;
-	void AddDefect(RECT rt, POINT ptDPos, float fSize);
-	DefectInfo GetDefectInfo(RECT rt, POINT ptDPos, float fSize);
-	void WriteDB(RECT rt, float size);
-	void OpenDB(int threadidx);
-	void EraseDB(int threadidx);
-	void CloseDB();
+	DefectDataStruct GetDefectData(RECT rt, POINT ptDPos, float fSize);
 public:
 	inline void SetDefectCode(int nValue)
 	{
@@ -93,7 +87,6 @@ public:
 	byte** ppBuffer;
 private:
 	PitSizer* pPitSizer;
-	Cpp_DB* pDataBase;
 	byte* pBuffer;
 	int nBufferW;
 	int nBufferH;
@@ -102,8 +95,6 @@ private:
 	bool bResult;
 	POINT m_ptCurrent;
 	int dbcount;
-
-	string DBFolderPath = "C:/vsdb";
 
 private:
 	RECT rtROI;

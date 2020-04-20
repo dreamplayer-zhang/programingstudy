@@ -3,9 +3,7 @@
 #include <stdio.h>
 #include <string>
 #include "..\RootTools_Cpp\\InspSurface_Reticle.h"
-#include "..\RootTools_Cpp\Cpp_DB.h"
-
-using namespace std;
+//#include "..\RootTools_Cpp\Cpp_DB.h"
 
 namespace RootTools_CLR
 {
@@ -17,9 +15,9 @@ namespace RootTools_CLR
 			virtual ~CLR_InspConnector();
 
 			InspSurface_Reticle* m_InspReticle;
-			Cpp_DB* m_DBmgr;
+			//Cpp_DB* m_DBmgr;
 
-			void GetImagePool(string memoryname,int pool_w, int pool_h);
+			void GetImagePool(std::string memoryname,int pool_w, int pool_h);
 
 
 			//현재 검사에 대한 parameter set
@@ -45,8 +43,6 @@ namespace RootTools_CLR
 	private:
 		void SetInitData();
 		int ProcessorNum;
-
-		string dbpath = "C:/sqlite/db/VSTEMP";
 
 
 		LPVOID ImgPool;

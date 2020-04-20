@@ -18,7 +18,7 @@ private:
 	int m_nWidth;
 	int m_nHeight;
 	int m_nThreshold;
-	vector<LabeledData> m_vtLabeledData;
+	std::vector<LabeledData> m_vtLabeledData;
 
 	//
 	bool SurfaceDark();

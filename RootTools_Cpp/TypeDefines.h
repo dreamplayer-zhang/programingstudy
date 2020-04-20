@@ -13,7 +13,7 @@ typedef struct _LabeledData
 	LONG value;
 } LabeledData;
 
-typedef struct _DefectInfo
+typedef struct _DefectDataStruct
 {
 	LONG nIdx;
 	LONG nClassifyCode;
@@ -25,9 +25,8 @@ typedef struct _DefectInfo
 	LONG nFOV;
 	double fPosX;
 	double fPosY;
-} DefectInfo;
+} DefectDataStruct;
 
 // namespace;
-using namespace std;
 
 

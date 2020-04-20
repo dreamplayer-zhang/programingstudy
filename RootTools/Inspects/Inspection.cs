@@ -28,11 +28,6 @@ namespace RootTools.Inspects
             //_thread.IsBackground = true;
             _thread.Start();
         }
-        public void EndInspection(int threadIndex)
-        {
-            clrDemo.EndInspection(threadIndex);
-
-        }
 
         public void DoInspection(object threadId)
         {
@@ -43,8 +38,8 @@ namespace RootTools.Inspects
                     Console.WriteLine(string.Format("Inspection ID : {0} Thread Index {1}", InspectionID, ThreadIndex));
                     bState = InspectionState.Running;
 
-                    clrDemo.Test_strip(ThreadIndex, m_InspProp.p_Rect.Left, m_InspProp.p_Rect.Top, m_InspProp.p_Rect.Right, m_InspProp.p_Rect.Bottom, 10000, 10000, m_InspProp.p_Sur_Param.p_GV, m_InspProp.p_Sur_Param.p_DefectSize, m_InspProp.p_Sur_Param.p_bDarkInspection);
-                    //clrDemo.Test_strip(10000, 10000);
+
+                    var arrDefects = clrDemo.Test_strip(ThreadIndex, m_InspProp.p_Rect.Left, m_InspProp.p_Rect.Top, m_InspProp.p_Rect.Right, m_InspProp.p_Rect.Bottom, 10000, 10000, m_InspProp.p_Sur_Param.p_GV, m_InspProp.p_Sur_Param.p_DefectSize, m_InspProp.p_Sur_Param.p_bDarkInspection);
                 }
                 else if (bState == InspectionState.Running)
                 {

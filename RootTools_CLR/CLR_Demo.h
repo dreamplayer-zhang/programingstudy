@@ -6,9 +6,10 @@
 #include "memoryapi.h"
 #include <stdio.h>
 #include <list>
-#include "..\RootTools_Cpp\\Cpp_DB.h"
+//#include "..\RootTools_Cpp\\Cpp_DB.h"
 #include "CLR_InspConnector.h"
 #include "..\RootTools_Cpp\\InspectionSurface.h"
+#include "DefectData.h"
 //#include "InspSurface_Reticle.h"
 
 //
@@ -32,7 +33,7 @@ namespace RootTools_CLR
 	protected:
 		Cpp_Demo* m_pDemo = nullptr; 
 		PitSizer* m_PitSizer = nullptr;
-		Cpp_DB*  m_pDB = nullptr;
+		//Cpp_DB*  m_pDB = nullptr;
 		//InspSurface_Reticle* m_Reticle = nullptr;
 		CLR_InspConnector* m_InspConn = nullptr;
 		InspectionSurface* pInspSurface = nullptr;
@@ -41,7 +42,7 @@ namespace RootTools_CLR
 		{
 			m_pDemo = new Cpp_Demo();
 			m_PitSizer = new PitSizer(2048 * 2048, 1);
-			m_pDB = new Cpp_DB();
+			//m_pDB = new Cpp_DB();
 			//m_Reticle = new InspSurface_Reticle();
 			m_InspConn = new CLR_InspConnector();
 			pInspSurface = new InspectionSurface();
@@ -74,15 +75,10 @@ namespace RootTools_CLR
 
 			return 1;
 		}
-		void EndInspection(int threadidx)
-		{
-			pInspSurface->EndInspection(threadidx);
-
-		}
-		int Test_strip(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark)
+		array<DefectData^>^ Test_strip(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark)
 		{
 			RECT testrect;
-			vector<DefectInfo> vResult;
+			std::vector<DefectDataStruct> vTempResult;
 
 			testrect.left = RoiLeft;
 			testrect.right = RoiRight;
@@ -105,9 +101,28 @@ namespace RootTools_CLR
 			pInspSurface->CheckConditions();
 
 			pInspSurface->CopyImageToBuffer(bDark);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
-			vResult = pInspSurface->Inspection(true, bDark);//TODO : absolute GV 구현해야함
+			vTempResult = pInspSurface->Inspection(true, bDark);//TODO : absolute GV 구현해야함
 			
-			bool bDebugPoint = vResult.size() > 0;
+			bool bResultExist = vTempResult.size() > 0;
+			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
+
+			if (bResultExist)
+			{
+				for (int i = 0; i < vTempResult.size(); i++)
+				{
+					local[i] = gcnew DefectData();
+					local[i]->nIdx = vTempResult[i].nIdx;
+					local[i]->nClassifyCode = vTempResult[i].nClassifyCode;
+					local[i]->fSize = vTempResult[i].fSize;
+					local[i]->nLength = vTempResult[i].nLength;
+					local[i]->nWidth = vTempResult[i].nWidth;
+					local[i]->nHeight = vTempResult[i].nHeight;
+					local[i]->nInspMode = vTempResult[i].nInspMode;
+					local[i]->nFOV = vTempResult[i].nFOV;
+					local[i]->fPosX = vTempResult[i].fPosX;
+					local[i]->fPosY = vTempResult[i].fPosY;
+				}
+			}
 
 			//return GetResult();
 
@@ -115,7 +130,7 @@ namespace RootTools_CLR
 			//m_InspConn->StripRun(testrect, 1);
 			//m_InspConn->EndRun();
 
-			return 1;
+			return local;
 
 
 			/*
@@ -336,41 +351,6 @@ namespace RootTools_CLR
 
 		}
 
-		void DBSaveTest(RECT rt, float size, int count)
-		{
-			int PosX;//
-			int PosY;//
-			int Darea;//
-			int UnitX;
-			int UnitY;
-			int Width;//
-			int Height;//
-			int ClusterID;
-			int Dcode;
-
-			Width = rt.right - rt.left;
-			Height = rt.bottom - rt.top;
-			PosX = rt.left + (int)(Width*0.5);
-			PosY = rt.top + (int)(Height*0.5);
-			Darea = (int)size;
-			UnitX = 0;
-			UnitY = 0;
-			ClusterID = 0;
-			Dcode = 101;
-
-
-			char ch[100];
-			//NO POSX POSY DAREA UNITX UNITY WIDTH HEIGHT CLUSTERID RECTL RECTT RECTR RECTB DNAME DCODE
-			//기존 VISION에는 adddefect에서 posx, posy, rect 환산식이 있음
-
-			sprintf(ch, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-				count, PosX, PosY, Darea, UnitX, UnitY, Width, Height, ClusterID, rt.left, rt.top, rt.right, rt.bottom, 1234, Dcode);
-			string str(ch);
-			std::string DBPath = "C:/sqlite/db/VS1.sqlite";
-			//m_pDB->DBOpenAndWrite(DBPath, str);
-			m_pDB->InsertData(str);
-		}
-
 		int Width(RECT rt)
 		{
 			int width = rt.right - rt.left;
@@ -388,7 +368,7 @@ namespace RootTools_CLR
 			return Height;
 		}
 
-		bool OpenImage(string FilePath)
+		bool OpenImage(std::string FilePath)
 		{
 			return m_pDemo->OpenImage(FilePath);
 		}

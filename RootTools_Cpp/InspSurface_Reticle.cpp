@@ -7,7 +7,7 @@ InspSurface_Reticle::InspSurface_Reticle(int processornum)
 {
 	ProcessorNum = processornum;
 	m_pPitSizer = new PitSizer(2048 * 2048, 1);
-	m_DBmgr = new Cpp_DB();
+	//m_DBmgr = new Cpp_DB();
 
 	dbcount = 0;
 
@@ -221,10 +221,10 @@ bool InspSurface_Reticle::InspRect_Dark(int nDCode, RECT rtROI, bool bABSGV, int
 							ret = (float)(ret / (InterOffset * InterOffset));
 
 						}
-						if (!AddDefect(nDCode, rt, ptDPos, ret)) //SASSAS
-						{
-							return false;
-						}
+						//if (!AddDefect(nDCode, rt, ptDPos, ret)) //SASSAS
+						//{
+						//	return false;
+						//}
 						bRst = false;
 					}
 				}
@@ -258,8 +258,8 @@ bool InspSurface_Reticle::InspRect_Dark(int nDCode, RECT rtROI, bool bABSGV, int
 					//defectVector.push_back(_tempDefect);
 
 					//구조체 defect add 나중에 구현
-					if(!AddDefect(nDCode, rt, ptDPos, ret)) 
-						return false;	
+					/*if(!AddDefect(nDCode, rt, ptDPos, ret)) 
+						return false;	*/
 					bRst = false;
 				}
 			}
@@ -278,131 +278,131 @@ bool InspSurface_Reticle::InspRect_Dark(int nDCode, RECT rtROI, bool bABSGV, int
 
 	return bRst;
 }
-bool InspSurface_Reticle::AddDefect(int nDCode, RECT rt, POINT ptDPos, float fSize)
-{
-	rt.left = rt.left + ptDPos.x - m_ptCurrent.x - m_nInspOffset;
-	rt.right = rt.right + ptDPos.x - m_ptCurrent.x - m_nInspOffset;
-	rt.bottom = rt.bottom + ptDPos.y - m_ptCurrent.y - m_nInspOffset;
-	rt.top = rt.top + ptDPos.y - m_ptCurrent.y - m_nInspOffset;
-
-	int nX = rt.left + (int)(Width(rt) * 0.5);
-	int nY = rt.top + (int)(Height(rt) * 0.5);
-
-	//CheckRedundancy 나중에 구현
-
-	//int nMin = 256, nMax = 0;
-	//int nBoxWidth = m_pParamSurface->m_nNonePattern_DZone;
-	//int nCheckSize = m_pParamSurface->m_nNonePattern_CheckLength;
-	//int nCheckGV = m_pParamSurface->m_nNonePattern_CheckGV;
-	//int nSX, nEX, nSY, nEY;
-	//LPBYTE p;
-
-	//CRect rtDefectZone;
-	//if (m_bNonePatternFiltering) {
-	//	// 현 불량 위치에서 상,하,좌,우의 패턴 여부 인지해서 nonepattern이 아니면 불량을 제거
-	//	// top
-	//	nSX = nX - nCheckSize;
-	//	nEX = nX + nCheckSize;
-	//	nSY = nY - nCheckSize;
-	//	nEY = nY + nCheckSize;
-
-	//	rtDefectZone = CRect(nX - nBoxWidth, nY - nBoxWidth, nX + nBoxWidth, nY + nBoxWidth);
-
-	//	for (int i = nSY; i < nEY; i++) {
-	//		p = &m_ppImage[i][nSX];
-	//		for (int j = nSX; j < nEX; j++, p++) {
-	//			if (rtDefectZone.PtInRect(CPoint(j, i)));
-	//			else if (*p < nMin)	nMin = *p;
-	//			else if (*p > nMax)	nMax = *p;
-	//		}
-	//	}
-
-	//	if (nMax - nMin > nCheckGV)
-	//		return TRUE;
-	//}
-
-	//if (CheckRedundancy(nDCode, nX, nY, rt, fSize, ptDPos)) // Xian
-	//{
-	//	// 결과값이 True 일때는 재검사를 시도함 불량이 추가 된지 안된지는 몰른다. 
-	//	return true;
-
-	//}
-	//else
-	//{
-	//	// 결과값이 false 일때는 실행을 안함
-	//}
-
-	return WriteDB(nDCode, rt, fSize);
-	//return AddDefect(nDCode, nX, nY, fSize, rt);
-}
-void InspSurface_Reticle::OpenDB()
-{
-	string temp;
-	temp = DBFolderPath + "/VSTEMP" + to_string(ProcessorNum) + ".sqlite";
-	dbcount = 0;
-	int result = CreateDirectoryA(DBFolderPath.c_str(), NULL);
-	m_DBmgr->DBCreateVSTemp(temp);
-	m_DBmgr->OpenAndBegin(temp);
-
-}
-void InspSurface_Reticle::CloseDB()
-{
-	dbcount = 0;
-	//WriteLastFlag();
-	m_DBmgr->CommitAndClose();
-
-}
-bool InspSurface_Reticle::WriteLastFlag()
-{
-	char ch[500];
-
-	sprintf_s(ch, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1);
-
-	string str(ch);
-	m_DBmgr->InsertData(str);
-
-	return true;
-}
-bool InspSurface_Reticle::WriteDB(int DCode, RECT rt, float size)
-{
-	int PosX;//
-	int PosY;//
-	int Darea;//
-	int UnitX;
-	int UnitY;
-	int Width;//
-	int Height;//
-	int ClusterID;
-	int Dcode;
-
-	Width = rt.right - rt.left;
-	Height = rt.bottom - rt.top;
-	PosX = rt.left + (int)(Width * 0.5);
-	PosY = rt.top + (int)(Height * 0.5);
-	Darea = (int)size;
-	UnitX = 0;
-	UnitY = 0;
-	ClusterID = 0;
-	Dcode = DCode;
-
-
-	char ch[500];
-	//NO POSX POSY DAREA UNITX UNITY WIDTH HEIGHT CLUSTERID RECTL RECTT RECTR RECTB DNAME DCODE
-	//기존 VISION에는 adddefect에서 posx, posy, rect 환산식이 있음
-
-	// 보여주기 용 일부로 rt rect 값 뺌
-	sprintf_s(ch, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-		dbcount, PosX, PosY, Darea, UnitX, UnitY, Width, Height, ClusterID, rt.left + 10, rt.top + 10, rt.right + 10, rt.bottom + 10, 1234, Dcode, 0);
-
+//bool InspSurface_Reticle::AddDefect(int nDCode, RECT rt, POINT ptDPos, float fSize)
+//{
+//	rt.left = rt.left + ptDPos.x - m_ptCurrent.x - m_nInspOffset;
+//	rt.right = rt.right + ptDPos.x - m_ptCurrent.x - m_nInspOffset;
+//	rt.bottom = rt.bottom + ptDPos.y - m_ptCurrent.y - m_nInspOffset;
+//	rt.top = rt.top + ptDPos.y - m_ptCurrent.y - m_nInspOffset;
+//
+//	int nX = rt.left + (int)(Width(rt) * 0.5);
+//	int nY = rt.top + (int)(Height(rt) * 0.5);
+//
+//	//CheckRedundancy 나중에 구현
+//
+//	//int nMin = 256, nMax = 0;
+//	//int nBoxWidth = m_pParamSurface->m_nNonePattern_DZone;
+//	//int nCheckSize = m_pParamSurface->m_nNonePattern_CheckLength;
+//	//int nCheckGV = m_pParamSurface->m_nNonePattern_CheckGV;
+//	//int nSX, nEX, nSY, nEY;
+//	//LPBYTE p;
+//
+//	//CRect rtDefectZone;
+//	//if (m_bNonePatternFiltering) {
+//	//	// 현 불량 위치에서 상,하,좌,우의 패턴 여부 인지해서 nonepattern이 아니면 불량을 제거
+//	//	// top
+//	//	nSX = nX - nCheckSize;
+//	//	nEX = nX + nCheckSize;
+//	//	nSY = nY - nCheckSize;
+//	//	nEY = nY + nCheckSize;
+//
+//	//	rtDefectZone = CRect(nX - nBoxWidth, nY - nBoxWidth, nX + nBoxWidth, nY + nBoxWidth);
+//
+//	//	for (int i = nSY; i < nEY; i++) {
+//	//		p = &m_ppImage[i][nSX];
+//	//		for (int j = nSX; j < nEX; j++, p++) {
+//	//			if (rtDefectZone.PtInRect(CPoint(j, i)));
+//	//			else if (*p < nMin)	nMin = *p;
+//	//			else if (*p > nMax)	nMax = *p;
+//	//		}
+//	//	}
+//
+//	//	if (nMax - nMin > nCheckGV)
+//	//		return TRUE;
+//	//}
+//
+//	//if (CheckRedundancy(nDCode, nX, nY, rt, fSize, ptDPos)) // Xian
+//	//{
+//	//	// 결과값이 True 일때는 재검사를 시도함 불량이 추가 된지 안된지는 몰른다. 
+//	//	return true;
+//
+//	//}
+//	//else
+//	//{
+//	//	// 결과값이 false 일때는 실행을 안함
+//	//}
+//
+//	return WriteDB(nDCode, rt, fSize);
+//	//return AddDefect(nDCode, nX, nY, fSize, rt);
+//}
+//void InspSurface_Reticle::OpenDB()
+//{
+//	string temp;
+//	temp = DBFolderPath + "/VSTEMP" + to_string(ProcessorNum) + ".sqlite";
+//	dbcount = 0;
+//	int result = CreateDirectoryA(DBFolderPath.c_str(), NULL);
+//	//m_DBmgr->DBCreateVSTemp(temp);
+//	//m_DBmgr->OpenAndBegin(temp);
+//
+//}
+//void InspSurface_Reticle::CloseDB()
+//{
+//	dbcount = 0;
+//	//WriteLastFlag();
+//	//m_DBmgr->CommitAndClose();
+//
+//}
+//bool InspSurface_Reticle::WriteLastFlag()
+//{
+//	char ch[500];
+//
 //	sprintf_s(ch, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-//		dbcount, PosX, PosY, Darea, UnitX, UnitY, Width, Height, ClusterID, rt.left, rt.top, rt.right, rt.bottom, 1234, Dcode,0);
-
-//	sprintf(ch, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-//		dbcount, PosX, PosY, Darea, UnitX, UnitY, Width, Height, ClusterID, rt.left, rt.top, rt.right, rt.bottom, 1234, Dcode);
-	string str(ch);
-	m_DBmgr->InsertData(str);
-	dbcount++;
-
-	return true;
-}
+//		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1);
+//
+//	string str(ch);
+//	//m_DBmgr->InsertData(str);
+//
+//	return true;
+//}
+//bool InspSurface_Reticle::WriteDB(int DCode, RECT rt, float size)
+//{
+//	int PosX;//
+//	int PosY;//
+//	int Darea;//
+//	int UnitX;
+//	int UnitY;
+//	int Width;//
+//	int Height;//
+//	int ClusterID;
+//	int Dcode;
+//
+//	Width = rt.right - rt.left;
+//	Height = rt.bottom - rt.top;
+//	PosX = rt.left + (int)(Width * 0.5);
+//	PosY = rt.top + (int)(Height * 0.5);
+//	Darea = (int)size;
+//	UnitX = 0;
+//	UnitY = 0;
+//	ClusterID = 0;
+//	Dcode = DCode;
+//
+//
+//	char ch[500];
+//	//NO POSX POSY DAREA UNITX UNITY WIDTH HEIGHT CLUSTERID RECTL RECTT RECTR RECTB DNAME DCODE
+//	//기존 VISION에는 adddefect에서 posx, posy, rect 환산식이 있음
+//
+//	// 보여주기 용 일부로 rt rect 값 뺌
+//	sprintf_s(ch, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+//		dbcount, PosX, PosY, Darea, UnitX, UnitY, Width, Height, ClusterID, rt.left + 10, rt.top + 10, rt.right + 10, rt.bottom + 10, 1234, Dcode, 0);
+//
+////	sprintf_s(ch, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+////		dbcount, PosX, PosY, Darea, UnitX, UnitY, Width, Height, ClusterID, rt.left, rt.top, rt.right, rt.bottom, 1234, Dcode,0);
+//
+////	sprintf(ch, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+////		dbcount, PosX, PosY, Darea, UnitX, UnitY, Width, Height, ClusterID, rt.left, rt.top, rt.right, rt.bottom, 1234, Dcode);
+//	string str(ch);
+//	m_DBmgr->InsertData(str);
+//	dbcount++;
+//
+//	return true;
+//}

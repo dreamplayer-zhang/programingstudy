@@ -3,16 +3,15 @@
 #include <stdio.h>
 #include <string>
 #include "PitSizer.h"
-#include "Cpp_DB.h"
+//#include "Cpp_DB.h"
 
-using namespace std;
 
 class InspSurface_Reticle
 {
 public:
 	InspSurface_Reticle(int processornum);
 	PitSizer* m_pPitSizer;
-	Cpp_DB* m_DBmgr;
+	//Cpp_DB* m_DBmgr;
 
 
 	int TestFunc(POINT A);
@@ -27,14 +26,14 @@ public:
 		POINT ptDPos, BOOL bLengthInsp, BOOL bInterpolation);
 	void CopyImageToBuffer(byte* mem, int nW, RECT rtR, int nBackGround, BOOL bInterpolation);
 	int CalHPPatternGV(int nBandwidth, int nIntensity, int nW, int nH);
-	bool AddDefect(int nDCode, RECT rt, POINT ptDPos, float fSize);
+	//bool AddDefect(int nDCode, RECT rt, POINT ptDPos, float fSize);
 
 	POINT m_ptCurrent;
 
-	void OpenDB();
+	/*void OpenDB();
 	void CloseDB();
 	bool WriteLastFlag();
-	bool WriteDB(int DCode, RECT rt, float size);
+	bool WriteDB(int DCode, RECT rt, float size);*/
 
 protected:
 	int m_Histogram[256];
@@ -51,7 +50,7 @@ protected:
 	double m_nPatternInterpolationOffset = 2.0;
 	bool m_bPatternUseInterpolation = false;//second interpolation
 
-	string DBFolderPath = "C:/vsdb";
+	std::string DBFolderPath = "C:/vsdb";
 	int dbcount;
 	int ProcessorNum;
 };
