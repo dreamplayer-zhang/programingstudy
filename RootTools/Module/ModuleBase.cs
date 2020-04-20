@@ -392,7 +392,7 @@ namespace RootTools.Module
         public IEngineer m_engineer;
         public LogWriter m_log;
         public IGem m_gem;
-        protected GAF m_gaf;
+        public GAF m_gaf;
         public ToolBox m_toolBox;
         public TreeRoot m_treeRoot;
         public TreeRoot m_treeToolBox;
