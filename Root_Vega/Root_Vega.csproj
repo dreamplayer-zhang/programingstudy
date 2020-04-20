@@ -215,6 +215,7 @@
     <Compile Include="Models\InspectionReview\ImageType.cs" />
     <Compile Include="Models\InspectionReview\InspectionInformation.cs" />
     <Compile Include="Models\InspectionReview\InspectionModeInfo.cs" />
+    <Compile Include="Module\FDC.cs" />
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="InfoPod.cs" />
     <Compile Include="InfoPod_UI.xaml.cs">
