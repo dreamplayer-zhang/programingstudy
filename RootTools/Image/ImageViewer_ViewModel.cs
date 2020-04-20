@@ -46,8 +46,8 @@ namespace RootTools
 
 		public void DrawDefect(DefectData item)
 		{
-
-		}
+            DrawingRectAtPoint(item.fPosX, item.fPosY);
+        }
 
 		private ImageData m_ImageData;
         public ImageData p_ImageData
@@ -762,6 +762,24 @@ namespace RootTools
             m_PtMouseBuffer = new CPoint(p_MouseX, p_MouseY);
             m_swMouse.Restart();
         }
+        /// <summary>
+        /// 지정된 포인트를 중심으로 Width와 Hegiht만큼 Rectangle을 Draw
+        /// </summary>
+        /// <param name="x_pos"></param>
+        /// <param name="y_pos"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public void DrawingRectAtPoint(double x_pos,double y_pos, double width, double height)
+        {
+            if (m_DrawHelper == null)
+                m_DrawHelper = new DrawHelper();
+
+            CPoint startPt = new CPoint((int)(x_pos - width / 2.0), (int)(y_pos - height / 2.0));
+            CPoint endPt = new CPoint((int)(x_pos + width / 2.0), (int)(y_pos + height / 2.0));
+        }
+        /// <summary>
+        /// 마우스 커서 기반 Rectangle Draw. 정상 동작을 위해 p_MouseMemX과 p_MouseMemY Update가 수반되어야 함
+        /// </summary>
         private void StartDrawingRect()
         {
             if (m_DrawHelper == null)
