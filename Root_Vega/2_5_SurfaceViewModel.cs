@@ -801,7 +801,8 @@ namespace Root_Vega
 
 		private void ClearUI()
 		{
-			p_UIElement.Clear();
+			if (p_UIElement != null)
+				p_UIElement.Clear();
 		}
 		private void _btnClear()
 		{
@@ -875,6 +876,14 @@ namespace Root_Vega
 		List<CRect> DrawRectList;
 		private void _btnInspTest()
 		{
+			ClearUI();//재검사 전 UI 정리
+
+			if (m_DD != null)
+				m_DD.Clear();//Draw Data정리
+
+			if (DrawRectList != null)
+				DrawRectList.Clear();//검사영역 draw용 Rect List 정리
+
 			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Surface.m_NonPattern[0].m_rt;
 			int nblocksize = 500;
 
