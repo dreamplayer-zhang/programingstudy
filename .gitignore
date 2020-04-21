@@ -187,6 +187,6 @@ ModelManifest.xml
 
 
 # NuGet Packages Directory
-#packages/*
+packages/*
 Lib/opencv_world347d.dll
 Lib/opencv_world347.dll
