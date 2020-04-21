@@ -1007,6 +1007,11 @@ namespace RootTools
         }
         public void OnMouseDown(Object sender, System.Windows.Input.MouseEventArgs e)
         {
+            //var viewer = (Canvas)sender;
+            //viewer.Focus();
+        }
+        public void OnMouseEnter(Object sender, System.Windows.Input.MouseEventArgs e)
+        {
             var viewer = (Canvas)sender;
             viewer.Focus();
         }
