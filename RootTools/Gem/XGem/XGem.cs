@@ -13,7 +13,7 @@ using System.Windows.Threading;
 
 namespace RootTools.Gem.XGem
 {
-    public class XGem : IGem, IToolSet
+    public class XGem : NotifyProperty, IGem, IToolSet
     {
         #region eCommunicate
         public enum eCommunicate
@@ -75,12 +75,13 @@ namespace RootTools.Gem.XGem
                 if (_eReqControl == value) return;
                 p_sInfo = "eReqControl : " + _eReqControl.ToString() + " -> " + value.ToString(); 
                 _eReqControl = value;
+                OnPropertyChanged();
                 long nError = 0;
                 switch (_eReqControl)
                 {
-                    case eControl.OFFLINE: nError = m_xGem.GEMReqOffline(); break;
-                    case eControl.LOCAL: nError = m_xGem.GEMReqLocal(); break;
-                    case eControl.ONLINEREMOTE: nError = m_xGem.GEMReqRemote(); break;
+                    case eControl.OFFLINE: nError = m_bStart ? m_xGem.GEMReqOffline() : 0; break;
+                    case eControl.LOCAL: nError = m_bStart ? m_xGem.GEMReqLocal() : 0; break;
+                    case eControl.ONLINEREMOTE: nError = m_bStart ? m_xGem.GEMReqRemote() : 0; break;
                     default: return;
                 }
                 LogSend(nError, "Change Control State = " + _eReqControl.ToString());
@@ -96,6 +97,7 @@ namespace RootTools.Gem.XGem
                 if (_eControl == value) return;
                 p_sInfo = "eControl : " + _eControl.ToString() + " -> " + value.ToString(); 
                 _eControl = value;
+                OnPropertyChanged(); 
                 foreach (GemCarrierBase carrier in m_aCarrier)
                 {
                     if (value == eControl.ONLINEREMOTE) carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Auto;
@@ -402,7 +404,7 @@ namespace RootTools.Gem.XGem
         public long SetAlarm(ALID alid, bool bSet)
         {
             long nSet = bSet ? 1 : 0;
-            long nError = m_xGem.GEMSetAlarm(alid.p_nID, nSet);
+            long nError = p_bEnable ? m_xGem.GEMSetAlarm(alid.p_nID, nSet) : 0;
             LogSend(nError, "GEMSetAlarm", alid.p_nID, nSet);
             p_sInfo = "SetAlarm " + alid.p_sModule + "." + alid.p_id + " = " + nSet.ToString();
             return nError; 
@@ -410,7 +412,8 @@ namespace RootTools.Gem.XGem
 
         public long SetCEID(CEID ecv)
         {
-            long nError = m_xGem.GEMSetEvent(ecv.p_nID);
+            if (p_bEnable == false) return -1;
+            long nError = p_bEnable ? m_xGem.GEMSetEvent(ecv.p_nID) : 0;
             LogSend(nError, "GEMSetEvent", ecv.p_nID);
             p_sInfo = "SetCEID " + ecv.p_sModule + "." + ecv.p_id;
             return nError; 
@@ -420,9 +423,10 @@ namespace RootTools.Gem.XGem
         string[] m_svValue = new string[1];
         public long SetSV(SVID sv, dynamic value)
         {
+            if (p_bEnable == false) return -1;
             m_svID[0] = sv.p_nID;
             m_svValue[0] = value.ToString();
-            long nError = m_xGem.GEMSetVariable(1, m_svID, m_svValue);
+            long nError = p_bEnable ? m_xGem.GEMSetVariable(1, m_svID, m_svValue) : 0;
             LogSend(nError, "GEMSetVariable", m_svID[0], m_svValue[0]);
             p_sInfo = "SetSV " + sv.p_sModule + "." + sv.p_id + " : " + sv.p_value.ToString() + " -> " + value.ToString(); 
             return nError; 
@@ -1116,6 +1120,7 @@ namespace RootTools.Gem.XGem
             foreach (Process process in ProcessList) process.Kill();
         }
 
+        bool m_bStart = false; 
         string m_sPathConfig = "C:\\ATI\\GEM300.cfg";
         void XGemConfigFile()
         {
@@ -1123,6 +1128,7 @@ namespace RootTools.Gem.XGem
             {
                 long nError = m_xGem.Initialize(m_sPathConfig);
                 LogSend(nError, "Initialize", m_sPathConfig);
+                if (nError == 0) m_bStart = true; 
             }
             catch { p_sInfo = "Initialize File Open Error : " + m_sPathConfig; }
         }
@@ -1283,11 +1289,12 @@ namespace RootTools.Gem.XGem
             if (m_bThread)
             {
                 m_bThread = false;
-                m_thread.Join(); 
+                m_thread.Join();
             }
             if (m_xGem == null) return;
             try
             {
+                if (m_bStart == false) return;
                 m_xGem.Stop();
                 m_xGem.Close();
             }

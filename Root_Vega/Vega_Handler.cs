@@ -19,6 +19,7 @@ namespace Root_Vega
         public Loadport[] m_aLoadport = new Loadport[2];
         public SideVision m_sideVision;
         public PatternVision m_patternVision;
+        public FDC m_FDC;
         Vision m_vision;
         public Vision p_vision
         {
@@ -41,6 +42,8 @@ namespace Root_Vega
             InitModule(m_patternVision);
             p_vision= new Vision("Vision", m_enginner, "Vision");
             InitModule(p_vision);
+            m_FDC = new FDC("FDC", m_enginner, "FDC");
+            InitModule(m_FDC); 
             m_robot.AddChild(m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision);
             m_robot.ReadInfoReticle_Registry();
             m_recipe = new Vega_Recipe("Recipe", m_enginner);

@@ -24,6 +24,12 @@ namespace RootTools
             set { m_EQ.p_eState = value; }
         }
 
+        public static string p_sInfo
+        {
+            get { return m_EQ.p_sInfo; }
+            set { m_EQ.p_sInfo = value; }
+        }
+
         public static bool p_bStop
         {
             get { return m_EQ.p_bStop; }
@@ -61,6 +67,17 @@ namespace RootTools
                 if (_eState == value) return;
                 _eState = value;
                 OnPropertyChanged();
+            }
+        }
+
+        string _sInfo = "Last Error"; 
+        public string p_sInfo
+        {
+            get { return _sInfo; }
+            set
+            {
+                _sInfo = value;
+                OnPropertyChanged(); 
             }
         }
 
