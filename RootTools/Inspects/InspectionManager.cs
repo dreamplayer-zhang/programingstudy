@@ -19,8 +19,16 @@ namespace RootTools.Inspects
 		public delegate void EventHandler();
 		public EventHandler InspectionStart;
 		public EventHandler InspectionComplete;
-		public delegate void ChangeDefectInfoEventHander(DefectData[] source, EventArgs args);
-		public event ChangeDefectInfoEventHander AddDefectToUI;
+		/// <summary>
+		/// Defect 정보 변경 시 사용할 Event Handler
+		/// </summary>
+		/// <param name="source">Defect List</param>
+		/// <param name="args">arguments. 필요한 경우 수정해서 사용</param>
+		public delegate void ChangeDefectInfoEventHanlder(DefectData[] source, EventArgs args);
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddDefectToUI;
 		#endregion
 
 		int nThreadNum = 4;
@@ -194,19 +202,6 @@ namespace RootTools.Inspects
 			return data;
 		}
 
-		public void PreInspection()
-		{
-			CreateVSTempDB();
-		}
-		public void EndInspection()
-		{
-			if(CollectVSTempDB())
-			{
-				//TODO : DB가 정상적으로 생성되었으면 해당 DB정보를 읽어 Add defect event를 발생시킨다?
-				//실시간으로 defect 정보가 추가되는것이 바람직한데....
-			}
-		}
-
 		public void DoInspection()
 		{
 			int nInspDoneNum = 0;
@@ -279,7 +274,7 @@ namespace RootTools.Inspects
 #endif
 			#endregion
 
-			if(AddDefectToUI != null)
+			if (AddDefectToUI != null)
 			{
 				AddDefectToUI(source, args);
 			}

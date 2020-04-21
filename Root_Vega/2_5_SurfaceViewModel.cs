@@ -15,6 +15,9 @@ namespace Root_Vega
 {
 	class _2_5_SurfaceViewModel : ObservableObject
 	{
+		/// <summary>
+		/// 외부 Thread에서 UI를 Update하기 위한 Dispatcher
+		/// </summary>
 		protected Dispatcher _dispatcher;
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
@@ -42,11 +45,14 @@ namespace Root_Vega
 			_dispatcher = Dispatcher.CurrentDispatcher;
 			m_Engineer = engineer;
 			Init(engineer, dialogService);
-			p_ImageViewer.m_AfterLoaded += ReDrawRect;
 
 			m_Engineer.m_InspManager.AddDefectToUI += M_InspManager_AddDefectToUI;
 		}
-
+		/// <summary>
+		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
+		/// </summary>
+		/// <param name="source">UI에 추가할 Defect List</param>
+		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
 		private void M_InspManager_AddDefectToUI(DefectData[] source, EventArgs args)
 		{
 			foreach (var item in source)
@@ -59,7 +65,7 @@ namespace Root_Vega
 				CRect resultBlock = new CRect(ptStart.X, ptStart.Y, ptEnd.X, ptEnd.Y);
 				m_DD.AddRectData(resultBlock, System.Drawing.Color.Red);
 			}
-			_dispatcher.Invoke(new Action(delegate() 
+			_dispatcher.Invoke(new Action(delegate ()
 			{
 				RedrawUIElement();
 			}));
@@ -272,35 +278,6 @@ namespace Root_Vega
 			System.Windows.Media.Color c = System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
 			return c;
 		}
-		private void ReDrawRect()
-		{
-			//if(m_Recipe.m_RD.p_Roi[p_IndexMask] != null)
-			//{
-			//    p_UIElement.Clear();
-			//    for (int i = 0; i < m_Recipe.m_RD.p_Roi[p_IndexMask].m_Surface.m_NonPattern.Count; i++)
-			//    {
-			//        CRect rect = m_Recipe.m_RD.p_Roi[p_IndexMask].m_Surface.m_NonPattern[i].m_rt;
-			//    }
-
-			//}
-			//if (m_DD.m_OriginData != null)
-			//{
-			//    p_UIElement.Clear();
-
-			//    m_DrawHelper.NowRect = new System.Windows.Shapes.Rectangle();
-			//    CPoint LeftTopPt = GetCanvasPoint(m_DD.m_OriginData.m_rt.Left, m_DD.m_OriginData.m_rt.Top);
-			//    CPoint RighBottomPt = GetCanvasPoint(m_DD.m_OriginData.m_rt.Right, m_DD.m_OriginData.m_rt.Bottom);
-			//    m_DrawHelper.NowRect.Stroke = new SolidColorBrush(ConvertColor(m_DD.m_OriginData.m_color));
-			//    m_DrawHelper.NowRect.StrokeThickness = 2;
-
-			//    Canvas.SetLeft(m_DrawHelper.NowRect, LeftTopPt.X);
-			//    Canvas.SetTop(m_DrawHelper.NowRect, LeftTopPt.Y);
-
-			//    m_DrawHelper.NowRect.Width = Math.Abs(LeftTopPt.X - RighBottomPt.X);
-			//    m_DrawHelper.NowRect.Height = Math.Abs(LeftTopPt.Y - RighBottomPt.Y);
-			//    p_UIElement.Add(m_DrawHelper.NowRect);
-			//}
-		}
 		#endregion
 
 		public void SaveCurrentMask()
@@ -337,13 +314,6 @@ namespace Root_Vega
 			get
 			{
 				return new RelayCommand(_mouseRightDown);
-			}
-		}
-		public ICommand CanvasMouseWheel
-		{
-			get
-			{
-				return new RelayCommand(ReDrawRect);
 			}
 		}
 		public ICommand btnDraw
@@ -390,7 +360,6 @@ namespace Root_Vega
 			{
 				case SurfaceProgress.None:
 					{
-						ReDrawRect();
 						break;
 					}
 				case SurfaceProgress.Start:
@@ -401,13 +370,10 @@ namespace Root_Vega
 					}
 				case SurfaceProgress.Drawing:
 					{
-						ReDrawRect();
 						break;
 					}
 				case SurfaceProgress.Done:
 					{
-						ReDrawRect();
-
 						if (m_MouseHitType == HitType.Body)
 						{
 							if (p_UIElement.Count > 0)
@@ -447,9 +413,6 @@ namespace Root_Vega
 						{
 							p_ImageViewer.p_Mode = ImageViewer_ViewModel.DrawingMode.None;
 							m_SurfaceProgress = SurfaceProgress.Done;
-							//m_DD.m_OriginData.m_color = System.Drawing.Color.Red;
-							ReDrawRect();
-							//Debug.WriteLine("Drag:State->Done // Move");
 						}
 						break;
 					}
@@ -468,13 +431,11 @@ namespace Root_Vega
 			{
 				case SurfaceProgress.None:
 					{
-						ReDrawRect();
 						RedrawUIElement();
 						break;
 					}
 				case SurfaceProgress.Start:
 					{
-						ReDrawRect();
 						break;
 					}
 				case SurfaceProgress.Drawing:
@@ -484,7 +445,6 @@ namespace Root_Vega
 					}
 				case SurfaceProgress.Done:
 					{
-						ReDrawRect();
 						if (MouseEvent.LeftButton == MouseButtonState.Released)
 						{
 							//m_MouseHitType = SetHitType(MousePoint);
@@ -504,7 +464,6 @@ namespace Root_Vega
 					}
 				case SurfaceProgress.Select:
 					{
-						ReDrawRect();
 						if (MouseEvent.LeftButton == MouseButtonState.Pressed)
 						{
 							if (m_MouseHitType != HitType.None)
@@ -761,10 +720,6 @@ namespace Root_Vega
 
 			CPoint MemLeftTop = GetMemPoint((int)new_x, (int)new_y);
 			CPoint MemRightBot = GetMemPoint((int)(new_x + new_width), (int)(new_y + new_height));
-			// m_DD.m_OriginData.m_rt.Left = MemLeftTop.X;
-			//m_DD.m_OriginData.m_rt.Top = MemLeftTop.Y;
-			//m_DD.m_OriginData.m_rt.Right = MemRightBot.X;
-			//m_DD.m_OriginData.m_rt.Bottom = MemRightBot.Y;
 
 		}
 
@@ -842,7 +797,6 @@ namespace Root_Vega
 			m_DrawHelper.NowRect.StrokeDashArray = new DoubleCollection(1);
 
 			m_DrawHelper.CanvasRectList.Add(m_DrawHelper.NowRect);
-			//m_Mask.m_Surface.m_NonPattern.Add(nonPattern); // Add Rect to Rect List
 		}
 
 		private void ClearUI()
@@ -877,8 +831,6 @@ namespace Root_Vega
 		{
 			RedrawRect();
 			RedrawStr();
-			//RedrawPt();
-			//RedrawLine();
 		}
 		private void RedrawRect()
 		{
@@ -913,59 +865,12 @@ namespace Root_Vega
 					RedrawnTB.Foreground = new SolidColorBrush(ConvertColor(m_DD.m_StringData[i].m_color));
 					Canvas.SetLeft(RedrawnTB, TbPt.X);
 					Canvas.SetTop(RedrawnTB, TbPt.Y);
-					//if (ViewWidth < Canvas.GetLeft(RedrawnTB) + RedrawnTB.ActualWidth)
-					//{
-					//    if (ViewWidth > Canvas.GetLeft(RedrawnTB))
-					//    {
-					//        RedrawnTB.Width = ViewWidth - Canvas.GetLeft(RedrawnTB);
-					//    }
-					//    else
-					//    {
-					//        RedrawnTB.Width = 0;
-					//    }
 
-					//}
-					//if (ViewHeight < Canvas.GetTop(RedrawnTB) + RedrawnTB.ActualHeight)
-					//{
-					//    if (ViewHeight > Canvas.GetTop(RedrawnTB))
-					//    {
-					//        RedrawnTB.Height = ViewHeight - Canvas.GetTop(RedrawnTB);
-					//    }
-					//    else
-					//    {
-					//        RedrawnTB.Height = 0;
-					//    }
-					//}
-					//if (Canvas.GetLeft(RedrawnTB) < 0)
-					//{
-					//    if (Math.Abs(Canvas.GetLeft(RedrawnTB)) < RedrawnTB.ActualWidth)
-					//    {
-					//        RedrawnTB.Width = RedrawnTB.Width - Math.Abs(Canvas.GetLeft(RedrawnTB));
-					//        Canvas.SetLeft(RedrawnTB, 0);
-					//    }
-					//    else
-					//    {
-					//        RedrawnTB.Height = 0;
-					//    }
-					//}
-					//if (Canvas.GetTop(RedrawnTB) < 0)
-					//{
-					//    if (Math.Abs(Canvas.GetTop(RedrawnTB)) < RedrawnTB.ActualHeight)
-					//    {
-					//        RedrawnTB.Height = RedrawnTB.Height - Math.Abs(Canvas.GetTop(RedrawnTB));
-					//        Canvas.SetTop(RedrawnTB, 0);
-					//    }
-					//    else
-					//    {
-					//        RedrawnTB.Height = 0;
-					//    }
-					//}
 					p_UIElement.Add(RedrawnTB);
 				}
 
 			}
 		}
-		//CLR_Demo clrDemo = new CLR_Demo();
 		VSDBManager m_VSDB = new VSDBManager();
 		List<CRect> DrawRectList;
 		private void _btnInspTest()
@@ -982,112 +887,7 @@ namespace Root_Vega
 				m_DD.AddRectData(inspblock, System.Drawing.Color.Orange);
 
 			}
-
-			m_Engineer.m_InspManager.PreInspection();
 			m_Engineer.m_InspManager.StartInspection();
-
-
-
-
-
-
-
-
-
-
-			//InspectionProperty ip = new InspectionProperty();
-			//ip.p_InspType = RootTools_Inspect.InspectionType.Surface;
-			//ip.p_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Surface.m_NonPattern[0].m_rt;
-			//ip.p_Sur_Param = p_Recipe.p_RecipeData.p_Roi[0].m_Surface.p_Parameter[0];
-			//ip.p_index = 1;
-			//m_Engineer.m_InspManager.AddInspection(ip);
-
-			//InspectionProperty ip2 = new InspectionProperty();
-			//ip2.p_InspType = RootTools_Inspect.InspectionType.Surface;
-			//ip2.p_Rect = p_Recipe.p_RecipeData.p_Roi[1].m_Surface.m_NonPattern[0].m_rt;
-			//ip2.p_Sur_Param = p_Recipe.p_RecipeData.p_Roi[1].m_Surface.p_Parameter[0];
-			//ip2.p_index = 2;
-			//m_Engineer.m_InspManager.AddInspection(ip2);
-
-			//m_InspManager.StartInspection();
-
-			//InspectionProperty ip2 = new InspectionProperty();
-			//ip2.index = 2;
-			//InspectionManager.Instance.AddInspection(ip2);
-
-			//InspectionProperty ip3 = new InspectionProperty();
-			//ip3.index = 3;
-			//InspectionManager.Instance.AddInspection(ip3);
-
-			//InspectionProperty ip4 = new InspectionProperty();
-			//ip4.index = 4;
-			//InspectionManager.Instance.AddInspection(ip4);
-
-			//InspectionProperty ip5 = new InspectionProperty();
-			//ip5.index = 5;
-			//InspectionManager.Instance.AddInspection(ip5);
-
-			//InspectionProperty ip6 = new InspectionProperty();
-			//ip6.index = 6;
-			//InspectionManager.Instance.AddInspection(ip6);
-
-			//InspectionProperty ip7 = new InspectionProperty();
-			//ip7.index = 7;
-			//InspectionManager.Instance.AddInspection(ip7);
-
-			//InspectionProperty ip8 = new InspectionProperty();
-			//ip8.index = 8;
-			//InspectionManager.Instance.AddInspection(ip8);
-
-			//InspectionProperty ip9 = new InspectionProperty();
-			//ip9.index = 9;
-			//InspectionManager.Instance.AddInspection(ip9);
-
-
-			//CPoint mem = m_Image.p_Size;
-
-			//int a = clrDemo.Test_Inspection(mem.X, mem.Y);
-
-			//m_VSDB.ConnectVSDB();
-			//DataTable ds;
-			//ds = m_VSDB.DBFillToTable("TempData");
-			//int x = 0, y = 0;
-			//CRect temp;
-			//temp = new CRect(0, 0, 10, 10);
-			//int w = 0, h = 0;
-			//for (int i = 0; i < ds.Rows.Count; i++)
-			//{
-			//    for (int j = 0; j < ds.Columns.Count; j++)
-			//    {
-			//        if (j == 1)
-			//            x = (int)ds.Rows[i][j];
-			//        if (j == 2)
-			//            y = (int)ds.Rows[i][j];
-
-			//        if (j == 6)
-			//            w = (int)ds.Rows[i][j];
-			//        if (j == 7)
-			//            h = (int)ds.Rows[i][j];
-
-			//        if (j == 9)
-			//            temp.Left = (int)ds.Rows[i][j];
-			//        if (j == 10)
-			//            temp.Top = (int)ds.Rows[i][j];
-			//        if (j == 11)
-			//            temp.Right = (int)ds.Rows[i][j];
-			//        if (j == 12)
-			//            temp.Bottom = (int)ds.Rows[i][j];
-
-			//        //string x = d[i][j]; <-- something like this.
-			//    }
-			//    CRect aa = new CRect(temp.Left, temp.Top, temp.Right, temp.Bottom);
-			//    m_DD.AddRectData(aa, System.Drawing.Color.Orange);
-			//    string str;
-			//    str = string.Format("width:{0},height{1}", w, h);
-			//    CPoint bb = new CPoint(temp.Right, temp.Bottom);
-			//    m_DD.AddString(str, bb, System.Drawing.Color.Red);
-			//}
-			//m_DD.AddRectData()
 
 			return;
 		}
