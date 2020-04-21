@@ -9,11 +9,13 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Root_Vega
 {
 	class _2_5_SurfaceViewModel : ObservableObject
 	{
+		protected Dispatcher _dispatcher;
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
 		ImageData m_Image;
@@ -37,6 +39,7 @@ namespace Root_Vega
 
 		public _2_5_SurfaceViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
+			_dispatcher = Dispatcher.CurrentDispatcher;
 			m_Engineer = engineer;
 			Init(engineer, dialogService);
 			p_ImageViewer.m_AfterLoaded += ReDrawRect;
@@ -48,8 +51,18 @@ namespace Root_Vega
 		{
 			foreach (var item in source)
 			{
-
+				CPoint ptStart = new CPoint(Convert.ToInt32(item.fPosX - item.nWidth / 2.0), Convert.ToInt32(item.fPosY - item.nHeight / 2.0));
+				CPoint ptEnd = new CPoint(Convert.ToInt32(item.fPosX + item.nWidth / 2.0), Convert.ToInt32(item.fPosY + item.nHeight / 2.0));
+#if DEBUG
+				//System.Diagnostics.Debug.WriteLine(string.Format("{0}/{1} {2}/{3}", ptStart.X, ptStart.Y, ptEnd.X, ptEnd.Y));
+#endif
+				CRect resultBlock = new CRect(ptStart.X, ptStart.Y, ptEnd.X, ptEnd.Y);
+				m_DD.AddRectData(resultBlock, System.Drawing.Color.Red);
 			}
+			_dispatcher.Invoke(new Action(delegate() 
+			{
+				RedrawUIElement();
+			}));
 		}
 
 		void Init(Vega_Engineer engineer, IDialogService dialogService)
@@ -1033,7 +1046,7 @@ namespace Root_Vega
 
 			//CPoint mem = m_Image.p_Size;
 
-			//int a = clrDemo.Test_strip(mem.X, mem.Y);
+			//int a = clrDemo.Test_Inspection(mem.X, mem.Y);
 
 			//m_VSDB.ConnectVSDB();
 			//DataTable ds;

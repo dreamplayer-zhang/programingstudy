@@ -7,8 +7,8 @@ DefectDataStruct InspectionBase::GetDefectData(RECT rt, POINT ptDPos, float fSiz
 
 	data.nWidth= rt.right - rt.left;
 	data.nHeight = rt.bottom - rt.top;
-	data.fPosX = rt.left + (data.nWidth * (double)0.5);// TODO : 해상도 hard-coding 0.5. 나중에 값 가져오도록 수정 필요
-	data.fPosY = rt.left + (data.nHeight * (double)0.5);// TODO : 해상도 hard-coding 0.5. 나중에 값 가져오도록 수정 필요
+	data.fPosX = rt.left + (data.nWidth * (double)0.5);//중앙값을 구하기 위한 width 더하기
+	data.fPosY = rt.top + (data.nHeight * (double)0.5);//중앙값을 구하기 위한 height 더하기
 	data.fSize = fSize;
 	data.nClassifyCode = GetDefectCode();
 

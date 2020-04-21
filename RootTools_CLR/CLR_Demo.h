@@ -75,15 +75,15 @@ namespace RootTools_CLR
 
 			return 1;
 		}
-		array<DefectData^>^ Test_strip(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark)
+		array<DefectData^>^ Test_Inspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark)
 		{
-			RECT testrect;
+			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
 
-			testrect.left = RoiLeft;
-			testrect.right = RoiRight;
-			testrect.top = RoiTop;
-			testrect.bottom = RoiBottom;
+			targetRect.left = RoiLeft;
+			targetRect.right = RoiRight;
+			targetRect.top = RoiTop;
+			targetRect.bottom = RoiBottom;
 
 			m_InspConn->GetImagePool("pool", memwidth, memHeight);
 			int bufferwidth = memwidth;
@@ -92,7 +92,7 @@ namespace RootTools_CLR
 
 			//PaintOutline(testrect.left, testrect.top, testrect.right, testrect.bottom, 10000, 5, m_InspConn->GetBuffer(), 10000);
 			//pInspSurface->SetParams(m_InspConn->GetBuffer(), testrect, 1, 70, 10, true);
-			pInspSurface->SetParams(m_InspConn->GetBuffer(), bufferwidth, bufferheight, testrect, 1, GV, DefectSize, bDark, threadindex);
+			pInspSurface->SetParams(m_InspConn->GetBuffer(), bufferwidth, bufferheight, targetRect, 1, GV, DefectSize, bDark, threadindex);
 			
 			//TODO 여기서 이벤트를 올리는 방식으로 변경한다
 			//여기 들어올때 이미 한 블럭에 대한 정보가 통째로 넘어오는 것이므로 구조 자체를 변경하여 AddDefect이 발생하는 순간을 여기서 포착하도록 수정한다
@@ -119,8 +119,8 @@ namespace RootTools_CLR
 					local[i]->nHeight = vTempResult[i].nHeight;
 					local[i]->nInspMode = vTempResult[i].nInspMode;
 					local[i]->nFOV = vTempResult[i].nFOV;
-					local[i]->fPosX = vTempResult[i].fPosX;
-					local[i]->fPosY = vTempResult[i].fPosY;
+					local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+					local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
 				}
 			}
 
