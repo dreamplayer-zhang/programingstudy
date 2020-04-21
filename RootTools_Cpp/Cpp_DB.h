@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string>
 
-using namespace std;
 class Cpp_DB
 {
 public:

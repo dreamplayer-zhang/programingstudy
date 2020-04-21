@@ -22,7 +22,7 @@ void IP::Threshold(BYTE* pSrc, int nW, int nH, int threshold, bool bDark, BYTE* 
     //imshow("Threshold2 window", imgDst);
 }
 
-void IP::Labeling(BYTE* pSrc, BYTE* pBin, int nW, int nH, bool bDark, BYTE* pDst, vector<LabeledData>& vtLabeled)
+void IP::Labeling(BYTE* pSrc, BYTE* pBin, int nW, int nH, bool bDark, BYTE* pDst, std::vector<LabeledData>& vtLabeled)
 {
     Mat imgSrc = Mat(nW, nH, CV_8UC1, pSrc);
     Mat imgBin = Mat(nW, nH, CV_8UC1, pBin);

@@ -926,76 +926,7 @@ namespace Root_Wind
         VSDBManager m_VSDB = new VSDBManager();
         private void _btnInspTest()
         {
-
-            InspSurfaceWrapper InspSurface = new InspSurfaceWrapper();
-
-
-            SurfaceParam param = new SurfaceParam();
-            param.bDark = true;
-            param.nDefectSize = 100;
-            param.nThreshold = 125;
-            byte[] buffer = new byte[Marshal.SizeOf(param)];
-
-            unsafe
-            {
-                fixed (byte* fixed_buffer = buffer)
-                {
-                    Marshal.StructureToPtr(param, (IntPtr)fixed_buffer, false);
-                    InspSurface.DoInsp(fixed_buffer);
-                }
-            }
-
-
-            //CPoint mem = m_Image.p_Size;
-
-            //int a = clrDemo.Test_strip(mem.X, mem.Y);
-
-            //m_VSDB.ConnectVSDB();
-            //DataTable ds;
-            //ds = m_VSDB.DBFillToTable("TempData");
-            //int x = 0, y = 0;
-            //CRect temp;
-            //temp = new CRect(0, 0, 10, 10);
-            //int w = 0, h = 0;
-            //for (int i = 0; i < ds.Rows.Count; i++)
-            //{
-            //    for (int j = 0; j < ds.Columns.Count; j++)
-            //    {
-            //        if (j == 1)
-            //            x = (int)ds.Rows[i][j];
-            //        if (j == 2)
-            //            y = (int)ds.Rows[i][j];
-
-            //        if (j == 6)
-            //            w = (int)ds.Rows[i][j];
-            //        if (j == 7)
-            //            h = (int)ds.Rows[i][j];
-
-            //        if (j == 9)
-            //            temp.Left = (int)ds.Rows[i][j];
-            //        if (j == 10)
-            //            temp.Top = (int)ds.Rows[i][j];
-            //        if (j == 11)
-            //            temp.Right = (int)ds.Rows[i][j];
-            //        if (j == 12)
-            //            temp.Bottom = (int)ds.Rows[i][j];
-
-            //        //string x = d[i][j]; <-- something like this.
-            //    }
-            //    CRect aa = new CRect(temp.Left, temp.Top, temp.Right, temp.Bottom);
-            //    m_DD.AddRectData(aa, System.Drawing.Color.Orange);
-            //    string str;
-            //    str = string.Format("width:{0},height{1}", w, h);
-            //    CPoint bb = new CPoint(temp.Right, temp.Bottom);
-            //    m_DD.AddString(str, bb, System.Drawing.Color.Red);
-            //}
-
-
-            //m_DD.AddRectData()
-
             return;
-            
-            
         }
         #endregion
 

@@ -3,12 +3,11 @@
 //#include <opencv2\opencv.hpp>
 
 //using namespace cv;
-using namespace std;
 
-bool Cpp_Demo::OpenImage(string strFilepath)
+bool Cpp_Demo::OpenImage(std::string strFilepath)
 {
 	//string ImageFilePath = cv::format("%s", strFilepath);
-	string ImageFilePath = "D:\\lena.jpg";
+	std::string ImageFilePath = "D:\\lena.jpg";
 	//Mat image;
 	//image = imread(ImageFilePath, IMREAD_COLOR);
 

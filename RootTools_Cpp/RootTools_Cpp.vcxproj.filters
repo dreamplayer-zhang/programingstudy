@@ -33,9 +33,6 @@
     <ClInclude Include="PitSizer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Cpp_DB.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="InspSurface_Reticle.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -66,9 +63,6 @@
     <ClInclude Include="InspBase.h">
       <Filter>Sources</Filter>
     </ClInclude>
-    <ClInclude Include="Lib\sqlite3.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RootTools_Cpp.cpp">
@@ -81,9 +75,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="PitSizer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Cpp_DB.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="InspSurface_Reticle.cpp">

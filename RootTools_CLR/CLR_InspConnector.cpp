@@ -16,7 +16,7 @@ namespace RootTools_CLR
 	{
 		ProcessorNum = processornum;
 		m_InspReticle = new InspSurface_Reticle(ProcessorNum);
-		m_DBmgr = new Cpp_DB();
+		//m_DBmgr = new Cpp_DB();
 
 
 		SetInitData();
@@ -62,14 +62,14 @@ namespace RootTools_CLR
 		return (byte*)ImgPool;
 	}
 
-	void CLR_InspConnector::GetImagePool(string memoryname, int pool_w, int pool_h)
+	void CLR_InspConnector::GetImagePool(std::string memoryname, int pool_w, int pool_h)
 	{
 		ImgPool_Width = pool_w;
 		ImgPool_Height = pool_h;
 		//memory 이름 하드코딩
 		//std::string mmfName = "pool";
-		string mmfName = memoryname;
-		wstring t;
+		std::string mmfName = memoryname;
+		std::wstring t;
 		t.assign(mmfName.begin(), mmfName.end());
 		HANDLE hMapping;
 		hMapping = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, t.c_str());
@@ -201,27 +201,6 @@ namespace RootTools_CLR
 
 
 
-
-		return true;
-	}
-	/// <summary>
-	/// 검사 시작 전 해야할 기능들 구현
-	/// Strip 검사와 같이 snap과 검사를 같이 진행한 경우 매 새 검사 전 prepare - run - end 순으로 검사 진행해야함
-	/// </summary>
-	bool CLR_InspConnector::PrepareRun()
-	{
-		m_InspReticle->OpenDB();
-
-
-		return true;
-	}
-	/// <summary>
-	/// 검사 완료 후 해야할 기능들 구현
-	/// Strip 검사와 같이 snap과 검사를 같이 진행한 경우 매 새 검사 전 prepare - run - end 순으로 검사 진행해야함
-	/// </summary>
-	bool CLR_InspConnector::EndRun()
-	{
-		m_InspReticle->CloseDB();
 
 		return true;
 	}
