@@ -50,6 +50,7 @@ namespace RootTools.Module
                 if (value == "OK") return;
                 m_log.Info("Info : " + _sInfo);
                 m_infoList.Add(_sInfo);
+                EQ.p_sInfo = p_id + " : " + value; 
             }
         }
 

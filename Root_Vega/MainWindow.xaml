@@ -84,11 +84,11 @@
                     BorderBrush="{StaticResource BorderBrush}"                
                     BorderThickness="3"
                     MouseLeftButtonDown="Border_MouseLeftButtonDown">
-                <TextBlock Text="On/Offline"
+                <TextBlock x:Name="textGemState" Text="{Binding p_eControl}"
                            Style="{StaticResource BasicTb}"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"
-                           FontSize="30"/>
+                           FontSize="24"/>
             </Border>
             <Border Grid.Column="1"
                     Margin="0,10,10,10"
@@ -157,9 +157,9 @@
                           Margin="8"
                           Opacity="0.3">
                     </Grid>
-                    <TextBlock Grid.Row="1" Grid.Column="1"
+                    <TextBlock x:Name="textLastError" Grid.Row="1" Grid.Column="1"
                                Style="{StaticResource BasicTb}"
-                               Text="Error Msg Area"
+                               Text="{Binding p_sInfo}"
                                FontSize="20"/>
                 </Grid>
             </Border>

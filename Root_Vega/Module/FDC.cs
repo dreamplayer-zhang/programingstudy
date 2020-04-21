@@ -34,7 +34,7 @@ namespace Root_Vega.Module
 
         string ReadFDC(string sRead)
         {
-            if (sRead.Length < 7) return "Short Massage : " + sRead.Length.ToString();
+            if (sRead.Length < 7) return "Short Message : " + sRead.Length.ToString();
             byte[] aByte = Encoding.UTF8.GetBytes(sRead);
             int nFDC = aByte[0] - 1;
             if (nFDC < 0) return "Invalid FDC Module ID : " + nFDC.ToString();
@@ -53,7 +53,7 @@ namespace Root_Vega.Module
         byte[] m_aSend = new byte[10]; 
         void SendQuery(int nFDC, int nAdd)
         {
-            m_aSend[0] = (byte)nFDC;
+            m_aSend[0] = (byte)(nFDC + 1);
             m_aSend[1] = 0x04;
             m_aSend[2] = (byte)(nAdd >> 8);
             m_aSend[3] = (byte)(nAdd & 0xff);
@@ -165,27 +165,28 @@ namespace Root_Vega.Module
             }
             ALID m_alidSend;
 
-            SVID m_svValue; 
-            double _fValue = 0;
+            SVID m_svValue;
+            int _nValue = 0; 
             public double p_fValue
             {
-                get { return _fValue; }
+                get { return m_svValue.p_value; }
                 set
                 {
-                    p_bSend = false; 
-                    _fValue = value / m_fDiv;
-                    m_svValue.p_value = _fValue; 
+                    p_bSend = false;
+                    if (_nValue == value) return;
+                    _nValue = (int)value; 
+                    m_svValue.p_value = value / m_fDiv;
                     OnPropertyChanged();
-                    m_alid[0].p_bSet = (_fValue < m_aLimit[0]);
-                    m_alid[1].p_bSet = (_fValue > m_aLimit[1]);
-                    double dValue = Math.Abs(_fValue - (m_aLimit[0] + m_aLimit[1]) / 2);
+                    m_alid[0].p_bSet = (m_svValue.p_value < m_aLimit[0]);
+                    m_alid[1].p_bSet = (m_svValue.p_value > m_aLimit[1]);
+                    double dValue = Math.Abs(m_svValue.p_value - (m_aLimit[0] + m_aLimit[1]) / 2);
                     int nRed = (int)(500 * dValue / (m_aLimit[1] - m_aLimit[0]));
                     if (nRed > 250) nRed = 250;
                     p_color = Color.FromRgb((byte)nRed, (byte)(250 - nRed), 0); 
                 }
             }
 
-            Color _color = Colors.Black;
+            Color _color = Colors.Green;
             public Color p_color
             {
                 get { return _color; }
@@ -208,10 +209,10 @@ namespace Root_Vega.Module
             {
                 p_eUnit = (eUnit)tree.Set(p_eUnit, p_eUnit, "Unit", "FDC Unit");
                 m_nDigit = tree.Set(m_nDigit, m_nDigit, "Digit", "FDC Decimal Point");
-                m_aLimit[0] = tree.Set(m_aLimit[0], m_aLimit[0], "Lower Limit", "FDC Lower Limit");
-                m_aLimit[1] = tree.Set(m_aLimit[1], m_aLimit[1], "Upper Limit", "FDC Upper Limit");
                 m_fDiv = 1;
                 for (int n = 0; n < m_nDigit; n++) m_fDiv *= 10;
+                m_aLimit[0] = tree.Set(m_aLimit[0], m_aLimit[0], "Lower Limit", "FDC Lower Limit");
+                m_aLimit[1] = tree.Set(m_aLimit[1], m_aLimit[1], "Upper Limit", "FDC Upper Limit");
                 if (m_alid[0] == null)
                 {
                     m_alid[0] = m_module.m_gaf.GetALID(m_module, p_id + ".LowerLimit", "FDC Lower Limit");
@@ -222,6 +223,9 @@ namespace Root_Vega.Module
                     m_alidSend.p_sMsg = "FDC Communicate Timeout";
                     m_svValue = m_module.m_gaf.GetSVID(m_module, p_id); 
                 }
+                m_alid[0].p_id = p_id + ".LowerLimit";
+                m_alid[1].p_id = p_id + ".UpperLimit";
+                m_alidSend.p_id = p_id + ".Timeout"; 
             }
         }
         #endregion
@@ -292,14 +296,15 @@ namespace Root_Vega.Module
             p_id = id;
             base.InitBase(id, engineer, sLogGroup);
 
-//            m_threadCheck = new Thread(new ThreadStart(CheckThread));
-//            m_threadCheck.Start();
+            m_threadCheck = new Thread(new ThreadStart(CheckThread));
+            m_threadCheck.Start();
         }
 
         public override void ThreadStop()
         {
             if (m_bThreadCheck)
             {
+                m_aData.Clear(); 
                 m_bThreadCheck = false;
                 m_threadCheck.Join(); 
             }
