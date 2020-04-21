@@ -48,7 +48,7 @@ namespace Root_Vega
 		{
 			foreach (var item in source)
 			{
-				p_ImageViewer.DrawDefect(item);
+
 			}
 		}
 

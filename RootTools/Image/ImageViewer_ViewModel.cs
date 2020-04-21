@@ -44,11 +44,6 @@ namespace RootTools
              }
          }
 
-		public void DrawDefect(DefectData item)
-		{
-            DrawingRectAtPoint(item.fPosX, item.fPosY);
-        }
-
 		private ImageData m_ImageData;
         public ImageData p_ImageData
         {
