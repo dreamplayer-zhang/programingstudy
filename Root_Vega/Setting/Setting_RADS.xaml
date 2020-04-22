@@ -7,8 +7,12 @@
              xmlns:local="clr-namespace:Root_Vega.Setting"
              xmlns:Tree="clr-namespace:RootTools.Trees;assembly=RootTools"
              xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="726" d:DesignWidth="1602">
+    <UserControl.Resources>
+        <Converter:InverseBooleanConverter x:Key="InverseBooleanConverters" />
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"></ColumnDefinition>
@@ -95,6 +99,7 @@
                                FontSize="20"/>
                     <Button Style="{StaticResource BasicBtn}"
                             Margin="5"
+                            IsEnabled="{Binding p_CamInfo._OpenStatus, Converter={StaticResource InverseBooleanConverters}}"
                             Command="{Binding ConnectCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
@@ -109,6 +114,22 @@
                     </Button>
                     <Button Style="{StaticResource BasicBtn}"
                             Margin="5"
+                            IsEnabled="{Binding p_CamInfo._OpenStatus }"
+                            Command="{Binding ConnectCommand}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <material:PackIcon Kind="LanDisconnect"
+                                                   Foreground="White"
+                                                   Width="30"
+                                                   Height="30"></material:PackIcon>
+                                <TextBlock Text="DisConnect"
+                                           Style="{StaticResource BasicTb}"></TextBlock>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Style="{StaticResource BasicBtn}"
+                            Margin="5"
+                            IsEnabled="{Binding p_CamInfo._IsCanGrab}"
                             Command="{Binding GrabCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
@@ -123,6 +144,7 @@
                     </Button>
                     <Button Style="{StaticResource BasicBtn}"
                             Margin="5"
+                            IsEnabled="{Binding p_CamInfo._IsCanGrab}"
                             Command="{Binding ContinousGrabCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">

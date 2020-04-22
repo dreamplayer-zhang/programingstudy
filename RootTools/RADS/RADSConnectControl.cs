@@ -47,8 +47,8 @@ namespace RootTools.RADS
 		public void StartListening()
 		{
 			// 200422 ESCHO 임시(설비 Test후 삭제해야함)
-			RADS controller = new RADS(m_engineer);
-			p_CurrentController = controller;
+			//RADS controller = new RADS(m_engineer);
+			//p_CurrentController = controller;
 			//
 
 			if (listen == null)
@@ -93,7 +93,7 @@ namespace RootTools.RADS
 						}
 						var MAC = controller_mac[0].ToString("X2") + ":" + controller_mac[1].ToString("X2") + ":" + controller_mac[2].ToString("X2") + ":" + (controller_mac[3]).ToString("X2") + ":" + (controller_mac[4]).ToString("X2") + ":" + (controller_mac[5]).ToString("X2");
 
-						controller = new RADS(m_engineer);
+						RADS controller = new RADS(m_engineer);
 						controller.ADSCP_Type = echoBuffer[0].ToString("X2") + echoBuffer[1].ToString("X2");
 						controller.ADSCP_Opcode = echoBuffer[2].ToString("X2") + echoBuffer[3].ToString("X2");
 						controller.ADSCP_Length = echoBuffer[4].ToString("X2") + echoBuffer[5].ToString("X2");
