@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows.Controls;
 
 namespace Root_Vega
 {
@@ -23,6 +10,19 @@ namespace Root_Vega
         public _1_Main()
         {
             InitializeComponent();
+        }
+
+        Vega_Engineer m_engineer;
+        Vega_Handler m_handler; 
+        public void Init(Vega_Engineer engineer)
+        {
+            m_engineer = engineer;
+            m_handler = engineer.m_handler; 
+            moduleVision.Init(m_handler.m_patternVision);
+            moduleSideVision.Init(m_handler.m_sideVision);
+            moduleRobot.Init(m_handler.m_robot);
+            loadportA.Init(m_handler.m_aLoadport[0]);
+            loadportB.Init(m_handler.m_aLoadport[1]);
         }
     }
 }
