@@ -36,7 +36,7 @@ std::vector<DefectDataStruct> InspectionSurface::Inspection(bool nAbsolute, bool
 
 		for (int y = rtinspROI.top; y < rtinspROI.bottom; y++)
 		{
-			for (int x = rtinspROI.left; x < rtinspROI.right; x++, pPos++)
+			for (int x = rtinspROI.left; x < rtinspROI.right; x++)
 			{
 				sum += (int)inspbuffer[y][x];
 			}
@@ -46,8 +46,14 @@ std::vector<DefectDataStruct> InspectionSurface::Inspection(bool nAbsolute, bool
 		if (bIsDarkInsp)
 		{
 			//입력된 GrayLevel을 %로 사용하여 연산
-			//예 : 20이 입력되어 있다면 평균GV에서 20%감산
-			//nGrayLevel = 
+			//예 : 20이 입력되어 있다면 평균GV에서 20%감산.
+			nGrayLevel = (int)(average * (1.0f - nGrayLevel / 100.0f));
+		}
+		else
+		{
+			//입력된 GrayLevel을 %로 사용하여 연산
+			//예 : 20이 입력되어 있다면 평균GV에서 20%증산.
+			nGrayLevel = (int)(average * (1.0f + nGrayLevel / 100.0f));
 		}
 	}
 
