@@ -94,8 +94,8 @@
         </Style>
         <Style TargetType="{x:Type TextBox}"
                x:Key="BasicTbox">
-            <Setter Property="TextBlock.Foreground"
-                    Value="{StaticResource TextForeGround}" />
+            <!--<Setter Property="TextBlock.Foreground"
+                    Value="{StaticResource TextForeGround}" />-->
             <Setter Property="TextBlock.VerticalAlignment"
                     Value="Center" />
             <Setter Property="TextBlock.TextAlignment"
