@@ -2,6 +2,7 @@
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Windows.Media;
 
 namespace RootTools.Gem
 {
@@ -229,6 +230,8 @@ namespace RootTools.Gem
             get { return _eReqAccessLP; }
             set
             {
+                OnPropertyChanged("p_bAccessLP_Auto");
+                OnPropertyChanged("p_bAccessLP_Manual");
                 if (_eReqAccessLP == value) return;
                 m_log.Info("Loadpert Req Access mode = " + value.ToString());
                 _eReqAccessLP = value;
@@ -237,8 +240,8 @@ namespace RootTools.Gem
             }
         }
 
-        public bool p_bAccessLP_Auto { get { return p_eAccessLP == eAccessLP.Auto; } }
-        public bool p_bAccessLP_Manual { get { return p_eAccessLP == eAccessLP.Manual; } }
+        public bool p_bAccessLP_Auto { get { return (p_eAccessLP == eAccessLP.Auto); } }
+        public bool p_bAccessLP_Manual { get { return (p_eAccessLP == eAccessLP.Manual); } }
 
         eAccessLP _eAccessLP = eAccessLP.Manual;
         public eAccessLP p_eAccessLP
@@ -367,6 +370,9 @@ namespace RootTools.Gem
             foreach (GemSlotBase slot in m_aGemSlot) slot.RegRead();
             m_treeRoot = new TreeRoot(p_sLocID + ".Gem", m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
+
+            OnPropertyChanged("p_bAccessLP_Auto");
+            OnPropertyChanged("p_bAccessLP_Manual");
         }
     }
 }
