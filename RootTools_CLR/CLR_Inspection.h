@@ -75,7 +75,7 @@ namespace RootTools_CLR
 
 			return 1;
 		}
-		array<DefectData^>^ Test_Inspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark)
+		array<DefectData^>^ Test_Inspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -101,7 +101,7 @@ namespace RootTools_CLR
 			pInspSurface->CheckConditions();
 
 			pInspSurface->CopyImageToBuffer(bDark);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
-			vTempResult = pInspSurface->Inspection(true, bDark);//TODO : absolute GV 구현해야함
+			vTempResult = pInspSurface->Inspection(bAbsolute, bDark);//TODO : absolute GV 구현해야함
 			
 			bool bResultExist = vTempResult.size() > 0;
 			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());

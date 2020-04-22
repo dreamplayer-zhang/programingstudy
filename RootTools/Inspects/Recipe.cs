@@ -116,10 +116,16 @@ namespace RootTools.Inspects
     }
     public class SurFace_ParamData : ObservableObject
     {
-        bool bDarkInspection = true;
-        Param<int> GV = new Param<int>(70, 0, 255);
-        Param<int> DefectSize = new Param<int>(10, 1, int.MaxValue);
+        public SurFace_ParamData()
+        {
+            p_bDarkInspection = true;
+            p_bAbsoluteInspection = true;
+            GV = new Param<int>(70, 0, 255);
+            DefectSize = new Param<int>(10, 1, int.MaxValue);
+        }
 
+        #region p_bDarkInspection
+        bool bDarkInspection;
         public bool p_bDarkInspection
         {
             get
@@ -131,6 +137,33 @@ namespace RootTools.Inspects
                 SetProperty(ref bDarkInspection, value);
             }
         }
+        #endregion
+
+        #region p_bAbsoluteInspection
+        bool bAbsoluteInspection;
+        public bool p_bAbsoluteInspection
+        {
+            get
+            {
+                return bAbsoluteInspection;
+            }
+            set
+            {
+                if(value)
+                {
+                    TargetLabelText = "GV";
+                }
+                else
+                {
+                    TargetLabelText = "Difference(%)";
+                }
+                SetProperty(ref bAbsoluteInspection, value);
+            }
+        }
+        #endregion
+
+        #region p_GV
+        Param<int> GV;
         public int p_GV
         {
             get
@@ -145,7 +178,10 @@ namespace RootTools.Inspects
                 RaisePropertyChanged();
             }
         }
+        #endregion
 
+        #region p_DefectSize
+        Param<int> DefectSize;
         public int p_DefectSize
         {
             get
@@ -160,6 +196,27 @@ namespace RootTools.Inspects
                 RaisePropertyChanged();
             }
         }
+        #endregion
+
+        #region TargetLabelText
+        string _TargetLabelText;
+        public string TargetLabelText
+        {
+            get
+            {
+                return _TargetLabelText;
+            }
+            set
+            {
+                if(_TargetLabelText != value)
+                {
+                    _TargetLabelText = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+        #endregion
     }
 
     public class Origin
