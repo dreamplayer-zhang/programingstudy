@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
+using System.Windows.Media;
 
 namespace Root_Vega.Module
 {
@@ -177,9 +178,26 @@ namespace Root_Vega.Module
 
         public bool IsReticleExist(bool bIgnoreExistSensor = false)
         {
-            if (bIgnoreExistSensor) return (p_infoReticle != null);
-            //forget
-            return false;
+            bool bExist = false;
+            if (bIgnoreExistSensor) bExist = (p_infoReticle != null);
+            else
+            {
+                //forget
+            }
+            p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
+            return bExist;
+        }
+
+        Brush _brushReticleExist = Brushes.Green;
+        public Brush p_brushReticleExist
+        {
+            get { return _brushReticleExist; }
+            set
+            {
+                if (_brushReticleExist == value) return;
+                _brushReticleExist = value;
+                OnPropertyChanged();
+            }
         }
 
         int m_nTeachRobot = 0;

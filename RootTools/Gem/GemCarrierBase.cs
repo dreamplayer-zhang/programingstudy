@@ -237,6 +237,9 @@ namespace RootTools.Gem
             }
         }
 
+        public bool p_bAccessLP_Auto { get { return p_eAccessLP == eAccessLP.Auto; } }
+        public bool p_bAccessLP_Manual { get { return p_eAccessLP == eAccessLP.Manual; } }
+
         eAccessLP _eAccessLP = eAccessLP.Manual;
         public eAccessLP p_eAccessLP
         {
@@ -247,6 +250,9 @@ namespace RootTools.Gem
                 m_log.Info("Loadpert Access mode = " + value.ToString());
                 _eAccessLP = value;
                 RunTree(Tree.eMode.Init);
+                OnPropertyChanged();
+                OnPropertyChanged("p_bAccessLP_Auto");
+                OnPropertyChanged("p_bAccessLP_Manual");
             }
         }
 
@@ -275,6 +281,7 @@ namespace RootTools.Gem
                 if (_sCarrierID == value) return;
                 if (m_log != null) m_log.Info("p_sCarrierID " + _sCarrierID + " -> " + value);
                 _sCarrierID = value;
+                OnPropertyChanged(); 
             }
         }
         #endregion

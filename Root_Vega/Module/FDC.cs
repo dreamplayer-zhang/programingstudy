@@ -257,22 +257,16 @@ namespace Root_Vega.Module
         #endregion
 
         #region Check Thread
-        bool m_bThreadCheck = false; 
-        Thread m_threadCheck; 
-        void CheckThread()
+        int m_iData = 0; 
+        protected override void RunThread()
         {
-            m_bThreadCheck = true;
-            Thread.Sleep(4000);
-            int m_iData = 0; 
-            while (m_bThreadCheck)
+            Thread.Sleep(m_msInterval);
+            if (m_aData.Count > 0)
             {
-                Thread.Sleep(m_msInterval);
-                if (m_aData.Count > 0)
-                {
-                    SendQuery(m_iData, 1000);
-                    m_iData = (m_iData + 1) % m_aData.Count;
-                }
+                SendQuery(m_iData, 1000);
+                m_iData = (m_iData + 1) % m_aData.Count;
             }
+            base.RunThread();
         }
 
         int m_msInterval = 100; 
@@ -295,19 +289,10 @@ namespace Root_Vega.Module
         {
             p_id = id;
             base.InitBase(id, engineer, sLogGroup);
-
-            m_threadCheck = new Thread(new ThreadStart(CheckThread));
-            m_threadCheck.Start();
         }
 
         public override void ThreadStop()
         {
-            if (m_bThreadCheck)
-            {
-                m_aData.Clear(); 
-                m_bThreadCheck = false;
-                m_threadCheck.Join(); 
-            }
             base.ThreadStop();
         }
     }

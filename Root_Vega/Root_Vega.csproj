@@ -141,6 +141,12 @@
       <DependentUpon>10_Setting.xaml</DependentUpon>
     </Compile>
     <Compile Include="10_SettingViewModel.cs" />
+    <Compile Include="1_1_Module.xaml.cs">
+      <DependentUpon>1_1_Module.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="1_2_LoadPort.xaml.cs">
+      <DependentUpon>1_2_LoadPort.xaml</DependentUpon>
+    </Compile>
     <Compile Include="1_Main.xaml.cs">
       <DependentUpon>1_Main.xaml</DependentUpon>
     </Compile>
@@ -276,6 +282,14 @@
     <Compile Include="2_8_InspectionViewModel.cs" />
     <Compile Include="Module\Vision.cs" />
     <Page Include="10_Setting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="1_1_Module.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="1_2_LoadPort.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
