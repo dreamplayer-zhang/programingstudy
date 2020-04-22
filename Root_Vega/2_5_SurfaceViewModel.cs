@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using ATI;
+using RootTools;
 using RootTools.Inspects;
 using RootTools.Memory;
 using System;
@@ -25,6 +26,12 @@ namespace Root_Vega
 		DrawHelper m_DrawHelper;
 		DrawData m_DD;
 		Recipe m_Recipe;
+
+		SqliteDataDB VSDBManager;
+		int currentDefectIdx;
+		System.Data.DataTable VSDataInfoDT;
+		System.Data.DataTable VSDataDT;
+
 		public Recipe p_Recipe
 		{
 			get
@@ -46,24 +53,52 @@ namespace Root_Vega
 			m_Engineer = engineer;
 			Init(engineer, dialogService);
 
-			m_Engineer.m_InspManager.AddDefectToUI += M_InspManager_AddDefectToUI;
+			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
+			m_Engineer.m_InspManager.InspectionComplete += () => 
+			{
+				//VSDBManager.Commit();
+				VSDBManager.SaveDataTable(VSDataInfoDT);
+				VSDBManager.SaveDataTable(VSDataDT);
+				VSDBManager.Disconnect();
+			};
+			m_Engineer.m_InspManager.InspectionStart += () =>
+			{
+				//VSDBManager.BeginWrite();
+			};
 		}
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
 		/// </summary>
 		/// <param name="source">UI에 추가할 Defect List</param>
 		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
-		private void M_InspManager_AddDefectToUI(DefectData[] source, EventArgs args)
+		private void M_InspManager_AddDefect(DefectData[] source, EventArgs args)
 		{
 			foreach (var item in source)
 			{
 				CPoint ptStart = new CPoint(Convert.ToInt32(item.fPosX - item.nWidth / 2.0), Convert.ToInt32(item.fPosY - item.nHeight / 2.0));
 				CPoint ptEnd = new CPoint(Convert.ToInt32(item.fPosX + item.nWidth / 2.0), Convert.ToInt32(item.fPosY + item.nHeight / 2.0));
-#if DEBUG
-				//System.Diagnostics.Debug.WriteLine(string.Format("{0}/{1} {2}/{3}", ptStart.X, ptStart.Y, ptEnd.X, ptEnd.Y));
-#endif
+
 				CRect resultBlock = new CRect(ptStart.X, ptStart.Y, ptEnd.X, ptEnd.Y);
 				m_DD.AddRectData(resultBlock, System.Drawing.Color.Red);
+
+				//여기서 DB에 Defect을 추가하는 부분도 구현한다
+				System.Data.DataRow dataRow = VSDataDT.NewRow();
+
+				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+
+				dataRow["No"] = currentDefectIdx;
+				currentDefectIdx++;
+				dataRow["DCode"] = item.nClassifyCode;
+				dataRow["Size"] = item.fSize;
+				dataRow["Length"] = item.nLength;
+				dataRow["Width"] = item.nWidth;
+				dataRow["Height"] = item.nHeight;
+				dataRow["InspMode"] = item.nInspMode;
+				//dataRow["FOV"] = item.FOV;
+				dataRow["PosX"] = item.fPosX;
+				dataRow["PosY"] = item.fPosY;
+
+				VSDataDT.Rows.Add(dataRow);
 			}
 			_dispatcher.Invoke(new Action(delegate ()
 			{
@@ -884,6 +919,8 @@ namespace Root_Vega
 			if (DrawRectList != null)
 				DrawRectList.Clear();//검사영역 draw용 Rect List 정리
 
+			currentDefectIdx = 0;
+
 			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Surface.m_NonPattern[0].m_rt;
 			int nblocksize = 500;
 
@@ -896,6 +933,35 @@ namespace Root_Vega
 				m_DD.AddRectData(inspblock, System.Drawing.Color.Orange);
 
 			}
+			System.Diagnostics.Debug.WriteLine("Start Insp");
+
+			string inspDefaultDir = @"C:\vsdb";
+			if (!System.IO.Directory.Exists(inspDefaultDir))
+			{
+				System.IO.Directory.CreateDirectory(inspDefaultDir);
+			}
+
+			string path = System.IO.Path.Combine(inspDefaultDir, DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result");
+			string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
+
+			if (VSDBManager == null)
+			{
+				VSDBManager = new SqliteDataDB(path, VSDB_configpath);
+			}
+			else if (VSDBManager.IsConnected)
+			{
+				VSDBManager.Disconnect();
+				VSDBManager = new SqliteDataDB(path, VSDB_configpath);
+			}
+			if(VSDBManager.Connect())
+			{
+				VSDBManager.CreateTable("Datainfo");
+				VSDBManager.CreateTable("Data"); 
+
+				VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
+				VSDataDT = VSDBManager.GetDataTable("Data");
+			}
+
 			m_Engineer.m_InspManager.StartInspection();
 
 			return;

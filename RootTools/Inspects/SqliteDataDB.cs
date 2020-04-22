@@ -90,13 +90,23 @@ namespace ATI
 				return;
 			}
 		}
-		internal void BeginWrite()
+		public void BeginWrite()
 		{
+			if (!IsConfigInitialized)
+				return;
+			if (!IsConnected)
+				return;
+
 			SQLiteCommand searchCommand = new SQLiteCommand("BEGIN;", sqliteDBconnect);
 			var result = searchCommand.ExecuteNonQuery();
 		}
-		internal void Commit()
+		public void Commit()
 		{
+			if (!IsConfigInitialized)
+				return;
+			if (!IsConnected)
+				return;
+
 			SQLiteCommand searchCommand = new SQLiteCommand("COMMIT;", sqliteDBconnect);
 			var result = searchCommand.ExecuteNonQuery();
 		}
@@ -196,10 +206,12 @@ namespace ATI
 				return SQLiteRowInsertStatus.Success;
 		}
 
-		internal SQLiteTableCreateStatus CreateTable(string tableName)
+		public SQLiteTableCreateStatus CreateTable(string tableName)
 		{
 			if (!this.IsConfigInitialized)
 				return SQLiteTableCreateStatus.ConfigIsNull;
+			if (!this.IsConnected)
+				return SQLiteTableCreateStatus.Fail;
 			//csv format
 
 			string tableListQurey = "SELECT name FROM sqlite_master WHERE type IN ('table', 'view') AND name NOT LIKE 'sqlite_%' UNION ALL SELECT name FROM sqlite_temp_master WHERE type IN ('table', 'view') ORDER BY 1;";
