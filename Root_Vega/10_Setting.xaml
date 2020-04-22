@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local ="clr-namespace:Root_Vega"
+             xmlns:localSetting ="clr-namespace:Root_Vega.Setting"
              mc:Ignorable="d"
              d:DesignHeight="756"
              d:DesignWidth="1876">
@@ -15,6 +16,14 @@
             <Border BorderBrush="Gray"
                     BorderThickness="3">
                 <local:AjinInOutSetting DataContext="{Binding p_AjinViewModel}"></local:AjinInOutSetting>
+            </Border>
+        </TabItem>
+        <TabItem Header="RADS"
+                 Margin="0,50,0,0"
+                 Style="{StaticResource RcptabItem}">
+            <Border BorderBrush="Gray"
+                    BorderThickness="3">
+                <localSetting:Setting_RADS DataContext="{Binding p_Setting_RADS}"></localSetting:Setting_RADS>
             </Border>
         </TabItem>
     </TabControl>

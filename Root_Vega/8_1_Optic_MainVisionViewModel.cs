@@ -180,8 +180,6 @@ namespace Root_Vega
             p_CamAlign1 = p_PatternVision.m_CamAlign1;
             p_CamAlign2= p_PatternVision.m_CamAlign2;
             m_LightSet = p_PatternVision.m_lightSet;
-        }
-
-        
+        }   
     }
 }

@@ -273,7 +273,6 @@ namespace RootTools.Camera.BaslerPylon
             p_CamInfo._IsCanGrab = false;
         }
 
-
         void bgw_Connect_DoWork(object sender, DoWorkEventArgs e)
         {
             try

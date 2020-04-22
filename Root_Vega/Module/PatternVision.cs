@@ -37,7 +37,8 @@ namespace Root_Vega.Module
         public Camera_Dalsa m_CamMain;
         public Camera_Basler m_CamVRS;
         public Camera_Basler m_CamAlign1;
-        public Camera_Basler m_CamAlign2; 
+        public Camera_Basler m_CamAlign2;
+        public Camera_Basler m_CamRADS;
 
         public LightSet m_lightSet;
         MemoryPool m_memoryPool;
@@ -50,6 +51,7 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_CamAlign1, this, "Align1");
             p_sInfo = m_toolBox.Get(ref m_CamAlign2, this, "Align2");
+            p_sInfo = m_toolBox.Get(ref m_CamRADS, this, "RADS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
