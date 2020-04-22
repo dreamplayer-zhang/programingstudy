@@ -922,7 +922,7 @@ namespace Root_Wind
 
 
 
-        //   CLR_Demo clrDemo = new CLR_Demo();
+        //   CLR_Inspection clrDemo = new CLR_Inspection();
         VSDBManager m_VSDB = new VSDBManager();
         private void _btnInspTest()
         {

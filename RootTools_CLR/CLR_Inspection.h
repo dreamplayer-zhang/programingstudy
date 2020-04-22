@@ -28,7 +28,7 @@
 
 namespace RootTools_CLR
 {
-	public ref class CLR_Demo
+	public ref class CLR_Inspection
 	{
 	protected:
 		Cpp_Demo* m_pDemo = nullptr; 
@@ -38,7 +38,7 @@ namespace RootTools_CLR
 		CLR_InspConnector* m_InspConn = nullptr;
 		InspectionSurface* pInspSurface = nullptr;
 	public:
-		CLR_Demo()
+		CLR_Inspection()
 		{
 			m_pDemo = new Cpp_Demo();
 			m_PitSizer = new PitSizer(2048 * 2048, 1);
@@ -48,7 +48,7 @@ namespace RootTools_CLR
 			pInspSurface = new InspectionSurface();
 		}
 
-		virtual ~CLR_Demo()
+		virtual ~CLR_Inspection()
 		{
 			delete m_pDemo; 
 			delete m_PitSizer;

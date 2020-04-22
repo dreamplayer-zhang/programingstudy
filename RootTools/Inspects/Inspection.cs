@@ -21,7 +21,7 @@ namespace RootTools.Inspects
         int inspectionID = -1;
         public InspectionState bState = InspectionState.None;
         Thread _thread;
-        CLR_Demo clrDemo = new CLR_Demo();
+        CLR_Inspection clrDemo = new CLR_Inspection();
         InspectionProperty m_InspProp;
         private volatile bool shouldStop = false;
 
