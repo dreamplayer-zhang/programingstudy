@@ -7,6 +7,7 @@ using RootTools.Inspects;
 using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
+using RootTools.SQLogs;
 
 namespace Root_Vega
 {

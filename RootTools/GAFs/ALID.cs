@@ -1,5 +1,6 @@
 ﻿using RootTools.Gem;
 using RootTools.Module;
+using RootTools.SQLogs;
 using RootTools.Trees;
 using System;
 using System.IO;
@@ -52,6 +53,7 @@ namespace RootTools.GAFs
                 p_dateTime = DateTime.Now;
                 OnPropertyChanged();
                 m_listALID.SetALID(this);
+                m_sqALID.Insert(); 
             }
         }
 
@@ -73,6 +75,7 @@ namespace RootTools.GAFs
 
         ModuleBase m_module;
         ALIDList m_listALID;
+        SQTable_ALID m_sqALID; 
         string m_sID;
         LogWriter m_log;
         IGem m_gem;
@@ -87,6 +90,7 @@ namespace RootTools.GAFs
             m_gem = module.m_gem;
             m_log = module.m_log;
             p_sImageFile = "";
+            m_sqALID = SQLog.Get(this); 
         }
 
         public void RunTree(Tree treeParent, int nDefaultID)

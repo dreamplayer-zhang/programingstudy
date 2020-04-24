@@ -6,6 +6,7 @@ using RootTools.Gem;
 using RootTools.Module;
 using RootTools.OHT.Semi;
 using RootTools.OHT.SSEM;
+using RootTools.SQLogs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -20,8 +21,7 @@ namespace Root_Vega.Module
         DIO_I m_diPlaced;
         DIO_I m_diPresent; 
         DMCControl m_dmc;
-        OHT_Semi m_OHT; 
-
+        OHT_Semi m_OHT;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Placed");
