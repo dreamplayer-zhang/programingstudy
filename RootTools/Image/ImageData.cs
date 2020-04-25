@@ -104,7 +104,7 @@ namespace RootTools
 
         public BackgroundWorker Worker_MemoryCopy = new BackgroundWorker();
         public BackgroundWorker Worker_MemoryClear = new BackgroundWorker();
-        public BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+
 
         int m_nProgress = 0;
         public int p_nProgress
@@ -151,8 +151,6 @@ namespace RootTools
             Worker_MemoryClear.DoWork += Worker_MemoryClear_DoWork;
             Worker_MemoryClear.RunWorkerCompleted += Worker_MemoryClear_RunWorkerCompleted;
             Worker_MemoryClear.WorkerSupportsCancellation = true;
-            Worker_MemorySave.DoWork += Worker_MemorySave_DoWork;
-            Worker_MemorySave.WorkerSupportsCancellation = true;
         }
 
 
@@ -171,9 +169,21 @@ namespace RootTools
                 List<object> arguments = new List<object>();
                 arguments.Add(ofd.FileName);
                 arguments.Add(memRect);
-                
+
+                BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+                Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
                 Worker_MemorySave.RunWorkerAsync(arguments);
             }
+        }
+        public void SaveRectImage(CRect memRect, string saveTargetPath)
+        {
+            List<object> arguments = new List<object>();
+            arguments.Add(saveTargetPath);
+            arguments.Add(memRect);
+
+            BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+            Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
+            Worker_MemorySave.RunWorkerAsync(arguments);
         }
 
         public void SaveWholeImage()
@@ -186,6 +196,9 @@ namespace RootTools
                 List<object> arguments = new List<object>();
                 arguments.Add(ofd.FileName);
                 arguments.Add(new CRect(0, 0, p_Size.X, p_Size.Y));
+
+                BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+                Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
                 Worker_MemorySave.RunWorkerAsync(arguments);
             }
         }
@@ -211,7 +224,7 @@ namespace RootTools
                 rect.Bottom+= 4 - rect.Height % 4;
             }
 
-            FileStream fs = new FileStream(sFile, FileMode.CreateNew, FileAccess.Write);
+            FileStream fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
             BinaryWriter bw = new BinaryWriter(fs);
 
             bw.Write(Convert.ToUInt16(0x4d42));

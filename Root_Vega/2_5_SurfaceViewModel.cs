@@ -54,7 +54,7 @@ namespace Root_Vega
 			Init(engineer, dialogService);
 
 			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
-			m_Engineer.m_InspManager.InspectionComplete += () => 
+			m_Engineer.m_InspManager.InspectionComplete += () =>
 			{
 				//VSDBManager.Commit();
 				VSDBManager.SaveDataTable(VSDataInfoDT);
@@ -73,12 +73,26 @@ namespace Root_Vega
 		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
 		private void M_InspManager_AddDefect(DefectData[] source, EventArgs args)
 		{
+			string tempInspDir = @"C:\vsdb\TEMP_IMAGE";
+			int tempImageWidth = 640;
+			int tempImageHeight = 480;
+
 			foreach (var item in source)
 			{
 				CPoint ptStart = new CPoint(Convert.ToInt32(item.fPosX - item.nWidth / 2.0), Convert.ToInt32(item.fPosY - item.nHeight / 2.0));
 				CPoint ptEnd = new CPoint(Convert.ToInt32(item.fPosX + item.nWidth / 2.0), Convert.ToInt32(item.fPosY + item.nHeight / 2.0));
 
 				CRect resultBlock = new CRect(ptStart.X, ptStart.Y, ptEnd.X, ptEnd.Y);
+
+				CRect ImageSizeBlock = new CRect(
+					(int)item.fPosX - tempImageWidth / 2, 
+					(int)item.fPosY - tempImageHeight / 2, 
+					(int)item.fPosX + tempImageWidth / 2, 
+					(int)item.fPosY + tempImageHeight / 2);
+
+				string filename = currentDefectIdx.ToString("D8") + ".bmp";
+				m_ImageViewer.p_ImageData.SaveRectImage(ImageSizeBlock, System.IO.Path.Combine(tempInspDir, filename));
+
 				m_DD.AddRectData(resultBlock, System.Drawing.Color.Red);
 
 				//여기서 DB에 Defect을 추가하는 부분도 구현한다
@@ -953,10 +967,10 @@ namespace Root_Vega
 				VSDBManager.Disconnect();
 				VSDBManager = new SqliteDataDB(path, VSDB_configpath);
 			}
-			if(VSDBManager.Connect())
+			if (VSDBManager.Connect())
 			{
 				VSDBManager.CreateTable("Datainfo");
-				VSDBManager.CreateTable("Data"); 
+				VSDBManager.CreateTable("Data");
 
 				VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
 				VSDataDT = VSDBManager.GetDataTable("Data");
