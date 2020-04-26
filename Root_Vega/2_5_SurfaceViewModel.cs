@@ -47,6 +47,10 @@ namespace Root_Vega
 		string sGroup = "group";
 		string sMem = "mem";
 
+		int tempImageWidth = 640;
+		int tempImageHeight = 480;
+
+		static int testIdx = 0;
 		public _2_5_SurfaceViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
 			_dispatcher = Dispatcher.CurrentDispatcher;
@@ -57,6 +61,23 @@ namespace Root_Vega
 			m_Engineer.m_InspManager.InspectionComplete += () =>
 			{
 				//VSDBManager.Commit();
+				foreach (System.Data.DataRow row in VSDataDT.Rows)
+				{
+					//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+					double fPosX = Convert.ToDouble(row["PosX"]);
+					double fPosY = Convert.ToDouble(row["PosY"]);
+
+					CRect ImageSizeBlock = new CRect(
+						(int)fPosX - tempImageWidth / 2,
+						(int)fPosY - tempImageHeight / 2,
+						(int)fPosX + tempImageWidth / 2,
+						(int)fPosY + tempImageHeight / 2);
+
+					var test = m_ImageViewer.p_ImageData.GetRectImage(ImageSizeBlock);
+					test.Save(System.IO.Path.Combine(@"C:\Temp", testIdx.ToString("D8")+".bmp"),System.Drawing.Imaging.ImageFormat.Bmp);
+					testIdx++;
+				}
+
 				VSDBManager.SaveDataTable(VSDataInfoDT);
 				VSDBManager.SaveDataTable(VSDataDT);
 				VSDBManager.Disconnect();
@@ -73,9 +94,7 @@ namespace Root_Vega
 		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
 		private void M_InspManager_AddDefect(DefectData[] source, EventArgs args)
 		{
-			string tempInspDir = @"C:\vsdb\TEMP_IMAGE";
-			int tempImageWidth = 640;
-			int tempImageHeight = 480;
+			//string tempInspDir = @"C:\vsdb\TEMP_IMAGE";
 
 			foreach (var item in source)
 			{
@@ -84,14 +103,14 @@ namespace Root_Vega
 
 				CRect resultBlock = new CRect(ptStart.X, ptStart.Y, ptEnd.X, ptEnd.Y);
 
-				CRect ImageSizeBlock = new CRect(
-					(int)item.fPosX - tempImageWidth / 2, 
-					(int)item.fPosY - tempImageHeight / 2, 
-					(int)item.fPosX + tempImageWidth / 2, 
-					(int)item.fPosY + tempImageHeight / 2);
+				//CRect ImageSizeBlock = new CRect(
+				//	(int)item.fPosX - tempImageWidth / 2,
+				//	(int)item.fPosY - tempImageHeight / 2,
+				//	(int)item.fPosX + tempImageWidth / 2,
+				//	(int)item.fPosY + tempImageHeight / 2);
 
-				string filename = currentDefectIdx.ToString("D8") + ".bmp";
-				m_ImageViewer.p_ImageData.SaveRectImage(ImageSizeBlock, System.IO.Path.Combine(tempInspDir, filename));
+				//string filename = currentDefectIdx.ToString("D8") + ".bmp";
+				//m_ImageViewer.p_ImageData.SaveRectImage(ImageSizeBlock, System.IO.Path.Combine(tempInspDir, filename));
 
 				m_DD.AddRectData(resultBlock, System.Drawing.Color.Red);
 

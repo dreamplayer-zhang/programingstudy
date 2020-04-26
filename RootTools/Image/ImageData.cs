@@ -158,7 +158,124 @@ namespace RootTools
         {
             OnUpdateImage();
         }
+        Bitmap GetBitmapToArray(int width, int height, byte[] imageData)
+        {
+            byte[] newData = new byte[imageData.Length];
 
+            for (int x = 0; x < imageData.Length; x += 3)
+            {
+                var gv = imageData[x];
+                byte[] newPixel = new byte[] { gv, gv, gv };
+
+                Array.Copy(newPixel, 0, newData, x, 3);
+            }
+
+            imageData = newData;
+            var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+            using (var stream = new MemoryStream(imageData))
+            {
+
+                System.Drawing.Imaging.BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0,
+                                                                bmp.Width,
+                                                                bmp.Height),
+                                                  System.Drawing.Imaging.ImageLockMode.WriteOnly,
+                                                  bmp.PixelFormat);
+
+                IntPtr pNative = bmpData.Scan0;
+                Marshal.Copy(imageData, 0, pNative, imageData.Length);
+
+                bmp.UnlockBits(bmpData);
+            }
+            return bmp;
+        }
+        public Bitmap GetRectImage(CRect rect)
+        {
+            #region TEMP
+            //byte[] aBuf = new byte[54 + (1024 * 2) + rect.Width * rect.Height];
+            //byte[] temp;
+            //int position = 0;
+            //temp = BitConverter.GetBytes(Convert.ToUInt16(0x4d42));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(54 + 1024 + rect.Width * rect.Height));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //temp = BitConverter.GetBytes(Convert.ToUInt16(0));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt16(0));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(1078));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(40));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(rect.Width));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(rect.Height));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //temp = BitConverter.GetBytes(Convert.ToUInt16(1));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt16(8));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(0));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(rect.Width * rect.Height));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(0));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(0));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(256));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(256));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //for (int i = 0; i < 256; i++)
+            //{
+
+            //    temp = BitConverter.GetBytes(Convert.ToByte(i));
+            //    temp.CopyTo(aBuf, position);
+            //    position += temp.Length;
+            //    temp = BitConverter.GetBytes(Convert.ToByte(i));
+            //    temp.CopyTo(aBuf, position);
+            //    position += temp.Length;
+            //    temp = BitConverter.GetBytes(Convert.ToByte(i));
+            //    temp.CopyTo(aBuf, position);
+            //    position += temp.Length;
+            //    temp = BitConverter.GetBytes(Convert.ToByte(255));
+            //    temp.CopyTo(aBuf, position);
+            //    position += temp.Length;
+            //}
+            #endregion
+
+            int position = 0;
+            byte[] aBuf = new byte[rect.Width * rect.Height];
+            for (int i = rect.Height - 1; i >= 0; i--)
+            {
+                Marshal.Copy((IntPtr)((long)m_ptrImg + rect.Left + ((long)i + (long)rect.Top) * p_Size.X), aBuf, position, rect.Width);
+                position += rect.Width;
+            }
+            return GetBitmapToArray(rect.Width, rect.Height, aBuf);
+        }
         public void SaveRectImage(CRect memRect)
         {
             SaveFileDialog ofd = new SaveFileDialog();
