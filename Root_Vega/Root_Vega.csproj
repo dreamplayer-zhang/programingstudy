@@ -57,6 +57,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
@@ -530,7 +531,7 @@
     <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
 copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
 copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
-
+copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
 IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"
