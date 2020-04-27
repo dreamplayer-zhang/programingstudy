@@ -261,7 +261,6 @@
     <Compile Include="Inspects\RecipeManager.cs" />
     <Compile Include="Inspects\Singleton.cs" />
     <Compile Include="Inspects\SqliteDataDB.cs" />
-    <Compile Include="Inspects\VSDBManager.cs" />
     <Compile Include="Memory\MemoryViewer.cs" />
     <Compile Include="Memory\MemoryViewer_UI.xaml.cs">
       <DependentUpon>MemoryViewer_UI.xaml</DependentUpon>

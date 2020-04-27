@@ -846,7 +846,6 @@ namespace Root_Vega
             }
         }
         //        CLR_Inspection clrDemo = new CLR_Inspection();
-        VSDBManager m_VSDB = new VSDBManager();
         private void _btnInspTest()
         {
             return;

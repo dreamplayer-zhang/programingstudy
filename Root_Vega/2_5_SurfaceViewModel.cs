@@ -974,7 +974,6 @@ namespace Root_Vega
 
 			}
 		}
-		VSDBManager m_VSDB = new VSDBManager();
 		List<CRect> DrawRectList;
 		private void _btnInspTest()
 		{
