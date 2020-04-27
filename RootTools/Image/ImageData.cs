@@ -23,6 +23,7 @@ namespace RootTools
 {
     public class ImageData :ObservableObject
     {
+        public static string MainFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
         private static System.Drawing.Imaging.ColorPalette mono;
         public enum eMode
         {
