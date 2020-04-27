@@ -32,6 +32,9 @@ namespace Root_Vega
 		System.Data.DataTable VSDataInfoDT;
 		System.Data.DataTable VSDataDT;
 
+		private string inspDefaultDir;
+		private string inspFileName;
+
 		public Recipe p_Recipe
 		{
 			get
@@ -50,7 +53,6 @@ namespace Root_Vega
 		int tempImageWidth = 640;
 		int tempImageHeight = 480;
 
-		static int testIdx = 0;
 		public _2_5_SurfaceViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
 			_dispatcher = Dispatcher.CurrentDispatcher;
@@ -61,6 +63,19 @@ namespace Root_Vega
 			m_Engineer.m_InspManager.InspectionComplete += () =>
 			{
 				//VSDBManager.Commit();
+
+				//여기서부터 DB Table데이터를 기준으로 tif 이미지 파일을 생성하는 구간
+				//해당 기능은 여러개의 pool을 사용하는 경우에 대해서는 테스트가 진행되지 않았습니다
+				//Concept은 검사 결과가 저장될 시점에 가지고 있던 Data Table을 저장하기 전 Image를 저장하는 형태
+				int stride = tempImageWidth / 8;
+				string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
+
+				System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
+
+				System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
+				System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
+				encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
+
 				foreach (System.Data.DataRow row in VSDataDT.Rows)
 				{
 					//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
@@ -73,19 +88,38 @@ namespace Root_Vega
 						(int)fPosX + tempImageWidth / 2,
 						(int)fPosY + tempImageHeight / 2);
 
-					var test = m_ImageViewer.p_ImageData.GetRectImage(ImageSizeBlock);
-					test.Save(System.IO.Path.Combine(@"C:\Temp", testIdx.ToString("D8")+".bmp"),System.Drawing.Imaging.ImageFormat.Bmp);
-					testIdx++;
+					encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(m_ImageViewer.p_ImageData.GetRectImage(ImageSizeBlock))));
 				}
 
+				encoder.Save(stream);
+				stream.Dispose();
+				//이미지 저장 완료
+
+				//Data Table 저장 시작
 				VSDBManager.SaveDataTable(VSDataInfoDT);
 				VSDBManager.SaveDataTable(VSDataDT);
 				VSDBManager.Disconnect();
+				//Data Table 저장 완료
 			};
 			m_Engineer.m_InspManager.InspectionStart += () =>
 			{
 				//VSDBManager.BeginWrite();
 			};
+		}
+		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
+		{
+			var bitmapData = bitmap.LockBits(
+				new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+				System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+			var bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
+				bitmapData.Width, bitmapData.Height,
+				bitmap.HorizontalResolution, bitmap.VerticalResolution,
+				PixelFormats.Gray8, null,
+				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+
+			bitmap.UnlockBits(bitmapData);
+			return bitmapSource;
 		}
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
@@ -968,23 +1002,23 @@ namespace Root_Vega
 			}
 			System.Diagnostics.Debug.WriteLine("Start Insp");
 
-			string inspDefaultDir = @"C:\vsdb";
+			inspDefaultDir = @"C:\vsdb";
 			if (!System.IO.Directory.Exists(inspDefaultDir))
 			{
 				System.IO.Directory.CreateDirectory(inspDefaultDir);
 			}
-
-			string path = System.IO.Path.Combine(inspDefaultDir, DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result");
+			inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+			var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
 			string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
 
 			if (VSDBManager == null)
 			{
-				VSDBManager = new SqliteDataDB(path, VSDB_configpath);
+				VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
 			}
 			else if (VSDBManager.IsConnected)
 			{
 				VSDBManager.Disconnect();
-				VSDBManager = new SqliteDataDB(path, VSDB_configpath);
+				VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
 			}
 			if (VSDBManager.Connect())
 			{
@@ -1004,6 +1038,7 @@ namespace Root_Vega
 
 		SurfaceProgress m_SurfaceProgress = SurfaceProgress.None;
 		HitType m_MouseHitType = HitType.None;
+
 		enum SurfaceProgress
 		{
 			None,

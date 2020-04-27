@@ -23,6 +23,7 @@ namespace RootTools
 {
     public class ImageData :ObservableObject
     {
+        private static System.Drawing.Imaging.ColorPalette mono;
         public enum eMode
         {
             MemoryRead,
@@ -125,7 +126,19 @@ namespace RootTools
             m_eMode = eMode.ImageBuffer;
             p_Size = new CPoint(Width, Height);
             ReAllocate(p_Size, nByte);
-            
+
+            var bmp = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+
+            //Grayscale 이미지를 위한 Pallete 설정
+            mono = bmp.Palette;
+            System.Drawing.Color[] ent = mono.Entries;
+
+            Parallel.For(0, 256, (j) =>
+            {
+                System.Drawing.Color b = new System.Drawing.Color();
+                b = System.Drawing.Color.FromArgb((byte)j, (byte)j, (byte)j);
+                ent[j] = b;
+            });
         }
         public void SetData(IntPtr ptr, CRect rect, int stride)
         {
@@ -160,18 +173,9 @@ namespace RootTools
         }
         Bitmap GetBitmapToArray(int width, int height, byte[] imageData)
         {
-            byte[] newData = new byte[imageData.Length];
+            var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
 
-            for (int x = 0; x < imageData.Length; x += 3)
-            {
-                var gv = imageData[x];
-                byte[] newPixel = new byte[] { gv, gv, gv };
-
-                Array.Copy(newPixel, 0, newData, x, 3);
-            }
-
-            imageData = newData;
-            var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            bmp.Palette = mono;
 
             using (var stream = new MemoryStream(imageData))
             {
