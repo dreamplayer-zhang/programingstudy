@@ -7,6 +7,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Windows.Media;
 
 namespace RootTools.Module
 {
@@ -50,6 +51,7 @@ namespace RootTools.Module
                 if (value == "OK") return;
                 m_log.Info("Info : " + _sInfo);
                 m_infoList.Add(_sInfo);
+                EQ.p_sInfo = p_id + " : " + value; 
             }
         }
 

@@ -13,6 +13,7 @@ using RootTools.Module;
 using RootTools.OHT.Semi;
 using RootTools.OHT.SSEM;
 using RootTools.RTC5s.LaserBright;
+using RootTools.SQLogs;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -309,7 +310,7 @@ namespace RootTools.ToolBoxs
         }
         #endregion
 
-        #region OHT
+        #region ITool OHT
         ToolSet m_toolSetOHT = null;
 
         public string Get(ref OHT_Semi value, ModuleBase module, GemCarrierBase carrier, string id)
@@ -377,6 +378,7 @@ namespace RootTools.ToolBoxs
         {
             m_id = id;
             m_engineer = engineer;
+            SQLog.Init(engineer);
             InitStringTable(id); 
             InitMemoryTool();
             InitInspectTool();

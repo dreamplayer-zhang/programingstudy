@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using Root_Vega.Module;
+using RootTools.Gem;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Root_Vega
 {
@@ -23,6 +12,28 @@ namespace Root_Vega
         public _1_2_LoadPort()
         {
             InitializeComponent();
+        }
+
+        Loadport m_loadport; 
+        public void Init(Loadport loadport)
+        {
+            m_loadport = loadport;
+            this.DataContext = loadport;
+            textBoxPodID.DataContext = loadport.m_infoPod;
+            toggleButtonAccessLPAuto.DataContext = loadport.m_infoPod;
+            toggleButtonAccessLPManual.DataContext = loadport.m_infoPod;
+            textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
+            textBoxSlotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
+        }
+
+        private void toggleButtonAccessLPAuto_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            m_loadport.m_infoPod.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto; 
+        }
+
+        private void toggleButtonAccessLPManual_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            m_loadport.m_infoPod.p_eReqAccessLP = GemCarrierBase.eAccessLP.Manual; 
         }
     }
 }

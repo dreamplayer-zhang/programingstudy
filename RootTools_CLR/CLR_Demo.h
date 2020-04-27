@@ -6,24 +6,25 @@
 #include "memoryapi.h"
 #include <stdio.h>
 #include <list>
-#include "..\RootTools_Cpp\\Cpp_DB.h"
+//#include "..\RootTools_Cpp\\Cpp_DB.h"
 #include "CLR_InspConnector.h"
 #include "..\RootTools_Cpp\\InspectionSurface.h"
+#include "DefectData.h"
 //#include "InspSurface_Reticle.h"
 
-
-typedef struct _defectData
-{
-	int NONE = -1;
-	POINT ptPos; // Center 
-	double dArea; // Count of points 
-	POINT ptUnit; // chip die
-	POINT ptSize; // w h 
-	int nClusterID = NONE; // 이웃
-	RECT rtArea;  //외각
-	string sDefectName;
-	int sDCode;
-}DefectData;
+//
+//typedef struct _defectData
+//{
+//	int NONE = -1;
+//	POINT ptPos; // Center 
+//	double dArea; // Count of points 
+//	POINT ptUnit; // chip die
+//	POINT ptSize; // w h 
+//	int nClusterID = NONE; // 이웃
+//	RECT rtArea;  //외각
+//	string sDefectName;
+//	int sDCode;
+//}DefectData;
 
 namespace RootTools_CLR
 {
@@ -32,7 +33,7 @@ namespace RootTools_CLR
 	protected:
 		Cpp_Demo* m_pDemo = nullptr; 
 		PitSizer* m_PitSizer = nullptr;
-		Cpp_DB*  m_pDB = nullptr;
+		//Cpp_DB*  m_pDB = nullptr;
 		//InspSurface_Reticle* m_Reticle = nullptr;
 		CLR_InspConnector* m_InspConn = nullptr;
 		InspectionSurface* pInspSurface = nullptr;
@@ -41,7 +42,7 @@ namespace RootTools_CLR
 		{
 			m_pDemo = new Cpp_Demo();
 			m_PitSizer = new PitSizer(2048 * 2048, 1);
-			m_pDB = new Cpp_DB();
+			//m_pDB = new Cpp_DB();
 			//m_Reticle = new InspSurface_Reticle();
 			m_InspConn = new CLR_InspConnector();
 			pInspSurface = new InspectionSurface();
@@ -64,28 +65,25 @@ namespace RootTools_CLR
 			m_pDemo->SetMemory(nCount, nByte, xSize, ySize, nAddress); 
 		}
 
-		void SendDefectData(DefectData* pStruct)
+		/*void SendDefectData(DefectData* pStruct)
 		{
 
-		}
+		}*/
 
 		int Test()
 		{
 
 			return 1;
 		}
-		void EndInspection(int threadidx)
+		array<DefectData^>^ Test_Inspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark)
 		{
-			pInspSurface->EndInspection(threadidx);
+			RECT targetRect;
+			std::vector<DefectDataStruct> vTempResult;
 
-		}
-		int Test_strip(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark)
-		{
-			RECT testrect;
-			testrect.left = RoiLeft;
-			testrect.right = RoiRight;
-			testrect.top = RoiTop;
-			testrect.bottom = RoiBottom;
+			targetRect.left = RoiLeft;
+			targetRect.right = RoiRight;
+			targetRect.top = RoiTop;
+			targetRect.bottom = RoiBottom;
 
 			m_InspConn->GetImagePool("pool", memwidth, memHeight);
 			int bufferwidth = memwidth;
@@ -94,13 +92,45 @@ namespace RootTools_CLR
 
 			//PaintOutline(testrect.left, testrect.top, testrect.right, testrect.bottom, 10000, 5, m_InspConn->GetBuffer(), 10000);
 			//pInspSurface->SetParams(m_InspConn->GetBuffer(), testrect, 1, 70, 10, true);
-			pInspSurface->SetParams(m_InspConn->GetBuffer(), bufferwidth, bufferheight, testrect, 1, GV, DefectSize, bDark, threadindex);
-			pInspSurface->Inspection();
+			pInspSurface->SetParams(m_InspConn->GetBuffer(), bufferwidth, bufferheight, targetRect, 1, GV, DefectSize, bDark, threadindex);
+			
+			//TODO 여기서 이벤트를 올리는 방식으로 변경한다
+			//여기 들어올때 이미 한 블럭에 대한 정보가 통째로 넘어오는 것이므로 구조 자체를 변경하여 AddDefect이 발생하는 순간을 여기서 포착하도록 수정한다
+			//pInspSurface->Inspection();
+
+			pInspSurface->CheckConditions();
+
+			pInspSurface->CopyImageToBuffer(bDark);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
+			vTempResult = pInspSurface->Inspection(true, bDark);//TODO : absolute GV 구현해야함
+			
+			bool bResultExist = vTempResult.size() > 0;
+			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
+
+			if (bResultExist)
+			{
+				for (int i = 0; i < vTempResult.size(); i++)
+				{
+					local[i] = gcnew DefectData();
+					local[i]->nIdx = vTempResult[i].nIdx;
+					local[i]->nClassifyCode = vTempResult[i].nClassifyCode;
+					local[i]->fSize = vTempResult[i].fSize;
+					local[i]->nLength = vTempResult[i].nLength;
+					local[i]->nWidth = vTempResult[i].nWidth;
+					local[i]->nHeight = vTempResult[i].nHeight;
+					local[i]->nInspMode = vTempResult[i].nInspMode;
+					local[i]->nFOV = vTempResult[i].nFOV;
+					local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+					local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+				}
+			}
+
+			//return GetResult();
+
 			//m_InspConn->PrepareRun();
 			//m_InspConn->StripRun(testrect, 1);
 			//m_InspConn->EndRun();
 
-			return 1;
+			return local;
 
 
 			/*
@@ -321,41 +351,6 @@ namespace RootTools_CLR
 
 		}
 
-		void DBSaveTest(RECT rt, float size, int count)
-		{
-			int PosX;//
-			int PosY;//
-			int Darea;//
-			int UnitX;
-			int UnitY;
-			int Width;//
-			int Height;//
-			int ClusterID;
-			int Dcode;
-
-			Width = rt.right - rt.left;
-			Height = rt.bottom - rt.top;
-			PosX = rt.left + (int)(Width*0.5);
-			PosY = rt.top + (int)(Height*0.5);
-			Darea = (int)size;
-			UnitX = 0;
-			UnitY = 0;
-			ClusterID = 0;
-			Dcode = 101;
-
-
-			char ch[100];
-			//NO POSX POSY DAREA UNITX UNITY WIDTH HEIGHT CLUSTERID RECTL RECTT RECTR RECTB DNAME DCODE
-			//기존 VISION에는 adddefect에서 posx, posy, rect 환산식이 있음
-
-			sprintf(ch, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-				count, PosX, PosY, Darea, UnitX, UnitY, Width, Height, ClusterID, rt.left, rt.top, rt.right, rt.bottom, 1234, Dcode);
-			string str(ch);
-			std::string DBPath = "C:/sqlite/db/VS1.sqlite";
-			//m_pDB->DBOpenAndWrite(DBPath, str);
-			m_pDB->InsertData(str);
-		}
-
 		int Width(RECT rt)
 		{
 			int width = rt.right - rt.left;
@@ -373,7 +368,7 @@ namespace RootTools_CLR
 			return Height;
 		}
 
-		bool OpenImage(string FilePath)
+		bool OpenImage(std::string FilePath)
 		{
 			return m_pDemo->OpenImage(FilePath);
 		}

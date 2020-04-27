@@ -107,7 +107,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\SQLite;$(SolutionDir)\Lib\opencv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Lib\opencv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -148,7 +148,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\Program Files\opencv-3.4.7\opencv\mybuild\install\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Lib\opencv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -157,12 +157,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>D:\Program Files\opencv-3.4.7\opencv\mybuild\install\x64\vc12\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Lib\opencv\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world347.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Constants.h" />
-    <ClInclude Include="Cpp_DB.h" />
     <ClInclude Include="Cpp_Demo.h" />
     <ClInclude Include="Cpp_Memory.h" />
     <ClInclude Include="framework.h" />
@@ -173,13 +173,11 @@
     <ClInclude Include="InspSurface.h" />
     <ClInclude Include="InspSurface_Reticle.h" />
     <ClInclude Include="IP.h" />
-    <ClInclude Include="Lib\sqlite3.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PitSizer.h" />
     <ClInclude Include="TypeDefines.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Cpp_DB.cpp" />
     <ClCompile Include="Cpp_Demo.cpp" />
     <ClCompile Include="Cpp_Memory.cpp" />
     <ClCompile Include="InspBase.cpp" />

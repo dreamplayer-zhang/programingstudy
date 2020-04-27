@@ -45,7 +45,11 @@ namespace Root_Vega
             _Maint.engineerUI.Init(m_engineer);
             ConnectViewModel(dialogService);
             //((GAF_Manager)m_engineer.ClassGAFManager()).UpdateTree();
-            textState.DataContext = EQ.m_EQ; 
+            textState.DataContext = EQ.m_EQ;
+            textGemState.DataContext = m_engineer.ClassGem();
+            textLastError.DataContext = EQ.m_EQ;
+
+            _Main.Init(m_engineer); 
         }
 
         void ConnectViewModel(IDialogService dialogService)

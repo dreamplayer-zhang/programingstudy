@@ -6,10 +6,12 @@ using RootTools.Gem;
 using RootTools.Module;
 using RootTools.OHT.Semi;
 using RootTools.OHT.SSEM;
+using RootTools.SQLogs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Windows.Media;
 
 namespace Root_Vega.Module
 {
@@ -19,8 +21,7 @@ namespace Root_Vega.Module
         DIO_I m_diPlaced;
         DIO_I m_diPresent; 
         DMCControl m_dmc;
-        OHT_Semi m_OHT; 
-
+        OHT_Semi m_OHT;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Placed");
@@ -31,6 +32,30 @@ namespace Root_Vega.Module
         #endregion
 
         #region DIO Function
+        Brush _brushPlaced = Brushes.Green; 
+        public Brush p_brushPlaced
+        { 
+            get { return _brushPlaced; }
+            set
+            {
+                if (_brushPlaced == value) return;
+                _brushPlaced = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        Brush _brushPresent = Brushes.Green;
+        public Brush p_brushPresent
+        {
+            get { return _brushPresent; }
+            set
+            {
+                if (_brushPresent == value) return;
+                _brushPresent = value;
+                OnPropertyChanged();
+            }
+        }
+
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present;
@@ -278,6 +303,13 @@ namespace Root_Vega.Module
                 StartRun(m_runUnDocking);
             }
             return "OK";
+        }
+
+        protected override void RunThread()
+        {
+            p_brushPlaced = m_diPlaced.p_bIn ? Brushes.Yellow : Brushes.Green;
+            p_brushPresent = m_diPresent.p_bIn ? Brushes.Yellow : Brushes.Green;
+            base.RunThread();
         }
         #endregion
 

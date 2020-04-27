@@ -66,16 +66,19 @@
                 <i:EventTrigger EventName="MouseRightButtonDown">
                     <i:InvokeCommandAction Command="{Binding CanvasMouseRightDown}" />
                 </i:EventTrigger>
-                <i:EventTrigger EventName="MouseLeave">
-                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeave}" />
-                </i:EventTrigger>
-                <i:EventTrigger EventName="MouseLeftButtonDown">
+				<i:EventTrigger EventName="MouseLeave">
+					<i:InvokeCommandAction Command="{Binding CanvasMouseLeave}" />
+				</i:EventTrigger>
+				<i:EventTrigger EventName="MouseLeftButtonDown">
                     <i:InvokeCommandAction Command="{Binding CanvasMouseLeftDown}" />
                 </i:EventTrigger>
                 <i:EventTrigger EventName="PreviewMouseDown">
                     <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseDown" />
-                </i:EventTrigger>
-                <i:EventTrigger EventName="PreviewMouseWheel">
+				</i:EventTrigger>
+				<i:EventTrigger EventName="MouseEnter">
+					<ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseEnter" />
+				</i:EventTrigger>
+				<i:EventTrigger EventName="PreviewMouseWheel">
                     <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseWheel" />
                 </i:EventTrigger>
                 <i:EventTrigger EventName="Loaded" >

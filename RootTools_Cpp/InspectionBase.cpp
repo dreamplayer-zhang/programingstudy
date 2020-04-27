@@ -1,86 +1,18 @@
 #include "pch.h"
 #include "InspectionBase.h"
 
-void InspectionBase::CloseDB()
+DefectDataStruct InspectionBase::GetDefectData(RECT rt, POINT ptDPos, float fSize)
 {
-	char ch[500];
+	DefectDataStruct data;
 
-	sprintf_s(ch, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1);
+	data.nWidth= rt.right - rt.left;
+	data.nHeight = rt.bottom - rt.top;
+	data.fPosX = rt.left + (data.nWidth * (double)0.5);//중앙값을 구하기 위한 width 더하기
+	data.fPosY = rt.top + (data.nHeight * (double)0.5);//중앙값을 구하기 위한 height 더하기
+	data.fSize = fSize;
+	data.nClassifyCode = GetDefectCode();
 
-	string str(ch);
-	//pDataBase->InsertData(str);
-
-	pDataBase->CommitAndClose();
-	//pDataBase->Commit();
-}
-
-
-void InspectionBase::OpenDB(int threadidx)
-{
-	string temp;
-	temp = DBFolderPath + "/VSTEMP" + to_string(threadidx) + ".sqlite";
-
-
-	dbcount = 0;
-	//int result = CreateDirectoryA(DBFolderPath.c_str(), NULL);
-	//pDataBase->DBCreateVSTemp(temp);
-	pDataBase->OpenAndBegin(temp);
-}
-
-void InspectionBase::WriteDB(RECT rt, float size)
-{
-	int PosX;//
-	int PosY;//
-	int Darea;//
-	int UnitX;
-	int UnitY;
-	int Width;//
-	int Height;//
-	int ClusterID;
-	int Dcode;
-
-	Width = rt.right - rt.left;
-	Height = rt.bottom - rt.top;
-	PosX = rt.left + (int)(Width * 0.5);
-	PosY = rt.top + (int)(Height * 0.5);
-	Darea = size;
-	UnitX = 0;
-	UnitY = 0;
-	ClusterID = 0;
-	Dcode = GetDefectCode();
-
-	char ch[500];
-	sprintf_s(ch, /*"%d,*/"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-		/*dbcount,*/ Dcode, Darea, Width, Height, PosX, PosY, rt.left + 10, rt.top + 10, rt.right + 10, rt.bottom + 10); //rt에 10 더해줘야 맞는게 m_inspoffset떄문인가? 확인필요
-	
-
-//	sprintf_s(ch, /*"%d,*/"%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
-//		/*dbcount,*/ PosX, PosY, Darea, UnitX, UnitY, Width, Height, ClusterID, rt.left + 10, rt.top + 10, rt.right + 10, rt.bottom + 10, 1234, Dcode, 0, 0);
-
-	string str(ch);
-	pDataBase->InsertData(str);
-	dbcount++;
-}
-void InspectionBase::EraseDB(int threadidx)
-{
-	string temp;
-	temp = DBFolderPath + "/VSTEMP" + to_string(threadidx) + ".sqlite";
-	pDataBase->EraseAndClose(temp);
-}
-
-
-void InspectionBase::AddDefect(RECT rt, POINT ptDPos, float fSize)
-{
-	rt.left = rt.left + ptDPos.x - m_ptCurrent.x;
-	rt.right = rt.right + ptDPos.x - m_ptCurrent.x;
-	rt.bottom = rt.bottom + ptDPos.y - m_ptCurrent.y;
-	rt.top = rt.top + ptDPos.y - m_ptCurrent.y;
-
-	int nX = rt.left + (int)(Functions::GetWidth(rt) * 0.5);
-	int nY = rt.top + (int)(Functions::GetHeight(rt) * 0.5);
-
-	return WriteDB(rt, fSize);
+	return data;
 }
 void InspectionBase::CheckConditions() const
 {
@@ -159,7 +91,7 @@ RECT InspectionBase::GetInspbufferROI() const
 {
 	return inspbufferROI;
 }
-void InspectionBase::CopyImageToBuffer()//byte* mem, int nW, RECT rt, int nBackGround, BOOL bInterpolation)
+void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, int nBackGround, BOOL bInterpolation)
 {
 	//opencv 전의 test용으로 interpolation 내용 미구현
 
@@ -167,6 +99,10 @@ void InspectionBase::CopyImageToBuffer()//byte* mem, int nW, RECT rt, int nBackG
 	int nW = nBufferW;//80000;
 	RECT rt = rtROI;
 	int nBackGround = 255;
+	if (!bDark)
+	{
+		nBackGround = 0;
+	}
 
 	
 	int nWidth = (int)(Functions::GetWidth(rt) + m_nInspOffset);
@@ -247,7 +183,7 @@ InspectionBase::InspectionBase()
 	bDarkInspection = false;
 
 	pPitSizer = new PitSizer(2048 * 2048, 1);
-	pDataBase = new Cpp_DB();
+	//pDataBase = new Cpp_DB();
 	pBuffer = new byte(10000 * 10000);
 
 	m_ptCurrent.x = -1;
@@ -257,6 +193,6 @@ InspectionBase::InspectionBase()
 InspectionBase::~InspectionBase()
 {
 	Functions::SafeDelete(pPitSizer);
-	Functions::SafeDelete(pDataBase);
+	//Functions::SafeDelete(pDataBase);
 	Functions::SafeDeleteArray(pBuffer);
 }

@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_Vega"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Margin="7.5,0,7.5,7.5"
-                          Grid.Column="0">
+    <Grid Margin="7.5,0,7.5,7.5" Grid.Column="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
             <RowDefinition/>
@@ -14,7 +14,7 @@
         <Border BorderThickness="3"
                             BorderBrush="{StaticResource BorderBrush}"
                             Background="{StaticResource Purple}">
-            <TextBlock Text="{Binding}"
+            <TextBlock Text="{Binding p_id}"
                        FontWeight="Bold"
                        Style="{StaticResource BasicTb}"
                        FontSize="15"
@@ -47,7 +47,7 @@
                         <Ellipse Width="15"
                                                  Height="15"
                                                  Margin="0,0,0,10"
-                                                 Fill="Green"/>
+                                                 Fill="{Binding p_brushReticleExist}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1">
                         <TextBlock Text="Alarm"
@@ -74,9 +74,10 @@
                                                TextAlignment="Left"/>
                     </Border>
                     <Grid Grid.Row="1" Background="{StaticResource LightGray}">
-                        <TextBlock Text="{Binding}"
-                                                   Foreground="{StaticResource Black}"
-                                                   Style="{StaticResource BasicTb}"/>
+                        <TextBlock Text="{Binding p_eState}"
+                                                Foreground="{StaticResource Black}"
+                                                FontSize="25"
+                                                Style="{StaticResource BasicTb}"/>
                     </Grid>
                 </Grid>
             </Grid>

@@ -7,6 +7,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Windows.Media;
 
 namespace Root_Vega.Module
 {
@@ -16,13 +17,13 @@ namespace Root_Vega.Module
         public DIO_I m_diCheckVac;
         public DIO_I m_diArmClose;
         RS232 m_rs232;
-        Camera_CognexOCR m_camOCR; 
+        Camera_CognexOCR m_camOCR;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diCheckVac, this, "CheckVac");
             p_sInfo = m_toolBox.Get(ref m_diArmClose, this, "ArmClose");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref m_camOCR, this, "CamOCR"); 
+            p_sInfo = m_toolBox.Get(ref m_camOCR, this, "CamOCR");
             if (bInit)
             {
                 m_rs232.OnRecieve += M_rs232_OnRecieve;
@@ -42,9 +43,26 @@ namespace Root_Vega.Module
 
         public bool IsReticleExist(bool bIgnoreExistSensor = false)
         {
-            if (bIgnoreExistSensor) return (p_infoReticle != null); 
-            //forget
-            return false; 
+            bool bExist = false; 
+            if (bIgnoreExistSensor) bExist = (p_infoReticle != null); 
+            else
+            {
+                //forget
+            }
+            p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
+            return bExist; 
+        }
+
+        Brush _brushReticleExist = Brushes.Green; 
+        public Brush p_brushReticleExist
+        {
+            get { return _brushReticleExist; }
+            set
+            {
+                if (_brushReticleExist == value) return;
+                _brushReticleExist = value;
+                OnPropertyChanged(); 
+            }
         }
         #endregion
 

@@ -6,6 +6,17 @@ namespace RootTools.Inspects
 {
     public class Inspection
     {
+        #region EventHandler
+        /// <summary>
+        /// 이벤트 핸들러
+        /// </summary>
+        public delegate void EventHandler();
+        public EventHandler InspectionStart;
+        public EventHandler InspectionComplete;
+        public delegate void ChangeDefectInfoEventHander(DefectData[] source, EventArgs args);
+        public event ChangeDefectInfoEventHander AddDefect;
+        #endregion
+
         int threadIndex = -1;
         int inspectionID = -1;
         public InspectionState bState = InspectionState.None;
@@ -28,11 +39,6 @@ namespace RootTools.Inspects
             //_thread.IsBackground = true;
             _thread.Start();
         }
-        public void EndInspection(int threadIndex)
-        {
-            clrDemo.EndInspection(threadIndex);
-
-        }
 
         public void DoInspection(object threadId)
         {
@@ -43,8 +49,12 @@ namespace RootTools.Inspects
                     Console.WriteLine(string.Format("Inspection ID : {0} Thread Index {1}", InspectionID, ThreadIndex));
                     bState = InspectionState.Running;
 
-                    clrDemo.Test_strip(ThreadIndex, m_InspProp.p_Rect.Left, m_InspProp.p_Rect.Top, m_InspProp.p_Rect.Right, m_InspProp.p_Rect.Bottom, 10000, 10000, m_InspProp.p_Sur_Param.p_GV, m_InspProp.p_Sur_Param.p_DefectSize, m_InspProp.p_Sur_Param.p_bDarkInspection);
-                    //clrDemo.Test_strip(10000, 10000);
+
+                    var arrDefects = clrDemo.Test_Inspection(ThreadIndex, m_InspProp.p_Rect.Left, m_InspProp.p_Rect.Top, m_InspProp.p_Rect.Right, m_InspProp.p_Rect.Bottom, 10000, 10000, m_InspProp.p_Sur_Param.p_GV, m_InspProp.p_Sur_Param.p_DefectSize, m_InspProp.p_Sur_Param.p_bDarkInspection);
+                    if(AddDefect != null)//대리자 호출을 간단하게 만들 수 있으나 vs2013에서 호환이 안 될 가능성이 없어 보류
+                    {
+                        AddDefect(arrDefects, EventArgs.Empty);
+                    }
                 }
                 else if (bState == InspectionState.Running)
                 {

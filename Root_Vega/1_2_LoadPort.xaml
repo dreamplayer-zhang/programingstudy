@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_Vega"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="400">
     <Grid Grid.Column="0" Margin="7.5">
@@ -13,7 +14,7 @@
         <Border BorderThickness="3"
                             BorderBrush="{StaticResource BorderBrush}"
                             Background="{StaticResource Purple}">
-            <TextBlock Text="{Binding}"
+            <TextBlock Text="{Binding p_id}"
                        FontWeight="Bold"
                        Style="{StaticResource BasicTb}"
                        FontSize="15"
@@ -79,17 +80,17 @@
                                            FontWeight="Bold"
                                            Foreground="{StaticResource Black}"/>
 
-                        <TextBlock Text="LotID"
+                        <TextBlock Text="{Binding p_sCarrierID}" x:Name="textBoxPodID"
                                            Grid.Column="1"
                                            Grid.Row="0"
                                            Style="{StaticResource BasicTb}"
                                            Foreground="{StaticResource Black}"/>
-                        <TextBlock Text="CstID"
+                        <TextBlock Text="{Binding p_sLotID}" x:Name="textBoxLotID"
                                            Grid.Column="1"
                                            Grid.Row="1"
                                            Style="{StaticResource BasicTb}"
                                            Foreground="{StaticResource Black}"/>
-                        <TextBlock Text="WaferID"
+                        <TextBlock Text="{Binding p_sSlotID}" x:Name="textBoxSlotID"
                                            Grid.Column="1"
                                            Grid.Row="2"
                                            Style="{StaticResource BasicTb}"
@@ -123,14 +124,14 @@
                         </Grid.ColumnDefinitions>
                         <Border Grid.Column="0"
                                                 Margin="5"
-                                                Background="{DynamicResource Green}">
+                                                Background="{Binding p_brushPresent}">
                             <TextBlock Text="PRESENT"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
                         </Border>
                         <Border Grid.Column="1"
                                                 Margin="5"
-                                        Background="{DynamicResource Green}">
+                                        Background="{Binding p_brushPlaced}">
                             <TextBlock Text="PLACED"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
@@ -169,11 +170,11 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <ToggleButton Content="Auto"
-                                              Margin="5"
+                        <ToggleButton Content="Auto" x:Name="toggleButtonAccessLPAuto" IsChecked="{Binding p_bAccessLP_Auto, Mode=OneWay}"
+                                              Margin="5" Click="toggleButtonAccessLPAuto_Click"
                                               Style="{StaticResource LoadPortToggle}"/>
-                        <ToggleButton Content="Manual"
-                                              Grid.Column="1"
+                        <ToggleButton Content="Manual" x:Name="toggleButtonAccessLPManual" IsChecked="{Binding p_bAccessLP_Manual, Mode=OneWay}"
+                                              Grid.Column="1" Click="toggleButtonAccessLPManual_Click"
                                               Margin="5"
                                               Style="{StaticResource LoadPortToggle}"/>
 

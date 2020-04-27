@@ -1325,6 +1325,22 @@ namespace RootTools.Control.Ajin
             ServoOn(!_bServoOn);
         }
 
+        public void PlusRelativeMove()
+        {
+            double dRead = 0.0;
+            AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetActPos(p_nAxisID, ref dRead));
+            p_posActual = dRead;
+            Move(p_posActual + p_dRelPos, GetSpeed(eSpeed.Move));
+        }
+
+        public void MinusRelativeMove()
+        {
+            double dRead = 0.0;
+            AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetActPos(p_nAxisID, ref dRead));
+            p_posActual = dRead;
+            Move(p_posActual - p_dRelPos, GetSpeed(eSpeed.Move));
+        }
+
         public void MovePosition()
         {
             Move(p_SelMovePos,0, GetSpeed(eSpeed.Move));
@@ -1338,6 +1354,19 @@ namespace RootTools.Control.Ajin
         public void HomeCommand()
         {
             HomeStart();
+        }
+
+        double m_dRelPos = 0;
+        public double p_dRelPos
+        {
+            get
+            {
+                return m_dRelPos;
+            }
+            set
+            {
+                SetProperty(ref m_dRelPos, value);
+            }
         }
 
         string _SelMovePos = "";
@@ -1393,6 +1422,22 @@ namespace RootTools.Control.Ajin
             get
             {
                 return new RelayCommand(Jog_Minus_Slow);
+            }
+        }
+
+        public RelayCommand PlusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(PlusRelativeMove);
+            }
+        }
+
+        public RelayCommand MinusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MinusRelativeMove);
             }
         }
 

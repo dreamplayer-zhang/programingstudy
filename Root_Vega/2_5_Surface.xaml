@@ -43,13 +43,10 @@
                 <i:EventTrigger EventName="MouseLeftButtonUp">
                     <i:InvokeCommandAction Command="{Binding CanvasMouseLeftUp}" />
                 </i:EventTrigger>
-                <i:EventTrigger EventName="MouseRightButtonDown">
-                    <i:InvokeCommandAction Command="{Binding CanvasMouseRightDown}"/>
-                </i:EventTrigger>
-                <i:EventTrigger EventName="MouseWheel">
-                    <i:InvokeCommandAction Command="{Binding CanvasMouseWheel}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
+				<i:EventTrigger EventName="MouseRightButtonDown">
+					<i:InvokeCommandAction Command="{Binding CanvasMouseRightDown}"/>
+				</i:EventTrigger>
+			</i:Interaction.Triggers>
         </Grid>
         <Grid Grid.Column="1" Margin="0,15,15,15">
             <Grid.RowDefinitions>
