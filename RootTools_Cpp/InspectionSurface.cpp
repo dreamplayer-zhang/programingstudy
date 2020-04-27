@@ -11,11 +11,11 @@ void InspectionSurface::SetParams(byte* buffer, int bufferwidth, int bufferheigh
 	SetDefectSize(defectSize);
 	SetIsDarkInspection(bDarkInspection);
 }
-std::vector<DefectDataStruct> InspectionSurface::Inspection(bool nAbsolute, bool bIsDartInsp)
+std::vector<DefectDataStruct> InspectionSurface::Inspection(bool nAbsolute, bool bIsDarkInsp)
 {
 	std::vector<DefectDataStruct> vResult;
 
-	bool bDarkResut = bIsDartInsp;
+	bool bDarkResut = bIsDarkInsp;
 	bool bInspResult = false;
 	RECT rt;
 	RECT rtROI = GetROI();
@@ -28,6 +28,34 @@ std::vector<DefectDataStruct> InspectionSurface::Inspection(bool nAbsolute, bool
 
 	int nWidth = Functions::GetWidth(rtROI);
 	int nGrayLevel = GetGrayLevel();
+	if (!nAbsolute)
+	{
+		//상대검사의 경우에는 평균 GV를 획득 후 GrayLevel을 %로 사용하여 Target GV를 획득한다
+		float sum = 0;
+		float average;
+
+		for (int y = rtinspROI.top; y < rtinspROI.bottom; y++)
+		{
+			for (int x = rtinspROI.left; x < rtinspROI.right; x++)
+			{
+				sum += (int)inspbuffer[y][x];
+			}
+		}
+		average = sum / (((float)rtinspROI.bottom - (float)rtinspROI.top) * ((float)rtinspROI.right - (float)rtinspROI.left));
+
+		if (bIsDarkInsp)
+		{
+			//입력된 GrayLevel을 %로 사용하여 연산
+			//예 : 20이 입력되어 있다면 평균GV에서 20%감산.
+			nGrayLevel = (int)(average * (1.0f - nGrayLevel / 100.0f));
+		}
+		else
+		{
+			//입력된 GrayLevel을 %로 사용하여 연산
+			//예 : 20이 입력되어 있다면 평균GV에서 20%증산.
+			nGrayLevel = (int)(average * (1.0f + nGrayLevel / 100.0f));
+		}
+	}
 
 	//opencv 새 알고리즘 전에는 inspoffset line background 255로 칠한 buffer 가지고 해야함
 	//for (int y = rtROI.top; y < rtROI.bottom; y++)

@@ -23,6 +23,7 @@ namespace RootTools
 {
     public class ImageData :ObservableObject
     {
+        private static System.Drawing.Imaging.ColorPalette mono;
         public enum eMode
         {
             MemoryRead,
@@ -104,7 +105,7 @@ namespace RootTools
 
         public BackgroundWorker Worker_MemoryCopy = new BackgroundWorker();
         public BackgroundWorker Worker_MemoryClear = new BackgroundWorker();
-        public BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+
 
         int m_nProgress = 0;
         public int p_nProgress
@@ -125,7 +126,19 @@ namespace RootTools
             m_eMode = eMode.ImageBuffer;
             p_Size = new CPoint(Width, Height);
             ReAllocate(p_Size, nByte);
-            
+
+            var bmp = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+
+            //Grayscale 이미지를 위한 Pallete 설정
+            mono = bmp.Palette;
+            System.Drawing.Color[] ent = mono.Entries;
+
+            Parallel.For(0, 256, (j) =>
+            {
+                System.Drawing.Color b = new System.Drawing.Color();
+                b = System.Drawing.Color.FromArgb((byte)j, (byte)j, (byte)j);
+                ent[j] = b;
+            });
         }
         public void SetData(IntPtr ptr, CRect rect, int stride)
         {
@@ -151,8 +164,6 @@ namespace RootTools
             Worker_MemoryClear.DoWork += Worker_MemoryClear_DoWork;
             Worker_MemoryClear.RunWorkerCompleted += Worker_MemoryClear_RunWorkerCompleted;
             Worker_MemoryClear.WorkerSupportsCancellation = true;
-            Worker_MemorySave.DoWork += Worker_MemorySave_DoWork;
-            Worker_MemorySave.WorkerSupportsCancellation = true;
         }
 
 
@@ -160,7 +171,115 @@ namespace RootTools
         {
             OnUpdateImage();
         }
+        Bitmap GetBitmapToArray(int width, int height, byte[] imageData)
+        {
+            var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
 
+            bmp.Palette = mono;
+
+            using (var stream = new MemoryStream(imageData))
+            {
+
+                System.Drawing.Imaging.BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0,
+                                                                bmp.Width,
+                                                                bmp.Height),
+                                                  System.Drawing.Imaging.ImageLockMode.WriteOnly,
+                                                  bmp.PixelFormat);
+
+                IntPtr pNative = bmpData.Scan0;
+                Marshal.Copy(imageData, 0, pNative, imageData.Length);
+
+                bmp.UnlockBits(bmpData);
+            }
+            return bmp;
+        }
+        public Bitmap GetRectImage(CRect rect)
+        {
+            #region TEMP
+            //byte[] aBuf = new byte[54 + (1024 * 2) + rect.Width * rect.Height];
+            //byte[] temp;
+            //int position = 0;
+            //temp = BitConverter.GetBytes(Convert.ToUInt16(0x4d42));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(54 + 1024 + rect.Width * rect.Height));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //temp = BitConverter.GetBytes(Convert.ToUInt16(0));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt16(0));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(1078));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(40));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(rect.Width));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(rect.Height));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //temp = BitConverter.GetBytes(Convert.ToUInt16(1));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt16(8));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(0));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(rect.Width * rect.Height));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(0));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(0));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(256));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+            //temp = BitConverter.GetBytes(Convert.ToUInt32(256));
+            //temp.CopyTo(aBuf, position);
+            //position += temp.Length;
+
+            //for (int i = 0; i < 256; i++)
+            //{
+
+            //    temp = BitConverter.GetBytes(Convert.ToByte(i));
+            //    temp.CopyTo(aBuf, position);
+            //    position += temp.Length;
+            //    temp = BitConverter.GetBytes(Convert.ToByte(i));
+            //    temp.CopyTo(aBuf, position);
+            //    position += temp.Length;
+            //    temp = BitConverter.GetBytes(Convert.ToByte(i));
+            //    temp.CopyTo(aBuf, position);
+            //    position += temp.Length;
+            //    temp = BitConverter.GetBytes(Convert.ToByte(255));
+            //    temp.CopyTo(aBuf, position);
+            //    position += temp.Length;
+            //}
+            #endregion
+
+            int position = 0;
+            byte[] aBuf = new byte[rect.Width * rect.Height];
+            for (int i = rect.Height - 1; i >= 0; i--)
+            {
+                Marshal.Copy((IntPtr)((long)m_ptrImg + rect.Left + ((long)i + (long)rect.Top) * p_Size.X), aBuf, position, rect.Width);
+                position += rect.Width;
+            }
+            return GetBitmapToArray(rect.Width, rect.Height, aBuf);
+        }
         public void SaveRectImage(CRect memRect)
         {
             SaveFileDialog ofd = new SaveFileDialog();
@@ -171,9 +290,21 @@ namespace RootTools
                 List<object> arguments = new List<object>();
                 arguments.Add(ofd.FileName);
                 arguments.Add(memRect);
-                
+
+                BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+                Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
                 Worker_MemorySave.RunWorkerAsync(arguments);
             }
+        }
+        public void SaveRectImage(CRect memRect, string saveTargetPath)
+        {
+            List<object> arguments = new List<object>();
+            arguments.Add(saveTargetPath);
+            arguments.Add(memRect);
+
+            BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+            Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
+            Worker_MemorySave.RunWorkerAsync(arguments);
         }
 
         public void SaveWholeImage()
@@ -186,6 +317,9 @@ namespace RootTools
                 List<object> arguments = new List<object>();
                 arguments.Add(ofd.FileName);
                 arguments.Add(new CRect(0, 0, p_Size.X, p_Size.Y));
+
+                BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+                Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
                 Worker_MemorySave.RunWorkerAsync(arguments);
             }
         }
@@ -211,7 +345,7 @@ namespace RootTools
                 rect.Bottom+= 4 - rect.Height % 4;
             }
 
-            FileStream fs = new FileStream(sFile, FileMode.CreateNew, FileAccess.Write);
+            FileStream fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
             BinaryWriter bw = new BinaryWriter(fs);
 
             bw.Write(Convert.ToUInt16(0x4d42));

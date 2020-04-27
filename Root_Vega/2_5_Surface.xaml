@@ -132,9 +132,16 @@
                             <ToggleButton Content="{Binding p_bDarkInspection}"
                                           Style="{StaticResource BasicToggle}"
                                           IsChecked="{Binding p_bDarkInspection}"/>
-                        </UniformGrid>
-                        <UniformGrid Columns="2" Margin="0,0,0,10">
-                            <TextBlock  Text="GV"
+						</UniformGrid>
+						<UniformGrid Columns="2" Margin="0,0,0,10">
+							<TextBlock  Text="Absolute Inspection"
+                                        Style="{StaticResource BasicTb}"/>
+							<ToggleButton Content="{Binding p_bAbsoluteInspection}"
+                                          Style="{StaticResource BasicToggle}"
+                                          IsChecked="{Binding p_bAbsoluteInspection}"/>
+						</UniformGrid>
+						<UniformGrid Columns="2" Margin="0,0,0,10">
+                            <TextBlock  Text="{Binding TargetLabelText}"
                                         Style="{StaticResource BasicTb}"/>
                             <TextBox Text="{Binding p_GV}"
                                      Style="{StaticResource BasicTbox}"/>

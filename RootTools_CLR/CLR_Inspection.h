@@ -28,7 +28,7 @@
 
 namespace RootTools_CLR
 {
-	public ref class CLR_Demo
+	public ref class CLR_Inspection
 	{
 	protected:
 		Cpp_Demo* m_pDemo = nullptr; 
@@ -38,7 +38,7 @@ namespace RootTools_CLR
 		CLR_InspConnector* m_InspConn = nullptr;
 		InspectionSurface* pInspSurface = nullptr;
 	public:
-		CLR_Demo()
+		CLR_Inspection()
 		{
 			m_pDemo = new Cpp_Demo();
 			m_PitSizer = new PitSizer(2048 * 2048, 1);
@@ -48,7 +48,7 @@ namespace RootTools_CLR
 			pInspSurface = new InspectionSurface();
 		}
 
-		virtual ~CLR_Demo()
+		virtual ~CLR_Inspection()
 		{
 			delete m_pDemo; 
 			delete m_PitSizer;
@@ -75,7 +75,7 @@ namespace RootTools_CLR
 
 			return 1;
 		}
-		array<DefectData^>^ Test_Inspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark)
+		array<DefectData^>^ Test_Inspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -101,7 +101,7 @@ namespace RootTools_CLR
 			pInspSurface->CheckConditions();
 
 			pInspSurface->CopyImageToBuffer(bDark);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
-			vTempResult = pInspSurface->Inspection(true, bDark);//TODO : absolute GV 구현해야함
+			vTempResult = pInspSurface->Inspection(bAbsolute, bDark);//TODO : absolute GV 구현해야함
 			
 			bool bResultExist = vTempResult.size() > 0;
 			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());

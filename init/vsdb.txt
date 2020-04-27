@@ -2,5 +2,6 @@
 // Index로 쓸꺼는 앞에 * 붙이기
 // Primary key로 쓸꺼는 앞에 @붙이기
 Datainfo,LotIndexID(INTEGER),InspStartTime(TEXT),BCRID(TEXT),RCPID(TEXT),DataSaveTime(TEXT),DefectCount(INTEGER)
-Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-Tempdata,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Width(INTEGER),Height(INTEGER),PosX(INTEGER),PosY(INTEGER),RectL(INTEGER),RectT(INTEGER),RectR(INTEGER),RectB(INTEGER)
+Data,*No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER),TdiImageExist(INTEGER),VrsImageExist(INTEGER)
+SearchTable,*Idx(INTEGER),InspStartTime(TEXT),ReticleID(TEXT),RecipeName(TEXT),TotalDefectCount(INTEGER),DataFilePath(TEXT)
+//Tempdata,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Width(INTEGER),Height(INTEGER),PosX(INTEGER),PosY(INTEGER),RectL(INTEGER),RectT(INTEGER),RectR(INTEGER),RectB(INTEGER)

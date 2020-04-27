@@ -135,7 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CLR_Demo.h" />
+    <ClInclude Include="CLR_Inspection.h" />
     <ClInclude Include="CLR_InspConnector.h" />
     <ClInclude Include="DefectData.h" />
     <ClInclude Include="InspSurfaceWrapper.h" />
@@ -144,7 +144,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="CLR_Demo.cpp" />
+    <ClCompile Include="CLR_Inspection.cpp" />
     <ClCompile Include="CLR_InspConnector.cpp" />
     <ClCompile Include="DefectData.cpp" />
     <ClCompile Include="InspSurcaeWrapper.cpp" />

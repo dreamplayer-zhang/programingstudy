@@ -28,7 +28,7 @@ namespace RootTools.Inspects
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
-		public event ChangeDefectInfoEventHanlder AddDefectToUI;
+		public event ChangeDefectInfoEventHanlder AddDefect;
 		#endregion
 
 		int nThreadNum = 4;
@@ -207,6 +207,11 @@ namespace RootTools.Inspects
 			int nInspDoneNum = 0;
 			Inspection[] inspection = new Inspection[nThreadNum];
 
+			if (InspectionStart != null)
+			{
+				InspectionStart();//DB Write 준비 시작
+			}
+
 			for (int i = 0; i < nThreadNum; i++)
 			{
 				inspection[i] = new Inspection();
@@ -274,15 +279,19 @@ namespace RootTools.Inspects
 #endif
 			#endregion
 
-			if (AddDefectToUI != null)
+			if (AddDefect != null)
 			{
-				AddDefectToUI(source, args);
+				AddDefect(source, args);
 			}
 		}
 
 		public void InspectionDone()
 		{
 			//TODO : 해당 Queue로 들어온 검사가 완전 종료되었을때 발동. 여기서 DB를 닫으면 될 것으로 보임
+			if (InspectionComplete != null)
+			{
+				InspectionComplete();
+			}
 		}
 
 		public void SetThread(int threadNum)  //(in int threadNum)  //2013 in 안됨
