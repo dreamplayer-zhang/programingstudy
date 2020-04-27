@@ -1330,7 +1330,7 @@ namespace RootTools.Control.Ajin
             double dRead = 0.0;
             AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetActPos(p_nAxisID, ref dRead));
             p_posActual = dRead;
-            Move(p_posActual + p_dRelPos, 0, GetSpeed(eSpeed.Move));
+            Move(p_posActual + p_dRelPos, GetSpeed(eSpeed.Move));
         }
 
         public void MinusRelativeMove()
@@ -1338,7 +1338,7 @@ namespace RootTools.Control.Ajin
             double dRead = 0.0;
             AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetActPos(p_nAxisID, ref dRead));
             p_posActual = dRead;
-            Move(p_posActual - p_dRelPos, 0, GetSpeed(eSpeed.Move));
+            Move(p_posActual - p_dRelPos, GetSpeed(eSpeed.Move));
         }
 
         public void MovePosition()
