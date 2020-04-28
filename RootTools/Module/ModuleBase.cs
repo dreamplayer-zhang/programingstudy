@@ -208,7 +208,6 @@ namespace RootTools.Module
                         p_eState = eState.Error;
                         m_qModuleRun.Clear();
                     }
-                    //else if (m_qModuleRun.Count 0) 
                     p_eState = eState.Ready;
                     break;
                 case eState.Error:
@@ -377,8 +376,10 @@ namespace RootTools.Module
         {
             if (m_qModuleRun.Count == 0) return "OK";
             ModuleRunBase moduleRun = m_qModuleRun.Dequeue();
+            moduleRun.p_eRunState = ModuleRunBase.eRunState.Run; 
             try { p_sInfo = moduleRun.Run(); }
             catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
+            moduleRun.p_eRunState = ModuleRunBase.eRunState.Done; 
             if (p_sInfo != "OK")
             {
                 EQ.p_bStop = true;
