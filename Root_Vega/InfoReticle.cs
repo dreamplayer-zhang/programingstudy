@@ -2,7 +2,10 @@
 using RootTools.Gem;
 using RootTools.Module;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace Root_Vega
 {
@@ -15,13 +18,13 @@ namespace Root_Vega
         {
             m_moduleRunList.Clear(); 
             foreach (GemPJ pj in m_aPJ) m_moduleRunList.OpenJob(pj.m_sRecipeID, false);
-            m_aProcess.Clear();
+            m_qProcess.Clear();
         }
 
         public void RecipeOpen(string sRecipe)
         {
             m_moduleRunList.OpenJob(sRecipe, true);
-            m_aProcess.Clear(); 
+            m_qProcess.Clear(); 
         }
 
         public string m_sManualRecipe = "";
@@ -36,27 +39,25 @@ namespace Root_Vega
 
         #region Process 
         /// <summary> Recipe ModuleRunList에 WTR Get, Put 추가 -> Process </summary>
-        public List<ModuleRunBase> m_aProcess = new List<ModuleRunBase>(); 
+        public Queue<ModuleRunBase> m_qProcess = new Queue<ModuleRunBase>(); 
         void RunTreeProcess(Tree tree)
         {
-            for (int n = 0; n < m_aProcess.Count; n++)
+            ModuleRunBase[] aProcess = m_qProcess.ToArray(); 
+            for (int n = 0; n < aProcess.Length; n++)
             {
-                ModuleRunBase moduleRun = m_aProcess[n];
+                ModuleRunBase moduleRun = aProcess[n];
                 moduleRun.RunTree(tree.GetTree(n, moduleRun.p_id, false), true);
             }
         }
-        #endregion
 
-        #region Process Simulation 
-        /// <summary> Process 계산 및 Simulation </summary>
-        public List<ModuleRunBase> m_aProcessSimulation = new List<ModuleRunBase>(); 
-        public void InitProcessSimulation()
+        ObservableCollection<ModuleRunBase> p_aProcess { get; set; }
+        public void SetObservableProcess()
         {
-            m_aProcessSimulation.Clear();
-            foreach (ModuleRunBase data in m_aProcess)
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                m_aProcessSimulation.Add(data);
-            }
+                p_aProcess.Clear();
+                foreach (ModuleRunBase moduleRun in m_qProcess) p_aProcess.Add(moduleRun); 
+            }); 
         }
         #endregion
 
@@ -77,6 +78,7 @@ namespace Root_Vega
             InitBase(id, engineer);
             m_moduleRunList = new ModuleRunList(id, engineer);
             m_moduleRunList.Clear();
+            p_aProcess = new ObservableCollection<ModuleRunBase>(); 
         }
     }
 }

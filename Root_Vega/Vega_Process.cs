@@ -24,23 +24,24 @@ namespace Root_Vega
 
         void CalcInfoReticleProcess(InfoReticle infoReticle)
         {
-            List<ModuleRunBase> aProcess = infoReticle.m_aProcess;
-            aProcess.Clear();
+            Queue<ModuleRunBase> qProcess = infoReticle.m_qProcess;
+            qProcess.Clear();
             string sLoadport = infoReticle.m_sLoadport;
-            aProcess.Add(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sLoadport));
+            qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sLoadport));
             for (int n = 0; n < infoReticle.m_moduleRunList.m_aModuleRun.Count; n++)
             {
                 ModuleRunBase moduleRun = infoReticle.m_moduleRunList.m_aModuleRun[n];
                 string sChild = moduleRun.m_moduleBase.p_id;
                 bool bGetPut = (sChild != m_robot.p_id);
                 bool bPut = !IsSameModule(infoReticle.m_moduleRunList, n - 1, n); 
-                if (bPut && bGetPut) aProcess.Add(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sChild));
-                aProcess.Add(moduleRun);
+                if (bPut && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sChild));
+                qProcess.Enqueue(moduleRun);
                 bool bGet = !IsSameModule(infoReticle.m_moduleRunList, n, n + 1);
-                if (bGet && bGetPut) aProcess.Add(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sChild));
+                if (bGet && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sChild));
             }
-            aProcess.Add(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sLoadport));
-            foreach (ModuleRunBase data in aProcess) data.m_infoObject = infoReticle;
+            qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sLoadport));
+            foreach (ModuleRunBase data in qProcess) data.m_infoObject = infoReticle;
+            infoReticle.SetObservableProcess(); 
             m_aInfoReticle.Add(infoReticle);
         }
 
@@ -169,10 +170,10 @@ namespace Root_Vega
             if (locate.p_infoReticle == null) return;
             InfoReticle infoReticle = locate.p_infoReticle;
             m_aInfoReticle.Add(infoReticle);
-            infoReticle.m_aProcess.Clear();
+            infoReticle.m_qProcess.Clear();
             ModuleRunBase moduleRun = m_robot.GetRunMotion(Robot_RND.eMotion.Put, infoReticle.m_sLoadport);
             moduleRun.m_infoObject = infoReticle;
-            infoReticle.m_aProcess.Add(moduleRun);
+            infoReticle.m_qProcess.Enqueue(moduleRun);
         }
 
         void CalcRecoverChild(IRobotChild child)
@@ -182,13 +183,13 @@ namespace Root_Vega
             if (locate.p_infoReticle == null) return;
             InfoReticle infoReticle = locate.p_infoReticle;
             m_aInfoReticle.Add(infoReticle);
-            infoReticle.m_aProcess.Clear();
+            infoReticle.m_qProcess.Clear();
             ModuleRunBase moduleRunGet = m_robot.GetRunMotion(Robot_RND.eMotion.Get, child.p_id);
             moduleRunGet.m_infoObject = infoReticle;
-            infoReticle.m_aProcess.Add(moduleRunGet);
+            infoReticle.m_qProcess.Enqueue(moduleRunGet);
             ModuleRunBase moduleRunPut = m_robot.GetRunMotion(Robot_RND.eMotion.Put, infoReticle.m_sLoadport);
             moduleRunPut.m_infoObject = infoReticle;
-            infoReticle.m_aProcess.Add(moduleRunPut);
+            infoReticle.m_qProcess.Enqueue(moduleRunPut);
         }
         #endregion
 
@@ -203,7 +204,11 @@ namespace Root_Vega
                 if (m_aInfoReticle.Count <= 0) return "OK"; 
                 foreach (InfoReticle infoReticle in m_aInfoReticle)
                 {
-                    foreach (ModuleRunBase moduleRun in infoReticle.m_aProcess) m_qSequence.Enqueue(moduleRun);
+                    if (infoReticle.m_qProcess.Count > 0)
+                    {
+                        foreach (ModuleRunBase moduleRun in infoReticle.m_qProcess) m_qSequence.Enqueue(moduleRun);
+                        infoReticle.SetObservableProcess(); 
+                    }
                 }
                 FinishLoadport(m_aInfoReticle[0]);
                 RunTree(Tree.eMode.Init);
@@ -234,7 +239,7 @@ namespace Root_Vega
             {
                 m_qSequence.Dequeue();
                 InfoReticle infoReticle = moduleRun.m_infoObject;
-                if (infoReticle.m_aProcess.Count > 0) infoReticle.m_aProcess.RemoveAt(0);
+                if (infoReticle.m_qProcess.Count > 0) infoReticle.m_qProcess.Dequeue(); 
                 if (m_qSequence.Count == 0) ClearInfoReticle(); 
             }
             RunTree(Tree.eMode.Init);
