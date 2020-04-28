@@ -17,5 +17,13 @@
                 <local:AjinInOutSetting DataContext="{Binding p_AjinViewModel}"></local:AjinInOutSetting>
             </Border>
         </TabItem>
+        <TabItem Header="Zoom Lens"
+                 Margin="0,50,0,0"
+                 Style="{StaticResource RcptabItem}">
+            <Border BorderBrush="Gray"
+                    BorderThickness="3">
+                
+            </Border>
+        </TabItem>
     </TabControl>
 </UserControl>

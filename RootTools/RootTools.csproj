@@ -483,6 +483,10 @@
       <DependentUpon>Dialog_ImageOpen.xaml</DependentUpon>
     </Compile>
     <Compile Include="Image\Dialog_ImageOpenViewModel.cs" />
+    <Compile Include="ZoomLens\ZoomLens.cs" />
+    <Compile Include="ZoomLens\ZoomLens_UI.xaml.cs">
+      <DependentUpon>ZoomLens_UI.xaml</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -715,6 +719,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ZoomLens\ZoomLens_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="License-LGPL.txt" />
@@ -731,5 +739,6 @@
   <ItemGroup>
     <Resource Include="Resources\OHT_SSEM.JPG" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

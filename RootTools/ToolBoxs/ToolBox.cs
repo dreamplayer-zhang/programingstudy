@@ -14,6 +14,7 @@ using RootTools.OHT.Semi;
 using RootTools.OHT.SSEM;
 using RootTools.RTC5s.LaserBright;
 using RootTools.SQLogs;
+using RootTools.ZoomLens;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -308,6 +309,20 @@ namespace RootTools.ToolBoxs
             }
             return "OK";
         }
+
+        public string Get(ref ZoomLens.ZoomLens value, ModuleBase module, string id)
+        {
+            if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
+            if (value == null)
+            {
+                value = new ZoomLens.ZoomLens(module.p_id + "." + id, module.m_log);
+                m_toolSetComm.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            return "OK";
+        }
+
+
         #endregion
 
         #region ITool OHT

@@ -8,6 +8,7 @@ using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using RootTools.ZoomLens;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,6 +44,7 @@ namespace Root_Vega.Module
         public LightSet m_lightSet;
         MemoryPool m_memoryPool;
         InspectTool m_inspectTool;
+        ZoomLens m_ZoomLens;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
@@ -54,6 +56,7 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
+            p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
             if (bInit) m_inspectTool.OnInspectDone += M_inspectTool_OnInspectDone;
         }
 

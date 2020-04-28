@@ -22,7 +22,7 @@ namespace Root_Vega
                 SetProperty(ref m_AjinViewModel,value);
             }
         }
-        
+
         public _10_SettingViewModel(Vega_Engineer engineer)
         {
             p_AjinViewModel = new AjinInOutSettingViewModel(engineer.m_ajin);
