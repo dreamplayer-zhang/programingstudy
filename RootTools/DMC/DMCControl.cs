@@ -448,7 +448,8 @@ namespace RootTools.DMC
         {
             string strCmd = "Execute " + sMsg + ", 1";
             p_sInfo = strCmd; 
-            CoreMon.executeCommand(p_nRobot, strCmd);
+            try { CoreMon.executeCommand(p_nRobot, strCmd); }
+            catch (Exception e) { return "DMC Send Error : " + e.Message; }
             return "OK";
         }
         #endregion

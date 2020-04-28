@@ -1,11 +1,47 @@
 ﻿using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Trees;
+using System.Windows.Media;
 
 namespace RootTools.Module
 {
-    public class ModuleRunBase
+    public class ModuleRunBase : NotifyProperty
     {
+        #region eRunState
+        public enum eRunState
+        {
+            Ready,
+            Run,
+            Done
+        }
+        eRunState _eRunState = eRunState.Ready;
+        public eRunState p_eRunState
+        { 
+            get { return _eRunState; }
+            set
+            {
+                if (_eRunState == value) return;
+                _eRunState = value;
+                OnPropertyChanged();
+                OnPropertyChanged("p_brushState");
+            }
+        }
+
+        public Brush p_brushState
+        { 
+            get
+            {
+                switch (p_eRunState)
+                {
+                    case eRunState.Ready: return Brushes.LightGreen;
+                    case eRunState.Run: return Brushes.Yellow;
+                    case eRunState.Done: return Brushes.LightBlue; 
+                }
+                return Brushes.White; 
+            }
+        }
+        #endregion
+
         string _id = "";
         public string p_id { get { return _id; } }
 
