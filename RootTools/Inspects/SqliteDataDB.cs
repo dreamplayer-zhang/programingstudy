@@ -366,9 +366,9 @@ namespace ATI
 			}
 		}
 		/// <summary>
-		/// 지정된 Table의 모든 데이터를 읽어들인 후 DataTable 형태로 반환한다.
+		/// 열려있는 Database에서 특정 Table 전체를 가져온다
 		/// </summary>
-		/// <param name="tablename">해당 DB에서 읽어올 Table의 이름</param>
+		/// <param name="tablename">DB Table명</param>
 		/// <returns></returns>
 		public DataTable GetDataTable(string tablename)
 		{
@@ -389,6 +389,7 @@ namespace ATI
 			DataTable DT = new DataTable();
 
 			sqLiteCmd = sqliteDBconnect.CreateCommand();
+
 			sqLiteCmd.CommandText = string.Format("SELECT * FROM {0}", tablename);
 			sqLiteAdapter = new SQLiteDataAdapter(sqLiteCmd);
 			sqLiteAdapter.AcceptChangesDuringFill = false;
@@ -403,10 +404,10 @@ namespace ATI
 			return DT;
 		}
 		/// <summary>
-		/// 지정된 Table의 선택된 Column의 데이터를 읽어들인 후, DataTable 형태로 반환한다.
+		/// 열려있는 Database에서 특정 Table 의 특정 Column을 지정하여 가져온다
 		/// </summary>
-		/// <param name="tablename"></param>
-		/// <param name="columns"></param>
+		/// <param name="tablename">DB 테이블 명</param>
+		/// <param name="columns">가져올 Column명 Array</param>
 		/// <returns></returns>
 		public DataTable GetDataTable(string tablename, params string[] columns)
 		{
@@ -449,23 +450,40 @@ namespace ATI
 			sqLiteAdapter.Dispose();
 			return DT;
 		}
-		public void SaveDataTable(DataTable DT)
+		/// <summary>
+		/// 열려있는 Database에 특정 DataTable을 Update한다. Table의 column 정보는 동일해야한다
+		/// </summary>
+		/// <param name="dataTable">Update 대상 DB DataTable</param>
+		/// <returns></returns>
+		public bool SetDataTable(DataTable dataTable)
 		{
-			try
+			if (!IsDBInitialized)
 			{
-				//sqliteDBconnect.Open();
-				sqLiteCmd = sqliteDBconnect.CreateCommand();
-				sqLiteCmd.CommandText = string.Format("SELECT * FROM {0}", DT.TableName);
-				sqLiteAdapter = new SQLiteDataAdapter(sqLiteCmd);
-				SQLiteCommandBuilder builder = new SQLiteCommandBuilder(sqLiteAdapter);
-				sqLiteAdapter.Update(DT);
-				//sqliteDBconnect.Close();
+#if DEBUG
+				Debug.WriteLine(string.Format("SetDataTable() - This class is not initialized"));
+#endif
+				return false;
 			}
-			catch (Exception)
+			if (!IsConnected)
 			{
-				//System.Windows.MessageBox.Show(Ex.Message);
+#if DEBUG
+				Debug.WriteLine(string.Format("SetDataTable() - This class is not connected with database"));
+#endif
+				return false;
 			}
+			sqLiteAdapter = new SQLiteDataAdapter(string.Format("SELECT * FROM {0}", dataTable.TableName), sqliteDBconnect);
+			sqLiteAdapter.AcceptChangesDuringFill = false;
+			var builder = new SQLiteCommandBuilder(sqLiteAdapter);
+			sqLiteAdapter.Update(dataTable);
+			builder.Dispose();
+
+			return true;
 		}
+		/// <summary>
+		/// 지정된 Table의 모든 데이터를 읽어들인 후 DataTable 형태로 반환한다.
+		/// </summary>
+		/// <param name="tablename">해당 DB에서 읽어올 Table의 이름</param>
+		/// <returns></returns>
 		public DataTable StartQuery(string tablename, string query)
 		{
 			if (!IsDBInitialized)

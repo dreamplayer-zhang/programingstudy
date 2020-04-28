@@ -96,8 +96,8 @@ namespace Root_Vega
 				//이미지 저장 완료
 
 				//Data Table 저장 시작
-				VSDBManager.SaveDataTable(VSDataInfoDT);
-				VSDBManager.SaveDataTable(VSDataDT);
+				VSDBManager.SetDataTable(VSDataInfoDT);
+				VSDBManager.SetDataTable(VSDataDT);
 				VSDBManager.Disconnect();
 				//Data Table 저장 완료
 			};
