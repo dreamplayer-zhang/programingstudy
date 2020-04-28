@@ -17,5 +17,13 @@
                 <local:AjinInOutSetting DataContext="{Binding p_AjinViewModel}"></local:AjinInOutSetting>
             </Border>
         </TabItem>
+        <TabItem Style="{StaticResource RcptabItem}"
+                 Header="MainVision">
+            <local:Optic_MainVision DataContext="{Binding p_MainVisionViewModel}"></local:Optic_MainVision>
+        </TabItem>
+        <TabItem Style="{StaticResource RcptabItem}"
+                 Header="SideVision">
+            <local:Optic_SideVision DataContext="{Binding p_SideVisionViewModel}"></local:Optic_SideVision>
+        </TabItem>
     </TabControl>
 </UserControl>

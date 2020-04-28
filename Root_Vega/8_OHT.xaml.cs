@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Root_Vega
 {
     /// <summary>
-    /// _8.xaml에 대한 상호 작용 논리
+    /// _8_OHT.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class _8_1_Optic_MainVision : UserControl
+    public partial class _8_OHT : UserControl
     {
-        public _8_1_Optic_MainVision()
+        public _8_OHT()
         {
             InitializeComponent();
         }

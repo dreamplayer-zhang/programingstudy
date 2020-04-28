@@ -161,14 +161,7 @@ namespace Root_Vega
         }
 
         private void Worker_ViewerUpdate_DoWork(object sender, DoWorkEventArgs e)
-        { 
-            Vision vision = ((Vega_Handler)m_Engineer.ClassHandler()).p_vision;
-            int p_nTime = 1;
-            while (vision.p_eState == ModuleBase.eState.Run)
-            {
-                Thread.Sleep(100);
-                Worker_ViewerUpdate.ReportProgress(p_nTime++);
-            }
+        {  
         }
 
         void Worker_ViewerUpdate_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -195,20 +188,20 @@ namespace Root_Vega
         public void WholeLineScan()
         {
             EQ.p_bStop = false;
-            Vision vision = ((Vega_Handler)m_Engineer.ClassHandler()).p_vision;
-            Vision.Run_Grab Grab = (Vision.Run_Grab)vision.CloneModuleRun("Grab");
-            if (vision.m_aGrabMode.Count == 0)
-                return;
-            GrabMode mode = vision.m_aGrabMode[0];
+            //Vision vision = ((Vega_Handler)m_Engineer.ClassHandler()).p_vision;
+            //Vision.Run_Grab Grab = (Vision.Run_Grab)vision.CloneModuleRun("Grab");
+            //if (vision.m_aGrabMode.Count == 0)
+            //    return;
+            //GrabMode mode = vision.m_aGrabMode[0];
 
-            int ScanWholeLine = (int)Math.Ceiling(Grab.m_yLine * 1000 / (mode.m_camera.GetRoiSize().X * Grab.m_fRes));
+            //int ScanWholeLine = (int)Math.Ceiling(Grab.m_yLine * 1000 / (mode.m_camera.GetRoiSize().X * Grab.m_fRes));
 
-            mode.m_ScanLineNum = ScanWholeLine;
-            mode.m_ScanStartLine = 0;
-            Grab.m_grabMode = mode;
-            p_MainCamera = Grab.m_grabMode.m_camera;
-            vision.StartRun(Grab);
-            Worker_ViewerUpdate.RunWorkerAsync();
+            //mode.m_ScanLineNum = ScanWholeLine;
+            //mode.m_ScanStartLine = 0;
+            //Grab.m_grabMode = mode;
+            //p_MainCamera = Grab.m_grabMode.m_camera;
+            //vision.StartRun(Grab);
+            //Worker_ViewerUpdate.RunWorkerAsync();
         }
 
         public void ManualAlign()

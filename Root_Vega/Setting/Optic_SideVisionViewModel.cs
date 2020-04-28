@@ -13,7 +13,7 @@ using System.Windows;
 
 namespace Root_Vega
 {
-    public class _8_2_Optic_SideVisionViewModel : ObservableObject
+    public class Optic_SideVisionViewModel : ObservableObject
     {
         Vega_Engineer m_Engineer;
         SideVision m_SideVision;
@@ -156,7 +156,7 @@ namespace Root_Vega
         
         private readonly IDialogService m_DialogService;
 
-        public _8_2_Optic_SideVisionViewModel(Vega_Engineer engineer,  IDialogService dialogService)
+        public Optic_SideVisionViewModel(Vega_Engineer engineer,  IDialogService dialogService)
         {
             m_Engineer = engineer;
             m_DialogService = dialogService;

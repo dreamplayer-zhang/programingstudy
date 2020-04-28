@@ -184,18 +184,18 @@
       <DependentUpon>7_Alarm.xaml</DependentUpon>
     </Compile>
     <Compile Include="7_AlarmViewModel.cs" />
-    <Compile Include="8_1_Optic_MainVision.xaml.cs">
-      <DependentUpon>8_1_Optic_MainVision.xaml</DependentUpon>
+    <Compile Include="Setting\Optic_MainVision.xaml.cs">
+      <DependentUpon>Optic_MainVision.xaml</DependentUpon>
     </Compile>
-    <Compile Include="8_1_Optic_MainVisionViewModel.cs" />
-    <Compile Include="8_2_Optic_SideVision.xaml.cs">
-      <DependentUpon>8_2_Optic_SideVision.xaml</DependentUpon>
+    <Compile Include="Setting\Optic_MainVisionViewModel.cs" />
+    <Compile Include="Setting\Optic_SideVision.xaml.cs">
+      <DependentUpon>Optic_SideVision.xaml</DependentUpon>
     </Compile>
-    <Compile Include="8_2_Optic_SideVisionViewModel.cs" />
-    <Compile Include="8_Optic.xaml.cs">
-      <DependentUpon>8_Optic.xaml</DependentUpon>
+    <Compile Include="Setting\Optic_SideVisionViewModel.cs" />
+    <Compile Include="8_OHT.xaml.cs">
+      <DependentUpon>8_OHT.xaml</DependentUpon>
     </Compile>
-    <Compile Include="8_Optic_ViewModel.cs" />
+    <Compile Include="8_OHT_ViewModel.cs" />
     <Compile Include="9_Yield.xaml.cs">
       <DependentUpon>9_Yield.xaml</DependentUpon>
     </Compile>
@@ -281,7 +281,6 @@
     </Compile>
     <Compile Include="6_LogViewModel.cs" />
     <Compile Include="2_8_InspectionViewModel.cs" />
-    <Compile Include="Module\Vision.cs" />
     <Page Include="10_Setting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -334,15 +333,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="8_1_Optic_MainVision.xaml">
+    <Page Include="Setting\Optic_MainVision.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="8_2_Optic_SideVision.xaml">
+    <Page Include="Setting\Optic_SideVision.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="8_Optic.xaml">
+    <Page Include="8_OHT.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

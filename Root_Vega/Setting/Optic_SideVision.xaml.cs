@@ -15,9 +15,9 @@ using System.Windows.Shapes;
 
 namespace Root_Vega
 {
-    public partial class _8_2_Optic_SideVision : UserControl
+    public partial class Optic_SideVision : UserControl
     {
-        public _8_2_Optic_SideVision()
+        public Optic_SideVision()
         {
             InitializeComponent();
         }

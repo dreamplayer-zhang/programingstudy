@@ -22,10 +22,37 @@ namespace Root_Vega
                 SetProperty(ref m_AjinViewModel,value);
             }
         }
+
+        Optic_MainVisionViewModel m_MainVisionViewModel;
+        public Optic_MainVisionViewModel p_MainVisionViewModel
+        {
+            get
+            {
+                return m_MainVisionViewModel;
+            }
+            set
+            {
+                SetProperty(ref m_MainVisionViewModel, value);
+            }
+        }
+        Optic_SideVisionViewModel m_SideVisionViewModel;
+        public Optic_SideVisionViewModel p_SideVisionViewModel
+        {
+            get
+            {
+                return m_SideVisionViewModel;
+            }
+            set
+            {
+                SetProperty(ref m_SideVisionViewModel, value);
+            }
+        }
         
-        public _10_SettingViewModel(Vega_Engineer engineer)
+        public _10_SettingViewModel(Vega_Engineer engineer, IDialogService service)
         {
             p_AjinViewModel = new AjinInOutSettingViewModel(engineer.m_ajin);
+            p_MainVisionViewModel = new Optic_MainVisionViewModel(engineer);
+            p_SideVisionViewModel = new Optic_SideVisionViewModel(engineer, service);
         }
     }
 }

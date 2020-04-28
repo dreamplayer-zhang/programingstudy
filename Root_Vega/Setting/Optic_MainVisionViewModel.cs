@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace Root_Vega
 {
-    public class _8_1_Optic_MainVisionViewModel : ObservableObject
+    public class Optic_MainVisionViewModel : ObservableObject
     {
         Vega_Engineer m_Engineer;
         PatternVision m_PatternVision;
@@ -171,7 +171,7 @@ namespace Root_Vega
 
         LightSet m_LightSet;
 
-        public _8_1_Optic_MainVisionViewModel(Vega_Engineer engineer)
+        public Optic_MainVisionViewModel(Vega_Engineer engineer)
         {
             m_Engineer = engineer;
             p_PatternVision = ((Vega_Handler)engineer.ClassHandler()).m_patternVision;

@@ -20,12 +20,6 @@ namespace Root_Vega
         public SideVision m_sideVision;
         public PatternVision m_patternVision;
         public FDC m_FDC;
-        Vision m_vision;
-        public Vision p_vision
-        {
-            get { return m_vision; }
-            set { SetProperty(ref m_vision, value); }
-        }
 
         void InitModule()
         {
@@ -40,8 +34,6 @@ namespace Root_Vega
             InitModule(m_sideVision);
             m_patternVision = new PatternVision("PatternVision", m_enginner, "PatternVision");
             InitModule(m_patternVision);
-            p_vision= new Vision("Vision", m_enginner, "Vision");
-            InitModule(p_vision);
             m_FDC = new FDC("FDC", m_enginner, "FDC");
             InitModule(m_FDC); 
             m_robot.AddChild(m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision);
