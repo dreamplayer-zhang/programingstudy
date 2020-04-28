@@ -331,7 +331,7 @@ namespace Root_Vega.Controls
 		string DBDataPath { get; set; }
 		string TiffDataPath
 		{
-			get { return this.DBDataPath.Replace(".sqlite", ".tif"); }
+			get { return this.DBDataPath.Replace(".vega_result", ".tif"); }
 		}
 
 		public string[] SignArray = new string[] { ">=", "<=", "=" };
@@ -421,9 +421,9 @@ namespace Root_Vega.Controls
 				}
 
 
-				if (File.Exists(dataPath.Replace(".sqlite", ".png")))
+				if (File.Exists(dataPath.Replace(".vega_result", ".png")))
 				{
-					var bmp = new BitmapImage(new Uri(dataPath.Replace(".sqlite", ".png"), UriKind.Absolute));
+					var bmp = new BitmapImage(new Uri(dataPath.Replace(".vega_result", ".png"), UriKind.Absolute));
 					bmp.CacheOption = BitmapCacheOption.OnLoad;
 					this.CurrentMapImage = bmp.Clone();
 				}

@@ -279,8 +279,8 @@ namespace Root_Vega
 		private readonly IDialogService m_DialogService;
 		SqliteDataDB DataIndexDB { get; set; }
 
-		string indexFilePath = @"C:\sqlite\db\SearchIndex.sqlite";
-		string dbFormatFilePath = @"C:\sqlite\db\vsdb.txt";
+		string indexFilePath = @"C:\vsdb\init\SearchIndex.sqlite";
+		string dbFormatFilePath = @"C:\vsdb\init\vsdb.txt";
 
 		public InspResultViewModel CurrentResultViewModel { get; set; }
 
