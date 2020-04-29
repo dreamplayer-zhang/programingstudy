@@ -9,6 +9,7 @@
              xmlns:behavior="clr-namespace:mousebehavior"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes"
+              Cursor="{Binding p_MouseCursor}"
              mc:Ignorable="d"
              Height="338" Width="356"
              Background="White">
@@ -18,6 +19,12 @@
     </UserControl.Resources>
     <Grid>
         <i:Interaction.Triggers>
+            <i:EventTrigger EventName="KeyDown">
+                <i:InvokeCommandAction Command="{Binding KeyPressedDownCommand}" />
+            </i:EventTrigger>
+            <i:EventTrigger EventName="KeyUp">
+                <i:InvokeCommandAction Command="{Binding KeyPressedUpCommand}" />
+            </i:EventTrigger>
             <i:EventTrigger EventName="KeyDown">
                 <ei:CallMethodAction TargetObject="{Binding}" MethodName="KeyDown"/>
             </i:EventTrigger>
@@ -46,10 +53,32 @@
                 </Style>
             </Slider.Style>
         </Slider>
+        <Grid Focusable="True">
         <Canvas Background="Black" obs:SizeObserver.Observe="true" Focusable="True"
                 obs:SizeObserver.ObservedWidth="{Binding p_CanvasWidth, Mode=OneWayToSource}"
                 obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}">
             <Image Source="{Binding Path=p_ImgSource}"/>
+            </Canvas>
+            <ItemsControl ItemsSource="{Binding p_Element}" 
+                          Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                          Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}"
+                          Panel.ZIndex="5">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas ClipToBounds="True" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <ItemsControl ItemsSource="{Binding p_ViewerUIElement}"
+                      Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                      Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}"
+                      Panel.ZIndex="2" IsHitTestVisible="False">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas ClipToBounds="True" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
             <i:Interaction.Behaviors>
                 <behavior:KeyBehaviour KeyEvent="{Binding KeyEvent, Mode=OneWayToSource}"/>
                 <behavior:MouseBehaviour MouseEvent="{Binding MouseEvent, Mode=OneWayToSource}" />
@@ -85,18 +114,8 @@
                     <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-        </Canvas>
-        <ItemsControl ItemsSource="{Binding p_ViewerUIElement}"
-                      Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                      Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}"
-                      Panel.ZIndex="2">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas ClipToBounds="True" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-        </ItemsControl>
-        <StackPanel HorizontalAlignment="Right">
+            </Grid>
+            <StackPanel HorizontalAlignment="Right" IsHitTestVisible="False">
             <WrapPanel Margin="3">
                 <TextBlock Text="(X,Y) = "  Foreground="White"/>
                 <TextBlock Text="{Binding p_MouseX}"
