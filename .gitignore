@@ -186,7 +186,5 @@ _Pvt_Extensions/
 ModelManifest.xml
 
 
-# NuGet Packages Directory
-packages/*
 Lib/opencv_world347d.dll
 Lib/opencv_world347.dll
