@@ -3,10 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:RootTools.ZoomLens"
              xmlns:comm="clr-namespace:RootTools.Comm"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="300">
     <Grid x:Name="grid">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -14,7 +15,199 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="80"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0"
+                        BorderThickness="2"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        Margin="-0.1,0,0,-2">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                Margin="5"
+                                Style="{StaticResource BasicBtn}"
+                                Click="HomeButtonClick">
+                            <Button.Content>
+                                <StackPanel Orientation="Vertical">
+                                    <material:PackIcon Kind="Home"
+                                                       Width="25"
+                                                       Foreground="White"></material:PackIcon>
+                                    <TextBlock Style="{StaticResource BasicTb}"
+                                               Text="Home"
+                                               FontSize="15"></TextBlock>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button Grid.Column="1"
+                                Margin="5"
+                                Style="{StaticResource BasicBtn}"
+                                Click="StopButtonClick">
+                            <Button.Content>
+                                <StackPanel Orientation="Vertical">
+                                    <material:PackIcon Kind="Stop"
+                                                       Width="25"
+                                                       Foreground="White"></material:PackIcon>
+                                    <TextBlock Style="{StaticResource BasicTb}"
+                                               Text="Stop"
+                                               FontSize="15"></TextBlock>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button Grid.Column="2"
+                                Margin="5"
+                                Style="{StaticResource BasicBtn}"
+                                Click="ResetButtonClick">
+                            <Button.Content>
+                                <StackPanel Orientation="Vertical">
+                                    <material:PackIcon Kind="Restart"
+                                                       Width="25"
+                                                       Foreground="White"></material:PackIcon>
+                                    <TextBlock Style="{StaticResource BasicTb}"
+                                               Text="Reset"
+                                               FontSize="15"></TextBlock>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button Grid.Column="3"
+                                Margin="5"
+                                Style="{StaticResource BasicBtn}"
+                                Click="EmergencyStopButtonClick">
+                            <Button.Content>
+                                <StackPanel Orientation="Vertical">
+                                    <material:PackIcon Kind="EmergencyExit"
+                                                       Width="25"
+                                                       Foreground="White"></material:PackIcon>
+                                    <TextBlock Style="{StaticResource BasicTb}"
+                                               Text="EMS"
+                                               FontSize="15"></TextBlock>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+                </Border>
+                <Border Grid.Row="1"
+                        BorderThickness="2"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        Margin="-0.1,0,0,-2">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0"
+                                    BorderThickness="2"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    Margin="-0.1,0,0,-2">
+                                <TextBlock Style="{StaticResource BasicTb}"
+                                           FontSize="20"
+                                           Foreground="Black"
+                                           Text="Absolute Move"></TextBlock>
+                            </Border>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Name="tbxMovePos"
+                                         Grid.Column="0"
+                                         VerticalAlignment="Center"
+                                         Background="{PriorityBinding}"
+                                         Text="1111111"
+                                         Foreground="Black"
+                                         HorizontalAlignment="Center"
+                                         FontSize="20"></TextBox>
+                                <Button Grid.Column="1"
+                                        Style="{StaticResource BasicBtn}"
+                                        Margin="5"
+                                        Click="MoveButtonClick">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Vertical">
+                                            <material:PackIcon Kind="MoveToInbox"
+                                                               Foreground="White"
+                                                               HorizontalAlignment="Center"
+                                                               Width="50"
+                                                               Height="50"></material:PackIcon>
+                                            <TextBlock Style="{StaticResource BasicTb}"
+                                                       Text="Move"
+                                                       FontSize="15"></TextBlock>
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="40"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0"
+                                    BorderThickness="2"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    Margin="-0.1,0,0,-2">
+                                <TextBlock Style="{StaticResource BasicTb}"
+                                           FontSize="20"
+                                           Foreground="Black"
+                                           Text="Jog Move"></TextBlock>
+                            </Border>
+                            <Grid Grid.Row="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Button Grid.Row="0"
+                                            Style="{StaticResource BasicBtn}"
+                                            Margin="5"
+                                            Name="btnUp"
+                                            PreviewMouseLeftButtonDown="PreviewMouseLeftButtonDown"
+                                            PreviewMouseLeftButtonUp="PreviewMouseLeftButtonUp">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Vertical">
+                                                <material:PackIcon Kind="ArrowCompressUp"
+                                                                   Width="25"
+                                                                   Foreground="White"></material:PackIcon>
+                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                           Text="Up"
+                                                           FontSize="15"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Grid.Row="1"
+                                            Style="{StaticResource BasicBtn}"
+                                            Margin="5"
+                                            Name="btnDown"
+                                            PreviewMouseLeftButtonDown="PreviewMouseLeftButtonDown"
+                                            PreviewMouseLeftButtonUp="PreviewMouseLeftButtonUp">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Vertical">
+                                                <material:PackIcon Kind="ArrowCompressDown"
+                                                                   Width="25"
+                                                                   Foreground="White"></material:PackIcon>
+                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                           Text="Down"
+                                                           FontSize="15"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
         <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
         <comm:RS232_UI Grid.Row="2" x:Name="rs232UI"/>

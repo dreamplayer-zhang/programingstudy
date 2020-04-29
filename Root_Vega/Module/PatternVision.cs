@@ -45,6 +45,7 @@ namespace Root_Vega.Module
         MemoryPool m_memoryPool;
         InspectTool m_inspectTool;
         ZoomLens m_ZoomLens;
+        public ZoomLens p_ZoomLens;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
