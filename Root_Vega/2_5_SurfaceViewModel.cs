@@ -23,7 +23,6 @@ namespace Root_Vega
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
 		ImageData m_Image;
-		DrawHelper m_DrawHelper;
 		DrawData m_DD;
 		Recipe m_Recipe;
 
@@ -186,6 +185,13 @@ namespace Root_Vega
 			m_Image = new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem));
 			p_ImageViewer = new ImageViewer_ViewModel(m_Image, dialogService);
 
+            p_SimpleShapeDrawer.Add(new SimpleShapeDrawerVM(p_ImageViewer));
+            p_SimpleShapeDrawer.Add(new SimpleShapeDrawerVM(p_ImageViewer));
+            p_SimpleShapeDrawer[0].RectangleKeyValue = Key.D1;
+            p_SimpleShapeDrawer[1].RectangleKeyValue = Key.D1;
+
+            p_ImageViewer.SetDrawer((DrawToolVM)p_SimpleShapeDrawer[0]);
+
 			//p_ListRoi = m_Recipe.m_RD.p_Roi;
 
 			//m_Recipe.m_RD.p_Roi = new List<Roi>(); //Mask#1, Mask#2... New List Mask
@@ -273,6 +279,18 @@ namespace Root_Vega
 			}
 		}
 
+        private List<SimpleShapeDrawerVM> m_SimpleShapeDrawer = new List<SimpleShapeDrawerVM>();
+        public List<SimpleShapeDrawerVM> p_SimpleShapeDrawer
+        {
+            get
+            {
+                return m_SimpleShapeDrawer;
+            }
+            set
+            {
+                SetProperty(ref m_SimpleShapeDrawer, value);
+            }
+        }
 
 		private int _IndexMask = 0;
 		public int p_IndexMask
@@ -284,8 +302,11 @@ namespace Root_Vega
 			set
 			{
 				SetProperty(ref _IndexMask, value);
-				p_ImageViewer.SetRectElement_MemPos(p_Recipe.p_RecipeData.p_Roi[_IndexMask].m_Surface.m_NonPattern[0].m_rt);
+				//수정필요p_ImageViewer.SetRectElement_MemPos(p_Recipe.p_RecipeData.p_Roi[_IndexMask].m_Surface.m_NonPattern[0].m_rt);
+                p_ImageViewer.SetDrawer((DrawToolVM)p_SimpleShapeDrawer[_IndexMask]);
+                p_ImageViewer.SetImageSource();
 				p_SurFace_ParamData = p_Recipe.p_RecipeData.p_Roi[_IndexMask].m_Surface.p_Parameter[0];
+
 			}
 		}
 
@@ -385,39 +406,13 @@ namespace Root_Vega
 		public void SaveCurrentMask()
 		{
 			CRect rect = p_ImageViewer.GetCurrentRect_MemPos();
-			p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.m_NonPattern[0].m_rt = rect;
+            p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.m_NonPattern[0].m_rt = rect;
+
 		}
 
 
 		#region Command
-		public ICommand CanvasMouseLeftDown
-		{
-			get
-			{
-				return new RelayCommand(_mouseLeftDown);
-			}
-		}
-		public ICommand CanvasMouseLeftUp
-		{
-			get
-			{
-				return new RelayCommand(_mouseLeftUp);
-			}
-		}
-		public ICommand CanvasMouseMove
-		{
-			get
-			{
-				return new RelayCommand(_mouseMove);
-			}
-		}
-		public ICommand CanvasMouseRightDown
-		{
-			get
-			{
-				return new RelayCommand(_mouseRightDown);
-			}
-		}
+		
 		public ICommand btnDraw
 		{
 			get
@@ -455,451 +450,6 @@ namespace Root_Vega
 		}
 
 
-
-		private void _mouseLeftDown()
-		{
-			switch (m_SurfaceProgress)
-			{
-				case SurfaceProgress.None:
-					{
-						break;
-					}
-				case SurfaceProgress.Start:
-					{
-						StartDrawingOrigin();
-						m_SurfaceProgress = SurfaceProgress.Drawing;
-						break;
-					}
-				case SurfaceProgress.Drawing:
-					{
-						break;
-					}
-				case SurfaceProgress.Done:
-					{
-						if (m_MouseHitType == HitType.Body)
-						{
-							if (p_UIElement.Count > 0)
-							{
-								int result = p_UIElement.IndexOf(m_DrawHelper.NowRect);
-								System.Windows.Shapes.Rectangle rect = (System.Windows.Shapes.Rectangle)p_UIElement[result];
-								rect.Stroke = m_DrawHelper.NowRect.Stroke = System.Windows.Media.Brushes.GreenYellow;
-								rect.StrokeDashArray = new DoubleCollection { 3, 2 };
-								//m_DD.m_OriginData.m_color = System.Drawing.Color.GreenYellow;
-								m_SurfaceProgress = SurfaceProgress.Select;
-							}
-						}
-						break;
-					}
-				case SurfaceProgress.Select:
-					{
-						if (m_MouseHitType == HitType.Body)
-						{
-							int result = p_UIElement.IndexOf(m_DrawHelper.NowRect);
-							System.Windows.Shapes.Rectangle rect = (System.Windows.Shapes.Rectangle)p_UIElement[result];
-							rect.Stroke = m_DrawHelper.NowRect.Stroke = System.Windows.Media.Brushes.Red;
-							rect.StrokeDashArray = new DoubleCollection(1);
-							m_SurfaceProgress = SurfaceProgress.Done;
-						}
-						if (m_MouseHitType != HitType.None)
-						{
-							p_ImageViewer.p_Mode = ImageViewer_ViewModel.DrawingMode.Tool;
-							m_DrawHelper.PreMousePt = new CPoint(p_ImageViewer.p_MouseX, p_ImageViewer.p_MouseY);
-							m_DrawHelper.preRect.Left = (int)Canvas.GetLeft(m_DrawHelper.NowRect);
-							m_DrawHelper.preRect.Right = (int)(m_DrawHelper.preRect.Left + m_DrawHelper.NowRect.Width);
-							m_DrawHelper.preRect.Top = (int)Canvas.GetTop(m_DrawHelper.NowRect);
-							m_DrawHelper.preRect.Bottom = (int)(m_DrawHelper.preRect.Top + m_DrawHelper.NowRect.Height);
-
-							m_SurfaceProgress = SurfaceProgress.Adjusting;
-						}
-						if (m_MouseHitType == HitType.None)
-						{
-							p_ImageViewer.p_Mode = ImageViewer_ViewModel.DrawingMode.None;
-							m_SurfaceProgress = SurfaceProgress.Done;
-						}
-						break;
-					}
-				case SurfaceProgress.Adjusting:
-					{
-						break;
-					}
-			}
-		}
-		private void _mouseMove()
-		{
-			Test = m_SurfaceProgress.ToString();
-			Test2 = p_ImageViewer.p_Mode.ToString();
-			CPoint MousePoint = new CPoint(p_ImageViewer.p_MouseX, p_ImageViewer.p_MouseY);
-			switch (m_SurfaceProgress)
-			{
-				case SurfaceProgress.None:
-					{
-						RedrawUIElement();
-						break;
-					}
-				case SurfaceProgress.Start:
-					{
-						break;
-					}
-				case SurfaceProgress.Drawing:
-					{
-						DrawingRectProgress();
-						break;
-					}
-				case SurfaceProgress.Done:
-					{
-						if (MouseEvent.LeftButton == MouseButtonState.Released)
-						{
-							//m_MouseHitType = SetHitType(MousePoint);
-							m_MouseHitType = MouseOnRect(MousePoint);
-							if (m_MouseHitType == HitType.Body)
-							{
-								SetMouseCursor();
-							}
-							else
-							{
-
-								m_MouseHitType = HitType.None;
-								SetMouseCursor();
-							}
-						}
-						break;
-					}
-				case SurfaceProgress.Select:
-					{
-						if (MouseEvent.LeftButton == MouseButtonState.Pressed)
-						{
-							if (m_MouseHitType != HitType.None)
-							{
-								p_ImageViewer.p_Mode = ImageViewer_ViewModel.DrawingMode.Tool;
-								m_DrawHelper.PreMousePt = new CPoint(p_ImageViewer.p_MouseX, p_ImageViewer.p_MouseY);
-								m_DrawHelper.preRect.Left = (int)Canvas.GetLeft(m_DrawHelper.NowRect);
-								m_DrawHelper.preRect.Right = (int)(m_DrawHelper.preRect.Left + m_DrawHelper.NowRect.Width);
-								m_DrawHelper.preRect.Top = (int)Canvas.GetTop(m_DrawHelper.NowRect);
-								m_DrawHelper.preRect.Bottom = (int)(m_DrawHelper.preRect.Top + m_DrawHelper.NowRect.Height);
-
-								m_SurfaceProgress = SurfaceProgress.Adjusting;
-							}
-						}
-						if (MouseEvent.LeftButton == MouseButtonState.Released)
-						{
-							m_MouseHitType = SetHitType(MousePoint);
-							SetMouseCursor();
-						}
-						break;
-					}
-				case SurfaceProgress.Adjusting:
-					{
-						// m_MouseHitType = SetHitType(MousePoint);
-						// SetMouseCursor();
-						if (MouseEvent.LeftButton == MouseButtonState.Pressed)
-						{
-							AdjustOrigin(MousePoint);
-						}
-						break;
-					}
-			}
-		}
-		private void _mouseRightDown()
-		{
-			switch (m_SurfaceProgress)
-			{
-				case SurfaceProgress.None:
-					{
-						break;
-					}
-				case SurfaceProgress.Start:
-					{
-						break;
-					}
-				case SurfaceProgress.Drawing:
-					{
-						DrawingRectDone();
-						m_SurfaceProgress = SurfaceProgress.Start;
-						break;
-					}
-				case SurfaceProgress.Done:
-					{
-						break;
-					}
-				case SurfaceProgress.Select:
-					{
-						break;
-					}
-				case SurfaceProgress.Adjusting:
-					{
-						break;
-					}
-			}
-		}
-		private void _mouseLeftUp()
-		{
-			switch (m_SurfaceProgress)
-			{
-				case SurfaceProgress.None:
-					{
-						break;
-					}
-				case SurfaceProgress.Start:
-					{
-						break;
-					}
-				case SurfaceProgress.Drawing:
-					{
-						break;
-					}
-				case SurfaceProgress.Done:
-					{
-						break;
-					}
-				case SurfaceProgress.Select:
-					{
-						break;
-					}
-				case SurfaceProgress.Adjusting:
-					{
-						p_ImageViewer.p_Mode = ImageViewer_ViewModel.DrawingMode.None;
-						m_SurfaceProgress = SurfaceProgress.Select;
-						break;
-					}
-			}
-		}
-		private HitType MouseOnRect(CPoint point)
-		{
-			if (m_DrawHelper.CanvasRectList != null)
-			{
-				foreach (Rectangle rect in m_DrawHelper.CanvasRectList)
-				{
-					double left = Canvas.GetLeft(rect);
-					double top = Canvas.GetTop(rect);
-					double right = left + rect.Width;
-					double bottom = top + rect.Height;
-					if (left < point.X && point.X < right &&
-						top < point.Y && point.Y < bottom)
-					{
-						m_DrawHelper.NowRect = rect;
-						return HitType.Body;
-					}
-				}
-			}
-
-			return HitType.None;
-		}
-		private HitType SetHitType(CPoint point)
-		{
-			double left = Canvas.GetLeft(m_DrawHelper.NowRect);
-			double top = Canvas.GetTop(m_DrawHelper.NowRect);
-			double right = left + m_DrawHelper.NowRect.Width;
-			double bottom = top + m_DrawHelper.NowRect.Height;
-
-			const double GAP = 10;
-			if (point.X < left) return HitType.None;
-			if (point.X > right) return HitType.None;
-			if (point.Y < top) return HitType.None;
-			if (point.Y > bottom) return HitType.None;
-			if (-1 * GAP <= point.X - left && point.X - left <= GAP)
-			{
-				if (-1 * GAP <= point.Y - top && point.Y - top <= GAP)
-					return HitType.UL;
-				if (-1 * GAP <= bottom - point.Y && bottom - point.Y <= GAP)
-					return HitType.LL;
-				return HitType.L;
-			}
-			if (-1 * GAP < right - point.X && right - point.X <= GAP)
-			{
-				if (-1 * GAP <= point.Y - top && point.Y - top <= GAP)
-					return HitType.UR;
-				if (-1 * GAP <= bottom - point.Y && bottom - point.Y <= GAP)
-					return HitType.LR;
-				return HitType.R;
-			}
-			if (-1 * GAP <= point.Y - top && point.Y - top <= GAP)
-				return HitType.T;
-			if (-1 * GAP <= bottom - point.Y && bottom - point.Y <= GAP)
-				return HitType.B;
-			if (left == 0)
-				return HitType.None;
-
-
-			return HitType.Body;
-		}
-		private void SetMouseCursor()
-		{
-			// See what cursor we should display.
-			Cursor desired_cursor = Cursors.Arrow;
-			switch (m_MouseHitType)
-			{
-				case HitType.None:
-					desired_cursor = Cursors.Arrow;
-					break;
-				case HitType.Body:
-					desired_cursor = Cursors.ScrollAll;
-					break;
-				case HitType.UL:
-				case HitType.LR:
-					desired_cursor = Cursors.SizeNWSE;
-					break;
-				case HitType.LL:
-				case HitType.UR:
-					desired_cursor = Cursors.SizeNESW;
-					break;
-				case HitType.T:
-				case HitType.B:
-					desired_cursor = Cursors.SizeNS;
-					break;
-				case HitType.L:
-				case HitType.R:
-					desired_cursor = Cursors.SizeWE;
-					break;
-			}
-			// Display the desired cursor.
-			if (RecipeCursor != desired_cursor) RecipeCursor = desired_cursor;
-		}
-		private void AdjustOrigin(CPoint CurrentPoint)
-		{
-			int offset_x = CurrentPoint.X - m_DrawHelper.PreMousePt.X;
-			int offset_y = CurrentPoint.Y - m_DrawHelper.PreMousePt.Y;
-			CPoint Offset = new CPoint(offset_x, offset_y);
-			int new_x = m_DrawHelper.preRect.Left;
-			int new_y = m_DrawHelper.preRect.Top;
-			int new_width = m_DrawHelper.preRect.Width;
-			int new_height = m_DrawHelper.preRect.Height;
-
-			switch (m_MouseHitType)
-			{
-				case HitType.Body:
-					new_x += Offset.X;
-					new_y += Offset.Y;
-					break;
-				case HitType.UL:
-					new_x += Offset.X;
-					new_y += Offset.Y;
-					new_width -= Offset.X;
-					new_height -= Offset.Y;
-					break;
-				case HitType.UR:
-					new_y += Offset.Y;
-					new_width += Offset.X;
-					new_height -= Offset.Y;
-					break;
-				case HitType.LR:
-					new_width += Offset.X;
-					new_height += Offset.Y;
-					break;
-				case HitType.LL:
-					new_x += Offset.X;
-					new_width -= Offset.X;
-					new_height += Offset.Y;
-					break;
-				case HitType.L:
-					new_x += Offset.X;
-					new_width -= Offset.X;
-					break;
-				case HitType.R:
-					new_width += Offset.X;
-					break;
-				case HitType.B:
-					new_height += Offset.Y;
-					break;
-				case HitType.T:
-					new_y += Offset.Y;
-					new_height -= Offset.Y;
-					break;
-			}
-
-			Canvas.SetLeft(m_DrawHelper.NowRect, new_x);
-			Canvas.SetTop(m_DrawHelper.NowRect, new_y);
-
-			if (new_height < 50)
-			{
-				new_height = 50;
-			}
-			if (new_width < 50)
-			{
-				new_width = 50;
-			}
-			m_DrawHelper.NowRect.Width = new_width;
-			m_DrawHelper.NowRect.Height = new_height;
-
-			CPoint MemLeftTop = GetMemPoint((int)new_x, (int)new_y);
-			CPoint MemRightBot = GetMemPoint((int)(new_x + new_width), (int)(new_y + new_height));
-
-		}
-
-		private void StartDrawingOrigin()
-		{
-			if (m_DrawHelper == null)
-				m_DrawHelper = new DrawHelper();
-
-
-			m_DrawHelper.NowRect = new System.Windows.Shapes.Rectangle();
-
-
-			m_DrawHelper.Rect_StartPt = new CPoint(p_ImageViewer.p_MouseMemX, p_ImageViewer.p_MouseMemY);
-			CPoint CanvasPt = GetCanvasPoint(p_ImageViewer.p_MouseMemX, p_ImageViewer.p_MouseMemY);
-
-			Canvas.SetLeft(m_DrawHelper.NowRect, CanvasPt.X);
-			Canvas.SetTop(m_DrawHelper.NowRect, CanvasPt.Y);
-
-			m_DrawHelper.NowRect.Stroke = System.Windows.Media.Brushes.Red;
-			m_DrawHelper.NowRect.StrokeThickness = 2;
-			m_DrawHelper.NowRect.StrokeDashArray = new DoubleCollection { 3, 2 };
-			p_UIElement.Add(m_DrawHelper.NowRect);
-
-		}
-		private void DrawingRectProgress()
-		{
-			if (m_DrawHelper.NowRect != null)
-			{
-				m_DrawHelper.Rect_EndPt = new CPoint(p_ImageViewer.p_MouseMemX, p_ImageViewer.p_MouseMemY);
-				CPoint StartPt = GetCanvasPoint(m_DrawHelper.Rect_StartPt.X, m_DrawHelper.Rect_StartPt.Y);
-				CPoint NowPt = GetCanvasPoint(p_ImageViewer.p_MouseMemX, p_ImageViewer.p_MouseMemY);
-
-
-				Canvas.SetLeft(m_DrawHelper.NowRect, StartPt.X);
-				Canvas.SetTop(m_DrawHelper.NowRect, StartPt.Y);
-
-
-				if (m_DrawHelper.Rect_EndPt.X < m_DrawHelper.Rect_StartPt.X)
-				{
-					Canvas.SetLeft(m_DrawHelper.NowRect, NowPt.X);
-				}
-				if (m_DrawHelper.Rect_EndPt.Y < m_DrawHelper.Rect_StartPt.Y)
-				{
-					Canvas.SetTop(m_DrawHelper.NowRect, NowPt.Y);
-				}
-				m_DrawHelper.NowRect.Width = Math.Abs(StartPt.X - NowPt.X);
-				m_DrawHelper.NowRect.Height = Math.Abs(StartPt.Y - NowPt.Y);
-
-			}
-		}
-		private void DrawingRectDone()
-		{
-			NonPattern nonPattern = new NonPattern(); // New Rect
-			nonPattern.m_rt = new CRect(); // Rect Info
-
-			nonPattern.m_rt.Left = m_DrawHelper.Rect_StartPt.X;
-			nonPattern.m_rt.Top = m_DrawHelper.Rect_StartPt.Y;
-			nonPattern.m_rt.Right = m_DrawHelper.Rect_EndPt.X;
-			nonPattern.m_rt.Bottom = m_DrawHelper.Rect_EndPt.Y;
-
-
-
-			if (m_DrawHelper.Rect_EndPt.X < m_DrawHelper.Rect_StartPt.X)
-			{
-				nonPattern.m_rt.Left = m_DrawHelper.Rect_EndPt.X;
-				nonPattern.m_rt.Right = m_DrawHelper.Rect_StartPt.X;
-
-			}
-			if (m_DrawHelper.Rect_EndPt.Y < m_DrawHelper.Rect_StartPt.Y)
-			{
-				nonPattern.m_rt.Top = m_DrawHelper.Rect_EndPt.Y;
-				nonPattern.m_rt.Bottom = m_DrawHelper.Rect_StartPt.Y;
-
-			}
-			m_DrawHelper.NowRect.StrokeDashArray = new DoubleCollection(1);
-
-			m_DrawHelper.CanvasRectList.Add(m_DrawHelper.NowRect);
-		}
 
 		private void ClearUI()
 		{

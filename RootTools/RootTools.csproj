@@ -242,11 +242,13 @@
     <Compile Include="Gem\GemCJ.cs" />
     <Compile Include="Gem\GemPJ.cs" />
     <Compile Include="Gem\IGem.cs" />
+    <Compile Include="Image\DrawHelper.cs" />
     <Compile Include="Image\ImageViewer_ViewModel.cs" />
     <Compile Include="Image\ImageViewer.xaml.cs">
       <DependentUpon>ImageViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Image\ImageData.cs" />
+    <Compile Include="Image\SimpleShapeDrawerVM.cs" />
     <Compile Include="Inspects\Inspection.cs" />
     <Compile Include="Inspects\InspectionManager.cs" />
     <Compile Include="Inspects\InspectTool.cs" />

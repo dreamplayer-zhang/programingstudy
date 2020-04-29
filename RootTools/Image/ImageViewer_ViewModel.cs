@@ -21,30 +21,47 @@ using System.Windows.Media;
 
 namespace RootTools
 {
+   
     public delegate void LoadedDelegate();
+    // public delegate void RedrawDelegate();
     public class ImageViewer_ViewModel : ObservableObject
     {
-         public enum DrawingMode
+        public enum DrawingMode
         {
             None,
             Drawing,
             Tool,
+            AttachedTool,
+            Modify
         }
         #region Property
-         private ObservableCollection<UIElement> _ViewerUIelement = new ObservableCollection<UIElement>();
-         public ObservableCollection<UIElement> p_ViewerUIElement
-         {
-             get
-             {
-                 return _ViewerUIelement;
-             }
-             set
-             {
-                 SetProperty(ref _ViewerUIelement, value);
-             }
-         }
+        private ObservableCollection<UIElement> m_Element = new ObservableCollection<UIElement>();
+        public ObservableCollection<UIElement> p_Element
+        {
+            get
+            {
+                return m_Element;
+            }
+            set
+            {
+                SetProperty(ref m_Element, value);
+            }
+        }
 
-		private ImageData m_ImageData;
+        private ObservableCollection<UIElement> _ViewerUIelement = new ObservableCollection<UIElement>();
+        public ObservableCollection<UIElement> p_ViewerUIElement
+        {
+            get
+            {
+                return _ViewerUIelement;
+            }
+            set
+            {
+                SetProperty(ref _ViewerUIelement, value);
+            }
+        }
+
+        private ImageData m_ImageData;
         public ImageData p_ImageData
         {
             get
@@ -54,6 +71,19 @@ namespace RootTools
             set
             {
                 SetProperty(ref m_ImageData, value);
+            }
+        }
+
+        private System.Windows.Input.Cursor m_MouseCursor;
+        public System.Windows.Input.Cursor p_MouseCursor
+        {
+            get
+            {
+                return m_MouseCursor;
+            }
+            set
+            {
+                SetProperty(ref m_MouseCursor, value);
             }
         }
 
@@ -130,6 +160,7 @@ namespace RootTools
 
         }
 
+        //public bool KeyPressedState = false;
         private System.Windows.Input.KeyEventArgs _keyEvent;
         public System.Windows.Input.KeyEventArgs KeyEvent
         {
@@ -378,42 +409,101 @@ namespace RootTools
             }
         }
 
+        private bool ToolExist = false;
+        private DrawToolVM SelectedTool;
+        public DrawHistoryWorker p_HistoryWorker = new DrawHistoryWorker();
+        public ModifyManager p_ModifyManager;
+
         DrawingMode m_Mode = DrawingMode.None;
         public DrawingMode p_Mode
         {
             get
             {
-                    return m_Mode;
+                return m_Mode;
             }
             set
             {
+                if (m_Mode != value)
+                {
+                    switch (m_Mode)
+                    {
+                        case DrawingMode.None:
+                            {
+                                //MouseCursor = System.Windows.Input.Cursors.Arrow;
+                                break;
+                            }
+                        case DrawingMode.Drawing:
+                            {
+                                if (value != DrawingMode.None)
+                                { 
+                                m_BasicTool.DrawEnd();
+                                m_BasicTool.p_State = false;
+                                } 
+                                break;
+                            }
+                        case DrawingMode.AttachedTool:
+                            {
+                                if (value != DrawingMode.None)
+                                {
+                                    SelectedTool.DrawEnd();
+                                    SelectedTool.p_State = false;
+                                }
+                                break;
+                            }
+                        case DrawingMode.Modify:
+                            {
+                                  if (value != DrawingMode.None)
+                                {
+                                    p_ModifyManager.p_ModifyState = false;
+                                p_ModifyManager.DeleteModifyData();
+                                p_MouseCursor = System.Windows.Input.Cursors.Arrow;
+                                      }
+                                break;
+                            }
+                    }
+                }
                 SetProperty(ref m_Mode, value);
             }
         }
 
         private readonly IDialogService m_DialogService;
-        #endregion 
-        DrawHelper m_DrawHelper = new DrawHelper();
-        public ImageViewer_ViewModel(ImageData image = null, IDialogService dialogService= null)
-        {       
+        #endregion
+        public UniquenessDrawerVM m_BasicTool; // 2_5에 m_DRawHelper.SetRectElement_MemPos 를 쓰므로 public 으로 선언. 
+        public ImageViewer_ViewModel(ImageData image = null, IDialogService dialogService = null)
+        {
             if (image != null)
             {
                 p_ImageData = image;
                 image.OnCreateNewImage += image_NewImage;
                 image.OnUpdateImage += image_OnUpdateImage;
                 image.UpdateOpenProgress += image_UpdateOpenProgress;
-                InitRoiRect(p_ImageData.p_Size.X,p_ImageData.p_Size.Y);
+                InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
                 SetImageSource();
-                
+
             }
             if (dialogService != null)
             {
                 m_DialogService = dialogService;
             }
+
+             p_ModifyManager= new ModifyManager(this);
+
+            m_BasicTool = new UniquenessDrawerVM(this);
+            m_BasicTool.LineKeyValue = Key.LeftCtrl;
+            m_BasicTool.RectangleKeyValue = Key.LeftShift;
+            p_Element = new ObservableCollection<UIElement>();
+        }
+
+        public void SetDrawer(DrawToolVM _SelectedTool)
+        {
+            SelectedTool = _SelectedTool;
+
+            if (SelectedTool != null)
+                ToolExist = true;
         }
 
         public void SetImageData(ImageData image)
-        {   
+        {
             p_ImageData = null;
             p_ImageData = image;
             image.OnCreateNewImage += image_NewImage;
@@ -477,7 +567,7 @@ namespace RootTools
             }
         }
         public void SetThumbNailSize(int width, int height)
-        {  
+        {
             p_ThumbWidth = width;
             p_ThumbHeight = height;
         }
@@ -485,7 +575,7 @@ namespace RootTools
         {
             Image<Gray, byte> view = new Image<Gray, byte>(p_ThumbWidth, p_ThumbHeight);
             IntPtr ptrMem = m_ImageData.GetPtr();
-            if (ptrMem == IntPtr.Zero) return; 
+            if (ptrMem == IntPtr.Zero) return;
             int pix_x = 0;
             int pix_y = 0;
 
@@ -537,7 +627,10 @@ namespace RootTools
             {
                 System.Windows.MessageBox.Show(ee.ToString());
             }
+
+            RedrawingElement();
         }
+
         void TumbNailMove()
         {
             if (MouseEvent.LeftButton == MouseButtonState.Pressed)
@@ -547,6 +640,7 @@ namespace RootTools
                 CanvasMovePoint(perX, perY);
             }
         }
+
         void ThumNailMoveStart()
         {
             TumbNailMove();
@@ -554,7 +648,7 @@ namespace RootTools
 
         void _btnOpenImage()
         {
-            if(m_ImageData == null)
+            if (m_ImageData == null)
             {
                 System.Windows.Forms.MessageBox.Show("Image를 열어주세요");
                 return;
@@ -579,6 +673,7 @@ namespace RootTools
                 }
             }
         }
+
         void _btnSaveImage()
         {
             if (m_ImageData == null)
@@ -587,15 +682,16 @@ namespace RootTools
                 return;
             }
             CancelCommand();
-          
-            if (m_DrawHelper.DrawnRect == null)
+
+            if (m_BasicTool.m_Element.Count == 0 || m_BasicTool.m_Element[0].GetType() != typeof(System.Windows.Shapes.Rectangle))
                 m_ImageData.SaveWholeImage();
             else
-                m_ImageData.SaveRectImage(new CRect(m_DrawHelper.Rect_StartPt.X, m_DrawHelper.Rect_StartPt.Y, m_DrawHelper.Rect_EndPt.X, m_DrawHelper.Rect_EndPt.Y));
+                m_ImageData.SaveRectImage(new CRect((int)m_BasicTool.m_TempRect.TopLeft.X, (int)m_BasicTool.m_TempRect.TopLeft.Y, (int)m_BasicTool.m_TempRect.BottomRight.X, (int)m_BasicTool.m_TempRect.BottomRight.Y));
         }
+
         void ImageClear()
         {
-            if(m_ImageData != null)
+            if (m_ImageData != null)
                 m_ImageData.ClearImage();
         }
 
@@ -610,6 +706,7 @@ namespace RootTools
                 m_ImageData.Worker_MemoryClear.CancelAsync();
             }
         }
+
         void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
         {
             //CPoint StartPt = GetCurrentPoint();
@@ -643,8 +740,8 @@ namespace RootTools
         void CanvasMovePoint(double nPercentX, double nPercentY)        // 0.xxx
         {
             CPoint StartPt = new CPoint();
-            StartPt.X = Convert.ToInt32(p_ImageData.p_Size.X * nPercentX - p_View_Rect.Width/2);
-            StartPt.Y = Convert.ToInt32(p_ImageData.p_Size.Y * nPercentY - p_View_Rect.Height/ 2);
+            StartPt.X = Convert.ToInt32(p_ImageData.p_Size.X * nPercentX - p_View_Rect.Width / 2);
+            StartPt.Y = Convert.ToInt32(p_ImageData.p_Size.Y * nPercentY - p_View_Rect.Height / 2);
             if (StartPt.X < 0)
                 StartPt.X = 0;
             else if (StartPt.X > p_ImageData.p_Size.X - p_View_Rect.Width)
@@ -655,6 +752,7 @@ namespace RootTools
                 StartPt.Y = p_ImageData.p_Size.Y - p_View_Rect.Height;
             SetViewRect(StartPt);
             SetImageSource();
+
         }
 
         void SetViewRect(CPoint point)      //point image의 좌상단
@@ -675,7 +773,7 @@ namespace RootTools
         {
             int nX = p_View_Rect.X + p_View_Rect.Width * MouseX / p_CanvasWidth - p_View_Rect.Width / 2;
             int nY = p_View_Rect.Y + p_View_Rect.Height * MouseY / p_CanvasHeight - p_View_Rect.Height / 2;
-            
+
             if (nX < 0)
                 nX = 0;
             else if (nX > p_ImageData.p_Size.X - p_View_Rect.Width)
@@ -688,8 +786,8 @@ namespace RootTools
         }
         CPoint GetCurrentPoint()
         {
-            int nX = p_View_Rect.X + p_View_Rect.Width/2;
-            int nY = p_View_Rect.Y +  p_View_Rect.Height / 2;
+            int nX = p_View_Rect.X + p_View_Rect.Width / 2;
+            int nY = p_View_Rect.Y + p_View_Rect.Height / 2;
 
             if (nX < 0)
                 nX = 0;
@@ -704,7 +802,7 @@ namespace RootTools
         CPoint GetStartPoint_Center(int nImgWidth, int nImgHeight)
         {
             bool bRatio_WH = (double)p_ImageData.p_Size.X / p_CanvasWidth < (double)p_ImageData.p_Size.Y / p_CanvasHeight;
-            int viewrectwidth =0;
+            int viewrectwidth = 0;
             int viewrectheight = 0;
             int nX = 0;
             int nY = 0;
@@ -717,33 +815,21 @@ namespace RootTools
             }
             else
             {
-                nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgHeight * p_Zoom * p_CanvasWidth / p_CanvasHeight) /2;
-                nY = p_View_Rect.Y + Convert.ToInt32(p_View_Rect.Height - nImgHeight * p_Zoom)/2 ;
+                nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgHeight * p_Zoom * p_CanvasWidth / p_CanvasHeight) / 2;
+                nY = p_View_Rect.Y + Convert.ToInt32(p_View_Rect.Height - nImgHeight * p_Zoom) / 2;
                 viewrectwidth = Convert.ToInt32(nImgHeight * p_Zoom * p_CanvasWidth / p_CanvasHeight);
                 viewrectheight = Convert.ToInt32(nImgHeight * p_Zoom);
             }
 
             if (nX < 0)
                 nX = 0;
-            else if (nX > nImgWidth -viewrectwidth)
+            else if (nX > nImgWidth - viewrectwidth)
                 nX = nImgWidth - viewrectwidth;
             if (nY < 0)
                 nY = 0;
             else if (nY > nImgHeight - viewrectheight)
                 nY = nImgHeight - viewrectheight;
             return new CPoint(nX, nY);
-        }
-        CPoint GetCanvasPoint(int memX, int memY)
-        {
-            if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)
-            {
-
-                int nX = (int)Math.Round((double)(memX - p_View_Rect.X) * p_CanvasWidth / p_View_Rect.Width, MidpointRounding.ToEven);
-                //int xx = (memX - p_ROI_Rect.X) * ViewWidth / p_ROI_Rect.Width;
-                int nY = (int)Math.Round((double)(memY - p_View_Rect.Y) * p_CanvasHeight / p_View_Rect.Height, MidpointRounding.AwayFromZero);
-                return new CPoint(nX, nY);
-            }
-            return new CPoint(0, 0);
         }
         #endregion
 
@@ -757,206 +843,231 @@ namespace RootTools
             m_PtMouseBuffer = new CPoint(p_MouseX, p_MouseY);
             m_swMouse.Restart();
         }
-        /// <summary>
-        /// 지정된 포인트를 중심으로 Width와 Hegiht만큼 Rectangle을 Draw
-        /// </summary>
-        /// <param name="x_pos"></param>
-        /// <param name="y_pos"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        public void DrawingRectAtPoint(double x_pos,double y_pos, double width, double height)
+
+        private void RedrawingElement()
         {
-            if (m_DrawHelper == null)
-                m_DrawHelper = new DrawHelper();
+            p_Element.Clear();
 
-            CPoint startPt = new CPoint((int)(x_pos - width / 2.0), (int)(y_pos - height / 2.0));
-            CPoint endPt = new CPoint((int)(x_pos + width / 2.0), (int)(y_pos + height / 2.0));
-        }
-        /// <summary>
-        /// 마우스 커서 기반 Rectangle Draw. 정상 동작을 위해 p_MouseMemX과 p_MouseMemY Update가 수반되어야 함
-        /// </summary>
-        private void StartDrawingRect()
-        {
-            if (m_DrawHelper == null)
-                m_DrawHelper = new DrawHelper();
-
-            p_ViewerUIElement.Clear();
-            m_DrawHelper.DrawnRect = new System.Windows.Shapes.Rectangle();
-            m_DrawHelper.DrawnTb = new TextBlock();
-
-            m_DrawHelper.Rect_StartPt = new CPoint(p_MouseMemX, p_MouseMemY);
-            CPoint CanvasPt = GetCanvasPoint(p_MouseMemX, p_MouseMemY);
-
-            Canvas.SetLeft(m_DrawHelper.DrawnRect, CanvasPt.X);
-            Canvas.SetTop(m_DrawHelper.DrawnRect, CanvasPt.Y);
-            SetRectStyle(3,2);
-
-            p_ViewerUIElement.Add(m_DrawHelper.DrawnTb);
-            p_ViewerUIElement.Add(m_DrawHelper.DrawnRect);
-
-        }
-
-        private void SetRectStyle(int nDash1, int nDash2)
-        {
-            m_DrawHelper.DrawnRect.Stroke = System.Windows.Media.Brushes.Yellow;
-            m_DrawHelper.DrawnRect.StrokeThickness = 2;
-            m_DrawHelper.DrawnRect.StrokeDashArray = new DoubleCollection { nDash1, nDash2 };
-            m_DrawHelper.DrawnTb.Foreground = System.Windows.Media.Brushes.Red;
-            m_DrawHelper.DrawnTb.FontSize = 18;
-        }
-
-        private void DrawingRectProgress()
-        {
-            if (m_DrawHelper.DrawnRect != null)
+            if (ToolExist)
             {
-                m_DrawHelper.Rect_EndPt = new CPoint(p_MouseMemX, p_MouseMemY);
-                CPoint StartPt = GetCanvasPoint(m_DrawHelper.Rect_StartPt.X, m_DrawHelper.Rect_StartPt.Y);
-                CPoint NowPt = GetCanvasPoint(p_MouseMemX, p_MouseMemY);
+                foreach (UIElement TempElement in SelectedTool.m_Element)
+                    p_Element.Add(TempElement);
 
+                SelectedTool.Redrawing();
+                if (p_Mode == DrawingMode.AttachedTool)
+                    SelectedTool.Drawing();
+            }
 
-                Canvas.SetLeft(m_DrawHelper.DrawnRect, StartPt.X);
-                Canvas.SetTop(m_DrawHelper.DrawnRect, StartPt.Y);
+            if (m_BasicTool != null)
+            {
+                foreach (UIElement TempElement in m_BasicTool.m_Element)
+                    p_Element.Add(TempElement);
+                m_BasicTool.Redrawing();
 
-                if (m_DrawHelper.Rect_EndPt.X < m_DrawHelper.Rect_StartPt.X)
+                if (p_Mode == DrawingMode.Drawing)
                 {
-                    Canvas.SetLeft(m_DrawHelper.DrawnRect, NowPt.X);
+                    p_ViewerUIElement.Clear();
+                    m_BasicTool.Drawing();
+                    p_ViewerUIElement.Add(m_BasicTool.DrawnTb);
                 }
-                if (m_DrawHelper.Rect_EndPt.Y < m_DrawHelper.Rect_StartPt.Y)
-                {
-                    Canvas.SetTop(m_DrawHelper.DrawnRect, NowPt.Y);
-                }
+            }
 
-                m_DrawHelper.DrawnRect.Width = Math.Abs(StartPt.X - NowPt.X);
-                m_DrawHelper.DrawnRect.Height = Math.Abs(StartPt.Y - NowPt.Y);
-
-                int w = m_DrawHelper.Rect_EndPt.X - m_DrawHelper.Rect_StartPt.X;
-                int h = m_DrawHelper.Rect_EndPt.Y - m_DrawHelper.Rect_StartPt.Y;
-
-                string msg = "Width :" + w.ToString() + " Height :" + h.ToString();
-                m_DrawHelper.DrawnTb.Text = msg;
-                m_DrawHelper.DrawnRect.StrokeDashArray = new DoubleCollection(1);
+            if (p_ModifyManager != null && p_ModifyManager.p_ModifyRect != null)
+            {
+                p_Element.Add(p_ModifyManager.p_ModifyRect);
+                p_ModifyManager.Redrawing();
             }
         }
-        private void DrawRectDone()
+
+        private void RedrawingHistory()
         {
-            try
+            p_Element.Clear();
+
+            if (ToolExist)
             {
-                int w = m_DrawHelper.Rect_EndPt.X - m_DrawHelper.Rect_StartPt.X;
-                int h = m_DrawHelper.Rect_EndPt.Y - m_DrawHelper.Rect_StartPt.Y;
-                string msg = "Width :" + w.ToString() + " Height :" + h.ToString();
-                m_DrawHelper.DrawnTb.Text = msg;
-                m_DrawHelper.DrawnRect.StrokeDashArray = new DoubleCollection(1);
+                foreach (UIElement TempElement in SelectedTool.m_Element)
+                    p_Element.Add(TempElement);
+
+                SelectedTool.Redrawing();
+                if (p_Mode == DrawingMode.AttachedTool)
+                    SelectedTool.Drawing();
             }
-            catch
+
+            if (m_BasicTool != null)
             {
-                return;
+                foreach (UIElement TempElement in m_BasicTool.m_Element)
+                    p_Element.Add(TempElement);
+                m_BasicTool.Redrawing();
             }
 
-        }
-
-        public void SetRectElement_MemPos(CRect rect)
-        {
-            p_ViewerUIElement.Clear();
-            m_DrawHelper.DrawnRect = new System.Windows.Shapes.Rectangle();
-            m_DrawHelper.DrawnTb = new TextBlock();
-
-
-            m_DrawHelper.Rect_StartPt = new CPoint(rect.Left,rect.Top);
-            m_DrawHelper.Rect_EndPt = new CPoint(rect.Right, rect.Bottom);
-
-            int w = m_DrawHelper.Rect_EndPt.X - m_DrawHelper.Rect_StartPt.X;
-            int h = m_DrawHelper.Rect_EndPt.Y - m_DrawHelper.Rect_StartPt.Y;
-            string msg = "Width :" + w.ToString() + " Height :" + h.ToString();
-            m_DrawHelper.DrawnTb.Text = msg;
-
-            CPoint StartPt = GetCanvasPoint(m_DrawHelper.Rect_StartPt.X, m_DrawHelper.Rect_StartPt.Y);
-            CPoint EndPt = GetCanvasPoint(m_DrawHelper.Rect_EndPt.X, m_DrawHelper.Rect_EndPt.Y);
-            Canvas.SetLeft(m_DrawHelper.DrawnRect, StartPt.X);
-            Canvas.SetTop(m_DrawHelper.DrawnRect, StartPt.Y);
-            m_DrawHelper.DrawnRect.Width = Math.Abs(StartPt.X - EndPt.X);
-            m_DrawHelper.DrawnRect.Height = Math.Abs(StartPt.Y - EndPt.Y);
-            SetRectStyle(3,2);
-            p_ViewerUIElement.Add(m_DrawHelper.DrawnTb);
-            m_DrawHelper.DrawnRect.StrokeDashArray = new DoubleCollection(1);
-            p_ViewerUIElement.Add(m_DrawHelper.DrawnRect);
+            if (p_ModifyManager != null && p_ModifyManager.p_ModifyRect != null)
+            {
+                p_Element.Add(p_ModifyManager.p_ModifyRect);
+                p_ModifyManager.Redrawing();
+            }
         }
 
         public CRect GetCurrentRect_MemPos()
         {
             try
             {
-                CPoint StartPt = new CPoint(m_DrawHelper.Rect_StartPt.X, m_DrawHelper.Rect_StartPt.Y);
-                CPoint EndPt = new CPoint(m_DrawHelper.Rect_EndPt.X, m_DrawHelper.Rect_EndPt.Y);
+                CPoint StartPt = new CPoint((int)m_BasicTool.m_TempRect.TopLeft.X, (int)m_BasicTool.m_TempRect.TopLeft.Y);
+                CPoint EndPt = new CPoint((int)m_BasicTool.m_TempRect.BottomRight.X, (int)m_BasicTool.m_TempRect.BottomRight.Y);
 
                 return new CRect(StartPt.X, StartPt.Y, EndPt.X, EndPt.Y);
             }
-            catch {
-                return new CRect(0,0,0,0);
+            catch
+            {
+                return new CRect(0, 0, 0, 0);
             }
         }
-        private void RedrawRect()
+
+        // public event RedrawDelegate _RedrawDelegate;
+
+        private void KeyPressedDownFunction()
         {
-            if (m_DrawHelper == null)
-                return;
-            if (m_DrawHelper.DrawnRect == null)
-                return;
+            if (KeyEvent != null)
+            {
+                for (int i = 0; i < m_BasicTool.p_KeyList.Length; i++)
+                    if (m_BasicTool.p_KeyList[i]!=Key.None && KeyEvent.KeyboardDevice.IsKeyDown(m_BasicTool.p_KeyList[i]))
+                    {
+                        m_BasicTool.SetShape(i);
+                        p_Mode = DrawingMode.Drawing;
 
+                    }
+                if (ToolExist)
+                {
+                    for (int i = 0; i < SelectedTool.p_KeyList.Length; i++)
+                        if (SelectedTool.p_KeyList[i] != Key.None && KeyEvent.KeyboardDevice.IsKeyDown(SelectedTool.p_KeyList[i]))
+                        {
+                            p_ViewerUIElement.Clear();
+                            SelectedTool.SetShape(i);
+                            p_ViewerUIElement.Add(SelectedTool.m_ShapeIcon);
 
-            p_ViewerUIElement.Remove(m_DrawHelper.DrawnRect);
-            m_DrawHelper.DrawnRect = new System.Windows.Shapes.Rectangle();
-            CPoint StartPt = GetCanvasPoint(m_DrawHelper.Rect_StartPt.X, m_DrawHelper.Rect_StartPt.Y);
-            CPoint EndPt = GetCanvasPoint(m_DrawHelper.Rect_EndPt.X, m_DrawHelper.Rect_EndPt.Y);
-            if (EndPt.X < StartPt.X)
-                Canvas.SetLeft(m_DrawHelper.DrawnRect, EndPt.X);
-            else
-                Canvas.SetLeft(m_DrawHelper.DrawnRect, StartPt.X);
-            if (EndPt.Y < StartPt.Y)
-                Canvas.SetTop(m_DrawHelper.DrawnRect, EndPt.Y);
-            else
-                Canvas.SetTop(m_DrawHelper.DrawnRect, StartPt.Y);
+                            p_Mode = DrawingMode.AttachedTool;
 
-            SetRectStyle(1,0);
-            //m_DrawHelper.DrawnRect.Stroke = System.Windows.Media.Brushes.Red;
-            //m_DrawHelper.DrawnRect.StrokeThickness = 2;
-            m_DrawHelper.DrawnRect.Width = Math.Abs(StartPt.X - EndPt.X);
-            m_DrawHelper.DrawnRect.Height = Math.Abs(StartPt.Y - EndPt.Y);
-            p_ViewerUIElement.Add(m_DrawHelper.DrawnRect);
+                        }
+                }
 
+               if ( KeyEvent.KeyboardDevice.Modifiers == ModifierKeys.Control)
+                {
+                    if (!m_BasicTool.p_State && !SelectedTool.p_State)
+                    {
+                        ModifyManager _ModifyManager = null;
+                        if (p_Mode == DrawingMode.Modify)
+                            _ModifyManager = p_ModifyManager;
+                        if (KeyEvent.KeyboardDevice.IsKeyDown(Key.Z))
+                        {
+                            p_HistoryWorker.Do_CtrlZ(_ModifyManager);
+                            RedrawingHistory();
+                        }
+                        if (KeyEvent.KeyboardDevice.IsKeyDown(Key.Y))
+                        {
+                            p_HistoryWorker.Do_CtrlY(_ModifyManager);
+                            RedrawingHistory();
+                        }
+                    }
+                }
 
-            
+            }
+        }
 
+        private void KeyPressedUpFunction()
+        {
+            if (KeyEvent != null)
+            {
+                
+                for (int i = 0; i < m_BasicTool.p_KeyList.Length; i++)
+                    if (m_BasicTool.p_KeyList[i] != Key.None && KeyEvent.KeyboardDevice.IsKeyUp(m_BasicTool.p_KeyList[i]))
+                    {
+                        if (p_Mode == DrawingMode.Drawing && m_BasicTool.p_State == false)
+                        {
+                            p_ViewerUIElement.Clear();
+                            m_BasicTool.SetShape(-1);
+                            p_Mode = DrawingMode.None;
+
+                        }
+                    } 
+                if (ToolExist)
+                {
+                    for (int i = 0; i < SelectedTool.p_KeyList.Length; i++)
+                        if (SelectedTool.p_KeyList[i]!=Key.None && KeyEvent.KeyboardDevice.IsKeyUp(SelectedTool.p_KeyList[i]))
+                        {
+                            if (p_Mode == DrawingMode.AttachedTool && SelectedTool.p_State == false)
+                            {
+                                p_ViewerUIElement.Clear();
+                                SelectedTool.SetShape(-1);
+                                p_Mode = DrawingMode.None;
+
+                            }
+                        }
+                }
+            }
+        }
+
+        private void LeftUp()
+        {
+            switch (p_Mode)
+            {
+                case DrawingMode.Modify:
+                    {
+
+                        if (!p_ModifyManager.p_SetStateDone)
+                            p_ModifyManager.p_SetStateDone = true;
+                        else
+                            if (p_ModifyManager.p_ModifyState && p_ModifyManager.m_MouseHitType != ModifyManager.HitType.None)
+                            {
+                                p_ModifyManager.ModifyEnd();
+                            }
+                        break;
+                    }
+            }
 
         }
 
         private void LeftDown()
         {
-
             if (m_ImageData == null)
                 return;
+
+            StartImageMove();
             switch (p_Mode)
             {
                 case DrawingMode.None:
                     {
-                        if (KeyEvent != null && KeyEvent.Key == Key.LeftShift && KeyEvent.IsDown)
-                        {
-                            StartDrawingRect();
-                            p_Mode = DrawingMode.Drawing;
-                            break;
-                        }
-                        else
-                            StartImageMove();
                         break;
                     }
                 case DrawingMode.Drawing:
                     {
+                        if (m_BasicTool.p_State == false)
+                        {
+                            m_BasicTool.p_State = true;
+                            m_BasicTool.DrawStart();
+                        }
                         break;
                     }
-                case DrawingMode.Tool:
+                case DrawingMode.AttachedTool:
                     {
+                        if (SelectedTool.p_State == false)
+                        {
+                            SelectedTool.p_State = true;
+                            SelectedTool.DrawStart();
+                        }
+                        break;
+                    }
+                case DrawingMode.Modify:
+                    {
+                        if (p_ModifyManager.m_MouseHitType != ModifyManager.HitType.None)
+                        {
+                            p_ModifyManager.p_ModifyState = true;
+                            p_ModifyManager.ModifyStart();
+                        }
+                     
                         break;
                     }
             }
         }
+
         private void MouseMove()
         {
 
@@ -964,28 +1075,15 @@ namespace RootTools
                 return;
 
             int m_nMouseMoveDelay = 0;
-            switch(p_Mode)
+
+            switch (p_Mode)
             {
-                case DrawingMode.None:
-                    {                       
+                default:
+                    {
                         if (MouseEvent.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > m_nMouseMoveDelay)
                         {
                             CPoint point = m_ptBuffer1;
                             CanvasMovePoint_Ref(point, m_PtMouseBuffer.X - p_MouseX, m_PtMouseBuffer.Y - p_MouseY);
-                            RedrawRect();
-                        }
-                        break;
-                    }
-                case DrawingMode.Drawing:
-                    {
-                        if (KeyEvent.IsDown)
-                        {
-                            DrawingRectProgress();
-                        }
-                        else
-                        {
-                            DrawRectDone();
-                            p_Mode = DrawingMode.None;
                         }
                         break;
                     }
@@ -993,43 +1091,142 @@ namespace RootTools
                     {
                         break;
                     }
+                case DrawingMode.Modify:
+                    {
+                        if (p_ModifyManager.m_MouseHitType == ModifyManager.HitType.Body)
+                        {
+                            int a = 1;
+                        }
+                        if (MouseEvent.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > m_nMouseMoveDelay)
+                        {
+                            if (p_ModifyManager.m_MouseHitType == ModifyManager.HitType.None)
+                            {
+                                CPoint point = m_ptBuffer1;
+                                CanvasMovePoint_Ref(point, m_PtMouseBuffer.X - p_MouseX, m_PtMouseBuffer.Y - p_MouseY);
+                            }
+                            else
+                            {
+                                p_ModifyManager.AdjustOrigin(new CPoint(p_MouseMemX, p_MouseMemY));
+                                //크기변환 혹은 위치변환.
+
+                            }
+                            //SelectedTool.ModifyTarget;
+                        }
+                        else
+                        {
+                            CPoint MousePoint = new CPoint(p_MouseX, p_MouseY);
+                            p_ModifyManager.m_MouseHitType = p_ModifyManager.SetHitType(MousePoint);
+                            p_MouseCursor = p_ModifyManager.SetMouseCursor(p_ModifyManager.m_MouseHitType);
+
+                        }
+
+                        break;
+                    }
             }
-            
+
+            switch (p_Mode)
+            {
+                case DrawingMode.None:
+                    {
+                        break;
+                    }
+                case DrawingMode.Drawing:
+                    {
+                        if (m_BasicTool.p_State == true)
+                        {
+                            m_BasicTool.Drawing();
+                            RedrawingElement();
+                        }
+
+                        break;
+                    }
+                case DrawingMode.AttachedTool:
+                    {
+                        if (SelectedTool.p_State == true)
+                        {
+                            SelectedTool.Drawing();
+                            RedrawingElement();
+                        }
+                        break;
+                    }
+            }
         }
+
         private void RightDown()
         {
-            DrawRectDone();
-            p_Mode = DrawingMode.None;
+            if (m_ImageData == null)
+                return;
+            switch (p_Mode)
+            {
+                case DrawingMode.None:
+                    {
+                        break;
+                    }
+                case DrawingMode.Drawing:
+                    {
+                        if (m_BasicTool.p_State == true)
+                        {
+                            m_BasicTool.DrawEnd();
+                            p_ViewerUIElement.Clear();
+                            p_ViewerUIElement.Add(m_BasicTool.DrawnTb);
+                            m_BasicTool.p_State = false;
+                            p_Mode = DrawingMode.None;
+                        }
+                        break;
+                    }
+                case DrawingMode.AttachedTool:
+                    {
+                        if (SelectedTool.p_State == true)
+                        {
+                            SelectedTool.DrawEnd();
+                            SelectedTool.p_State = false;
+                            p_ViewerUIElement.Clear();
+                            p_Mode = DrawingMode.None;
+                        }
+                        break;
+                    }
+                case DrawingMode.Modify:
+                    { 
+                       if (p_ModifyManager.m_MouseHitType == ModifyManager.HitType.None)
+                        {
+                            p_ModifyManager.p_ModifyState = false;
+                            p_ModifyManager.DeleteModifyData();
+                            p_Mode = DrawingMode.None;
+                        }
+                        break;
+                    }
+            }
         }
+
         public void KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             KeyEvent = e;
         }
         public void OnMouseDown(Object sender, System.Windows.Input.MouseEventArgs e)
         {
-            //var viewer = (Canvas)sender;
+           //var viewer = (Canvas)sender;
             //viewer.Focus();
         }
         public void OnMouseEnter(Object sender, System.Windows.Input.MouseEventArgs e)
         {
-            var viewer = (Canvas)sender;
+            var viewer = (Grid)sender;
             viewer.Focus();
         }
         public void OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            
-            var viewer = (Canvas)sender;
+
+            var viewer = (Grid)sender;
             viewer.Focus();
             try
             {
                 int lines = e.Delta * SystemInformation.MouseWheelScrollLines / 120;
                 double zoom = _Zoom;
 
-                if(lines < 0)
+                if (lines < 0)
                 {
-                    zoom *= 1.1F;    
+                    zoom *= 1.1F;
                 }
-                if(lines > 0)
+                if (lines > 0)
                 {
                     zoom *= 0.9F;
                 }
@@ -1061,20 +1258,28 @@ namespace RootTools
                 p_Zoom = zoom;
                 //SetRoiRect();
             }
-            catch(Exception ee)
+            catch (Exception ee)
             {
                 System.Windows.Forms.MessageBox.Show(ee.ToString());
             }
-            RedrawRect();
+            //if (ToolExist)
+            //    SelectedTool.Drawing();
         }
 
         #region ICommand
-        
+
         public ICommand SaveImageCommand
         {
             get
             {
                 return new RelayCommand(p_ImageData.SaveWholeImage);
+            }
+        }
+        public ICommand CanvasMouseLeftUp
+        {
+            get
+            {
+                return new RelayCommand(LeftUp);
             }
         }
         public ICommand CanvasMouseLeftDown
@@ -1121,7 +1326,8 @@ namespace RootTools
         }
         public ICommand TumbNailMouseMove
         {
-            get{
+            get
+            {
                 return new RelayCommand(TumbNailMove);
             }
         }
@@ -1138,7 +1344,9 @@ namespace RootTools
             {
                 return new RelayCommand(delegate
                 {
-                    p_ViewerUIElement.Clear();
+                    m_BasicTool.Clear();
+                    SelectedTool.Clear();
+                    p_Mode = DrawingMode.None;
                 }
                 );
             }
@@ -1147,7 +1355,8 @@ namespace RootTools
         {
             get
             {
-                return new RelayCommand(delegate {
+                return new RelayCommand(delegate
+                {
                     CanvasMoveCanvasPoint(Convert.ToInt32(p_CanvasWidth / 2), Convert.ToInt32(p_CanvasHeight / 4));
                 }
                 );
@@ -1156,10 +1365,11 @@ namespace RootTools
         public ICommand KeyDownCommand
         {
             get
-        {
-                return new RelayCommand(delegate {
+            {
+                return new RelayCommand(delegate
+                {
 
-                    CanvasMoveCanvasPoint(Convert.ToInt32(p_CanvasWidth / 2), Convert.ToInt32(p_CanvasHeight *3/ 4));
+                    CanvasMoveCanvasPoint(Convert.ToInt32(p_CanvasWidth / 2), Convert.ToInt32(p_CanvasHeight * 3 / 4));
                 }
                 );
             }
@@ -1167,19 +1377,29 @@ namespace RootTools
         public ICommand KeyLeftCommand
         {
             get
-        {
-                return new RelayCommand(delegate {
+            {
+                return new RelayCommand(delegate
+                {
                     CanvasMoveCanvasPoint(Convert.ToInt32(p_CanvasWidth / 4), Convert.ToInt32(p_CanvasHeight / 2));
-        }
+                }
                 );
             }
+        }
+        public ICommand KeyPressedDownCommand
+        {
+            get { return new RelayCommand(KeyPressedDownFunction); }
+        }
+        public ICommand KeyPressedUpCommand
+        {
+            get { return new RelayCommand(KeyPressedUpFunction); }
         }
         public ICommand KeyRightCommand
         {
             get
-        {
-                return new RelayCommand(delegate {
-                    CanvasMoveCanvasPoint(Convert.ToInt32(p_CanvasWidth * 3/ 4), Convert.ToInt32(p_CanvasHeight / 2));
+            {
+                return new RelayCommand(delegate
+                {
+                    CanvasMoveCanvasPoint(Convert.ToInt32(p_CanvasWidth * 3 / 4), Convert.ToInt32(p_CanvasHeight / 2));
                 }
                 );
             }
@@ -1202,16 +1422,13 @@ namespace RootTools
         void Loaded_function()
         {
             if (p_ImageData != null)
-            {
-                SetRoiRect();
-                SetThumNailIamge();
-            }
-            if(m_AfterLoaded!=null)
+                InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
+            if (m_AfterLoaded != null)
                 m_AfterLoaded();
-            RedrawRect();
         }
-        #endregion 
+        #endregion
     }
+
     public class DrawHelper
     {
         public TextBlock DrawnTb = new TextBlock();

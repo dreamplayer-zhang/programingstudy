@@ -20,33 +20,6 @@
             <tools:ImageViewer DataContext="{Binding p_ImageViewer}"
                                Width="{PriorityBinding}"
                                Height="{PriorityBinding}"/>
-            <ItemsControl ItemsSource="{Binding p_UIElement}"
-                          Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                          Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}"
-                          Panel.ZIndex="5">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas ClipToBounds="True" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-            <i:Interaction.Behaviors>
-                <mouse:MouseBehaviour MouseEvent="{Binding MouseEvent, Mode=OneWayToSource}"/>
-            </i:Interaction.Behaviors>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseMove">
-                    <i:InvokeCommandAction Command="{Binding CanvasMouseMove}" />
-                </i:EventTrigger>
-                <i:EventTrigger EventName="MouseLeftButtonDown">
-                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftDown}" />
-                </i:EventTrigger>
-                <i:EventTrigger EventName="MouseLeftButtonUp">
-                    <i:InvokeCommandAction Command="{Binding CanvasMouseLeftUp}" />
-                </i:EventTrigger>
-				<i:EventTrigger EventName="MouseRightButtonDown">
-					<i:InvokeCommandAction Command="{Binding CanvasMouseRightDown}"/>
-				</i:EventTrigger>
-			</i:Interaction.Triggers>
         </Grid>
         <Grid Grid.Column="1" Margin="0,15,15,15">
             <Grid.RowDefinitions>
