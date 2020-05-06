@@ -18,7 +18,7 @@ namespace Root_Vega
         Vega_Engineer m_Engineer;
         MemoryTool m_MemoryModule;
         ImageData m_Image;
-      
+
         Recipe m_Recipe;
         Roi m_Roi;
         Stack<Feature> m_PasteFeature = new Stack<Feature>();
@@ -54,7 +54,7 @@ namespace Root_Vega
         }
         //int aa = 0;
         #region Property
-        
+
         private ImageViewer_ViewModel m_ImageViewer;
         public ImageViewer_ViewModel p_ImageViewer
         {
@@ -175,7 +175,7 @@ namespace Root_Vega
         {
 
             p_SimpleShapeDrawer.Clear();
-            p_ImageViewer.p_HistoryWorker.Clear();
+            p_ImageViewer.m_HistoryWorker.Clear();
             p_ImageViewer.m_BasicTool.Clear();
             p_ImageViewer.SetImageSource();
             p_FeatureCnt = 0;

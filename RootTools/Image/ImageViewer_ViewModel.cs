@@ -411,8 +411,8 @@ namespace RootTools
 
         private bool ToolExist = false;
         private DrawToolVM SelectedTool;
-        public DrawHistoryWorker p_HistoryWorker = new DrawHistoryWorker();
-        public ModifyManager p_ModifyManager;
+        public DrawHistoryWorker m_HistoryWorker = new DrawHistoryWorker();
+        public ModifyManager m_ModifyManager;
 
         DrawingMode m_Mode = DrawingMode.None;
         public DrawingMode p_Mode
@@ -454,8 +454,8 @@ namespace RootTools
                             {
                                   if (value != DrawingMode.None)
                                 {
-                                    p_ModifyManager.p_ModifyState = false;
-                                p_ModifyManager.DeleteModifyData();
+                                    m_ModifyManager.p_ModifyState = false;
+                                m_ModifyManager.DeleteModifyData();
                                 p_MouseCursor = System.Windows.Input.Cursors.Arrow;
                                       }
                                 break;
@@ -486,7 +486,7 @@ namespace RootTools
                 m_DialogService = dialogService;
             }
 
-             p_ModifyManager= new ModifyManager(this);
+             m_ModifyManager= new ModifyManager(this);
 
             m_BasicTool = new UniquenessDrawerVM(this);
             m_BasicTool.LineKeyValue = Key.LeftCtrl;
@@ -872,10 +872,10 @@ namespace RootTools
                 }
             }
 
-            if (p_ModifyManager != null && p_ModifyManager.p_ModifyRect != null)
+            if (m_ModifyManager != null && m_ModifyManager.p_ModifyRect != null)
             {
-                p_Element.Add(p_ModifyManager.p_ModifyRect);
-                p_ModifyManager.Redrawing();
+                p_Element.Add(m_ModifyManager.p_ModifyRect);
+                m_ModifyManager.Redrawing();
             }
         }
 
@@ -900,10 +900,10 @@ namespace RootTools
                 m_BasicTool.Redrawing();
             }
 
-            if (p_ModifyManager != null && p_ModifyManager.p_ModifyRect != null)
+            if (m_ModifyManager != null && m_ModifyManager.p_ModifyRect != null)
             {
-                p_Element.Add(p_ModifyManager.p_ModifyRect);
-                p_ModifyManager.Redrawing();
+                p_Element.Add(m_ModifyManager.p_ModifyRect);
+                m_ModifyManager.Redrawing();
             }
         }
 
@@ -955,15 +955,15 @@ namespace RootTools
                     {
                         ModifyManager _ModifyManager = null;
                         if (p_Mode == DrawingMode.Modify)
-                            _ModifyManager = p_ModifyManager;
+                            _ModifyManager = m_ModifyManager;
                         if (KeyEvent.KeyboardDevice.IsKeyDown(Key.Z))
                         {
-                            p_HistoryWorker.Do_CtrlZ(_ModifyManager);
+                            m_HistoryWorker.Do_CtrlZ(_ModifyManager);
                             RedrawingHistory();
                         }
                         if (KeyEvent.KeyboardDevice.IsKeyDown(Key.Y))
                         {
-                            p_HistoryWorker.Do_CtrlY(_ModifyManager);
+                            m_HistoryWorker.Do_CtrlY(_ModifyManager);
                             RedrawingHistory();
                         }
                     }
@@ -1012,12 +1012,12 @@ namespace RootTools
                 case DrawingMode.Modify:
                     {
 
-                        if (!p_ModifyManager.p_SetStateDone)
-                            p_ModifyManager.p_SetStateDone = true;
+                        if (!m_ModifyManager.p_SetStateDone)
+                            m_ModifyManager.p_SetStateDone = true;
                         else
-                            if (p_ModifyManager.p_ModifyState && p_ModifyManager.m_MouseHitType != ModifyManager.HitType.None)
+                            if (m_ModifyManager.p_ModifyState && m_ModifyManager.m_MouseHitType != ModifyManager.HitType.None)
                             {
-                                p_ModifyManager.ModifyEnd();
+                                m_ModifyManager.ModifyEnd();
                             }
                         break;
                     }
@@ -1057,10 +1057,10 @@ namespace RootTools
                     }
                 case DrawingMode.Modify:
                     {
-                        if (p_ModifyManager.m_MouseHitType != ModifyManager.HitType.None)
+                        if (m_ModifyManager.m_MouseHitType != ModifyManager.HitType.None)
                         {
-                            p_ModifyManager.p_ModifyState = true;
-                            p_ModifyManager.ModifyStart();
+                            m_ModifyManager.p_ModifyState = true;
+                            m_ModifyManager.ModifyStart();
                         }
                      
                         break;
@@ -1093,20 +1093,20 @@ namespace RootTools
                     }
                 case DrawingMode.Modify:
                     {
-                        if (p_ModifyManager.m_MouseHitType == ModifyManager.HitType.Body)
+                        if (m_ModifyManager.m_MouseHitType == ModifyManager.HitType.Body)
                         {
                             int a = 1;
                         }
                         if (MouseEvent.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > m_nMouseMoveDelay)
                         {
-                            if (p_ModifyManager.m_MouseHitType == ModifyManager.HitType.None)
+                            if (m_ModifyManager.m_MouseHitType == ModifyManager.HitType.None)
                             {
                                 CPoint point = m_ptBuffer1;
                                 CanvasMovePoint_Ref(point, m_PtMouseBuffer.X - p_MouseX, m_PtMouseBuffer.Y - p_MouseY);
                             }
                             else
                             {
-                                p_ModifyManager.AdjustOrigin(new CPoint(p_MouseMemX, p_MouseMemY));
+                                m_ModifyManager.AdjustOrigin(new CPoint(p_MouseMemX, p_MouseMemY));
                                 //크기변환 혹은 위치변환.
 
                             }
@@ -1115,8 +1115,8 @@ namespace RootTools
                         else
                         {
                             CPoint MousePoint = new CPoint(p_MouseX, p_MouseY);
-                            p_ModifyManager.m_MouseHitType = p_ModifyManager.SetHitType(MousePoint);
-                            p_MouseCursor = p_ModifyManager.SetMouseCursor(p_ModifyManager.m_MouseHitType);
+                            m_ModifyManager.m_MouseHitType = m_ModifyManager.SetHitType(MousePoint);
+                            p_MouseCursor = m_ModifyManager.SetMouseCursor(m_ModifyManager.m_MouseHitType);
 
                         }
 
@@ -1187,10 +1187,10 @@ namespace RootTools
                     }
                 case DrawingMode.Modify:
                     { 
-                       if (p_ModifyManager.m_MouseHitType == ModifyManager.HitType.None)
+                       if (m_ModifyManager.m_MouseHitType == ModifyManager.HitType.None)
                         {
-                            p_ModifyManager.p_ModifyState = false;
-                            p_ModifyManager.DeleteModifyData();
+                            m_ModifyManager.p_ModifyState = false;
+                            m_ModifyManager.DeleteModifyData();
                             p_Mode = DrawingMode.None;
                         }
                         break;
