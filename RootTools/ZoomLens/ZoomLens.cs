@@ -51,6 +51,33 @@ namespace RootTools.ZoomLens
         private void M_rs232_OnRecieve(string sRead)
         {
             // 반환값이 있는 명령에 대한 처리
+            switch (eLastCommand)
+            {
+                case eCommand.SET_SPEED:
+                    {
+                        break;
+                    }
+                case eCommand.GET_SENSOR_STATUS:
+                    {
+                        break;
+                    }
+                case eCommand.GET_PARAMETER:
+                    {
+                        break;
+                    }
+                case eCommand.SET_PARAMETER:
+                    {
+                        break;
+                    }
+                case eCommand.GET_STATUS:
+                    {
+                        break;
+                    }
+                case eCommand.TOGGLE_RESPONSE:
+                    {
+                        break;
+                    }
+            }
         }
 
         public void ThreadStop()
@@ -65,6 +92,34 @@ namespace RootTools.ZoomLens
 
         #region Command
         // ZoomLens Manual Link = https://teams.microsoft.com/l/file/C90A7049-FA40-48B4-8FB3-D1746BA76443?tenantId=9dff1e71-4997-4d9b-84cc-ad9df6d78706&fileType=pdf&objectUrl=https%3A%2F%2Fati5344.sharepoint.com%2Fsites%2FSW1%2FShared%20Documents%2FGeneral%2F14.VEGA%2FQT-ADL1_S3%ED%86%B5%EC%8B%A0%EC%A0%9C%EC%96%B4%ED%8E%B8_%ED%95%9C%EA%B8%80.pdf&baseUrl=https%3A%2F%2Fati5344.sharepoint.com%2Fsites%2FSW1&serviceName=teams&threadId=19:6c82bda1676547f8bfbb3ce429ac3755@thread.skype&groupId=b795c55c-d063-4717-b935-4a39197b5bcb
+
+        eCommand eLastCommand = eCommand.NONE;
+        enum eCommand 
+        { 
+            NONE,
+            SET_ABSOLUTE_COORDINATE,
+            ABSOLUTE_GO, 
+            SET_SPEED, 
+            GET_SPEED, 
+            EMERGENCY_STOP, 
+            FLASH_BACKUP,
+            GO, 
+            HOME,
+            GET_SENSOR_STATUS, 
+            SET_JOG_DIRECTION,
+            JOG_MOVE,
+            STOP,
+            SET_STEP,
+            STEP_MOVE,
+            GET_PARAMETER,
+            SET_PARAMETER,
+            GET_STATUS,
+            CHANGE_COODINATE,
+            SET_WAIT,
+            TOGGLE_RESPONSE,
+            RESET,
+            RESTART
+        }
         public void SetAbsoluteCoordinate(int nAbsoluteCoordinate)
         {
             string strResult;
@@ -73,6 +128,7 @@ namespace RootTools.ZoomLens
             string strAbsoluteCoordinate = nAbsoluteCoordinate.ToString();
             strResult = strCommand + strAxisName + strAbsoluteCoordinate;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.SET_ABSOLUTE_COORDINATE;
         }
         public void AbsoluteGo(int nAbsoluteCoordinate)
         {
@@ -82,6 +138,7 @@ namespace RootTools.ZoomLens
             string strAbsoluteCoordinate = nAbsoluteCoordinate.ToString();
             strResult = strCommand + strAxisName + strAbsoluteCoordinate;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.ABSOLUTE_GO;
         }
         public void SetSpeed(int nLowSpeed, int nHighSpeed, int nAcceleration)
         {
@@ -92,6 +149,7 @@ namespace RootTools.ZoomLens
             strResult = strCommand + strAxisName + nLowSpeed.ToString() + strComma + nHighSpeed.ToString() + strComma + nAcceleration.ToString();
             string strRet = m_rs232.Send(strResult.Trim());
             if (strRet == "OK") FlashBackup();
+            eLastCommand = eCommand.SET_SPEED;
         }
 
         public void GetSpeed()
@@ -104,6 +162,7 @@ namespace RootTools.ZoomLens
             m_rs232.Send(strResult.Trim());
             // Received Data = <저속pps>,<고속pps>,<가감속시간ms> = 5byte 1byte 5byte 1byte 4byte = 16byte
             // Example : 01500,09000,0800
+            eLastCommand = eCommand.GET_SPEED;
         }
 
         public void EmergencyStop()
@@ -112,6 +171,7 @@ namespace RootTools.ZoomLens
             string strCommand = "E:";
             strResult = strCommand;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.EMERGENCY_STOP;
         }
 
         public void FlashBackup()
@@ -120,6 +180,7 @@ namespace RootTools.ZoomLens
             string strCommand = "F:";
             strResult = strCommand;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.FLASH_BACKUP;
         }
 
         public void Go()
@@ -129,6 +190,7 @@ namespace RootTools.ZoomLens
             string strAxisName = "A";
             strResult = strCommand + strAxisName;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.GO;
         }
 
         public void Home()
@@ -138,6 +200,7 @@ namespace RootTools.ZoomLens
             string strAxisName = "A";
             strResult = strCommand + strAxisName;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.HOME;
         }
 
         public void GetSensorStatus()
@@ -149,6 +212,7 @@ namespace RootTools.ZoomLens
             m_rs232.Send(strResult.Trim());
             // Received Data = <+리미트><-리미트><원점전><원점> = 1byte 1byte 1byte 1byte = 4byte
             // Example : 0110
+            eLastCommand = eCommand.GET_SENSOR_STATUS;
         }
 
         public void SetJogDirection(bool bDirection)
@@ -159,6 +223,7 @@ namespace RootTools.ZoomLens
             string strDirection = bDirection ? "+" : "-";
             strResult = strCommand + strAxisName + strDirection;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.SET_JOG_DIRECTION;
         }
 
         public void JogMove(bool bDirection)
@@ -169,6 +234,7 @@ namespace RootTools.ZoomLens
             string strDirection = bDirection ? "+" : "-";
             strResult = strCommand + strAxisName + strDirection;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.JOG_MOVE;
         }
 
         public void Stop()
@@ -178,6 +244,7 @@ namespace RootTools.ZoomLens
             string strAxisName = "A";
             strResult = strCommand + strAxisName;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.STOP;
         }
 
         public void SetStep(int nPulse)
@@ -188,6 +255,7 @@ namespace RootTools.ZoomLens
             string strpulse = nPulse.ToString();
             strResult = strCommand + strAxisName + strpulse;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.SET_STEP;
         }
 
         public void StepMove(int nPulse)
@@ -198,6 +266,7 @@ namespace RootTools.ZoomLens
             string strPulse = nPulse.ToString();
             strResult = strCommand + strAxisName + strPulse;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.STEP_MOVE;
         }
 
         public void GetParameter(int nParamNumber)
@@ -208,6 +277,7 @@ namespace RootTools.ZoomLens
             string strReceive = "R";
             strResult = strCommand + strParamNumber + strReceive;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.GET_PARAMETER;
         }
 
         public void SetParameter(int nParamNumber, int? nValue1 = null, int? nValue2 = null, int? nValue3 = null, int? nValue4 = null)
@@ -231,7 +301,8 @@ namespace RootTools.ZoomLens
             }
             m_rs232.Send(strResult.Trim());
             FlashBackup();
-            // RESTA Command 실행 해야됨
+            Restart();
+            eLastCommand = eCommand.SET_PARAMETER;
         }
 
         public enum eZoomLensStatus { COORD_AND_STATUS, COORD_ONLY, STATUS_ONLY}
@@ -243,6 +314,7 @@ namespace RootTools.ZoomLens
             string strRequestNumber = nRequestNmuber.ToString("0");
             strResult = strCommand + strAxisName + strRequestNumber;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.GET_STATUS;
         }
 
         public void ChangeCoordinate(int nCoordinate)
@@ -253,6 +325,7 @@ namespace RootTools.ZoomLens
             string strCoordinate = nCoordinate.ToString();
             strResult = strCommand + strAxisName + strCoordinate;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.CHANGE_COODINATE;
         }
 
         public void SetWait(int nMiliSec)
@@ -262,6 +335,7 @@ namespace RootTools.ZoomLens
             string strTime = (nMiliSec / 100).ToString();
             strResult = strCommand + strTime;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.SET_WAIT;
         }
 
         enum eResponseStatus { NONE, EXIST, REQUEST};
@@ -272,6 +346,7 @@ namespace RootTools.ZoomLens
             string strResponse = nResponse.ToString("0");
             strResult = strCommand + strResponse;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.TOGGLE_RESPONSE;
         }
 
         public void Reset()
@@ -280,6 +355,7 @@ namespace RootTools.ZoomLens
             string strCommand = "RESET:";
             strResult = strCommand;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.RESET;
         }
 
         public void Restart()
@@ -288,6 +364,7 @@ namespace RootTools.ZoomLens
             string strCommand = "RESTA:";
             strResult = strCommand;
             m_rs232.Send(strResult.Trim());
+            eLastCommand = eCommand.RESTART;
         }
         #endregion
 
