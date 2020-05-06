@@ -173,7 +173,7 @@ namespace Root_Vega.Module
 
         private void M_inspectTool_OnInspectDone(InspectTool.Data data)
         {
-            p_sInfo = data.p_sInfo; 
+            p_sInfo = data.p_sInfo;
         }
         #endregion
 
@@ -198,9 +198,9 @@ namespace Root_Vega.Module
             Grab,
         }
 
-        
+
         void InitPosAlign()
-        {  
+        {
             m_axisTheta.AddPos(Enum.GetNames(typeof(eAxisPosTheta)));
             m_axisTheta.AddPosDone();
             m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPosZ)));
@@ -305,7 +305,7 @@ namespace Root_Vega.Module
         {
             m_nTeachRobot = tree.Set(m_nTeachRobot, m_nTeachRobot, p_id, "Robot Teach Index");
         }
-        #endregion 
+        #endregion
 
         #region InfoReticle
         string m_sInfoReticle = "";
@@ -335,42 +335,47 @@ namespace Root_Vega.Module
         void InitInspect()
         {
             InitMemory();
-            InitThreadInspect(); 
+            InitThreadInspect();
         }
 
-        int m_lMaxGrab = 1000; 
+        int m_lMaxGrab = 3000;
         CPoint m_szAlignROI = new CPoint();
-        MemoryData m_memoryGrab;
-        MemoryData m_memoryHeight;
-        MemoryData m_memoryBright;
+        MemoryData m_memoryTop;
+        MemoryData m_memoryLeft;
+        MemoryData m_memoryRight;
+        MemoryData m_memoryBottom;
         public ushort[] m_aHeight;
-        double m_fScaleH = 0; 
+        double m_fScaleH = 0;
         void InitMemory()
         {
             m_szAlignROI = p_CamLADS.p_szROI;
-            m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
-            m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-            m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            //m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
+            //m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            //m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);            
+            m_memoryTop = m_memoryPool.GetGroup(p_id).CreateMemory("Top", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            m_memoryLeft = m_memoryPool.GetGroup(p_id).CreateMemory("Left", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            m_memoryRight = m_memoryPool.GetGroup(p_id).CreateMemory("Right", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            m_memoryBottom = m_memoryPool.GetGroup(p_id).CreateMemory("Bottom", 1, 1, m_szAlignROI.X, m_lMaxGrab);
             m_aHeight = new ushort[m_szAlignROI.X * m_lMaxGrab];
-            m_fScaleH = 65535.0 / m_szAlignROI.Y; 
+            m_fScaleH = 65535.0 / m_szAlignROI.Y;
         }
 
-        bool m_bThreadInspect3D = false; 
-        Thread m_threadInspect3D; 
+        bool m_bThreadInspect3D = false;
+        Thread m_threadInspect3D;
         void InitThreadInspect()
         {
             m_threadInspect3D = new Thread(new ThreadStart(RunThreadInspect3D));
             m_threadInspect3D.Start();
         }
 
-        Queue<int> m_qInspect = new Queue<int>(); 
+        Queue<int> m_qInspect = new Queue<int>();
         void RunThreadInspect3D()
         {
             m_bThreadInspect3D = true;
-            Thread.Sleep(3000); 
+            Thread.Sleep(3000);
             while (m_bThreadInspect3D)
             {
-                Thread.Sleep(10); 
+                Thread.Sleep(10);
                 while (m_qInspect.Count > 0)
                 {
                     try { RunThreadInspect(m_qInspect.Dequeue()); }
@@ -381,30 +386,32 @@ namespace Root_Vega.Module
 
         unsafe void RunThreadInspect(int iInspect)
         {
-            byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
-            byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
-            byte* pBright = (byte*)m_memoryBright.GetPtr(0, 0, iInspect).ToPointer();
-            for (int x = 0; x < m_szAlignROI.X; x++, pSrc++, pHeight++, pBright++)
-            {
-                byte* pSrcY = pSrc;
-                int nSum = 0;
-                int nYSum = 0;
-                for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
-                {
-                    nSum += *pSrcY;
-                    nYSum = *pSrcY * y;
-                }
-                int nAdd = x + iInspect * m_szAlignROI.X;
-                m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
-                *pHeight = (byte)(m_aHeight[nAdd] >> 8);
-                int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
-                *pBright = pSrc[x + yAve * m_szAlignROI.X];
-            }
+            System.Windows.MessageBox.Show(" unsafe void RunThreadInspect(int iInspect) 주석처리되어있는 부분 확인바람.", "처리되지않음.", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+
+            //byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
+            //byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
+            //byte* pBright = (byte*)m_memoryBright.GetPtr(0, 0, iInspect).ToPointer();
+            //for (int x = 0; x < m_szAlignROI.X; x++, pSrc++, pHeight++, pBright++)
+            //{
+            //    byte* pSrcY = pSrc;
+            //    int nSum = 0;
+            //    int nYSum = 0;
+            //    for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
+            //    {
+            //        nSum += *pSrcY;
+            //        nYSum = *pSrcY * y;
+            //    }
+            //    int nAdd = x + iInspect * m_szAlignROI.X;
+            //    m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
+            //    *pHeight = (byte)(m_aHeight[nAdd] >> 8);
+            //    int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
+            //    *pBright = pSrc[x + yAve * m_szAlignROI.X];
+            //}
         }
 
         void StartInspect(int iInspect)
         {
-            m_qInspect.Enqueue(iInspect); 
+            m_qInspect.Enqueue(iInspect);
         }
 
 
@@ -450,7 +457,7 @@ namespace Root_Vega.Module
         {
             RunTreeDIODelay(tree.GetTree("DIO Delay", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
-            RunTreeInspect(tree.GetTree("Inspect", false)); 
+            RunTreeInspect(tree.GetTree("Inspect", false));
         }
         #endregion
 
@@ -465,9 +472,9 @@ namespace Root_Vega.Module
         {
             if (m_bThreadInspect3D)
             {
-                m_qInspect.Clear(); 
+                m_qInspect.Clear();
                 m_bThreadInspect3D = false;
-                m_threadInspect3D.Join(); 
+                m_threadInspect3D.Join();
             }
             base.ThreadStop();
         }
@@ -476,7 +483,7 @@ namespace Root_Vega.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
-//            AddModuleRunList(new Run_Inspect(this), true, "3D Inspect");
+            //            AddModuleRunList(new Run_Inspect(this), true, "3D Inspect");
             AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
             AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
         }
@@ -505,7 +512,7 @@ namespace Root_Vega.Module
             public override string Run()
             {
                 Thread.Sleep((int)(1000 * m_secDelay));
-                m_module.m_gem.STSSetProcessing(m_module.p_infoReticle, RootTools.Gem.GemSlotBase.eSTSProcess.Processed); 
+                m_module.m_gem.STSSetProcessing(m_module.p_infoReticle, RootTools.Gem.GemSlotBase.eSTSProcess.Processed);
                 return "OK";
             }
         }
@@ -571,12 +578,12 @@ namespace Root_Vega.Module
             public double m_fRes = 1;       //단위 um
             public int m_nFocusPos = 0;
             public CPoint m_cpMemory = new CPoint();
-            public int  m_nScanGap = 1000;
+            public int m_nScanGap = 1000;
             public int m_yLine = 1000;  // Y축 Reticle Size
             public int m_xLine = 1000;  // X축 Reticle Size
             public int m_nMaxFrame = 100;  // Camera max Frame 스펙
             public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
-          
+
             public eScanPos m_eScanPos = eScanPos.Bottom;
             public override ModuleRunBase Clone()
             {
@@ -605,7 +612,7 @@ namespace Root_Vega.Module
                 m_xLine = tree.Set(m_xLine, m_xLine, "Reticle XSize", "# of Grab Lines", bVisible);
                 m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
-                m_nScanRate = (tree.GetTree("Scan Velocity",false)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+                m_nScanRate = (tree.GetTree("Scan Velocity", false)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
                 if (m_grabMode != null)
                     m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
