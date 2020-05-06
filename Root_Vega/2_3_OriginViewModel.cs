@@ -24,8 +24,8 @@ namespace Root_Vega
         string sPool = "pool";
         string sGroup = "group";
         string sMem = "mem";
-        public int MemWidth = 10000;
-        public int MemHeight = 10000;
+        public int MemWidth = 12400;
+        public int MemHeight = 12400;
 
         public _2_3_OriginViewModel(Vega_Engineer engineer, IDialogService dialogService)
         {

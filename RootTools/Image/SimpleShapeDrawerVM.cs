@@ -602,11 +602,10 @@ namespace RootTools
                 SetTopLeft(tempShape, TopLeft);
                 BottomRight = GetCanvasPoint((Point)(m_ListRect[i].Size));
                 SetBottomRight(tempShape, BottomRight);
-
             }
         }
 
-        void SetTopLeft(Shape _shape, Point _point)
+        protected void SetTopLeft(Shape _shape, Point _point)
         {
             if (_shape.GetType() == typeof(Line))
             {
@@ -619,7 +618,7 @@ namespace RootTools
                 Canvas.SetTop(_shape, _point.Y);
             }
         }
-        void SetBottomRight(Shape _shape, Point _point)
+        protected void SetBottomRight(Shape _shape, Point _point)
         {
             if (_shape.GetType() == typeof(Line))
             {
@@ -799,14 +798,62 @@ namespace RootTools
         public new void ProcessEnd<T>(T element) where T : Shape
         {
             element.StrokeDashArray = new DoubleCollection(1);
-            if (element.GetType() == typeof(Line))
-                element.StrokeDashArray = new DoubleCollection { 0.5, 1 };
-            //element.StrokeDashArray = new DoubleCollection { 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 1.5, 1 };
-
             m_ListShape.Add(element);
             m_ListRect.Add(m_TempRect);
             p_ImageViewer.m_HistoryWorker.AddHistory(this, Work.Create, element, m_TempRect);
         }
+
+        public override void Redrawing()
+        {
+            Shape tempShape;
+            Point TopLeft = new Point();
+            Point BottomRight = new Point();
+
+
+
+            for (int i = 0; i < m_ListShape.Count; i++)
+            {
+                tempShape = m_ListShape[i];
+
+                TopLeft = GetCanvasPoint(m_ListRect[i].Location);
+                SetTopLeft(tempShape, TopLeft);
+                BottomRight = GetCanvasPoint((Point)(m_ListRect[i].Size));
+                SetBottomRight(tempShape, BottomRight);
+
+                
+            if (tempShape.GetType() == typeof(Line))
+            {
+                int TempLength = 10;
+                Point GraduationStart;
+                Point GraduationEnd;
+
+                Point Perpendicular = new Point(BottomRight.Y - TopLeft.Y, BottomRight.X - TopLeft.X);
+                Point Ratio = new Point(TempLength * Perpendicular.X / Math.Sqrt(Math.Pow(Perpendicular.X, 2) + Math.Pow(Perpendicular.Y, 2)), TempLength * Perpendicular.Y / Math.Sqrt(Math.Pow(Perpendicular.X, 2) + Math.Pow(Perpendicular.Y, 2)));
+
+                for(int Temp_i=0; Temp_i<10; Temp_i++)
+                {
+                GraduationStart= new Point (TopLeft.X+i*TempLength, TopLeft.Y+i*TempLength);
+                    GraduationEnd = new Point (GraduationStart.X + Ratio.X , GraduationStart.Y + Ratio.Y );
+                
+                    Line Graduation = new Line();
+                    Graduation.X1 = TopLeft.X+i*TempLength;
+                    Graduation.Y1 = TopLeft.Y+i*TempLength;
+                    Graduation.X2 = GraduationStart.X + Ratio.X;
+                    Graduation.Y2 = GraduationStart.Y + Ratio.Y;
+
+                    p_ImageViewer.p_Element.Add(Graduation);
+                }
+
+
+
+                
+
+            }
+
+
+            }
+        }
+
 
         public new void ProcessDoingShape<T>(T element) where T : Shape
         {
@@ -819,6 +866,8 @@ namespace RootTools
                 msg = "Width :" + (m_TempRect.BottomRight.X - m_TempRect.TopLeft.X).ToString() + " Height :" + (m_TempRect.BottomRight.Y - m_TempRect.TopLeft.Y).ToString();
 
             DrawnTb.Text = msg;
+            DrawnTb.Foreground = Brushes.White;
+            DrawnTb.FontSize = 12;
         }
 
     }

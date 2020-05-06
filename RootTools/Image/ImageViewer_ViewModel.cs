@@ -952,7 +952,7 @@ namespace RootTools
 
                if ( KeyEvent.KeyboardDevice.Modifiers == ModifierKeys.Control)
                 {
-                    if (!m_BasicTool.p_State && !SelectedTool.p_State)
+                    if (!m_BasicTool.p_State && (SelectedTool!=null && !SelectedTool.p_State))
                     {
                         ModifyManager _ModifyManager = null;
                         if (p_Mode == DrawingMode.Modify)

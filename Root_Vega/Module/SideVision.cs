@@ -338,19 +338,24 @@ namespace Root_Vega.Module
             InitThreadInspect(); 
         }
 
-        int m_lMaxGrab = 1000; 
+        int m_lMaxGrab = 3000; 
         CPoint m_szAlignROI = new CPoint();
-        MemoryData m_memoryGrab;
-        MemoryData m_memoryHeight;
-        MemoryData m_memoryBright;
+        MemoryData m_memoryTop;
+        MemoryData m_memoryLeft;
+        MemoryData m_memoryRight;
+        MemoryData m_memoryBottom;
         public ushort[] m_aHeight;
         double m_fScaleH = 0; 
         void InitMemory()
         {
             m_szAlignROI = p_CamLADS.p_szROI;
-            m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
-            m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-            m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            //m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
+            //m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            //m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);            
+            m_memoryTop = m_memoryPool.GetGroup(p_id).CreateMemory("Top", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            m_memoryLeft = m_memoryPool.GetGroup(p_id).CreateMemory("Left", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            m_memoryRight = m_memoryPool.GetGroup(p_id).CreateMemory("Right", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            m_memoryBottom = m_memoryPool.GetGroup(p_id).CreateMemory("Bottom", 1, 1, m_szAlignROI.X, m_lMaxGrab);
             m_aHeight = new ushort[m_szAlignROI.X * m_lMaxGrab];
             m_fScaleH = 65535.0 / m_szAlignROI.Y; 
         }
@@ -381,25 +386,27 @@ namespace Root_Vega.Module
 
         unsafe void RunThreadInspect(int iInspect)
         {
-            byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
-            byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
-            byte* pBright = (byte*)m_memoryBright.GetPtr(0, 0, iInspect).ToPointer();
-            for (int x = 0; x < m_szAlignROI.X; x++, pSrc++, pHeight++, pBright++)
-            {
-                byte* pSrcY = pSrc;
-                int nSum = 0;
-                int nYSum = 0;
-                for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
-                {
-                    nSum += *pSrcY;
-                    nYSum = *pSrcY * y;
-                }
-                int nAdd = x + iInspect * m_szAlignROI.X;
-                m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
-                *pHeight = (byte)(m_aHeight[nAdd] >> 8);
-                int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
-                *pBright = pSrc[x + yAve * m_szAlignROI.X];
-            }
+            System.Windows.MessageBox.Show(" unsafe void RunThreadInspect(int iInspect) 주석처리되어있는 부분 확인바람.", "처리되지않음.", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+
+            //byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
+            //byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
+            //byte* pBright = (byte*)m_memoryBright.GetPtr(0, 0, iInspect).ToPointer();
+            //for (int x = 0; x < m_szAlignROI.X; x++, pSrc++, pHeight++, pBright++)
+            //{
+            //    byte* pSrcY = pSrc;
+            //    int nSum = 0;
+            //    int nYSum = 0;
+            //    for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
+            //    {
+            //        nSum += *pSrcY;
+            //        nYSum = *pSrcY * y;
+            //    }
+            //    int nAdd = x + iInspect * m_szAlignROI.X;
+            //    m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
+            //    *pHeight = (byte)(m_aHeight[nAdd] >> 8);
+            //    int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
+            //    *pBright = pSrc[x + yAve * m_szAlignROI.X];
+            //}
         }
 
         void StartInspect(int iInspect)
@@ -471,7 +478,7 @@ namespace Root_Vega.Module
             }
             base.ThreadStop();
         }
-
+         
         #region ModuleRun
         protected override void InitModuleRuns()
         {

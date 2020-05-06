@@ -21,7 +21,7 @@ namespace Root_Vega
 		protected Dispatcher _dispatcher;
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
-		ImageData m_Image;
+		List<ImageData> m_Image = new List<ImageData>();
 		DrawData m_DD;
 		Recipe m_Recipe;
 
@@ -44,9 +44,9 @@ namespace Root_Vega
 				SetProperty(ref m_Recipe, value);
 			}
 		}
-		string sPool = "pool";
-		string sGroup = "group";
-		string sMem = "mem";
+		string sPool = "SideVision.Memory";
+        string sGroup = "SideVision";
+		List<string> sMem = new List<String>{"Top", "Left", "Right", "Bottom"};
 
 		int tempImageWidth = 640;
 		int tempImageHeight = 480;
@@ -136,23 +136,29 @@ namespace Root_Vega
 			//m_MemoryModule.GetPool(sPool).CreateGroup(sGroup);
 
 			//m_MemoryModule.GetPool(sPool).p_gbPool = 2;
-			m_Image = new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem));
-
-
-            m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
-            m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
 
 
 
-            for (int i = 0; i < 4; i++)
-            { 
-                p_ImageViewer_List.Add(new ImageViewer_ViewModel(m_Image, dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
-                p_SimpleShapeDrawer_List.Add(new SimpleShapeDrawerVM(p_ImageViewer_List[i]));
-                p_SimpleShapeDrawer_List[i].RectangleKeyValue = Key.D1;
-                p_ImageViewer_List[i].SetDrawer((DrawToolVM)p_SimpleShapeDrawer_List[i]);
-                p_ImageViewer_List[i].m_HistoryWorker = m_DrawHistoryWorker_List[0];
 
+            for (int _Index = 0; _Index < 2; _Index++)
+            {
+                m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
+                p_SimpleShapeDrawer_List.Add(new List<SimpleShapeDrawerVM>());
+                for (int i = 0; i < 4; i++)
+                {
+                    m_Image.Add(new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem[i])));
+                    p_ImageViewer_List.Add(new ImageViewer_ViewModel(m_Image[i], dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
+                    p_SimpleShapeDrawer_List[_Index].Add(new SimpleShapeDrawerVM(p_ImageViewer_List[i]));
+                    p_SimpleShapeDrawer_List[_Index][i].RectangleKeyValue = Key.D1;
+
+                }
             }
+            for (int i = 0; i < 4; i++)
+            {
+                p_ImageViewer_List[i].SetDrawer((DrawToolVM)p_SimpleShapeDrawer_List[0][i]);
+                p_ImageViewer_List[i].m_HistoryWorker = m_DrawHistoryWorker_List[0];
+            }
+
             p_ImageViewer_Top = p_ImageViewer_List[0];
             p_ImageViewer_Left = p_ImageViewer_List[1];
             p_ImageViewer_Right = p_ImageViewer_List[2];
@@ -248,8 +254,8 @@ namespace Root_Vega
 			}
 		}
 
-        private List<SimpleShapeDrawerVM> m_SimpleShapeDrawer_List = new List<SimpleShapeDrawerVM>();
-        public List<SimpleShapeDrawerVM> p_SimpleShapeDrawer_List
+        private List<List<SimpleShapeDrawerVM>> m_SimpleShapeDrawer_List = new List<List<SimpleShapeDrawerVM>>();
+        public List<List<SimpleShapeDrawerVM>> p_SimpleShapeDrawer_List
         {
             get
             {
@@ -277,7 +283,7 @@ namespace Root_Vega
 				p_SurFace_ParamData = p_Recipe.p_RecipeData.p_Roi[_IndexMask].m_Surface.p_Parameter[0];
                 for (int i = 0; i < 4;i++ )
                 {
-                    p_ImageViewer_List[i].SetDrawer((DrawToolVM)p_SimpleShapeDrawer_List[_IndexMask]);
+                    p_ImageViewer_List[i].SetDrawer((DrawToolVM)p_SimpleShapeDrawer_List[_IndexMask][i]);
                     p_ImageViewer_List[i].m_HistoryWorker = m_DrawHistoryWorker_List[_IndexMask];
                     p_ImageViewer_List[i].SetImageSource();
                     p_SurFace_ParamData = p_Recipe.p_RecipeData.p_Roi[_IndexMask].m_Surface.p_Parameter[0];
