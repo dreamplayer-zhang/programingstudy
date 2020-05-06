@@ -4,6 +4,7 @@ using RootTools.SQLogs;
 using RootTools.Trees;
 using System;
 using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace RootTools.GAFs
 {
@@ -52,8 +53,11 @@ namespace RootTools.GAFs
                 if (m_gem != null) m_gem.SetAlarm(this, _bSet);
                 p_dateTime = DateTime.Now;
                 OnPropertyChanged();
-                m_listALID.SetALID(this);
-                m_sqALID.Insert(); 
+                if (value)
+                {
+                    m_listALID.SetALID(this);
+                    m_sqALID.Insert();
+                }
             }
         }
 
@@ -68,10 +72,29 @@ namespace RootTools.GAFs
             }
         }
 
-        public string p_sImageFile { get; set; }
+        string _sImageFile = "";
+        public string p_sImageFile 
+        { 
+            get { return _sImageFile; }
+            set
+            {
+                if (_sImageFile == value) return;
+                _sImageFile = value;
+                p_image = new BitmapImage(new Uri(value)); 
+            }
+        }
         #endregion
 
-        public ImageData m_image = null;
+        BitmapImage _image = null;
+        public BitmapImage p_image 
+        { 
+            get { return _image; }
+            set
+            {
+                _image = value;
+                OnPropertyChanged(); 
+            }
+        }
 
         ModuleBase m_module;
         ALIDList m_listALID;

@@ -66,6 +66,14 @@ namespace RootTools.GAFs
                 OnPropertyChanged(); 
             }
         }
+
+        public void ShowPopup()
+        {
+            if (ALIDList_PopupUI.m_bShow) return; 
+            ALIDList_PopupUI alidPopup = new ALIDList_PopupUI();
+            alidPopup.Init(this);
+            alidPopup.Show();
+        }
         #endregion 
 
         #region List Set ALID
@@ -90,16 +98,11 @@ namespace RootTools.GAFs
             {
                 if (p_aSetALID[n].p_bSet == false) p_aSetALID.RemoveAt(n); 
             }
-            if (m_qSetALID.Count > 0)
+            while (m_qSetALID.Count > 0)
             {
-                if (ALIDList_PopupUI.m_bShow == false)
-                {
-                    ALIDList_PopupUI alidPopup = new ALIDList_PopupUI();
-                    alidPopup.Init(this);
-                    alidPopup.Show();
-                }
+                ShowPopup(); 
+                p_aSetALID.Add(m_qSetALID.Dequeue());
             }
-            while (m_qSetALID.Count > 0) p_aSetALID.Add(m_qSetALID.Dequeue());
             p_brushAlarm = (p_aSetALID.Count > 0) ? Brushes.Red : Brushes.White;
         }
         #endregion

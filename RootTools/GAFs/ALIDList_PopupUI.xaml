@@ -13,29 +13,46 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" Orientation="Vertical">
-            <Button x:Name="buttonClearALID" Content="Clear All ALID" Margin="2" Click="buttonClearALID_Click"/>
-            <ListView x:Name="listViewALID" Margin="2">
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" x:Name="buttonClearALID" Content="Clear All ALID" Margin="2" Click="buttonClearALID_Click"/>
+            <ListView Grid.Row="1" x:Name="listViewALID" Margin="2">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Module">
+                        <GridViewColumn Header="Time">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding p_sModule}"/>
+                                    <TextBlock Text="{Binding p_dateTime}" PreviewMouseUp="TextBlock_PreviewMouseUp"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Description">
+                        <GridViewColumn Header="ALID">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding p_sDesc}"/>
+                                    <TextBlock Text="{Binding p_nID}" PreviewMouseUp="TextBlock_PreviewMouseUp"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                     </GridView>
                 </ListView.View>
             </ListView>
-        </StackPanel>
+        </Grid>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Background="AliceBlue">
+                <Label x:Name="lableALID" Content="{Binding p_nID}" ToolTip="ALID"/>
+                <Label x:Name="lableModule" Content="{Binding p_sModule}" ToolTip="Module"/>
+                <Label x:Name="lableDesc" Content="{Binding p_sDesc}" ToolTip="Description"/>
+                <Label x:Name="lableMsg" Content="{Binding p_sMsg}" ToolTip="Message"/>
+            </StackPanel>
+            <Image Grid.Row="1" x:Name="imageALID" Stretch="Uniform"  Source="{Binding p_image}"/>
+        </Grid>
     </Grid>
 </Window>

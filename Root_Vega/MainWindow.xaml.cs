@@ -237,12 +237,7 @@ namespace Root_Vega
 
         private void textLastError_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (ALIDList_PopupUI.m_bShow == false)
-            {
-                ALIDList_PopupUI alidPopup = new ALIDList_PopupUI();
-                alidPopup.Init(m_engineer.m_gaf.m_listALID);
-                alidPopup.Show();
-            }
+            m_engineer.m_gaf.m_listALID.ShowPopup(); 
         }
     }
 }
