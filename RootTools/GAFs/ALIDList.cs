@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace RootTools.GAFs
 {
-    public class ALIDList
+    public class ALIDList : NotifyProperty
     {
         #region List ALID
         ObservableCollection<ALID> _aALID = new ObservableCollection<ALID>();
@@ -41,6 +42,32 @@ namespace RootTools.GAFs
         }
         #endregion
 
+        #region UI Binding
+        string _sInfo = "Last Error";
+        public string p_sInfo
+        {
+            get { return _sInfo; }
+            set
+            {
+                if (_sInfo == value) return;
+                _sInfo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        Brush _brushAlarm = Brushes.White; 
+        public Brush p_brushAlarm
+        { 
+            get { return _brushAlarm; }
+            set
+            {
+                if (_brushAlarm == value) return;
+                _brushAlarm = value;
+                OnPropertyChanged(); 
+            }
+        }
+        #endregion 
+
         #region List Set ALID
         ObservableCollection<ALID> _aSetALID = new ObservableCollection<ALID>();
         public ObservableCollection<ALID> p_aSetALID
@@ -53,15 +80,27 @@ namespace RootTools.GAFs
         public void SetALID(ALID alid)
         {
             m_qSetALID.Enqueue(alid);
+            p_sInfo = alid.p_sModule + " : " + alid.p_sDesc + ", " + alid.p_sMsg;
+            p_brushAlarm = Brushes.Red;
         }
 
         private void M_timerSetALID_Tick(object sender, EventArgs e)
         {
-            for (int n = p_aSetALID.Count - 1; n >= 0; n++)
+            for (int n = p_aSetALID.Count - 1; n >= 0; n--)
             {
                 if (p_aSetALID[n].p_bSet == false) p_aSetALID.RemoveAt(n); 
             }
+            if (m_qSetALID.Count > 0)
+            {
+                if (ALIDList_PopupUI.m_bShow == false)
+                {
+                    ALIDList_PopupUI alidPopup = new ALIDList_PopupUI();
+                    alidPopup.Init(this);
+                    alidPopup.Show();
+                }
+            }
             while (m_qSetALID.Count > 0) p_aSetALID.Add(m_qSetALID.Dequeue());
+            p_brushAlarm = (p_aSetALID.Count > 0) ? Brushes.Red : Brushes.White;
         }
         #endregion
 

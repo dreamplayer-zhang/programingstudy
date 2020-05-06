@@ -1,8 +1,10 @@
 ﻿using RootTools;
+using RootTools.GAFs;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Root_Vega
 {
@@ -47,7 +49,7 @@ namespace Root_Vega
             //((GAF_Manager)m_engineer.ClassGAFManager()).UpdateTree();
             textState.DataContext = EQ.m_EQ;
             textGemState.DataContext = m_engineer.ClassGem();
-            textLastError.DataContext = EQ.m_EQ;
+            textLastError.DataContext = m_engineer.m_gaf.m_listALID;
 
             _Main.Init(m_engineer); 
         }
@@ -172,14 +174,14 @@ namespace Root_Vega
             dialogService.Register<Dialog_SideScan_ViewModel, Dialog_SideScan>();
         }
 
-        private void Border_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _7_AlarmViewModel avm = new _7_AlarmViewModel();
             _Alarm.DataContext = avm;
         }
 
 
-        private void MainTab_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        private void MainTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             TabItem ti = (TabItem) MainTab.SelectedItem;
             tb_CurrenView.Text = ti.Header.ToString();
@@ -210,7 +212,7 @@ namespace Root_Vega
             this.Close();
         }
 
-        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if(e.ClickCount == 2)
             {
@@ -230,6 +232,16 @@ namespace Root_Vega
             else
             {
                 this.DragMove();
+            }
+        }
+
+        private void textLastError_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (ALIDList_PopupUI.m_bShow == false)
+            {
+                ALIDList_PopupUI alidPopup = new ALIDList_PopupUI();
+                alidPopup.Init(m_engineer.m_gaf.m_listALID);
+                alidPopup.Show();
             }
         }
     }

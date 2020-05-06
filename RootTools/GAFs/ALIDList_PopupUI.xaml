@@ -1,0 +1,41 @@
+﻿<Window x:Class="RootTools.GAFs.ALIDList_PopupUI"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RootTools.GAFs"
+        mc:Ignorable="d"
+        Title="Alarm" Height="450" Width="800" WindowStyle="ToolWindow" Visibility="Visible" 
+        WindowStartupLocation="CenterScreen" Topmost="True" Closing="Window_Closing">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" Orientation="Vertical">
+            <Button x:Name="buttonClearALID" Content="Clear All ALID" Margin="2" Click="buttonClearALID_Click"/>
+            <ListView x:Name="listViewALID" Margin="2">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Module">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding p_sModule}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Description">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding p_sDesc}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </StackPanel>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+    </Grid>
+</Window>
