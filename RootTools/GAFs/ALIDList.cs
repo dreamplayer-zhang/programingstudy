@@ -53,12 +53,14 @@ namespace RootTools.GAFs
         public void SetALID(ALID alid)
         {
             m_qSetALID.Enqueue(alid);
-            m_timerSetALID.Start();
         }
 
         private void M_timerSetALID_Tick(object sender, EventArgs e)
         {
-            m_timerSetALID.Stop();
+            for (int n = p_aSetALID.Count - 1; n >= 0; n++)
+            {
+                if (p_aSetALID[n].p_bSet == false) p_aSetALID.RemoveAt(n); 
+            }
             while (m_qSetALID.Count > 0) p_aSetALID.Add(m_qSetALID.Dequeue());
         }
         #endregion
@@ -103,10 +105,12 @@ namespace RootTools.GAFs
             ClearALID();
             m_timerSetALID.Interval = TimeSpan.FromMilliseconds(1);
             m_timerSetALID.Tick += M_timerSetALID_Tick;
+            m_timerSetALID.Start();
         }
 
         public void ThreadStop()
         {
+            m_timerSetALID.Stop();
         }
 
     }

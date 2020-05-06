@@ -207,6 +207,9 @@
     <Compile Include="GAFs\ALIDList_UI.xaml.cs">
       <DependentUpon>ALIDList_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GAFs\ALIDPopup_UI.xaml.cs">
+      <DependentUpon>ALIDPopup_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GAFs\CEID.cs" />
     <Compile Include="GAFs\CEIDList.cs" />
     <Compile Include="GAFs\CEIDList_UI.xaml.cs">
@@ -553,6 +556,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GAFs\ALIDList_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GAFs\ALIDPopup_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

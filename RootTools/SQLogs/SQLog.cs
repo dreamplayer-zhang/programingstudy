@@ -94,10 +94,19 @@ namespace RootTools.SQLogs
 
         string CreateTable(SQTableBase table)
         {
+            if (IsTableExist(table) == false)
+            {
+                SQLiteCommand cmdCreate = new SQLiteCommand(table.p_sCreateTable, m_sqConnection);
+                if (cmdCreate.ExecuteNonQuery() <= 0) return "Create Table Fail : " + table.p_sCreateTable;
+            }
+            SQLiteCommand cmdDelete = new SQLiteCommand("Delete FROM " + table.m_sTable + " where Time < datetime('now', '-100 days')", m_sqConnection);
+            return (cmdDelete.ExecuteNonQuery() > 0) ? "OK" : "Delete Old Data Fail"; 
+        }
+
+        bool IsTableExist(SQTableBase table)
+        {
             SQLiteCommand cmdCheck = new SQLiteCommand(table.p_sCheckTable, m_sqConnection);
-            if (Convert.ToInt32(cmdCheck.ExecuteScalar()) == 1) return "OK";
-            SQLiteCommand cmd = new SQLiteCommand(table.p_sCreateTable, m_sqConnection);
-            return (cmd.ExecuteNonQuery() >= 0) ? "OK" : "Create Table Fail : " + table.p_sCreateTable;
+            return (Convert.ToInt32(cmdCheck.ExecuteScalar()) == 1);
         }
         #endregion
 
