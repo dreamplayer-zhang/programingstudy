@@ -578,7 +578,7 @@ namespace RootTools
             element.MouseDown += new MouseButtonEventHandler(MyElementMouseDownEvent);
             m_ListShape.Add(element);
             m_ListRect.Add(m_TempRect);
-            p_ImageViewer.p_HistoryWorker.AddHistory(this, Work.Create, element, m_TempRect);
+            p_ImageViewer.m_HistoryWorker.AddHistory(this, Work.Create, element, m_TempRect);
 
             // m_TempCRect
         }
@@ -676,7 +676,7 @@ namespace RootTools
 
 
                 //ModifyTarget = 
-                p_ImageViewer.p_ModifyManager.SetModifyData(this, (Shape)sender);
+                p_ImageViewer.m_ModifyManager.SetModifyData(this, (Shape)sender);
 
                 p_ImageViewer.p_Mode = ImageViewer_ViewModel.DrawingMode.Modify;
 
@@ -733,7 +733,7 @@ namespace RootTools
                     {
                         if (m_ListShape[i].GetType() == typeof(Rectangle))
                         {
-                            p_ImageViewer.p_HistoryWorker.AddHistory(this, Work.Delete, m_ListShape[i], m_ListRect[i], _Continue: true);
+                            p_ImageViewer.m_HistoryWorker.AddHistory(this, Work.Delete, m_ListShape[i], m_ListRect[i], _Continue: true);
                             m_ListShape.RemoveAt(i);
                             m_ListRect.RemoveAt(i);
 
@@ -746,7 +746,7 @@ namespace RootTools
                     {
                         if (m_ListShape[i].GetType() == typeof(Ellipse))
                         {
-                            p_ImageViewer.p_HistoryWorker.AddHistory(this, Work.Delete, m_ListShape[i], m_ListRect[i], _Continue: true);
+                            p_ImageViewer.m_HistoryWorker.AddHistory(this, Work.Delete, m_ListShape[i], m_ListRect[i], _Continue: true);
                             m_ListShape.RemoveAt(i);
                             m_ListRect.RemoveAt(i);
                             break;
@@ -758,7 +758,7 @@ namespace RootTools
                     {
                         if (m_ListShape[i].GetType() == typeof(Line))
                         {
-                            p_ImageViewer.p_HistoryWorker.AddHistory(this, Work.Delete, m_ListShape[i], m_ListRect[i], _Continue: true);
+                            p_ImageViewer.m_HistoryWorker.AddHistory(this, Work.Delete, m_ListShape[i], m_ListRect[i], _Continue: true);
                             m_ListShape.RemoveAt(i);
                             m_ListRect.RemoveAt(i);
                             break;
@@ -800,7 +800,7 @@ namespace RootTools
 
             m_ListShape.Add(element);
             m_ListRect.Add(m_TempRect);
-            p_ImageViewer.p_HistoryWorker.AddHistory(this, Work.Create, element, m_TempRect);
+            p_ImageViewer.m_HistoryWorker.AddHistory(this, Work.Create, element, m_TempRect);
         }
 
         public new void ProcessDoingShape<T>(T element) where T : Shape

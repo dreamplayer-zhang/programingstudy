@@ -163,6 +163,10 @@
       <DependentUpon>2_5_Surface.xaml</DependentUpon>
     </Compile>
     <Compile Include="2_5_SurfaceViewModel.cs" />
+    <Compile Include="2_6_Side.xaml.cs">
+      <DependentUpon>2_6_Side.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="2_6_SideViewModel.cs" />
     <Compile Include="2_Recipe.xaml.cs">
       <DependentUpon>2_Recipe.xaml</DependentUpon>
     </Compile>
@@ -308,6 +312,10 @@
     <Page Include="2_5_Surface.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="2_6_Side.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="2_Recipe.xaml">
       <SubType>Designer</SubType>

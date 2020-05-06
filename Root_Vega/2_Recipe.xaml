@@ -172,6 +172,13 @@
                     <local:_2_5_Surface x:Name="_Surface"/>
                 </Border>
             </TabItem>
+            <TabItem Header="Side"
+                     Style="{StaticResource RcptabItem}">
+                <Border BorderBrush="Gray"
+                        BorderThickness="3">
+                    <local:_2_6_Side x:Name="_Side"/>
+                </Border>
+            </TabItem>
             <TabItem Header="Manager"
                      Style="{StaticResource RcptabItem}">
                 <Border BorderBrush="Gray"

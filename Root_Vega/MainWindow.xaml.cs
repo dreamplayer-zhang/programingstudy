@@ -61,8 +61,11 @@ namespace Root_Vega
             _Recipe._Origin.DataContext = ovm;
             //_recipe._recipeOrigin.DataContext = rovm;
 
-            _2_5_SurfaceViewModel svm = new _2_5_SurfaceViewModel(m_engineer, dialogService);
-            _Recipe._Surface.DataContext = svm;
+            _2_5_SurfaceViewModel suvm = new _2_5_SurfaceViewModel(m_engineer, dialogService);
+            _Recipe._Surface.DataContext = suvm;
+
+            _2_6_SideViewModel sivm = new _2_6_SideViewModel(m_engineer, dialogService);
+            _Recipe._Side.DataContext = sivm;
 
             _2_8_InspectionViewModel ivm = new _2_8_InspectionViewModel(m_engineer);
             _Recipe._InspectionManager.DataContext = ivm;
