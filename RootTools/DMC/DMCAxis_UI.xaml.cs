@@ -22,7 +22,7 @@ namespace RootTools.DMC
 
         private void btnJogM_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (m_dmcAxis.m_bJog) m_dmcAxis.Jog_Minus_Stop(); 
+            //if (m_dmcAxis.m_bJog) m_dmcAxis.Jog_Minus_Stop(); 
         }
 
         private void btnJogM_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -32,12 +32,12 @@ namespace RootTools.DMC
 
         private void btnJogP_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            m_dmcAxis.Jog_Minus_Move(); 
+            m_dmcAxis.Jog_Plus_Move();
         }
 
         private void btnJogP_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (m_dmcAxis.m_bJog) m_dmcAxis.Jog_Plus_Stop(); 
+            //if (m_dmcAxis.m_bJog) m_dmcAxis.Jog_Plus_Stop(); 
         }
 
         private void btnJogP_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -47,7 +47,7 @@ namespace RootTools.DMC
 
         private void btnJogM_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            m_dmcAxis.Jog_Plus_Move(); 
+            m_dmcAxis.Jog_Plus_Move();
         }
     }
 }

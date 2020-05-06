@@ -167,11 +167,14 @@ namespace RootTools.DMC
             get { return _bSetLock; }
             set
             {
-                if (value == _bSetLock) return;
-                _bSetLock = value;
-                if (value) CoreMon.setLock(p_nRobot);
-                else CoreMon.setUnLock(p_nRobot);
-                m_bRunTreeInit = true;
+                if (_bConnect)
+                {
+                    if (value == _bSetLock) return;
+                    _bSetLock = value;
+                    if (value) CoreMon.setLock(p_nRobot);
+                    else CoreMon.setUnLock(p_nRobot);
+                    m_bRunTreeInit = true;
+                }
             }
         }
 
@@ -193,10 +196,13 @@ namespace RootTools.DMC
             get { return _bSetEnableTP; }
             set
             {
-                if (value == _bSetEnableTP) return;
-                _bSetEnableTP = value;
-                CoreMon.setTPEnable(p_nRobot, _bSetEnableTP);
-                m_bRunTreeInit = true;
+                if (_bConnect)
+                {
+                    if (value == _bSetEnableTP) return;
+                    _bSetEnableTP = value;
+                    CoreMon.setTPEnable(p_nRobot, _bSetEnableTP);
+                    m_bRunTreeInit = true;
+                }
             }
         }
 
@@ -225,10 +231,13 @@ namespace RootTools.DMC
             get { return _eSetCoordinate; }
             set
             {
-                if (_eSetCoordinate == value) return;
-                _eSetCoordinate = value;
-                CoreMon.setTeachCoordinate(p_nRobot, (int)value);
-                m_bRunTreeInit = true;
+                if (_bConnect)
+                {
+                    if (_eSetCoordinate == value) return;
+                    _eSetCoordinate = value;
+                    CoreMon.setTeachCoordinate(p_nRobot, (int)value);
+                    m_bRunTreeInit = true;
+                }
             }
         }
 
@@ -278,7 +287,7 @@ namespace RootTools.DMC
         {
             set
             {
-                if (p_nRobot > 0) CoreMon.setMotorOn(p_nRobot, value);
+                if (p_nRobot > 0 && _bConnect) CoreMon.setMotorOn(p_nRobot, value);
             }
         }
 
@@ -306,10 +315,13 @@ namespace RootTools.DMC
             get { return _eSetTCRMode; }
             set
             {
-                if (_eSetTCRMode == value) return;
-                _eSetTCRMode = value;
-                if (p_nRobot > 0) CoreMon.setTeachMode(p_nRobot, (value == eTCRMode.Teach));
-                OnPropertyChanged();
+                if (_bConnect)
+                {
+                    if (_eSetTCRMode == value) return;
+                    _eSetTCRMode = value;
+                    if (p_nRobot > 0) CoreMon.setTeachMode(p_nRobot, (value == eTCRMode.Teach));
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -337,10 +349,13 @@ namespace RootTools.DMC
             get { return _eSetJogSpeed; }
             set
             {
-                if (_eSetJogSpeed == value) return;
-                _eSetJogSpeed = value;
-                if (p_nRobot > 0) CoreMon.setTeachSpeed(p_nRobot, (int)_eSetJogSpeed);
-                OnPropertyChanged();
+                if (_bConnect)
+                {
+                    if (_eSetJogSpeed == value) return;
+                    _eSetJogSpeed = value;
+                    if (p_nRobot > 0) CoreMon.setTeachSpeed(p_nRobot, (int)_eSetJogSpeed);
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -356,18 +371,21 @@ namespace RootTools.DMC
         float[] m_aTrans = new float[20];
         void ThreadCheck_Axis()
         {
-            if (p_nRobot <= 0) return;
-            if (p_bConnect == false) return;
-            p_bGetServo = CoreMon.getMotorOnStatus(p_nRobot);
-            p_eGetTCRMode = (eTCRMode)CoreMon.getTCRMode(p_nRobot);
-            p_eGetJogSpeed = (eJogSpeed)CoreMon.getTeachSpeed(p_nRobot);
-            CoreMon.getgetCurJointition(p_nRobot, m_aJoint);
-            CoreMon.getgetCurTransition(p_nRobot, m_aTrans);
-            for (int n = 0; n < m_aAxis.Count; n++)
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                m_aAxis[n].p_fJoint = m_aJoint[n];
-                m_aAxis[n].p_fCartesian = m_aTrans[n]; 
-            }
+                if (p_nRobot <= 0) return;
+                if (p_bConnect == false) return;
+                p_bGetServo = CoreMon.getMotorOnStatus(p_nRobot);
+                p_eGetTCRMode = (eTCRMode)CoreMon.getTCRMode(p_nRobot);
+                p_eGetJogSpeed = (eJogSpeed)CoreMon.getTeachSpeed(p_nRobot);
+                CoreMon.getgetCurJointition(p_nRobot, m_aJoint);
+                CoreMon.getgetCurTransition(p_nRobot, m_aTrans);
+                for (int n = 0; n < m_aAxis.Count; n++)
+                {
+                    m_aAxis[n].p_fJoint = m_aJoint[n];
+                    m_aAxis[n].p_fCartesian = m_aTrans[n];
+                }
+            });
         }
         #endregion
 
@@ -379,18 +397,21 @@ namespace RootTools.DMC
         uint[] m_getDO = new uint[32];
         void ThreadCheck_DIO()
         {
-            if (p_nRobot <= 0) return;
-            if (p_bConnect == false) return;
-            CoreMon.getDIN(p_nRobot, m_getDI);
-            for (int n = 0, bit = 1; n < m_listDI.p_lDIO; n++, bit *= 2)
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                m_listDI.m_aDIO[n].p_bOn = ((m_getDI[n / 32] & bit) != 0); 
-            }
-            CoreMon.getDOUT(p_nRobot, m_getDO);
-            for (int n = 0, bit = 1; n < m_listDO.p_lDIO; n++, bit *= 2)
-            {
-                m_listDO.m_aDIO[n].p_bOn = ((m_getDO[n / 32] & bit) != 0);
-            }
+                if (p_nRobot <= 0) return;
+                if (p_bConnect == false) return;
+                CoreMon.getDIN(p_nRobot, m_getDI);
+                for (int n = 0, bit = 1; n < m_listDI.p_lDIO; n++, bit *= 2)
+                {
+                    m_listDI.m_aDIO[n].p_bOn = ((m_getDI[n / 32] & bit) != 0);
+                }
+                CoreMon.getDOUT(p_nRobot, m_getDO);
+                for (int n = 0, bit = 1; n < m_listDO.p_lDIO; n++, bit *= 2)
+                {
+                    m_listDO.m_aDIO[n].p_bOn = ((m_getDO[n / 32] & bit) != 0);
+                }
+            });
         }
 
         void RunTreeDIO(Tree tree)
@@ -419,27 +440,34 @@ namespace RootTools.DMC
                     sw.Restart(); 
                 }
                 ThreadCheck_Axis();
-                ThreadCheck_DIO(); 
-                if (m_bRunTreeInit) RunTree(Tree.eMode.Init); 
+                ThreadCheck_DIO();
+                if (m_bRunTreeInit)
+                {
+                    RunTree(Tree.eMode.Init);
+                    m_bRunTreeInit = false;
+                }
             }
         }
 
         void ThreadCheck_DMC()
         {
-            if (p_nRobot == 0) return;
-            p_bConnect = CoreMon.isConnected(p_nRobot);
-            if (!p_bConnect) return;
-            p_bGetLock = CoreMon.getLockStatus(p_nRobot);
-            p_bGetEnableTP = CoreMon.getTPEnableStatus(p_nRobot);
-            p_eGetCoordinate = (eCoordinate)CoreMon.getTeachCoordinate(p_nRobot);
-            if (CoreMon.getErrorStatus(p_nRobot)) p_eState = eState.Error;
-            else
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                int nStep = 0;
-                p_sTask = CoreMon.getMainTaskName(p_nRobot);
-                p_eState = (eState)CoreMon.getMainTaskMoveStep(p_nRobot, ref nStep);
-                p_nStep = nStep;
-            }
+                if (p_nRobot == 0) return;
+                p_bConnect = CoreMon.isConnected(p_nRobot);
+                if (!p_bConnect) return;
+                p_bGetLock = CoreMon.getLockStatus(p_nRobot);
+                p_bGetEnableTP = CoreMon.getTPEnableStatus(p_nRobot);
+                p_eGetCoordinate = (eCoordinate)CoreMon.getTeachCoordinate(p_nRobot);
+                if (CoreMon.getErrorStatus(p_nRobot)) p_eState = eState.Error;
+                else
+                {
+                    int nStep = 0;
+                    p_sTask = CoreMon.getMainTaskName(p_nRobot);
+                    p_eState = (eState)CoreMon.getMainTaskMoveStep(p_nRobot, ref nStep);
+                    p_nStep = nStep;
+                }
+            });
         }
         #endregion
 
