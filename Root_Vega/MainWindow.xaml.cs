@@ -174,12 +174,6 @@ namespace Root_Vega
             dialogService.Register<Dialog_SideScan_ViewModel, Dialog_SideScan>();
         }
 
-        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            _7_AlarmViewModel avm = new _7_AlarmViewModel();
-            _Alarm.DataContext = avm;
-        }
-
 
         private void MainTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

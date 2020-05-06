@@ -92,8 +92,7 @@
                            FontSize="13"/>
                 <Border Grid.Row="1"
                         BorderBrush="{StaticResource BorderBrush}"                
-                        BorderThickness="3"
-                        MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                        BorderThickness="3">
                     <TextBlock x:Name="textGemState" Text="{Binding p_eControl}"
                                Style="{StaticResource BasicTb}"
                                VerticalAlignment="Center"
