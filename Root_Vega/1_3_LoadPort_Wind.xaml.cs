@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Root_Vega
 {
     /// <summary>
-    /// _8_OHT.xaml에 대한 상호 작용 논리
+    /// _1_3_LoadPort_Wind.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class _8_OHT : UserControl
+    public partial class _1_3_LoadPort_Wind : UserControl
     {
-        public _8_OHT()
+        public _1_3_LoadPort_Wind()
         {
             InitializeComponent();
         }

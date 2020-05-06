@@ -1,12 +1,12 @@
-﻿<UserControl x:Class="Root_Vega._1_2_LoadPort"
+﻿<UserControl x:Class="Root_Vega._1_3_LoadPort_Wind"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_Vega"
              mc:Ignorable="d" 
-             d:DesignHeight="795" d:DesignWidth="360">
-    <Grid Grid.Column="0">
+             d:DesignHeight="650" d:DesignWidth="400">
+    <Grid Grid.Column="0" Margin="7.5">
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
             <RowDefinition/>
@@ -27,12 +27,13 @@
                             BorderBrush="{StaticResource BorderBrush}">
             <Grid Margin="15,15,15,15">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="35*"/>
-                    <RowDefinition Height="35*"/>
+                    <RowDefinition Height="20*"/>
                     <RowDefinition Height="30*"/>
+                    <RowDefinition Height="25*"/>
+                    <RowDefinition Height="25*"/>
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Margin="0,0,0,30">
+                <Grid Grid.Row="0" Margin="0,0,0,10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20"/>
                         <RowDefinition/>
@@ -73,7 +74,7 @@
                                            Style="{StaticResource BasicTb}"
                                            FontWeight="Bold"
                                            Foreground="{StaticResource Black}"/>
-                        <TextBlock Text="RECIPE ID"
+                        <TextBlock Text="RECIPE"
                                            Grid.Row="3"
                                            Style="{StaticResource BasicTb}"
                                            FontWeight="Bold"
@@ -102,7 +103,7 @@
 
                     </Grid>
                 </Grid>
-                <Grid Grid.Row="1" Margin="0,0,0,0">
+                <Grid Grid.Row="1" Margin="0,0,0,10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20"/>
                         <RowDefinition/>
@@ -126,27 +127,26 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Border Grid.Column="0"
-                                Margin="5,10,5,10">
+                                Margin="5">
                             <TextBlock Text="AUTO"
                                        Foreground="{StaticResource Black}"
                                        Style="{StaticResource BasicTb}"/>
                         </Border>
                         <Border Grid.Column="1"
-                                Margin="5,10,5,10"
-                                Background="{StaticResource Green}">
+                                Margin="5">
                             <TextBlock Text="MANUAL"
                                        Foreground="{StaticResource Black}"
                                        Style="{StaticResource BasicTb}"/>
                         </Border>
                         <Border Grid.Column="2"
-                                                Margin="5,10,5,10"
+                                                Margin="5"
                                         Background="{Binding p_brushPlaced}">
                             <TextBlock Text="PLACED"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
                         </Border>
                         <Border Grid.Column="3"
-                                                Margin="5,10,5,10"
+                                                Margin="5"
                                                 Background="{Binding p_brushPresent}">
                             <TextBlock Text="PRESENT"
                                                Foreground="{StaticResource Black}"
@@ -155,7 +155,7 @@
 
                         <Border Grid.Column="0"
                                 Grid.Row="1"
-                                                Margin="5,10,5,10"
+                                                Margin="5"
                                         Background="{DynamicResource Green}">
                             <TextBlock Text="LOAD"
                                                Foreground="{StaticResource Black}"
@@ -163,21 +163,21 @@
                         </Border>
                         <Border Grid.Column="1"
                                 Grid.Row="1"
-                                                Margin="5,10,5,10">
+                                                Margin="5">
                             <TextBlock Text="UNLOAD"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
                         </Border>
                         <Border Grid.Column="2"
                                 Grid.Row="1"
-                                                Margin="5,10,5,10">
+                                                Margin="5">
                             <TextBlock Text="RESERVE"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
                         </Border>
                         <Border Grid.Column="3"
                                 Grid.Row="1"
-                                                Margin="5,10,5,10"
+                                                Margin="5"
                                         Background="{DynamicResource DarkGray}">
                             <TextBlock Text="ALARM"
                                                Foreground="{StaticResource Black}"
@@ -186,13 +186,30 @@
 
                     </Grid>
                 </Grid>
-                <Grid Grid.Row="3" Margin="0,30,0,0">
+                <Grid Grid.Row="2" Margin="0,0,0,10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20"/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Border>
-                        <TextBlock Text="조작"
+                        <TextBlock Text="CST MAP"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                    </Border>
+                    <Border Grid.Row="1" Background="White">
+
+                    </Border>
+                </Grid>
+
+                <Grid Grid.Row="3" Margin="0,0,0,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Border>
+                        <TextBlock Text="OPERATION"
                                                FontWeight="Black"
                                                FontSize="15"
                                                Style="{StaticResource BasicTb}"
