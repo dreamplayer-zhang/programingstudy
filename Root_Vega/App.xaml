@@ -278,7 +278,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="{x:Type Button}" x:Key="LoadPortBtn">
+        <Style TargetType="{x:Type Button}"
+               x:Key="LoadPortBtn">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -288,7 +289,6 @@
                                 x:Name="Bdr">
                             <TextBlock Foreground="{StaticResource TextForeGround}"
                                        FontFamily="Arial"
-                                       FontSize="15"
                                        TextAlignment="Center"
                                        VerticalAlignment="Center">
                                 <ContentPresenter Margin="0" /></TextBlock>

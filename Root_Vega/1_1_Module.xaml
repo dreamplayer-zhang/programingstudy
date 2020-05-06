@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_Vega"
              mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="300">
-    <Grid Grid.Column="0">
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid Margin="7.5,0,7.5,7.5" Grid.Column="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
             <RowDefinition/>
@@ -24,23 +24,61 @@
         <Border Grid.Row="1"
                             BorderThickness="3,0,3,3"
                             BorderBrush="{StaticResource BorderBrush}">
-            <Grid Grid.Row="1" Margin="15">
+            <Grid Margin="15">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition/>
+                    <RowDefinition Height="5*"/>
+                    <RowDefinition Height="5*"/>
                 </Grid.RowDefinitions>
-                <Border>
-                    <TextBlock Text="STATE"
+
+                <Grid Grid.Row="0" Margin="0,0,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="Green"/>
+                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="{StaticResource Red}"/>
+                        <Ellipse Width="15"
+                                                 Height="15"
+                                                 Margin="0,0,0,10"
+                                                 Fill="{Binding p_brushReticleExist}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Alarm"
+                                               Margin="0,1,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                        <TextBlock Text="InPos."
+                                               Margin="0,11,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                        <TextBlock Text="Reticle Exist"
+                                               Margin="0,11,0,0"
+                                               Style="{StaticResource BasicTb}"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="1" Margin="0,0,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Border>
+                        <TextBlock Text="STATE"
                                                FontWeight="Black"
                                                FontSize="15"
                                                Style="{StaticResource BasicTb}"
                                                TextAlignment="Left"/>
-                </Border>
-                <Grid Grid.Row="1" Background="{StaticResource LightGray}">
-                    <TextBlock Text="{Binding p_eState}"
+                    </Border>
+                    <Grid Grid.Row="1" Background="{StaticResource LightGray}">
+                        <TextBlock Text="{Binding p_eState}"
                                                 Foreground="{StaticResource Black}"
                                                 FontSize="25"
                                                 Style="{StaticResource BasicTb}"/>
+                    </Grid>
                 </Grid>
             </Grid>
         </Border>

@@ -74,55 +74,23 @@
 
 		<Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="7.5*"/>
-                <ColumnDefinition Width="7.5*"/>
-                <ColumnDefinition Width="65*"/>
+                <ColumnDefinition Width="10*"/>
+                <ColumnDefinition Width="70*"/>
                 <ColumnDefinition Width="10*"/>
                 <ColumnDefinition Width="10*"/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0"
-                  Margin="10,5,5,10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <TextBlock Text="CommState"
+            <Border Grid.Column="0"
+                    Margin="10"
+                    BorderBrush="{StaticResource BorderBrush}"                
+                    BorderThickness="3"
+                    MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                <TextBlock x:Name="textGemState" Text="{Binding p_eControl}"
                            Style="{StaticResource BasicTb}"
-                           VerticalAlignment="Bottom"
-                           FontSize="13"/>
-                <Border Grid.Row="1"
-                        BorderBrush="{StaticResource BorderBrush}"                
-                        BorderThickness="3"
-                        MouseLeftButtonDown="Border_MouseLeftButtonDown">
-                    <TextBlock x:Name="textGemState" Text="{Binding p_eControl}"
-                               Style="{StaticResource BasicTb}"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               FontSize="24"/>
-                </Border>
-            </Grid>
-            <Grid Grid.Column="1"
-                  Margin="5,5,10,10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <TextBlock Text="ControlState"
-                           Style="{StaticResource BasicTb}"
-                           VerticalAlignment="Bottom"
-                           FontSize="13"/>
-                <Border Grid.Row="1"
-                        BorderBrush="{StaticResource BorderBrush}"                
-                        BorderThickness="3"
-                        MouseLeftButtonDown="Border_MouseLeftButtonDown">
-                    <TextBlock Text="On/Offline"
-                               Style="{StaticResource BasicTb}"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               FontSize="24"/>
-                </Border>
-            </Grid>
-            <Border Grid.Column="2"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="24"/>
+            </Border>
+            <Border Grid.Column="1"
                     Margin="0,10,10,10"
                     BorderBrush="{StaticResource BorderBrush}"
                     BorderThickness="3">
@@ -142,8 +110,8 @@
                               VerticalAlignment="Bottom"
                               Stretch="Fill" Stroke="{StaticResource BorderBrush}"
                               StrokeThickness="3" X2="1"/>
-                    <Line Grid.Row="0"
-                              Margin="0,-2,0,-2"
+                    <Line Grid.RowSpan="2"
+                              Margin="0,-1.5,0,-1.5"
                               HorizontalAlignment="Right"
                               Stretch="Fill" Stroke="{StaticResource BorderBrush}" 
                               StrokeThickness="3" Y2="1"/>
@@ -153,6 +121,12 @@
                               Stretch="Fill" Stroke="{StaticResource BorderBrush}"
                               StrokeThickness="3" Y2="1"/>
 
+                    <Grid Grid.Column="0"
+                              Grid.Row="0">
+                        <TextBlock Text="Date"
+                                   Style="{StaticResource BasicTb}"
+                                       FontSize="20"/>
+                    </Grid>
                     <Grid Grid.Column="1">
                         <TextBlock Text="Current View"
                                    Style="{StaticResource BasicTb}"
@@ -173,13 +147,17 @@
                                FontSize="15"
                                FontFamily="Arial"/>
                     </Grid>
-                    <Grid Grid.Row="0">
-                        <TextBlock Text="Date"
+                    <Grid Grid.Row="1">
+                        <TextBlock Text="Last Progress"
                                    Style="{StaticResource BasicTb}"
                                        FontSize="20" Grid.ColumnSpan="2"/>
                     </Grid>
-                    <TextBlock x:Name="textLastError" Grid.Row="1"
-                               Grid.ColumnSpan="3"
+                    <Grid Grid.Row="1" Grid.Column="1"
+                          Grid.ColumnSpan="2"
+                          Margin="8"
+                          Opacity="0.3">
+                    </Grid>
+                    <TextBlock x:Name="textLastError" Grid.Row="1" Grid.Column="1"
                                Style="{StaticResource BasicTb}"
                                Text="{Binding p_sInfo}"
                                Foreground="{Binding p_brushAlarm}"
@@ -187,7 +165,7 @@
                                MouseLeftButtonUp="textLastError_MouseLeftButtonUp"/>
                 </Grid>
             </Border>
-            <Border Grid.Column="3"
+            <Border Grid.Column="2"
                     BorderBrush="{StaticResource BorderBrush}"
                     Margin="0,10,10,10"
                     BorderThickness="3">
@@ -195,7 +173,7 @@
                            Style="{StaticResource BasicTb}"
                            FontSize="30"/>
             </Border>
-            <Border Grid.Column="4"
+            <Border Grid.Column="3"
                     Background="White"
                     BorderBrush="{StaticResource BorderBrush}"
                     Margin="0,10,10,10"

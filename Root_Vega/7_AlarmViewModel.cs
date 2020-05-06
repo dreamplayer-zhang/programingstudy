@@ -90,8 +90,8 @@ namespace Root_Vega
     {
         public _7_AlarmViewModel()
         {
-            ReadAlaram(@"D:\vega_log");
-            ChartInit();
+            //ReadAlaram(@"C:\Users\JTL\Desktop\Log");
+            //ChartInit();
 
        }
 
@@ -437,7 +437,7 @@ namespace Root_Vega
         }
         void ReadAlaram(string path)
         {
-            //return;
+            return;
             DirectoryInfo[] dirs = new DirectoryInfo(path).GetDirectories(EQ.m_sModel, SearchOption.AllDirectories);
             foreach (DirectoryInfo di in dirs)
             {

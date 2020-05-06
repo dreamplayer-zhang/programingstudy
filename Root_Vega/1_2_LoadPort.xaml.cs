@@ -20,8 +20,8 @@ namespace Root_Vega
             m_loadport = loadport;
             this.DataContext = loadport;
             textBoxPodID.DataContext = loadport.m_infoPod;
-            //toggleButtonAccessLPAuto.DataContext = loadport.m_infoPod;
-            //toggleButtonAccessLPManual.DataContext = loadport.m_infoPod;
+            toggleButtonAccessLPAuto.DataContext = loadport.m_infoPod;
+            toggleButtonAccessLPManual.DataContext = loadport.m_infoPod;
             textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
         }
