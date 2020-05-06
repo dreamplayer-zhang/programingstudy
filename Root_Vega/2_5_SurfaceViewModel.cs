@@ -1,16 +1,3 @@
-
-namespace Root_Vega
-{
-	class _2_5_SurfaceViewModel : ObservableObject
-	{
-		/// <summary>
-		/// 외부 Thread에서 UI를 Update하기 위한 Dispatcher
-		/// </summary>
-		protected Dispatcher _dispatcher;
-		Vega_Engineer m_Engineer;
-		MemoryTool m_MemoryModule;
-		ImageData m_Image;
-		DrawData m_DD;
 ﻿using ATI;
 using RootTools;
 using RootTools.Inspects;
