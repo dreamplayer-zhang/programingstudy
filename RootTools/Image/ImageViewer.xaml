@@ -36,11 +36,7 @@
             <KeyBinding Key="Left" Command="{Binding KeyLeftCommand}" />
             <KeyBinding Key="Right" Command="{Binding KeyRightCommand}" />
         </Grid.InputBindings>
-        <TextBlock Text="{Binding test}"
-                   Foreground="White"
-                   VerticalAlignment="Top"
-                   FontSize="30"
-                   Panel.ZIndex="10"/>
+      
         <Slider Panel.ZIndex="5" VerticalAlignment="Bottom" Width="200"  Height="20" Margin="0,0,0,10" Value="{Binding p_Zoom, Converter={StaticResource ZoomConverters}, Mode=TwoWay}" Minimum="1" Maximum="1000"
                 SmallChange="10" LargeChange="100" Focusable="False">
             <Slider.Style>

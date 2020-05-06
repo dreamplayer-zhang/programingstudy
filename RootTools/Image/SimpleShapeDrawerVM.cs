@@ -32,8 +32,8 @@ namespace RootTools
     public class DrawHistoryWorker
     {
         int HistoryIndex = 0;
-        Stack<DrawHistory> m_History = new Stack<DrawHistory>();
-        Stack<DrawHistory> m_future = new Stack<DrawHistory>();
+        List<DrawHistory> m_History = new List<DrawHistory>();
+        List<DrawHistory> m_future = new List<DrawHistory>();
         DrawToolVM m_DrawerToolVM; //가장 최근 DrawHistoryWorker에 사용된 DrawerToolVM
         DrawHistory tempHistory;
         DrawHistory TargetHistory;
@@ -52,14 +52,16 @@ namespace RootTools
 
         public void AddHistory(Work _Work, Shape _StartShape, Rect _StartRect, Shape _EndShape = null, Rect _EndRect = new Rect(), bool _Continue = false)
         {
-            m_History.Push(new DrawHistory(m_DrawerToolVM, _Work, HistoryIndex, _StartShape, _StartRect, _EndShape, _EndRect));
+            m_History.Add(new DrawHistory(m_DrawerToolVM, _Work, HistoryIndex, _StartShape, _StartRect, _EndShape, _EndRect));
             if (m_future.Any())
             {
                 m_future.Clear();
             }
-
             if (!_Continue)
                 HistoryIndex++;
+
+            while(HistoryIndex-m_History.First().p_Index > 20)
+                m_History.RemoveAt(0);
         }
         #endregion
 
@@ -72,16 +74,18 @@ namespace RootTools
 
             while (m_History.Any())
             {
-                tempHistory = m_History.Pop();
+
+                tempHistory = m_History.Last();
+                m_History.RemoveAt(m_History.Count-1);
 
                 if (tempHistory.p_Index != HistoryIndex)
                 {
-                    m_History.Push(tempHistory);
+                    m_History.Add(tempHistory);
                     break;
                 }
                 if (_ModifyManager != null && tempHistory.p_EndShape != _ModifyManager.p_ModifyTarget)
                 {
-                    m_History.Push(tempHistory);
+                    m_History.Add(tempHistory);
                     break;
                 }
 
@@ -106,7 +110,7 @@ namespace RootTools
                             break;
                         }
                 }
-                m_future.Push(tempHistory);
+                m_future.Add(tempHistory);
                 TargetHistory = tempHistory;
 
 
@@ -123,16 +127,17 @@ namespace RootTools
             {
                 Doing = true;
 
-                tempHistory = m_future.Pop();
+                tempHistory = m_future.Last();
+                m_future.RemoveAt(m_future.Count - 1);
 
                 if (tempHistory.p_Index != HistoryIndex)
                 {
-                    m_future.Push(tempHistory);
+                    m_future.Add(tempHistory);
                     break;
                 }
                 if (_ModifyManager != null && tempHistory.p_StartShape != _ModifyManager.p_ModifyTarget)
                 {
-                    m_future.Push(tempHistory);
+                    m_future.Add(tempHistory);
                     break;
                 }
 
@@ -158,7 +163,7 @@ namespace RootTools
                         }
 
                 }
-                m_History.Push(tempHistory);
+                m_History.Add(tempHistory);
                 TargetHistory = tempHistory;
 
             }

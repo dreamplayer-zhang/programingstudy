@@ -188,6 +188,7 @@ namespace RootTools
                 SetProperty(ref _mouseEvent, value);
             }
         }
+        private MouseButtonState MouseState;
 
         private int _MouseX = 0;
         public int p_MouseX
@@ -633,7 +634,7 @@ namespace RootTools
 
         void TumbNailMove()
         {
-            if (MouseEvent.LeftButton == MouseButtonState.Pressed)
+            if (MouseState == MouseButtonState.Pressed)
             {
                 double perX = (double)p_TumbMouseX / p_ThumbWidth;
                 double perY = (double)p_TumbMouseY / p_ThumbHeight;
@@ -1007,6 +1008,7 @@ namespace RootTools
 
         private void LeftUp()
         {
+            MouseState = MouseEvent.LeftButton;
             switch (p_Mode)
             {
                 case DrawingMode.Modify:
@@ -1027,9 +1029,9 @@ namespace RootTools
 
         private void LeftDown()
         {
+            MouseState = MouseEvent.LeftButton;
             if (m_ImageData == null)
                 return;
-
             StartImageMove();
             switch (p_Mode)
             {
@@ -1080,7 +1082,7 @@ namespace RootTools
             {
                 default:
                     {
-                        if (MouseEvent.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > m_nMouseMoveDelay)
+                        if (MouseState == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > m_nMouseMoveDelay)
                         {
                             CPoint point = m_ptBuffer1;
                             CanvasMovePoint_Ref(point, m_PtMouseBuffer.X - p_MouseX, m_PtMouseBuffer.Y - p_MouseY);
@@ -1097,7 +1099,7 @@ namespace RootTools
                         {
                             int a = 1;
                         }
-                        if (MouseEvent.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > m_nMouseMoveDelay)
+                        if (MouseState == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > m_nMouseMoveDelay)
                         {
                             if (m_ModifyManager.m_MouseHitType == ModifyManager.HitType.None)
                             {
@@ -1209,6 +1211,8 @@ namespace RootTools
         }
         public void OnMouseEnter(Object sender, System.Windows.Input.MouseEventArgs e)
         {
+            if (MouseState == MouseButtonState.Pressed)
+                MouseState = MouseEvent.LeftButton;
             var viewer = (Grid)sender;
             viewer.Focus();
         }

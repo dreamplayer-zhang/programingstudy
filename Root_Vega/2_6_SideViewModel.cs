@@ -139,6 +139,11 @@ namespace Root_Vega
 			m_Image = new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem));
 
 
+            m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
+            m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
+
+
+
             for (int i = 0; i < 4; i++)
             { 
                 p_ImageViewer_List.Add(new ImageViewer_ViewModel(m_Image, dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
@@ -152,7 +157,6 @@ namespace Root_Vega
             p_ImageViewer_Left = p_ImageViewer_List[1];
             p_ImageViewer_Right = p_ImageViewer_List[2];
             p_ImageViewer_Bottom = p_ImageViewer_List[3];
-
 
 
 			//p_ListRoi = m_Recipe.m_RD.p_Roi;

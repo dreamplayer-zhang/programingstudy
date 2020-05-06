@@ -12,6 +12,50 @@
              xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes" 
              mc:Ignorable="d" Cursor="{Binding RecipeCursor}"
              d:DesignHeight="726" d:DesignWidth="1442">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type Button}"
+               x:Key="Btn">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderBrush="{DynamicResource BtnBorderBrush}"
+                                BorderThickness="2"
+                                Background="{StaticResource BtnBackGround}"
+                                x:Name="Bdr">
+                            <TextBlock FontSize="15"
+                                       Foreground="{StaticResource BtnForeGround}"
+                                       FontFamily="Arial"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="1" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                                <Setter Property="Cursor"
+                                        Value="Hand" />
+                            </Trigger>
+                            <Trigger Property="Button.IsPressed"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnPressed}" />
+                            </Trigger>
+                            <Trigger Property="Button.IsEnabled"
+                                     Value="False">
+                                <Setter TargetName="Bdr"
+                                        Property="Opacity"
+                                        Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="75*"/>
@@ -35,7 +79,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button Content="Top" Grid.Column="1"
-                            Style="{StaticResource BasicBtn}"
+                            Style="{StaticResource Btn}"
                             Command="{Binding p_ImageViewer_Top.btnClickOpenImage}"
                         
                             >
@@ -53,7 +97,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button Content="Left" Grid.Column="1"
-                            Style="{StaticResource BasicBtn}"
+                            Style="{StaticResource Btn}"
                             Command="{Binding p_ImageViewer_Left.btnClickOpenImage}"
                             Margin="3,0,0,3" />
             </Grid>
@@ -69,7 +113,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button Content="Right" Grid.Column="1"
-                            Style="{StaticResource BasicBtn}"
+                            Style="{StaticResource Btn}"
                             Command="{Binding p_ImageViewer_Right.btnClickOpenImage}"
                             Margin="3,0,0,3" />
             </Grid>
@@ -85,7 +129,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button Content="Bottom" Grid.Column="1"
-                            Style="{StaticResource BasicBtn}"
+                            Style="{StaticResource Btn}"
                             Command="{Binding p_ImageViewer_Bottom.btnClickOpenImage}"
                             Margin="3,0,0,3" />
             </Grid>
