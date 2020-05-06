@@ -204,11 +204,11 @@
     <Compile Include="DrawData.cs" />
     <Compile Include="GAFs\ALID.cs" />
     <Compile Include="GAFs\ALIDList.cs" />
+    <Compile Include="GAFs\ALIDList_PopupUI.xaml.cs">
+      <DependentUpon>ALIDList_PopupUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GAFs\ALIDList_UI.xaml.cs">
       <DependentUpon>ALIDList_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="GAFs\ALIDPopup_UI.xaml.cs">
-      <DependentUpon>ALIDPopup_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="GAFs\CEID.cs" />
     <Compile Include="GAFs\CEIDList.cs" />
@@ -555,11 +555,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="GAFs\ALIDList_UI.xaml">
+    <Page Include="GAFs\ALIDList_PopupUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="GAFs\ALIDPopup_UI.xaml">
+    <Page Include="GAFs\ALIDList_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

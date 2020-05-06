@@ -160,7 +160,9 @@
                     <TextBlock x:Name="textLastError" Grid.Row="1" Grid.Column="1"
                                Style="{StaticResource BasicTb}"
                                Text="{Binding p_sInfo}"
-                               FontSize="20"/>
+                               Foreground="{Binding p_brushAlarm}"
+                               FontSize="20"
+                               MouseLeftButtonUp="textLastError_MouseLeftButtonUp"/>
                 </Grid>
             </Border>
             <Border Grid.Column="2"

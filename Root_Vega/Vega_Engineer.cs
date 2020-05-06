@@ -25,7 +25,7 @@ namespace Root_Vega
 
         public IGem ClassGem() { return m_xGem; }
 
-        GAF m_gaf = new GAF();
+        public GAF m_gaf = new GAF();
         public GAF ClassGAF() { return m_gaf; }
 
         //GAF_Manager m_GAFManager = new GAF_Manager();
