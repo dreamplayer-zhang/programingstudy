@@ -464,24 +464,25 @@ namespace Root_Vega
 		private void _btnClear()
 		{
 			p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.m_NonPattern[0].m_rt = new CRect();
+		
+			p_ImageViewer.ClearShape();
+			p_ImageViewer.SetImageSource();
+			
 			p_IndexMask = _IndexMask;
 		}
 		private void _btnDraw()
 		{
 			if (!Draw_IsChecked)
 			{
-				m_SurfaceProgress = SurfaceProgress.None;
 			}
 			else
 			{
-				m_SurfaceProgress = SurfaceProgress.Start;
 				RecipeCursor = Cursors.Cross;
 			}
 		}
 		private void _btnDone()
 		{
 			Draw_IsChecked = false;
-			m_SurfaceProgress = SurfaceProgress.Done;
 			RecipeCursor = Cursors.Arrow;
 		}
 		//insp 결과 display를 위해 임시 redrawUI 구현
@@ -590,8 +591,6 @@ namespace Root_Vega
 		#endregion
 
 
-		SurfaceProgress m_SurfaceProgress = SurfaceProgress.None;
-		HitType m_MouseHitType = HitType.None;
 
 		enum SurfaceProgress
 		{
@@ -606,14 +605,6 @@ namespace Root_Vega
 		{
 			None, Body, UL, UR, LR, LL, L, R, T, B
 		};
-		public class DrawHelper
-		{
-			public List<Rectangle> CanvasRectList = new List<System.Windows.Shapes.Rectangle>();
-			public Rectangle NowRect;
-			public CPoint Rect_StartPt;
-			public CPoint Rect_EndPt;
-			public CPoint PreMousePt;
-			public CRect preRect = new CRect();
-		}
+		
 	}
 }
