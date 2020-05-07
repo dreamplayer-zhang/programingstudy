@@ -913,15 +913,6 @@ namespace Root_Wind
         }
 
 
-        public  struct SurfaceParam
-        {
-            public bool bDark;
-            public int nThreshold;
-            public int nDefectSize;
-        };
-
-
-
         //   CLR_Inspection clrDemo = new CLR_Inspection();
         private void _btnInspTest()
         {

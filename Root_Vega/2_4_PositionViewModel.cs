@@ -205,20 +205,7 @@ namespace Root_Vega
 
 
         //PositionMode m_PositionMode = PositionMode.None;
-        PositionProgress m_PositionProgress = PositionProgress.None;
-        enum PositionMode
-        {
-            None,
-            Feature,
-            EdgeBox,
-        }
-        enum PositionProgress
-        {
-            None,
-            Start,
-            Drawing,
-            Done,
-        }
-
+       
+        
     }
 }

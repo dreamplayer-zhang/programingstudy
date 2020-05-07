@@ -48,8 +48,8 @@ namespace Root_Vega
         string sGroup = "SideVision";
 		List<string> sMem = new List<String>{"Top", "Left", "Right", "Bottom"};
 
-		int tempImageWidth = 640;
-		int tempImageHeight = 480;
+		//int tempImageWidth = 640;
+		//int tempImageHeight = 480;
 
 		public _2_6_SideViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
@@ -138,7 +138,11 @@ namespace Root_Vega
 			//m_MemoryModule.GetPool(sPool).p_gbPool = 2;
 
 
-
+			for (int i = 0; i < 4; i++)
+			{
+				m_Image.Add(new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem[i])));
+				p_ImageViewer_List.Add(new ImageViewer_ViewModel(m_Image[i], dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
+			}
 
             for (int _Index = 0; _Index < 2; _Index++)
             {
@@ -146,11 +150,8 @@ namespace Root_Vega
                 p_SimpleShapeDrawer_List.Add(new List<SimpleShapeDrawerVM>());
                 for (int i = 0; i < 4; i++)
                 {
-                    m_Image.Add(new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem[i])));
-                    p_ImageViewer_List.Add(new ImageViewer_ViewModel(m_Image[i], dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
                     p_SimpleShapeDrawer_List[_Index].Add(new SimpleShapeDrawerVM(p_ImageViewer_List[i]));
                     p_SimpleShapeDrawer_List[_Index][i].RectangleKeyValue = Key.D1;
-
                 }
             }
             for (int i = 0; i < 4; i++)
@@ -449,6 +450,12 @@ namespace Root_Vega
 		private void _btnClear()
 		{
 			p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.m_NonPattern[0].m_rt = new CRect();
+
+			foreach (var viewer in p_ImageViewer_List)
+			{
+				viewer.ClearShape();
+				viewer.SetImageSource();
+			}
 			p_IndexMask = _IndexMask;
 		}
 		
