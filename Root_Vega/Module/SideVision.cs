@@ -173,7 +173,7 @@ namespace Root_Vega.Module
 
         private void M_inspectTool_OnInspectDone(InspectTool.Data data)
         {
-            p_sInfo = data.p_sInfo; 
+            p_sInfo = data.p_sInfo;
         }
         #endregion
 
@@ -198,9 +198,9 @@ namespace Root_Vega.Module
             Grab,
         }
 
-        
+
         void InitPosAlign()
-        {  
+        {
             m_axisTheta.AddPos(Enum.GetNames(typeof(eAxisPosTheta)));
             m_axisTheta.AddPosDone();
             m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPosZ)));
@@ -335,16 +335,16 @@ namespace Root_Vega.Module
         void InitInspect()
         {
             InitMemory();
-            InitThreadInspect(); 
+            InitThreadInspect();
         }
 
-        int m_lMaxGrab = 1000; 
+        int m_lMaxGrab = 1000;
         CPoint m_szAlignROI = new CPoint();
         MemoryData m_memoryGrab;
         MemoryData m_memoryHeight;
         MemoryData m_memoryBright;
         public ushort[] m_aHeight;
-        double m_fScaleH = 0; 
+        double m_fScaleH = 0;
         void InitMemory()
         {
             m_szAlignROI = p_CamLADS.p_szROI;
@@ -352,25 +352,25 @@ namespace Root_Vega.Module
             m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
             m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
             m_aHeight = new ushort[m_szAlignROI.X * m_lMaxGrab];
-            m_fScaleH = 65535.0 / m_szAlignROI.Y; 
+            m_fScaleH = 65535.0 / m_szAlignROI.Y;
         }
 
-        bool m_bThreadInspect3D = false; 
-        Thread m_threadInspect3D; 
+        bool m_bThreadInspect3D = false;
+        Thread m_threadInspect3D;
         void InitThreadInspect()
         {
             m_threadInspect3D = new Thread(new ThreadStart(RunThreadInspect3D));
             m_threadInspect3D.Start();
         }
 
-        Queue<int> m_qInspect = new Queue<int>(); 
+        Queue<int> m_qInspect = new Queue<int>();
         void RunThreadInspect3D()
         {
             m_bThreadInspect3D = true;
-            Thread.Sleep(3000); 
+            Thread.Sleep(3000);
             while (m_bThreadInspect3D)
             {
-                Thread.Sleep(10); 
+                Thread.Sleep(10);
                 while (m_qInspect.Count > 0)
                 {
                     try { RunThreadInspect(m_qInspect.Dequeue()); }
@@ -404,13 +404,29 @@ namespace Root_Vega.Module
 
         void StartInspect(int iInspect)
         {
-            m_qInspect.Enqueue(iInspect); 
+            m_qInspect.Enqueue(iInspect);
         }
 
 
         void RunTreeInspect(Tree tree)
         {
             m_lMaxGrab = tree.Set(m_lMaxGrab, m_lMaxGrab, "Max Grab", "Max Grab Count for Memory Allocate");
+        }
+        #endregion
+
+        #region AutoFocus
+        AutoFocus m_AutoFocusModule;
+        public AutoFocus p_AutoFocus
+        {
+            get
+            {
+                return m_AutoFocusModule;
+            }
+        }
+        void InitAutoFocus()
+        {
+            m_AutoFocusModule = new AutoFocus();
+            return;
         }
         #endregion
 
@@ -450,7 +466,7 @@ namespace Root_Vega.Module
         {
             RunTreeDIODelay(tree.GetTree("DIO Delay", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
-            RunTreeInspect(tree.GetTree("Inspect", false)); 
+            RunTreeInspect(tree.GetTree("Inspect", false));
         }
         #endregion
 
@@ -459,15 +475,16 @@ namespace Root_Vega.Module
             base.InitBase(id, engineer, sLogGroup);
             InitInspect();
             InitPosAlign();
+            InitAutoFocus();
         }
 
         public override void ThreadStop()
         {
             if (m_bThreadInspect3D)
             {
-                m_qInspect.Clear(); 
+                m_qInspect.Clear();
                 m_bThreadInspect3D = false;
-                m_threadInspect3D.Join(); 
+                m_threadInspect3D.Join();
             }
             base.ThreadStop();
         }
@@ -476,9 +493,10 @@ namespace Root_Vega.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
-//            AddModuleRunList(new Run_Inspect(this), true, "3D Inspect");
+            //            AddModuleRunList(new Run_Inspect(this), true, "3D Inspect");
             AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
             AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
+            AddModuleRunList(new Run_AutoFocus(this), true, "Auto Focus");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -505,7 +523,7 @@ namespace Root_Vega.Module
             public override string Run()
             {
                 Thread.Sleep((int)(1000 * m_secDelay));
-                m_module.m_gem.STSSetProcessing(m_module.p_infoReticle, RootTools.Gem.GemSlotBase.eSTSProcess.Processed); 
+                m_module.m_gem.STSSetProcessing(m_module.p_infoReticle, RootTools.Gem.GemSlotBase.eSTSProcess.Processed);
                 return "OK";
             }
         }
@@ -571,12 +589,12 @@ namespace Root_Vega.Module
             public double m_fRes = 1;       //단위 um
             public int m_nFocusPos = 0;
             public CPoint m_cpMemory = new CPoint();
-            public int  m_nScanGap = 1000;
+            public int m_nScanGap = 1000;
             public int m_yLine = 1000;  // Y축 Reticle Size
             public int m_xLine = 1000;  // X축 Reticle Size
             public int m_nMaxFrame = 100;  // Camera max Frame 스펙
             public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
-          
+
             public eScanPos m_eScanPos = eScanPos.Bottom;
             public override ModuleRunBase Clone()
             {
@@ -605,7 +623,7 @@ namespace Root_Vega.Module
                 m_xLine = tree.Set(m_xLine, m_xLine, "Reticle XSize", "# of Grab Lines", bVisible);
                 m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
-                m_nScanRate = (tree.GetTree("Scan Velocity",false)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+                m_nScanRate = (tree.GetTree("Scan Velocity", false)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
                 if (m_grabMode != null)
                     m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
@@ -693,6 +711,131 @@ namespace Root_Vega.Module
                     axisXY.p_axisY.ResetTrigger();
                     m_grabMode.SetLight(false);
                 }
+            }
+        }
+
+        public class Run_AutoFocus : ModuleRunBase
+        {
+            SideVision m_module;
+            public Run_AutoFocus(SideVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public double m_dLeftStartPosX = 0.0;
+            public double m_dLeftEndPosX = 0.0;
+            public double m_dLeftPosY = 0.0;
+            public double m_dLeftPosZ = 0.0;
+            public double m_dRightStartPosX = 0.0;
+            public double m_dRightEndPosX = 0.0;
+            public double m_dRightPosY = 0.0;
+            public double m_dRightPosZ = 0.0;
+            public int m_nStep = 0;
+            public int m_nVarianceSize = 0;
+
+            public override ModuleRunBase Clone()
+            {
+                Run_AutoFocus run = new Run_AutoFocus(m_module);
+                run.m_dLeftStartPosX = m_dLeftStartPosX;
+                run.m_dLeftEndPosX = m_dLeftEndPosX;
+                run.m_dLeftPosY = m_dLeftPosY;
+                run.m_dLeftPosZ = m_dLeftPosZ;
+                run.m_dRightStartPosX = m_dRightStartPosX;
+                run.m_dRightEndPosX = m_dRightEndPosX;
+                run.m_dRightPosY = m_dRightPosY;
+                run.m_dRightPosZ = m_dRightPosZ;
+                run.m_nStep = m_nStep;
+                run.m_nVarianceSize = m_nVarianceSize;
+
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_dLeftStartPosX = tree.Set(m_dLeftStartPosX, m_dLeftStartPosX, "Left Start X Position", "Left Start X Position", bVisible);
+                m_dLeftEndPosX = tree.Set(m_dLeftEndPosX, m_dLeftEndPosX, "Left End X Position", "Left End X Position", bVisible);
+                m_dLeftPosY = tree.Set(m_dLeftPosY, m_dLeftPosY, "Left Y Position", "Left Start Y Position", bVisible);
+                m_dLeftPosZ = tree.Set(m_dLeftPosZ, m_dLeftPosZ, "Left Z Position", "Left Start Z Position", bVisible);
+                m_dRightStartPosX = tree.Set(m_dRightStartPosX, m_dRightStartPosX, "Right Start X Position", "Right Start X Position", bVisible);
+                m_dRightEndPosX = tree.Set(m_dRightEndPosX, m_dRightEndPosX, "Right End X Position", "Right End X Position", bVisible);
+                m_dRightPosY = tree.Set(m_dRightPosY, m_dRightPosY, "Right Y Position", "Right Start Y Position", bVisible);
+                m_dRightPosZ = tree.Set(m_dRightPosZ, m_dRightPosZ, "Right Z Position", "Right Start Z Position", bVisible);
+                m_nStep = tree.Set(m_nStep, m_nStep, "AutoFocus Step", "AutoFocus Step", bVisible);
+                m_nVarianceSize = tree.Set(m_nVarianceSize, m_nVarianceSize, "Variance Size", "Variance Size", bVisible);
+
+                base.RunTree(tree, bVisible, bRecipe);
+            }
+
+            public override string Run()
+            {
+                AutoFocus af = m_module.p_AutoFocus;
+                Camera_Basler cam = m_module.p_CamSideVRS;
+                ImageData img = cam.p_ImageViewer.p_ImageData;
+                AxisXY axisXY = m_module.p_axisXY;
+                Axis axisZ = m_module.p_axisZ;
+                Axis axisTheta = m_module.p_axisTheta;
+                double dLeftCurrentScore = 0.0;
+                double dLeftMaxScore = -1.0;
+                double dLeftMaxScorePosX = m_dLeftStartPosX;
+                double dRightCurrentScore = 0.0;
+                double dRightMaxScore = -1.0;
+                double dRightMaxScorePosX = m_dRightStartPosX;
+
+                // 1. Reticle 좌측 위치로 이동 후 AF
+                int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
+                for (int i = 0; i < nStepCount; i++)
+                {
+                    // 축 이동
+                    if (m_module.Run(axisXY.Move(new RPoint(m_dLeftStartPosX + (m_nStep * i), m_dLeftPosY))))
+                        return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady()))
+                        return p_sInfo;
+                    if (m_module.Run(axisZ.p_axis.Move(m_dLeftPosZ)))
+                        return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady()))
+                        return p_sInfo;
+                    // Grab
+                    if (m_module.Run(cam.Grab()))
+                        return p_sInfo;
+                    // 분산 Score 계산
+                    dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                    if (dLeftCurrentScore > dLeftMaxScore) dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
+                }
+
+                // 2. Reticle 우측 위치로 이동 후 AF
+                nStepCount = (int)Math.Abs(m_dRightEndPosX - m_dRightStartPosX) / m_nStep;
+                for (int i = 0; i<nStepCount; i++)
+                {
+                    // 축 이동
+                    if (m_module.Run(axisXY.Move(new RPoint(m_dRightStartPosX + (m_nStep * i), m_dRightPosY))))
+                        return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady()))
+                        return p_sInfo;
+                    if (m_module.Run(axisZ.p_axis.Move(m_dRightPosZ)))
+                        return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady()))
+                        return p_sInfo;
+                    // Grab
+                    if (m_module.Run(cam.Grab()))
+                        return p_sInfo;
+                    // 분산 Score 계산
+                    dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                    if (dRightCurrentScore > dRightMaxScore) dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
+                }
+
+                // 3. 좌우측 AF편차 구하기
+                af.p_dDifferenceOfFocusDistance = dRightMaxScorePosX - dLeftMaxScorePosX;
+                af.p_dDistanceOfLeftPointToRightPoint = m_dLeftPosY - m_dRightPosY;
+
+                // 4. 좌우측 위치 사이의 거리와 좌우측 AF편차를 이용하여 Theta 계산
+                double dThetaRadian = af.GetThetaRadian();
+                double dTehtaDegree = af.GetThetaDegree(dThetaRadian);
+
+                // 5. Theta축 돌리기
+                m_module.p_axisTheta.Move(dThetaRadian);
+
+                return base.Run();
             }
         }
         #endregion

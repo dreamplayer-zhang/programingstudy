@@ -132,6 +132,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoFocus\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_basler_Classes.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_UI.xaml.cs">
