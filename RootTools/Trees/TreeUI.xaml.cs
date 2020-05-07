@@ -30,12 +30,12 @@ namespace RootTools.Trees
             //if (data > 0) Column2.Width = data;
             if (ControlTree.ActualWidth < 16) return; 
             Column1.Width = ControlTree.ActualWidth / 2; 
-            Column2.Width = ControlTree.ActualWidth / 2 - 8;
+            Column2.Width = ControlTree.ActualWidth / 2;
         }
 
         private void ControlTree_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            Column2.Width = ControlTree.ActualWidth - Column1.ActualWidth - 8; 
+            Column2.Width = ControlTree.ActualWidth - Column1.ActualWidth; 
         }
     }
 }

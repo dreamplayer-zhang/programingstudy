@@ -32,17 +32,6 @@ namespace RootTools.Trees
                 }
             }
         }
-
-        Tree _treeSelect;
-        public Tree p_treeSelect
-        {
-            get { return _treeSelect; }
-            set
-            {
-                _treeSelect = value;
-                OnPropertyChanged(); 
-            }
-        }
         #endregion
 
         public TreeRoot(string id, LogWriter log, bool bReadOnly = false)
