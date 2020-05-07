@@ -48,13 +48,13 @@ namespace Root_Vega.Module
             // variable
             double dTemp = 0;
             int nTempCount = 0;
-            int nImageWidth  = 0;   // 이미지 Width 넣어야 함
-            int nImageHeight = 0;   // 이미지 Height 넣어야 함
+            int nWidth = img.p_Size.X / nVarianceSize;
+            int nHeight = img.p_Size.Y / nVarianceSize;
             
             // implement
-            for (int i = 0; i < nImageWidth; i++)
+            for (int i = 0; i < nWidth; i++)
             {
-                for (int j = 0; j < nImageHeight; j++)
+                for (int j = 0; j < nHeight; j++)
                 {
                     dTemp += GetImageLocalVariance(img, new Point(i * nVarianceSize, j * nVarianceSize), nVarianceSize);
                     nTempCount++;
