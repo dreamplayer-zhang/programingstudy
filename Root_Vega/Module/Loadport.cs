@@ -5,57 +5,34 @@ using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
 using RootTools.OHT.Semi;
-using RootTools.OHT.SSEM;
-using RootTools.SQLogs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Windows.Media;
 
 namespace Root_Vega.Module
 {
     public class Loadport : ModuleBase, IRobotChild
     {
         #region ToolBox
-        DIO_I m_diPlaced;
-        DIO_I m_diPresent; 
+        public DIO_I m_diPlaced;
+        public DIO_I m_diPresent;
+        public DIO_I m_diLoad;
+        public DIO_I m_diUnload; 
         DMCControl m_dmc;
         OHT_Semi m_OHT;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Placed");
             p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
+            p_sInfo = m_toolBox.Get(ref m_diLoad, this, "Load");
+            p_sInfo = m_toolBox.Get(ref m_diUnload, this, "Unload");
             p_sInfo = m_toolBox.Get(ref m_dmc, this, "DMC");
             p_sInfo = m_toolBox.Get(ref m_OHT, this, m_infoPod, "OHT");
         }
         #endregion
 
         #region DIO Function
-        Brush _brushPlaced = Brushes.Green; 
-        public Brush p_brushPlaced
-        { 
-            get { return _brushPlaced; }
-            set
-            {
-                if (_brushPlaced == value) return;
-                _brushPlaced = value;
-                OnPropertyChanged(); 
-            }
-        }
-
-        Brush _brushPresent = Brushes.Green;
-        public Brush p_brushPresent
-        {
-            get { return _brushPresent; }
-            set
-            {
-                if (_brushPresent == value) return;
-                _brushPresent = value;
-                OnPropertyChanged();
-            }
-        }
-
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present;
@@ -303,13 +280,6 @@ namespace Root_Vega.Module
                 StartRun(m_runUnDocking);
             }
             return "OK";
-        }
-
-        protected override void RunThread()
-        {
-            p_brushPlaced = m_diPlaced.p_bIn ? Brushes.Yellow : Brushes.Green;
-            p_brushPresent = m_diPresent.p_bIn ? Brushes.Yellow : Brushes.Green;
-            base.RunThread();
         }
         #endregion
 

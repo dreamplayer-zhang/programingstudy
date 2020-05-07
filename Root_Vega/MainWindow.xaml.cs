@@ -49,6 +49,7 @@ namespace Root_Vega
             //((GAF_Manager)m_engineer.ClassGAFManager()).UpdateTree();
             textState.DataContext = EQ.m_EQ;
             textGemState.DataContext = m_engineer.ClassGem();
+            textGemControl.DataContext = m_engineer.ClassGem();
             textLastError.DataContext = m_engineer.m_gaf.m_listALID;
 
             _Main.Init(m_engineer); 
@@ -232,6 +233,11 @@ namespace Root_Vega
         private void textLastError_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             m_engineer.m_gaf.m_listALID.ShowPopup(); 
+        }
+
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
         }
     }
 }

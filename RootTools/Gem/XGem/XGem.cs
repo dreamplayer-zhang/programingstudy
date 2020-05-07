@@ -34,6 +34,7 @@ namespace RootTools.Gem.XGem
                 if (_eComm == value) return;
                 p_sInfo = "eCommunicate : " + _eComm.ToString() + " -> " + value.ToString(); 
                 _eComm = value;
+                OnPropertyChanged(); 
             }
         }
 
