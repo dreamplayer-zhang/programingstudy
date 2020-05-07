@@ -827,19 +827,29 @@ namespace RootTools
                 Point GraduationStart;
                 Point GraduationEnd;
 
-                Point Perpendicular = new Point(BottomRight.Y - TopLeft.Y, BottomRight.X - TopLeft.X);
-                Point Ratio = new Point(TempLength * Perpendicular.X / Math.Sqrt(Math.Pow(Perpendicular.X, 2) + Math.Pow(Perpendicular.Y, 2)), TempLength * Perpendicular.Y / Math.Sqrt(Math.Pow(Perpendicular.X, 2) + Math.Pow(Perpendicular.Y, 2)));
 
-                for(int Temp_i=0; Temp_i<10; Temp_i++)
+                Point parallel = new Point (BottomRight.X-TopLeft.X, BottomRight.Y - TopLeft.Y);
+                Point Perpendicular = new Point(BottomRight.Y - TopLeft.Y, -(BottomRight.X - TopLeft.X));
+                double total = Math.Sqrt(Math.Pow(parallel.X, 2) + Math.Pow(parallel.Y, 2));
+                Point parallel_Ratio = new Point(parallel.X / total, parallel.Y / total);
+                Point Perpendicular_Ratio = new Point(TempLength * Perpendicular.X / total, TempLength * Perpendicular.Y / total);
+
+                int TempCounter = 20;
+                for (int Temp_i = 0; Temp_i <= TempCounter; Temp_i++)
                 {
-                GraduationStart= new Point (TopLeft.X+i*TempLength, TopLeft.Y+i*TempLength);
-                    GraduationEnd = new Point (GraduationStart.X + Ratio.X , GraduationStart.Y + Ratio.Y );
+                    GraduationStart = new Point(((TempCounter - Temp_i) * TopLeft.X + Temp_i * BottomRight.X) / TempCounter, ((TempCounter - Temp_i) * TopLeft.Y + Temp_i * BottomRight.Y) / TempCounter);
+                    GraduationEnd = new Point (GraduationStart.X + Perpendicular_Ratio.X , GraduationStart.Y + Perpendicular_Ratio.Y );
                 
                     Line Graduation = new Line();
-                    Graduation.X1 = TopLeft.X+i*TempLength;
-                    Graduation.Y1 = TopLeft.Y+i*TempLength;
-                    Graduation.X2 = GraduationStart.X + Ratio.X;
-                    Graduation.Y2 = GraduationStart.Y + Ratio.Y;
+
+
+                    Graduation.Stroke = m_Stroke;
+                    Graduation.StrokeThickness = m_StrokeThickness;
+                    Graduation.StrokeDashArray = m_StrokeDashArray;
+
+            SetTopLeft(Graduation, GraduationStart);
+            SetBottomRight(Graduation, GraduationEnd);
+          
 
                     p_ImageViewer.p_Element.Add(Graduation);
                 }
