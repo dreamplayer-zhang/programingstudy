@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.AutoFocus;
 using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;

@@ -6,8 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Root_Vega.Module
+namespace RootTools.AutoFocus
 {
+    public enum eImageState { GRAY_SCALE, COLOR_RGB };
     public class AutoFocus
     {
         double m_dDistanceOfLeftPointToRightPoint;
@@ -34,6 +35,18 @@ namespace Root_Vega.Module
                 m_dDifferenceOfFocusDistance = value;
             }
         }
+        eImageState m_eImageState = eImageState.COLOR_RGB;
+        public eImageState p_eImageState
+        {
+            get
+            {
+                return m_eImageState;
+            }
+            set
+            {
+                m_eImageState = value;
+            }
+        }
 
         public double GetThetaDegree(double dRadian)
         {
@@ -50,7 +63,7 @@ namespace Root_Vega.Module
             int nTempCount = 0;
             int nWidth = img.p_Size.X / nVarianceSize;
             int nHeight = img.p_Size.Y / nVarianceSize;
-            
+
             // implement
             for (int i = 0; i < nWidth; i++)
             {
@@ -68,7 +81,6 @@ namespace Root_Vega.Module
             // variable
             double dTemp = 0.0;
             double dAvg = 0.0;
-            int nCount = 0;
             int nVal = 0;
 
             // implement
@@ -76,14 +88,34 @@ namespace Root_Vega.Module
 
             unsafe
             {
-                byte* p = (byte*)(img.m_ptrImg.ToPointer());
-                for (int i = 0; i < nVarianceSize; i++)
+                switch (m_eImageState)
                 {
-                    for (int j = 0; j < nVarianceSize; j++)
-                    {
-                        nVal = p[((int)pt.Y + j) * img.p_Size.X + (int)pt.X + i];
-                        dTemp += (nVal - dAvg) * (nVal - dAvg);
-                    }
+                    case eImageState.GRAY_SCALE:
+                        {
+                            byte* p = (byte*)(img.m_ptrImg.ToPointer());
+                            for (int i = 0; i < nVarianceSize; i++)
+                            {
+                                for (int j = 0; j < nVarianceSize; j++)
+                                {
+                                    nVal = p[((int)pt.Y + j) * img.p_Size.X + (int)pt.X + i];
+                                    dTemp += (nVal - dAvg) * (nVal - dAvg);
+                                }
+                            }
+                            break;
+                        }
+                    case eImageState.COLOR_RGB:
+                        {
+                            byte* p = (byte*)(img.m_ptrImg.ToPointer());
+                            for (int i = 0; i<nVarianceSize; i++)
+                            {
+                                for (int j = 0; j<nVarianceSize; j++)
+                                {
+                                    nVal = GetRGBPixelVal((int)pt.X + i, (int)pt.Y + j, p);
+                                    dTemp += (nVal - dAvg) * (nVal - dAvg);
+                                }
+                            }
+                            break;
+                        }
                 }
             }
 
@@ -107,9 +139,14 @@ namespace Root_Vega.Module
                     }
                 }
             }
-            
+
             return dTemp / (double)nVarianceSize / (double)nVarianceSize;
         }
 
+        unsafe public byte GetRGBPixelVal(int x, int y, byte *p)
+        {
+            //200507
+            return 0;
+        }
     }
 }
