@@ -344,6 +344,7 @@ namespace Root_Vega.Module
         MemoryData m_memoryLeft;
         MemoryData m_memoryRight;
         MemoryData m_memoryBottom;
+
         public ushort[] m_aHeight;
         double m_fScaleH = 0;
         void InitMemory()
@@ -356,6 +357,7 @@ namespace Root_Vega.Module
             m_memoryLeft = m_memoryPool.GetGroup(p_id).CreateMemory("Left", 1, 1, m_szAlignROI.X, m_lMaxGrab);
             m_memoryRight = m_memoryPool.GetGroup(p_id).CreateMemory("Right", 1, 1, m_szAlignROI.X, m_lMaxGrab);
             m_memoryBottom = m_memoryPool.GetGroup(p_id).CreateMemory("Bottom", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+
             m_aHeight = new ushort[m_szAlignROI.X * m_lMaxGrab];
             m_fScaleH = 65535.0 / m_szAlignROI.Y;
         }
@@ -406,6 +408,7 @@ namespace Root_Vega.Module
             //    *pHeight = (byte)(m_aHeight[nAdd] >> 8);
             //    int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
             //    *pBright = pSrc[x + yAve * m_szAlignROI.X];
+
             //}
         }
 
@@ -478,7 +481,7 @@ namespace Root_Vega.Module
             }
             base.ThreadStop();
         }
-
+         
         #region ModuleRun
         protected override void InitModuleRuns()
         {

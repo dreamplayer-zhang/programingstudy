@@ -32,8 +32,8 @@ namespace RootTools
     public class DrawHistoryWorker
     {
         int HistoryIndex = 0;
-        Stack<DrawHistory> m_History = new Stack<DrawHistory>();
-        Stack<DrawHistory> m_future = new Stack<DrawHistory>();
+        List<DrawHistory> m_History = new List<DrawHistory>();
+        List<DrawHistory> m_future = new List<DrawHistory>();
         DrawToolVM m_DrawerToolVM; //가장 최근 DrawHistoryWorker에 사용된 DrawerToolVM
         DrawHistory tempHistory;
         DrawHistory TargetHistory;
@@ -52,14 +52,16 @@ namespace RootTools
 
         public void AddHistory(Work _Work, Shape _StartShape, Rect _StartRect, Shape _EndShape = null, Rect _EndRect = new Rect(), bool _Continue = false)
         {
-            m_History.Push(new DrawHistory(m_DrawerToolVM, _Work, HistoryIndex, _StartShape, _StartRect, _EndShape, _EndRect));
+            m_History.Add(new DrawHistory(m_DrawerToolVM, _Work, HistoryIndex, _StartShape, _StartRect, _EndShape, _EndRect));
             if (m_future.Any())
             {
                 m_future.Clear();
             }
-
             if (!_Continue)
                 HistoryIndex++;
+
+            while(HistoryIndex-m_History.First().p_Index > 20)
+                m_History.RemoveAt(0);
         }
         #endregion
 
@@ -72,16 +74,18 @@ namespace RootTools
 
             while (m_History.Any())
             {
-                tempHistory = m_History.Pop();
+
+                tempHistory = m_History.Last();
+                m_History.RemoveAt(m_History.Count-1);
 
                 if (tempHistory.p_Index != HistoryIndex)
                 {
-                    m_History.Push(tempHistory);
+                    m_History.Add(tempHistory);
                     break;
                 }
                 if (_ModifyManager != null && tempHistory.p_EndShape != _ModifyManager.p_ModifyTarget)
                 {
-                    m_History.Push(tempHistory);
+                    m_History.Add(tempHistory);
                     break;
                 }
 
@@ -106,7 +110,7 @@ namespace RootTools
                             break;
                         }
                 }
-                m_future.Push(tempHistory);
+                m_future.Add(tempHistory);
                 TargetHistory = tempHistory;
 
 
@@ -123,16 +127,17 @@ namespace RootTools
             {
                 Doing = true;
 
-                tempHistory = m_future.Pop();
+                tempHistory = m_future.Last();
+                m_future.RemoveAt(m_future.Count - 1);
 
                 if (tempHistory.p_Index != HistoryIndex)
                 {
-                    m_future.Push(tempHistory);
+                    m_future.Add(tempHistory);
                     break;
                 }
                 if (_ModifyManager != null && tempHistory.p_StartShape != _ModifyManager.p_ModifyTarget)
                 {
-                    m_future.Push(tempHistory);
+                    m_future.Add(tempHistory);
                     break;
                 }
 
@@ -158,7 +163,7 @@ namespace RootTools
                         }
 
                 }
-                m_History.Push(tempHistory);
+                m_History.Add(tempHistory);
                 TargetHistory = tempHistory;
 
             }
@@ -597,11 +602,10 @@ namespace RootTools
                 SetTopLeft(tempShape, TopLeft);
                 BottomRight = GetCanvasPoint((Point)(m_ListRect[i].Size));
                 SetBottomRight(tempShape, BottomRight);
-
             }
         }
 
-        void SetTopLeft(Shape _shape, Point _point)
+        protected void SetTopLeft(Shape _shape, Point _point)
         {
             if (_shape.GetType() == typeof(Line))
             {
@@ -614,7 +618,7 @@ namespace RootTools
                 Canvas.SetTop(_shape, _point.Y);
             }
         }
-        void SetBottomRight(Shape _shape, Point _point)
+        protected void SetBottomRight(Shape _shape, Point _point)
         {
             if (_shape.GetType() == typeof(Line))
             {
@@ -794,14 +798,62 @@ namespace RootTools
         public new void ProcessEnd<T>(T element) where T : Shape
         {
             element.StrokeDashArray = new DoubleCollection(1);
-            if (element.GetType() == typeof(Line))
-                element.StrokeDashArray = new DoubleCollection { 0.5, 1 };
-            //element.StrokeDashArray = new DoubleCollection { 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 1.5, 1 };
-
             m_ListShape.Add(element);
             m_ListRect.Add(m_TempRect);
             p_ImageViewer.m_HistoryWorker.AddHistory(this, Work.Create, element, m_TempRect);
         }
+
+        public override void Redrawing()
+        {
+            Shape tempShape;
+            Point TopLeft = new Point();
+            Point BottomRight = new Point();
+
+
+
+            for (int i = 0; i < m_ListShape.Count; i++)
+            {
+                tempShape = m_ListShape[i];
+
+                TopLeft = GetCanvasPoint(m_ListRect[i].Location);
+                SetTopLeft(tempShape, TopLeft);
+                BottomRight = GetCanvasPoint((Point)(m_ListRect[i].Size));
+                SetBottomRight(tempShape, BottomRight);
+
+                
+            if (tempShape.GetType() == typeof(Line))
+            {
+                int TempLength = 10;
+                Point GraduationStart;
+                Point GraduationEnd;
+
+                Point Perpendicular = new Point(BottomRight.Y - TopLeft.Y, BottomRight.X - TopLeft.X);
+                Point Ratio = new Point(TempLength * Perpendicular.X / Math.Sqrt(Math.Pow(Perpendicular.X, 2) + Math.Pow(Perpendicular.Y, 2)), TempLength * Perpendicular.Y / Math.Sqrt(Math.Pow(Perpendicular.X, 2) + Math.Pow(Perpendicular.Y, 2)));
+
+                for(int Temp_i=0; Temp_i<10; Temp_i++)
+                {
+                GraduationStart= new Point (TopLeft.X+i*TempLength, TopLeft.Y+i*TempLength);
+                    GraduationEnd = new Point (GraduationStart.X + Ratio.X , GraduationStart.Y + Ratio.Y );
+                
+                    Line Graduation = new Line();
+                    Graduation.X1 = TopLeft.X+i*TempLength;
+                    Graduation.Y1 = TopLeft.Y+i*TempLength;
+                    Graduation.X2 = GraduationStart.X + Ratio.X;
+                    Graduation.Y2 = GraduationStart.Y + Ratio.Y;
+
+                    p_ImageViewer.p_Element.Add(Graduation);
+                }
+
+
+
+                
+
+            }
+
+
+            }
+        }
+
 
         public new void ProcessDoingShape<T>(T element) where T : Shape
         {
@@ -814,6 +866,8 @@ namespace RootTools
                 msg = "Width :" + (m_TempRect.BottomRight.X - m_TempRect.TopLeft.X).ToString() + " Height :" + (m_TempRect.BottomRight.Y - m_TempRect.TopLeft.Y).ToString();
 
             DrawnTb.Text = msg;
+            DrawnTb.Foreground = Brushes.White;
+            DrawnTb.FontSize = 12;
         }
 
     }

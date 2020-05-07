@@ -54,7 +54,6 @@ namespace Root_Vega
         }
         //int aa = 0;
         #region Property
-
         private ImageViewer_ViewModel m_ImageViewer;
         public ImageViewer_ViewModel p_ImageViewer
         {

@@ -87,6 +87,7 @@
             </Grid>
             <Border Grid.Row="1" Margin="2,2,2,2" BorderBrush ="Gray" BorderThickness="3">
 
+
                 <tools:ImageViewer DataContext="{Binding p_ImageViewer_Top}"
                                Width="{PriorityBinding}"
                                Height="{PriorityBinding}"/>
