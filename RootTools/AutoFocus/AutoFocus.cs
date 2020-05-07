@@ -110,7 +110,7 @@ namespace RootTools.AutoFocus
                             {
                                 for (int j = 0; j<nVarianceSize; j++)
                                 {
-                                    nVal = GetRGBPixelVal((int)pt.X + i, (int)pt.Y + j, p);
+                                    nVal = GetRGBPixelVal(img, (int)pt.X + i, (int)pt.Y + j);
                                     dTemp += (nVal - dAvg) * (nVal - dAvg);
                                 }
                             }
@@ -143,10 +143,14 @@ namespace RootTools.AutoFocus
             return dTemp / (double)nVarianceSize / (double)nVarianceSize;
         }
 
-        unsafe public byte GetRGBPixelVal(int x, int y, byte *p)
+        unsafe public byte GetRGBPixelVal(ImageData img, int x, int y)
         {
-            //200507
-            return 0;
+            int nWidth = img.p_Size.X;
+            byte* p = (byte*)(img.m_ptrImg.ToPointer());
+            int r = *(p + y * nWidth * 3 + x * 3);
+            int g = *(p + y * nWidth * 3 + x * 3 + 1);
+            int b = *(p + y * nWidth * 3 + x * 3 + 2);
+            return (byte)((r + g + b) / 3);
         }
     }
 }
