@@ -214,7 +214,7 @@ namespace RootTools
 
         public void ModifyEnd()
         {
-            p_ImageViewer.p_HistoryWorker.AddHistory(p_ModifyDrawerTool, Work.Modify, p_ModifyTarget, p_ModifyStartData, p_ModifyTarget, p_ModifyData);
+            p_ImageViewer.m_HistoryWorker.AddHistory(p_ModifyDrawerTool, Work.Modify, p_ModifyTarget, p_ModifyStartData, p_ModifyTarget, p_ModifyData);
         }
 
         private void CheckMinSize(ref Rect _Data, int min)

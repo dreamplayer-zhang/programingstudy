@@ -57,7 +57,6 @@ namespace RootTools.DMC
         }
 
 
-
         /*---------------------   robot status --------------------------------------------*/
 
         [DllImport("coremon.dll", EntryPoint = "cmon_get_lock_status", CallingConvention = CallingConvention.Cdecl)]

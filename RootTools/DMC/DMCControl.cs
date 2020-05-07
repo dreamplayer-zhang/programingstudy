@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Threading;
 using System.Windows;
 using System.Collections.ObjectModel;
+using System.Windows.Threading;
 
 namespace RootTools.DMC
 {
@@ -104,7 +105,7 @@ namespace RootTools.DMC
             p_secInterval = 3;
         }
         
-        void ThreadCheck_Connect()
+        void TimerCheck_Connect()
         {
             if (p_bConnect && (p_eState == eState.Error))
             {
@@ -167,11 +168,14 @@ namespace RootTools.DMC
             get { return _bSetLock; }
             set
             {
-                if (value == _bSetLock) return;
-                _bSetLock = value;
-                if (value) CoreMon.setLock(p_nRobot);
-                else CoreMon.setUnLock(p_nRobot);
-                m_bRunTreeInit = true;
+                if (_bConnect)
+                {
+                    if (value == _bSetLock) return;
+                    _bSetLock = value;
+                    if (value) CoreMon.setLock(p_nRobot);
+                    else CoreMon.setUnLock(p_nRobot);
+                    m_bRunTreeInit = true;
+                }
             }
         }
 
@@ -193,10 +197,13 @@ namespace RootTools.DMC
             get { return _bSetEnableTP; }
             set
             {
-                if (value == _bSetEnableTP) return;
-                _bSetEnableTP = value;
-                CoreMon.setTPEnable(p_nRobot, _bSetEnableTP);
-                m_bRunTreeInit = true;
+                if (_bConnect)
+                {
+                    if (value == _bSetEnableTP) return;
+                    _bSetEnableTP = value;
+                    CoreMon.setTPEnable(p_nRobot, _bSetEnableTP);
+                    m_bRunTreeInit = true;
+                }
             }
         }
 
@@ -225,10 +232,13 @@ namespace RootTools.DMC
             get { return _eSetCoordinate; }
             set
             {
-                if (_eSetCoordinate == value) return;
-                _eSetCoordinate = value;
-                CoreMon.setTeachCoordinate(p_nRobot, (int)value);
-                m_bRunTreeInit = true;
+                if (_bConnect)
+                {
+                    if (_eSetCoordinate == value) return;
+                    _eSetCoordinate = value;
+                    CoreMon.setTeachCoordinate(p_nRobot, (int)value);
+                    m_bRunTreeInit = true;
+                }
             }
         }
 
@@ -278,7 +288,7 @@ namespace RootTools.DMC
         {
             set
             {
-                if (p_nRobot > 0) CoreMon.setMotorOn(p_nRobot, value);
+                if (p_nRobot > 0 && _bConnect) CoreMon.setMotorOn(p_nRobot, value);
             }
         }
 
@@ -306,10 +316,13 @@ namespace RootTools.DMC
             get { return _eSetTCRMode; }
             set
             {
-                if (_eSetTCRMode == value) return;
-                _eSetTCRMode = value;
-                if (p_nRobot > 0) CoreMon.setTeachMode(p_nRobot, (value == eTCRMode.Teach));
-                OnPropertyChanged();
+                if (_bConnect)
+                {
+                    if (_eSetTCRMode == value) return;
+                    _eSetTCRMode = value;
+                    if (p_nRobot > 0) CoreMon.setTeachMode(p_nRobot, (value == eTCRMode.Teach));
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -337,10 +350,13 @@ namespace RootTools.DMC
             get { return _eSetJogSpeed; }
             set
             {
-                if (_eSetJogSpeed == value) return;
-                _eSetJogSpeed = value;
-                if (p_nRobot > 0) CoreMon.setTeachSpeed(p_nRobot, (int)_eSetJogSpeed);
-                OnPropertyChanged();
+                if (_bConnect)
+                {
+                    if (_eSetJogSpeed == value) return;
+                    _eSetJogSpeed = value;
+                    if (p_nRobot > 0) CoreMon.setTeachSpeed(p_nRobot, (int)_eSetJogSpeed);
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -354,7 +370,7 @@ namespace RootTools.DMC
 
         float[] m_aJoint = new float[20];
         float[] m_aTrans = new float[20];
-        void ThreadCheck_Axis()
+        void TimerCheck_Axis()
         {
             if (p_nRobot <= 0) return;
             if (p_bConnect == false) return;
@@ -366,7 +382,7 @@ namespace RootTools.DMC
             for (int n = 0; n < m_aAxis.Count; n++)
             {
                 m_aAxis[n].p_fJoint = m_aJoint[n];
-                m_aAxis[n].p_fCartesian = m_aTrans[n]; 
+                m_aAxis[n].p_fCartesian = m_aTrans[n];
             }
         }
         #endregion
@@ -377,14 +393,14 @@ namespace RootTools.DMC
 
         uint[] m_getDI = new uint[32];
         uint[] m_getDO = new uint[32];
-        void ThreadCheck_DIO()
+        void TimerCheck_DIO()
         {
             if (p_nRobot <= 0) return;
             if (p_bConnect == false) return;
             CoreMon.getDIN(p_nRobot, m_getDI);
             for (int n = 0, bit = 1; n < m_listDI.p_lDIO; n++, bit *= 2)
             {
-                m_listDI.m_aDIO[n].p_bOn = ((m_getDI[n / 32] & bit) != 0); 
+                m_listDI.m_aDIO[n].p_bOn = ((m_getDI[n / 32] & bit) != 0);
             }
             CoreMon.getDOUT(p_nRobot, m_getDO);
             for (int n = 0, bit = 1; n < m_listDO.p_lDIO; n++, bit *= 2)
@@ -400,31 +416,24 @@ namespace RootTools.DMC
         }
         #endregion
 
-        #region Thread
-        Thread m_thread;
-        bool m_bThread = false;
-        void CheckThread()
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer();
+        StopWatch m_swConnect = new StopWatch();
+        private void M_timer_Tick(object sender, EventArgs e)
         {
-            Thread.Sleep(2000);
-            StopWatch sw = new StopWatch();
-            int msInterval = 1000 * p_secInterval; 
-            while (m_bThread)
+            TimerCheck_DMC();
+            int msInterval = 1000 * p_secInterval;
+            if (m_swConnect.ElapsedMilliseconds > msInterval)
             {
-                Thread.Sleep(10);
-                ThreadCheck_DMC();
-                if (sw.ElapsedMilliseconds > msInterval)
-                {
-                    ThreadCheck_Connect(); 
-                    msInterval = 1000 * p_secInterval;
-                    sw.Restart(); 
-                }
-                ThreadCheck_Axis();
-                ThreadCheck_DIO(); 
-                if (m_bRunTreeInit) RunTree(Tree.eMode.Init); 
+                TimerCheck_Connect();
+                m_swConnect.Restart();
             }
+            TimerCheck_Axis();
+            TimerCheck_DIO();
+            if (m_bRunTreeInit) RunTree(Tree.eMode.Init);
         }
 
-        void ThreadCheck_DMC()
+        void TimerCheck_DMC()
         {
             if (p_nRobot == 0) return;
             p_bConnect = CoreMon.isConnected(p_nRobot);
@@ -465,15 +474,13 @@ namespace RootTools.DMC
         bool m_bRunTreeInit = false;
         public void RunTree(Tree.eMode mode)
         {
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                m_treeRoot.p_eMode = mode;
-                RunTreeState(m_treeRoot.GetTree("State")); 
-                RunTreeControl(m_treeRoot.GetTree("Control"));
-                RunTreeSet(m_treeRoot.GetTree("Setting"));
-                RunTreeAxis(m_treeRoot.GetTree("Axis"));
-                RunTreeDIO(m_treeRoot); 
-            });
+            m_treeRoot.p_eMode = mode;
+            RunTreeState(m_treeRoot.GetTree("State"));
+            RunTreeControl(m_treeRoot.GetTree("Control"));
+            RunTreeSet(m_treeRoot.GetTree("Setting"));
+            RunTreeAxis(m_treeRoot.GetTree("Axis"));
+            RunTreeDIO(m_treeRoot);
+            if (mode == Tree.eMode.Init) m_bRunTreeInit = false;
         }
         #endregion
 
@@ -491,18 +498,14 @@ namespace RootTools.DMC
             m_treeRoot.UpdateTree += m_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);
 
-            m_thread = new Thread(new ThreadStart(CheckThread));
-            m_thread.Start();
-            m_bThread = true;
+            m_timer.Interval = TimeSpan.FromMilliseconds(10);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
         }
 
         public void ThreadStop()
         {
-            if (m_bThread)
-            {
-                m_bThread = false;
-                m_thread.Join();
-            }
+            m_timer.Stop(); 
         }
     }
 }

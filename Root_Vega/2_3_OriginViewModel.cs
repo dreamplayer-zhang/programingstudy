@@ -38,7 +38,7 @@ namespace Root_Vega
         {
             m_DD = new DrawData();
             m_Recipe = engineer.m_recipe;
-            
+
             m_MemoryModule = engineer.ClassMemoryTool();
             //m_MemoryModule.CreatePool(sPool, 8);
             //m_MemoryModule.GetPool(sPool).CreateGroup(sGroup);
@@ -113,10 +113,10 @@ namespace Root_Vega
                 if (value == false)
                 {
 
-                    if (p_ImageViewer.p_ModifyManager.p_SetState == true)
-                        p_ImageViewer.p_ModifyManager.DeleteModifyData();
+                    if (p_ImageViewer.m_ModifyManager.p_SetState == true)
+                        p_ImageViewer.m_ModifyManager.DeleteModifyData();
 
-                    p_ImageViewer.p_HistoryWorker.Clear();
+                    p_ImageViewer.m_HistoryWorker.Clear();
 
                     p_ImageViewer.p_Mode = ImageViewer_ViewModel.DrawingMode.None;
                     p_OriginDrawerVM.Clear();
@@ -187,8 +187,8 @@ namespace Root_Vega
             if (p_OriginDrawerVM.m_ListShape.Count > 0)
             {
                 (p_OriginDrawerVM.m_ListShape[0]).StrokeDashArray = p_OriginDrawerVM.m_StrokeDashArray;
-                p_ImageViewer.p_ModifyManager.SetModifyData(p_OriginDrawerVM, p_OriginDrawerVM.m_ListShape[0]);
-                p_ImageViewer.p_ModifyManager.p_SetStateDone = true;
+                p_ImageViewer.m_ModifyManager.SetModifyData(p_OriginDrawerVM, p_OriginDrawerVM.m_ListShape[0]);
+                p_ImageViewer.m_ModifyManager.p_SetStateDone = true;
                 p_ImageViewer.p_Mode = ImageViewer_ViewModel.DrawingMode.Modify;
             }
 
@@ -218,7 +218,7 @@ namespace Root_Vega
                 return new RelayCommand(SaveRectImage);
             }
         }
-       
+
         public ICommand btnClear
         {
             get
@@ -262,7 +262,7 @@ namespace Root_Vega
         }
 
 
-       
+
         //        CLR_Inspection clrDemo = new CLR_Inspection();
         private void _btnInspTest()
         {

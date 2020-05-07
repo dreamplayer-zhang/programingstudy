@@ -90,8 +90,8 @@ namespace Root_Vega
     {
         public _7_AlarmViewModel()
         {
-            //ReadAlaram(@"C:\Users\JTL\Desktop\Log");
-            //ChartInit();
+            ReadAlaram(@"D:\vega_log");
+            ChartInit();
 
        }
 

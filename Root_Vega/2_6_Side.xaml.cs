@@ -13,21 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RootTools.GAFs
+namespace Root_Vega
 {
     /// <summary>
-    /// ALIDPopup_UI.xaml에 대한 상호 작용 논리
+    /// _2_6_Side.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class ALIDPopup_UI : UserControl
+    public partial class _2_6_Side : UserControl
     {
-        public ALIDPopup_UI()
+        public _2_6_Side()
         {
             InitializeComponent();
-        }
-
-        private void buttonHide_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }
