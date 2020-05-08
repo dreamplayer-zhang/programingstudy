@@ -104,13 +104,15 @@ namespace RootTools.Module
                 {
                     case EQ.eState.Init: p_sRun = "Home"; break;
                     case EQ.eState.Home: p_sRun = "Stop"; break;
-                    case EQ.eState.Ready:
-                        p_sRun = (m_qModuleRun.Count == 0) ? "Run" : "Stop";
-                        if (m_qModuleRun.Count > 0)
+                    case EQ.eState.Ready: p_sRun = "Run"; break; 
+                    case EQ.eState.Run: p_sRun = "Stop"; 
+                        if (m_qModuleRun.Count == 0) EQ.p_eState = EQ.eState.Ready;
+                        else
                         {
                             ModuleRunBase moduleRun = m_qModuleRun.Dequeue();
                             moduleRun.StartRun();
                             while (moduleRun.m_moduleBase.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+                            if (m_qModuleRun.Count == 0) p_visibleRnR = Visibility.Visible; 
                         }
                         break;
                     case EQ.eState.Error: p_sRun = "Reset"; break;
@@ -142,6 +144,10 @@ namespace RootTools.Module
                         EQ.p_bStop = true;
                     }
                     break;
+                case EQ.eState.Run:
+                    m_qModuleRun.Clear();
+                    EQ.p_bStop = true;
+                    break; 
                 case EQ.eState.Error: m_handler.Reset(); break;
             }
             return "OK";
