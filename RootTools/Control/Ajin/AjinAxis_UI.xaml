@@ -301,13 +301,20 @@
                                         <ColumnDefinition></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                     <GroupBox Header="Start">
-                                        <ComboBox Margin="5" ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                        <ComboBox Margin="5" 
+                                                  SelectedItem="{Binding p_strRepeatStartPos, Mode=TwoWay}"
+                                                  ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
                                     </GroupBox>
                                     <GroupBox Grid.Column="1" Header="End">
-                                        <!--<ComboBox Margin="5"
-                                                ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>-->
+                                        <ComboBox Margin="5"
+                                                  SelectedItem="{Binding p_strRepeatEndPos, Mode=TwoWay}"
+                                                  ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
                                     </GroupBox>
-                                    <Button Grid.Column="2" Margin="5" Content="Start"></Button>
+                                    <Grid Grid.Column="2">
+                                        
+                                    </Grid>
+                                    <!--<Button Grid.Column="2" Margin="5" Content="Start"
+                                            Command="{Binding RepeatCommand}"></Button>-->
                                 </Grid>
                             </Grid>
                         </TabItem>

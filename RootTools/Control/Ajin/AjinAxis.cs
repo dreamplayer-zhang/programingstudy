@@ -1037,15 +1037,35 @@ namespace RootTools.Control.Ajin
         int m_iRepeat = 1; 
         void StateRepeat()
         {
-            Move(m_asPosRepeat[m_iRepeat]);
+            //Move(m_asPosRepeat[m_iRepeat]);
+            switch (m_iRepeat)
+            {
+                case 0:
+                    Move(p_strRepeatStartPos);
+                    break;
+                case 1:
+                    Move(p_strRepeatEndPos);
+                    break;
+            }
             m_iRepeat = 1 - m_iRepeat; 
         }
 
         string[] m_asPosRepeat = new string[] { "= Pos0", "= Pos1" };
+        
         void RunRepeatTree(Tree tree, bool bReadOnly)
         {
             //m_asPosRepeat[0] = tree.Set(m_asPosRepeat[0], "= Pos0", m_asPos, "From", "Axis Position Name");
             //m_asPosRepeat[1] = tree.Set(m_asPosRepeat[1], "= Pos1", m_asPos, "To", "Axis Position Name");
+        }
+        public string RepeatStart()
+        {
+            switch (p_eState)
+            {
+                case Axis.eState.Ready:
+                    p_bRepeat = true;
+                    return "OK";
+                default: return p_sID + " Repeat Cancel eState = " + p_eState.ToString();
+            }
         }
         #endregion
 
@@ -1346,6 +1366,11 @@ namespace RootTools.Control.Ajin
             Move(p_SelMovePos,0, GetSpeed(eSpeed.Move));
         }
 
+        public void RepeatMovePosition()
+        {
+            RepeatStart();
+        }
+
         public void AlarmCommand()
         {
             if (p_sensorAlarm)
@@ -1379,6 +1404,32 @@ namespace RootTools.Control.Ajin
             set
             {
                 SetProperty(ref _SelMovePos, value);
+            }
+        }
+
+        string m_strRepeatStartPos;
+        public string p_strRepeatStartPos
+        {
+            get
+            {
+                return m_strRepeatStartPos;
+            }
+            set
+            {
+                SetProperty(ref m_strRepeatStartPos, value);
+            }
+        }
+
+        string m_strRepeatEndPos;
+        public string p_strRepeatEndPos
+        {
+            get
+            {
+                return m_strRepeatEndPos;
+            }
+            set
+            {
+                SetProperty(ref m_strRepeatEndPos, value);
             }
         }
 
@@ -1448,7 +1499,15 @@ namespace RootTools.Control.Ajin
                 return new RelayCommand(MovePosition);
             }
         }
-        
+
+        public RelayCommand RepeatCommand
+        {
+            get
+            {
+                return new RelayCommand(RepeatMovePosition);
+            }
+        }
+
         public RelayCommand AlarmOffCommand
         {
            get{
