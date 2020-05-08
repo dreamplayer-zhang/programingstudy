@@ -498,17 +498,21 @@ namespace RootTools
 
                 if (m_eMode == eMode.MemoryRead)
                 {
-                    byte[] hRGB = br.ReadBytes(256 * 4);
 					p_nByte = nByte;
+					byte[] hRGB;
+					if(p_nByte!=3)
+						hRGB = br.ReadBytes(256 * 4);
 
                      for (int y = lowheight-1; y >=0 ; y--) 
                     {
+						if (y == 0)
+							y = y;
                         if (Worker_MemoryCopy.CancellationPending)
                             return;
 						byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
 						if (pBuf.Length != 0)
 						{
-							Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + offset.X + (long)p_Size.X * ((long)offset.Y + y)), lowwidth);
+							Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X) * ((long)offset.Y + y)), p_nByte * lowwidth);
 							p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
 						}
 						else

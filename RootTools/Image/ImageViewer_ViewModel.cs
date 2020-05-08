@@ -637,14 +637,15 @@ namespace RootTools
 						int pix_x = 0;
 						int pix_y = 0;
 
-						for (int yy = 0; yy < p_CanvasHeight; yy++)
+						for (int yy = 1; yy < p_CanvasHeight; yy++)
 						{
 							for (int xx = 0; xx < p_CanvasWidth; xx++)
 							{
 								pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
 								pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
 								for (int layer = 0; layer < 3; layer++ )
-									view.Data[yy, xx, layer] = ((byte*)ptrMem)[layer + (long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+
+									view.Data[yy, xx, (1 - layer)%3] = ((byte*)ptrMem)[layer + m_ImageData.p_nByte * ((long)pix_x + (long)pix_y * p_ImageData.p_Size.X)];
 							}
 						}
 
