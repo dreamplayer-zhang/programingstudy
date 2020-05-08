@@ -125,45 +125,41 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Border Grid.Column="0"
+                        <Border Grid.Column="0" x:Name="borderAccessAuto"
                                 Margin="5,10,5,10">
                             <TextBlock Text="AUTO"
                                        Foreground="{StaticResource Black}"
                                        Style="{StaticResource BasicTb}"/>
                         </Border>
-                        <Border Grid.Column="1"
-                                Margin="5,10,5,10"
-                                Background="{StaticResource Green}">
+                        <Border Grid.Column="1" x:Name="borderAccessManual"
+                                Margin="5,10,5,10">
                             <TextBlock Text="MANUAL"
                                        Foreground="{StaticResource Black}"
                                        Style="{StaticResource BasicTb}"/>
                         </Border>
-                        <Border Grid.Column="2"
-                                                Margin="5,10,5,10"
-                                        Background="{Binding p_brushPlaced}">
+                        <Border Grid.Column="2" x:Name="borderPlaced"
+                                                Margin="5,10,5,10">
                             <TextBlock Text="PLACED"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
                         </Border>
-                        <Border Grid.Column="3"
-                                                Margin="5,10,5,10"
-                                                Background="{Binding p_brushPresent}">
+                        <Border Grid.Column="3" x:Name="borderPresent"
+                                                Margin="5,10,5,10">
                             <TextBlock Text="PRESENT"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
                         </Border>
 
-                        <Border Grid.Column="0"
+                        <Border Grid.Column="0" x:Name="borderLoad"
                                 Grid.Row="1"
-                                                Margin="5,10,5,10"
-                                        Background="{DynamicResource Green}">
+                                                Margin="5,10,5,10">
                             <TextBlock Text="LOAD"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
                         </Border>
-                        <Border Grid.Column="1"
+                        <Border Grid.Column="1" x:Name="borderUnload"
                                 Grid.Row="1"
-                                                Margin="5,10,5,10">
+                                Margin="5,10,5,10">
                             <TextBlock Text="UNLOAD"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
@@ -175,10 +171,9 @@
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
                         </Border>
-                        <Border Grid.Column="3"
+                        <Border Grid.Column="3" x:Name="borderAlarm"
                                 Grid.Row="1"
-                                                Margin="5,10,5,10"
-                                        Background="{DynamicResource DarkGray}">
+                                                Margin="5,10,5,10">
                             <TextBlock Text="ALARM"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>

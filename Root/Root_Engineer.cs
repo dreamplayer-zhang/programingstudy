@@ -5,14 +5,15 @@ using RootTools.Memory;
 using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
+using RootTools.Logs;
 
 namespace Root
 {
     public class Root_Engineer : IEngineer
     {
         #region IEngineer
-        LogView m_logView = new LogView();
-        public LogView ClassLogView() { return m_logView; }
+        public LogViewer m_logView = new LogViewer();
+        public LogView ClassLogView() { return null; }
 
         public Login m_login = new Login();
         public Login.User p_user { get { return m_login.p_user; } }
@@ -57,7 +58,7 @@ namespace Root
         {
             EQ.m_sModel = id; 
             m_logView.Init();
-            m_login.Init(m_logView);
+//            m_login.Init(m_logView);
             m_toolBox.Init(id, this);
             InitAjin();
             m_handler.Init(id, this);

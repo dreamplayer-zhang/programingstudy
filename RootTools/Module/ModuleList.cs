@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace RootTools.Module
@@ -163,6 +164,50 @@ namespace RootTools.Module
             }
             EQ.p_eState = EQ.eState.Run;
             return "OK";
+        }
+        #endregion
+
+        #region RnR
+        Visibility _visibleRnR = Visibility.Hidden; 
+        public Visibility p_visibleRnR
+        { 
+            get { return _visibleRnR; }
+            set
+            {
+                if (_visibleRnR == value) return;
+                _visibleRnR = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        int _nRnR = 1; 
+        public int p_nRnR
+        {
+            get { return _nRnR; }
+            set
+            {
+                if (_nRnR == value) return;
+                _nRnR = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        public string ClickRunRnR()
+        {
+            if (EQ.p_eState != EQ.eState.Ready) return "EQ not Ready"; 
+            if (m_qModuleRun.Count > 0)
+            {
+                m_qModuleRun.Clear();
+                EQ.p_bStop = true;
+                return "ModuleRun Queue Clear"; 
+            }
+            EQ.p_bStop = false;
+            for (int n = 0; n < p_nRnR; n++)
+            {
+                foreach (ModuleRunBase moduleRun in m_moduleRunList.m_aModuleRun) m_qModuleRun.Enqueue(moduleRun);
+            }
+            EQ.p_eState = EQ.eState.Run;
+            return "OK"; 
         }
         #endregion
 

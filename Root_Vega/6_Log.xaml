@@ -16,18 +16,10 @@
         <Border Grid.Column="0">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="4*"/>
                     <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="4*"/>
                 </Grid.ColumnDefinitions>
-                <Border BorderBrush="{StaticResource BorderBrush}"
-                        BorderThickness="3"
-                        Grid.Column="0"
-                        Margin="15,15,0,15">
-                    <tools:UI_LogView Grid.Column="4"
-                                      DataContext="{Binding p_LogView}"
-                                      Margin="1"/>
-                </Border>
-                <Grid Grid.Column="1">
+                <Grid Grid.Column="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="55*"/>
                         <ColumnDefinition Width="45*"/>
@@ -398,6 +390,14 @@
                         </Border>
                     </Grid>
                 </Grid>
+                <Border BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="3"
+                        Grid.Column="1"
+                        Margin="15,15,0,15">
+                    <tools:UI_LogView DataContext="{Binding p_LogView}"
+                                      Margin="1"/>
+                </Border>
+
             </Grid>
         </Border>
         <StackPanel Grid.Column="1" Margin="0,45,15,15">
