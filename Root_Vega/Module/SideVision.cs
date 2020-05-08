@@ -825,7 +825,7 @@ namespace Root_Vega.Module
                     if (dRightCurrentScore > dRightMaxScore) dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
                 }
 
-                // 3. 좌우측 AF편차 구하기
+                // 3. 좌우측 AF편차 구하기 (단위환산 필요..)
                 af.p_dDifferenceOfFocusDistance = dRightMaxScorePosX - dLeftMaxScorePosX;
                 af.p_dDistanceOfLeftPointToRightPoint = m_dLeftPosY - m_dRightPosY;
 
@@ -833,7 +833,7 @@ namespace Root_Vega.Module
                 double dThetaRadian = af.GetThetaRadian();
                 double dTehtaDegree = af.GetThetaDegree(dThetaRadian);
 
-                // 5. Theta축 돌리기
+                // 5. Theta축 돌리기 (Theta축 회전 방향 확인 필요.. 시계방향/반시계방향)
                 m_module.p_axisTheta.Move(dThetaRadian);
 
                 return base.Run();

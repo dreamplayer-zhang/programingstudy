@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace RootTools.AutoFocus
 {
-    public enum eImageState { GRAY_SCALE, COLOR_RGB };
+    public enum eImageState { GRAY_SCALE, COLOR_RGB, COLOR_RGBA };
     public class AutoFocus
     {
         double m_dDistanceOfLeftPointToRightPoint;
@@ -88,7 +88,7 @@ namespace RootTools.AutoFocus
 
             unsafe
             {
-                switch (m_eImageState)
+                switch (p_eImageState)
                 {
                     case eImageState.GRAY_SCALE:
                         {
@@ -105,12 +105,23 @@ namespace RootTools.AutoFocus
                         }
                     case eImageState.COLOR_RGB:
                         {
-                            byte* p = (byte*)(img.m_ptrImg.ToPointer());
-                            for (int i = 0; i<nVarianceSize; i++)
+                            for (int i = 0; i < nVarianceSize; i++)
                             {
-                                for (int j = 0; j<nVarianceSize; j++)
+                                for (int j = 0; j < nVarianceSize; j++)
                                 {
                                     nVal = GetRGBPixelVal(img, (int)pt.X + i, (int)pt.Y + j);
+                                    dTemp += (nVal - dAvg) * (nVal - dAvg);
+                                }
+                            }
+                            break;
+                        }
+                    case eImageState.COLOR_RGBA:
+                        {
+                            for (int i = 0; i < nVarianceSize; i++)
+                            {
+                                for (int j = 0; j < nVarianceSize; j++)
+                                {
+                                    nVal = GetRGBAPixelVal(img, (int)pt.X + i, (int)pt.Y + j);
                                     dTemp += (nVal - dAvg) * (nVal - dAvg);
                                 }
                             }
@@ -126,30 +137,85 @@ namespace RootTools.AutoFocus
         {
             // variable
             double dTemp = 0.0;
+            int nVal = 0;
 
             // implement
             unsafe
             {
-                byte* p = (byte*)(img.m_ptrImg.ToPointer());
-                for (int i = 0; i < nVarianceSize; i++)
+                switch (p_eImageState)
                 {
-                    for (int j = 0; j < nVarianceSize; j++)
-                    {
-                        dTemp += p[((int)pt.Y + j) * img.p_Size.X + (int)pt.X + i];
-                    }
+                    case eImageState.GRAY_SCALE:
+                        {
+                            byte* p = (byte*)(img.m_ptrImg.ToPointer());
+                            for (int i = 0; i < nVarianceSize; i++)
+                            {
+                                for (int j = 0; j < nVarianceSize; j++)
+                                {
+                                    dTemp += p[((int)pt.Y + j) * img.p_Size.X + (int)pt.X + i];
+                                }
+                            }
+                            break;
+                        }
+                    case eImageState.COLOR_RGB:
+                        {
+                            for (int i = 0; i < nVarianceSize; i++)
+                            {
+                                for (int j = 0; j < nVarianceSize; j++)
+                                {
+                                    nVal = GetRGBPixelVal(img, (int)pt.X + i, (int)pt.Y + j);
+                                    dTemp += nVal;
+                                }
+                            }
+                            break;
+                        }
+                    case eImageState.COLOR_RGBA:
+                        {
+                            for (int i = 0; i < nVarianceSize; i++)
+                            {
+                                for (int j = 0; j < nVarianceSize; j++)
+                                {
+                                    nVal = GetRGBAPixelVal(img, (int)pt.X + i, (int)pt.Y + j);
+                                    dTemp += nVal;
+                                }
+                            }
+                            break;
+                        }
                 }
             }
 
             return dTemp / (double)nVarianceSize / (double)nVarianceSize;
         }
 
-        unsafe public byte GetRGBPixelVal(ImageData img, int x, int y)
+        public byte GetRGBPixelVal(ImageData img, int x, int y)
         {
+            // variable
             int nWidth = img.p_Size.X;
-            byte* p = (byte*)(img.m_ptrImg.ToPointer());
-            int r = *(p + y * nWidth * 3 + x * 3);
-            int g = *(p + y * nWidth * 3 + x * 3 + 1);
-            int b = *(p + y * nWidth * 3 + x * 3 + 2);
+            int r, g, b;
+
+            // implement
+            unsafe
+            {
+                byte* p = (byte*)(img.m_ptrImg.ToPointer());
+                r = *(p + y * nWidth * 3 + x * 3);
+                g = *(p + y * nWidth * 3 + x * 3 + 1);
+                b = *(p + y * nWidth * 3 + x * 3 + 2);
+            }
+            return (byte)((r + g + b) / 3);
+        }
+        public byte GetRGBAPixelVal(ImageData img, int x, int y)
+        {
+            // variable
+            int nWidth = img.p_Size.X;
+            int r, g, b;
+
+            // implement
+            unsafe
+            {
+                byte* p = (byte*)(img.m_ptrImg.ToPointer());
+                r = *(p + y * nWidth * 4 + x * 4);
+                g = *(p + y * nWidth * 4 + x * 4 + 1);
+                b = *(p + y * nWidth * 4 + x * 4 + 2);
+            }
             return (byte)((r + g + b) / 3);
         }
     }
