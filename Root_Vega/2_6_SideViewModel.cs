@@ -530,4 +530,4 @@ namespace Root_Vega
 
     }
 }
->>>>>>> RealRuler
+
