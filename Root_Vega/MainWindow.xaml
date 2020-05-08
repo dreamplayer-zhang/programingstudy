@@ -113,7 +113,7 @@
                 <Border Grid.Row="1"
                         BorderBrush="{StaticResource BorderBrush}"                
                         BorderThickness="3"
-                        MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                        >
                     <TextBlock Text="On/Offline"
                                Style="{StaticResource BasicTb}"
                                VerticalAlignment="Center"

@@ -499,14 +499,22 @@ namespace RootTools
                 if (m_eMode == eMode.MemoryRead)
                 {
                     byte[] hRGB = br.ReadBytes(256 * 4);
+					p_nByte = nByte;
 
                      for (int y = lowheight-1; y >=0 ; y--) 
                     {
                         if (Worker_MemoryCopy.CancellationPending)
                             return;
-                        byte[] pBuf = br.ReadBytes(nWidth);
-                        Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + offset.X + (long)p_Size.X * ((long)offset.Y + y)), lowwidth);
-                        p_nProgress = Convert.ToInt32(((double)(lowheight -y) / lowheight) * 100);
+						byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+						if (pBuf.Length != 0)
+						{
+							Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + offset.X + (long)p_Size.X * ((long)offset.Y + y)), lowwidth);
+							p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+						}
+						else
+						{
+							pBuf = pBuf;
+						}
                     }
                 }
                 else
@@ -517,7 +525,7 @@ namespace RootTools
                     ReAllocate(p_Size, _nByte);
                     for (int y = p_Size.Y - 1; y >= 0; y--)
                     {
-                        byte[] pBuf = br.ReadBytes((int)nWidth);
+                        byte[] pBuf = br.ReadBytes((int) nWidth);
                         Buffer.BlockCopy(pBuf, 0, m_aBuf, (int)(offset.X + (offset.Y + y) * p_Stride), (int)nWidth);
                         p_nProgress = Convert.ToInt32(((double)(p_Size.Y-y) / p_Size.Y) * 100);
                        
@@ -988,5 +996,30 @@ namespace RootTools
                 return bitmapSource;
             }
         }
+
+		public static BitmapSource ToBitmapSource(Image<Rgb, byte> image)
+		{
+			using (System.Drawing.Bitmap source = image.Bitmap)
+			{
+
+
+				var bitmapData = source.LockBits(
+		new System.Drawing.Rectangle(0, 0, source.Width, source.Height),
+		System.Drawing.Imaging.ImageLockMode.ReadOnly, source.PixelFormat);
+
+				BitmapSource bitmapSource = BitmapSource.Create(
+	   source.Width, source.Height,
+	   source.HorizontalResolution, source.VerticalResolution,
+	   PixelFormats.Bgr24, null,
+	   bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+
+
+				source.UnlockBits(bitmapData);
+
+				//DeleteObject(ptr);
+				return bitmapSource;
+			}
+
+		}
     }
 }

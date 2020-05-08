@@ -206,7 +206,7 @@ namespace RootTools
 					{
 						if (p_MouseX < p_ImgSource.Width && p_MouseY < p_ImgSource.Height)
 						{
-							p_ImgSource.CopyPixels(new Int32Rect(p_MouseX, p_MouseY, 1, 1), pixel, 1, 0);
+							//p_ImgSource.CopyPixels(new Int32Rect(p_MouseX, p_MouseY, 1, 1), pixel, 1, 0);
 							p_GV = pixel[0];
 							p_MouseMemY = p_View_Rect.Y + p_MouseY * p_View_Rect.Height / _CanvasHeight;
 							p_MouseMemX = p_View_Rect.X + p_MouseX * p_View_Rect.Width / _CanvasWidth;
@@ -600,29 +600,64 @@ namespace RootTools
 			{
 				if (p_ImageData != null)
 				{
-					Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-					IntPtr ptrMem = m_ImageData.GetPtr();
-					if (ptrMem == IntPtr.Zero)
-						return;
-					int pix_x = 0;
-					int pix_y = 0;
-
-					for (int yy = 0; yy < p_CanvasHeight; yy++)
+					if (p_ImageData.p_nByte == 1)
 					{
-						for (int xx = 0; xx < p_CanvasWidth; xx++)
-						{
-							pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
-							pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
-							view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
-						}
-					}
-					p_ImgSource = ImageHelper.ToBitmapSource(view);
+						Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+						IntPtr ptrMem = m_ImageData.GetPtr();
+						if (ptrMem == IntPtr.Zero)
+							return;
+						int pix_x = 0;
+						int pix_y = 0;
 
-					p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / m_ImageData.p_Size.Y), 0, 0);
-					if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y) == 0)
-						p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), 2);
-					else
-						p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y));
+						for (int yy = 0; yy < p_CanvasHeight; yy++)
+						{
+							for (int xx = 0; xx < p_CanvasWidth; xx++)
+							{
+								pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
+								pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
+								view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+							}
+						}
+
+						p_ImgSource = ImageHelper.ToBitmapSource(view);
+
+						p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / m_ImageData.p_Size.Y), 0, 0);
+						if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y) == 0)
+							p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), 2);
+						else
+							p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y));
+
+					}
+					else if (p_ImageData.p_nByte == 3)
+					{
+						Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
+						IntPtr ptrMem = m_ImageData.GetPtr();
+						if (ptrMem == IntPtr.Zero)
+							return;
+						int pix_x = 0;
+						int pix_y = 0;
+
+						for (int yy = 0; yy < p_CanvasHeight; yy++)
+						{
+							for (int xx = 0; xx < p_CanvasWidth; xx++)
+							{
+								pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
+								pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
+								for (int layer = 0; layer < 3; layer++ )
+									view.Data[yy, xx, layer] = ((byte*)ptrMem)[layer + (long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+							}
+						}
+
+						p_ImgSource = ImageHelper.ToBitmapSource(view);
+
+						p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / m_ImageData.p_Size.Y), 0, 0);
+						if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y) == 0)
+							p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), 2);
+						else
+							p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y));
+
+					}
+					
 				}
 			}
 			catch (Exception ee)
