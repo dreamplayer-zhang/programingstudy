@@ -72,6 +72,7 @@ namespace RootTools.Control
 
         public void Write(Enum eDO)
         {
+            ClearBut(eDO);
             Write(eDO.ToString(), true);
         }
 
@@ -113,6 +114,15 @@ namespace RootTools.Control
             for (int n = 0; n < m_asDO.Count; n++)
             {
                 if (n != nIndex) m_aBitDO[n].Write(false); 
+            }
+        }
+
+        void ClearBut(Enum eDO)
+        {
+            string sDO = eDO.ToString(); 
+            for (int n = 0; n < m_asDO.Count; n++)
+            {
+                if (sDO != m_asDO[n]) m_aBitDO[n].Write(false);
             }
         }
 

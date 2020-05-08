@@ -36,7 +36,7 @@ namespace Root_Vega.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
-            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
+            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer, true, true);
             p_sInfo = m_toolBox.Get(ref m_diEMS, this, "EMS");
             p_sInfo = m_toolBox.Get(ref m_diProtectionBar, this, "ProtectionBar");
             p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
