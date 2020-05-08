@@ -70,6 +70,11 @@ namespace RootTools.Control
             Write(eDO.ToString(), bOn);
         }
 
+        public void Write(Enum eDO)
+        {
+            Write(eDO.ToString(), true);
+        }
+
         public void Write(string sDO, bool bOn)
         {
             int nIndex = GetIndex(sDO); 

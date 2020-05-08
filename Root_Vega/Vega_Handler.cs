@@ -15,6 +15,7 @@ namespace Root_Vega
         public ModuleList m_moduleList;
         public Vega_Recipe m_recipe;
         public Vega_Process m_process;
+        public Vega m_vega; 
         public Robot_RND m_robot;
         public Loadport[] m_aLoadport = new Loadport[2];
         public SideVision m_sideVision;
@@ -24,6 +25,8 @@ namespace Root_Vega
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
+            m_vega = new Vega("Vega", m_enginner, "Vega");
+            InitModule(m_vega); 
             m_robot = new Robot_RND("Robot", m_enginner, "Robot");
             InitModule(m_robot);
             m_aLoadport[0] = new Loadport("LoadportA", "LP1", m_enginner, "LoadportA");
