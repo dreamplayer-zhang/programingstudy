@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,7 +10,7 @@ namespace RootTools.Module
     public class ModuleList : NotifyProperty
     {
         #region Property
-        bool _bEnableRun = false; 
+        bool _bEnableRun = false;
         public bool p_bEnableRun
         {
             get { return _bEnableRun; }
@@ -17,7 +18,7 @@ namespace RootTools.Module
             {
                 if (_bEnableRun == value) return;
                 _bEnableRun = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
 
@@ -99,20 +100,22 @@ namespace RootTools.Module
             while (m_bThread)
             {
                 Thread.Sleep(10);
-                p_bEnableRun = (EQ.p_eState == EQ.eState.Ready); 
+                p_bEnableRun = (EQ.p_eState == EQ.eState.Ready);
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Init: p_sRun = "Home"; break;
                     case EQ.eState.Home: p_sRun = "Stop"; break;
-                    case EQ.eState.Ready: p_sRun = "Run"; break; 
-                    case EQ.eState.Run: p_sRun = "Stop"; 
+                    case EQ.eState.Ready: p_sRun = "Run"; break;
+                    case EQ.eState.Run: p_sRun = "Stop";
                         if (m_qModuleRun.Count == 0) EQ.p_eState = EQ.eState.Ready;
                         else
                         {
                             ModuleRunBase moduleRun = m_qModuleRun.Dequeue();
+                            p_iRun = m_qModuleRun.Count;
                             moduleRun.StartRun();
+                            Thread.Sleep(100); 
                             while (moduleRun.m_moduleBase.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
-                            if (m_qModuleRun.Count == 0) p_visibleRnR = Visibility.Visible; 
+                            if (m_qModuleRun.Count == 0) p_visibleRnR = Visibility.Visible;
                         }
                         break;
                     case EQ.eState.Error: p_sRun = "Reset"; break;
@@ -130,7 +133,7 @@ namespace RootTools.Module
             switch (EQ.p_eState)
             {
                 case EQ.eState.Init:
-                    EQ.p_eState = EQ.eState.Home; 
+                    EQ.p_eState = EQ.eState.Home;
                     break;
                 case EQ.eState.Home:
                     EQ.p_bStop = true;
@@ -141,13 +144,15 @@ namespace RootTools.Module
                     else
                     {
                         m_qModuleRun.Clear();
+                        p_iRun = m_qModuleRun.Count;
                         EQ.p_bStop = true;
                     }
                     break;
                 case EQ.eState.Run:
                     m_qModuleRun.Clear();
+                    p_iRun = m_qModuleRun.Count;
                     EQ.p_bStop = true;
-                    break; 
+                    break;
                 case EQ.eState.Error: m_handler.Reset(); break;
             }
             return "OK";
@@ -157,6 +162,7 @@ namespace RootTools.Module
         {
             EQ.p_bStop = false;
             foreach (ModuleRunBase moduleRun in m_moduleRunList.m_aModuleRun) m_qModuleRun.Enqueue(moduleRun);
+            p_maxRun = m_qModuleRun.Count;
             EQ.p_eState = EQ.eState.Run;
         }
 
@@ -168,25 +174,26 @@ namespace RootTools.Module
             {
                 if (moduleRun.p_id == p_sRunStep) m_qModuleRun.Enqueue(moduleRun);
             }
+            p_maxRun = m_qModuleRun.Count;
             EQ.p_eState = EQ.eState.Run;
             return "OK";
         }
         #endregion
 
         #region RnR
-        Visibility _visibleRnR = Visibility.Hidden; 
+        Visibility _visibleRnR = Visibility.Hidden;
         public Visibility p_visibleRnR
-        { 
+        {
             get { return _visibleRnR; }
             set
             {
                 if (_visibleRnR == value) return;
                 _visibleRnR = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
 
-        int _nRnR = 1; 
+        int _nRnR = 1;
         public int p_nRnR
         {
             get { return _nRnR; }
@@ -194,8 +201,26 @@ namespace RootTools.Module
             {
                 if (_nRnR == value) return;
                 _nRnR = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
+        }
+
+        int _maxRun = 1;
+        public int p_maxRun
+        {
+            get { return _maxRun; }
+            set
+            {
+                if (_maxRun == value) return;
+                _maxRun = Math.Max(value, 1);
+                OnPropertyChanged();
+            }
+        }
+
+        public int p_iRun
+        {
+            get { return (m_qModuleRun.Count == 0) ? 0 : p_maxRun - m_qModuleRun.Count; }
+            set { OnPropertyChanged(); }
         }
 
         public string ClickRunRnR()
@@ -212,6 +237,7 @@ namespace RootTools.Module
             {
                 foreach (ModuleRunBase moduleRun in m_moduleRunList.m_aModuleRun) m_qModuleRun.Enqueue(moduleRun);
             }
+            p_maxRun = m_qModuleRun.Count;
             EQ.p_eState = EQ.eState.Run;
             return "OK"; 
         }
