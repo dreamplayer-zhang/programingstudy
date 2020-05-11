@@ -70,8 +70,10 @@ namespace RootTools
             set
             {
                 SetProperty(ref _nByte, value);
+
             }
         }
+		public IntPtr m_ptrByte;
 
         public long p_Stride
         {
@@ -350,38 +352,49 @@ namespace RootTools
             BinaryWriter bw = new BinaryWriter(fs);
 
             bw.Write(Convert.ToUInt16(0x4d42));
-            bw.Write(Convert.ToUInt32(54 + 1024 + rect.Width * rect.Height));
+			if (p_nByte==1)
+				bw.Write(Convert.ToUInt32(54 + 1024 + p_nByte * rect.Width * rect.Height));
+			else if(p_nByte==3)
+				bw.Write(Convert.ToUInt32(54 + p_nByte * rect.Width * rect.Height));
+			
             //image 크기 bw.Write();   bmfh.bfSize = sizeof(14byte) + nSizeHdr + rect.right * rect.bottom;
             bw.Write(Convert.ToUInt16(0));   //reserved
             bw.Write(Convert.ToUInt16(0));   //reserved
-            bw.Write(Convert.ToUInt32(1078));
+			if (p_nByte == 1)
+				bw.Write(Convert.ToUInt32(1078));
+			else if (p_nByte == 3)
+				bw.Write(Convert.ToUInt32(54));
+			
 
             bw.Write(Convert.ToUInt32(40));
             bw.Write(Convert.ToInt32(rect.Width));
             bw.Write(Convert.ToInt32(rect.Height));
             bw.Write(Convert.ToUInt16(1));
-            bw.Write(Convert.ToUInt16(8));     //byte                      
+            bw.Write(Convert.ToUInt16(8*p_nByte));     //byte                      
             bw.Write(Convert.ToUInt32(0));      //compress
             bw.Write(Convert.ToUInt32(rect.Width * rect.Height));
             bw.Write(Convert.ToInt32(0));
             bw.Write(Convert.ToInt32(0));
             bw.Write(Convert.ToUInt32(256));      //color
             bw.Write(Convert.ToUInt32(256));      //import
-            for (int i = 0; i < 256; i++)
-            {
-                bw.Write(Convert.ToByte(i));
-                bw.Write(Convert.ToByte(i));
-                bw.Write(Convert.ToByte(i));
-                bw.Write(Convert.ToByte(255));
-            }
-            byte[] aBuf = new byte[rect.Width];
-            for (int i = rect.Height-1; i >=0 ; i--)
-            {
-                Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * p_Size.X), aBuf, 0, rect.Width);
-                bw.Write(aBuf);
-                 p_nProgress = Convert.ToInt32(((double)(rect.Height-i) / rect.Height) * 100);
-            }
-
+			if (p_nByte == 1)
+			{
+				for (int i = 0; i < 256; i++)
+				{
+					bw.Write(Convert.ToByte(i));
+					bw.Write(Convert.ToByte(i));
+					bw.Write(Convert.ToByte(i));
+					bw.Write(Convert.ToByte(255));
+				}
+			}
+			byte[] aBuf = new byte[p_nByte * rect.Width];
+			for (int i = rect.Height - 1; i >= 0; i--)
+			{
+				Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * p_Size.X * p_nByte), aBuf, 0, rect.Width);
+				bw.Write(aBuf);
+				p_nProgress = Convert.ToInt32(((double)(rect.Height - i) / rect.Height) * 100);
+			}
+			
             //byte[] pBuf = br.ReadBytes(nWidth);
             //Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + offset.X + (long)p_Size.X * ((long)offset.Y + y)), lowwidth);
             //p_nProgress = Convert.ToInt32(((double)y / lowheight) * 100);
@@ -505,20 +518,13 @@ namespace RootTools
 
                      for (int y = lowheight-1; y >=0 ; y--) 
                     {
-						if (y == 0)
-							y = y;
                         if (Worker_MemoryCopy.CancellationPending)
                             return;
+
 						byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
-						if (pBuf.Length != 0)
-						{
-							Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X) * ((long)offset.Y + y)), p_nByte * lowwidth);
+						
+							Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte *( offset.X + p_Size.X * ((long)offset.Y + y))), p_nByte * lowwidth);
 							p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
-						}
-						else
-						{
-							pBuf = pBuf;
-						}
                     }
                 }
                 else
@@ -561,7 +567,7 @@ namespace RootTools
             IntPtr ip = (IntPtr)null;
             if (m_eMode == eMode.MemoryRead)
             {
-                ip = (IntPtr)((long)m_ptrImg + y * p_Stride + x * p_nByte);
+				ip = (IntPtr)((long)m_ptrImg + p_nByte*(y * p_Stride + x));
             }
             else if(m_eMode == eMode.ImageBuffer)
             {
@@ -571,7 +577,7 @@ namespace RootTools
                 {
                     unsafe
                     {
-                        fixed (byte* p = &m_aBuf[y * p_Stride + x * p_nByte])
+						fixed (byte* p = &m_aBuf[p_nByte * (y * p_Stride + x)])
                         {
                             ip = (IntPtr)(p);
                         }

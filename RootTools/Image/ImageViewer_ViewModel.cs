@@ -190,6 +190,25 @@ namespace RootTools
 		}
 		private MouseButtonState MouseState;
 
+
+		public System.Windows.Media.Color GetPixelColor(BitmapSource source, int x, int y)
+		{
+			System.Windows.Media.Color c = Colors.White;
+			if (source != null)
+			{
+				try
+				{
+					CroppedBitmap cb = new CroppedBitmap(source, new Int32Rect(x, y, 1, 1));
+					var pixels = new byte[4];
+					cb.CopyPixels(pixels, 4, 0);
+					c = System.Windows.Media.Color.FromRgb(pixels[2], pixels[1], pixels[0]);
+				}
+				catch (Exception) { }
+			}
+			return c;
+		}
+
+
 		private int _MouseX = 0;
 		public int p_MouseX
 		{
@@ -201,18 +220,25 @@ namespace RootTools
 			{
 				if (p_ImgSource != null)
 				{
-					byte[] pixel = new byte[1];
 					if (_CanvasWidth != 0 && _CanvasHeight != 0)
 					{
 						if (p_MouseX < p_ImgSource.Width && p_MouseY < p_ImgSource.Height)
 						{
-							//p_ImgSource.CopyPixels(new Int32Rect(p_MouseX, p_MouseY, 1, 1), pixel, 1, 0);
-							p_GV = pixel[0];
+							if (p_ImgSource.Format.BitsPerPixel == 24)
+							{
+								System.Windows.Media.Color c_Pixel = GetPixelColor(p_ImgSource, p_MouseX, p_MouseY);
+								p_Data = "R = " + c_Pixel.R + "G = " + c_Pixel.G + "B = " + c_Pixel.B;
+							}
+							else if (p_ImgSource.Format.BitsPerPixel == 8)
+							{
+								byte[] pixel = new byte[1];
+								p_ImgSource.CopyPixels(new Int32Rect(p_MouseX, p_MouseY, 1, 1), pixel, 1, 0);
+								p_Data = "GV = " + pixel[0];
+							}
 							p_MouseMemY = p_View_Rect.Y + p_MouseY * p_View_Rect.Height / _CanvasHeight;
 							p_MouseMemX = p_View_Rect.X + p_MouseX * p_View_Rect.Width / _CanvasWidth;
 						}
 					}
-
 				}
 				SetProperty(ref _MouseX, value);
 			}
@@ -278,16 +304,16 @@ namespace RootTools
 			}
 		}
 
-		private int _GV = 0;
-		public int p_GV
+		private string _Data = "";
+		public string p_Data
 		{
 			get
 			{
-				return _GV;
+				return _Data;
 			}
 			set
 			{
-				SetProperty(ref _GV, value);
+				SetProperty(ref _Data, value);
 			}
 		}
 
@@ -575,23 +601,49 @@ namespace RootTools
 		}
 		public unsafe void SetThumNailIamge()
 		{
-			Image<Gray, byte> view = new Image<Gray, byte>(p_ThumbWidth, p_ThumbHeight);
-			IntPtr ptrMem = m_ImageData.GetPtr();
-			if (ptrMem == IntPtr.Zero) return;
-			int pix_x = 0;
-			int pix_y = 0;
-
-			for (int yy = 0; yy < p_ThumbHeight; yy++)
+			if (p_ImageData.p_nByte == 1)
 			{
-				for (int xx = 0; xx < p_ThumbWidth; xx++)
+				Image<Gray, byte> view = new Image<Gray, byte>(p_ThumbWidth, p_ThumbHeight);
+				IntPtr ptrMem = m_ImageData.GetPtr();
+				if (ptrMem == IntPtr.Zero) return;
+				int pix_x = 0;
+				int pix_y = 0;
+
+				for (int yy = 0; yy < p_ThumbHeight; yy++)
 				{
-					pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
-					pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
-					view.Data[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * p_ImageData.p_Size.X];
+					for (int xx = 0; xx < p_ThumbWidth; xx++)
+					{
+						pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
+						pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
+						view.Data[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * p_ImageData.p_Size.X];
+					}
 				}
+				if (view.Width != 0 && view.Height != 0)
+					p_ThumNailImgSource = ImageHelper.ToBitmapSource(view);
 			}
-			if (view.Width != 0 && view.Height != 0)
-				p_ThumNailImgSource = ImageHelper.ToBitmapSource(view);
+			else if (p_ImageData.p_nByte == 3)
+			{
+				Image<Rgb, byte> view = new Image<Rgb, byte>(p_ThumbWidth, p_ThumbHeight);
+				IntPtr ptrMem = m_ImageData.GetPtr();
+				if (ptrMem == IntPtr.Zero) return;
+				int pix_x = 0;
+				int pix_y = 0;
+
+				for (int yy = 0; yy < p_ThumbHeight; yy++)
+				{
+						pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
+					for (int xx = 0; xx < p_ThumbWidth; xx++)
+					{
+						pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
+						view.Data[yy, xx, 2] = ((byte*)ptrMem)[0 + m_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+						view.Data[yy, xx, 1] = ((byte*)ptrMem)[1 + m_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+						view.Data[yy, xx, 0] = ((byte*)ptrMem)[2 + m_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+					}
+				}
+				if (view.Width != 0 && view.Height != 0)
+					p_ThumNailImgSource = ImageHelper.ToBitmapSource(view);
+			}
+			
 		}
 
 		public unsafe void SetImageSource()
@@ -636,16 +688,20 @@ namespace RootTools
 							return;
 						int pix_x = 0;
 						int pix_y = 0;
+						long pix_rect;
 
 						for (int yy = 1; yy < p_CanvasHeight; yy++)
 						{
+							pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
+							pix_rect = (long)pix_y * p_ImageData.p_Size.X;
 							for (int xx = 0; xx < p_CanvasWidth; xx++)
 							{
 								pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
-								pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
-								for (int layer = 0; layer < 3; layer++ )
 
-									view.Data[yy, xx, (1 - layer)%3] = ((byte*)ptrMem)[layer + m_ImageData.p_nByte * ((long)pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+								view.Data[yy, xx, 2] = ((byte*)ptrMem)[0 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
+								view.Data[yy, xx,1] = ((byte*)ptrMem)[1 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
+								view.Data[yy, xx, 0] = ((byte*)ptrMem)[2 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
+								
 							}
 						}
 
@@ -658,7 +714,7 @@ namespace RootTools
 							p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y));
 
 					}
-					
+
 				}
 			}
 			catch (Exception ee)
@@ -671,7 +727,7 @@ namespace RootTools
 
 		void TumbNailMove()
 		{
-			if (MouseState == MouseButtonState.Pressed)
+			if (MouseEvent.LeftButton == MouseButtonState.Pressed)
 			{
 				double perX = (double)p_TumbMouseX / p_ThumbWidth;
 				double perY = (double)p_TumbMouseY / p_ThumbHeight;
@@ -846,15 +902,16 @@ namespace RootTools
 			int nY = 0;
 			if (bRatio_WH)
 			{ //세로가 길어
-				nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgWidth * p_Zoom) / 2;
-				nY = p_View_Rect.Y + Convert.ToInt32(p_View_Rect.Height - nImgWidth * p_Zoom * p_CanvasHeight / p_CanvasWidth) / 2;
+				//nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgWidth * p_Zoom) /2; 기존 중앙기준으로 확대/축소되는 코드. 
+				nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgWidth * p_Zoom) * p_MouseX / _CanvasWidth; // 마우스 커서기준으로 확대/축소
+				nY = p_View_Rect.Y + Convert.ToInt32(p_View_Rect.Height - nImgWidth * p_Zoom * p_CanvasHeight / p_CanvasWidth) * p_MouseY / _CanvasHeight;
 				viewrectwidth = Convert.ToInt32(nImgWidth * p_Zoom);
 				viewrectheight = Convert.ToInt32(nImgWidth * p_Zoom * p_CanvasHeight / p_CanvasWidth);
 			}
 			else
 			{
-				nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgHeight * p_Zoom * p_CanvasWidth / p_CanvasHeight) / 2;
-				nY = p_View_Rect.Y + Convert.ToInt32(p_View_Rect.Height - nImgHeight * p_Zoom) / 2;
+				nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgHeight * p_Zoom * p_CanvasWidth / p_CanvasHeight) * p_MouseX / _CanvasWidth;
+				nY = p_View_Rect.Y + Convert.ToInt32(p_View_Rect.Height - nImgHeight * p_Zoom) * p_MouseY / _CanvasHeight;
 				viewrectwidth = Convert.ToInt32(nImgHeight * p_Zoom * p_CanvasWidth / p_CanvasHeight);
 				viewrectheight = Convert.ToInt32(nImgHeight * p_Zoom);
 			}
@@ -989,7 +1046,7 @@ namespace RootTools
 
 				if (KeyEvent.KeyboardDevice.Modifiers == ModifierKeys.Control)
 				{
-					if (!m_BasicTool.p_State && (ToolExist==true && !SelectedTool.p_State))
+					if (!m_BasicTool.p_State && (ToolExist == true && !SelectedTool.p_State))
 					{
 						ModifyManager _ModifyManager = null;
 						if (p_Mode == DrawingMode.Modify)
