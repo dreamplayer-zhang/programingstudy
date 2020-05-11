@@ -276,8 +276,9 @@
     <Compile Include="Logs\LogViewer_UI.xaml.cs">
       <DependentUpon>LogViewer_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Logs\Log_UI.xaml.cs">
-      <DependentUpon>Log_UI.xaml</DependentUpon>
+    <Compile Include="Logs\Log_Group.cs" />
+    <Compile Include="Logs\Log_Group_UI.xaml.cs">
+      <DependentUpon>Log_Group_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Memory\MemoryViewer.cs" />
     <Compile Include="Memory\MemoryViewer_UI.xaml.cs">
@@ -656,7 +657,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Logs\Log_UI.xaml">
+    <Page Include="Logs\Log_Group_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

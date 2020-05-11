@@ -1,26 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using NLog;
+using System;
 
 namespace RootTools.Logs
 {
-    public class Log : NLog.Logger, ILog
+    public class Log
     {
-        #region ILogSet
-        public string p_id { get; set; }
-
-        public UserControl p_ui
+        #region Write
+        public void Info(string str)
         {
-            get
-            {
-                Log_UI ui = new Log_UI();
-                ui.Init(this);
-                return ui;
-            }
+            m_logger.Info(str);
+        }
+        public void Error(string str)
+        {
+            m_logger.Error(str);
+        }
+        public void Error(string str, string sArgument)
+        {
+            m_logger.Error(str, sArgument);
+        }
+        public void Error(Exception e, string str)
+        {
+            m_logger.Error(e, str);
+        }
+
+        public void Warn(string str)
+        {
+            m_logger.Warn(str);
         }
         #endregion
+
+        Logger m_logger;
+        public Log(Logger logger)
+        {
+            m_logger = logger; 
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using NLog;
+using NLog.Config;
+using System.Collections.Generic;
 using System.Windows.Controls;
 
 namespace RootTools.Logs
@@ -32,12 +34,18 @@ namespace RootTools.Logs
         #endregion
 
         #region Get Log
-/*        public Log GetLog(string sLogSet = "ATI", string sGroup = "")
+        public Log GetLog(string sLogSet, string sGroup)
         {
-            var config = new NLog.Config.LoggingConfiguration();    // 현재 설정 값
-            var factory = new NLog.LogFactory();                    // 중간 사용 변수
-            ILogSet logSet = GetLogSet(sLogSet); 
-        }*/
+            var config = new LoggingConfiguration();    // 현재 설정 값
+            var factory = new LogFactory();             // 중간 사용 변수
+            InitLogGroup(config, sGroup); 
+            ILog logSet = GetLogSet(sLogSet); 
+        }
+
+        void InitLogGroup(LoggingConfiguration config, string sGroup)
+        {
+
+        }
         #endregion
 
         public void Init()
