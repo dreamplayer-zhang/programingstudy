@@ -814,7 +814,21 @@ namespace RootTools.Control.Ajin
             //m_log.Info(string.Format("Start Trigger (Level = {1}, Cmd = {2}, Uptime = {3})", bLevel, bCmd, dTrigTime));
         }
 
-       
+        public void _SetTrigger()
+        {
+            // variable
+            Trigger trigger = p_TrgSet;
+            double dTrigStart = trigger.p_dTrigStart;
+            double dTrigEnd = trigger.p_dTrigEnd;
+            double dTrigPeriod = trigger.p_dTrigPeriod;
+            bool bCmd = !trigger.p_bActTrigger;
+
+            // implement
+            SetTrigger(dTrigStart, dTrigEnd, dTrigPeriod, bCmd);
+
+            return;
+        }
+
         public void ResetTrigger()
         {
             AXM("AxmTriggerSetReset", CAXM.AxmTriggerSetReset(p_nAxisID));
@@ -1508,6 +1522,14 @@ namespace RootTools.Control.Ajin
             }
         }
 
+        public RelayCommand StopCommand
+        {
+            get
+            {
+                return new RelayCommand(SStopAxis);
+            }
+        }
+
         public RelayCommand AlarmOffCommand
         {
            get{
@@ -1534,6 +1556,22 @@ namespace RootTools.Control.Ajin
             get
             {
                 return new RelayCommand(EStopAxis);
+            }
+        }
+
+        public RelayCommand SetTriggerCommand
+        {
+            get
+            {
+                return new RelayCommand(_SetTrigger);
+            }
+        }
+
+        public RelayCommand ResetTriggerCommand
+        {
+            get
+            {
+                return new RelayCommand(ResetTrigger);
             }
         }
     }
