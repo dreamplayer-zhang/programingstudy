@@ -825,7 +825,7 @@ namespace RootTools.Control.Ajin
 
             // implement
             SetTrigger(dTrigStart, dTrigEnd, dTrigPeriod, bCmd);
-
+            p_TrgInfo = trigger;
             return;
         }
 
