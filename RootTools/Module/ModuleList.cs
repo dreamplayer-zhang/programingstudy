@@ -172,7 +172,11 @@ namespace RootTools.Module
             EQ.p_bStop = false;
             foreach (ModuleRunBase moduleRun in m_moduleRunList.m_aModuleRun)
             {
-                if (moduleRun.p_id == p_sRunStep) m_qModuleRun.Enqueue(moduleRun);
+                if (moduleRun.p_id == p_sRunStep)
+                {
+                    m_qModuleRun.Enqueue(moduleRun);
+                    return "OK";  //forget
+                }
             }
             p_maxRun = m_qModuleRun.Count;
             EQ.p_eState = EQ.eState.Run;
