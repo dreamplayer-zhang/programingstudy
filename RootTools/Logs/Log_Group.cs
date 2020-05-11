@@ -3,6 +3,7 @@ using NLog.Targets;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace RootTools.Logs
 {
@@ -46,6 +47,7 @@ namespace RootTools.Logs
             public string p_sLogger { get; set; }
             public string p_sMessage { get; set; }
             public string p_sStackTrace { get; set; }
+            public Color p_sColor { get; set; }
 
             public Data(string sLog)
             {
@@ -56,6 +58,12 @@ namespace RootTools.Logs
                 if (asLog.Length > 3) p_sLevel = asLog[3];
                 if (asLog.Length > 4) p_sMessage = asLog[4];
                 if (asLog.Length > 5) p_sStackTrace = asLog[5];
+                switch (p_sLevel)
+                {
+                    case "Error": p_sColor = Colors.Red; break;
+                    case "Warn": p_sColor = Colors.Purple; break;
+                    default: p_sColor = Colors.Black; break;
+                }
             }
         }
         #endregion

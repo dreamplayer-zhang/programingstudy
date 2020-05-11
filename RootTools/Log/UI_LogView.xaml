@@ -166,7 +166,7 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="Logger" Binding="{Binding m_sLogger}"
+                                <DataGridTextColumn Header="Logger" Binding="{Binding m_sLogger}" 
                                         Width="100">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">

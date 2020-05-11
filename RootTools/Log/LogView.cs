@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace RootTools
@@ -258,6 +259,7 @@ namespace RootTools
                 get;
                 set;
             }
+            public Color p_sColor { get; set; }
             public string m_sLogger
             {
                 get;
@@ -291,6 +293,13 @@ namespace RootTools
                         m_sLevel = Enum.GetName(typeof(eLogType), i);
                     }
                 }
+                switch (m_sLevel)
+                {
+                    case "Error": p_sColor = Colors.Red; break;
+                    case "Warn": p_sColor = Colors.Purple; break;
+                    default: p_sColor =  Colors.Black; break; 
+                }
+
                 m_sStack = sLogs[4];
             }
         }
