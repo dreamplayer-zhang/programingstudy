@@ -49,6 +49,7 @@ namespace RootTools.Module
 
         private void ComboBoxRunStep_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (comboBoxRunStep.SelectedValue == null) return; 
             m_moduleList.p_sRunStep = comboBoxRunStep.SelectedValue.ToString();
         }
 

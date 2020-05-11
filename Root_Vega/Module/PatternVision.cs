@@ -142,7 +142,7 @@ namespace Root_Vega.Module
         public string IsPutOK(ref int posRobot, InfoReticle infoReticle)
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            if (p_infoReticle == null) return p_id + " IsPutOK - InfoReticle Exist";
+            if (p_infoReticle != null) return p_id + " IsPutOK - InfoReticle Exist";
             posRobot = m_nTeachRobot;
             return "OK";
         }
