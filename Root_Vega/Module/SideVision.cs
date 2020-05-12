@@ -682,7 +682,8 @@ namespace Root_Vega.Module
                         string sPool = "SideVision.Memory";
                         string sGroup = m_grabMode.p_sMemoryGroup;
                         string sMem = m_grabMode.p_sMemoryData;
-                        MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetPool(sPool).GetGroup(sGroup).GetMemory(sMem);
+                        //MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetPool(sPool).GetGroup(sGroup).GetMemory(sMem);
+                        MemoryData mem = m_module.m_engineer.GetMemory(sPool, sGroup, sMem);
 
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
                         /* 방향 바꾸는 코드 들어가야함*/

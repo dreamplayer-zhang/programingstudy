@@ -1201,7 +1201,8 @@ namespace RootTools.Control.Ajin
 
         public void RunTree(Tree.eMode mode)
         {
-            bool bReadOnly = (m_engineer.p_user.m_eLevel < Login.eLevel.Operator);
+            //bool bReadOnly = (m_engineer.p_user.m_eLevel < Login.eLevel.Operator);
+            bool bReadOnly = false;
             p_treeRootMain.p_eMode = mode;
             RunPosTree(p_treeRootMain.GetTree("Position"), bReadOnly);
             RunSetupSWLimitTree(p_treeRootMain.GetTree("SW Limit-"), 0, true, bReadOnly);
