@@ -2,6 +2,7 @@
 using RootTools.Trees;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace RootTools.Module
 {
@@ -66,6 +67,7 @@ namespace RootTools.Module
                     TabItem tabItem = new TabItem();
                     tabItem.Header = tool.p_id.Replace(m_module.p_id + ".", "");
                     tabItem.Content = tool.p_ui;
+                    tabItem.Background = Brushes.DarkSalmon; 
                     tabControlTools.Items.Add(tabItem);
                 }
             }

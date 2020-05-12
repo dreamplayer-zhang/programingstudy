@@ -10,22 +10,30 @@ namespace RootTools.Logs
         {
             m_logger.Info(str);
         }
+
+        public void Warn(string str)
+        {
+            m_logger.Warn(str);
+        }
+
         public void Error(string str)
         {
             m_logger.Error(str);
         }
+
         public void Error(string str, string sArgument)
         {
             m_logger.Error(str, sArgument);
         }
+
         public void Error(Exception e, string str)
         {
             m_logger.Error(e, str);
         }
 
-        public void Warn(string str)
+        public void Fatal(string str)
         {
-            m_logger.Warn(str);
+            m_logger.Fatal(str);
         }
         #endregion
 

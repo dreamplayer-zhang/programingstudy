@@ -30,7 +30,7 @@
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
             <toolBox:ToolBox_UI Grid.Column="2" x:Name="toolBoxUI" Margin="2"/>
             <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-            <log:LogViewer_UI Grid.Column="4" x:Name="logViewUI" Margin="2"/>
+            <log:LogView_UI Grid.Column="4" x:Name="logViewUI" Margin="2"/>
         </Grid>
     </Grid>
 </UserControl>

@@ -1,4 +1,5 @@
 ﻿using NLog;
+using NLog.Config;
 using NLog.Targets;
 using System;
 using System.Collections.ObjectModel;
@@ -14,7 +15,27 @@ namespace RootTools.Logs
         #region ILog
         public string p_id { get; set; }
 
-        public UserControl p_ui => throw new NotImplementedException();
+        public UserControl p_ui
+        {
+            get
+            {
+                Log_Group_UI ui = new Log_Group_UI();
+                ui.Init(this);
+                return ui;
+            }
+        }
+
+        public void CalcData()
+        {
+            if (m_memory.Logs.Count <= 0) return;
+            while (m_memory.Logs.Count > 0)
+            {
+                Data data = new Data(m_memory.Logs[0]);
+                m_memory.Logs.RemoveAt(0);
+                p_aLog.Add(data);
+            }
+            while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
+        }
         #endregion
 
         #region Layout
@@ -47,7 +68,7 @@ namespace RootTools.Logs
             public string p_sLogger { get; set; }
             public string p_sMessage { get; set; }
             public string p_sStackTrace { get; set; }
-            public Color p_sColor { get; set; }
+            public Color p_sColor { get; set; } //forget
 
             public Data(string sLog)
             {
@@ -68,19 +89,11 @@ namespace RootTools.Logs
         }
         #endregion
 
-        #region Timer
-        public void CalcData()
+        public void AddRule(LoggingConfiguration config)
         {
-            if (m_memory.Logs.Count <= 0) return; 
-            while (m_memory.Logs.Count > 0)
-            {
-                Data data = new Data(m_memory.Logs[0]);
-                m_memory.Logs.RemoveAt(0); 
-                p_aLog.Add(data); 
-            }
-            while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0); 
+            config.AddRule(m_lvMin, m_lvMax, m_file);
+            config.AddRule(m_lvMin, m_lvMax, m_memory);
         }
-        #endregion
 
         public MemoryTarget m_memory;  // DataGrid에 Log를 추가하기 위해 임시로 저장 되는 Memory Target
         public FileTarget m_file;      // File로 Log를 남기기 위한 Target

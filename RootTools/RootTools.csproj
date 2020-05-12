@@ -268,13 +268,13 @@
     <Compile Include="Inspects\SqliteDataDB.cs" />
     <Compile Include="Logs\ILog.cs" />
     <Compile Include="Logs\Log.cs" />
-    <Compile Include="Logs\LogSet.cs" />
-    <Compile Include="Logs\LogSet_UI.xaml.cs">
-      <DependentUpon>LogSet_UI.xaml</DependentUpon>
+    <Compile Include="Logs\Log_Set.cs" />
+    <Compile Include="Logs\Log_Set_UI.xaml.cs">
+      <DependentUpon>Log_Set_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Logs\LogViewer.cs" />
-    <Compile Include="Logs\LogViewer_UI.xaml.cs">
-      <DependentUpon>LogViewer_UI.xaml</DependentUpon>
+    <Compile Include="Logs\LogView_UI.xaml.cs">
+      <DependentUpon>LogView_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Logs\Log_Group.cs" />
     <Compile Include="Logs\Log_Group_UI.xaml.cs">
@@ -649,11 +649,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Logs\LogSet_UI.xaml">
+    <Page Include="Logs\Log_Set_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Logs\LogViewer_UI.xaml">
+    <Page Include="Logs\LogView_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

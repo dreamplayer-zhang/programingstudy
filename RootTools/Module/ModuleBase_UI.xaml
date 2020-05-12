@@ -44,10 +44,10 @@
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <Grid Grid.Column="2">
             <TabControl x:Name="tabControlTools">
-                <TabItem Header="Info">
+                <TabItem Header="Info" Background="DarkSalmon">
                     <tool:InfoList_UI x:Name="infoListUI"/>
                 </TabItem>
-                <TabItem Header="DIO">
+                <TabItem Header="DIO" Background="DarkSalmon">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>

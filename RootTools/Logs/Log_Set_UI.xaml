@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="RootTools.Logs.LogViewer_UI"
+﻿<UserControl x:Class="RootTools.Logs.Log_Set_UI"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
