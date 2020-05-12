@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace RootTools.Logs
 {
-    public class Log_Group : ILog
+    public class Log_Group : ILogGroup
     {
         const int c_lLog = 500; 
 

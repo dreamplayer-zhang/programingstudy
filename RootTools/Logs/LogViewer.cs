@@ -30,17 +30,12 @@ namespace RootTools.Logs
         #region Get Log
         public static Log GetLog(string id)
         {
-            return m_logView.GetLog(id, null, null); 
+            return m_logView.GetLog(id, null); 
         }
 
         public static Log GetLog(string id, string sGroup)
         {
-            return m_logView.GetLog(id, sGroup, null); 
-        }
-
-        public static Log GetLog(string id, string sGroup, string sSet)
-        {
-            return m_logView.GetLog(id, sGroup, sSet); 
+            return m_logView.GetLog(id, sGroup); 
         }
         #endregion
 
@@ -75,44 +70,36 @@ namespace RootTools.Logs
         #endregion
 
         #region List Log
-        public List<ILog> m_aLogSet = new List<ILog>();
+        public List<ILogGroup> m_aLogGroup = new List<ILogGroup>();
         #endregion
 
-        #region Get Log
-        public Log GetLog(string id, string sGroup, string sSet)
+        #region Get ATI Log
+        public Log GetLog(string id, string sGroup)
         {
             var config = new LoggingConfiguration();    // 현재 설정 값
+            InitLogGroup(config, sGroup);               // sGroup에 해당하는 LogGroup 가져오거나 생성
             var factory = new LogFactory();             // 중간 사용 변수
-            ILog logSet = GetLogSet(sSet);
-            return null;
+            factory.Configuration = config;
+            return new Log(factory.GetLogger(id));
         }
-        /*        public Log GetLog(string sLogSet, string sGroup)
-                {
-                    InitLogGroup(config, sGroup); 
-                    ILog logSet = GetLogSet(sLogSet); 
-                }
-                */
 
-        ILog GetLogSet(string sSet)
-        {
-            if ((sSet == null) || (sSet == "")) return null;
-            foreach (ILog log in m_aLogSet)
-            {
-                if (log.p_id == sSet) return log; 
-            }
-            Log_Set logSet = new Log_Set(sSet);
-            m_aLogSet.Add(logSet);
-            if (OnChangeTab != null) OnChangeTab();
-            return logSet; 
-        }
-        
         void InitLogGroup(LoggingConfiguration config, string sGroup)
         {
             m_groupTotal.AddRule(config);
             if ((sGroup == null) || (sGroup == "")) return;
-
+            foreach (ILogGroup group in m_aLogGroup)
+            {
+                if (group.p_id == sGroup)
+                {
+                    group.AddRule(config);
+                    return; 
+                }
+            }
+            Log_Group logGroup = new Log_Group(sGroup, LogLevel.Info, LogLevel.Fatal);
+            logGroup.AddRule(config);
+            m_aLogGroup.Add(logGroup);
+            if (OnChangeTab != null) OnChangeTab(); 
         }
-
         #endregion
 
         #region Timer
@@ -127,7 +114,7 @@ namespace RootTools.Logs
         private void M_timer_Tick(object sender, EventArgs e)
         {
             if (p_bHold) return;
-            foreach (ILog log in m_aLogSet) log.CalcData();
+            foreach (ILogGroup log in m_aLogGroup) log.CalcData();
         }
         #endregion
 
@@ -135,7 +122,7 @@ namespace RootTools.Logs
         public void Init()
         {
             m_groupTotal = new Log_Group("Total", LogLevel.Info, LogLevel.Fatal);
-            m_aLogSet.Add(m_groupTotal);
+            m_aLogGroup.Add(m_groupTotal);
             //            StartTimer();
         }
 

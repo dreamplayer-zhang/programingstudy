@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace RootTools.Logs
@@ -29,10 +31,14 @@ namespace RootTools.Logs
 
         void UpdateLogTab()
         {
-            foreach (ILog log in m_logView.m_aLogSet) UpdateLogTab(log); 
+            foreach (ILogGroup log in m_logView.m_aLogGroup) UpdateLogTab(log);
+            m_asLog.Clear();
+            comboLog.ItemsSource = null;
+            foreach (ILogGroup log in m_logView.m_aLogGroup) m_asLog.Add(log.p_id);
+            comboLog.ItemsSource = m_asLog; 
         }
 
-        void UpdateLogTab(ILog log)
+        void UpdateLogTab(ILogGroup log)
         {
             foreach (TabItem tabItem in tabLog.Items)
             {
@@ -40,9 +46,17 @@ namespace RootTools.Logs
             }
             TabItem item = new TabItem();
             item.Header = log.p_id;
+            item.Height = 0; 
             item.Content = log.p_ui;
             item.Background = Brushes.AliceBlue;
             tabLog.Items.Add(item);
+        }
+
+        List<string> m_asLog = new List<string>();
+        private void comboLog_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (comboLog.SelectedIndex < 0) return;
+            tabLog.SelectedIndex = comboLog.SelectedIndex; 
         }
     }
 }

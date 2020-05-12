@@ -6,5 +6,12 @@
              xmlns:local="clr-namespace:RootTools.Logs"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <TabControl x:Name="tabLog"/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <ComboBox Grid.Row="0" x:Name="comboLog" SelectionChanged="comboLog_SelectionChanged"/>
+        <TabControl Grid.Row="1" x:Name="tabLog"/>
+    </Grid>
 </UserControl>
