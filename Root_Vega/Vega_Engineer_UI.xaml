@@ -22,9 +22,11 @@
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="58*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="29*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="13*"/>
             </Grid.ColumnDefinitions>
             <local:Vega_Handler_UI Grid.Column="0" x:Name="handlerUI"/>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
@@ -36,6 +38,7 @@
                     <tools:UI_LogView x:Name="logViewUI" Margin="2"/>
                 </TabItem>
             </TabControl>
+            <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         </Grid>
     </Grid>
 </UserControl>
