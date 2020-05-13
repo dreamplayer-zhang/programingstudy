@@ -801,7 +801,11 @@ namespace Root_Vega.Module
                         return p_sInfo;
                     // 분산 Score 계산
                     dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
-                    if (dLeftCurrentScore > dLeftMaxScore) dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
+                    if (dLeftCurrentScore > dLeftMaxScore)
+                    {
+                        dLeftMaxScore = dLeftCurrentScore;
+                        dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
+                    }
                 }
 
                 // 2. Reticle 우측 위치로 이동 후 AF
@@ -822,19 +826,32 @@ namespace Root_Vega.Module
                         return p_sInfo;
                     // 분산 Score 계산
                     dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
-                    if (dRightCurrentScore > dRightMaxScore) dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
+                    if (dRightCurrentScore > dRightMaxScore)
+                    {
+                        dRightMaxScore = dRightCurrentScore;
+                        dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
+                    }
                 }
 
                 // 3. 좌우측 AF편차 구하기 (단위환산 필요..)
                 af.p_dDifferenceOfFocusDistance = dRightMaxScorePosX - dLeftMaxScorePosX;
-                af.p_dDistanceOfLeftPointToRightPoint = m_dLeftPosY - m_dRightPosY;
+                af.p_dDistanceOfLeftPointToRightPoint = m_dRightPosY - m_dLeftPosY;
 
                 // 4. 좌우측 위치 사이의 거리와 좌우측 AF편차를 이용하여 Theta 계산
                 double dThetaRadian = af.GetThetaRadian();
                 double dTehtaDegree = af.GetThetaDegree(dThetaRadian);
 
-                // 5. Theta축 돌리기 (Theta축 회전 방향 확인 필요.. 시계방향/반시계방향)
-                m_module.p_axisTheta.Move(dThetaRadian);
+                // 5. Radian 값을 Theta 모터 포지션 값으로 Scaling
+                double dMinValue = 0.0;
+                double dMaxValue = 2 * Math.PI;
+                double dMinScaleValue = 0.0;
+                double dMaxScaleValue = 360000.0;
+                double dScaled = dMinScaleValue + (Math.Abs(dThetaRadian) - dMinValue) / (dMaxValue - dMinValue) * (dMaxScaleValue - dMinScaleValue);
+
+                // 6. Theta축 돌리기
+                // Theta + -> 반시계 방향
+                // Theta - -> 시계 방향
+                //m_module.p_axisTheta.Move(dThetaRadian);
 
                 return base.Run();
             }

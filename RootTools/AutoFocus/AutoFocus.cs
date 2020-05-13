@@ -35,7 +35,7 @@ namespace RootTools.AutoFocus
                 m_dDifferenceOfFocusDistance = value;
             }
         }
-        eImageState m_eImageState = eImageState.COLOR_RGB;
+        eImageState m_eImageState = eImageState.GRAY_SCALE;
         public eImageState p_eImageState
         {
             get
@@ -54,7 +54,7 @@ namespace RootTools.AutoFocus
         }
         public double GetThetaRadian()
         {
-            return Math.Atan2(m_dDistanceOfLeftPointToRightPoint, m_dDifferenceOfFocusDistance);
+            return Math.Atan2(m_dDifferenceOfFocusDistance, m_dDistanceOfLeftPointToRightPoint);
         }
         public double GetImageVarianceScore(ImageData img, int nVarianceSize)
         {
@@ -92,7 +92,7 @@ namespace RootTools.AutoFocus
                 {
                     case eImageState.GRAY_SCALE:
                         {
-                            byte* p = (byte*)(img.m_ptrImg.ToPointer());
+                            byte* p = (byte*)img.GetPtr();
                             for (int i = 0; i < nVarianceSize; i++)
                             {
                                 for (int j = 0; j < nVarianceSize; j++)
@@ -146,7 +146,7 @@ namespace RootTools.AutoFocus
                 {
                     case eImageState.GRAY_SCALE:
                         {
-                            byte* p = (byte*)(img.m_ptrImg.ToPointer());
+                            byte* p = (byte*)img.GetPtr();
                             for (int i = 0; i < nVarianceSize; i++)
                             {
                                 for (int j = 0; j < nVarianceSize; j++)
@@ -195,7 +195,7 @@ namespace RootTools.AutoFocus
             // implement
             unsafe
             {
-                byte* p = (byte*)(img.m_ptrImg.ToPointer());
+                byte* p = (byte*)img.GetPtr();
                 r = *(p + y * nWidth * 3 + x * 3);
                 g = *(p + y * nWidth * 3 + x * 3 + 1);
                 b = *(p + y * nWidth * 3 + x * 3 + 2);
@@ -211,7 +211,7 @@ namespace RootTools.AutoFocus
             // implement
             unsafe
             {
-                byte* p = (byte*)(img.m_ptrImg.ToPointer());
+                byte* p = (byte*)img.GetPtr();
                 r = *(p + y * nWidth * 4 + x * 4);
                 g = *(p + y * nWidth * 4 + x * 4 + 1);
                 b = *(p + y * nWidth * 4 + x * 4 + 2);
