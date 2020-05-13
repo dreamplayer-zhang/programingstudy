@@ -67,6 +67,8 @@ namespace RootTools.Control.Ajin
                 RaisePropertyChanged();
             }
         }
+
+        public Log p_log { get { return m_log; } }
         #endregion
 
         #region UI Binding
@@ -1228,7 +1230,7 @@ namespace RootTools.Control.Ajin
 
         string m_id;
         IEngineer m_engineer;
-        Log m_log;
+        public Log m_log = null;
         bool m_bEnable = false;
         
         TreeRoot m_treeRootMain;
@@ -1252,13 +1254,13 @@ namespace RootTools.Control.Ajin
             set { SetProperty(ref m_treeSetup, value); }
         }
 
-        public void Init(string id, int nAxisID, IEngineer engineer, Log log, bool bEnable)
+        public void Init(string id, int nAxisID, IEngineer engineer, bool bEnable)
         {
             m_id = id + "." + nAxisID.ToString("00");
             p_nAxisID = nAxisID;
             p_sID = "Axis";
             m_engineer = engineer;
-            m_log = log;
+            m_log = LogViewer.GetLog(id);
             m_bEnable = bEnable;
             InitPosition();
             InitSpeed();

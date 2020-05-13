@@ -168,6 +168,7 @@ namespace RootTools.Control
                 {
                     axis = m_toolAxis[nAxis1];
                     axis.p_sID = m_id + "." + sName;
+                    axis.p_log.m_logger = m_log.m_logger; 
                     AddPosDone(axis);
                 }
             }

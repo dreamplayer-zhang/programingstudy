@@ -125,6 +125,7 @@ namespace RootTools.Control
                 {
                     p_axis = m_toolAxis[nAxis1];
                     p_axis.p_sID = m_id;
+                    p_axis.p_log.m_logger = m_log.m_logger; 
                     AddPosDone();
                 }
             }

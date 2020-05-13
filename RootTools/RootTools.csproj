@@ -331,9 +331,6 @@
       <DependentUpon>RTC5_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="SQLogs\SQLog.cs" />
-    <Compile Include="SQLogs\SQLog_UI.xaml.cs">
-      <DependentUpon>SQLog_UI.xaml</DependentUpon>
-    </Compile>
     <Compile Include="SQLogs\SQTableBase.cs" />
     <Compile Include="SQLogs\SQTable_ALID.cs" />
     <Compile Include="ToolBoxs\StringTable.cs" />
@@ -714,10 +711,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RTC5s\RTC5_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="SQLogs\SQLog_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
