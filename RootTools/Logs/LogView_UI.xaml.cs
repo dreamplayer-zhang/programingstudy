@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace RootTools.Logs
+namespace RootTools
 {
     /// <summary>
     /// LogView_UI.xaml에 대한 상호 작용 논리

@@ -7,7 +7,6 @@
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
              xmlns:toolBox="clr-namespace:RootTools.ToolBoxs;assembly=RootTools"
-             xmlns:log="clr-namespace:RootTools.Logs;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -30,7 +29,7 @@
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
             <toolBox:ToolBox_UI Grid.Column="2" x:Name="toolBoxUI" Margin="2"/>
             <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-            <log:LogView_UI Grid.Column="4" x:Name="logViewUI" Margin="2"/>
+            <tools:LogView_UI Grid.Column="4" x:Name="logViewUI" Margin="2"/>
         </Grid>
     </Grid>
 </UserControl>

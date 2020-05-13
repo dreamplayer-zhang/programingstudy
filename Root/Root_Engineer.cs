@@ -5,7 +5,6 @@ using RootTools.Memory;
 using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
-using RootTools.Logs;
 
 namespace Root
 {

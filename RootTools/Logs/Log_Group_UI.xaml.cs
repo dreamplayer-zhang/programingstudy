@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace RootTools.Logs
+namespace RootTools
 {
     /// <summary>
     /// Log_UI.xaml에 대한 상호 작용 논리

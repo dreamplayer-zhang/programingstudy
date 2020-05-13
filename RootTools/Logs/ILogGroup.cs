@@ -1,7 +1,7 @@
 ﻿using NLog.Config;
 using System.Windows.Controls;
 
-namespace RootTools.Logs
+namespace RootTools
 {
     public interface ILogGroup
     {

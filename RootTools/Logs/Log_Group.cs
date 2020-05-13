@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace RootTools.Logs
+namespace RootTools
 {
     public class Log_Group : ILogGroup
     {

@@ -1,7 +1,7 @@
 ﻿using NLog;
 using System;
 
-namespace RootTools.Logs
+namespace RootTools
 {
     public class Log
     {

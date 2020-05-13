@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Threading;
 
-namespace RootTools.Logs
+namespace RootTools
 {
     // WPF LogView
     // NLog 외부 라이브러리 사용 https://nlog-project.org/
