@@ -833,8 +833,12 @@ namespace Root_Vega.Module
                     }
                 }
 
-                // 3. 좌우측 AF편차 구하기 (단위환산 필요..)
-                af.p_dDifferenceOfFocusDistance = dRightMaxScorePosX - dLeftMaxScorePosX;
+                // 3. 좌우측 AF편차 구하기
+                bool bThetaClockwise = true;    // Theta+ = Anticlockwise
+                                                // Theta- = Clockwise
+                if (dLeftMaxScorePosX > dRightMaxScorePosX) bThetaClockwise = false;
+                af.p_dDifferenceOfFocusDistance = Math.Abs(dRightMaxScorePosX - dLeftMaxScorePosX);
+                if (m_dRightPosY >= m_dLeftPosY) return "AutoFocus - Right Y Position is bigger than Left Y Position";
                 af.p_dDistanceOfLeftPointToRightPoint = m_dRightPosY - m_dLeftPosY;
 
                 // 4. 좌우측 위치 사이의 거리와 좌우측 AF편차를 이용하여 Theta 계산
@@ -849,9 +853,9 @@ namespace Root_Vega.Module
                 double dScaled = dMinScaleValue + (Math.Abs(dThetaRadian) - dMinValue) / (dMaxValue - dMinValue) * (dMaxScaleValue - dMinScaleValue);
 
                 // 6. Theta축 돌리기
-                // Theta + -> 반시계 방향
-                // Theta - -> 시계 방향
-                //m_module.p_axisTheta.Move(dThetaRadian);
+                double dActualPos = m_module.p_axisTheta.p_axis.p_posActual;
+                if (!bThetaClockwise) dScaled = -dScaled;
+                m_module.p_axisTheta.Move(dActualPos + dScaled);
 
                 return base.Run();
             }
