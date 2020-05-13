@@ -103,10 +103,10 @@ namespace Root_Vega
 
             public void InitAlarmData()
             {
-                //((GAF_Manager)m_Engineer.ClassGAFManager()).GetALID(this.ToString(), eAlarm.TestAlarm1, "Test Alarm 1", "이건 Test용으로 하는거");
-                //((GAF_Manager)m_Engineer.ClassGAFManager()).GetALID(this.ToString(), eAlarm.TestAlarm2, "Test Alarm 2", "1. 공압이 떨어졌습니다. \n 2.선연결 확인해주세요.");
-                //((GAF_Manager)m_Engineer.ClassGAFManager()).GetALID(this.ToString(), eAlarm.TestAlarm3, "Test Alarm 3", "1.어쩌구\n 2. 어쩌구");
-                //((GAF_Manager)m_Engineer.ClassGAFManager()).GetALID(this.ToString(), eAlarm.TestAlarm4, "Test Alarm 4", "?!._-특수문자 테스트!@#$| 되는지 확인");
+                ((GAF_Manager)m_Engineer.ClassGAFManager()).GetALID(this.ToString(), eAlarm.TestAlarm1, "Test Alarm 1", "이건 Test용으로 하는거");
+                ((GAF_Manager)m_Engineer.ClassGAFManager()).GetALID(this.ToString(), eAlarm.TestAlarm2, "Test Alarm 2", "1. 공압이 떨어졌습니다. \n 2.선연결 확인해주세요.");
+                ((GAF_Manager)m_Engineer.ClassGAFManager()).GetALID(this.ToString(), eAlarm.TestAlarm3, "Test Alarm 3", "1.어쩌구\n 2. 어쩌구");
+                ((GAF_Manager)m_Engineer.ClassGAFManager()).GetALID(this.ToString(), eAlarm.TestAlarm4, "Test Alarm 4", "?!._-특수문자 테스트!@#$| 되는지 확인");
             }
 
             void TestFunction()

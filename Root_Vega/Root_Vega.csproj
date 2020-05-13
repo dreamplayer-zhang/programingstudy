@@ -148,6 +148,9 @@
     <Compile Include="1_2_LoadPort.xaml.cs">
       <DependentUpon>1_2_LoadPort.xaml</DependentUpon>
     </Compile>
+    <Compile Include="1_3_FDC.xaml.cs">
+      <DependentUpon>1_3_FDC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="1_Main.xaml.cs">
       <DependentUpon>1_Main.xaml</DependentUpon>
     </Compile>
@@ -294,6 +297,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="1_2_LoadPort.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="1_3_FDC.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

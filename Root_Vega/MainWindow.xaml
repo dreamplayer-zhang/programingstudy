@@ -200,16 +200,19 @@
                     BorderBrush="{StaticResource BorderBrush}"
                     Margin="0,10,10,10"
                     BorderThickness="3">
-                <Grid Opacity="0.8">
+                <Grid Background="{StaticResource BackGround}">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Grid Background="#FFDE3A3A"/>
+                    <Grid Background="#FFDE3A3A"
+                          Opacity="0.1"/>
                     <Grid Background="#FFF3CD6E"
+                          Opacity="0.1"
                               Grid.Row="1"/>
                     <Grid Background="#FF57AE7D"
+                          Opacity="0.1"
                               Grid.Row="2"/>
                 </Grid>
             </Border>
@@ -253,18 +256,13 @@
                      Style="{StaticResource ResourceKey=MainTabItem}">
                 <local:_6_Log x:Name="_Log"/>
             </TabItem>
-            <TabItem Header="OHT"
-                     Grid.Column="6"
-                     Style="{StaticResource ResourceKey=MainTabItem}">
-                <local:_8_OHT x:Name="_Optic" />
-            </TabItem>
             <TabItem Header="Alarm"
-                     Grid.Column="7"
+                     Grid.Column="6"
                      Style="{StaticResource ResourceKey=MainTabItem}">
                 <local:_7_Alarm x:Name="_Alarm"/>
             </TabItem>
             <TabItem Header="Setting"
-                     Grid.Column="8"
+                     Grid.Column="7"
                      Style="{StaticResource ResourceKey=MainTabItem}">
                 <local:_10_Setting x:Name="_Setting"/>
             </TabItem>

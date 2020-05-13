@@ -350,7 +350,6 @@
                                         <ColumnDefinition />
                                         <ColumnDefinition />
                                         <ColumnDefinition />
-                                        <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
                                 </Grid>
                             </Border>
@@ -732,34 +731,39 @@
 				Value="Bottom" />
 		</Style>
 
-		<Style x:Key="MaximizeIconKey"
+        <Style x:Key="MaximizeIconKey"
 		   TargetType="{x:Type Path}"
 		   BasedOn="{StaticResource ChromeIconBaseKey}">
-			<Setter Property="Width"
+            <Setter Property="Width"
 				Value="11" />
-			<Setter Property="Height"
+            <Setter Property="Height"
 				Value="11" />
-			<Setter Property="Data"
+            <Setter Property="Data"
 				Value="M5,12.5 L5,32.5 L30.078125,32.5 L30.078125,12.5 z M2.5,7.5 L32.578125,7.5 L32.578125,35 L2.5,35 z" />
-		</Style>
+        </Style>
 
-		<Style x:Key="NormalizeIconKey"
+        <Style x:Key="NormalizeIconKey"
 		   TargetType="{x:Type Path}"
 		   BasedOn="{StaticResource ChromeIconBaseKey}">
-			<Setter Property="Data"
+            <Setter Property="Data"
 				Value="M5,22.5 L5,32.5 L22.5,32.5 L22.5,22.5 z M12.5,12.5 L12.5,17.5 L25,17.5 L25,22.5 L30,22.5 L30,12.5 z M10,7.5 L32.5,7.5 L32.5,25 L25,25 L25,35 L2.5,35 L2.5,17.5 L10,17.5 z" />
-		</Style>
+        </Style>
 
-		<Style x:Key="CloseIconKey"
+        <Style x:Key="CloseIconKey"
 		   TargetType="{x:Type Path}"
 		   BasedOn="{StaticResource ChromeIconBaseKey}">
-			<Setter Property="Width"
+            <Setter Property="Width"
 				Value="10" />
-			<Setter Property="Height"
+            <Setter Property="Height"
 				Value="10" />
-			<Setter Property="Data"
+            <Setter Property="Data"
 				Value="M48.578243,0 L57.856652,0 71.665367,15.433628 85.779,0 94.404,0 75.760063,19.752212 94.404,39.999999 85.125595,39.999999 71.229759,24.460176 56.98544,39.999999 48.404,39.999999 67.135063,20.141593 z" />
-		</Style>
+        </Style>
 
-	</Application.Resources>
+
+        <DataTemplate x:Key="listviewHeadr">
+            <TextBlock Text="{Binding}" Foreground="White" Margin="3,0,0,0"/>
+        </DataTemplate>
+
+    </Application.Resources>
 </Application>

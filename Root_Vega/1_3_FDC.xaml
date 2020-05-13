@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="Root_Vega._1_3_FDC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="300">
+    <Grid Grid.Column="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Border BorderThickness="3"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            Background="{StaticResource Purple}">
+            <TextBlock Text="{Binding p_id}"
+                       FontWeight="Bold"
+                       Style="{StaticResource BasicTb}"
+                       FontSize="15"
+                       TextAlignment="Left"
+                       Margin="10,0,0,0"/>
+        </Border>
+        <Border Grid.Row="1"
+                            BorderThickness="3,0,3,3"
+                            BorderBrush="{StaticResource BorderBrush}">
+            <Grid Grid.Row="1" Margin="15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Border>
+                    <TextBlock Text="STATE"
+                                               FontWeight="Black"
+                                               FontSize="15"
+                                               Style="{StaticResource BasicTb}"
+                                               TextAlignment="Left"/>
+                </Border>
+                <Grid Grid.Row="1" Background="{StaticResource LightGray}">
+                    <TextBlock Text="{Binding p_eState}"
+                                                Foreground="{StaticResource Black}"
+                                                FontSize="25"
+                                                Style="{StaticResource BasicTb}"/>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
