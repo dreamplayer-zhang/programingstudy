@@ -2,7 +2,7 @@
 {
     class TreeGroup : Tree
     {
-        public TreeGroup(string sName, Tree treeParent, LogWriter log, bool bExpand, bool bVisible, bool bReadOnly)
+        public TreeGroup(string sName, Tree treeParent, Log log, bool bExpand, bool bVisible, bool bReadOnly)
         {
             p_sName = sName;
             p_treeParent = treeParent;
@@ -14,7 +14,7 @@
             p_bExpand = bExpand;
         }
 
-        public TreeGroup(int nIndex, string sName, Tree treeParent, LogWriter log, bool bExpand, bool bVisible, bool bReadOnly)
+        public TreeGroup(int nIndex, string sName, Tree treeParent, Log log, bool bExpand, bool bVisible, bool bReadOnly)
         {
             p_nIndex = nIndex; 
             p_sName = sName;

@@ -149,10 +149,10 @@ namespace RootTools.RTC5s.LaserBright
             }
         }
 
-        LogWriter m_log;
+        Log m_log;
         public RTC5 m_RTC5;
         public TreeRoot m_treeRoot;
-        public Laser_Bright(string id, LogWriter log)
+        public Laser_Bright(string id, Log log)
         {
             p_id = id;
             m_log = log;

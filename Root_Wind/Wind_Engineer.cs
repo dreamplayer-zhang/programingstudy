@@ -13,9 +13,6 @@ namespace Root_Wind
     public class Wind_Engineer : IEngineer
     {
         #region IEngineer
-        LogView m_logView = new LogView();
-        public LogView ClassLogView() { return m_logView; }
-
         public Login m_login = new Login();
         public Login.User p_user { get { return m_login.p_user; } }
 
@@ -71,8 +68,8 @@ namespace Root_Wind
         public void Init(string id)
         {
             EQ.m_sModel = id;
-            m_logView.Init();
-            m_login.Init(m_logView);
+            LogViewer.Init();
+            m_login.Init();
             //m_GAF.Init(this);
             m_toolBox.Init(id, this);
             InitAjin();
@@ -88,7 +85,7 @@ namespace Root_Wind
             m_handler.ThreadStop();
             m_toolBox.ThreadStop();
             m_login.ThreadStop();
-            m_logView.ThreadStop();
+            LogViewer.ThreadStop();
             //m_GAF.ThreadStop();
         }
     }

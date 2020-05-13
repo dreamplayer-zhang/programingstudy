@@ -133,11 +133,11 @@ namespace RootTools.SQLogs
         }
         #endregion
 
-        LogWriter m_log;
+        Log m_log;
         public _SQLog(IEngineer engineer)
         {
             p_id = "SQLog";
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, p_id, p_id);
+            m_log = LogViewer.GetLog(p_id, p_id);
             m_treeRoot = new TreeRoot(p_id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);

@@ -285,10 +285,10 @@ namespace Root_Vega.Module
         }
         #endregion
 
-        public FDC(string id, IEngineer engineer, string sLogGroup = "")
+        public FDC(string id, IEngineer engineer)
         {
             p_id = id;
-            base.InitBase(id, engineer, sLogGroup);
+            base.InitBase(id, engineer);
         }
 
         public override void ThreadStop()

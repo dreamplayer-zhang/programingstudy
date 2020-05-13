@@ -264,7 +264,7 @@ namespace RootTools.Memory
         public string p_id { get { return m_id; } }
         string m_id;
         IEngineer m_engineer;
-        LogWriter m_log;
+        Log m_log;
         public TreeRoot m_treeRootSetup;
         public TreeRoot m_treeRoot;
         public MemoryTool(string id, IEngineer engineer, bool bRegRead = true)
@@ -275,7 +275,7 @@ namespace RootTools.Memory
             p_fNotRootPageFile = p_fTotalPageFile - p_fAvailPageFile;
             m_id = id;
             m_engineer = engineer;
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, id);
+            m_log = LogViewer.GetLog(id);
             InitRuns(); 
             m_treeRootSetup = new TreeRoot("Memory", m_log);
             m_treeRootSetup.UpdateTree += M_treeRootSetup_UpdateTree;

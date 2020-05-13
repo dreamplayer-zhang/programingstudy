@@ -16,8 +16,8 @@ namespace RootTools.Control
 
         ListDIO m_listDI; 
         public string m_id;
-        LogWriter m_log;
-        public DIO_I(IToolDIO tool, string id, LogWriter log, bool bEnableRun)
+        Log m_log;
+        public DIO_I(IToolDIO tool, string id, Log log, bool bEnableRun)
         {
             m_listDI = tool.p_listDI;
             m_id = id;

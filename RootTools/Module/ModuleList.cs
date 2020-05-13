@@ -250,15 +250,15 @@ namespace RootTools.Module
         string m_id;
         IEngineer m_engineer;
         IHandler m_handler;
-        LogWriter m_log;
+        Log m_log;
         /// <summary> m_moduleRunList : ModuleRun 편집용 -> m_qModuleRun 으로 실행 </summary>
         public ModuleRunList m_moduleRunList;
-        public ModuleList(IEngineer engineer, string sLogGroup = "")
+        public ModuleList(IEngineer engineer)
         {
             m_id = EQ.m_sModel;
             m_engineer = engineer;
             m_handler = engineer.ClassHandler();
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, m_id, sLogGroup);
+            m_log = LogViewer.GetLog(m_id);
             m_moduleRunList = new ModuleRunList(m_id, engineer);
 
             StartThread();

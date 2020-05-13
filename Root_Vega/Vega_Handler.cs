@@ -39,19 +39,19 @@ namespace Root_Vega
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
-            m_vega = new Vega("Vega", m_enginner, "Vega");
+            m_vega = new Vega("Vega", m_enginner);
             InitModule(m_vega); 
-            m_robot = new Robot_RND("Robot", m_enginner, "Robot");
+            m_robot = new Robot_RND("Robot", m_enginner);
             InitModule(m_robot);
-            m_aLoadport[0] = new Loadport("LoadportA", "LP1", m_enginner, "LoadportA");
+            m_aLoadport[0] = new Loadport("LoadportA", "LP1", m_enginner);
             InitModule(m_aLoadport[0]);
-            m_aLoadport[1] = new Loadport("LoadportB", "LP2", m_enginner, "LoadportB");
+            m_aLoadport[1] = new Loadport("LoadportB", "LP2", m_enginner);
             InitModule(m_aLoadport[1]);
-            m_sideVision = new SideVision("SideVision", m_enginner, "SideVision");
+            m_sideVision = new SideVision("SideVision", m_enginner);
             InitModule(m_sideVision);
-            m_patternVision = new PatternVision("PatternVision", m_enginner, "PatternVision");
+            m_patternVision = new PatternVision("PatternVision", m_enginner);
             InitModule(m_patternVision);
-            m_FDC = new FDC("FDC", m_enginner, "FDC");
+            m_FDC = new FDC("FDC", m_enginner);
             InitModule(m_FDC); 
             m_robot.AddChild(m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision);
             m_robot.ReadInfoReticle_Registry();

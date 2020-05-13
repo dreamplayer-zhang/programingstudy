@@ -18,7 +18,7 @@ namespace RootTools.Comm
         }
 
         #region class Log
-        public class Log
+        public class LogData
         {
             string _sTime = "";
             public string p_sTime
@@ -38,7 +38,7 @@ namespace RootTools.Comm
                 get { return _bColor; }
             }
 
-            public Log(eType type, string sMsg)
+            public LogData(eType type, string sMsg)
             {
                 _sTime = DateTime.Now.ToLongTimeString();
                 _sMsg = sMsg;
@@ -53,12 +53,12 @@ namespace RootTools.Comm
         #endregion
 
         #region List Log
-        public ObservableCollection<Log> m_aLog = new ObservableCollection<Log>();
-        public Queue<Log> m_qLog = new Queue<Log>(); 
+        public ObservableCollection<LogData> m_aLog = new ObservableCollection<LogData>();
+        public Queue<LogData> m_qLog = new Queue<LogData>(); 
 
         public void Add(eType type, string sMsg)
         {
-            m_qLog.Enqueue(new Log(type, sMsg));
+            m_qLog.Enqueue(new LogData(type, sMsg));
             if (m_log != null)
             {
                 string sHead = "";
@@ -91,9 +91,9 @@ namespace RootTools.Comm
             m_comm.Send(sMsg); 
         }
         #endregion
-        
-        LogWriter m_log; 
-        public CommLog(IComm comm, LogWriter log)
+
+        Log m_log; 
+        public CommLog(IComm comm, Log log)
         {
             m_comm = comm; 
             m_log = log;

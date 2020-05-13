@@ -42,7 +42,7 @@ namespace RootTools
             Y = p.Y;
         }
 
-        public RPoint(string str, LogWriter log)
+        public RPoint(string str, Log log)
         {
             try
             {

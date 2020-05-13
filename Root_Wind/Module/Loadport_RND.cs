@@ -560,13 +560,13 @@ namespace Root_Wind.Module
         #endregion
 
         public InfoCarrier m_infoCarrier;
-        public Loadport_RND(string id, string sLocID, IEngineer engineer, string sLogGroup = "")
+        public Loadport_RND(string id, string sLocID, IEngineer engineer)
         {
             InitCmd();
             p_id = id; 
-            m_infoCarrier = new InfoCarrier(this, sLocID, engineer, sLogGroup);
+            m_infoCarrier = new InfoCarrier(this, sLocID, engineer);
             m_aTool.Add(m_infoCarrier);
-            base.InitBase(id, engineer, sLogGroup);
+            base.InitBase(id, engineer);
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
         }

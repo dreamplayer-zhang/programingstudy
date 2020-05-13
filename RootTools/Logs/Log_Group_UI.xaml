@@ -9,10 +9,21 @@
     <DataGrid x:Name="dataGrid" IsReadOnly="True" AutoGenerateColumns="False">
         <DataGrid.Columns>
             <DataGridTextColumn Header="Time" Binding="{Binding p_sTime}"/>
-            <DataGridTextColumn Header="Level" Binding="{Binding p_sLevel}"/>
             <DataGridTextColumn Header="Logger" Binding="{Binding p_sLogger}"/>
-            <DataGridTextColumn Header="Message" Binding="{Binding p_sMessage}"/>
-            <DataGridTextColumn Header="Stack Trace" Binding="{Binding p_sStackTrace}"/>
+            <DataGridTemplateColumn Header="Message">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding p_sMessage}" Background="{Binding p_sColor}"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+            <DataGridTemplateColumn Header="Stack Trace">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding p_sStackTrace}" Foreground="Gray"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
         </DataGrid.Columns>
     </DataGrid>
 </UserControl>

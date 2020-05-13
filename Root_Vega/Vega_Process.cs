@@ -311,7 +311,7 @@ namespace Root_Vega
         IEngineer m_engineer;
         public Vega_Handler m_handler;
         Robot_RND m_robot;
-        LogWriter m_log;
+        Log m_log;
         public TreeRoot m_treeReticle;
         public TreeRoot m_treeLocate;
         public TreeRoot m_treeSequence;
@@ -321,7 +321,7 @@ namespace Root_Vega
             m_engineer = engineer;
             m_handler = handler;
             m_robot = handler.m_robot; 
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, id);
+            m_log = LogViewer.GetLog(id);
 
             m_treeReticle = new TreeRoot(id + "Reticle", m_log, true);
             m_treeLocate = new TreeRoot(id + "Locate", m_log);

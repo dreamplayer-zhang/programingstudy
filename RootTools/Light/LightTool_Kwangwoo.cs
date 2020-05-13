@@ -184,14 +184,14 @@ namespace RootTools.Light
 
         string m_id;
         IEngineer m_engineer;
-        LogWriter m_log;
+        Log m_log;
         public RS232 m_rs232;
         public TreeRoot m_treeRoot; 
         public LightTool_Kwangwoo(string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer;
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, id);
+            m_log = LogViewer.GetLog(id);
             m_rs232 = new RS232(id, m_log);
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;

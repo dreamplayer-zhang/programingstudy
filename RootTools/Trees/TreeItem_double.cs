@@ -23,7 +23,7 @@
 
         public dynamic GetValue() { return p_value; }
 
-        public TreeItem_double(string sName, Tree treeParent, double value, string sDesc, LogWriter log)
+        public TreeItem_double(string sName, Tree treeParent, double value, string sDesc, Log log)
         {
             p_sName = sName;
             p_treeParent = treeParent;

@@ -19,7 +19,7 @@
         public dynamic GetValue() { return p_value; }
 
         public string p_sButtonName { get; set; }
-        public TreeItem_ICommand(string sName, Tree treeParent, RelayCommand value, string sButtonName, string sDesc, LogWriter log)
+        public TreeItem_ICommand(string sName, Tree treeParent, RelayCommand value, string sButtonName, string sDesc, Log log)
         {
             p_sName = sName;
             p_treeParent = treeParent;

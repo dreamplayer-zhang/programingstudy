@@ -46,7 +46,7 @@ namespace RootTools.Module
         public string p_id { get { return _id; } }
 
         public string m_sModuleRun;
-        protected LogWriter m_log;
+        protected Log m_log;
         public ModuleBase m_moduleBase = null;
         public dynamic m_infoObject;
         public GemPJ m_pj = null;

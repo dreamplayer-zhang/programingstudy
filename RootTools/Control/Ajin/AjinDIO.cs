@@ -67,13 +67,13 @@ namespace RootTools.Control.Ajin
         #endregion
 
         string m_id;
-        LogWriter m_log;
+        Log m_log;
         public int m_nInputModule;
         public int m_nOutputModule;
-        public void Init(string id, LogView logView, int nInputModule, int nOutputModule)
+        public void Init(string id, int nInputModule, int nOutputModule)
         {
             m_id = id;
-            m_log = logView.GetLog(LogView.eLogType.ENG, id);
+            m_log = LogViewer.GetLog(id);
             InitList();
             m_nInputModule = nInputModule;
             m_nOutputModule = nOutputModule;

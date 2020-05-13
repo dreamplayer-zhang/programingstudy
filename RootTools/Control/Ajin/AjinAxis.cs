@@ -634,7 +634,7 @@ namespace RootTools.Control.Ajin
             {
                 
                 if (_bServoOn == value) return;
-                m_log.WriteLog("Servo : " + value);
+                m_log.Info("Servo : " + value);
                 _bServoOn = value;
                 RaisePropertyChanged();
             }
@@ -1228,7 +1228,7 @@ namespace RootTools.Control.Ajin
 
         string m_id;
         IEngineer m_engineer;
-        LogWriter m_log;
+        Log m_log;
         bool m_bEnable = false;
         
         TreeRoot m_treeRootMain;
@@ -1252,7 +1252,7 @@ namespace RootTools.Control.Ajin
             set { SetProperty(ref m_treeSetup, value); }
         }
 
-        public void Init(string id, int nAxisID, IEngineer engineer, LogWriter log, bool bEnable)
+        public void Init(string id, int nAxisID, IEngineer engineer, Log log, bool bEnable)
         {
             m_id = id + "." + nAxisID.ToString("00");
             p_nAxisID = nAxisID;

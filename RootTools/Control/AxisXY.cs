@@ -133,8 +133,8 @@ namespace RootTools.Control
 
         List<IAxis> m_toolAxis;
         string m_id;
-        LogWriter m_log;
-        public AxisXY(List<IAxis> toolAxis, string id, LogWriter log)
+        Log m_log;
+        public AxisXY(List<IAxis> toolAxis, string id, Log log)
         {
             m_toolAxis = toolAxis;
             m_id = id;

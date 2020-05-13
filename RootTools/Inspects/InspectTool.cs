@@ -392,7 +392,7 @@ namespace RootTools.Inspects
         IEngineer m_engineer;
         bool m_bHost;
         MemoryTool m_memoryTool;
-        LogWriter m_log;
+        Log m_log;
         public TreeRoot m_treeRoot;
         public InspectTool(string id, IEngineer engineer, bool bHost)
         {
@@ -401,7 +401,7 @@ namespace RootTools.Inspects
             m_bHost = bHost;
             m_memoryTool = engineer.ClassMemoryTool();
             m_memoryTool.AddNamedPipe(m_id + ".Memory");
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, m_id);
+            m_log = LogViewer.GetLog(id);
             m_memoryPool = null;
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_tree_UpdateTree;

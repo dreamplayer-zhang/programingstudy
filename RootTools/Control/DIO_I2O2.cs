@@ -33,8 +33,8 @@ namespace RootTools.Control
         ListDIO m_listDI;
         ListDIO m_listDO;
         string m_id;
-        LogWriter m_log;
-        public DIO_I2O2(IToolDIO tool, string id, LogWriter log, bool bEnableRun, string sFalse, string sTrue)
+        Log m_log;
+        public DIO_I2O2(IToolDIO tool, string id, Log log, bool bEnableRun, string sFalse, string sTrue)
         {
             m_listDI = tool.p_listDI;
             m_listDO = tool.p_listDO;

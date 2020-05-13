@@ -14,9 +14,6 @@ namespace Root_Vega
     public class Vega_Engineer : IEngineer
     {
         #region IEngineer
-        LogView m_logView = new LogView();
-        public LogView ClassLogView() { return m_logView; }
-
         public Login m_login = new Login();
         public Login.User p_user
         { 
@@ -78,8 +75,8 @@ namespace Root_Vega
         public void Init(string id)
         {
             EQ.m_sModel = id;
-            m_logView.Init();
-            m_login.Init(m_logView);
+            LogViewer.Init();
+            m_login.Init();
             m_toolBox.Init(id, this);
             InitAjin();
             InitXGem(); 
@@ -94,7 +91,7 @@ namespace Root_Vega
             m_handler.ThreadStop();
             m_toolBox.ThreadStop();
             m_login.ThreadStop();
-            m_logView.ThreadStop();
+            LogViewer.ThreadStop();
         }
     }
 }

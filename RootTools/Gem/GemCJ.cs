@@ -47,9 +47,9 @@ namespace RootTools.Gem
 
         public string m_sCJobID = "";
         public List<GemPJ> m_aPJ = new List<GemPJ>();
-        LogWriter m_log;
+        Log m_log;
 
-        public GemCJ(string sCJobID, GemPJ.eAutoStart autoStart, LogWriter log)
+        public GemCJ(string sCJobID, GemPJ.eAutoStart autoStart, Log log)
         {
             m_log = log;
             m_sCJobID = sCJobID;

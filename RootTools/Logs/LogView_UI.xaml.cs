@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -31,10 +30,10 @@ namespace RootTools
 
         void UpdateLogTab()
         {
-            foreach (ILogGroup log in m_logView.m_aLogGroup) UpdateLogTab(log);
+            foreach (ILogGroup log in m_logView.m_aGroup) UpdateLogTab(log);
             m_asLog.Clear();
             comboLog.ItemsSource = null;
-            foreach (ILogGroup log in m_logView.m_aLogGroup) m_asLog.Add(log.p_id);
+            foreach (ILogGroup log in m_logView.m_aGroup) m_asLog.Add(log.p_id);
             comboLog.ItemsSource = m_asLog; 
         }
 

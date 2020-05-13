@@ -55,8 +55,8 @@ namespace RootTools.Camera
         string m_id;
         public string m_sModule; 
         ToolSetCamera m_toolSetCamera;
-        LogWriter m_log; 
-        public CameraSet(ToolSetCamera toolSetCamera, string sModule, LogWriter log)
+        Log m_log; 
+        public CameraSet(ToolSetCamera toolSetCamera, string sModule, Log log)
         {
             m_id = "Camera";
             m_sModule = sModule; 

@@ -29,7 +29,7 @@ namespace Root
         TreeDemo m_treeDemo = new TreeDemo(); 
         void InitTreeDemo()
         {
-            m_treeDemo.Init("TreeDemo", m_engineer.ClassLogView());
+            m_treeDemo.Init("TreeDemo");
             treeRootUI.Init(m_treeDemo.m_treeRoot);
             m_treeDemo.RunTree(Tree.eMode.Init); 
         }

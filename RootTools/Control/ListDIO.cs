@@ -25,7 +25,7 @@ namespace RootTools.Control
             m_aDIO.Add(bit); 
         }
 
-        public void AddBit(int nID, LogWriter log)
+        public void AddBit(int nID, Log log)
         {
             switch (m_eDIO)
             {

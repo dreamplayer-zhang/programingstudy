@@ -19,6 +19,6 @@
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <TabControl Grid.Column="2" x:Name="tabControlNamedPipe"/>
         <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <tool:UI_LogView Grid.Column="4" x:Name="logViewUI"/>
+        <tool:LogView_UI Grid.Column="4" x:Name="logViewUI"/>
     </Grid>
 </Window>

@@ -10,9 +10,6 @@ namespace Root_Inspect
     public class Inspect_Engineer : IEngineer
     {
         #region IEngineer
-        LogView m_logView = new LogView();
-        public LogView ClassLogView() { return m_logView; }
-
         public Login m_login = new Login();
         public Login.User p_user { get { return m_login.p_user; } }
 
@@ -39,8 +36,8 @@ namespace Root_Inspect
 
         public void Init()
         {
-            m_logView.Init();
-            m_login.Init(m_logView);
+            LogViewer.Init();
+            m_login.Init();
             m_memoryTool = new MemoryTool(EQ.m_sModel, this);
         }
 
@@ -48,7 +45,7 @@ namespace Root_Inspect
         {
             m_memoryTool.ThreadStop();
             m_login.ThreadStop();
-            m_logView.ThreadStop();
+            LogViewer.ThreadStop();
         }
     }
 }

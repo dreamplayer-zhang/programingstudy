@@ -11,8 +11,6 @@ namespace Root
     public class Root_Engineer : IEngineer
     {
         #region IEngineer
-        public LogView ClassLogView() { return null; }
-
         public Login m_login = new Login();
         public Login.User p_user { get { return m_login.p_user; } }
 
@@ -55,8 +53,8 @@ namespace Root
         public void Init(string id)
         {
             EQ.m_sModel = id; 
-//            m_logView.Init();
-//            m_login.Init(m_logView);
+            LogViewer.Init();
+            m_login.Init();
             m_toolBox.Init(id, this);
             InitAjin();
             m_handler.Init(id, this);

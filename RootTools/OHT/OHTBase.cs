@@ -185,7 +185,7 @@ namespace RootTools.OHT
         #endregion
 
         public ModuleBase m_module; 
-        public LogWriter m_log;
+        public Log m_log;
         public TreeRoot m_treeRoot;
         public GemCarrierBase m_carrier = null;
         IToolDIO m_toolDIO;

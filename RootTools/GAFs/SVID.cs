@@ -59,7 +59,7 @@ namespace RootTools.GAFs
         ModuleBase m_module;
         string m_sID;
         IGem m_gem;
-        LogWriter m_log;
+        Log m_log;
         public SVID(ModuleBase module, string id, eType type = eType.SV)
         {
             m_module = module;

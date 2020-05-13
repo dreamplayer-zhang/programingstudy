@@ -338,10 +338,10 @@ namespace RootTools.Comm
         #endregion
 
         string m_id;
-        LogWriter m_log;
+        Log m_log;
         public CommLog m_commLog = null;
         public TreeRoot m_treeRoot; 
-        public NamedPipe(string id, LogWriter log)
+        public NamedPipe(string id, Log log)
         {
             m_id = id;
             m_log = log;

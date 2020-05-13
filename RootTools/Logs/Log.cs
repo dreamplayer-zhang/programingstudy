@@ -37,7 +37,7 @@ namespace RootTools
         }
         #endregion
 
-        Logger m_logger;
+        public Logger m_logger;
         public Log(Logger logger)
         {
             m_logger = logger; 

@@ -490,11 +490,11 @@ namespace Root_Wind.Module
         }
         #endregion
 
-        public Aligner_ATI(string id, IEngineer engineer, string sLogGroup = "")
+        public Aligner_ATI(string id, IEngineer engineer)
         {
             m_waferSize = new WaferSize(id, false, false);
             m_aoi = new Aligner_ATI_AOI(m_log);
-            base.InitBase(id, engineer, sLogGroup);
+            base.InitBase(id, engineer);
             InitPosAlign();
             InitPosOCR();   
         }

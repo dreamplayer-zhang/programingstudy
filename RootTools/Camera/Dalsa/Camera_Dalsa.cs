@@ -106,7 +106,7 @@ namespace RootTools.Camera.Dalsa
         #endregion
 
         string m_id;
-        LogWriter m_log;
+        Log m_log;
         public SapAcquisition m_sapAcq = null;
         public SapBuffer m_sapBuf = null;
         public SapTransfer m_sapXfer = null;
@@ -133,7 +133,7 @@ namespace RootTools.Camera.Dalsa
             }
         }
 
-        public Camera_Dalsa(string id, LogWriter log)
+        public Camera_Dalsa(string id, Log log)
         {
             m_id = id;
             m_log = log;
@@ -278,7 +278,7 @@ namespace RootTools.Camera.Dalsa
             p_CamParam.SetCamHandle(m_sapDevice, m_sapAcq);
             p_CamInfo.p_eState = eCamState.Ready;
             p_CamParam.ReadParamter();
-            m_log.WriteLog(m_id + "Connect Success");
+            m_log.Info(m_id + "Connect Success");
             
         }
 

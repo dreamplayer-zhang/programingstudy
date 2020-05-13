@@ -128,8 +128,8 @@ namespace RootTools
         public string m_sFile;
         Group m_group = new Group("ATI");
 
-        LogWriter m_log = null;
-        public Job(string sFile, bool bSave, LogWriter log)
+        Log m_log = null;
+        public Job(string sFile, bool bSave, Log log)
         {
             m_bSave = bSave;
             m_sFile = sFile;

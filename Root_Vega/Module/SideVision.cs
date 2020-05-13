@@ -467,9 +467,9 @@ namespace Root_Vega.Module
         }
         #endregion
 
-        public SideVision(string id, IEngineer engineer, string sLogGroup = "")
+        public SideVision(string id, IEngineer engineer)
         {
-            base.InitBase(id, engineer, sLogGroup);
+            base.InitBase(id, engineer);
             InitInspect();
             InitPosAlign();
         }

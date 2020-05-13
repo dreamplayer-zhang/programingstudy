@@ -35,7 +35,7 @@
                     <toolBox:ToolBox_UI x:Name="toolBoxUI" Margin="2"/>
                 </TabItem>
                 <TabItem Header="Log" Background="DarkCyan">
-                    <tools:UI_LogView x:Name="logViewUI" Margin="2"/>
+                    <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
                 </TabItem>
             </TabControl>
             <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>

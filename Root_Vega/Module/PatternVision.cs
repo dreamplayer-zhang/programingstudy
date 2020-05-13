@@ -256,9 +256,9 @@ namespace Root_Vega.Module
         }
         #endregion
 
-        public PatternVision(string id, IEngineer engineer, string sLogGroup = "")
+        public PatternVision(string id, IEngineer engineer)
         {
-            base.InitBase(id, engineer, sLogGroup);
+            base.InitBase(id, engineer);
         }
 
         public override void ThreadStop()

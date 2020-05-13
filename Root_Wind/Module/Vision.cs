@@ -310,10 +310,10 @@ namespace Root_Wind.Module
         }
         #endregion
 
-        public Vision(string id, IEngineer engineer, string sLogGroup = "")
+        public Vision(string id, IEngineer engineer)
         {
             m_waferSize = new WaferSize(id, false, false); 
-            base.InitBase(id, engineer, sLogGroup);
+            base.InitBase(id, engineer);
         }
 
         public override void ThreadStop()

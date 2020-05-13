@@ -172,13 +172,13 @@ namespace RootTools.Light
         public string p_id { get { return m_id; } }
         string m_id;
         IEngineer m_engineer;
-        LogWriter m_log; 
+        Log m_log; 
         public TreeRoot m_treeRoot; 
         public LightToolSet(string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer; 
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, id); 
+            m_log = LogViewer.GetLog(id); 
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);

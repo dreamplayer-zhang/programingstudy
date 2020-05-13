@@ -136,8 +136,8 @@ namespace RootTools.RTC5s
             RunTreeMarkPos(tree.GetTree("Mark Position", false));
         }
 
-        LogWriter m_log;
-        public RTC5Setting(LogWriter log)
+        Log m_log;
+        public RTC5Setting(Log log)
         {
             m_log = log;
         }

@@ -228,7 +228,7 @@ namespace Root_Vega
             p_sLocID = sLocID;
             m_engineer = engineer;
             m_gem = m_engineer.ClassGem();
-            m_log = m_engineer.ClassLogView().GetLog(LogView.eLogType.ENG, sLogGroup);
+            m_log = module.m_log;
             m_treeRootReticle = new TreeRoot(p_id, m_log);
             m_treeRootReticle.UpdateTree += M_treeRootReticle_UpdateTree;
             InitSlot();

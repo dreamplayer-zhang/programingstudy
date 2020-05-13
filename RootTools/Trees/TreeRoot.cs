@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RootTools.Trees
+﻿namespace RootTools.Trees
 {
     public class TreeRoot : Tree
     {
@@ -34,7 +32,7 @@ namespace RootTools.Trees
         }
         #endregion
 
-        public TreeRoot(string id, LogWriter log, bool bReadOnly = false)
+        public TreeRoot(string id, Log log, bool bReadOnly = false)
         {
             p_id = id;
             p_treeRoot = this;

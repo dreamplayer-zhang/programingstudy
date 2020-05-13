@@ -70,10 +70,11 @@ namespace RootTools
         #endregion
 
         #region List Log
-        public List<ILogGroup> m_aLogGroup = new List<ILogGroup>();
+        public List<ILogGroup> m_aGroup = new List<ILogGroup>();
         #endregion
 
         #region Get ATI Log
+        public List<Log_Group> m_aLogGroup = new List<Log_Group>();
         public Log GetLog(string id, string sGroup)
         {
             var config = new LoggingConfiguration();    // 현재 설정 값
@@ -97,7 +98,8 @@ namespace RootTools
             }
             Log_Group logGroup = new Log_Group(sGroup, LogLevel.Info, LogLevel.Fatal);
             logGroup.AddRule(config);
-            m_aLogGroup.Add(logGroup);
+            m_aGroup.Add(logGroup);
+            m_aLogGroup.Add(logGroup); 
             if (OnChangeTab != null) OnChangeTab(); 
         }
         #endregion
@@ -114,7 +116,7 @@ namespace RootTools
         private void M_timer_Tick(object sender, EventArgs e)
         {
             if (p_bHold) return;
-            foreach (ILogGroup log in m_aLogGroup) log.CalcData();
+            foreach (ILogGroup log in m_aGroup) log.CalcData();
         }
         #endregion
 
@@ -122,12 +124,13 @@ namespace RootTools
         public void Init()
         {
             m_groupTotal = new Log_Group("Total", LogLevel.Info, LogLevel.Fatal);
-            m_aLogGroup.Add(m_groupTotal);
-            //            StartTimer();
+            m_aGroup.Add(m_groupTotal);
+            StartTimer();
         }
 
         public void ThreadStop()
         {
+            m_timer.Stop(); 
             LogManager.Shutdown();
         }
     }

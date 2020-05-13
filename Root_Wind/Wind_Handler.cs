@@ -43,15 +43,15 @@ namespace Root_Wind
         void InitModule()
         {  
             m_moduleList = new ModuleList(m_enginner);
-            p_wtr = new WTR_RND("WTR", m_enginner, "WTR");
+            p_wtr = new WTR_RND("WTR", m_enginner);
             InitModule(p_wtr);
-            p_aLoadport[0] = new Loadport_RND("LoadportA", "LP1", m_enginner, "LoadportA");
+            p_aLoadport[0] = new Loadport_RND("LoadportA", "LP1", m_enginner);
             InitModule(p_aLoadport[0]);
-            p_aLoadport[1] = new Loadport_RND("LoadportB", "LP2", m_enginner, "LoadportB");
+            p_aLoadport[1] = new Loadport_RND("LoadportB", "LP2", m_enginner);
             InitModule(p_aLoadport[1]);
-            p_aligner = new Aligner_ATI("Aligner", m_enginner, "Aligner");
+            p_aligner = new Aligner_ATI("Aligner", m_enginner);
             InitModule(p_aligner);
-            p_vision = new Vision("Vision", m_enginner, "Vision");
+            p_vision = new Vision("Vision", m_enginner);
             InitModule(p_vision);
             p_wtr.AddChild(p_aLoadport[0], p_aLoadport[1], p_aligner, p_vision);
             p_wtr.ReadInfoWafer_Registry();

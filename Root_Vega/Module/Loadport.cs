@@ -310,13 +310,13 @@ namespace Root_Vega.Module
         #endregion
 
         public InfoPod m_infoPod; 
-        public Loadport(string id, string sLocID, IEngineer engineer, string sLogGroup = "")
+        public Loadport(string id, string sLocID, IEngineer engineer)
         {
             p_id = id; 
-            m_infoPod = new InfoPod(this, sLocID, engineer, sLogGroup);
+            m_infoPod = new InfoPod(this, sLocID, engineer);
             m_aTool.Add(m_infoPod);
             InitCmd();
-            base.InitBase(id, engineer, sLogGroup);
+            base.InitBase(id, engineer);
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
         }

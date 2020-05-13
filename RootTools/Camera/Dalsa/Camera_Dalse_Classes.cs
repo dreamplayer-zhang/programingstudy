@@ -27,7 +27,7 @@ namespace RootTools.Camera.Dalsa
                 SetValueProperty(ref _eState, value);
             }
         }
-        public LogWriter m_log;
+        public Log m_log;
         string _sServer = "";
         public string p_sServer
         {
@@ -54,7 +54,7 @@ namespace RootTools.Camera.Dalsa
         }
        
 
-        public DalseCamInfo(LogWriter log)
+        public DalseCamInfo(Log log)
         {
             m_log = log;
         }
@@ -77,7 +77,7 @@ namespace RootTools.Camera.Dalsa
             Reverse,
         }
         
-        public LogWriter m_log;
+        public Log m_log;
         SapAcqDevice m_sapCam;
         SapAcquisition m_SapGrabber;
         int m_Width = 0;
@@ -210,7 +210,7 @@ namespace RootTools.Camera.Dalsa
             m_sapCam.SetFeatureValue("SensorScanDirection", dir.ToString());
         }
 
-        public DalsaParameterSet(LogWriter log)
+        public DalsaParameterSet(Log log)
         {
             m_log = log;
         }

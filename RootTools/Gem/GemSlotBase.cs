@@ -218,13 +218,13 @@ namespace RootTools.Gem
         #endregion
 
         protected IEngineer m_engineer; 
-        protected LogWriter m_log;
+        protected Log m_log;
         protected IGem m_gem; 
         protected void InitBase(string id, IEngineer engineer)
         {
             p_id = id; 
             m_engineer = engineer;
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, id, "InfoSlot");
+            m_log = LogViewer.GetLog(id, "InfoSlot");
             m_gem = engineer.ClassGem();
             m_treeRoot = new TreeRoot(id, m_log); 
         }

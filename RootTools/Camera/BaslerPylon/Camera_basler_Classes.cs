@@ -67,7 +67,7 @@ namespace RootTools.Camera.BaslerPylon
                 SetValueProperty(ref IPAddress, value);
             }
         }
-        public LogWriter m_log;
+        public Log m_log;
         public Basler.Pylon.Camera m_Cam = null;
 
         //string IsCanGrab = "";
@@ -88,7 +88,7 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
-        public BaslerCamInfo(LogWriter log)
+        public BaslerCamInfo(Log log)
         {
             m_log = log;
         }
@@ -111,7 +111,7 @@ namespace RootTools.Camera.BaslerPylon
     public class BaslerParameterSet : ObservableObject
     {
         public Basler.Pylon.Camera m_Cam;
-        public LogWriter m_log;
+        public Log m_log;
         public long _HeartbeatTimeout
         {
             get
@@ -512,7 +512,7 @@ namespace RootTools.Camera.BaslerPylon
         {
         
         }
-        public BaslerParameterSet (Basler.Pylon.Camera cam, LogWriter log)
+        public BaslerParameterSet (Basler.Pylon.Camera cam, Log log)
         {
             m_Cam = cam;
             m_log = log;

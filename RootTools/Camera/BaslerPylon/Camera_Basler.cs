@@ -63,7 +63,7 @@ namespace RootTools.Camera.BaslerPylon
         #endregion
 
         string m_id;
-        LogWriter m_log;
+        Log m_log;
         Basler.Pylon.Camera m_cam;
         int m_nGrabTimeout = 2000;
         ImageData m_ImageGrab;
@@ -119,7 +119,7 @@ namespace RootTools.Camera.BaslerPylon
         BackgroundWorker bgw_Connect = new BackgroundWorker();
         BackgroundWorker bgw_Grab = new BackgroundWorker();
 
-        public Camera_Basler(string id, LogWriter log)
+        public Camera_Basler(string id, Log log)
         {
             m_id = id;
             m_log = log;

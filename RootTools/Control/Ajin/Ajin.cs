@@ -132,8 +132,7 @@ namespace RootTools.Control.Ajin
 
         string m_id;
         IEngineer m_engineer; 
-        LogView m_logView;
-        LogWriter m_log;
+        Log m_log;
         public TreeRoot m_treeRoot;
         public AjinDIO m_dio = new AjinDIO();
         public AjinListAxis m_listAxis = new AjinListAxis();
@@ -155,12 +154,11 @@ namespace RootTools.Control.Ajin
             int nInput=0, nOutput = 0;
             m_id = id;
             m_engineer = engineer;
-            m_logView = engineer.ClassLogView(); 
-            m_log = m_logView.GetLog(LogView.eLogType.ENG, m_id);
+            m_log = LogViewer.GetLog(id);
             bool bAXL = InitCAXL(ref nInput,ref nOutput);
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-            m_dio.Init(m_id + ".DIO", m_logView, nInput, nOutput);
+            m_dio.Init(m_id + ".DIO", nInput, nOutput);
             m_listAxis.Init(m_id + ".Axis", engineer, bAXL); 
             RunTree(Tree.eMode.RegRead);
             m_listAxis.LoadMotFile();

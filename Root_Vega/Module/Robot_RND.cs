@@ -592,11 +592,11 @@ namespace Root_Vega.Module
             }
         }
 
-        public Robot_RND(string id, IEngineer engineer, string sLog = "")
+        public Robot_RND(string id, IEngineer engineer)
         {
             InitCmd();
             InitMotion();
-            base.InitBase(id, engineer, sLog);
+            base.InitBase(id, engineer);
         }
 
         public override void ThreadStop()

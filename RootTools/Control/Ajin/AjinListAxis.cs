@@ -137,7 +137,7 @@ namespace RootTools.Control.Ajin
         #endregion
 
         string m_id;
-        LogWriter m_log;
+        Log m_log;
         IEngineer m_engineer;
         bool m_bAXL = false;
         bool m_bEnable = false;
@@ -147,7 +147,7 @@ namespace RootTools.Control.Ajin
             m_id = id;
             m_engineer = engineer;
             m_bAXL = bAXL;
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, id);
+            m_log = LogViewer.GetLog(id);
             AXM("Init Axis Error (ReStart SW) : ", InitAxis());
         }
 

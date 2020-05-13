@@ -70,7 +70,7 @@ namespace RootTools
         #endregion
 
         public string m_id;
-        LogWriter m_log;
+        Log m_log;
         public TreeRoot m_treeRoot;
         Socket m_socket = null;
         List<Socket> m_listSocket = new List<Socket>();
@@ -104,7 +104,7 @@ namespace RootTools
         }
         #endregion
 
-        public TCPIPServer(string id, LogWriter log)
+        public TCPIPServer(string id, Log log)
         {
             m_id = id;
             m_log = log;

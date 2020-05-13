@@ -214,8 +214,8 @@ namespace RootTools
 
         public string p_id { get { return m_id; } }
         string m_id;
-        LogWriter m_log;
-        public CyUSBTool(string id, LogWriter log)
+        Log m_log;
+        public CyUSBTool(string id, Log log)
         {
             m_id = id;
             m_log = log;

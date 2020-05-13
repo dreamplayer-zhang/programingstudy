@@ -138,9 +138,9 @@ namespace RootTools.Memory
                 RaisePropertyChanged();
             }
         }
-        public LogWriter m_log;
+        public Log m_log;
         MemoryMappedFile m_MMF = null;
-        public MemoryPool(string id, LogWriter log)
+        public MemoryPool(string id, Log log)
         {
             _id = id;
             m_log = log;
