@@ -47,7 +47,6 @@ namespace RootTools
             item.Header = log.p_id;
             item.Height = 0; 
             item.Content = log.p_ui;
-            item.Background = Brushes.AliceBlue;
             tabLog.Items.Add(item);
         }
 

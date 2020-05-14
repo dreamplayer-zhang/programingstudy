@@ -51,7 +51,7 @@ namespace RootTools
             public string p_sLogger { get; set; }
             public string p_sMessage { get; set; }
             public string p_sStackTrace { get; set; }
-            public Brush p_sColor { get; set; } //forget
+            public Brush p_sColor { get; set; } 
 
             public Data(string sLog)
             {
