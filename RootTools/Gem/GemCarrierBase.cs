@@ -175,8 +175,8 @@ namespace RootTools.Gem
 
         #region Remote Variable
         public bool m_bReqReadCarrierID = false;
-        public bool m_bReqDocking = false;
-        public bool m_bReqUnDocking = false;
+        public bool m_bReqLoad = false;
+        public bool m_bReqUnload = false;
         #endregion
 
         #region Carrier Access
@@ -213,7 +213,7 @@ namespace RootTools.Gem
                 {
                     case eAccess.CarrierCompleted: 
 
-                        m_bReqUnDocking = true; 
+                        m_bReqUnload = true; 
                         break; 
                 }
             }

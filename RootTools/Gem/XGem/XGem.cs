@@ -624,7 +624,7 @@ namespace RootTools.Gem.XGem
             switch (nVerifyType)
             {
                 case 0:
-                    carrier.m_bReqDocking = true; 
+                    carrier.m_bReqLoad = true; 
                     break;
                 case 1:
                     if (sSlotMap.Length < nCount) return; 

@@ -269,14 +269,14 @@ namespace Root_Vega.Module
                 m_infoPod.m_bReqReadCarrierID = false;
                 StartRun(m_runReadPodID);
             }
-            if (m_infoPod.m_bReqDocking)
+            if (m_infoPod.m_bReqLoad)
             {
-                m_infoPod.m_bReqDocking = false;
+                m_infoPod.m_bReqLoad = false;
                 StartRun(m_runLoad);
             }
-            if (m_infoPod.m_bReqUnDocking)
+            if (m_infoPod.m_bReqUnload)
             {
-                m_infoPod.m_bReqUnDocking = false;
+                m_infoPod.m_bReqUnload = false;
                 StartRun(m_runUnLoad);
             }
             return "OK";
@@ -285,16 +285,16 @@ namespace Root_Vega.Module
 
         #region GAF
         SVID m_svidPlaced;
-        CEID m_ceidDocking;
-        CEID m_ceidUnDocking;
+        CEID m_ceidLoad;
+        CEID m_ceidUnload;
         CEID m_ceidOpen;
         CEID m_ceidClose; 
         ALID m_alidPlaced;
         void InitGAF()
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
-            m_ceidDocking = m_gaf.GetCEID(this, "Docking");
-            m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
+            m_ceidLoad = m_gaf.GetCEID(this, "Load");
+            m_ceidUnload = m_gaf.GetCEID(this, "Unload");
             m_ceidOpen = m_gaf.GetCEID(this, "Door Open");
             m_ceidClose = m_gaf.GetCEID(this, "Door Close");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked"); 
@@ -349,77 +349,6 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_PodClose(this), false, "Pod Close");
         }
 
-        public class Run_Load : ModuleRunBase
-        {
-            Loadport m_module;
-            InfoPod m_infoPod;
-            public Run_Load(Loadport module)
-            {
-                m_module = module;
-                m_infoPod = module.m_infoPod;
-                InitModuleRun(module);
-            }
-
-            bool m_bMapping = true;
-            public override ModuleRunBase Clone()
-            {
-                Run_Load run = new Run_Load(m_module);
-                run.m_bMapping = m_bMapping;
-                return run;
-            }
-
-            string m_sLoad = "Load";
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_sLoad = tree.Set(m_sLoad, m_sLoad, "Load", "Load Pod", bVisible, true);
-            }
-
-            public override string Run()
-            {
-                if (m_module.Run(m_module.WriteCmd(eCmd.Load))) return p_sInfo;
-                m_infoPod.p_eState = InfoPod.eState.Dock; 
-                m_module.m_ceidDocking.Send();
-                m_module.m_ceidOpen.Send();
-                m_module.m_infoPod.p_infoReticle.p_eState = GemSlotBase.eState.Exist; 
-                m_module.m_infoPod.SendSlotMap(); 
-                return "OK";
-            }
-        }
-
-        public class Run_Unload : ModuleRunBase
-        {
-            Loadport m_module;
-            InfoPod m_infoPod;
-            public Run_Unload(Loadport module)
-            {
-                m_module = module;
-                m_infoPod = module.m_infoPod;
-                InitModuleRun(module);
-            }
-
-            string m_sUnload = "Unload";
-            public override ModuleRunBase Clone()
-            {
-                Run_Unload run = new Run_Unload(m_module);
-                run.m_sUnload = m_sUnload;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_sUnload = tree.Set(m_sUnload, m_sUnload, "Unlad", "Unload Pod", bVisible, true);
-            }
-
-            public override string Run()
-            {
-                if (m_module.Run(m_module.WriteCmd(eCmd.Unload))) return p_sInfo;
-                m_infoPod.p_eState = InfoPod.eState.Placed;
-                m_module.m_ceidClose.Send();
-                m_module.m_ceidUnDocking.Send(); 
-                return "OK";
-            }
-        }
-
         public class Run_ReadPodID : ModuleRunBase
         {
             Loadport m_module;
@@ -466,23 +395,84 @@ namespace Root_Vega.Module
                 InitModuleRun(module);
             }
 
-            string m_sPodOpen = "Pod Open";
             public override ModuleRunBase Clone()
             {
                 Run_PodOpen run = new Run_PodOpen(m_module);
-                run.m_sPodOpen = m_sPodOpen;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_sPodOpen = tree.Set(m_sPodOpen, m_sPodOpen, "Pod Open", "Pod Open", bVisible, true);
             }
 
             public override string Run()
             {
                 if (m_module.Run(m_module.WriteCmd(eCmd.PodOpen))) return p_sInfo;
                 //m_infoPod.p_eState = InfoPod.eState.Placed;
+                return "OK";
+            }
+        }
+
+        public class Run_Load : ModuleRunBase
+        {
+            Loadport m_module;
+            InfoPod m_infoPod;
+            public Run_Load(Loadport module)
+            {
+                m_module = module;
+                m_infoPod = module.m_infoPod;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Load run = new Run_Load(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                if (m_module.Run(m_module.WriteCmd(eCmd.Load))) return p_sInfo;
+                m_infoPod.p_eState = InfoPod.eState.Load;
+                m_module.m_ceidLoad.Send();
+                m_module.m_ceidOpen.Send();
+                m_module.m_infoPod.SetInfoReticleExist(); 
+                m_module.m_infoPod.SendSlotMap();
+                return "OK";
+            }
+        }
+
+        public class Run_Unload : ModuleRunBase
+        {
+            Loadport m_module;
+            InfoPod m_infoPod;
+            public Run_Unload(Loadport module)
+            {
+                m_module = module;
+                m_infoPod = module.m_infoPod;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Unload run = new Run_Unload(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                if (m_module.Run(m_module.WriteCmd(eCmd.Unload))) return p_sInfo;
+                m_infoPod.p_eState = InfoPod.eState.Placed;
+                m_module.m_ceidClose.Send();
+                m_module.m_ceidUnload.Send();
                 return "OK";
             }
         }
@@ -498,17 +488,14 @@ namespace Root_Vega.Module
                 InitModuleRun(module);
             }
 
-            string m_sPodClose = "Pod Close";
             public override ModuleRunBase Clone()
             {
                 Run_PodClose run = new Run_PodClose(m_module);
-                run.m_sPodClose = m_sPodClose;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_sPodClose = tree.Set(m_sPodClose, m_sPodClose, "Pod Close", "Pod Close", bVisible, true);
             }
 
             public override string Run()

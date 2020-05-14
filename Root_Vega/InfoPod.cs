@@ -18,7 +18,7 @@ namespace Root_Vega
         {
             Empty,
             Placed,
-            Dock,
+            Load,
             Run,
         }
         eState _eState = eState.Empty;
@@ -30,7 +30,7 @@ namespace Root_Vega
                 if (_eState == value) return;
                 m_log.Info(p_id + " eState : " + _eState.ToString() + " -> " + value.ToString());
                 _eState = value;
-                if (_eState == eState.Dock) m_timeLotStart = DateTime.Now;
+                if (_eState == eState.Load) m_timeLotStart = DateTime.Now;
                 OnPropertyChanged();
             }
         }
@@ -85,7 +85,7 @@ namespace Root_Vega
         {
             switch (p_eState)
             {
-                case eState.Dock:
+                case eState.Load:
                 case eState.Run: return "OK";
             }
             return p_id + " eState = " + p_eState.ToString();

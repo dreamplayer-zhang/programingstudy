@@ -527,14 +527,14 @@ namespace Root_Wind.Module
 //                m_infoCarrier.m_bReqReadCarrierID = false;
 //                StartRun(m_runReadPodID);
 //            }
-            if (m_infoCarrier.m_bReqDocking)
+            if (m_infoCarrier.m_bReqLoad)
             {
-                m_infoCarrier.m_bReqDocking = false;
+                m_infoCarrier.m_bReqLoad = false;
                 StartRun(m_runDocking);
             }
-            if (m_infoCarrier.m_bReqUnDocking)
+            if (m_infoCarrier.m_bReqUnload)
             {
-                m_infoCarrier.m_bReqUnDocking = false;
+                m_infoCarrier.m_bReqUnload = false;
                 StartRun(m_runUndocking);
             }
             return "OK";
