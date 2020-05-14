@@ -272,12 +272,12 @@ namespace Root_Vega.Module
             if (m_infoPod.m_bReqDocking)
             {
                 m_infoPod.m_bReqDocking = false;
-                StartRun(m_runDocking);
+                StartRun(m_runLoad);
             }
             if (m_infoPod.m_bReqUnDocking)
             {
                 m_infoPod.m_bReqUnDocking = false;
-                StartRun(m_runUnDocking);
+                StartRun(m_runUnLoad);
             }
             return "OK";
         }
@@ -337,23 +337,23 @@ namespace Root_Vega.Module
         }
 
         #region ModuleRun
-        ModuleRunBase m_runDocking;
-        ModuleRunBase m_runUnDocking;
-        ModuleRunBase m_runReadPodID; 
+        ModuleRunBase m_runReadPodID;
+        ModuleRunBase m_runLoad;
+        ModuleRunBase m_runUnLoad;
         protected override void InitModuleRuns()
         {
-            m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Pod to Work Position");
-            m_runUnDocking = AddModuleRunList(new Run_Undocking(this), false, "Undocking Pod from Work Position");
             m_runReadPodID = AddModuleRunList(new Run_ReadPodID(this), false, "Read Pod ID");
             AddModuleRunList(new Run_PodOpen(this), false, "Pod Open");
+            m_runLoad = AddModuleRunList(new Run_Load(this), false, "Load Pod to Work Position");
+            m_runUnLoad = AddModuleRunList(new Run_Unload(this), false, "Unload Pod from Work Position");
             AddModuleRunList(new Run_PodClose(this), false, "Pod Close");
         }
 
-        public class Run_Docking : ModuleRunBase
+        public class Run_Load : ModuleRunBase
         {
             Loadport m_module;
             InfoPod m_infoPod;
-            public Run_Docking(Loadport module)
+            public Run_Load(Loadport module)
             {
                 m_module = module;
                 m_infoPod = module.m_infoPod;
@@ -363,14 +363,15 @@ namespace Root_Vega.Module
             bool m_bMapping = true;
             public override ModuleRunBase Clone()
             {
-                Run_Docking run = new Run_Docking(m_module);
+                Run_Load run = new Run_Load(m_module);
                 run.m_bMapping = m_bMapping;
                 return run;
             }
 
+            string m_sLoad = "Load";
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_bMapping = tree.Set(m_bMapping, m_bMapping, "Mapping", "Wafer Mapping When Docking", bVisible);
+                m_sLoad = tree.Set(m_sLoad, m_sLoad, "Load", "Load Pod", bVisible, true);
             }
 
             public override string Run()
@@ -385,28 +386,28 @@ namespace Root_Vega.Module
             }
         }
 
-        public class Run_Undocking : ModuleRunBase
+        public class Run_Unload : ModuleRunBase
         {
             Loadport m_module;
             InfoPod m_infoPod;
-            public Run_Undocking(Loadport module)
+            public Run_Unload(Loadport module)
             {
                 m_module = module;
                 m_infoPod = module.m_infoPod;
                 InitModuleRun(module);
             }
 
-            string m_sUndocking = "UnDocking";
+            string m_sUnload = "Unload";
             public override ModuleRunBase Clone()
             {
-                Run_Undocking run = new Run_Undocking(m_module);
-                run.m_sUndocking = m_sUndocking;
+                Run_Unload run = new Run_Unload(m_module);
+                run.m_sUnload = m_sUnload;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_sUndocking = tree.Set(m_sUndocking, m_sUndocking, "UnDocking", "Pod UnDocking", bVisible, true);
+                m_sUnload = tree.Set(m_sUnload, m_sUnload, "Unlad", "Unload Pod", bVisible, true);
             }
 
             public override string Run()
