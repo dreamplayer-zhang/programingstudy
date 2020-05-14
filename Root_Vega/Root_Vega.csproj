@@ -14,7 +14,8 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp>6aaf70da</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -62,11 +63,9 @@
   <ItemGroup>
     <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="LiveCharts">
       <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
@@ -547,4 +546,11 @@ copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectNam
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets'))" />
+  </Target>
 </Project>
