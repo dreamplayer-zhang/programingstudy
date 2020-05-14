@@ -57,15 +57,15 @@ namespace RootTools.Control
         #endregion
 
         public int m_nID = -1;
-        public LogWriter m_log;
-        public void Init(int nID, LogWriter log)
+        public Log m_log;
+        public void Init(int nID, Log log)
         {
             m_nID = nID;
             m_log = log;
             p_sID = "Input"; 
         }
 
-        public void SetID(LogWriter log, string sID)
+        public void SetID(Log log, string sID)
         {
             m_log = log;
             p_sID = sID;

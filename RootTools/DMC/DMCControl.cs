@@ -485,8 +485,8 @@ namespace RootTools.DMC
         #endregion
 
         public CommLog m_commLog = null;
-        LogWriter m_log;
-        public DMCControl(string id, LogWriter log)
+        Log m_log;
+        public DMCControl(string id, Log log)
         {
             p_id = id;
             m_log = log;

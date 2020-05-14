@@ -23,7 +23,6 @@ namespace Root_Vega
             recipeUI.Init(handler.m_recipe);
             processUI.Init(handler.m_process);
             gafUI.Init(handler.m_gaf);
-            //GAFManagerUI.DataContext = handler.m_GAFManager;
             InitTabControl();
         }
 
@@ -34,7 +33,8 @@ namespace Root_Vega
                 TabItem tabItem = new TabItem();
                 tabItem.Header = kv.Key.p_id;
                 tabItem.Content = kv.Value;
-                tabControl.Items.Add(tabItem);
+                tabItem.Background = m_handler.p_brushModule;
+                tabModule.Items.Add(tabItem);
             }
         }
     }

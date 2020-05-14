@@ -22,18 +22,23 @@
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="58*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="29*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="13*"/>
             </Grid.ColumnDefinitions>
             <local:Vega_Handler_UI Grid.Column="0" x:Name="handlerUI"/>
-            <!--<local:Vega_Handler_UI Grid.Column="0" x:Name="handlerUI" Margin="2"/>-->
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-            <toolBox:ToolBox_UI Grid.Column="2" x:Name="toolBoxUI" Margin="2"/>
+            <TabControl Grid.Column="2">
+                <TabItem Header="ToolBox" Background="DarkSalmon">
+                    <toolBox:ToolBox_UI x:Name="toolBoxUI" Margin="2"/>
+                </TabItem>
+                <TabItem Header="Log" Background="DarkCyan">
+                    <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
+                </TabItem>
+            </TabControl>
             <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-            <tools:UI_LogView Grid.Column="4" x:Name="logViewUI" Margin="2"/>
         </Grid>
     </Grid>
 </UserControl>

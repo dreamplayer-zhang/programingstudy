@@ -429,7 +429,7 @@ namespace RootTools.Memory
         #endregion
 
         MemoryGroup m_group;
-        LogWriter m_log;
+        Log m_log;
         public MemoryData(MemoryGroup group, string id, int nCount, int nByte, int xSize, int ySize, ref int gbOffset)
         {
             m_group = group;

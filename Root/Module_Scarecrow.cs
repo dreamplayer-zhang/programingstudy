@@ -34,9 +34,9 @@ namespace Root
         }
         #endregion
 
-        public Module_ScareCrow(string id, IEngineer engineer, string sLog = "")
+        public Module_ScareCrow(string id, IEngineer engineer)
         {
-            base.InitBase(id, engineer, sLog);
+            base.InitBase(id, engineer);
         }
 
         public override void RunTree(Tree tree)

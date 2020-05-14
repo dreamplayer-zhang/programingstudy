@@ -132,9 +132,7 @@
                            Foreground="White" />
             </WrapPanel>
             <WrapPanel Margin="3">
-                <TextBlock Text="GV = "
-                           Foreground="White" />
-                <TextBlock Text="{Binding p_GV}"
+                <TextBlock Text="{Binding p_Data}"
                            Margin="0,0,70,0"
                            Foreground="White" />
                 <TextBlock Text="Zoom = "

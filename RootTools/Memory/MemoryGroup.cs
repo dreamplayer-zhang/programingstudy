@@ -108,7 +108,7 @@ namespace RootTools.Memory
         #endregion
 
         public MemoryPool m_pool;
-        public LogWriter m_log; 
+        public Log m_log; 
         public MemoryGroup(MemoryPool pool, string id)
         {
             m_pool = pool; 

@@ -128,11 +128,11 @@ namespace RootTools.Gem
         }
         #endregion
 
-        LogWriter m_log;
+        Log m_log;
         public string m_sPJobID = "";
         public string m_sRecipeID = "";
 
-        public GemPJ(string sPJobID, eAutoStart autoStart, string sRcpID, LogWriter log)
+        public GemPJ(string sPJobID, eAutoStart autoStart, string sRcpID, Log log)
         {
             m_log = log;
             m_sPJobID = sPJobID;

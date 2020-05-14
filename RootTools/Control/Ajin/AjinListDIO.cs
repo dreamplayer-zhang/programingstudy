@@ -100,8 +100,8 @@ namespace RootTools.Control.Ajin
         #endregion
 
         string m_id;
-        LogWriter m_log;
-        public void Init(eDIO dio, LogWriter log)
+        Log m_log;
+        public void Init(eDIO dio, Log log)
         {
             m_id = dio.ToString();
             m_eDIO = dio;

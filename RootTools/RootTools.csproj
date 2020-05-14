@@ -266,6 +266,16 @@
     <Compile Include="Inspects\RecipeManager.cs" />
     <Compile Include="Inspects\Singleton.cs" />
     <Compile Include="Inspects\SqliteDataDB.cs" />
+    <Compile Include="Logs\ILogGroup.cs" />
+    <Compile Include="Logs\Log.cs" />
+    <Compile Include="Logs\LogViewer.cs" />
+    <Compile Include="Logs\LogView_UI.xaml.cs">
+      <DependentUpon>LogView_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Logs\Log_Group.cs" />
+    <Compile Include="Logs\Log_Group_UI.xaml.cs">
+      <DependentUpon>Log_Group_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Memory\MemoryViewer.cs" />
     <Compile Include="Memory\MemoryViewer_UI.xaml.cs">
       <DependentUpon>MemoryViewer_UI.xaml</DependentUpon>
@@ -635,6 +645,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Logs\LogView_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Logs\Log_Group_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Memory\MemoryPool_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -739,5 +757,6 @@
   <ItemGroup>
     <Resource Include="Resources\OHT_SSEM.JPG" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

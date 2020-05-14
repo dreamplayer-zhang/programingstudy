@@ -373,7 +373,7 @@ namespace Root_Wind
         }
         #endregion
 
-        public InfoCarrier(ModuleBase module, string sLocID, IEngineer engineer, string sLogGroup = "")
+        public InfoCarrier(ModuleBase module, string sLocID, IEngineer engineer)
         {
             m_module = module;
             p_sModule = module.p_id;
@@ -382,7 +382,7 @@ namespace Root_Wind
             p_sLocID = sLocID;
             m_engineer = engineer;
             m_gem = m_engineer.ClassGem();
-            m_log = m_engineer.ClassLogView().GetLog(LogView.eLogType.ENG, sLogGroup);
+            m_log = module.m_log;
             m_waferSize = new WaferSize(p_sModule, true, true);
             m_treeRootWafer = new TreeRoot(p_id, m_log);
             m_treeRootWafer.UpdateTree += M_treeRootWafer_UpdateTree;

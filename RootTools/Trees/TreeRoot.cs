@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace RootTools.Trees
+﻿namespace RootTools.Trees
 {
     public class TreeRoot : Tree
     {
@@ -32,20 +30,9 @@ namespace RootTools.Trees
                 }
             }
         }
-
-        Tree _treeSelect;
-        public Tree p_treeSelect
-        {
-            get { return _treeSelect; }
-            set
-            {
-                _treeSelect = value;
-                OnPropertyChanged(); 
-            }
-        }
         #endregion
 
-        public TreeRoot(string id, LogWriter log, bool bReadOnly = false)
+        public TreeRoot(string id, Log log, bool bReadOnly = false)
         {
             p_id = id;
             p_treeRoot = this;

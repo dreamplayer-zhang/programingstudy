@@ -260,13 +260,13 @@ namespace Root_Vega.Module
         int m_iData = 0; 
         protected override void RunThread()
         {
+            base.RunThread();
             Thread.Sleep(m_msInterval);
             if (m_aData.Count > 0)
             {
                 SendQuery(m_iData, 1000);
                 m_iData = (m_iData + 1) % m_aData.Count;
             }
-            base.RunThread();
         }
 
         int m_msInterval = 100; 
@@ -285,10 +285,10 @@ namespace Root_Vega.Module
         }
         #endregion
 
-        public FDC(string id, IEngineer engineer, string sLogGroup = "")
+        public FDC(string id, IEngineer engineer)
         {
             p_id = id;
-            base.InitBase(id, engineer, sLogGroup);
+            base.InitBase(id, engineer);
         }
 
         public override void ThreadStop()

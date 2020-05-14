@@ -173,11 +173,11 @@ namespace RootTools.GAFs
         #endregion
 
         string m_id;
-        public LogWriter m_log;
+        public Log m_log;
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, id);
+            m_log = LogViewer.GetLog(id, "GAF");
             m_listCEID.Init(id + ".CEID", this);
             m_listSVID.Init(id + ".SVID", this);
             m_listALID.Init(id + ".ALID", this);

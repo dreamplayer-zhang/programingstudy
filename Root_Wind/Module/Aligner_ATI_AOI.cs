@@ -582,8 +582,8 @@ namespace Root_Wind.Module
         }
         #endregion
 
-        LogWriter m_log;
-        public Aligner_ATI_AOI(LogWriter log)
+        Log m_log;
+        public Aligner_ATI_AOI(Log log)
         {
             m_log = log;
             InitThread();

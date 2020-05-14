@@ -69,9 +69,9 @@ namespace Root
             m_axisZ.AddPosDone(); 
         }
         #endregion
-        public Module_Test(string id, IEngineer engineer, string sLog = "")
+        public Module_Test(string id, IEngineer engineer)
         {
-            base.InitBase(id, engineer, sLog);
+            base.InitBase(id, engineer);
             InitAxisPos();
         }
 

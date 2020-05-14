@@ -285,8 +285,8 @@ namespace RootTools.Memory
         #endregion
 
         public MemoryTool m_memoryTool;
-        LogWriter m_log; 
-        public MemoryViewer(string id, MemoryTool memoryTool, LogWriter log)
+        Log m_log; 
+        public MemoryViewer(string id, MemoryTool memoryTool, Log log)
         {
             p_id = id; 
             m_memoryTool = memoryTool;

@@ -45,10 +45,7 @@ namespace Root_Vega.Module
         {
             bool bExist = false; 
             if (bIgnoreExistSensor) bExist = (p_infoReticle != null); 
-            else
-            {
-                //forget
-            }
+            else bExist = m_diCheckVac.p_bIn;
             p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
             return bExist; 
         }
@@ -152,11 +149,11 @@ namespace Root_Vega.Module
 
         string ReplyCmd(string[] sMsgs)
         {
-            string sLastCmd = m_eSendCmd.ToString();
+            string sLastCmd = m_dicCmd[m_eSendCmd]; 
             try
             {
                 if (sMsgs.Length > 1) return GetErrorString(sMsgs[1]);
-                else if (sMsgs[0] == sLastCmd && sMsgs.Length == 1) return "Received Successfully : " + sLastCmd;
+                else if (sMsgs[0] == sLastCmd && sMsgs.Length == 1) return "OK";
                 else return "Cannot Recieve Status Command : " + sLastCmd;
             }
             catch (Exception)
@@ -506,6 +503,7 @@ namespace Root_Vega.Module
                     m_asChild.Add(child.p_id);
                 }
             }
+            RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
         }
 
@@ -594,11 +592,11 @@ namespace Root_Vega.Module
             }
         }
 
-        public Robot_RND(string id, IEngineer engineer, string sLog = "")
+        public Robot_RND(string id, IEngineer engineer)
         {
             InitCmd();
             InitMotion();
-            base.InitBase(id, engineer, sLog);
+            base.InitBase(id, engineer);
         }
 
         public override void ThreadStop()

@@ -242,7 +242,7 @@ namespace Root_Vega.Module
         public string IsPutOK(ref int posRobot, InfoReticle infoReticle)
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            if (p_infoReticle == null) return p_id + " IsPutOK - InfoReticle Exist";
+            if (p_infoReticle != null) return p_id + " IsPutOK - InfoReticle Exist";
             posRobot = m_nTeachRobot;
             return "OK";
         }
@@ -340,9 +340,12 @@ namespace Root_Vega.Module
 
         int m_lMaxGrab = 3000;
         CPoint m_szAlignROI = new CPoint();
-        MemoryData m_memoryTop;
-        MemoryData m_memoryLeft;
-        MemoryData m_memoryRight;
+		MemoryData m_memoryGrab;
+		MemoryData m_memoryHeight;
+		MemoryData m_memoryBright;
+		MemoryData m_memoryTop;
+		MemoryData m_memoryLeft;
+		MemoryData m_memoryRight;
         MemoryData m_memoryBottom;
 
         public ushort[] m_aHeight;
@@ -350,9 +353,9 @@ namespace Root_Vega.Module
         void InitMemory()
         {
             m_szAlignROI = p_CamLADS.p_szROI;
-            //m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
-            //m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-            //m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);            
+			m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
+			m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+			m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);            
             m_memoryTop = m_memoryPool.GetGroup(p_id).CreateMemory("Top", 1, 1, m_szAlignROI.X, m_lMaxGrab);
             m_memoryLeft = m_memoryPool.GetGroup(p_id).CreateMemory("Left", 1, 1, m_szAlignROI.X, m_lMaxGrab);
             m_memoryRight = m_memoryPool.GetGroup(p_id).CreateMemory("Right", 1, 1, m_szAlignROI.X, m_lMaxGrab);
@@ -464,9 +467,9 @@ namespace Root_Vega.Module
         }
         #endregion
 
-        public SideVision(string id, IEngineer engineer, string sLogGroup = "")
+        public SideVision(string id, IEngineer engineer)
         {
-            base.InitBase(id, engineer, sLogGroup);
+            base.InitBase(id, engineer);
             InitInspect();
             InitPosAlign();
         }

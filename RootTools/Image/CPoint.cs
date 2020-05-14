@@ -42,7 +42,7 @@ namespace RootTools
             Y = (int)Math.Round(p.Y);
         }
 
-        public CPoint(string str, LogWriter log)
+        public CPoint(string str, Log log)
         {
             try
             {

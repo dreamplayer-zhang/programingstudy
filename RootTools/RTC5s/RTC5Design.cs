@@ -173,7 +173,7 @@ namespace RootTools.RTC5s
         #endregion
 
         string m_id;
-        LogWriter m_log;
+        Log m_log;
         public TreeRoot m_treeRoot;
         RTC5 m_rtc5;
         public RTC5Design(string id, RTC5 rtc5)

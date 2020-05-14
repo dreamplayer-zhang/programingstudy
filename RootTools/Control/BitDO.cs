@@ -6,7 +6,7 @@
         {
         }
 
-        public new void Init(int nID, LogWriter log)
+        public new void Init(int nID, Log log)
         {
             m_nID = nID;
             m_log = log;

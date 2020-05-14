@@ -111,7 +111,7 @@ namespace RootTools.RTC5s
             SendDelay();
         }
 
-        LogWriter m_log;
+        Log m_log;
         RTC5Setting m_setting;
         public LaserParameter(RTC5 rtc5)
         {

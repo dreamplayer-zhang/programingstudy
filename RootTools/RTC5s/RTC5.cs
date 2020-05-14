@@ -324,11 +324,11 @@ namespace RootTools.RTC5s
         #endregion
 
         public string p_id { get; set; }
-        public LogWriter m_log;
+        public Log m_log;
         public TreeRoot m_treeRoot;
         public LaserParameter m_laserParameter;
 
-        public RTC5(string sLaser, LogWriter log)
+        public RTC5(string sLaser, Log log)
         {
             p_id = sLaser + ".RTC5";
             m_log = log;

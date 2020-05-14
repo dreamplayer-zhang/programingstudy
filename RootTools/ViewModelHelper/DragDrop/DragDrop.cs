@@ -386,7 +386,7 @@ namespace DragDrop
                         if (_itemDroppedCommand != null)
                         { _itemDroppedCommand.Execute(_dragDropPreviewControlDataContext); }
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     { }
                     break;
                 case DropState.CannotDrop:

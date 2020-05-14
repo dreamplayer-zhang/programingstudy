@@ -26,12 +26,12 @@ namespace Root_Vega
 
         public string m_id;
         IEngineer m_engineer;
-        LogWriter m_log;
+        Log m_log;
         public Vega_Recipe(string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer;
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, id);
+            m_log = LogViewer.GetLog(id);
             m_moduleRunList = new ModuleRunList(id, engineer);
         }
     }

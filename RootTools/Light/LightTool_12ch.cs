@@ -96,13 +96,13 @@ namespace RootTools.Light
 
         string m_id;
         IEngineer m_engineer;
-        LogWriter m_log;
+        Log m_log;
         public CyUSBTool m_usb;
         public LightTool_12ch(string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer; 
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, id);
+            m_log = LogViewer.GetLog(id);
             m_usb = new CyUSBTool(m_id, m_log);
             InitLight();
         }

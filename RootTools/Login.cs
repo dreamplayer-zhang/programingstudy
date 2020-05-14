@@ -159,10 +159,10 @@ namespace RootTools
         #endregion
 
         public string m_id = "Login";
-        public LogWriter m_log; 
-        public void Init(LogView logView)
+        public Log m_log; 
+        public void Init()
         {
-            m_log = logView.GetLog(LogView.eLogType.ENG,m_id);
+            m_log = LogViewer.GetLog(m_id);
             InitUser();
             m_treeRoot = new TreeRoot(m_id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;

@@ -362,7 +362,7 @@ namespace RootTools.Gem
 
         protected IEngineer m_engineer;
         protected ModuleBase m_module; 
-        protected LogWriter m_log;
+        protected Log m_log;
         public IGem m_gem;
         public void InitBase()
         {

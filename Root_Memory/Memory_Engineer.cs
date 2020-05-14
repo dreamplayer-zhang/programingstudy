@@ -10,9 +10,6 @@ namespace Root_Memory
     public class Memory_Engineer : IEngineer
     {
         #region IEngineer
-        LogView m_logView = new LogView();
-        public LogView ClassLogView() { return m_logView; }
-
         public Login m_login = new Login();
         public Login.User p_user
         {
@@ -43,8 +40,8 @@ namespace Root_Memory
         public void Init(string id)
         {
             EQ.m_sModel = id;
-            m_logView.Init();
-            m_login.Init(m_logView);
+            LogViewer.Init();
+            m_login.Init();
             m_memoryTool = new MemoryTool(id, this);
         }
 
@@ -52,7 +49,7 @@ namespace Root_Memory
         {
             m_memoryTool.ThreadStop();
             m_login.ThreadStop();
-            m_logView.ThreadStop();
+            LogViewer.ThreadStop();
         }
     }
 }

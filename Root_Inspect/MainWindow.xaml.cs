@@ -46,7 +46,7 @@ namespace Root_Inspect
         {
             string id = EQ.m_sModel; 
             m_engineer.Init();
-            logViewUI.DataContext = m_engineer.ClassLogView();
+            logViewUI.Init(LogViewer.m_logView);
             InitMemory();
             InitInspect(); 
         }

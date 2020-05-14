@@ -570,163 +570,157 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="8*"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="16"></RowDefinition>
-        </Grid.RowDefinitions>
-        <local:TreeListView HorizontalAlignment="Stretch" ItemsSource="{Binding p_childs}"
-                x:Name="ControlTree"
-                SelectedItem_="{Binding p_treeSelect, Mode=TwoWay}" PreviewMouseUp="ControlTree_PreviewMouseUp">
-            <local:TreeListView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding p_childs}" />
-            </local:TreeListView.ItemTemplate>
-            <local:TreeListView.Columns>
-                <GridViewColumn Header="Name" Width="120" x:Name="Column1"
+    <local:TreeListView HorizontalAlignment="Stretch" ItemsSource="{Binding p_childs}"
+                x:Name="ControlTree" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                PreviewMouseUp="ControlTree_PreviewMouseUp">
+        <local:TreeListView.ItemTemplate>
+            <HierarchicalDataTemplate ItemsSource="{Binding p_childs}" />
+        </local:TreeListView.ItemTemplate>
+        <local:TreeListView.Columns>
+            <GridViewColumn Header="Name" Width="120" x:Name="Column1"
                         HeaderContainerStyle="{StaticResource GridHeaderRight}">
-                    <GridViewColumn.CellTemplate>
-                        <DataTemplate>
-                            <DataTemplate.Resources>
-                                <DataTemplate DataType="{x:Type local:Tree}">
-                                    <TextBlock Text="{Binding p_sName}"/>
-                                </DataTemplate>
-                            </DataTemplate.Resources>
-                            <ToggleButton Content="{Binding}" 
+                <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                        <DataTemplate.Resources>
+                            <DataTemplate DataType="{x:Type local:Tree}">
+                                <TextBlock Text="{Binding p_sName}" ToolTip="{Binding p_sDescription}"/>
+                            </DataTemplate>
+                        </DataTemplate.Resources>
+                        <ToggleButton Content="{Binding}" 
                                     Style="{StaticResource ToggleButton.TreeExpander}"/>
-                        </DataTemplate>
-                    </GridViewColumn.CellTemplate>
-                </GridViewColumn>
-                <GridViewColumn Header="Value" x:Name="Column2" Width="120"
+                    </DataTemplate>
+                </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+            <GridViewColumn Header="Value" x:Name="Column2" Width="120"
                         HeaderContainerStyle="{StaticResource GridHeaderRight}">
-                    <GridViewColumn.CellTemplate>
-                        <DataTemplate>
-                            <DataTemplate.Resources>
-                                <DataTemplate DataType="{x:Type local:Tree}"></DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeGroup}"></DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeItem_bool}">
-                                    <ToggleButton IsChecked="{Binding p_value}"
+                <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                        <DataTemplate.Resources>
+                            <DataTemplate DataType="{x:Type local:Tree}"></DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeGroup}"></DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_bool}">
+                                <ToggleButton IsChecked="{Binding p_value}"
                                             IsEnabled="{Binding p_bEnable}">
-                                        <ToggleButton.Template>
-                                            <ControlTemplate TargetType="{x:Type ToggleButton}">
-                                                <TextBlock x:Name="tbBool"></TextBlock>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsChecked" Value="True">
-                                                        <Setter TargetName="tbBool" Property="Text"
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                            <TextBlock x:Name="tbBool"></TextBlock>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter TargetName="tbBool" Property="Text"
                                                                 Value="TRUE" />
-                                                    </Trigger>
-                                                    <Trigger Property="IsChecked" Value="False">
-                                                        <Setter TargetName="tbBool" Property="Text"
+                                                </Trigger>
+                                                <Trigger Property="IsChecked" Value="False">
+                                                    <Setter TargetName="tbBool" Property="Text"
                                                                 Value="FALSE" />
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </ToggleButton.Template>
-                                    </ToggleButton>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeItem_int}">
-                                    <TextBox Style="{StaticResource BorderChangeTextBox}"
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                </ToggleButton>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_int}">
+                                <TextBox Style="{StaticResource BorderChangeTextBox}"
                                             IsEnabled="{Binding p_bEnable}"
                                             Text="{Binding p_value, Converter={StaticResource TextBoxToIntConverters}}"
                                             PreviewKeyDown="ToggleButton_PreviewKeyDown" />
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeItem_double}">
-                                    <TextBox IsEnabled="{Binding p_bEnable}"
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_double}">
+                                <TextBox IsEnabled="{Binding p_bEnable}"
                                             Text="{Binding p_value, Converter={StaticResource TextBoxToDoubleConverters}}"
                                             PreviewKeyDown="ToggleButton_PreviewKeyDown"
                                             Style="{StaticResource BorderChangeTextBox}" />
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeItem_long}">
-                                    <TextBox IsEnabled="{Binding p_bEnable}"
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_long}">
+                                <TextBox IsEnabled="{Binding p_bEnable}"
                                             Text="{Binding p_value, Converter={StaticResource TextBoxToLongConverters}}"
                                             PreviewKeyDown="ToggleButton_PreviewKeyDown"
                                             Style="{StaticResource BorderChangeTextBox}" />
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeItem_Password}">
-                                    <TextBox Text="{Binding p_value}"
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_Password}">
+                                <TextBox Text="{Binding p_value}"
                                             IsEnabled="{Binding p_bEnable}"
                                             Style="{StaticResource BorderChangeTextBox}"
                                             PreviewKeyDown="ToggleButton_PreviewKeyDown" />
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeItem_FileName}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="30"></ColumnDefinition>
-                                            <ColumnDefinition></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Button Command="{Binding OpenFileCommand}" 
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_FileName}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30"></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Command="{Binding OpenFileCommand}" 
                                                 IsEnabled="{Binding p_bEnable}">
-                                            <Button.Template>
-                                                <ControlTemplate>
-                                                    <Border BorderThickness="1" BorderBrush="Black">
-                                                        <marterial:PackIcon Kind="FileFind"
+                                        <Button.Template>
+                                            <ControlTemplate>
+                                                <Border BorderThickness="1" BorderBrush="Black">
+                                                    <marterial:PackIcon Kind="FileFind"
                                                                 Width="{PriorityBinding}"
                                                                 Height="{PriorityBinding}"
                                                                 VerticalAlignment="Center"
                                                                 HorizontalAlignment="Center"
                                                                 Foreground="Black" />
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Button.Template>
-                                        </Button>
-                                        <TextBox Text="{Binding p_value}" Grid.Column="1"
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                    <TextBox Text="{Binding p_value}" Grid.Column="1"
                                                 IsEnabled="{Binding p_bEnable}"
                                                 Style="{StaticResource BorderChangeTextBox}"
                                                 PreviewKeyDown="ToggleButton_PreviewKeyDown" />
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeItem_string}">
-                                    <TextBox Text="{Binding p_value}"
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_string}">
+                                <TextBox Text="{Binding p_value}"
                                             IsEnabled="{Binding p_bEnable}"
                                             Style="{StaticResource BorderChangeTextBox}"
                                             PreviewKeyDown="ToggleButton_PreviewKeyDown" />
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeItem_CPoint}">
-                                    <WrapPanel>
-                                        <TextBlock Text=" ( "></TextBlock>
-                                        <TextBox IsEnabled="{Binding p_bEnable}"
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_CPoint}">
+                                <WrapPanel>
+                                    <TextBlock Text=" ( "></TextBlock>
+                                    <TextBox IsEnabled="{Binding p_bEnable}"
                                                 Text="{Binding p_valueX, Converter= {StaticResource TextBoxToIntConverters}}"
                                                 Style="{StaticResource BorderChangeTextBox}"
                                                 PreviewKeyDown="ToggleButton_PreviewKeyDown" />
-                                        <!--<TextBlock Text=" Y : "></TextBlock>-->
-                                        <TextBlock Text=" , "></TextBlock>
-                                        <TextBox IsEnabled="{Binding p_bEnable}"
+                                    <!--<TextBlock Text=" Y : "></TextBlock>-->
+                                    <TextBlock Text=" , "></TextBlock>
+                                    <TextBox IsEnabled="{Binding p_bEnable}"
                                                 Text="{Binding p_valueY, Converter= {StaticResource TextBoxToIntConverters}}"
                                                 Style="{StaticResource BorderChangeTextBox}"
                                                 PreviewKeyDown="ToggleButton_PreviewKeyDown" />
-                                        <TextBlock Text=" )"></TextBlock>
-                                    </WrapPanel>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeItem_RPoint}">
-                                    <WrapPanel>
-                                        <TextBlock Text=" ( "></TextBlock>
-                                        <TextBox IsEnabled="{Binding p_bEnable}"
+                                    <TextBlock Text=" )"></TextBlock>
+                                </WrapPanel>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_RPoint}">
+                                <WrapPanel>
+                                    <TextBlock Text=" ( "></TextBlock>
+                                    <TextBox IsEnabled="{Binding p_bEnable}"
                                                 Text="{Binding p_valueX, Converter= {StaticResource TextBoxToDoubleConverters}}"
                                                 Style="{StaticResource BorderChangeTextBox}"
                                                 PreviewKeyDown="ToggleButton_PreviewKeyDown" />
-                                        <TextBlock Text=" , "></TextBlock>
-                                        <TextBox IsEnabled="{Binding p_bEnable}"
+                                    <TextBlock Text=" , "></TextBlock>
+                                    <TextBox IsEnabled="{Binding p_bEnable}"
                                                 Text="{Binding p_valueY, Converter= {StaticResource TextBoxToDoubleConverters}}"
                                                 Style="{StaticResource BorderChangeTextBox}"
                                                 PreviewKeyDown="ToggleButton_PreviewKeyDown" />
-                                        <TextBlock Text=" )"></TextBlock>
-                                    </WrapPanel>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeItem_stringList}">
-                                    <ComboBox SelectedValue="{Binding p_value}"
+                                    <TextBlock Text=" )"></TextBlock>
+                                </WrapPanel>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_stringList}">
+                                <ComboBox SelectedValue="{Binding p_value}"
                                             IsEnabled="{Binding p_bEnable}"
                                             ItemsSource="{Binding p_list}" />
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type local:TreeItem_ICommand}">
-                                    <Button Command="{Binding p_value}"
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type local:TreeItem_ICommand}">
+                                <Button Command="{Binding p_value}"
                                             Content="{Binding p_sButtonName}"/>
-                                </DataTemplate>
-                            </DataTemplate.Resources>
-                            <ContentPresenter Content="{Binding}" VerticalAlignment="Center" />
-                        </DataTemplate>
-                    </GridViewColumn.CellTemplate>
-                </GridViewColumn>
-                <!--<GridViewColumn Header="" Width="1000"
+                            </DataTemplate>
+                        </DataTemplate.Resources>
+                        <ContentPresenter Content="{Binding}" VerticalAlignment="Center" />
+                    </DataTemplate>
+                </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+            <!--<GridViewColumn Header="" Width="1000"
                         HeaderContainerStyle="{StaticResource GridHeaderRight}">
                     <GridViewColumn.CellTemplate>
                         <DataTemplate>
@@ -736,16 +730,6 @@
                         </DataTemplate>
                     </GridViewColumn.CellTemplate>
                 </GridViewColumn>-->
-            </local:TreeListView.Columns>
-        </local:TreeListView>
-        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                Background="AliceBlue" BorderThickness="2" BorderBrush="Black" ShowsPreview="True"
-                Height="3" />
-        <Grid Grid.Row="2">
-			<TextBlock TextWrapping="WrapWithOverflow" Text="{Binding Path=p_treeSelect.p_sDescription, Mode=OneWay}"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Stretch" Height ="{PriorityBinding}"
-                    Background="#FFFAF3FF" />
-        </Grid>
-    </Grid>
+        </local:TreeListView.Columns>
+    </local:TreeListView>
 </UserControl>

@@ -297,11 +297,11 @@ namespace RootTools.Comm
         #endregion
 
         string m_id;
-        LogWriter m_log;
+        Log m_log;
         public CommLog m_commLog = null;
         public TreeRoot m_treeRoot;
         SerialPort m_sp = null;
-        public RS232(string id, LogWriter log)
+        public RS232(string id, Log log)
         {
             m_id = id;
             m_log = log;

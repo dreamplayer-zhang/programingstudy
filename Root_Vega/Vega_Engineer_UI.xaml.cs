@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using RootTools;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_Vega
@@ -17,7 +18,7 @@ namespace Root_Vega
         public void Init(Vega_Engineer engineer)
         {
             m_engineer = engineer;
-            logViewUI.DataContext = engineer.ClassLogView();
+            logViewUI.Init(LogViewer.m_logView);
             loginUI.Init(engineer.m_login);
             toolBoxUI.Init(engineer.ClassToolBox());
             handlerUI.Init(engineer.m_handler);

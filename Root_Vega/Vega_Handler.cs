@@ -6,15 +6,30 @@ using RootTools.Module;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Root_Vega
 {
     public class Vega_Handler : ObservableObject, IHandler
     {
+        #region UI Binding
+        #endregion 
+        public Brush p_brushHandler 
+        {  
+            get { return Brushes.MediumAquamarine; } 
+            set { }
+        }
+
+        public Brush p_brushModule
+        { 
+            get { return Brushes.BurlyWood; }
+            set { }
+        }
         #region Module
         public ModuleList m_moduleList;
         public Vega_Recipe m_recipe;
         public Vega_Process m_process;
+        public Vega m_vega; 
         public Robot_RND m_robot;
         public Loadport[] m_aLoadport = new Loadport[2];
         public SideVision m_sideVision;
@@ -24,17 +39,19 @@ namespace Root_Vega
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
-            m_robot = new Robot_RND("Robot", m_enginner, "Robot");
+            m_vega = new Vega("Vega", m_enginner);
+            InitModule(m_vega); 
+            m_robot = new Robot_RND("Robot", m_enginner);
             InitModule(m_robot);
-            m_aLoadport[0] = new Loadport("LoadportA", "LP1", m_enginner, "LoadportA");
+            m_aLoadport[0] = new Loadport("LoadportA", "LP1", m_enginner);
             InitModule(m_aLoadport[0]);
-            m_aLoadport[1] = new Loadport("LoadportB", "LP2", m_enginner, "LoadportB");
+            m_aLoadport[1] = new Loadport("LoadportB", "LP2", m_enginner);
             InitModule(m_aLoadport[1]);
-            m_sideVision = new SideVision("SideVision", m_enginner, "SideVision");
+            m_sideVision = new SideVision("SideVision", m_enginner);
             InitModule(m_sideVision);
-            m_patternVision = new PatternVision("PatternVision", m_enginner, "PatternVision");
+            m_patternVision = new PatternVision("PatternVision", m_enginner);
             InitModule(m_patternVision);
-            m_FDC = new FDC("FDC", m_enginner, "FDC");
+            m_FDC = new FDC("FDC", m_enginner);
             InitModule(m_FDC); 
             m_robot.AddChild(m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision);
             m_robot.ReadInfoReticle_Registry();

@@ -36,7 +36,7 @@
 
         public dynamic GetValue() { return p_value; }
 
-        public TreeItem_CPoint(string sName, Tree treeParent, CPoint value, string sDesc, LogWriter log)
+        public TreeItem_CPoint(string sName, Tree treeParent, CPoint value, string sDesc, Log log)
         {
             p_sName = sName;
             p_treeParent = treeParent;

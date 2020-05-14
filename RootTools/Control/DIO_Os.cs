@@ -32,8 +32,8 @@ namespace RootTools.Control
 
         ListDIO m_listDO;
         string m_id;
-        LogWriter m_log;
-        public DIO_Os(IToolDIO tool, string id, LogWriter log, bool bEnableRun, string[] asDO)
+        Log m_log;
+        public DIO_Os(IToolDIO tool, string id, Log log, bool bEnableRun, string[] asDO)
         {
             m_listDO = tool.p_listDO;
             m_id = id;
@@ -68,6 +68,12 @@ namespace RootTools.Control
         public void Write(Enum eDO, bool bOn)
         {
             Write(eDO.ToString(), bOn);
+        }
+
+        public void Write(Enum eDO)
+        {
+            ClearBut(eDO);
+            Write(eDO.ToString(), true);
         }
 
         public void Write(string sDO, bool bOn)
@@ -108,6 +114,15 @@ namespace RootTools.Control
             for (int n = 0; n < m_asDO.Count; n++)
             {
                 if (n != nIndex) m_aBitDO[n].Write(false); 
+            }
+        }
+
+        void ClearBut(Enum eDO)
+        {
+            string sDO = eDO.ToString(); 
+            for (int n = 0; n < m_asDO.Count; n++)
+            {
+                if (sDO != m_asDO[n]) m_aBitDO[n].Write(false);
             }
         }
 

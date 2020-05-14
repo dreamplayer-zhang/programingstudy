@@ -9,8 +9,6 @@ namespace RootTools
     /// <summary> IEngineer : Class 참조를 위한 Interface (AutoMom 역활) </summary>
     public interface IEngineer
     {
-        LogView ClassLogView();
-
         Login.User p_user { get; }
 
         IGem ClassGem();

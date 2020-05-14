@@ -8,23 +8,25 @@
              xmlns:gaf="clr-namespace:RootTools.GAFs;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <TabControl x:Name="tabControl">
-        <TabItem Header="ModuleList">
-            <module:ModuleList_UI x:Name="moduleListUI"/>
+    <TabControl>
+        <TabItem Header="Handler" Background="{Binding p_brushHandler}">
+            <TabControl>
+                <TabItem Header="ModuleList" Background="{Binding p_brushHandler}">
+                    <module:ModuleList_UI x:Name="moduleListUI"/>
+                </TabItem>
+                <TabItem Header="Recipe" Background="{Binding p_brushHandler}">
+                    <local:Vega_Recipe_UI x:Name="recipeUI"/>
+                </TabItem>
+                <TabItem Header="Process" Background="{Binding p_brushHandler}">
+                    <local:Vega_Process_UI x:Name="processUI"/>
+                </TabItem>
+                <TabItem Header="GAF" Background="{Binding p_brushHandler}">
+                    <gaf:GAF_UI x:Name="gafUI"/>
+                </TabItem>
+            </TabControl>
         </TabItem>
-        <TabItem Header="Recipe">
-            <local:Vega_Recipe_UI x:Name="recipeUI"/>
+        <TabItem Header="Module" Background="{Binding p_brushModule}">
+            <TabControl x:Name="tabModule"/>
         </TabItem>
-        <TabItem Header="Process">
-            <local:Vega_Process_UI x:Name="processUI"/>
-        </TabItem>
-        <TabItem Header="GAF">
-            <gaf:GAF_UI x:Name="gafUI"/>
-        </TabItem>
-        <!--
-        <TabItem Header="GAF_Manager">
-            <module:GAF_ManagerUI  x:Name="GAFManagerUI" />
-        </TabItem>
-        -->
     </TabControl>
 </UserControl>

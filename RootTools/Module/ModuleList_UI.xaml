@@ -29,6 +29,9 @@
             <ComboBox x:Name="comboBoxModule" Margin="2,12,2,2" SelectionChanged="ComboBoxModule_SelectionChanged"/>
             <ComboBox x:Name="comboBoxModuleRun" Margin="2" SelectionChanged="ComboBoxModuleRun_SelectionChanged"/>
             <Button x:Name="buttonAdd" Content="Add" Margin="2" Visibility="Hidden" Click="ButtonAdd_Click"/>
+            <Button x:Name="buttonRnR" Content="RnR" Margin="2,12,2,2" Visibility="{Binding p_visibleRnR}" Click="buttonRnR_Click"/>
+            <TextBox x:Name="textBoxRnR" Text="{Binding p_nRnR}" Margin="2" Visibility="{Binding p_visibleRnR}" TextAlignment="Center"/>
+            <ProgressBar Margin="2,12,2,2" Orientation="Horizontal" Height="10" Value="{Binding p_iRun}" Maximum="{Binding p_maxRun}" Minimum="0"/>
         </StackPanel>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <Grid Grid.Column="2">

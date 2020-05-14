@@ -57,7 +57,7 @@ namespace RootTools.GAFs
         #endregion
 
         string m_id;
-        LogWriter m_log;
+        Log m_log;
         List<GAF.Group> m_aGroup;
         public TreeRoot m_treeRoot;
         public void Init(string id, GAF gaf)

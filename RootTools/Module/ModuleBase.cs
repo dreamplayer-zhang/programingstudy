@@ -393,17 +393,17 @@ namespace RootTools.Module
         public string p_id { get; set; }
 
         public IEngineer m_engineer;
-        public LogWriter m_log;
+        public Log m_log;
         public IGem m_gem;
         public GAF m_gaf;
         public ToolBox m_toolBox;
         public TreeRoot m_treeRoot;
         public TreeRoot m_treeToolBox;
-        public void InitBase(string id, IEngineer enginner, string sLog = "")
+        public void InitBase(string id, IEngineer enginner)
         {
             p_id = id;
             m_engineer = enginner;
-            m_log = enginner.ClassLogView().GetLog(LogView.eLogType.ENG, id, sLog);
+            m_log = LogViewer.GetLog(id, id);
             m_gem = enginner.ClassGem();
             m_gaf = enginner.ClassGAF();
             m_toolBox = enginner.ClassToolBox();

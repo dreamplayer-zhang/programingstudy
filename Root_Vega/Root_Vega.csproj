@@ -188,6 +188,7 @@
       <DependentUpon>7_Alarm.xaml</DependentUpon>
     </Compile>
     <Compile Include="7_AlarmViewModel.cs" />
+    <Compile Include="Module\Vega.cs" />
     <Compile Include="Setting\Optic_MainVision.xaml.cs">
       <DependentUpon>Optic_MainVision.xaml</DependentUpon>
     </Compile>

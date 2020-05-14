@@ -147,7 +147,7 @@
                                 <DataGridTextColumn Header="Date" Binding="{Binding m_sDate}">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
-                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
                                         </Style>
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
@@ -166,7 +166,7 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="Logger" Binding="{Binding m_sLogger}"
+                                <DataGridTextColumn Header="Logger" Binding="{Binding m_sLogger}" 
                                         Width="100">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">

@@ -1,6 +1,5 @@
 ﻿using RootTools;
 using RootTools.Trees;
-using System.Collections.Generic;
 
 namespace Root
 {
@@ -9,11 +8,11 @@ namespace Root
         public TreeRoot m_treeRoot; 
 
         string m_id;
-        LogWriter m_log; 
-        public void Init(string id, LogView logView)
+        Log m_log; 
+        public void Init(string id)
         {
             m_id = id;
-            m_log = logView.GetLog(LogView.eLogType.ENG, id); 
+            m_log = LogViewer.GetLog(id); 
             m_treeRoot = new TreeRoot("TreeDemo", m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
 

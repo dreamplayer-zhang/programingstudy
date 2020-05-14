@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace RootTools.ToolBoxs
 {
@@ -23,6 +24,7 @@ namespace RootTools.ToolBoxs
                 TabItem tabItem = new TabItem();
                 tabItem.Header = kv.Key.p_id;
                 tabItem.Content = kv.Value;
+                tabItem.Background = Brushes.DarkSalmon;
                 tabControl.Items.Add(tabItem);
             }
         }

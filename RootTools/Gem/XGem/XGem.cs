@@ -34,6 +34,7 @@ namespace RootTools.Gem.XGem
                 if (_eComm == value) return;
                 p_sInfo = "eCommunicate : " + _eComm.ToString() + " -> " + value.ToString(); 
                 _eComm = value;
+                OnPropertyChanged(); 
             }
         }
 
@@ -203,7 +204,7 @@ namespace RootTools.Gem.XGem
             Error,
         }
 
-        public class Log
+        public class LogData
         {
             string _sTime = "";
             public string p_sTime
@@ -223,7 +224,7 @@ namespace RootTools.Gem.XGem
                 get { return _bColor; }
             }
 
-            public Log(eType type, string sMsg)
+            public LogData(eType type, string sMsg)
             {
                 _sTime = DateTime.Now.ToLongTimeString();
                 _sMsg = sMsg;
@@ -236,8 +237,8 @@ namespace RootTools.Gem.XGem
                 }
             }
         }
-        public ObservableCollection<Log> m_aLog = new ObservableCollection<Log>();
-        public Queue<Log> m_qLog = new Queue<Log>();
+        public ObservableCollection<LogData> m_aLog = new ObservableCollection<LogData>();
+        public Queue<LogData> m_qLog = new Queue<LogData>();
 
         DispatcherTimer m_timer = new DispatcherTimer();
         void InitLogTimer()
@@ -265,7 +266,7 @@ namespace RootTools.Gem.XGem
                 if (value == _sInfo) return;
                 _sInfo = value;
                 m_log.Info("Info = " + _sInfo);
-                m_qLog.Enqueue(new Log(eType.Info, _sInfo));
+                m_qLog.Enqueue(new LogData(eType.Info, _sInfo));
             }
         }
         
@@ -279,7 +280,7 @@ namespace RootTools.Gem.XGem
                 if (value == "OK") return;
                 _sLastError = value;
                 m_log.Error("Error = " + _sLastError);
-                m_qLog.Enqueue(new Log(eType.Error, _sLastError)); 
+                m_qLog.Enqueue(new LogData(eType.Error, _sLastError)); 
             }
         }
 
@@ -288,7 +289,7 @@ namespace RootTools.Gem.XGem
             string sLog = sCmd;
             foreach (object obj in objs) sLog += ", " + obj.ToString();
             m_log.Info(" --> " + sLog);
-            m_qLog.Enqueue(new Log(eType.Send, sLog));
+            m_qLog.Enqueue(new LogData(eType.Send, sLog));
             if (nError >= 0) return "OK";
             p_sLastError = sCmd + " Error # = " + nError.ToString() + " : " + GetErrerString(nError);
             return p_sLastError; 
@@ -299,7 +300,7 @@ namespace RootTools.Gem.XGem
             string sLog = sCmd;
             foreach (object obj in objs) sLog += ", " + obj.ToString();
             m_log.Info(" <-- " + sLog);
-            m_qLog.Enqueue(new Log(eType.Receive, sLog));
+            m_qLog.Enqueue(new LogData(eType.Receive, sLog));
         }
 
         string GetErrerString(long nError)
@@ -1255,13 +1256,13 @@ namespace RootTools.Gem.XGem
         IEngineer m_engineer;
         IHandler m_handler; 
         string m_sRecipeExt = "ASL";
-        LogWriter m_log;
+        Log m_log;
         public void Init(string id, IEngineer engineer)
         {
             p_id = id;
             m_engineer = engineer;
             m_handler = engineer.ClassHandler(); 
-            m_log = engineer.ClassLogView().GetLog(LogView.eLogType.ENG, id, id);
+            m_log = LogViewer.GetLog(id, id);
 
             CopyDllFile();
             ProcessKill("XGem");

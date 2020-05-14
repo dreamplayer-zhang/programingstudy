@@ -27,7 +27,7 @@ namespace RootTools.Trees
 
         public dynamic GetValue() { return p_value; }
 
-        public TreeItem_stringList(string sName, Tree treeParent, string value, List<string> list, string sDesc, LogWriter log)
+        public TreeItem_stringList(string sName, Tree treeParent, string value, List<string> list, string sDesc, Log log)
         {
             p_sName = sName;
             p_treeParent = treeParent;

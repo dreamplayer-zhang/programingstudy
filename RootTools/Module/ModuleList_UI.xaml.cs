@@ -19,12 +19,14 @@ namespace RootTools.Module
         #region Run
         private void ButtonRun_Click(object sender, RoutedEventArgs e)
         {
-            m_moduleList.ClickRun();
+            m_moduleList.p_visibleRnR = Visibility.Hidden;
+            m_moduleList.p_sInfo = m_moduleList.ClickRun();
         }
 
         private void ButtonRunStep_Click(object sender, RoutedEventArgs e)
         {
-            m_moduleList.ClickRunStep();
+            m_moduleList.p_visibleRnR = Visibility.Hidden;
+            m_moduleList.p_sInfo = m_moduleList.ClickRunStep();
         }
 
         private void ButtonPause_Click(object sender, RoutedEventArgs e)
@@ -47,7 +49,13 @@ namespace RootTools.Module
 
         private void ComboBoxRunStep_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (comboBoxRunStep.SelectedValue == null) return; 
             m_moduleList.p_sRunStep = comboBoxRunStep.SelectedValue.ToString();
+        }
+
+        private void buttonRnR_Click(object sender, RoutedEventArgs e)
+        {
+            m_moduleList.p_sInfo = m_moduleList.ClickRunRnR(); 
         }
         #endregion
 
@@ -65,6 +73,7 @@ namespace RootTools.Module
 
         private void ButtonOpen_Click(object sender, RoutedEventArgs e)
         {
+            m_moduleList.p_visibleRnR = Visibility.Hidden;
             string sModel = EQ.m_sModel;
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.InitialDirectory = m_sPath;
@@ -97,12 +106,14 @@ namespace RootTools.Module
 
         private void ButtonClear_Click(object sender, RoutedEventArgs e)
         {
+            m_moduleList.p_visibleRnR = Visibility.Hidden;
             m_moduleRunList.Clear();
             InitModuleRunNames();
         }
 
         private void ButtonAdd_Click(object sender, RoutedEventArgs e)
         {
+            m_moduleList.p_visibleRnR = Visibility.Hidden;
             m_moduleRunList.Add(m_sModule, m_sModuleRun);
             InitModuleRunNames();
         }

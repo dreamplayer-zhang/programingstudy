@@ -214,7 +214,7 @@ namespace RootTools.Comm
         #endregion
 
         public string m_id;
-        LogWriter m_log;
+        Log m_log;
         public TreeRoot m_treeRoot;
         Socket m_socket = null;
         bool m_bRunConnect = false;
@@ -224,7 +224,7 @@ namespace RootTools.Comm
 
 
         public CommLog m_commLog = null;
-        public TCPIPClient(string id, LogWriter log)
+        public TCPIPClient(string id, Log log)
         {
             m_id = id;
             m_log = log;

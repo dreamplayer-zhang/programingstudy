@@ -22,7 +22,7 @@ namespace RootTools.RTC5s
         public string m_id;
         public int m_nIndex;
         public string m_sMark;
-        protected LogWriter m_log;
+        protected Log m_log;
         protected RTC5 m_rtc5;
         public virtual void Init(int nIndex, RTC5 rtc5)
         {

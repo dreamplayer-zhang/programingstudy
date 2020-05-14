@@ -93,7 +93,7 @@
                 <Border Grid.Row="1"
                         BorderBrush="{StaticResource BorderBrush}"                
                         BorderThickness="3">
-                    <TextBlock x:Name="textGemState" Text="{Binding p_eControl}"
+                    <TextBlock x:Name="textGemState" Text="{Binding p_eComm}"
                                Style="{StaticResource BasicTb}"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
@@ -114,7 +114,7 @@
                         BorderBrush="{StaticResource BorderBrush}"                
                         BorderThickness="3"
                         MouseLeftButtonDown="Border_MouseLeftButtonDown">
-                    <TextBlock Text="On/Offline"
+                    <TextBlock x:Name="textGemControl" Text="{Binding p_eControl}"
                                Style="{StaticResource BasicTb}"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
@@ -225,7 +225,7 @@
                     Style="{StaticResource ResourceKey=MainTabControl}">
             <TabItem Header="Main"
                      Style="{StaticResource ResourceKey=MainTabItem}">
-                <local:_1_Main x:Name="_Main"/>
+                <local:_1_Main x:Name="_Main" Margin="0,10,0,-10"/>
             </TabItem>
             <TabItem Header="Recipe"
                      Grid.Column="1"

@@ -197,7 +197,7 @@ namespace RootTools.Camera.CognexOCR
         #endregion
 
         string m_id;
-        LogWriter m_log;
+        Log m_log;
         public TCPIPClient m_tcpip;
         TreeRoot m_treeRoot = null;
         public TreeRoot p_treeRoot
@@ -211,7 +211,7 @@ namespace RootTools.Camera.CognexOCR
                 SetProperty(ref m_treeRoot, value);
             }
         }
-        public Camera_CognexOCR(string id, LogWriter log)
+        public Camera_CognexOCR(string id, Log log)
         {
             m_id = id;
             m_log = log;

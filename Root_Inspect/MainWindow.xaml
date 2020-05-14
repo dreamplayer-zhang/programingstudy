@@ -25,6 +25,6 @@
         <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <comm:NamedPipe_UI Grid.Column="4" x:Name="namedPipeUI"/>
         <GridSplitter Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <tool:UI_LogView Grid.Column="6" x:Name="logViewUI"/>
+        <tool:LogView_UI Grid.Column="6" x:Name="logViewUI"/>
     </Grid>
 </Window>

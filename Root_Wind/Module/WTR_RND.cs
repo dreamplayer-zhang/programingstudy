@@ -598,12 +598,12 @@ namespace Root_Wind.Module
             foreach (IWTRChild child in m_aChild) child.ReadInfoWafer_Registry(); 
         }
 
-        public WTR_RND(string id, IEngineer engineer, string sLog = "")
+        public WTR_RND(string id, IEngineer engineer)
         {
             InitCmd();
             InitMotion();
             InitArms(id);
-            base.InitBase(id, engineer, sLog);
+            base.InitBase(id, engineer);
         }
 
         public override void ThreadStop()

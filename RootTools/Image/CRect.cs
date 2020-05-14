@@ -112,7 +112,7 @@ namespace RootTools
             Top = t;
             Bottom = b;
         }
-        public CRect(string str, LogWriter log)
+        public CRect(string str, Log log)
         {
             try
             {
