@@ -321,7 +321,7 @@ namespace Root_Vega
             m_engineer = engineer;
             m_handler = handler;
             m_robot = handler.m_robot; 
-            m_log = LogViewer.GetLog(id);
+            m_log = LogView.GetLog(id);
 
             m_treeReticle = new TreeRoot(id + "Reticle", m_log, true);
             m_treeLocate = new TreeRoot(id + "Locate", m_log);

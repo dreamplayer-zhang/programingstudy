@@ -28,7 +28,7 @@ namespace Root_Memory
         {
             string id = "Root_Memory"; 
             m_engineer.Init(id);
-            logViewUI.Init(LogViewer.m_logView);
+            logViewUI.Init(LogView.m_logView);
             m_memoryTool = m_engineer.m_memoryTool; 
             memoryToolUI.Init(m_memoryTool);
             foreach (NamedPipe namedPipe in m_memoryTool.m_aNamedPipe)

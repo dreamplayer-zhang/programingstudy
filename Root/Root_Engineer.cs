@@ -53,7 +53,7 @@ namespace Root
         public void Init(string id)
         {
             EQ.m_sModel = id; 
-            LogViewer.Init();
+            LogView.Init();
             m_login.Init();
             m_toolBox.Init(id, this);
             InitAjin();
@@ -65,7 +65,7 @@ namespace Root
             m_handler.ThreadStop(); 
             m_toolBox.ThreadStop();
             m_login.ThreadStop();
-            LogViewer.ThreadStop();
+            LogView.ThreadStop();
         }
     }
 }

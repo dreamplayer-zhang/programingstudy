@@ -492,7 +492,7 @@ namespace Root_Wind
             m_engineer = engineer;
             m_handler = handler;
             m_wtr = m_handler.p_wtr; 
-            m_log = LogViewer.GetLog(id);
+            m_log = LogView.GetLog(id);
 
             m_treeWafer = new TreeRoot(id + "Wafer", m_log, true);
             m_treeLocate = new TreeRoot(id + "Locate", m_log);

@@ -12,7 +12,7 @@ namespace Root
         public void Init(string id)
         {
             m_id = id;
-            m_log = LogViewer.GetLog(id); 
+            m_log = LogView.GetLog(id); 
             m_treeRoot = new TreeRoot("TreeDemo", m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
 

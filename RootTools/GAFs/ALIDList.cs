@@ -35,8 +35,8 @@ namespace RootTools.GAFs
         {
             foreach (ALID alid in p_aALID)
             {
-                alid.p_bSet = false;
                 alid.p_sMsg = "";
+                alid.p_bSet = false;
             }
             p_aSetALID.Clear();
         }

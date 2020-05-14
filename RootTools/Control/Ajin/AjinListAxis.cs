@@ -32,7 +32,7 @@ namespace RootTools.Control.Ajin
             while (m_aAxis.Count < m_lAxis)
             {
                 AjinAxis axis = new AjinAxis();
-                axis.Init(m_id, m_aAxis.Count, m_engineer, m_log, m_bEnable);
+                axis.Init(m_id, m_aAxis.Count, m_engineer, m_bEnable);
                 m_aAxis.Add(axis);
             }
             if (OnChangeAxisList != null) OnChangeAxisList(); 
@@ -147,7 +147,7 @@ namespace RootTools.Control.Ajin
             m_id = id;
             m_engineer = engineer;
             m_bAXL = bAXL;
-            m_log = LogViewer.GetLog(id);
+            m_log = LogView.GetLog(id);
             AXM("Init Axis Error (ReStart SW) : ", InitAxis());
         }
 

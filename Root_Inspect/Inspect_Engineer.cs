@@ -36,7 +36,7 @@ namespace Root_Inspect
 
         public void Init()
         {
-            LogViewer.Init();
+            LogView.Init();
             m_login.Init();
             m_memoryTool = new MemoryTool(EQ.m_sModel, this);
         }
@@ -45,7 +45,7 @@ namespace Root_Inspect
         {
             m_memoryTool.ThreadStop();
             m_login.ThreadStop();
-            LogViewer.ThreadStop();
+            LogView.ThreadStop();
         }
     }
 }

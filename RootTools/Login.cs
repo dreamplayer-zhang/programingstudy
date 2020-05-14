@@ -162,7 +162,7 @@ namespace RootTools
         public Log m_log; 
         public void Init()
         {
-            m_log = LogViewer.GetLog(m_id);
+            m_log = LogView.GetLog(m_id);
             InitUser();
             m_treeRoot = new TreeRoot(m_id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;

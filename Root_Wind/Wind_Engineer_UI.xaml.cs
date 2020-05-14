@@ -18,7 +18,7 @@ namespace Root_Wind
         public void Init(Wind_Engineer engineer)
         {
             m_engineer = engineer;
-            logViewUI.Init(LogViewer.m_logView);
+            logViewUI.Init(LogView.m_logView);
             loginUI.Init(engineer.m_login);
             toolBoxUI.Init(engineer.ClassToolBox());
             handlerUI.Init(engineer.m_handler);

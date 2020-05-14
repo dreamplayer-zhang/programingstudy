@@ -121,7 +121,7 @@ namespace RootTools.Light
         {
             m_id = id;
             m_engineer = engineer;
-            m_log = LogViewer.GetLog(id);
+            m_log = LogView.GetLog(id);
             
             m_rs232 = new RS232(id, m_log);
             InitLight();

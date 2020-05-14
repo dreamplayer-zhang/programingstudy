@@ -56,30 +56,30 @@ namespace ViewConverter
         {
             PackIconKind result;
             string str = value.ToString();
-            LogView.eLogType type = LogView.eLogType.ENG;
+            LogViewX.eLogType type = LogViewX.eLogType.ENG;
             if (Enum.TryParse(value.ToString(), out type))
             {
                 switch (type)
                 {
-                    case LogView.eLogType.FNC:
+                    case LogViewX.eLogType.FNC:
                         result = MaterialDesignThemes.Wpf.PackIconKind.VectorPoint;
                         break;
-                    case LogView.eLogType.XFR:
+                    case LogViewX.eLogType.XFR:
                         result = MaterialDesignThemes.Wpf.PackIconKind.Motorbike;
                         break;
-                    case LogView.eLogType.PRC:
+                    case LogViewX.eLogType.PRC:
                         result = MaterialDesignThemes.Wpf.PackIconKind.Monitor;
                         break;
-                    case LogView.eLogType.ALM:
+                    case LogViewX.eLogType.ALM:
                         result = MaterialDesignThemes.Wpf.PackIconKind.Error;
                         break;
-                    case LogView.eLogType.CFG:
+                    case LogViewX.eLogType.CFG:
                         result = MaterialDesignThemes.Wpf.PackIconKind.Wrench;
                         break;
-                    case LogView.eLogType.COMM:
+                    case LogViewX.eLogType.COMM:
                         result = MaterialDesignThemes.Wpf.PackIconKind.PhoneIncoming;
                         break;
-                    case LogView.eLogType.LEH:
+                    case LogViewX.eLogType.LEH:
                         result = MaterialDesignThemes.Wpf.PackIconKind.CalendarAlert;
                         break;
                     default:
@@ -122,30 +122,30 @@ namespace ViewConverter
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             System.Windows.Media.Brush result;
-            LogView.eLogType type = LogView.eLogType.ENG;
+            LogViewX.eLogType type = LogViewX.eLogType.ENG;
             if (Enum.TryParse(value.ToString(), out type))
             {
                 switch (type)
                 {
-                    case LogView.eLogType.FNC:
+                    case LogViewX.eLogType.FNC:
                         result = System.Windows.Media.Brushes.LightSeaGreen;
                         break;
-                    case LogView.eLogType.XFR:
+                    case LogViewX.eLogType.XFR:
                         result = System.Windows.Media.Brushes.MediumBlue;
                         break;
-                    case LogView.eLogType.PRC:
+                    case LogViewX.eLogType.PRC:
                         result = System.Windows.Media.Brushes.OrangeRed;
                         break;
-                    case LogView.eLogType.ALM:
+                    case LogViewX.eLogType.ALM:
                         result = System.Windows.Media.Brushes.Red;
                         break;
-                    case LogView.eLogType.CFG:
+                    case LogViewX.eLogType.CFG:
                         result = System.Windows.Media.Brushes.BlueViolet;
                         break;
-                    case LogView.eLogType.COMM:
+                    case LogViewX.eLogType.COMM:
                         result = System.Windows.Media.Brushes.DodgerBlue;
                         break;
-                    case LogView.eLogType.LEH:
+                    case LogViewX.eLogType.LEH:
                         result = System.Windows.Media.Brushes.Khaki;
                         break;
                     default:

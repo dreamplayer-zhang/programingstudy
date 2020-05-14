@@ -40,8 +40,8 @@ namespace Root_Vega.Module
             else present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
             if (m_infoPod.CheckPlaced(present) != "OK")
             {
-                m_alidPlaced.p_bSet = true;
                 m_alidPlaced.p_sMsg = "Placed Sensor Remain Checked while Pod State = " + m_infoPod.p_eState;
+                m_alidPlaced.p_bSet = true;
             }
             switch (m_infoPod.p_ePresentSensor)
             {

@@ -1,11 +1,8 @@
 ﻿using RootTools.GAFs;
 using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.SQLite;
 using System.IO;
-using System.Windows.Controls;
 
 namespace RootTools.SQLogs
 {
@@ -15,7 +12,6 @@ namespace RootTools.SQLogs
         public static void Init(IEngineer engineer)
         {
             m_sqLog = new _SQLog(engineer);
-            engineer.ClassToolBox().AddToolSet(m_sqLog, m_sqLog.p_ui); 
         }
 
         public static SQTable_ALID Get(ALID alid)
@@ -39,18 +35,6 @@ namespace RootTools.SQLogs
                 OnPropertyChanged(); 
             }
         }
-
-        #region UI
-        public UserControl p_ui
-        {
-            get
-            {
-                SQLog_UI ui = new SQLog_UI();
-                ui.Init(this);
-                return ui;
-            }
-        }
-        #endregion
 
         #region Setting
         SQLiteConnection m_sqConnection = null;
@@ -137,7 +121,7 @@ namespace RootTools.SQLogs
         public _SQLog(IEngineer engineer)
         {
             p_id = "SQLog";
-            m_log = LogViewer.GetLog(p_id, p_id);
+            m_log = LogView.GetLog(p_id, p_id);
             m_treeRoot = new TreeRoot(p_id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);

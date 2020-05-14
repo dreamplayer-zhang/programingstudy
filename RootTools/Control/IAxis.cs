@@ -8,6 +8,7 @@ namespace RootTools.Control
     {
         Axis.eState p_eState { get; set; }
         UserControl p_ui { get; }
+        Log p_log { get; }
         string p_sID { get; set; }
         int p_nAxisID { get; set; }
         int p_prgHome

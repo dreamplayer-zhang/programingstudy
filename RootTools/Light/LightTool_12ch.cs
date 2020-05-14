@@ -102,7 +102,7 @@ namespace RootTools.Light
         {
             m_id = id;
             m_engineer = engineer; 
-            m_log = LogViewer.GetLog(id);
+            m_log = LogView.GetLog(id);
             m_usb = new CyUSBTool(m_id, m_log);
             InitLight();
         }

@@ -73,7 +73,7 @@ namespace RootTools.Control.Ajin
         public void Init(string id, int nInputModule, int nOutputModule)
         {
             m_id = id;
-            m_log = LogViewer.GetLog(id);
+            m_log = LogView.GetLog(id);
             InitList();
             m_nInputModule = nInputModule;
             m_nOutputModule = nOutputModule;

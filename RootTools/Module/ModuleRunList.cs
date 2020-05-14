@@ -145,7 +145,7 @@ namespace RootTools.Module
             m_id = id;
             m_engineer = engineer;
             m_moduleList = engineer.ClassModuleList();
-            m_log = LogViewer.GetLog(m_id, sLogGroup);
+            m_log = LogView.GetLog(m_id, sLogGroup);
             m_treeRoot = new TreeRoot(m_id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);

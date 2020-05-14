@@ -224,7 +224,7 @@ namespace RootTools.Gem
         {
             p_id = id; 
             m_engineer = engineer;
-            m_log = LogViewer.GetLog(id, "InfoSlot");
+            m_log = LogView.GetLog(id, "InfoSlot");
             m_gem = engineer.ClassGem();
             m_treeRoot = new TreeRoot(id, m_log); 
         }

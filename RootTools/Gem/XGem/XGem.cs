@@ -1262,7 +1262,7 @@ namespace RootTools.Gem.XGem
             p_id = id;
             m_engineer = engineer;
             m_handler = engineer.ClassHandler(); 
-            m_log = LogViewer.GetLog(id, id);
+            m_log = LogView.GetLog(id, id);
 
             CopyDllFile();
             ProcessKill("XGem");

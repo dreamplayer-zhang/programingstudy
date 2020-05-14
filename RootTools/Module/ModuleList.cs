@@ -258,7 +258,7 @@ namespace RootTools.Module
             m_id = EQ.m_sModel;
             m_engineer = engineer;
             m_handler = engineer.ClassHandler();
-            m_log = LogViewer.GetLog(m_id);
+            m_log = LogView.GetLog(m_id);
             m_moduleRunList = new ModuleRunList(m_id, engineer);
 
             StartThread();

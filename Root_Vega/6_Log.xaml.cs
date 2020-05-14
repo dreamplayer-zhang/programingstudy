@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,7 @@ namespace Root_Vega
         public _6_Log()
         {
             InitializeComponent();
+            logView.Init(LogView.m_logView); 
         }
     }
 }
