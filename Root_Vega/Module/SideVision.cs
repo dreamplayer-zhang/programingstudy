@@ -799,6 +799,33 @@ namespace Root_Vega.Module
                     // Grab
                     if (m_module.Run(cam.Grab()))
                         return p_sInfo;
+                    cam.p_ImageViewer.SetImageData(cam.p_ImageViewer.p_ImageData);
+
+                    ////////////////////////// AutoFocus Algorithm Test (with Sobel Filter)
+                    Emgu.CV.Mat src = new Emgu.CV.Mat(img.p_Size.X, img.p_Size.Y, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
+                    Emgu.CV.Mat grad = new Emgu.CV.Mat();
+                    int scale = 1;
+                    int delta = 0;
+                    //int ddepth = (int)Emgu.CV.CvEnum.DepthType.Cv8U;
+                    Emgu.CV.Mat grad_x = new Emgu.CV.Mat();
+                    Emgu.CV.Mat grad_y = new Emgu.CV.Mat();
+                    Emgu.CV.Mat abs_grad_x = new Emgu.CV.Mat();
+                    Emgu.CV.Mat abs_grad_y = new Emgu.CV.Mat();
+                    ///Gradient X
+                    Emgu.CV.CvInvoke.Sobel(src, grad_x, Emgu.CV.CvEnum.DepthType.Cv8U, 1, 0, 3, scale, delta, Emgu.CV.CvEnum.BorderType.Default);
+                    ///Gradient Y
+                    Emgu.CV.CvInvoke.Sobel(src, grad_y, Emgu.CV.CvEnum.DepthType.Cv8U, 0, 1, 3, scale, delta, Emgu.CV.CvEnum.BorderType.Default);
+                    Emgu.CV.CvInvoke.ConvertScaleAbs(grad_x, abs_grad_x, scale, delta);
+                    Emgu.CV.CvInvoke.ConvertScaleAbs(grad_y, abs_grad_y, scale, delta);
+                    Emgu.CV.CvInvoke.AddWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad);
+                    Emgu.CV.Structure.MCvScalar mu = new Emgu.CV.Structure.MCvScalar();
+                    Emgu.CV.Structure.MCvScalar sigma = new Emgu.CV.Structure.MCvScalar();
+                    Emgu.CV.CvInvoke.MeanStdDev(grad, ref mu, ref sigma);
+                    double focusMeasure = mu.V0 * mu.V0;
+
+                    continue;
+                    //////////////////////////
+
                     // 분산 Score 계산
                     dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
                     if (dLeftCurrentScore > dLeftMaxScore)
@@ -854,7 +881,7 @@ namespace Root_Vega.Module
 
                 // 6. Theta축 돌리기
                 double dActualPos = m_module.p_axisTheta.p_axis.p_posActual;
-                if (!bThetaClockwise) dScaled = -dScaled;
+                if (bThetaClockwise) dScaled = -dScaled;
                 m_module.p_axisTheta.Move(dActualPos + dScaled);
 
                 return base.Run();
