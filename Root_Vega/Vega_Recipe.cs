@@ -31,7 +31,7 @@ namespace Root_Vega
         {
             m_id = id;
             m_engineer = engineer;
-            m_log = LogViewer.GetLog(id);
+            m_log = LogView.GetLog(id);
             m_moduleRunList = new ModuleRunList(id, engineer);
         }
     }

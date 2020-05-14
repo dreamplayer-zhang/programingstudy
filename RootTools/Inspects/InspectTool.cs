@@ -401,7 +401,7 @@ namespace RootTools.Inspects
             m_bHost = bHost;
             m_memoryTool = engineer.ClassMemoryTool();
             m_memoryTool.AddNamedPipe(m_id + ".Memory");
-            m_log = LogViewer.GetLog(id);
+            m_log = LogView.GetLog(id);
             m_memoryPool = null;
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_tree_UpdateTree;

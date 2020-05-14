@@ -403,7 +403,7 @@ namespace RootTools.Module
         {
             p_id = id;
             m_engineer = enginner;
-            m_log = LogViewer.GetLog(id, id);
+            m_log = LogView.GetLog(id, id);
             m_gem = enginner.ClassGem();
             m_gaf = enginner.ClassGAF();
             m_toolBox = enginner.ClassToolBox();

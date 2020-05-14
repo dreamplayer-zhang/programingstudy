@@ -133,7 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
-    <Compile Include="Camera\BaslerPylon\Camera_basler_Classes.cs" />
+    <Compile Include="Camera\BaslerPylon\Camera_Basler_Classes.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_UI.xaml.cs">
       <DependentUpon>Camera_Basler_UI.xaml</DependentUpon>
     </Compile>
@@ -268,7 +268,7 @@
     <Compile Include="Inspects\SqliteDataDB.cs" />
     <Compile Include="Logs\ILogGroup.cs" />
     <Compile Include="Logs\Log.cs" />
-    <Compile Include="Logs\LogViewer.cs" />
+    <Compile Include="Logs\LogView.cs" />
     <Compile Include="Logs\LogView_UI.xaml.cs">
       <DependentUpon>LogView_UI.xaml</DependentUpon>
     </Compile>
@@ -423,7 +423,7 @@
     </Compile>
     <Compile Include="Registry.cs" />
     <Compile Include="IEngineer.cs" />
-    <Compile Include="Log\LogView.cs" />
+    <Compile Include="Log\LogViewX.cs" />
     <Compile Include="ViewModelHelper\NotifyProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

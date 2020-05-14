@@ -23,7 +23,7 @@ namespace RootTools
     // m_log = m_logView.GetLog(m_id, sGroup);
     // m_log.Info("Log Here");  
 
-    public static class LogViewer
+    public static class LogView
     {
         public static _LogView m_logView = new _LogView();
 

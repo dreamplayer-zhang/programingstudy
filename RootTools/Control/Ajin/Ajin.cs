@@ -154,7 +154,7 @@ namespace RootTools.Control.Ajin
             int nInput=0, nOutput = 0;
             m_id = id;
             m_engineer = engineer;
-            m_log = LogViewer.GetLog(id);
+            m_log = LogView.GetLog(id);
             bool bAXL = InitCAXL(ref nInput,ref nOutput);
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;

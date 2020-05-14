@@ -178,7 +178,7 @@ namespace RootTools.Light
         {
             m_id = id;
             m_engineer = engineer; 
-            m_log = LogViewer.GetLog(id); 
+            m_log = LogView.GetLog(id); 
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);

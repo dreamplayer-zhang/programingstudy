@@ -38,8 +38,8 @@ namespace RootTools
         #endregion
 
         #region Layout
-        string m_sLayoutMemory = "${time}\t${level}\t${logger}\t${message}\t${stacktrace}\t";
-        string m_sLayoutFile = "${longdate}\t${level}\t${logger}\t${message}\t${stacktrace}\t";
+        string m_sLayoutMemory = "${time}\t${level}\t${logger}\t${message}\t${stacktrace}";
+        string m_sLayoutFile = "${longdate}\t${level}\t${logger}\t${message}\t${stacktrace}";
         #endregion
 
         #region Data

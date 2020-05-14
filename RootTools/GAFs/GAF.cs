@@ -177,7 +177,7 @@ namespace RootTools.GAFs
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_log = LogViewer.GetLog(id, "GAF");
+            m_log = LogView.GetLog(id, "GAF");
             m_listCEID.Init(id + ".CEID", this);
             m_listSVID.Init(id + ".SVID", this);
             m_listALID.Init(id + ".ALID", this);

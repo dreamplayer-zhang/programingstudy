@@ -26,7 +26,7 @@ namespace RootTools
     // m_log.Info("Log Here");  
     #endregion
 
-    public class LogView : ObservableObject
+    public class LogViewX : ObservableObject
     {
         public enum eMaterial
         {
@@ -366,7 +366,7 @@ namespace RootTools
             }
             
 
-            public LogGroup(LogView.eLogType func, string sGroup, NLog.LogLevel lvMin, NLog.LogLevel lvMax)
+            public LogGroup(LogViewX.eLogType func, string sGroup, NLog.LogLevel lvMin, NLog.LogLevel lvMax)
             {  
                 m_sGroupName = sGroup;
                 m_lvMin = lvMin;
@@ -375,7 +375,7 @@ namespace RootTools
                 m_memory.Layout = GetLayout();
                 m_file = new NLog.Targets.FileTarget(sGroup);
                 m_file.Layout = GetLayout();
-                if (func == LogView.eLogType.ENG)
+                if (func == LogViewX.eLogType.ENG)
                 {
                     m_file.FileName = m_sLogPath + "\\${shortdate}\\" + EQ.m_sModel + "\\${shortdate}_" + m_file.Name + ".csv";   // FileName 지정 날짜가 바뀌면 자동으로 변경
                 }

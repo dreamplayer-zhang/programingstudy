@@ -24,7 +24,7 @@ namespace Root_Vega
         public _6_Log()
         {
             InitializeComponent();
-            logView.Init(LogViewer.m_logView); 
+            logView.Init(LogView.m_logView); 
         }
     }
 }

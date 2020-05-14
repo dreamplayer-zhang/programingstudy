@@ -9,12 +9,12 @@ namespace RootTools
      
     public class LogFNC
     {  
-        public LogView.eLogType m_eFunc = LogView.eLogType.FNC;
+        public LogViewX.eLogType m_eFunc = LogViewX.eLogType.FNC;
         public string m_sEvent;
         public string m_sMatType;
         public string m_sMatID;
         public List<LogData> m_datas;
-        public LogFNC(string sEvent, LogView.eMaterial eMatType, string sMatID, List<LogData> datas)
+        public LogFNC(string sEvent, LogViewX.eMaterial eMatType, string sMatID, List<LogData> datas)
         {  
             m_sEvent = sEvent;
             m_sMatType = eMatType.ToString().ToUpper();
@@ -30,7 +30,7 @@ namespace RootTools
         public string m_sFrom;
         public string m_sTo;
         public List<LogData> m_datas;
-        public LogXFR(string sEvent, LogView.eMaterial eMatType, string sMatID, string sFrom, string sTo,  List<LogData> datas)
+        public LogXFR(string sEvent, LogViewX.eMaterial eMatType, string sMatID, string sFrom, string sTo,  List<LogData> datas)
         {
             m_sEvent = sEvent;
             m_sMatType = eMatType.ToString().ToUpper();
@@ -65,7 +65,7 @@ namespace RootTools
         public string m_sRecipe;
         public string m_sCarrierID;
         public List<LogData> m_datas;
-        public LogLEH(LogView.eLotEvent eEvent, string DeviceID, string sLot, string sRecipe, string sCarrier, List<LogData> datas)
+        public LogLEH(LogViewX.eLotEvent eEvent, string DeviceID, string sLot, string sRecipe, string sCarrier, List<LogData> datas)
         {
             m_sDeviceID = DeviceID;
             m_sEvent = eEvent.ToString();
@@ -83,7 +83,7 @@ namespace RootTools
         public string m_sALcode;
         public string m_sStateALM;
         public List<LogData> m_datas;
-        public LogALM(string sDeviceID, string sEventID, string sALcode, LogView.eStateALM state, LogView.eEQP_Stop stop, List<LogData> datas)
+        public LogALM(string sDeviceID, string sEventID, string sALcode, LogViewX.eStateALM state, LogViewX.eEQP_Stop stop, List<LogData> datas)
         {
             m_sDeviceID = sDeviceID;
             m_sEventID=sEventID;
@@ -91,7 +91,7 @@ namespace RootTools
             m_sStateALM=state.ToString();
             
             m_datas = datas;
-            if (stop != LogView.eEQP_Stop.NONE)
+            if (stop != LogViewX.eEQP_Stop.NONE)
             {
                 LogData data = new LogData("DESCRIPTION", stop.ToString());
                 m_datas.Insert(0, data);
@@ -104,7 +104,7 @@ namespace RootTools
         public string m_sDeviceID;
         public string m_sCfgType;
         public List<LogData> m_datas;
-        public LogCFG(string sDeviceID, LogView.eCFGType cfgType, List<LogData> datas)
+        public LogCFG(string sDeviceID, LogViewX.eCFGType cfgType, List<LogData> datas)
         {
             m_sDeviceID = sDeviceID;
             m_sCfgType = cfgType.ToString();
@@ -117,7 +117,7 @@ namespace RootTools
         public string m_sDeviceID;
         public string m_sCommType;
         public List<LogData> m_datas;
-        public LogCOMM(string sDeviceID, LogView.eCOMMType CommType, List<LogData> datas)
+        public LogCOMM(string sDeviceID, LogViewX.eCOMMType CommType, List<LogData> datas)
         {
             m_sDeviceID = sDeviceID;
             m_sCommType = CommType.ToString();

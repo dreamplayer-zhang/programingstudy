@@ -1260,7 +1260,7 @@ namespace RootTools.Control.Ajin
             p_nAxisID = nAxisID;
             p_sID = "Axis";
             m_engineer = engineer;
-            m_log = LogViewer.GetLog(id);
+            m_log = LogView.GetLog(id);
             m_bEnable = bEnable;
             InitPosition();
             InitSpeed();

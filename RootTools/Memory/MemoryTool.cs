@@ -275,7 +275,7 @@ namespace RootTools.Memory
             p_fNotRootPageFile = p_fTotalPageFile - p_fAvailPageFile;
             m_id = id;
             m_engineer = engineer;
-            m_log = LogViewer.GetLog(id);
+            m_log = LogView.GetLog(id);
             InitRuns(); 
             m_treeRootSetup = new TreeRoot("Memory", m_log);
             m_treeRootSetup.UpdateTree += M_treeRootSetup_UpdateTree;
