@@ -85,8 +85,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="MMFClass.cs" />
-    <Compile Include="Module_ScareCrow.cs" />
-    <Compile Include="Module_Test.cs" />
+    <Compile Include="Module\ScareCrow.cs" />
+    <Compile Include="Module\Siltron.cs" />
+    <Compile Include="Module\Test.cs" />
     <Compile Include="Root_Handler.cs" />
     <Compile Include="Root_Handler_UI.xaml.cs">
       <DependentUpon>Root_Handler_UI.xaml</DependentUpon>

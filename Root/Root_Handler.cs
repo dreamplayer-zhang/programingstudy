@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root.Module;
+using RootTools;
 using RootTools.GAFs;
 using RootTools.Module;
 using System.Collections.Generic;
@@ -11,15 +12,18 @@ namespace Root
     {
         #region Module
         public ModuleList m_moduleList;
-        public Module_Test m_moduleTest;
-        public Module_ScareCrow m_moduleScareCrow;
+        public Test m_test;
+        public ScareCrow m_scarecrow;
+        public Siltron m_siltron; 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
-            m_moduleTest = new Module_Test("Test", m_enginner);
-            InitModule(m_moduleTest);
-            m_moduleScareCrow =new Module_ScareCrow("ScareCrow", m_enginner);
-            InitModule(m_moduleScareCrow);
+            //m_test = new Test("Test", m_enginner);
+            //InitModule(m_test);
+            //m_scarecrow =new ScareCrow("ScareCrow", m_enginner);
+            //InitModule(m_scarecrow);
+            m_siltron = new Siltron("Siltrion", m_enginner);
+            InitModule(m_siltron); 
         }
 
         void InitModule(ModuleBase module)

@@ -8,19 +8,19 @@ using RootTools.RTC5s.LaserBright;
 using RootTools.Trees;
 using System.Threading;
 
-namespace Root
+namespace Root.Module
 {
-    public class Module_ScareCrow : ModuleBase
+    public class ScareCrow : ModuleBase
     {
         #region ToolBox
-        DIO_I m_diTest; 
+        DIO_I m_diTest;
         NamedPipe m_namePipe;
         LightSet m_light;
         RS232 m_rs232WTR;
         RS232 m_rs232LP;
-//        Camera_Basler m_camBasler;
+        //        Camera_Basler m_camBasler;
         MemoryPool m_memoryPool;
-        Laser_Bright m_laser; 
+        Laser_Bright m_laser;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diTest, this, "Test");
@@ -28,13 +28,13 @@ namespace Root
             p_sInfo = m_toolBox.Get(ref m_light, this);
             p_sInfo = m_toolBox.Get(ref m_rs232WTR, this, "WTR");
             p_sInfo = m_toolBox.Get(ref m_rs232LP, this, "LP");
-//            p_sInfo = m_toolBox.Get(ref m_camBasler, this, "Basler");
+            //            p_sInfo = m_toolBox.Get(ref m_camBasler, this, "Basler");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
-            p_sInfo = m_toolBox.Get(ref m_laser, this, "Laser"); 
+            p_sInfo = m_toolBox.Get(ref m_laser, this, "Laser");
         }
         #endregion
 
-        public Module_ScareCrow(string id, IEngineer engineer)
+        public ScareCrow(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
         }
@@ -57,8 +57,8 @@ namespace Root
 
         public class Run_Test : ModuleRunBase
         {
-            Module_ScareCrow m_module;
-            public Run_Test(Module_ScareCrow module)
+            ScareCrow m_module;
+            public Run_Test(ScareCrow module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -85,6 +85,5 @@ namespace Root
                 return "OK";
             }
         }
-
     }
 }

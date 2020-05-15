@@ -7,9 +7,9 @@ using RootTools.Trees;
 using System;
 using System.Threading;
 
-namespace Root
+namespace Root.Module
 {
-    public class Module_Test : ModuleBase
+    public class Test : ModuleBase
     {
         #region ToolBox
         enum eBuzzer
@@ -20,7 +20,7 @@ namespace Root
             Test
         }
         DIO_I m_diTest;
-        DIO_O m_doBeep; 
+        DIO_O m_doBeep;
         DIO_IO m_dioStart;
         DIO_I2O2 m_dioDoor;
         DIO_Os m_doBuzzer;
@@ -32,7 +32,7 @@ namespace Root
         LightSet m_light;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_dioStart, this, "Start"); 
+            p_sInfo = m_toolBox.Get(ref m_dioStart, this, "Start");
             p_sInfo = m_toolBox.Get(ref m_dioDoor, this, "Door", "Close", "Open");
             p_sInfo = m_toolBox.Get(ref m_diTest, this, "Test");
             p_sInfo = m_toolBox.Get(ref m_doBeep, this, "Beep");
@@ -63,13 +63,13 @@ namespace Root
         {
             m_axisXY.AddPos(Enum.GetNames(typeof(ePosXY)));
             m_axisXY.AddPos("Center");
-            m_axisXY.AddPosDone(); 
+            m_axisXY.AddPosDone();
             m_axisZ.AddPos(Enum.GetNames(typeof(ePosZ)));
             m_axisZ.AddPos("First", "Second");
-            m_axisZ.AddPosDone(); 
+            m_axisZ.AddPosDone();
         }
         #endregion
-        public Module_Test(string id, IEngineer engineer)
+        public Test(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
             InitAxisPos();
@@ -95,8 +95,8 @@ namespace Root
 
         public class Run_Test : ModuleRunBase
         {
-            Module_Test m_module; 
-            public Run_Test(Module_Test module)
+            Test m_module;
+            public Run_Test(Test module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -107,7 +107,7 @@ namespace Root
             {
                 Run_Test run = new Run_Test(m_module);
                 run.m_bTest = m_bTest;
-                return run; 
+                return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
@@ -117,18 +117,18 @@ namespace Root
 
             public override string Run()
             {
-                m_log.Info(p_id + " : Test Start"); 
+                m_log.Info(p_id + " : Test Start");
                 Thread.Sleep(2000);
                 m_log.Info(p_id + " : Test End");
-                return "OK"; 
+                return "OK";
             }
         }
 
         public class Run_Run : ModuleRunBase
         {
-            Module_Test m_module;
-            Run_Test m_runTest; 
-            public Run_Run(Module_Test module)
+            Test m_module;
+            Run_Test m_runTest;
+            public Run_Run(Test module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -140,14 +140,14 @@ namespace Root
             {
                 Run_Run run = new Run_Run(m_module);
                 run.m_nTry = m_nTry;
-                run.m_runTest = (Run_Test)m_runTest.Clone(); 
-                return run; 
+                run.m_runTest = (Run_Test)m_runTest.Clone();
+                return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_nTry = tree.Set(m_nTry, 3, "Try", "Try Count", bVisible);
-                m_runTest.RunTree(tree.GetTree("Test"), bVisible); 
+                m_runTest.RunTree(tree.GetTree("Test"), bVisible);
             }
 
             public override string Run()
@@ -158,8 +158,8 @@ namespace Root
 
         public class Run_AxisMove : ModuleRunBase
         {
-            Module_Test m_module;
-            public Run_AxisMove(Module_Test module)
+            Test m_module;
+            public Run_AxisMove(Test module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -177,7 +177,7 @@ namespace Root
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                if (m_module.m_axisXY == null) return; 
+                if (m_module.m_axisXY == null) return;
                 m_sPosXY = tree.Set(m_sPosXY, "", m_module.m_axisXY.m_asPos, "PosXY", "Axis Move Posistion", bVisible);
                 m_sPosZ = tree.Set(m_sPosZ, "", m_module.m_axisZ.m_asPos, "PosZ", "Axis Move Posistion", bVisible);
             }
@@ -185,7 +185,7 @@ namespace Root
             public override string Run()
             {
                 if (m_module.Run(m_module.m_axisXY.Move(m_sPosXY))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisZ.Move(m_sPosZ))) return p_sInfo; 
+                if (m_module.Run(m_module.m_axisZ.Move(m_sPosZ))) return p_sInfo;
                 return "OK";
             }
 
