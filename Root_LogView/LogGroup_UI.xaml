@@ -12,7 +12,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
-            <ComboBox x:Name="comboFilter" Width="100" Margin="2" SelectionChanged="comboFilter_SelectionChanged"/>
+            <ComboBox x:Name="comboFilter" Width="100" Margin="2"/>
             <TextBox x:Name="textBoxFilter" Width="120" Margin="2" TextAlignment="Center"/>
             <Button x:Name="buttonFilter" Width="54" Margin="2" Content="Filter" Click="buttonFilter_Click"/>
         </StackPanel>

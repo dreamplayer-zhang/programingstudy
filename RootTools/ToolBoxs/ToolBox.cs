@@ -124,7 +124,7 @@ namespace RootTools.ToolBoxs
         {
             if (value == null)
             {
-                value = m_memoryTool.GetPool(module.p_id + "." + id);
+                value = m_memoryTool.GetPool(module.p_id + "." + id, true);
                 module.m_aTool.Add(value);
             }
             value.RunTree(module.m_treeToolBox.GetTree(id));

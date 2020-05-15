@@ -436,7 +436,7 @@ namespace Root_Wind
             m_MemoryModule = engineer.ClassMemoryTool();
 
             //m_MemoryModule.CreateMemoryPool(m_sPoolName, 1);
-            MemoryPool memoryPool = m_MemoryModule.GetPool(m_sPoolName);
+            MemoryPool memoryPool = m_MemoryModule.GetPool(m_sPoolName, true);
             memoryPool.p_gbPool = 1;
             memoryPool.GetGroup("TestGroup").CreateMemory(p_sMemName, 1, 1, new CPoint(p_nNewMemWidth, p_nNewMemHeigth));
             memoryPool.GetGroup(p_sGroupName).CreateMemory(p_sMemName, 1, 1, new CPoint(p_nNewMemWidth, p_nNewMemHeigth));
@@ -1304,21 +1304,21 @@ namespace Root_Wind
 
             if (m_PoolSelectedIndex >= 0)
             {
-                if (m_MemoryModule.GetPool(m_PoolData[m_PoolSelectedIndex].p_id).p_aGroup.Count != m_GroupData.Count)
+                if (m_MemoryModule.GetPool(m_PoolData[m_PoolSelectedIndex].p_id, true).p_aGroup.Count != m_GroupData.Count)
                 {
                     m_GroupData.Clear();
                     m_MemoryData.Clear();
-                    foreach (MemoryGroup data in m_MemoryModule.GetPool(m_PoolData[m_PoolSelectedIndex].p_id).p_aGroup)
+                    foreach (MemoryGroup data in m_MemoryModule.GetPool(m_PoolData[m_PoolSelectedIndex].p_id, true).p_aGroup)
                         m_GroupData.Add(data);
                 }
             }
 
             if (m_GroupSelectedIndex >= 0)
             {
-                if (m_MemoryModule.GetPool(m_PoolData[m_PoolSelectedIndex].p_id).GetGroup(m_GroupData[m_GroupSelectedIndex].p_id).p_aMemory.Count != m_MemoryData.Count)
+                if (m_MemoryModule.GetPool(m_PoolData[m_PoolSelectedIndex].p_id, true).GetGroup(m_GroupData[m_GroupSelectedIndex].p_id).p_aMemory.Count != m_MemoryData.Count)
                 {
                     m_MemoryData.Clear();
-                    foreach (MemoryData data in m_MemoryModule.GetPool(m_PoolData[m_PoolSelectedIndex].p_id).GetGroup(m_GroupData[m_GroupSelectedIndex].p_id).p_aMemory)
+                    foreach (MemoryData data in m_MemoryModule.GetPool(m_PoolData[m_PoolSelectedIndex].p_id, true).GetGroup(m_GroupData[m_GroupSelectedIndex].p_id).p_aMemory)
                     {
                         m_MemoryData.Add(data);
                     }

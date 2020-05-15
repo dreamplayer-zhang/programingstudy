@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Root_LogView
@@ -18,13 +19,13 @@ namespace Root_LogView
         {
             m_logGroup = logGroup;
             DataContext = logGroup;
-            dataGrid.ItemsSource = logGroup.p_aLog; 
+            dataGrid.ItemsSource = logGroup.p_aLog;
+            foreach (DataGridColumn column in dataGrid.Columns) m_asColumn.Add((string)column.Header);
+            comboFilter.ItemsSource = m_asColumn;
+            comboFilter.SelectedIndex = 2; 
         }
 
-        private void comboFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-        }
-
+        List<string> m_asColumn = new List<string>(); 
         private void buttonFilter_Click(object sender, RoutedEventArgs e)
         {
 

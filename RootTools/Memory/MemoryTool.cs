@@ -105,12 +105,13 @@ namespace RootTools.Memory
             }
         }
 
-        public MemoryPool GetPool(string sPool)
+        public MemoryPool GetPool(string sPool, bool bCreate)
         {
             foreach (MemoryPool pool in m_aPool)
             {
                 if (pool.p_id == sPool) return pool;
             }
+            if (bCreate == false) return null; 
             MemoryPool memoryPool = new MemoryPool(sPool, m_log);
             m_aPool.Add(memoryPool);
             InitPoolNames();
@@ -119,13 +120,13 @@ namespace RootTools.Memory
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
         {
-            MemoryPool pool = GetPool(sPool);
+            MemoryPool pool = GetPool(sPool, false);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory); 
         }
 
         public string DeletePool(string sPool)
         {
-            MemoryPool memoryPool = GetPool(sPool);
+            MemoryPool memoryPool = GetPool(sPool, false);
             if (memoryPool != null) return "Memory Pool Not Exist";
             m_aPool.Remove(memoryPool);
             InitPoolNames();
@@ -140,7 +141,7 @@ namespace RootTools.Memory
             {
                 string sPool = (m_aPool.Count > n) ? m_aPool[n].p_id : "Pool";
                 sPool = tree.Set(sPool, sPool, "sPool." + n.ToString(), "Pool Name", bVisible);
-                MemoryPool memoryPool = GetPool(sPool); 
+                MemoryPool memoryPool = GetPool(sPool, true); 
                 int gbPool = (m_aPool.Count > n) ? m_aPool[n].p_gbPool : 0;
                 gbPool = tree.Set(gbPool, 0, "gbPool." + n.ToString(), "Pool size gb", bVisible);
                 memoryPool.p_gbPool = gbPool; 
@@ -381,7 +382,7 @@ namespace RootTools.Memory
 
             public string Run()
             {
-                MemoryPool memoryPool = m_tool.GetPool(m_sPool);
+                MemoryPool memoryPool = m_tool.GetPool(m_sPool, true);
                 memoryPool.p_gbPool = m_gbPool; 
                 if (m_tool.OnChangeTool != null) m_tool.OnChangeTool(); 
                 return "OK"; 
@@ -428,7 +429,7 @@ namespace RootTools.Memory
 
             public string Run()
             {
-                MemoryPool pool = m_tool.GetPool(m_sPool);
+                MemoryPool pool = m_tool.GetPool(m_sPool, false);
                 if (pool == null) return "Pool not Found";
                 pool.GetGroup(m_sGroup);
                 return "OK"; 
@@ -448,14 +449,14 @@ namespace RootTools.Memory
             public void RunTree(Tree tree, bool bVisible)
             {
                 m_sPool = tree.Set(m_sPool, "Pool", m_tool.m_asPool, "Pool", "Pool Name", bVisible);
-                MemoryPool pool = m_tool.GetPool(m_sPool);
+                MemoryPool pool = m_tool.GetPool(m_sPool, false);
                 if (pool == null) return; 
                 m_sGroup = tree.Set(m_sGroup, m_sGroup, pool.m_asGroup, "Group", "Group Name", bVisible);
             }
 
             public string Run()
             {
-                MemoryPool pool = m_tool.GetPool(m_sPool);
+                MemoryPool pool = m_tool.GetPool(m_sPool, false);
                 if (pool == null) return "Pool not Found";
                 return pool.DeleteGroup(m_sGroup);
             }
@@ -478,7 +479,7 @@ namespace RootTools.Memory
             public void RunTree(Tree tree, bool bVisible)
             {
                 m_sPool = tree.Set(m_sPool, "Pool", m_tool.m_asPool, "Pool", "Pool Name", bVisible);
-                MemoryPool pool = m_tool.GetPool(m_sPool);
+                MemoryPool pool = m_tool.GetPool(m_sPool, false);
                 if (pool == null) return;
                 m_sGroup = tree.Set(m_sGroup, m_sGroup, pool.m_asGroup, "Group", "Group Name", bVisible);
                 MemoryGroup group = pool.GetGroup(m_sGroup);
@@ -491,7 +492,7 @@ namespace RootTools.Memory
 
             public string Run()
             {
-                MemoryPool pool = m_tool.GetPool(m_sPool);
+                MemoryPool pool = m_tool.GetPool(m_sPool, false);
                 if (pool == null) return "Pool not Found";
                 MemoryGroup group = pool.GetGroup(m_sGroup);
                 if (group == null) return "Group not Found";
@@ -514,7 +515,7 @@ namespace RootTools.Memory
             public void RunTree(Tree tree, bool bVisible)
             {
                 m_sPool = tree.Set(m_sPool, "Pool", m_tool.m_asPool, "Pool", "Pool Name", bVisible);
-                MemoryPool pool = m_tool.GetPool(m_sPool);
+                MemoryPool pool = m_tool.GetPool(m_sPool, false);
                 if (pool == null) return;
                 m_sGroup = tree.Set(m_sGroup, m_sGroup, pool.m_asGroup, "Group", "Group Name", bVisible);
                 MemoryGroup group = pool.GetGroup(m_sGroup);
@@ -524,7 +525,7 @@ namespace RootTools.Memory
 
             public string Run()
             {
-                MemoryPool pool = m_tool.GetPool(m_sPool);
+                MemoryPool pool = m_tool.GetPool(m_sPool, false);
                 if (pool == null) return "Pool not Found";
                 MemoryGroup group = pool.GetGroup(m_sGroup);
                 if (group == null) return "Group not Found"; 
@@ -551,7 +552,7 @@ namespace RootTools.Memory
             {
                 m_memory = null; ; 
                 m_sPool = tree.Set(m_sPool, "Pool", m_tool.m_asPool, "Pool", "Pool Name", bVisible);
-                MemoryPool pool = m_tool.GetPool(m_sPool);
+                MemoryPool pool = m_tool.GetPool(m_sPool, false);
                 if (pool == null) return;
                 m_sGroup = tree.Set(m_sGroup, m_sGroup, pool.m_asGroup, "Group", "Group Name", bVisible);
                 MemoryGroup group = pool.GetGroup(m_sGroup);
@@ -589,7 +590,7 @@ namespace RootTools.Memory
             {
                 m_memory = null; ;
                 m_sPool = tree.Set(m_sPool, "Pool", m_tool.m_asPool, "Pool", "Pool Name", bVisible);
-                MemoryPool pool = m_tool.GetPool(m_sPool);
+                MemoryPool pool = m_tool.GetPool(m_sPool, false);
                 if (pool == null) return;
                 m_sGroup = tree.Set(m_sGroup, m_sGroup, pool.m_asGroup, "Group", "Group Name", bVisible);
                 MemoryGroup group = pool.GetGroup(m_sGroup);

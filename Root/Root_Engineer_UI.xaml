@@ -22,14 +22,17 @@
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <local:Root_Handler_UI Grid.Column="0" x:Name="handlerUI" Margin="2"/>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-            <toolBox:ToolBox_UI Grid.Column="2" x:Name="toolBoxUI" Margin="2"/>
-            <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-            <tools:LogView_UI Grid.Column="4" x:Name="logViewUI" Margin="2"/>
+            <TabControl Grid.Column="2">
+                <TabItem Header="ToolBox">
+                    <toolBox:ToolBox_UI x:Name="toolBoxUI" Margin="2"/>
+                </TabItem>
+                <TabItem Header="Log">
+                    <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
+                </TabItem>
+            </TabControl>
         </Grid>
     </Grid>
 </UserControl>

@@ -147,7 +147,7 @@ namespace Root_Wind
         void Init(Wind_Engineer engineer, IDialogService dialogService)
         {
             m_MemoryModule = engineer.ClassMemoryTool();
-            MemoryPool memoryPool = m_MemoryModule.GetPool(sPool);
+            MemoryPool memoryPool = m_MemoryModule.GetPool(sPool, true);
             memoryPool.p_gbPool = 10;
             memoryPool.GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
 

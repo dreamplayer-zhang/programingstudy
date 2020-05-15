@@ -26,6 +26,7 @@ namespace RootTools
         private void LogView_OnChangeTab()
         {
             UpdateLogTab();
+            comboLog.SelectedIndex = 0; 
         }
 
         void UpdateLogTab()
@@ -34,7 +35,7 @@ namespace RootTools
             m_asLog.Clear();
             comboLog.ItemsSource = null;
             foreach (ILogGroup log in m_logView.m_aGroup) m_asLog.Add(log.p_id);
-            comboLog.ItemsSource = m_asLog; 
+            comboLog.ItemsSource = m_asLog;
         }
 
         void UpdateLogTab(ILogGroup log)

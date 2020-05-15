@@ -42,8 +42,8 @@ namespace Root_Vega
 			m_MemoryModule = engineer.ClassMemoryTool();
 			//m_MemoryModule.CreatePool(sPool, 8);
 			//m_MemoryModule.GetPool(sPool).CreateGroup(sGroup);
-			m_MemoryModule.GetPool(sPool).p_gbPool = 2;
-			m_MemoryModule.GetPool(sPool).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
+			m_MemoryModule.GetPool(sPool, true).p_gbPool = 2;
+			m_MemoryModule.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
 			m_MemoryModule.GetMemory(sPool, sGroup, sMem);
 
 			m_Image = new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem));
