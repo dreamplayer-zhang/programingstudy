@@ -685,7 +685,7 @@ namespace Root_Vega.Module
                         string sPool = "pool";
                         string sGroup = "group";
                         string sMem = "mem";
-                        MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetPool(sPool).GetGroup(sGroup).GetMemory(sMem);
+                        MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetPool(sPool, true).GetGroup(sGroup).GetMemory(sMem);
 
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
                         /* 방향 바꾸는 코드 들어가야함*/

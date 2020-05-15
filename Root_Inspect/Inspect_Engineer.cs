@@ -28,7 +28,7 @@ namespace Root_Inspect
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
         {
-            MemoryPool pool = m_memoryTool.GetPool(sPool);
+            MemoryPool pool = m_memoryTool.GetPool(sPool, false);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
         }
 

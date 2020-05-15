@@ -39,7 +39,7 @@ namespace Root_Wind
             m_Recipe = engineer.m_recipe;
 
             m_MemoryModule = engineer.ClassMemoryTool();
-            MemoryPool memoryPool = m_MemoryModule.GetPool(sPool);
+            MemoryPool memoryPool = m_MemoryModule.GetPool(sPool, true);
 
             m_Image = new ImageData(memoryPool.GetMemory(sGroup, sMem));
             p_ImageViewer = new ImageViewer_ViewModel(m_Image, dialogService);
