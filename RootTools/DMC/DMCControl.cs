@@ -26,6 +26,7 @@ namespace RootTools.DMC
             set
             {
                 if (_eState == value) return;
+                m_log.Info("DMC State : " + _eState.ToString() + " -> " + value.ToString()); 
                 _eState = value;
                 OnPropertyChanged();
                 m_bRunTreeInit = true; 
@@ -104,9 +105,14 @@ namespace RootTools.DMC
             p_nPort = 0;
             p_secInterval = 3;
         }
-        
+
+        StopWatch m_swTimer = new StopWatch();
+        StopWatch m_swCheck = new StopWatch(); 
+        int m_nTimer = 0;
+        double m_msTimer = 0; 
         void TimerCheck_Connect()
         {
+            m_swCheck.Restart(); 
             if (p_bConnect && (p_eState == eState.Error))
             {
                 if (p_nRobot == 0) return;
@@ -124,6 +130,13 @@ namespace RootTools.DMC
                 CoreMon.stopService(p_nRobot);
                 CoreMon.deleteRobot(p_nRobot);
                 p_nRobot = 0;
+            }
+            m_nTimer++;
+            m_msTimer += m_swCheck.ElapsedMilliseconds; 
+            if (m_swTimer.ElapsedMilliseconds > 5000)
+            {
+                if (m_nTimer > 0) m_log.Info("DMC Average Time (ms) = " + (m_msTimer / m_nTimer).ToString());
+                m_swTimer.Restart(); 
             }
         }
 
