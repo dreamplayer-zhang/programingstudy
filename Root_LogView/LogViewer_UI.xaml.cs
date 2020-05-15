@@ -34,7 +34,8 @@ namespace Root_LogView
             }
             comboLog.ItemsSource = null;
             foreach (string sFile in dlg.FileNames) OpenLog(sFile); 
-            comboLog.ItemsSource = m_asLog; 
+            comboLog.ItemsSource = m_asLog;
+            comboLog.SelectedIndex = 0; 
         }
 
         void OpenLog(string sFile)
