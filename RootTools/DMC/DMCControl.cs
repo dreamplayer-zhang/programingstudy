@@ -106,13 +106,8 @@ namespace RootTools.DMC
             p_secInterval = 3;
         }
 
-        StopWatch m_swTimer = new StopWatch();
-        StopWatch m_swCheck = new StopWatch(); 
-        int m_nTimer = 0;
-        double m_msTimer = 0; 
         void TimerCheck_Connect()
         {
-            m_swCheck.Restart(); 
             if (p_bConnect && (p_eState == eState.Error))
             {
                 if (p_nRobot == 0) return;
@@ -130,13 +125,6 @@ namespace RootTools.DMC
                 CoreMon.stopService(p_nRobot);
                 CoreMon.deleteRobot(p_nRobot);
                 p_nRobot = 0;
-            }
-            m_nTimer++;
-            m_msTimer += m_swCheck.ElapsedMilliseconds; 
-            if (m_swTimer.ElapsedMilliseconds > 5000)
-            {
-                if (m_nTimer > 0) m_log.Info("DMC Average Time (ms) = " + (m_msTimer / m_nTimer).ToString());
-                m_swTimer.Restart(); 
             }
         }
 
@@ -432,6 +420,10 @@ namespace RootTools.DMC
         #region Timer
         DispatcherTimer m_timer = new DispatcherTimer();
         StopWatch m_swConnect = new StopWatch();
+        StopWatch m_swTimer = new StopWatch();
+        StopWatch m_swCheck = new StopWatch();
+        int m_nTimer = 0;
+        double m_msTimer = 0;
         private void M_timer_Tick(object sender, EventArgs e)
         {
             TimerCheck_DMC();
@@ -444,6 +436,14 @@ namespace RootTools.DMC
             TimerCheck_Axis();
             TimerCheck_DIO();
             if (m_bRunTreeInit) RunTree(Tree.eMode.Init);
+            m_nTimer++;
+            m_msTimer += m_swCheck.ElapsedMilliseconds;
+            if (m_swTimer.ElapsedMilliseconds > 5000)
+            {
+                if (m_nTimer > 0) m_log.Info("DMC Average Period (ms) = " + (m_msTimer / m_nTimer).ToString());
+                m_swTimer.Restart();
+            }
+            m_swCheck.Restart();
         }
 
         void TimerCheck_DMC()
@@ -513,6 +513,7 @@ namespace RootTools.DMC
             m_timer.Interval = TimeSpan.FromMilliseconds(10);
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
+            m_swCheck.Restart();
         }
 
         public void ThreadStop()
