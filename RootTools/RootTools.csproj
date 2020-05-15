@@ -187,10 +187,10 @@
     <Compile Include="Control\Ajin\Ajin_UI.xaml.cs">
       <DependentUpon>Ajin_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DMC\CoreMon.cs" />
     <Compile Include="DMC\DMCAxis_UI.xaml.cs">
       <DependentUpon>DMCAxis_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DMC\CoreMon.cs" />
     <Compile Include="DMC\DMCAxis.cs" />
     <Compile Include="DMC\DMCControl.cs" />
     <Compile Include="DMC\DMCControl_UI.xaml.cs">

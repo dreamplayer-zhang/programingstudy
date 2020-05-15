@@ -57,6 +57,7 @@ namespace RootTools.DMC
         }
 
 
+
         /*---------------------   robot status --------------------------------------------*/
 
         [DllImport("coremon.dll", EntryPoint = "cmon_get_lock_status", CallingConvention = CallingConvention.Cdecl)]
@@ -218,10 +219,10 @@ namespace RootTools.DMC
         /*---------------  get position & DIO --------------------------------------*/
 
         [DllImport("coremon.dll", EntryPoint = "cmon_get_joint_position", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int getgetCurJointition(int idRobot, float[] res);
+        public static extern int getCurJointPosition(int idRobot, float[] res);
 
         [DllImport("coremon.dll", EntryPoint = "cmon_get_trans_position", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int getgetCurTransition(int idRobot, float[] res);
+        public static extern int getCurTransPosition(int idRobot, float[] res);
 
         [DllImport("coremon.dll", EntryPoint = "cmon_get_din", CallingConvention = CallingConvention.Cdecl)]
         public static extern int getDIN(int idRobot, UInt32[] res);
@@ -270,6 +271,21 @@ namespace RootTools.DMC
             return 0;
         }
 
+        [DllImport("coremon.dll", EntryPoint = "cmon_get_maintask_status", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        static extern int cmon_get_maintask_status(int idRobot, ref int status);
+        static public int getMainTaskStatus(int idRobot)
+        {
+            int res = 0;
+
+            int retcode = cmon_get_maintask_status(idRobot, ref res);
+
+            if (retcode == 0)
+                return res;
+
+            return 0;
+        }
+        
+
         [DllImport("coremon.dll", EntryPoint = "cmon_get_maintask_cycle", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         static extern int cmon_get_maintask_cycle(int idRobot, ref int cycle);
         static public int getMainTaskCycle(int idRobot)
@@ -310,7 +326,8 @@ namespace RootTools.DMC
 
             retcode = cmon_get_subtask_name(idRobot, sb);
 
-            if (retcode == 0) return sb.ToString();
+            if (retcode == 0)
+                return sb.ToString();
 
             return "";
         }
@@ -463,7 +480,65 @@ namespace RootTools.DMC
         [DllImport("coremon.dll", EntryPoint = "cmon_set_unlock", CallingConvention = CallingConvention.Cdecl)]
         public static extern int setUnLock(int idRobot);
 
-       
+        /*--------------------------- system log -------------------------------------*/
+        [DllImport("coremon.dll", EntryPoint = "cmon_get_slog", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        static extern int cmon_get_slog(int idRobot, StringBuilder log);
+        static public String getSystemlog(int idRobot)
+        {
+            StringBuilder sb = new StringBuilder(2048);
+
+            int retcode = cmon_get_slog(idRobot, sb);
+
+            if (retcode == 0)
+                return sb.ToString();
+
+            return "";
+        }
+
+        [DllImport("coremon.dll", EntryPoint = "cmon_get_slog_size", CallingConvention = CallingConvention.Cdecl)]
+        static extern int cmon_get_slog_size(int idRobot, ref int logsize);
+        public static int getSLogSize(int idRobot)
+        {
+            int res = 0;
+
+            int retcode = cmon_get_slog_size(idRobot, ref res);
+
+            return res;
+        }
+
+        [DllImport("coremon.dll", EntryPoint = "cmon_get_number_data", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        static extern int cmon_get_number_data(int idRobot, string vbname, ref float value);
+        public static float getNumberData(int idRobot, string vbname)
+        {
+            float res = 0;
+
+            int retcode = cmon_get_number_data(idRobot, vbname, ref res);
+
+            return res;
+        }
+
+        [DllImport("coremon.dll", EntryPoint = "cmon_set_number_data", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        static extern int cmon_set_number_data(int idRobot, string vbname, ref float value);
+        public static int setNumberData(int idRobot, string vbname, ref float value)
+        {
+            float res = 0;
+
+            int retcode = cmon_set_number_data(idRobot, vbname, ref value);
+
+            return retcode;
+        }
+
+        [DllImport("coremon.dll", EntryPoint = "cmon_get_error_code", CallingConvention = CallingConvention.Cdecl)]
+        static extern int cmon_get_error_code(int idRobot, ref int errcode);
+        public static int getErrorCode(int idRobot, ref int errcode)
+        {
+            
+            int retcode = cmon_get_error_code(idRobot, ref errcode);
+
+            return retcode;
+        }
+      
+      
 
     }
 }

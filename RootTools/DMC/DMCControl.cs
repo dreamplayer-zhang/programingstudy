@@ -377,8 +377,8 @@ namespace RootTools.DMC
             p_bGetServo = CoreMon.getMotorOnStatus(p_nRobot);
             p_eGetTCRMode = (eTCRMode)CoreMon.getTCRMode(p_nRobot);
             p_eGetJogSpeed = (eJogSpeed)CoreMon.getTeachSpeed(p_nRobot);
-            CoreMon.getgetCurJointition(p_nRobot, m_aJoint);
-            CoreMon.getgetCurTransition(p_nRobot, m_aTrans);
+            CoreMon.getCurJointPosition(p_nRobot, m_aJoint);
+            CoreMon.getCurTransPosition(p_nRobot, m_aTrans);
             for (int n = 0; n < m_aAxis.Count; n++)
             {
                 m_aAxis[n].p_fJoint = m_aJoint[n];
@@ -444,10 +444,9 @@ namespace RootTools.DMC
             if (CoreMon.getErrorStatus(p_nRobot)) p_eState = eState.Error;
             else
             {
-                int nStep = 0;
                 p_sTask = CoreMon.getMainTaskName(p_nRobot);
-                p_eState = (eState)CoreMon.getMainTaskMoveStep(p_nRobot, ref nStep);
-                p_nStep = nStep;
+                p_eState = (eState)CoreMon.getMainTaskStatus(p_nRobot);
+                p_nStep = CoreMon.getMainTaskCurStep(p_nRobot);
             }
         }
         #endregion
