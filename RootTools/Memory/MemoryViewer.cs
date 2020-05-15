@@ -13,14 +13,13 @@ namespace RootTools.Memory
         #endregion
 
         #region MemoryData
-        MemoryData m_memoryData = null;
+        public MemoryData m_memoryData = null;
         public void SetMemory(MemoryData memoryData, int nIndex)
         {
             m_memoryData = memoryData;
             OnPropertyChanged("p_sMemoryData");
             p_nMemoryIndex = nIndex;
             OnPropertyChanged("p_nMemoryIndex");
-            OnPropertyChanged("p_visibleMenu");
             UpdateBitmapSource(); 
         }
 
@@ -30,11 +29,6 @@ namespace RootTools.Memory
         }
 
         public int p_nMemoryIndex { get; set; }
-
-        public Visibility p_visibleMenu
-        {
-            get { return (m_memoryData != null) ? Visibility.Visible : Visibility.Hidden; }
-        }
         #endregion
 
         #region UI
@@ -52,6 +46,7 @@ namespace RootTools.Memory
         #region File Open & Save
         public void FileOpen(string sFile)
         {
+            if (m_memoryData == null) return; 
             switch (GetUpperExt(sFile))
             {
                 case "BMP": m_memoryData.p_sInfo = m_memoryData.FileOpenBMP(sFile, p_nMemoryIndex); break;
@@ -62,7 +57,7 @@ namespace RootTools.Memory
 
         public void FileSave(string sFile)
         {
-
+            if (m_memoryData == null) return;
             switch (GetUpperExt(sFile))
             {
                 case "BMP": m_memoryData.p_sInfo = m_memoryData.FileSaveBMP(sFile, p_nMemoryIndex); break;
@@ -131,6 +126,7 @@ namespace RootTools.Memory
 
         public void ZoomOut(CPoint cpWindow)
         {
+            if (m_memoryData == null) return; 
             if (m_iZoom >= (m_aZoom.Length - 1)) return;
             double sx = m_memoryData.p_sz.X * p_fZoom / p_szWindow.X;
             double sy = m_memoryData.p_sz.Y * p_fZoom / p_szWindow.Y;

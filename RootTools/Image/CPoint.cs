@@ -86,13 +86,11 @@ namespace RootTools
 
         public static bool operator ==(CPoint cp0, CPoint cp1)
         {
-         
             return cp0.Equals(cp1);
         }
 
         public static bool operator !=(CPoint cp0, CPoint cp1)
         {
-         
             return !cp0.Equals(cp1);
         }
 

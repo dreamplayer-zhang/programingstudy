@@ -20,6 +20,7 @@ namespace RootTools.Memory
         {
             m_memoryViewer = memoryViewer;
             this.DataContext = memoryViewer;
+            comboBoxPool.ItemsSource = memoryViewer.m_memoryTool.m_asPool;
         }
 
         private void menuOpen_Click(object sender, RoutedEventArgs e)
@@ -70,6 +71,42 @@ namespace RootTools.Memory
         private void gridBitmapSource_MouseLeave(object sender, MouseEventArgs e)
         {
             m_memoryViewer.m_bLBD = false;
+        }
+
+        private void comboBoxPool_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            m_memoryViewer.m_memoryData = null;
+            string sPool = comboBoxPool.SelectedValue.ToString();
+            MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
+            if (pool == null) return;
+            comboBoxGroup.ItemsSource = pool.m_asGroup;
+            comboBoxGroup.SelectedIndex = -1;
+        }
+
+        private void comboBoxGroup_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            m_memoryViewer.m_memoryData = null;
+            string sPool = comboBoxPool.SelectedValue.ToString();
+            MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
+            if (pool == null) return;
+            string sGroup = comboBoxGroup.SelectedValue.ToString();
+            MemoryGroup group = pool.GetGroup(sGroup);
+            if (group == null) return;
+            comboBoxMemory.ItemsSource = group.m_asMemory;
+            comboBoxMemory.SelectedIndex = -1;
+        }
+
+        private void comboBoxMemory_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            m_memoryViewer.m_memoryData = null;
+            string sPool = comboBoxPool.SelectedValue.ToString();
+            MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
+            if (pool == null) return;
+            string sGroup = comboBoxGroup.SelectedValue.ToString();
+            MemoryGroup group = pool.GetGroup(sGroup);
+            if (group == null) return;
+            string sMemory = comboBoxMemory.SelectedValue.ToString();
+            m_memoryViewer.m_memoryData = group.GetMemory(sMemory); 
         }
     }
 }

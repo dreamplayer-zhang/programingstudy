@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
-             xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+             xmlns:memory="clr-namespace:RootTools.Memory;assembly=RootTools"
              xmlns:toolBox="clr-namespace:RootTools.ToolBoxs;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -28,6 +28,9 @@
             <TabControl Grid.Column="2">
                 <TabItem Header="ToolBox">
                     <toolBox:ToolBox_UI x:Name="toolBoxUI" Margin="2"/>
+                </TabItem>
+                <TabItem Header="MemoryViewer">
+                    <memory:MemoryViewer_UI x:Name="memoryViewer" Margin="2"/>
                 </TabItem>
                 <TabItem Header="Log">
                     <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
