@@ -13,9 +13,11 @@ namespace RootTools.Inspects
 		public delegate void EventHandler();
 		public EventHandler InspectionStart;
 		public EventHandler InspectionComplete;
-		public delegate void ChangeDefectInfoEventHander(DefectData[] source, EventArgs args);
+		public delegate void ChangeDefectInfoEventHander(DefectData[] source, InspectionType type);
 		public event ChangeDefectInfoEventHander AddDefect;
 		#endregion
+
+		InspectionType inspectionType;
 
 		int threadIndex = -1;
 		int inspectionID = -1;
@@ -64,7 +66,7 @@ namespace RootTools.Inspects
 						m_InspProp.p_Sur_Param.p_bAbsoluteInspection);
 					if (AddDefect != null)//대리자 호출을 간단하게 만들 수 있으나 vs2013에서 호환이 안 될 가능성이 없어 보류
 					{
-						AddDefect(arrDefects, EventArgs.Empty);
+						AddDefect(arrDefects, inspectionType);
 					}
 				}
 				else if (bState == InspectionState.Running)

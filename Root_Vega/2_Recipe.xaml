@@ -165,11 +165,11 @@
                     <local:_2_4_Position x:Name="_Position" />
                 </Border>
             </TabItem>
-            <TabItem Header="Surface"
+            <TabItem Header="Strip"
                      Style="{StaticResource RcptabItem}">
                 <Border BorderBrush="Gray"
                         BorderThickness="3">
-                    <local:_2_5_Surface x:Name="_Surface"/>
+                    <local:_2_5_Surface x:Name="_Strip"/>
                 </Border>
             </TabItem>
             <TabItem Header="Side"

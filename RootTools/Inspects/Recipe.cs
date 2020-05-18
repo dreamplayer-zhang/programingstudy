@@ -218,6 +218,108 @@ namespace RootTools.Inspects
 
 		#endregion
 	}
+	public class StripParamData :ObservableObject
+	{
+		public StripParamData()
+		{
+			GV = new Param<int>(70, 0, 255);
+			DefectSize = new Param<int>(10, 1, int.MaxValue);
+			bandwidth = new Param<int>(10, 0, 255);
+			intensity = new Param<int>(120, 0, int.MaxValue);
+		}
+
+		#region p_GV
+		Param<int> GV;
+		public int p_GV
+		{
+			get
+			{
+				return GV._value;
+			}
+			set
+			{
+				if (GV._value == value)
+					return;
+				GV._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region p_DefectSize
+		Param<int> DefectSize;
+		public int p_DefectSize
+		{
+			get
+			{
+				return DefectSize._value;
+			}
+			set
+			{
+				if (DefectSize._value == value)
+					return;
+				DefectSize._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region TargetLabelText
+		string _TargetLabelText;
+		public string TargetLabelText
+		{
+			get
+			{
+				return _TargetLabelText;
+			}
+			set
+			{
+				if (_TargetLabelText != value)
+				{
+					_TargetLabelText = value;
+					RaisePropertyChanged();
+				}
+			}
+		}
+
+		#endregion
+
+		#region p_Intensity
+		Param<int> intensity;
+		public int p_Intensity
+		{
+			get
+			{
+				return intensity._value;
+			}
+			set
+			{
+				if (intensity._value == value)
+					return;
+				intensity._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region p_Bandwidth
+		Param<int> bandwidth;
+		public int p_Bandwidth
+		{
+			get
+			{
+				return bandwidth._value;
+			}
+			set
+			{
+				if (bandwidth._value == value)
+					return;
+				bandwidth._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+	}
 
 	public class Origin
 	{
@@ -259,6 +361,7 @@ namespace RootTools.Inspects
 		public Origin m_Origin = new Origin();
 		public Position m_Position = new Position();
 		public Surface m_Surface = new Surface();
+		public Strip m_Strip = new Strip();
 		public Bump m_Bump = new Bump();
 		//DeadLine m_DeadLine;
 
@@ -285,6 +388,23 @@ namespace RootTools.Inspects
 		public List<NonPattern> m_NonPattern;
 		ObservableCollection<SurFace_ParamData> m_Parameter = new ObservableCollection<SurFace_ParamData>();
 		public ObservableCollection<SurFace_ParamData> p_Parameter
+		{
+			get
+			{
+				return m_Parameter;
+			}
+			set
+			{
+				SetProperty(ref m_Parameter, value);
+			}
+		}
+	}
+	public class Strip : ItemParent
+	{
+		public List<Pattern> m_Pattern;
+		public List<NonPattern> m_NonPattern;
+		ObservableCollection<StripParamData> m_Parameter = new ObservableCollection<StripParamData>();
+		public ObservableCollection<StripParamData> p_Parameter
 		{
 			get
 			{

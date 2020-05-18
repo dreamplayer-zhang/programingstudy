@@ -16,7 +16,7 @@ namespace RootTools.Inspects
 		/// <summary>
 		/// 이벤트 핸들러
 		/// </summary>
-		public delegate void EventHandler();
+		public delegate void EventHandler(InspectionType type);
 		public EventHandler InspectionStart;
 		public EventHandler InspectionComplete;
 		/// <summary>
@@ -24,7 +24,7 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="source">Defect List</param>
 		/// <param name="args">arguments. 필요한 경우 수정해서 사용</param>
-		public delegate void ChangeDefectInfoEventHanlder(DefectData[] source, EventArgs args);
+		public delegate void ChangeDefectInfoEventHanlder(DefectData[] source, InspectionType type);
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
@@ -34,8 +34,12 @@ namespace RootTools.Inspects
 		int nThreadNum = 4;
 		int nInspectionCount = 0;
 
-		public void StartInspection()
+		InspectionType inspectionType;
+
+		public void StartInspection(InspectionType type)
 		{
+			inspectionType = type;
+
 			if (0 < GetWaitQueue())
 			{
 				if (GetWaitQueue() < nThreadNum)
@@ -54,7 +58,7 @@ namespace RootTools.Inspects
 
 			if (InspectionStart != null)
 			{
-				InspectionStart();//DB Write 준비 시작
+				InspectionStart(inspectionType);//DB Write 준비 시작
 			}
 
 			for (int i = 0; i < nThreadNum; i++)
@@ -104,7 +108,7 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="source">DefectData array</param>
 		/// <param name="args">추후 arguments가 필요하면 사용할것</param>
-		private void InspectionManager_AddDefect(DefectData[] source, System.EventArgs args)
+		private void InspectionManager_AddDefect(DefectData[] source, InspectionType type)
 		{
 			#region DEBUG
 
@@ -126,7 +130,7 @@ namespace RootTools.Inspects
 
 			if (AddDefect != null)
 			{
-				AddDefect(source, args);
+				AddDefect(source, inspectionType);
 			}
 		}
 
@@ -135,7 +139,7 @@ namespace RootTools.Inspects
 			//TODO : 해당 Queue로 들어온 검사가 완전 종료되었을때 발동. 여기서 DB를 닫으면 될 것으로 보임
 			if (InspectionComplete != null)
 			{
-				InspectionComplete();
+				InspectionComplete(inspectionType);
 			}
 		}
 
@@ -220,6 +224,68 @@ namespace RootTools.Inspects
 			return inspblocklist;
 
 		}
+		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, StripParamData param)
+		{
+			List<CRect> inspblocklist = new List<CRect>();
+
+			int AreaStartX = WholeInspArea.Left;
+			int AreaEndX = WholeInspArea.Right;
+			int AreaStartY = WholeInspArea.Top;
+			int AreaEndY = WholeInspArea.Bottom;
+
+			int AreaWidth = WholeInspArea.Width;
+			int AreaHeight = WholeInspArea.Height;
+
+			//if (StartX + blocksize > EndX || StartY + blocksize > EndY)
+			//{
+			//    return;
+			//}
+
+			int iw = AreaWidth / blocksize;
+			int ih = AreaHeight / blocksize;
+
+			if (iw == 0 || ih == 0)
+			{
+				// return;
+			}
+			else
+			{
+				//insp blockd에 대한 start xy, end xy
+				int sx, sy, ex, ey;
+				int blockcount = 1;
+
+				for (int i = 0; i < iw; i++)
+				{
+					sx = AreaStartX + i * blocksize;
+					if (i < iw - 1) ex = sx + blocksize;
+					else ex = AreaEndX;
+
+					for (int j = 0; j < ih; j++)
+					{
+						sy = AreaStartY + j * blocksize;
+						if (j < ih - 1) ey = sy + blocksize;
+						else ey = AreaEndY;
+
+						InspectionProperty ip = new InspectionProperty();
+						ip.p_InspType = RootTools.Inspects.InspectionType.Surface;
+
+						CRect inspblock = new CRect(sx, sy, ex, ey);
+						ip.p_Rect = inspblock;
+						ip.p_StripParam = param;
+						ip.p_index = blockcount;
+						AddInspection(ip);
+						blockcount++;
+
+						inspblocklist.Add(inspblock);
+					}
+					//inspection offset, 모서리 영역 미구현
+
+				}
+			}
+
+			return inspblocklist;
+
+		}
 
 		//static ??
 		private ObservableQueue<InspectionProperty> qInspection = new ObservableQueue<InspectionProperty>();
@@ -289,6 +355,18 @@ namespace RootTools.Inspects
 				SetProperty(ref Sur_Param, value);
 			}
 		}
+		StripParamData stripParam;
+		public StripParamData p_StripParam
+		{
+			get
+			{
+				return stripParam;
+			}
+			set
+			{
+				SetProperty(ref stripParam, value);
+			}
+		}
 		int index = 0;
 		public int p_index
 		{
@@ -307,6 +385,6 @@ namespace RootTools.Inspects
 	{
 		None,
 		Surface,
-		Pattern
+		Strip,
 	};
 }

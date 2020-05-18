@@ -27,7 +27,7 @@ namespace Root_Vega
 
         private void InspStart()
         {
-            p_InspectionManager.StartInspection();
+            p_InspectionManager.StartInspection(InspectionType.None);
         }
 
         public RelayCommand InspStartCommand
