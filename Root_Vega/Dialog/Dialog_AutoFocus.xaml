@@ -4,8 +4,11 @@
         xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
         xmlns:module="clr-namespace:Root_Vega.Module"
-        Height="330"
-        Width="500"
+        xmlns:Tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+        Height="768"
+        Width="1280"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen"
         Background="#FF2D2D30">
@@ -51,31 +54,131 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="8*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Row="3"
-              Grid.ColumnSpan="2">
+        <Grid Grid.Column="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0"
-                    Style="{StaticResource MyBtn}"
-                    Content="AutoFocus Start"
-                    Command="{Binding OkCommand}"
-                    Margin="20,5,20,5"></Button>
-            <Button Grid.Column="1"
-                    Style="{StaticResource MyBtn}"
-                    Content="Cancel"
-                    Command="{Binding CancelCommand}"
-                    Margin="20,5,20,5"></Button>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Column="0"
+                    Grid.Row="0">
+                <TextBlock Style="{StaticResource BasicTb}"
+                           Text="Left Side"
+                           FontSize="30"></TextBlock>
+            </Border>
+            <Border Grid.Column="1"
+                    Grid.Row="0">
+                <TextBlock Style="{StaticResource BasicTb}"
+                           Text="Right Side"
+                           FontSize="30"></TextBlock>
+            </Border>
+            <Grid Grid.Column="0"
+                  Grid.Row="1">
+                <tools:ImageViewer Height="{PriorityBinding}"
+                                   Width="{PriorityBinding}"
+                                   DataContext="{Binding p_ImageViewerLeft}" 
+                                   Margin="10,10,10,10"></tools:ImageViewer>
+            </Grid>
+            <Grid Grid.Column="1"
+                  Grid.Row="1">
+                <tools:ImageViewer Height="{PriorityBinding}"
+                                   Width="{PriorityBinding}"
+                                   DataContext="{Binding p_ImageViewerRight}" 
+                                   Margin="10,10,10,10"></tools:ImageViewer>
+            </Grid>
+            <Border Grid.Column="0"
+                    Grid.Row="2"
+                    Margin="5">
+                <ListView Background="Transparent"
+                          ItemsSource="{Binding p_lstLeftStepInfo}">
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="True">
+                            <GridViewColumn DisplayMemberBinding="{Binding p_img}" Header="Image" Width="100"/>
+                            <GridViewColumn DisplayMemberBinding="{Binding p_strInfo}" Header="Info" Width="80"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Border>
+            <Border Grid.Column="1"
+                    Grid.Row="2"
+                    Margin="5">
+                <ListView Background="Transparent"
+                          ItemsSource="{Binding p_lstRightStepInfo}">
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="True">
+                            <GridViewColumn Header="Image" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Height="50" Width="300" Source="">
+                                            
+                                            
+                                        </Image>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding p_strInfo}" Header="Info" Width="80"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Border>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0"
+                            Orientation="Vertical">
+                    <Button Style="{StaticResource BasicBtn}"
+                                    Command="{Binding OkCommand}"
+                                    Margin="10">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <material:PackIcon Kind="ZoomInOutline" 
+                                               Foreground="White"
+                                               Width="30"
+                                               Height="30"></material:PackIcon>
+                                <TextBlock Text="Start AutoFocus"
+                                       Style="{StaticResource BasicTb}"></TextBlock>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Style="{StaticResource BasicBtn}"
+                                    Command="{Binding CancelCommand}"
+                                    Margin="10">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <material:PackIcon Kind="Cancel" 
+                                               Foreground="White"
+                                               Width="30"
+                                               Height="30"></material:PackIcon>
+                                <TextBlock Text="Cancel"
+                                       Style="{StaticResource BasicTb}"></TextBlock>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <TextBlock TextAlignment="Center"
+                               FontSize="30"
+                               Foreground="Red"
+                               Text="Theta = 0"></TextBlock>
+                    <TextBlock TextAlignment="Center"
+                               FontSize="30"
+                               Foreground="Lime"
+                               Text="Success"></TextBlock>
+                </StackPanel>
+                <Tree:TreeUI  Grid.Row="1"
+                                  Background="White"
+                                  DataContext="{Binding p_treeRoot}"></Tree:TreeUI>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

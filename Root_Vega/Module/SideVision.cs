@@ -15,6 +15,7 @@ using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Root_Vega.Module
 {
@@ -715,13 +716,44 @@ namespace Root_Vega.Module
             }
         }
 
+
         public class Run_AutoFocus : ModuleRunBase
         {
+            public class StepInfoList : ObservableCollection<StepInfo> { }
+            public class StepInfo
+            {
+                string m_strInfo;
+                public string p_strInfo
+                {
+                    get
+                    {
+                        return m_strInfo;
+                    }
+                }
+                BitmapSource m_img;
+                public BitmapSource p_img
+                {
+                    get
+                    {
+                        return m_img;
+                    }
+                }
+
+                public StepInfo(string strInfo, BitmapSource img)
+                {
+                    m_strInfo = strInfo;
+                    m_img = img;
+                }
+            }
+            public StepInfoList m_lstLeftStepInfo;
+            public StepInfoList m_lstRightStepInfo;
             SideVision m_module;
             public Run_AutoFocus(SideVision module)
             {
                 m_module = module;
                 InitModuleRun(module);
+                m_lstLeftStepInfo = new StepInfoList();
+                m_lstRightStepInfo = new StepInfoList();
             }
 
             public double m_dLeftStartPosX = 0.0;
@@ -734,6 +766,26 @@ namespace Root_Vega.Module
             public double m_dRightPosZ = 0.0;
             public int m_nStep = 0;
             public int m_nVarianceSize = 0;
+            public ImageData m_imgDataLeft = null;
+            public ImageData m_imgDataRight = null;
+            public string m_strLeftCurrentStatus;
+            public string m_strRightCurrentStatus;
+
+            public BitmapSource Convert(System.Drawing.Bitmap bitmap)
+            {
+                var bitmapData = bitmap.LockBits(
+                    new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                    System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+                var bitmapSource = BitmapSource.Create(
+                    bitmapData.Width, bitmapData.Height,
+                    bitmap.HorizontalResolution, bitmap.VerticalResolution,
+                    PixelFormats.Bgr24, null,
+                    bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+
+                bitmap.UnlockBits(bitmapData);
+                return bitmapSource;
+            }
 
             public override ModuleRunBase Clone()
             {
@@ -748,7 +800,11 @@ namespace Root_Vega.Module
                 run.m_dRightPosZ = m_dRightPosZ;
                 run.m_nStep = m_nStep;
                 run.m_nVarianceSize = m_nVarianceSize;
-
+                run.m_lstLeftStepInfo = m_lstLeftStepInfo;
+                run.m_lstRightStepInfo = m_lstRightStepInfo;
+                System.Drawing.Bitmap bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG.BMP");
+                BitmapSource bmpSrc = Convert(bmp);
+                m_lstLeftStepInfo.Add(new StepInfo("Test1", bmpSrc));
                 return run;
             }
 
@@ -764,7 +820,7 @@ namespace Root_Vega.Module
                 m_dRightPosZ = tree.Set(m_dRightPosZ, m_dRightPosZ, "Right Z Position", "Right Start Z Position", bVisible);
                 m_nStep = tree.Set(m_nStep, m_nStep, "AutoFocus Step", "AutoFocus Step", bVisible);
                 m_nVarianceSize = tree.Set(m_nVarianceSize, m_nVarianceSize, "Variance Size", "Variance Size", bVisible);
-
+                
                 base.RunTree(tree, bVisible, bRecipe);
             }
 
@@ -800,29 +856,19 @@ namespace Root_Vega.Module
                     if (m_module.Run(cam.Grab()))
                         return p_sInfo;
                     cam.p_ImageViewer.SetImageData(cam.p_ImageViewer.p_ImageData);
-
+                    m_imgDataLeft = new ImageData(img.p_Size.X, img.p_Size.Y);
+                    m_imgDataLeft.SetData(img.GetPtr(), new CRect(0, 0, img.p_Size.X, img.p_Size.Y), (int)img.p_Stride);
+                    System.Drawing.Bitmap bmp = m_imgDataLeft.GetRectImage(new CRect(0, 0, img.p_Size.X - 1, img.p_Size.Y - 1));
                     ////////////////////////// AutoFocus Algorithm Test (with Sobel Filter)
-                    Emgu.CV.Mat src = new Emgu.CV.Mat(img.p_Size.X, img.p_Size.Y, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
-                    Emgu.CV.Mat grad = new Emgu.CV.Mat();
-                    int scale = 1;
-                    int delta = 0;
-                    //int ddepth = (int)Emgu.CV.CvEnum.DepthType.Cv8U;
-                    Emgu.CV.Mat grad_x = new Emgu.CV.Mat();
-                    Emgu.CV.Mat grad_y = new Emgu.CV.Mat();
-                    Emgu.CV.Mat abs_grad_x = new Emgu.CV.Mat();
-                    Emgu.CV.Mat abs_grad_y = new Emgu.CV.Mat();
-                    ///Gradient X
-                    Emgu.CV.CvInvoke.Sobel(src, grad_x, Emgu.CV.CvEnum.DepthType.Cv8U, 1, 0, 3, scale, delta, Emgu.CV.CvEnum.BorderType.Default);
-                    ///Gradient Y
-                    Emgu.CV.CvInvoke.Sobel(src, grad_y, Emgu.CV.CvEnum.DepthType.Cv8U, 0, 1, 3, scale, delta, Emgu.CV.CvEnum.BorderType.Default);
-                    Emgu.CV.CvInvoke.ConvertScaleAbs(grad_x, abs_grad_x, scale, delta);
-                    Emgu.CV.CvInvoke.ConvertScaleAbs(grad_y, abs_grad_y, scale, delta);
-                    Emgu.CV.CvInvoke.AddWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0, grad);
-                    Emgu.CV.Structure.MCvScalar mu = new Emgu.CV.Structure.MCvScalar();
-                    Emgu.CV.Structure.MCvScalar sigma = new Emgu.CV.Structure.MCvScalar();
-                    Emgu.CV.CvInvoke.MeanStdDev(grad, ref mu, ref sigma);
-                    double focusMeasure = mu.V0 * mu.V0;
-
+                    dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img);
+                    if (dLeftCurrentScore > dLeftMaxScore)
+                    {
+                        dLeftCurrentScore = dLeftMaxScore;
+                        dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
+                    }
+                    m_strLeftCurrentStatus = "Current Position:" + (m_dLeftStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dLeftCurrentScore.ToString();
+                    //StepInfo stepInfo = new StepInfo(m_strLeftCurrentStatus, bmp);
+                    //m_lstLeftStepInfo.Add(stepInfo);
                     continue;
                     //////////////////////////
 
@@ -851,6 +897,23 @@ namespace Root_Vega.Module
                     // Grab
                     if (m_module.Run(cam.Grab()))
                         return p_sInfo;
+                    cam.p_ImageViewer.SetImageData(cam.p_ImageViewer.p_ImageData);
+                    m_imgDataRight = new ImageData(img.p_Size.X, img.p_Size.Y);
+                    m_imgDataRight.SetData(img.GetPtr(), new CRect(0, 0, img.p_Size.X-1, img.p_Size.Y-1), (int)img.p_Stride);
+                    System.Drawing.Bitmap bmp = m_imgDataRight.GetRectImage(new CRect(0, 0, img.p_Size.X - 1, img.p_Size.Y - 1));
+                    ////////////////////////// AutoFocus Algorithm Test (with Sobel Filter)
+                    dRightCurrentScore = af.GetImageFocusScoreWithSobel(img);
+                    if (dRightCurrentScore > dRightMaxScore)
+                    {
+                        dRightCurrentScore = dRightMaxScore;
+                        dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
+                    }
+                    m_strRightCurrentStatus = "Current Position:" + (m_dRightStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dRightCurrentScore.ToString();
+                    //StepInfo stepInfo = new StepInfo(m_strRightCurrentStatus, bmp);
+                    //m_lstRightStepInfo.Add(stepInfo);
+                    continue;
+                    //////////////////////////
+
                     // 분산 Score 계산
                     dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
                     if (dRightCurrentScore > dRightMaxScore)

@@ -35,6 +35,56 @@ namespace RootTools.AutoFocus
                 m_dDifferenceOfFocusDistance = value;
             }
         }
+        double m_dLeftPosMaxScore;
+        public double p_dMaxScore
+        {
+            get
+            {
+                return m_dLeftPosMaxScore;
+            }
+            set
+            {
+                m_dLeftPosMaxScore = value;
+            }
+        }
+        double m_dRightPosMaxScore;
+        public double p_dRightPosMaxScore
+        {
+            get
+            {
+                return m_dRightPosMaxScore;
+            }
+            set
+            {
+                m_dRightPosMaxScore = value;
+            }
+        }
+        double m_dLeftMaxPos;
+        public double p_dLeftMaxPos
+        {
+            get
+            {
+                return m_dLeftMaxPos;
+            }
+            set
+            {
+                m_dLeftMaxPos = value;
+            }
+        }
+        double m_dRightMaxPos;
+        public double p_dRightMaxPos
+        {
+            get
+            {
+                return m_dRightMaxPos;
+            }
+            set
+            {
+                m_dRightMaxPos = value;
+            }
+        }
+
+
         eImageState m_eImageState = eImageState.GRAY_SCALE;
         public eImageState p_eImageState
         {
@@ -217,6 +267,33 @@ namespace RootTools.AutoFocus
                 b = *(p + y * nWidth * 4 + x * 4 + 2);
             }
             return (byte)((r + g + b) / 3);
+        }
+
+        public double GetImageFocusScoreWithSobel(ImageData img)
+        {
+            Emgu.CV.Mat matSrc = new Emgu.CV.Mat(img.p_Size.X, img.p_Size.Y, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
+            Emgu.CV.Mat matGrad = new Emgu.CV.Mat();
+            int nScale = 1;
+            int nDelta = 0;
+            //int ddepth = (int)Emgu.CV.CvEnum.DepthType.Cv8U;
+            Emgu.CV.Mat matGradX = new Emgu.CV.Mat();
+            Emgu.CV.Mat matGradY = new Emgu.CV.Mat();
+            Emgu.CV.Mat matAbsGradX = new Emgu.CV.Mat();
+            Emgu.CV.Mat matAbsGradY = new Emgu.CV.Mat();
+            ///Gradient X
+            Emgu.CV.CvInvoke.Sobel(matSrc, matGradX, Emgu.CV.CvEnum.DepthType.Cv8U, 1, 0, 3, nScale, nDelta, Emgu.CV.CvEnum.BorderType.Default);
+            ///Gradient Y
+            Emgu.CV.CvInvoke.Sobel(matSrc, matGradY, Emgu.CV.CvEnum.DepthType.Cv8U, 0, 1, 3, nScale, nDelta, Emgu.CV.CvEnum.BorderType.Default);
+            Emgu.CV.CvInvoke.ConvertScaleAbs(matGradX, matAbsGradX, nScale, nDelta);
+            Emgu.CV.CvInvoke.ConvertScaleAbs(matGradY, matAbsGradY, nScale, nDelta);
+            Emgu.CV.CvInvoke.AddWeighted(matAbsGradX, 0.5, matAbsGradY, 0.5, 0, matGrad);
+            
+            Emgu.CV.Structure.MCvScalar mu = new Emgu.CV.Structure.MCvScalar();
+            Emgu.CV.Structure.MCvScalar sigma = new Emgu.CV.Structure.MCvScalar();
+            Emgu.CV.CvInvoke.MeanStdDev(matGrad, ref mu, ref sigma);
+            double dFocusMeasure = mu.V0 * mu.V0;
+
+            return dFocusMeasure;
         }
     }
 }
