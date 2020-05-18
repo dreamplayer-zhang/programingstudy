@@ -28,6 +28,7 @@ protected:
 	RECT GetInspbufferROI() const;
 	DefectDataStruct GetDefectData(RECT rt, POINT ptDPos, float fSize);
 public:
+	virtual void SetParams();
 	inline void SetDefectCode(int nValue)
 	{
 		assert(0 < nValue && nValue < Constants::MaxDefectCode);

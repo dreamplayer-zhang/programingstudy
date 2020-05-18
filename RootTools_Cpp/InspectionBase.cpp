@@ -14,6 +14,9 @@ DefectDataStruct InspectionBase::GetDefectData(RECT rt, POINT ptDPos, float fSiz
 
 	return data;
 }
+void InspectionBase::SetParams()
+{
+}
 void InspectionBase::CheckConditions() const
 {
 	//assert(!IsRectEmpty(&rtROI));

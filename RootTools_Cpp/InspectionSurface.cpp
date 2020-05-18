@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "InspectionSurface.h"
 
-void InspectionSurface::SetParams(byte* buffer, int bufferwidth, int bufferheight, RECT roi, int defectCode, int grayLevel, int defectSize, bool bDarkInspection,int threadindex)
+void CInspectionSurface::SetParams(byte* buffer, int bufferwidth, int bufferheight, RECT roi, int defectCode, int grayLevel, int defectSize, bool bDarkInspection,int threadindex)
 {
 	SetBuffer(buffer);
 	SetBufferWidthHeight(bufferwidth, bufferheight);
@@ -11,11 +11,11 @@ void InspectionSurface::SetParams(byte* buffer, int bufferwidth, int bufferheigh
 	SetDefectSize(defectSize);
 	SetIsDarkInspection(bDarkInspection);
 }
-std::vector<DefectDataStruct> InspectionSurface::Inspection(bool nAbsolute, bool bIsDarkInsp)
+std::vector<DefectDataStruct> CInspectionSurface::SurfaceInspection(bool bAbsolute)
 {
 	std::vector<DefectDataStruct> vResult;
 
-	bool bDarkResut = bIsDarkInsp;
+	bool bDarkResut = GetDarkInspection();
 	bool bInspResult = false;
 	RECT rt;
 	RECT rtROI = GetROI();
@@ -28,7 +28,7 @@ std::vector<DefectDataStruct> InspectionSurface::Inspection(bool nAbsolute, bool
 
 	int nWidth = Functions::GetWidth(rtROI);
 	int nGrayLevel = GetGrayLevel();
-	if (!nAbsolute)
+	if (!bAbsolute)
 	{
 		//상대검사의 경우에는 평균 GV를 획득 후 GrayLevel을 %로 사용하여 Target GV를 획득한다
 		float sum = 0;
@@ -43,7 +43,7 @@ std::vector<DefectDataStruct> InspectionSurface::Inspection(bool nAbsolute, bool
 		}
 		average = sum / (((float)rtinspROI.bottom - (float)rtinspROI.top) * ((float)rtinspROI.right - (float)rtinspROI.left));
 
-		if (bIsDarkInsp)
+		if (GetDarkInspection())
 		{
 			//입력된 GrayLevel을 %로 사용하여 연산
 			//예 : 20이 입력되어 있다면 평균GV에서 20%감산.
@@ -105,11 +105,11 @@ std::vector<DefectDataStruct> InspectionSurface::Inspection(bool nAbsolute, bool
 	return vResult;
 }
 
-InspectionSurface::InspectionSurface()
+CInspectionSurface::CInspectionSurface()
 {
 	SetDefectCode(1);
 }
 
-InspectionSurface::~InspectionSurface()
+CInspectionSurface::~CInspectionSurface()
 {
 }

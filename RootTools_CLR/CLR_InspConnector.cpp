@@ -15,7 +15,7 @@ namespace RootTools_CLR
 	CLR_InspConnector::CLR_InspConnector(int processornum)
 	{
 		ProcessorNum = processornum;
-		m_InspReticle = new InspSurface_Reticle(ProcessorNum);
+		//m_InspReticle = new InspSurface_Reticle(ProcessorNum);
 		//m_DBmgr = new Cpp_DB();
 
 
@@ -30,7 +30,7 @@ namespace RootTools_CLR
 		m_ptCurrent.x = -1;
 		m_ptCurrent.y = 0;
 
-		bIP = false;
+		/*bIP = false;
 		bIP = false;
 		nPatternInterpolationOffset = 2.0;
 
@@ -51,7 +51,7 @@ namespace RootTools_CLR
 
 		nDarkBandwidthPitSize = 5;
 
-		nInspOffset = 10;
+		nInspOffset = 10;*/
 	}
 	CLR_InspConnector::~CLR_InspConnector()
 	{
@@ -77,13 +77,13 @@ namespace RootTools_CLR
 
 
 	}
-	bool CLR_InspConnector::SetParam_Common()
+	/*bool CLR_InspConnector::SetParam_Common()
 	{
 
 
 		return true;
-	}
-	bool CLR_InspConnector::SetParam_Strip(bool bip, bool bip_2nd, double bipoffset, int darkpitlevel, int darkpitsize, bool lengthinsp, 
+	}*/
+	/*bool CLR_InspConnector::SetParam_Strip(bool bip, bool bip_2nd, double bipoffset, int darkpitlevel, int darkpitsize, bool lengthinsp, 
 		int bandwidth, int intensity, int bandwidth_shadow, int intensity_shadow, int bandwidth_outshadow, int intensity_outshadow,
 		int bandwidth_edge, int intensity_edge, int bandwidth_darkpit, int inspoffset)
 	{
@@ -120,20 +120,20 @@ namespace RootTools_CLR
 
 
 		return true;
-	}
-	bool CLR_InspConnector::NormalRun()
+	}*/
+	/*bool CLR_InspConnector::NormalRun()
 	{
 
 
 		return true;
-	}
+	}*/
 	/// <summary>
 	/// 실제 suface 검사를 진행
 	/// InspArea : 검사 진행할 block의 좌표 정보
 	/// areainfo : 위 block의 area info (예 : shadow area)
 	/// areainfo : 1 normal, 2 shadow, 3 outshadow, 4 edge
 	/// </summary>
-	bool CLR_InspConnector::StripRun(RECT insparea, int areainfo)
+	/*bool CLR_InspConnector::StripRun(RECT insparea, int areainfo)
 	{
 		byte* pByte = (byte*)ImgPool;
 
@@ -203,7 +203,7 @@ namespace RootTools_CLR
 
 
 		return true;
-	}
+	}*/
 	int CLR_InspConnector::Width(RECT rect)
 	{
 		int w;

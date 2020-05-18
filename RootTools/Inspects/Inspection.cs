@@ -21,7 +21,7 @@ namespace RootTools.Inspects
 		int inspectionID = -1;
 		public InspectionState bState = InspectionState.None;
 		Thread _thread;
-		CLR_Inspection clrDemo = new CLR_Inspection();
+		CLR_Inspection clrInsp = new CLR_Inspection();
 		InspectionProperty m_InspProp;
 		private volatile bool shouldStop = false;
 
@@ -50,7 +50,7 @@ namespace RootTools.Inspects
 					bState = InspectionState.Running;
 
 
-					var arrDefects = clrDemo.Test_Inspection(
+					var arrDefects = clrInsp.SurfaceInspection(
 						ThreadIndex,
 						m_InspProp.p_Rect.Left,
 						m_InspProp.p_Rect.Top,

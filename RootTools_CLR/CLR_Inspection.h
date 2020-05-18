@@ -9,6 +9,7 @@
 //#include "..\RootTools_Cpp\\Cpp_DB.h"
 #include "CLR_InspConnector.h"
 #include "..\RootTools_Cpp\\InspectionSurface.h"
+#include "..\RootTools_Cpp\\InspectionReticle.h"
 #include "DefectData.h"
 //#include "InspSurface_Reticle.h"
 
@@ -31,51 +32,54 @@ namespace RootTools_CLR
 	public ref class CLR_Inspection
 	{
 	protected:
-		Cpp_Demo* m_pDemo = nullptr; 
+		//Cpp_Demo* m_pDemo = nullptr; 
 		PitSizer* m_PitSizer = nullptr;
 		//Cpp_DB*  m_pDB = nullptr;
 		//InspSurface_Reticle* m_Reticle = nullptr;
 		CLR_InspConnector* m_InspConn = nullptr;
-		InspectionSurface* pInspSurface = nullptr;
+		CInspectionSurface* pInspSurface = nullptr;
+		CInspectionReticle* pInspReticle = nullptr;
 	public:
 		CLR_Inspection()
 		{
-			m_pDemo = new Cpp_Demo();
+			//m_pDemo = new Cpp_Demo();
 			m_PitSizer = new PitSizer(2048 * 2048, 1);
 			//m_pDB = new Cpp_DB();
 			//m_Reticle = new InspSurface_Reticle();
 			m_InspConn = new CLR_InspConnector();
-			pInspSurface = new InspectionSurface();
+			pInspSurface = new CInspectionSurface();
+			pInspReticle = new CInspectionReticle();
 		}
 
 		virtual ~CLR_Inspection()
 		{
-			delete m_pDemo; 
+			//delete m_pDemo; 
 			delete m_PitSizer;
 			delete pInspSurface;
+			delete pInspReticle;
 		}
 
-		int Add(int n0, int n1)
+		/*int Add(int n0, int n1)
 		{
 			return m_pDemo->Add(n0, n1); 
-		}
+		}*/
 
-		void SetMemory(int nCount, int nByte, int xSize, int ySize, __int64 nAddress)
+		/*void SetMemory(int nCount, int nByte, int xSize, int ySize, __int64 nAddress)
 		{
 			m_pDemo->SetMemory(nCount, nByte, xSize, ySize, nAddress); 
-		}
+		}*/
 
 		/*void SendDefectData(DefectData* pStruct)
 		{
 
-		}*/
+		}
 
 		int Test()
 		{
 
 			return 1;
-		}
-		array<DefectData^>^ Test_Inspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
+		}*/
+		array<DefectData^>^ SurfaceInspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -101,7 +105,7 @@ namespace RootTools_CLR
 			pInspSurface->CheckConditions();
 
 			pInspSurface->CopyImageToBuffer(bDark);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
-			vTempResult = pInspSurface->Inspection(bAbsolute, bDark);//TODO : absolute GV 구현해야함
+			vTempResult = pInspSurface->SurfaceInspection(bAbsolute);//TODO : absolute GV 구현해야함
 			
 			bool bResultExist = vTempResult.size() > 0;
 			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
@@ -285,7 +289,31 @@ namespace RootTools_CLR
 			*/
 
 		}
+		array<DefectData^>^ StripInspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, bool nBandwidth)
+		{
+			RECT targetRect;
+			std::vector<DefectDataStruct> vTempResult;
 
+			targetRect.left = RoiLeft;
+			targetRect.right = RoiRight;
+			targetRect.top = RoiTop;
+			targetRect.bottom = RoiBottom;
+
+			m_InspConn->GetImagePool("pool", memwidth, memHeight);
+			int bufferwidth = memwidth;
+			int bufferheight = memHeight;
+
+			pInspReticle->SetParams(m_InspConn->GetBuffer(), bufferwidth, bufferheight, targetRect, 1, threadindex, GV, DefectSize);
+			pInspReticle->CheckConditions();
+
+			pInspReticle->CopyImageToBuffer(true);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
+			vTempResult = pInspReticle->StripInspection(nBandwidth, nIntensity);
+
+			bool bResultExist = vTempResult.size() > 0;
+			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
+
+			return local;
+		}
 		void PaintOutline(int nY, int nOutline, byte* pByte, int nX)
 		{
 			for (int i = 0; i < nY; i++)
@@ -368,10 +396,10 @@ namespace RootTools_CLR
 			return Height;
 		}
 
-		bool OpenImage(std::string FilePath)
+		/*bool OpenImage(std::string FilePath)
 		{
 			return m_pDemo->OpenImage(FilePath);
-		}
+		}*/
 	};
 }
 
