@@ -163,6 +163,7 @@ namespace RootTools.Memory
                 Shift(_cpWindow);
                 p_cpImage = GetImagePos(_cpWindow);
                 if (m_aBufDisplay == null) return;
+                if (m_memoryData == null) return; 
                 int nAdd = m_memoryData.p_nByte * (_cpWindow.X + _cpWindow.Y * m_szBitmapSource.X);
                 if ((nAdd < 0) || (nAdd >= m_aBufDisplay.Length)) return;
                 switch (m_memoryData.p_nByte)

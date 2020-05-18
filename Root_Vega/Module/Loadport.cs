@@ -71,7 +71,7 @@ namespace Root_Vega.Module
             public void RunTree(Tree tree)
             {
                 m_sCmd = tree.Set(m_sCmd, m_sCmd, "Command", "DMC Excute Command String");
-                m_secRun = tree.Set(m_secRun, m_secRun, "Timeout", "DMC Run Timeout (sec)"); 
+             m_secRun = tree.Set(m_secRun, m_secRun, "Timeout", "DMC Run Timeout (sec)"); 
             }
 
             public string Run()
@@ -312,7 +312,8 @@ namespace Root_Vega.Module
         public InfoPod m_infoPod; 
         public Loadport(string id, string sLocID, IEngineer engineer)
         {
-            p_id = id; 
+            p_id = id;
+            m_log = LogView.GetLog(id, id);
             m_infoPod = new InfoPod(this, sLocID, engineer);
             m_aTool.Add(m_infoPod);
             InitCmd();

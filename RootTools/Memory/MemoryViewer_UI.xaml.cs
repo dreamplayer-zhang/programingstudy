@@ -76,6 +76,7 @@ namespace RootTools.Memory
         private void comboBoxPool_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             m_memoryViewer.m_memoryData = null;
+            if (comboBoxPool.SelectedValue == null) return; 
             string sPool = comboBoxPool.SelectedValue.ToString();
             MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
             if (pool == null) return;
@@ -86,9 +87,11 @@ namespace RootTools.Memory
         private void comboBoxGroup_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             m_memoryViewer.m_memoryData = null;
+            if (comboBoxPool.SelectedValue == null) return;
             string sPool = comboBoxPool.SelectedValue.ToString();
             MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
             if (pool == null) return;
+            if (comboBoxGroup.SelectedValue == null) return; 
             string sGroup = comboBoxGroup.SelectedValue.ToString();
             MemoryGroup group = pool.GetGroup(sGroup);
             if (group == null) return;
@@ -99,12 +102,15 @@ namespace RootTools.Memory
         private void comboBoxMemory_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             m_memoryViewer.m_memoryData = null;
+            if (comboBoxPool.SelectedValue == null) return;
             string sPool = comboBoxPool.SelectedValue.ToString();
             MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
             if (pool == null) return;
+            if (comboBoxGroup.SelectedValue == null) return;
             string sGroup = comboBoxGroup.SelectedValue.ToString();
             MemoryGroup group = pool.GetGroup(sGroup);
             if (group == null) return;
+            if (comboBoxMemory.SelectedValue == null) return; 
             string sMemory = comboBoxMemory.SelectedValue.ToString();
             m_memoryViewer.m_memoryData = group.GetMemory(sMemory); 
         }

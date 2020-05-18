@@ -462,9 +462,6 @@
     <Compile Include="Control\ListDIO_ShortID_UI.xaml.cs">
       <DependentUpon>ListDIO_ShortID_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Log\UI_LogView.xaml.cs">
-      <DependentUpon>UI_LogView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Trees\Tree.cs" />
     <Compile Include="Trees\TreeItem_bool.cs" />
     <Compile Include="Trees\TreeItem_CPoint.cs" />
@@ -671,10 +668,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Comm\TCPIPServer_UI.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Log\UI_LogView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

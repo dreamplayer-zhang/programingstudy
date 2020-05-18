@@ -438,7 +438,7 @@ namespace RootTools.DMC
             if (m_bRunTreeInit) RunTree(Tree.eMode.Init);
             m_nTimer++;
             m_msTimer += m_swCheck.ElapsedMilliseconds;
-            if (m_swTimer.ElapsedMilliseconds > 5000)
+            if (m_swTimer.ElapsedMilliseconds > 60000)
             {
                 if (m_nTimer > 0) m_log.Info("DMC Average Period (ms) = " + (m_msTimer / m_nTimer).ToString());
                 m_swTimer.Restart();
