@@ -414,7 +414,7 @@ namespace Root_Vega.Module
                     m_grabMode.SetLight(true);
                     AxisXY axisXY = m_module.p_axisXY;
                     Axis axisZ = m_module.p_axisZ;
-                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
+                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.p_sz.X;
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fRes);        // 축해상도 0.1um로 하드코딩.
                     int nLines = Convert.ToInt32(m_yLine * 1000 / m_fRes);
                     while (m_grabMode.m_ScanLineNum > nScanLine)
@@ -427,18 +427,18 @@ namespace Root_Vega.Module
                         double yPos0 = m_rpAxis.Y - yAxis / 2 - m_grabMode.m_intervalAcc;
                         double yPos1 = m_rpAxis.Y + yAxis / 2 + m_grabMode.m_intervalAcc;
 
-                        m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
+                        m_grabMode.m_eGrabDirection = GrabMode.eDirection.Forward;
                         if (m_grabMode.m_bUseBiDirectionScan && Math.Abs(axisXY.p_axisY.p_posActual - yPos0) > Math.Abs(axisXY.p_axisY.p_posActual - yPos1))
                         {
                             double buffer = yPos0;            //yp1 <--> yp0 바꿈.
                             yPos0 = yPos1;
                             yPos1 = buffer;
-                            m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
+                            m_grabMode.m_eGrabDirection = GrabMode.eDirection.BackWard;
                         }
 
                         /* 조명 Set하는거 Test해서 넣어야됨.*/
                         //m_grabMode.SetLight(true);
-                        double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
+                        double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.p_sz.X * m_grabMode.m_dTrigger; //해상도추가필요
 
                         if (m_module.Run(axisZ.Move(m_nFocusPos)))
                             return p_sInfo;
@@ -460,7 +460,7 @@ namespace Root_Vega.Module
                         MemoryData mem = m_module.m_engineer.GetMemory(sPool, sGroup, sMem);
 
                         /* 방향 바꾸는 코드 들어가야함*/
-                        m_grabMode.StartGrab(mem, m_cpMemory, nLines, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.StartGrab(mem, m_cpMemory, nLines, m_grabMode.m_eGrabDirection == GrabMode.eDirection.BackWard);
                         if (m_module.Run(axisXY.p_axisY.Move(yPos1)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
@@ -468,7 +468,7 @@ namespace Root_Vega.Module
                         axisXY.p_axisY.ResetTrigger();
 
                         nScanLine++;
-                        m_cpMemory.X += m_grabMode.m_camera.GetRoiSize().X;
+                        m_cpMemory.X += m_grabMode.m_camera.p_sz.X;
                     }
                     m_grabMode.m_camera.StopGrabbing();
                     #region Grab1차 Test후에 코드 부분

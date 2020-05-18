@@ -336,9 +336,9 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
-        public CPoint GetRoiSize()
+        public CPoint p_sz
         {
-            return new CPoint(Convert.ToInt32(m_CamParam._Width), Convert.ToInt32(m_CamParam._Height));
+            get { return new CPoint(Convert.ToInt32(m_CamParam._Width), Convert.ToInt32(m_CamParam._Height)); }
         }
 
         public string Grab()

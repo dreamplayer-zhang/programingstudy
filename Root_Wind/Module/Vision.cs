@@ -441,7 +441,7 @@ namespace Root_Wind.Module
 
                     int nScanLine = 0;
                     AxisXY axisXY = m_module.m_axisXY;
-                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
+                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.p_sz.X;
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
                         double yAxis = m_grabMode.m_dTrigger * m_yLine;     // 총 획득할 Image Y size
@@ -451,18 +451,18 @@ namespace Root_Wind.Module
                         double yPos1 = m_rpAxis.Y + yAxis + m_grabMode.m_intervalAcc;
 
 
-                        m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
+                        m_grabMode.m_eGrabDirection = GrabMode.eDirection.Forward;
                         if (m_grabMode.m_bUseBiDirectionScan &&  Math.Abs(axisXY.p_axisY.p_posActual - yPos0) > Math.Abs(axisXY.p_axisY.p_posActual - yPos1))
                         {
                             double buffer = yPos0;            //yp1 <--> yp0 바꿈.
                             yPos0 = yPos1;
                             yPos1 = buffer;
-                            m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
+                            m_grabMode.m_eGrabDirection = GrabMode.eDirection.BackWard;
                         }
                         
                         /* 조명 Set하는거 Test해서 넣어야됨.*/
                         //m_grabMode.SetLight(true);
-                        double nPosX = m_rpAxis.X - (nScanLine+ m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X* m_grabMode.m_dTrigger; //해상도추가필요
+                        double nPosX = m_rpAxis.X - (nScanLine+ m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.p_sz.X* m_grabMode.m_dTrigger; //해상도추가필요
 
                         if (m_module.Run(axisXY.Move(new RPoint(nPosX, yPos0))))
                             return p_sInfo;
@@ -481,7 +481,7 @@ namespace Root_Wind.Module
 
                         /* 방향 바꾸는 코드 들어가야함*/
                        
-                        m_grabMode.StartGrab(mem, m_cpMemory, m_yLine, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.StartGrab(mem, m_cpMemory, m_yLine, m_grabMode.m_eGrabDirection == GrabMode.eDirection.BackWard);
                         if (m_module.Run(axisXY.p_axisY.Move(yPos1)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
@@ -489,7 +489,7 @@ namespace Root_Wind.Module
                         axisXY.p_axisY.ResetTrigger();
 
                         nScanLine++;
-                        m_cpMemory.X += m_grabMode.m_camera.GetRoiSize().X;
+                        m_cpMemory.X += m_grabMode.m_camera.p_sz.X;
                     }
                     m_grabMode.m_camera.StopGrabbing();
                     #region Grab1차 Test후에 코드 부분

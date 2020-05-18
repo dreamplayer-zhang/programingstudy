@@ -88,8 +88,8 @@ namespace Root_Vega
                 SetProperty(ref m_SelGrabMode, value);
                 p_StartLine = m_SelGrabMode.m_ScanStartLine;
                 p_ScanNum = m_SelGrabMode.m_ScanLineNum;
-                if (m_SelGrabMode.m_camera.GetRoiSize().X != 0)
-                    p_ScanWholeLine = (int)Math.Ceiling(m_RunGrab.m_xLine * 1000 / (m_SelGrabMode.m_camera.GetRoiSize().X * m_RunGrab.m_fRes));
+                if (m_SelGrabMode.m_camera.p_sz.X != 0)
+                    p_ScanWholeLine = (int)Math.Ceiling(m_RunGrab.m_xLine * 1000 / (m_SelGrabMode.m_camera.p_sz.X * m_RunGrab.m_fRes));
             }
         }
 

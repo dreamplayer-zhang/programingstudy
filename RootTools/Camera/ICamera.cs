@@ -4,32 +4,19 @@ using RootTools.Trees;
 
 namespace RootTools.Camera
 {
-    public enum eGrabDirection
-    {
-        Forward,
-        BackWard,
-    }
-
     public interface ICamera
     {  
         string p_id { get; }
-        int p_nGrabProgress
-        {
-            get;
-        }
-        TreeRoot p_treeRoot
-        {
-            get;
-            set;
-        }
+
+        int p_nGrabProgress { get; }
+
+        TreeRoot p_treeRoot { get; set; }
+
+        CPoint p_sz { get; }
 
         UserControl p_ui { get; }
 
-        
-
         void ThreadStop();
-
-        CPoint GetRoiSize();
 
         void StopGrabbing();
 

@@ -230,9 +230,9 @@ namespace RootTools.Camera.CognexOCR
             m_tcpip.ThreadStop(); 
         }
 
-        public CPoint GetRoiSize()
+        public CPoint p_sz
         {
-            return null;
+            get { return null; }
         }
 
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
