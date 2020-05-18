@@ -14,7 +14,7 @@ namespace RootTools.Camera.CognexOCR
     public class Camera_CognexOCR : ObservableObject, ICamera
     {
         #region Property
-        public string p_id { get { return m_id; } }
+        public string p_id { get; set; }
 
         string _sInfo = "Info";
         public string p_sInfo
@@ -35,10 +35,8 @@ namespace RootTools.Camera.CognexOCR
 
         public int p_nGrabProgress
         {
-            get
-            {
-                return 0;
-            }
+            get { return 0; }
+            set { }
         }
 
         string _sOCR = "OCR"; 
@@ -196,7 +194,6 @@ namespace RootTools.Camera.CognexOCR
         }
         #endregion
 
-        string m_id;
         Log m_log;
         public TCPIPClient m_tcpip;
         TreeRoot m_treeRoot = null;
@@ -213,7 +210,7 @@ namespace RootTools.Camera.CognexOCR
         }
         public Camera_CognexOCR(string id, Log log)
         {
-            m_id = id;
+            p_id = id;
             m_log = log;
 
             m_tcpip = new TCPIPClient(id, log);
@@ -233,6 +230,7 @@ namespace RootTools.Camera.CognexOCR
         public CPoint p_sz
         {
             get { return null; }
+            set { }
         }
 
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }

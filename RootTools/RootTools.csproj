@@ -132,6 +132,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera\BaslerPylon\CameraBasler.cs" />
+    <Compile Include="Camera\BaslerPylon\CameraBasler_UI.xaml.cs">
+      <DependentUpon>CameraBasler_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_Classes.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_UI.xaml.cs">
@@ -503,6 +507,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Camera\BaslerPylon\CameraBasler_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Camera\BaslerPylon\Camera_Basler_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

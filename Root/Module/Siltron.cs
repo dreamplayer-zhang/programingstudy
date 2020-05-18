@@ -19,14 +19,13 @@ namespace Root.Module
         #region ToolBox
         MemoryPool m_memoryPool;
         Camera_Dalsa[] m_camDalsa = new Camera_Dalsa[3]; 
-        Camera_Basler[] m_camBasler = new Camera_Basler[3];
+        CameraBasler[] m_camBasler = new CameraBasler[3];
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {
                 p_sInfo = m_toolBox.Get(ref m_camDalsa[(int)cam], this, "Dalsa " + cam.ToString()); 
-                
             }
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {

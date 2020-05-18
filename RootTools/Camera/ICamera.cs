@@ -6,13 +6,13 @@ namespace RootTools.Camera
 {
     public interface ICamera
     {  
-        string p_id { get; }
+        string p_id { get; set; }
 
-        int p_nGrabProgress { get; }
+        int p_nGrabProgress { get; set; }
 
         TreeRoot p_treeRoot { get; set; }
 
-        CPoint p_sz { get; }
+        CPoint p_sz { get; set; }
 
         UserControl p_ui { get; }
 

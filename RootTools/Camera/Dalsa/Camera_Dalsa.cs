@@ -13,7 +13,7 @@ namespace RootTools.Camera.Dalsa
     public class Camera_Dalsa : ObservableObject, ICamera
     {
         #region Property
-        public string p_id { get { return m_id; } }
+        public string p_id { get; set; }
 
         int m_nGrabProgress = 0;
         public int p_nGrabProgress{
@@ -105,7 +105,6 @@ namespace RootTools.Camera.Dalsa
         }
         #endregion
 
-        string m_id;
         Log m_log;
         public SapAcquisition m_sapAcq = null;
         public SapBuffer m_sapBuf = null;
@@ -135,7 +134,7 @@ namespace RootTools.Camera.Dalsa
 
         public Camera_Dalsa(string id, Log log)
         {
-            m_id = id;
+            p_id = id;
             m_log = log;
             p_treeRoot = new TreeRoot(id, m_log);
             bgw_Connect.DoWork += bgw_Connect_DoWork;
@@ -278,7 +277,7 @@ namespace RootTools.Camera.Dalsa
             p_CamParam.SetCamHandle(m_sapDevice, m_sapAcq);
             p_CamInfo.p_eState = eCamState.Ready;
             p_CamParam.ReadParamter();
-            m_log.Info(m_id + "Connect Success");
+            m_log.Info(p_id + "Connect Success");
             
         }
 
@@ -327,6 +326,7 @@ namespace RootTools.Camera.Dalsa
         public CPoint p_sz
         {
             get { return new CPoint(m_CamParam.p_Width, m_CamParam.p_Height); }
+            set { }
         }
 
         public void StopGrabbing()
