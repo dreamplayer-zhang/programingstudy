@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -766,27 +768,10 @@ namespace Root_Vega.Module
             public double m_dRightPosZ = 0.0;
             public int m_nStep = 0;
             public int m_nVarianceSize = 0;
+            public bool m_bUsingSobel = true;
             public ImageData m_imgDataLeft = null;
             public ImageData m_imgDataRight = null;
-            public string m_strLeftCurrentStatus;
-            public string m_strRightCurrentStatus;
-
-            public BitmapSource Convert(System.Drawing.Bitmap bitmap)
-            {
-                var bitmapData = bitmap.LockBits(
-                    new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                    System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
-
-                var bitmapSource = BitmapSource.Create(
-                    bitmapData.Width, bitmapData.Height,
-                    bitmap.HorizontalResolution, bitmap.VerticalResolution,
-                    PixelFormats.Bgr24, null,
-                    bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
-
-                bitmap.UnlockBits(bitmapData);
-                return bitmapSource;
-            }
-
+            
             public override ModuleRunBase Clone()
             {
                 Run_AutoFocus run = new Run_AutoFocus(m_module);
@@ -800,11 +785,15 @@ namespace Root_Vega.Module
                 run.m_dRightPosZ = m_dRightPosZ;
                 run.m_nStep = m_nStep;
                 run.m_nVarianceSize = m_nVarianceSize;
+                run.m_bUsingSobel = m_bUsingSobel;
+
                 run.m_lstLeftStepInfo = m_lstLeftStepInfo;
                 run.m_lstRightStepInfo = m_lstRightStepInfo;
+
                 System.Drawing.Bitmap bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG.BMP");
-                BitmapSource bmpSrc = Convert(bmp);
-                m_lstLeftStepInfo.Add(new StepInfo("Test1", bmpSrc));
+                BitmapSource bmpSrc = GetBitmapSource(bmp);
+                m_lstLeftStepInfo.Add(new StepInfo("Test", bmpSrc));
+
                 return run;
             }
 
@@ -820,6 +809,7 @@ namespace Root_Vega.Module
                 m_dRightPosZ = tree.Set(m_dRightPosZ, m_dRightPosZ, "Right Z Position", "Right Start Z Position", bVisible);
                 m_nStep = tree.Set(m_nStep, m_nStep, "AutoFocus Step", "AutoFocus Step", bVisible);
                 m_nVarianceSize = tree.Set(m_nVarianceSize, m_nVarianceSize, "Variance Size", "Variance Size", bVisible);
+                m_bUsingSobel = tree.Set(m_bUsingSobel, m_bUsingSobel, "Using Sovel Filter", "Using Sovel Filter", bVisible);
                 
                 base.RunTree(tree, bVisible, bRecipe);
             }
@@ -843,84 +833,60 @@ namespace Root_Vega.Module
                 int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
                 for (int i = 0; i < nStepCount; i++)
                 {
-                    // 축 이동
-                    if (m_module.Run(axisXY.Move(new RPoint(m_dLeftStartPosX + (m_nStep * i), m_dLeftPosY))))
-                        return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady()))
-                        return p_sInfo;
-                    if (m_module.Run(axisZ.p_axis.Move(m_dLeftPosZ)))
-                        return p_sInfo;
-                    if (m_module.Run(axisZ.WaitReady()))
-                        return p_sInfo;
-                    // Grab
-                    if (m_module.Run(cam.Grab()))
-                        return p_sInfo;
-                    cam.p_ImageViewer.SetImageData(cam.p_ImageViewer.p_ImageData);
-                    m_imgDataLeft = new ImageData(img.p_Size.X, img.p_Size.Y);
-                    m_imgDataLeft.SetData(img.GetPtr(), new CRect(0, 0, img.p_Size.X, img.p_Size.Y), (int)img.p_Stride);
-                    System.Drawing.Bitmap bmp = m_imgDataLeft.GetRectImage(new CRect(0, 0, img.p_Size.X - 1, img.p_Size.Y - 1));
-                    ////////////////////////// AutoFocus Algorithm Test (with Sobel Filter)
-                    dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img);
-                    if (dLeftCurrentScore > dLeftMaxScore)
-                    {
-                        dLeftCurrentScore = dLeftMaxScore;
-                        dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
-                    }
-                    m_strLeftCurrentStatus = "Current Position:" + (m_dLeftStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dLeftCurrentScore.ToString();
-                    //StepInfo stepInfo = new StepInfo(m_strLeftCurrentStatus, bmp);
-                    //m_lstLeftStepInfo.Add(stepInfo);
-                    continue;
-                    //////////////////////////
+                    // Axis Move
+                    if (m_module.Run(axisXY.Move(new RPoint(m_dLeftStartPosX + (m_nStep * i), m_dLeftPosY)))) return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    if (m_module.Run(axisZ.p_axis.Move(m_dLeftPosZ))) return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
 
-                    // 분산 Score 계산
-                    dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                    // Grab
+                    if (m_module.Run(cam.Grab())) return p_sInfo;
+                    cam.p_ImageViewer.SetImageData(img);
+                    
+                    // Calculating Score
+                    if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img);
+                    else dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+
                     if (dLeftCurrentScore > dLeftMaxScore)
                     {
                         dLeftMaxScore = dLeftCurrentScore;
                         dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
                     }
+
+                    string strTemp = "Current Position:" + (m_dLeftStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dLeftCurrentScore.ToString();
+                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X - 1, img.p_Size.Y - 1));
+                    BitmapSource bmpSrc = GetBitmapSource(bmp);
+                    m_lstLeftStepInfo.Add(new StepInfo(strTemp, bmpSrc));
                 }
 
                 // 2. Reticle 우측 위치로 이동 후 AF
                 nStepCount = (int)Math.Abs(m_dRightEndPosX - m_dRightStartPosX) / m_nStep;
                 for (int i = 0; i<nStepCount; i++)
                 {
-                    // 축 이동
-                    if (m_module.Run(axisXY.Move(new RPoint(m_dRightStartPosX + (m_nStep * i), m_dRightPosY))))
-                        return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady()))
-                        return p_sInfo;
-                    if (m_module.Run(axisZ.p_axis.Move(m_dRightPosZ)))
-                        return p_sInfo;
-                    if (m_module.Run(axisZ.WaitReady()))
-                        return p_sInfo;
+                    // Axis Move
+                    if (m_module.Run(axisXY.Move(new RPoint(m_dRightStartPosX + (m_nStep * i), m_dRightPosY)))) return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    if (m_module.Run(axisZ.p_axis.Move(m_dRightPosZ))) return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+
                     // Grab
-                    if (m_module.Run(cam.Grab()))
-                        return p_sInfo;
-                    cam.p_ImageViewer.SetImageData(cam.p_ImageViewer.p_ImageData);
-                    m_imgDataRight = new ImageData(img.p_Size.X, img.p_Size.Y);
-                    m_imgDataRight.SetData(img.GetPtr(), new CRect(0, 0, img.p_Size.X-1, img.p_Size.Y-1), (int)img.p_Stride);
-                    System.Drawing.Bitmap bmp = m_imgDataRight.GetRectImage(new CRect(0, 0, img.p_Size.X - 1, img.p_Size.Y - 1));
-                    ////////////////////////// AutoFocus Algorithm Test (with Sobel Filter)
-                    dRightCurrentScore = af.GetImageFocusScoreWithSobel(img);
+                    if (m_module.Run(cam.Grab())) return p_sInfo;
+                    cam.p_ImageViewer.SetImageData(img);
+                    
+                    // Calculating Score
+                    if (m_bUsingSobel) dRightCurrentScore = af.GetImageFocusScoreWithSobel(img);
+                    else dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+
                     if (dRightCurrentScore > dRightMaxScore)
                     {
                         dRightCurrentScore = dRightMaxScore;
                         dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
                     }
-                    m_strRightCurrentStatus = "Current Position:" + (m_dRightStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dRightCurrentScore.ToString();
-                    //StepInfo stepInfo = new StepInfo(m_strRightCurrentStatus, bmp);
-                    //m_lstRightStepInfo.Add(stepInfo);
-                    continue;
-                    //////////////////////////
 
-                    // 분산 Score 계산
-                    dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
-                    if (dRightCurrentScore > dRightMaxScore)
-                    {
-                        dRightMaxScore = dRightCurrentScore;
-                        dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
-                    }
+                    string strTemp = "Current Position:" + (m_dRightStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dRightCurrentScore.ToString();
+                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X - 1, img.p_Size.Y - 1));
+                    BitmapSource bmpSrc = GetBitmapSource(bmp);
+                    m_lstRightStepInfo.Add(new StepInfo(strTemp, bmpSrc));
                 }
 
                 // 3. 좌우측 AF편차 구하기
@@ -948,6 +914,19 @@ namespace Root_Vega.Module
                 m_module.p_axisTheta.Move(dActualPos + dScaled);
 
                 return base.Run();
+            }
+
+            private BitmapSource GetBitmapSource(System.Drawing.Bitmap bitmap)
+            {
+                BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap
+                (
+                    bitmap.GetHbitmap(),
+                    IntPtr.Zero,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions()
+                );
+
+                return bitmapSource;
             }
         }
         #endregion

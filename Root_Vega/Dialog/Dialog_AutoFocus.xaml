@@ -7,6 +7,7 @@
         xmlns:Tree="clr-namespace:RootTools.Trees;assembly=RootTools"
         xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         Height="768"
         Width="1280"
         WindowStyle="None"
@@ -97,15 +98,36 @@
             <Border Grid.Column="0"
                     Grid.Row="2"
                     Margin="5">
-                <ListView Background="Transparent"
-                          ItemsSource="{Binding p_lstLeftStepInfo}">
-                    <ListView.View>
-                        <GridView AllowsColumnReorder="True">
-                            <GridViewColumn DisplayMemberBinding="{Binding p_img}" Header="Image" Width="100"/>
-                            <GridViewColumn DisplayMemberBinding="{Binding p_strInfo}" Header="Info" Width="80"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                <Grid>
+                    <Image Stretch="Fill" Visibility="{Binding p_eLeftViewerVisibility}" Panel.ZIndex="999" Source="{Binding p_bmpSrcLeftViewer}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding ImageDoubleClick}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Image>
+                    <ListView Background="Transparent"
+                              ItemsSource="{Binding p_lstLeftStepInfo}"
+                              x:Name="LeftListView">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding DoubleClick}" CommandParameter="{Binding ElementName=LeftListView, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="True">
+                                <GridViewColumn Header="Image" Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Height="50" Width="300" Source="{Binding p_img}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding p_strInfo}" Header="Info" Width="80"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
             </Border>
             <Border Grid.Column="1"
                     Grid.Row="2"
@@ -117,10 +139,7 @@
                             <GridViewColumn Header="Image" Width="100">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Image Height="50" Width="300" Source="">
-                                            
-                                            
-                                        </Image>
+                                        <Image Height="50" Width="300" Source="{Binding p_img}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
