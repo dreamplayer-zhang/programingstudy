@@ -289,7 +289,7 @@ namespace RootTools_CLR
 			*/
 
 		}
-		array<DefectData^>^ StripInspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, bool nBandwidth)
+		array<DefectData^>^ StripInspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -311,6 +311,24 @@ namespace RootTools_CLR
 
 			bool bResultExist = vTempResult.size() > 0;
 			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
+
+			if (bResultExist)
+			{
+				for (int i = 0; i < vTempResult.size(); i++)
+				{
+					local[i] = gcnew DefectData();
+					local[i]->nIdx = vTempResult[i].nIdx;
+					local[i]->nClassifyCode = vTempResult[i].nClassifyCode;
+					local[i]->fSize = vTempResult[i].fSize;
+					local[i]->nLength = vTempResult[i].nLength;
+					local[i]->nWidth = vTempResult[i].nWidth;
+					local[i]->nHeight = vTempResult[i].nHeight;
+					local[i]->nInspMode = vTempResult[i].nInspMode;
+					local[i]->nFOV = vTempResult[i].nFOV;
+					local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+					local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+				}
+			}
 
 			return local;
 		}

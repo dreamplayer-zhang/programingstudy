@@ -95,23 +95,21 @@
                 </StackPanel>
             </Grid>
             <Grid Grid.Row="1"
-                  DataContext="{Binding p_SurFace_ParamData}" >
+                  DataContext="{Binding p_StripParamData}" >
                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                               Background="{DynamicResource BtnMouseOver}" >
                     <StackPanel Margin="10,0,10,0">
                         <UniformGrid Columns="2" Margin="0,10,0,10">    
-                            <TextBlock  Text="Dark Inspection"
+                            <TextBlock  Text="Intensity"
                                         Style="{StaticResource BasicTb}"/>
-                            <ToggleButton Content="{Binding p_bDarkInspection}"
-                                          Style="{StaticResource BasicToggle}"
-                                          IsChecked="{Binding p_bDarkInspection}"/>
+							<TextBox Text="{Binding p_Intensity}"
+                                     Style="{StaticResource BasicTbox}"/>
 						</UniformGrid>
 						<UniformGrid Columns="2" Margin="0,0,0,10">
-							<TextBlock  Text="Absolute Inspection"
+							<TextBlock  Text="Bandwidth"
                                         Style="{StaticResource BasicTb}"/>
-							<ToggleButton Content="{Binding p_bAbsoluteInspection}"
-                                          Style="{StaticResource BasicToggle}"
-                                          IsChecked="{Binding p_bAbsoluteInspection}"/>
+							<TextBox Text="{Binding p_Bandwidth}"
+                                     Style="{StaticResource BasicTbox}"/>
 						</UniformGrid>
 						<UniformGrid Columns="2" Margin="0,0,0,10">
                             <TextBlock  Text="{Binding TargetLabelText}"

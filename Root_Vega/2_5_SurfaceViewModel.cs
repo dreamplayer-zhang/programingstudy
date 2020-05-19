@@ -61,7 +61,7 @@ namespace Root_Vega
 			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
 			m_Engineer.m_InspManager.InspectionComplete += (type) =>
 			{
-				if(type != InspectionType.Strip)
+				if (type != InspectionType.Strip)
 				{
 					return;
 				}
@@ -93,8 +93,10 @@ namespace Root_Vega
 
 					encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(m_ImageViewer.p_ImageData.GetRectImage(ImageSizeBlock))));
 				}
-
-				encoder.Save(stream);
+				if (VSDataDT.Rows.Count > 0)
+				{
+					encoder.Save(stream);
+				}
 				stream.Dispose();
 				//이미지 저장 완료
 
@@ -196,15 +198,15 @@ namespace Root_Vega
 			//m_MemoryModule.GetPool(sPool).p_gbPool = 2;
 			m_Image = new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem));
 			p_ImageViewer = new ImageViewer_ViewModel(m_Image, dialogService);
-            m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
-            m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
+			m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
+			m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
 
-            p_SimpleShapeDrawer.Add(new SimpleShapeDrawerVM(p_ImageViewer));
-            p_SimpleShapeDrawer.Add(new SimpleShapeDrawerVM(p_ImageViewer));
-            p_SimpleShapeDrawer[0].RectangleKeyValue = Key.D1;
-            p_SimpleShapeDrawer[1].RectangleKeyValue = Key.D1;
-            p_ImageViewer.SetDrawer((DrawToolVM)p_SimpleShapeDrawer[0]);
-            p_ImageViewer.m_HistoryWorker = m_DrawHistoryWorker_List[0];
+			p_SimpleShapeDrawer.Add(new SimpleShapeDrawerVM(p_ImageViewer));
+			p_SimpleShapeDrawer.Add(new SimpleShapeDrawerVM(p_ImageViewer));
+			p_SimpleShapeDrawer[0].RectangleKeyValue = Key.D1;
+			p_SimpleShapeDrawer[1].RectangleKeyValue = Key.D1;
+			p_ImageViewer.SetDrawer((DrawToolVM)p_SimpleShapeDrawer[0]);
+			p_ImageViewer.m_HistoryWorker = m_DrawHistoryWorker_List[0];
 
 			//p_ListRoi = m_Recipe.m_RD.p_Roi;
 
@@ -218,8 +220,8 @@ namespace Root_Vega
 			StripParamData param = new StripParamData();
 			Mask.m_Strip.p_Parameter.Add(param);
 			Mask.m_Strip.m_NonPattern.Add(rect); // Add Rect to Rect List
-												   //m_Recipe.m_RD.p_Roi.Add(Mask);
-												   //p_ListRoi.Add(m_Mask);
+												 //m_Recipe.m_RD.p_Roi.Add(Mask);
+												 //p_ListRoi.Add(m_Mask);
 
 			Mask2 = new Roi("Strip MASK2", Roi.Item.ReticlePattern);  // Mask Number.. New Mask
 			Mask2.m_Strip.p_Parameter = new ObservableCollection<StripParamData>();
@@ -253,19 +255,19 @@ namespace Root_Vega
 			}
 		}
 
-        private List<SimpleShapeDrawerVM> m_SimpleShapeDrawer = new List<SimpleShapeDrawerVM>();
-        public List<SimpleShapeDrawerVM> p_SimpleShapeDrawer
-        {
-            get
-            {
-                return m_SimpleShapeDrawer;
-            }
-            set
-            {
-                SetProperty(ref m_SimpleShapeDrawer, value);
-            }
-        }
-        public List<DrawHistoryWorker> m_DrawHistoryWorker_List = new List<DrawHistoryWorker>();
+		private List<SimpleShapeDrawerVM> m_SimpleShapeDrawer = new List<SimpleShapeDrawerVM>();
+		public List<SimpleShapeDrawerVM> p_SimpleShapeDrawer
+		{
+			get
+			{
+				return m_SimpleShapeDrawer;
+			}
+			set
+			{
+				SetProperty(ref m_SimpleShapeDrawer, value);
+			}
+		}
+		public List<DrawHistoryWorker> m_DrawHistoryWorker_List = new List<DrawHistoryWorker>();
 
 		private int _IndexMask = 0;
 		public int p_IndexMask
@@ -279,8 +281,8 @@ namespace Root_Vega
 				SetProperty(ref _IndexMask, value);
 				//수정필요p_ImageViewer.SetRectElement_MemPos(p_Recipe.p_RecipeData.p_Roi[_IndexMask].m_Strip.m_NonPattern[0].m_rt);
 				p_ImageViewer.SetDrawer((DrawToolVM)p_SimpleShapeDrawer[_IndexMask]);
-                p_ImageViewer.m_HistoryWorker = m_DrawHistoryWorker_List[_IndexMask];
-                p_ImageViewer.SetImageSource();
+				p_ImageViewer.m_HistoryWorker = m_DrawHistoryWorker_List[_IndexMask];
+				p_ImageViewer.SetImageSource();
 				p_StripParamData = p_Recipe.p_RecipeData.p_Roi[_IndexMask].m_Strip.p_Parameter[0];
 
 			}
@@ -381,14 +383,15 @@ namespace Root_Vega
 
 		public void SaveCurrentMask()
 		{
-			CRect rect = p_ImageViewer.GetCurrentRect_MemPos();
-            p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.m_NonPattern[0].m_rt = rect;
+			var temp = p_SimpleShapeDrawer[0].m_ListRect[0];
+			CRect rect = new CRect((int)temp.Location.X, (int)temp.Location.Y, (int)temp.Width, (int)temp.Height);
+			p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.m_NonPattern[0].m_rt = rect;
 
 		}
 
 
 		#region Command
-		
+
 		public ICommand btnDraw
 		{
 			get
@@ -435,10 +438,10 @@ namespace Root_Vega
 		private void _btnClear()
 		{
 			p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.m_NonPattern[0].m_rt = new CRect();
-		
+
 			p_ImageViewer.ClearShape();
 			p_ImageViewer.SetImageSource();
-			
+
 			p_IndexMask = _IndexMask;
 		}
 		private void _btnDraw()
@@ -555,7 +558,7 @@ namespace Root_Vega
 				VSDataDT = VSDBManager.GetDataTable("Data");
 			}
 
-			m_Engineer.m_InspManager.StartInspection(InspectionType.Strip);
+			m_Engineer.m_InspManager.StartInspection(InspectionType.Strip, m_Image.p_Size.X, m_Image.p_Size.Y);
 
 			return;
 		}
@@ -576,6 +579,6 @@ namespace Root_Vega
 		{
 			None, Body, UL, UR, LR, LL, L, R, T, B
 		};
-		
+
 	}
 }

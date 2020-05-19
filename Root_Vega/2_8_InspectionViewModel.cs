@@ -27,7 +27,7 @@ namespace Root_Vega
 
         private void InspStart()
         {
-            p_InspectionManager.StartInspection(InspectionType.None);
+            //p_InspectionManager.StartInspection(InspectionType.None, m_Image.p_Size.X, m_Image.p_Size.Y);//사용예시
         }
 
         public RelayCommand InspStartCommand

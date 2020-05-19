@@ -41,7 +41,11 @@ std::vector<DefectDataStruct> CInspectionReticle::StripInspection(int nBandwidth
 
 	if (nGrayLevel > 0)//절대검사 먼저
 	{
-		SurfaceInspection(true);
+		std::vector<DefectDataStruct> tempResult = SurfaceInspection(true);
+		for (int i = 0; i < tempResult.size(); i++)
+		{
+			vResult.push_back(tempResult[i]);
+		}
 	}
 
 	int nPL = CalHPPatternGV(nBandwidth, nIntensity, nEndX, nEndY);
@@ -49,7 +53,11 @@ std::vector<DefectDataStruct> CInspectionReticle::StripInspection(int nBandwidth
 
 	if (nPL > 0)
 	{
-		SurfaceInspection(true);
+		std::vector<DefectDataStruct> tempResult = SurfaceInspection(true);
+		for (int i = 0; i < tempResult.size(); i++)
+		{
+			vResult.push_back(tempResult[i]);
+		}
 	}
 
 	SetResult(bInspResult);

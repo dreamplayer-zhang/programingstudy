@@ -36,9 +36,18 @@ namespace RootTools.Inspects
 
 		InspectionType inspectionType;
 
-		public void StartInspection(InspectionType type)
+		int m_nMemWidth;
+		int m_nMemHeight;
+
+		public bool IsInitialized { get; private set; }
+
+		public void StartInspection(InspectionType type, int nMemWidth, int nMemHegiht)
 		{
 			inspectionType = type;
+			m_nMemWidth = nMemWidth;
+			m_nMemHeight = nMemHegiht;
+
+			IsInitialized = true;
 
 			if (0 < GetWaitQueue())
 			{
@@ -53,6 +62,9 @@ namespace RootTools.Inspects
 		}
 		public void DoInspection()
 		{
+			if (!IsInitialized)
+				return;
+
 			int nInspDoneNum = 0;
 			Inspection[] inspection = new Inspection[nThreadNum];
 
@@ -63,7 +75,7 @@ namespace RootTools.Inspects
 
 			for (int i = 0; i < nThreadNum; i++)
 			{
-				inspection[i] = new Inspection();
+				inspection[i] = new Inspection(m_nMemWidth, m_nMemHeight);
 				inspection[i].AddDefect += InspectionManager_AddDefect;
 			}
 
@@ -267,7 +279,7 @@ namespace RootTools.Inspects
 						else ey = AreaEndY;
 
 						InspectionProperty ip = new InspectionProperty();
-						ip.p_InspType = RootTools.Inspects.InspectionType.Surface;
+						ip.p_InspType = RootTools.Inspects.InspectionType.Strip;
 
 						CRect inspblock = new CRect(sx, sy, ex, ey);
 						ip.p_Rect = inspblock;

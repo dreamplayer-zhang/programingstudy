@@ -521,7 +521,7 @@ namespace Root_Vega
 				VSDataDT = VSDBManager.GetDataTable("Data");
 			}
 
-			m_Engineer.m_InspManager.StartInspection(InspectionType.Surface);
+			//m_Engineer.m_InspManager.StartInspection(InspectionType.Surface, m_Image.p_Size.X, m_Image.p_Size.Y);//사용 예시
 
 			return;
 		}

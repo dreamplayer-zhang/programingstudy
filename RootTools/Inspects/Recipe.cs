@@ -226,6 +226,7 @@ namespace RootTools.Inspects
 			DefectSize = new Param<int>(10, 1, int.MaxValue);
 			bandwidth = new Param<int>(10, 0, 255);
 			intensity = new Param<int>(120, 0, int.MaxValue);
+			TargetLabelText = "GV";//Strip은 무조건 절대검사
 		}
 
 		#region p_GV
