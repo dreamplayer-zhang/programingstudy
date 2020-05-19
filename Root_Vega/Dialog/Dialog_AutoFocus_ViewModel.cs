@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interactivity;
 using System.Windows.Media.Imaging;
 
 namespace Root_Vega
@@ -18,7 +19,24 @@ namespace Root_Vega
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
         SideVision m_Vision;
         SideVision.Run_AutoFocus m_RunAutoFocus;
-
+        TreeRoot m_treeRoot = null;
+        public TreeRoot p_treeRoot
+        {
+            get { return m_treeRoot; }
+            set { SetProperty(ref m_treeRoot, value); }
+        }
+        string m_strLeftSelectedInfo;
+        public string p_strLeftSelectedInfo
+        {
+            get { return m_strLeftSelectedInfo; }
+            set { SetProperty(ref m_strLeftSelectedInfo, value); }
+        }
+        string m_strRightSelectedInfo;
+        public string p_strRightSelectedInfo
+        {
+            get { return m_strRightSelectedInfo; }
+            set { SetProperty(ref m_strRightSelectedInfo, value); }
+        }
         BitmapSource m_bmpSrcLeftViewer;
         public BitmapSource p_bmpSrcLeftViewer
         {
@@ -45,82 +63,37 @@ namespace Root_Vega
             get { return m_eRightViewerVisibility; }
             set { SetProperty(ref m_eRightViewerVisibility, value); }
         }
-
-        SideVision.Run_AutoFocus.StepInfoList m_lstLeftStepInfo;
-        public SideVision.Run_AutoFocus.StepInfoList p_lstLeftStepInfo
+        SideVision.Run_AutoFocus.CAutoFocusStatus m_afs;
+        public SideVision.Run_AutoFocus.CAutoFocusStatus p_afs
         {
-            get
-            {
-                return m_lstLeftStepInfo;
-            }
-            set
-            {
-                SetProperty(ref m_lstLeftStepInfo, value);
-            }
+            get { return m_afs; }
+            set { SetProperty(ref m_afs, value); }
         }
-        SideVision.Run_AutoFocus.StepInfoList m_lstRightStepInfo;
-        public SideVision.Run_AutoFocus.StepInfoList p_lstRightStepInfo
+        SideVision.Run_AutoFocus.CStepInfoList m_lstLeftStepInfo;
+        public SideVision.Run_AutoFocus.CStepInfoList p_lstLeftStepInfo
         {
-            get
-            {
-                return m_lstRightStepInfo;
-            }
-            set
-            {
-                SetProperty(ref m_lstRightStepInfo, value);
-            }
+            get { return m_lstLeftStepInfo; }
+            set { SetProperty(ref m_lstLeftStepInfo, value); }
+        }
+        SideVision.Run_AutoFocus.CStepInfoList m_lstRightStepInfo;
+        public SideVision.Run_AutoFocus.CStepInfoList p_lstRightStepInfo
+        {
+            get { return m_lstRightStepInfo; }
+            set { SetProperty(ref m_lstRightStepInfo, value); }
         }
         ImageViewer_ViewModel m_ImageViewerLeft = new ImageViewer_ViewModel();
         public ImageViewer_ViewModel p_ImageViewerLeft
         {
-            get
-            {
-                return m_ImageViewerLeft;
-            }
-            set
-            {
-                SetProperty(ref m_ImageViewerLeft, value);
-                
-            }
+            get { return m_ImageViewerLeft; }
+            set { SetProperty(ref m_ImageViewerLeft, value); }
         }
         ImageViewer_ViewModel m_ImageViewerRight = new ImageViewer_ViewModel();
         public ImageViewer_ViewModel p_ImageViewerRight
         {
-            get
-            {
-                return m_ImageViewerRight;
-            }
-            set
-            {
-                SetProperty(ref m_ImageViewerRight, value);
-            }
+            get { return m_ImageViewerRight; }
+            set { SetProperty(ref m_ImageViewerRight, value); }
         }
-        string m_strLeftStatus;
-        public string p_strLeftStatus
-        {
-            get
-            {
-                return m_strLeftStatus;
-            }
-            set
-            {
-                SetProperty(ref m_strLeftStatus, value);
-            }
-        }
-
-        string m_strRightStatus;
-        public string p_strRightStatus
-        {
-            get
-            {
-                return m_strRightStatus;
-            }
-            set
-            {
-                SetProperty(ref m_strRightStatus, value);
-            }
-        }
-
+        
         public Dialog_AutoFocus_ViewModel(SideVision vision, SideVision.Run_AutoFocus af)
         {
             m_Vision = vision;
@@ -129,6 +102,18 @@ namespace Root_Vega
             p_ImageViewerRight.p_ImageData = af.m_imgDataRight;
             p_lstLeftStepInfo = af.m_lstLeftStepInfo;
             p_lstRightStepInfo = af.m_lstRightStepInfo;
+            p_afs = af.m_afs;
+            p_treeRoot = new TreeRoot("AutoFocus_ViewModel", vision.m_log);
+            af.RunTree(p_treeRoot, Tree.eMode.RegRead);
+            af.RunTree(p_treeRoot, Tree.eMode.Init);
+            p_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
+        }
+
+        private void M_treeRoot_UpdateTree()
+        {
+            m_RunAutoFocus.RunTree(p_treeRoot, Tree.eMode.Update);
+            m_RunAutoFocus.RunTree(p_treeRoot, Tree.eMode.Init);
+            m_RunAutoFocus.RunTree(p_treeRoot, Tree.eMode.RegWrite);
         }
 
         public void OnOkButton()
@@ -141,37 +126,49 @@ namespace Root_Vega
             CloseRequested(this, new DialogCloseRequestedEventArgs(false));
         }
 
-        public void OnDoubleClick(object obj)
+        public void OnLeftSideDoubleClick(object obj)
         {
-            SideVision.Run_AutoFocus.StepInfo si = (SideVision.Run_AutoFocus.StepInfo)obj;
-            p_bmpSrcLeftViewer = si.p_img;
+            if (obj != null)
+            {
+                SideVision.Run_AutoFocus.CStepInfo si = (SideVision.Run_AutoFocus.CStepInfo)obj;
+                p_bmpSrcLeftViewer = si.p_img;
+                p_strLeftSelectedInfo = si.p_strInfo;
+            }
+
             if (p_eLeftViewerVisibility == Visibility.Collapsed) p_eLeftViewerVisibility = Visibility.Visible;
             else p_eLeftViewerVisibility = Visibility.Collapsed;
 
             return;
         }
 
-        public void OnImageDoubleClick()
+        public void OnRightSideDoubleClick(object obj)
         {
-            if (p_eLeftViewerVisibility == Visibility.Collapsed) p_eLeftViewerVisibility = Visibility.Visible;
-            else p_eLeftViewerVisibility = Visibility.Collapsed;
+            if (obj != null)
+            {
+                SideVision.Run_AutoFocus.CStepInfo si = (SideVision.Run_AutoFocus.CStepInfo)obj;
+                p_bmpSrcRightViewer = si.p_img;
+                p_strRightSelectedInfo = si.p_strInfo;
+            }
+
+            if (p_eRightViewerVisibility == Visibility.Collapsed) p_eRightViewerVisibility = Visibility.Visible;
+            else p_eRightViewerVisibility = Visibility.Collapsed;
 
             return;
         }
 
-        public RelayCommand ImageDoubleClick
+        public RelayCommandWithParameter LeftSideDoubleClick
         {
             get
             {
-                return new RelayCommand(OnImageDoubleClick);
+                return new RelayCommandWithParameter(OnLeftSideDoubleClick);
             }
         }
 
-        public RelayCommandWithParameter DoubleClick
+        public RelayCommandWithParameter RightSideDoubleClick
         {
             get
             {
-                return new RelayCommandWithParameter(OnDoubleClick);
+                return new RelayCommandWithParameter(OnRightSideDoubleClick);
             }
         }
 

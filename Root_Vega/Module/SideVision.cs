@@ -12,6 +12,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
@@ -721,43 +722,50 @@ namespace Root_Vega.Module
 
         public class Run_AutoFocus : ModuleRunBase
         {
-            public class StepInfoList : ObservableCollection<StepInfo> { }
-            public class StepInfo
+            public class CStepInfoList : ObservableCollection<CStepInfo> { }
+            public class CStepInfo
             {
                 string m_strInfo;
                 public string p_strInfo
                 {
-                    get
-                    {
-                        return m_strInfo;
-                    }
+                    get { return m_strInfo; }
                 }
                 BitmapSource m_img;
                 public BitmapSource p_img
                 {
-                    get
-                    {
-                        return m_img;
-                    }
+                    get { return m_img; }
                 }
 
-                public StepInfo(string strInfo, BitmapSource img)
+                public CStepInfo(string strInfo, BitmapSource img)
                 {
                     m_strInfo = strInfo;
                     m_img = img;
                 }
             }
-            public StepInfoList m_lstLeftStepInfo;
-            public StepInfoList m_lstRightStepInfo;
-            SideVision m_module;
-            public Run_AutoFocus(SideVision module)
+            public CStepInfoList m_lstLeftStepInfo;
+            public CStepInfoList m_lstRightStepInfo;
+            public class CAutoFocusStatus
             {
-                m_module = module;
-                InitModuleRun(module);
-                m_lstLeftStepInfo = new StepInfoList();
-                m_lstRightStepInfo = new StepInfoList();
-            }
+                public double m_dTheta;
+                public double p_dTheta
+                {
+                    get { return m_dTheta; }
+                }
 
+                public string m_strStatus;
+                public string p_strStatus
+                {
+                    get { return m_strStatus; }
+                }
+                
+                public CAutoFocusStatus(double dTheta, string strStatus)
+                {
+                    m_dTheta = dTheta;
+                    m_strStatus = strStatus;
+                }
+            }
+            public CAutoFocusStatus m_afs;
+            SideVision m_module;
             public double m_dLeftStartPosX = 0.0;
             public double m_dLeftEndPosX = 0.0;
             public double m_dLeftPosY = 0.0;
@@ -771,7 +779,16 @@ namespace Root_Vega.Module
             public bool m_bUsingSobel = true;
             public ImageData m_imgDataLeft = null;
             public ImageData m_imgDataRight = null;
-            
+
+            public Run_AutoFocus(SideVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+                m_lstLeftStepInfo = new CStepInfoList();
+                m_lstRightStepInfo = new CStepInfoList();
+                m_afs = new CAutoFocusStatus(0.0, "Ready");
+            }
+
             public override ModuleRunBase Clone()
             {
                 Run_AutoFocus run = new Run_AutoFocus(m_module);
@@ -789,14 +806,33 @@ namespace Root_Vega.Module
 
                 run.m_lstLeftStepInfo = m_lstLeftStepInfo;
                 run.m_lstRightStepInfo = m_lstRightStepInfo;
+                run.m_afs = m_afs;
 
-                System.Drawing.Bitmap bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG.BMP");
-                BitmapSource bmpSrc = GetBitmapSource(bmp);
-                m_lstLeftStepInfo.Add(new StepInfo("Test", bmpSrc));
+                //System.Drawing.Bitmap bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG.BMP");
+                //BitmapSource bmpSrc = GetBitmapSource(bmp);
+                //m_lstLeftStepInfo.Add(new StepInfo("LeftTest", bmpSrc));
+
+                //bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG2.BMP");
+                //bmpSrc = GetBitmapSource(bmp);
+                //m_lstLeftStepInfo.Add(new StepInfo("LeftTest2", bmpSrc));
+
+
+                //bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG.BMP");
+                //bmpSrc = GetBitmapSource(bmp);
+                //m_lstRightStepInfo.Add(new StepInfo("RightTest", bmpSrc));
+
+                //bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG2.BMP");
+                //bmpSrc = GetBitmapSource(bmp);
+                //m_lstRightStepInfo.Add(new StepInfo("RightTest2", bmpSrc));
 
                 return run;
             }
 
+            public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+            {
+                treeRoot.p_eMode = mode;
+                RunTree(treeRoot, true);
+            }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_dLeftStartPosX = tree.Set(m_dLeftStartPosX, m_dLeftStartPosX, "Left Start X Position", "Left Start X Position", bVisible);
@@ -828,9 +864,12 @@ namespace Root_Vega.Module
                 double dRightCurrentScore = 0.0;
                 double dRightMaxScore = -1.0;
                 double dRightMaxScorePosX = m_dRightStartPosX;
+                m_afs.m_dTheta = 0.0;
+                m_afs.m_strStatus = "Ready";
 
                 // 1. Reticle 좌측 위치로 이동 후 AF
                 int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
+                m_afs.m_strStatus = "Left Side AF...";
                 for (int i = 0; i < nStepCount; i++)
                 {
                     // Axis Move
@@ -856,11 +895,12 @@ namespace Root_Vega.Module
                     string strTemp = "Current Position:" + (m_dLeftStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dLeftCurrentScore.ToString();
                     System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X - 1, img.p_Size.Y - 1));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
-                    m_lstLeftStepInfo.Add(new StepInfo(strTemp, bmpSrc));
+                    m_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
                 }
 
                 // 2. Reticle 우측 위치로 이동 후 AF
                 nStepCount = (int)Math.Abs(m_dRightEndPosX - m_dRightStartPosX) / m_nStep;
+                m_afs.m_strStatus = "Right Side AF...";
                 for (int i = 0; i<nStepCount; i++)
                 {
                     // Axis Move
@@ -886,7 +926,7 @@ namespace Root_Vega.Module
                     string strTemp = "Current Position:" + (m_dRightStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dRightCurrentScore.ToString();
                     System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X - 1, img.p_Size.Y - 1));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
-                    m_lstRightStepInfo.Add(new StepInfo(strTemp, bmpSrc));
+                    m_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
                 }
 
                 // 3. 좌우측 AF편차 구하기
@@ -899,7 +939,9 @@ namespace Root_Vega.Module
 
                 // 4. 좌우측 위치 사이의 거리와 좌우측 AF편차를 이용하여 Theta 계산
                 double dThetaRadian = af.GetThetaRadian();
-                double dTehtaDegree = af.GetThetaDegree(dThetaRadian);
+                double dThetaDegree = af.GetThetaDegree(dThetaRadian);
+                if (bThetaClockwise) m_afs.m_dTheta = -dThetaDegree;
+                else m_afs.m_dTheta = dThetaDegree;
 
                 // 5. Radian 값을 Theta 모터 포지션 값으로 Scaling
                 double dMinValue = 0.0;
@@ -912,6 +954,8 @@ namespace Root_Vega.Module
                 double dActualPos = m_module.p_axisTheta.p_axis.p_posActual;
                 if (bThetaClockwise) dScaled = -dScaled;
                 m_module.p_axisTheta.Move(dActualPos + dScaled);
+
+                m_afs.m_strStatus = "Success";
 
                 return base.Run();
             }
