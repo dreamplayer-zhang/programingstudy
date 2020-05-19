@@ -37,9 +37,9 @@ namespace RootTools.ZoomLens
         }
         #endregion
 
-        public LogWriter m_log;
+        public Log m_log;
         public RS232 m_rs232;
-        public ZoomLens(string id, LogWriter log)
+        public ZoomLens(string id, Log log)
         {
             m_id = id;
             m_log = log;
