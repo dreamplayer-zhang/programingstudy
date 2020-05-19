@@ -18,9 +18,9 @@ namespace Root_Vega
     /// <summary>
     /// _2_4_Surface.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class _2_5_Surface : UserControl
+    public partial class _2_5_MainVision : UserControl
     {
-        public _2_5_Surface()
+        public _2_5_MainVision()
         {
             InitializeComponent();
         }

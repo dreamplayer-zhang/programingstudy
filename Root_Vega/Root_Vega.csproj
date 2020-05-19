@@ -158,10 +158,10 @@
       <DependentUpon>2_4_Position.xaml</DependentUpon>
     </Compile>
     <Compile Include="2_4_PositionViewModel.cs" />
-    <Compile Include="2_5_Surface.xaml.cs">
-      <DependentUpon>2_5_Surface.xaml</DependentUpon>
+    <Compile Include="2_5_MainVision.xaml.cs">
+      <DependentUpon>2_5_MainVision.xaml</DependentUpon>
     </Compile>
-    <Compile Include="2_5_SurfaceViewModel.cs" />
+    <Compile Include="2_5_MainVisionViewModel.cs" />
     <Compile Include="2_6_Side.xaml.cs">
       <DependentUpon>2_6_Side.xaml</DependentUpon>
     </Compile>
@@ -309,7 +309,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="2_5_Surface.xaml">
+    <Page Include="2_5_MainVision.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

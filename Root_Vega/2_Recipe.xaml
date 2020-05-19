@@ -169,7 +169,7 @@
                      Style="{StaticResource RcptabItem}">
                 <Border BorderBrush="Gray"
                         BorderThickness="3">
-                    <local:_2_5_Surface x:Name="_Strip"/>
+                    <local:_2_5_MainVision x:Name="_Strip"/>
                 </Border>
             </TabItem>
             <TabItem Header="Side"
