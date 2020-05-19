@@ -48,7 +48,8 @@ namespace Root.Module
             }
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {
-                m_memBasler[(int)cam] = m_memoryGroup.CreateMemory("Basler " + cam.ToString(), 1, 1, m_camBasler[(int)cam].p_sz); 
+                m_memBasler[(int)cam] = m_memoryGroup.CreateMemory("Basler " + cam.ToString(), 1, 1, m_camBasler[(int)cam].p_sz);
+                m_camBasler[(int)cam].SetMemoryData(m_memBasler[(int)cam]); 
             }
         }
 

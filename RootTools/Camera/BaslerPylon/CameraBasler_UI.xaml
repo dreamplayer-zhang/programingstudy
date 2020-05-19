@@ -21,10 +21,7 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Vertical">
                 <CheckBox IsChecked="{Binding p_bConnect}" Content="Connect" Margin="2,10,2,2"/>
-                <ComboBox x:Name="comboPool" Margin="2,20,2,2" SelectionChanged="comboPool_SelectionChanged" PreviewMouseDown="comboPool_PreviewMouseDown"/>
-                <ComboBox x:Name="comboGroup" Margin="2" SelectionChanged="comboGroup_SelectionChanged"/>
-                <ComboBox x:Name="comboMemory" Margin="2" SelectionChanged="comboMemory_SelectionChanged"/>
-                <StackPanel Orientation="Horizontal" Margin="2,20,2,2">
+                <StackPanel Orientation="Horizontal" Margin="2,15,2,2">
                     <Label Content="Grab Progress" Margin="2" VerticalAlignment="Center"/>
                     <Label Content="{Binding p_nGrabProgress}" Margin="2" VerticalAlignment="Center"/>
                 </StackPanel>

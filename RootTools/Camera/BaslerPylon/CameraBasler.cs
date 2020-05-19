@@ -333,8 +333,15 @@ namespace RootTools.Camera.BaslerPylon
             set 
             { 
                 m_memoryPool = m_memoryTool.GetPool(value, false);
+                OnPropertyChanged();
+                if (m_memoryPool != null)
+                {
+                    foreach (string sGroup in m_memoryPool.m_asGroup)
+                    {
+                        if (p_sMemoryGroup == sGroup) return;
+                    }
+                }
                 p_sMemoryGroup = "";
-                OnPropertyChanged(); 
             }
         }
 
@@ -346,8 +353,15 @@ namespace RootTools.Camera.BaslerPylon
             {
                 if (m_memoryPool == null) return; 
                 m_memoryGroup = m_memoryPool.GetGroup(value);
-                p_sMemoryData = "";
                 OnPropertyChanged();
+                if (m_memoryGroup != null)
+                {
+                    foreach (string sMemory in m_memoryGroup.m_asMemory)
+                    {
+                        if (p_sMemoryData == sMemory) return; 
+                    }
+                }
+                p_sMemoryData = "";
             }
         }
 
@@ -372,7 +386,17 @@ namespace RootTools.Camera.BaslerPylon
             }
             p_sMemoryPool = memoryData.m_group.m_pool.p_id;
             p_sMemoryGroup = memoryData.m_group.p_id;
-            p_sMemoryData = memoryData.p_id; 
+            p_sMemoryData = memoryData.p_id;
+            RunTree(Tree.eMode.Init); 
+        }
+
+        void RunTreeMemory(Tree tree)
+        {
+            p_sMemoryPool = tree.Set(p_sMemoryPool, p_sMemoryPool, m_memoryTool.m_asPool, "Pool", "Memory Pool ID");
+            if (m_memoryPool == null) return;
+            p_sMemoryGroup = tree.Set(p_sMemoryGroup, p_sMemoryGroup, m_memoryPool.m_asGroup, "Group", "Memory Group ID");
+            if (m_memoryGroup == null) return;
+            p_sMemoryData = tree.Set(p_sMemoryData, p_sMemoryData, m_memoryGroup.m_asMemory, "Memory", "Memory Data ID"); 
         }
         #endregion
 
@@ -508,6 +532,7 @@ namespace RootTools.Camera.BaslerPylon
                     p_treeRoot.p_eMode = mode;
                     bool bOpen = ((m_cam != null) && m_cam.IsOpen);
                     RunTreeConnect(p_treeRoot.GetTree("Connect", false));
+                    RunTreeMemory(p_treeRoot.GetTree("Memory", false)); 
                     RunTreeGrab(p_treeRoot.GetTree("Start Grab", true, bOpen));
                     RunTreeConfigurationSet(p_treeRoot.GetTree("Configuration Set", false, bOpen));
                     RunTreeAOI(p_treeRoot.GetTree("AOI", false, bOpen));
