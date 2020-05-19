@@ -41,10 +41,6 @@ namespace RootTools.Camera.BaslerPylon
         }
         #endregion
 
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0)
-        {
-        }
-
         #region Connect
         BackgroundWorker m_bgwConnect = new BackgroundWorker(); 
         void InitConnect()
@@ -366,6 +362,18 @@ namespace RootTools.Camera.BaslerPylon
                 OnPropertyChanged();
             }
         }
+
+        public void SetMemoryData(MemoryData memoryData)
+        {
+            if (memoryData == null)
+            {
+                p_sMemoryData = "";
+                return;
+            }
+            p_sMemoryPool = memoryData.m_group.m_pool.p_id;
+            p_sMemoryGroup = memoryData.m_group.p_id;
+            p_sMemoryData = memoryData.p_id; 
+        }
         #endregion
 
         #region Grab
@@ -542,6 +550,10 @@ namespace RootTools.Camera.BaslerPylon
                 m_cam.Close();
                 m_cam = null; 
             }
+        }
+
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0)
+        {
         }
     }
 }

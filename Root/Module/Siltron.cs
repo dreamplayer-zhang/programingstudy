@@ -23,6 +23,7 @@ namespace Root.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            m_memoryGroup = m_memoryPool.GetGroup(p_id);
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {
                 p_sInfo = m_toolBox.Get(ref m_camDalsa[(int)cam], this, "Dalsa " + cam.ToString()); 
@@ -41,14 +42,13 @@ namespace Root.Module
         MemoryData[] m_memBasler = new MemoryData[3];
         void InitMemory()
         {
-            m_memoryGroup = m_memoryPool.GetGroup(p_id);
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {
-                m_memDalsa[(int)cam] = m_memoryGroup.CreateMemory("Dalsa " + cam.ToString(), 1, 1, m_szDalsaGrab); 
+                m_memDalsa[(int)cam] = m_memoryGroup.CreateMemory("Dalsa " + cam.ToString(), 1, 1, m_szDalsaGrab);
             }
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {
-                m_memBasler[(int)cam] = m_memoryGroup.CreateMemory("Basler " + cam.ToString(), 1, 1, new CPoint(1024, 1024)); //forget
+                m_memBasler[(int)cam] = m_memoryGroup.CreateMemory("Basler " + cam.ToString(), 1, 1, m_camBasler[(int)cam].p_sz); 
             }
         }
 
