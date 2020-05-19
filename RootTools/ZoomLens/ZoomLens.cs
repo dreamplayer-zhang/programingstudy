@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace RootTools.ZoomLens
 {
-    public class ZoomLens : NotifyProperty, ITool, IComm
+    public class ZoomLens : NotifyProperty, ITool
     {
         #region Property
         string m_id;
@@ -82,12 +82,7 @@ namespace RootTools.ZoomLens
 
         public void ThreadStop()
         {
-            throw new NotImplementedException();
-        }
-
-        public string Send(string sMsg)
-        {
-            throw new NotImplementedException();
+            //TODO : 구현하거나 지우거나
         }
 
         #region Command
