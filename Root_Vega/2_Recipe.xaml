@@ -165,7 +165,7 @@
                     <local:_2_4_Position x:Name="_Position" />
                 </Border>
             </TabItem>
-            <TabItem Header="Strip"
+            <TabItem Header="MainVision"
                      Style="{StaticResource RcptabItem}">
                 <Border BorderBrush="Gray"
                         BorderThickness="3">
