@@ -207,6 +207,17 @@ namespace RootTools.ToolBoxs
             module.m_aTool.Add(module.m_cameraSet);
         }
 
+        public string Get(ref CameraBasler value, ModuleBase module, string id)
+        {
+            if (value == null)
+            {
+                InitCameraSet(module);
+                value = new CameraBasler(module.p_id + "." + id, module.m_log, m_memoryTool);
+                module.m_cameraSet.Add(value);
+            }
+            return "OK";
+        }
+
         public string Get(ref Camera_Basler value, ModuleBase module, string id)
         {
             if (value == null)

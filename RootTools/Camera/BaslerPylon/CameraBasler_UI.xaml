@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="RootTools.Camera.BaslerPylon.CameraBasler_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RootTools.Camera.BaslerPylon"
+             xmlns:tree="clr-namespace:RootTools.Trees"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Content="{Binding p_sInfo}" Margin="2" VerticalAlignment="Center"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Vertical">
+                <CheckBox IsChecked="{Binding p_bConnect}" Content="Connect" Margin="2,10,2,2"/>
+                <ComboBox x:Name="comboPool" Margin="2,20,2,2" SelectionChanged="comboPool_SelectionChanged" PreviewMouseDown="comboPool_PreviewMouseDown"/>
+                <ComboBox x:Name="comboGroup" Margin="2" SelectionChanged="comboGroup_SelectionChanged"/>
+                <ComboBox x:Name="comboMemory" Margin="2" SelectionChanged="comboMemory_SelectionChanged"/>
+                <StackPanel Orientation="Horizontal" Margin="2,20,2,2">
+                    <Label Content="Grab Progress" Margin="2" VerticalAlignment="Center"/>
+                    <Label Content="{Binding p_nGrabProgress}" Margin="2" VerticalAlignment="Center"/>
+                </StackPanel>
+                <Button x:Name="buttonSingle" Content="Grab Single" Margin="2" Click="buttonSingle_Click"/>
+                <Button x:Name="buttonContinuous" Content="Continuous" Margin="2" Click="buttonContinuous_Click"/>
+                <Button x:Name="buttonLive" Content="Live" Margin="2" Click="buttonLive_Click"/>
+                <Button x:Name="buttonStop" Content="Stop" Margin="2" Click="buttonStop_Click"/>
+            </StackPanel>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+            <tree:TreeUI Grid.Column="2" x:Name="treeUI"/>
+        </Grid>
+    </Grid>
+</UserControl>

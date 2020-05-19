@@ -2,8 +2,6 @@
 using RootTools.Trees;
 using System;
 using System.Windows.Controls;
-using System.Threading;
-using System.Windows;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 
@@ -468,7 +466,8 @@ namespace RootTools.DMC
         public string Send(string sMsg)
         {
             string strCmd = "Execute " + sMsg + ", 1";
-            p_sInfo = strCmd; 
+            p_sInfo = strCmd;
+            m_commLog.Add(CommLog.eType.Send, strCmd); 
             try { CoreMon.executeCommand(p_nRobot, strCmd); }
             catch (Exception e) { return "DMC Send Error : " + e.Message; }
             return "OK";

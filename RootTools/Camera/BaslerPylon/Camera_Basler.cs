@@ -14,19 +14,11 @@ namespace RootTools.Camera.BaslerPylon
     public class Camera_Basler : ObservableObject, RootTools.Camera.ICamera
     {
         #region Property
-        public string p_id
-        {
-            get
-            {
-                return m_id;
-            }
-        }
+        public string p_id { get; set; }
         public int p_nGrabProgress
         {
-            get
-            {
-                return 0;
-            }
+            get { return 0; }
+            set { }
         }
 
         string _sInfo = "";
@@ -62,7 +54,6 @@ namespace RootTools.Camera.BaslerPylon
         }
         #endregion
 
-        string m_id;
         Log m_log;
         Basler.Pylon.Camera m_cam;
         int m_nGrabTimeout = 2000;
@@ -121,7 +112,7 @@ namespace RootTools.Camera.BaslerPylon
 
         public Camera_Basler(string id, Log log)
         {
-            m_id = id;
+            p_id = id;
             m_log = log;
             p_CamInfo = new BaslerCamInfo(m_log);
             p_treeRoot = new TreeRoot(id, m_log);
@@ -339,6 +330,7 @@ namespace RootTools.Camera.BaslerPylon
         public CPoint p_sz
         {
             get { return new CPoint(Convert.ToInt32(m_CamParam._Width), Convert.ToInt32(m_CamParam._Height)); }
+            set { }
         }
 
         public string Grab()
@@ -551,8 +543,9 @@ namespace RootTools.Camera.BaslerPylon
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReverseOffsetY = 0)
         {
         }
-        public void StopGrabbing()
+        public string StopGrab()
         {
+            return "OK"; 
         }
     }
 }

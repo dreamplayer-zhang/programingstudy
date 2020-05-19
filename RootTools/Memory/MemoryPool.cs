@@ -61,7 +61,8 @@ namespace RootTools.Memory
         }
         public MemoryGroup GetGroup(string sGroup)
         {
-            if (sGroup == null) return null; 
+            if (sGroup == null) return null;
+            if (sGroup == "") return null; 
             foreach (MemoryGroup group in m_aGroup)
             {
                 if (group.p_id == sGroup) return group; 
