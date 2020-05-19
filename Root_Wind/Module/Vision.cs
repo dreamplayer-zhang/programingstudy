@@ -491,7 +491,7 @@ namespace Root_Wind.Module
                         nScanLine++;
                         m_cpMemory.X += m_grabMode.m_camera.p_sz.X;
                     }
-                    m_grabMode.m_camera.StopGrabbing();
+                    m_grabMode.m_camera.StopGrab();
                     #region Grab1차 Test후에 코드 부분
                     //double yp0 = m_bInvDir ? m_rpAxis.Y + yAxis + m_grabMode.m_mmAcc : m_rpAxis.Y - m_grabMode.m_mmAcc;
                     //double yp1 = m_bInvDir ? m_rpAxis.Y - m_grabMode.m_mmAcc : m_rpAxis.Y + yAxis + m_grabMode.m_mmAcc;

@@ -211,7 +211,7 @@ namespace RootTools.ToolBoxs
             if (value == null)
             {
                 InitCameraSet(module);
-                value = new CameraBasler(module.p_id + "." + id, module.m_log);
+                value = new CameraBasler(module.p_id + "." + id, module.m_log, m_memoryTool);
                 module.m_cameraSet.Add(value);
             }
             return "OK";

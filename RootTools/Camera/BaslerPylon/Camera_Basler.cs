@@ -543,8 +543,9 @@ namespace RootTools.Camera.BaslerPylon
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReverseOffsetY = 0)
         {
         }
-        public void StopGrabbing()
+        public string StopGrab()
         {
+            return "OK"; 
         }
     }
 }

@@ -234,8 +234,9 @@ namespace RootTools.Camera.CognexOCR
         }
 
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
-        public void StopGrabbing()
+        public string StopGrab()
         {
+            return "OK";
         }
     }
 }

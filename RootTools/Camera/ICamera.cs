@@ -18,7 +18,7 @@ namespace RootTools.Camera
 
         void ThreadStop();
 
-        void StopGrabbing();
+        string StopGrab();
 
         void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0);
     }

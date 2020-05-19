@@ -329,10 +329,11 @@ namespace RootTools.Camera.Dalsa
             set { }
         }
 
-        public void StopGrabbing()
+        public string StopGrab()
         {
             //m_nGrabCount = 0;
             //m_sapXfer.Freeze();
+            return "OK";
         }
 
         public int GetGrabProgress()
