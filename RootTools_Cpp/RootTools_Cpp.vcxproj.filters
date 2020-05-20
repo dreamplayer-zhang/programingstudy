@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Sources">
-      <UniqueIdentifier>{c2cf0f4b-7cf3-4184-bc47-b97d8a9cf35b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headers">
-      <UniqueIdentifier>{0e6cc53d-3af0-4c50-b5d6-fa4bb2db36bf}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -39,16 +33,16 @@
     <ClInclude Include="Functions.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="InspectionReticle.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
     <ClInclude Include="TypeDefines.h">
-      <Filter>Headers</Filter>
+      <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="IP.h">
-      <Filter>Headers</Filter>
+      <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="InspectionReticle.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -62,13 +56,13 @@
     <ClCompile Include="InspectionSurface.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="InspectionReticle.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
     <ClCompile Include="IP.cpp">
-      <Filter>Sources</Filter>
+      <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="InspectionReticle.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
