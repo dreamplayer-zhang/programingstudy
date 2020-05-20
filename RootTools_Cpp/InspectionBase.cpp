@@ -169,7 +169,7 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	}
 
 }
-InspectionBase::InspectionBase()
+InspectionBase::InspectionBase(int nWidth, int nHeight)
 {
 	bResult = false;
 
@@ -184,14 +184,11 @@ InspectionBase::InspectionBase()
 	bAbsoulteGrayLevel = false;
 	bLengthInspection = false;
 	bDarkInspection = false;
-	int sizerSize = 2048 * 2048;
-	pPitSizer = new PitSizer(sizerSize, 1);
-	//pDataBase = new Cpp_DB();
-	int bufSize = 10000 * 10000;//Inspection Buffer Size를 어떻게 할 지 정해야 함
-	pBuffer = new byte(bufSize);
+	int sizerSize = nHeight * nHeight;
+	int bufSize = nWidth * nHeight;
 
-	m_ptCurrent.x = -1;
-	m_ptCurrent.y = 0;
+	pPitSizer = new PitSizer(sizerSize, 1);
+	pBuffer = new byte(bufSize);
 }
 
 InspectionBase::~InspectionBase()

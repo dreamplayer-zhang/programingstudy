@@ -90,7 +90,6 @@ private:
 	
 
 	bool bResult;
-	POINT m_ptCurrent;
 	int dbcount;
 
 private:
@@ -107,6 +106,6 @@ private:
 	bool bDarkInspection;
 
 public:
-	InspectionBase();
+	InspectionBase(int nWidth, int nHeight);
 	virtual ~InspectionBase();
 };

@@ -14,22 +14,19 @@ namespace RootTools_CLR
 	public ref class CLR_Inspection
 	{
 	protected:
-		PitSizer* m_PitSizer = nullptr;
 		CLR_InspConnector^ m_InspConn = nullptr;
 		CInspectionSurface* pInspSurface = nullptr;
 		CInspectionReticle* pInspReticle = nullptr;
 	public:
-		CLR_Inspection(int nThreadNum)
+		CLR_Inspection(int nThreadNum, int nROIWidth, int nROIHeight)
 		{
-			m_PitSizer = new PitSizer(2048 * 2048, 1);
 			m_InspConn = gcnew CLR_InspConnector(nThreadNum);
-			pInspSurface = new CInspectionSurface();
-			pInspReticle = new CInspectionReticle();
+			pInspSurface = new CInspectionSurface(nROIWidth, nROIHeight);
+			pInspReticle = new CInspectionReticle(nROIWidth, nROIHeight);
 		}
 
 		virtual ~CLR_Inspection()
 		{
-			delete m_PitSizer;
 			delete pInspSurface;
 			delete pInspReticle;
 		}

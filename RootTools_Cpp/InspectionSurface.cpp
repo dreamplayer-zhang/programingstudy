@@ -105,11 +105,7 @@ std::vector<DefectDataStruct> CInspectionSurface::SurfaceInspection(bool bAbsolu
 	return vResult;
 }
 
-CInspectionSurface::CInspectionSurface()
+CInspectionSurface::CInspectionSurface(int nWidth, int nHeight) :InspectionBase(nWidth, nHeight)
 {
-	SetDefectCode(1);
-}
-
-CInspectionSurface::~CInspectionSurface()
-{
+	
 }

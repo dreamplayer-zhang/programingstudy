@@ -84,7 +84,7 @@ namespace RootTools.Inspects
 					List<DefectData> arrDefects = new List<DefectData>();
 					if (inspectionType == InspectionType.AbsoluteSurface && inspectionType == InspectionType.RelativeSurface)
 					{
-						using(CLR_Inspection clrInsp =new CLR_Inspection(m_nThreadNum))
+						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
 						{
 							arrDefects.AddRange(clrInsp.SurfaceInspection(
 								ThreadIndex,
@@ -102,7 +102,7 @@ namespace RootTools.Inspects
 					}
 					else if (inspectionType == InspectionType.Strip)
 					{
-						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum))
+						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
 						{
 							arrDefects.AddRange(clrInsp.StripInspection(
 									   ThreadIndex,
