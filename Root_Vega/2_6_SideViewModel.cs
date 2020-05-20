@@ -238,14 +238,14 @@ namespace Root_Vega
 		//    }
 		//}
 
-		public SurFace_ParamData p_SurFace_ParamData
+		public SurfaceParamData p_SurFace_ParamData
 		{
 			get
 			{
 				if (m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.p_Parameter.Count != 0)
 					return m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.p_Parameter[0];
 				else
-					return new SurFace_ParamData();
+					return new SurfaceParamData();
 			}
 			set
 			{

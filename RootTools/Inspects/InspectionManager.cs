@@ -207,7 +207,7 @@ namespace RootTools.Inspects
 		{
 			p_qInspection.Clear();
 		}
-		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, SurFace_ParamData param)
+		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, SurfaceParamData param)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -438,8 +438,8 @@ namespace RootTools.Inspects
 				SetProperty(ref Rect, value);
 			}
 		}
-		SurFace_ParamData Sur_Param;
-		public SurFace_ParamData p_Sur_Param
+		SurfaceParamData Sur_Param;
+		public SurfaceParamData p_Sur_Param
 		{
 			get
 			{

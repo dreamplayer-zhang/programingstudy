@@ -238,7 +238,28 @@ namespace Root_Vega
 		}
 
 		#region Property
-
+		public RecipeData p_RecipeData
+		{
+			get
+			{
+				if (m_Recipe.p_RecipeData != null)
+				{
+					return m_Recipe.p_RecipeData;
+				}
+				else
+				{
+					return new RecipeData();
+				}
+			}
+			set
+			{
+				if (m_Recipe.p_RecipeData != null)
+				{
+					m_Recipe.p_RecipeData = value;
+					RaisePropertyChanged();
+				}
+			}
+		}
 		public StripParamData p_StripParamData
 		{
 			get

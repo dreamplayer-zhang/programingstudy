@@ -68,7 +68,16 @@ namespace RootTools.Inspects
 	}
 	public class RecipeData : ObservableObject
 	{
-		ObservableCollection<Roi> m_Roi = new ObservableCollection<Roi>();
+		public RecipeData()
+		{
+			m_bDefectMerge = false;
+			m_nMergeDistance = new Param<int>(10, 0, int.MaxValue);//최대치는 나중에 정하기
+			m_Roi = new ObservableCollection<Roi>();
+		}
+
+		#region p_Roi
+
+		ObservableCollection<Roi> m_Roi;
 		public ObservableCollection<Roi> p_Roi
 		{
 			get
@@ -80,7 +89,38 @@ namespace RootTools.Inspects
 				SetProperty(ref m_Roi, value);
 			}
 		}
-		//ParamData m_PD;
+		#endregion
+
+		#region p_bDefectMerge
+		bool m_bDefectMerge;
+		public bool p_bDefectMerge
+		{
+			get { return m_bDefectMerge; }
+			set
+			{
+				SetProperty(ref m_bDefectMerge, value);
+			}
+		}
+		#endregion
+
+		#region p_nMergeDistance
+		Param<int> m_nMergeDistance;
+		public int p_nMergeDistance
+		{
+			get
+			{
+				return m_nMergeDistance._value;
+			}
+			set
+			{
+				if (m_nMergeDistance._value == value)
+					return;
+				m_nMergeDistance._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
 	}
 	public class Param<T> where T : IComparable
 	{
@@ -114,9 +154,9 @@ namespace RootTools.Inspects
 
 		}
 	}
-	public class SurFace_ParamData : ObservableObject
+	public class SurfaceParamData : ObservableObject
 	{
-		public SurFace_ParamData()
+		public SurfaceParamData()
 		{
 			p_bDarkInspection = true;
 			p_bAbsoluteInspection = true;
@@ -218,7 +258,7 @@ namespace RootTools.Inspects
 
 		#endregion
 	}
-	public class StripParamData :ObservableObject
+	public class StripParamData : ObservableObject
 	{
 		public StripParamData()
 		{
@@ -387,8 +427,8 @@ namespace RootTools.Inspects
 	{
 		public List<Pattern> m_Pattern;
 		public List<NonPattern> m_NonPattern;
-		ObservableCollection<SurFace_ParamData> m_Parameter = new ObservableCollection<SurFace_ParamData>();
-		public ObservableCollection<SurFace_ParamData> p_Parameter
+		ObservableCollection<SurfaceParamData> m_Parameter = new ObservableCollection<SurfaceParamData>();
+		public ObservableCollection<SurfaceParamData> p_Parameter
 		{
 			get
 			{
