@@ -1,0 +1,52 @@
+﻿<Window x:Class="Root_Vega.ManualJob.ManualJobSchedule_UI"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        Closing="Window_Closing"
+        Title="ManualJobSchedule" Height="500" Width="500" Background="#FF2D2D30" Topmost="True">
+    <Grid Background="{Binding p_brushJobSchedule}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="9*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Name="TitleBar" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="9*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="Manual Job Schedule" Foreground="White" VerticalAlignment="Center" FontSize="20" Margin="10"/>
+            <Button Grid.Column="1" Style="{StaticResource SystemButton}" x:Name="btnClose" Foreground="White" 
+                    Width="34" Height="26" 
+                    VerticalAlignment="Center"
+                    Click="btnClose_Click">
+                <Path Style="{StaticResource CloseIconKey}"/>
+            </Button>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="7*"/>
+                <RowDefinition Height="3*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Margin="10">
+                <TextBlock Text="Recipe ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
+                <ComboBox x:Name="comboRecipeID" Margin="5"/>
+                <TextBlock Text="Location ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
+                <TextBox x:Name="tbLocID" Height="23" Margin="5" Text="{Binding p_sLocID}" VerticalAlignment="Center" TextAlignment="Left"/>
+                <TextBlock Text="Pod ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
+                <TextBox x:Name="tbPodID" Height="23" Margin="5" Text="{Binding p_sPodID}" VerticalAlignment="Center" TextAlignment="Left"/>
+                <TextBlock Text="Lot ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
+                <TextBox x:Name="tbLotID" Height="23" Margin="5" Text="{Binding p_sLotID}" VerticalAlignment="Center" TextAlignment="Left"/>
+            </StackPanel>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Job Start" Margin="12"
+                        Style="{StaticResource BasicBtn}"/>
+                <Button Grid.Column="1" Content="Job Cancel" Margin="12"
+                        Style="{StaticResource BasicBtn}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

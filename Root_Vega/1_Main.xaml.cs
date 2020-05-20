@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using Root_Vega.ManualJob;
+using System.Windows.Controls;
 
 namespace Root_Vega
 {

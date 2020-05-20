@@ -15,64 +15,64 @@
         Background="#FF2D2D30"
         Title="VEGA" Loaded="Window_Loaded" Closing="Window_Closing" WindowState="Maximized">
     <Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="50"/>
-			<RowDefinition Height="9*"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="9*"/>
             <RowDefinition Height="91*"/>
         </Grid.RowDefinitions>
 
-		<!--Title Bar Start-->
-		<Grid Grid.ColumnSpan="100"
+        <!--Title Bar Start-->
+        <Grid Grid.ColumnSpan="100"
 			  Name="TitleBar"
               Background="#FF2D2D30" 
               MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="Auto"/>
-			</Grid.ColumnDefinitions>
-			<icons:AtiLogo Width="40"
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <icons:AtiLogo Width="40"
                            Height="25"
                            Margin="3"/>
-			<TextBlock Text="VEGA" Foreground="White" VerticalAlignment="Center" FontSize="15" Margin="10" Grid.Column="1"/>
-			<StackPanel WindowChrome.IsHitTestVisibleInChrome="True" Orientation="Horizontal" Grid.Column="2">
-				<Button Style="{StaticResource SystemButton}"
+            <TextBlock Text="VEGA" Foreground="White" VerticalAlignment="Center" FontSize="15" Margin="10" Grid.Column="1"/>
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True" Orientation="Horizontal" Grid.Column="2">
+                <Button Style="{StaticResource SystemButton}"
                         x:Name="MinimizeButton"
 						Width="34"
 						Height="26"
                         Margin="0,0,10,0"
 						Foreground="White" Click="MinimizeButton_Click">
-					<Path Style="{StaticResource MinimizeIconKey}"/>
-				</Button>
-				<Button Style="{StaticResource SystemButton}"
+                    <Path Style="{StaticResource MinimizeIconKey}"/>
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
                         x:Name="MaximizeButton"
 						Width="34"
 						Height="26"
                         Margin="0,0,10,0"
 						Foreground="White" Click="MaximizeButton_Click">
-					<Path Style="{StaticResource MaximizeIconKey}"/>
-				</Button>
-				<Button Style="{StaticResource SystemButton}"
+                    <Path Style="{StaticResource MaximizeIconKey}"/>
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
                         x:Name="NormalizeButton"
 						Width="34"
 						Height="26"
                         Margin="0,0,10,0"
 						Foreground="White" Click="NormalizeButton_Click">
-					<Path Style="{StaticResource NormalizeIconKey}"/>
-				</Button>
-				<Button Style="{StaticResource SystemButton}"
+                    <Path Style="{StaticResource NormalizeIconKey}"/>
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
                         x:Name="CloseButton"
 						Width="34"
 						Height="26"
-                        Margin="0,0,10,0"
-						Foreground="White" Click="CloseButton_Click">
-					<Path Style="{StaticResource CloseIconKey}"/>
-				</Button>
-			</StackPanel>
-		</Grid>
-		<!--Title Bar End-->
+                        Margin="0,0,10,12"
+						Foreground="White" Click="CloseButton_Click" VerticalAlignment="Bottom">
+                    <Path Style="{StaticResource CloseIconKey}"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <!--Title Bar End-->
 
-		<Grid Grid.Row="1">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="7.5*"/>
                 <ColumnDefinition Width="7.5*"/>

@@ -1,4 +1,5 @@
-﻿using Root_Vega.Module;
+﻿using Root_Vega.ManualJob;
+using Root_Vega.Module;
 using RootTools.Gem;
 using System;
 using System.Windows.Controls;
@@ -12,9 +13,11 @@ namespace Root_Vega
     /// </summary>
     public partial class _1_2_LoadPort : UserControl
     {
+        ManualJobSchedule manualjob;
         public _1_2_LoadPort()
         {
             InitializeComponent();
+            manualjob = new ManualJobSchedule();
         }
 
         Loadport m_loadport; 
@@ -44,6 +47,11 @@ namespace Root_Vega
             bool bAuto = (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto); 
             borderAccessAuto.Background = bAuto ? Brushes.LightGreen : null;
             borderAccessManual.Background = bAuto ? null : Brushes.LightGreen; 
+        }
+
+        private void ToggleButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            manualjob.ShowPopup();
         }
     }
 }

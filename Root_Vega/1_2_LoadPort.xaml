@@ -201,7 +201,8 @@
                         <ToggleButton Content="Load"
                                 Grid.Row="0"
                                 Margin="5"
-                                Style="{StaticResource LoadPortToggle}"/>
+                                Style="{StaticResource LoadPortToggle}"
+                                Click="ToggleButton_Click"/>
                         <Button Content="Unload Request"
                                                 Grid.Row="2"
                                                 Margin="5"
