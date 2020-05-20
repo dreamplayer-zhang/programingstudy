@@ -14,7 +14,7 @@ namespace RootTools.Inspects
 		public delegate void EventHandler();
 		public EventHandler InspectionStart;
 		public EventHandler InspectionComplete;
-		public delegate void ChangeDefectInfoEventHander(DefectData[] source, InspectionType type);
+		public delegate void ChangeDefectInfoEventHander(DefectData[] source, int nDCode);
 		public event ChangeDefectInfoEventHander AddDefect;
 		#endregion
 
@@ -24,22 +24,30 @@ namespace RootTools.Inspects
 		int inspectionID = -1;
 		public InspectionState bState = InspectionState.None;
 		Thread _thread;
-		CLR_Inspection clrInsp = new CLR_Inspection();
 		InspectionProperty m_InspProp;
 		private volatile bool shouldStop = false;
+		int m_nThreadNum;
 
 		public int ThreadIndex { get { return threadIndex; } set { threadIndex = value; } }
 		public int InspectionID { get { return inspectionID; } set { inspectionID = value; } }
 
 		int m_nWholeImageWidth;
 		int m_nWholeImageHeight;
+		int m_nDefectCode;
 		public bool IsInitialized { get; private set; }
 
-		public Inspection(int nWholeImageWidth, int nWholeImageHeight)
+		public Inspection(int nWholeImageWidth, int nWholeImageHeight, int nDefectCode, int nThreadNum)
 		{
 			m_nWholeImageWidth = nWholeImageWidth;
 			m_nWholeImageHeight = nWholeImageHeight;
+			m_nDefectCode = nDefectCode;
+			m_nThreadNum = nThreadNum;
+
 			IsInitialized = true;
+		}
+		public void Dispose()
+		{
+			//clrInsp.Dispose();
 		}
 
 		public bool StartInspection(InspectionProperty prop, int threadIndex)
@@ -53,7 +61,7 @@ namespace RootTools.Inspects
 			InspectionID = prop.p_index;
 			bState = InspectionState.Run;
 			_thread = new Thread(DoInspection);
-			inspectionType = prop.p_InspType;
+			inspectionType = InspectionManager.GetInspectionType(m_nDefectCode);
 			//_thread.IsBackground = true;
 			_thread.Start();
 
@@ -62,7 +70,10 @@ namespace RootTools.Inspects
 
 		public void DoInspection(object threadId)
 		{
-			while (!shouldStop)
+			if (!IsInitialized)
+				return;
+
+			while (shouldStop == false)
 			{
 				if (bState == InspectionState.Run)
 				{
@@ -71,9 +82,10 @@ namespace RootTools.Inspects
 
 
 					List<DefectData> arrDefects = new List<DefectData>();
-					switch (inspectionType)
+					if (inspectionType == InspectionType.AbsoluteSurface && inspectionType == InspectionType.RelativeSurface)
 					{
-						case InspectionType.Surface:
+						using(CLR_Inspection clrInsp =new CLR_Inspection(m_nThreadNum))
+						{
 							arrDefects.AddRange(clrInsp.SurfaceInspection(
 								ThreadIndex,
 								m_InspProp.p_Rect.Left,
@@ -86,30 +98,32 @@ namespace RootTools.Inspects
 								m_InspProp.p_Sur_Param.p_DefectSize,
 								m_InspProp.p_Sur_Param.p_bDarkInspection,
 								m_InspProp.p_Sur_Param.p_bAbsoluteInspection));
-							break;
-						case InspectionType.Strip:
+						}
+					}
+					else if (inspectionType == InspectionType.Strip)
+					{
+						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum))
+						{
 							arrDefects.AddRange(clrInsp.StripInspection(
-								ThreadIndex,
-								m_InspProp.p_Rect.Left,
-								m_InspProp.p_Rect.Top,
-								m_InspProp.p_Rect.Right,
-								m_InspProp.p_Rect.Bottom,
-								m_nWholeImageWidth,
-								m_nWholeImageHeight,
-								m_InspProp.p_StripParam.p_GV,
-								m_InspProp.p_StripParam.p_DefectSize,
-								m_InspProp.p_StripParam.p_Intensity,
-								m_InspProp.p_StripParam.p_Bandwidth));
-							break;
-						case InspectionType.None:
-						default:
-							break;
+									   ThreadIndex,
+									   m_InspProp.p_Rect.Left,
+									   m_InspProp.p_Rect.Top,
+									   m_InspProp.p_Rect.Right,
+									   m_InspProp.p_Rect.Bottom,
+									   m_nWholeImageWidth,
+									   m_nWholeImageHeight,
+									   m_InspProp.p_StripParam.p_GV,
+									   m_InspProp.p_StripParam.p_DefectSize,
+									   m_InspProp.p_StripParam.p_Intensity,
+									   m_InspProp.p_StripParam.p_Bandwidth));
+						}
 					}
 
 					if (AddDefect != null)//대리자 호출을 간단하게 만들 수 있으나 vs2013에서 호환이 안 될 가능성이 없어 보류
 					{
-						AddDefect(arrDefects.ToArray(), inspectionType);
+						AddDefect(arrDefects.ToArray(), m_nDefectCode);
 					}
+					arrDefects.Clear();
 				}
 				else if (bState == InspectionState.Running)
 				{

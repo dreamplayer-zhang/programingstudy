@@ -184,10 +184,11 @@ InspectionBase::InspectionBase()
 	bAbsoulteGrayLevel = false;
 	bLengthInspection = false;
 	bDarkInspection = false;
-
-	pPitSizer = new PitSizer(2048 * 2048, 1);
+	int sizerSize = 2048 * 2048;
+	pPitSizer = new PitSizer(sizerSize, 1);
 	//pDataBase = new Cpp_DB();
-	pBuffer = new byte(10000 * 10000);
+	int bufSize = 10000 * 10000;//Inspection Buffer Size를 어떻게 할 지 정해야 함
+	pBuffer = new byte(bufSize);
 
 	m_ptCurrent.x = -1;
 	m_ptCurrent.y = 0;
@@ -197,5 +198,7 @@ InspectionBase::~InspectionBase()
 {
 	Functions::SafeDelete(pPitSizer);
 	//Functions::SafeDelete(pDataBase);
-	Functions::SafeDeleteArray(pBuffer);
+	//Functions::SafeDeleteArray(pBuffer);
+	//pPitSizer = nullptr;
+	//pBuffer = nullptr;
 }

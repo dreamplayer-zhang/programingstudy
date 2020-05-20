@@ -7,10 +7,10 @@
 namespace RootTools_CLR
 {
 	//Box 단위로 들어온 surface 검사 구현 및 db연동화
-	class CLR_InspConnector
+	ref class CLR_InspConnector
 	{
 		public:
-			CLR_InspConnector(int processornum = 0);//검사 멀티쓰레드로 돌릴 시 각 쓰레드별 할당된 번호(visionworks처럼)
+			CLR_InspConnector(int processornum);//검사 멀티쓰레드로 돌릴 시 각 쓰레드별 할당된 번호(visionworks처럼)
 			virtual ~CLR_InspConnector();
 
 			//InspSurface_Reticle* m_InspReticle;
@@ -46,7 +46,7 @@ namespace RootTools_CLR
 		int ImgPool_Height;
 
 		//Common
-		POINT m_ptCurrent;
+		//POINT m_ptCurrent; //ref class 에서는 POINT 사용 불가
 
 		//Surface Strip Inspection
 		//검사에서 쓰는 parameter들 별도 class로 선언해서 inspsurface_reticle에 넘겨주는 식으로 구현

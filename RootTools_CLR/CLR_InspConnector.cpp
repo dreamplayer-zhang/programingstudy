@@ -27,8 +27,8 @@ namespace RootTools_CLR
 		ImgPool_Height = 40000;
 
 
-		m_ptCurrent.x = -1;
-		m_ptCurrent.y = 0;
+		//m_ptCurrent.x = -1;//ref class 에서는 POINT 사용 불가
+		//m_ptCurrent.y = 0;//ref class 에서는 POINT 사용 불가
 
 		/*bIP = false;
 		bIP = false;
