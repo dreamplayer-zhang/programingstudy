@@ -597,6 +597,10 @@ namespace ViewConverter
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             // variable
+            if(values[0] == null)
+            {
+                return 0.0f;
+            }
             AjinAxis axis = (AjinAxis)values[0];
             double dStageLength = (double)values[1];
             double dMinusLimit = (double)axis.p_posLimitSW[0];
