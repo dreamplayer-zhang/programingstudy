@@ -41,10 +41,6 @@ namespace RootTools.Camera.BaslerPylon
         }
         #endregion
 
-        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0)
-        {
-        }
-
         #region Connect
         BackgroundWorker m_bgwConnect = new BackgroundWorker(); 
         void InitConnect()
@@ -102,6 +98,7 @@ namespace RootTools.Camera.BaslerPylon
             set
             {
                 if (p_bConnect == value) return;
+                OnPropertyChanged(); 
                 if (value)
                 {
                     if (m_bgwConnect.IsBusy == false) m_bgwConnect.RunWorkerAsync();
@@ -337,8 +334,15 @@ namespace RootTools.Camera.BaslerPylon
             set 
             { 
                 m_memoryPool = m_memoryTool.GetPool(value, false);
+                OnPropertyChanged();
+                if (m_memoryPool != null)
+                {
+                    foreach (string sGroup in m_memoryPool.m_asGroup)
+                    {
+                        if (p_sMemoryGroup == sGroup) return;
+                    }
+                }
                 p_sMemoryGroup = "";
-                OnPropertyChanged(); 
             }
         }
 
@@ -350,8 +354,15 @@ namespace RootTools.Camera.BaslerPylon
             {
                 if (m_memoryPool == null) return; 
                 m_memoryGroup = m_memoryPool.GetGroup(value);
-                p_sMemoryData = "";
                 OnPropertyChanged();
+                if (m_memoryGroup != null)
+                {
+                    foreach (string sMemory in m_memoryGroup.m_asMemory)
+                    {
+                        if (p_sMemoryData == sMemory) return; 
+                    }
+                }
+                p_sMemoryData = "";
             }
         }
 
@@ -366,22 +377,44 @@ namespace RootTools.Camera.BaslerPylon
                 OnPropertyChanged();
             }
         }
+
+        public void SetMemoryData(MemoryData memoryData)
+        {
+            if (memoryData == null)
+            {
+                p_sMemoryData = "";
+                return;
+            }
+            p_sMemoryPool = memoryData.m_group.m_pool.p_id;
+            p_sMemoryGroup = memoryData.m_group.p_id;
+            p_sMemoryData = memoryData.p_id;
+            RunTree(Tree.eMode.Init); 
+        }
+
+        void RunTreeMemory(Tree tree)
+        {
+            p_sMemoryPool = tree.Set(p_sMemoryPool, p_sMemoryPool, m_memoryTool.m_asPool, "Pool", "Memory Pool ID");
+            if (m_memoryPool == null) return;
+            p_sMemoryGroup = tree.Set(p_sMemoryGroup, p_sMemoryGroup, m_memoryPool.m_asGroup, "Group", "Memory Group ID");
+            if (m_memoryGroup == null) return;
+            p_sMemoryData = tree.Set(p_sMemoryData, p_sMemoryData, m_memoryGroup.m_asMemory, "Memory", "Memory Data ID"); 
+        }
         #endregion
 
         #region Grab
         bool m_bLive = false; 
-        int m_iMemory = 0; 
         public string StartGrab(int nGrab, int nOffset = 0)
         {
             if (m_cam == null) return "Camera not Connected";
             if (m_cam.IsOpen == false) return "Camera not Opened";
             if (m_memoryData == null) return "MemoryData not Assigned";
             if (m_cam.StreamGrabber.IsGrabbing) return "Camera is OnGrabbing";
+            m_qGrab.Clear();
             m_bLive = false; 
             if (nGrab <= 0) nGrab = 1;
             if ((nGrab + nOffset) > m_memoryData.p_nCount) return "Grab Count Larger then Memory Count";
-            m_iMemory = nOffset; 
-            m_iGrab = 0;
+            m_nGrabCount = nGrab; 
+            m_nGrabOffset = nOffset; 
             string sMode = (nGrab <= 1) ? PLCamera.AcquisitionMode.SingleFrame : PLCamera.AcquisitionMode.Continuous; 
             m_cam.Parameters[PLCamera.AcquisitionMode].SetValue(sMode);
             m_cam.StreamGrabber.Start(nGrab, GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
@@ -396,8 +429,7 @@ namespace RootTools.Camera.BaslerPylon
             if (m_cam.StreamGrabber.IsGrabbing) return "Camera is OnGrabbing";
             m_bLive = true;
             if (nOffset > m_memoryData.p_nCount) return "Grab Offset Larger then Memory Count";
-            m_iMemory = nOffset;
-            m_iGrab = 0;
+            m_nGrabOffset = nOffset;
             m_cam.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.Continuous);
             m_cam.StreamGrabber.Start(GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
             return "OK";
@@ -408,15 +440,11 @@ namespace RootTools.Camera.BaslerPylon
             if (m_cam == null) return "Camera not Connected";
             if (m_cam.IsOpen == false) return "Camera not Opened";
             m_cam.StreamGrabber.Stop();
-            m_iGrab = 0;
             m_qGrab.Clear();
-            m_qGrabInfo.Clear(); 
             return "OK";
         }
 
-        int m_iGrab = 0; 
         Queue<byte[]> m_qGrab = new Queue<byte[]>(); 
-        Queue<string> m_qGrabInfo = new Queue<string>();
         private void StreamGrabber_ImageGrabbed(object sender, ImageGrabbedEventArgs e)
         {
             try
@@ -424,13 +452,12 @@ namespace RootTools.Camera.BaslerPylon
                 IGrabResult result = e.GrabResult;
                 if (result.IsValid == false)
                 {
-                    m_qGrabInfo.Enqueue("Grab Invalid : " + m_iGrab.ToString());
+                    p_sInfo = "Grab Invalid : " + e.GrabResult.ImageNumber.ToString();
                     return; 
                 }
                 m_qGrab.Enqueue(result.PixelData as byte[]);
-                m_iGrab++; 
             }
-            catch (Exception ex) { m_qGrabInfo.Enqueue("Grab Exception : " + ex.Message); }
+            catch (Exception ex) { p_sInfo = "Grab Exception : " + ex.Message; }
             finally { e.DisposeGrabResultIfClone(); }
         }
 
@@ -455,7 +482,11 @@ namespace RootTools.Camera.BaslerPylon
             while (m_bThread)
             {
                 Thread.Sleep(5);
-                while (m_qGrab.Count > 0) p_sInfo = ThreadGrab(); 
+                while (m_qGrab.Count > 0)
+                {
+                    if (m_bLive) p_sInfo = ThreadLive();
+                    else p_sInfo = ThreadGrab(); 
+                }
             }
         }
 
@@ -470,16 +501,29 @@ namespace RootTools.Camera.BaslerPylon
                 OnPropertyChanged();
             }
         }
+
         string ThreadGrab()
         {
-            int nIndex = m_bLive ? m_iMemory : m_iMemory + p_nGrabProgress; 
-            IntPtr intPtr = m_memoryData.GetPtr(nIndex);
+            IntPtr intPtr = m_memoryData.GetPtr(m_nGrabOffset + p_nGrabProgress);
+            p_sInfo = CopyBuf(intPtr); 
+            p_nGrabProgress++; 
+            return p_sInfo; 
+        }
+
+        string ThreadLive()
+        {
+            while (m_qGrab.Count > 1) m_qGrab.Dequeue();
+            IntPtr intPtr = m_memoryData.GetPtr(m_nGrabOffset);
+            return CopyBuf(intPtr); 
+        }
+
+        string CopyBuf(IntPtr intPtr)
+        {
             int nSize = p_sz.X * p_sz.Y * p_nByte;
             byte[] aBuf = m_qGrab.Dequeue();
             Marshal.Copy(aBuf, 0, intPtr, nSize);
-            //forget MemoryData Invalid
-            p_nGrabProgress++; 
-            return "OK"; 
+            //forget MemoryData Invalid View
+            return "OK";
         }
         #endregion
 
@@ -500,6 +544,7 @@ namespace RootTools.Camera.BaslerPylon
                     p_treeRoot.p_eMode = mode;
                     bool bOpen = ((m_cam != null) && m_cam.IsOpen);
                     RunTreeConnect(p_treeRoot.GetTree("Connect", false));
+                    RunTreeMemory(p_treeRoot.GetTree("Memory", false)); 
                     RunTreeGrab(p_treeRoot.GetTree("Start Grab", true, bOpen));
                     RunTreeConfigurationSet(p_treeRoot.GetTree("Configuration Set", false, bOpen));
                     RunTreeAOI(p_treeRoot.GetTree("AOI", false, bOpen));
@@ -542,6 +587,10 @@ namespace RootTools.Camera.BaslerPylon
                 m_cam.Close();
                 m_cam = null; 
             }
+        }
+
+        public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0)
+        {
         }
     }
 }

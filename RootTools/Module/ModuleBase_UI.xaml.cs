@@ -57,6 +57,7 @@ namespace RootTools.Module
                     TabItem tabItem = new TabItem();
                     tabItem.Header = axis.p_sID.Replace(m_module.p_id + ".", "");
                     tabItem.Content = axis.p_ui;
+                    tabItem.Background = Brushes.DarkSalmon;
                     tabControlTools.Items.Add(tabItem);
                 }
             }

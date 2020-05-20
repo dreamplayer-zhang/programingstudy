@@ -145,6 +145,10 @@
     <Compile Include="Camera\CameraSet_UI.xaml.cs">
       <DependentUpon>CameraSet_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Camera\Dalsa\CameraDalsa.cs" />
+    <Compile Include="Camera\Dalsa\CameraDalsa_UI.xaml.cs">
+      <DependentUpon>CameraDalsa_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Camera\ToolSetCamera.cs" />
     <Compile Include="Camera\ToolSetCamera_UI.xaml.cs">
       <DependentUpon>ToolSetCamera_UI.xaml</DependentUpon>
@@ -523,6 +527,10 @@
     <Page Include="Camera\CameraSet_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Camera\Dalsa\CameraDalsa_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Camera\ToolSetCamera_UI.xaml">
       <Generator>MSBuild:Compile</Generator>

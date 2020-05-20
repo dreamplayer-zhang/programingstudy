@@ -428,7 +428,7 @@ namespace RootTools.Memory
         }
         #endregion
 
-        MemoryGroup m_group;
+        public MemoryGroup m_group;
         Log m_log;
         public MemoryData(MemoryGroup group, string id, int nCount, int nByte, int xSize, int ySize, ref int gbOffset)
         {

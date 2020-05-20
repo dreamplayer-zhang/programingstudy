@@ -218,6 +218,17 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
+        public string Get(ref CameraDalsa value, ModuleBase module, string id)
+        {
+            if (value == null)
+            {
+                InitCameraSet(module);
+                value = new CameraDalsa(module.p_id + "." + id, module.m_log, m_memoryTool);
+                module.m_cameraSet.Add(value);
+            }
+            return "OK";
+        }
+
         public string Get(ref Camera_Basler value, ModuleBase module, string id)
         {
             if (value == null)
