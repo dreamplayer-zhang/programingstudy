@@ -18,7 +18,7 @@ namespace Root.Module
         }
         #region ToolBox
         MemoryPool m_memoryPool;
-        Camera_Dalsa[] m_camDalsa = new Camera_Dalsa[3]; 
+        CameraDalsa[] m_camDalsa = new CameraDalsa[3]; 
         CameraBasler[] m_camBasler = new CameraBasler[3];
         public override void GetTools(bool bInit)
         {
@@ -32,7 +32,6 @@ namespace Root.Module
             {
                 p_sInfo = m_toolBox.Get(ref m_camBasler[(int)cam], this, "Basler " + cam.ToString());
             }
-            if (bInit) InitMemory(); 
         }
         #endregion
 
@@ -45,10 +44,11 @@ namespace Root.Module
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {
                 m_memDalsa[(int)cam] = m_memoryGroup.CreateMemory("Dalsa " + cam.ToString(), 1, 1, m_szDalsaGrab);
+                m_camDalsa[(int)cam].SetMemoryData(m_memBasler[(int)cam]); 
             }
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {
-                m_memBasler[(int)cam] = m_memoryGroup.CreateMemory("Basler " + cam.ToString(), 1, 1, m_camBasler[(int)cam].p_sz);
+                m_memBasler[(int)cam] = m_memoryGroup.CreateMemory("Basler " + cam.ToString(), m_nBaslerGrab, m_camBasler[(int)cam].p_nByte, m_camBasler[(int)cam].p_sz);
                 m_camBasler[(int)cam].SetMemoryData(m_memBasler[(int)cam]); 
             }
         }
@@ -57,6 +57,12 @@ namespace Root.Module
         void RunTreeDalsa(Tree tree)
         {
             m_szDalsaGrab = tree.Set(m_szDalsaGrab, m_szDalsaGrab, "Grab Size", "Dalsa Grab Size (pixel)"); 
+        }
+
+        int m_nBaslerGrab = 10; 
+        void RunTreeBasler(Tree tree)
+        {
+            m_nBaslerGrab = tree.Set(m_nBaslerGrab, m_nBaslerGrab, "Grab Count", "Basler Continuous Grab Count");
         }
         #endregion
 
@@ -70,12 +76,14 @@ namespace Root.Module
         {
             base.RunTree(tree);
             RunTreeDalsa(tree.GetTree("Dalsa", false));
+            RunTreeBasler(tree.GetTree("Basler", false));
         }
         #endregion
 
         public Siltron(string id, IEngineer engineer)
         {
-            base.InitBase(id, engineer); 
+            base.InitBase(id, engineer);
+            InitMemory(); 
         }
 
         public override void ThreadStop()
