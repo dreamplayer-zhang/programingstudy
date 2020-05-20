@@ -1,10 +1,12 @@
 ﻿using RootTools;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
+using RootTools.Control;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 
 namespace Root.Module
 {
@@ -17,39 +19,47 @@ namespace Root.Module
             Bottom
         }
         #region ToolBox
+        Axis m_axisRotate;
+        AxisXY m_axisXZ; 
         MemoryPool m_memoryPool;
-        CameraDalsa[] m_camDalsa = new CameraDalsa[3]; 
-        CameraBasler[] m_camBasler = new CameraBasler[3];
+        CameraDalsa[] m_aCamDalsa = new CameraDalsa[3]; 
+        CameraBasler[] m_aCamBasler = new CameraBasler[3];
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
+            p_sInfo = m_toolBox.Get(ref m_axisXZ, this, "Camera XZ"); 
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {
-                p_sInfo = m_toolBox.Get(ref m_camDalsa[(int)cam], this, "Dalsa " + cam.ToString()); 
+                p_sInfo = m_toolBox.Get(ref m_aCamDalsa[(int)cam], this, "Dalsa " + cam.ToString()); 
             }
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {
-                p_sInfo = m_toolBox.Get(ref m_camBasler[(int)cam], this, "Basler " + cam.ToString());
+                p_sInfo = m_toolBox.Get(ref m_aCamBasler[(int)cam], this, "Basler " + cam.ToString());
             }
         }
         #endregion
 
         #region Memory
         MemoryGroup m_memoryGroup;
-        MemoryData[] m_memDalsa = new MemoryData[3];
-        MemoryData[] m_memBasler = new MemoryData[3];
+        Dictionary<eCam, CameraDalsa> m_camDalsa = new Dictionary<eCam, CameraDalsa>();
+        Dictionary<eCam, CameraBasler> m_camBasler = new Dictionary<eCam, CameraBasler>();
+        Dictionary<eCam, MemoryData> m_memDalsa = new Dictionary<eCam, MemoryData>();
+        Dictionary<eCam, MemoryData> m_memBasler = new Dictionary<eCam, MemoryData>();
         void InitMemory()
         {
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {
-                m_memDalsa[(int)cam] = m_memoryGroup.CreateMemory("Dalsa " + cam.ToString(), 1, 1, m_szDalsaGrab);
-                m_camDalsa[(int)cam].SetMemoryData(m_memBasler[(int)cam]); 
+                m_camDalsa.Add(cam, m_aCamDalsa[(int)cam]);
+                m_memDalsa.Add(cam, m_memoryGroup.CreateMemory(m_camDalsa[cam].p_id, 1, m_camDalsa[cam].p_nByte, m_szDalsaGrab));
+                m_camDalsa[cam].SetMemoryData(m_memDalsa[cam]);
             }
             foreach (eCam cam in Enum.GetValues(typeof(eCam)))
             {
-                m_memBasler[(int)cam] = m_memoryGroup.CreateMemory("Basler " + cam.ToString(), m_nBaslerGrab, m_camBasler[(int)cam].p_nByte, m_camBasler[(int)cam].p_sz);
-                m_camBasler[(int)cam].SetMemoryData(m_memBasler[(int)cam]); 
+                m_camBasler.Add(cam, m_aCamBasler[(int)cam]);
+                m_memBasler.Add(cam, m_memoryGroup.CreateMemory(m_camBasler[cam].p_id, m_nBaslerGrab, m_camBasler[cam].p_nByte, m_aCamBasler[(int)cam].p_sz));
+                m_camBasler[cam].SetMemoryData(m_memBasler[cam]);
             }
         }
 
