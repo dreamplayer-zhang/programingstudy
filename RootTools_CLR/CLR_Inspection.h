@@ -31,7 +31,7 @@ namespace RootTools_CLR
 			delete pInspReticle;
 		}
 
-		array<DefectData^>^ SurfaceInspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
+		array<DefectData^>^ SurfaceInspection(int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -65,7 +65,7 @@ namespace RootTools_CLR
 				{
 					local[i] = gcnew DefectData();
 					local[i]->nIdx = vTempResult[i].nIdx;
-					local[i]->nClassifyCode = vTempResult[i].nClassifyCode;
+					local[i]->nClassifyCode = nDefectCode;//vTempResult[i].nClassifyCode;
 					local[i]->fSize = vTempResult[i].fSize;
 					local[i]->nLength = vTempResult[i].nLength;
 					local[i]->nWidth = vTempResult[i].nWidth;
@@ -79,7 +79,7 @@ namespace RootTools_CLR
 
 			return local;
 		}
-		array<DefectData^>^ StripInspection(int threadindex, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
+		array<DefectData^>^ StripInspection(int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -108,7 +108,7 @@ namespace RootTools_CLR
 				{
 					local[i] = gcnew DefectData();
 					local[i]->nIdx = vTempResult[i].nIdx;
-					local[i]->nClassifyCode = vTempResult[i].nClassifyCode;
+					local[i]->nClassifyCode = nDefectCode;//vTempResult[i].nClassifyCode;
 					local[i]->fSize = vTempResult[i].fSize;
 					local[i]->nLength = vTempResult[i].nLength;
 					local[i]->nWidth = vTempResult[i].nWidth;

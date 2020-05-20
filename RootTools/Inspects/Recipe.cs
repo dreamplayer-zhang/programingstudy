@@ -154,7 +154,65 @@ namespace RootTools.Inspects
 
 		}
 	}
-	public class SurfaceParamData : ObservableObject
+	public class BaseParamData : ObservableObject
+	{
+		#region p_GV
+		protected Param<int> GV;
+		public int p_GV
+		{
+			get
+			{
+				return GV._value;
+			}
+			set
+			{
+				if (GV._value == value)
+					return;
+				GV._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region p_DefectSize
+		protected Param<int> DefectSize;
+		public int p_DefectSize
+		{
+			get
+			{
+				return DefectSize._value;
+			}
+			set
+			{
+				if (DefectSize._value == value)
+					return;
+				DefectSize._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region TargetLabelText
+		protected string _TargetLabelText;
+		public string TargetLabelText
+		{
+			get
+			{
+				return _TargetLabelText;
+			}
+			set
+			{
+				if (_TargetLabelText != value)
+				{
+					_TargetLabelText = value;
+					RaisePropertyChanged();
+				}
+			}
+		}
+
+		#endregion
+	}
+	public class SurfaceParamData : BaseParamData
 	{
 		public SurfaceParamData()
 		{
@@ -201,64 +259,8 @@ namespace RootTools.Inspects
 			}
 		}
 		#endregion
-
-		#region p_GV
-		Param<int> GV;
-		public int p_GV
-		{
-			get
-			{
-				return GV._value;
-			}
-			set
-			{
-				if (GV._value == value)
-					return;
-				GV._value = value;
-				RaisePropertyChanged();
-			}
-		}
-		#endregion
-
-		#region p_DefectSize
-		Param<int> DefectSize;
-		public int p_DefectSize
-		{
-			get
-			{
-				return DefectSize._value;
-			}
-			set
-			{
-				if (DefectSize._value == value)
-					return;
-				DefectSize._value = value;
-				RaisePropertyChanged();
-			}
-		}
-		#endregion
-
-		#region TargetLabelText
-		string _TargetLabelText;
-		public string TargetLabelText
-		{
-			get
-			{
-				return _TargetLabelText;
-			}
-			set
-			{
-				if (_TargetLabelText != value)
-				{
-					_TargetLabelText = value;
-					RaisePropertyChanged();
-				}
-			}
-		}
-
-		#endregion
 	}
-	public class StripParamData : ObservableObject
+	public class StripParamData : BaseParamData
 	{
 		public StripParamData()
 		{
@@ -268,62 +270,6 @@ namespace RootTools.Inspects
 			intensity = new Param<int>(120, 0, int.MaxValue);
 			TargetLabelText = "GV";//Strip은 무조건 절대검사
 		}
-
-		#region p_GV
-		Param<int> GV;
-		public int p_GV
-		{
-			get
-			{
-				return GV._value;
-			}
-			set
-			{
-				if (GV._value == value)
-					return;
-				GV._value = value;
-				RaisePropertyChanged();
-			}
-		}
-		#endregion
-
-		#region p_DefectSize
-		Param<int> DefectSize;
-		public int p_DefectSize
-		{
-			get
-			{
-				return DefectSize._value;
-			}
-			set
-			{
-				if (DefectSize._value == value)
-					return;
-				DefectSize._value = value;
-				RaisePropertyChanged();
-			}
-		}
-		#endregion
-
-		#region TargetLabelText
-		string _TargetLabelText;
-		public string TargetLabelText
-		{
-			get
-			{
-				return _TargetLabelText;
-			}
-			set
-			{
-				if (_TargetLabelText != value)
-				{
-					_TargetLabelText = value;
-					RaisePropertyChanged();
-				}
-			}
-		}
-
-		#endregion
 
 		#region p_Intensity
 		Param<int> intensity;

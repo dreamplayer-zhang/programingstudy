@@ -198,8 +198,11 @@ namespace RootTools.Inspects
 			return p_qInspection.Count;
 		}
 
-		public void AddInspection(InspectionProperty _property)//(in InspectionProperty _property) //2013 in 안됨
+		public void AddInspection(InspectionProperty _property, bool bDefectMerge, int nMergeDistance)//(in InspectionProperty _property) //2013 in 안됨
 		{
+			_property.p_bDefectMerge = bDefectMerge;
+			_property.p_nMergeDistance = nMergeDistance;
+
 			p_qInspection.Enqueue(_property);
 		}
 
@@ -207,7 +210,7 @@ namespace RootTools.Inspects
 		{
 			p_qInspection.Clear();
 		}
-		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, SurfaceParamData param)
+		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, SurfaceParamData param, bool bDefectMerge, int nMergeDistance)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -261,9 +264,9 @@ namespace RootTools.Inspects
 
 						CRect inspblock = new CRect(sx, sy, ex, ey);
 						ip.p_Rect = inspblock;
-						ip.p_Sur_Param = param;
+						ip.p_surfaceParam = param;
 						ip.p_index = blockcount;
-						AddInspection(ip);
+						AddInspection(ip, bDefectMerge, nMergeDistance);
 						blockcount++;
 
 						inspblocklist.Add(inspblock);
@@ -276,7 +279,7 @@ namespace RootTools.Inspects
 			return inspblocklist;
 
 		}
-		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, StripParamData param)
+		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, StripParamData param, bool bDefectMerge, int nMergeDistance)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -325,7 +328,7 @@ namespace RootTools.Inspects
 						ip.p_Rect = inspblock;
 						ip.p_StripParam = param;
 						ip.p_index = blockcount;
-						AddInspection(ip);
+						AddInspection(ip, bDefectMerge, nMergeDistance);
 						blockcount++;
 
 						inspblocklist.Add(inspblock);
@@ -438,16 +441,41 @@ namespace RootTools.Inspects
 				SetProperty(ref Rect, value);
 			}
 		}
-		SurfaceParamData Sur_Param;
-		public SurfaceParamData p_Sur_Param
+		public int m_nDefectCode;
+		bool bDefectMerge;
+		public bool p_bDefectMerge
 		{
 			get
 			{
-				return Sur_Param;
+				return bDefectMerge;
 			}
 			set
 			{
-				SetProperty(ref Sur_Param, value);
+				SetProperty(ref bDefectMerge, value);
+			}
+		}
+		int nMergeDistance;
+		public int p_nMergeDistance
+		{
+			get
+			{
+				return nMergeDistance;
+			}
+			set
+			{
+				SetProperty(ref nMergeDistance, value);
+			}
+		}
+		SurfaceParamData surfaceParam;
+		public SurfaceParamData p_surfaceParam
+		{
+			get
+			{
+				return surfaceParam;
+			}
+			set
+			{
+				SetProperty(ref surfaceParam, value);
 			}
 		}
 		StripParamData stripParam;
