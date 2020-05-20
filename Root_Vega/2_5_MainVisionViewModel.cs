@@ -238,7 +238,28 @@ namespace Root_Vega
 		}
 
 		#region Property
-
+		public RecipeData p_RecipeData
+		{
+			get
+			{
+				if (m_Recipe.p_RecipeData != null)
+				{
+					return m_Recipe.p_RecipeData;
+				}
+				else
+				{
+					return new RecipeData();
+				}
+			}
+			set
+			{
+				if (m_Recipe.p_RecipeData != null)
+				{
+					m_Recipe.p_RecipeData = value;
+					RaisePropertyChanged();
+				}
+			}
+		}
 		public StripParamData p_StripParamData
 		{
 			get
@@ -521,15 +542,16 @@ namespace Root_Vega
 			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Strip.m_NonPattern[0].m_rt;
 			int nblocksize = 500;
 
+			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize, 
+				p_Recipe.p_RecipeData.p_Roi[0].m_Strip.p_Parameter[0],
+				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance);
 
-			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize, p_Recipe.p_RecipeData.p_Roi[0].m_Strip.p_Parameter[0]);
+			//for (int i = 0; i < DrawRectList.Count; i++)
+			//{
+			//	CRect inspblock = DrawRectList[i];
+			//	m_DD.AddRectData(inspblock, System.Drawing.Color.Orange);
 
-			for (int i = 0; i < DrawRectList.Count; i++)
-			{
-				CRect inspblock = DrawRectList[i];
-				m_DD.AddRectData(inspblock, System.Drawing.Color.Orange);
-
-			}
+			//}
 			System.Diagnostics.Debug.WriteLine("Start Insp");
 
 			inspDefaultDir = @"C:\vsdb";

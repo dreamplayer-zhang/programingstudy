@@ -238,14 +238,14 @@ namespace Root_Vega
 		//    }
 		//}
 
-		public SurFace_ParamData p_SurFace_ParamData
+		public SurfaceParamData p_SurFace_ParamData
 		{
 			get
 			{
 				if (m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.p_Parameter.Count != 0)
 					return m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.p_Parameter[0];
 				else
-					return new SurFace_ParamData();
+					return new SurfaceParamData();
 			}
 			set
 			{
@@ -484,7 +484,9 @@ namespace Root_Vega
 			int nblocksize = 500;
 
 
-			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize, p_Recipe.p_RecipeData.p_Roi[0].m_Surface.p_Parameter[0]);
+			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
+				p_Recipe.p_RecipeData.p_Roi[0].m_Surface.p_Parameter[0],
+				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance);
 
 			for (int i = 0; i < DrawRectList.Count; i++)
 			{
