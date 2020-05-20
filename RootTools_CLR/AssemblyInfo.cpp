@@ -6,12 +6,12 @@ using namespace System::Runtime::CompilerServices;
 using namespace System::Runtime::InteropServices;
 using namespace System::Security::Permissions;
 
-[assembly:AssemblyTitleAttribute(L"RootToolsCLR")];
+[assembly:AssemblyTitleAttribute(L"RootTools CLR")];
 [assembly:AssemblyDescriptionAttribute(L"")];
 [assembly:AssemblyConfigurationAttribute(L"")];
-[assembly:AssemblyCompanyAttribute(L"")];
-[assembly:AssemblyProductAttribute(L"RootToolsCLR")];
-[assembly:AssemblyCopyrightAttribute(L"Copyright (C)  2019")];
+[assembly:AssemblyCompanyAttribute(L"Advanced Technology Inc.")];
+[assembly:AssemblyProductAttribute(L"RootTools CLR")];
+[assembly:AssemblyCopyrightAttribute(L"Copyright (C) Advanced Technology Inc. 2020")];
 [assembly:AssemblyTrademarkAttribute(L"")];
 [assembly:AssemblyCultureAttribute(L"")];
 

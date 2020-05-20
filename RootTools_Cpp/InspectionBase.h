@@ -5,7 +5,6 @@
 #include <assert.h>
 #include "Constants.h"
 #include "PitSizer.h"
-//#include "Cpp_DB.h"
 #include "Functions.h"
 #include "TypeDefines.h"
 #include <vector>
@@ -17,12 +16,9 @@ public :
 	void CopyImageToBuffer(bool bDark);
 	void CheckConditions() const;
 protected:
-	//virtual bool Inspection() = 0;
 
 	int m_nInspOffset = 10;
-	//byte inspbuffer[2000][2000];
-	//byte* inspbuffer2;
-		byte inspbuffer[2000][2000];
+	byte inspbuffer[2000][2000];
 	byte inspbuffer2[16000000];
 	RECT inspbufferROI;
 	RECT GetInspbufferROI() const;
@@ -94,7 +90,6 @@ private:
 	
 
 	bool bResult;
-	POINT m_ptCurrent;
 	int dbcount;
 
 private:
@@ -111,6 +106,6 @@ private:
 	bool bDarkInspection;
 
 public:
-	InspectionBase();
+	InspectionBase(int nWidth, int nHeight);
 	virtual ~InspectionBase();
 };

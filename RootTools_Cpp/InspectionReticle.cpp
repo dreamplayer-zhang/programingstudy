@@ -64,15 +64,6 @@ std::vector<DefectDataStruct> CInspectionReticle::StripInspection(int nBandwidth
 	return vResult;
 }
 
-CInspectionReticle::CInspectionReticle()
-{
-	SetDefectCode(100);
-}
-
-CInspectionReticle::~CInspectionReticle()
-{
-}
-
 int CInspectionReticle::CalHPPatternGV(int nBandwidth, int nIntensity, int nW, int nH)
 {
 	memset(m_Histogram, 0, 256 * sizeof(int));
@@ -104,4 +95,8 @@ int CInspectionReticle::CalHPPatternGV(int nBandwidth, int nIntensity, int nW, i
 	}
 
 	return nPL;
+}
+
+CInspectionReticle::CInspectionReticle(int nWidth, int nHeight) : CInspectionSurface(nWidth, nHeight)
+{
 }

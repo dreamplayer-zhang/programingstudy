@@ -3,55 +3,15 @@
 
 namespace RootTools_CLR
 {
-	//CLR_InspConnector::CLR_InspConnector()
-	//{
-	//	ProcessorNum = 0;
-	//	m_InspReticle = new InspSurface_Reticle();
-	//	m_DBmgr = new Cpp_DB();
-	//	
-
-	//	SetInitData();
-	//}
 	CLR_InspConnector::CLR_InspConnector(int processornum)
 	{
 		ProcessorNum = processornum;
-		//m_InspReticle = new InspSurface_Reticle(ProcessorNum);
-		//m_DBmgr = new Cpp_DB();
-
-
 		SetInitData();
 	}
 	void CLR_InspConnector::SetInitData()
 	{
 		ImgPool_Width = 40000;
 		ImgPool_Height = 40000;
-
-
-		//m_ptCurrent.x = -1;//ref class 에서는 POINT 사용 불가
-		//m_ptCurrent.y = 0;//ref class 에서는 POINT 사용 불가
-
-		/*bIP = false;
-		bIP = false;
-		nPatternInterpolationOffset = 2.0;
-
-		nDarkPitLevel = 60;
-		nDarkPitSize = 5;
-		bLengthInsp = false;
-
-		nBandwidth = 10;
-		nIntensity = 120;
-
-		nBandwidth_Shadow = 10;
-		nIntensity_Shadow = 120;
-		nBandwidth_OutShadow = 10;
-		nIntensity_OutShadow = 120;
-
-		nBandwidth_EdgeArea = 10;
-		nIntensity_EdgeArea = 120;
-
-		nDarkBandwidthPitSize = 5;
-
-		nInspOffset = 10;*/
 	}
 	CLR_InspConnector::~CLR_InspConnector()
 	{
@@ -66,8 +26,6 @@ namespace RootTools_CLR
 	{
 		ImgPool_Width = pool_w;
 		ImgPool_Height = pool_h;
-		//memory 이름 하드코딩
-		//std::string mmfName = "pool";
 		std::string mmfName = memoryname;
 		std::wstring t;
 		t.assign(mmfName.begin(), mmfName.end());
@@ -77,56 +35,6 @@ namespace RootTools_CLR
 
 
 	}
-	/*bool CLR_InspConnector::SetParam_Common()
-	{
-
-
-		return true;
-	}*/
-	/*bool CLR_InspConnector::SetParam_Strip(bool bip, bool bip_2nd, double bipoffset, int darkpitlevel, int darkpitsize, bool lengthinsp, 
-		int bandwidth, int intensity, int bandwidth_shadow, int intensity_shadow, int bandwidth_outshadow, int intensity_outshadow,
-		int bandwidth_edge, int intensity_edge, int bandwidth_darkpit, int inspoffset)
-	{
-		m_ptCurrent.x = -1;
-		m_ptCurrent.y = 0;
-
-		bIP = bip;
-		bIP = bip_2nd;
-		nPatternInterpolationOffset = bipoffset;
-
-		nDarkPitLevel = darkpitlevel;
-		nDarkPitSize = darkpitsize;
-		bLengthInsp = lengthinsp;
-		
-		nBandwidth = bandwidth;
-		nIntensity = intensity;
-
-		nBandwidth_Shadow = bandwidth_shadow;
-		nIntensity_Shadow = intensity_shadow;
-		nBandwidth_OutShadow = bandwidth_outshadow;
-		nIntensity_OutShadow = intensity_outshadow;
-
-		nBandwidth_EdgeArea = bandwidth_edge;
-		nIntensity_EdgeArea = intensity_edge;
-
-		nDarkBandwidthPitSize = bandwidth_darkpit;
-
-		nInspOffset = inspoffset;
-
-		return true;
-	}
-	bool CLR_InspConnector::SetParam_Normal()
-	{
-
-
-		return true;
-	}*/
-	/*bool CLR_InspConnector::NormalRun()
-	{
-
-
-		return true;
-	}*/
 	/// <summary>
 	/// 실제 suface 검사를 진행
 	/// InspArea : 검사 진행할 block의 좌표 정보

@@ -163,28 +163,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Constants.h" />
-    <ClInclude Include="Cpp_Demo.h" />
-    <ClInclude Include="Cpp_Memory.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Functions.h" />
-    <ClInclude Include="InspBase.h" />
     <ClInclude Include="InspectionBase.h" />
     <ClInclude Include="InspectionReticle.h" />
     <ClInclude Include="InspectionSurface.h" />
-    <ClInclude Include="InspSurface.h" />
     <ClInclude Include="IP.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PitSizer.h" />
     <ClInclude Include="TypeDefines.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Cpp_Demo.cpp" />
-    <ClCompile Include="Cpp_Memory.cpp" />
-    <ClCompile Include="InspBase.cpp" />
     <ClCompile Include="InspectionBase.cpp" />
     <ClCompile Include="InspectionReticle.cpp" />
     <ClCompile Include="InspectionSurface.cpp" />
-    <ClCompile Include="InspSurface.cpp" />
     <ClCompile Include="IP.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -193,7 +185,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PitSizer.cpp" />
-    <ClCompile Include="RootTools_Cpp.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

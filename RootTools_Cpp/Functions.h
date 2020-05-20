@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdio>
-//#include <mutex>  // vs2013 에서 컴파일 안되서 주석
 #include <memory>
 
 
