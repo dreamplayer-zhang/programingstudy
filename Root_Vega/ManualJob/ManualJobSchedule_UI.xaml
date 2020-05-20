@@ -24,8 +24,8 @@
         </Grid>
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="7*"/>
-                <RowDefinition Height="3*"/>
+                <RowDefinition Height="8*"/>
+                <RowDefinition Height="2*"/>
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Margin="10">
                 <TextBlock Text="Recipe ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
@@ -36,6 +36,8 @@
                 <TextBox x:Name="tbPodID" Height="23" Margin="5" Text="{Binding p_sPodID}" VerticalAlignment="Center" TextAlignment="Left"/>
                 <TextBlock Text="Lot ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
                 <TextBox x:Name="tbLotID" Height="23" Margin="5" Text="{Binding p_sLotID}" VerticalAlignment="Center" TextAlignment="Left"/>
+                <TextBlock Text="Reticle ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
+                <TextBox x:Name="tbReticleID" Height="23" Margin="5" Text="{Binding p_sReticleID}" VerticalAlignment="Center" TextAlignment="Left"/>
             </StackPanel>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>

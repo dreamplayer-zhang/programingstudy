@@ -17,7 +17,6 @@ namespace Root_Vega
         public _1_2_LoadPort()
         {
             InitializeComponent();
-            manualjob = new ManualJobSchedule();
         }
 
         Loadport m_loadport; 
@@ -34,6 +33,8 @@ namespace Root_Vega
             m_timer.Interval = TimeSpan.FromMilliseconds(20);
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
+
+            manualjob = new ManualJobSchedule(m_loadport.p_id, m_loadport.m_log);
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
