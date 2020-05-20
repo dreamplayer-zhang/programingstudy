@@ -36,17 +36,14 @@ namespace RootTools_CLR
 		PitSizer* m_PitSizer = nullptr;
 		//Cpp_DB*  m_pDB = nullptr;
 		//InspSurface_Reticle* m_Reticle = nullptr;
-		CLR_InspConnector* m_InspConn = nullptr;
+		CLR_InspConnector^ m_InspConn = nullptr;
 		CInspectionSurface* pInspSurface = nullptr;
 		CInspectionReticle* pInspReticle = nullptr;
 	public:
-		CLR_Inspection()
+		CLR_Inspection(int nThreadNum)
 		{
-			//m_pDemo = new Cpp_Demo();
 			m_PitSizer = new PitSizer(2048 * 2048, 1);
-			//m_pDB = new Cpp_DB();
-			//m_Reticle = new InspSurface_Reticle();
-			m_InspConn = new CLR_InspConnector();
+			m_InspConn = gcnew CLR_InspConnector(nThreadNum);
 			pInspSurface = new CInspectionSurface();
 			pInspReticle = new CInspectionReticle();
 		}

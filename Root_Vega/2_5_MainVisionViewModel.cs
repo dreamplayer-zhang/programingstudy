@@ -59,9 +59,9 @@ namespace Root_Vega
 			Init(engineer, dialogService);
 
 			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
-			m_Engineer.m_InspManager.InspectionComplete += (type) =>
+			m_Engineer.m_InspManager.InspectionComplete += (nDCode) =>
 			{
-				if (type != InspectionType.Strip)
+				if (InspectionManager.GetInspectionType(nDCode) != InspectionType.Strip)
 				{
 					return;
 				}
@@ -105,10 +105,11 @@ namespace Root_Vega
 				VSDBManager.SetDataTable(VSDataDT);
 				VSDBManager.Disconnect();
 				//Data Table 저장 완료
+				m_Engineer.m_InspManager.Dispose();
 			};
-			m_Engineer.m_InspManager.InspectionStart += (type) =>
+			m_Engineer.m_InspManager.InspectionStart += (nDCode) =>
 			{
-				if (type != InspectionType.Strip)
+				if (InspectionManager.GetInspectionType(nDCode) != InspectionType.Strip)
 				{
 					return;
 				}
@@ -135,9 +136,9 @@ namespace Root_Vega
 		/// </summary>
 		/// <param name="source">UI에 추가할 Defect List</param>
 		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
-		private void M_InspManager_AddDefect(DefectData[] source, InspectionType type)
+		private void M_InspManager_AddDefect(DefectData[] source, int nDCode)
 		{
-			if (type != InspectionType.Strip)
+			if (InspectionManager.GetInspectionType(nDCode) != InspectionType.Strip)
 			{
 				return;
 			}
@@ -540,15 +541,12 @@ namespace Root_Vega
 			var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
 			string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
 
-			if (VSDBManager == null)
-			{
-				VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
-			}
-			else if (VSDBManager.IsConnected)
+			if (VSDBManager != null && VSDBManager.IsConnected)
 			{
 				VSDBManager.Disconnect();
-				VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
 			}
+			VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+
 			if (VSDBManager.Connect())
 			{
 				VSDBManager.CreateTable("Datainfo");
@@ -557,8 +555,8 @@ namespace Root_Vega
 				VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
 				VSDataDT = VSDBManager.GetDataTable("Data");
 			}
-
-			m_Engineer.m_InspManager.StartInspection(InspectionType.Strip, m_Image.p_Size.X, m_Image.p_Size.Y);
+			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
+			m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
 
 			return;
 		}

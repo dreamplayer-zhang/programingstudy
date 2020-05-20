@@ -8,6 +8,7 @@
              xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:Dalsa="clr-namespace:RootTools.Camera.Dalsa;assembly=RootTools"
              xmlns:Axis="clr-namespace:RootTools.Control.Ajin;assembly=RootTools"
+             xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
              mc:Ignorable="d"
              d:DesignHeight="726"
@@ -19,6 +20,7 @@
         <Converter:AjinAxisToIAxis x:Key="AjinAxisToIAxiss" />
         <Converter:DictionaryItemKeysConverter x:Key="DictionaryItemKeysConverters" />
         <Axis:DictionaryItemGetPosConverter x:Key="DictionaryItemGetPosConverters" />
+        <Converter:PositionScalingConverter x:Key="PositionScalingConverters"/>
         <Style TargetType="{x:Type TabControl}"
                x:Key="StackPanelTabControl">
             <Setter Property="Template">
@@ -1032,7 +1034,10 @@
                                 <ColumnDefinition Width="40"></ColumnDefinition>
                                 <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Canvas>
+                            <Canvas x:Name="StageCanvas"
+                                    obs:SizeObserver.Observe="true"
+                                    obs:SizeObserver.ObservedWidth="{Binding p_dStageCanvasWidth, Mode=OneWayToSource}"
+                                    obs:SizeObserver.ObservedHeight="{Binding p_dStageCanvasHeight, Mode=OneWayToSource}">
                                 <Canvas.Background>
                                     <VisualBrush TileMode="Tile"
                                                  Viewport="0 0 30 30"
@@ -1050,13 +1055,30 @@
                                 </Canvas.Background>
                                 <Rectangle Fill="Gray"
                                            Opacity="1"
-                                           Canvas.Left="319"
-                                           Height="301"
-                                           Width="50" />
-                                <Grid Canvas.Left="104"
-                                      Canvas.Top="93">
+                                           Width="50"
+                                           Height="{Binding ActualHeight, ElementName=StageCanvas}"
+                                           Canvas.Right="0"/>
+                                <Grid Canvas.Top="125"
+                                      RenderTransformOrigin="0.5, 0.5">
+                                    <Canvas.Left>
+                                        <MultiBinding Converter="{StaticResource PositionScalingConverters}"
+                                                      ConverterParameter="AxisX">
+                                            <Binding Path="p_SideVision.p_axisXY.p_axisX"></Binding>
+                                            <Binding Path="ActualWidth" ElementName="StageCanvas"></Binding>
+                                            <Binding Path="p_SideVision.p_axisXY.p_axisX.p_posActual"></Binding>
+                                        </MultiBinding>
+                                    </Canvas.Left>
                                     <Grid.RenderTransform>
-                                        <RotateTransform Angle="{Binding }" />
+                                        <RotateTransform>
+                                            <RotateTransform.Angle>
+                                                <MultiBinding Converter="{StaticResource PositionScalingConverters}"
+                                                              ConverterParameter="AxisTheta">
+                                                    <Binding Path="p_SideVision.p_axisTheta.p_axis"></Binding>
+                                                    <Binding Path="ActualWidth" ElementName="StageCanvas"></Binding>
+                                                    <Binding Path="p_SideVision.p_axisTheta.p_axis.p_posActual"></Binding>
+                                                </MultiBinding>
+                                            </RotateTransform.Angle>
+                                        </RotateTransform>
                                     </Grid.RenderTransform>
                                     <Rectangle Fill="White"
                                                Opacity="0.5"
@@ -1066,43 +1088,62 @@
                                                Width="10"
                                                Margin="40,0,0,0" />
                                 </Grid>
-                                <material:PackIcon Kind="Camera"
-                                                   Foreground="White"
-                                                   Height="50"
-                                                   Width="50"
-                                                   Opacity="0.7"
-                                                   Canvas.Left="258" />
-                                <material:PackIcon Kind="Camera"
-                                                   Foreground="White"
-                                                   Height="50"
-                                                   Width="50"
-                                                   Opacity="0.7"
-                                                   Canvas.Left="259"
-                                                   Canvas.Top="69" />
-                                <Rectangle Fill="White"
-                                           Opacity="0.5"
-                                           Canvas.Left="287"
-                                           Height="119"
-                                           Width="32" />
-                                <!--<Ellipse Fill="Black"
-                                         Opacity="0.3"
-                                         Canvas.Left="170"
-                                         Canvas.Top="135"
-                                         Height="50"
-                                         Width="50"></Ellipse>-->
+                                <Grid Canvas.Right="50"
+                                      Height="100">
+                                    <Canvas.Top>
+                                        <MultiBinding Converter="{StaticResource PositionScalingConverters}"
+                                                      ConverterParameter="AxisY">
+                                            <Binding Path="p_SideVision.p_axisXY.p_axisY"></Binding>
+                                            <Binding Path="ActualHeight" ElementName="StageCanvas"></Binding>
+                                            <Binding Path="p_SideVision.p_axisXY.p_axisY.p_posActual"></Binding>
+                                        </MultiBinding>
+                                    </Canvas.Top>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <material:PackIcon Grid.Row="0"
+                                                       Kind="Camera"
+                                                       Foreground="White"
+                                                       Height="50"
+                                                       Width="50"
+                                                       Opacity="0.7"/>
+                                    <material:PackIcon Grid.Row="1"
+                                                       Kind="Camera"
+                                                       Foreground="White"
+                                                       Height="50"
+                                                       Width="50"
+                                                       Opacity="0.7"/>
+                                    <Rectangle Grid.RowSpan="2"
+                                               Fill="White"
+                                               Opacity="0.5"
+                                               Width="30"
+                                               HorizontalAlignment="Right"/>
+                                </Grid>
                             </Canvas>
                             <Canvas Grid.Column="1"
-                                    x:Name="CanvasZ">
+                                    x:Name="ZCanvas"
+                                    obs:SizeObserver.Observe="true"
+                                    obs:SizeObserver.ObservedWidth="{Binding p_dZCanvasWidth, Mode=OneWayToSource}"
+                                    obs:SizeObserver.ObservedHeight="{Binding p_dZCanvasHeight, Mode=OneWayToSource}">
                                 <Rectangle Width="40"
                                            Height="20"
                                            Fill="HotPink"></Rectangle>
                                 <material:PackIcon Kind="Camera"
                                                    Foreground="White"
-                                                   Canvas.Top="150"
                                                    HorizontalAlignment="Center"
                                                    Canvas.Left="5"
                                                    Height="30"
-                                                   Width="30"></material:PackIcon>
+                                                   Width="30">
+                                    <Canvas.Bottom>
+                                        <MultiBinding Converter="{StaticResource PositionScalingConverters}"
+                                                      ConverterParameter="AxisZ">
+                                            <Binding Path="p_SideVision.p_axisZ.p_axis"></Binding>
+                                            <Binding Path="ActualHeight" ElementName="ZCanvas"></Binding>
+                                            <Binding Path="p_SideVision.p_axisZ.p_axis.p_posActual"></Binding>
+                                        </MultiBinding>
+                                    </Canvas.Bottom>
+                                </material:PackIcon>
                             </Canvas>
                             <Grid Grid.Column="2">
                                 <Grid.RowDefinitions>
