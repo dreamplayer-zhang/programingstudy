@@ -1,6 +1,7 @@
 ﻿using RootTools_CLR;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.ServiceModel.Configuration;
@@ -160,7 +161,7 @@ namespace RootTools.Inspects
 					if (arrDefects[i].nClassifyCode != arrDefects[j].nClassifyCode)
 						continue;
 
-					if (CheckDistance(arrDefects[i], arrDefects[j], nMergeDistance))
+					if (CheckMerge(arrDefects[i], arrDefects[j], nMergeDistance))
 					{
 						arrDefects[i] = MergeDefectInformation(arrDefects[i], arrDefects[j]);
 						arrDefects[j].bMergeUsed = true;
@@ -196,10 +197,34 @@ namespace RootTools.Inspects
 			return result;
 		}
 
-		private bool CheckDistance(DefectData data1, DefectData data2, int distance)
+		private bool CheckMerge(DefectData data1, DefectData data2, int distance)
 		{
+			int data1Width = data1.nWidth + (distance * 2);
+			int data1Height = data1.nHeight + (distance * 2);
+			Rectangle data1Rect = new Rectangle(
+				Convert.ToInt32(data1.fPosX - data1Width / 2.0),
+				Convert.ToInt32(data1.fPosY - data1Height / 2.0),
+				data1Width,
+				data1Height);
+
+			int data2Width = data2.nWidth + (distance * 2);
+			int data2Height = data2.nHeight + (distance * 2);
+			Rectangle data2Rect = new Rectangle(
+				Convert.ToInt32(data2.fPosX - data2Width / 2.0),
+				Convert.ToInt32(data2.fPosY - data2Height / 2.0),
+				data2Width,
+				data2Height);
+			var result = Rectangle.Intersect(data1Rect, data2Rect);
+			if(result.IsEmpty)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
 			//return Convert.ToInt32(Math.Sqrt(Math.Pow(data1.fPosX - data2.fPosX, 2.0) + Math.Pow(data1.fPosY - data2.fPosY, 2.0)));//TODO : 사각형 두개가 겹치는지를 확인하여 return
-			return true;//그냥 Merge가 되는지 안되는지 출력하기위해 강제로 true return
+			//return true;//그냥 Merge가 되는지 안되는지 출력하기위해 강제로 true return
 		}
 
 		public enum InspectionState
