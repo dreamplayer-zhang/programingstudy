@@ -682,6 +682,7 @@ namespace Root_Vega.Module
                         m_module.p_axisXY.p_axisY.SetTrigger(yPos1, yTrigger1, m_grabMode.m_dTrigger, true);
 
                         /* 메모리 위치도 가져오게는 좀 다시 하자.*/
+
                         string sPool = "pool";
                         string sGroup = "group";
                         string sMem = "mem";

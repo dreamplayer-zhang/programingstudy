@@ -63,7 +63,21 @@ namespace Root_Vega
         MemoryGroup m_memoryGroup;
         public MemoryData m_memoryData;
         string m_sMemoryGroup = "";
+        public string p_sMemoryGroup
+        {
+            get
+            {
+                return m_sMemoryGroup;
+            }
+        }
         string m_sMemoryData = "Grab";
+        public string p_sMemoryData
+        {
+            get
+            {
+                return m_sMemoryData;
+            }
+        }
         int m_nByte = 1;
         CPoint m_szROI = new CPoint(1024, 1024);
         void RunTreeMemory(Tree tree, bool bVisible, bool bReadOnly)

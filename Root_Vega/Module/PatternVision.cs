@@ -458,9 +458,9 @@ namespace Root_Vega.Module
                         m_module.p_axisXY.p_axisY.SetTrigger(yTrigger0, yTrigger1, m_grabMode.m_dTrigger, true);
 
                         /* 메모리 위치도 가져오게는 좀 다시 하자.*/
-                        string sPool = "pool";
-                        string sGroup = "group";
-                        string sMem = "mem";
+                        string sPool = "PatternVision.Memory";
+                        string sGroup = m_grabMode.p_sMemoryGroup;
+                        string sMem = m_grabMode.p_sMemoryData;
                         MemoryData mem = m_module.m_engineer.GetMemory(sPool, sGroup, sMem);
 
                         /* 방향 바꾸는 코드 들어가야함*/

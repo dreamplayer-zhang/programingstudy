@@ -10,6 +10,9 @@ using RootTools.Camera.BaslerPylon;
 using RootTools.Light;
 using RootTools.Module;
 using System.Windows;
+using RootTools.Control.Ajin;
+using RootTools.Control;
+using System.Threading;
 
 namespace Root_Vega
 {
@@ -153,7 +156,59 @@ namespace Root_Vega
                 SetLightByName("Align2", value);
             }
         }
-        
+
+        double m_dStageCanvasWidth;
+        public double p_dStageCanvasWidth
+        {
+            get
+            {
+                return m_dStageCanvasWidth;
+            }
+            set
+            {
+                SetProperty(ref m_dStageCanvasWidth, value);
+            }
+        }
+
+        double m_dStageCanvasHeight;
+        public double p_dStageCanvasHeight
+        {
+            get
+            {
+                return m_dStageCanvasHeight;
+            }
+            set
+            {
+                SetProperty(ref m_dStageCanvasHeight, value);
+            }
+        }
+
+        double m_dZCanvasWidth;
+        public double p_dZCanvasWidth
+        {
+            get
+            {
+                return m_dZCanvasWidth;
+            }
+            set
+            {
+                SetProperty(ref m_dZCanvasWidth, value);
+            }
+        }
+
+        double m_dZCanvasHeight;
+        public double p_dZCanvasHeight
+        {
+            get
+            {
+                return m_dZCanvasHeight;
+            }
+            set
+            {
+                SetProperty(ref m_dZCanvasHeight, value);
+            }
+        }
+
         private readonly IDialogService m_DialogService;
 
         public Optic_SideVisionViewModel(Vega_Engineer engineer,  IDialogService dialogService)
