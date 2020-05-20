@@ -16,7 +16,7 @@ namespace RootTools.Inspects
 		/// <summary>
 		/// 이벤트 핸들러
 		/// </summary>
-		public delegate void EventHandler(InspectionType type);
+		public delegate void EventHandler(int nDCode);
 		public EventHandler InspectionStart;
 		public EventHandler InspectionComplete;
 		/// <summary>
@@ -24,28 +24,35 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="source">Defect List</param>
 		/// <param name="args">arguments. 필요한 경우 수정해서 사용</param>
-		public delegate void ChangeDefectInfoEventHanlder(DefectData[] source, InspectionType type);
+		public delegate void ChangeDefectInfoEventHanlder(DefectData[] source, int nDCode);
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
 		public event ChangeDefectInfoEventHanlder AddDefect;
 		#endregion
 
+		Thread inspThread;
+		Inspection[] InsepctionThread;
+
 		int nThreadNum = 4;
 		int nInspectionCount = 0;
 
-		InspectionType inspectionType;
+		int m_nDefectCode;
 
 		int m_nMemWidth;
 		int m_nMemHeight;
 
+		bool m_bProgress;
+
 		public bool IsInitialized { get; private set; }
 
-		public void StartInspection(InspectionType type, int nMemWidth, int nMemHegiht)
+		public void StartInspection(int nDefectCode, int nMemWidth, int nMemHegiht)
 		{
-			inspectionType = type;
+			m_nDefectCode = nDefectCode;
 			m_nMemWidth = nMemWidth;
 			m_nMemHeight = nMemHegiht;
+			m_bProgress = false;
+			nInspectionCount = 0;
 
 			IsInitialized = true;
 
@@ -55,9 +62,16 @@ namespace RootTools.Inspects
 				{
 					nThreadNum = GetWaitQueue();
 				}
-
-				Thread thread = new Thread(DoInspection);
-				thread.Start();
+				inspThread = new Thread(DoInspection);
+				
+				//if (inspThread != null)
+				//{
+				//	if (inspThread.IsAlive)
+				//	{
+				//		inspThread.Abort();
+				//	}
+				//}
+				inspThread.Start();
 			}
 		}
 		public void DoInspection()
@@ -66,28 +80,30 @@ namespace RootTools.Inspects
 				return;
 
 			int nInspDoneNum = 0;
-			Inspection[] inspection = new Inspection[nThreadNum];
+			InsepctionThread = new Inspection[nThreadNum];
 
 			if (InspectionStart != null)
 			{
-				InspectionStart(inspectionType);//DB Write 준비 시작
+				InspectionStart(m_nDefectCode);//DB Write 준비 시작
 			}
 
 			for (int i = 0; i < nThreadNum; i++)
 			{
-				inspection[i] = new Inspection(m_nMemWidth, m_nMemHeight);
-				inspection[i].AddDefect += InspectionManager_AddDefect;
+				InsepctionThread[i] = new Inspection(m_nMemWidth, m_nMemHeight, m_nDefectCode, nThreadNum);
+				InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
 			}
 
-			while (true)
+			m_bProgress = true;
+
+			while (m_bProgress)
 			{
 				lock (lockObj)
 				{
 					for (int i = 0; i < nThreadNum; i++)
 					{
-						if (inspection[i].bState == Inspection.InspectionState.Done)
+						if (InsepctionThread[i].bState == Inspection.InspectionState.Done)
 						{
-							inspection[i].bState = Inspection.InspectionState.Ready;
+							InsepctionThread[i].bState = Inspection.InspectionState.Ready;
 							nInspDoneNum++;
 						}
 					}
@@ -96,18 +112,20 @@ namespace RootTools.Inspects
 					{
 						InspectionDone();
 						Monitor.Wait(lockObj);
+						m_bProgress = false;
+						break;
 					}
 
 					for (int i = 0; i < nThreadNum; i++)
 					{
 						if (0 < GetWaitQueue())
 						{
-							if (inspection[i].bState == Inspection.InspectionState.Ready ||
-							inspection[i].bState == Inspection.InspectionState.None)
+							if (InsepctionThread[i].bState == Inspection.InspectionState.Ready ||
+							InsepctionThread[i].bState == Inspection.InspectionState.None)
 							{
 								nInspectionCount++;
 								InspectionProperty ipQueue = p_qInspection.Dequeue();
-								inspection[i].StartInspection(ipQueue, i);
+								InsepctionThread[i].StartInspection(ipQueue, i);
 							}
 						}
 					}
@@ -120,7 +138,7 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="source">DefectData array</param>
 		/// <param name="args">추후 arguments가 필요하면 사용할것</param>
-		private void InspectionManager_AddDefect(DefectData[] source, InspectionType type)
+		private void InspectionManager_AddDefect(DefectData[] source, int nDCode)
 		{
 			#region DEBUG
 
@@ -142,7 +160,7 @@ namespace RootTools.Inspects
 
 			if (AddDefect != null)
 			{
-				AddDefect(source, inspectionType);
+				AddDefect(source, nDCode);
 			}
 		}
 
@@ -151,7 +169,22 @@ namespace RootTools.Inspects
 			//TODO : 해당 Queue로 들어온 검사가 완전 종료되었을때 발동. 여기서 DB를 닫으면 될 것으로 보임
 			if (InspectionComplete != null)
 			{
-				InspectionComplete(inspectionType);
+				InspectionComplete(m_nDefectCode);
+			}
+		}
+		public void Dispose()
+		{
+			if (!IsInitialized)
+				return;
+
+			if (InsepctionThread != null)
+			{
+				for (int i = 0; i < InsepctionThread.Length; i++)
+				{
+					//이벤트 핸들러 제거
+					InsepctionThread[i].AddDefect -= InspectionManager_AddDefect;
+					//InsepctionThread[i].Dispose();
+				}
 			}
 		}
 
@@ -217,7 +250,14 @@ namespace RootTools.Inspects
 						else ey = AreaEndY;
 
 						InspectionProperty ip = new InspectionProperty();
-						ip.p_InspType = RootTools.Inspects.InspectionType.Surface;
+						if (param.p_bAbsoluteInspection)
+						{
+							ip.p_InspType = InspectionType.AbsoluteSurface;
+						}
+						else
+						{
+							ip.p_InspType = InspectionType.RelativeSurface;
+						}
 
 						CRect inspblock = new CRect(sx, sy, ex, ey);
 						ip.p_Rect = inspblock;
@@ -296,9 +336,52 @@ namespace RootTools.Inspects
 			}
 
 			return inspblocklist;
-
 		}
+		/// <summary>
+		/// Defect Code를 int형식으로 변환하여 반환
+		/// </summary>
+		/// <param name="target">검사 대상</param>
+		/// <param name="inspType">검사 알고리즘 종류</param>
+		/// <param name="idx">ROI Index</param>
+		/// <returns></returns>
+		public static int MakeDefectCode(InspectionTarget target, InspectionType inspType, int idx)
+		{
+			int result = 0;
 
+			result += (((int)target) * 10000);
+			result += (((int)inspType) * 100);
+			result += idx;
+
+			return result;
+		}
+		/// <summary>
+		/// Defect Code를 6자리 string 변환하여 반환 (앞에 0채움)
+		/// </summary>
+		/// <param name="target">검사 대상</param>
+		/// <param name="inspType">검사 알고리즘 종류</param>
+		/// <param name="idx">ROI Index</param>
+		/// <returns></returns>
+		public static string MakeDefectCodeToString(InspectionTarget target, InspectionType inspType, int idx)
+		{
+			int result = MakeDefectCode(target, inspType, idx);
+			return result.ToString("D6");
+		}
+		public static InspectionTarget GetInspectionTarget(int nDefectCode)
+		{
+			return (InspectionTarget)(nDefectCode / 10000);
+		}
+		public static InspectionType GetInspectionType(int nDefectCode)
+		{
+			int target = Convert.ToInt32(nDefectCode / 10000) * 10000;
+			int result = (nDefectCode - target) / 100;
+			return (InspectionType)result;
+		}
+		public static int GetROIInfo(int nDefectCode)
+		{
+			int target = Convert.ToInt32(nDefectCode / 10000) * 10000;
+			int type = Convert.ToInt32((nDefectCode - target) / 100) * 100;
+			return (nDefectCode - target - type);
+		}
 		//static ??
 		private ObservableQueue<InspectionProperty> qInspection = new ObservableQueue<InspectionProperty>();
 		public ObservableQueue<InspectionProperty> p_qInspection
@@ -392,11 +475,4 @@ namespace RootTools.Inspects
 			}
 		}
 	}
-
-	public enum InspectionType
-	{
-		None,
-		Surface,
-		Strip,
-	};
 }
