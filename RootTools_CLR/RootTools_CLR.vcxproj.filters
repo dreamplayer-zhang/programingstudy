@@ -30,9 +30,6 @@
     <ClInclude Include="CLR_InspConnector.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="InspSurfaceWrapper.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="DefectData.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -49,9 +46,6 @@
     </ClCompile>
     <ClCompile Include="CLR_InspConnector.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="InspSurcaeWrapper.cpp">
-      <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="DefectData.cpp">
       <Filter>소스 파일</Filter>

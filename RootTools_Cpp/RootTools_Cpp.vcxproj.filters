@@ -24,12 +24,6 @@
     <ClInclude Include="framework.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Cpp_Demo.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Cpp_Memory.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="PitSizer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -54,26 +48,11 @@
     <ClInclude Include="pch.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="InspSurface.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="InspBase.h">
-      <Filter>Sources</Filter>
-    </ClInclude>
     <ClInclude Include="InspectionReticle.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RootTools_Cpp.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Cpp_Demo.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Cpp_Memory.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="PitSizer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -88,12 +67,6 @@
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="InspSurface.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="InspBase.cpp">
-      <Filter>Headers</Filter>
     </ClCompile>
     <ClCompile Include="InspectionReticle.cpp">
       <Filter>소스 파일</Filter>
