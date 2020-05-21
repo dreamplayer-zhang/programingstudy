@@ -5,10 +5,10 @@ using RootTools.Control;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
-using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Root.Module
 {
@@ -22,19 +22,58 @@ namespace Root.Module
         }
         #region ToolBox
         Axis m_axisRotate;
-        AxisXY m_axisXZ; 
+        AxisXY m_axisXZ;
+        DIO_O m_doVac;
+        DIO_O m_doBlow; 
         MemoryPool m_memoryPool;
         MemoryGroup m_memoryGroup;
         LightSet m_lightSet;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisXZ, this, "Camera XZ"); 
+            p_sInfo = m_toolBox.Get(ref m_axisXZ, this, "Camera XZ");
+            p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
+            p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             foreach (eCam cam in Enum.GetValues(typeof(eCam))) m_lineScan[cam].GetTool(this);
             foreach (eCam cam in Enum.GetValues(typeof(eCam))) m_areaScan[cam].GetTool(this); 
+        }
+        #endregion
+
+        #region DIO
+        public bool p_bStageVac
+        {
+            get { return m_doVac.p_bOut; }
+            set
+            {
+                if (m_doVac.p_bOut == value) return;
+                m_doVac.Write(value); 
+            }
+        }
+
+        public bool p_bStageBlow
+        {
+            get { return m_doBlow.p_bOut; }
+            set
+            {
+                if (m_doBlow.p_bOut == value) return;
+                m_doBlow.Write(value); 
+            }
+        }
+
+        public void RunBlow(int msDelay)
+        {
+            m_doBlow.DelayOff(msDelay); 
+        }
+        #endregion
+
+        #region Axis
+        public int m_pulseRound = 1000; 
+        void RunTreeAxis(Tree tree)
+        {
+            m_pulseRound = tree.Set(m_pulseRound, m_pulseRound, "Rotate Pulse / Round", "Rotate Axis Pulse / 1 Round (pulse)"); 
         }
         #endregion
 
@@ -56,12 +95,18 @@ namespace Root.Module
                 m_camera.SetMemoryData(m_memory); 
             }
 
+            public bool m_bRunGrab = false; 
+            public void ModuleRunTree(Tree tree)
+            {
+                m_bRunGrab = tree.Set(m_bRunGrab, m_bRunGrab, m_id, "Module Run Grab"); 
+            }
+
             public string m_id;
             eCam m_eCam; 
             public LineScan(eCam cam)
             {
                 m_eCam = cam;
-                m_id = "Dalsa." + cam.ToString(); 
+                m_id = "Dalsa." + cam.ToString();
             }
         }
 
@@ -137,6 +182,21 @@ namespace Root.Module
             base.RunTree(tree);
             RunTreeDalsa(tree.GetTree("Dalsa", false));
             RunTreeBasler(tree.GetTree("Basler", false));
+            RunTreeAxis(tree.GetTree("Axis", false));
+        }
+        #endregion
+
+        #region State Home
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate) return "OK";
+            p_bStageBlow = false; 
+            p_bStageVac = true;
+            Thread.Sleep(200);
+            p_sInfo = base.StateHome();
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            //p_bStageVac = false;
+            return "OK"; 
         }
         #endregion
 
@@ -157,7 +217,74 @@ namespace Root.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            
+            AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
+            AddModuleRunList(new Run_GrabLineScan(this), false, "Run Grab LineScan Camera");
+        }
+
+        public class Run_Rotate : ModuleRunBase
+        {
+            Siltron m_module; 
+            public Run_Rotate(Siltron module)
+            {
+                m_module = module;
+                InitModuleRun(module); 
+            }
+
+            double m_fDeg = 0; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Rotate run = new Run_Rotate(m_module);
+                run.m_fDeg = m_fDeg; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_fDeg = tree.Set(m_fDeg, m_fDeg, "Degree", "Rotation Degree (0 ~ 360)", bVisible);
+            }
+
+            public override string Run()
+            {
+                int pulseRound = m_module.m_pulseRound;
+                Axis axis = m_module.m_axisRotate; 
+                int pulse = (int)Math.Round(m_module.m_pulseRound * m_fDeg / 360);
+                while (pulse < axis.p_axis.p_posCommand) pulse += pulseRound; 
+                {
+                    axis.p_axis.p_posCommand -= pulseRound;
+                    axis.p_axis.p_posActual -= pulseRound;
+                }
+                if (m_module.Run(axis.p_axis.Move(pulse))) return p_sInfo;
+                return axis.WaitReady(); 
+            }
+        }
+
+        public class Run_GrabLineScan : ModuleRunBase
+        {
+            Siltron m_module;
+            public Run_GrabLineScan(Siltron module)
+            {
+                m_module = module;
+                m_lineScan = module.m_lineScan; 
+                InitModuleRun(module);
+            }
+
+            Dictionary<eCam, LineScan> m_lineScan = new Dictionary<eCam, LineScan>();
+            public override ModuleRunBase Clone()
+            {
+                Run_GrabLineScan run = new Run_GrabLineScan(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                foreach (LineScan line in m_lineScan.Values) line.ModuleRunTree(tree.GetTree("Grab Camera")); 
+            }
+
+            public override string Run()
+            {
+                m_module.RunBlow(2000);
+                return "OK"; 
+            }
         }
         #endregion
     }

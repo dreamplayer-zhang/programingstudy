@@ -44,29 +44,44 @@ namespace RootTools.Control
             m_bitDO.Write(bOn); 
         }
 
+        int m_msDelay = 100; 
+        public void DelayOff(int msDelay)
+        {
+            m_msDelay = msDelay;
+            m_swRun.Restart();
+            m_eRun = eRun.DelayOff;
+            m_bitDO.Write(true);
+        }
+
         public bool p_bEnableRun { get; set; }
 
         enum eRun
         {
             Nothing,
-            Repeat
+            Repeat,
+            DelayOff,
         };
         eRun m_eRun = eRun.Nothing;
         public void RunDIO()
         {
             switch (m_eRun)
             {
-                case eRun.Repeat: Repeat(); break;
+                case eRun.Repeat: Repeat(); return;
+                case eRun.DelayOff:
+                    if (m_swRun.ElapsedMilliseconds < m_msDelay) return;
+                    m_eRun = eRun.Nothing;
+                    Write(false);
+                    break; 
             }
         }
 
-        StopWatch m_swRepeat = new StopWatch();
+        StopWatch m_swRun = new StopWatch();
         int m_msRepeat = 1000;
         void Repeat()
         {
-            if (m_swRepeat.ElapsedMilliseconds < m_msRepeat) return;
+            if (m_swRun.ElapsedMilliseconds < m_msRepeat) return;
             Write(!p_bOut);
-            m_swRepeat.Restart();
+            m_swRun.Restart();
         }
     }
 }

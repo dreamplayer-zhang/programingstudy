@@ -26,8 +26,8 @@
                 <CheckBox x:Name="checkBoxPause" Content="EQ.Pause" IsChecked="{Binding p_bPause}" Margin="2"/>
                 <CheckBox x:Name="checkBoxSimulate" Content="EQ.Simulate" IsChecked="{Binding p_bSimulate}" Margin="2"/>
                 <Label Content="{Binding p_eState}" Margin="2,22,2,2"/>
-                <Button x:Name="buttonHome" Content="Home" Height="20" IsEnabled="{Binding p_bEnableHome}" Margin="2"  Click="ButtonHome_Click"/>
-                <Button x:Name="buttonRun" Content="{Binding p_sRun}" Height="20" Margin="2" Click="ButtonRun_Click"/>
+                <Button x:Name="buttonRun" Content="{Binding p_sRun}" Height="22" Margin="2,12,2,2" Click="ButtonRun_Click"/>
+                <Button x:Name="buttonHome" Content="Home" Height="22" IsEnabled="{Binding p_bEnableHome}" Margin="2,12,2,2"  Click="ButtonHome_Click"/>
             </StackPanel>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
             <Grid Grid.Column="2">
