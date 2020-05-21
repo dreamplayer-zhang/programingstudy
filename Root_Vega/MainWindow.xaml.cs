@@ -85,7 +85,7 @@ namespace Root_Vega
             _Result.DataContext = rvm;
 
             _8_OHT_ViewModel opticvm = new _8_OHT_ViewModel(m_engineer, dialogService);
-            _Optic.DataContext = opticvm;
+            //_Optic.DataContext = opticvm;
 
             _10_SettingViewModel settingvm = new _10_SettingViewModel(m_engineer, dialogService);
             _Setting.DataContext = settingvm;

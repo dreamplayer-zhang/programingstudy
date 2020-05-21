@@ -132,8 +132,7 @@
                                        Style="{StaticResource BasicTb}"/>
                         </Border>
                         <Border Grid.Column="1"
-                                Margin="5,10,5,10"
-                                Background="{StaticResource Green}">
+                                Margin="5,10,5,10">
                             <TextBlock Text="MANUAL"
                                        Foreground="{StaticResource Black}"
                                        Style="{StaticResource BasicTb}"/>
@@ -155,8 +154,7 @@
 
                         <Border Grid.Column="0"
                                 Grid.Row="1"
-                                                Margin="5,10,5,10"
-                                        Background="{DynamicResource Green}">
+                                                Margin="5,10,5,10">
                             <TextBlock Text="LOAD"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
@@ -192,7 +190,7 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Border>
-                        <TextBlock Text="조작"
+                        <TextBlock Text="Operation"
                                                FontWeight="Black"
                                                FontSize="15"
                                                Style="{StaticResource BasicTb}"
