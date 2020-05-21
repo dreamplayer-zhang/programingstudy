@@ -143,4 +143,76 @@ namespace RootTools
 
         #endregion
     }
+
+    /// <summary>
+    /// Parameter 사용시 object로 넘어온다.
+    /// </summary>
+    public class RelayCommandWithParameter : ICommand
+    {
+
+        #region Declarations
+
+        readonly Func<Boolean> _canExecute;
+        readonly Action<object> _execute;
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RelayCommand&lt;T&gt;"/> class and the command can always be executed.
+        /// </summary>
+        /// <param name="execute">The execution logic.</param>
+        public RelayCommandWithParameter(Action<object> execute)
+            : this(execute, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RelayCommand&lt;T&gt;"/> class.
+        /// </summary>
+        /// <param name="execute">The execution logic.</param>
+        /// <param name="canExecute">The execution status logic.</param>
+        public RelayCommandWithParameter(Action<object> execute, Func<Boolean> canExecute)
+        {
+
+            if (execute == null)
+                throw new ArgumentNullException("execute");
+            _execute = execute;
+            _canExecute = canExecute;
+        }
+
+        #endregion
+
+        #region ICommand Members
+
+        public event EventHandler CanExecuteChanged
+        {
+            add
+            {
+
+                if (_canExecute != null)
+                    CommandManager.RequerySuggested += value;
+            }
+            remove
+            {
+
+                if (_canExecute != null)
+                    CommandManager.RequerySuggested -= value;
+            }
+        }
+
+        [DebuggerStepThrough]
+        public Boolean CanExecute(Object parameter)
+        {
+            return _canExecute == null ? true : _canExecute();
+        }
+
+        public void Execute(Object parameter)
+        {
+            _execute(parameter as object);
+        }
+
+        #endregion
+    }
 }

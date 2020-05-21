@@ -13,6 +13,7 @@ using System.Windows;
 using RootTools.Control.Ajin;
 using RootTools.Control;
 using System.Threading;
+using System.ComponentModel;
 
 namespace Root_Vega
 {
@@ -281,7 +282,34 @@ namespace Root_Vega
             }
         }
 
+        public void AutoFocus()
+        {
+            EQ.p_bStop = false;
+            SideVision Sidevision = ((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision;
+            SideVision.Run_AutoFocus af = (SideVision.Run_AutoFocus)Sidevision.CloneModuleRun("AutoFocus");
+            var viewModel = new Dialog_AutoFocus_ViewModel(Sidevision, af);
+            Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+            if (result.HasValue)
+            {
+                if (result.Value)
+                {
+                    Sidevision.StartRun(af);
+                }
+                else
+                {
+                    // Cancelled
+                }
+            }
+        }
+
         #region RelayCommand
+        public RelayCommand CommandAutoFocus
+        {
+            get
+            {
+                return new RelayCommand(AutoFocus);
+            }
+        }
         public RelayCommand CommandScan
         {
             get

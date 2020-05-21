@@ -529,7 +529,7 @@ namespace Root_Wind
                 ////    CvInvoke.VConcat(view, viewimg, view);
                 //    //view += viewimg;
                 //    //Emgu.CV.Util.CvToolbox.Memcpy(view.Ptr + i * ViewWidth, viewimg.Ptr, ViewWidth);
-
+                
                 //    memcpy((byte*)(view.Ptr + i * ViewWidth), (byte*)(viewimg.Ptr), ViewWidth);
                 //    a++;
                 //}

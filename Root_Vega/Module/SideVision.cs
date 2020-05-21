@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.AutoFocus;
 using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
@@ -11,9 +12,14 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace Root_Vega.Module
 {
@@ -427,10 +433,27 @@ namespace Root_Vega.Module
         }
         #endregion
 
+        #region AutoFocus
+        AutoFocus m_AutoFocusModule;
+        public AutoFocus p_AutoFocus
+        {
+            get
+            {
+                return m_AutoFocusModule;
+            }
+        }
+        void InitAutoFocus()
+        {
+            m_AutoFocusModule = new AutoFocus();
+            return;
+        }
+        #endregion
+
         #region override Function
         public override string StateHome()
         {
             if (EQ.p_bSimulate) return "OK";
+            p_sInfo = "OK";
             p_bStageVac = true;
             Thread.Sleep(200);
 
@@ -472,6 +495,7 @@ namespace Root_Vega.Module
             base.InitBase(id, engineer);
             InitInspect();
             InitPosAlign();
+            InitAutoFocus();
         }
 
         public override void ThreadStop()
@@ -492,6 +516,7 @@ namespace Root_Vega.Module
             //            AddModuleRunList(new Run_Inspect(this), true, "3D Inspect");
             AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
             AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
+            AddModuleRunList(new Run_AutoFocus(this), true, "Auto Focus");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -707,6 +732,271 @@ namespace Root_Vega.Module
                     axisXY.p_axisY.ResetTrigger();
                     m_grabMode.SetLight(false);
                 }
+            }
+        }
+
+
+        public class Run_AutoFocus : ModuleRunBase
+        {
+            public class CStepInfoList : ObservableCollection<CStepInfo> { }
+            public class CStepInfo
+            {
+                string m_strInfo;
+                public string p_strInfo
+                {
+                    get { return m_strInfo; }
+                }
+                BitmapSource m_img;
+                public BitmapSource p_img
+                {
+                    get { return m_img; }
+                }
+
+                public CStepInfo(string strInfo, BitmapSource img)
+                {
+                    m_strInfo = strInfo;
+                    m_img = img;
+                }
+            }
+            public CStepInfoList m_lstLeftStepInfo;
+            public CStepInfoList m_lstRightStepInfo;
+            public class CAutoFocusStatus
+            {
+                public double m_dTheta;
+                public double p_dTheta
+                {
+                    get { return m_dTheta; }
+                }
+
+                public string m_strStatus;
+                public string p_strStatus
+                {
+                    get { return m_strStatus; }
+                }
+
+                public CAutoFocusStatus(double dTheta, string strStatus)
+                {
+                    m_dTheta = dTheta;
+                    m_strStatus = strStatus;
+                }
+            }
+            public CAutoFocusStatus m_afs;
+            SideVision m_module;
+            public double m_dLeftStartPosX = 0.0;
+            public double m_dLeftEndPosX = 0.0;
+            public double m_dLeftPosY = 0.0;
+            public double m_dLeftPosZ = 0.0;
+            public double m_dRightStartPosX = 0.0;
+            public double m_dRightEndPosX = 0.0;
+            public double m_dRightPosY = 0.0;
+            public double m_dRightPosZ = 0.0;
+            public int m_nStep = 0;
+            public int m_nVarianceSize = 0;
+            public bool m_bUsingSobel = true;
+            public ImageData m_imgDataLeft = null;
+            public ImageData m_imgDataRight = null;
+
+            public Run_AutoFocus(SideVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+                m_lstLeftStepInfo = new CStepInfoList();
+                m_lstRightStepInfo = new CStepInfoList();
+                m_afs = new CAutoFocusStatus(0.0, "Ready");
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_AutoFocus run = new Run_AutoFocus(m_module);
+                run.m_dLeftStartPosX = m_dLeftStartPosX;
+                run.m_dLeftEndPosX = m_dLeftEndPosX;
+                run.m_dLeftPosY = m_dLeftPosY;
+                run.m_dLeftPosZ = m_dLeftPosZ;
+                run.m_dRightStartPosX = m_dRightStartPosX;
+                run.m_dRightEndPosX = m_dRightEndPosX;
+                run.m_dRightPosY = m_dRightPosY;
+                run.m_dRightPosZ = m_dRightPosZ;
+                run.m_nStep = m_nStep;
+                run.m_nVarianceSize = m_nVarianceSize;
+                run.m_bUsingSobel = m_bUsingSobel;
+
+                run.m_lstLeftStepInfo = m_lstLeftStepInfo;
+                run.m_lstRightStepInfo = m_lstRightStepInfo;
+                run.m_afs = m_afs;
+
+                //System.Drawing.Bitmap bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG.BMP");
+                //BitmapSource bmpSrc = GetBitmapSource(bmp);
+                //m_lstLeftStepInfo.Add(new StepInfo("LeftTest", bmpSrc));
+
+                //bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG2.BMP");
+                //bmpSrc = GetBitmapSource(bmp);
+                //m_lstLeftStepInfo.Add(new StepInfo("LeftTest2", bmpSrc));
+
+
+                //bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG.BMP");
+                //bmpSrc = GetBitmapSource(bmp);
+                //m_lstRightStepInfo.Add(new StepInfo("RightTest", bmpSrc));
+
+                //bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG2.BMP");
+                //bmpSrc = GetBitmapSource(bmp);
+                //m_lstRightStepInfo.Add(new StepInfo("RightTest2", bmpSrc));
+
+                return run;
+            }
+
+            public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+            {
+                treeRoot.p_eMode = mode;
+                RunTree(treeRoot, true);
+            }
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_dLeftStartPosX = tree.Set(m_dLeftStartPosX, m_dLeftStartPosX, "Left Start X Position", "Left Start X Position", bVisible);
+                m_dLeftEndPosX = tree.Set(m_dLeftEndPosX, m_dLeftEndPosX, "Left End X Position", "Left End X Position", bVisible);
+                m_dLeftPosY = tree.Set(m_dLeftPosY, m_dLeftPosY, "Left Y Position", "Left Start Y Position", bVisible);
+                m_dLeftPosZ = tree.Set(m_dLeftPosZ, m_dLeftPosZ, "Left Z Position", "Left Start Z Position", bVisible);
+                m_dRightStartPosX = tree.Set(m_dRightStartPosX, m_dRightStartPosX, "Right Start X Position", "Right Start X Position", bVisible);
+                m_dRightEndPosX = tree.Set(m_dRightEndPosX, m_dRightEndPosX, "Right End X Position", "Right End X Position", bVisible);
+                m_dRightPosY = tree.Set(m_dRightPosY, m_dRightPosY, "Right Y Position", "Right Start Y Position", bVisible);
+                m_dRightPosZ = tree.Set(m_dRightPosZ, m_dRightPosZ, "Right Z Position", "Right Start Z Position", bVisible);
+                m_nStep = tree.Set(m_nStep, m_nStep, "AutoFocus Step", "AutoFocus Step", bVisible);
+                m_nVarianceSize = tree.Set(m_nVarianceSize, m_nVarianceSize, "Variance Size", "Variance Size", bVisible);
+                m_bUsingSobel = tree.Set(m_bUsingSobel, m_bUsingSobel, "Using Sovel Filter", "Using Sovel Filter", bVisible);
+
+                base.RunTree(tree, bVisible, bRecipe);
+            }
+
+            public override string Run()
+            {
+                AutoFocus af = m_module.p_AutoFocus;
+                Camera_Basler cam = m_module.p_CamSideVRS;
+                ImageData img = cam.p_ImageViewer.p_ImageData;
+                AxisXY axisXY = m_module.p_axisXY;
+                Axis axisZ = m_module.p_axisZ;
+                Axis axisTheta = m_module.p_axisTheta;
+                double dLeftCurrentScore = 0.0;
+                double dLeftMaxScore = -1.0;
+                double dLeftMaxScorePosX = m_dLeftStartPosX;
+                double dRightCurrentScore = 0.0;
+                double dRightMaxScore = -1.0;
+                double dRightMaxScorePosX = m_dRightStartPosX;
+                m_afs.m_dTheta = 0.0;
+                m_afs.m_strStatus = "Ready";
+
+                App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                {
+                    m_lstLeftStepInfo.Clear();
+                    m_lstRightStepInfo.Clear();
+                });
+
+                //1.Reticle 좌측 위치로 이동 후 AF
+                int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
+                m_afs.m_strStatus = "Left Side AF...";
+                for (int i = 0; i < /*nStepCount*/30; i++)
+                {
+                    // Axis Move
+                    if (m_module.Run(axisXY.Move(new RPoint(m_dLeftStartPosX + (m_nStep * i), m_dLeftPosY)))) return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    if (m_module.Run(axisZ.p_axis.Move(m_dLeftPosZ))) return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+
+                    // Grab
+                    string strRet = cam.Grab();
+
+                    // Calculating Score
+                    if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img);
+                    else dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+
+                    if (dLeftCurrentScore > dLeftMaxScore)
+                    {
+                        dLeftMaxScore = dLeftCurrentScore;
+                        dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
+                    }
+
+                    string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
+                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    BitmapSource bmpSrc = GetBitmapSource(bmp);
+                    App.Current.Dispatcher.InvokeAsync((Action)delegate // <--- HERE
+                    {
+                        m_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    });
+                }
+
+                // 2. Reticle 우측 위치로 이동 후 AF
+                nStepCount = (int)Math.Abs(m_dRightEndPosX - m_dRightStartPosX) / m_nStep;
+                m_afs.m_strStatus = "Right Side AF...";
+                for (int i = 0; i < /*nStepCount*/30; i++)
+                {
+                    // Axis Move
+                    if (m_module.Run(axisXY.Move(new RPoint(m_dRightStartPosX + (m_nStep * i), m_dRightPosY)))) return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    if (m_module.Run(axisZ.p_axis.Move(m_dRightPosZ))) return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+
+                    // Grab
+                    string strRet = cam.Grab();
+
+                    // Calculating Score
+                    if (m_bUsingSobel) dRightCurrentScore = af.GetImageFocusScoreWithSobel(img);
+                    else dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+
+                    if (dRightCurrentScore > dRightMaxScore)
+                    {
+                        dRightMaxScore = dRightCurrentScore;
+                        dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
+                    }
+
+                    string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dRightStartPosX + (m_nStep * i)), dRightCurrentScore);
+                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    BitmapSource bmpSrc = GetBitmapSource(bmp);
+                    App.Current.Dispatcher.InvokeAsync((Action)delegate // <--- HERE
+                    {
+                        m_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    });
+                }
+
+                // 3. 좌우측 AF편차 구하기
+                bool bThetaClockwise = true;    // Theta+ = Anticlockwise
+                                                // Theta- = Clockwise
+                if (dLeftMaxScorePosX > dRightMaxScorePosX) bThetaClockwise = false;
+                af.p_dDifferenceOfFocusDistance = Math.Abs(dRightMaxScorePosX - dLeftMaxScorePosX);
+                if (m_dRightPosY >= m_dLeftPosY) return "AutoFocus - Right Y Position is bigger than Left Y Position";
+                af.p_dDistanceOfLeftPointToRightPoint = Math.Abs(m_dRightPosY - m_dLeftPosY);
+
+                // 4. 좌우측 위치 사이의 거리와 좌우측 AF편차를 이용하여 Theta 계산
+                double dThetaRadian = af.GetThetaRadian();
+                double dThetaDegree = af.GetThetaDegree(dThetaRadian);
+                if (bThetaClockwise) m_afs.m_dTheta = -dThetaDegree;
+                else m_afs.m_dTheta = dThetaDegree;
+
+                // 5. Radian 값을 Theta 모터 포지션 값으로 Scaling
+                double dMinValue = 0.0;
+                double dMaxValue = 2 * Math.PI;
+                double dMinScaleValue = 0.0;
+                double dMaxScaleValue = 360000.0;
+                double dScaled = dMinScaleValue + (Math.Abs(dThetaRadian) - dMinValue) / (dMaxValue - dMinValue) * (dMaxScaleValue - dMinScaleValue);
+
+                // 6. Theta축 돌리기
+                double dActualPos = m_module.p_axisTheta.p_axis.p_posActual;
+                if (bThetaClockwise) dScaled = -dScaled;
+                m_module.p_axisTheta.Move(dActualPos + dScaled);
+
+                m_afs.m_strStatus = "Success";
+
+                return base.Run();
+            }
+
+            private BitmapSource GetBitmapSource(System.Drawing.Bitmap bitmap)
+            {
+                BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap
+                (
+                    bitmap.GetHbitmap(),
+                    IntPtr.Zero,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions()
+                );
+
+                return bitmapSource;
             }
         }
         #endregion

@@ -157,6 +157,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="False"
+                                    Command="{Binding GrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -171,6 +172,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="False"
+                                    Command="{Binding ContinousGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -474,6 +476,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                    Command="{Binding GrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -488,6 +491,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                    Command="{Binding ContinousGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -502,6 +506,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="{Binding p_CamInfo._IsCanGrab, Converter={StaticResource InverseBooleanConverters}}"
+                                    Command="{Binding StopGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -1208,6 +1213,24 @@
                                                                    Foreground="White"></material:PackIcon>
                                                 <TextBlock Style="{StaticResource BasicTb}"
                                                            Text="Scan"
+                                                           FontSize="15"></TextBlock>
+                                            </StackPanel>
+                                        </Button.Content>
+                                    </Button>
+                                    <Button Grid.Column="1"
+                                            Grid.Row="1"
+                                            Margin="5"
+                                            Command="{Binding CommandAutoFocus}"
+                                            Style="{StaticResource BasicBtn}">
+                                        <Button.Content>
+                                            <StackPanel Orientation="Vertical">
+                                                <material:PackIcon Kind="ZoomInOutline"
+                                                                   Width="25"
+                                                                   HorizontalAlignment="Center"
+                                                                   Height="25"
+                                                                   Foreground="White"></material:PackIcon>
+                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                           Text="AutoFocus"
                                                            FontSize="15"></TextBlock>
                                             </StackPanel>
                                         </Button.Content>

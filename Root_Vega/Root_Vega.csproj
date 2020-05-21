@@ -192,6 +192,10 @@
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Module\Vega.cs" />
+    <Compile Include="Dialog\Dialog_AutoFocus.xaml.cs">
+      <DependentUpon>Dialog_AutoFocus.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Dialog_AutoFocus_ViewModel.cs" />
     <Compile Include="Setting\Optic_MainVision.xaml.cs">
       <DependentUpon>Optic_MainVision.xaml</DependentUpon>
     </Compile>
@@ -346,6 +350,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ManualJob\ManualJobSchedule_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\Dialog_AutoFocus.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
