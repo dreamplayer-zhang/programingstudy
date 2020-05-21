@@ -276,7 +276,7 @@ namespace RootTools
             byte[] aBuf = new byte[rect.Width * rect.Height];
             for (int i = rect.Height - 1; i >= 0; i--)
             {
-                Marshal.Copy((IntPtr)((long)m_ptrImg + rect.Left + ((long)i + (long)rect.Top) * p_Size.X), aBuf, position, rect.Width);
+                Marshal.Copy((IntPtr)((long)GetPtr() + rect.Left + ((long)i + (long)rect.Top) * p_Size.X), aBuf, position, rect.Width);
                 position += rect.Width;
             }
             return GetBitmapToArray(rect.Width, rect.Height, aBuf);

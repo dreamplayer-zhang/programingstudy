@@ -190,7 +190,7 @@ namespace RootTools.Camera.BaslerPylon
                 p_CamParam._GainAuto = tree.Set(p_CamParam._GainAuto, "Off", p_CamParam._GainAutoEnum, "Gain Auto", "Auto Gain Use");
                 p_CamParam._GainRaw = tree.Set(p_CamParam._GainRaw, 0, "Gain(Raw)", "Gain: 카메라 센서의 신호 증폭\n 어두운 상황에서 센서 신호를 올려 밝은 영상을 획득하지만 노이즈도 증폭되어 이미지 품질도 저하된다.");
                 p_CamParam._GammaEnable = tree.Set(p_CamParam._GammaEnable, false, "GammaEnable", "Gamma Correction 사용 유무");
-                p_CamParam._Gamma = tree.Set(p_CamParam._Gamma, 1.0, "Gamma", "Gamma : intensity(밝기)를 비선형적으로 변형하는 역활,");
+                //p_CamParam._Gamma = tree.Set(p_CamParam._Gamma, 1.0, "Gamma", "Gamma : intensity(밝기)를 비선형적으로 변형하는 역활,");
             }
             else
             {

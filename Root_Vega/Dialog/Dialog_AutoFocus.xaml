@@ -118,12 +118,13 @@
                                Foreground="White"
                                TextAlignment="Center"
                                VerticalAlignment="Center"
-                               FontSize="30"
+                               FontSize="15"
                                Text="{Binding p_strLeftSelectedInfo}"
                                Visibility="{Binding p_eLeftViewerVisibility}">
                     </TextBlock>
                     <ListView Grid.RowSpan="2"
                               Background="Transparent"
+                              Foreground="White"
                               ItemsSource="{Binding p_lstLeftStepInfo}"
                               x:Name="LeftListView">
                         <i:Interaction.Triggers>
@@ -169,12 +170,13 @@
                                Foreground="White"
                                TextAlignment="Center"
                                VerticalAlignment="Center"
-                               FontSize="30"
+                               FontSize="15"
                                Text="{Binding p_strRightSelectedInfo}"
                                Visibility="{Binding p_eRightViewerVisibility}">
                     </TextBlock>       
                     <ListView Grid.RowSpan="2"
                               Background="Transparent"
+                              Foreground="White"
                               ItemsSource="{Binding p_lstRightStepInfo}"
                               x:Name="RightListView">
                         <i:Interaction.Triggers>

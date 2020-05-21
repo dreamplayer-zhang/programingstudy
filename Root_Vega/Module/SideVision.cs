@@ -19,6 +19,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace Root_Vega.Module
 {
@@ -439,6 +440,7 @@ namespace Root_Vega.Module
         public override string StateHome()
         {
             if (EQ.p_bSimulate) return "OK";
+            p_sInfo = "OK";
             p_bStageVac = true;
             Thread.Sleep(200);
 
@@ -757,7 +759,7 @@ namespace Root_Vega.Module
                 {
                     get { return m_strStatus; }
                 }
-                
+
                 public CAutoFocusStatus(double dTheta, string strStatus)
                 {
                     m_dTheta = dTheta;
@@ -846,7 +848,7 @@ namespace Root_Vega.Module
                 m_nStep = tree.Set(m_nStep, m_nStep, "AutoFocus Step", "AutoFocus Step", bVisible);
                 m_nVarianceSize = tree.Set(m_nVarianceSize, m_nVarianceSize, "Variance Size", "Variance Size", bVisible);
                 m_bUsingSobel = tree.Set(m_bUsingSobel, m_bUsingSobel, "Using Sovel Filter", "Using Sovel Filter", bVisible);
-                
+
                 base.RunTree(tree, bVisible, bRecipe);
             }
 
@@ -867,6 +869,12 @@ namespace Root_Vega.Module
                 m_afs.m_dTheta = 0.0;
                 m_afs.m_strStatus = "Ready";
 
+                App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                {
+                    m_lstLeftStepInfo.Clear();
+                    m_lstRightStepInfo.Clear();
+                });
+
                 // 1. Reticle 좌측 위치로 이동 후 AF
                 int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
                 m_afs.m_strStatus = "Left Side AF...";
@@ -879,9 +887,8 @@ namespace Root_Vega.Module
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
 
                     // Grab
-                    if (m_module.Run(cam.Grab())) return p_sInfo;
-                    cam.p_ImageViewer.SetImageData(img);
-                    
+                    string strRet = cam.Grab();
+
                     // Calculating Score
                     if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img);
                     else dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
@@ -893,15 +900,18 @@ namespace Root_Vega.Module
                     }
 
                     string strTemp = "Current Position:" + (m_dLeftStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dLeftCurrentScore.ToString();
-                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X - 1, img.p_Size.Y - 1));
+                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
-                    m_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                    {
+                        m_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    });
                 }
 
                 // 2. Reticle 우측 위치로 이동 후 AF
                 nStepCount = (int)Math.Abs(m_dRightEndPosX - m_dRightStartPosX) / m_nStep;
                 m_afs.m_strStatus = "Right Side AF...";
-                for (int i = 0; i<nStepCount; i++)
+                for (int i = 0; i < nStepCount; i++)
                 {
                     // Axis Move
                     if (m_module.Run(axisXY.Move(new RPoint(m_dRightStartPosX + (m_nStep * i), m_dRightPosY)))) return p_sInfo;
@@ -910,23 +920,25 @@ namespace Root_Vega.Module
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
 
                     // Grab
-                    if (m_module.Run(cam.Grab())) return p_sInfo;
-                    cam.p_ImageViewer.SetImageData(img);
-                    
+                    string strRet = cam.Grab();
+
                     // Calculating Score
                     if (m_bUsingSobel) dRightCurrentScore = af.GetImageFocusScoreWithSobel(img);
                     else dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
 
                     if (dRightCurrentScore > dRightMaxScore)
                     {
-                        dRightCurrentScore = dRightMaxScore;
+                        dRightMaxScore = dRightCurrentScore;
                         dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
                     }
 
                     string strTemp = "Current Position:" + (m_dRightStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dRightCurrentScore.ToString();
-                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X - 1, img.p_Size.Y - 1));
+                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
-                    m_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                    {
+                        m_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    });
                 }
 
                 // 3. 좌우측 AF편차 구하기
@@ -935,7 +947,7 @@ namespace Root_Vega.Module
                 if (dLeftMaxScorePosX > dRightMaxScorePosX) bThetaClockwise = false;
                 af.p_dDifferenceOfFocusDistance = Math.Abs(dRightMaxScorePosX - dLeftMaxScorePosX);
                 if (m_dRightPosY >= m_dLeftPosY) return "AutoFocus - Right Y Position is bigger than Left Y Position";
-                af.p_dDistanceOfLeftPointToRightPoint = m_dRightPosY - m_dLeftPosY;
+                af.p_dDistanceOfLeftPointToRightPoint = Math.Abs(m_dRightPosY - m_dLeftPosY);
 
                 // 4. 좌우측 위치 사이의 거리와 좌우측 AF편차를 이용하여 Theta 계산
                 double dThetaRadian = af.GetThetaRadian();

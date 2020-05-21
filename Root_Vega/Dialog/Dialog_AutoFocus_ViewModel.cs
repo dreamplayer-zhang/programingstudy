@@ -3,6 +3,7 @@ using RootTools;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -118,7 +119,7 @@ namespace Root_Vega
 
         public void OnOkButton()
         {
-            m_Vision.StartRun(m_RunAutoFocus);
+            CloseRequested(this, new DialogCloseRequestedEventArgs(true));
         }
 
         public void OnCancelButton()

@@ -10,6 +10,7 @@ using RootTools.Camera.BaslerPylon;
 using RootTools.Light;
 using RootTools.Module;
 using System.Windows;
+using System.ComponentModel;
 
 namespace Root_Vega
 {
@@ -233,7 +234,17 @@ namespace Root_Vega
             SideVision.Run_AutoFocus af = (SideVision.Run_AutoFocus)Sidevision.CloneModuleRun("AutoFocus");
             var viewModel = new Dialog_AutoFocus_ViewModel(Sidevision, af);
             Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
-            return;
+            if (result.HasValue)
+            {
+                if (result.Value)
+                {
+                    Sidevision.StartRun(af);
+                }
+                else
+                {
+                    // Cancelled
+                }
+            }
         }
 
         #region RelayCommand
