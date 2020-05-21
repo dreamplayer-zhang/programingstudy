@@ -875,10 +875,10 @@ namespace Root_Vega.Module
                     m_lstRightStepInfo.Clear();
                 });
 
-                // 1. Reticle 좌측 위치로 이동 후 AF
+                //1.Reticle 좌측 위치로 이동 후 AF
                 int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
                 m_afs.m_strStatus = "Left Side AF...";
-                for (int i = 0; i < nStepCount; i++)
+                for (int i = 0; i < /*nStepCount*/30; i++)
                 {
                     // Axis Move
                     if (m_module.Run(axisXY.Move(new RPoint(m_dLeftStartPosX + (m_nStep * i), m_dLeftPosY)))) return p_sInfo;
@@ -899,10 +899,10 @@ namespace Root_Vega.Module
                         dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
                     }
 
-                    string strTemp = "Current Position:" + (m_dLeftStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dLeftCurrentScore.ToString();
+                    string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
                     System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
-                    App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                    App.Current.Dispatcher.InvokeAsync((Action)delegate // <--- HERE
                     {
                         m_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
                     });
@@ -911,7 +911,7 @@ namespace Root_Vega.Module
                 // 2. Reticle 우측 위치로 이동 후 AF
                 nStepCount = (int)Math.Abs(m_dRightEndPosX - m_dRightStartPosX) / m_nStep;
                 m_afs.m_strStatus = "Right Side AF...";
-                for (int i = 0; i < nStepCount; i++)
+                for (int i = 0; i < /*nStepCount*/30; i++)
                 {
                     // Axis Move
                     if (m_module.Run(axisXY.Move(new RPoint(m_dRightStartPosX + (m_nStep * i), m_dRightPosY)))) return p_sInfo;
@@ -932,10 +932,10 @@ namespace Root_Vega.Module
                         dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
                     }
 
-                    string strTemp = "Current Position:" + (m_dRightStartPosX + (m_nStep * i)).ToString() + " Current Score:" + dRightCurrentScore.ToString();
+                    string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dRightStartPosX + (m_nStep * i)), dRightCurrentScore);
                     System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
-                    App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                    App.Current.Dispatcher.InvokeAsync((Action)delegate // <--- HERE
                     {
                         m_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
                     });
