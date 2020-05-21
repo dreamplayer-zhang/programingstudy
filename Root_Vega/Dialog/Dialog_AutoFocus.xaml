@@ -13,7 +13,9 @@
         WindowStyle="None"
         WindowStartupLocation="CenterScreen"
         Background="#FF2D2D30"
-        Topmost="True">
+        Topmost="True"
+        xmlns:md="clr-namespace:MvvmDialogs;assembly=RootTools"
+        md:DialogServiceViews.IsRegistered="True">
     <Window.InputBindings></Window.InputBindings>
     <Window.Resources>
         <converter:ListViewContentsWidthConverter  x:Key="ListViewContentsWidthConverters" />

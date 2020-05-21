@@ -211,11 +211,13 @@ namespace Root_Vega
         }
 
         private readonly IDialogService m_DialogService;
+        private readonly MvvmDialogs.IDialogService m_DialogServiceTest;
 
-        public Optic_SideVisionViewModel(Vega_Engineer engineer,  IDialogService dialogService)
+        public Optic_SideVisionViewModel(Vega_Engineer engineer,  IDialogService dialogService, MvvmDialogs.IDialogService dialogServiceTest)
         {
             m_Engineer = engineer;
             m_DialogService = dialogService;
+            m_DialogServiceTest = dialogServiceTest;
             p_SideVision = ((Vega_Handler)engineer.ClassHandler()).m_sideVision;
             m_LightSet = p_SideVision.m_lightSet;
         }
@@ -288,18 +290,21 @@ namespace Root_Vega
             SideVision Sidevision = ((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision;
             SideVision.Run_AutoFocus af = (SideVision.Run_AutoFocus)Sidevision.CloneModuleRun("AutoFocus");
             var viewModel = new Dialog_AutoFocus_ViewModel(Sidevision, af);
-            Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
-            if (result.HasValue)
-            {
-                if (result.Value)
-                {
-                    Sidevision.StartRun(af);
-                }
-                else
-                {
-                    // Cancelled
-                }
-            }
+            bool? bRet = m_DialogServiceTest.ShowDialog<Dialog_AutoFocus>(this, viewModel);
+            
+            return;
+            //Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+            //if (result.HasValue)
+            //{
+            //    if (result.Value)
+            //    {
+            //        Sidevision.StartRun(af);
+            //    }
+            //    else
+            //    {
+            //        // Cancelled
+            //    }
+            //}
         }
 
         #region RelayCommand

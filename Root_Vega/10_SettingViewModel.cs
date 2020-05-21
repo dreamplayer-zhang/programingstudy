@@ -48,11 +48,11 @@ namespace Root_Vega
             }
         }
         
-        public _10_SettingViewModel(Vega_Engineer engineer, IDialogService service)
+        public _10_SettingViewModel(Vega_Engineer engineer, IDialogService service, MvvmDialogs.IDialogService serviceTest)
         {
             p_AjinViewModel = new AjinInOutSettingViewModel(engineer.m_ajin);
             p_MainVisionViewModel = new Optic_MainVisionViewModel(engineer);
-            p_SideVisionViewModel = new Optic_SideVisionViewModel(engineer, service);
+            p_SideVisionViewModel = new Optic_SideVisionViewModel(engineer, service, serviceTest);
         }
     }
 }

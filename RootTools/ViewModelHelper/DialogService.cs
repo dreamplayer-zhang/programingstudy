@@ -2,10 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Windows;
 
     public class DialogService : IDialogService
     {
+        #region original
         private readonly Window owner;
 
         public DialogService(Window owner)
@@ -60,5 +62,6 @@
 
             return dialog.ShowDialog();
         }
+        #endregion
     }
 }

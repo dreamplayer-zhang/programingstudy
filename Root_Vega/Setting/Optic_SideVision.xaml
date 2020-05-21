@@ -12,7 +12,9 @@
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
              mc:Ignorable="d"
              d:DesignHeight="726"
-             d:DesignWidth="1602">
+             d:DesignWidth="1602"
+             xmlns:md="clr-namespace:MvvmDialogs;assembly=RootTools"
+             md:DialogServiceViews.IsRegistered="True">
     <UserControl.Resources>
         <Converter:InverseBooleanConverter x:Key="InverseBooleanConverters" />
         <Dalsa:CameraConnectStateConverter x:Key="CameraConnectStateConverters" />
