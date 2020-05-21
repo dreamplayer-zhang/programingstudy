@@ -68,7 +68,16 @@ namespace RootTools.Inspects
 	}
 	public class RecipeData : ObservableObject
 	{
-		ObservableCollection<Roi> m_Roi = new ObservableCollection<Roi>();
+		public RecipeData()
+		{
+			m_bDefectMerge = false;
+			m_nMergeDistance = new Param<int>(10, 0, int.MaxValue);//최대치는 나중에 정하기
+			m_Roi = new ObservableCollection<Roi>();
+		}
+
+		#region p_Roi
+
+		ObservableCollection<Roi> m_Roi;
 		public ObservableCollection<Roi> p_Roi
 		{
 			get
@@ -80,7 +89,38 @@ namespace RootTools.Inspects
 				SetProperty(ref m_Roi, value);
 			}
 		}
-		//ParamData m_PD;
+		#endregion
+
+		#region p_bDefectMerge
+		bool m_bDefectMerge;
+		public bool p_bDefectMerge
+		{
+			get { return m_bDefectMerge; }
+			set
+			{
+				SetProperty(ref m_bDefectMerge, value);
+			}
+		}
+		#endregion
+
+		#region p_nMergeDistance
+		Param<int> m_nMergeDistance;
+		public int p_nMergeDistance
+		{
+			get
+			{
+				return m_nMergeDistance._value;
+			}
+			set
+			{
+				if (m_nMergeDistance._value == value)
+					return;
+				m_nMergeDistance._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
 	}
 	public class Param<T> where T : IComparable
 	{
@@ -114,9 +154,67 @@ namespace RootTools.Inspects
 
 		}
 	}
-	public class SurFace_ParamData : ObservableObject
+	public class BaseParamData : ObservableObject
 	{
-		public SurFace_ParamData()
+		#region p_GV
+		protected Param<int> GV;
+		public int p_GV
+		{
+			get
+			{
+				return GV._value;
+			}
+			set
+			{
+				if (GV._value == value)
+					return;
+				GV._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region p_DefectSize
+		protected Param<int> DefectSize;
+		public int p_DefectSize
+		{
+			get
+			{
+				return DefectSize._value;
+			}
+			set
+			{
+				if (DefectSize._value == value)
+					return;
+				DefectSize._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region TargetLabelText
+		protected string _TargetLabelText;
+		public string TargetLabelText
+		{
+			get
+			{
+				return _TargetLabelText;
+			}
+			set
+			{
+				if (_TargetLabelText != value)
+				{
+					_TargetLabelText = value;
+					RaisePropertyChanged();
+				}
+			}
+		}
+
+		#endregion
+	}
+	public class SurfaceParamData : BaseParamData
+	{
+		public SurfaceParamData()
 		{
 			p_bDarkInspection = true;
 			p_bAbsoluteInspection = true;
@@ -161,64 +259,8 @@ namespace RootTools.Inspects
 			}
 		}
 		#endregion
-
-		#region p_GV
-		Param<int> GV;
-		public int p_GV
-		{
-			get
-			{
-				return GV._value;
-			}
-			set
-			{
-				if (GV._value == value)
-					return;
-				GV._value = value;
-				RaisePropertyChanged();
-			}
-		}
-		#endregion
-
-		#region p_DefectSize
-		Param<int> DefectSize;
-		public int p_DefectSize
-		{
-			get
-			{
-				return DefectSize._value;
-			}
-			set
-			{
-				if (DefectSize._value == value)
-					return;
-				DefectSize._value = value;
-				RaisePropertyChanged();
-			}
-		}
-		#endregion
-
-		#region TargetLabelText
-		string _TargetLabelText;
-		public string TargetLabelText
-		{
-			get
-			{
-				return _TargetLabelText;
-			}
-			set
-			{
-				if (_TargetLabelText != value)
-				{
-					_TargetLabelText = value;
-					RaisePropertyChanged();
-				}
-			}
-		}
-
-		#endregion
 	}
-	public class StripParamData :ObservableObject
+	public class StripParamData : BaseParamData
 	{
 		public StripParamData()
 		{
@@ -228,62 +270,6 @@ namespace RootTools.Inspects
 			intensity = new Param<int>(120, 0, int.MaxValue);
 			TargetLabelText = "GV";//Strip은 무조건 절대검사
 		}
-
-		#region p_GV
-		Param<int> GV;
-		public int p_GV
-		{
-			get
-			{
-				return GV._value;
-			}
-			set
-			{
-				if (GV._value == value)
-					return;
-				GV._value = value;
-				RaisePropertyChanged();
-			}
-		}
-		#endregion
-
-		#region p_DefectSize
-		Param<int> DefectSize;
-		public int p_DefectSize
-		{
-			get
-			{
-				return DefectSize._value;
-			}
-			set
-			{
-				if (DefectSize._value == value)
-					return;
-				DefectSize._value = value;
-				RaisePropertyChanged();
-			}
-		}
-		#endregion
-
-		#region TargetLabelText
-		string _TargetLabelText;
-		public string TargetLabelText
-		{
-			get
-			{
-				return _TargetLabelText;
-			}
-			set
-			{
-				if (_TargetLabelText != value)
-				{
-					_TargetLabelText = value;
-					RaisePropertyChanged();
-				}
-			}
-		}
-
-		#endregion
 
 		#region p_Intensity
 		Param<int> intensity;
@@ -387,8 +373,8 @@ namespace RootTools.Inspects
 	{
 		public List<Pattern> m_Pattern;
 		public List<NonPattern> m_NonPattern;
-		ObservableCollection<SurFace_ParamData> m_Parameter = new ObservableCollection<SurFace_ParamData>();
-		public ObservableCollection<SurFace_ParamData> p_Parameter
+		ObservableCollection<SurfaceParamData> m_Parameter = new ObservableCollection<SurfaceParamData>();
+		public ObservableCollection<SurfaceParamData> p_Parameter
 		{
 			get
 			{
