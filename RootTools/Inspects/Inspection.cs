@@ -127,7 +127,7 @@ namespace RootTools.Inspects
 					}
 					if (m_InspProp.p_bDefectMerge)
 					{
-						arrDefects = MergeTest(arrDefects, m_InspProp.p_nMergeDistance);
+						arrDefects = MergeDefect(arrDefects, m_InspProp.p_nMergeDistance);
 					}
 					if (AddDefect != null)//대리자 호출을 간단하게 만들 수 있으나 vs2013에서 호환이 안 될 가능성이 없어 보류
 					{
@@ -144,7 +144,7 @@ namespace RootTools.Inspects
 			}
 		}
 
-		private List<DefectData> MergeTest(List<DefectData> arrDefects, int nMergeDistance)
+		private List<DefectData> MergeDefect(List<DefectData> arrDefects, int nMergeDistance)
 		{
 			//List<DefectData> resultList = new List<DefectData>();
 			//return resultList;
