@@ -631,7 +631,7 @@ namespace RootTools
 
 				for (int yy = 0; yy < p_ThumbHeight; yy++)
 				{
-						pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
+					pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
 					for (int xx = 0; xx < p_ThumbWidth; xx++)
 					{
 						pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
@@ -643,7 +643,7 @@ namespace RootTools
 				if (view.Width != 0 && view.Height != 0)
 					p_ThumNailImgSource = ImageHelper.ToBitmapSource(view);
 			}
-			
+
 		}
 
 		public unsafe void SetImageSource()
@@ -699,9 +699,9 @@ namespace RootTools
 								pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
 
 								view.Data[yy, xx, 2] = ((byte*)ptrMem)[0 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
-								view.Data[yy, xx,1] = ((byte*)ptrMem)[1 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
+								view.Data[yy, xx, 1] = ((byte*)ptrMem)[1 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
 								view.Data[yy, xx, 0] = ((byte*)ptrMem)[2 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
-								
+
 							}
 						}
 
@@ -780,7 +780,16 @@ namespace RootTools
 			if (m_BasicTool.m_Element.Count == 0 || m_BasicTool.m_Element[0].GetType() != typeof(System.Windows.Shapes.Rectangle))
 				m_ImageData.SaveWholeImage();
 			else
-				m_ImageData.SaveRectImage(new CRect((int)m_BasicTool.m_TempRect.TopLeft.X, (int)m_BasicTool.m_TempRect.TopLeft.Y, (int)m_BasicTool.m_TempRect.BottomRight.X, (int)m_BasicTool.m_TempRect.BottomRight.Y));
+			{
+				var temp = m_BasicTool.m_TempRect;
+				int left = (int)temp.StartPos.X;
+				int top = (int)temp.StartPos.Y;
+
+				int right = (int)temp.EndPos.X;
+				int bot = (int)temp.EndPos.Y;
+
+				m_ImageData.SaveRectImage(new CRect(left, top, right, bot));
+			}
 		}
 
 		void ImageClear()
@@ -902,7 +911,7 @@ namespace RootTools
 			int nY = 0;
 			if (bRatio_WH)
 			{ //세로가 길어
-				//nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgWidth * p_Zoom) /2; 기존 중앙기준으로 확대/축소되는 코드. 
+			  //nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgWidth * p_Zoom) /2; 기존 중앙기준으로 확대/축소되는 코드. 
 				nX = p_View_Rect.X + Convert.ToInt32(p_View_Rect.Width - nImgWidth * p_Zoom) * p_MouseX / _CanvasWidth; // 마우스 커서기준으로 확대/축소
 				nY = p_View_Rect.Y + Convert.ToInt32(p_View_Rect.Height - nImgWidth * p_Zoom * p_CanvasHeight / p_CanvasWidth) * p_MouseY / _CanvasHeight;
 				viewrectwidth = Convert.ToInt32(nImgWidth * p_Zoom);
@@ -1006,8 +1015,8 @@ namespace RootTools
 		{
 			try
 			{
-				CPoint StartPt = new CPoint((int)m_BasicTool.m_TempRect.TopLeft.X, (int)m_BasicTool.m_TempRect.TopLeft.Y);
-				CPoint EndPt = new CPoint((int)m_BasicTool.m_TempRect.BottomRight.X, (int)m_BasicTool.m_TempRect.BottomRight.Y);
+				CPoint StartPt = new CPoint(m_BasicTool.m_TempRect.StartPos);
+				CPoint EndPt = new CPoint(m_BasicTool.m_TempRect.EndPos);
 
 				return new CRect(StartPt.X, StartPt.Y, EndPt.X, EndPt.Y);
 			}
@@ -1112,9 +1121,9 @@ namespace RootTools
 							m_ModifyManager.p_SetStateDone = true;
 						else
 							if (m_ModifyManager.p_ModifyState && m_ModifyManager.m_MouseHitType != ModifyManager.HitType.None)
-							{
-								m_ModifyManager.ModifyEnd();
-							}
+						{
+							m_ModifyManager.ModifyEnd();
+						}
 						break;
 					}
 			}

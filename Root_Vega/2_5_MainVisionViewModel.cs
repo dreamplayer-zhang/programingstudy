@@ -406,7 +406,11 @@ namespace Root_Vega
 		public void SaveCurrentMask()
 		{
 			var temp = p_SimpleShapeDrawer[0].m_ListRect[0];
-			CRect rect = new CRect((int)temp.Location.X, (int)temp.Location.Y, (int)temp.Width, (int)temp.Height);
+			int left = (int)temp.StartPos.X;
+			int top = (int)temp.StartPos.Y;
+			int right = (int)temp.EndPos.X;
+			int bot = (int)temp.EndPos.Y;
+			CRect rect = new CRect(left, top, right, bot);
 			p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.m_NonPattern[0].m_rt = rect;
 
 		}
@@ -542,7 +546,7 @@ namespace Root_Vega
 			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Strip.m_NonPattern[0].m_rt;
 			int nblocksize = 500;
 
-			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize, 
+			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
 				p_Recipe.p_RecipeData.p_Roi[0].m_Strip.p_Parameter[0],
 				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance);
 

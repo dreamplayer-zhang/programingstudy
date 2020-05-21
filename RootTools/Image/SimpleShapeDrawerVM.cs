@@ -43,14 +43,22 @@ namespace RootTools
 		{
 			m_DrawerToolVM = _DrawerToolVM;
 		}
-		public void AddHistory(DrawToolVM _DrawerToolVM, Work _Work, Shape _StartShape, Rect _StartRect, Shape _EndShape = null, Rect _EndRect = new Rect(), bool _Continue = false)
+		public void AddHistory(DrawToolVM _DrawerToolVM, Work _Work, Shape _StartShape, UIElementInfo _StartRect, Shape _EndShape = null, UIElementInfo _EndRect = null, bool _Continue = false)
 		{
+			if (_EndRect == null)
+			{
+				_EndRect = new UIElementInfo();
+			}
 			m_DrawerToolVM = _DrawerToolVM;
 			AddHistory(_Work, _StartShape, _StartRect, _EndShape, _EndRect, _Continue);
 		}
 
-		public void AddHistory(Work _Work, Shape _StartShape, Rect _StartRect, Shape _EndShape = null, Rect _EndRect = new Rect(), bool _Continue = false)
+		public void AddHistory(Work _Work, Shape _StartShape, UIElementInfo _StartRect, Shape _EndShape = null, UIElementInfo _EndRect = null, bool _Continue = false)
 		{
+			if (_EndRect == null)
+			{
+				_EndRect = new UIElementInfo();
+			}
 			m_History.Add(new DrawHistory(m_DrawerToolVM, _Work, HistoryIndex, _StartShape, _StartRect, _EndShape, _EndRect));
 			if (m_future.Any())
 			{
@@ -253,13 +261,17 @@ namespace RootTools
 		public int p_Index;
 		public Shape p_StartShape;
 		public Shape p_EndShape;
-		public Rect p_StartRect;
-		public Rect p_EndRect;
+		public UIElementInfo p_StartRect;
+		public UIElementInfo p_EndRect;
 
 		//List<Shape> _List;
 
-		public DrawHistory(DrawToolVM _DrawerToolVM, Work _Work, int _Index, Shape _StartShape, Rect _StartRect, Shape _EndShape = null, Rect _EndRect = new Rect())
+		public DrawHistory(DrawToolVM _DrawerToolVM, Work _Work, int _Index, Shape _StartShape, UIElementInfo _StartRect, Shape _EndShape = null, UIElementInfo _EndRect = null)
 		{
+			if (_EndRect == null)
+			{
+				_EndRect = new UIElementInfo();
+			}
 			p_DrawerToolVM = _DrawerToolVM;
 			p_Work = _Work;
 			p_Index = _Index;  //n번째 작업
@@ -277,7 +289,7 @@ namespace RootTools
 	public abstract class DrawToolVM : ObservableObject
 	{
 		public List<Shape> m_ListShape = new List<Shape>();
-		public List<Rect> m_ListRect = new List<Rect>();
+		public List<UIElementInfo> m_ListRect = new List<UIElementInfo>();
 
 		//m_ListRect와 동일해보이나, Drawing중인 객체는 m_ListRect에는 없고, p_Element에만 있다.
 		public ObservableCollection<UIElement> m_Element = new ObservableCollection<UIElement>();
@@ -291,8 +303,8 @@ namespace RootTools
 		{ get; set; }
 		public abstract KeyEventArgs p_KeyEvent
 		{ get; }
-		public abstract bool p_State
-		{ get; set; }
+		public abstract bool p_State { get; set; }
+		public UIElementInfo m_TempRect;
 		//System.Drawing.Rectangle p_View_Rect
 		//{ get; set; }
 
@@ -390,7 +402,6 @@ namespace RootTools
 		protected process m_Process;
 
 		protected Shape m_SelectedShape;
-		protected Rect m_TempRect;
 
 		// List<Ellipse> ListEllipse = new List<Ellipse>();
 
@@ -531,8 +542,8 @@ namespace RootTools
 								   p_ImageViewer.p_View_Rect.Y + p_ImageViewer.p_MouseY * p_ImageViewer.p_View_Rect.Height / p_ImageViewer.p_CanvasHeight);
 
 
-			m_TempRect = new Rect(m_ClickPos, (Size)m_MousePos);
-			MakeRect(element, ref m_TempRect);
+			m_TempRect = new UIElementInfo(m_ClickPos, m_MousePos);
+			m_TempRect = MakeRect(element, m_TempRect);
 
 			m_StartPos = GetCanvasPoint(m_ClickPos);
 			m_EndPos = GetCanvasPoint(m_MousePos);
@@ -543,24 +554,34 @@ namespace RootTools
 		}
 		#endregion
 
-		private void MakeRect(Shape _Shape, ref Rect _Rect)
+		private UIElementInfo MakeRect(Shape _Shape, UIElementInfo originRect)
 		{
+			UIElementInfo _Rect = new UIElementInfo();
 			if (_Shape.GetType() != typeof(Line))
 			{
 				double temp;
-				if (_Rect.X > _Rect.Width)
+				if (originRect.StartPos.X > originRect.EndPos.X)
 				{
-					temp = _Rect.X;
-					_Rect.X = _Rect.Width;
-					_Rect.Width = temp;
+					_Rect.StartPos.X = originRect.EndPos.X;
+					_Rect.EndPos.X = originRect.StartPos.X;
 				}
-				if (_Rect.Y > _Rect.Height)
+				else
 				{
-					temp = _Rect.Y;
-					_Rect.Y = _Rect.Height;
-					_Rect.Height = temp;
+					_Rect.StartPos.X = originRect.StartPos.X;
+					_Rect.EndPos.X = originRect.EndPos.X;
+				}
+				if (originRect.StartPos.Y > originRect.EndPos.Y)
+				{
+					_Rect.StartPos.Y = originRect.EndPos.Y;
+					_Rect.EndPos.Y = originRect.StartPos.Y;
+				}
+				else
+				{
+					_Rect.StartPos.Y = originRect.StartPos.Y;
+					_Rect.EndPos.Y = originRect.EndPos.Y;
 				}
 			}
+			return _Rect;
 		}
 
 		#region DrawEnd()
@@ -597,9 +618,9 @@ namespace RootTools
 			{
 				tempShape = m_ListShape[i];
 
-				TopLeft = GetCanvasPoint(m_ListRect[i].Location);
+				TopLeft = GetCanvasPoint(m_ListRect[i].StartPos);
 				SetTopLeft(tempShape, TopLeft);
-				BottomRight = GetCanvasPoint((Point)(m_ListRect[i].Size));
+				BottomRight = GetCanvasPoint(m_ListRect[i].EndPos);
 				SetBottomRight(tempShape, BottomRight);
 			}
 		}
@@ -700,7 +721,6 @@ namespace RootTools
 	{
 
 		public TextBlock DrawnTb = new TextBlock();
-		public new Rect m_TempRect;
 
 		public UniquenessDrawerVM(ImageViewer_ViewModel _ImageViewer)
 			: base(_ImageViewer)
@@ -818,16 +838,16 @@ namespace RootTools
 			{
 				tempShape = m_ListShape[i];
 
-				TopLeft = GetCanvasPoint(m_ListRect[i].Location);
+				TopLeft = GetCanvasPoint(m_ListRect[i].StartPos);
 				SetTopLeft(tempShape, TopLeft);
-				BottomRight = GetCanvasPoint((Point)(m_ListRect[i].Size));
+				BottomRight = GetCanvasPoint(m_ListRect[i].EndPos);
 				SetBottomRight(tempShape, BottomRight);
 
 
 				if (tempShape.GetType() == typeof(Line))
 				{
 					DrawGraduation(m_ListRect[i]);
-					
+
 				}
 			}
 		}
@@ -839,11 +859,11 @@ namespace RootTools
 			string msg;
 			if (element.GetType() == typeof(Line))
 			{
-				msg = "Length : " + Math.Round(Math.Sqrt(Math.Pow((m_TempRect.Location.X - m_TempRect.Size.Width), 2) + Math.Pow((m_TempRect.Location.Y - m_TempRect.Size.Height), 2)));
+				msg = "Length : " + Math.Round(Math.Sqrt(Math.Pow((m_TempRect.StartPos.X - m_TempRect.EndPos.X), 2) + Math.Pow((m_TempRect.StartPos.Y - m_TempRect.EndPos.Y), 2)));
 				DrawGraduation(m_TempRect);
 			}
 			else
-				msg = "Width :" + (m_TempRect.Size.Width - m_TempRect.Location.X).ToString() + " Height :" + (m_TempRect.Size.Height - m_TempRect.Location.Y).ToString();
+				msg = "Width :" + (m_TempRect.EndPos.X - m_TempRect.StartPos.X).ToString() + " Height :" + (m_TempRect.EndPos.Y - m_TempRect.StartPos.Y).ToString();
 
 			DrawnTb.Text = msg;
 			DrawnTb.Foreground = Brushes.White;
@@ -851,14 +871,14 @@ namespace RootTools
 		}
 
 
-		
-		private void DrawGraduation( Rect _Rect) 
+
+		private void DrawGraduation(UIElementInfo _Rect)
 		{
 			Point ptGraduationStart;
 			Point ptGraduationEnd;
 
-			Point TopLeft = GetCanvasPoint(_Rect.Location);
-			Point BottomRight = GetCanvasPoint((Point)(_Rect.Size));
+			Point TopLeft = GetCanvasPoint(_Rect.StartPos);
+			Point BottomRight = GetCanvasPoint((Point)(_Rect.EndPos));
 
 			Point ptParallel = new Point(BottomRight.X - TopLeft.X, BottomRight.Y - TopLeft.Y);
 			Point ptPerpendicular = new Point(BottomRight.Y - TopLeft.Y, -(BottomRight.X - TopLeft.X));
@@ -879,7 +899,7 @@ namespace RootTools
 				dStandardEnd = BottomRight.Y;
 			}
 
-			double dPixelLength = Math.Floor(Math.Sqrt(Math.Pow((_Rect.Location.X - _Rect.Size.Width), 2) + Math.Pow((_Rect.Location.Y - _Rect.Size.Height), 2)));
+			double dPixelLength = Math.Floor(Math.Sqrt(Math.Pow((_Rect.StartPos.X - _Rect.EndPos.X), 2) + Math.Pow((_Rect.StartPos.Y - _Rect.EndPos.Y), 2)));
 			double dCanvasLength = Math.Floor(Math.Sqrt(Math.Pow(ptParallel.X, 2) + Math.Pow(ptParallel.Y, 2)));
 
 
@@ -893,7 +913,7 @@ namespace RootTools
 				else
 					nScale /= 5;
 
-					bScaleToggle = !bScaleToggle;
+				bScaleToggle = !bScaleToggle;
 				if (nScale == 0)
 					break;
 
@@ -901,7 +921,7 @@ namespace RootTools
 				for (int _Scale = 0; _Scale <= dPixelLength; _Scale += nScale)
 				{
 					double dAddLength = _Scale * dCanvasLength / dPixelLength;
-					
+
 					if (_Scale == 0 && _Scale + nScale > dPixelLength)
 						break;
 
@@ -926,11 +946,11 @@ namespace RootTools
 					}
 				}
 			}
-		
+
 		}
 
 
-		
+
 	}
 
 	public sealed class OriginDrawerVM : UniquenessDrawerVM
