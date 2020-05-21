@@ -79,8 +79,7 @@ namespace RootTools
         #region CyUSB
         USBDeviceList m_listDevice = null;
         CyUSBDevice m_device = null;
-        CyUSBDevice m_device2 = null;
-        string OpenUSB()
+        string OpenUSB(int iDevice)
         {
             try
             {
@@ -88,10 +87,9 @@ namespace RootTools
                 Thread.Sleep(10);
                 m_listDevice = new USBDeviceList(CyConst.DEVICES_CYUSB);
                 if (m_listDevice == null) return "Can't Fine CyUSB Device List";
-               // m_device = m_listDevice[0x547, 0x1003] as CyUSBDevice;
-                m_device = m_listDevice[0] as CyUSBDevice;
-                if (m_listDevice.Count == 2)
-                    m_device2 = m_listDevice[1] as CyUSBDevice;
+                // m_device = m_listDevice[0x547, 0x1003] as CyUSBDevice;
+                if (iDevice >= m_listDevice.Count) return "Invalid CyUSB Index : " + iDevice.ToString() + " / " + m_listDevice.Count.ToString(); 
+                m_device = m_listDevice[iDevice] as CyUSBDevice;
                 OnPropertyChanged("p_bOpen");
                 if (m_device == null) return "Can't Find Light Board";
                 return "OK";
@@ -108,18 +106,9 @@ namespace RootTools
             lock (m_csLock)
             {
                 if (m_device == null) return "Write Error  : Device not Found";
-                if (nCh < 12)
-                {
-                    p_nCh = nCh;
-                    p_fPower = fPower;
-                    return Write(m_device.ControlEndPt);
-                }
-                else
-                {
-                    p_nCh = nCh % 12;
-                    p_fPower = fPower;
-                    return Write(m_device2.ControlEndPt);
-                }
+                p_nCh = nCh;
+                p_fPower = fPower;
+                return Write(m_device.ControlEndPt);
             }
         }
 
@@ -151,18 +140,9 @@ namespace RootTools
         {
             lock (m_csLock)
             {
-                if (m_device == null)
-                    return "Read Error  : Device not Found";
-                if (nCh < 12)
-                {
-                    p_nCh = nCh;
-                    return Read(m_device.ControlEndPt, ref fPower);
-                }
-                else
-                {
-                    p_nCh = nCh % 12;
-                    return Read(m_device2.ControlEndPt, ref fPower);
-                }
+                if (m_device == null) return "Read Error  : Device not Found";
+                p_nCh = nCh;
+                return Read(m_device.ControlEndPt, ref fPower);
             }
         }
 
@@ -215,11 +195,11 @@ namespace RootTools
         public string p_id { get { return m_id; } }
         string m_id;
         Log m_log;
-        public CyUSBTool(string id, Log log)
+        public CyUSBTool(int iDevice, string id, Log log)
         {
             m_id = id;
             m_log = log;
-            p_sInfo = OpenUSB();
+            p_sInfo = OpenUSB(iDevice);
         }
 
         public void ThreadStop()
