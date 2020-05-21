@@ -32,15 +32,19 @@ namespace RootTools.Light
 
         #region Light 12 Channel
         const string c_s12ch = "12ch"; 
-        bool m_bUse12Ch = false;
-        LightTool_12ch m_lightTool12ch = null; 
+        int m_n12Ch = 0;
+        List<LightTool_12ch> m_aLightTool12ch = new List<LightTool_12ch>(); 
         bool Run12ChTree(Tree tree)
         {
-            bool bUse = m_bUse12Ch; 
-            m_bUse12Ch = tree.Set(m_bUse12Ch, false, "Use", "Use Light 12 Channel (CyUSB)");
-            if (bUse == m_bUse12Ch) return false;
-            if (m_bUse12Ch) m_lightTool12ch = new LightTool_12ch(c_s12ch, m_engineer);
-            else m_lightTool12ch = null;
+            int n12Ch = m_n12Ch;
+            m_n12Ch = tree.Set(m_n12Ch, m_n12Ch, "Count", "Light 12 Channel Count (CyUSB)");
+            if (n12Ch == m_n12Ch) return false;
+            while (m_aLightTool12ch.Count > m_n12Ch) m_aLightTool12ch.RemoveAt(m_aLightTool12ch.Count - 1);
+            while (m_aLightTool12ch.Count < m_n12Ch)
+            {
+                LightTool_12ch lightTool = new LightTool_12ch(m_aLightTool12ch.Count, c_s12ch + "." + (char)('A' + m_aLightTool12ch.Count), m_engineer);
+                m_aLightTool12ch.Add(lightTool);
+            }
             return true; 
         }
         #endregion
@@ -154,7 +158,7 @@ namespace RootTools.Light
             {
                 m_asLightTool.Clear();
                 m_aLightTool.Clear();
-                AddTool(m_lightTool12ch); 
+                foreach (LightTool_12ch lightTool in m_aLightTool12ch) AddTool(lightTool); 
                 foreach (LightTool_4ch lightTool in m_aLightTool4ch) AddTool(lightTool);
                 foreach (LightTool_Kwangwoo lightTool in m_aLightToolKwangwoo) AddTool(lightTool);
                 foreach (LightTool_LVS lightTool in m_aLightToolLVS) AddTool(lightTool);

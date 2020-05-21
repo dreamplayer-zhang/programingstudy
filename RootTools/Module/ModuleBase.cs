@@ -373,19 +373,17 @@ namespace RootTools.Module
             return "OK";
         }
 
+        StopWatch m_swRun = new StopWatch(); 
         protected string StateRun()
         {
             if (m_qModuleRun.Count == 0) return "OK";
             ModuleRunBase moduleRun = m_qModuleRun.Dequeue();
-            moduleRun.p_eRunState = ModuleRunBase.eRunState.Run; 
-            try {
-                Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    p_sInfo = moduleRun.Run();
-                });
-            }
+            moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
+            m_swRun.Restart(); 
+            try { p_sInfo = moduleRun.Run(); }
             catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
-            moduleRun.p_eRunState = ModuleRunBase.eRunState.Done; 
+            moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
+            m_log.Info("ModuleRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec")); 
             if (p_sInfo != "OK")
             {
                 EQ.p_bStop = true;

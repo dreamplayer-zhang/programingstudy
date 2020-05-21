@@ -5,7 +5,7 @@ namespace RootTools.Light
 {
     public class LightTool_12ch : NotifyProperty, ILightTool
     {
-        const int c_lLight = 24;
+        const int c_lLight = 12;
 
         public delegate void dgOnChangeTool();
         public event dgOnChangeTool OnChangeTool;
@@ -98,12 +98,12 @@ namespace RootTools.Light
         IEngineer m_engineer;
         Log m_log;
         public CyUSBTool m_usb;
-        public LightTool_12ch(string id, IEngineer engineer)
+        public LightTool_12ch(int iDevice, string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer; 
             m_log = LogView.GetLog(id);
-            m_usb = new CyUSBTool(m_id, m_log);
+            m_usb = new CyUSBTool(iDevice, m_id, m_log);
             InitLight();
         }
 
