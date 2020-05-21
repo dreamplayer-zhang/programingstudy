@@ -260,6 +260,7 @@
     </Compile>
     <Compile Include="Image\ImageData.cs" />
     <Compile Include="Image\SimpleShapeDrawerVM.cs" />
+    <Compile Include="Image\UIElementInfo.cs" />
     <Compile Include="Inspects\DefectCode.cs" />
     <Compile Include="Inspects\Inspection.cs" />
     <Compile Include="Inspects\InspectionManager.cs" />

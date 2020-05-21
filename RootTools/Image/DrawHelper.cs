@@ -31,8 +31,8 @@ namespace RootTools
         }
         public Shape p_ModifyTarget = null;
         public System.Windows.Shapes.Rectangle p_ModifyRect;
-        public Rect p_ModifyData;
-        private Rect p_ModifyStartData;
+        public UIElementInfo p_ModifyData;
+        private UIElementInfo p_ModifyStartData;
 
 
         ImageViewer_ViewModel p_ImageViewer;
@@ -134,11 +134,11 @@ namespace RootTools
             CPoint Offset = new CPoint(offset_x, offset_y);
 
 
-            int new_x1 = (int)p_ModifyData.X;
-            int new_y1 = (int)p_ModifyData.Y;
+            int new_x1 = (int)p_ModifyData.StartPos.X;
+            int new_y1 = (int)p_ModifyData.StartPos.Y;
 
-            int new_x2 = (int)(p_ModifyData.Width);
-            int new_y2 = (int)(p_ModifyData.Height);
+            int new_x2 = (int)(p_ModifyData.EndPos.X);
+            int new_y2 = (int)(p_ModifyData.EndPos.Y);
 
             switch (m_MouseHitType)
             {
@@ -181,17 +181,17 @@ namespace RootTools
                     break;
             }
 
-            p_ModifyData.X = new_x1;
-            p_ModifyData.Y = new_y1;
-            p_ModifyData.Width = new_x2;
-            p_ModifyData.Height = new_y2;
+            p_ModifyData.StartPos.X = new_x1;
+            p_ModifyData.StartPos.Y = new_y1;
+            p_ModifyData.EndPos.X = new_x2;
+            p_ModifyData.EndPos.Y = new_y2;
 
             CheckMinSize(ref p_ModifyData, 50);
 
 
 
-            Point test1 = GetCanvasPoint(p_ModifyData.X, p_ModifyData.Y);
-            Point test2 = GetCanvasPoint(p_ModifyData.Width, p_ModifyData.Height);
+            Point test1 = GetCanvasPoint(p_ModifyData.StartPos.X, p_ModifyData.StartPos.Y);
+            Point test2 = GetCanvasPoint(p_ModifyData.EndPos.X, p_ModifyData.EndPos.Y);
 
             PreMousePt = CurrentPoint;
             Redrawing();
@@ -217,17 +217,17 @@ namespace RootTools
             p_ImageViewer.m_HistoryWorker.AddHistory(p_ModifyDrawerTool, Work.Modify, p_ModifyTarget, p_ModifyStartData, p_ModifyTarget, p_ModifyData);
         }
 
-        private void CheckMinSize(ref Rect _Data, int min)
+        private void CheckMinSize(ref UIElementInfo _Data, int min)
         {
             int size = (int)(min * p_ImageViewer.p_View_Rect.Width / p_ImageViewer.p_CanvasWidth);
-            if (size > _Data.Width - _Data.X)
+            if (size > _Data.EndPos.X - _Data.StartPos.X)
             {
-                _Data.Width = _Data.X + size;
+                _Data.EndPos.X = _Data.StartPos.X + size;
             }
             size = (int)(min * p_ImageViewer.p_View_Rect.Height / p_ImageViewer.p_CanvasHeight);
-            if (size > _Data.Height - _Data.Y)
+            if (size > _Data.EndPos.Y - _Data.StartPos.Y)
             {
-                _Data.Height = _Data.Y + size;
+                _Data.EndPos.Y = _Data.StartPos.Y + size;
             }
 
 
@@ -236,9 +236,9 @@ namespace RootTools
         public void Redrawing()
         {
 
-            Point TopLeft = GetCanvasPoint(p_ModifyData.Location);
+            Point TopLeft = GetCanvasPoint(p_ModifyData.StartPos);
             SetTopLeft(p_ModifyRect, TopLeft);
-            Point BottomRight = GetCanvasPoint(p_ModifyData.Size.Width, p_ModifyData.Size.Height);
+            Point BottomRight = GetCanvasPoint(p_ModifyData.EndPos.X, p_ModifyData.EndPos.Y);
             SetBottomRight(p_ModifyRect, BottomRight);
         }
 
@@ -265,9 +265,9 @@ namespace RootTools
 
 
 
-            Point TopLeft = GetCanvasPoint(p_ModifyData.Location);
+            Point TopLeft = GetCanvasPoint(p_ModifyData.StartPos);
             SetTopLeft(p_ModifyRect, TopLeft);
-            Point BottomRight = GetCanvasPoint(p_ModifyData.Size.Width, p_ModifyData.Size.Height);
+            Point BottomRight = GetCanvasPoint(p_ModifyData.EndPos.X, p_ModifyData.EndPos.Y);
             SetBottomRight(p_ModifyRect, BottomRight);
 
 

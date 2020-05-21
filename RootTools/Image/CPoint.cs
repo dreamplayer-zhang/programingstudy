@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 
 namespace RootTools
 {
@@ -57,6 +58,12 @@ namespace RootTools
                 if (log == null) return;
                 log.Warn("new CPoint Error " + str); 
             }
+        }
+
+        public CPoint(System.Windows.Point pos)
+        {
+            X = (int)pos.X;
+            Y = (int)pos.Y;
         }
 
         public void Set(CPoint cp)
