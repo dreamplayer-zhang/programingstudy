@@ -12,6 +12,18 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
+            <ComboBox x:Name="comboLevel" Margin="2,2,22,2" MinWidth="50" SelectionChanged="comboLevel_SelectionChanged"/>
+            <StackPanel x:Name="stackLog" Orientation="Horizontal">
+                <Label Content="Clip으로 복사 : " VerticalAlignment="Center"/>
+                <Button x:Name="buttonSendClipSelect" Content="Selected" Margin="2" MinWidth="60" Click="buttonSendClipSelect_Click"/>
+                <Button x:Name="buttonSendClipAll" Content="All" Margin="2" MinWidth="60" Click="buttonSendClipAll_Click"/>
+                <Button x:Name="buttonSendClipAllFile" Content="All File" Margin="2" MinWidth="60" Click="buttonSendClipAllFile_Click"/>
+            </StackPanel>
+            <StackPanel x:Name="stackClip" Orientation="Horizontal">
+                <Button x:Name="buttonRemove" Content="Remove Selected" Margin="2" MinWidth="60" Click="buttonRemove_Click"/>
+                <Button x:Name="buttonSave" Content="Save as" Margin="22,2,2,2" MinWidth="60" Click="buttonSave_Click"/>
+                <Button x:Name="buttonSaveSimple" Content="Save Simple" Margin="2" MinWidth="60" Click="buttonSaveSimple_Click"/>
+            </StackPanel>
         </StackPanel>
         <DataGrid Grid.Row="1" x:Name="dataGrid" IsReadOnly="True" AutoGenerateColumns="False" GridLinesVisibility="None">
             <DataGrid.Columns>

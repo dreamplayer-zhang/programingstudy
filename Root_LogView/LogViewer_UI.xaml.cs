@@ -19,7 +19,8 @@ namespace Root_LogView
         public void Init(LogViewer logViewer)
         {
             m_logViewer = logViewer;
-            DataContext = logViewer; 
+            DataContext = logViewer;
+            InitTabClip(); 
         }
 
         private void buttonOpen_Click(object sender, RoutedEventArgs e)
@@ -66,6 +67,14 @@ namespace Root_LogView
         {
             if (comboLog.SelectedIndex < 0) return;
             tabLog.SelectedIndex = comboLog.SelectedIndex;
+        }
+
+        void InitTabClip()
+        {
+            TabItem item = new TabItem();
+            item.Header = "Clip";
+            item.Content = m_logViewer.m_logClip.p_ui;
+            tabMain.Items.Add(item); 
         }
     }
 }

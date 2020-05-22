@@ -7,16 +7,25 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button x:Name="buttonOpen" Content="Open" Width="60" Margin="2" Click="buttonOpen_Click"/>
-            <Button x:Name="buttonClose" Content="Close All" Width="90" Margin="2" Click="buttonClose_Click"/>
-        </StackPanel>
-        <ComboBox Grid.Row="1" x:Name="comboLog" SelectionChanged="comboLog_SelectionChanged"/>
-        <TabControl Grid.Row="2" x:Name="tabLog"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <Button x:Name="buttonOpen" Content="Open" Width="60" Margin="2" Click="buttonOpen_Click"/>
+                <Button x:Name="buttonClose" Content="Close All" Width="90" Margin="2" Click="buttonClose_Click"/>
+            </StackPanel>
+            <ComboBox Grid.Row="1" x:Name="comboLog" SelectionChanged="comboLog_SelectionChanged"/>
+            <TabControl Grid.Row="2" x:Name="tabLog"/>
+        </Grid>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+        <TabControl Grid.Column="2" x:Name="tabMain"/>
     </Grid>
 </UserControl>
