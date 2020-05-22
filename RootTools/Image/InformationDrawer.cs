@@ -13,12 +13,9 @@ namespace RootTools
 		{
 		}
 
-		public void AddDefectInfo(DefectData item)
+		public void AddDefectInfo(DefectDataWrapper item)
 		{
-			int left = (int)(item.fPosX - item.nWidth / 2.0);
-			int top = (int)(item.fPosY - item.nHeight / 2.0);
-
-			AddRectInfo(left, top, item.nWidth, item.nHeight, System.Windows.Media.Brushes.Red, 2);
+			AddRectInfo(item.DrawStartPoint.X, item.DrawStartPoint.Y, item.DrawWidth, item.DrawHeight, System.Windows.Media.Brushes.Red, 2);
 		}
 
 		private void AddRectInfo(int left, int top, int width, int height, System.Windows.Media.Brush brush, int thickness)

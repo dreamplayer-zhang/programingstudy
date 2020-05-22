@@ -113,7 +113,6 @@ namespace Root_Vega
 				dataRow["Length"] = item.nLength;
 				dataRow["Width"] = item.nWidth;
 				dataRow["Height"] = item.nHeight;
-				dataRow["InspMode"] = item.nInspMode;
 				//dataRow["FOV"] = item.FOV;
 				dataRow["PosX"] = item.fPosX;
 				dataRow["PosY"] = item.fPosY;

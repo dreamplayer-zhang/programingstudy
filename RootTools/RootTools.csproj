@@ -254,6 +254,7 @@
     <Compile Include="Gem\GemCJ.cs" />
     <Compile Include="Gem\GemPJ.cs" />
     <Compile Include="Gem\IGem.cs" />
+    <Compile Include="Image\DefectDataWrapper.cs" />
     <Compile Include="Image\DrawHelper.cs" />
     <Compile Include="Image\ImageViewer_ViewModel.cs" />
     <Compile Include="Image\ImageViewer.xaml.cs">
