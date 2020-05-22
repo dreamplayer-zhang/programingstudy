@@ -175,7 +175,6 @@ namespace Root_Vega
 
             p_SimpleShapeDrawer.Clear();
             p_ImageViewer.m_HistoryWorker.Clear();
-            p_ImageViewer.m_BasicTool.Clear();
             p_ImageViewer.SetImageSource();
             p_FeatureCnt = 0;
         }

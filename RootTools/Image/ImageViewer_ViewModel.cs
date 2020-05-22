@@ -17,7 +17,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 using System.Windows.Media;
-
+using RootTools.Inspects;
 
 namespace RootTools
 {
@@ -291,6 +291,7 @@ namespace RootTools
 				SetProperty(ref _TumbMouseX, value);
 			}
 		}
+
 		private int _TumbMouseY = 0;
 		public int p_TumbMouseY
 		{
@@ -437,9 +438,11 @@ namespace RootTools
 		}
 
 		private bool ToolExist = false;
+		bool InformationToolExist = false;
 		private DrawToolVM SelectedTool;
 		public DrawHistoryWorker m_HistoryWorker = new DrawHistoryWorker();
 		public ModifyManager m_ModifyManager;
+		public InformationDrawer informationDrawer;
 
 		DrawingMode m_Mode = DrawingMode.None;
 		public DrawingMode p_Mode
@@ -495,7 +498,8 @@ namespace RootTools
 
 		private readonly IDialogService m_DialogService;
 		#endregion
-		public UniquenessDrawerVM m_BasicTool; // 2_5에 m_DRawHelper.SetRectElement_MemPos 를 쓰므로 public 으로 선언. 
+		private UniquenessDrawerVM m_BasicTool;
+		private UniquenessDrawerVM m_InformationTool;
 		public ImageViewer_ViewModel(ImageData image = null, IDialogService dialogService = null)
 		{
 			if (image != null)
@@ -519,6 +523,11 @@ namespace RootTools
 			m_BasicTool.LineKeyValue = Key.LeftCtrl;
 			m_BasicTool.RectangleKeyValue = Key.LeftShift;
 			m_BasicTool.m_Stroke = System.Windows.Media.Brushes.Yellow;
+
+			m_InformationTool = new UniquenessDrawerVM(this);
+			m_InformationTool.m_Stroke = System.Windows.Media.Brushes.Red;
+
+
 			p_Element = new ObservableCollection<UIElement>();
 		}
 
@@ -528,6 +537,15 @@ namespace RootTools
 
 			if (SelectedTool != null)
 				ToolExist = true;
+		}
+		public void SetInformationViewer(InformationDrawer info)
+		{
+			informationDrawer = info;
+
+			if(informationDrawer!=null)
+			{
+				InformationToolExist = true;
+			}
 		}
 
 		public void SetImageData(ImageData image)
@@ -948,9 +966,17 @@ namespace RootTools
 			m_swMouse.Restart();
 		}
 
-		private void RedrawingElement()
+		public void RedrawingElement()
 		{
 			p_Element.Clear();
+
+			if(InformationToolExist)
+			{
+				foreach (UIElement TempElement in informationDrawer.m_Element)
+					p_Element.Add(TempElement);
+
+				informationDrawer.Redrawing();
+			}
 
 			if (ToolExist)
 			{
@@ -1010,23 +1036,6 @@ namespace RootTools
 				m_ModifyManager.Redrawing();
 			}
 		}
-
-		public CRect GetCurrentRect_MemPos()
-		{
-			try
-			{
-				CPoint StartPt = new CPoint(m_BasicTool.m_TempRect.StartPos);
-				CPoint EndPt = new CPoint(m_BasicTool.m_TempRect.EndPos);
-
-				return new CRect(StartPt.X, StartPt.Y, EndPt.X, EndPt.Y);
-			}
-			catch
-			{
-				return new CRect(0, 0, 0, 0);
-			}
-		}
-
-		// public event RedrawDelegate _RedrawDelegate;
 
 		private void KeyPressedDownFunction()
 		{

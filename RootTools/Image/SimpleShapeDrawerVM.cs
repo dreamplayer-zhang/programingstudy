@@ -559,7 +559,6 @@ namespace RootTools
 			UIElementInfo _Rect = new UIElementInfo();
 			if (_Shape.GetType() != typeof(Line))
 			{
-				double temp;
 				if (originRect.StartPos.X > originRect.EndPos.X)
 				{
 					_Rect.StartPos.X = originRect.EndPos.X;
