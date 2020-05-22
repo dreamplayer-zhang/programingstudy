@@ -12,22 +12,65 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
-            <ComboBox x:Name="comboFilter" Width="100" Margin="2"/>
-            <TextBox x:Name="textBoxFilter" Width="120" Margin="2" TextAlignment="Center"/>
-            <Button x:Name="buttonFilter" Width="54" Margin="2" Content="Filter" Click="buttonFilter_Click"/>
+            <ComboBox x:Name="comboLevel" Margin="2,2,22,2" MinWidth="50" SelectionChanged="comboLevel_SelectionChanged"/>
+            <StackPanel x:Name="stackLog" Orientation="Horizontal">
+                <Label Content="Clip으로 복사 : " VerticalAlignment="Center"/>
+                <Button x:Name="buttonSendClipSelect" Content="Selected" Margin="2" MinWidth="60" Click="buttonSendClipSelect_Click"/>
+                <Button x:Name="buttonSendClipAll" Content="All" Margin="2" MinWidth="60" Click="buttonSendClipAll_Click"/>
+                <Button x:Name="buttonSendClipAllFile" Content="All File" Margin="2" MinWidth="60" Click="buttonSendClipAllFile_Click"/>
+            </StackPanel>
+            <StackPanel x:Name="stackClip" Orientation="Horizontal">
+                <Button x:Name="buttonRemove" Content="Remove Selected" Margin="2" MinWidth="60" Click="buttonRemove_Click"/>
+                <Button x:Name="buttonSave" Content="Save as" Margin="22,2,2,2" MinWidth="60" Click="buttonSave_Click"/>
+                <Button x:Name="buttonSaveSimple" Content="Save Simple" Margin="2" MinWidth="60" Click="buttonSaveSimple_Click"/>
+            </StackPanel>
         </StackPanel>
         <DataGrid Grid.Row="1" x:Name="dataGrid" IsReadOnly="True" AutoGenerateColumns="False" GridLinesVisibility="None">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Time" Binding="{Binding p_sTime}"/>
-                <DataGridTextColumn Header="Logger" Binding="{Binding p_sLogger}"/>
-                <DataGridTemplateColumn Header="Message">
+                <DataGridTextColumn Binding="{Binding p_sTime}">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Time" TextAlignment="Center"/>
+                                <TextBox x:Name="textFilterTime" TextAlignment="Center" TextChanged="textFilterTime_TextChanged"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding p_sLogger}">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Logger" TextAlignment="Center"/>
+                                <TextBox x:Name="textFilterLogger" TextAlignment="Center" TextChanged="textFilterLogger_TextChanged"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
+                </DataGridTextColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Message" TextAlignment="Center"/>
+                                <TextBox x:Name="textFilterMessage" TextAlignment="Center" TextChanged="textFilterMessage_TextChanged"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding p_sMessage}" Foreground="Black" Background="{Binding p_sColor}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Stack Trace">
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Stack Trace" TextAlignment="Center"/>
+                                <TextBox x:Name="textFilterStackTrace" TextAlignment="Center" TextChanged="textFilterStackTrace_TextChanged"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding p_sStackTrace}" Foreground="Gray"/>

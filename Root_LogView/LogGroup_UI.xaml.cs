@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -19,16 +19,77 @@ namespace Root_LogView
         {
             m_logGroup = logGroup;
             DataContext = logGroup;
-            dataGrid.ItemsSource = logGroup.p_aLog;
-            foreach (DataGridColumn column in dataGrid.Columns) m_asColumn.Add((string)column.Header);
-            comboFilter.ItemsSource = m_asColumn;
-            comboFilter.SelectedIndex = 2; 
+            dataGrid.ItemsSource = logGroup.p_aLogFilter;
+            comboLevel.ItemsSource = Enum.GetValues(typeof(LogGroup.eLevel));
+            comboLevel.SelectedIndex = 0; 
+            if (logGroup.m_logClip == null) stackLog.Width = 0;
+            else stackClip.Width = 0; 
         }
 
-        List<string> m_asColumn = new List<string>(); 
-        private void buttonFilter_Click(object sender, RoutedEventArgs e)
+        #region Filter
+        private void textFilterTime_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            m_logGroup.m_filter.m_sTime = ((TextBox)e.Source).Text.ToString();
+            m_logGroup.InvalidFilter(); 
         }
+
+        private void textFilterLogger_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            m_logGroup.m_filter.m_sLogger = ((TextBox)e.Source).Text.ToString();
+            m_logGroup.InvalidFilter();
+        }
+
+        private void textFilterMessage_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            m_logGroup.m_filter.m_sMessage = ((TextBox)e.Source).Text.ToString();
+            m_logGroup.InvalidFilter();
+        }
+
+        private void textFilterStackTrace_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            m_logGroup.m_filter.m_sStackTrace = ((TextBox)e.Source).Text.ToString();
+            m_logGroup.InvalidFilter();
+        }
+
+        private void comboLevel_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            m_logGroup.m_filter.m_eLevel = (LogGroup.eLevel)comboLevel.SelectedItem;
+            m_logGroup.InvalidFilter();
+        }
+        #endregion 
+
+        #region Clip Function
+        private void buttonRemove_Click(object sender, RoutedEventArgs e)
+        {
+            m_logGroup.RemoveSelection(dataGrid.SelectedItems); 
+        }
+
+        private void buttonSave_Click(object sender, RoutedEventArgs e)
+        {
+            m_logGroup.FileSave(dataGrid.Items); 
+        }
+
+        private void buttonSaveSimple_Click(object sender, RoutedEventArgs e)
+        {
+            m_logGroup.FileSave(dataGrid.Items, true);
+        }
+        #endregion
+
+        #region Log Function
+        private void buttonSendClipSelect_Click(object sender, RoutedEventArgs e)
+        {
+            m_logGroup.SendClip(dataGrid.SelectedItems);
+        }
+
+        private void buttonSendClipAll_Click(object sender, RoutedEventArgs e)
+        {
+            m_logGroup.SendClip(dataGrid.Items);
+        }
+
+        private void buttonSendClipAllFile_Click(object sender, RoutedEventArgs e)
+        {
+            m_logGroup.m_logViewer.SendClip(m_logGroup.m_filter); 
+        }
+        #endregion
     }
 }
