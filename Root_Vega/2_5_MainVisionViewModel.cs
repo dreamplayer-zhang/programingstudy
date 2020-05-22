@@ -152,7 +152,7 @@ namespace Root_Vega
 				dataRow["No"] = currentDefectIdx;
 				currentDefectIdx++;
 				dataRow["DCode"] = item.nClassifyCode;
-				dataRow["Size"] = item.fAreaSize;
+				dataRow["AreaSize"] = item.fAreaSize;
 				dataRow["Length"] = item.nLength;
 				dataRow["Width"] = item.nWidth;
 				dataRow["Height"] = item.nHeight;
