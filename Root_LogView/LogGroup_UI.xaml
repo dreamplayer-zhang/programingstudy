@@ -12,22 +12,53 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center">
-            <ComboBox x:Name="comboFilter" Width="100" Margin="2"/>
-            <TextBox x:Name="textBoxFilter" Width="120" Margin="2" TextAlignment="Center"/>
-            <Button x:Name="buttonFilter" Width="54" Margin="2" Content="Filter" Click="buttonFilter_Click"/>
         </StackPanel>
         <DataGrid Grid.Row="1" x:Name="dataGrid" IsReadOnly="True" AutoGenerateColumns="False" GridLinesVisibility="None">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Time" Binding="{Binding p_sTime}"/>
-                <DataGridTextColumn Header="Logger" Binding="{Binding p_sLogger}"/>
-                <DataGridTemplateColumn Header="Message">
+                <DataGridTextColumn Binding="{Binding p_sTime}">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Time" TextAlignment="Center"/>
+                                <TextBox x:Name="textFilterTime" TextAlignment="Center" TextChanged="textFilterTime_TextChanged"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
+                </DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding p_sLogger}">
+                    <DataGridTextColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Logger" TextAlignment="Center"/>
+                                <TextBox x:Name="textFilterLogger" TextAlignment="Center" TextChanged="textFilterLogger_TextChanged"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTextColumn.HeaderTemplate>
+                </DataGridTextColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Message" TextAlignment="Center"/>
+                                <TextBox x:Name="textFilterMessage" TextAlignment="Center" TextChanged="textFilterMessage_TextChanged"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding p_sMessage}" Foreground="Black" Background="{Binding p_sColor}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Stack Trace">
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Stack Trace" TextAlignment="Center"/>
+                                <TextBox x:Name="textFilterStackTrace" TextAlignment="Center" TextChanged="textFilterStackTrace_TextChanged"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding p_sStackTrace}" Foreground="Gray"/>

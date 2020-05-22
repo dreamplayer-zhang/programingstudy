@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace Root_LogView
 {
@@ -19,16 +17,31 @@ namespace Root_LogView
         {
             m_logGroup = logGroup;
             DataContext = logGroup;
-            dataGrid.ItemsSource = logGroup.p_aLog;
-            foreach (DataGridColumn column in dataGrid.Columns) m_asColumn.Add((string)column.Header);
-            comboFilter.ItemsSource = m_asColumn;
-            comboFilter.SelectedIndex = 2; 
+            dataGrid.ItemsSource = logGroup.p_aLogFilter; 
         }
 
-        List<string> m_asColumn = new List<string>(); 
-        private void buttonFilter_Click(object sender, RoutedEventArgs e)
+        private void textFilterTime_TextChanged(object sender, TextChangedEventArgs e)
         {
+            m_logGroup.m_sFilterTime = ((TextBox)e.Source).Text.ToString();
+            m_logGroup.InvalidFilter(); 
+        }
 
+        private void textFilterLogger_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            m_logGroup.m_sFilterLogger = ((TextBox)e.Source).Text.ToString();
+            m_logGroup.InvalidFilter();
+        }
+
+        private void textFilterMessage_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            m_logGroup.m_sFilterMessage = ((TextBox)e.Source).Text.ToString();
+            m_logGroup.InvalidFilter();
+        }
+
+        private void textFilterStackTrace_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            m_logGroup.m_sFilterStackTrace = ((TextBox)e.Source).Text.ToString();
+            m_logGroup.InvalidFilter();
         }
     }
 }

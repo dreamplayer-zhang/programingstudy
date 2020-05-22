@@ -1,12 +1,14 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Windows.Media;
 
 namespace Root_LogView
 {
-    public class LogGroup
+    public class LogGroup : NotifyProperty
     {
         public LogGroup_UI p_ui
         {
@@ -19,7 +21,7 @@ namespace Root_LogView
         }
 
         #region Data
-        public List<Data> p_aLog { get; set; }
+        List<Data> m_aLog = new List<Data>(); 
         public class Data
         {
             public string p_sTime { get; set; }
@@ -72,19 +74,52 @@ namespace Root_LogView
             finally
             {
                 if (sr != null) sr.Dispose();
+                InvalidFilter(); 
             }
         }
 
         public void CalcDataGrid(string sLog)
         {
             Data data = new Data(sLog);
-            p_aLog.Add(data); 
+            m_aLog.Add(data); 
+        }
+        #endregion
+
+        #region Filter
+        public string m_sFilterTime = "";
+        public string m_sFilterLogger = "";
+        public string m_sFilterMessage = "";
+        public string m_sFilterStackTrace = "";
+
+        public ObservableCollection<Data> p_aLogFilter { get; set; }
+        public void InvalidFilter()
+        {
+            p_aLogFilter.Clear(); 
+            foreach (Data data in m_aLog)
+            {
+                if (IsVisible(data)) p_aLogFilter.Add(data); 
+            }
+        }
+
+        bool IsVisible(Data data)
+        {
+            if (IsVisible(m_sFilterTime, data.p_sTime) == false) return false;
+            if (IsVisible(m_sFilterLogger, data.p_sLogger) == false) return false;
+            if (IsVisible(m_sFilterMessage, data.p_sMessage) == false) return false;
+            if (IsVisible(m_sFilterStackTrace, data.p_sStackTrace) == false) return false;
+            return true; 
+        }
+
+        bool IsVisible(string sFilter, string sData)
+        {
+            if (sFilter == "") return true;
+            return sData.Contains(sFilter); 
         }
         #endregion
 
         public LogGroup()
         {
-            p_aLog = new List<Data>(); 
+            p_aLogFilter = new ObservableCollection<Data>(); 
         }
     }
 }
