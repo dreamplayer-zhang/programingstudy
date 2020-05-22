@@ -23,7 +23,6 @@ namespace Root_Vega
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
 		ImageData m_Image;
-		DrawData m_DD;
 		Recipe m_Recipe;
 
 		SqliteDataDB VSDBManager;
@@ -146,23 +145,6 @@ namespace Root_Vega
 
 			foreach (var item in source)
 			{
-				CPoint ptStart = new CPoint(Convert.ToInt32(item.fPosX - item.nWidth / 2.0), Convert.ToInt32(item.fPosY - item.nHeight / 2.0));
-				CPoint ptEnd = new CPoint(Convert.ToInt32(item.fPosX + item.nWidth / 2.0), Convert.ToInt32(item.fPosY + item.nHeight / 2.0));
-
-				CRect resultBlock = new CRect(ptStart.X, ptStart.Y, ptEnd.X, ptEnd.Y);
-
-				//CRect ImageSizeBlock = new CRect(
-				//	(int)item.fPosX - tempImageWidth / 2,
-				//	(int)item.fPosY - tempImageHeight / 2,
-				//	(int)item.fPosX + tempImageWidth / 2,
-				//	(int)item.fPosY + tempImageHeight / 2);
-
-				//string filename = currentDefectIdx.ToString("D8") + ".bmp";
-				//m_ImageViewer.p_ImageData.SaveRectImage(ImageSizeBlock, System.IO.Path.Combine(tempInspDir, filename));
-
-				m_DD.AddRectData(resultBlock, System.Drawing.Color.Red);
-
-				//여기서 DB에 Defect을 추가하는 부분도 구현한다
 				System.Data.DataRow dataRow = VSDataDT.NewRow();
 
 				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
@@ -180,16 +162,16 @@ namespace Root_Vega
 				dataRow["PosY"] = item.fPosY;
 
 				VSDataDT.Rows.Add(dataRow);
+				_dispatcher.Invoke(new Action(delegate ()
+				{
+					p_InformationDrawer.AddDefectInfo(item);
+					p_ImageViewer.RedrawingElement();
+				}));
 			}
-			_dispatcher.Invoke(new Action(delegate ()
-			{
-				RedrawUIElement();
-			}));
 		}
 
 		void Init(Vega_Engineer engineer, IDialogService dialogService)
 		{
-			m_DD = new DrawData();
 			p_Recipe = engineer.m_recipe;
 
 			m_MemoryModule = engineer.ClassMemoryTool();
@@ -202,11 +184,14 @@ namespace Root_Vega
 			m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
 			m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
 
+			p_InformationDrawer = new InformationDrawer(p_ImageViewer);
+
 			p_SimpleShapeDrawer.Add(new SimpleShapeDrawerVM(p_ImageViewer));
 			p_SimpleShapeDrawer.Add(new SimpleShapeDrawerVM(p_ImageViewer));
 			p_SimpleShapeDrawer[0].RectangleKeyValue = Key.D1;
 			p_SimpleShapeDrawer[1].RectangleKeyValue = Key.D1;
 			p_ImageViewer.SetDrawer((DrawToolVM)p_SimpleShapeDrawer[0]);
+			p_ImageViewer.SetInformationViewer(informationDrawer);
 			p_ImageViewer.m_HistoryWorker = m_DrawHistoryWorker_List[0];
 
 			//p_ListRoi = m_Recipe.m_RD.p_Roi;
@@ -310,6 +295,19 @@ namespace Root_Vega
 			}
 		}
 
+		private InformationDrawer informationDrawer;
+		public InformationDrawer p_InformationDrawer
+		{
+			get
+			{
+				return informationDrawer;
+			}
+			set
+			{
+				SetProperty(ref informationDrawer, value);
+			}
+		}
+
 		private ImageViewer_ViewModel m_ImageViewer;
 		public ImageViewer_ViewModel p_ImageViewer
 		{
@@ -320,19 +318,6 @@ namespace Root_Vega
 			set
 			{
 				SetProperty(ref m_ImageViewer, value);
-			}
-		}
-
-		private ObservableCollection<UIElement> _UIelement = new ObservableCollection<UIElement>();
-		public ObservableCollection<UIElement> p_UIElement
-		{
-			get
-			{
-				return _UIelement;
-			}
-			set
-			{
-				SetProperty(ref _UIelement, value);
 			}
 		}
 
@@ -458,8 +443,8 @@ namespace Root_Vega
 
 		private void ClearUI()
 		{
-			if (p_UIElement != null)
-				p_UIElement.Clear();
+			if (p_InformationDrawer != null)
+				p_InformationDrawer.Clear();
 		}
 		private void _btnClear()
 		{
@@ -485,58 +470,11 @@ namespace Root_Vega
 			Draw_IsChecked = false;
 			RecipeCursor = Cursors.Arrow;
 		}
-		//insp 결과 display를 위해 임시 redrawUI 구현
-		private void RedrawUIElement()
-		{
-			RedrawRect();
-			RedrawStr();
-		}
-		private void RedrawRect()
-		{
-			if (m_DD.m_RectData.Count > 0)
-			{
-				p_UIElement.Clear();
-				for (int i = 0; i < m_DD.m_RectData.Count; i++)
-				{
-					System.Windows.Shapes.Rectangle RedrawnRect = new System.Windows.Shapes.Rectangle();
-					CPoint LeftTopPt = GetCanvasPoint(m_DD.m_RectData[i].m_rt.Left, m_DD.m_RectData[i].m_rt.Top);
-					CPoint RighBottomPt = GetCanvasPoint(m_DD.m_RectData[i].m_rt.Right, m_DD.m_RectData[i].m_rt.Bottom);
-					RedrawnRect.Stroke = new SolidColorBrush(ConvertColor(m_DD.m_RectData[i].m_color));
-					RedrawnRect.StrokeThickness = 2;
-					Canvas.SetLeft(RedrawnRect, LeftTopPt.X);
-					Canvas.SetTop(RedrawnRect, LeftTopPt.Y);
-
-					RedrawnRect.Width = Math.Abs(LeftTopPt.X - RighBottomPt.X);
-					RedrawnRect.Height = Math.Abs(LeftTopPt.Y - RighBottomPt.Y);
-					p_UIElement.Add(RedrawnRect);
-				}
-			}
-		}
-		private void RedrawStr()
-		{
-			if (m_DD.m_StringData.Count > 0)
-			{
-				for (int i = 0; i < m_DD.m_StringData.Count; i++)
-				{
-					TextBlock RedrawnTB = new TextBlock();
-					CPoint TbPt = GetCanvasPoint(m_DD.m_StringData[i].m_pt.X, m_DD.m_StringData[i].m_pt.Y);
-					RedrawnTB.Text = m_DD.m_StringData[i].m_str;
-					RedrawnTB.Foreground = new SolidColorBrush(ConvertColor(m_DD.m_StringData[i].m_color));
-					Canvas.SetLeft(RedrawnTB, TbPt.X);
-					Canvas.SetTop(RedrawnTB, TbPt.Y);
-
-					p_UIElement.Add(RedrawnTB);
-				}
-
-			}
-		}
 		List<CRect> DrawRectList;
+
 		private void _btnInspTest()
 		{
 			ClearUI();//재검사 전 UI 정리
-
-			if (m_DD != null)
-				m_DD.Clear();//Draw Data정리
 
 			if (DrawRectList != null)
 				DrawRectList.Clear();//검사영역 draw용 Rect List 정리

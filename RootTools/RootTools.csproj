@@ -260,6 +260,7 @@
       <DependentUpon>ImageViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Image\ImageData.cs" />
+    <Compile Include="Image\InformationDrawer.cs" />
     <Compile Include="Image\SimpleShapeDrawerVM.cs" />
     <Compile Include="Image\UIElementInfo.cs" />
     <Compile Include="Inspects\DefectCode.cs" />
