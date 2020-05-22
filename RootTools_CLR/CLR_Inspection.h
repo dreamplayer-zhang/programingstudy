@@ -70,7 +70,6 @@ namespace RootTools_CLR
 					local[i]->nLength = vTempResult[i].nLength;
 					local[i]->nWidth = vTempResult[i].nWidth;
 					local[i]->nHeight = vTempResult[i].nHeight;
-					local[i]->nInspMode = vTempResult[i].nInspMode;
 					local[i]->nFOV = vTempResult[i].nFOV;
 					local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
 					local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
@@ -113,7 +112,6 @@ namespace RootTools_CLR
 					local[i]->nLength = vTempResult[i].nLength;
 					local[i]->nWidth = vTempResult[i].nWidth;
 					local[i]->nHeight = vTempResult[i].nHeight;
-					local[i]->nInspMode = vTempResult[i].nInspMode;
 					local[i]->nFOV = vTempResult[i].nFOV;
 					local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
 					local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다

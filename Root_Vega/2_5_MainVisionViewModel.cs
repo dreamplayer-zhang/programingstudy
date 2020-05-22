@@ -135,7 +135,7 @@ namespace Root_Vega
 		/// </summary>
 		/// <param name="source">UI에 추가할 Defect List</param>
 		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
-		private void M_InspManager_AddDefect(DefectData[] source, int nDCode)
+		private void M_InspManager_AddDefect(DefectDataWrapper[] source, int nDCode)
 		{
 			if (InspectionManager.GetInspectionType(nDCode) != InspectionType.Strip)
 			{
@@ -156,7 +156,6 @@ namespace Root_Vega
 				dataRow["Length"] = item.nLength;
 				dataRow["Width"] = item.nWidth;
 				dataRow["Height"] = item.nHeight;
-				dataRow["InspMode"] = item.nInspMode;
 				//dataRow["FOV"] = item.FOV;
 				dataRow["PosX"] = item.fPosX;
 				dataRow["PosY"] = item.fPosY;

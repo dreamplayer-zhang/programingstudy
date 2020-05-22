@@ -276,7 +276,8 @@ namespace RootTools
 
             int position = 0;
             byte[] aBuf = new byte[rect.Width * rect.Height];
-            for (int i = rect.Height - 1; i >= 0; i--)
+            //나중에 거꾸로 나왔던것 확인해야 함. 일단 지금은 정순으로 바꿔둠
+            for (int i = 0; i < rect.Height; i++)
             {
                 Marshal.Copy((IntPtr)((long)GetPtr() + rect.Left + ((long)i + (long)rect.Top) * p_Size.X), aBuf, position, rect.Width);
                 position += rect.Width;

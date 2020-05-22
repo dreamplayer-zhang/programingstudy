@@ -24,7 +24,7 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="source">Defect List</param>
 		/// <param name="args">arguments. 필요한 경우 수정해서 사용</param>
-		public delegate void ChangeDefectInfoEventHanlder(DefectData[] source, int nDCode);
+		public delegate void ChangeDefectInfoEventHanlder(DefectDataWrapper[] source, int nDCode);
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
@@ -138,7 +138,7 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="source">DefectData array</param>
 		/// <param name="args">추후 arguments가 필요하면 사용할것</param>
-		private void InspectionManager_AddDefect(DefectData[] source, int nDCode)
+		private void InspectionManager_AddDefect(DefectDataWrapper[] source, int nDCode)
 		{
 			#region DEBUG
 

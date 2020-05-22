@@ -18,7 +18,7 @@ namespace RootTools.Inspects
 		public delegate void EventHandler();
 		public EventHandler InspectionStart;
 		public EventHandler InspectionComplete;
-		public delegate void ChangeDefectInfoEventHander(DefectData[] source, int nDCode);
+		public delegate void ChangeDefectInfoEventHander(DefectDataWrapper[] source, int nDCode);
 		public event ChangeDefectInfoEventHander AddDefect;
 		#endregion
 
@@ -86,12 +86,12 @@ namespace RootTools.Inspects
 					bState = InspectionState.Running;
 
 
-					List<DefectData> arrDefects = new List<DefectData>();
+					List<DefectDataWrapper> arrDefects = new List<DefectDataWrapper>();
 					if (inspectionType == InspectionType.AbsoluteSurface && inspectionType == InspectionType.RelativeSurface)
 					{
 						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
 						{
-							arrDefects.AddRange(clrInsp.SurfaceInspection(
+							var temp = clrInsp.SurfaceInspection(
 								ThreadIndex,
 								m_InspProp.m_nDefectCode,
 								m_InspProp.p_Rect.Left,
@@ -103,14 +103,18 @@ namespace RootTools.Inspects
 								m_InspProp.p_surfaceParam.p_GV,
 								m_InspProp.p_surfaceParam.p_DefectSize,
 								m_InspProp.p_surfaceParam.p_bDarkInspection,
-								m_InspProp.p_surfaceParam.p_bAbsoluteInspection));
+								m_InspProp.p_surfaceParam.p_bAbsoluteInspection);
+							foreach (var item in temp)
+							{
+								arrDefects.Add(new DefectDataWrapper(item));
+							}
 						}
 					}
 					else if (inspectionType == InspectionType.Strip)
 					{
 						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
 						{
-							arrDefects.AddRange(clrInsp.StripInspection(
+							var temp = clrInsp.StripInspection(
 									   ThreadIndex,
 									   m_InspProp.m_nDefectCode,
 									   m_InspProp.p_Rect.Left,
@@ -122,12 +126,16 @@ namespace RootTools.Inspects
 									   m_InspProp.p_StripParam.p_GV,
 									   m_InspProp.p_StripParam.p_DefectSize,
 									   m_InspProp.p_StripParam.p_Intensity,
-									   m_InspProp.p_StripParam.p_Bandwidth));
+									   m_InspProp.p_StripParam.p_Bandwidth);
+							foreach (var item in temp)
+							{
+								arrDefects.Add(new DefectDataWrapper(item));
+							}
 						}
 					}
-					if (m_InspProp.p_bDefectMerge)
+					if (m_InspProp.p_bDefectMerge)//TODO : 기능 개선이 필요함. UI에 표시할때의 변수가 별도로 있는 것이 좋을 것으로 보임 + Defect Clustering구현
 					{
-						arrDefects = MergeDefect(arrDefects, m_InspProp.p_nMergeDistance);
+						arrDefects = DefectDataWrapper.MergeDefect(arrDefects.ToArray(), m_InspProp.p_nMergeDistance);
 					}
 					if (AddDefect != null)//대리자 호출을 간단하게 만들 수 있으나 vs2013에서 호환이 안 될 가능성이 없어 보류
 					{
@@ -142,89 +150,6 @@ namespace RootTools.Inspects
 					_thread.Join();
 				}
 			}
-		}
-
-		private List<DefectData> MergeDefect(List<DefectData> arrDefects, int nMergeDistance)
-		{
-			//List<DefectData> resultList = new List<DefectData>();
-			//return resultList;
-			for (int i = 0; i < arrDefects.Count; i++)
-			{
-				if (arrDefects[i].bMergeUsed)
-					continue;
-
-				//0부터 전부 돈다
-				//만약 merged옵션이 켜져있다면 해당 defect은 pass
-				//한바퀴 다 돌면 기준 defect의 merge는 무조건 true(추후 처리를 위함)
-				for (int j = i + 1; j < arrDefects.Count; j++)
-				{
-					if (arrDefects[i].nClassifyCode != arrDefects[j].nClassifyCode)
-						continue;
-
-					if (CheckMerge(arrDefects[i], arrDefects[j], nMergeDistance))
-					{
-						arrDefects[i] = MergeDefectInformation(arrDefects[i], arrDefects[j]);
-						arrDefects[j].bMergeUsed = true;
-					}
-				}
-				arrDefects[i].bMerged = true;
-			}
-			return arrDefects.Where(x => x.bMerged && !x.bMergeUsed).ToList();
-		}
-		/// <summary>
-		/// Origin Data의 정보와 Target Data의 정보를 합친다. 기준은 Origin Data가 된다
-		/// </summary>
-		/// <param name="originData">합칠때 기준이 되는 Defect Data</param>
-		/// <param name="targetData">합칠때 데이터를 보정할 정보로 쓰일 Defect Data</param>
-		/// <returns></returns>
-		private DefectData MergeDefectInformation(DefectData originData, DefectData targetData)
-		{
-			DefectData result = originData;
-
-			result.fPosX = (originData.fPosX + targetData.fPosX) / 2.0;
-			result.fPosY = (originData.fPosY + targetData.fPosY) / 2.0;
-
-			result.nWidth += targetData.nWidth;
-			result.nHeight += targetData.nHeight;
-			result.fSize += targetData.fSize;
-
-			result.nLength = result.nHeight;
-			if (result.nHeight < result.nWidth)
-			{
-				result.nLength = result.nWidth;
-			}
-
-			return result;
-		}
-
-		private bool CheckMerge(DefectData data1, DefectData data2, int distance)
-		{
-			int data1Width = data1.nWidth + (distance * 2);
-			int data1Height = data1.nHeight + (distance * 2);
-			Rectangle data1Rect = new Rectangle(
-				Convert.ToInt32(data1.fPosX - data1Width / 2.0),
-				Convert.ToInt32(data1.fPosY - data1Height / 2.0),
-				data1Width,
-				data1Height);
-
-			int data2Width = data2.nWidth + (distance * 2);
-			int data2Height = data2.nHeight + (distance * 2);
-			Rectangle data2Rect = new Rectangle(
-				Convert.ToInt32(data2.fPosX - data2Width / 2.0),
-				Convert.ToInt32(data2.fPosY - data2Height / 2.0),
-				data2Width,
-				data2Height);
-			var result = Rectangle.Intersect(data1Rect, data2Rect);
-			if(result.IsEmpty)
-			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
-			//return Convert.ToInt32(Math.Sqrt(Math.Pow(data1.fPosX - data2.fPosX, 2.0) + Math.Pow(data1.fPosY - data2.fPosY, 2.0)));//TODO : 사각형 두개가 겹치는지를 확인하여 return
-			//return true;//그냥 Merge가 되는지 안되는지 출력하기위해 강제로 true return
 		}
 
 		public enum InspectionState

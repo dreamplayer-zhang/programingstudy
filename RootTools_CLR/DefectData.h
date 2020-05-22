@@ -11,12 +11,8 @@ public:
 	int nLength;
 	int nWidth;
 	int nHeight;
-	int nInspMode;
 	int nFOV;
 	double fPosX;
 	double fPosY;
-
-	bool bMerged;
-	bool bMergeUsed;
 };
 
