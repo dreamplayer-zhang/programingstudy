@@ -22,7 +22,7 @@ protected:
 	byte inspbuffer2[16000000];
 	RECT inspbufferROI;
 	RECT GetInspbufferROI() const;
-	DefectDataStruct GetDefectData(RECT rt, POINT ptDPos, float fSize);
+	DefectDataStruct GetDefectData(RECT rt, POINT ptDPos, float nArea);
 public:
 	virtual void SetParams();
 	inline void SetDefectCode(int nValue)

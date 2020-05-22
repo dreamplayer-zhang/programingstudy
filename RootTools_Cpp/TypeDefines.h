@@ -17,7 +17,7 @@ typedef struct _DefectDataStruct
 {
 	LONG nIdx;
 	LONG nClassifyCode;
-	double fSize;
+	float fAreaSize;
 	LONG nLength;
 	LONG nWidth;
 	LONG nHeight;

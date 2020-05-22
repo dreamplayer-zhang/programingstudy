@@ -137,7 +137,7 @@ namespace RootTools
 		{
 			fPosX = item.fPosX;
 			fPosY = item.fPosY;
-			fSize = item.fSize;
+			fAreaSize = item.fAreaSize;
 			nClassifyCode = item.nClassifyCode;
 			nFOV = item.nFOV;
 			nWidth = item.nWidth;
@@ -218,7 +218,7 @@ namespace RootTools
 			 */
 			this.fPosX = ClusterItems.Average(x => x.fPosX);
 			this.fPosY = ClusterItems.Average(x => x.fPosY);
-			this.fSize = ClusterItems.Sum(x => x.fSize);
+			this.fAreaSize = ClusterItems.Sum(x => x.fAreaSize);
 			this.nClassifyCode = ClusterItems.First().nClassifyCode;
 			this.nFOV = ClusterItems.First().nFOV;
 			this.nWidth = ClusterItems.Sum(x => x.nWidth);

@@ -148,7 +148,7 @@ namespace RootTools.Inspects
 				StringBuilder stbr = new StringBuilder();
 				stbr.Append(data.nIdx);
 				stbr.Append(",");
-				stbr.Append(data.fSize);
+				stbr.Append(data.fAreaSize);
 				stbr.Append(",");
 				stbr.Append(data.fPosX);
 				stbr.Append(",");

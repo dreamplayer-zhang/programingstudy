@@ -7,7 +7,7 @@ public ref class DefectData
 public:
 	int nIdx;
 	int nClassifyCode;
-	double fSize;
+	float fAreaSize;
 	int nLength;
 	int nWidth;
 	int nHeight;

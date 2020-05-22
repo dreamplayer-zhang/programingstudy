@@ -66,7 +66,7 @@ namespace RootTools_CLR
 					local[i] = gcnew DefectData();
 					local[i]->nIdx = vTempResult[i].nIdx;
 					local[i]->nClassifyCode = nDefectCode;//vTempResult[i].nClassifyCode;
-					local[i]->fSize = vTempResult[i].fSize;
+					local[i]->fAreaSize = vTempResult[i].fAreaSize;
 					local[i]->nLength = vTempResult[i].nLength;
 					local[i]->nWidth = vTempResult[i].nWidth;
 					local[i]->nHeight = vTempResult[i].nHeight;
@@ -108,7 +108,7 @@ namespace RootTools_CLR
 					local[i] = gcnew DefectData();
 					local[i]->nIdx = vTempResult[i].nIdx;
 					local[i]->nClassifyCode = nDefectCode;//vTempResult[i].nClassifyCode;
-					local[i]->fSize = vTempResult[i].fSize;
+					local[i]->fAreaSize = vTempResult[i].fAreaSize;
 					local[i]->nLength = vTempResult[i].nLength;
 					local[i]->nWidth = vTempResult[i].nWidth;
 					local[i]->nHeight = vTempResult[i].nHeight;
