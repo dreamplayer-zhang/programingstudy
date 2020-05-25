@@ -1093,7 +1093,6 @@
                                                Width="10"
                                                Margin="40,0,0,0" />
                                 </Grid>
-                               
                                 <Grid Canvas.Right="50"
                                       Height="100">
                                     <Canvas.Top>

@@ -1,14 +1,19 @@
-﻿using RootModule;
-using RootTools;
+﻿using RootTools;
+using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
+using RootTools.Inspects;
 using RootTools.Light;
 using RootTools.Memory;
-using RootTools.Tree;
-using RootTools_Inspect;
+using RootTools.Module;
+using RootTools.Trees;
+using RootTools.ZoomLens;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
+using System.Windows.Media;
 
 namespace Root_Vega.Module
 {
@@ -16,7 +21,21 @@ namespace Root_Vega.Module
     {
         #region ToolBox
         AxisXY m_axisXY;
+        public AxisXY p_axisXY
+        {
+            get
+            {
+                return m_axisXY;
+            }
+        }
         Axis m_axisZ;
+        public Axis p_axisZ
+        {
+            get
+            {
+                return m_axisZ;
+            }
+        }
         public Camera_Dalsa m_CamMain;
         public Camera_Basler m_CamVRS;
         public Camera_Basler m_CamAlign1;
@@ -25,6 +44,8 @@ namespace Root_Vega.Module
         public LightSet m_lightSet;
         MemoryPool m_memoryPool;
         InspectTool m_inspectTool;
+        ZoomLens m_ZoomLens;
+        public ZoomLens p_ZoomLens;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
@@ -36,12 +57,13 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
+            p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
             if (bInit) m_inspectTool.OnInspectDone += M_inspectTool_OnInspectDone;
         }
 
         private void M_inspectTool_OnInspectDone(InspectTool.Data data)
         {
-            p_sInfo = data.p_sInfo; //forget
+            p_sInfo = data.p_sInfo; 
         }
         #endregion
 
@@ -56,7 +78,7 @@ namespace Root_Vega.Module
 
         #region Grab Mode
         int m_lGrabMode = 0;
-        public List<GrabMode> m_aGrabMode = new List<GrabMode>();
+        public ObservableCollection<GrabMode> m_aGrabMode = new ObservableCollection<GrabMode>();
         public List<string> p_asGrabMode
         {
             get
@@ -124,7 +146,7 @@ namespace Root_Vega.Module
         public string IsPutOK(ref int posRobot, InfoReticle infoReticle)
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            if (p_infoReticle == null) return p_id + " IsPutOK - InfoReticle Exist";
+            if (p_infoReticle != null) return p_id + " IsPutOK - InfoReticle Exist";
             posRobot = m_nTeachRobot;
             return "OK";
         }
@@ -158,6 +180,30 @@ namespace Root_Vega.Module
             return "OK";
         }
 
+        public bool IsReticleExist(bool bIgnoreExistSensor = false)
+        {
+            bool bExist = false;
+            if (bIgnoreExistSensor) bExist = (p_infoReticle != null);
+            else
+            {
+                //forget
+            }
+            p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
+            return bExist;
+        }
+
+        Brush _brushReticleExist = Brushes.Green;
+        public Brush p_brushReticleExist
+        {
+            get { return _brushReticleExist; }
+            set
+            {
+                if (_brushReticleExist == value) return;
+                _brushReticleExist = value;
+                OnPropertyChanged();
+            }
+        }
+
         int m_nTeachRobot = 0;
         public void RunTeachTree(Tree tree)
         {
@@ -176,7 +222,7 @@ namespace Root_Vega.Module
                 m_sInfoReticle = (value == null) ? "" : value.p_id;
                 _infoReticle = value;
                 if (m_reg != null) m_reg.Write("sInfoReticle", m_sInfoReticle);
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -185,14 +231,14 @@ namespace Root_Vega.Module
         {
             m_reg = new Registry(p_id + ".InfoReticle");
             m_sInfoReticle = m_reg.Read("sInfoReticle", m_sInfoReticle);
-            if (m_sInfoReticle == "") return;
-            p_infoReticle = new InfoReticle(m_sInfoReticle, m_engineer);
+            p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
         }
         #endregion
 
         #region override Function
         public override string StateHome()
         {
+            if (EQ.p_bSimulate) return "OK";
             p_bStageVac = true;
             Thread.Sleep(200);
             p_sInfo = base.StateHome();
@@ -214,9 +260,9 @@ namespace Root_Vega.Module
         }
         #endregion
 
-        public PatternVision(string id, IEngineer engineer, string sLogGroup = "")
+        public PatternVision(string id, IEngineer engineer)
         {
-            base.InitBase(id, engineer, sLogGroup);
+            base.InitBase(id, engineer);
         }
 
         public override void ThreadStop()
@@ -252,6 +298,7 @@ namespace Root_Vega.Module
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
             AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
+            AddModuleRunList(new Run_Grab(this), true, "Run Grab");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -307,6 +354,164 @@ namespace Root_Vega.Module
             {
                 Thread.Sleep((int)(1000 * m_secDelay));
                 return "OK";
+            }
+        }
+        
+        public class Run_Grab : ModuleRunBase
+        {
+            PatternVision m_module;
+            public Run_Grab(PatternVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public GrabMode m_grabMode = null;
+            string _sGrabMode = "";
+            string p_sGrabMode
+            {
+                get { return _sGrabMode; }
+                set
+                {
+                    _sGrabMode = value;
+                    m_grabMode = m_module.GetGrabMode(value);
+                }
+            }
+
+            bool m_bInvDir = false;
+            public RPoint m_rpAxis = new RPoint();
+            public double m_fRes = 1;
+            public int m_nFocusPos = 0;
+            public CPoint m_cpMemory = new CPoint();
+            public int m_yLine = 1000;
+            public override ModuleRunBase Clone()
+            {
+                Run_Grab run = new Run_Grab(m_module);
+                run.p_sGrabMode = p_sGrabMode;
+                run.m_fRes = m_fRes;
+                run.m_bInvDir = m_bInvDir;
+                run.m_nFocusPos = m_nFocusPos;
+                run.m_rpAxis = new RPoint(m_rpAxis);
+                run.m_cpMemory = new CPoint(m_cpMemory);
+                run.m_yLine = m_yLine;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_rpAxis = tree.Set(m_rpAxis, m_rpAxis, "Center Axis Position", "Center Axis Position (mm ?)", bVisible);
+                m_fRes = tree.Set(m_fRes, m_fRes, "Cam Resolution", "Resolution  um", bVisible);
+                m_nFocusPos = tree.Set(m_nFocusPos, 0, "Focus Z Pos", "Focus Z Pos", bVisible);
+                m_cpMemory = tree.Set(m_cpMemory, m_cpMemory, "Memory Position", "Grab Start Memory Position (pixel)", bVisible);
+                m_bInvDir = tree.Set(m_bInvDir, m_bInvDir, "Inverse Direction", "Grab Direction", bVisible);
+                m_yLine = tree.Set(m_yLine, m_yLine, "WaferSize", "# of Grab Lines", bVisible);
+                p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
+            }
+
+            public override string Run()
+            {
+                if (m_grabMode == null) return "Grab Mode == null";
+                try
+                {
+                    int nScanLine = 0;
+                    m_grabMode.SetLight(true);
+                    AxisXY axisXY = m_module.p_axisXY;
+                    Axis axisZ = m_module.p_axisZ;
+                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.p_sz.X;
+                    m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fRes);        // 축해상도 0.1um로 하드코딩.
+                    int nLines = Convert.ToInt32(m_yLine * 1000 / m_fRes);
+                    while (m_grabMode.m_ScanLineNum > nScanLine)
+                    {
+                        if (EQ.IsStop())
+                            return "OK";
+                        double yAxis = m_grabMode.m_dTrigger * nLines;     // 총 획득할 Image Y 
+                        /*위에서 아래로 찍는것을 정방향으로 함, 즉 Y 축 값이 큰쪽에서 작은쪽으로 찍는것이 정방향*/
+                        /* Grab하기 위해 이동할 Y축의 시작 끝 점*/
+                        double yPos0 = m_rpAxis.Y - yAxis / 2 - m_grabMode.m_intervalAcc;
+                        double yPos1 = m_rpAxis.Y + yAxis / 2 + m_grabMode.m_intervalAcc;
+
+                        m_grabMode.m_eGrabDirection = GrabMode.eDirection.Forward;
+                        if (m_grabMode.m_bUseBiDirectionScan && Math.Abs(axisXY.p_axisY.p_posActual - yPos0) > Math.Abs(axisXY.p_axisY.p_posActual - yPos1))
+                        {
+                            double buffer = yPos0;            //yp1 <--> yp0 바꿈.
+                            yPos0 = yPos1;
+                            yPos1 = buffer;
+                            m_grabMode.m_eGrabDirection = GrabMode.eDirection.BackWard;
+                        }
+
+                        /* 조명 Set하는거 Test해서 넣어야됨.*/
+                        //m_grabMode.SetLight(true);
+                        double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.p_sz.X * m_grabMode.m_dTrigger; //해상도추가필요
+
+                        if (m_module.Run(axisZ.Move(m_nFocusPos)))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.Move(new RPoint(nPosX, yPos0))))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady()))
+                            return p_sInfo;
+                        if (m_module.Run(axisZ.WaitReady()))
+                            return p_sInfo;
+
+                        double yTrigger0 = m_rpAxis.Y - yAxis / 2;
+                        double yTrigger1 = m_rpAxis.Y + yAxis / 2;
+                        m_module.p_axisXY.p_axisY.SetTrigger(yTrigger0, yTrigger1, m_grabMode.m_dTrigger, true);
+
+                        /* 메모리 위치도 가져오게는 좀 다시 하자.*/
+                        string sPool = "PatternVision.Memory";
+                        string sGroup = m_grabMode.p_sMemoryGroup;
+                        string sMem = m_grabMode.p_sMemoryData;
+                        MemoryData mem = m_module.m_engineer.GetMemory(sPool, sGroup, sMem);
+
+                        /* 방향 바꾸는 코드 들어가야함*/
+                        m_grabMode.StartGrab(mem, m_cpMemory, nLines, m_grabMode.m_eGrabDirection == GrabMode.eDirection.BackWard);
+                        if (m_module.Run(axisXY.p_axisY.Move(yPos1)))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady()))
+                            return p_sInfo;
+                        axisXY.p_axisY.ResetTrigger();
+
+                        nScanLine++;
+                        m_cpMemory.X += m_grabMode.m_camera.p_sz.X;
+                    }
+                    m_grabMode.m_camera.StopGrab();
+                    #region Grab1차 Test후에 코드 부분
+                    //double yp0 = m_bInvDir ? m_rpAxis.Y + yAxis + m_grabMode.m_mmAcc : m_rpAxis.Y - m_grabMode.m_mmAcc;
+                    //double yp1 = m_bInvDir ? m_rpAxis.Y - m_grabMode.m_mmAcc : m_rpAxis.Y + yAxis + m_grabMode.m_mmAcc;
+
+                    //m_grabMode.SetLight(true);
+
+                    //double yp0 = m_bInvDir ? m_rpAxis.Y + yAxis + m_grabMode.m_mmAcc : m_rpAxis.Y - m_grabMode.m_mmAcc;
+                    //double yp1 = m_bInvDir ? m_rpAxis.Y - m_grabMode.m_mmAcc : m_rpAxis.Y + yAxis + m_grabMode.m_mmAcc;
+                    //if (m_module.Run(axisXY.Move(new RPoint(m_rpAxis.X, yp1))))
+                    //    return p_sInfo;
+                    //if (m_module.Run(axisXY.WaitReady()))
+                    //    return p_sInfo;
+
+                    //double yTrigger0 = m_bInvDir ? m_rpAxis.Y - m_grabMode.m_mmAcc : m_rpAxis.Y;
+                    //double yTrigger1 = m_bInvDir ? m_rpAxis.Y + yAxis : m_rpAxis.Y + yAxis;
+                    //m_module.m_axisXY.m_axisY.SetTrigger(yTrigger0, yTrigger1, 10, true);
+                    ////m_grabMode.SetTrigger(m_module.m_axisXY.m_axisY, yTrigger0, yTrigger1);
+                    //string sPool = "pool";
+                    //string sGroup = "grou p";
+                    //string sMem = "mem";
+                    //MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetPool(sPool).GetGroup(sGroup).GetMemory(sMem);
+
+                    ////m_grabMode.StartGrab(m_grabMode.m_memoryData, new CPoint(0, 0), m_yLine, m_bInvDir);
+                    //m_grabMode.StartGrab(mem, m_cpMemory, m_yLine, m_bInvDir);
+                    //if (m_module.Run(axisXY.m_axisY.Move(yp0)))
+                    //    return p_sInfo;
+                    //if (m_module.Run(axisXY.WaitReady()))
+                    //    return p_sInfo;
+                    //axisXY.m_axisY.ResetTrigger();
+                    #endregion
+                    return "OK";
+                }
+                finally
+                {
+                    //m_grabMode.ResetTrigger(m_module.m_axisXY.m_axisY);
+                    m_grabMode.SetLight(false);
+                }
             }
         }
         #endregion

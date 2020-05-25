@@ -26,7 +26,6 @@ namespace RootTools.Control
 
         void ClearPos();
         void AddPos(string sPos);
-        double GetPos(string sPos);
         double p_posCommand { get; set; }
         double p_posActual { get; set; }
         double p_vNow { get; set; }

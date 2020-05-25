@@ -14,7 +14,7 @@ namespace Root_Vega
     {
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
         SideVision m_Vision;
-        SideVision.Run_SideGrab m_RunSideGrab;
+        SideVision.Run_SideGrab m_RunGrab;
         int m_StartY = 0;
         public int p_StartLine
         {
@@ -27,9 +27,6 @@ namespace Root_Vega
                 SetProperty(ref m_StartY, value);
             }
         }
-        
-        SideVision.Run_BevelGrab m_RunBevelGrab;
-        
         int m_ScanNum = 0;
         public int p_ScanNum
         {
@@ -92,15 +89,14 @@ namespace Root_Vega
                 p_StartLine = m_SelGrabMode.m_ScanStartLine;
                 p_ScanNum = m_SelGrabMode.m_ScanLineNum;
                 if (m_SelGrabMode.m_camera.p_sz.X != 0)
-                    p_ScanWholeLine = (int)Math.Ceiling(m_RunSideGrab.m_xLine * 1000 / (m_SelGrabMode.m_camera.p_sz.X * m_RunSideGrab.m_fRes));
+                    p_ScanWholeLine = (int)Math.Ceiling(m_RunGrab.m_xLine * 1000 / (m_SelGrabMode.m_camera.p_sz.X * m_RunGrab.m_fRes));
             }
         }
 
-        public Dialog_SideScan_ViewModel(SideVision vision, SideVision.Run_SideGrab SideGrab, SideVision.Run_BevelGrab BevelGrab)
+        public Dialog_SideScan_ViewModel(SideVision vision, SideVision.Run_SideGrab grab)
         {
             m_Vision = vision;
-            m_RunSideGrab = SideGrab;
-            m_RunBevelGrab = BevelGrab;
+            m_RunGrab = grab;
             p_GrabMode = m_Vision.m_aGrabMode;
             if (p_GrabMode.Count != 0)
             {
@@ -115,18 +111,8 @@ namespace Root_Vega
                 return;
             p_SelGrabMode.m_ScanLineNum = p_ScanNum;
             p_SelGrabMode.m_ScanStartLine = p_StartLine;
-            if(p_SelGrabMode.p_sName.IndexOf("SIDE") >=0)
-            {
-                m_RunSideGrab.m_grabMode = p_SelGrabMode;
-                m_RunSideGrab.m_eScanPos = p_eSelScanPos;
-                m_RunBevelGrab.m_grabMode = null;
-            }
-            else if( p_SelGrabMode.p_sName.IndexOf("BEVEL")>=0)
-            {
-                m_RunBevelGrab.m_grabMode = p_SelGrabMode;
-                m_RunBevelGrab.m_eScanPos = p_eSelScanPos;
-                m_RunSideGrab.m_grabMode = null;
-            }
+            m_RunGrab.m_grabMode = p_SelGrabMode;
+            m_RunGrab.m_eScanPos = p_eSelScanPos;
             CloseRequested(this, new DialogCloseRequestedEventArgs(true));
         }
 

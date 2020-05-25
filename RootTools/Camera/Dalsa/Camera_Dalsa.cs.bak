@@ -323,11 +323,6 @@ namespace RootTools.Camera.Dalsa
             GrabArea();
         }
 
-        public CPoint GetRoiSize()
-        {
-            return new CPoint(m_CamParam.p_Width, m_CamParam.p_Height);
-        }
-
         public CPoint p_sz
         {
             get { return new CPoint(m_CamParam.p_Width, m_CamParam.p_Height); }
@@ -336,8 +331,8 @@ namespace RootTools.Camera.Dalsa
 
         public string StopGrab()
         {
-            m_nGrabCount = 0;
-            m_sapXfer.Freeze();
+            //m_nGrabCount = 0;
+            //m_sapXfer.Freeze();
             return "OK";
         }
 

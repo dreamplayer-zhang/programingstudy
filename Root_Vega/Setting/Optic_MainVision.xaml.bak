@@ -764,8 +764,7 @@
                                         </Grid.ColumnDefinitions>
                                         <Button Grid.Column="0"
                                                 Margin="5"
-                                                Style="{StaticResource BasicBtn}"
-                                                Command="{Binding CommandHome}">
+                                                Style="{StaticResource BasicBtn}">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
                                                     <material:PackIcon Kind="Home"
@@ -781,8 +780,7 @@
                                         </Button>
                                         <Button Grid.Column="1"
                                                 Margin="5"
-                                                Style="{StaticResource BasicBtn}"
-                                                Command="{Binding CommandStop}">
+                                                Style="{StaticResource BasicBtn}">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
                                                     <material:PackIcon Kind="StopCircleOutline"
@@ -798,8 +796,7 @@
                                         </Button>
                                         <Button Grid.Column="2"
                                                 Margin="5"
-                                                Style="{StaticResource BasicBtn}"
-                                                Command="{Binding CommandScan}">
+                                                Style="{StaticResource BasicBtn}">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
                                                     <material:PackIcon Kind="Camera"

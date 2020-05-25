@@ -319,10 +319,6 @@ namespace RootTools.Camera.Dalsa
             m_sapXfer.Freeze();
             return "OK";
         }
-        public CPoint GetRoiSize()
-        {
-            return null;
-        }
 
         Queue<int> m_qGrab = new Queue<int>(); 
         private void M_sapXfer_XferNotify(object sender, SapXferNotifyEventArgs args)

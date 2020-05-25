@@ -21,10 +21,7 @@ namespace RootTools.Light
 
         public double p_fPower
         {
-            get {
-                if (m_light == null)
-                    return 0;
-                return m_light.p_fSetPower; }
+            get { return m_light.p_fSetPower; }
             set
             {
                 if (m_light.p_fSetPower == value) return;
