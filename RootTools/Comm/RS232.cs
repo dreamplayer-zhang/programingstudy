@@ -174,7 +174,7 @@ namespace RootTools.Comm
         public delegate void dgOnRecieve(string sRead);
         public event dgOnRecieve OnRecieve;
 
-        string m_sRead = ""; 
+        public string m_sRead = ""; 
         private void M_sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             if (OnRecieve == null) return;
