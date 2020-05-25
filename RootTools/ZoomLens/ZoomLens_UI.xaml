@@ -12,6 +12,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -209,7 +210,13 @@
                 </Border>
             </Grid>
         </Grid>
-        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
-        <comm:RS232_UI Grid.Row="2" x:Name="rs232UI"/>
+        <Grid Grid.Row="1">
+            <TextBlock FontSize="25"
+                       TextAlignment="Center"
+                       VerticalAlignment="Center"
+                       Text="{Binding p_nCurrentPos}"></TextBlock>
+        </Grid>
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
+        <comm:RS232_UI Grid.Row="3" x:Name="rs232UI"/>
     </Grid>
 </UserControl>

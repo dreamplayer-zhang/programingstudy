@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace RootTools.ZoomLens
 {
-    public class ZoomLens : NotifyProperty, ITool
+    public class ZoomLens : ObservableObject, ITool
     {
         #region Property
         string m_id;
@@ -18,7 +18,7 @@ namespace RootTools.ZoomLens
             {
                 if (value == _sInfo) return;
                 _sInfo = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();
                 if (value == "OK") return;
                 m_log.Error(value);
             }
@@ -37,6 +37,12 @@ namespace RootTools.ZoomLens
         }
         #endregion
 
+        int m_nCurrentPos;
+        public int p_nCurrentPos
+        {
+            get { return m_nCurrentPos; }
+            set { SetProperty(ref m_nCurrentPos, value); }
+        }
         public Log m_log;
         public RS232 m_rs232;
         public ZoomLens(string id, Log log)
@@ -71,6 +77,9 @@ namespace RootTools.ZoomLens
                     }
                 case eCommand.GET_STATUS:
                     {
+                        string strResult = m_rs232.m_sRead;
+                        string strPos = strResult.Substring(0, 8);
+                        p_nCurrentPos = int.Parse(strPos);
                         break;
                     }
                 case eCommand.TOGGLE_RESPONSE:
