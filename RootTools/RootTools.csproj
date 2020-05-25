@@ -281,6 +281,11 @@
     <Compile Include="Inspects\SqliteDataDB.cs" />
     <Compile Include="Logs\ILogGroup.cs" />
     <Compile Include="Logs\Log.cs" />
+    <Compile Include="Logs\LogMars.cs" />
+    <Compile Include="Logs\LogMars_Group.cs" />
+    <Compile Include="Logs\LogMars_Group_UI.xaml.cs">
+      <DependentUpon>LogMars_Group_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Logs\LogView.cs" />
     <Compile Include="Logs\LogView_UI.xaml.cs">
       <DependentUpon>LogView_UI.xaml</DependentUpon>
@@ -417,8 +422,6 @@
     <Compile Include="Login_UI.xaml.cs">
       <DependentUpon>Login_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Log\LogMars.cs" />
-    <Compile Include="Log\LogWriter.cs" />
     <Compile Include="Memory\MemoryData.cs" />
     <Compile Include="Memory\MemoryGroup.cs" />
     <Compile Include="Memory\MemoryPool.cs" />
@@ -436,7 +439,6 @@
     </Compile>
     <Compile Include="Registry.cs" />
     <Compile Include="IEngineer.cs" />
-    <Compile Include="Log\LogViewX.cs" />
     <Compile Include="ViewModelHelper\NotifyProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -661,6 +663,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\ListDIO_ShortID_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Logs\LogMars_Group_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

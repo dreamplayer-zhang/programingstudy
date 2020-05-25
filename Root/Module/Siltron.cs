@@ -3,6 +3,7 @@ using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
 using RootTools.Light;
+using RootTools.Logs;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
@@ -122,7 +123,7 @@ namespace Root.Module
         {
             CameraBasler m_camera = null;
             MemoryData m_memory = null;
-            LightSet m_lightSet = null;
+            //LightSet m_lightSet = null;
 
             public void GetTool(Siltron siltron)
             {
@@ -217,8 +218,34 @@ namespace Root.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
+            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
             AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
             AddModuleRunList(new Run_GrabLineScan(this), false, "Run Grab LineScan Camera");
+        }
+
+        public class Run_Delay : ModuleRunBase
+        {
+            Siltron m_module;
+            public Run_Delay(Siltron module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Delay run = new Run_Delay(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return "OK";
+            }
         }
 
         public class Run_Rotate : ModuleRunBase

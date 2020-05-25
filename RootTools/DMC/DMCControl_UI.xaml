@@ -9,36 +9,6 @@
              xmlns:tree="clr-namespace:RootTools.Trees"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <converter:TabSizeConverter x:Key="tabSizeConverter" />
-        <LinearGradientBrush x:Key="TabitemBackground" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#FF3C3C3C" Offset="0"/>
-            <GradientStop Color="#FF6E6E6E" Offset="1"/>
-        </LinearGradientBrush>
-        <Style TargetType="TabItem">
-            <Setter Property="Background" Value="{StaticResource TabitemBackground}"/>
-            <Setter Property="Width">
-                <Setter.Value>
-                    <MultiBinding Converter="{StaticResource tabSizeConverter}">
-                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type TabControl}}"/>
-                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type TabControl}}" Path="ActualWidth"/>
-                    </MultiBinding>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="TextElement.Foreground">
-                        <Setter.Value>
-                            <SolidColorBrush Color="Black"/>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-                <Trigger Property="Selector.IsSelected" Value="False">
-                    <Setter Property="Foreground" Value="White"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

@@ -49,7 +49,7 @@ namespace RootTools.ZoomLens
             m_ZoomLens.AbsoluteGo(nMovePos);
         }
 
-        private void PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private new void PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             Button btn = (Button)sender;
             if (btn.Name == "btnUp")
@@ -63,7 +63,7 @@ namespace RootTools.ZoomLens
             Console.WriteLine("PreviewMouseLeftButtonDown");
         }
 
-        private void PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private new void PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             m_ZoomLens.Stop();
             Console.WriteLine("PreviewMouseLeftButtonUp");
