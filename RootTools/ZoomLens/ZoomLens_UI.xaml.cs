@@ -19,8 +19,8 @@ namespace RootTools.ZoomLens
         {
             m_ZoomLens = zoomLens;
             this.DataContext = zoomLens;
-            m_ZoomLens.p_rs232.p_bConnect = true;
-            rs232UI.Init(zoomLens.p_rs232);
+            m_ZoomLens.m_rs232.p_bConnect = true;
+            rs232UI.Init(zoomLens.m_rs232);
         }
 
         private void HomeButtonClick(object sender, System.Windows.RoutedEventArgs e)
