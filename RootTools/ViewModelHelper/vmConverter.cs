@@ -634,6 +634,8 @@ namespace ViewConverter
             else if (strAxis == "AxisZ") dControlLength = 30.0;
             else if (strAxis == "AxisTheta")
             {
+                dMinusLimit = -180000.0;
+                dPlusLimit = 180000.0;
                 dStageLength = 360.0;
                 dControlLength = 0.0;
             }

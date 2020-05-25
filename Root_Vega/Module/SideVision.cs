@@ -739,48 +739,67 @@ namespace Root_Vega.Module
         public class Run_AutoFocus : ModuleRunBase
         {
             public class CStepInfoList : ObservableCollection<CStepInfo> { }
-            public class CStepInfo
+            public class CStepInfo : ObservableObject
             {
                 string m_strInfo;
                 public string p_strInfo
                 {
                     get { return m_strInfo; }
+                    set { SetProperty(ref m_strInfo, value); }
                 }
                 BitmapSource m_img;
                 public BitmapSource p_img
                 {
                     get { return m_img; }
+                    set { SetProperty(ref m_img, value); }
                 }
 
                 public CStepInfo(string strInfo, BitmapSource img)
                 {
-                    m_strInfo = strInfo;
-                    m_img = img;
+                    p_strInfo = strInfo;
+                    p_img = img.Clone();
                 }
             }
-            public CStepInfoList m_lstLeftStepInfo;
-            public CStepInfoList m_lstRightStepInfo;
-            public class CAutoFocusStatus
+            CStepInfoList m_lstLeftStepInfo;
+            public CStepInfoList p_lstLeftStepInfo
+            {
+                get { return m_lstLeftStepInfo; }
+                set { SetProperty(ref m_lstLeftStepInfo, value); }
+            }
+            CStepInfoList m_lstRightStepInfo;
+            public CStepInfoList p_lstRightStepInfo
+            {
+                get { return m_lstRightStepInfo; }
+                set { SetProperty(ref m_lstRightStepInfo, value); }
+            }
+            public class CAutoFocusStatus : ObservableObject
             {
                 public double m_dTheta;
                 public double p_dTheta
                 {
                     get { return m_dTheta; }
+                    set { SetProperty(ref m_dTheta, value); }
                 }
 
                 public string m_strStatus;
                 public string p_strStatus
                 {
                     get { return m_strStatus; }
+                    set { SetProperty(ref m_strStatus, value); }
                 }
 
                 public CAutoFocusStatus(double dTheta, string strStatus)
                 {
-                    m_dTheta = dTheta;
-                    m_strStatus = strStatus;
+                    p_dTheta = dTheta;
+                    p_strStatus = strStatus;
                 }
             }
-            public CAutoFocusStatus m_afs;
+            CAutoFocusStatus m_afs;
+            public CAutoFocusStatus p_afs
+            {
+                get { return m_afs; }
+                set { SetProperty(ref m_afs, value); }
+            }
             SideVision m_module;
             public double m_dLeftStartPosX = 0.0;
             public double m_dLeftEndPosX = 0.0;
@@ -793,16 +812,14 @@ namespace Root_Vega.Module
             public int m_nStep = 0;
             public int m_nVarianceSize = 0;
             public bool m_bUsingSobel = true;
-            public ImageData m_imgDataLeft = null;
-            public ImageData m_imgDataRight = null;
-
+           
             public Run_AutoFocus(SideVision module)
             {
                 m_module = module;
                 InitModuleRun(module);
-                m_lstLeftStepInfo = new CStepInfoList();
-                m_lstRightStepInfo = new CStepInfoList();
-                m_afs = new CAutoFocusStatus(0.0, "Ready");
+                p_lstLeftStepInfo = new CStepInfoList();
+                p_lstRightStepInfo = new CStepInfoList();
+                p_afs = new CAutoFocusStatus(0.0, "Ready");
             }
 
             public override ModuleRunBase Clone()
@@ -820,9 +837,9 @@ namespace Root_Vega.Module
                 run.m_nVarianceSize = m_nVarianceSize;
                 run.m_bUsingSobel = m_bUsingSobel;
 
-                run.m_lstLeftStepInfo = m_lstLeftStepInfo;
-                run.m_lstRightStepInfo = m_lstRightStepInfo;
-                run.m_afs = m_afs;
+                run.p_lstLeftStepInfo = p_lstLeftStepInfo;
+                run.p_lstRightStepInfo = p_lstRightStepInfo;
+                run.p_afs = p_afs;
 
                 //System.Drawing.Bitmap bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG.BMP");
                 //BitmapSource bmpSrc = GetBitmapSource(bmp);
@@ -880,19 +897,16 @@ namespace Root_Vega.Module
                 double dRightCurrentScore = 0.0;
                 double dRightMaxScore = -1.0;
                 double dRightMaxScorePosX = m_dRightStartPosX;
-                m_afs.m_dTheta = 0.0;
-                m_afs.m_strStatus = "Ready";
+                p_afs.p_dTheta = 0.0;
+                p_afs.p_strStatus = "Ready";
 
-                App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
-                {
-                    m_lstLeftStepInfo.Clear();
-                    m_lstRightStepInfo.Clear();
-                });
+                p_lstLeftStepInfo.Clear();
+                p_lstRightStepInfo.Clear();
 
                 //1.Reticle 좌측 위치로 이동 후 AF
                 int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
-                m_afs.m_strStatus = "Left Side AF...";
-                for (int i = 0; i < /*nStepCount*/30; i++)
+                p_afs.p_strStatus = "Left Side AF...";
+                for (int i = 0; i < nStepCount; i++)
                 {
                     // Axis Move
                     if (m_module.Run(axisXY.Move(new RPoint(m_dLeftStartPosX + (m_nStep * i), m_dLeftPosY)))) return p_sInfo;
@@ -916,16 +930,14 @@ namespace Root_Vega.Module
                     string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
                     System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
-                    App.Current.Dispatcher.InvokeAsync((Action)delegate // <--- HERE
-                    {
-                        m_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    });
+                    
+                    p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
                 }
 
                 // 2. Reticle 우측 위치로 이동 후 AF
                 nStepCount = (int)Math.Abs(m_dRightEndPosX - m_dRightStartPosX) / m_nStep;
-                m_afs.m_strStatus = "Right Side AF...";
-                for (int i = 0; i < /*nStepCount*/30; i++)
+                p_afs.p_strStatus = "Right Side AF...";
+                for (int i = 0; i < nStepCount; i++)
                 {
                     // Axis Move
                     if (m_module.Run(axisXY.Move(new RPoint(m_dRightStartPosX + (m_nStep * i), m_dRightPosY)))) return p_sInfo;
@@ -949,10 +961,8 @@ namespace Root_Vega.Module
                     string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dRightStartPosX + (m_nStep * i)), dRightCurrentScore);
                     System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
-                    App.Current.Dispatcher.InvokeAsync((Action)delegate // <--- HERE
-                    {
-                        m_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    });
+                    
+                    p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
                 }
 
                 // 3. 좌우측 AF편차 구하기
@@ -966,8 +976,8 @@ namespace Root_Vega.Module
                 // 4. 좌우측 위치 사이의 거리와 좌우측 AF편차를 이용하여 Theta 계산
                 double dThetaRadian = af.GetThetaRadian();
                 double dThetaDegree = af.GetThetaDegree(dThetaRadian);
-                if (bThetaClockwise) m_afs.m_dTheta = -dThetaDegree;
-                else m_afs.m_dTheta = dThetaDegree;
+                if (bThetaClockwise) p_afs.m_dTheta = -dThetaDegree;
+                else p_afs.p_dTheta = dThetaDegree;
 
                 // 5. Radian 값을 Theta 모터 포지션 값으로 Scaling
                 double dMinValue = 0.0;
@@ -981,7 +991,7 @@ namespace Root_Vega.Module
                 if (bThetaClockwise) dScaled = -dScaled;
                 m_module.p_axisTheta.Move(dActualPos + dScaled);
 
-                m_afs.m_strStatus = "Success";
+                p_afs.p_strStatus = "Success";
 
                 return base.Run();
             }

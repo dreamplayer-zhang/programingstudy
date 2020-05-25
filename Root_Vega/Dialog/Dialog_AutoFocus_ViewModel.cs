@@ -1,4 +1,5 @@
-﻿using MvvmDialogs;
+﻿using MaterialDesignThemes.Wpf;
+using MvvmDialogs;
 using Root_Vega.Module;
 using RootTools;
 using RootTools.Trees;
@@ -100,11 +101,9 @@ namespace Root_Vega
         {
             m_Vision = vision;
             m_RunAutoFocus = af;
-            p_ImageViewerLeft.p_ImageData = af.m_imgDataLeft;
-            p_ImageViewerRight.p_ImageData = af.m_imgDataRight;
-            p_lstLeftStepInfo = af.m_lstLeftStepInfo;
-            p_lstRightStepInfo = af.m_lstRightStepInfo;
-            p_afs = af.m_afs;
+            p_lstLeftStepInfo = af.p_lstLeftStepInfo;
+            p_lstRightStepInfo = af.p_lstRightStepInfo;
+            p_afs = af.p_afs;
             p_treeRoot = new TreeRoot("AutoFocus_ViewModel", vision.m_log);
             af.RunTree(p_treeRoot, Tree.eMode.RegRead);
             af.RunTree(p_treeRoot, Tree.eMode.Init);
@@ -120,7 +119,8 @@ namespace Root_Vega
 
         public void OnOkButton()
         {
-            
+            m_Vision.StartRun(m_RunAutoFocus);
+            return;
         }
 
         public void OnCancelButton()

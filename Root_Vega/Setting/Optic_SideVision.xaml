@@ -10,11 +10,11 @@
              xmlns:Axis="clr-namespace:RootTools.Control.Ajin;assembly=RootTools"
              xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
+             xmlns:md="clr-namespace:MvvmDialogs;assembly=RootTools"
+             md:DialogServiceViews.IsRegistered="True"
              mc:Ignorable="d"
              d:DesignHeight="726"
-             d:DesignWidth="1602"
-             xmlns:md="clr-namespace:MvvmDialogs;assembly=RootTools"
-             md:DialogServiceViews.IsRegistered="True">
+             d:DesignWidth="1602">
     <UserControl.Resources>
         <Converter:InverseBooleanConverter x:Key="InverseBooleanConverters" />
         <Dalsa:CameraConnectStateConverter x:Key="CameraConnectStateConverters" />
@@ -1065,7 +1065,7 @@
                                            Width="50"
                                            Height="{Binding ActualHeight, ElementName=StageCanvas}"
                                            Canvas.Right="0"/>
-                                <Grid Canvas.Top="125"
+                                <Grid Canvas.Top="100"
                                       RenderTransformOrigin="0.5, 0.5">
                                     <Canvas.Left>
                                         <MultiBinding Converter="{StaticResource PositionScalingConverters}"
@@ -1089,11 +1089,11 @@
                                     </Grid.RenderTransform>
                                     <Rectangle Fill="White"
                                                Opacity="0.5"
-                                               Height="50"
-                                               Width="50"></Rectangle>
+                                               Height="100"
+                                               Width="100"></Rectangle>
                                     <Rectangle Fill="Red"
                                                Width="10"
-                                               Margin="40,0,0,0" />
+                                               Margin="0,0,90,0" />
                                 </Grid>
                                 <Grid Canvas.Right="50"
                                       Height="100">
