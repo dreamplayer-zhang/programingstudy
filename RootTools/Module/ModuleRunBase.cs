@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace RootTools.Module
 {
-    public class ModuleRunBase : NotifyProperty
+    public class ModuleRunBase : ObservableObject
     {
         #region eRunState
         public enum eRunState
@@ -22,8 +22,8 @@ namespace RootTools.Module
             {
                 if (_eRunState == value) return;
                 _eRunState = value;
-                OnPropertyChanged();
-                OnPropertyChanged("p_brushState");
+                RaisePropertyChanged();
+                RaisePropertyChanged("p_brushState");
             }
         }
 
