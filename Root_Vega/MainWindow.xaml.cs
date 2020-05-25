@@ -42,10 +42,11 @@ namespace Root_Vega
         void Init()
         {
             IDialogService dialogService = new DialogService(this);
+            MvvmDialogs.IDialogService dialogServiceTest = new MvvmDialogs.DialogService();
             DialogInit(dialogService);
             m_engineer.Init("Vega");
             _Maint.engineerUI.Init(m_engineer);
-            ConnectViewModel(dialogService);
+            ConnectViewModel(dialogService, dialogServiceTest);
             //((GAF_Manager)m_engineer.ClassGAFManager()).UpdateTree();
             textState.DataContext = EQ.m_EQ;
             textGemState.DataContext = m_engineer.ClassGem();
@@ -55,7 +56,7 @@ namespace Root_Vega
             _Main.Init(m_engineer); 
         }
 
-        void ConnectViewModel(IDialogService dialogService)
+        void ConnectViewModel(IDialogService dialogService, MvvmDialogs.IDialogService dialogServiceTest)
         {
             mvm = new _1_Mainview_ViewModel(m_engineer, dialogService);
             //_Main.DataContext = mvm;
@@ -88,7 +89,7 @@ namespace Root_Vega
             _8_OHT_ViewModel opticvm = new _8_OHT_ViewModel(m_engineer, dialogService);
             _Optic.DataContext = opticvm;
 
-            _10_SettingViewModel settingvm = new _10_SettingViewModel(m_engineer, dialogService);
+            _10_SettingViewModel settingvm = new _10_SettingViewModel(m_engineer, dialogService, dialogServiceTest);
             _Setting.DataContext = settingvm;
         }
 
