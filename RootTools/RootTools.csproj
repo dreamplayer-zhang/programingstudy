@@ -281,6 +281,11 @@
     <Compile Include="Inspects\SqliteDataDB.cs" />
     <Compile Include="Logs\ILogGroup.cs" />
     <Compile Include="Logs\Log.cs" />
+    <Compile Include="Logs\LogMars.cs" />
+    <Compile Include="Logs\LogMars_Group.cs" />
+    <Compile Include="Logs\LogMars_Group_UI.xaml.cs">
+      <DependentUpon>LogMars_Group_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Logs\LogView.cs" />
     <Compile Include="Logs\LogView_UI.xaml.cs">
       <DependentUpon>LogView_UI.xaml</DependentUpon>
@@ -366,6 +371,43 @@
     <Compile Include="ViewModelHelper\DragDrop\DragDropPreviewBase.cs" />
     <Compile Include="ViewModelHelper\DragDrop\DropState.cs" />
     <Compile Include="ViewModelHelper\EnumBinginSource.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\DialogFactories\IDialogFactory.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\DialogFactories\ReflectionDialogFactory.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\DialogFactories\WindowWrapper.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\DialogService.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\DialogServiceViews.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\DialogTypeLocators\DialogTypeLocatorCache.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\DialogTypeLocators\IDialogTypeLocator.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\DialogTypeLocators\NamingConventionDialogTypeLocator.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\Extensions\System\Windows\FrameworkElementExtensions.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\DefaultFrameworkDialogFactory.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\FileDialogSettings.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\FolderBrowser\FolderBrowserDialogSettings.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\FolderBrowser\FolderBrowserDialogSettingsSync.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\FolderBrowser\FolderBrowserDialogWrapper.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\IFrameworkDialog.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\IFrameworkDialogFactory.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\MessageBox\IMessageBox.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\MessageBox\IMessageBoxShow.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\MessageBox\MessageBoxSettings.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\MessageBox\MessageBoxShow.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\MessageBox\MessageBoxWrapper.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\OpenFile\OpenFileDialogSettings.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\OpenFile\OpenFileDialogSettingsSync.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\OpenFile\OpenFileDialogWrapper.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\SaveFile\SaveFileDialogSettings.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\SaveFile\SaveFileDialogSettingsSync.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\SaveFile\SaveFileDialogWrapper.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\FrameworkDialogs\Win32Window.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\IDialogService.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\IModalDialogViewModel.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\IWindow.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\Logging\Logger.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\Reflection\Members.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\ViewNotRegisteredException.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\Views\IdGenerator.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\Views\IView.cs" />
+    <Compile Include="ViewModelHelper\NewDialogService\Views\ViewWrapper.cs" />
     <Compile Include="ViewModelHelper\ObservableQueue.cs" />
     <Compile Include="ViewModelHelper\DialogCloseRequestedEventArgs.cs" />
     <Compile Include="ViewModelHelper\DialogService.cs" />
@@ -417,8 +459,6 @@
     <Compile Include="Login_UI.xaml.cs">
       <DependentUpon>Login_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Log\LogMars.cs" />
-    <Compile Include="Log\LogWriter.cs" />
     <Compile Include="Memory\MemoryData.cs" />
     <Compile Include="Memory\MemoryGroup.cs" />
     <Compile Include="Memory\MemoryPool.cs" />
@@ -436,7 +476,6 @@
     </Compile>
     <Compile Include="Registry.cs" />
     <Compile Include="IEngineer.cs" />
-    <Compile Include="Log\LogViewX.cs" />
     <Compile Include="ViewModelHelper\NotifyProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -661,6 +700,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\ListDIO_ShortID_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Logs\LogMars_Group_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

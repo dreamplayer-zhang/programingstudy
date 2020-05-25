@@ -357,7 +357,7 @@ namespace RootTools.Camera.BaslerPylon
                     m_ImageGrab.p_Size = new CPoint((int)m_CamParam._Width, (int)m_CamParam._Height);
                     byte[] aBuf = result.PixelData as byte[];
                     Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
-                    p_ImageViewer.SetImageSource();
+                    //p_ImageViewer.SetImageSource();
                     //Array.Copy(aBuf, m_ImageGrab.m_aBuf, m_ImageGrab.p_sz.X * m_ImageGrab.p_sz.Y);
                 }
                 return "OK";
