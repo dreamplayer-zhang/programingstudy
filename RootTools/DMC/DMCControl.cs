@@ -4,6 +4,7 @@ using System;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
+using System.Windows;
 
 namespace RootTools.DMC
 {
@@ -55,6 +56,18 @@ namespace RootTools.DMC
             }
         }
 
+        int _nTotalStep = 0;
+        public int p_nTotalStep
+        {
+            get { return _nTotalStep; }
+            set
+            {
+                if (_nTotalStep == value) return;
+                _nTotalStep = value;
+                m_bRunTreeInit = true;
+            }
+        }
+
         public string p_id { get; set; }
 
         string _sInfo = "";
@@ -84,7 +97,8 @@ namespace RootTools.DMC
         {
             tree.Set(p_eState, p_eState, "State", "DMC State", true, true);
             tree.Set(p_sTask, p_sTask, "Task", "DMC Task Name", true, true);
-            tree.Set(p_nStep, p_nStep, "Step", "DMC Run Step", true, true); 
+            tree.Set(p_nStep, p_nStep, "Step", "DMC Run Step", true, true);
+            tree.Set(p_nTotalStep, p_nTotalStep, "Total Step", "DMC Run Total Step", true, true);
         }
         #endregion
 
@@ -458,6 +472,7 @@ namespace RootTools.DMC
                 p_sTask = CoreMon.getMainTaskName(p_nRobot);
                 p_eState = (eState)CoreMon.getMainTaskStatus(p_nRobot);
                 p_nStep = CoreMon.getMainTaskCurStep(p_nRobot);
+                p_nTotalStep = CoreMon.getMainTaskStepCount(p_nRobot);
             }
         }
         #endregion
@@ -468,7 +483,13 @@ namespace RootTools.DMC
             string strCmd = "Execute " + sMsg + ", 1";
             p_sInfo = strCmd;
             m_commLog.Add(CommLog.eType.Send, strCmd); 
-            try { CoreMon.executeCommand(p_nRobot, strCmd); }
+            try 
+            {
+                Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    CoreMon.executeCommand(p_nRobot, strCmd);
+                });
+            }
             catch (Exception e) { return "DMC Send Error : " + e.Message; }
             return "OK";
         }

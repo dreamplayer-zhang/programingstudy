@@ -233,10 +233,10 @@ namespace RootTools.OHT.SSEM
             {
                 Thread.Sleep(20);
                 p_eAccessLP = m_carrier.p_eAccessLP; 
-                p_bModuyleReady = (m_module.p_eState == ModuleBase.eState.Ready);
+                p_bModuleReady = (m_module.p_eState == ModuleBase.eState.Ready);
 
                 bool bES = m_diLightCurtain.p_bOn || (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual);
-                p_bAbort = bES || (p_bModuyleReady == false);
+                p_bAbort = bES || (p_bModuleReady == false);
 
                 string sTP = CheckTP();
                 if (sTP != "OK")
@@ -343,7 +343,7 @@ namespace RootTools.OHT.SSEM
         }
 
         bool _bModuleReady = false; 
-        bool p_bModuyleReady
+        bool p_bModuleReady
         {
             get { return _bModuleReady; }
             set
@@ -352,8 +352,8 @@ namespace RootTools.OHT.SSEM
                 _bModuleReady = value; 
                 if (value == false)
                 {
-                    p_sInfo = "Loadport State not Ready";
-                    p_eState = eState.All_Off;
+                    //p_sInfo = "Loadport State not Ready";
+                    //p_eState = eState.All_Off;
                 }
             }
         }

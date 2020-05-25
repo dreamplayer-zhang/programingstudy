@@ -779,8 +779,9 @@ namespace Root_Vega.Module
                 child.p_bLock = false;
                 if (m_module.IsReticleExist())
                 {
-                    if (child.IsReticleExist()) return "Robot Get Error : Reticle Check Sensor Detected at Child = " + child.p_id;
                     child.p_infoReticle = null;
+                    if (child.IsReticleExist(true)) return "Robot Get Error : Reticle Check Sensor Detected at Child = " + child.p_id;
+                    //child.p_infoReticle = null;
                 }
                 else
                 {
@@ -827,19 +828,21 @@ namespace Root_Vega.Module
                 }
                 else
                 {
-                    child.p_infoReticle = m_module.p_infoReticle;
+                    //child.p_infoReticle = m_module.p_infoReticle;
                     int posRobot = -1;
                     if (m_module.Run(child.IsPutOK(ref posRobot, m_module.p_infoReticle))) return p_sInfo;
                     if (posRobot < 0) return "Robot Teach Position Not Defined";
                     if (m_module.Run(child.BeforePut())) return p_sInfo;
+                    child.p_infoReticle = m_module.p_infoReticle;
                     child.p_bLock = true;
                     if (m_module.Run(m_module.WriteCmd(eCmd.Put, posRobot, 1, 1))) return p_sInfo;
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                     child.p_bLock = false;
-                    if (child.IsReticleExist())
+                    if (child.IsReticleExist(true))
                     {
-                        if (m_module.IsReticleExist()) return "Robot Put Error : Reticle Check Sensor Detected at Arm";
                         m_module.p_infoReticle = null;
+                        if (m_module.IsReticleExist()) return "Robot Put Error : Reticle Check Sensor Detected at Arm";
+                        //m_module.p_infoReticle = null;
                     }
                     else
                     {

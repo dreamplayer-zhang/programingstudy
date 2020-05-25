@@ -316,9 +316,9 @@ namespace Root_Vega.Module
             m_log = LogView.GetLog(id, id);
             m_infoPod = new InfoPod(this, sLocID, engineer);
             m_aTool.Add(m_infoPod);
-            InitCmd();
             base.InitBase(id, engineer);
             InitGAF();
+            InitCmd();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
         }
 

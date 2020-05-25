@@ -317,6 +317,20 @@ namespace RootTools.DMC
         [DllImport("coremon.dll", EntryPoint = "cmon_get_maintask_move_step", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int getMainTaskMoveStep(int idRobot, ref int step);
 
+        [DllImport("coremon.dll", EntryPoint = "cmon_get_maintask_step_count", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        static extern int cmon_get_maintask_step_count(int idRobot, ref int step);
+        static public int getMainTaskStepCount(int idRobot)
+        {
+            int res = 0;
+
+            int retcode = cmon_get_maintask_step_count(idRobot, ref res);
+
+            if (retcode == 0)
+                return res;
+
+            return 0;
+        }
+      
         [DllImport("coremon.dll", EntryPoint = "cmon_get_subtask_name", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern int cmon_get_subtask_name(int idRobot, StringBuilder name);
         static public String getSubTaskName(int idRobot)
@@ -339,6 +353,20 @@ namespace RootTools.DMC
             int res = 0;
 
             int retcode = cmon_get_subtask_cur_step(idRobot, ref res);
+
+            if (retcode == 0)
+                return res;
+
+            return 0;
+        }
+
+        [DllImport("coremon.dll", EntryPoint = "cmon_get_subtask_step_count", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        static extern int cmon_get_subtask_step_count(int idRobot, ref int step);
+        public static int getSubTaskStepCount(int idRobot)
+        {
+            int res = 0;
+
+            int retcode = cmon_get_subtask_step_count(idRobot, ref res);
 
             if (retcode == 0)
                 return res;
@@ -521,6 +549,8 @@ namespace RootTools.DMC
         static extern int cmon_set_number_data(int idRobot, string vbname, ref float value);
         public static int setNumberData(int idRobot, string vbname, ref float value)
         {
+            float res = 0;
+
             int retcode = cmon_set_number_data(idRobot, vbname, ref value);
 
             return retcode;
@@ -535,8 +565,6 @@ namespace RootTools.DMC
 
             return retcode;
         }
-      
-      
 
     }
 }
