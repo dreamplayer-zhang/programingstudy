@@ -40,8 +40,6 @@ namespace RootTools.Camera.BaslerPylon
             get { return new CPoint(1024, 1024); }
         }
 
-
-
         #endregion
 
         #region UI
@@ -328,12 +326,6 @@ namespace RootTools.Camera.BaslerPylon
                 m_cam.Close();
             }
         }
-
-        public CPoint GetRoiSize()
-        {
-            return new CPoint(Convert.ToInt32(m_CamParam._Width), Convert.ToInt32(m_CamParam._Height));
-        }
-
 
         public CPoint p_sz
         {

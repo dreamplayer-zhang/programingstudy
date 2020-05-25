@@ -266,17 +266,14 @@ namespace Root_Vega
             //    return;
             //}
             SideVision.Run_SideGrab Grab = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-            SideVision.Run_BevelGrab BevelGrab = (SideVision.Run_BevelGrab)Sidevision.CloneModuleRun("BevelGrab");
-            var viewModel = new Dialog_SideScan_ViewModel(Sidevision, Grab, BevelGrab);
+            var viewModel = new Dialog_SideScan_ViewModel(Sidevision, Grab);
             Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
             if (result.HasValue)
             {
                 if (result.Value)
                 {
-                    if (Grab.m_grabMode != null)
-                        Sidevision.StartRun(Grab);
-                    else if (BevelGrab.m_grabMode != null)
-                        Sidevision.StartRun(BevelGrab);
+                    //p_MainCamera = Grab.m_grabMode.m_camera;
+                    Sidevision.StartRun(Grab);
                 }
                 else
                 {

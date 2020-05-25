@@ -233,15 +233,10 @@ namespace RootTools.Camera.CognexOCR
             set { }
         }
 
-        public CPoint GetRoiSize()
-        {
-            return null;
-        }
-
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
         public string StopGrab()
         {
-            return "FALSE";
+            return "OK";
         }
     }
 }

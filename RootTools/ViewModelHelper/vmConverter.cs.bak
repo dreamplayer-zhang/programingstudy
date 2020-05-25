@@ -629,19 +629,16 @@ namespace ViewConverter
             string strAxis = (string)parameter;
 
             // implement
-            if (strAxis == "AxisX") 
-                dControlLength = 150.0;
-            else if (strAxis == "AxisY") 
-                dControlLength = 100.0;
-            else if (strAxis == "AxisZ") 
-                dControlLength = 30.0;
+            if (strAxis == "AxisX") dControlLength = 150.0;
+            else if (strAxis == "AxisY") dControlLength = 100.0;
+            else if (strAxis == "AxisZ") dControlLength = 30.0;
             else if (strAxis == "AxisTheta")
             {
                 dStageLength = 360.0;
                 dControlLength = 0.0;
             }
 
-            dScaled = PositionScaling(dActualPos, dMinusLimit+10000, dPlusLimit, 0.0, dStageLength-dControlLength);
+            dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, 0.0, dStageLength-dControlLength);
             
             return dScaled;
         }

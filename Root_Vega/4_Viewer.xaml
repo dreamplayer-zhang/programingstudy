@@ -287,34 +287,10 @@
                     Style="{StaticResource BasicBtn}"
                     Command="{Binding p_ImageViewer.btnClickSaveImage}" 
                     Margin="0,0,0,10"/>
-            <Button Content="Image Clear" 
+            <Button Content="Image Clear"
                     Style="{StaticResource BasicBtn}"
                     Margin="0,0,0,10"
-                    Command="{Binding p_ImageViewer.CommandImageClear}"/>
-            <Button Content="Home"
-                    Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"
-                    Command="{Binding CommandVisionHome}" />
-            <Button Content="Scan"
-                    Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"
-                    Command="{Binding CommandScan}" />
-            <Button Content="Inspection"
-                    Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"
-                    Command="{Binding CommandInspection}" />
-            <Button Content="Stop"
-                    Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"
-                    Command="{Binding CommandStop}" />
-            <Button Content="Manual Align"
-                    Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"
-                    Command="{Binding CommandManualAlign}"/>
-            <Button Content="Test"
-                    Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"
-                    Command="{Binding CommandTest}" />
+                    Command="{Binding p_ImageViewer.CommandImageClear}" />
         </StackPanel>
     </Grid>
 </UserControl>
