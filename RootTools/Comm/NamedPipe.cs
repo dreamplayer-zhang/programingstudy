@@ -63,7 +63,7 @@ namespace RootTools.Comm
         #endregion
 
         #region ITool
-        public string p_id { get { return m_id; } }
+        public string p_id { get; set; }
 
         public UserControl p_ui
         {
@@ -93,16 +93,16 @@ namespace RootTools.Comm
             set
             {
                 if (_sTarget == value) return;
-                m_sRecieveID = value + "-" + m_id;
-                m_sSendID = m_id + "-" + value;
-                m_log.Info(m_id + " Change Target : " + _sTarget + " -> " + value);
+                m_sRecieveID = value + "-" + p_id;
+                m_sSendID = p_id + "-" + value;
+                m_log.Info(p_id + " Change Target : " + _sTarget + " -> " + value);
                 _sTarget = value;
             }
         }
 
         void RunNameTree(Tree tree)
         {
-            tree.Set(m_id, m_id, "ID", "Host ID", true, true);
+            tree.Set(p_id, p_id, "ID", "Host ID", true, true);
             p_sTarget = tree.Set(_sTarget, "", "Target", "Target ID");
         }
         #endregion
@@ -112,7 +112,7 @@ namespace RootTools.Comm
         public List<SendData> m_aSend = new List<SendData>();
         public string Send(params object[] objs)
         {
-            if (objs.Length == 0) return m_id + " Has no Object";
+            if (objs.Length == 0) return p_id + " Has no Object";
             string sMsg = GetMsg(objs);
             return AddSend(sMsg);
         }
@@ -141,8 +141,8 @@ namespace RootTools.Comm
             {
                 NamedPipeClientStream pipe = new NamedPipeClientStream(".", sSendID, PipeDirection.Out);
                 try { pipe.Connect(300); }
-                catch (Exception) { return m_id + " Client Connect Error"; }
-                if (pipe.CanWrite == false) return m_id + "Can't Write Pipe : " + send.p_sMsg;
+                catch (Exception) { return p_id + " Client Connect Error"; }
+                if (pipe.CanWrite == false) return p_id + "Can't Write Pipe : " + send.p_sMsg;
                 m_commLog.Add(CommLog.eType.Send, send.p_sMsg); 
                 send.Write(pipe);
                 return "OK";
@@ -151,7 +151,7 @@ namespace RootTools.Comm
 
         string GetMsg(params object[] objs)
         {
-            string sMsg = m_id + c_cSeparate + m_iSend.ToString("000");
+            string sMsg = p_id + c_cSeparate + m_iSend.ToString("000");
             for (int n = 0; n < objs.Length; n++) sMsg += c_cSeparate + objs[n].ToString();
             return sMsg;
         }
@@ -276,7 +276,7 @@ namespace RootTools.Comm
                             string sMsg = encoder.GetString(bufRead, 0, nRead - 1);
                             m_commLog.Add(CommLog.eType.Receive, sMsg);
                             string[] sMsgs = sMsg.Split(c_cSeparate);
-                            if (sMsgs[0] == m_id)
+                            if (sMsgs[0] == p_id)
                             {
                                 SendData send = GetSendIndex(sMsg);
                                 if (send != null) m_aSend.Remove(send);
@@ -286,7 +286,7 @@ namespace RootTools.Comm
                                 string sReply = SendReply(sMsg);
                                 if (sReply == "OK")
                                 {
-                                    m_log.Info(m_id + " ReadMsg = " + sMsg);
+                                    m_log.Info(p_id + " ReadMsg = " + sMsg);
                                     ReadTimerMsg(sMsg);
                                 }
                             }
@@ -337,13 +337,12 @@ namespace RootTools.Comm
         }
         #endregion
 
-        string m_id;
         Log m_log;
         public CommLog m_commLog = null;
         public TreeRoot m_treeRoot; 
         public NamedPipe(string id, Log log)
         {
-            m_id = id;
+            p_id = id;
             m_log = log;
             m_commLog = new CommLog(this, m_log);
 

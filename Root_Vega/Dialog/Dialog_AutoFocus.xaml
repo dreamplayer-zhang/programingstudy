@@ -8,8 +8,6 @@
         xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:md="clr-namespace:MvvmDialogs;assembly=RootTools"
-        md:DialogServiceViews.IsRegistered="True"
         Height="768"
         Width="1280"
         

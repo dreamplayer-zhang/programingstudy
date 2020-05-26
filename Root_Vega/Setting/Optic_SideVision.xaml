@@ -10,8 +10,6 @@
              xmlns:Axis="clr-namespace:RootTools.Control.Ajin;assembly=RootTools"
              xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
-             xmlns:md="clr-namespace:MvvmDialogs;assembly=RootTools"
-             md:DialogServiceViews.IsRegistered="True"
              mc:Ignorable="d"
              d:DesignHeight="726"
              d:DesignWidth="1602">

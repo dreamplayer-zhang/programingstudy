@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using System.Net;
 using System.Net.Sockets;
 using RootTools.Trees;
+using RootTools.Comm;
 
 namespace RootTools
 {
@@ -34,60 +35,35 @@ namespace RootTools
             m_timer.Start();
         }
 
-        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key != Key.Enter) return;
-            try
-            {
-                m_server.Send(textBox.Text, m_server.GetSocket((IPEndPoint)comboBoxSocket.SelectedItem));
-            }
-            catch
-            {
-
-            }
-        }
-
+        List<CommLog_UI> m_aCommLogUI = new List<CommLog_UI>(); 
         void CheckConnect()
         {
-            if (m_server.GetClientSocketList().Count != comboBoxSocket.Items.Count) comboBoxSocket.Items.Clear();
-            foreach (Socket socket in m_server.GetClientSocketList())
+            if ((m_server.m_aSocket.Count + 1) == tabComm.Items.Count) return;
+            m_aCommLogUI.Clear(); 
+            AddCommLog(m_server.m_commLog);
+            foreach (TCPIPServer.TCPSocket tcpSocket in m_server.m_aSocket) AddCommLog(tcpSocket.m_commLog);
+            tabComm.Items.Clear();
+            foreach (CommLog_UI ui in m_aCommLogUI) tabComm.Items.Add(ui); 
+        }
+
+        void AddCommLog(CommLog commLog)
+        {
+            foreach (CommLog_UI ui in tabComm.Items)
             {
-                bool bExsit = false;
-                for (int n = 0; n < comboBoxSocket.Items.Count; n++)
+                if (ui.m_commLog.m_comm.p_id == commLog.m_comm.p_id)
                 {
-                    IPEndPoint comboSocket = (IPEndPoint)comboBoxSocket.Items[n];
-                    if (comboSocket.ToString() == socket.LocalEndPoint.ToString())
-                    {
-                        bExsit = true;
-                        break;
-                    }
-                }
-                if (!bExsit)
-                {
-                    comboBoxSocket.Items.Add(socket.LocalEndPoint);
+                    m_aCommLogUI.Add(ui);
+                    return; 
                 }
             }
+            CommLog_UI commLogUI = new CommLog_UI();
+            commLogUI.Init(commLog);
+            m_aCommLogUI.Add(commLogUI); 
         }
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
             CheckConnect();
-            CheckCommLog();
         }
-
-        #region List Log
-        List<TCPIPServer.CommLog> m_aCommLog = new List<TCPIPServer.CommLog>();
-        void CheckCommLog()
-        {
-            if (m_server.m_aCommLog.Count == 0) return;
-            while (m_server.m_aCommLog.Count > 0)
-            {
-                m_aCommLog.Insert(0, m_server.m_aCommLog.Dequeue());
-                if (m_aCommLog.Count > 1024) m_aCommLog.RemoveAt(m_aCommLog.Count - 1);
-            }
-            listViewLog.ItemsSource = null;
-            listViewLog.ItemsSource = m_aCommLog;
-        }
-        #endregion
     }
 }

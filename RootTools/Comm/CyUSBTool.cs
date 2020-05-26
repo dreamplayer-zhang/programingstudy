@@ -192,12 +192,11 @@ namespace RootTools
         }
         #endregion
 
-        public string p_id { get { return m_id; } }
-        string m_id;
+        public string p_id { get; set; }
         Log m_log;
         public CyUSBTool(int iDevice, string id, Log log)
         {
-            m_id = id;
+            p_id = id;
             m_log = log;
             p_sInfo = OpenUSB(iDevice);
         }

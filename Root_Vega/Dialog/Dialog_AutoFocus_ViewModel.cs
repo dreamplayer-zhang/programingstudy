@@ -1,5 +1,4 @@
 ﻿using MaterialDesignThemes.Wpf;
-using MvvmDialogs;
 using Root_Vega.Module;
 using RootTools;
 using RootTools.Trees;
@@ -17,7 +16,7 @@ using System.Windows.Media.Imaging;
 
 namespace Root_Vega
 {
-    public class Dialog_AutoFocus_ViewModel : ObservableObject, IDialogRequestClose, IModalDialogViewModel
+    public class Dialog_AutoFocus_ViewModel : ObservableObject, IDialogRequestClose
     {
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
         SideVision m_Vision;
@@ -125,7 +124,7 @@ namespace Root_Vega
 
         public void OnCancelButton()
         {
-            
+            CloseRequested(this, new DialogCloseRequestedEventArgs(false));
         }
 
         public void OnLeftSideDoubleClick(object obj)
@@ -188,7 +187,5 @@ namespace Root_Vega
                 return new RelayCommand(OnCancelButton);
             }
         }
-
-        public bool? DialogResult => this.DialogResult;
     }
 }

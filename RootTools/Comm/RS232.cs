@@ -12,7 +12,7 @@ namespace RootTools.Comm
     public class RS232 : NotifyProperty, ITool, IComm
     {
         #region Property
-        public string p_id { get { return m_id; } }
+        public string p_id { get; set; }
 
         string _sInfo = ""; 
         public string p_sInfo
@@ -55,7 +55,7 @@ namespace RootTools.Comm
             set
             {
                 if ((m_sp != null) == value) return;
-                m_log.Info(m_id + " Connect -> " + value.ToString());
+                m_log.Info(p_id + " Connect -> " + value.ToString());
                 if (value)
                 {
                     _sInfo = Connect();
@@ -296,14 +296,13 @@ namespace RootTools.Comm
         }
         #endregion
 
-        string m_id;
         Log m_log;
         public CommLog m_commLog = null;
         public TreeRoot m_treeRoot;
         SerialPort m_sp = null;
         public RS232(string id, Log log)
         {
-            m_id = id;
+            p_id = id;
             m_log = log;
             m_commLog = new CommLog(this, m_log);
             m_treeRoot = new TreeRoot(id, log);

@@ -85,7 +85,7 @@ namespace RootTools.Comm
         #endregion
 
         #region IComm
-        IComm m_comm; 
+        public IComm m_comm; 
         public void Send(string sMsg)
         {
             m_comm.Send(sMsg); 
