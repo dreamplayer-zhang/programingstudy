@@ -41,15 +41,14 @@ namespace RootTools.Light
         }
         #endregion
 
-        public string p_id { get { return m_id; } }
-        string m_id;
+        public string p_id { get; set; }
         string m_sModule; 
         LightToolSet m_lightToolSet;
         Log m_log;
         public LightSet(LightToolSet lightToolSet, string sModule, Log log)
         {
             m_sModule = sModule; 
-            m_id = sModule + ".Light";
+           p_id = sModule + ".Light";
             m_lightToolSet = lightToolSet;
             m_log = log;
         }

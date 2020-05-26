@@ -51,14 +51,13 @@ namespace RootTools.Camera
         }
         #endregion
 
-        public string p_id { get { return m_id; } }
-        string m_id;
+        public string p_id { get; set; }
         public string m_sModule; 
         ToolSetCamera m_toolSetCamera;
         Log m_log; 
         public CameraSet(ToolSetCamera toolSetCamera, string sModule, Log log)
         {
-            m_id = "Camera";
+            p_id = "Camera";
             m_sModule = sModule; 
             m_toolSetCamera = toolSetCamera;
             m_log = log;

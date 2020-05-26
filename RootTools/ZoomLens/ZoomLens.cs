@@ -7,8 +7,7 @@ namespace RootTools.ZoomLens
     public class ZoomLens : ObservableObject, ITool
     {
         #region Property
-        string m_id;
-        public string p_id { get { return m_id; } }
+        public string p_id { get; set; }
 
         string _sInfo = "OK";
         public string p_sInfo
@@ -47,7 +46,7 @@ namespace RootTools.ZoomLens
         public RS232 m_rs232;
         public ZoomLens(string id, Log log)
         {
-            m_id = id;
+            p_id = id;
             m_log = log;
 
             m_rs232 = new RS232(id, m_log);

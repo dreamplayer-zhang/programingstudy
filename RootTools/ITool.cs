@@ -4,7 +4,7 @@ namespace RootTools
 {
     public interface ITool
     {
-        string p_id { get; }
+        string p_id { get; set; }
         UserControl p_ui { get; }
         void ThreadStop();
     }

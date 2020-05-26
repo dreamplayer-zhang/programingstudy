@@ -205,6 +205,10 @@
     <Compile Include="DMC\DMCControl_UI.xaml.cs">
       <DependentUpon>DMCControl_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DMC\DMCCore.cs" />
+    <Compile Include="DMC\DMCCore_UI.xaml.cs">
+      <DependentUpon>DMCCore_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DMC\DMCDIO.cs" />
     <Compile Include="DMC\DMCListDIO.cs" />
     <Compile Include="DMC\DMCListDIO_UI.xaml.cs">
@@ -579,6 +583,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DMC\DMCControl_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DMC\DMCCore_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
