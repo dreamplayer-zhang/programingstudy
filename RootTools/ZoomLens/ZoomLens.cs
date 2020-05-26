@@ -22,6 +22,13 @@ namespace RootTools.ZoomLens
                 m_log.Error(value);
             }
         }
+
+        int m_nMovePos = 0;
+        public int p_nMovePos
+        {
+            get { return m_nMovePos; }
+            set { SetProperty(ref m_nMovePos, value); }
+        }
         #endregion
 
         #region UI
@@ -371,5 +378,91 @@ namespace RootTools.ZoomLens
         }
         #endregion
 
+        #region RelayCommand
+        public void HomeClick()
+        {
+            Home();
+            GetStatus(1);
+        }
+
+        public void StopClick()
+        {
+            Stop();
+            GetStatus(1);
+        }
+
+        public void ResetClick()
+        {
+            Reset();
+            GetStatus(1);
+        }
+
+        public void EmergencyStopClick()
+        {
+            EmergencyStop();
+            GetStatus(1);
+        }
+
+        public void MoveClick()
+        {
+            AbsoluteGo(p_nMovePos);
+            GetStatus(1);
+        }
+
+        public RelayCommand HomeCommand
+        {
+            get
+            {
+                return new RelayCommand(HomeClick);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand StopCommand
+        {
+            get
+            {
+                return new RelayCommand(StopClick);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand ResetCommand
+        {
+            get
+            {
+                return new RelayCommand(ResetClick);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand EmergencyStopCommand
+        {
+            get
+            {
+                return new RelayCommand(EmergencyStopClick);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand MoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MoveClick);
+            }
+            set
+            {
+            }
+        }
+        #endregion
     }
 }

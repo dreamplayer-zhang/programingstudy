@@ -35,7 +35,7 @@
                         <Button Grid.Column="0"
                                 Margin="5"
                                 Style="{StaticResource BasicBtn}"
-                                Click="HomeButtonClick">
+                                Command="{Binding HomeCommand}">
                             <Button.Content>
                                 <StackPanel Orientation="Vertical">
                                     <material:PackIcon Kind="Home"
@@ -50,7 +50,7 @@
                         <Button Grid.Column="1"
                                 Margin="5"
                                 Style="{StaticResource BasicBtn}"
-                                Click="StopButtonClick">
+                                Command="{Binding StopCommand}">
                             <Button.Content>
                                 <StackPanel Orientation="Vertical">
                                     <material:PackIcon Kind="Stop"
@@ -65,7 +65,7 @@
                         <Button Grid.Column="2"
                                 Margin="5"
                                 Style="{StaticResource BasicBtn}"
-                                Click="ResetButtonClick">
+                                Command="{Binding ResetCommand}">
                             <Button.Content>
                                 <StackPanel Orientation="Vertical">
                                     <material:PackIcon Kind="Restart"
@@ -80,7 +80,7 @@
                         <Button Grid.Column="3"
                                 Margin="5"
                                 Style="{StaticResource BasicBtn}"
-                                Click="EmergencyStopButtonClick">
+                                Command="{Binding EmergencyStopCommand}">
                             <Button.Content>
                                 <StackPanel Orientation="Vertical">
                                     <material:PackIcon Kind="EmergencyExit"
@@ -126,14 +126,14 @@
                                          Grid.Column="0"
                                          VerticalAlignment="Center"
                                          Background="{PriorityBinding}"
-                                         Text="1111111"
+                                         Text="{Binding p_nMovePos}"
                                          Foreground="Black"
                                          HorizontalAlignment="Center"
                                          FontSize="20"></TextBox>
                                 <Button Grid.Column="1"
                                         Style="{StaticResource BasicBtn}"
                                         Margin="5"
-                                        Click="MoveButtonClick">
+                                        Command="{Binding MoveCommand}">
                                     <Button.Content>
                                         <StackPanel Orientation="Vertical">
                                             <material:PackIcon Kind="MoveToInbox"
