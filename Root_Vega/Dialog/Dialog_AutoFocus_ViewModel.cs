@@ -124,7 +124,7 @@ namespace Root_Vega
 
         public void OnCancelButton()
         {
-            
+            CloseRequested(this, new DialogCloseRequestedEventArgs(false));
         }
 
         public void OnLeftSideDoubleClick(object obj)

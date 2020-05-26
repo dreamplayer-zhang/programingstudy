@@ -291,7 +291,18 @@ namespace Root_Vega
             SideVision Sidevision = ((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision;
             SideVision.Run_AutoFocus af = (SideVision.Run_AutoFocus)Sidevision.CloneModuleRun("AutoFocus");
             var viewModel = new Dialog_AutoFocus_ViewModel(Sidevision, af);
-            
+            Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+            if (result.HasValue)
+            {
+                if (result.Value)
+                {
+                    
+                }
+                else
+                {
+                    // Cancelled
+                }
+            }
             //m_DialogServiceTest.Show<Dialog_AutoFocus>(this, viewModel);
             
             return;
