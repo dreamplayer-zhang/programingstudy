@@ -89,11 +89,7 @@ namespace Root_Wind
         public int m_ScanStartLine = 0;
         #endregion
 
-        public string p_id
-        {
-            get;
-            set;
-        }
+        public string p_id { get; set; }
         
         public string p_sName{get;set;}
         public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool)

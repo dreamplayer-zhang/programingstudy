@@ -6,16 +6,7 @@ namespace RootTools.Gem
     public class GemSlotBase : NotifyProperty
     {
         #region Property
-        string _id; 
-        public string p_id
-        {
-            get { return _id; }
-            set
-            {
-                _id = value;
-                OnPropertyChanged(); 
-            }
-        }
+        public string p_id { get; set; }
         #endregion
 
         #region Gem Property

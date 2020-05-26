@@ -42,8 +42,7 @@ namespace RootTools.Module
         }
         #endregion
 
-        string _id = "";
-        public string p_id { get { return _id; } }
+        public string p_id { get; set; }
 
         public string m_sModuleRun;
         protected Log m_log;
@@ -62,7 +61,7 @@ namespace RootTools.Module
             m_moduleBase = module;
             string[] asName = this.GetType().Name.Split('_');
             m_sModuleRun = asName[asName.Length - 1];
-            _id = module.p_id + "." + m_sModuleRun;
+            p_id = module.p_id + "." + m_sModuleRun;
             m_log = module.m_log;
         }
 

@@ -22,12 +22,11 @@ namespace RootTools.Inspects
         }
         #endregion
 
-        public string p_id { get { return m_id; } }
-        string m_id;
+        public string p_id { get; set; }
         IEngineer m_engineer;
         public InspectToolSet(string id, IEngineer engineer)
         {
-            m_id = id;
+            p_id = id;
             m_engineer = engineer;
         }
 

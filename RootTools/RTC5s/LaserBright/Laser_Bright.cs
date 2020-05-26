@@ -138,16 +138,7 @@ namespace RootTools.RTC5s.LaserBright
         }
         #endregion
 
-        string _id = "";
-        public string p_id
-        {
-            get { return _id; }
-            set
-            {
-                _id = value;
-                OnPropertyChanged();
-            }
-        }
+        public string p_id { get; set; }
 
         Log m_log;
         public RTC5 m_RTC5;

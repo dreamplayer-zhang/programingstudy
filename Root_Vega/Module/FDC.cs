@@ -125,16 +125,7 @@ namespace Root_Vega.Module
 
         public class Data : NotifyProperty
         {
-            string _id = "";
-            public string p_id
-            {
-                get { return _id; }
-                set
-                {
-                    _id = value;
-                    OnPropertyChanged();
-                }
-            }
+            public string p_id { get; set; }
 
             eUnit _eUnit = eUnit.None;
             eUnit p_eUnit

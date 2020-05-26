@@ -21,11 +21,11 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="4">
             <TextBlock Text="Max Power" Width="80"/>
-            <TextBox Text="{Binding p_fMaxPower}" TextAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+            <TextBox Text="{Binding p_fMaxPower}" TextAlignment="Center" Width="50" PreviewKeyDown="TextBox_PreviewKeyDown"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="4">
             <TextBlock Text="Power Scale" Width="80"/>
-            <TextBox Text="{Binding p_fScalePower}" TextAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+            <TextBox Text="{Binding p_fScalePower}" TextAlignment="Center" Width="50" PreviewKeyDown="TextBox_PreviewKeyDown"/>
         </StackPanel>
     </StackPanel>
 </UserControl>

@@ -5,7 +5,7 @@ namespace RootTools.Light
 {
     public interface ILightTool
     {
-        string p_id { get; }
+        string p_id { get; set; }
         UserControl p_ui { get; }
         string p_sInfo { get; set; }
         void ThreadStop();

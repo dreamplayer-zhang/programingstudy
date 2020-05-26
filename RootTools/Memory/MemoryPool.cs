@@ -127,23 +127,12 @@ namespace RootTools.Memory
             p_gbPool = tree.Set(p_gbPool, 1, "Pool Size", "Memory Pool Size (GB)");
         }
 
-        string _id;
-        public string p_id
-        {
-            get
-            {
-                return _id;
-            }
-            set
-            {
-                RaisePropertyChanged();
-            }
-        }
+        public string p_id { get; set; }
         public Log m_log;
         MemoryMappedFile m_MMF = null;
         public MemoryPool(string id, Log log)
         {
-            _id = id;
+            p_id = id;
             m_log = log;
         }
 
