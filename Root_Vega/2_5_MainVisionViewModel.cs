@@ -51,6 +51,9 @@ namespace Root_Vega
 		int tempImageWidth = 640;
 		int tempImageHeight = 480;
 
+		int currentSnap;
+		int wLimit;
+
 		public _2_5_MainVisionViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
 			_dispatcher = Dispatcher.CurrentDispatcher;
@@ -64,47 +67,52 @@ namespace Root_Vega
 				{
 					return;
 				}
-				//VSDBManager.Commit();
-
-				//여기서부터 DB Table데이터를 기준으로 tif 이미지 파일을 생성하는 구간
-				//해당 기능은 여러개의 pool을 사용하는 경우에 대해서는 테스트가 진행되지 않았습니다
-				//Concept은 검사 결과가 저장될 시점에 가지고 있던 Data Table을 저장하기 전 Image를 저장하는 형태
-				int stride = tempImageWidth / 8;
-				string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
-
-				System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
-
-				System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
-				System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
-				encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
-
-				foreach (System.Data.DataRow row in VSDataDT.Rows)
+				if (wLimit <= currentSnap)
 				{
-					//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-					double fPosX = Convert.ToDouble(row["PosX"]);
-					double fPosY = Convert.ToDouble(row["PosY"]);
 
-					CRect ImageSizeBlock = new CRect(
-						(int)fPosX - tempImageWidth / 2,
-						(int)fPosY - tempImageHeight / 2,
-						(int)fPosX + tempImageWidth / 2,
-						(int)fPosY + tempImageHeight / 2);
+					//VSDBManager.Commit();
 
-					encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(m_ImageViewer.p_ImageData.GetRectImage(ImageSizeBlock))));
+					//여기서부터 DB Table데이터를 기준으로 tif 이미지 파일을 생성하는 구간
+					//해당 기능은 여러개의 pool을 사용하는 경우에 대해서는 테스트가 진행되지 않았습니다
+					//Concept은 검사 결과가 저장될 시점에 가지고 있던 Data Table을 저장하기 전 Image를 저장하는 형태
+					int stride = tempImageWidth / 8;
+					string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
+
+					System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
+
+					System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
+					System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
+					encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
+
+					foreach (System.Data.DataRow row in VSDataDT.Rows)
+					{
+						//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+						double fPosX = Convert.ToDouble(row["PosX"]);
+						double fPosY = Convert.ToDouble(row["PosY"]);
+
+						CRect ImageSizeBlock = new CRect(
+							(int)fPosX - tempImageWidth / 2,
+							(int)fPosY - tempImageHeight / 2,
+							(int)fPosX + tempImageWidth / 2,
+							(int)fPosY + tempImageHeight / 2);
+
+						encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(m_ImageViewer.p_ImageData.GetRectImage(ImageSizeBlock))));
+					}
+					if (VSDataDT.Rows.Count > 0)
+					{
+						encoder.Save(stream);
+					}
+					stream.Dispose();
+					//이미지 저장 완료
+
+					//Data Table 저장 시작
+					VSDBManager.SetDataTable(VSDataInfoDT);
+					VSDBManager.SetDataTable(VSDataDT);
+					VSDBManager.Disconnect();
+					//Data Table 저장 완료
+					m_Engineer.m_InspManager.Dispose();
+					VSDataDT.Clear();
 				}
-				if (VSDataDT.Rows.Count > 0)
-				{
-					encoder.Save(stream);
-				}
-				stream.Dispose();
-				//이미지 저장 완료
-
-				//Data Table 저장 시작
-				VSDBManager.SetDataTable(VSDataInfoDT);
-				VSDBManager.SetDataTable(VSDataDT);
-				VSDBManager.Disconnect();
-				//Data Table 저장 완료
-				m_Engineer.m_InspManager.Dispose();
 			};
 			m_Engineer.m_InspManager.InspectionStart += (nDCode) =>
 			{
@@ -430,6 +438,20 @@ namespace Root_Vega
 				return new RelayCommand(_btnInspTest);
 			}
 		}
+		public ICommand btnStartInsp
+		{
+			get
+			{
+				return new RelayCommand(_btnStartInsp);
+			}
+		}
+		public ICommand btnNextSnap
+		{
+			get
+			{
+				return new RelayCommand(_btnNextSnap);
+			}
+		}
 		public RelayCommand CommandSaveMask
 		{
 			get
@@ -469,14 +491,90 @@ namespace Root_Vega
 			Draw_IsChecked = false;
 			RecipeCursor = Cursors.Arrow;
 		}
-		List<CRect> DrawRectList;
-
-		private void _btnInspTest()
+		private void _btnStartInsp()
 		{
 			ClearUI();//재검사 전 UI 정리
 
 			if (DrawRectList != null)
 				DrawRectList.Clear();//검사영역 draw용 Rect List 정리
+
+			currentDefectIdx = 0;
+			currentSnap = 0;
+			m_Engineer.m_InspManager.ClearInspection();
+
+			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Strip.m_NonPattern[0].m_rt;
+			int nblocksize = 500;
+
+			int AreaWidth = Mask_Rect.Width;
+
+			wLimit = AreaWidth / nblocksize;
+			System.Diagnostics.Debug.WriteLine(string.Format("Set wLimit : {0}", wLimit));
+
+			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
+				p_Recipe.p_RecipeData.p_Roi[0].m_Strip.p_Parameter[0],
+				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance, currentSnap, currentSnap + 1);
+
+			currentSnap++;//한줄 추가
+
+			System.Diagnostics.Debug.WriteLine("Start Insp");
+
+			inspDefaultDir = @"C:\vsdb";
+			if (!System.IO.Directory.Exists(inspDefaultDir))
+			{
+				System.IO.Directory.CreateDirectory(inspDefaultDir);
+			}
+			inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+			var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
+			string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
+
+			if (VSDBManager != null && VSDBManager.IsConnected)
+			{
+				VSDBManager.Disconnect();
+			}
+			VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+
+			if (VSDBManager.Connect())
+			{
+				VSDBManager.CreateTable("Datainfo");
+				VSDBManager.CreateTable("Data");
+
+				VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
+				VSDataDT = VSDBManager.GetDataTable("Data");
+			}
+			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
+			m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
+		}
+
+		private void _btnNextSnap()
+		{
+			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
+			if (wLimit == currentSnap)
+			{
+				return;
+			}
+
+			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Strip.m_NonPattern[0].m_rt;
+			int nblocksize = 500;
+
+			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
+				p_Recipe.p_RecipeData.p_Roi[0].m_Strip.p_Parameter[0],
+				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance, currentSnap, currentSnap + 1);
+
+			currentSnap++;//한줄 추가
+			m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
+		}
+		List<CRect> DrawRectList;
+		private void _btnInspTest()
+		{
+			ClearUI();//재검사 전 UI 정리
+			currentSnap = 0;
+			wLimit = 0;
+			System.Diagnostics.Debug.WriteLine(string.Format("Set wLimit : {0}", wLimit));
+
+			if (DrawRectList != null)
+				DrawRectList.Clear();//검사영역 draw용 Rect List 정리
+
+			m_Engineer.m_InspManager.ClearInspection();
 
 			currentDefectIdx = 0;
 
