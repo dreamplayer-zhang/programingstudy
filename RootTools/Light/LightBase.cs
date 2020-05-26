@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 
 namespace RootTools.Light
 {
@@ -23,7 +24,7 @@ namespace RootTools.Light
             set
             {
                 if (_fGetPower == value) return;
-                _fGetPower = value;
+                _fGetPower = Math.Round(100 * value) / 100.0;
                 OnPropertyChanged(); 
             }
         }
@@ -50,7 +51,7 @@ namespace RootTools.Light
                 double fSetPower = value * p_fScalePower;
                 if (fSetPower < 0) fSetPower = 0;
                 if (fSetPower > p_fMaxPower) fSetPower = p_fMaxPower;
-                _fSetPower = fSetPower / p_fScalePower; 
+                _fSetPower = Math.Round(100 * fSetPower / p_fScalePower) / 100.0; 
                 OnPropertyChanged();
                 SetPower();
                 _nDifferent = 0; 

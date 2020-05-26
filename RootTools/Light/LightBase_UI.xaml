@@ -6,22 +6,26 @@
              xmlns:local="clr-namespace:RootTools.Light"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" Orientation="Vertical">
-            <TextBlock Text="{Binding p_id}"/>
-            <CheckBox IsChecked="{Binding p_bOn}" Content="Light On"/>
-            <TextBlock Text="Get Power"/>
-            <TextBox Text="{Binding p_fGetPower}" TextAlignment="Center" IsEnabled="False"/>
-            <TextBlock Text="Set Power"/>
-            <TextBox Text="{Binding p_fSetPower}" TextAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"/>
-            <TextBlock Text="Max Power"/>
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="{Binding p_id}" Margin="4"/>
+        <CheckBox IsChecked="{Binding p_bOn}" Content="Light On" Margin="4"/>
+        <StackPanel Orientation="Horizontal" Margin="4">
+            <TextBlock Text="Get Power" Width="80"/>
+            <TextBox Text="{Binding p_fGetPower}" TextAlignment="Center" Width="50" IsEnabled="False"/>
+            <Slider Value="{Binding p_fGetPower}" Minimum="0" Maximum="100" TickFrequency="0.1" Width="160" IsEnabled="False" Margin="2"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="4">
+            <TextBlock Text="Set Power" Width="80"/>
+            <TextBox Text="{Binding p_fSetPower}" TextAlignment="Center" Width="50" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+            <Slider Value="{Binding p_fSetPower}" Minimum="0" Maximum="100" TickFrequency="0.1" Width="160" Margin="2"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="4">
+            <TextBlock Text="Max Power" Width="80"/>
             <TextBox Text="{Binding p_fMaxPower}" TextAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"/>
-            <TextBlock Text="Power Scale"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="4">
+            <TextBlock Text="Power Scale" Width="80"/>
             <TextBox Text="{Binding p_fScalePower}" TextAlignment="Center" PreviewKeyDown="TextBox_PreviewKeyDown"/>
         </StackPanel>
-    </Grid>
+    </StackPanel>
 </UserControl>
