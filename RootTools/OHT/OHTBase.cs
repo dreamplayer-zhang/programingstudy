@@ -44,7 +44,7 @@ namespace RootTools.OHT
         #region OHT DIO
         public interface IDIO
         {
-            string p_id { get; }
+            string p_id { get; set; }
             bool p_bInput { get; }
             bool p_bOn { get; set; }
             void RunTree(Tree tree);

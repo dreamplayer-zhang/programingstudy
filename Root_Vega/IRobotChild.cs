@@ -4,7 +4,7 @@ namespace Root_Vega
 {
     public interface IRobotChild
     {
-        string p_id { get; }
+        string p_id { get; set; }
 
         bool p_bLock { get; set; }
 

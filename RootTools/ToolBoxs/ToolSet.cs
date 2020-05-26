@@ -4,10 +4,7 @@ namespace RootTools.ToolBoxs
 {
     public class ToolSet : IToolSet
     {
-        public string p_id
-        {
-            get { return m_id; }
-        }
+        public string p_id { get; set; }
 
         public delegate void dgOnChangeTool();
         public event dgOnChangeTool OnChangeTool;
@@ -21,10 +18,9 @@ namespace RootTools.ToolBoxs
         }
         #endregion
 
-        string m_id;
         public ToolSet(string id)
         {
-            m_id = id;
+            p_id = id;
         }
 
         public void ThreadStop()

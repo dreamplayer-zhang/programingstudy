@@ -6,11 +6,7 @@ namespace Root_Wind
 {
     public interface IWTRChild
     {
-        string p_id
-        {
-            get;
-            set;
-        }
+        string p_id { get; set; }
         
         ModuleBase.eState p_eState { get;}
 

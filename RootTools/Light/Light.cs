@@ -14,7 +14,7 @@ namespace RootTools.Light
             set
             {
                 if (m_light.p_bOn == value) return;
-                m_log.Info(m_id + " Light On : " + m_light.p_bOn.ToString() + " -> " + value.ToString());
+                m_log.Info(p_id + " Light On : " + m_light.p_bOn.ToString() + " -> " + value.ToString());
                 m_light.p_bOn = value;
             }
         }
@@ -28,7 +28,7 @@ namespace RootTools.Light
             set
             {
                 if (m_light.p_fSetPower == value) return;
-                m_log.Info(m_id + " Current Power : " + m_light.p_fSetPower.ToString() + " -> " + value.ToString());
+                m_log.Info(p_id + " Current Power : " + m_light.p_fSetPower.ToString() + " -> " + value.ToString());
                 m_light.p_fSetPower = value;
             }
         }
@@ -44,14 +44,13 @@ namespace RootTools.Light
         }
         #endregion
 
-        public string p_id { get { return m_id; } }
-        string m_id;
+        public string p_id { get; set; }
         public string m_sName; 
         LightToolSet m_lightToolSet;
         Log m_log; 
         public Light(LightToolSet lightToolSet, string id, Log log)
         {
-            m_id = id;
+            p_id = id;
             m_sName = id; 
             m_lightToolSet = lightToolSet; 
             m_log = log;
@@ -81,7 +80,7 @@ namespace RootTools.Light
                 int nLight1 = tree.Set(nLight0, -1, "Channel", "Select Light Channel", lightTool1 != null);
                 if (nLight0 == nLight1) return "OK";
                 if (lightTool1 == null) return "OK";
-                LightBase lightBase = lightTool1.GetLight(nLight1, m_id);
+                LightBase lightBase = lightTool1.GetLight(nLight1, p_id);
                 if (lightBase == null) return "OK";
                 if (lightTool0 != null) Deselect(lightTool0);
                 m_light = lightBase;

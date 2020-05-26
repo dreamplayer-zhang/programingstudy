@@ -11,7 +11,7 @@ namespace RootTools.Light
         public event dgOnChangeTool OnChangeTool;
 
         #region Property
-        public string p_id { get { return m_id; } }
+        public string p_id { get; set; }
 
         string _sInfo = "OK";
         public string p_sInfo
@@ -35,7 +35,7 @@ namespace RootTools.Light
             {
                 LightTool_12ch_UI ui = new LightTool_12ch_UI();
                 ui.Init(this);
-                return (UserControl)ui;
+                return ui;
             }
         }
         #endregion
@@ -72,7 +72,7 @@ namespace RootTools.Light
         {
             for (int n = 0; n < c_lLight; n++)
             {
-                Light light = new Light(m_id, n, m_usb);
+                Light light = new Light(p_id, n, m_usb);
                 m_aLight.Add(light);
             }
         }
@@ -94,16 +94,15 @@ namespace RootTools.Light
         }
         #endregion
 
-        string m_id;
         IEngineer m_engineer;
         Log m_log;
         public CyUSBTool m_usb;
         public LightTool_12ch(int iDevice, string id, IEngineer engineer)
         {
-            m_id = id;
+            p_id = id;
             m_engineer = engineer; 
             m_log = LogView.GetLog(id);
-            m_usb = new CyUSBTool(iDevice, m_id, m_log);
+            m_usb = new CyUSBTool(iDevice, p_id, m_log);
             InitLight();
         }
 

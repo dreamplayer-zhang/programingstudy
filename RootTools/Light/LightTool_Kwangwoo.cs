@@ -22,7 +22,7 @@ namespace RootTools.Light
         #endregion
 
         #region Property
-        public string p_id { get { return m_id; } }
+        public string p_id { get; set; }
 
         string _sInfo = "OK";
         public string p_sInfo
@@ -130,7 +130,7 @@ namespace RootTools.Light
                 while (m_aLight.Count > value) m_aLight.RemoveAt(m_aLight.Count - 1); 
                 while (m_aLight.Count < value)
                 {
-                    Light light = new Light(m_id, m_aLight.Count, this);
+                    Light light = new Light(p_id, m_aLight.Count, this);
                     m_aLight.Add(light); 
                 }
                 if (OnChangeTool != null) OnChangeTool();
@@ -182,14 +182,13 @@ namespace RootTools.Light
         }
         #endregion
 
-        string m_id;
         IEngineer m_engineer;
         Log m_log;
         public RS232 m_rs232;
         public TreeRoot m_treeRoot; 
         public LightTool_Kwangwoo(string id, IEngineer engineer)
         {
-            m_id = id;
+            p_id = id;
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
             m_rs232 = new RS232(id, m_log);

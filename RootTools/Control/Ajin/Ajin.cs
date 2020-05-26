@@ -111,7 +111,7 @@ namespace RootTools.Control.Ajin
         #endregion
 
         #region ITool
-        public string p_id { get { return m_id; } }
+        public string p_id { get; set; }
         #endregion
 
         #region Tree
@@ -130,7 +130,6 @@ namespace RootTools.Control.Ajin
         }
         #endregion
 
-        string m_id;
         IEngineer m_engineer; 
         Log m_log;
         public TreeRoot m_treeRoot;
@@ -152,14 +151,14 @@ namespace RootTools.Control.Ajin
         public void Init(string id, IEngineer engineer)
         {
             int nInput=0, nOutput = 0;
-            m_id = id;
+            p_id = id;
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
             bool bAXL = InitCAXL(ref nInput,ref nOutput);
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-            m_dio.Init(m_id + ".DIO", nInput, nOutput);
-            m_listAxis.Init(m_id + ".Axis", engineer, bAXL); 
+            m_dio.Init(id + ".DIO", nInput, nOutput);
+            m_listAxis.Init(id + ".Axis", engineer, bAXL); 
             RunTree(Tree.eMode.RegRead);
             m_listAxis.LoadMotFile();
             RunTree(Tree.eMode.Init);

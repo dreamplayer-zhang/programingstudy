@@ -184,7 +184,7 @@ namespace RootTools.Memory
                         Process[] aProcess = Process.GetProcessesByName(m_idProcess);
                         if (aProcess.Length == 0) Process.Start(m_sProcessFile);
                     }
-                    catch (Exception e) { p_sInfo = m_id + " StartProcess Error : " + e.Message; }
+                    catch (Exception e) { p_sInfo = p_id + " StartProcess Error : " + e.Message; }
                 }
             }
         }
@@ -262,8 +262,7 @@ namespace RootTools.Memory
         }
         #endregion
 
-        public string p_id { get { return m_id; } }
-        string m_id;
+        public string p_id { get; set; }
         IEngineer m_engineer;
         Log m_log;
         public TreeRoot m_treeRootSetup;
@@ -274,7 +273,7 @@ namespace RootTools.Memory
             p_fTotalPageFile = stats.ullTotalPageFile / c_fGB;
             p_fAvailPageFile = stats.ullAvailPageFile / c_fGB;
             p_fNotRootPageFile = p_fTotalPageFile - p_fAvailPageFile;
-            m_id = id;
+            p_id = id;
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
             InitRuns(); 

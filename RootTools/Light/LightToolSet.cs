@@ -173,14 +173,13 @@ namespace RootTools.Light
         }
         #endregion
 
-        public string p_id { get { return m_id; } }
-        string m_id;
+        public string p_id { get; set; }
         IEngineer m_engineer;
         Log m_log; 
         public TreeRoot m_treeRoot; 
         public LightToolSet(string id, IEngineer engineer)
         {
-            m_id = id;
+            p_id = id;
             m_engineer = engineer; 
             m_log = LogView.GetLog(id); 
             m_treeRoot = new TreeRoot(id, m_log);
