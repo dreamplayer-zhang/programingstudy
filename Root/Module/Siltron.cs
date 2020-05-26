@@ -3,7 +3,6 @@ using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
 using RootTools.Light;
-using RootTools.Logs;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
@@ -21,6 +20,7 @@ namespace Root.Module
             Top,
             Bottom
         }
+
         #region ToolBox
         Axis m_axisRotate;
         AxisXY m_axisXZ;

@@ -320,6 +320,18 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
+        public string Get(ref DMCCore value, ModuleBase module, string id)
+        {
+            if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
+            if (value == null)
+            {
+                value = new DMCCore(module.p_id + "." + id, module.m_log);
+                m_toolSetComm.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            return "OK";
+        }
+
         public string Get(ref RS232 value, ModuleBase module, string id)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");

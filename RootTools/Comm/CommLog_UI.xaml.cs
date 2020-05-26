@@ -13,7 +13,7 @@ namespace RootTools.Comm
             InitializeComponent();
         }
 
-        CommLog m_commLog; 
+        public CommLog m_commLog; 
         public void Init(CommLog commLog)
         {
             m_commLog = commLog;

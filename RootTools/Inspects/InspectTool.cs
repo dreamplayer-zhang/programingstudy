@@ -37,7 +37,7 @@ namespace RootTools.Inspects
         public NamedPipe m_namedPipe;
         void InitNamedPipe(bool bHost)
         {
-            if (bHost) m_namedPipe = m_memoryTool.AddNamedPipe(m_id);
+            if (bHost) m_namedPipe = m_memoryTool.AddNamedPipe(p_id);
             else m_namedPipe = m_memoryTool.m_aNamedPipe[0];
             m_namedPipe.ReadMsg += M_namedPipe_ReadMsg;
         }
@@ -135,13 +135,13 @@ namespace RootTools.Inspects
                     {
                         if (IsProcessRun() == false)
                         {
-                            Process process = Process.Start(m_sProcessFile, m_id);
+                            Process process = Process.Start(m_sProcessFile, p_id);
                             m_nProcessID = process.Id;
                             m_aValidProcessID.Add(process.Id);
                             m_bRemoteInspect = false;
                         }
                     }
-                    catch (Exception e) { p_sInfo = m_id + " StartProcess Error : " + e.Message; }
+                    catch (Exception e) { p_sInfo = p_id + " StartProcess Error : " + e.Message; }
                 }
             }
         }
@@ -387,8 +387,7 @@ namespace RootTools.Inspects
         }
         #endregion
 
-        public string p_id { get { return m_id; } }
-        string m_id;
+        public string p_id { get; set; }
         IEngineer m_engineer;
         bool m_bHost;
         MemoryTool m_memoryTool;
@@ -396,11 +395,11 @@ namespace RootTools.Inspects
         public TreeRoot m_treeRoot;
         public InspectTool(string id, IEngineer engineer, bool bHost)
         {
-            m_id = id;
+            p_id = id;
             m_engineer = engineer;
             m_bHost = bHost;
             m_memoryTool = engineer.ClassMemoryTool();
-            m_memoryTool.AddNamedPipe(m_id + ".Memory");
+            m_memoryTool.AddNamedPipe(p_id + ".Memory");
             m_log = LogView.GetLog(id);
             m_memoryPool = null;
             m_treeRoot = new TreeRoot(id, m_log);

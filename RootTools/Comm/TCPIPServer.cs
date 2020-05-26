@@ -6,21 +6,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Windows.Controls;
 using System.Windows.Media;
 using RootTools.Trees;
+using RootTools.Comm;
 
 namespace RootTools
 {
-    public class TCPIPServer : ITool
+    public class TCPIPServer : ITool, IComm
     {
         public delegate void OnReciveData(byte[] aBuf, int nSize, Socket socket);
-        public event OnReciveData EventReciveData;
 
         #region ITool
-        public string p_id { get { return m_id; } }
-
         public UserControl p_ui
         {
             get
@@ -69,15 +66,90 @@ namespace RootTools
         }
         #endregion
 
-        public string m_id;
+        #region TCPSocket
+        public class TCPSocket : IComm
+        {
+            public event OnReciveData EventReciveData;
+
+            public Socket m_socket;
+            public CommLog m_commLog;
+
+            bool m_bRun = false;
+            Thread m_thread;
+
+            public string Send(string sMsg)
+            {
+                string sSend = Send(sMsg);
+                m_commLog.Add(CommLog.eType.Send, sMsg);
+                if (sSend != "OK") m_commLog.Add(CommLog.eType.Info, sSend);
+                return sSend;
+            }
+
+            string SendMsg(string sMsg)
+            {
+                if (m_socket == null) return "Socket not Defined";
+                if (!m_socket.Connected) return "Socket not Connected";
+                try
+                {
+                    byte[] aBuf = Encoding.UTF8.GetBytes(sMsg);
+                    m_socket.Send(aBuf);
+                    return "OK";
+                }
+                catch (Exception ex) { return "Send Exception : " + ex.Message; }
+            }
+
+            void RunThread()
+            {
+                m_bRun = true;
+                Socket socket = m_socket;
+                int nSize;
+                byte[] aBuf = new byte[m_nBufRecieve];
+                while (socket.Connected)
+                {
+                    Thread.Sleep(10);
+                    if (!m_bRun) break;
+                    try
+                    {
+                        nSize = socket.Receive(aBuf);
+                        m_commLog.Add(CommLog.eType.Receive, (nSize < 1024) ? Encoding.ASCII.GetString(aBuf, 0, nSize) : "...");
+                        if (EventReciveData != null) EventReciveData(aBuf, nSize, socket);
+                    }
+                    catch (Exception ex) { m_commLog.Add(CommLog.eType.Info, "Recieve Exception : " + ex.Message); }
+                }
+            }
+
+            public string p_id { get; set; }
+            int m_nBufRecieve = 1024 * 1024;
+            public TCPSocket(Socket socket, Log log, int nBufRecieve = -1)
+            {
+                p_id = socket.RemoteEndPoint.ToString(); 
+                m_socket = socket;
+                m_commLog = new CommLog(this, log);
+                m_nBufRecieve = (nBufRecieve > 0) ? nBufRecieve : m_nBufRecieve;
+                m_thread = new Thread(new ThreadStart(RunThread));
+                m_thread.Start();
+            }
+
+            public void ThreadStop()
+            {
+                if (m_bRun)
+                {
+                    m_bRun = false;
+                    m_thread.Join();
+                }
+            }
+        }
+        public List<TCPSocket> m_aSocket = new List<TCPSocket>();
+        #endregion
+
+        public string p_id { get; set; }
         Log m_log;
+        int m_nBufRecieve = 1024 * 1024;
+        public CommLog m_commLog; 
         public TreeRoot m_treeRoot;
         Socket m_socket = null;
-        List<Socket> m_listSocket = new List<Socket>();
-        List<Thread> m_listCommThread = new List<Thread>();
         Thread m_threadListener;
-        bool m_bRunThreadListener = false;
-        bool m_bRun = false;
+        bool m_bRunListener = false;
 
         #region Tree
         private void M_treeRoot_UpdateTree()
@@ -104,10 +176,12 @@ namespace RootTools
         }
         #endregion
 
-        public TCPIPServer(string id, Log log)
+        public TCPIPServer(string id, Log log, int nBufRecieve = -1)
         {
-            m_id = id;
+            p_id = id;
             m_log = log;
+            m_nBufRecieve = (nBufRecieve > 0) ? nBufRecieve : m_nBufRecieve;
+            m_commLog = new CommLog(this, log); 
 
             m_treeRoot = new TreeRoot(id, log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
@@ -131,168 +205,49 @@ namespace RootTools
             }
             catch (Exception ex)
             {
-                m_log.Error(m_id + " Server Bind & Listen Fail !!");
-                m_log.Error(m_id + " Exception : " + ex.Message);
+                m_log.Error(p_id + " Server Bind & Listen Fail !!");
+                m_log.Error(p_id + " Exception : " + ex.Message);
                 return;
             }
         }
 
         public void ThreadStop()
         {
+            foreach (TCPSocket tcpSocket in m_aSocket) tcpSocket.ThreadStop();
+            if (m_bRunListener)
+            {
+                m_bRunListener = false;
+                m_threadListener.Abort();
+            }
+            m_aSocket.Clear();
             if (m_socket != null)
             {
                 m_socket.Close();
                 m_socket.Dispose();
             }
-
-            if (m_bRunThreadListener)
-            {
-                m_bRunThreadListener = false;
-                m_threadListener.Abort();
-            }
-            if (m_bRun)
-            {
-                m_bRun = false;
-                foreach (Thread threadComm in m_listCommThread)
-                {
-                    threadComm.Abort();
-                }
-            }
-            m_listCommThread.Clear();
-            m_listSocket.Clear();
         }
 
         void RunThreadListner()
         {
-            m_bRunThreadListener = true;
+            m_bRunListener = true;
             Thread.Sleep(5000);
-            while (m_bRunThreadListener)
+            while (m_bRunListener)
             {
                 Thread.Sleep(10);
                 try
                 {
                     Socket socketHandle = m_socket.Accept();
-                    Thread commThread = new Thread(new ParameterizedThreadStart(RunThreadRecive));
-                    commThread.Start((object)socketHandle);
-                    m_log.Info(m_id + " Client Connected, Client IP : " + socketHandle.LocalEndPoint.ToString());
-                    m_listSocket.Add(socketHandle);
-                    m_listCommThread.Add(commThread);
+                    TCPSocket tcpSocket = new TCPSocket(socketHandle, m_log);
+                    m_aSocket.Add(tcpSocket);
+                    m_commLog.Add(CommLog.eType.Info, p_id + " Client Connected, Client IP : " + socketHandle.LocalEndPoint.ToString()); 
                 }
-                catch (Exception ex)
-                {
-                    m_log.Error("Listner Fail : " + ex.Message);
-                }
+                catch (Exception ex) { m_commLog.Add(CommLog.eType.Info, "Listner Exception : " + ex.Message); }
             }
         }
 
-        void RunThreadRecive(object objSocket)
+        public string Send(string sMsg)
         {
-            m_bRun = true;
-            Socket socket = (Socket)objSocket;
-            int nSize;
-            byte[] aBuf = new byte[1024 * 1024];
-            while (socket.Connected)
-            {
-                Thread.Sleep(10);
-                if (!m_bRun) break;
-                try
-                {
-                    nSize = socket.Receive(aBuf);
-                    AddCommLog(false, "RECIVE : " + Encoding.Default.GetString(aBuf));
-                    if (EventReciveData != null) EventReciveData(aBuf, nSize, socket);
-                }
-                catch (Exception ex)
-                {
-                    m_log.Error("Recive Fail : " + ex.Message);
-                    m_listSocket.Remove(socket);
-                }
-            }
+            return "OK"; 
         }
-
-        public string Send(byte[] byteBuf, Socket socket)
-        {
-            if (socket == null) return "Null";
-            if (!socket.Connected) return "Disconnect";
-            try
-            {
-                socket.Send(byteBuf);
-                AddCommLog(true, "SEND : " + Encoding.Default.GetString(byteBuf));
-            }
-            catch (Exception eX)
-            {
-                m_log.Error("Send : " + eX.Message);
-                return "Error";
-            }
-            return "OK";
-        }
-
-        public string Send(string sBuf, Socket socket)
-        {
-            if (socket == null) return "Null";
-            if (!socket.Connected) return "Disconne ct";
-            try
-            {
-                byte[] aBuf = Encoding.UTF8.GetBytes(sBuf);
-                socket.Send(aBuf);
-                AddCommLog(true, "SEND : " + sBuf);
-            }
-            catch (Exception eX)
-            {
-                m_log.Error("Send : " + eX.Message);
-                return "Error";
-            }
-            return "OK";
-        }
-
-        public List<Socket> GetClientSocketList()
-        {
-            return m_listSocket;
-        }
-
-        public Socket GetSocket(IPEndPoint ipEndPoint)
-        {
-            try
-            {
-                foreach (Socket socket in m_listSocket)
-                {
-                    if (socket.LocalEndPoint.ToString() == ipEndPoint.ToString()) return socket;
-                }
-            }
-            catch (Exception ex)
-            {
-                m_log.Error("Get Socket Fail !! : " + ex.Message);
-            }
-            return null;
-        }
-
-        #region Comm Log
-        public class CommLog
-        {
-            public string p_sMsg { get; set; }
-
-            bool m_bSend = false;
-            public Brush p_bColor
-            {
-                get { return m_bSend ? Brushes.Black : Brushes.DarkGray; }
-            }
-
-            public CommLog(bool bSend, string sMsg)
-            {
-                m_bSend = bSend;
-                p_sMsg = sMsg;
-            }
-
-            public override string ToString()
-            {
-                return p_sMsg;
-            }
-        }
-
-        public Queue<CommLog> m_aCommLog = new Queue<CommLog>();
-        void AddCommLog(bool bSend, string sMsg)
-        {
-            m_aCommLog.Enqueue(new CommLog(bSend, DateTime.Now.ToLongTimeString() + " " + sMsg));
-        }
-        #endregion
     }
 }

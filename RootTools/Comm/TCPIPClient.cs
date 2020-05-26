@@ -14,7 +14,7 @@ namespace RootTools.Comm
         public event TCPIPServer.OnReciveData EventReciveData;
 
         #region ITool
-        public string p_id { get { return m_id; } }
+        public string p_id { get; set; }
 
         string _sInfo = "";
         public string p_sInfo
@@ -168,7 +168,7 @@ namespace RootTools.Comm
                         try
                         {
                             m_socket.Connect(_sIP, _nPort);
-                            p_sInfo = m_id + " Connect Success !!"; 
+                            p_sInfo = p_id + " Connect Success !!"; 
                             if (m_threadRecive != null)
                             {
                                 m_bRunRecive = false;
@@ -177,12 +177,10 @@ namespace RootTools.Comm
                             }
                             m_threadRecive = new Thread(new ThreadStart(RunThreadRecive));
                             m_threadRecive.Start();
-                            //m_threadRecive = new Thread(new ParameterizedThreadStart(RunThreadRecive));
-                            //m_threadRecive.Start(m_socket);
                         }
                         catch (Exception ex)
                         {
-                            p_sInfo = m_id + " Connect Fail : " + ex.Message; 
+                            p_sInfo = p_id + " Connect Fail : " + ex.Message; 
                         }
                     }
                 }
@@ -192,9 +190,8 @@ namespace RootTools.Comm
         void RunThreadRecive()
         {
             m_bRunRecive = true;
-            //Socket socket = (Socket)objSocket;
             int nSize;
-            byte[] aBuf = new byte[1024 * 1024];
+            byte[] aBuf = new byte[m_nBufRecieve];
             while (m_socket.Connected)
             {
                 Thread.Sleep(10);
@@ -202,7 +199,7 @@ namespace RootTools.Comm
                 try
                 {
                     nSize = m_socket.Receive(aBuf);
-                    m_commLog.Add(CommLog.eType.Receive, Encoding.ASCII.GetString(aBuf, 0, nSize)); 
+                    m_commLog.Add(CommLog.eType.Receive, (nSize < 1024) ? Encoding.ASCII.GetString(aBuf, 0, nSize) : "..."); 
                     if (EventReciveData != null) EventReciveData(aBuf, nSize, m_socket);
                 }
                 catch (Exception ex)
@@ -213,21 +210,20 @@ namespace RootTools.Comm
         }
         #endregion
 
-        public string m_id;
         Log m_log;
+        int m_nBufRecieve = 1024 * 1024; 
         public TreeRoot m_treeRoot;
         Socket m_socket = null;
         bool m_bRunConnect = false;
         Thread m_threadConnect;
         bool m_bRunRecive = false;
         Thread m_threadRecive;
-
-
         public CommLog m_commLog = null;
-        public TCPIPClient(string id, Log log)
+        public TCPIPClient(string id, Log log, int nBufRecieve = -1)
         {
-            m_id = id;
+            p_id = id;
             m_log = log;
+            m_nBufRecieve = (nBufRecieve > 0) ? nBufRecieve : m_nBufRecieve; 
             m_commLog = new CommLog(this, m_log);
 
             m_treeRoot = new TreeRoot(id, log);
