@@ -59,9 +59,19 @@ namespace Root_LogView
         #endregion 
 
         #region Clip Function
+        private void buttonUndo_Click(object sender, RoutedEventArgs e)
+        {
+            m_logGroup.Undo(); 
+        }
+
         private void buttonRemove_Click(object sender, RoutedEventArgs e)
         {
             m_logGroup.RemoveSelection(dataGrid.SelectedItems); 
+        }
+
+        private void buttonRemoveAll_Click(object sender, RoutedEventArgs e)
+        {
+            m_logGroup.RemoveAll();
         }
 
         private void buttonSave_Click(object sender, RoutedEventArgs e)
@@ -78,16 +88,19 @@ namespace Root_LogView
         #region Log Function
         private void buttonSendClipSelect_Click(object sender, RoutedEventArgs e)
         {
+            m_logGroup.StackLog(); 
             m_logGroup.SendClip(dataGrid.SelectedItems);
         }
 
         private void buttonSendClipAll_Click(object sender, RoutedEventArgs e)
         {
+            m_logGroup.StackLog();
             m_logGroup.SendClip(dataGrid.Items);
         }
 
         private void buttonSendClipAllFile_Click(object sender, RoutedEventArgs e)
         {
+            m_logGroup.StackLog();
             m_logGroup.m_logViewer.SendClip(m_logGroup.m_filter); 
         }
         #endregion

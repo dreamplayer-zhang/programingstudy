@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace Root_LogView
@@ -30,7 +31,6 @@ namespace Root_LogView
         }
 
         #region Data
-        List<Data> m_aLog = new List<Data>(); 
         public class Data
         {
             public string p_sTime { get; set; }
@@ -40,6 +40,7 @@ namespace Root_LogView
             public string p_sStackTrace { get; set; }
             public Brush p_sColor { get; set; }
 
+            public bool m_bSame = false;
             public bool IsSame(Data data)
             {
                 if (p_sTime != data.p_sTime) return false;
@@ -47,6 +48,7 @@ namespace Root_LogView
                 if (p_sLogger != data.p_sLogger) return false;
                 if (p_sMessage != data.p_sMessage) return false;
                 if (p_sStackTrace != data.p_sStackTrace) return false;
+                m_bSame = true; 
                 return true; 
             }
 
@@ -78,6 +80,8 @@ namespace Root_LogView
                 }
             }
         }
+        List<Data> m_aLog = new List<Data>();
+        Stack<List<Data>> m_stackLog = new Stack<List<Data>>(); 
         #endregion
 
         #region FileOpen
@@ -155,33 +159,55 @@ namespace Root_LogView
         #endregion
 
         #region Clip
+        public void StackLog()
+        {
+            if (m_logClip == null) return; 
+            List<Data> aLog = new List<Data>();
+            foreach (Data data in m_logClip.m_aLog) aLog.Add(data);
+            m_logClip.m_stackLog.Push(aLog); 
+        }
+
+        public void Undo()
+        {
+            if (m_stackLog.Count <= 0) return; 
+            m_aLog = m_stackLog.Pop();
+            InvalidFilter(); 
+        }
+
         public void SendClip(System.Collections.IList aData)
         {
             if (m_logClip == null) return;
-            foreach (Data data in aData) m_logClip.AddClip(data);
-            m_logClip.InvalidFilter(); 
+            foreach (Data data in aData) m_logClip.CheckSame(data);
+            foreach (Data data in aData) if (data.m_bSame == false) m_aLog.Add(data); 
+            m_logClip.InvalidFilter();
         }
 
         public void SendClip()
         {
             if (m_logClip == null) return;
-            foreach (Data data in p_aLogFilter) m_logClip.AddClip(data);
+            foreach (Data data in p_aLogFilter) m_logClip.CheckSame(data);
+            foreach (Data data in p_aLogFilter) if (data.m_bSame == false) m_aLog.Add(data);
             m_logClip.InvalidFilter();
         }
 
-        void AddClip(Data data)
+        void CheckSame(Data data)
         {
-            foreach (Data dat in m_aLog)
+            Parallel.ForEach(m_aLog, dat =>
             {
-                if (data.IsSame(dat)) return; 
-            }
-            m_aLog.Add(data); 
+                if (data.m_bSame == false) data.IsSame(dat); 
+            }); 
         }
 
         public void RemoveSelection(System.Collections.IList aData)
         {
             foreach (Data data in aData) m_aLog.Remove(data);
             InvalidFilter(); 
+        }
+
+        public void RemoveAll()
+        {
+            m_aLog.Clear();
+            InvalidFilter();
         }
 
         public void FileSave(System.Collections.IList aData, bool bSimple = false)
