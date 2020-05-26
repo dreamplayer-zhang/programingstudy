@@ -25,5 +25,9 @@
                  Header="SideVision">
             <local:Optic_SideVision DataContext="{Binding p_SideVisionViewModel}"></local:Optic_SideVision>
         </TabItem>
+        <TabItem Style="{StaticResource RcptabItem}"
+                 Header="Illumination">
+            <local:Setting_Illumination DataContext="{Binding p_IlluminationViewModel}"></local:Setting_Illumination>
+        </TabItem>
     </TabControl>
 </UserControl>
