@@ -489,7 +489,7 @@ namespace ViewConverter
                 dControlLength = 0.0;
             }
 
-            dScaled = PositionScaling(dActualPos, dMinusLimit+10000, dPlusLimit, 0.0, dStageLength-dControlLength);
+            dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, 0.0, dStageLength-dControlLength);
             
             return dScaled;
         }
