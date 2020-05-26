@@ -71,18 +71,18 @@ namespace Root_Vega.Module
             public void RunTree(Tree tree)
             {
                 m_sCmd = tree.Set(m_sCmd, m_sCmd, "Command", "DMC Excute Command String");
-             m_secRun = tree.Set(m_secRun, m_secRun, "Timeout", "DMC Run Timeout (sec)"); 
+                m_secRun = tree.Set(m_secRun, m_secRun, "Timeout", "DMC Run Timeout (sec)");
             }
 
-            public string Run()
+            public string Run(DMCControl dmc)
             {
                 string sCmd = m_cmd.ToString(); 
-                string sSend = m_dmc.Send(m_sCmd);
+                string sSend = dmc.Send(m_sCmd);
                 if (sSend != "OK") return sSend;
                 StopWatch sw = new StopWatch();
                 int msWait = (int)(1000 * m_secRun);
                 Thread.Sleep(100);
-                while (m_dmc.p_eState == DMCControl.eState.Running)
+                while (dmc.p_eState == DMCControl.eState.Running)
                 {
                     Thread.Sleep(10);
                     if (sw.ElapsedMilliseconds > msWait)
@@ -91,7 +91,7 @@ namespace Root_Vega.Module
                         return "DMC Run Timeout : " + sCmd;
                     }
                 }
-                switch (m_dmc.p_eState)
+                switch (dmc.p_eState)
                 {
                     case DMCControl.eState.Error: return "DMC Run Error : " + sCmd;
                     case DMCControl.eState.Running: return "DMC Run Timeout : " + sCmd;
@@ -99,12 +99,10 @@ namespace Root_Vega.Module
                 }
             }
 
-            DMCControl m_dmc;
-            public Command(eCmd cmd, DMCControl dmc)
+            public Command(eCmd cmd)
             {
                 m_cmd = cmd;
                 m_sCmd = cmd.ToString().ToLower();
-                m_dmc = dmc; 
             }
         }
 
@@ -120,7 +118,7 @@ namespace Root_Vega.Module
 
         void InitCmd()
         {
-            foreach (eCmd cmd in Enum.GetValues(typeof(eCmd))) m_aCmd.Add(new Command(cmd, m_dmc));
+            foreach (eCmd cmd in Enum.GetValues(typeof(eCmd))) m_aCmd.Add(new Command(cmd));
         }
 
         void RunTreeCmd(Tree tree)
@@ -142,7 +140,7 @@ namespace Root_Vega.Module
             if (EQ.IsStop()) return "EQ Stop";
             Command command = GetCommand(cmd);
             if (command == null) return "Command not Found : " + cmd.ToString();
-            return command.Run(); 
+            return command.Run(m_dmc); 
         }
         #endregion
 

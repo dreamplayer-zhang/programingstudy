@@ -561,15 +561,6 @@ namespace Root_Vega.Module
         }
         #endregion
 
-        #region OCR
-        public string ReadOCR(int nRetry)
-        {
-            //m_camOCR.Read(); 
-            //p_infoReticle.p_sReticleID = ;
-            return "OK";
-        }
-        #endregion
-
         public ModuleRunBase GetRunMotion(eMotion motion, string sChild)
         {
             switch (motion)
@@ -866,7 +857,8 @@ namespace Root_Vega.Module
                 InitModuleRun(module);
             }
 
-            int m_nRetry = 3; 
+            int m_nRetry = 3;
+            double m_fMinScore = 70; 
             public override ModuleRunBase Clone()
             {
                 Run_ReadOCR run = new Run_ReadOCR(m_module);
@@ -884,10 +876,34 @@ namespace Root_Vega.Module
                 int posRobot = m_module.m_teachOCR;
                 if (m_module.Run(m_module.WriteCmd(eCmd.PutReady, posRobot, 1, 1))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                if (m_module.Run(m_module.ReadOCR(m_nRetry))) return p_sInfo;
+                if (m_module.Run(ReadOCR(m_nRetry))) return p_sInfo;
                 if (m_module.Run(m_module.WriteCmd(eCmd.GetReady, posRobot, 1, 1))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 return "OK";
+            }
+
+            string ReadOCR(int nRetry)
+            {
+                if (m_module.p_infoReticle == null) return "InfoReticle = null";
+                string sOCRMax = ""; 
+                string sOCR = "";
+                double fScoreMax = 0; 
+                double fScore = 0;
+                for (int n = 0; n < nRetry; n++)
+                {
+                    m_module.m_camOCR.ReadOCR(ref sOCR, ref fScore);
+                    if (fScore >= m_fMinScore)
+                    {
+                        m_module.p_infoReticle.p_sSlotID = sOCR;
+                        return "OK"; 
+                    }
+                    if (fScoreMax < fScore)
+                    {
+                        fScoreMax = fScore;
+                        sOCRMax = sOCR; 
+                    }
+                }
+                return "ReadOCR Score Error : " + fScoreMax.ToString() + "%, " + sOCRMax;
             }
         }
         #endregion

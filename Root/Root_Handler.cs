@@ -14,7 +14,7 @@ namespace Root
         public ModuleList m_moduleList;
         public Test m_test;
         public ScareCrow m_scarecrow;
-        //public Siltron m_siltron;
+        public Siltron m_siltron;
         public LoadPort_DMC m_loadport; 
         void InitModule()
         {
@@ -23,8 +23,8 @@ namespace Root
             //InitModule(m_test);
             //m_scarecrow =new ScareCrow("ScareCrow", m_enginner);
             //InitModule(m_scarecrow);
-            //m_siltron = new Siltron("Siltrion", m_enginner);
-            //InitModule(m_siltron);
+            m_siltron = new Siltron("Siltrion", m_enginner);
+            InitModule(m_siltron);
             m_loadport = new LoadPort_DMC("Loadport", m_enginner);
             InitModule(m_loadport);
         }

@@ -913,7 +913,7 @@ namespace Root_Vega.Module
                 public CStepInfo(string strInfo, BitmapSource img)
                 {
                     p_strInfo = strInfo;
-                    p_img = img.Clone();
+                    p_img = img;
                 }
             }
             CStepInfoList m_lstLeftStepInfo;
@@ -997,23 +997,6 @@ namespace Root_Vega.Module
                 run.p_lstRightStepInfo = p_lstRightStepInfo;
                 run.p_afs = p_afs;
 
-                //System.Drawing.Bitmap bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG.BMP");
-                //BitmapSource bmpSrc = GetBitmapSource(bmp);
-                //m_lstLeftStepInfo.Add(new StepInfo("LeftTest", bmpSrc));
-
-                //bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG2.BMP");
-                //bmpSrc = GetBitmapSource(bmp);
-                //m_lstLeftStepInfo.Add(new StepInfo("LeftTest2", bmpSrc));
-
-
-                //bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG.BMP");
-                //bmpSrc = GetBitmapSource(bmp);
-                //m_lstRightStepInfo.Add(new StepInfo("RightTest", bmpSrc));
-
-                //bmp = new System.Drawing.Bitmap("D://CHOEUNSUNG2.BMP");
-                //bmpSrc = GetBitmapSource(bmp);
-                //m_lstRightStepInfo.Add(new StepInfo("RightTest2", bmpSrc));
-
                 return run;
             }
 
@@ -1056,8 +1039,20 @@ namespace Root_Vega.Module
                 p_afs.p_dTheta = 0.0;
                 p_afs.p_strStatus = "Ready";
 
-                p_lstLeftStepInfo.Clear();
-                p_lstRightStepInfo.Clear();
+                //p_lstLeftStepInfo.Clear();
+                //p_lstRightStepInfo.Clear();
+
+                //Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
+                //{
+                //    p_lstLeftStepInfo.Clear();
+                //    p_lstRightStepInfo.Clear();
+                //}));
+
+                //DispatcherService.Invoke((System.Action)(() =>
+                //{
+                //    p_lstLeftStepInfo.Clear();
+                //    p_lstRightStepInfo.Clear();
+                //}));
 
                 //1.Reticle 좌측 위치로 이동 후 AF
                 int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
@@ -1086,8 +1081,18 @@ namespace Root_Vega.Module
                     string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
                     System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
-                    
-                    p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+
+                    //p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+
+                    //Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
+                    //{
+                    //    p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    //}));
+
+                    //DispatcherService.Invoke((System.Action)(() =>
+                    //{
+                    //    p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    //}));
                 }
 
                 // 2. Reticle 우측 위치로 이동 후 AF
@@ -1118,7 +1123,17 @@ namespace Root_Vega.Module
                     System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
                     
-                    p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    //p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+
+                    //Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
+                    //{
+                    //    p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    //}));
+
+                    //DispatcherService.Invoke((System.Action)(() =>
+                    //{
+                    //    p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    //}));
                 }
 
                 // 3. 좌우측 AF편차 구하기
@@ -1166,5 +1181,17 @@ namespace Root_Vega.Module
             }
         }
         #endregion
+
+        public static class DispatcherService
+        {
+            public static void Invoke(Action action)
+            {
+                Dispatcher dispatchObject = Application.Current != null ? Application.Current.Dispatcher : null;
+                if (dispatchObject == null || dispatchObject.CheckAccess())
+                    action();
+                else
+                    dispatchObject.Invoke(action);
+            }
+        }
     }
 }
