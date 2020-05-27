@@ -34,7 +34,7 @@ namespace RootTools.Inspects
 		Thread inspThread;
 		Inspection[] InsepctionThread;
 
-		int nThreadNum = 4;
+		int nThreadNum = 10;
 		int nInspectionCount = 0;
 
 		int m_nDefectCode;
@@ -63,7 +63,7 @@ namespace RootTools.Inspects
 					nThreadNum = GetWaitQueue();
 				}
 				inspThread = new Thread(DoInspection);
-				
+
 				//if (inspThread != null)
 				//{
 				//	if (inspThread.IsAlive)
@@ -210,7 +210,18 @@ namespace RootTools.Inspects
 		{
 			p_qInspection.Clear();
 		}
-		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, SurfaceParamData param, bool bDefectMerge, int nMergeDistance)
+		/// <summary>
+		/// nStart와 nStop은 테스트용으로 만든 argument이므로 테스트 종료후에는 정리합시다
+		/// </summary>
+		/// <param name="WholeInspArea"></param>
+		/// <param name="blocksize"></param>
+		/// <param name="param"></param>
+		/// <param name="bDefectMerge"></param>
+		/// <param name="nMergeDistance"></param>
+		/// <param name="nStart"></param>
+		/// <param name="nStop"></param>
+		/// <returns></returns>
+		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, StripParamData param, bool bDefectMerge, int nMergeDistance, int nStart = -1, int nStop = -1)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -230,7 +241,16 @@ namespace RootTools.Inspects
 			int iw = AreaWidth / blocksize;
 			int ih = AreaHeight / blocksize;
 
-			if (iw == 0 || ih == 0)
+			int wStart = 0;
+			int wStop = iw;
+
+			if (nStart != -1 && nStop != -1)//검사영역을 제한하는 기능
+			{
+				wStart = nStart;
+				wStop = nStop;
+			}
+
+			if (wStop == 0 || ih == 0)
 			{
 				// return;
 			}
@@ -240,76 +260,7 @@ namespace RootTools.Inspects
 				int sx, sy, ex, ey;
 				int blockcount = 1;
 
-				for (int i = 0; i < iw; i++)
-				{
-					sx = AreaStartX + i * blocksize;
-					if (i < iw - 1) ex = sx + blocksize;
-					else ex = AreaEndX;
-
-					for (int j = 0; j < ih; j++)
-					{
-						sy = AreaStartY + j * blocksize;
-						if (j < ih - 1) ey = sy + blocksize;
-						else ey = AreaEndY;
-
-						InspectionProperty ip = new InspectionProperty();
-						if (param.p_bAbsoluteInspection)
-						{
-							ip.p_InspType = InspectionType.AbsoluteSurface;
-						}
-						else
-						{
-							ip.p_InspType = InspectionType.RelativeSurface;
-						}
-
-						CRect inspblock = new CRect(sx, sy, ex, ey);
-						ip.p_Rect = inspblock;
-						ip.p_surfaceParam = param;
-						ip.p_index = blockcount;
-						AddInspection(ip, bDefectMerge, nMergeDistance);
-						blockcount++;
-
-						inspblocklist.Add(inspblock);
-					}
-					//inspection offset, 모서리 영역 미구현
-
-				}
-			}
-
-			return inspblocklist;
-
-		}
-		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, StripParamData param, bool bDefectMerge, int nMergeDistance)
-		{
-			List<CRect> inspblocklist = new List<CRect>();
-
-			int AreaStartX = WholeInspArea.Left;
-			int AreaEndX = WholeInspArea.Right;
-			int AreaStartY = WholeInspArea.Top;
-			int AreaEndY = WholeInspArea.Bottom;
-
-			int AreaWidth = WholeInspArea.Width;
-			int AreaHeight = WholeInspArea.Height;
-
-			//if (StartX + blocksize > EndX || StartY + blocksize > EndY)
-			//{
-			//    return;
-			//}
-
-			int iw = AreaWidth / blocksize;
-			int ih = AreaHeight / blocksize;
-
-			if (iw == 0 || ih == 0)
-			{
-				// return;
-			}
-			else
-			{
-				//insp blockd에 대한 start xy, end xy
-				int sx, sy, ex, ey;
-				int blockcount = 1;
-
-				for (int i = 0; i < iw; i++)
+				for (int i = wStart; i < wStop; i++)
 				{
 					sx = AreaStartX + i * blocksize;
 					if (i < iw - 1) ex = sx + blocksize;

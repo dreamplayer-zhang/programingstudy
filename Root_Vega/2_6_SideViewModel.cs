@@ -483,9 +483,9 @@ namespace Root_Vega
 			int nblocksize = 500;
 
 
-			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
-				p_Recipe.p_RecipeData.p_Roi[0].m_Surface.p_Parameter[0],
-				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance);
+			//DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
+			//	p_Recipe.p_RecipeData.p_Roi[0].m_Surface.p_Parameter[0],
+			//	p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance);
 
 			for (int i = 0; i < DrawRectList.Count; i++)
 			{
