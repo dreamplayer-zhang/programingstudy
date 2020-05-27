@@ -409,6 +409,30 @@ namespace RootTools.ZoomLens
             GetStatus(1);
         }
 
+        public void JogUpMouseDown()
+        {
+            JogMove(false);
+            GetStatus(1);
+        }
+
+        public void JogDownMouseDown()
+        {
+            JogMove(true);
+            GetStatus(1);
+        }
+
+        public void JogUpMouseUp()
+        {
+            Stop();
+            GetStatus(1);
+        }
+
+        public void JogDownMouseUp()
+        {
+            Stop();
+            GetStatus(1);
+        }
+
         public RelayCommand HomeCommand
         {
             get
@@ -461,6 +485,38 @@ namespace RootTools.ZoomLens
             }
             set
             {
+            }
+        }
+
+        public RelayCommand JogUpMouseDownCommand
+        {
+            get
+            {
+                return new RelayCommand(JogUpMouseDown);
+            }
+        }
+
+        public RelayCommand JogDownMouseDownCommand
+        {
+            get
+            {
+                return new RelayCommand(JogDownMouseDown);
+            }
+        }
+
+        public RelayCommand JogUpMouseUpCommand
+        {
+            get
+            {
+                return new RelayCommand(JogUpMouseUp);
+            }
+        }
+
+        public RelayCommand JogDownMouseUpCommand
+        {
+            get
+            {
+                return new RelayCommand(JogDownMouseUp);
             }
         }
         #endregion
