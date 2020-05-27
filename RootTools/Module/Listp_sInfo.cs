@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 
-namespace RootTools
+namespace RootTools.Module
 {
-    /// <summary> InfoList : p_sInfo에 값을 쓸 때 마다 List에 저장하여 보여 준다 </summary>
-    public class InfoList : NotifyProperty
+    /// <summary> Listp_sInfo : p_sInfo에 값을 쓸 때 마다 List에 저장하여 보여 준다 </summary>
+    public class Listp_sInfo : NotifyProperty
     {
         #region Info Data
         public class Info
@@ -20,13 +23,7 @@ namespace RootTools
                 p_sInfo = sInfo;
             }
         }
-
-        ObservableCollection<Info> _aInfo = new ObservableCollection<Info>(); 
-        public ObservableCollection<Info> p_aInfo
-        {
-            get { return _aInfo; }
-            set { _aInfo = value; }
-        }
+        public ObservableCollection<Info> p_aInfo { get; set; }
         #endregion
 
         #region Timer
@@ -35,7 +32,7 @@ namespace RootTools
         {
             while (m_qInfo.Count > 0) p_aInfo.Add(m_qInfo.Dequeue());
             while (p_aInfo.Count > 100) p_aInfo.RemoveAt(0);
-            OnPropertyChanged("p_aInfo"); 
+            OnPropertyChanged("p_aInfo");
         }
 
         Queue<Info> m_qInfo = new Queue<Info>();
@@ -45,16 +42,16 @@ namespace RootTools
         public void Add(string sInfo)
         {
             Info data = new Info(sInfo);
-            m_qInfo.Enqueue(data); 
+            m_qInfo.Enqueue(data);
         }
         #endregion
 
-        public InfoList()
+        public Listp_sInfo()
         {
+            p_aInfo = new ObservableCollection<Info>(); 
             m_timer.Interval = TimeSpan.FromMilliseconds(100);
-            m_timer.Tick += M_timer_Tick; ;
+            m_timer.Tick += M_timer_Tick; 
             m_timer.Start();
         }
-
     }
 }

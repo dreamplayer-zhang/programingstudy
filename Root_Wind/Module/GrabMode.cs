@@ -91,7 +91,7 @@ namespace Root_Wind
 
         public string p_id { get; set; }
         
-        public string p_sName{get;set;}
+        public string p_sName { get; set; }
         public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool)
         {
             p_id = id;
