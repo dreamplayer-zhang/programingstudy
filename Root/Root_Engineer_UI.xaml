@@ -10,32 +10,23 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0">
-            <tools:Login_UI x:Name="loginUI"/>
-        </StackPanel>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <local:Root_Handler_UI Grid.Column="0" x:Name="handlerUI" Margin="2"/>
-            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-            <TabControl Grid.Column="2">
-                <TabItem Header="ToolBox">
-                    <toolBox:ToolBox_UI x:Name="toolBoxUI" Margin="2"/>
-                </TabItem>
-                <TabItem Header="MemoryViewer">
-                    <memory:MemoryViewer_UI x:Name="memoryViewer" Margin="2"/>
-                </TabItem>
-                <TabItem Header="Log">
-                    <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
-                </TabItem>
-            </TabControl>
-        </Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <local:Root_Handler_UI Grid.Column="0" x:Name="handlerUI" Margin="2"/>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+        <TabControl Grid.Column="2">
+            <TabItem Header="ToolBox">
+                <toolBox:ToolBox_UI x:Name="toolBoxUI" Margin="2"/>
+            </TabItem>
+            <TabItem Header="MemoryViewer">
+                <memory:MemoryViewer_UI x:Name="memoryViewer" Margin="2"/>
+            </TabItem>
+            <TabItem Header="Log">
+                <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>

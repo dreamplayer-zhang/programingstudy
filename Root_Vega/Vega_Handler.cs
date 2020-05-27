@@ -13,7 +13,6 @@ namespace Root_Vega
     public class Vega_Handler : ObservableObject, IHandler
     {
         #region UI Binding
-        #endregion 
         public Brush p_brushHandler 
         {  
             get { return Brushes.MediumAquamarine; } 
@@ -25,6 +24,8 @@ namespace Root_Vega
             get { return Brushes.BurlyWood; }
             set { }
         }
+        #endregion 
+
         #region Module
         public ModuleList m_moduleList;
         public Vega_Recipe m_recipe;

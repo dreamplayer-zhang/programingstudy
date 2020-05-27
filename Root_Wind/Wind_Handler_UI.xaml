@@ -4,26 +4,39 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_Wind"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:module="clr-namespace:RootTools.Module;assembly=RootTools"
              xmlns:gaf="clr-namespace:RootTools.GAFs;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <TabControl x:Name="tabControl">
-        <TabItem Header="ModuleList">
-            <module:ModuleList_UI x:Name="moduleListUI"
-                                  Margin="0,-2,0,2" />
+    <TabControl>
+        <TabItem Header="Login">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <tools:Login_UI Grid.Column="0" x:Name="loginUI" />
+            </Grid>
         </TabItem>
-        <TabItem Header="Recipe">
-            <local:Wind_Recipe_UI x:Name="recipeUI"/>
+        <TabItem Header="Handler" Background="{Binding p_brushHandler}">
+            <TabControl>
+                <TabItem Header="ModuleList" Background="{Binding p_brushHandler}">
+                    <module:ModuleList_UI x:Name="moduleListUI"/>
+                </TabItem>
+                <TabItem Header="Recipe" Background="{Binding p_brushHandler}">
+                    <local:Wind_Recipe_UI x:Name="recipeUI"/>
+                </TabItem>
+                <TabItem Header="Process" Background="{Binding p_brushHandler}">
+                    <local:Wind_Process_UI x:Name="processUI"/>
+                </TabItem>
+                <TabItem Header="GAF" Background="{Binding p_brushHandler}">
+                    <gaf:GAF_UI x:Name="gafUI"/>
+                </TabItem>
+            </TabControl>
         </TabItem>
-        <TabItem Header="Process">
-            <local:Wind_Process_UI x:Name="processUI"/>
+        <TabItem Header="Module" Background="{Binding p_brushModule}">
+            <TabControl x:Name="tabModule"/>
         </TabItem>
-        <TabItem Header="GAF">
-            <gaf:GAF_UI x:Name="gafUI"/>
-        </TabItem>
-        <!--<TabItem Header="GAF_Manager">
-            <module:GAF_ManagerUI  x:Name="GAFManagerUI" />
-        </TabItem>-->
     </TabControl>
 </UserControl>

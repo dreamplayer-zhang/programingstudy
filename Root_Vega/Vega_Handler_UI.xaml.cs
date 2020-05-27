@@ -18,7 +18,7 @@ namespace Root_Vega
         public void Init(Vega_Handler handler)
         {
             m_handler = handler;
-            this.DataContext = handler;
+            DataContext = handler;
             loginUI.Init(handler.m_enginner.m_login);
             moduleListUI.Init(handler.m_moduleList);
             recipeUI.Init(handler.m_recipe);

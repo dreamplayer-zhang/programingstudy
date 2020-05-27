@@ -18,7 +18,6 @@ namespace Root
         {
             m_engineer = engineer; 
             logViewUI.Init(LogView.m_logView); 
-            loginUI.Init(engineer.m_login);
             toolBoxUI.Init(engineer.ClassToolBox());
             handlerUI.Init(engineer.m_handler);
             memoryViewer.Init(engineer.m_memoryViewer); 

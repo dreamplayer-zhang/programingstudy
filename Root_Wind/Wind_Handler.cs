@@ -6,11 +6,26 @@ using RootTools.Module;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Root_Wind
 {
     public class Wind_Handler : NotifyProperty, IHandler
     {
+        #region UI Binding
+        public Brush p_brushHandler
+        {
+            get { return Brushes.MediumAquamarine; }
+            set { }
+        }
+
+        public Brush p_brushModule
+        {
+            get { return Brushes.BurlyWood; }
+            set { }
+        }
+        #endregion 
+
         #region Module
         public ModuleList m_moduleList;
         public Wind_Recipe m_recipe;
@@ -199,14 +214,14 @@ namespace Root_Wind
         #endregion
 
         string m_id;
-        IEngineer m_enginner;
+        public Wind_Engineer m_enginner;
         public GAF m_gaf;
         IGem m_gem;
 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_enginner = engineer;
+            m_enginner = (Wind_Engineer)engineer;
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();

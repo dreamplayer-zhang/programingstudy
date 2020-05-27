@@ -124,12 +124,12 @@ namespace Root
         #endregion
 
         string m_id;
-        IEngineer m_enginner;
+        public Root_Engineer m_enginner;
         GAF m_gaf; 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_enginner = engineer;
+            m_enginner = (Root_Engineer)engineer;
             m_gaf = engineer.ClassGAF(); 
             InitModule(); 
         }

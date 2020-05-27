@@ -18,13 +18,12 @@ namespace Root_Wind
         public void Init(Wind_Handler handler)
         {
             m_handler = handler;
-            this.DataContext = handler;
+            DataContext = handler;
+            loginUI.Init(handler.m_enginner.m_login);
             moduleListUI.Init(handler.m_moduleList);
             recipeUI.Init(handler.m_recipe);
             processUI.Init(handler.m_process); 
             gafUI.Init(handler.m_gaf);
-            //GAFManagerUI.DataContext = handler.m_GAF;
-            //GAFManagerUI. = handler.m_GAF;
             InitTabControl();
         }
 
@@ -35,7 +34,8 @@ namespace Root_Wind
                 TabItem tabItem = new TabItem();
                 tabItem.Header = kv.Key.p_id;
                 tabItem.Content = kv.Value;
-                tabControl.Items.Add(tabItem); 
+                tabItem.Background = m_handler.p_brushModule;
+                tabModule.Items.Add(tabItem); 
             }
         }
     }

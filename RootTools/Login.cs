@@ -31,7 +31,7 @@ namespace RootTools
 
             public void RunTree(Tree tree)
             {
-                m_eLevel = (eLevel)tree.Set(m_eLevel, eLevel.Logout, "Level", "Login Level");
+                m_eLevel = (eLevel)tree.Set(m_eLevel, m_eLevel, "Level", "Login Level");
                 m_sPassword = tree.SetPassword(m_sPassword, m_sPassword, "Password", "Login Password");
             }
 
