@@ -7,7 +7,6 @@ using RootTools.Inspects;
 using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
-using RootTools.SQLogs;
 
 namespace Root_Vega
 {
@@ -24,9 +23,6 @@ namespace Root_Vega
 
         public GAF m_gaf = new GAF();
         public GAF ClassGAF() { return m_gaf; }
-
-        //GAF_Manager m_GAFManager = new GAF_Manager();
-        //public object ClassGAFManager() { return m_GAFManager; }
 
         ToolBox m_toolBox = new ToolBox();
         public ToolBox ClassToolBox() { return m_toolBox; }
@@ -76,7 +72,7 @@ namespace Root_Vega
         {
             EQ.m_sModel = id;
             LogView.Init();
-            m_login.Init();
+            m_login.Init(); 
             m_toolBox.Init(id, this);
             InitAjin();
             InitXGem(); 

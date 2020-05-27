@@ -196,16 +196,16 @@ namespace Root_Vega
         #endregion
 
         string m_id;
-        IEngineer m_enginner;
+        public Vega_Engineer m_enginner;
         public GAF m_gaf;
         IGem m_gem; 
 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_enginner = engineer;
+            m_enginner = (Vega_Engineer)engineer;
             m_gaf = engineer.ClassGAF();
-            m_gem = engineer.ClassGem(); 
+            m_gem = engineer.ClassGem();
             InitModule();
             InitThread();
         }
