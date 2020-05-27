@@ -1,17 +1,35 @@
 ﻿using RootTools.Trees;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Threading;
 
 namespace RootTools.Light
 {
-    public class LightToolSet : IToolSet
+    public class LightToolSet : ObservableObject, IToolSet
     {
         public delegate void dgOnToolChanged();
         public event dgOnToolChanged OnToolChanged;
 
+        string m_strSelectedID;
+        public string p_strSelectedID
+        {
+            get { return m_strSelectedID; }
+            set { SetProperty(ref m_strSelectedID, value); }
+        }
+
         #region ILightTool
         public List<string> m_asLightTool = new List<string>(); 
+        public List<string> p_asLightTool
+        {
+            get { return m_asLightTool; }
+            set { SetProperty(ref m_asLightTool, value); }
+        }
         public List<ILightTool> m_aLightTool = new List<ILightTool>();
+        public List<ILightTool> p_aLightTool
+        {
+            get { return m_aLightTool; }
+            set { SetProperty(ref m_aLightTool, value); }
+        }
 
         void AddTool(ILightTool lightTool)
         {
@@ -178,6 +196,11 @@ namespace RootTools.Light
         IEngineer m_engineer;
         Log m_log; 
         public TreeRoot m_treeRoot; 
+        public TreeRoot p_treeRoot
+        {
+            get { return m_treeRoot; }
+            set { SetProperty(ref m_treeRoot, value); }
+        }
         public LightToolSet(string id, IEngineer engineer)
         {
             m_id = id;
