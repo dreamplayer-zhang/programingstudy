@@ -46,7 +46,7 @@ namespace RootTools.Module
             }
         }
 
-        public InfoList m_infoList = new InfoList();
+        public Listp_sInfo m_infoList = new Listp_sInfo();
         string _sInfo = "Info";
         public string p_sInfo
         {
