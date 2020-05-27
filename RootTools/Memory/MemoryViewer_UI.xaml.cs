@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -75,7 +76,7 @@ namespace RootTools.Memory
 
         private void comboBoxPool_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            m_memoryViewer.m_memoryData = null;
+            m_memoryViewer.p_memoryData = null;
             if (comboBoxPool.SelectedValue == null) return; 
             string sPool = comboBoxPool.SelectedValue.ToString();
             MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
@@ -86,7 +87,7 @@ namespace RootTools.Memory
 
         private void comboBoxGroup_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            m_memoryViewer.m_memoryData = null;
+            m_memoryViewer.p_memoryData = null;
             if (comboBoxPool.SelectedValue == null) return;
             string sPool = comboBoxPool.SelectedValue.ToString();
             MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
@@ -99,9 +100,10 @@ namespace RootTools.Memory
             comboBoxMemory.SelectedIndex = -1;
         }
 
+        List<int> m_aMemoryIndex = new List<int>(); 
         private void comboBoxMemory_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            m_memoryViewer.m_memoryData = null;
+            m_memoryViewer.p_memoryData = null;
             if (comboBoxPool.SelectedValue == null) return;
             string sPool = comboBoxPool.SelectedValue.ToString();
             MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
@@ -112,7 +114,11 @@ namespace RootTools.Memory
             if (group == null) return;
             if (comboBoxMemory.SelectedValue == null) return; 
             string sMemory = comboBoxMemory.SelectedValue.ToString();
-            m_memoryViewer.m_memoryData = group.GetMemory(sMemory); 
+            m_memoryViewer.p_memoryData = group.GetMemory(sMemory);
+            comboBoxIndex.ItemsSource = null;
+            m_aMemoryIndex.Clear();
+            for (int n = 0; n < m_memoryViewer.p_memoryData.p_nCount; n++) m_aMemoryIndex.Add(n);
+            comboBoxIndex.ItemsSource = m_aMemoryIndex;
         }
     }
 }

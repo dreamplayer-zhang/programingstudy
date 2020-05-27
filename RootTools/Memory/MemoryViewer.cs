@@ -13,22 +13,37 @@ namespace RootTools.Memory
         #endregion
 
         #region MemoryData
-        public MemoryData m_memoryData = null;
         public void SetMemory(MemoryData memoryData, int nIndex)
         {
-            m_memoryData = memoryData;
-            OnPropertyChanged("p_sMemoryData");
+            p_memoryData = memoryData;
             p_nMemoryIndex = nIndex;
-            OnPropertyChanged("p_nMemoryIndex");
-            UpdateBitmapSource(); 
         }
 
-        public string p_sMemoryData 
-        {
-            get { return (m_memoryData != null) ? m_memoryData.p_id : ""; }
+        MemoryData _memoryData = null;
+        public MemoryData p_memoryData
+        { 
+            get { return _memoryData; }
+            set
+            {
+                if (_memoryData == value) return;
+                _memoryData = value;
+                p_nMemoryIndex = 0; 
+                OnPropertyChanged();
+            }
         }
 
-        public int p_nMemoryIndex { get; set; }
+        int _nMemoryIndex = 0; 
+        public int p_nMemoryIndex 
+        { 
+            get { return _nMemoryIndex; }
+            set
+            {
+                if (_nMemoryIndex == value) return;
+                _nMemoryIndex = value; 
+                OnPropertyChanged();
+                UpdateBitmapSource();
+            }
+        }
         #endregion
 
         #region UI
@@ -46,22 +61,22 @@ namespace RootTools.Memory
         #region File Open & Save
         public void FileOpen(string sFile)
         {
-            if (m_memoryData == null) return; 
+            if (p_memoryData == null) return; 
             switch (GetUpperExt(sFile))
             {
-                case "BMP": m_memoryData.p_sInfo = m_memoryData.FileOpenBMP(sFile, p_nMemoryIndex); break;
-                case "JPG": m_memoryData.p_sInfo = m_memoryData.FileOpenJPG(sFile, p_nMemoryIndex); break; 
+                case "BMP": p_memoryData.p_sInfo = p_memoryData.FileOpenBMP(sFile, p_nMemoryIndex); break;
+                case "JPG": p_memoryData.p_sInfo = p_memoryData.FileOpenJPG(sFile, p_nMemoryIndex); break; 
             }
             UpdateBitmapSource(); 
         }
 
         public void FileSave(string sFile)
         {
-            if (m_memoryData == null) return;
+            if (p_memoryData == null) return;
             switch (GetUpperExt(sFile))
             {
-                case "BMP": m_memoryData.p_sInfo = m_memoryData.FileSaveBMP(sFile, p_nMemoryIndex); break;
-                case "JPG": m_memoryData.p_sInfo = m_memoryData.FileSaveJPG(sFile, p_nMemoryIndex); break; 
+                case "BMP": p_memoryData.p_sInfo = p_memoryData.FileSaveBMP(sFile, p_nMemoryIndex); break;
+                case "JPG": p_memoryData.p_sInfo = p_memoryData.FileSaveJPG(sFile, p_nMemoryIndex); break; 
             }
         }
 
@@ -126,10 +141,10 @@ namespace RootTools.Memory
 
         public void ZoomOut(CPoint cpWindow)
         {
-            if (m_memoryData == null) return; 
+            if (p_memoryData == null) return; 
             if (m_iZoom >= (m_aZoom.Length - 1)) return;
-            double sx = m_memoryData.p_sz.X * p_fZoom / p_szWindow.X;
-            double sy = m_memoryData.p_sz.Y * p_fZoom / p_szWindow.Y;
+            double sx = p_memoryData.p_sz.X * p_fZoom / p_szWindow.X;
+            double sy = p_memoryData.p_sz.Y * p_fZoom / p_szWindow.Y;
             if (Math.Max(sx, sy) < 1) return;
             CPoint cpImage = GetImagePos(cpWindow);
             m_iZoom++;
@@ -163,10 +178,10 @@ namespace RootTools.Memory
                 Shift(_cpWindow);
                 p_cpImage = GetImagePos(_cpWindow);
                 if (m_aBufDisplay == null) return;
-                if (m_memoryData == null) return; 
-                int nAdd = m_memoryData.p_nByte * (_cpWindow.X + _cpWindow.Y * m_szBitmapSource.X);
+                if (p_memoryData == null) return; 
+                int nAdd = p_memoryData.p_nByte * (_cpWindow.X + _cpWindow.Y * m_szBitmapSource.X);
                 if ((nAdd < 0) || (nAdd >= m_aBufDisplay.Length)) return;
-                switch (m_memoryData.p_nByte)
+                switch (p_memoryData.p_nByte)
                 {
                     case 1: p_sGV = m_aBufDisplay[nAdd].ToString(); break;
                     case 3:
@@ -232,13 +247,13 @@ namespace RootTools.Memory
         byte[] m_aBufDisplay = null; 
         unsafe void UpdateBitmapSource()
         {
-            if (m_memoryData == null) return;
-            if (m_memoryData.GetPtr(p_nMemoryIndex) == null) return;
+            if (p_memoryData == null) return;
+            if (p_memoryData.GetPtr(p_nMemoryIndex) == null) return;
             if (p_szWindow.X * p_szWindow.Y == 0) return;
 
-            m_szImage = new CPoint((int)(m_memoryData.p_sz.X * p_fZoom), (int)(m_memoryData.p_sz.Y * p_fZoom));
+            m_szImage = new CPoint((int)(p_memoryData.p_sz.X * p_fZoom), (int)(p_memoryData.p_sz.Y * p_fZoom));
 
-            int nByte = m_memoryData.p_nByte;
+            int nByte = p_memoryData.p_nByte;
             CPoint sz = m_szBitmapSource = new CPoint(Math.Min(p_szWindow.X, m_szImage.X), Math.Min(p_szWindow.Y, m_szImage.Y));
             byte[] aBuf = m_aBufDisplay = new byte[nByte * sz.Y * sz.X];
             FixOffset();
@@ -252,7 +267,7 @@ namespace RootTools.Memory
             for (int y = 0, iy = 0; y < sz.Y; y++, iy += nByte * sz.X)
             {
                 int pY = m_cpOffset.Y + (int)Math.Round(y / p_fZoom);
-                byte* pSrc = (byte*)m_memoryData.GetPtr(p_nMemoryIndex, 0, pY).ToPointer();
+                byte* pSrc = (byte*)p_memoryData.GetPtr(p_nMemoryIndex, 0, pY).ToPointer();
                 switch (nByte)
                 {
                     case 1: for (int x = 0; x < sz.X; x++) aBuf[x + iy] = *(pSrc + aX[x]); break;
