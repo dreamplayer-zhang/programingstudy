@@ -7,14 +7,12 @@
              xmlns:tree="clr-namespace:RootTools.Trees"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="4*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <local:CommLog_UI Grid.Row="0" x:Name="commLogUI"/>
-        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
-        <tree:TreeUI Grid.Row="2" x:Name="treeRootUI"/>
-    </Grid>
+    <TabControl>
+        <TabItem Header="CommLog">
+            <local:CommLog_UI x:Name="commLogUI"/>
+        </TabItem>
+        <TabItem Header="Setting">
+            <tree:TreeUI x:Name="treeRootUI"/>
+        </TabItem>
+    </TabControl>
 </UserControl>

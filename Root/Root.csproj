@@ -112,10 +112,6 @@
     <Compile Include="Root_Handler_UI.xaml.cs">
       <DependentUpon>Root_Handler_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TreeDemo.cs" />
-    <Compile Include="TreeViewTest.xaml.cs">
-      <DependentUpon>TreeViewTest.xaml</DependentUpon>
-    </Compile>
     <Page Include="Root_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -137,10 +133,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Root_Handler_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="TreeViewTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

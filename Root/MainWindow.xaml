@@ -12,22 +12,6 @@
             <TabItem Header="Engineer">
                 <local:Root_Engineer_UI x:Name="engineerUI"/>
             </TabItem>
-            <TabItem Header="Tree">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="50"></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Orientation="Horizontal">
-                        <Button x:Name="buttonOpen" Content="Open" Click="ButtonOpen_Click" Margin="5" Width="50"/>
-                        <Button x:Name="buttonSave" Content="Save" Click="ButtonSave_Click" Margin="5" Width="50"/>
-                    </StackPanel>
-                    <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" Margin="5" />
-                </Grid>
-            </TabItem>
-            <TabItem Header="TreeView">
-                <local:TreeViewTest/>
-            </TabItem>
         </TabControl>
     </Grid>
 </Window>

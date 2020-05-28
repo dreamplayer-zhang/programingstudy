@@ -44,16 +44,19 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="4*"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <ToggleButton Grid.Column="0" x:Name="checkBoxConnect" Width ="{PriorityBinding}" Background="Green"
                     Style="{StaticResource ConnectButton}" IsChecked="{Binding p_bConnect}" Content="Connect" Margin="2"/>
         </Grid>
-        <local:CommLog_UI Grid.Row="1" x:Name="commLogUI"/>
-        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
-        <tree:TreeUI Grid.Row="3" x:Name="treeRootUI"/>
+        <TabControl Grid.Row="1">
+            <TabItem Header="CommLog">
+                <local:CommLog_UI x:Name="commLogUI"/>
+            </TabItem>
+            <TabItem Header="Setting">
+                <tree:TreeUI x:Name="treeRootUI"/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>

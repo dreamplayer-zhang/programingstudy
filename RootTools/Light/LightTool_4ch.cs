@@ -57,8 +57,6 @@ namespace RootTools.Light
                 m_sSetPower = ((int)(fPower * p_fScalePower)).ToString("000");
                 string str = "led " + m_nCh.ToString() + " " + m_sSetPower;
                 m_rs232.Send(str);
-                
-                p_fGetPower = fPower;
             }
 
             private void M_rs232_OnRecieve(string sRead)
