@@ -3,11 +3,6 @@ using RootTools.Camera;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Root.Module
 {
@@ -41,7 +36,7 @@ namespace Root.Module
         public void RunConvert()
         {
             StopWatch sw = new StopWatch(); 
-            p_sInfo = m_converter.Convert(m_memoryBayer, 0, m_memoryRGB, 0);
+            for (int n = 0; n < 100; n++) p_sInfo = m_converter.Convert(m_memoryBayer, 0, m_memoryRGB, 0);
             m_log.Info("Convert Time : " + sw.ElapsedMilliseconds.ToString()); 
         }
         #endregion

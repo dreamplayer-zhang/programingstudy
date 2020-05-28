@@ -30,13 +30,13 @@ namespace RootTools.Camera
             {
                 int y = 2 * i + oy;
                 byte* pSrc = (byte*)m_memBayer.GetPtr(m_iBayer, ox, y);
-                byte* pSrcU = pSrc - w;
-                byte* pSrcD = pSrc + w;
+                byte* pSrcT = pSrc - w;
+                byte* pSrcB = pSrc + w;
                 byte* pDst = (byte*)m_memRGB.GetPtr(m_iRGB, ox, y);
-                for (int x = ox; x < m_memBayer.p_sz.X; x += 2, pSrc += 2, pSrcU += 2, pSrcD += 2)
+                for (int x = ox; x < m_memBayer.p_sz.X; x += 2, pSrc += 2, pSrcT += 2, pSrcB += 2)
                 {
-                    int nB = *(pSrcU - 1) + *(pSrcU + 1) + *(pSrcD - 1) + *(pSrcD + 1);
-                    int nG = *pSrcU + *pSrcD + *(pSrc - 1) + *(pSrc + 1);
+                    int nB = *(pSrcT - 1) + *(pSrcT + 1) + *(pSrcB - 1) + *(pSrcB + 1);
+                    int nG = *pSrcT + *pSrcB + *(pSrc - 1) + *(pSrc + 1);
                     *pDst = (byte)(nB / 4);
                     pDst++;
                     *pDst = (byte)(nG / 4);
@@ -54,13 +54,13 @@ namespace RootTools.Camera
             {
                 int y = 2 * i + oy;
                 byte* pSrc = (byte*)m_memBayer.GetPtr(m_iBayer, ox, y);
-                byte* pSrcU = pSrc - w;
-                byte* pSrcD = pSrc + w;
+                byte* pSrcT = pSrc - w;
+                byte* pSrcB = pSrc + w;
                 byte* pDst = (byte*)m_memRGB.GetPtr(m_iRGB, ox, y);
-                for (int x = ox; x < m_memBayer.p_sz.X; x += 2, pSrc += 2, pSrcU += 2, pSrcD += 2)
+                for (int x = ox; x < m_memBayer.p_sz.X; x += 2, pSrc += 2, pSrcT += 2, pSrcB += 2)
                 {
-                    int nR = *(pSrcU - 1) + *(pSrcU + 1) + *(pSrcD - 1) + *(pSrcD + 1);
-                    int nG = *pSrcU + *pSrcD + *(pSrc - 1) + *(pSrc + 1);
+                    int nR = *(pSrcT - 1) + *(pSrcT + 1) + *(pSrcB - 1) + *(pSrcB + 1);
+                    int nG = *pSrcT + *pSrcB + *(pSrc - 1) + *(pSrc + 1);
                     *pDst = *pSrc;
                     pDst++;
                     *pDst = (byte)(nG / 4);
@@ -78,13 +78,13 @@ namespace RootTools.Camera
             {
                 int y = 2 * i + oy;
                 byte* pSrc = (byte*)m_memBayer.GetPtr(m_iBayer, ox, y);
-                byte* pSrcU = pSrc - w;
-                byte* pSrcD = pSrc + w;
+                byte* pSrcT = pSrc - w;
+                byte* pSrcB = pSrc + w;
                 byte* pDst = (byte*)m_memRGB.GetPtr(m_iRGB, ox, y);
-                for (int x = ox; x < m_memBayer.p_sz.X; x += 2, pSrc += 2, pSrcU += 2, pSrcD += 2)
+                for (int x = ox; x < m_memBayer.p_sz.X; x += 2, pSrc += 2, pSrcT += 2, pSrcB += 2)
                 {
                     int nB = *(pSrc - 1) + *(pSrc + 1);
-                    int nR = *pSrcU + *pSrcD;
+                    int nR = *pSrcT + *pSrcB;
                     *pDst = (byte)(nB / 2);
                     pDst++;
                     *pDst = *pSrc;
@@ -102,13 +102,13 @@ namespace RootTools.Camera
             {
                 int y = 2 * i + oy;
                 byte* pSrc = (byte*)m_memBayer.GetPtr(m_iBayer, ox, y);
-                byte* pSrcU = pSrc - w;
-                byte* pSrcD = pSrc + w;
+                byte* pSrcT = pSrc - w;
+                byte* pSrcB = pSrc + w;
                 byte* pDst = (byte*)m_memRGB.GetPtr(m_iRGB, ox, y);
-                for (int x = ox; x < m_memBayer.p_sz.X; x += 2, pSrc += 2, pSrcU += 2, pSrcD += 2)
+                for (int x = ox; x < m_memBayer.p_sz.X; x += 2, pSrc += 2, pSrcT += 2, pSrcB += 2)
                 {
                     int nR = *(pSrc - 1) + *(pSrc + 1);
-                    int nB = *pSrcU + *pSrcD;
+                    int nB = *pSrcT + *pSrcB;
                     *pDst = (byte)(nB / 2);
                     pDst++;
                     *pDst = *pSrc;
