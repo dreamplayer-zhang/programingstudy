@@ -175,7 +175,7 @@ namespace RootTools.Memory
                 unsafe
                 {
                     byte* p = (byte*)ip.ToPointer();
-                    p += y * W + x;
+                    p += y * W + x * p_nByte;
                     return (IntPtr)(p);
                 }
             }
@@ -276,6 +276,29 @@ namespace RootTools.Memory
             int n = n0;
             n0 = n1;
             n1 = n; 
+        }
+        #endregion
+
+        #region Bayer
+        public string FileOpenBayer(string sFile, int nIndex)
+        {
+            if ((nIndex < 0) || (nIndex >= p_nCount)) return "Invalid Index";
+            FileStream fs = null;
+            try
+            {
+                fs = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read, 32768, true);
+            }
+            catch (Exception) { return "File Open Error"; }
+            BinaryReader br = new BinaryReader(fs);
+            CPoint szMemory = new CPoint(p_sz);
+            for (int y = 0; y < szMemory.Y; y++)
+            {
+                byte[] pBuf = br.ReadBytes(p_nByte * szMemory.X);
+                Marshal.Copy(pBuf, 0, GetPtr(nIndex, 0, y), p_nByte * szMemory.X);
+            }
+            br.Close();
+            fs.Close();
+            return "OK"; 
         }
         #endregion
 
