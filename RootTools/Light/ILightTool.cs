@@ -10,7 +10,7 @@ namespace RootTools.Light
         string p_sInfo { get; set; }
         void ThreadStop();
         LightBase GetLight(int nCh, string sNewID);
-        List<LightBase> p_aLight { get; }
+        List<LightBase> p_aLight { get; set; }
         void Deselect(LightBase light); 
     }
 }

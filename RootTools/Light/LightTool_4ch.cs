@@ -82,15 +82,14 @@ namespace RootTools.Light
             }
         }
 
-        List<LightBase> m_aLight = new List<LightBase>();
-        public List<LightBase> p_aLight { get { return m_aLight; } }
+        public List<LightBase> p_aLight { get; set; }
         void InitLight()
         {  
             m_rs232.p_bConnect = true;
             for (int n = 0; n < c_lLight; n++)
             {
                 Light light = new Light(p_id, n, m_rs232); 
-                m_aLight.Add(light);
+                p_aLight.Add(light);
             }
         }
 
@@ -98,10 +97,10 @@ namespace RootTools.Light
         {
             if (nCh < 0) return null;
             if (nCh >= c_lLight) return null;
-            if (m_aLight[nCh].p_sID != m_aLight[nCh].p_id) return null;
-            m_aLight[nCh].p_sID = sNewID;
+            if (p_aLight[nCh].p_sID != p_aLight[nCh].p_id) return null;
+            p_aLight[nCh].p_sID = sNewID;
             if (OnChangeTool != null) OnChangeTool();
-            return m_aLight[nCh];
+            return p_aLight[nCh];
         }
 
         public void Deselect(LightBase light)
@@ -116,6 +115,7 @@ namespace RootTools.Light
         public RS232 m_rs232; 
         public LightTool_4ch(string id, IEngineer engineer)
         {
+            p_aLight = new List<LightBase>(); 
             p_id = id;
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
