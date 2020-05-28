@@ -29,6 +29,7 @@ namespace RootTools.Memory
                 _memoryData = value;
                 p_nMemoryIndex = 0; 
                 OnPropertyChanged();
+                UpdateBitmapSource();
             }
         }
 
@@ -64,6 +65,7 @@ namespace RootTools.Memory
             if (p_memoryData == null) return; 
             switch (GetUpperExt(sFile))
             {
+                case "BAYER": p_memoryData.p_sInfo = p_memoryData.FileOpenBayer(sFile, p_nMemoryIndex); break;
                 case "BMP": p_memoryData.p_sInfo = p_memoryData.FileOpenBMP(sFile, p_nMemoryIndex); break;
                 case "JPG": p_memoryData.p_sInfo = p_memoryData.FileOpenJPG(sFile, p_nMemoryIndex); break; 
             }
@@ -250,6 +252,7 @@ namespace RootTools.Memory
             if (p_memoryData == null) return;
             if (p_memoryData.GetPtr(p_nMemoryIndex) == null) return;
             if (p_szWindow.X * p_szWindow.Y == 0) return;
+            p_bitmapSrc = null;
 
             m_szImage = new CPoint((int)(p_memoryData.p_sz.X * p_fZoom), (int)(p_memoryData.p_sz.Y * p_fZoom));
 

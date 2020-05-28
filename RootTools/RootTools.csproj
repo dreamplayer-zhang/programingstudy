@@ -142,6 +142,7 @@
     <Compile Include="Camera\BaslerPylon\Camera_Basler_UI.xaml.cs">
       <DependentUpon>Camera_Basler_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Camera\Bayer2RGB.cs" />
     <Compile Include="Camera\CameraSet.cs" />
     <Compile Include="Camera\CameraSet_UI.xaml.cs">
       <DependentUpon>CameraSet_UI.xaml</DependentUpon>

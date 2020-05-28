@@ -15,7 +15,8 @@ namespace Root
         public Test m_test;
         public ScareCrow m_scarecrow;
         public Siltron m_siltron;
-        public LoadPort_DMC m_loadport; 
+        public LoadPort_DMC m_loadport;
+        public BayerConvert m_bayer; 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
@@ -27,6 +28,8 @@ namespace Root
             InitModule(m_siltron);
             m_loadport = new LoadPort_DMC("Loadport", m_enginner);
             InitModule(m_loadport);
+            m_bayer = new BayerConvert("BayerConvert", m_enginner);
+            InitModule(m_bayer);
         }
 
         void InitModule(ModuleBase module)

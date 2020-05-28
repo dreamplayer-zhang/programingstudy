@@ -27,7 +27,7 @@ namespace RootTools.Memory
         private void menuOpen_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
+            dlg.Filter = "Image Files(*.bmp;*.jpg;*.bayer)|*.bmp;*.jpg;*.bayer";
             if (dlg.ShowDialog() == true) m_memoryViewer.FileOpen(dlg.FileName); 
         }
 
@@ -119,6 +119,7 @@ namespace RootTools.Memory
             m_aMemoryIndex.Clear();
             for (int n = 0; n < m_memoryViewer.p_memoryData.p_nCount; n++) m_aMemoryIndex.Add(n);
             comboBoxIndex.ItemsSource = m_aMemoryIndex;
+            comboBoxIndex.SelectedIndex = 0; 
         }
     }
 }
