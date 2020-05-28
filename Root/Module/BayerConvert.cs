@@ -36,7 +36,7 @@ namespace Root.Module
         public void RunConvert()
         {
             StopWatch sw = new StopWatch(); 
-            for (int n = 0; n < 100; n++) p_sInfo = m_converter.Convert(m_memoryBayer, 0, m_memoryRGB, 0);
+            p_sInfo = m_converter.Convert(m_memoryBayer, 0, m_memoryRGB, 0);
             m_log.Info("Convert Time : " + sw.ElapsedMilliseconds.ToString()); 
         }
         #endregion
