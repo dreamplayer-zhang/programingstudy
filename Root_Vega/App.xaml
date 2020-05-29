@@ -498,11 +498,11 @@
                     <ControlTemplate TargetType="TabControl">
                         <Grid UseLayoutRounding="True">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="10*" />
-                                <ColumnDefinition Width="90*" />
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <StackPanel IsItemsHost="True"
-                                        Panel.ZIndex="2" />
+                                        Panel.ZIndex="2"/>
                             <Grid Grid.Column="1"
                                   Margin="10,0,0,0">
                                 <ContentPresenter ContentSource="SelectedContent" />
@@ -517,8 +517,9 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
-                        <Grid Name="Panel"
+                        <Border Name="Panel"
                               Margin="0,0,0,10"
+                                Padding="20,3"
                               Background="{StaticResource BtnBackGround}">
                             <TextBlock VerticalAlignment="Center"
                                        HorizontalAlignment="Center"
@@ -529,7 +530,7 @@
                                                   HorizontalAlignment="Center"
                                                   ContentSource="Header"
                                                   Margin="10" /></TextBlock>
-                        </Grid>
+                        </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected"
                                      Value="False">

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Windows.Controls;
 
 namespace RootTools.Light
 {
-    public class LightTool_12ch : NotifyProperty, ILightTool
+    public class LightTool_12ch : ObservableObject, ILightTool
     {
         const int c_lLight = 12;
 
@@ -22,7 +23,7 @@ namespace RootTools.Light
             {
                 if (value == _sInfo) return;
                 _sInfo = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();
                 if (value == "OK") return;
                 m_log.Error(value);
             }
@@ -59,10 +60,15 @@ namespace RootTools.Light
 
             int m_nCh = 0;
             CyUSBTool m_usb;
+            public CyUSBTool p_usb
+            {
+                get { return m_usb; }
+                set { SetProperty(ref m_usb, value); }
+            }
             public Light(string id, int nCh, CyUSBTool usb)
             {
                 m_nCh = nCh;
-                m_usb = usb;
+                p_usb = usb;
                 Init(id + "." + nCh.ToString("00"), nCh); 
             }
         }
@@ -99,6 +105,11 @@ namespace RootTools.Light
         IEngineer m_engineer;
         Log m_log;
         public CyUSBTool m_usb;
+        public CyUSBTool p_usb
+        {
+            get { return m_usb; }
+            set { SetProperty(ref m_usb, value); }
+        }
         public LightTool_12ch(int iDevice, string id, IEngineer engineer)
         {
             m_id = id;

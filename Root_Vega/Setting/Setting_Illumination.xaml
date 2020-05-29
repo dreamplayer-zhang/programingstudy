@@ -7,6 +7,7 @@
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
              xmlns:comm="clr-namespace:RootTools.Comm;assembly=RootTools"
+             xmlns:root="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d"
              d:DesignHeight="726"
              d:DesignWidth="1602">
@@ -43,36 +44,37 @@
                                                    Margin="5,0,5,0"
                                                    Name="tb">
 											<ContentPresenter VerticalAlignment="Center"
-                                                  HorizontalAlignment="Center"
-                                                  ContentSource="Header" /></TextBlock>
+                                                              HorizontalAlignment="Center"
+                                                              ContentSource="Header" />
+                                        </TextBlock>
 									</Border>
 									<ControlTemplate.Triggers>
 										<Trigger Property="IsSelected"
-                                     Value="False">
+                                                 Value="False">
 											<Setter TargetName="Panel"
-                                        Property="Background"
-                                        Value="{StaticResource ResourceKey=TabBackGround}" />
+                                                    Property="Background"
+                                                    Value="{StaticResource ResourceKey=TabBackGround}" />
 											<Setter TargetName="tb"
-                                        Property="Foreground"
-                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                                                    Property="Foreground"
+                                                    Value="{StaticResource ResourceKey=TabForeGround}" />
 										</Trigger>
 										<Trigger Property="IsMouseOver"
-                                     Value="True">
+                                                 Value="True">
 											<Setter TargetName="Panel"
-                                        Property="Background"
-                                        Value="{StaticResource ResourceKey=TabMouseOver}" />
+                                                    Property="Background"
+                                                    Value="{StaticResource ResourceKey=TabMouseOver}" />
 											<Setter TargetName="tb"
-                                        Property="Foreground"
-                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                                                    Property="Foreground"
+                                                    Value="{StaticResource ResourceKey=TabForeGround}" />
 										</Trigger>
 										<Trigger Property="IsSelected"
-                                     Value="True">
+                                                 Value="True">
 											<Setter TargetName="Panel"
-                                        Property="Background"
-                                        Value="{StaticResource ResourceKey=TabSelected}" />
+                                                    Property="Background"
+                                                    Value="{StaticResource ResourceKey=TabSelected}" />
 											<Setter TargetName="tb"
-                                        Property="Foreground"
-                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                                                    Property="Foreground"
+                                                    Value="{StaticResource ResourceKey=TabForeGround}" />
 										</Trigger>
 									</ControlTemplate.Triggers>
 								</ControlTemplate>
@@ -85,19 +87,6 @@
 						<TextBlock Text="{Binding p_id}"/>
 					</DataTemplate>
                 </TabControl.ItemTemplate>
-                <!--TabControl.ItemTemplate>
-                    <DataTemplate>
-                        --><!--<Grid Margin="5"
-                                DataContext="{Binding }">
-                            <TextBlock FontFamily="Arial"
-                                       FontWeight="Bold"
-                                       FontSize="25"
-                                       Margin="5,0,5,0"
-                                       Text="{Binding p_id}"></TextBlock>
-                        </Grid>--><!--
-                        
-                    </DataTemplate>
-                </TabControl.ItemTemplate>-->
                 <TabControl.ContentTemplate>
                     <DataTemplate>
                         <Grid>
@@ -106,24 +95,76 @@
                                 <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
                             <TabControl x:Name="LightTool"
-                                    Style="{StaticResource StackPanelTabControl}"
+                                        Style="{StaticResource RcpTabControl}"
                                     ItemsSource="{Binding p_aLight}"
-                                    Background="Black"
-                                    Foreground="White"
                                     Grid.Column="0">
-                                <TabControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Margin="5"
-                                                VerticalAlignment="Stretch"
-                                                   HorizontalAlignment="Stretch"
-                                            BorderBrush="{StaticResource BorderBrush}"
-                                            DataContext="{Binding }">
-                                            <TextBlock 
+                                <TabControl.ItemContainerStyle>
+                                    <Style TargetType="{x:Type TabItem}">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type TabItem}">
+                                                    <Border Name="Panel"
+                                            Margin="5"
+                                                            Padding="10,0"
+                                            BorderBrush="{StaticResource BorderBrush}">
+                                                        <TextBlock VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
                                                    FontFamily="Arial"
                                                    FontWeight="Bold"
                                                    FontSize="25"
                                                    Margin="5,0,5,0"
-                                                   Text="{Binding p_id}"></TextBlock>
+                                                   Name="tb">
+											<ContentPresenter VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header" /></TextBlock>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsSelected"
+                                     Value="False">
+                                                            <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabBackGround}" />
+                                                            <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                                                        </Trigger>
+                                                        <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                                            <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabMouseOver}" />
+                                                            <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                                                        </Trigger>
+                                                        <Trigger Property="IsSelected"
+                                     Value="True">
+                                                            <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabSelected}" />
+                                                            <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </TabControl.ItemContainerStyle>
+                                <TabControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="5"
+                                                VerticalAlignment="Stretch"
+                                                HorizontalAlignment="Stretch"
+                                                BorderBrush="{StaticResource BorderBrush}"
+                                                DataContext="{Binding }">
+                                            <TextBlock FontFamily="Arial"
+                                                       FontWeight="Bold"
+                                                       FontSize="25"
+                                                       Margin="5,0,5,0"
+                                                       Text="{Binding p_id}">
+                                            </TextBlock>
                                         </Border>
                                     </DataTemplate>
                                 </TabControl.ItemTemplate>
@@ -131,14 +172,24 @@
                                     <DataTemplate>
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="2*"/>
+                                                <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
-                                            <Border Grid.Column="0">
-                                                <ContentControl Content="{Binding p_ui}"></ContentControl>
-                                            </Border>
-                                            <Border Grid.Column="1">
+                                            <Grid Grid.Column="0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <Border Grid.Row="0">
+                                                    <ContentControl Content="{Binding p_ui}"></ContentControl>
+                                                </Border>
+                                                <Border Grid.Row="1">
+                                                    <ContentControl Content="{Binding p_usb.p_ui}"></ContentControl>
+                                                    <!--<root:CyUSBTool_UI Grid.Row="2" 
+                                                                       DataContext="{Binding p_usb}"/>-->
+                                                </Border>
+                                            </Grid>
+                                            <Border Grid.Column="2">
                                                 <ContentControl Content="{Binding p_rs232.p_ui}"></ContentControl>
                                             </Border>
                                         </Grid>
