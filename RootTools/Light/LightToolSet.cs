@@ -1,6 +1,8 @@
 ﻿using RootTools.Trees;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
+using System.Data;
 using System.Threading;
 
 namespace RootTools.Light
@@ -24,8 +26,9 @@ namespace RootTools.Light
             get { return m_asLightTool; }
             set { SetProperty(ref m_asLightTool, value); }
         }
-        public List<ILightTool> m_aLightTool = new List<ILightTool>();
-        public List<ILightTool> p_aLightTool
+
+        public ObservableCollection<ILightTool> m_aLightTool = new ObservableCollection<ILightTool>();
+        public ObservableCollection<ILightTool> p_aLightTool
         {
             get { return m_aLightTool; }
             set { SetProperty(ref m_aLightTool, value); }
@@ -34,13 +37,13 @@ namespace RootTools.Light
         void AddTool(ILightTool lightTool)
         {
             if (lightTool == null) return; 
-            m_aLightTool.Add(lightTool);
-            m_asLightTool.Add(lightTool.p_id);
+            p_aLightTool.Add(lightTool);
+            p_asLightTool.Add(lightTool.p_id);
         }
 
         public ILightTool GetTool(string sID)
         {
-            foreach (ILightTool lightTool in m_aLightTool)
+            foreach (ILightTool lightTool in p_aLightTool)
             {
                 if (sID == lightTool.p_id) return lightTool; 
             }
@@ -174,8 +177,8 @@ namespace RootTools.Light
             bChange |= RunLVSTree(m_treeRoot.GetTree(c_sLVS));
             if (bChange)
             {
-                m_asLightTool.Clear();
-                m_aLightTool.Clear();
+                p_asLightTool.Clear();
+                p_aLightTool.Clear();
                 foreach (LightTool_12ch lightTool in m_aLightTool12ch) AddTool(lightTool); 
                 foreach (LightTool_4ch lightTool in m_aLightTool4ch) AddTool(lightTool);
                 foreach (LightTool_Kwangwoo lightTool in m_aLightToolKwangwoo) AddTool(lightTool);

@@ -112,28 +112,5 @@ namespace RootTools.Light
         {
             m_usb.ThreadStop(); 
         }
-
-        public void Expand(object obj)
-        {
-            LightTool_12ch light = (LightTool_12ch)obj;
-
-            
-            //foreach(KeyValuePair<IToolSet, UserControl> kv in m_engineer.ClassToolBox().m_aToolSet)
-            //{
-            //    if (kv.Key.p_id == light.p_id)
-            //        break;
-            //}
-
-
-            return;
-        }
-
-        public RelayCommandWithParameter ExpandCommand
-        {
-            get
-            {
-                return new RelayCommandWithParameter(Expand);
-            }
-        }
     }
 }

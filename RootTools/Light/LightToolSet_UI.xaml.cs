@@ -33,12 +33,12 @@ namespace RootTools.Light
         void InitTabControl()
         {
             tabControl.Items.Clear(); 
-            foreach (ILightTool lightTool in m_lightToolSet.m_aLightTool)
+            foreach (ILightTool lightTool in m_lightToolSet.p_aLightTool)
             {
                 TabItem tabItem = new TabItem();
                 tabItem.Header = lightTool.p_id;
                 tabItem.Content = lightTool.p_ui;
-                tabControl.Items.Add(tabItem); 
+                tabControl.Items.Add(tabItem);
             }
         }
 

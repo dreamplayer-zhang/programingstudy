@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+             xmlns:comm="clr-namespace:RootTools.Comm;assembly=RootTools"
              mc:Ignorable="d"
              d:DesignHeight="726"
              d:DesignWidth="1602">
@@ -12,39 +14,93 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <tree:TreeUI Grid.Row="0"
                          Margin="15"
                          DataContext="{Binding p_treeRoot}"/>
-            <ScrollViewer Grid.Row="1"
-                          VerticalScrollBarVisibility="Visible">
-                <StackPanel Margin="15">
-                    <ItemsControl ItemsSource="{Binding p_aLightTool}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button Grid.Column="0"
-                                    Margin="5"
-                                    Style="{StaticResource BasicBtn}"
-                                    Content="{Binding p_id}"
-                                    Command="{Binding ExpandCommand}"
-                                    CommandParameter="{Binding }"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </ScrollViewer>
         </Grid>
-        <ScrollViewer Grid.Column="1"
-                      VerticalScrollBarVisibility="Visible">
-            <StackPanel Margin="15">
-                
-            </StackPanel>
-        </ScrollViewer>
+        <Grid Grid.Column="1">
+            <TabControl x:Name="LightToolSet"
+                        Style="{StaticResource StackPanelTabControl}"
+                        ItemsSource="{Binding p_aLightTool}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TabItem Style="{DynamicResource StackPanelTabItem}"
+                                 Header="{Binding p_id}">
+                        </TabItem>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <!--TabControl.ItemTemplate>
+                    <DataTemplate>
+                        --><!--<Grid Margin="5"
+                                DataContext="{Binding }">
+                            <TextBlock FontFamily="Arial"
+                                       FontWeight="Bold"
+                                       FontSize="25"
+                                       Margin="5,0,5,0"
+                                       Text="{Binding p_id}"></TextBlock>
+                        </Grid>--><!--
+                        
+                    </DataTemplate>
+                </TabControl.ItemTemplate>-->
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="8*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TabControl x:Name="LightTool"
+                                    Style="{StaticResource StackPanelTabControl}"
+                                    ItemsSource="{Binding p_aLight}"
+                                    Background="Black"
+                                    Foreground="White"
+                                    Grid.Column="0">
+                                <TabControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="5"
+                                                VerticalAlignment="Stretch"
+                                                   HorizontalAlignment="Stretch"
+                                            BorderBrush="{StaticResource BorderBrush}"
+                                            DataContext="{Binding }">
+                                            <TextBlock 
+                                                   FontFamily="Arial"
+                                                   FontWeight="Bold"
+                                                   FontSize="25"
+                                                   Margin="5,0,5,0"
+                                                   Text="{Binding p_id}"></TextBlock>
+                                        </Border>
+                                    </DataTemplate>
+                                </TabControl.ItemTemplate>
+                                <TabControl.ContentTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0">
+                                                <ContentControl Content="{Binding p_ui}"></ContentControl>
+                                            </Border>
+                                            <Border Grid.Column="1">
+                                                <ContentControl Content="{Binding p_rs232.p_ui}"></ContentControl>
+                                            </Border>
+                                        </Grid>
+                                    </DataTemplate>
+                                </TabControl.ContentTemplate>
+                            </TabControl>
+                            <Border Grid.Column="1">
+                                <tree:TreeUI DataContext="{Binding p_treeRoot}"/>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+        </Grid>
     </Grid>
 </UserControl>

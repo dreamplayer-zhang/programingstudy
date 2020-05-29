@@ -3,7 +3,7 @@ using System.Windows.Controls;
 
 namespace RootTools.Light
 {
-    public class LightBase : NotifyProperty
+    public class LightBase : ObservableObject
     {
         #region Property
         string _sID = "";
@@ -13,7 +13,7 @@ namespace RootTools.Light
             set
             {
                 _sID = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();
             }
         }
 
@@ -25,7 +25,7 @@ namespace RootTools.Light
             {
                 if (_fGetPower == value) return;
                 _fGetPower = Math.Round(100 * value) / 100.0;
-                OnPropertyChanged(); 
+                RaisePropertyChanged(); 
             }
         }
 
@@ -37,7 +37,7 @@ namespace RootTools.Light
             {
                 if (_bOn == value) return;
                 _bOn = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();
                 SetPower(); 
             }
         }
@@ -52,7 +52,7 @@ namespace RootTools.Light
                 if (fSetPower < 0) fSetPower = 0;
                 if (fSetPower > p_fMaxPower) fSetPower = p_fMaxPower;
                 _fSetPower = Math.Round(100 * fSetPower / p_fScalePower) / 100.0; 
-                OnPropertyChanged();
+                RaisePropertyChanged();
                 SetPower();
                 _nDifferent = 0; 
             }
@@ -80,7 +80,7 @@ namespace RootTools.Light
                 _fMaxPower = value;
                 if (_fMaxPower < 0) _fMaxPower = 0;
                 if (_fMaxPower > 1000) _fMaxPower = 1000;
-                OnPropertyChanged();
+                RaisePropertyChanged();
                 m_reg.Write("MaxPower", p_fMaxPower);
             }
         }
@@ -95,7 +95,7 @@ namespace RootTools.Light
                 _fScalePower = value;
                 if (_fScalePower < 0) _fScalePower = 0;
                 if (_fScalePower > 2) _fScalePower = 2;
-                OnPropertyChanged();
+                RaisePropertyChanged();
                 m_reg.Write("ScalePower", p_fScalePower);
             }
         }
@@ -140,7 +140,5 @@ namespace RootTools.Light
         {
             p_sID = p_id; 
         }
-
-
     }
 }

@@ -5,7 +5,7 @@ using System.Windows.Controls;
 
 namespace RootTools.Light
 {
-    public class LightTool_LVS : NotifyProperty, ILightTool
+    public class LightTool_LVS : ObservableObject, ILightTool
     {
         const int c_lLight = 4;
 
@@ -23,7 +23,7 @@ namespace RootTools.Light
             {
                 if (value == _sInfo) return;
                 _sInfo = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();
                 if (value == "OK") return;
                 m_log.Error(value);
             }
@@ -53,7 +53,7 @@ namespace RootTools.Light
                 double fPower = p_bOn ? p_fSetPower : 0;
                 fPower *= p_fScalePower;
                 m_sSend = GetCommand(fPower);
-                m_rs232.Send(m_sSend); 
+                p_rs232.Send(m_sSend); 
             }
 
             const int c_lMaxPower = 255;
@@ -70,12 +70,17 @@ namespace RootTools.Light
 
             int m_nCh = 0;
             RS232 m_rs232;
+            public RS232 p_rs232
+            {
+                get { return m_rs232; }
+                set { SetProperty(ref m_rs232, value); }
+            }
             public Light(string id, int nCh, RS232 rs232)
             {
                 m_nCh = nCh;
-                m_rs232 = rs232;
+                p_rs232 = rs232;
                 Init(id + "." + nCh.ToString("00"), nCh);
-                m_rs232.OnRecieve += M_rs232_OnRecieve;
+                p_rs232.OnRecieve += M_rs232_OnRecieve;
             }
         }
 
@@ -85,7 +90,7 @@ namespace RootTools.Light
         {
             for (int n = 0; n < c_lLight; n++)
             {
-                Light light = new Light(m_id, n, m_rs232);
+                Light light = new Light(m_id, n, p_rs232);
                 m_aLight.Add(light);
             }
         }
@@ -111,18 +116,23 @@ namespace RootTools.Light
         IEngineer m_engineer;
         Log m_log;
         public RS232 m_rs232;
+        public RS232 p_rs232
+        {
+            get { return m_rs232; }
+            set { SetProperty(ref m_rs232, value); }
+        }
         public LightTool_LVS(string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
-            m_rs232 = new RS232(id, m_log);
+            p_rs232 = new RS232(id, m_log);
             InitLight();
         }
 
         public void ThreadStop()
         {
-            m_rs232.ThreadStop();
+            p_rs232.ThreadStop();
         }
     }
 }
