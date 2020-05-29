@@ -8,30 +8,24 @@
              xmlns:tree="clr-namespace:RootTools.Trees"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="500">
-    <TabControl>
-        <TabItem Header="Run">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="3*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <Button Content="Read" Margin="2" Click="Button_Click"/>
-                    <TextBox Text="{Binding p_sOCR}" Width="120" TextAlignment="Center" Margin="2" />
-                    <TextBlock Text="{Binding p_fScore}" Margin="2" MinWidth="70"/>
-                    <TextBlock Text="{Binding p_sInfo}" Margin="2"/>
-                </StackPanel>
-                <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
-                
-                <GridSplitter Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
-                <tree:TreeUI Grid.Row="4" x:Name="treeRootUI"/>
-            </Grid>
-        </TabItem>
-        <TabItem Header="TCPIP">
-            <comm:TCPIPClient_UI x:Name="tcpipUI"/>
-        </TabItem>
-    </TabControl>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5">
+            <Button Content="Read" Margin="2" Click="Button_Click"/>
+            <TextBox Text="{Binding p_sOCR}" Width="120" TextAlignment="Center" Margin="2" />
+            <TextBlock Text="{Binding p_fScore}" Margin="2" MinWidth="70"/>
+            <TextBlock Text="{Binding p_sInfo}" Margin="2"/>
+        </StackPanel>
+        <TabControl Grid.Row="1">
+            <TabItem Header="TCPIP">
+                <comm:TCPIPClient_UI x:Name="tcpipUI"/>
+            </TabItem>
+            <TabItem Header="Cognex Setting">
+                <tree:TreeUI x:Name="treeRootUI"/>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </UserControl>
