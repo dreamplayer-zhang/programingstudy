@@ -252,6 +252,8 @@ namespace RootTools.Trees
         {
             Tree item = GetItemPassword(id, value, sDesc);
             if (item == null) return value;
+            item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
+            item.p_bVisible = bVisible;
             return (string)Set(item, value, valueDef);
         }
 

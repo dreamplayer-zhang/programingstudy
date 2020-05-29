@@ -18,7 +18,8 @@ namespace Root
         public void Init(Root_Handler handler)
         {
             m_handler = handler;
-            this.DataContext = handler;
+            DataContext = handler;
+            loginUI.Init(handler.m_enginner.m_login);
             moduleListUI.Init(handler.m_moduleList);
             InitTabControl();
         }

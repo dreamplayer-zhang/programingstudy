@@ -23,7 +23,7 @@
         </Grid>
         <Grid Grid.Column="1" Margin="0,15,15,15">
             <Grid.RowDefinitions>
-				<RowDefinition Height="300"/>
+				<RowDefinition Height="Auto"/>
 				<RowDefinition  Height="*"/>
 			</Grid.RowDefinitions>
             <Grid Grid.Row="0">
@@ -63,7 +63,15 @@
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnInspTest}"
                             Margin="0,0,0,10" />
-                    <!--<StackPanel>
+					<Button Content="Start Insp Test"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding btnStartInsp}"
+                            Margin="0,0,0,10" />
+					<Button Content="Next Snap Test"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding btnNextSnap}"
+                            Margin="0,0,0,10" />
+					<!--<StackPanel>
                         <WrapPanel Margin="3">
                             <TextBlock Text="(X,Y) = " />
                             <TextBlock Text="{Binding p_ImageViewer.p_MouseX}" />

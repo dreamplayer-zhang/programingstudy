@@ -142,6 +142,7 @@
     <Compile Include="Camera\BaslerPylon\Camera_Basler_UI.xaml.cs">
       <DependentUpon>Camera_Basler_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Camera\Bayer2RGB.cs" />
     <Compile Include="Camera\CameraSet.cs" />
     <Compile Include="Camera\CameraSet_UI.xaml.cs">
       <DependentUpon>CameraSet_UI.xaml</DependentUpon>
@@ -302,6 +303,10 @@
     <Compile Include="Memory\MemoryViewer_UI.xaml.cs">
       <DependentUpon>MemoryViewer_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\Listp_sInfo.cs" />
+    <Compile Include="Module\Listp_sInfo_UI.xaml.cs">
+      <DependentUpon>Listp_sInfo_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\ModuleBase.cs" />
     <Compile Include="Module\ModuleBase_UI.xaml.cs">
       <DependentUpon>ModuleBase_UI.xaml</DependentUpon>
@@ -380,10 +385,6 @@
     <Compile Include="ViewModelHelper\DialogService.cs" />
     <Compile Include="ViewModelHelper\GridViewColumnResize.cs" />
     <Compile Include="Camera\ICamera.cs" />
-    <Compile Include="InfoList.cs" />
-    <Compile Include="InfoList_UI.xaml.cs">
-      <DependentUpon>InfoList_UI.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ITool.cs" />
     <Compile Include="IToolSet.cs" />
     <Compile Include="Control\BitDI.cs" />
@@ -622,10 +623,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="InfoList_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Inspects\InspectToolSet_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -711,6 +708,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Memory\MemoryViewer_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\Listp_sInfo_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

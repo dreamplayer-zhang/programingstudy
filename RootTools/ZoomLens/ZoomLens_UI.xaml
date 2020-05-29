@@ -6,6 +6,9 @@
              xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:RootTools.ZoomLens"
              xmlns:comm="clr-namespace:RootTools.Comm"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:behavior="clr-namespace:mousebehavior"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300">
     <Grid x:Name="grid">
@@ -172,9 +175,7 @@
                                     <Button Grid.Row="0"
                                             Style="{StaticResource BasicBtn}"
                                             Margin="5"
-                                            Name="btnUp"
-                                            PreviewMouseLeftButtonDown="PreviewMouseLeftButtonDown"
-                                            PreviewMouseLeftButtonUp="PreviewMouseLeftButtonUp">
+                                            Name="btnUp">
                                         <Button.Content>
                                             <StackPanel Orientation="Vertical">
                                                 <material:PackIcon Kind="ArrowCompressUp"
@@ -185,13 +186,22 @@
                                                            FontSize="15"></TextBlock>
                                             </StackPanel>
                                         </Button.Content>
+                                        <i:Interaction.Behaviors>
+                                            <behavior:MouseBehaviour MouseEvent="{Binding MouseEvent, Mode=OneWayToSource}"/>
+                                        </i:Interaction.Behaviors>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding JogUpMouseDownCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                <i:InvokeCommandAction Command="{Binding JogUpMouseUpCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
                                     </Button>
                                     <Button Grid.Row="1"
                                             Style="{StaticResource BasicBtn}"
                                             Margin="5"
-                                            Name="btnDown"
-                                            PreviewMouseLeftButtonDown="PreviewMouseLeftButtonDown"
-                                            PreviewMouseLeftButtonUp="PreviewMouseLeftButtonUp">
+                                            Name="btnDown">
                                         <Button.Content>
                                             <StackPanel Orientation="Vertical">
                                                 <material:PackIcon Kind="ArrowCompressDown"
@@ -202,6 +212,17 @@
                                                            FontSize="15"></TextBlock>
                                             </StackPanel>
                                         </Button.Content>
+                                        <i:Interaction.Behaviors>
+                                            <behavior:MouseBehaviour MouseEvent="{Binding MouseEvent, Mode=OneWayToSource}"/>
+                                        </i:Interaction.Behaviors>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                <i:InvokeCommandAction Command="{Binding JogDownMouseDownCommand}"/>
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                <i:InvokeCommandAction Command="{Binding JogDownMouseUpCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
                                     </Button>
                                 </Grid>
                             </Grid>

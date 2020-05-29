@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RootTools.Module"
-             xmlns:Tool="clr-namespace:RootTools"
              xmlns:tree="clr-namespace:RootTools.Trees"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -43,7 +42,7 @@
             <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" Margin="2"/>
         </Grid>
         <Grid Grid.Column="3">
-            <Tool:InfoList_UI x:Name="infoListUI"/>
+            <local:Listp_sInfo_UI x:Name="infoListUI"/>
         </Grid>
     </Grid>
 </UserControl>

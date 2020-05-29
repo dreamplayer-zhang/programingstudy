@@ -15,10 +15,7 @@
             <ComboBox x:Name="comboBoxPool" Margin="2" MinWidth="80" SelectionChanged="comboBoxPool_SelectionChanged"/>
             <ComboBox x:Name="comboBoxGroup" Margin="2" MinWidth="80" SelectionChanged="comboBoxGroup_SelectionChanged"/>
             <ComboBox x:Name="comboBoxMemory" Margin="2" MinWidth="80" SelectionChanged="comboBoxMemory_SelectionChanged"/>
-            <StackPanel Orientation="Horizontal" Margin="0,0,12,0">
-                <TextBlock Text="{Binding p_sMemoryData}" Margin="2" MinWidth="20"/>
-                <TextBlock Text="{Binding p_nMemoryIndex}" Margin="2"/>
-            </StackPanel>
+            <ComboBox x:Name="comboBoxIndex" SelectedValue="{Binding p_nMemoryIndex}" Margin="2" MinWidth="40"/>
             <Menu VerticalAlignment="Center">
                 <MenuItem Header="File">
                     <MenuItem x:Name="menuOpen" Header="Open" Click="menuOpen_Click"/>

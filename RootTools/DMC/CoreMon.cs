@@ -549,10 +549,7 @@ namespace RootTools.DMC
         static extern int cmon_set_number_data(int idRobot, string vbname, ref float value);
         public static int setNumberData(int idRobot, string vbname, ref float value)
         {
-            float res = 0;
-
             int retcode = cmon_set_number_data(idRobot, vbname, ref value);
-
             return retcode;
         }
 

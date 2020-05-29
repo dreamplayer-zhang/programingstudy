@@ -7,8 +7,6 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Windows;
-using System.Windows.Media;
 
 namespace RootTools.Module
 {
@@ -39,7 +37,7 @@ namespace RootTools.Module
         #endregion
 
         #region Property
-        public InfoList m_infoList = new InfoList();
+        public Listp_sInfo m_infoList = new Listp_sInfo();
         string _sInfo = "Info";
         public string p_sInfo
         {

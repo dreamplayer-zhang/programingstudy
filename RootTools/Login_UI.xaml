@@ -10,12 +10,20 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0" VerticalAlignment="Center" Background="{Binding p_colorLevel}">
-            <Label Content="{Binding p_sUserName}" Margin="5" Width="80" MouseLeftButtonDown="Label_MouseLeftButtonDown" MouseRightButtonDown="Label_MouseRightButtonDown"/>
-            <ComboBox x:Name="comboBoxName" Margin="5" Width="80" Text="{Binding p_sComboName}" ItemsSource="{Binding p_asUserName}"/>
-            <PasswordBox x:Name="passwordBox" Margin="5" Width="80" PasswordChanged="PasswordBox_PasswordChanged"/>
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="{Binding p_colorLevel}">
+                <Label Content="{Binding p_sUserName}" Margin="5" Width="80" MouseLeftButtonDown="Label_MouseLeftButtonDown"/>
+                <ComboBox x:Name="comboBoxName" Margin="5" Width="80" Text="{Binding p_sComboName}" ItemsSource="{Binding p_asUserName}"/>
+                <PasswordBox x:Name="passwordBox" Margin="5" MinWidth="100" HorizontalContentAlignment="Center" PasswordChanged="PasswordBox_PasswordChanged"/>
+            </StackPanel>
+            <StackPanel x:Name="stackAddUser" Orientation="Horizontal">
+                <Label Content="User" Margin="5"/>
+                <TextBox x:Name="textBoxAddUser" Width="80" Margin="5" TextAlignment="Center"/>
+                <Button x:Name="buttonAddUser" Content="Add" Width="40" Margin="5" Click="buttonAddUser_Click"/>
+                <Button x:Name="buttonDeleteUser" Content="Delete" Width="40" Margin="5" Click="buttonDeleteUser_Click"/>
+            </StackPanel>
         </StackPanel>
         <tree:TreeUI Grid.Row="1" x:Name="treeRootUI"/>
     </Grid>

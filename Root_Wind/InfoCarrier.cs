@@ -158,7 +158,7 @@ namespace Root_Wind
             set
             {
                 if (_eSlotType == value) return;
-                m_log.Info(p_id + " SlotTyper : " + _eSlotType.ToString() + " -> " + value.ToString());
+                if (m_log != null) m_log.Info(p_id + " SlotTyper : " + _eSlotType.ToString() + " -> " + value.ToString());
                 _eSlotType = value;
                 InitChildID();
             }

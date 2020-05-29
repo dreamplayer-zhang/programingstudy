@@ -15,7 +15,8 @@ namespace Root
         public Test m_test;
         public ScareCrow m_scarecrow;
         public Siltron m_siltron;
-        public LoadPort_DMC m_loadport; 
+        public LoadPort_DMC m_loadport;
+        public BayerConvert m_bayer; 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
@@ -27,6 +28,8 @@ namespace Root
             InitModule(m_siltron);
             m_loadport = new LoadPort_DMC("Loadport", m_enginner);
             InitModule(m_loadport);
+            m_bayer = new BayerConvert("BayerConvert", m_enginner);
+            InitModule(m_bayer);
         }
 
         void InitModule(ModuleBase module)
@@ -124,12 +127,12 @@ namespace Root
         #endregion
 
         string m_id;
-        IEngineer m_enginner;
+        public Root_Engineer m_enginner;
         GAF m_gaf; 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_enginner = engineer;
+            m_enginner = (Root_Engineer)engineer;
             m_gaf = engineer.ClassGAF(); 
             InitModule(); 
         }

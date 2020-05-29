@@ -103,6 +103,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="MMFClass.cs" />
+    <Compile Include="Module\BayerConvert.cs" />
     <Compile Include="Module\LoadPort_DMC.cs" />
     <Compile Include="Module\ScareCrow.cs" />
     <Compile Include="Module\Siltron.cs" />

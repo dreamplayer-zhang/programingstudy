@@ -19,20 +19,8 @@ namespace Root_Wind
         {
             m_engineer = engineer;
             logViewUI.Init(LogView.m_logView);
-            loginUI.Init(engineer.m_login);
             toolBoxUI.Init(engineer.ClassToolBox());
             handlerUI.Init(engineer.m_handler);
-        }
-
-        private void UserControl_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == Key.F12)
-            {
-                if (loginGrid.Visibility == System.Windows.Visibility.Visible)
-                    loginGrid.Visibility = System.Windows.Visibility.Collapsed;
-                else
-                    loginGrid.Visibility = System.Windows.Visibility.Visible;
-            }
         }
     }
 }

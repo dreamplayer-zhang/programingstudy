@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:tool="clr-namespace:RootTools"
+             xmlns:local="clr-namespace:RootTools.Module"
              xmlns:tree="clr-namespace:RootTools.Trees"
              xmlns:dio="clr-namespace:RootTools.Control"
              mc:Ignorable="d" 
@@ -45,7 +45,8 @@
         <Grid Grid.Column="2">
             <TabControl x:Name="tabControlTools">
                 <TabItem Header="Info" Background="DarkSalmon">
-                    <tool:InfoList_UI x:Name="infoListUI"/>
+                    <local:Listp_sInfo_UI x:Name="infoListUI"/>
+                    
                 </TabItem>
                 <TabItem Header="DIO" Background="DarkSalmon">
                     <Grid>
