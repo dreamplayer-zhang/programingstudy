@@ -105,8 +105,8 @@ namespace Root_Vega.Module
             PutExt,     // Robot PUT 세부동작1 팔 뻗고 z축 PUT 1단계 Down 동작 까지 수행
             PutRet,     // Robot PUT 세부동작2 Grip off 이후 Z축 PUT 2단계 Down 후 팔 접는 동작까지 수행
             PutReady,
-            Open,
-            Close,
+            Extend,
+            Retraction,
         };
         Dictionary<eCmd, string> m_dicCmd = new Dictionary<eCmd, string>();
         void InitCmd()
@@ -124,8 +124,8 @@ namespace Root_Vega.Module
             m_dicCmd.Add(eCmd.PutExt, "PAEXTA");
             m_dicCmd.Add(eCmd.PutRet, "PARETA");
             m_dicCmd.Add(eCmd.PutReady, "PRDY");
-            m_dicCmd.Add(eCmd.Open, "EXTA");
-            m_dicCmd.Add(eCmd.Close, "RETA");
+            m_dicCmd.Add(eCmd.Extend, "EXTA");
+            m_dicCmd.Add(eCmd.Retraction, "RETA");
         }
         public enum eMotion
         {
@@ -137,8 +137,8 @@ namespace Root_Vega.Module
             PutExt,     // Robot PUT 세부동작1 팔 뻗고 z축 PUT 1단계 Down 동작 까지 수행
             PutRet,     // Robot PUT 세부동작2 Grip off 이후 Z축 PUT 2단계 Down 후 팔 접는 동작까지 수행
             PutReady,
-            Open,
-            Close,
+            Extend,
+            Retraction,
         }
         Dictionary<eMotion, eCmd> m_dicMotion = new Dictionary<eMotion, eCmd>();
         void InitMotion()
@@ -151,8 +151,8 @@ namespace Root_Vega.Module
             m_dicMotion.Add(eMotion.PutExt, eCmd.PutExt);
             m_dicMotion.Add(eMotion.PutRet, eCmd.PutRet);
             m_dicMotion.Add(eMotion.PutReady, eCmd.PutReady);
-            m_dicMotion.Add(eMotion.Open, eCmd.Open);
-            m_dicMotion.Add(eMotion.Close, eCmd.Close);
+            m_dicMotion.Add(eMotion.Extend, eCmd.Extend);
+            m_dicMotion.Add(eMotion.Retraction, eCmd.Retraction);
         }
 
         string ReplyCmd(string[] sMsgs)
@@ -883,11 +883,11 @@ namespace Root_Vega.Module
                 if (EQ.p_bSimulate) return "OK"; 
                 int posRobot = m_module.m_teachOCR;
                 if (m_module.Run(m_module.WriteCmd(eCmd.PutReady, posRobot, 1, 1))) return p_sInfo;
-                if (m_module.Run(m_module.WriteCmd(eCmd.Open, posRobot, 1))) return p_sInfo;
+                if (m_module.Run(m_module.WriteCmd(eCmd.Extend, posRobot, 1))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 if (m_module.Run(ReadOCR(m_nRetry))) return p_sInfo;
                 //if (m_module.Run(m_module.WriteCmd(eCmd.GetReady, posRobot, 1, 1))) return p_sInfo;
-                if (m_module.Run(m_module.WriteCmd(eCmd.Close))) return p_sInfo;
+                if (m_module.Run(m_module.WriteCmd(eCmd.Retraction))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 return "OK";
             }
