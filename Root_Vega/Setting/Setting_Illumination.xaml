@@ -24,16 +24,67 @@
                          DataContext="{Binding p_treeRoot}"/>
         </Grid>
         <Grid Grid.Column="1">
-            <TabControl x:Name="LightToolSet"
+			<TabControl x:Name="LightToolSet"
                         Style="{StaticResource StackPanelTabControl}"
                         ItemsSource="{Binding p_aLightTool}">
-                <ItemsControl.ItemTemplate>
+				<TabControl.ItemContainerStyle>
+					<Style TargetType="{x:Type TabItem}">
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate TargetType="{x:Type TabItem}">
+									<Border Name="Panel"
+                                            Margin="5"
+                                            BorderBrush="{StaticResource BorderBrush}">
+										<TextBlock VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   FontFamily="Arial"
+                                                   FontWeight="Bold"
+                                                   FontSize="25"
+                                                   Margin="5,0,5,0"
+                                                   Name="tb">
+											<ContentPresenter VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header" /></TextBlock>
+									</Border>
+									<ControlTemplate.Triggers>
+										<Trigger Property="IsSelected"
+                                     Value="False">
+											<Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabBackGround}" />
+											<Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+										</Trigger>
+										<Trigger Property="IsMouseOver"
+                                     Value="True">
+											<Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabMouseOver}" />
+											<Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+										</Trigger>
+										<Trigger Property="IsSelected"
+                                     Value="True">
+											<Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabSelected}" />
+											<Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+										</Trigger>
+									</ControlTemplate.Triggers>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</TabControl.ItemContainerStyle>
+				<TabControl.ItemTemplate>
                     <DataTemplate>
-                        <TabItem Style="{DynamicResource StackPanelTabItem}"
-                                 Header="{Binding p_id}">
-                        </TabItem>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
+						<TextBlock Text="{Binding p_id}"/>
+					</DataTemplate>
+                </TabControl.ItemTemplate>
                 <!--TabControl.ItemTemplate>
                     <DataTemplate>
                         --><!--<Grid Margin="5"
