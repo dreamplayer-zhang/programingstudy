@@ -21,12 +21,12 @@
             <Button x:Name="buttonRead" Content="Read" Click="ButtonRead_Click"/>
             <Button x:Name="buttonWrite" Content="Write" Click="ButtonWrite_Click"/>
         </StackPanel>-->
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0"
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="3"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <GroupBox Grid.Column="0"
                   Header="Settings"
                   Margin="10,0,10,10"
                   Foreground="{StaticResource BtnForeGround}"
@@ -105,8 +105,8 @@
                 </Grid>
             </Grid>
         </GroupBox>
-        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <ListView Grid.Row="2" x:Name="listViewLog">
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
+        <ListView Grid.Column="2" x:Name="listViewLog">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Comm Log">
