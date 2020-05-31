@@ -119,19 +119,18 @@ namespace RootTools.Light
             }
         }
 
-        List<LightBase> m_aLight = new List<LightBase>();
-        public List<LightBase> p_aLight { get { return m_aLight; } }
+        public List<LightBase> p_aLight { get; set; } 
         public int p_lLight
         {
-            get { return m_aLight.Count; }
+            get { return p_aLight.Count; }
             set
             {
-                if (m_aLight.Count == value) return;
-                while (m_aLight.Count > value) m_aLight.RemoveAt(m_aLight.Count - 1); 
-                while (m_aLight.Count < value)
+                if (p_aLight.Count == value) return;
+                while (p_aLight.Count > value) p_aLight.RemoveAt(p_aLight.Count - 1); 
+                while (p_aLight.Count < value)
                 {
-                    Light light = new Light(p_id, m_aLight.Count, this);
-                    m_aLight.Add(light); 
+                    Light light = new Light(p_id, p_aLight.Count, this);
+                    p_aLight.Add(light); 
                 }
                 if (OnChangeTool != null) OnChangeTool();
             }
@@ -141,10 +140,10 @@ namespace RootTools.Light
         {
             if (nCh < 0) return null;
             if (nCh >= p_lLight) return null;
-            if (m_aLight[nCh].p_sID != m_aLight[nCh].p_id) return null;
-            m_aLight[nCh].p_sID = sNewID;
+            if (p_aLight[nCh].p_sID != p_aLight[nCh].p_id) return null;
+            p_aLight[nCh].p_sID = sNewID;
             if (OnChangeTool != null) OnChangeTool();
-            return m_aLight[nCh];
+            return p_aLight[nCh];
         }
 
         public void Deselect(LightBase light)
@@ -166,7 +165,7 @@ namespace RootTools.Light
         {
             m_treeRoot.p_eMode = mode;
             RunSetupTree(m_treeRoot.GetTree("Setup"));
-            foreach (Light light in m_aLight) light.RunTree(m_treeRoot.GetTree("Address"));
+            foreach (Light light in p_aLight) light.RunTree(m_treeRoot.GetTree("Address"));
         }
 
         void RunSetupTree(Tree tree)
@@ -188,6 +187,7 @@ namespace RootTools.Light
         public TreeRoot m_treeRoot; 
         public LightTool_Kwangwoo(string id, IEngineer engineer)
         {
+            p_aLight = new List<LightBase>(); 
             p_id = id;
             m_engineer = engineer;
             m_log = LogView.GetLog(id);

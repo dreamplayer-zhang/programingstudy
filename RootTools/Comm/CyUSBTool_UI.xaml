@@ -13,13 +13,13 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Orientation="Vertical">
-            <CheckBox IsChecked="{Binding p_bOpen, Mode=OneWay}" Content="Enable" IsEnabled="False"/>
-            <TextBlock Text="Channel"/>
-            <TextBox Text="{Binding p_nCh}"/>
-            <TextBlock Text="Power"/>
-            <TextBox Text="{Binding p_fPower}"/>
-            <Button x:Name="buttonRead" Content="Read" Click="ButtonRead_Click"/>
-            <Button x:Name="buttonWrite" Content="Write" Click="ButtonWrite_Click"/>
+            <CheckBox IsChecked="{Binding p_bOpen, Mode=OneWay}" Margin="2" Content="Enable" IsEnabled="False"/>
+            <TextBlock Text="Channel" Margin="2,12,2,2"/>
+            <TextBox Text="{Binding p_nCh}" Margin="2" />
+            <TextBlock Text="Power" Margin="2,12,2,2"/>
+            <TextBox Text="{Binding p_fPower}" Margin="2" />
+            <Button x:Name="buttonRead" Content="Read" Margin="2,12,2,2" Click="ButtonRead_Click"/>
+            <Button x:Name="buttonWrite" Content="Write" Margin="2" Click="ButtonWrite_Click"/>
         </StackPanel>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <ListView Grid.Column="2" x:Name="listViewLog">

@@ -19,11 +19,14 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <Button x:Name="buttonOpen" Content="Open" Width="60" Margin="2" Click="buttonOpen_Click"/>
-                <Button x:Name="buttonClose" Content="Close All" Width="90" Margin="2" Click="buttonClose_Click"/>
+                <Button x:Name="buttonClose" Content="Close All" Width="90" Margin="4" Click="buttonClose_Click"/>
+                <Label Content="Log Open : Drag and Drop, File Filter : " Margin="20,4,4,4" VerticalAlignment="Center"/>
+                <TextBox x:Name="textBoxFileFilter0" Margin="4" MinWidth="50" VerticalAlignment="Center" TextAlignment="Center"/>
+                <TextBox x:Name="textBoxFileFilter1" Margin="4" MinWidth="50" VerticalAlignment="Center" TextAlignment="Center"/>
+                <TextBox x:Name="textBoxFileFilter2" Margin="4" MinWidth="50" VerticalAlignment="Center" TextAlignment="Center"/>
             </StackPanel>
             <ComboBox Grid.Row="1" x:Name="comboLog" SelectionChanged="comboLog_SelectionChanged"/>
-            <TabControl Grid.Row="2" x:Name="tabLog"/>
+            <TabControl Grid.Row="2" x:Name="tabLog" AllowDrop="True" DragEnter="tabLog_DragEnter" DragLeave="tabLog_DragLeave" Drop="tabLog_Drop"/>
         </Grid>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <TabControl Grid.Column="2" x:Name="tabMain"/>

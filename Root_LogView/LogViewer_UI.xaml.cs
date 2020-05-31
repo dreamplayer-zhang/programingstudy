@@ -1,5 +1,5 @@
-﻿using Microsoft.Win32;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -23,37 +23,6 @@ namespace Root_LogView
             InitTabClip(); 
         }
 
-        private void buttonOpen_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Multiselect = true; 
-            dlg.Filter = "Log Files (*.log)|*.log";
-            if (dlg.ShowDialog() == false)
-            {
-                MessageBox.Show("Log File not Found");
-                return; 
-            }
-            comboLog.ItemsSource = null;
-            foreach (string sFile in dlg.FileNames) OpenLog(sFile); 
-            comboLog.ItemsSource = m_asLog;
-            comboLog.SelectedIndex = 0; 
-        }
-
-        void OpenLog(string sFile)
-        {
-            foreach (string str in m_asLog)
-            {
-                if (str == sFile) return;
-            }
-            m_asLog.Add(sFile);
-            LogGroup_UI ui = m_logViewer.OpenLog(sFile);
-            TabItem item = new TabItem();
-            item.Header = sFile;
-            item.Height = 0;
-            item.Content = ui;
-            tabLog.Items.Add(item);
-        }
-
         private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
             tabLog.Items.Clear();
@@ -75,6 +44,69 @@ namespace Root_LogView
             item.Header = "Clip";
             item.Content = m_logViewer.m_logClip.p_ui;
             tabMain.Items.Add(item); 
+        }
+
+        private void tabLog_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop) == false) return;
+            e.Effects = DragDropEffects.Copy;
+        }
+
+        private void tabLog_DragLeave(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.None; 
+        }
+
+        private void tabLog_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop) == false) return;
+            string[] asDrop = (string[])e.Data.GetData(DataFormats.FileDrop);
+            comboLog.ItemsSource = null;
+            foreach (string sDrop in asDrop) OpenDrop(sDrop);
+            comboLog.ItemsSource = m_asLog;
+            if (comboLog.SelectedIndex < 0) comboLog.SelectedIndex = 0;
+        }
+
+        void OpenDrop(string sDrop)
+        {
+            if (Directory.Exists(sDrop))
+            {
+                string[] asFile = Directory.GetFiles(sDrop);
+                foreach (string sFile in asFile) OpenDrop(sFile);
+                string[] asFolder = Directory.GetDirectories(sDrop);
+                foreach (string sFolder in asFolder) OpenDrop(sFolder);
+            }
+            else OpenLog(sDrop); 
+        }
+
+        void OpenLog(string sFile)
+        {
+            if (CheckFileFilter(sFile) == false) return; 
+            foreach (string str in m_asLog)
+            {
+                if (str == sFile) return;
+            }
+            m_asLog.Add(sFile);
+            LogGroup_UI ui = m_logViewer.OpenLog(sFile);
+            TabItem item = new TabItem();
+            item.Header = sFile;
+            item.Height = 0;
+            item.Content = ui;
+            tabLog.Items.Add(item);
+        }
+
+        bool CheckFileFilter(string sFile)
+        {
+            if (CheckFileFilter(sFile, textBoxFileFilter0.Text) == false) return false;
+            if (CheckFileFilter(sFile, textBoxFileFilter1.Text) == false) return false;
+            if (CheckFileFilter(sFile, textBoxFileFilter2.Text) == false) return false;
+            return true; 
+        }
+
+        bool CheckFileFilter(string sFile, string sFilter)
+        {
+            if (sFilter == "") return true;
+            return sFile.Contains(sFilter); 
         }
     }
 }

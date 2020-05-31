@@ -178,7 +178,7 @@ namespace Root_LogView
         {
             if (m_logClip == null) return;
             foreach (Data data in aData) m_logClip.CheckSame(data);
-            foreach (Data data in aData) if (data.m_bSame == false) m_aLog.Add(data); 
+            foreach (Data data in aData) if (data.m_bSame == false) m_logClip.m_aLog.Add(data); 
             m_logClip.InvalidFilter();
         }
 
@@ -186,7 +186,7 @@ namespace Root_LogView
         {
             if (m_logClip == null) return;
             foreach (Data data in p_aLogFilter) m_logClip.CheckSame(data);
-            foreach (Data data in p_aLogFilter) if (data.m_bSame == false) m_aLog.Add(data);
+            foreach (Data data in p_aLogFilter) if (data.m_bSame == false) m_logClip.m_aLog.Add(data);
             m_logClip.InvalidFilter();
         }
 

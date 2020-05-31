@@ -11,9 +11,11 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="58*"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="29*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="13*"/>
         </Grid.ColumnDefinitions>
         <local:Root_Handler_UI Grid.Column="0" x:Name="handlerUI" Margin="2"/>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
@@ -28,5 +30,6 @@
                 <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
             </TabItem>
         </TabControl>
+        <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
     </Grid>
 </UserControl>
