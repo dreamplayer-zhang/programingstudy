@@ -31,30 +31,63 @@ namespace RootTools.Control
             tool.p_listIDIO.Add(this);
         }
 
-        string m_sTreeInfo = "OK";
         public string RunTree(Tree tree)
         {
-            int nDI = tree.Set(m_bitDI.m_nID, -1, "Input", "DIO Input Number");
-            int nDO = tree.Set(m_bitDO.m_nID, -1, "Output", "DIO Output Number");
-            m_sTreeInfo = "OK";
-            m_bitDI = GetBit(m_listDI, m_bitDI, nDI);
-            m_bitDO = (BitDO)GetBit(m_listDO, m_bitDO, nDO);
+            string sDI = RunTreeDI(tree);
+            string sDO = RunTreeDO(tree);
+            if (sDI != "OK") return sDI;
+            if (sDO != "OK") return sDO;
             m_eRun = (eRun)tree.Set(m_eRun, eRun.Nothing, "Run", "DIO Run Mode", p_bEnableRun);
             m_msRepeat = tree.Set(m_msRepeat, 1000, "Repeat", "Repeat Toggle Period (ms)", m_eRun == eRun.Repeat);
-            return m_sTreeInfo;
+            return "OK";
         }
 
-        BitDI GetBit(ListDIO listDIO, BitDI bitDIO, int nDIO)
+        string RunTreeDI(Tree tree)
         {
-            if (nDIO == bitDIO.m_nID) return bitDIO;
-            if (listDIO.m_aDIO[nDIO].p_sID != listDIO.m_eDIO.ToString())
+            int nDI = tree.Set(m_bitDI.m_nID, -1, "Input", "DIO Input Number");
+            if (nDI != m_bitDI.m_nID)
             {
-                m_sTreeInfo = "Can't Assign Exist DIO_IO Input : " + m_id;
-                return bitDIO;
+                if (IsUsedDI(nDI)) return "Can't Assign Exist DIO_I Input : " + m_id;
+                m_bitDI.SetID(m_log, "Input");
+                if (nDI < 0) m_bitDI = new BitDI();
+                else
+                {
+                    m_bitDI = m_listDI.m_aDIO[nDI];
+                    m_bitDI.SetID(m_log, m_id);
+                }
             }
-            bitDIO.SetID(m_log, listDIO.m_eDIO.ToString());
-            listDIO.m_aDIO[nDIO].SetID(m_log, m_id);
-            return listDIO.m_aDIO[nDIO];
+            return "OK";
+        }
+
+        bool IsUsedDI(int nDI)
+        {
+            if (nDI < 0) return false;
+            if (nDI >= m_listDI.m_aDIO.Count) return true;
+            return (m_listDI.m_aDIO[nDI].p_sID != "Input");
+        }
+
+        string RunTreeDO(Tree tree)
+        {
+            int nDO = tree.Set(m_bitDO.m_nID, -1, "Output", "DIO Output Number");
+            if (nDO != m_bitDO.m_nID)
+            {
+                if (IsUsedDO(nDO)) return "Can't Assign Exist DIO_O Output : " + m_id;
+                m_bitDO.SetID(m_log, "Output");
+                if (nDO < 0) m_bitDO = new BitDO();
+                else
+                {
+                    m_bitDO = (BitDO)m_listDO.m_aDIO[nDO];
+                    m_bitDO.SetID(m_log, m_id);
+                }
+            }
+            return "OK";
+        }
+
+        bool IsUsedDO(int nDO)
+        {
+            if (nDO < 0) return false;
+            if (nDO >= m_listDO.m_aDIO.Count) return true;
+            return (m_listDO.m_aDIO[nDO].p_sID != "Output");
         }
 
         public void Write(bool bOn)
