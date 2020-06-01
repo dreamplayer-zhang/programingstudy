@@ -52,12 +52,16 @@ namespace RootTools.Control
             for (int n = 0; n < m_asDO.Count; n++)
             {
                 int nDO = tree.Set(m_aBitDO[n].m_nID, -1, "Output." + m_asDO[n], "DIO Output Number");
-                if (nDO != m_aBitDO[n].m_nID && nDO != -1)
+                if (nDO != m_aBitDO[n].m_nID)
                 {
-                    if (m_listDO.m_aDIO[nDO].p_sID != "Output") return "Can't Assign Exist DIO_Os Output : " + m_id;
+                    if (IsUsedDO(nDO)) return "Can't Assign Exist DIO_O Output : " + m_id;
                     m_aBitDO[n].SetID(m_log, "Output");
-                    m_aBitDO[n] = (BitDO)m_listDO.m_aDIO[nDO];
-                    m_aBitDO[n].SetID(m_log, m_id + "." + m_asDO[n]);
+                    if (nDO < 0) m_aBitDO[n] = new BitDO();
+                    else
+                    {
+                        m_aBitDO[n] = (BitDO)m_listDO.m_aDIO[nDO];
+                        m_aBitDO[n].SetID(m_log, m_id + "." + m_asDO[n]);
+                    }
                 }
             }
             m_eRun = (eRun)tree.Set(m_eRun, eRun.Nothing, "Run", "DIO Run Mode", p_bEnableRun);
@@ -65,6 +69,13 @@ namespace RootTools.Control
             return "OK"; 
         }
 
+        bool IsUsedDO(int nDO)
+        {
+            if (nDO < 0) return false;
+            if (nDO >= m_listDO.m_aDIO.Count) return true;
+            return (m_listDO.m_aDIO[nDO].p_sID != "Output");
+        }
+        
         public void Write(Enum eDO, bool bOn)
         {
             Write(eDO.ToString(), bOn);

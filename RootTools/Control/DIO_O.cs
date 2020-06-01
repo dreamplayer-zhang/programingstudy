@@ -29,14 +29,25 @@ namespace RootTools.Control
             int nDO = tree.Set(m_bitDO.m_nID, -1, "Output", "DIO Output Number");
             if (nDO != m_bitDO.m_nID)
             {
-                if (m_listDO.m_aDIO[nDO].p_sID != "Output") return "Can't Assign Exist DIO_O Output : " + m_id;
-                m_bitDO.SetID(m_log, "Output"); 
-                m_bitDO = (BitDO)m_listDO.m_aDIO[nDO];
-                m_bitDO.SetID(m_log, m_id);
+                if (IsUsed(nDO)) return "Can't Assign Exist DIO_O Output : " + m_id;
+                m_bitDO.SetID(m_log, "Output");
+                if (nDO < 0) m_bitDO = new BitDO();
+                else
+                {
+                    m_bitDO = (BitDO)m_listDO.m_aDIO[nDO];
+                    m_bitDO.SetID(m_log, m_id);
+                }
             }
             m_eRun = (eRun)tree.Set(m_eRun, eRun.Nothing, "Run", "DIO Run Mode", p_bEnableRun);
             m_msRepeat = tree.Set(m_msRepeat, 1000, "Repeat", "Repeat Toggle Period (ms)", m_eRun == eRun.Repeat); 
             return "OK";
+        }
+
+        bool IsUsed(int nDO)
+        {
+            if (nDO < 0) return false;
+            if (nDO >= m_listDO.m_aDIO.Count) return true;
+            return (m_listDO.m_aDIO[nDO].p_sID != "Output");
         }
 
         public void Write(bool bOn)
