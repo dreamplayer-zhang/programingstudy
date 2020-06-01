@@ -266,7 +266,6 @@ namespace RootTools.Camera.BaslerPylon
             p_CamInfo._IsCanGrab = false;
         }
 
-
         void bgw_Connect_DoWork(object sender, DoWorkEventArgs e)
         {
             try
@@ -330,6 +329,7 @@ namespace RootTools.Camera.BaslerPylon
         }
 
         public CPoint GetRoiSize()
+
         {
             return new CPoint(Convert.ToInt32(m_CamParam._Width), Convert.ToInt32(m_CamParam._Height));
         }

@@ -47,12 +47,40 @@ namespace Root_Vega
                 SetProperty(ref m_SideVisionViewModel, value);
             }
         }
+
+        Setting_IlluminationViewModel m_IlluminationViewModel;
+        public Setting_IlluminationViewModel p_IlluminationViewModel
+        {
+            get
+            {
+                return m_IlluminationViewModel;
+            }
+            set
+            {
+                SetProperty(ref m_IlluminationViewModel, value);
+            }
+        }
+
+        Setting.Setting_RADSViewModel m_Setting_RADS;
+        public Setting.Setting_RADSViewModel p_Setting_RADS
+        {
+            get
+            {
+                return m_Setting_RADS;
+            }
+            set
+            {
+                SetProperty(ref m_Setting_RADS, value);
+            }
+        }
         
         public _10_SettingViewModel(Vega_Engineer engineer, IDialogService service)
         {
             p_AjinViewModel = new AjinInOutSettingViewModel(engineer.m_ajin);
             p_MainVisionViewModel = new Optic_MainVisionViewModel(engineer, service);
             p_SideVisionViewModel = new Optic_SideVisionViewModel(engineer, service);
+            p_IlluminationViewModel = new Setting_IlluminationViewModel(engineer);
+            p_Setting_RADS = new Setting.Setting_RADSViewModel(engineer);
         }
     }
 }

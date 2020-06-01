@@ -25,7 +25,7 @@ namespace RootTools.Module
             labelEQState.DataContext = EQ.m_EQ; 
             checkBoxStop.DataContext = EQ.m_EQ;
             checkBoxPause.DataContext = EQ.m_EQ;
-            checkBoxSimulate.DataContext = EQ.m_EQ; 
+            checkBoxSimulate.DataContext = EQ.m_EQ;
             
             infoListUI.Init(module.m_infoList);
             listDIUI.Init(module.m_listDI);

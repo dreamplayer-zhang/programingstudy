@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local ="clr-namespace:Root_Vega"
+             xmlns:localSetting ="clr-namespace:Root_Vega.Setting"
              mc:Ignorable="d"
              d:DesignHeight="756"
              d:DesignWidth="1876">
@@ -24,6 +25,17 @@
         <TabItem Style="{StaticResource RcptabItem}"
                  Header="SideVision">
             <local:Optic_SideVision DataContext="{Binding p_SideVisionViewModel}"></local:Optic_SideVision>
+        </TabItem>
+        <TabItem Style="{StaticResource RcptabItem}"
+                 Header="Illumination">
+            <local:Setting_Illumination DataContext="{Binding p_IlluminationViewModel}"></local:Setting_Illumination>
+        </TabItem>
+        <TabItem Header="RADS"
+                 Style="{StaticResource RcptabItem}">
+            <Border BorderBrush="Gray"
+                    BorderThickness="3">
+                <localSetting:Setting_RADS DataContext="{Binding p_Setting_RADS}"></localSetting:Setting_RADS>
+            </Border>
         </TabItem>
     </TabControl>
 </UserControl>

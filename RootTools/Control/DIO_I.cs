@@ -46,7 +46,7 @@ namespace RootTools.Control
 
         bool IsUsed(int nDI)
         {
-            if (nDI < 0) return true;
+            if (nDI < 0) return false;
             if (nDI >= m_listDI.m_aDIO.Count) return true;
             return (m_listDI.m_aDIO[nDI].p_sID != "Input"); 
         }

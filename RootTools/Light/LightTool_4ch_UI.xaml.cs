@@ -17,7 +17,7 @@ namespace RootTools.Light
         {
             m_lightTool = lightTool;
             this.DataContext = lightTool;
-            rs232UI.Init(lightTool.m_rs232);
+            rs232UI.Init(lightTool.p_rs232);
             InitTabControl();
             lightTool.OnChangeTool += LightTool_OnChangeTool; ;
         }
