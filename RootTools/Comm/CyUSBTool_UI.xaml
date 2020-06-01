@@ -8,20 +8,91 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="3"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" Orientation="Vertical">
-            <CheckBox IsChecked="{Binding p_bOpen, Mode=OneWay}" Margin="2" Content="Enable" IsEnabled="False"/>
-            <TextBlock Text="Channel" Margin="2,12,2,2"/>
-            <TextBox Text="{Binding p_nCh}" Margin="2" />
-            <TextBlock Text="Power" Margin="2,12,2,2"/>
-            <TextBox Text="{Binding p_fPower}" Margin="2" />
-            <Button x:Name="buttonRead" Content="Read" Margin="2,12,2,2" Click="ButtonRead_Click"/>
-            <Button x:Name="buttonWrite" Content="Write" Margin="2" Click="ButtonWrite_Click"/>
-        </StackPanel>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+        <GroupBox Grid.Column="0"
+                  Header="Settings"
+                  Margin="10,0,10,10"
+                  Foreground="{StaticResource BtnForeGround}"
+                  FontSize="20">
+            <Grid Height="250"
+                  Margin="30,0,30,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                           TextAlignment="Left"
+                           Style="{StaticResource BasicTb}"
+                           Text="Enable"></TextBlock>
+                    <ToggleButton Grid.Column="1"
+                                  Margin="0,10"
+                                  Style="{StaticResource BasicToggle}"
+                                  Content="On"
+                                  IsEnabled="False"    
+                                  IsChecked="{Binding p_bOn, Mode=OneWay}"></ToggleButton>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                           TextAlignment="Left"
+                           Style="{StaticResource BasicTb}"
+                           Text="Channel"></TextBlock>
+                    <TextBox Grid.Column="1"
+                         Style="{StaticResource BasicTbox}"
+                         Text="{Binding p_nCh}"
+                         TextAlignment="Center"></TextBox>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                           TextAlignment="Left"
+                           Style="{StaticResource BasicTb}"
+                           Text="Power"></TextBlock>
+                    <TextBox Grid.Column="1"
+                             Style="{StaticResource BasicTbox}"
+                             Text="{Binding p_fPower}"
+                             TextAlignment="Center"></TextBox>
+                </Grid>
+                <Grid Grid.Row="3">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                x:Name="buttonRead"
+                                Style="{StaticResource BasicBtn}"
+                                Margin="10,10,10,10"
+                                Content="Read"
+                                Click="ButtonRead_Click"/>
+                        <Button Grid.Column="1"
+                                x:Name="buttonWrite"
+                                Style="{StaticResource BasicBtn}"
+                                Margin="10,10,10,10"
+                                Content="Write"
+                                Click="ButtonWrite_Click"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </GroupBox>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
+
         <ListView Grid.Column="2" x:Name="listViewLog">
             <ListView.View>
                 <GridView>

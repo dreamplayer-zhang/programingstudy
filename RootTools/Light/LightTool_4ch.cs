@@ -1,11 +1,12 @@
 ﻿using RootTools.Comm;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Windows.Controls;
 
 namespace RootTools.Light
 {
-    public class LightTool_4ch : NotifyProperty, ILightTool
+    public class LightTool_4ch : ObservableObject, ILightTool
     {
         const int c_lLight = 4;
 
@@ -23,7 +24,7 @@ namespace RootTools.Light
             {
                 if (value == _sInfo) return;
                 _sInfo = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();
                 if (value == "OK") return;
                 m_log.Error(value); 
             }
@@ -70,6 +71,11 @@ namespace RootTools.Light
 
             int m_nCh = 0;
             RS232 m_rs232;
+            public RS232 p_rs232
+            {
+                get { return m_rs232; }
+                set { SetProperty(ref m_rs232, value); }
+            }
             public Light(string id, int nCh, RS232 rs232)
             {
                 m_nCh = nCh;
@@ -85,10 +91,10 @@ namespace RootTools.Light
         public List<LightBase> p_aLight { get; set; }
         void InitLight()
         {  
-            m_rs232.p_bConnect = true;
+            p_rs232.p_bConnect = true;
             for (int n = 0; n < c_lLight; n++)
             {
-                Light light = new Light(p_id, n, m_rs232); 
+                Light light = new Light(p_id, n, p_rs232); 
                 p_aLight.Add(light);
             }
         }
@@ -113,6 +119,11 @@ namespace RootTools.Light
         IEngineer m_engineer;
         Log m_log;
         public RS232 m_rs232; 
+        public RS232 p_rs232
+        {
+            get { return m_rs232; }
+            set { SetProperty(ref m_rs232, value); }
+        }
         public LightTool_4ch(string id, IEngineer engineer)
         {
             p_aLight = new List<LightBase>(); 
@@ -120,13 +131,13 @@ namespace RootTools.Light
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
             
-            m_rs232 = new RS232(id, m_log);
+            p_rs232 = new RS232(id, m_log);
             InitLight();
         }
 
         public void ThreadStop()
         {
-            m_rs232.ThreadStop(); 
+            p_rs232.ThreadStop(); 
         }
     }
 }

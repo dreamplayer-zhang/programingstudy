@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace RootTools.Light
 {
-    public class LightTool_Kwangwoo : NotifyProperty, ILightTool
+    public class LightTool_Kwangwoo : ObservableObject, ILightTool
     {
         public delegate void dgOnChangeTool();
         public event dgOnChangeTool OnChangeTool;
@@ -32,7 +32,7 @@ namespace RootTools.Light
             {
                 if (value == _sInfo) return;
                 _sInfo = value;
-                OnPropertyChanged();
+                RaisePropertyChanged();
                 if (value == "OK") return;
                 m_log.Error(value);
             }
@@ -62,7 +62,7 @@ namespace RootTools.Light
                 double fPower = p_bOn ? p_fSetPower : 0;
                 fPower *= p_fScalePower;
                 m_sSend = GetCommand(fPower); 
-                m_rs232.Send(m_sSend); 
+                p_rs232.Send(m_sSend); 
             }
 
             const int c_lMaxPower = 999;
@@ -102,13 +102,18 @@ namespace RootTools.Light
             public int m_nAddress = 0;
             LightTool_Kwangwoo m_lightTool; 
             RS232 m_rs232;
+            public RS232 p_rs232
+            {
+                get { return m_rs232; }
+                set { SetProperty(ref m_rs232, value); }
+            }
             public Light(string id, int nCh, LightTool_Kwangwoo lightTool)
             {
                 m_nAddress = nCh;
                 m_lightTool = lightTool; 
-                m_rs232 = lightTool.m_rs232;
+                p_rs232 = lightTool.p_rs232;
                 Init(id + "." + nCh.ToString("00"), nCh);
-                m_rs232.OnRecieve += M_rs232_OnRecieve;
+                p_rs232.OnRecieve += M_rs232_OnRecieve;
             }
 
             string m_sAddress = "00";
@@ -184,14 +189,24 @@ namespace RootTools.Light
         IEngineer m_engineer;
         Log m_log;
         public RS232 m_rs232;
+        public RS232 p_rs232
+        {
+            get { return m_rs232; }
+            set { SetProperty(ref m_rs232, value); }
+        }
         public TreeRoot m_treeRoot; 
+        public TreeRoot p_treeRoot
+        {
+            get { return m_treeRoot; }
+            set { SetProperty(ref m_treeRoot, value); }
+        }
         public LightTool_Kwangwoo(string id, IEngineer engineer)
         {
             p_aLight = new List<LightBase>(); 
             p_id = id;
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
-            m_rs232 = new RS232(id, m_log);
+            p_rs232 = new RS232(id, m_log);
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead); 
@@ -199,7 +214,7 @@ namespace RootTools.Light
 
         public void ThreadStop()
         {
-            m_rs232.ThreadStop();
+            p_rs232.ThreadStop();
         }
     }
 }

@@ -45,6 +45,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <ToggleButton Grid.Column="0" x:Name="checkBoxConnect" Width ="{PriorityBinding}" Background="Green"

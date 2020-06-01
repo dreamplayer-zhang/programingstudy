@@ -1,28 +1,49 @@
 ﻿using RootTools.Trees;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Configuration;
+using System.Data;
 using System.Threading;
 
 namespace RootTools.Light
 {
-    public class LightToolSet : IToolSet
+    public class LightToolSet : ObservableObject, IToolSet
     {
         public delegate void dgOnToolChanged();
         public event dgOnToolChanged OnToolChanged;
 
+        string m_strSelectedID;
+        public string p_strSelectedID
+        {
+            get { return m_strSelectedID; }
+            set { SetProperty(ref m_strSelectedID, value); }
+        }
+
         #region ILightTool
         public List<string> m_asLightTool = new List<string>(); 
-        public List<ILightTool> m_aLightTool = new List<ILightTool>();
+        public List<string> p_asLightTool
+        {
+            get { return m_asLightTool; }
+            set { SetProperty(ref m_asLightTool, value); }
+        }
+
+        public ObservableCollection<ILightTool> m_aLightTool = new ObservableCollection<ILightTool>();
+        public ObservableCollection<ILightTool> p_aLightTool
+        {
+            get { return m_aLightTool; }
+            set { SetProperty(ref m_aLightTool, value); }
+        }
 
         void AddTool(ILightTool lightTool)
         {
             if (lightTool == null) return; 
-            m_aLightTool.Add(lightTool);
-            m_asLightTool.Add(lightTool.p_id);
+            p_aLightTool.Add(lightTool);
+            p_asLightTool.Add(lightTool.p_id);
         }
 
         public ILightTool GetTool(string sID)
         {
-            foreach (ILightTool lightTool in m_aLightTool)
+            foreach (ILightTool lightTool in p_aLightTool)
             {
                 if (sID == lightTool.p_id) return lightTool; 
             }
@@ -156,8 +177,8 @@ namespace RootTools.Light
             bChange |= RunLVSTree(m_treeRoot.GetTree(c_sLVS));
             if (bChange)
             {
-                m_asLightTool.Clear();
-                m_aLightTool.Clear();
+                p_asLightTool.Clear();
+                p_aLightTool.Clear();
                 foreach (LightTool_12ch lightTool in m_aLightTool12ch) AddTool(lightTool); 
                 foreach (LightTool_4ch lightTool in m_aLightTool4ch) AddTool(lightTool);
                 foreach (LightTool_Kwangwoo lightTool in m_aLightToolKwangwoo) AddTool(lightTool);
@@ -177,6 +198,11 @@ namespace RootTools.Light
         IEngineer m_engineer;
         Log m_log; 
         public TreeRoot m_treeRoot; 
+        public TreeRoot p_treeRoot
+        {
+            get { return m_treeRoot; }
+            set { SetProperty(ref m_treeRoot, value); }
+        }
         public LightToolSet(string id, IEngineer engineer)
         {
             p_id = id;
