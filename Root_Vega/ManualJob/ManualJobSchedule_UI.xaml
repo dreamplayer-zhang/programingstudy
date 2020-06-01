@@ -3,7 +3,38 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         WindowStyle="None"
         Closing="Window_Closing"
-        Title="ManualJobSchedule" Height="500" Width="500" Background="#FF2D2D30" Topmost="True">
+        Title="ManualJobSchedule" Height="610.795" Width="705.966" Background="#FF2D2D30" Topmost="True">
+    <Window.Resources>
+        <LinearGradientBrush x:Key="BtnGradientBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FF3E3E40" Offset="0"/>
+            <!--<GradientStop Color="#CCFFFA" Offset="0.5"/>-->
+            <GradientStop Color="#FF3E3E40" Offset="0.5"/>
+            <GradientStop Color="#FF3E3E40" Offset="1"/>
+        </LinearGradientBrush>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="Black"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="10" Background="{TemplateBinding Background}" BorderThickness="2" BorderBrush="White">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center">
+                            </ContentPresenter>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource BtnGradientBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
     <Grid Background="{Binding p_brushJobSchedule}">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -23,32 +54,65 @@
             </Button>
         </Grid>
         <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="8*"/>
-                <RowDefinition Height="2*"/>
-            </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Margin="10">
-                <TextBlock Text="Recipe ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
-                <ComboBox x:Name="comboRecipeID" Margin="5"/>
-                <TextBlock Text="Location ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
-                <TextBox x:Name="tbLocID" Height="23" Margin="5" Text="{Binding p_sLocID}" VerticalAlignment="Center" TextAlignment="Left"/>
-                <TextBlock Text="Pod ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
-                <TextBox x:Name="tbPodID" Height="23" Margin="5" Text="{Binding p_sPodID}" VerticalAlignment="Center" TextAlignment="Left"/>
-                <TextBlock Text="Lot ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
-                <TextBox x:Name="tbLotID" Height="23" Margin="5" Text="{Binding p_sLotID}" VerticalAlignment="Center" TextAlignment="Left"/>
-                <TextBlock Text="Reticle ID" Foreground="White" FontSize="15" VerticalAlignment="Center" Margin="5"/>
-                <TextBox x:Name="tbReticleID" Height="23" Margin="5" Text="{Binding p_sReticleID}" VerticalAlignment="Center" TextAlignment="Left"/>
-            </StackPanel>
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="Job Start" Margin="12"
-                        Style="{StaticResource BasicBtn}"/>
-                <Button Grid.Column="1" Content="Job Cancel" Margin="12"
-                        Style="{StaticResource BasicBtn}"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3.7*"/>
+                    <RowDefinition Height="1.8*"/>
+                    <RowDefinition Height="3.7*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Height="auto">
+                    <GroupBox FontSize="20" Header="Infomation" Height="auto" Foreground="White">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                <TextBlock Text=" Location ID = " VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding p_sLocID}" VerticalAlignment="Center" TextAlignment="Left" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                <TextBlock Text=" Lot ID = " VerticalAlignment="Center"/>
+                                <TextBox Text="{Binding p_sLotID}" VerticalAlignment="Center" TextAlignment="Left" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                                <TextBlock Text=" Pod ID = " VerticalAlignment="Center"/>
+                                <TextBox Text="{Binding p_sPodID}" VerticalAlignment="Center" TextAlignment="Left"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="3" Orientation="Horizontal">
+                                <TextBlock Text=" Reticle ID = " VerticalAlignment="Center"/>
+                                <TextBox Text="{Binding p_sReticleID}" VerticalAlignment="Center" TextAlignment="Left" />
+                            </StackPanel>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Row="1" Height="auto">
+                    <GroupBox FontSize="20" Header="Recipe Select" Height="100" Foreground="White">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text=" Recipe ID = " VerticalAlignment="Center"/>
+                            <ComboBox x:Name="comboRecipeID" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Row="2" Height="auto">
+                    <GroupBox FontSize="20" Header="Option" Height="auto" Foreground="White">
+                        <StackPanel Orientation="Horizontal">
+
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
             </Grid>
+            <StackPanel Grid.Column="1" Margin="10">
+                <Button Height="100" Margin="5" Content="Run"/>
+                <Button Height="100" Margin="5" Content="Cancel"/>
+            </StackPanel>
         </Grid>
+        
     </Grid>
 </Window>
