@@ -58,7 +58,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Basler.Pylon">
+    <Reference Include="Basler.Pylon, Version=1.1.0.0, Culture=neutral, PublicKeyToken=e389355f398382ab, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Basler.Pylon.dll</HintPath>
     </Reference>
     <Reference Include="CyUSB">
@@ -329,6 +330,10 @@
     <Compile Include="OHT\SSEM\OHT_SSEM_UI.xaml.cs">
       <DependentUpon>OHT_SSEM_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RADS\RADS.cs" />
+    <Compile Include="RADS\RADSConnectControl.cs" />
+    <Compile Include="RADS\RADSControl.cs" />
+    <Compile Include="RADS\RADSControlInfo.cs" />
     <Compile Include="RTC5s\DataList.cs" />
     <Compile Include="RTC5s\DesignBase.cs" />
     <Compile Include="RTC5s\DesignOutline.cs" />

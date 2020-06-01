@@ -275,6 +275,10 @@
       <DependentUpon>Setting_Illumination.xaml</DependentUpon>
     </Compile>
     <Compile Include="Setting\Setting_IlluminationViewModel.cs" />
+    <Compile Include="Setting\Setting_RADS.xaml.cs">
+      <DependentUpon>Setting_RADS.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Setting_RADSViewModel.cs" />
     <Compile Include="Vega_Engineer.cs" />
     <Compile Include="Vega_Engineer_UI.xaml.cs">
       <DependentUpon>Vega_Engineer_UI.xaml</DependentUpon>
@@ -430,6 +434,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Setting\Setting_Illumination.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Setting\Setting_RADS.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
