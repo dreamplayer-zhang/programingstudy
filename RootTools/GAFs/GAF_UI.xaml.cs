@@ -15,6 +15,7 @@ namespace RootTools.GAFs
         GAF m_gaf;
         public void Init(GAF gaf)
         {
+            if (gaf == null) return; 
             m_gaf = gaf;
             this.DataContext = gaf;
             ceidListUI.Init(gaf.m_listCEID);

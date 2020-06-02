@@ -302,7 +302,6 @@ namespace Root_Vega
                 InfoReticle infoReticle = moduleRun.m_infoObject;
                 string sTree = "(" + infoReticle.p_id + ")." + moduleRun.p_id;
                 moduleRun.RunTree(tree.GetTree(n, sTree, false), true);
-
             }
         }
         #endregion

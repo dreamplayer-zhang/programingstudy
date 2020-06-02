@@ -2,9 +2,12 @@
 using RootTools.Gem;
 using RootTools.Module;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Windows;
 
-namespace Root_Wind
+namespace Root_Siltron
 {
     public class InfoWafer : GemSlotBase
     {
@@ -30,7 +33,7 @@ namespace Root_Wind
                 m_log.Info(p_id + " Wafer Size : " + _eSize.ToString() + " -> " + value.ToString());
                 _eSize = value;
                 OnPropertyChanged();
-                RegWrite(); 
+                RegWrite();
             }
         }
         public double p_mmWaferSize
@@ -74,20 +77,6 @@ namespace Root_Wind
         #endregion
 
         #region Property
-        string _sWaferID = "";
-        public string p_sWaferID
-        {
-            get { return _sWaferID; }
-            set
-            {
-                if (_sWaferID == value) return;
-                m_log.Info(p_id + " Wafer ID : " + _sWaferID + " -> " + value);
-                _sWaferID = value;
-                OnPropertyChanged();
-                RegWrite(); 
-            }
-        }
-
         string _sFrameID = "";
         public string p_sFrameID
         {
@@ -98,15 +87,15 @@ namespace Root_Wind
                 m_log.Info(p_id + " Frame ID : " + _sFrameID + " -> " + value);
                 _sFrameID = value;
                 OnPropertyChanged();
-                RegWrite(); 
+                RegWrite();
             }
         }
-
+        public double m_degNotch = 0;
         protected override void RunTreeProperty(Tree tree)
         {
-            _sWaferID = tree.Set(p_sWaferID, p_sWaferID, "Wafer", "Wafer ID");
+            base.RunTreeProperty(tree);
             _sFrameID = tree.Set(p_sFrameID, p_sFrameID, "Frame", "Frame ID");
-            base.RunTreeProperty(tree.GetTree("Gem")); 
+            m_degNotch = tree.Set(m_degNotch, m_degNotch, "Notch Degree", "Notch Degree (Deg)", true, true); 
         }
         #endregion
 
@@ -117,13 +106,13 @@ namespace Root_Wind
         {
             m_moduleRunList.Clear();
             foreach (GemPJ pj in m_aPJ) m_moduleRunList.OpenJob(pj.m_sRecipeID, false);
-            m_aProcess.Clear();
+            m_qProcess.Clear();
         }
 
         public void RecipeOpen(string sRecipe)
         {
             m_moduleRunList.OpenJob(sRecipe, true);
-            m_aProcess.Clear();
+            m_qProcess.Clear();
         }
 
         public string m_sManualRecipe = "";
@@ -136,34 +125,27 @@ namespace Root_Wind
         }
         #endregion
 
-        #region Process
+        #region Process 
         /// <summary> Recipe ModuleRunList에 WTR Get, Put 추가 -> Process </summary>
-        public List<ModuleRunBase> m_aProcess = new List<ModuleRunBase>(); 
-        public ModuleRunBase GetProcess(int nNext)
-        {
-            if (nNext < 0) return null;
-            if (m_aProcess.Count <= nNext) return null;
-            return m_aProcess[nNext]; 
-        }
-
+        public Queue<ModuleRunBase> m_qProcess = new Queue<ModuleRunBase>();
         void RunTreeProcess(Tree tree)
         {
-            for (int n = 0; n < m_aProcess.Count; n++)
+            ModuleRunBase[] aProcess = m_qProcess.ToArray();
+            for (int n = 0; n < aProcess.Length; n++)
             {
-                ModuleRunBase moduleRun = m_aProcess[n];
+                ModuleRunBase moduleRun = aProcess[n];
                 moduleRun.RunTree(tree.GetTree(n, moduleRun.p_id, false), true);
             }
         }
 
-        #endregion
-
-        #region Calc Process 
-        /// <summary> Process 계산 및 Simulation </summary>
-        public Queue<ModuleRunBase> m_qCalcProcess = new Queue<ModuleRunBase>();
-        public void InitCalcProcess()
+        ObservableCollection<ModuleRunBase> p_aProcess { get; set; }
+        public void SetObservableProcess()
         {
-            m_qCalcProcess.Clear();
-            foreach (ModuleRunBase data in m_aProcess) m_qCalcProcess.Enqueue(data);
+            Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                p_aProcess.Clear();
+                foreach (ModuleRunBase moduleRun in m_qProcess) p_aProcess.Add(moduleRun);
+            });
         }
         #endregion
 
@@ -172,17 +154,15 @@ namespace Root_Wind
         {
             RunTreeWaferInfo(tree.GetTree("Wafer Info", false));
             base.RunTree(tree);
-            RunTreeRecipe(tree.GetTree("Recipe", false)); 
+            RunTreeRecipe(tree.GetTree("Recipe", false));
             RunTreeProcess(tree.GetTree("Process", false));
         }
         #endregion
 
-        public double m_degNotch = 0;
-
         public string m_sLoadport;
-
         public InfoWafer(string id, IEngineer engineer)
         {
+            p_aProcess = new ObservableCollection<ModuleRunBase>();
             string[] asID = id.Split('.');
             m_sLoadport = asID[0];
             InitBase(id, engineer);

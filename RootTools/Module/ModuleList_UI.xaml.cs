@@ -123,6 +123,7 @@ namespace RootTools.Module
         ModuleRunList m_moduleRunList;
         public void Init(ModuleList moduleList)
         {
+            if (moduleList == null) return; 
             m_moduleList = moduleList;
             m_moduleRunList = moduleList.m_moduleRunList;
             this.DataContext = moduleList;

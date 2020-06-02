@@ -73,12 +73,12 @@ namespace Root_Vega
         public string m_sLoadport; 
         public InfoReticle(string id, IEngineer engineer)
         {
+            p_aProcess = new ObservableCollection<ModuleRunBase>();
             string[] asID = id.Split('.');
             m_sLoadport = asID[0]; 
             InitBase(id, engineer);
             m_moduleRunList = new ModuleRunList(id, engineer);
             m_moduleRunList.Clear();
-            p_aProcess = new ObservableCollection<ModuleRunBase>(); 
         }
     }
 }

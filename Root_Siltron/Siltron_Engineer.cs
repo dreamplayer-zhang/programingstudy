@@ -1,20 +1,19 @@
 ﻿using RootTools;
+using RootTools.Control.Ajin;
+using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Gem.XGem;
 using RootTools.Memory;
-using RootTools.Control.Ajin;
-using RootTools.Inspects;
-using RootTools.GAFs;
-using RootTools.ToolBoxs;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 
-namespace Root_Vega
+namespace Root_Siltron
 {
-    public class Vega_Engineer : IEngineer
+    public class Siltron_Engineer : IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
-        public Login.User p_user {  get { return m_login.p_user; } }
+        public Login.User p_user { get { return m_login.p_user; } }
 
         public IGem ClassGem() { return m_xGem; }
 
@@ -51,27 +50,26 @@ namespace Root_Vega
         #endregion
 
         #region XGem
-        XGem m_xGem = new XGem();
-        XGem_UI m_xGemUI = new XGem_UI(); 
+        XGem m_xGem = null;
+        XGem_UI m_xGemUI = new XGem_UI();
         void InitXGem()
         {
+            m_xGem = new XGem(); 
             m_xGem.Init("XGem", this);
             m_xGemUI.Init(m_xGem);
-            m_toolBox.AddToolSet(m_xGem, m_xGemUI); 
+            m_toolBox.AddToolSet(m_xGem, m_xGemUI);
         }
         #endregion
 
-        public Recipe m_recipe = new Recipe();
-        public Vega_Handler m_handler = new Vega_Handler();
-        public InspectionManager m_InspManager = new InspectionManager();
+        public Siltron_Handler m_handler = new Siltron_Handler();
         public void Init(string id)
         {
             EQ.m_sModel = id;
             LogView.Init();
-            m_login.Init(); 
+            m_login.Init();
             m_toolBox.Init(id, this);
             InitAjin();
-            InitXGem(); 
+//            InitXGem();
             m_handler.Init(id, this);
             m_gaf.Init(id, this);
         }

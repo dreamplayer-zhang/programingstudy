@@ -1,20 +1,20 @@
 ﻿using RootTools;
 using System.Windows.Controls;
 
-namespace Root_Vega
+namespace Root_Siltron
 {
     /// <summary>
-    /// Vega_Engineer_UI.xaml에 대한 상호 작용 논리
+    /// Siltron_Engineer_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Vega_Engineer_UI : UserControl
+    public partial class Siltron_Engineer_UI : UserControl
     {
-        public Vega_Engineer_UI()
+        public Siltron_Engineer_UI()
         {
             InitializeComponent();
         }
 
-        Vega_Engineer m_engineer = null;
-        public void Init(Vega_Engineer engineer)
+        Siltron_Engineer m_engineer = null;
+        public void Init(Siltron_Engineer engineer)
         {
             m_engineer = engineer;
             logViewUI.Init(LogView.m_logView);
