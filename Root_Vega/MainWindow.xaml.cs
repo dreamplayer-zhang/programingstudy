@@ -1,10 +1,13 @@
-﻿using RootTools;
-using RootTools.GAFs;
+﻿using Root_Vega.Module;
+using RootTools;
+using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Root_Vega
 {
@@ -17,7 +20,7 @@ namespace Root_Vega
         public MainWindow()
         {
             InitializeComponent();
-            if(this.WindowState == WindowState.Maximized)
+            if (this.WindowState == WindowState.Maximized)
             {
                 MaximizeButton.Visibility = Visibility.Collapsed;
             }
@@ -38,6 +41,32 @@ namespace Root_Vega
         }
         #endregion
 
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick; 
+            m_timer.Start();
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            textBoxDateTime.Text = DateTime.Now.ToString();
+            TimerLamp(); 
+        }
+        #endregion
+
+        #region Lamp
+        void TimerLamp()
+        {
+            Vega vega = m_engineer.m_handler.m_vega;
+            gridLampR.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Red) ? Brushes.Red : Brushes.DarkRed;
+            gridLampY.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Yellow) ? Brushes.LightYellow : Brushes.YellowGreen;
+            gridLampG.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Green) ? Brushes.LightGreen : Brushes.DarkGreen;
+        }
+        #endregion
+
         Vega_Engineer m_engineer = new Vega_Engineer();
         void Init()
         {
@@ -46,13 +75,14 @@ namespace Root_Vega
             m_engineer.Init("Vega");
             _Maint.engineerUI.Init(m_engineer);
             ConnectViewModel(dialogService);
-            //((GAF_Manager)m_engineer.ClassGAFManager()).UpdateTree();
             textState.DataContext = EQ.m_EQ;
             textGemState.DataContext = m_engineer.ClassGem();
             textGemControl.DataContext = m_engineer.ClassGem();
             textLastError.DataContext = m_engineer.m_gaf.m_listALID;
 
-            _Main.Init(m_engineer); 
+            _Main.Init(m_engineer);
+
+            InitTimer(); 
         }
 
         void ConnectViewModel(IDialogService dialogService)
@@ -94,73 +124,6 @@ namespace Root_Vega
 
         _1_Mainview_ViewModel mvm;
         _4_ViewerViweModel vvm;
-
-        //DispatcherTimer m_timer = new DispatcherTimer();
-        //Random m_rand = new Random();
-        //int nDay = 1;
-
-        //void m_timer_Tick(object sender, EventArgs e)
-        //{
-        //    if (nDay == 31)
-        //        return;
-
-        //    SYSTEMTIME Systime = new SYSTEMTIME();
-
-
-        //    int nHour = m_rand.Next(24);
-        //    int nMinute = m_rand.Next(60);
-        //    int nSec = m_rand.Next(60);
-
-        //    Systime.wYearvi = Convert.ToUInt16(2020);
-        //    Systime.wDayOfWeek = 4;
-        //    Systime.wMonth = Convert.ToUInt16(1);
-        //    Systime.wDay = Convert.ToUInt16(nDay);
-        //    Systime.wHour = Convert.ToUInt16(nHour);
-        //    Systime.wMinute = Convert.ToUInt16(nMinute);
-        //    Systime.wSecond = Convert.ToUInt16(nSec);
-
-
-        //    int i = SetSystemTime(ref Systime);
-
-        //    mvm.SetAlarm();
-        //    vvm.SetAlarm();
-
-        //    DateTime settime = new DateTime(Systime.wYearvi, Systime.wMonth, Systime.wDay, Systime.wHour, Systime.wMinute, Systime.wSecond);
-
-        //    int nSecc = m_rand.Next(3600);
-
-        //    DateTime endtime = settime + TimeSpan.FromSeconds(nSecc);
-
-        //    Systime.wYearvi = Convert.ToUInt16(endtime.Year);
-        //    Systime.wDayOfWeek = 4;
-        //    Systime.wMonth = Convert.ToUInt16(endtime.Month);
-        //    Systime.wDay = Convert.ToUInt16(endtime.Day);
-        //    Systime.wHour = Convert.ToUInt16(endtime.Hour);
-        //    Systime.wMinute = Convert.ToUInt16(endtime.Minute);
-        //    Systime.wSecond = Convert.ToUInt16(endtime.Second);
-
-        //    i = SetSystemTime(ref Systime);
-
-        //    mvm.ClearAlarm();
-        //    nDay++;
-
-        //}
-
-
-        public struct SYSTEMTIME
-        {
-            public ushort wYearvi;
-            public ushort wMonth;
-            public ushort wDayOfWeek;
-            public ushort wDay;
-            public ushort wHour;
-            public ushort wMinute;
-            public ushort wSecond;
-            public ushort wMilliseconds;
-        }
-        [DllImport("kernel32")]
-        public static extern int SetSystemTime(ref SYSTEMTIME lpSystemTime);
-
 
         void ThreadStop()
         {
@@ -236,9 +199,5 @@ namespace Root_Vega
             m_engineer.m_gaf.m_listALID.ShowPopup(); 
         }
 
-        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-
-        }
     }
 }

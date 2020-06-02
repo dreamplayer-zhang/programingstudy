@@ -9,7 +9,7 @@ namespace Root_Vega.Module
     public class Vega : ModuleBase
     {
         #region ToolBox
-        enum eLamp
+        public enum eLamp
         { 
             Red,
             Yellow,
@@ -26,7 +26,7 @@ namespace Root_Vega.Module
         eBuzzer m_eBuzzer = eBuzzer.BuzzerOff; 
         string[] m_asLamp = Enum.GetNames(typeof(eLamp)); 
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
-        DIO_Os m_doLamp;
+        public DIO_Os m_doLamp;
         DIO_Os m_doBuzzer;
         DIO_I m_diEMS;
         DIO_I m_diProtectionBar;

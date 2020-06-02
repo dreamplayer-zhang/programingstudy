@@ -78,7 +78,7 @@
                 <ColumnDefinition Width="7.5*"/>
                 <ColumnDefinition Width="65*"/>
                 <ColumnDefinition Width="10*"/>
-                <ColumnDefinition Width="10*"/>
+                <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0"
                   Margin="10,5,5,10">
@@ -112,8 +112,7 @@
                            FontSize="13"/>
                 <Border Grid.Row="1"
                         BorderBrush="{StaticResource BorderBrush}"                
-                        BorderThickness="3"
-                        MouseLeftButtonDown="Border_MouseLeftButtonDown">
+                        BorderThickness="3">
                     <TextBlock x:Name="textGemControl" Text="{Binding p_eControl}"
                                Style="{StaticResource BasicTb}"
                                VerticalAlignment="Center"
@@ -173,7 +172,7 @@
                                FontFamily="Arial"/>
                     </Grid>
                     <Grid Grid.Row="0">
-                        <TextBlock Text="Date"
+                        <TextBlock x:Name="textBoxDateTime" Text="Date"
                                    Style="{StaticResource BasicTb}"
                                        FontSize="20" Grid.ColumnSpan="2"/>
                     </Grid>
@@ -205,11 +204,9 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Grid Background="#FFDE3A3A"/>
-                    <Grid Background="#FFF3CD6E"
-                              Grid.Row="1"/>
-                    <Grid Background="#FF57AE7D"
-                              Grid.Row="2"/>
+                    <Grid Grid.Row="0" x:Name="gridLampR" Background="#FFDE3A3A"/>
+                    <Grid Grid.Row="1" x:Name="gridLampY" Background="#FFF3CD6E"/>
+                    <Grid Grid.Row="2" x:Name="gridLampG" Background="#FF57AE7D"/>
                 </Grid>
             </Border>
         </Grid>
