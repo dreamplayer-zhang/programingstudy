@@ -480,6 +480,7 @@ namespace RootTools.DMC
         #region Send
         public string Send(string sMsg)
         {
+            if (p_nRobot <= 0) return "OK"; 
             string strCmd = "Execute " + sMsg + ", 1";
             p_sInfo = strCmd;
             m_commLog.Add(CommLog.eType.Send, strCmd); 

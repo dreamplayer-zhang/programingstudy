@@ -198,7 +198,7 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <ToggleButton Content="Load"
+                        <ToggleButton Content="Load" x:Name="buttonLoad"
                                 Grid.Row="0"
                                 Margin="5"
                                 Style="{StaticResource LoadPortToggle}"

@@ -1,7 +1,11 @@
 ﻿using Root_Vega.ManualJob;
 using Root_Vega.Module;
 using RootTools.Gem;
+using RootTools.Module;
 using System;
+using System.ComponentModel;
+using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -13,7 +17,7 @@ namespace Root_Vega
     /// </summary>
     public partial class _1_2_LoadPort : UserControl
     {
-        ManualJobSchedule manualjob;
+        ManualJobSchedule m_manualjob;
         public _1_2_LoadPort()
         {
             InitializeComponent();
@@ -30,11 +34,13 @@ namespace Root_Vega
             textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
 
+            InitButtonLoad(); 
+
             m_timer.Interval = TimeSpan.FromMilliseconds(20);
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
 
-            manualjob = new ManualJobSchedule(m_loadport.p_id, m_loadport.m_log);
+            m_manualjob = new ManualJobSchedule(m_loadport.p_id, m_loadport.m_log);
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -44,15 +50,55 @@ namespace Root_Vega
             borderPresent.Background = m_loadport.m_diPresent.p_bIn ? Brushes.LightGreen : null;
             borderLoad.Background = m_loadport.m_diLoad.p_bIn ? Brushes.LightGreen : null;
             borderUnload.Background = m_loadport.m_diUnload.p_bIn ? Brushes.LightGreen : null;
-            borderAlarm.Background = (m_loadport.p_eState == RootTools.Module.ModuleBase.eState.Error) ? Brushes.Red : null;
+            borderAlarm.Background = (m_loadport.p_eState == ModuleBase.eState.Error) ? Brushes.Red : null;
             bool bAuto = (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto); 
             borderAccessAuto.Background = bAuto ? Brushes.LightGreen : null;
-            borderAccessManual.Background = bAuto ? null : Brushes.LightGreen; 
+            borderAccessManual.Background = bAuto ? null : Brushes.LightGreen;
+            buttonLoad.IsEnabled = IsEnableLoad(); 
         }
 
-        private void ToggleButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        #region Button Load
+        BackgroundWorker m_bgwLoad = new BackgroundWorker();
+        void InitButtonLoad()
         {
-            manualjob.ShowPopup();
+            m_bgwLoad.DoWork += M_bgwLoad_DoWork;
+            m_bgwLoad.RunWorkerCompleted += M_bgwLoad_RunWorkerCompleted;
         }
+
+        bool IsEnableLoad()
+        {
+            bool bReadyLoadport = m_loadport.p_eState == ModuleBase.eState.Ready; 
+            bool bReadyToLoad = m_loadport.m_infoPod.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad;
+            bReadyToLoad = true; 
+            bool bReadyBGW = m_bgwLoad.IsBusy == false;
+            return bReadyLoadport && bReadyToLoad && bReadyBGW; //forget 조건
+        }
+
+        private void ToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsEnableLoad() == false) return; 
+            m_bgwLoad.RunWorkerAsync(); 
+        }
+
+        private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
+        {
+            ModuleRunBase moduleRun = m_loadport.m_runReadPodID.Clone();
+            m_loadport.StartRun(moduleRun);
+            Thread.Sleep(100);
+            while (m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10); 
+        }
+
+        private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            switch (m_loadport.p_eState)
+            {
+                case ModuleBase.eState.Ready: 
+                    m_manualjob.ShowPopup();
+                    ModuleRunBase moduleRun = m_loadport.m_runLoad.Clone();
+                    m_loadport.StartRun(moduleRun);
+                    break; 
+            }
+        }
+        #endregion
     }
 }

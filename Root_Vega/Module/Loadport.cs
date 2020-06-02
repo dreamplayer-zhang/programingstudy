@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Comm;
 using RootTools.Control;
 using RootTools.DMC;
 using RootTools.GAFs;
@@ -21,6 +22,7 @@ namespace Root_Vega.Module
         public DIO_I m_diUnload; 
         DMCControl m_dmc;
         OHT_Semi m_OHT;
+        RS232 m_rs232RFID;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Placed");
@@ -29,6 +31,7 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_diUnload, this, "Unload");
             p_sInfo = m_toolBox.Get(ref m_dmc, this, "DMC");
             p_sInfo = m_toolBox.Get(ref m_OHT, this, m_infoPod, "OHT");
+            p_sInfo = m_toolBox.Get(ref m_rs232RFID, this, "RFID");
         }
         #endregion
 
@@ -336,8 +339,8 @@ namespace Root_Vega.Module
         }
 
         #region ModuleRun
-        ModuleRunBase m_runReadPodID;
-        ModuleRunBase m_runLoad;
+        public ModuleRunBase m_runReadPodID;
+        public ModuleRunBase m_runLoad;
         ModuleRunBase m_runUnLoad;
         protected override void InitModuleRuns()
         {
@@ -376,7 +379,7 @@ namespace Root_Vega.Module
                 if (EQ.p_bSimulate) sCarrierID = m_sSimulCarrierID; 
                 else
                 {
-                    //forget Read CarrierID
+                    //forget Read CarrierID RFID
                 }
                 m_module.m_infoPod.SendCarrierID(sCarrierID); 
                 return "OK"; 
