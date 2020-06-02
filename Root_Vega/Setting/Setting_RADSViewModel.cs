@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using RootTools.Trees;
 using RootTools.Camera.BaslerPylon;
 using Root_Vega.Module;
+using System.Threading;
 
 namespace Root_Vega.Setting
 {
@@ -117,8 +118,15 @@ namespace Root_Vega.Setting
 
         void StartADS()
         {
-            p_timerControl.StartRADS();
+            Thread thread = new Thread(new ThreadStart(_StartADS));
+            thread.Start();
+            
             return;
+        }
+
+        void _StartADS()
+        {
+            p_timerControl.StartRADS();
         }
 
         public RelayCommand StartADSCommand

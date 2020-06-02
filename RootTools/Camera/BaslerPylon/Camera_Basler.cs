@@ -292,7 +292,9 @@ namespace RootTools.Camera.BaslerPylon
                     UpdateCamInfo(ConnectCamInfo, m_cam);
                     m_ImageGrab.p_nByte = ((m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString()) ? 1 : 3);
                     m_ImageGrab.p_Size = new CPoint((int)m_CamParam._Width, (int)m_CamParam._Height);
-                    
+                    m_cam.Parameters[PLStream.TransmissionType].TrySetValue(PLStream.TransmissionType.Multicast);
+                    string strTemp = m_cam.Parameters[PLStream.TransmissionType].GetValue();
+
                 }
                 UpdateCamInfo(ConnectCamInfo, m_cam);
             }
@@ -475,22 +477,33 @@ namespace RootTools.Camera.BaslerPylon
 
         private Stopwatch stopWatch = new Stopwatch();
 
+        private PixelDataConverter converter = new PixelDataConverter();
         private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
         {
             try
             {
-                IGrabResult result = e.GrabResult;
+                IGrabResult grabResult = e.GrabResult;
                 // Check if the image can be displayed.
-                if (result.IsValid)
+                if (grabResult.IsValid)
                 {
                     if (!stopWatch.IsRunning || stopWatch.ElapsedMilliseconds > 100)
                     {  
                         m_ImageGrab.p_nByte = ((m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString()) ? 1 : 3);
                         m_ImageGrab.p_Size = new CPoint((int)m_CamParam._Width, (int)m_CamParam._Height);
-                        byte[] aBuf = result.PixelData as byte[];
-                        //Array.Copy(aBuf, m_ImageGrab.m_aBuf, m_ImageGrab.p_sz.X * m_ImageGrab.p_sz.Y);
-                        Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
+
+                        if (m_ImageGrab.p_nByte == 3)
+                        {
+                            converter.OutputPixelFormat = PixelType.BGR8packed;
+                            converter.Convert(m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.p_nByte, grabResult);
+                        }
+                        else
+                        {
+                            byte[] aBuf = grabResult.PixelData as byte[];
+                            Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
+                        }
+
                         stopWatch.Reset();
+
                         Application.Current.Dispatcher.Invoke((Action)delegate
                         {
                             m_ImageGrab.UpdateImage();

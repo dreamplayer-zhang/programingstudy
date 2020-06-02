@@ -1,5 +1,7 @@
-﻿using System;
+﻿using RootTools.Inspects;
+using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -23,6 +25,9 @@ namespace RootTools.RADS
 
 		UdpClient listen = null;
 
+		private UdpClient dataSocket;
+		//Socket listen = null;
+		private MulticastOption mcastOption;
 		RADS m_CurrentController;
 		public RADS p_CurrentController
 		{
@@ -41,109 +46,50 @@ namespace RootTools.RADS
 		{
 			m_engineer = engineer;
 			p_CurrentController = null;
-			StartListening();
-		}
-
-		public void StartListening()
-		{
-			// 200422 ESCHO 임시(설비 Test후 삭제해야함)
-			//RADS controller = new RADS(m_engineer);
-			//p_CurrentController = controller;
-			//
 
 			if (listen == null)
 			{
 				listen = new UdpClient(RADSControlInfo.ADSCP_PORT);
+
 			}
 			else
 			{
 				Console.WriteLine("Alerady Listening");
 				return;
 			}
-
-			Task.Run(() =>
+			if (dataSocket == null)
 			{
-				IPEndPoint from = new IPEndPoint(0, 0);
-				while (true)
-				{
-					var echoBuffer = listen.Receive(ref from);
 
-					var ADSCP_Type = echoBuffer[0].ToString("X2") + echoBuffer[1].ToString("X2");
-					var ADSCP_Opcode = echoBuffer[2].ToString("X2") + echoBuffer[3].ToString("X2");
-					var ADSCP_Length = echoBuffer[4].ToString("X2") + echoBuffer[5].ToString("X2");
-					int ADSCP_seqNumber = (int)uint.Parse(echoBuffer[6].ToString("X2") + echoBuffer[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-					int ADSCP_address = (int)uint.Parse(echoBuffer[8].ToString("X2") + echoBuffer[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-					int ADSCP_value = (int)uint.Parse(echoBuffer[10].ToString("X2") + echoBuffer[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+				dataSocket = new UdpClient(RADSControlInfo.ADSDP_PORT);
+				dataSocket.BeginReceive(OnReceive, dataSocket);
+			}
+			else
+			{
+				Console.WriteLine("Alerady Data Listening");
+				return;
+			}
+			GetDeviceInfo();
 
-					Console.WriteLine("Response IP Address : {0}", from);
-					Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
-						ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
-
-					if (ADSCP_Type == "0000" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_PONG) //Controller Discovery Pong!
-					{
-						byte[] controller_ip = new byte[4];
-						byte[] controller_mac = new byte[6];
-						byte[] controller_name = new byte[10];
-
-						for (int i = 0; i < 10; i++)
-						{
-							controller_name[i] = echoBuffer[i + 8];
-							if (i < 6) { controller_mac[i] = echoBuffer[i + 18]; }
-							if (i < 4) { controller_ip[i] = echoBuffer[i + 24]; }
-						}
-						var MAC = controller_mac[0].ToString("X2") + ":" + controller_mac[1].ToString("X2") + ":" + controller_mac[2].ToString("X2") + ":" + (controller_mac[3]).ToString("X2") + ":" + (controller_mac[4]).ToString("X2") + ":" + (controller_mac[5]).ToString("X2");
-
-						RADS controller = new RADS(m_engineer);
-						controller.ADSCP_Type = echoBuffer[0].ToString("X2") + echoBuffer[1].ToString("X2");
-						controller.ADSCP_Opcode = echoBuffer[2].ToString("X2") + echoBuffer[3].ToString("X2");
-						controller.ADSCP_Length = echoBuffer[4].ToString("X2") + echoBuffer[5].ToString("X2");
-						controller.RawName = controller_name;
-						controller.p_MAC = controller_mac[0].ToString("X2") + ":" + controller_mac[1].ToString("X2") + ":" + controller_mac[2].ToString("X2") + ":" + (controller_mac[3]).ToString("X2") + ":" + (controller_mac[4]).ToString("X2") + ":" + (controller_mac[5]).ToString("X2");
-						controller.p_IP = new IPAddress(controller_ip);
-
-						listen.Close();
-						listen = null;
-						GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
-
-
-						p_CurrentController = controller;
-
-						Console.WriteLine("Find Controller. Controller Info : ");
-						Console.WriteLine(p_CurrentController.GetInformation());
-
-						Console.WriteLine("Start Read Registry");
-
-						ReadPacket(0);
-						ReadPacket(1);
-						ReadPacket(2);
-						ReadPacket(3);
-						ReadPacket(4);
-						ReadPacket(5);
-						//6,7번은 어디로갔을깡...
-						ReadPacket(8);
-						ReadPacket(9);
-
-						Console.WriteLine("Read Registry Finish");
-
-						if (SearchComplete != null)
-						{
-							SearchComplete();
-						}
-						break;
-					}
-				}
-			});
+		//	StartListening();
 		}
-		/// <summary>
-		/// 물리적으로 연결된 모든 네트워크에서 Piezo Controller를 탐색
-		/// </summary>
-		/// <param name="dest_ip">Broadcast IP. 기본값은 Piezo Broadcast IP인 100.11.255.255. 그 외 전역 탐색의 경우 255.255.255.255 사용 권장</param>
-		public void GetDeviceInfo(string dest_ip = "100.11.255.255")
+		byte[] buffer = new byte[1024];
+
+        public void StartListening()
+        {
+
+           
+
+        }
+        /// <summary>
+        /// 물리적으로 연결된 모든 네트워크에서 Piezo Controller를 탐색
+        /// </summary>
+        /// <param name="dest_ip">Broadcast IP. 기본값은 Piezo Broadcast IP인 100.11.255.255. 그 외 전역 탐색의 경우 255.255.255.255 사용 권장</param>
+        public void GetDeviceInfo(string dest_ip = "255.255.255.255")
 		{
 			//100.11.0.12 Default IP Dest
 			//Broadcast Address : 100.11.255.255
 			//Normal Broadcast Address : 255.255.255.255
-			StartListening();
+		
 			string message = RADSControlInfo.ADSCP_TYPE_REQ + RADSControlInfo.ADSCP_OPCODE_PING;
 
 			if (seq_number < 65534)
@@ -160,6 +106,77 @@ namespace RootTools.RADS
 			byte[] bytes = ConvertToByteArr(message);
 			listen.EnableBroadcast = true;
 			listen.Send(bytes, bytes.Length, new IPEndPoint(IPAddress.Parse(dest_ip), RADSControlInfo.ADSCP_PORT));
+
+			IPEndPoint from = new IPEndPoint(0, 0);
+			while (true)
+			{
+
+				var echoBuffer = listen.Receive(ref from);
+
+				var ADSCP_Type = echoBuffer[0].ToString("X2") + echoBuffer[1].ToString("X2");
+				var ADSCP_Opcode = echoBuffer[2].ToString("X2") + echoBuffer[3].ToString("X2");
+				var ADSCP_Length = echoBuffer[4].ToString("X2") + echoBuffer[5].ToString("X2");
+				int ADSCP_seqNumber = (int)uint.Parse(echoBuffer[6].ToString("X2") + echoBuffer[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+				int ADSCP_address = (int)uint.Parse(echoBuffer[8].ToString("X2") + echoBuffer[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+				int ADSCP_value = (int)uint.Parse(echoBuffer[10].ToString("X2") + echoBuffer[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+
+				Console.WriteLine("Response IP Address : {0}", from);
+				Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
+					ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
+
+				if (ADSCP_Type == "0000" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_PONG) //Controller Discovery Pong!
+				{
+					byte[] controller_ip = new byte[4];
+					byte[] controller_mac = new byte[6];
+					byte[] controller_name = new byte[10];
+
+					for (int i = 0; i < 10; i++)
+					{
+						controller_name[i] = echoBuffer[i + 8];
+						if (i < 6) { controller_mac[i] = echoBuffer[i + 18]; }
+						if (i < 4) { controller_ip[i] = echoBuffer[i + 24]; }
+					}
+					var MAC = controller_mac[0].ToString("X2") + ":" + controller_mac[1].ToString("X2") + ":" + controller_mac[2].ToString("X2") + ":" + (controller_mac[3]).ToString("X2") + ":" + (controller_mac[4]).ToString("X2") + ":" + (controller_mac[5]).ToString("X2");
+
+					RADS controller = new RADS(m_engineer);
+					controller.ADSCP_Type = ADSCP_Type;
+					controller.ADSCP_Opcode = ADSCP_Opcode;
+					controller.ADSCP_Length = ADSCP_Length;
+					controller.RawName = controller_name;
+					controller.p_MAC = MAC;
+					controller.p_IP = new IPAddress(controller_ip);
+
+				//	listen.Close();
+				//	listen = null;
+				//	GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
+
+
+					p_CurrentController = controller;
+
+					Console.WriteLine("Find Controller. Controller Info : ");
+					Console.WriteLine(p_CurrentController.GetInformation());
+
+					Console.WriteLine("Start Read Registry");
+
+					ReadPacket(0);
+					ReadPacket(1);
+					ReadPacket(2);
+					ReadPacket(3);
+					ReadPacket(4);
+					ReadPacket(5);
+					//6,7번은 어디로갔을깡...
+					ReadPacket(8);
+					ReadPacket(9);
+					Console.WriteLine("Read Registry Finish");
+
+
+					if (SearchComplete != null)
+					{
+						SearchComplete();
+					}
+					break;
+				}
+			}
 		}
 		private void ChangeRegestry(int ADSCP_address, int ADSCP_value)
 		{
@@ -277,6 +294,15 @@ namespace RootTools.RADS
 					break;
 			}
 		}
+
+		public struct UdpState
+		{
+			public UdpClient u;
+			public IPEndPoint e;
+		}
+
+		public static bool messageReceived = false;
+		
 		private void ReadPacket(int address)
 		{
 			// send read packet to controller 
@@ -299,16 +325,30 @@ namespace RootTools.RADS
 			}
 			out_packet += seq_number.ToString("X4");
 			out_packet += address.ToString("X4");
-
 			byte[] bytes = ConvertToByteArr(out_packet);
-			UdpClient sender = new UdpClient();
+			dataSocket.Send(bytes, bytes.Length, new IPEndPoint(p_CurrentController.p_IP, RADSControlInfo.ADSCP_PORT));
 
-			sender.Send(bytes, bytes.Length, new IPEndPoint(p_CurrentController.p_IP, RADSControlInfo.ADSCP_PORT));
+			//UdpClient sender = new UdpClient();
+			//	byte[] bytes = ConvertToByteArr(out_packet);
+			//sender.Send(bytes, bytes.Length, new IPEndPoint(p_CurrentController.p_IP, RADSControlInfo.ADSCP_PORT));			
+			//var results = sender.BeginReceive(new AsyncCallback(OnReceive), sender);
 
-			IPEndPoint remoteEP = new IPEndPoint(0, 0);
+			//while(true)
+			//{
+			////	var results = sender.BeginReceive(new AsyncCallback(OnReceive), sender);
+			//	Thread.Sleep(100);
+			//}
+			////////// VisionWorks Copy
+
+			//////////
+
+
+			/////////////////////////////////////////////////////// 홍님주석
+			//	IPEndPoint remoteEP = new IPEndPoint(0, 0);
+			//var results = sender.Receive(ref remoteEP);
+			//
 
 			//var results = sender.Receive(ref remoteEP);
-			var results = sender.BeginReceive(new AsyncCallback(OnReceive), sender);
 
 
 			//var ADSCP_Type = results[0].ToString("X2") + results[1].ToString("X2");
@@ -330,6 +370,7 @@ namespace RootTools.RADS
 			//	Console.WriteLine();
 			//}
 			//sender.Close();
+			/////////////////////////////////////////////////////// 홍님주석
 		}
 
 		private void OnReceive(IAsyncResult ar)
@@ -355,7 +396,24 @@ namespace RootTools.RADS
 				p_CurrentController.p_reg[ADSCP_address] = ADSCP_value;
 				ChangeRegestry(ADSCP_address, ADSCP_value);
 				Console.WriteLine();
+				
 			}
+
+			
+			if (ADSCP_Type == "3202" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_SEND_DATA)
+			{
+				int ADSCP_ADS_up = (int)uint.Parse(results[8].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+				int ADSCP_ADS_down = (int)uint.Parse(results[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+				int ADSCP_ADS_data = (int)uint.Parse(results[10].ToString("X2") + results[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+				if (p_CurrentController != null)
+				{
+					p_CurrentController.p_ADS_up = ADSCP_ADS_up;
+					p_CurrentController.p_ADS_down = ADSCP_ADS_down;
+					p_CurrentController.p_ADS_data = ADSCP_ADS_data;
+				}
+				
+			}
+			u.BeginReceive(OnReceive, u);
 		}
 		/// <summary>
 		/// Piezo Reset

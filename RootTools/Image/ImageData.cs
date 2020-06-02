@@ -68,9 +68,14 @@ namespace RootTools
                 return _nByte;
             }
             set
-            {
-                SetProperty(ref _nByte, value);
-
+            {   
+                //SetProperty(ref _nByte, value);
+                if (_nByte != value)
+                {
+                    RaisePropertyChanged();
+                    _nByte = value;
+                    ReAllocate(p_Size, value);
+                }
             }
         }
 		public IntPtr m_ptrByte;
@@ -578,7 +583,7 @@ namespace RootTools
                 {
                     unsafe
                     {
-						fixed (byte* p = &m_aBuf[p_nByte * (y * p_Stride + x)])
+						fixed (byte* p = &m_aBuf[p_nByte * (y * p_Size.X + x)])
                         {
                             ip = (IntPtr)(p);
                         }
