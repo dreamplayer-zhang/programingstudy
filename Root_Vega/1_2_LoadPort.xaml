@@ -198,15 +198,16 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <ToggleButton Content="Load" x:Name="buttonLoad"
+                        <Button Content="Load" x:Name="buttonLoad"
                                 Grid.Row="0"
                                 Margin="5"
-                                Style="{StaticResource LoadPortToggle}"
+                                Style="{StaticResource LoadPortBtn}"
                                 Click="ToggleButton_Click"/>
-                        <Button Content="Unload Request"
+                        <Button Content="Unload Request" x:Name="buttonUnload"
                                                 Grid.Row="2"
                                                 Margin="5"
-                                                Style="{StaticResource LoadPortBtn}"/>
+                                                Style="{StaticResource LoadPortBtn}"
+                                Click="buttonUnload_Click"/>
                     </Grid>
                 </Grid>
 

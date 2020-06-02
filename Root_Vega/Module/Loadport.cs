@@ -21,7 +21,7 @@ namespace Root_Vega.Module
         public DIO_I m_diLoad;
         public DIO_I m_diUnload; 
         DMCControl m_dmc;
-        OHT_Semi m_OHT;
+        public OHT_Semi m_OHT;
         RS232 m_rs232RFID;
         public override void GetTools(bool bInit)
         {
@@ -287,7 +287,7 @@ namespace Root_Vega.Module
         #region GAF
         SVID m_svidPlaced;
         CEID m_ceidLoad;
-        CEID m_ceidUnload;
+        public CEID m_ceidUnload;
         CEID m_ceidOpen;
         CEID m_ceidClose; 
         ALID m_alidPlaced;

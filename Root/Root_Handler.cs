@@ -38,6 +38,11 @@ namespace Root
             ui.Init(module);
             m_moduleList.AddModule(module, ui);
         }
+
+        public bool IsEnableRecovery()
+        {
+            return false; 
+        }
         #endregion
 
         #region StateHome

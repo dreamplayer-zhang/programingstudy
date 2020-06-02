@@ -82,6 +82,16 @@ namespace Root_Wind
             ui.Init(module);
             m_moduleList.AddModule(module, ui);
         }
+
+        public bool IsEnableRecovery()
+        {
+            if (p_aligner.p_infoWafer != null) return true;
+            if (p_vision.p_infoWafer != null) return true;
+            if (p_wtr.m_dicArm[WTR_RND.eArm.Lower].p_infoWafer != null) return true;
+            if (p_wtr.m_dicArm[WTR_RND.eArm.Upper].p_infoWafer != null) return true;
+            return false; 
+        }
+
         #endregion
 
         #region StateHome 

@@ -1,5 +1,6 @@
 ﻿using Root_Vega.ManualJob;
 using Root_Vega.Module;
+using RootTools;
 using RootTools.Gem;
 using RootTools.Module;
 using System;
@@ -34,16 +35,21 @@ namespace Root_Vega
             textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
 
-            InitButtonLoad(); 
-
-            m_timer.Interval = TimeSpan.FromMilliseconds(20);
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
+            InitButtonLoad();
+            InitTimer(); 
 
             m_manualjob = new ManualJobSchedule(m_loadport.p_id, m_loadport.m_log);
         }
 
+        #region Timer
         DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(20);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+
         private void M_timer_Tick(object sender, EventArgs e)
         {
             borderPlaced.Background = m_loadport.m_diPlaced.p_bIn ? Brushes.LightGreen : null;
@@ -54,8 +60,10 @@ namespace Root_Vega
             bool bAuto = (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto); 
             borderAccessAuto.Background = bAuto ? Brushes.LightGreen : null;
             borderAccessManual.Background = bAuto ? null : Brushes.LightGreen;
-            buttonLoad.IsEnabled = IsEnableLoad(); 
+            buttonLoad.IsEnabled = IsEnableLoad();
+            buttonUnload.IsEnabled = IsEnableUnload(); 
         }
+        #endregion
 
         #region Button Load
         BackgroundWorker m_bgwLoad = new BackgroundWorker();
@@ -96,8 +104,27 @@ namespace Root_Vega
                     m_manualjob.ShowPopup();
                     ModuleRunBase moduleRun = m_loadport.m_runLoad.Clone();
                     m_loadport.StartRun(moduleRun);
+                    EQ.p_eState = EQ.eState.Run; 
                     break; 
             }
+        }
+        #endregion
+
+
+        #region Button Unload
+        bool IsEnableUnload()
+        {
+            bool bReadyLoadport = m_loadport.p_eState == ModuleBase.eState.Ready;
+            bool bPlace = m_loadport.CheckPlaced(); 
+            bool bReadyToUnload = m_loadport.m_infoPod.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload;
+            bool bAccess = m_loadport.m_OHT.p_eAccessLP == GemCarrierBase.eAccessLP.Auto; 
+            return bReadyLoadport && bPlace && bReadyToUnload && bAccess; 
+        }
+
+        private void buttonUnload_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsEnableUnload() == false) return;
+            m_loadport.m_ceidUnload.Send(); 
         }
         #endregion
     }

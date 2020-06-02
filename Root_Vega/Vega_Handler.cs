@@ -67,6 +67,14 @@ namespace Root_Vega
             ui.Init(module);
             m_moduleList.AddModule(module, ui);
         }
+
+        public bool IsEnableRecovery()
+        {
+            if (m_robot.p_infoReticle != null) return true; 
+            if (m_sideVision.p_infoReticle != null) return true;
+            if (m_patternVision.p_infoReticle != null) return true; 
+            return false; 
+        }
         #endregion
 
         #region StateHome

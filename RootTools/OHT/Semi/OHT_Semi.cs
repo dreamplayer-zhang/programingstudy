@@ -330,7 +330,7 @@ namespace RootTools.OHT.Semi
         }
 
         GemCarrierBase.eAccessLP _eAccessLP = GemCarrierBase.eAccessLP.Manual;
-        GemCarrierBase.eAccessLP p_eAccessLP
+        public GemCarrierBase.eAccessLP p_eAccessLP
         {
             get { return _eAccessLP; }
             set

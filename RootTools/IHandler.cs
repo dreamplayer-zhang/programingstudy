@@ -12,6 +12,6 @@
 
         void CheckFinish();
 
-        dynamic GetGemSlot(string sSlot); 
+        dynamic GetGemSlot(string sSlot);
     }
 }

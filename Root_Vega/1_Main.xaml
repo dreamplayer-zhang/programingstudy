@@ -402,19 +402,23 @@
         </Grid>
         <Grid Grid.Column="1" >
             <StackPanel Margin="0,45,15,15">
-                <Button Content="Start"
+                <Button Content="Resume" x:Name="buttonResume"
                         Style="{StaticResource BasicBtn}"
-                        Margin="0,0,0,10"/>
-                <Button Content="Stop"
+                        Margin="0,0,0,10"
+                        Click="buttonResume_Click"/>
+                <Button Content="Pause" x:Name="buttonPause"
                         Style="{StaticResource BasicBtn}"
-                        Margin="0,0,0,10"/>
-                <Button Content="Initialization"
+                        Margin="0,0,0,10"
+                        Click="buttonPause_Click"/>
+                <Button Content="Initialization" x:Name="buttonInitialization"
                         Style="{StaticResource BasicBtn}"
                         Command="{Binding InitializeCommand}"
-                        Margin="0,0,0,10"/>
-                <Button Content="Recovery"
+                        Margin="0,0,0,10"
+                        Click="buttonInitialization_Click"/>
+                <Button Content="Recovery" x:Name="buttonRecovery"
                         Style="{StaticResource BasicBtn}"
-                        Margin="0,0,0,10"/>
+                        Margin="0,0,0,10"
+                        Click="buttonRecovery_Click"/>
             </StackPanel>
             <Button Content="OHT"
                     VerticalAlignment="Bottom"
