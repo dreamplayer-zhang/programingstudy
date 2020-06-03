@@ -20,7 +20,6 @@ namespace Root
             logViewUI.Init(LogView.m_logView); 
             toolBoxUI.Init(engineer.ClassToolBox());
             handlerUI.Init(engineer.m_handler);
-            memoryViewer.Init(engineer.m_memoryViewer); 
         }
     }
 }

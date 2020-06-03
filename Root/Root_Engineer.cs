@@ -49,7 +49,6 @@ namespace Root
         }
         #endregion
 
-        public MemoryViewer m_memoryViewer; 
         public Root_Handler m_handler = new Root_Handler();
         public void Init(string id)
         {
@@ -59,7 +58,6 @@ namespace Root
             m_toolBox.Init(id, this);
             InitAjin();
             m_handler.Init(id, this);
-            m_memoryViewer = new MemoryViewer("MemoryViewer", ClassMemoryTool(), LogView.GetLog("MemoryViewer")); 
         }
 
         public void ThreadStop()

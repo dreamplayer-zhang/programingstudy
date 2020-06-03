@@ -83,11 +83,11 @@
                             </StackPanel>
                             <StackPanel Grid.Row="2" Orientation="Horizontal">
                                 <TextBlock Text=" Pod ID = " VerticalAlignment="Center"/>
-                                <TextBox Text="{Binding p_sPodID}" VerticalAlignment="Center" TextAlignment="Left"/>
+                                <TextBox Text="{Binding p_sCarrierID}" VerticalAlignment="Center" TextAlignment="Left"/>
                             </StackPanel>
                             <StackPanel Grid.Row="3" Orientation="Horizontal">
                                 <TextBlock Text=" Reticle ID = " VerticalAlignment="Center"/>
-                                <TextBox Text="{Binding p_sReticleID}" VerticalAlignment="Center" TextAlignment="Left" />
+                                <TextBox Text="{Binding p_sSlotID}" VerticalAlignment="Center" TextAlignment="Left" />
                             </StackPanel>
                         </Grid>
                     </GroupBox>

@@ -23,9 +23,6 @@
             <TabItem Header="ToolBox">
                 <toolBox:ToolBox_UI x:Name="toolBoxUI" Margin="2"/>
             </TabItem>
-            <TabItem Header="MemoryViewer">
-                <memory:MemoryViewer_UI x:Name="memoryViewer" Margin="2"/>
-            </TabItem>
             <TabItem Header="Log">
                 <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
             </TabItem>
