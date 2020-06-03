@@ -576,11 +576,9 @@ namespace RootTools
 		}
 		void InitRoiRect(int nWidth, int nHeight)
 		{
-            if (p_ImageData == null)
-            { 
 			p_View_Rect = new System.Drawing.Rectangle(0, 0, nWidth, nHeight);
 			p_Zoom = 1;
-            }
+
 			bool bRatio_WH = (double)p_View_Rect.Width / p_CanvasWidth < (double)p_View_Rect.Height / p_CanvasHeight;
 			//m_View_Rect = new Rectangle(m_View_Rect.X, m_View_Rect.Y, m_View_Rect.Width, m_View_Rect.Height * ViewWidth / imgWidth);
 			if (bRatio_WH)//세로가 길어

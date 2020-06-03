@@ -10,15 +10,9 @@ namespace Root_Vega
     public class GrabMode
     {
         #region Camera
-        public enum eDirection
-        {
-            Forward,
-            BackWard,
-        }
-
         public bool m_bUseBiDirectionScan = false;
         public int m_nReverseOffsetY = 800;
-        public eDirection m_eGrabDirection = eDirection.Forward;
+        public eGrabDirection m_eGrabDirection = eGrabDirection.Forward;
         string m_sCamera = "";
         public ICamera m_camera = null;
         CameraSet m_cameraSet;
@@ -102,11 +96,7 @@ namespace Root_Vega
         public int m_ScanStartLine = 0;
         #endregion
 
-        public string p_id
-        {
-            get;
-            set;
-        }
+        public string p_id { get; set; }
         
         public string p_sName{get;set;}
         public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool)

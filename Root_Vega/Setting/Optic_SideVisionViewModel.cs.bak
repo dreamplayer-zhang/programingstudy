@@ -211,7 +211,7 @@ namespace Root_Vega
         }
 
         private readonly IDialogService m_DialogService;
-
+        
         public Optic_SideVisionViewModel(Vega_Engineer engineer,  IDialogService dialogService)
         {
             m_Engineer = engineer;
@@ -266,14 +266,17 @@ namespace Root_Vega
             //    return;
             //}
             SideVision.Run_SideGrab Grab = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-            var viewModel = new Dialog_SideScan_ViewModel(Sidevision, Grab);
+            SideVision.Run_BevelGrab BevelGrab = (SideVision.Run_BevelGrab)Sidevision.CloneModuleRun("BevelGrab");
+            var viewModel = new Dialog_SideScan_ViewModel(Sidevision, Grab, BevelGrab);
             Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
             if (result.HasValue)
             {
                 if (result.Value)
                 {
-                    //p_MainCamera = Grab.m_grabMode.m_camera;
-                    Sidevision.StartRun(Grab);
+                    if (Grab.m_grabMode != null)
+                        Sidevision.StartRun(Grab);
+                    else if (BevelGrab.m_grabMode != null)
+                        Sidevision.StartRun(BevelGrab);
                 }
                 else
                 {
@@ -293,13 +296,21 @@ namespace Root_Vega
             {
                 if (result.Value)
                 {
-                    Sidevision.StartRun(af);
+                    
                 }
                 else
                 {
                     // Cancelled
                 }
             }
+            //m_DialogServiceTest.Show<Dialog_AutoFocus>(this, viewModel);
+            
+            return;
+        }
+
+        private void ViewModel_CloseRequested(object sender, DialogCloseRequestedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         #region RelayCommand

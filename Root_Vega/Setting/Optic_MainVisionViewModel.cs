@@ -192,8 +192,8 @@ namespace Root_Vega
             EQ.p_bStop = false;
             PatternVision vision = ((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision;
             vision.p_eState = ModuleBase.eState.Home;
-            if (vision.m_CamMain.p_CamInfo.p_eState == eCamState.Init)
-                vision.m_CamMain.Connect();
+            //if (vision.m_CamMain.p_CamInfo.p_eState == eCamState.Init)
+            //    vision.m_CamMain.Connect();
         }
 
         void Stop()

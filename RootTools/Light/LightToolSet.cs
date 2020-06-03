@@ -57,9 +57,7 @@ namespace RootTools.Light
         ObservableCollection<LightTool_12ch> m_aLightTool12ch = new ObservableCollection<LightTool_12ch>(); 
         public ObservableCollection<LightTool_12ch> p_aLightTool12ch
         {
-            get
-            { 
-            }
+      
         }
         bool Run12ChTree(Tree tree)
         {

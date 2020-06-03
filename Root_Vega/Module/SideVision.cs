@@ -455,10 +455,14 @@ namespace Root_Vega.Module
             if (EQ.p_bSimulate) return "OK";
             p_bStageVac = true;
             Thread.Sleep(200);
-
+            
             m_axisXY.p_axisX.HomeStart();
             if (m_axisXY.WaitReady() != "OK")
                 p_bStageVac = false;
+
+            //m_axisXY.p_axisX.Move(-50000);
+            //if (m_axisXY.WaitReady() != "OK")
+            //    return "Error";
             m_axisXY.p_axisY.HomeStart();
             m_axisZ.p_axis.HomeStart();
             m_axisTheta.p_axis.HomeStart();
@@ -466,6 +470,9 @@ namespace Root_Vega.Module
                 return "Error";
             if (m_axisTheta.WaitReady() != "OK")
                 return "Error";
+            //m_axisXY.p_axisX.Move(0);
+            //if (m_axisXY.WaitReady() != "OK")
+            //    return "Error";d
             //p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             p_bStageVac = false;
@@ -684,8 +691,8 @@ namespace Root_Vega.Module
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
-                        //if (m_module.Run(axisXY.p_axisX.Move(0)))
-                        //    return p_sInfo;
+                        if (m_module.Run(axisXY.p_axisX.Move(-70000)))
+                            return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
                         if (m_module.Run(axisTheta.Move(nPosTheta)))
@@ -704,7 +711,7 @@ namespace Root_Vega.Module
                         /* Trigger Set*/
                         double yTrigger0 = m_rpAxis.Y - yAxis / 2;
                         double yTrigger1 = m_rpAxis.Y + yAxis / 2;
-                        m_module.p_axisXY.p_axisY.SetTrigger(yPos1, yTrigger1, m_grabMode.m_dTrigger, true);
+                        m_module.p_axisXY.p_axisY.SetTrigger(yPos1, yTrigger1+100000, m_grabMode.m_dTrigger, true);
 
                         /* 메모리 위치도 가져오게는 좀 다시 하자.*/
                         string sPool = "pool";
@@ -841,8 +848,8 @@ namespace Root_Vega.Module
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
-                        //if (m_module.Run(axisXY.p_axisX.Move(0)))
-                        //    return p_sInfo;
+                        if (m_module.Run(axisXY.p_axisX.Move(-70000)))
+                            return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
                         if (m_module.Run(axisTheta.Move(nPosTheta)))

@@ -91,12 +91,16 @@ namespace Root_Vega
 
         #region Axis
         public int m_dTrigger = 10;
-        public int m_intervalAcc = 300000;        // 가속 구간 point,  단위 0.1um
+        public int m_intervalAcc = 100000;        // 가속 구간 point,  단위 0.1um
         public int m_ScanLineNum = 1;
         public int m_ScanStartLine = 0;
         #endregion
 
-        public string p_id { get; set; }
+        public string p_id
+        {
+            get;
+            set;
+        }
         
         public string p_sName{get;set;}
         public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool)

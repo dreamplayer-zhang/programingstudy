@@ -211,7 +211,7 @@ namespace Root_Vega
         }
 
         private readonly IDialogService m_DialogService;
-        
+
         public Optic_SideVisionViewModel(Vega_Engineer engineer,  IDialogService dialogService)
         {
             m_Engineer = engineer;
