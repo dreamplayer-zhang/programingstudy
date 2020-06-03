@@ -82,6 +82,9 @@
                     <TabControl Grid.Row="2" x:Name="tabControlPool" />
                 </Grid>
             </TabItem>
+            <TabItem Header="Viewer">
+                <local:MemoryViewer_UI x:Name="memoryViewerUI"/>
+            </TabItem>
             <TabItem Header="Run">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -97,10 +100,10 @@
                 </Grid>
             </TabItem>
             <TabItem Header="NamedPipe">
-                <comm:NamedPipe_UI x:Name="namedPipeUI" />
+                <comm:NamedPipe_UI x:Name="namedPipeUI"/>
             </TabItem>
             <TabItem Header="Setup" Visibility="Hidden">
-                <tree:TreeUI x:Name="treeRootSetupUI" />
+                <tree:TreeUI x:Name="treeRootSetupUI"/>
             </TabItem>
         </TabControl>
     </Grid>

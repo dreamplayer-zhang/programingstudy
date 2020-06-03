@@ -267,6 +267,7 @@ namespace RootTools.Memory
         Log m_log;
         public TreeRoot m_treeRootSetup;
         public TreeRoot m_treeRoot;
+        public MemoryViewer m_viewer; 
         public MemoryTool(string id, IEngineer engineer, bool bRegRead = true)
         {
             MEMORYSTATUSEX stats = GlobalMemoryStatusEx();
@@ -283,6 +284,7 @@ namespace RootTools.Memory
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             if (bRegRead) RunSetupTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.RegRead);
+            m_viewer = new MemoryViewer(id, this, m_log); 
             InitThreadProcess();
             AddNamedPipe(id); 
         }
