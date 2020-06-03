@@ -54,7 +54,13 @@ namespace RootTools.Light
         #region Light 12 Channel
         const string c_s12ch = "12ch"; 
         int m_n12Ch = 0;
-        List<LightTool_12ch> m_aLightTool12ch = new List<LightTool_12ch>(); 
+        ObservableCollection<LightTool_12ch> m_aLightTool12ch = new ObservableCollection<LightTool_12ch>(); 
+        public ObservableCollection<LightTool_12ch> p_aLightTool12ch
+        {
+            get
+            { 
+            }
+        }
         bool Run12ChTree(Tree tree)
         {
             int n12Ch = m_n12Ch;

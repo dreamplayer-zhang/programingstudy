@@ -24,14 +24,7 @@ namespace Root_Vega
         public Setting_IlluminationViewModel(Vega_Engineer engineer)
         {
             m_Engineer = engineer;
-            foreach (KeyValuePair<IToolSet, UserControl> kv in engineer.ClassToolBox().m_aToolSet)
-            {
-                if (kv.Key.p_id == "Light")
-                {
-                    p_lightToolSet = (LightToolSet)kv.Key;
-                    break;
-                }
-            }
+            m_lightToolSet =(LightToolSet)m_Engineer.ClassToolBox().GetToolSet("Light");
         }
     }
 }

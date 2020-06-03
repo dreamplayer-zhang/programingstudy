@@ -411,6 +411,18 @@ namespace RootTools.ToolBoxs
             m_aToolSet.Add(toolSet, userControl);
         }
 
+        public IToolSet GetToolSet(string sName)
+        {
+            foreach (KeyValuePair<IToolSet, UserControl> kv in m_aToolSet)
+            {
+                if (kv.Key.p_id == sName)
+                {
+                    return kv.Key;
+                }
+            }
+            return null;
+        }
+
         ToolSet InitToolSet(string sToolSet)
         {
             ToolSet toolSet = new ToolSet(sToolSet);

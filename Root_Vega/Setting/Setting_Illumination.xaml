@@ -1,8 +1,8 @@
 ﻿<UserControl x:Class="Root_Vega.Setting_Illumination"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
@@ -11,7 +11,180 @@
              mc:Ignorable="d"
              d:DesignHeight="726"
              d:DesignWidth="1602">
-    <Grid DataContext="{Binding p_lightToolSet}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="400"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Border Margin="10"
+                CornerRadius="20"
+                Background="#FF3B3B3B">
+            <StackPanel>
+                <TextBlock Text="전체 Controller"
+                           HorizontalAlignment="Center"
+                           Margin="0,10,0,0"
+                           FontSize="30"
+                           Foreground="White"></TextBlock>
+                <Line Margin="10,10,10,0"
+                      Stroke="White"
+                      StrokeThickness="5"
+                      X1="0"
+                      Y1="0"
+                      X2="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Border}}, Path=ActualWidth}"
+                      Y2="0"></Line>
+                <Border BorderThickness="1"
+                        Background="Black"
+                        Margin="10"
+                        CornerRadius="10">
+                    <StackPanel>
+                        <WrapPanel Margin="0,10,0,0">
+                            <material:PackIcon Kind="Lightbulb"
+                                               Foreground="White"
+                                               Width="50"
+                                               Panel.ZIndex="2"
+                                               Height="50"></material:PackIcon>
+                            <TextBlock Text="4CH Controller"
+                                       FontSize="30"
+                                       Foreground="White"></TextBlock>
+                        </WrapPanel>
+                        <WrapPanel Margin="180,0,0,0">
+                            <Button Height="40"
+                                    Width="40"
+                                    Margin="10,0,10,10">
+                                <material:PackIcon Kind="Minus"
+                                                   Width="30"
+                                                   Height="30"></material:PackIcon>
+                            </Button>
+                            <TextBlock Text="50"
+                                       Foreground="White"
+                                       FontSize="30"
+                                       Margin="10,0,10,10"></TextBlock>
+                            <Button Height="40"
+                                    Width="40"
+                                    Margin="10,0,10,10">
+                                <material:PackIcon Kind="Plus"
+                                                   Width="30"
+                                                   Height="30"></material:PackIcon>
+                            </Button>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+                <Border BorderThickness="1"
+                        Background="Black"
+                        Margin="10"
+                        CornerRadius="10">
+                    <StackPanel>
+                        <WrapPanel Margin="0,10,0,0">
+                            <material:PackIcon Kind="Lightbulb"
+                                               Foreground="White"
+                                               Width="50"
+                                               Panel.ZIndex="2"
+                                               Height="50"></material:PackIcon>
+                            <TextBlock Text="12CH Controller"
+                                       FontSize="30"
+                                       Foreground="White"></TextBlock>
+                        </WrapPanel>
+                        <WrapPanel Margin="180,0,0,0">
+                            <Button Height="40"
+                                    Width="40"
+                                    Margin="10,0,10,10">
+                                <material:PackIcon Kind="Minus"
+                                                   Width="30"
+                                                   Height="30"></material:PackIcon>
+                            </Button>
+                            <TextBlock Text="50"
+                                       Foreground="White"
+                                       FontSize="30"
+                                       Margin="10,0,10,10"></TextBlock>
+                            <Button Height="40"
+                                    Width="40"
+                                    Margin="10,0,10,10">
+                                <material:PackIcon Kind="Plus"
+                                                   Width="30"
+                                                   Height="30"></material:PackIcon>
+                            </Button>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+                <Border BorderThickness="1"
+                        Background="Black"
+                        Margin="10"
+                        CornerRadius="10">
+                    <StackPanel>
+                        <WrapPanel Margin="0,10,0,0">
+                            <material:PackIcon Kind="Lightbulb"
+                                               Foreground="White"
+                                               Width="50"
+                                               Panel.ZIndex="2"
+                                               Height="50"></material:PackIcon>
+                            <TextBlock Text="Kangwoo"
+                                       FontSize="30"
+                                       Foreground="White"></TextBlock>
+                        </WrapPanel>
+                        <WrapPanel Margin="180,0,0,0">
+                            <Button Height="40"
+                                    Width="40"
+                                    Margin="10,0,10,10">
+                                <material:PackIcon Kind="Minus"
+                                                   Width="30"
+                                                   Height="30"></material:PackIcon>
+                            </Button>
+                            <TextBlock Text="50"
+                                       Foreground="White"
+                                       FontSize="30"
+                                       Margin="10,0,10,10"></TextBlock>
+                            <Button Height="40"
+                                    Width="40"
+                                    Margin="10,0,10,10">
+                                <material:PackIcon Kind="Plus"
+                                                   Width="30"
+                                                   Height="30"></material:PackIcon>
+                            </Button>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+                <Border BorderThickness="1"
+                        Background="Black"
+                        Margin="10"
+                        CornerRadius="10">
+                    <StackPanel>
+                        <WrapPanel Margin="0,10,0,0">
+                            <material:PackIcon Kind="Lightbulb"
+                                               Foreground="White"
+                                               Width="50"
+                                               Panel.ZIndex="2"
+                                               Height="50"></material:PackIcon>
+                            <TextBlock Text="LVS Laser"
+                                       FontSize="30"
+                                       Foreground="White"></TextBlock>
+                        </WrapPanel>
+                        <WrapPanel Margin="180,0,0,0">
+                            <Button Height="40"
+                                    Width="40"
+                                    Margin="10,0,10,10">
+                                <material:PackIcon Kind="Minus"
+                                                   Width="30"
+                                                   Height="30"></material:PackIcon>
+                            </Button>
+                            <TextBlock Text="50"
+                                       Foreground="White"
+                                       FontSize="30"
+                                       Margin="10,0,10,10"></TextBlock>
+                            <Button Height="40"
+                                    Width="40"
+                                    Margin="10,0,10,10">
+                                <material:PackIcon Kind="Plus"
+                                                   Width="30"
+                                                   Height="30"></material:PackIcon>
+                            </Button>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+        <TabControl Grid.Column="1"></TabControl>
+    </Grid>
+    <!--<Grid DataContext="{Binding p_lightToolSet}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
@@ -202,5 +375,5 @@
                 </TabControl.ContentTemplate>
             </TabControl>
         </Grid>
-    </Grid>
+    </Grid>-->
 </UserControl>
