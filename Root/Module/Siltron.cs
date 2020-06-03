@@ -5,6 +5,7 @@ using RootTools.Control;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -104,17 +105,21 @@ namespace Root.Module
 
             public string m_id;
             eCam m_eCam; 
-            public LineScan(eCam cam)
+            public LineScan(eCam cam, string id)
             {
                 m_eCam = cam;
-                m_id = "Dalsa." + cam.ToString();
+                m_id = id;
             }
         }
 
         Dictionary<eCam, LineScan> m_lineScan = new Dictionary<eCam, LineScan>(); 
         void InitLineScan()
         {
-            foreach (eCam cam in Enum.GetValues(typeof(eCam))) m_lineScan.Add(cam, new LineScan(cam));
+            foreach (eCam cam in Enum.GetValues(typeof(eCam)))
+            {
+                string id = m_stringDalsa.p_sValue + "." + m_stringCam[(int)cam].p_sValue; 
+                m_lineScan.Add(cam, new LineScan(cam, id));
+            }
         }
         #endregion
 
@@ -181,8 +186,8 @@ namespace Root.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeDalsa(tree.GetTree("Dalsa", false));
-            RunTreeBasler(tree.GetTree("Basler", false));
+            RunTreeDalsa(tree.GetTree(m_stringDalsa.p_sValue, false));
+            RunTreeBasler(tree.GetTree(m_stringBasler.p_sValue, false));
             RunTreeAxis(tree.GetTree("Axis", false));
         }
         #endregion
@@ -201,8 +206,20 @@ namespace Root.Module
         }
         #endregion
 
+        #region String Table
+        StringTable.String m_stringDalsa = StringTable.Get("Dalsa", "Siltron");
+        StringTable.String m_stringBasler = StringTable.Get("Basler", "Siltron");
+        StringTable.String[] m_stringCam = new StringTable.String[3];
+        StringTable.String m_stringSide = StringTable.Get("Side", "Siltron");
+        StringTable.String m_stringTop = StringTable.Get("Top", "Siltron");
+        StringTable.String m_stringBottom = StringTable.Get("Bottom", "Siltron");
+        #endregion
+
         public Siltron(string id, IEngineer engineer)
         {
+            m_stringCam[0] = m_stringSide;
+            m_stringCam[1] = m_stringTop;
+            m_stringCam[2] = m_stringBottom;
             InitLineScan();
             InitAreaScan(); 
             base.InitBase(id, engineer);

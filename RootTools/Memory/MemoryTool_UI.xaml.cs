@@ -24,6 +24,7 @@ namespace RootTools.Memory
             treeRootSetupUI.Init(memoryTool.m_treeRootSetup);
             memoryTool.RunSetupTree(Tree.eMode.Init);
             m_memoryTool.OnChangeTool += M_memoryTool_OnChangeTool;
+            memoryViewerUI.Init(memoryTool.m_viewer); 
             InitTabControl();
             namedPipeUI.Init(memoryTool.m_aNamedPipe[0]); 
         }

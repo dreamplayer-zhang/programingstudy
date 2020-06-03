@@ -8,7 +8,6 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <GroupBox Header="{Binding p_id}"
               Margin="10,0,10,10"
-              Foreground="{StaticResource BtnForeGround}"
               FontSize="20">
         <Grid Height="250"
               Margin="30,0,30,10">
@@ -26,11 +25,9 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
                            TextAlignment="Left"
-                           Style="{StaticResource BasicTb}"
                            Text="Light On"></TextBlock>
                 <ToggleButton Grid.Column="1"
                               Margin="0,10"
-                              Style="{StaticResource BasicToggle}"
                               Content="On"
                               IsChecked="{Binding p_bOn}"></ToggleButton>
             </Grid>
@@ -50,9 +47,8 @@
                 <TextBlock Grid.Column="1"
                            Text="{Binding p_fGetPower}"
                            IsEnabled="False"
-                           Style="{StaticResource BasicTb}"></TextBlock>
+                       ></TextBlock>
                 <TextBlock Grid.Column="2"
-                           Style="{StaticResource BasicTb}"
                            Text="Get Power"></TextBlock>
             </Grid>
             <Grid Grid.Row="4">
@@ -69,10 +65,8 @@
                         TickFrequency="0.1"></Slider>
                 <TextBox Grid.Column="1"
                          Text="{Binding p_fSetPower}"
-                         Style="{StaticResource BasicTbox}"
                          PreviewKeyDown="TextBox_PreviewKeyDown"></TextBox>
                 <TextBlock Grid.Column="2"
-                           Style="{StaticResource BasicTb}"
                            Text="Set Power"></TextBlock>
             </Grid>
             <Grid Grid.Row="1">
@@ -82,10 +76,8 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
                            TextAlignment="Left"
-                           Style="{StaticResource BasicTb}"
                            Text="Max Power"></TextBlock>
                 <TextBox Grid.Column="1"
-                         Style="{StaticResource BasicTbox}"
                          Text="{Binding p_fMaxPower}"
                          TextAlignment="Center"
                          PreviewKeyDown="TextBox_PreviewKeyDown"></TextBox>
@@ -97,10 +89,8 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
                            TextAlignment="Left"
-                           Style="{StaticResource BasicTb}"
                            Text="Power Scale"></TextBlock>
                 <TextBox Grid.Column="1"
-                         Style="{StaticResource BasicTbox}"
                          Text="{Binding p_fScalePower}"
                          TextAlignment="Center"
                          PreviewKeyDown="TextBox_PreviewKeyDown"></TextBox>
