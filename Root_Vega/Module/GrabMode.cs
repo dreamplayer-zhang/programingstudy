@@ -2,8 +2,10 @@
 using RootTools.Camera;
 using RootTools.Light;
 using RootTools.Memory;
+using RootTools.RADS;
 using RootTools.Trees;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace Root_Vega
 {  
@@ -49,6 +51,20 @@ namespace Root_Vega
             {  
                 m_lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
             }
+        }
+        #endregion
+
+        #region RADS
+        public RADSControl m_RADSControl;
+        bool m_bUseRADS = false;
+        void RunTreeRADS(Tree tree, bool bVisible, bool bReadOnly)
+        {
+            m_bUseRADS = tree.Set(m_bUseRADS, m_bUseRADS, "Use", "Using RADS", bVisible, false);
+        }
+
+        public bool GetUseRADS()
+        {
+            return m_bUseRADS;
         }
         #endregion
 
@@ -99,13 +115,14 @@ namespace Root_Vega
         public string p_id { get; set; }
         
         public string p_sName{get;set;}
-        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool)
+        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, RADSControl radsControl)
         {
             p_id = id;
             p_sName = id;
             m_cameraSet = cameraSet;
             m_lightSet = lightSet;
             m_memoryPool = memoryPool;
+            m_RADSControl = radsControl;
         }
 
         public void RunTreeName(Tree tree)
@@ -121,6 +138,7 @@ namespace Root_Vega
             RunTreeCamera(tree, bVisible, bReadOnly);
             RunTreeLight(tree.GetTree("LightPower", false), bVisible, bReadOnly);
             RunTreeMemory(tree.GetTree("Memory", false), bVisible, bReadOnly);
+            RunTreeRADS(tree.GetTree("RADS", false), bVisible, bReadOnly);
         }
     }
 }

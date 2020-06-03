@@ -40,10 +40,16 @@ namespace RootTools.RADS
 			}
 		}
 		int seq_number;
-		IEngineer m_engineer;
-		public RADSConnectControl(IEngineer engineer)
+
+		RADSControl m_parent;
+		public RADSControl p_parent
 		{
-			m_engineer = engineer;
+			get { return m_parent; }
+			set { SetProperty(ref m_parent, value); }
+		}
+		public RADSConnectControl(RADSControl parent)
+		{
+			p_parent = parent;
 			p_CurrentController = null;
 
 			if (listen == null)
@@ -109,9 +115,7 @@ namespace RootTools.RADS
 			IPEndPoint from = new IPEndPoint(0, 0);
 			while (true)
 			{
-
 				var echoBuffer = listen.Receive(ref from);
-
 				var ADSCP_Type = echoBuffer[0].ToString("X2") + echoBuffer[1].ToString("X2");
 				var ADSCP_Opcode = echoBuffer[2].ToString("X2") + echoBuffer[3].ToString("X2");
 				var ADSCP_Length = echoBuffer[4].ToString("X2") + echoBuffer[5].ToString("X2");
@@ -137,7 +141,7 @@ namespace RootTools.RADS
 					}
 					var MAC = controller_mac[0].ToString("X2") + ":" + controller_mac[1].ToString("X2") + ":" + controller_mac[2].ToString("X2") + ":" + (controller_mac[3]).ToString("X2") + ":" + (controller_mac[4]).ToString("X2") + ":" + (controller_mac[5]).ToString("X2");
 
-					RADS controller = new RADS(m_engineer);
+					RADS controller = new RADS();
 					controller.ADSCP_Type = ADSCP_Type;
 					controller.ADSCP_Opcode = ADSCP_Opcode;
 					controller.ADSCP_Length = ADSCP_Length;

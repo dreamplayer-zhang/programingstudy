@@ -4,6 +4,7 @@ using RootTools.Control;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
+using RootTools.RADS;
 using RootTools.RTC5s.LaserBright;
 using RootTools.Trees;
 using System.Threading;
@@ -21,6 +22,7 @@ namespace Root.Module
         //        Camera_Basler m_camBasler;
         MemoryPool m_memoryPool;
         Laser_Bright m_laser;
+        RADSControl m_RADSControl;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diTest, this, "Test");
@@ -31,6 +33,7 @@ namespace Root.Module
             //            p_sInfo = m_toolBox.Get(ref m_camBasler, this, "Basler");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_laser, this, "Laser");
+            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl");
         }
         #endregion
 

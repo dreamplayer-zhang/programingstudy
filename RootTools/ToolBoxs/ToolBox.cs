@@ -12,6 +12,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.OHT.Semi;
 using RootTools.OHT.SSEM;
+using RootTools.RADS;
 using RootTools.RTC5s.LaserBright;
 using RootTools.SQLogs;
 using RootTools.ZoomLens;
@@ -401,6 +402,21 @@ namespace RootTools.ToolBoxs
                 module.m_aTool.Add(value);
             }
             return value.GetTools(module);
+        }
+        #endregion
+
+        #region ITool RADS
+        ToolSet m_toolSetRADS = null;
+        public string Get(ref RADSControl value, ModuleBase module, string id)
+        {
+            if (m_toolSetRADS == null) m_toolSetRADS = InitToolSet("RADSControl");
+            if (value == null)
+            {
+                value = new RADSControl(module.p_id + "." + id, module.m_log);
+                m_toolSetRADS.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            return "OK";
         }
         #endregion
 

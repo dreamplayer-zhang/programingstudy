@@ -14,13 +14,11 @@ namespace RootTools.RADS
 	{
 		Log m_log;
 		string m_strID = "RADS";
-		IEngineer m_engineer;
-
-		public RADS(IEngineer engineer)
+		
+		public RADS()
 		{
 			p_limit = 100;
 			p_reg = new int[16];
-			m_engineer = engineer;
 			//m_log = m_engineer.ClassLogView().GetLog(LogView.eLogType.ENG, "RADS");
 			//m_log = LogView.GetLog(m_strID, "RADS");
 			m_log = null;
@@ -265,7 +263,7 @@ namespace RootTools.RADS
 				SetProperty(ref m_wFilterSize, value);
 			}
 		}
-		int m_limit;
+		int m_limit = 123;
 		public int p_limit
 		{
 			get

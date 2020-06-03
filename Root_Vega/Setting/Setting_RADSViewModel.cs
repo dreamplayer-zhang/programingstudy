@@ -60,11 +60,10 @@ namespace Root_Vega.Setting
         public Setting_RADSViewModel(Vega_Engineer engineer)
         {
             p_strLabel = "NULL";
-            p_timerControl = new RADSControl(engineer);
-            p_timerControl.SearchComplete += SetEvent;
-
             m_Engineer = engineer;
             p_PatternVision = ((Vega_Handler)engineer.ClassHandler()).m_patternVision;
+            p_timerControl = p_PatternVision.m_RADSControl;
+            p_timerControl.SearchComplete += SetEvent;
             p_CamRADS = p_PatternVision.m_CamRADS;
         }
 
