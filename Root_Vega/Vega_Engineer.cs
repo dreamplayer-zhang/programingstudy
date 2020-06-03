@@ -51,10 +51,11 @@ namespace Root_Vega
         #endregion
 
         #region XGem
-        XGem m_xGem = new XGem();
+        XGem m_xGem = null;
         XGem_UI m_xGemUI = new XGem_UI(); 
         void InitXGem()
         {
+            m_xGem = new XGem(); 
             m_xGem.Init("XGem", this);
             m_xGemUI.Init(m_xGem);
             m_toolBox.AddToolSet(m_xGem, m_xGemUI); 
