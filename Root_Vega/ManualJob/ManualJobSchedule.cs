@@ -25,14 +25,14 @@ namespace Root_Vega.ManualJob
             }
         }
 
-        string _sPodID = "PodID";
-        public string p_sPodID
+        string _sCarrierID = "PodID";
+        public string p_sCarrierID
         {
-            get { return _sPodID; }
+            get { return _sCarrierID; }
             set
             {
-                if (_sPodID == value) return;
-                _sPodID = value;
+                if (_sCarrierID == value) return;
+                _sCarrierID = value;
                 OnPropertyChanged();
             }
         }
@@ -49,14 +49,14 @@ namespace Root_Vega.ManualJob
             }
         }
 
-        string _sReticleID = "ReticleID";
-        public string p_sReticleID
+        string _sSlotID = "ReticleID";
+        public string p_sSlotID
         {
-            get { return _sReticleID; }
+            get { return _sSlotID; }
             set
             {
-                if (_sReticleID == value) return;
-                _sReticleID = value;
+                if (_sSlotID == value) return;
+                _sSlotID = value;
                 OnPropertyChanged();
             }
         }

@@ -103,7 +103,7 @@ namespace RootTools.DMC
         #endregion
 
         #region Setting
-        public bool p_bUse { get; set; }
+        //public bool p_bUse { get; set; }
         public int p_nRobot { get; set; }
         public string p_sIP { get; set; }
         public int p_nPort { get; set; }
@@ -126,23 +126,24 @@ namespace RootTools.DMC
                 CoreMon.resetError(p_nRobot);
                 return;
             }
-            if (p_bUse && (p_nRobot <= 0))
-            {
-                p_nRobot = CoreMon.createRobot(p_sIP);
-                if (p_nRobot <= 0) return;
-                CoreMon.startService(p_nRobot);
-            }
-            if (!p_bUse && (p_nRobot > 0))
-            {
-                CoreMon.stopService(p_nRobot);
-                CoreMon.deleteRobot(p_nRobot);
-                p_nRobot = 0;
-            }
+            //if (p_bUse && (p_nRobot <= 0))
+            //{
+            //    p_nRobot = CoreMon.createRobot(p_sIP);
+            //    if (p_nRobot <= 0) return;
+            //    CoreMon.startService(p_nRobot);
+            //}
+            //if (!p_bUse && (p_nRobot > 0))
+            //{
+            //    CoreMon.stopService(p_nRobot);
+            //    CoreMon.deleteRobot(p_nRobot);
+            //    p_nRobot = 0;
+            //}
         }
 
         void RunTreeSet(Tree tree)
         {
-            p_bUse = (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead) ? tree.Set(p_bUse, false, "Use", "Use DMC") : false;
+            //p_bUse = (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead) ? tree.Set(p_bUse, false, "Use", "Use DMC") : false;
+            p_bUse = tree.Set(p_bUse, false, "Use", "Use DMC");
             tree.Set(p_nRobot, p_nRobot, "Robot", "Robot Index", true, true);
             p_sIP = tree.Set(p_sIP, "0.0.0.0", "IP", "IP Address");
             p_nPort = tree.Set(p_nPort, 0, "Port", "Port Number");
@@ -151,6 +152,31 @@ namespace RootTools.DMC
         #endregion
 
         #region Control
+        bool _bUse = false;
+        public bool p_bUse
+        {
+            get { return _bUse; }
+            set
+            {
+                if (value == _bUse) return;
+                _bUse = value;
+                if (value && p_nRobot <= 0)
+                {
+                    p_nRobot = CoreMon.createRobot(p_sIP);
+                    if (p_nRobot <= 0) return;
+                    CoreMon.startService(p_nRobot);
+                }
+                else if (!value && p_nRobot > 0)
+                {
+                    CoreMon.stopService(p_nRobot);
+                    CoreMon.deleteRobot(p_nRobot);
+                    p_nRobot = 0;
+                    p_bConnect = false;
+                }
+                m_bRunTreeInit = true;
+            }
+        }
+
         bool _bConnect = false;
         public bool p_bConnect
         {
@@ -394,8 +420,8 @@ namespace RootTools.DMC
             CoreMon.getCurTransPosition(p_nRobot, m_aTrans);
             for (int n = 0; n < m_aAxis.Count; n++)
             {
-                m_aAxis[n].p_fJoint = m_aJoint[n];
-                m_aAxis[n].p_fCartesian = m_aTrans[n];
+                m_aAxis[n].p_fJoint = (float)(Math.Truncate(m_aJoint[n] * 100) / 100);
+                m_aAxis[n].p_fCartesian = (float)(Math.Truncate(m_aTrans[n] * 100) / 100);
             }
         }
         #endregion

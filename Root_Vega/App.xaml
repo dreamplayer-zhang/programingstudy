@@ -431,7 +431,7 @@
                                         <ColumnDefinition />
                                         <ColumnDefinition />
                                         <ColumnDefinition />
-                                        <ColumnDefinition />
+                                        <!--<ColumnDefinition />-->
                                     </Grid.ColumnDefinitions>
                                 </Grid>
                             </Border>
@@ -446,7 +446,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
                         <Border Name="Panel"
-                                Margin="10"
+                                Margin="20,10,20,10"
                                 BorderBrush="{StaticResource BorderBrush}">
                             <TextBlock VerticalAlignment="Center"
                                        HorizontalAlignment="Center"
