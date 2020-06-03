@@ -27,7 +27,6 @@ namespace RootTools.RADS
 
 		private UdpClient dataSocket;
 		//Socket listen = null;
-		private MulticastOption mcastOption;
 		RADS m_CurrentController;
 		public RADS p_CurrentController
 		{
@@ -70,7 +69,7 @@ namespace RootTools.RADS
 			}
 			GetDeviceInfo();
 
-		//	StartListening();
+			//StartListening();
 		}
 		byte[] buffer = new byte[1024];
 
@@ -146,9 +145,9 @@ namespace RootTools.RADS
 					controller.p_MAC = MAC;
 					controller.p_IP = new IPAddress(controller_ip);
 
-				//	listen.Close();
-				//	listen = null;
-				//	GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
+					listen.Close();
+					listen = null;
+					//	GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
 
 
 					p_CurrentController = controller;
@@ -295,14 +294,6 @@ namespace RootTools.RADS
 			}
 		}
 
-		public struct UdpState
-		{
-			public UdpClient u;
-			public IPEndPoint e;
-		}
-
-		public static bool messageReceived = false;
-		
 		private void ReadPacket(int address)
 		{
 			// send read packet to controller 
@@ -327,50 +318,6 @@ namespace RootTools.RADS
 			out_packet += address.ToString("X4");
 			byte[] bytes = ConvertToByteArr(out_packet);
 			dataSocket.Send(bytes, bytes.Length, new IPEndPoint(p_CurrentController.p_IP, RADSControlInfo.ADSCP_PORT));
-
-			//UdpClient sender = new UdpClient();
-			//	byte[] bytes = ConvertToByteArr(out_packet);
-			//sender.Send(bytes, bytes.Length, new IPEndPoint(p_CurrentController.p_IP, RADSControlInfo.ADSCP_PORT));			
-			//var results = sender.BeginReceive(new AsyncCallback(OnReceive), sender);
-
-			//while(true)
-			//{
-			////	var results = sender.BeginReceive(new AsyncCallback(OnReceive), sender);
-			//	Thread.Sleep(100);
-			//}
-			////////// VisionWorks Copy
-
-			//////////
-
-
-			/////////////////////////////////////////////////////// 홍님주석
-			//	IPEndPoint remoteEP = new IPEndPoint(0, 0);
-			//var results = sender.Receive(ref remoteEP);
-			//
-
-			//var results = sender.Receive(ref remoteEP);
-
-
-			//var ADSCP_Type = results[0].ToString("X2") + results[1].ToString("X2");
-			//var ADSCP_Opcode = results[2].ToString("X2") + results[3].ToString("X2");
-			//var ADSCP_Length = results[4].ToString("X2") + results[5].ToString("X2");
-			//int ADSCP_seqNumber = (int)uint.Parse(results[6].ToString("X2") + results[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-			//int ADSCP_address = (int)uint.Parse(results[8].ToString("X2") + results[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-			//int ADSCP_value = (int)uint.Parse(results[10].ToString("X2") + results[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-
-			//Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
-			//	ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
-
-			//if (ADSCP_Type == "3202" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_READ_RSP)
-			//{
-			//	//Read response!
-			//	Console.WriteLine("Read Packet Response");
-			//	CurrentController.reg[ADSCP_address] = ADSCP_value;
-			//	ChangeRegestry(ADSCP_address, ADSCP_value);
-			//	Console.WriteLine();
-			//}
-			//sender.Close();
-			/////////////////////////////////////////////////////// 홍님주석
 		}
 
 		private void OnReceive(IAsyncResult ar)
@@ -473,6 +420,19 @@ namespace RootTools.RADS
 			GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
 			return result;
 		}
+
+		void SetReg()
+		{
+			SetYSize(p_CurrentController.p_ySize);
+			SetThreshold(p_CurrentController.p_nThreshold);
+			SetHFilterMin(p_CurrentController.p_hFilterMin);
+			SetHFilterMax(p_CurrentController.p_hFilterMax);
+			SetWFilterSize(p_CurrentController.p_wFilterSize);
+			SetADSLimit(p_CurrentController.p_limit);
+			bool bDir = true;
+			if (p_CurrentController.p_offset_updown < 0) bDir = false;
+			SetADSOffset(bDir, Math.Abs(p_CurrentController.p_offset_value));
+		}
 		public bool Start()
 		{
 			if (p_CurrentController == null)
@@ -483,6 +443,7 @@ namespace RootTools.RADS
 
 			bool result = false;
 			p_CurrentController.p_ADS_run = 1;
+			SetReg();
 			result = SetFilter(p_CurrentController.p_filterType, p_CurrentController.p_yFilter_on, p_CurrentController.p_hFilter_on, p_CurrentController.p_wFilter_on);
 
 			return result;
@@ -497,6 +458,7 @@ namespace RootTools.RADS
 
 			bool result = false;
 			p_CurrentController.p_ADS_run = 0;
+			SetReg();
 			result = SetFilter(p_CurrentController.p_filterType, p_CurrentController.p_yFilter_on, p_CurrentController.p_hFilter_on, p_CurrentController.p_wFilter_on);
 
 			return result;
@@ -514,6 +476,8 @@ namespace RootTools.RADS
 				return false;
 			}
 			p_CurrentController.p_ADS_view = ViewStatus ? 1 : 0;
+
+			SetReg();
 			return SetFilter(p_CurrentController.p_filterType, p_CurrentController.p_yFilter_on, p_CurrentController.p_hFilter_on, p_CurrentController.p_wFilter_on);
 		}
 		public void SetADSOffset(int value)
@@ -737,6 +701,7 @@ namespace RootTools.RADS
 			out_packet += value.ToString("X4");
 			//SEND
 			byte[] bytes = ConvertToByteArr(out_packet);
+			
 			UdpClient sender = new UdpClient(RADSControlInfo.ADSCP_PORT);
 
 			sender.Send(bytes, bytes.Length, new IPEndPoint(p_CurrentController.p_IP, RADSControlInfo.ADSCP_PORT));
