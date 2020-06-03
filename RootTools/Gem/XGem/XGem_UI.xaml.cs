@@ -25,17 +25,21 @@ namespace RootTools.Gem.XGem
             listViewLog.LayoutUpdated += ListViewLog_LayoutUpdated;
         }
 
-        int m_nCount = 0;
         private void ListViewLog_LayoutUpdated(object sender, EventArgs e)
         {
-            int nCount = listViewLog.Items.Count;
-            if (m_nCount == nCount) return;
-            m_nCount = nCount;
-            listViewLog.SelectedIndex = nCount - 1;
-            listViewLog.ScrollIntoView(listViewLog.SelectedItem);
-            ListViewItem item = listViewLog.ItemContainerGenerator.ContainerFromIndex(m_nCount - 1) as ListViewItem;
-            if (item == null) return;
-            item.Focus();
+            p_nCount = listViewLog.Items.Count;
+        }
+
+        int _nCount = 0;
+        int p_nCount
+        {
+            set
+            {
+                if (_nCount == value) return;
+                _nCount = value;
+                if (value > 0) listViewLog.ScrollIntoView(listViewLog.Items[value - 1]);
+                //listViewLog.Focus();
+            }
         }
     }
 }

@@ -35,8 +35,11 @@ namespace RootTools.DMC
 
         private void checkBoxServoOn_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            m_dmc.p_bSetServo = !m_dmc.p_bGetServo;
-            checkBoxServoOn.IsChecked = m_dmc.p_bGetServo; 
+            bool bServo = m_dmc.p_bGetServo;
+            m_dmc.p_bSetServo = !bServo;
+            checkBoxServoOn.IsChecked = !bServo;
+            //m_dmc.p_bSetServo = !m_dmc.p_bGetServo;
+            //checkBoxServoOn.IsChecked = m_dmc.p_bGetServo; 
         }
 
         private void comboTeach_SelectionChanged(object sender, SelectionChangedEventArgs e)

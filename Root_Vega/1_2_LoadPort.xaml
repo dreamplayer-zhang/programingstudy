@@ -27,8 +27,8 @@
                             BorderBrush="{StaticResource BorderBrush}">
             <Grid Margin="15,15,15,15">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="35*"/>
-                    <RowDefinition Height="35*"/>
+                    <RowDefinition Height="40*"/>
+                    <RowDefinition Height="30*"/>
                     <RowDefinition Height="30*"/>
                 </Grid.RowDefinitions>
 
@@ -55,8 +55,9 @@
                             <RowDefinition/>
                             <RowDefinition/>
                             <RowDefinition/>
+                            <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Grid Grid.RowSpan="4"
+                        <Grid Grid.RowSpan="5"
                                           Background="{StaticResource LightGray}"/>
                         <TextBlock Text="POD ID"
                                            Grid.Row="0"
@@ -75,6 +76,11 @@
                                            Foreground="{StaticResource Black}"/>
                         <TextBlock Text="RECIPE ID"
                                            Grid.Row="3"
+                                           Style="{StaticResource BasicTb}"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource Black}"/>
+                        <TextBlock Text="STATE"
+                                           Grid.Row="4"
                                            Style="{StaticResource BasicTb}"
                                            FontWeight="Bold"
                                            Foreground="{StaticResource Black}"/>
@@ -99,6 +105,11 @@
                                            Grid.Row="3"
                                            Style="{StaticResource BasicTb}"
                                            Foreground="{StaticResource Black}"/>
+                        <TextBlock Text="{Binding p_eState}" x:Name="textBoxState"
+                                           Grid.Column="1"
+                                           Grid.Row="4"
+                                           Style="{StaticResource BasicTb}"
+                                           Foreground="{StaticResource Black}"/>
 
                     </Grid>
                 </Grid>
@@ -108,7 +119,7 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Border>
-                        <TextBlock Text="LOADPORT STATE"
+                        <TextBlock Text="LOADPORT LED STATE"
                                                FontWeight="Black"
                                                FontSize="15"
                                                Style="{StaticResource BasicTb}"

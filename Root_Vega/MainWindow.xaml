@@ -249,18 +249,18 @@
                      Style="{StaticResource ResourceKey=MainTabItem}">
                 <local:_6_Log x:Name="_Log"/>
             </TabItem>
-            <TabItem Header="OHT"
+            <!--<TabItem Header="OHT"
                      Grid.Column="6"
                      Style="{StaticResource ResourceKey=MainTabItem}">
                 <local:_8_OHT x:Name="_Optic" />
-            </TabItem>
+            </TabItem>-->
             <TabItem Header="Alarm"
-                     Grid.Column="7"
+                     Grid.Column="6"
                      Style="{StaticResource ResourceKey=MainTabItem}">
                 <local:_7_Alarm x:Name="_Alarm"/>
             </TabItem>
             <TabItem Header="Setting"
-                     Grid.Column="8"
+                     Grid.Column="7"
                      Style="{StaticResource ResourceKey=MainTabItem}">
                 <local:_10_Setting x:Name="_Setting"/>
             </TabItem>
