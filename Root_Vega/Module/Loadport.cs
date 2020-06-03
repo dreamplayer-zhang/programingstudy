@@ -22,7 +22,6 @@ namespace Root_Vega.Module
         public DIO_I m_diUnload; 
         DMCControl m_dmc;
         public OHT_Semi m_OHT;
-        RS232 m_rs232RFID;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Placed");
@@ -31,7 +30,6 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_diUnload, this, "Unload");
             p_sInfo = m_toolBox.Get(ref m_dmc, this, "DMC");
             p_sInfo = m_toolBox.Get(ref m_OHT, this, m_infoPod, "OHT");
-            p_sInfo = m_toolBox.Get(ref m_rs232RFID, this, "RFID");
         }
         #endregion
 
@@ -310,12 +308,14 @@ namespace Root_Vega.Module
         }
         #endregion
 
-        public InfoPod m_infoPod; 
+        public InfoPod m_infoPod;
+        public Vega.RFID m_RFID = null; 
         public Loadport(string id, string sLocID, IEngineer engineer)
         {
             p_id = id;
             m_log = LogView.GetLog(id, id);
             m_infoPod = new InfoPod(this, sLocID, engineer);
+            m_RFID = ((Vega_Engineer)engineer).m_handler.m_vega.m_RFID; 
             m_aTool.Add(m_infoPod);
             InitCmd();
             base.InitBase(id, engineer);
@@ -344,45 +344,50 @@ namespace Root_Vega.Module
         ModuleRunBase m_runUnLoad;
         protected override void InitModuleRuns()
         {
-            m_runReadPodID = AddModuleRunList(new Run_ReadPodID(this), false, "Read Pod ID");
+            m_runReadPodID = AddModuleRunList(new Run_ReadRFID(this), false, "Read RFID");
             AddModuleRunList(new Run_PodOpen(this), false, "Pod Open");
             m_runLoad = AddModuleRunList(new Run_Load(this), false, "Load Pod to Work Position");
             m_runUnLoad = AddModuleRunList(new Run_Unload(this), false, "Unload Pod from Work Position");
             AddModuleRunList(new Run_PodClose(this), false, "Pod Close");
         }
 
-        public class Run_ReadPodID : ModuleRunBase
+        public class Run_ReadRFID : ModuleRunBase
         {
             Loadport m_module;
-            public Run_ReadPodID(Loadport module)
+            public Run_ReadRFID(Loadport module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
 
+            int m_nCh = 1; 
             string m_sSimulCarrierID = "CarrierID";
             public override ModuleRunBase Clone()
             {
-                Run_ReadPodID run = new Run_ReadPodID(m_module);
+                Run_ReadRFID run = new Run_ReadRFID(m_module);
+                run.m_nCh = m_nCh; 
                 run.m_sSimulCarrierID = m_sSimulCarrierID;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_nCh = tree.Set(m_nCh, m_nCh, "Channel", "RFID Channel"); 
                 m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible && EQ.p_bSimulate);
             }
 
             public override string Run()
             {
+                string sResult = "OK"; 
                 string sCarrierID = "";
                 if (EQ.p_bSimulate) sCarrierID = m_sSimulCarrierID; 
                 else
                 {
-                    //forget Read CarrierID RFID
+                    sResult = m_module.m_RFID.ReadRFID((byte)m_nCh, out sCarrierID);
+                    m_module.m_infoPod.p_sCarrierID = (sResult == "OK") ? sCarrierID : ""; 
                 }
                 m_module.m_infoPod.SendCarrierID(sCarrierID); 
-                return "OK"; 
+                return sResult; 
             }
         }
 
