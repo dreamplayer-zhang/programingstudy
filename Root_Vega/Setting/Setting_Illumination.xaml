@@ -64,6 +64,8 @@
                                        Margin="10,0,10,10"></TextBlock>
                             <Button Height="40"
                                     Width="40"
+                                    Command="{Binding ControlAddCommand}"
+                                    CommandParameter="{Binding p_lightToolSet.p_aLightTool12ch}"
                                     Margin="10,0,10,10">
                                 <material:PackIcon Kind="Plus"
                                                    Width="30"
@@ -89,19 +91,23 @@
                         </WrapPanel>
                         <WrapPanel Margin="180,0,0,0">
                             <Button Height="40"
+                                    Command="{Binding ControlRemoveCommand}"
+                                    CommandParameter="{Binding p_lightToolSet.p_aLightTool4ch}"
                                     Width="40"
                                     Margin="10,0,10,10">
                                 <material:PackIcon Kind="Minus"
                                                    Width="30"
                                                    Height="30"></material:PackIcon>
                             </Button>
-                            <TextBlock Text="50"
+                            <TextBlock Text="{Binding p_lightToolSet.p_aLightTool4ch.Count}"
                                        Width="30"
                                        Foreground="White"
                                        FontSize="30"
                                        Margin="10,0,10,10"></TextBlock>
                             <Button Height="40"
                                     Width="40"
+                                    Command="{Binding ControlAddCommand}"
+                                    CommandParameter="{Binding p_lightToolSet.p_aLightTool4ch}"
                                     Margin="10,0,10,10">
                                 <material:PackIcon Kind="Plus"
                                                    Width="30"
@@ -128,18 +134,22 @@
                         <WrapPanel Margin="180,0,0,0">
                             <Button Height="40"
                                     Width="40"
+                                    Command="{Binding ControlRemoveCommand}"
+                                    CommandParameter="{Binding p_lightToolSet.p_aLightToolKwangwoo}"
                                     Margin="10,0,10,10">
                                 <material:PackIcon Kind="Minus"
                                                    Width="30"
                                                    Height="30"></material:PackIcon>
                             </Button>
-                            <TextBlock Text="50"
+                            <TextBlock Text="{Binding p_lightToolSet.p_aLightToolKwangwoo.Count}"
                                        Width="30"
                                        Foreground="White"
                                        FontSize="30"
                                        Margin="10,0,10,10"></TextBlock>
                             <Button Height="40"
                                     Width="40"
+                                    Command="{Binding ControlAddCommand}"
+                                    CommandParameter="{Binding p_lightToolSet.p_aLightToolKwangwoo}"
                                     Margin="10,0,10,10">
                                 <material:PackIcon Kind="Plus"
                                                    Width="30"
@@ -166,18 +176,22 @@
                         <WrapPanel Margin="180,0,0,0">
                             <Button Height="40"
                                     Width="40"
+                                    Command="{Binding ControlRemoveCommand}"
+                                    CommandParameter="{Binding p_lightToolSet.p_aLightToolLVS}"
                                     Margin="10,0,10,10">
                                 <material:PackIcon Kind="Minus"
                                                    Width="30"
                                                    Height="30"></material:PackIcon>
                             </Button>
-                            <TextBlock Text="50"
+                            <TextBlock Text="{Binding p_lightToolSet.p_aLightToolLVS.Count}"
                                        Width="30"
                                        Foreground="White"
                                        FontSize="30"
                                        Margin="10,0,10,10"></TextBlock>
                             <Button Height="40"
                                     Width="40"
+                                    Command="{Binding ControlAddCommand}"
+                                    CommandParameter="{Binding p_lightToolSet.p_aLightToolLVS}"
                                     Margin="10,0,10,10">
                                 <material:PackIcon Kind="Plus"
                                                    Width="30"
@@ -188,7 +202,38 @@
                 </Border>
             </StackPanel>
         </Border>
-        <TabControl Grid.Column="1"></TabControl>
+        <TabControl ItemsSource="{Binding p_lightToolSet.p_aLightTool}"
+                    Grid.Column="1">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding p_id}"
+                               Width="100"
+                               Height="100"
+                               FontSize="50" />
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.Resources>
+                <!--<DataTemplate DataType="{x:Type light:}"></DataTemplate>-->
+            </TabControl.Resources>
+            <!--<TabControl.ContentTemplate>
+                <DataTemplate>
+                    <DataTemplate.Resources>
+                        <DataTemplate DataType="{x:Type light:}">
+                            <TextBlock Text="{Binding p_String}"
+                                       Width="100"
+                                       Height="100"
+                                       FontSize="50" />
+                        </DataTemplate>
+                        <DataTemplate DataType="{x:Type light:LightTool_4ch}">
+                            <TextBlock Text="4CH"
+                                       Width="100"
+                                       Height="100"
+                                       FontSize="50" />
+                        </DataTemplate>
+                    </DataTemplate.Resources>
+                </DataTemplate>
+            </TabControl.ContentTemplate>-->
+        </TabControl>
     </Grid>
     <!--<Grid DataContext="{Binding p_lightToolSet}">
         <Grid.ColumnDefinitions>

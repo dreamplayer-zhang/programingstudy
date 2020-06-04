@@ -42,6 +42,18 @@ namespace Root_Vega
             {
                 m_lightToolSet.RemoveContoroller(typeof(LightTool_12ch));
             }
+            else if (obj.GetType() == typeof(ObservableCollection<LightTool_4ch>))
+            {
+                m_lightToolSet.RemoveContoroller(typeof(LightTool_4ch));
+            }
+            else if (obj.GetType() == typeof(ObservableCollection<LightTool_Kwangwoo>))
+            {
+                m_lightToolSet.RemoveContoroller(typeof(LightTool_Kwangwoo));
+            }
+            else if (obj.GetType() == typeof(ObservableCollection<LightTool_LVS>))
+            {
+                m_lightToolSet.RemoveContoroller(typeof(LightTool_LVS));
+            }
         }
         public RelayCommandWithParameter ControlAddCommand
         {
@@ -56,6 +68,18 @@ namespace Root_Vega
             if (obj.GetType() == typeof(ObservableCollection<LightTool_12ch>))
             {
                 m_lightToolSet.AddContoroller(typeof(LightTool_12ch));
+            }
+            else if (obj.GetType() == typeof(ObservableCollection<LightTool_4ch>))
+            {
+                m_lightToolSet.AddContoroller(typeof(LightTool_4ch));
+            }
+            else if (obj.GetType() == typeof(ObservableCollection<LightTool_Kwangwoo>))
+            {
+                m_lightToolSet.AddContoroller(typeof(LightTool_Kwangwoo));
+            }
+            else if (obj.GetType() == typeof(ObservableCollection<LightTool_LVS>))
+            {
+                m_lightToolSet.AddContoroller(typeof(LightTool_LVS));
             }
         }
         #endregion
