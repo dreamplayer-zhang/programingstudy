@@ -162,7 +162,7 @@ namespace RootTools.DMC
                 _bUse = value;
                 if (value && p_nRobot <= 0)
                 {
-                    p_nRobot = CoreMon.createRobot(p_sIP);
+                    p_nRobot = CoreMon.createRobot(p_sIP); //RootTools->DMC->dll->coremon.dll
                     if (p_nRobot <= 0) return;
                     CoreMon.startService(p_nRobot);
                 }
