@@ -6,66 +6,39 @@
              xmlns:local="clr-namespace:RootTools.Light"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <GroupBox Header="{Binding p_id}"
-              Margin="10,0,10,10"
-              FontSize="18">
-        <Grid Height="250" Margin="30,0,30,10">
+    <GroupBox Header="{Binding p_id}" Margin="10,0,10,10" FontSize="18">
+        <Grid Margin="30,0,30,10">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="0.8*"/>
-                    <ColumnDefinition Width="1.5*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" TextAlignment="Left" Text="Light On" VerticalAlignment="Center"/>
-                <ToggleButton Grid.Column="1" Margin="5" Content="On" IsChecked="{Binding p_bOn}"/>
-            </Grid>
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="0.8*"/>
-                    <ColumnDefinition Width="1.5*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" TextAlignment="Left" Text="Max Power" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Text="{Binding p_fMaxPower}" TextAlignment="Center" Margin="5" PreviewKeyDown="TextBox_PreviewKeyDown"/>
-            </Grid>
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="0.8*"/>
-                    <ColumnDefinition Width="1.5*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" TextAlignment="Left" Text="Power Scale" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Text="{Binding p_fScalePower}" TextAlignment="Center" Margin="5" PreviewKeyDown="TextBox_PreviewKeyDown"/>
-            </Grid>
-            <Grid Grid.Row="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="0.8*"/>
-                    <ColumnDefinition Width="1.5*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Get Power" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Text="{Binding p_fGetPower}" TextAlignment="Center" Margin="5" IsEnabled="False"/>
-                <Slider Grid.Column="2" VerticalAlignment="Center" Margin="10" Maximum="100" Minimum="0" 
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0.8*"/>
+                <ColumnDefinition Width="1.5*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" TextAlignment="Left" Text="Light On" VerticalAlignment="Center"/>
+            <ToggleButton Grid.Row="0" Grid.Column="1" Margin="5" Content="On" IsChecked="{Binding p_bOn}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" TextAlignment="Left" Text="Max Power" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding p_fMaxPower}" TextAlignment="Center" Margin="5" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" TextAlignment="Left" Text="Power Scale" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding p_fScalePower}" TextAlignment="Center" Margin="5" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Get Power" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding p_fGetPower}" TextAlignment="Center" Margin="5" IsEnabled="False"/>
+            <Slider Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" Margin="10" Maximum="100" Minimum="0" 
                         Value="{Binding p_fGetPower}" TickFrequency="0.1" IsEnabled="False"/>
-            </Grid>
-            <Grid Grid.Row="4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="0.8*"/>
-                    <ColumnDefinition Width="1.5*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Set Power" VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1" Text="{Binding p_fSetPower}" TextAlignment="Center" Margin="5" PreviewKeyDown="TextBox_PreviewKeyDown"/>
-                <Slider Grid.Column="2" VerticalAlignment="Center" Margin="10" Maximum="100" Minimum="0"
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Set Power" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding p_fSetPower}" TextAlignment="Center" Margin="5" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+            <Slider Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" Margin="10" Maximum="100" Minimum="0"
                         Value="{Binding p_fSetPower}" TickFrequency="0.1"/>
-            </Grid>
         </Grid>
     </GroupBox>
 </UserControl>
