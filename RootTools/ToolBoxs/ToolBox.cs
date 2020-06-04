@@ -407,12 +407,12 @@ namespace RootTools.ToolBoxs
 
         #region ITool RADS
         ToolSet m_toolSetRADS = null;
-        public string Get(ref RADSControl value, ModuleBase module, string id)
+        public string Get(ref RADSControl value, ModuleBase module, string id, bool bUseRADS)
         {
             if (m_toolSetRADS == null) m_toolSetRADS = InitToolSet("RADSControl");
             if (value == null)
             {
-                value = new RADSControl(module.p_id + "." + id, module.m_log);
+                value = new RADSControl(module.p_id + "." + id, module.m_log, bUseRADS);
                 m_toolSetRADS.AddTool(value);
                 module.m_aTool.Add(value);
             }

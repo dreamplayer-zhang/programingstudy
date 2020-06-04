@@ -62,7 +62,12 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
-            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl");
+            bool bUseRADS = false;
+            foreach (GrabMode gm in m_aGrabMode)
+            {
+                if (gm.GetUseRADS()) bUseRADS = true;
+            }
+            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
             if (bInit) m_inspectTool.OnInspectDone += M_inspectTool_OnInspectDone;
         }
 

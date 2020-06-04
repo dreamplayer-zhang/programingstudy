@@ -32,8 +32,11 @@ namespace RootTools.RADS
         {
             m_RADSControl = radsControl;
             this.DataContext = radsControl.p_connect.p_CurrentController;
-            treeUI.Init(radsControl.p_connect.p_CurrentController.p_TreeRoot);
-            radsControl.p_connect.p_CurrentController.RunTree(Tree.eMode.Init);
+            if (radsControl.p_connect.p_CurrentController != null)
+            {
+                treeUI.Init(radsControl.p_connect.p_CurrentController.p_TreeRoot);
+                radsControl.p_connect.p_CurrentController.RunTree(Tree.eMode.Init);
+            }
         }
     }
 }

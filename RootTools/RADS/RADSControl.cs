@@ -14,19 +14,21 @@ namespace RootTools.RADS
 		public string p_id { get; set; }
 		Log m_log;
 
-		public RADSControl(string id, Log log)
+		public RADSControl(string id, Log log, bool bUseRADS)
 		{
 			p_id = id;
 			m_log = log;
 
-			p_connect = new RADSConnectControl(this);
+			p_connect = new RADSConnectControl(this, bUseRADS);
 			p_connect.SearchComplete += OnSearchComplete;
 
-			p_treeRoot = p_connect.p_CurrentController.p_TreeRoot;
-			
-			m_timer = new Timer(100);
-			m_timer.Elapsed += Timer_Elapsed;
-			m_timer.Start();
+			//if (bUseRADS == true)
+			//{
+			//	p_treeRoot = p_connect.p_CurrentController.p_TreeRoot;
+			//	m_timer = new Timer(100);
+			//	m_timer.Elapsed += Timer_Elapsed;
+			//	m_timer.Start();
+			//}
 		}
 
 		#region Tree

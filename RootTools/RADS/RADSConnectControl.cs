@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,7 +48,7 @@ namespace RootTools.RADS
 			get { return m_parent; }
 			set { SetProperty(ref m_parent, value); }
 		}
-		public RADSConnectControl(RADSControl parent)
+		public RADSConnectControl(RADSControl parent, bool bUseRADS)
 		{
 			p_parent = parent;
 			p_CurrentController = null;
@@ -55,7 +56,6 @@ namespace RootTools.RADS
 			if (listen == null)
 			{
 				listen = new UdpClient(RADSControlInfo.ADSCP_PORT);
-
 			}
 			else
 			{
@@ -64,7 +64,6 @@ namespace RootTools.RADS
 			}
 			if (dataSocket == null)
 			{
-
 				dataSocket = new UdpClient(RADSControlInfo.ADSDP_PORT);
 				dataSocket.BeginReceive(OnReceive, dataSocket);
 			}
@@ -73,18 +72,11 @@ namespace RootTools.RADS
 				Console.WriteLine("Alerady Data Listening");
 				return;
 			}
-			GetDeviceInfo();
-
-			//StartListening();
+			if (bUseRADS == true)
+				GetDeviceInfo();
 		}
 		byte[] buffer = new byte[1024];
 
-        public void StartListening()
-        {
-
-           
-
-        }
         /// <summary>
         /// 물리적으로 연결된 모든 네트워크에서 Piezo Controller를 탐색
         /// </summary>
@@ -109,11 +101,15 @@ namespace RootTools.RADS
 			message += seq_number.ToString("X4");
 
 			byte[] bytes = ConvertToByteArr(message);
+			if (listen == null)
+			{
+				listen = new UdpClient(RADSControlInfo.ADSCP_PORT);
+			}
 			listen.EnableBroadcast = true;
 			listen.Send(bytes, bytes.Length, new IPEndPoint(IPAddress.Parse(dest_ip), RADSControlInfo.ADSCP_PORT));
 
 			IPEndPoint from = new IPEndPoint(0, 0);
-			while (true)
+			while(true)
 			{
 				var echoBuffer = listen.Receive(ref from);
 				var ADSCP_Type = echoBuffer[0].ToString("X2") + echoBuffer[1].ToString("X2");
@@ -149,10 +145,12 @@ namespace RootTools.RADS
 					controller.p_MAC = MAC;
 					controller.p_IP = new IPAddress(controller_ip);
 
-					listen.Close();
-					listen = null;
+					if (listen != null)
+					{
+						listen.Close();
+						listen = null;
+					}
 					//	GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
-
 
 					p_CurrentController = controller;
 
@@ -321,6 +319,12 @@ namespace RootTools.RADS
 			out_packet += seq_number.ToString("X4");
 			out_packet += address.ToString("X4");
 			byte[] bytes = ConvertToByteArr(out_packet);
+
+			if (dataSocket == null)
+			{
+				dataSocket = new UdpClient(RADSControlInfo.ADSDP_PORT);
+				dataSocket.BeginReceive(OnReceive, dataSocket);
+			}
 			dataSocket.Send(bytes, bytes.Length, new IPEndPoint(p_CurrentController.p_IP, RADSControlInfo.ADSCP_PORT));
 		}
 
@@ -568,91 +572,7 @@ namespace RootTools.RADS
 			p_CurrentController.p_limit = value;
 			return WritePacket(8, value);
 		}
-		public bool SetBaseLine()
-		{
-			return SetBaseLinePacket();
-		}
-		private bool SetBaseLinePacket()
-		{
-			if (p_CurrentController == null)
-			{
-				Console.WriteLine("Current Controller is null. GetDeviceInfo() First");
-				return false;
-			}
-			bool result = false;
-
-			string message = RADSControlInfo.ADSCP_TYPE_REQ;
-			message += RADSControlInfo.ADSCP_OPCODE_SET_BASE_REQ;
-			int length = 0;
-			message += length.ToString("X4");
-			if (seq_number < 65534)
-			{
-				seq_number += 1;
-			}
-			else
-			{
-				seq_number = 0;
-			}
-			message += seq_number.ToString("X4");
-
-			byte[] bytes = ConvertToByteArr(message);
-			UdpClient sender = new UdpClient(RADSControlInfo.ADSCP_PORT);
-
-			sender.Send(bytes, bytes.Length, new IPEndPoint(p_CurrentController.p_IP, RADSControlInfo.ADSCP_PORT));
-
-			IPEndPoint remoteEP = new IPEndPoint(0, 0);
-
-			var results = sender.Receive(ref remoteEP);
-
-			var ADSCP_Type = results[0].ToString("X2") + results[1].ToString("X2");
-			var ADSCP_Opcode = results[2].ToString("X2") + results[3].ToString("X2");
-			var ADSCP_Length = results[4].ToString("X2") + results[5].ToString("X2");
-			int ADSCP_seqNumber = (int)uint.Parse(results[6].ToString("X2") + results[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-			int ADSCP_address = (int)uint.Parse(results[8].ToString("X2") + results[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-			int ADSCP_value = (int)uint.Parse(results[10].ToString("X2") + results[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-
-			Console.WriteLine("Response IP Address : {0}", remoteEP);
-			Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
-				ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
-
-			if (ADSCP_Type == "3202" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_SET_BASE_RSP)
-			{
-				//set base response!
-				Console.WriteLine("Set BaseLine Function Complete!");
-				result = true;
-			}
-
-			sender.Close();
-			GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
-			return result;
-		}
-
-		private bool SetFilter(int filter_type, int yfilter_on, int hfilter_on, int wfilter_on)
-		{
-			if (p_CurrentController == null)
-			{
-				Console.WriteLine("Current Controller is null. GetDeviceInfo() First");
-				return false;
-			}
-			int ads_config = 0;
-			bool result = false;
-
-			if (filter_type == 1) { ads_config += 128; }
-			if (yfilter_on == 1) { ads_config += 64; }
-			if (hfilter_on == 1) { ads_config += 32; }
-			if (wfilter_on == 1) { ads_config += 16; }
-			if (p_CurrentController.p_ADS_view == 1) { ads_config += 16384; }
-			if (p_CurrentController.p_ADS_run == 1) { ads_config += 32768; }
-			do
-			{
-				result = WritePacket(0, ads_config);
-			}
-			while (ads_config != p_CurrentController.p_reg[0]);
-
-			Console.WriteLine("Set Filter Complete");
-			return result;
-		}
-
+		
 		private bool SetFilter(RADS.eFilterType filter_type, bool yfilter_on, bool hfilter_on, bool wfilter_on)
 		{
 			if (p_CurrentController == null)
@@ -705,8 +625,16 @@ namespace RootTools.RADS
 			out_packet += value.ToString("X4");
 			//SEND
 			byte[] bytes = ConvertToByteArr(out_packet);
-			
-			UdpClient sender = new UdpClient(RADSControlInfo.ADSCP_PORT);
+
+			UdpClient sender = null;
+			if (listen != null)
+			{
+				sender = listen;
+			}
+			else
+			{
+				sender = new UdpClient(RADSControlInfo.ADSCP_PORT);
+			}
 
 			sender.Send(bytes, bytes.Length, new IPEndPoint(p_CurrentController.p_IP, RADSControlInfo.ADSCP_PORT));
 
