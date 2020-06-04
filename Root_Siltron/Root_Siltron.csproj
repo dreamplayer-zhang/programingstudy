@@ -56,6 +56,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MainUI\3_Maint.xaml.cs">
+      <DependentUpon>3_Maint.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Icon\AtiLogo.xaml.cs">
+      <DependentUpon>AtiLogo.xaml</DependentUpon>
+    </Compile>
     <Compile Include="InfoWafer.cs" />
     <Compile Include="IWTRChild.cs" />
     <Compile Include="Module\Vision.cs" />
@@ -75,6 +81,14 @@
     <Compile Include="Siltron_Recipe_UI.xaml.cs">
       <DependentUpon>Siltron_Recipe_UI.xaml</DependentUpon>
     </Compile>
+    <Page Include="MainUI\3_Maint.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Icon\AtiLogo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -130,9 +144,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="MainUI\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\RootTools\RootTools.csproj">
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>

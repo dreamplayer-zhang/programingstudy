@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace Root_Siltron
@@ -10,12 +12,20 @@ namespace Root_Siltron
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Window Event
         public MainWindow()
         {
             InitializeComponent();
+            if (this.WindowState == WindowState.Maximized)
+            {
+                MaximizeButton.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                NormalizeButton.Visibility = Visibility.Collapsed;
+            }
         }
 
-        #region Window Event
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Init();
@@ -45,7 +55,7 @@ namespace Root_Siltron
         void Init()
         {
             m_engineer.Init("Siltron");
-            engineerUI.Init(m_engineer); 
+            _Maint.engineerUI.Init(m_engineer);
             InitTimer();
         }
 
@@ -53,5 +63,66 @@ namespace Root_Siltron
         {
             m_engineer.ThreadStop();
         }
+
+
+        private void MainTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TabItem ti = (TabItem)MainTab.SelectedItem;
+            tb_CurrenView.Text = ti.Header.ToString();
+        }
+
+        #region TitleBar
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Maximized;
+            NormalizeButton.Visibility = Visibility.Visible;
+            MaximizeButton.Visibility = Visibility.Collapsed;
+        }
+
+        private void NormalizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Normal;
+            MaximizeButton.Visibility = Visibility.Visible;
+            NormalizeButton.Visibility = Visibility.Collapsed;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                if (this.WindowState == WindowState.Maximized)
+                {
+                    this.WindowState = WindowState.Normal;
+                    MaximizeButton.Visibility = Visibility.Visible;
+                    NormalizeButton.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    this.WindowState = WindowState.Maximized;
+                    NormalizeButton.Visibility = Visibility.Visible;
+                    MaximizeButton.Visibility = Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                this.DragMove();
+            }
+        }
+
+        private void textLastError_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            m_engineer.m_gaf.m_listALID.ShowPopup();
+        }
+        #endregion
     }
 }

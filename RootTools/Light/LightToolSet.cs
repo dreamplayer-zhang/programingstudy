@@ -1,4 +1,5 @@
 ﻿using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
@@ -66,16 +67,16 @@ namespace RootTools.Light
                 SetProperty(ref m_aLightTool12ch, value);
             }
         }
+
         bool Run12ChTree(Tree tree)
-        {
-            int n12Ch = m_n12Ch;
+        {  
             m_n12Ch = tree.Set(m_n12Ch, m_n12Ch, "Count", "Light 12 Channel Count (CyUSB)");
-            if (n12Ch == m_n12Ch) return false;
-            while (m_aLightTool12ch.Count > m_n12Ch) m_aLightTool12ch.RemoveAt(m_aLightTool12ch.Count - 1);
+            while (m_aLightTool12ch.Count > m_n12Ch)
+                p_aLightTool12ch.RemoveAt(m_aLightTool12ch.Count - 1);
             while (m_aLightTool12ch.Count < m_n12Ch)
             {
-                LightTool_12ch lightTool = new LightTool_12ch(m_aLightTool12ch.Count, c_s12ch + "." + (char)('A' + m_aLightTool12ch.Count), m_engineer);
-                m_aLightTool12ch.Add(lightTool);
+                LightTool_12ch lightTool = new LightTool_12ch(p_aLightTool12ch.Count, c_s12ch + "." + (char)('A' + p_aLightTool12ch.Count), m_engineer);
+                p_aLightTool12ch.Add(lightTool);
             }
             return true; 
         }
@@ -88,9 +89,7 @@ namespace RootTools.Light
 
         bool Run4ChTree(Tree tree)
         {
-            int n4Ch = m_n4Ch;
             m_n4Ch = tree.Set(m_n4Ch, m_n4Ch, "Count", "Light 4 Channel Count (RS232)");
-            if (n4Ch == m_n4Ch) return false;
             while (m_aLightTool4ch.Count > m_n4Ch) m_aLightTool4ch.RemoveAt(m_aLightTool4ch.Count - 1); 
             while (m_aLightTool4ch.Count < m_n4Ch)
             {
@@ -128,9 +127,7 @@ namespace RootTools.Light
 
         bool RunLVSTree(Tree tree)
         {
-            int nLVS = m_nLVS;
             m_nLVS = tree.Set(m_nLVS, m_nLVS, "Count", "Light LVS Count (RS232)");
-            if (nLVS == m_nLVS) return false;
             while (m_aLightToolLVS.Count > m_nLVS) m_aLightToolLVS.RemoveAt(m_aLightToolLVS.Count - 1);
             while (m_aLightToolLVS.Count < m_nLVS)
             {
@@ -235,5 +232,49 @@ namespace RootTools.Light
                 m_thread.Join(); 
             }
         }
+
+        public void AddContoroller(Type type)
+        {
+            if (type.GetType() == typeof(LightTool_12ch))
+                m_n12Ch++;
+            else if (type.GetType() == typeof(LightTool_4ch))
+                m_n4Ch++;
+            else if (type.GetType() == typeof(LightTool_Kwangwoo))
+                m_nKwangwoo++;
+            else if (type.GetType() == typeof(LightTool_LVS))
+                m_nLVS++;
+            RunTree(Tree.eMode.Init);
+        }
+
+        public void RemoveContoroller(Type type)
+        {
+            if (type.GetType() == typeof(LightTool_12ch))
+            {
+                if (m_n12Ch == 0)
+                    return;
+                m_n12Ch--;
+            }
+            else if (type.GetType() == typeof(LightTool_4ch))
+            {
+                if (m_n4Ch== 0)
+                    return;
+                m_n4Ch--;
+            }
+            else if (type.GetType() == typeof(LightTool_Kwangwoo))
+            {
+                if (m_nKwangwoo == 0)
+                    return;
+                m_nKwangwoo--;
+            }
+            else if (type.GetType() == typeof(LightTool_LVS))
+            {
+                if (m_nLVS == 0)
+                    return;
+                m_nLVS--;
+            }
+            RunTree(Tree.eMode.Init);
+        }
+
+
     }
 }
