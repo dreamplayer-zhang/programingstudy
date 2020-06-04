@@ -29,9 +29,13 @@ namespace RootTools
             if (m_memory.Logs.Count <= 0) return;
             while (m_memory.Logs.Count > 0)
             {
-                Data data = new Data(m_memory.Logs[0]);
-                m_memory.Logs.RemoveAt(0);
-                p_aLog.Add(data);
+                if (m_memory.Logs[0] == null) m_memory.Logs.RemoveAt(0);
+                else
+                {
+                    Data data = new Data(m_memory.Logs[0]);
+                    m_memory.Logs.RemoveAt(0);
+                    p_aLog.Add(data);
+                }
             }
             while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
         }
