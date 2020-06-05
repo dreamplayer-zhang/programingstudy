@@ -102,6 +102,18 @@ namespace RootTools.Light
 
         IEngineer m_engineer;
         Log m_log;
+        public string strr = "111";
+        public string p_String
+        {
+            get
+            {
+                return strr;
+            }
+            set
+            {
+                SetProperty(ref strr, value);
+            }
+        }
         public CyUSBTool m_usb;
         public CyUSBTool p_usb
         {

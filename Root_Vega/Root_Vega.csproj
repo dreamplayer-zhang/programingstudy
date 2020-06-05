@@ -90,8 +90,9 @@
     <Reference Include="Microsoft.Expression.Effects, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.SDK.Expression.Blend.1.0.0\lib\net45\Microsoft.Expression.Effects.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Expression.Interactions, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.SDK.Expression.Blend.1.0.0\lib\net45\Microsoft.Expression.Interactions.dll</HintPath>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Expression.Prototyping.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.SDK.Expression.Blend.1.0.0\lib\net45\Microsoft.Expression.Prototyping.Interactivity.dll</HintPath>
@@ -112,8 +113,9 @@
       <HintPath>..\packages\System.Drawing.Common.4.7.0\lib\net461\System.Drawing.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.SDK.Expression.Blend.1.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -137,56 +139,56 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="10_Setting.xaml.cs">
+    <Compile Include="UI\10_Setting.xaml.cs">
       <DependentUpon>10_Setting.xaml</DependentUpon>
     </Compile>
-    <Compile Include="10_SettingViewModel.cs" />
-    <Compile Include="1_1_Module.xaml.cs">
+    <Compile Include="UI\10_SettingViewModel.cs" />
+    <Compile Include="UI\1_1_Module.xaml.cs">
       <DependentUpon>1_1_Module.xaml</DependentUpon>
     </Compile>
-    <Compile Include="1_2_LoadPort.xaml.cs">
+    <Compile Include="UI\1_2_LoadPort.xaml.cs">
       <DependentUpon>1_2_LoadPort.xaml</DependentUpon>
     </Compile>
-    <Compile Include="1_Main.xaml.cs">
+    <Compile Include="UI\1_Main.xaml.cs">
       <DependentUpon>1_Main.xaml</DependentUpon>
     </Compile>
-    <Compile Include="2_3_Origin.xaml.cs">
+    <Compile Include="UI\2_3_Origin.xaml.cs">
       <DependentUpon>2_3_Origin.xaml</DependentUpon>
     </Compile>
-    <Compile Include="2_3_OriginViewModel.cs" />
-    <Compile Include="2_4_Position.xaml.cs">
+    <Compile Include="UI\2_3_OriginViewModel.cs" />
+    <Compile Include="UI\2_4_Position.xaml.cs">
       <DependentUpon>2_4_Position.xaml</DependentUpon>
     </Compile>
-    <Compile Include="2_4_PositionViewModel.cs" />
-    <Compile Include="2_5_MainVision.xaml.cs">
+    <Compile Include="UI\2_4_PositionViewModel.cs" />
+    <Compile Include="UI\2_5_MainVision.xaml.cs">
       <DependentUpon>2_5_MainVision.xaml</DependentUpon>
     </Compile>
-    <Compile Include="2_5_MainVisionViewModel.cs" />
-    <Compile Include="2_6_Side.xaml.cs">
+    <Compile Include="UI\2_5_MainVisionViewModel.cs" />
+    <Compile Include="UI\2_6_Side.xaml.cs">
       <DependentUpon>2_6_Side.xaml</DependentUpon>
     </Compile>
-    <Compile Include="2_6_SideViewModel.cs" />
-    <Compile Include="2_Recipe.xaml.cs">
+    <Compile Include="UI\2_6_SideViewModel.cs" />
+    <Compile Include="UI\2_Recipe.xaml.cs">
       <DependentUpon>2_Recipe.xaml</DependentUpon>
     </Compile>
-    <Compile Include="3_Maint.xaml.cs">
+    <Compile Include="UI\3_Maint.xaml.cs">
       <DependentUpon>3_Maint.xaml</DependentUpon>
     </Compile>
-    <Compile Include="4_Viewer.xaml.cs">
+    <Compile Include="UI\4_Viewer.xaml.cs">
       <DependentUpon>4_Viewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="4_ViewerViweModel.cs" />
-    <Compile Include="5_Result.xaml.cs">
+    <Compile Include="UI\4_ViewerViweModel.cs" />
+    <Compile Include="UI\5_Result.xaml.cs">
       <DependentUpon>5_Result.xaml</DependentUpon>
     </Compile>
-    <Compile Include="5_ResultViewModel.cs" />
-    <Compile Include="6_Log.xaml.cs">
+    <Compile Include="UI\5_ResultViewModel.cs" />
+    <Compile Include="UI\6_Log.xaml.cs">
       <DependentUpon>6_Log.xaml</DependentUpon>
     </Compile>
-    <Compile Include="7_Alarm.xaml.cs">
+    <Compile Include="UI\7_Alarm.xaml.cs">
       <DependentUpon>7_Alarm.xaml</DependentUpon>
     </Compile>
-    <Compile Include="7_AlarmViewModel.cs" />
+    <Compile Include="UI\7_AlarmViewModel.cs" />
     <Compile Include="ManualJob\ManualJobSchedule.cs" />
     <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
@@ -196,6 +198,7 @@
       <DependentUpon>Dialog_AutoFocus.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialog\Dialog_AutoFocus_ViewModel.cs" />
+    <Compile Include="Setting\ObservableCollection.cs" />
     <Compile Include="Setting\Optic_MainVision.xaml.cs">
       <DependentUpon>Optic_MainVision.xaml</DependentUpon>
     </Compile>
@@ -204,11 +207,11 @@
       <DependentUpon>Optic_SideVision.xaml</DependentUpon>
     </Compile>
     <Compile Include="Setting\Optic_SideVisionViewModel.cs" />
-    <Compile Include="8_OHT.xaml.cs">
+    <Compile Include="UI\8_OHT.xaml.cs">
       <DependentUpon>8_OHT.xaml</DependentUpon>
     </Compile>
-    <Compile Include="8_OHT_ViewModel.cs" />
-    <Compile Include="9_Yield.xaml.cs">
+    <Compile Include="UI\8_OHT_ViewModel.cs" />
+    <Compile Include="UI\9_Yield.xaml.cs">
       <DependentUpon>9_Yield.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\CallMethodButton.cs" />
@@ -257,11 +260,11 @@
       <DependentUpon>InfoPod_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoReticle.cs" />
-    <Compile Include="2_8_Inspection_Manager.xaml.cs">
+    <Compile Include="UI\2_8_Inspection_Manager.xaml.cs">
       <DependentUpon>2_8_Inspection_Manager.xaml</DependentUpon>
     </Compile>
     <Compile Include="IRobotChild.cs" />
-    <Compile Include="1_MainViewModel.cs" />
+    <Compile Include="UI\1_MainViewModel.cs" />
     <Compile Include="Module\Loadport.cs" />
     <Compile Include="Module\PatternVision.cs" />
     <Compile Include="Module\Robot_RND.cs" />
@@ -295,61 +298,61 @@
     <Compile Include="Vega_Recipe_UI.xaml.cs">
       <DependentUpon>Vega_Recipe_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="6_LogViewModel.cs" />
-    <Compile Include="2_8_InspectionViewModel.cs" />
-    <Page Include="10_Setting.xaml">
+    <Compile Include="UI\6_LogViewModel.cs" />
+    <Compile Include="UI\2_8_InspectionViewModel.cs" />
+    <Page Include="UI\10_Setting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="1_1_Module.xaml">
+    <Page Include="UI\1_1_Module.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="1_2_LoadPort.xaml">
+    <Page Include="UI\1_2_LoadPort.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="1_Main.xaml">
+    <Page Include="UI\1_Main.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="2_3_Origin.xaml">
+    <Page Include="UI\2_3_Origin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="2_4_Position.xaml">
+    <Page Include="UI\2_4_Position.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="2_5_MainVision.xaml">
+    <Page Include="UI\2_5_MainVision.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="2_6_Side.xaml">
+    <Page Include="UI\2_6_Side.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="2_Recipe.xaml">
+    <Page Include="UI\2_Recipe.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="3_Maint.xaml">
+    <Page Include="UI\3_Maint.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="4_Viewer.xaml">
+    <Page Include="UI\4_Viewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="5_Result.xaml">
+    <Page Include="UI\5_Result.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="6_Log.xaml">
+    <Page Include="UI\6_Log.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="7_Alarm.xaml">
+    <Page Include="UI\7_Alarm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -369,11 +372,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="8_OHT.xaml">
+    <Page Include="UI\8_OHT.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="9_Yield.xaml">
+    <Page Include="UI\9_Yield.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -413,7 +416,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="2_8_Inspection_Manager.xaml">
+    <Page Include="UI\2_8_Inspection_Manager.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
