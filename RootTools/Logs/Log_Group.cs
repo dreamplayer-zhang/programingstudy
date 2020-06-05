@@ -96,7 +96,7 @@ namespace RootTools
             m_memory.Layout = m_sLayoutMemory; 
             m_file = new FileTarget(sGroup);
             m_file.Layout = m_sLayoutFile; 
-            m_file.FileName = "c:\\Log\\${shortdate}\\" + EQ.m_sModel + "\\${shortdate}_" + m_file.Name + ".log"; // FileName 지정 날짜가 바뀌면 자동으로 변경
+            m_file.FileName = "c:\\Log\\" + EQ.m_sModel + "\\${shortdate}\\${shortdate}_" + m_file.Name + ".log"; // FileName 지정 날짜가 바뀌면 자동으로 변경
         }
     }
 }
