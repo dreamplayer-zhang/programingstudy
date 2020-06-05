@@ -99,6 +99,9 @@ namespace Root_Vega
             _2_6_SideViewModel sivm = new _2_6_SideViewModel(m_engineer, dialogService);
             _Recipe._Side.DataContext = sivm;
 
+            _2_7_EdgeBoxViewModel evm = new _2_7_EdgeBoxViewModel(m_engineer, dialogService);
+            _Recipe._EdgeBox.DataContext = evm;
+
             _2_4_PositionViewModel pvm = new _2_4_PositionViewModel(m_engineer, dialogService);
             _Recipe._Position.DataContext = pvm;
 

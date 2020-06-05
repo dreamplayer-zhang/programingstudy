@@ -168,6 +168,10 @@
       <DependentUpon>2_6_Side.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\2_6_SideViewModel.cs" />
+    <Compile Include="UI\2_7_EdgeBox.xaml.cs">
+      <DependentUpon>2_7_EdgeBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_7_EdgeBoxViewModel.cs" />
     <Compile Include="UI\2_Recipe.xaml.cs">
       <DependentUpon>2_Recipe.xaml</DependentUpon>
     </Compile>
@@ -329,6 +333,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\2_6_Side.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2_7_EdgeBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
