@@ -452,6 +452,13 @@ namespace Root_Vega
 				return new RelayCommand(_btnNextSnap);
 			}
 		}
+		public ICommand btnRcpSaveTest
+		{
+			get
+			{
+				return new RelayCommand(_btnRcpSaveTest);
+			}
+		}
 		public RelayCommand CommandSaveMask
 		{
 			get
@@ -544,7 +551,10 @@ namespace Root_Vega
 			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 			m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
 		}
-
+		private void _btnRcpSaveTest()
+		{
+			this.p_Recipe.Save("D:\\Tstrcp.VegaVision");
+		}
 		private void _btnNextSnap()
 		{
 			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);

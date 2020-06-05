@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.IO.Packaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace RootTools.Inspects
 {
@@ -19,16 +23,29 @@ namespace RootTools.Inspects
 
 		public Result m_SI;
 		public MapData m_MD;
+		public void Save(string filePath)
+		{
+			//파일에 출력하는 예
+			using (StreamWriter wr = new StreamWriter(filePath))
+			{
+				XmlSerializer xs = new XmlSerializer(typeof(Recipe));
+				xs.Serialize(wr, this);
+			}
+		}
+		public void Load(string filePath)
+		{
+
+		}
 	}
 	public class Result
 	{
 		//DateTime m_StartTime;
 		//DateTime m_EndTime;
-		DefectInfo[] m_DD;
+		List<DefectInfo> m_DD;
 
-		Result(int nCnt = 100000)
+		Result()
 		{
-			m_DD = new DefectInfo[nCnt];
+			m_DD = new List<DefectInfo>();
 		}
 
 		public void MakeCluster(List<DefectInfo> DD, int nRange = 10)
@@ -423,6 +440,13 @@ namespace RootTools.Inspects
 		public MapData(int w, int h)
 		{
 			Map = new Unit[w, h];
+		}
+		/// <summary>
+		/// Serialize를 위한 생성자
+		/// </summary>
+		public MapData()
+		{
+			Map = new Unit[1, 1];//다차원 배열은 시리얼라이즈 할 수 없습니다!
 		}
 		public enum DIR
 		{
