@@ -339,7 +339,7 @@ namespace RootTools.Inspects
 	}
 	public class Feature
 	{
-		public ImageData m_Feature;
+		[XmlIgnore] public ImageData m_Feature;
 		public CRect m_rtRoi = new CRect();
 	}
 	public class Roi : ObservableObject
@@ -348,6 +348,12 @@ namespace RootTools.Inspects
 		{
 			m_sName = name;
 			m_Item = item;
+			m_Origin = new Origin();
+		}
+		public Roi()
+		{
+			m_sName = string.Empty;
+			m_Item = Item.None;
 			m_Origin = new Origin();
 		}
 		string m_sName = "";
@@ -373,7 +379,7 @@ namespace RootTools.Inspects
 		Item m_Item;
 		public enum Item
 		{
-			Test,
+			None,
 			Origin,
 			Position,
 			ReticlePattern,
@@ -436,7 +442,7 @@ namespace RootTools.Inspects
 	}
 	public class MapData
 	{
-		public Unit[,] Map = null;
+		[XmlIgnore] public Unit[,] Map = null;
 		public MapData(int w, int h)
 		{
 			Map = new Unit[w, h];
@@ -446,7 +452,7 @@ namespace RootTools.Inspects
 		/// </summary>
 		public MapData()
 		{
-			Map = new Unit[1, 1];//다차원 배열은 시리얼라이즈 할 수 없습니다!
+			//Map = new Unit[1, 1];//다차원 배열은 시리얼라이즈 할 수 없습니다!
 		}
 		public enum DIR
 		{
