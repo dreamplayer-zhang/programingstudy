@@ -553,8 +553,8 @@ namespace Root_Vega
 		}
 		private void _btnRcpSaveTest()
 		{
-			//this.p_Recipe.Save("D:\\Tstrcp.VegaVision");
-			this.p_Recipe = Recipe.Load("D:\\Tstrcp.VegaVision");
+			this.p_Recipe.Save("D:\\Tstrcp.VegaVision");
+			//this.p_Recipe = Recipe.Load("D:\\Tstrcp.VegaVision");
 		}
 		private void _btnNextSnap()
 		{

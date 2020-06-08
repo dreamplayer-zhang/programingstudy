@@ -327,8 +327,18 @@ namespace RootTools
                 Worker_MemorySave.RunWorkerAsync(arguments);
             }
         }
-        
-        void Worker_MemorySave_DoWork(object sender, DoWorkEventArgs e)
+		public void SaveWholeImage(string targetPath)
+		{
+			List<object> arguments = new List<object>();
+			arguments.Add(targetPath);
+			arguments.Add(new CRect(0, 0, p_Size.X, p_Size.Y));
+
+			BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+			Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
+			Worker_MemorySave.RunWorkerAsync(arguments);
+		}
+
+		void Worker_MemorySave_DoWork(object sender, DoWorkEventArgs e)
         {
             List<object> arguments = (List<object>)(e.Argument);
 

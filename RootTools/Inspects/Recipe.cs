@@ -1,9 +1,11 @@
-﻿using System;
+﻿using NLog.Targets;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Packaging;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -25,11 +27,32 @@ namespace RootTools.Inspects
 		public MapData m_MD;
 		public void Save(string filePath)
 		{
-			//파일에 출력하는 예
+			//Serialize가능한 내용을 xml로 저장
 			using (StreamWriter wr = new StreamWriter(filePath))
 			{
 				XmlSerializer xs = new XmlSerializer(typeof(Recipe));
 				xs.Serialize(wr, this);
+			}
+			//Feature 저장
+			if (p_RecipeData != null)
+			{
+				foreach (var roi in p_RecipeData.p_Roi)
+				{
+					if (roi != null)
+					{
+						foreach (var feature in roi.m_Position.m_ListFeature)
+						{
+							if (feature != null)
+							{
+								feature.m_Feature.SaveWholeImage(feature.m_sFeaturePath);
+							}
+						}
+					}
+				}
+			}
+			if (m_MD != null)
+			{
+				m_MD.Save();
 			}
 		}
 		public static Recipe Load(string filePath)
@@ -350,6 +373,10 @@ namespace RootTools.Inspects
 	{
 		[XmlIgnore] public ImageData m_Feature;
 		public CRect m_rtRoi = new CRect();
+		/// <summary>
+		/// Feature Image의 경로. 파일 확장자는 bmp
+		/// </summary>
+		public string m_sFeaturePath;
 	}
 	public class Roi : ObservableObject
 	{
@@ -452,16 +479,64 @@ namespace RootTools.Inspects
 	public class MapData
 	{
 		[XmlIgnore] public Unit[,] Map = null;
+		int nWidthCount;
+		int nHeightCount;
+		/// <summary>
+		/// Map 레시피의 경로. 파일 확장자는 csv
+		/// </summary>
+		public string m_sMapFilePath;
+
+		internal void Save()
+		{
+			StringBuilder stbr = new StringBuilder();
+			for (int y = 0; y < nHeightCount; y++)
+			{
+				for (int x = 0; x < nWidthCount; x++)
+				{
+					stbr.Append(Map[y, x]);
+					if (x < nWidthCount - 1) stbr.Append(",");
+				}
+				if (y < nHeightCount - 1) stbr.AppendLine();
+			}
+			File.WriteAllText(m_sMapFilePath, stbr.ToString());
+		}
+		internal void Load(int nRoiIdx, int nFeaturIdx)
+		{
+			if (!File.Exists(m_sMapFilePath))
+			{
+				if (m_sMapFilePath == string.Empty || m_sMapFilePath == null)
+				{
+					//신규 경로에 맵 파일을 생성
+				}
+			}
+			var lines = File.ReadAllLines(m_sMapFilePath);
+
+			nHeightCount = lines.Length;
+			nWidthCount = lines.First().Split(',').Count();
+
+			for (int y = 0; y < nHeightCount; y++)
+			{
+				for (int x = 0; x < nWidthCount; x++)
+				{
+					Map[y, x] = lines[y].Split(',')[x];
+				}
+			}
+
+		}
 		public MapData(int w, int h)
 		{
 			Map = new Unit[w, h];
+			nWidthCount = w;
+			nHeightCount = h;
 		}
 		/// <summary>
 		/// Serialize를 위한 생성자
 		/// </summary>
 		public MapData()
 		{
-			//Map = new Unit[1, 1];//다차원 배열은 시리얼라이즈 할 수 없습니다!
+			Map = new Unit[1, 1];//다차원 배열은 시리얼라이즈 할 수 없습니다!
+			nWidthCount = 1;
+			nHeightCount = 1;
 		}
 		public enum DIR
 		{
@@ -504,5 +579,6 @@ namespace RootTools.Inspects
 			Processing,
 			Done,
 		}
+		//TODO : 손쉬운 저장/로드를 위한 ToString의 override등이 필요할 수 있음
 	}
 }
