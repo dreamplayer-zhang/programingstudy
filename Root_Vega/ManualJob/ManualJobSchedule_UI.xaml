@@ -96,7 +96,7 @@
                     <GroupBox FontSize="20" Header="Recipe Select" Height="100" Foreground="White">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text=" Recipe ID = " VerticalAlignment="Center"/>
-                            <ComboBox x:Name="comboRecipeID" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="comboRecipeID" VerticalAlignment="Center" SelectionChanged="comboRecipeID_SelectionChanged"/>
                         </StackPanel>
                     </GroupBox>
                 </Grid>

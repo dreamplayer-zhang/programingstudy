@@ -1,10 +1,6 @@
-﻿using RootTools;
-using RootTools.Trees;
+﻿using Root_Vega.Module;
+using RootTools;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Threading;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -13,54 +9,6 @@ namespace Root_Vega.ManualJob
     public class ManualJobSchedule : NotifyProperty
     {
         #region UI Binding
-        string _sLocID = "Loadport1";
-        public string p_sLocID
-        {
-            get { return _sLocID; }
-            set
-            {
-                if (_sLocID == value) return;
-                _sLocID = value;
-                OnPropertyChanged();
-            }
-        }
-
-        string _sCarrierID = "PodID";
-        public string p_sCarrierID
-        {
-            get { return _sCarrierID; }
-            set
-            {
-                if (_sCarrierID == value) return;
-                _sCarrierID = value;
-                OnPropertyChanged();
-            }
-        }
-
-        string _sLotID = "LotID";
-        public string p_sLotID
-        {
-            get { return _sLotID; }
-            set
-            {
-                if (_sLotID == value) return;
-                _sLotID = value;
-                OnPropertyChanged();
-            }
-        }
-
-        string _sSlotID = "ReticleID";
-        public string p_sSlotID
-        {
-            get { return _sSlotID; }
-            set
-            {
-                if (_sSlotID == value) return;
-                _sSlotID = value;
-                OnPropertyChanged();
-            }
-        }
-
         Brush _brushJobSchedule = Brushes.Black;
         public Brush p_brushJobSchedule
         {
@@ -74,8 +22,6 @@ namespace Root_Vega.ManualJob
         }
         #endregion
 
-        public string p_id { get; set; }
-        Log m_log;
         DispatcherTimer m_UIBackTimer = new DispatcherTimer();
         bool bChangUI = false;
         Color UIBackColorT = Color.FromArgb(255, 67, 67, 122);
@@ -83,10 +29,14 @@ namespace Root_Vega.ManualJob
         Color UIBackColorF = Color.FromArgb(255, 45, 45, 48);
         Brush UIBackBrushF;
 
-        public ManualJobSchedule(string id, Log log)
+        public string p_id { get; set; }
+        Log m_log;
+        public Loadport m_loadport; 
+        public ManualJobSchedule(Loadport loadport)
         {
-            p_id = id;
-            m_log = log;
+            m_loadport = loadport; 
+            p_id = loadport.p_id;
+            m_log = loadport.m_log;
 
             UIBackBrushT = new SolidColorBrush(UIBackColorT);
             UIBackBrushF = new SolidColorBrush(UIBackColorF);
