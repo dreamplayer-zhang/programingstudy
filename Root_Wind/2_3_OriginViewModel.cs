@@ -673,7 +673,7 @@ namespace Root_Wind
 
             if(m_Recipe.p_RecipeData.p_Roi == null)
                 m_Recipe.p_RecipeData.p_Roi = new ObservableCollection<Roi>();
-            Roi OriginRoi = new Roi("Origin", Roi.Item.Test);
+            Roi OriginRoi = new Roi("Origin", Roi.Item.None);
             OriginRoi.m_Origin.m_rtOrigin = m_DD.m_OriginData.m_rt;
             m_Recipe.p_RecipeData.p_Roi.Add(OriginRoi);
            
