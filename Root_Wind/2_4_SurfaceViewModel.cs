@@ -46,7 +46,7 @@ namespace Root_Wind
 
             p_ListRoi = new ObservableCollection<Roi>(m_Recipe.p_RecipeData.p_Roi);
             //m_Recipe.m_RD.p_Roi = new List<Roi>(); //Mask#1, Mask#2... New List Mask
-            m_Mask = new Roi("MASK1", Roi.Item.Test);  // Mask Number.. New Mask
+            m_Mask = new Roi("MASK1", Roi.Item.None);  // Mask Number.. New Mask
 
             m_Mask.m_Surface.m_NonPattern = new List<NonPattern>(); // List Rect in Mask
             NonPattern rect = new NonPattern(); // New Rect
