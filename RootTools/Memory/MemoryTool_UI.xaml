@@ -102,7 +102,7 @@
             <TabItem Header="NamedPipe">
                 <comm:NamedPipe_UI x:Name="namedPipeUI"/>
             </TabItem>
-            <TabItem Header="Setup" Visibility="Hidden">
+            <TabItem Header="Setup" Visibility="Visible">
                 <tree:TreeUI x:Name="treeRootSetupUI"/>
             </TabItem>
         </TabControl>

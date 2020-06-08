@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Root_Vega.ManualJob
 {
@@ -31,7 +21,8 @@ namespace Root_Vega.ManualJob
         public void Init(ManualJobSchedule jobschdule)
         {
             m_JobSchedule = jobschdule;
-            this.DataContext = jobschdule;
+            this.DataContext = jobschdule.m_loadport.m_infoPod;
+            InitRecipeList();
         }
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
@@ -49,5 +40,19 @@ namespace Root_Vega.ManualJob
             this.DragMove();
         }
 
+        #region Recipe
+        void InitRecipeList()
+        {
+            string[] asRecipeFile = Directory.GetFiles("c:\\Recipe");
+            comboRecipeID.ItemsSource = asRecipeFile;
+        }
+        private void comboRecipeID_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string sRecipe = (string)comboRecipeID.SelectedValue;
+            if (sRecipe == null) return;
+            m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.m_sManualRecipe = sRecipe;
+            m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.RecipeOpen(sRecipe); 
+        }
+        #endregion
     }
 }

@@ -38,7 +38,7 @@ namespace Root_Vega
             InitButtonLoad();
             InitTimer(); 
 
-            m_manualjob = new ManualJobSchedule(m_loadport.p_id, m_loadport.m_log);
+            m_manualjob = new ManualJobSchedule(m_loadport);
         }
 
         #region Timer
