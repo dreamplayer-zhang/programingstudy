@@ -131,8 +131,9 @@ namespace Root_Vega
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
             dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
             dialogService.Register<Dialog_ManualAlignViewModel, Dialog_ManualAlign>();
-            dialogService.Register<Dialog_SideScan_ViewModel, Dialog_SideScan>();
-            dialogService.Register<Dialog_AutoFocus_ViewModel, Dialog_AutoFocus>();
+			dialogService.Register<Dialog_SideScan_ViewModel, Dialog_SideScan>();
+			dialogService.Register<Dialog_SettingFDC_ViewModel, Dialog_SettingFDC>();
+			dialogService.Register<Dialog_AutoFocus_ViewModel, Dialog_AutoFocus>();
         }
 
 

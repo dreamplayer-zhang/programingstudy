@@ -47,7 +47,18 @@ namespace Root_Vega
                 SetProperty(ref m_SideVisionViewModel, value);
             }
         }
-
+		Setting_FDCViewModel m_Setting_FDCViewModel;
+		public Setting_FDCViewModel p_Setting_FDCViewModel
+		{
+			get
+			{
+				return m_Setting_FDCViewModel;
+			}
+			set
+			{
+				SetProperty(ref m_Setting_FDCViewModel, value);
+			}
+		}
         Setting_IlluminationViewModel m_IlluminationViewModel;
         public Setting_IlluminationViewModel p_IlluminationViewModel
         {
@@ -78,8 +89,9 @@ namespace Root_Vega
         {
             p_AjinViewModel = new AjinInOutSettingViewModel(engineer.m_ajin);
             p_MainVisionViewModel = new Optic_MainVisionViewModel(engineer, service);
-            p_SideVisionViewModel = new Optic_SideVisionViewModel(engineer, service);
-            p_IlluminationViewModel = new Setting_IlluminationViewModel(engineer);
+			p_SideVisionViewModel = new Optic_SideVisionViewModel(engineer, service);
+			p_Setting_FDCViewModel = new Setting_FDCViewModel(engineer, service);
+			p_IlluminationViewModel = new Setting_IlluminationViewModel(engineer);
             p_Setting_RADS = new Setting.Setting_RADSViewModel(engineer);
         }
     }

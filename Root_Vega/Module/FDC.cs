@@ -14,7 +14,7 @@ namespace Root_Vega.Module
     public class FDC : ModuleBase
     {
         #region ToolBox
-        RS232 m_rs232;
+        public RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
@@ -128,7 +128,7 @@ namespace Root_Vega.Module
             public string p_id { get; set; }
 
             eUnit _eUnit = eUnit.None;
-            eUnit p_eUnit
+            public eUnit p_eUnit
             {
                 get { return _eUnit; }
                 set
@@ -141,7 +141,7 @@ namespace Root_Vega.Module
 
             int m_nDigit = 2;
             double m_fDiv = 100;
-            int[] m_aLimit = new int[2] { 0, 0 };
+            public int[] m_aLimit = new int[2] { 0, 0 };
             ALID[] m_alid = new ALID[2] { null, null };
 
             bool _bSend = false; 

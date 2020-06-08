@@ -139,6 +139,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\FDC_ContorlViewModel.cs" />
+    <Compile Include="Controls\FDC_Control.xaml.cs">
+      <DependentUpon>FDC_Control.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Dialog_SettingFDC.cs" />
+    <Compile Include="Dialog\Dialog_SettingFDC.xaml.cs">
+      <DependentUpon>Dialog_SettingFDC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Setting_FDC.xaml.cs">
+      <DependentUpon>Setting_FDC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Setting_FDCViewModel.cs" />
     <Compile Include="UI\10_Setting.xaml.cs">
       <DependentUpon>10_Setting.xaml</DependentUpon>
     </Compile>
@@ -300,6 +312,18 @@
     </Compile>
     <Compile Include="UI\6_LogViewModel.cs" />
     <Compile Include="UI\2_8_InspectionViewModel.cs" />
+    <Page Include="Controls\FDC_Control.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialog\Dialog_SettingFDC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Setting\Setting_FDC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\10_Setting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

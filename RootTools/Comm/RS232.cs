@@ -30,12 +30,12 @@ namespace RootTools.Comm
         #endregion
 
         #region Connect Param
-        string m_sPort = "COM99";
-        int m_nBaudrate = 19200;
-        int m_nDataBit = 8;
-        Parity m_eParity = Parity.None;
-        StopBits m_eStopbits = StopBits.None;
-        bool m_bUseCallback = true;
+        public string m_sPort = "COM99";
+		public int m_nBaudrate = 19200;
+		public int m_nDataBit = 8;
+		public Parity m_eParity = Parity.None;
+		public StopBits m_eStopbits = StopBits.None;
+		public bool m_bUseCallback = true;
 
         void RunConnectTree(Tree tree)
         {

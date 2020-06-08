@@ -1,0 +1,190 @@
+﻿<UserControl x:Class="Root_Vega.FDC_Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:behavior="clr-namespace:mousebehavior;assembly=RootTools"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             d:DesignHeight="360" d:DesignWidth="300" Margin="25"
+Background="Transparent" >
+    <UserControl.Resources>
+
+        <Style x:Key="TotalGrid" TargetType="{x:Type Border}">
+            <!--<Setter Property="Background" Value="{StaticResource BackGround}"/>-->
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="False">
+                    <Setter Property="Background" Value="{StaticResource ResourceKey=TabBackGround}"></Setter>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource ResourceKey=TabMouseOver}"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="FontDigital" TargetType="TextBlock">
+            <Setter Property="TextElement.FontFamily" Value="./MyFont/#digital-7 (mono).ttf"/>
+            <Setter Property="FontSize" Value="60"/>
+            <Setter Property="Foreground" Value=" #FF9E0F0F"/>
+        </Style>
+        <Style x:Key="FontColor" TargetType="TextBlock">
+            <!--<Setter Property="Foreground" Value="#FFD40404"/>-->
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="65"/>
+        </Style>
+        <Style TargetType="{ x:Type Border}" x:Key ="Boundery">
+            <Setter Property="BorderBrush" Value="#FF4D4D4D"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style TargetType="{x:Type Grid}" x:Key="BorderMouseOver">
+            <Setter Property="Background" Value="#FFB8B8B8" />
+        </Style>
+
+        <Style TargetType="Button"
+               x:Key="MyBtn">
+            <Setter Property="FontSize"
+                    Value="20"></Setter>
+            <Setter Property="Height"
+                    Value="30"></Setter>
+            <Setter Property="Margin"
+                    Value="5"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="0"
+                                Background="{StaticResource ResourceKey=BtnBackGround}"
+                                BorderBrush="Gray"
+                                BorderThickness="0"
+                                x:Name="Bdr"
+                                Margin="0,0,0,0">
+                            <TextBlock FontSize="15"
+                                       FontFamily="Arial"
+                                       Foreground="White"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="5" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                                <Setter Property="Cursor"
+                                        Value="Hand" />
+                            </Trigger>
+                            <Trigger Property="Button.IsPressed"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnPressed}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TrashCan" TargetType="Button" BasedOn="{StaticResource MyBtn}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="1" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="false">
+                    <Setter Property="Opacity" Value="0.5" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="RotatePlus90Path" TargetType="{x:Type Path}">
+            <Setter Property="Stroke" Value="Black"></Setter>
+            <Setter Property="Pen.LineJoin" Value="Miter"></Setter>
+            <Setter Property="Data" Value="F 0 M 10,0 V 15 H 18 Z M 1,12 S 0,5 8,5 M 8,5 L 6,7 6,3 8,5 "></Setter>
+        </Style>
+
+        
+    </UserControl.Resources>
+    <!--<Border Style="{StaticResource Boundery}" CornerRadius="50,50,50,50">-->
+    <!--<Grid Width="400" Height="200" Style = "{StaticResource TotalGrid}" Name="GridControl" >-->
+    <Grid Name="GridControl" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="300"/>
+            <RowDefinition Height="60"/>
+
+        </Grid.RowDefinitions>
+        <Border CornerRadius="999999"  Style = "{StaticResource TotalGrid}" >
+
+
+            <Grid Grid.Row="0">
+                <lvc:Gauge
+                        Uses360Mode="True"
+                          From="{Binding p_LowerValue}" To="{Binding p_UpperValue}"
+                                   InnerRadius="144"
+                                   LabelsVisibility="Hidden"
+                                   Foreground="Transparent"
+                                   LabelFormatter="{Binding GaugeFormatter}"
+                                   HighFontSize="40"
+                    
+                    FromColor="#FF007ACC"
+                    ToColor="#FFE45555"
+                    Value="{Binding p_CurrentValue}">
+                 
+                    <lvc:Gauge.GaugeRenderTransform>
+                        <TransformGroup>
+                            <RotateTransform Angle="300"></RotateTransform>
+                            <ScaleTransform ScaleX="1"></ScaleTransform>
+                        </TransformGroup>
+                    </lvc:Gauge.GaugeRenderTransform>
+                    
+                </lvc:Gauge>
+                <!--<lvc:AngularGauge Grid.Row="1" Value="{Binding p_CurrentValue}"  FromValue="0" ToValue="100"-->
+                <!--<lvc:AngularGauge Grid.Row="1" Value="{Binding p_CurrentValue}"  FromValue="{Binding p_MinLimitValue}" ToValue="{Binding p_MaxLimitValue}"
+                          Wedge="300"
+                                
+                          TicksForeground="Red" Foreground="Gray"
+                                  FontWeight ="Bold" FontSize="16"
+                          SectionsInnerRadius=".5">
+                    <lvc:AngularGauge.Sections>
+                        <lvc:AngularSection FromValue="{Binding p_LowerValue}"  ToValue="{Binding p_UpperValue}" Fill="#FF0023FF">
+                        </lvc:AngularSection>
+                        --><!--<lvc:AngularSection FromValue="0"  ToValue="100" Fill="#FFFF0046">
+                        </lvc:AngularSection>-->
+
+                        <!--<lvc:AngularSection FromValue="{Binding p_UpperValue}"  ToValue="{Binding p_MaxLimitValue}" Fill="#FFFF0046"/>--><!--
+
+                    </lvc:AngularGauge.Sections>
+                    
+                </lvc:AngularGauge>-->
+                
+                <TextBlock Name="ValueTextBlock" TextWrapping="Wrap" FontWeight="UltraBold" FontSize="30"
+                        Style="{StaticResource FontColor}" Height="54" Margin="10,128,10,118" Width="280" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" 
+                          Text= "{Binding p_CurrentString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </Grid>
+
+            
+        </Border>
+        <Grid Grid.Row="1">
+
+            <TextBlock Name="TitleTextBlock" TextWrapping="Wrap" FontWeight="UltraBold" FontSize="30"
+                       Margin="0,5,0,0"
+                        Style="{StaticResource FontColor}" Height="50" Width="300" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"
+                           Text= "{Binding p_XamlName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextTrimming="CharacterEllipsis"
+                     />
+        </Grid>
+        <Ellipse x:Name="rect"
+              Stroke="Red" 
+              StrokeThickness="2"
+              StrokeDashArray="2" 
+                 
+                 Visibility="{Binding p_Selected}"
+                 />
+    
+
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="MouseLeftButtonDown">
+                <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
+    </Grid>
+</UserControl>
