@@ -498,7 +498,7 @@ namespace RootTools
 
 		private readonly IDialogService m_DialogService;
 		#endregion
-		private UniquenessDrawerVM m_BasicTool;
+		public UniquenessDrawerVM m_BasicTool;
 		private UniquenessDrawerVM m_InformationTool;
 		public ImageViewer_ViewModel(ImageData image = null, IDialogService dialogService = null)
 		{
@@ -574,7 +574,7 @@ namespace RootTools
 			InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
 			SetImageSource();
 		}
-		void InitRoiRect(int nWidth, int nHeight)
+		public void InitRoiRect(int nWidth, int nHeight)
 		{
             if (p_ImageData == null)
             { 

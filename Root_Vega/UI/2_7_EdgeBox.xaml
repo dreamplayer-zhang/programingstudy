@@ -155,5 +155,18 @@
                                    Height="{PriorityBinding}"/>
             </Border>
         </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBox Grid.Row="0"
+                     Text="{Binding p_nThreshold}"></TextBox>
+            <Button Grid.Row="1"
+                Content="Init"
+                Command="{Binding CommandInspect}">
+            </Button>
+        </Grid>
+        
     </Grid>
 </UserControl>
