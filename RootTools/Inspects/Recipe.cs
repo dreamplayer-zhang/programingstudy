@@ -32,9 +32,18 @@ namespace RootTools.Inspects
 				xs.Serialize(wr, this);
 			}
 		}
-		public void Load(string filePath)
+		public static Recipe Load(string filePath)
 		{
+			XmlSerializer serializer = new XmlSerializer(typeof(Recipe));
+			Recipe result = new Recipe();
 
+			using (Stream reader = new FileStream(filePath, FileMode.Open))
+			{
+				// Call the Deserialize method to restore the object's state.
+				result = (Recipe)serializer.Deserialize(reader);
+			}
+
+			return result;
 		}
 	}
 	public class Result
