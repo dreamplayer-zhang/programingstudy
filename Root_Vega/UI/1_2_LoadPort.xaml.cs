@@ -100,8 +100,8 @@ namespace Root_Vega
         {
             switch (m_loadport.p_eState)
             {
-                case ModuleBase.eState.Ready: 
-                    m_manualjob.ShowPopup();
+                case ModuleBase.eState.Ready:
+                    if (m_manualjob.ShowPopup() == false) return; 
                     ModuleRunBase moduleRun = m_loadport.m_runLoad.Clone();
                     m_loadport.StartRun(moduleRun);
                     EQ.p_eState = EQ.eState.Run; 

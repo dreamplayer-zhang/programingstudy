@@ -54,12 +54,12 @@ namespace Root_Vega.ManualJob
             bChangUI = !bChangUI;
         }
 
-        public void ShowPopup()
+        public bool ShowPopup()
         {
-            if (ManualJobSchedule_UI.m_bShow) return;
+            if (ManualJobSchedule_UI.m_bShow) return false;
             ManualJobSchedule_UI jobschedulePopup = new ManualJobSchedule_UI();
             jobschedulePopup.Init(this);
-            jobschedulePopup.Show();
+            return jobschedulePopup.ShowDialog() == true;
         }
     }
 }
