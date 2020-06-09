@@ -204,11 +204,15 @@ namespace RootTools.Comm
                 Thread.Sleep(10);
                 if (p_bUse)
                 {
-                    if (p_bConnect == false) p_sInfo = Connect(); 
+                    if (p_bConnect == false)
+                    {
+                        p_sInfo = Connect();
+                        Thread.Sleep(1000); 
+                    }
                     else if (m_qSend.Count > 0)
                     {
                         string sMsg = m_qSend.Peek();
-                        if (SendMsg(sMsg) == "OK") m_qSend.Dequeue(); 
+                        if (SendMsg(sMsg) == "OK") m_qSend.Dequeue();
                     }
                 }
             }
