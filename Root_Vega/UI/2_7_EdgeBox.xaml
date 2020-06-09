@@ -1,0 +1,243 @@
+﻿<UserControl x:Class="Root_Vega._2_7_EdgeBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:tools ="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="726" d:DesignWidth="1442">
+    <UserControl.Resources>
+        <Converter:InverseBooleanConverter x:Key="InverseBooleanConverters" />
+        <Style TargetType="{x:Type Button}"
+               x:Key="Btn">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderBrush="{DynamicResource BtnBorderBrush}"
+                                BorderThickness="2"
+                                Background="{StaticResource BtnBackGround}"
+                                x:Name="Bdr">
+                            <TextBlock FontSize="15"
+                                       Foreground="{StaticResource BtnForeGround}"
+                                       FontFamily="Arial"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="1" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                                <Setter Property="Cursor"
+                                        Value="Hand" />
+                            </Trigger>
+                            <Trigger Property="Button.IsPressed"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnPressed}" />
+                            </Trigger>
+                            <Trigger Property="Button.IsEnabled"
+                                     Value="False">
+                                <Setter TargetName="Bdr"
+                                        Property="Opacity"
+                                        Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="75*"/>
+            <ColumnDefinition Width="25*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="20*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1"
+                        Content="Top"
+                        Style="{StaticResource Btn}"
+                        Margin="3,0,0,3"
+                        Command="{Binding p_ImageViewer_Top.btnClickOpenImage}">
+                </Button>
+            </Grid>
+            <Border Grid.Row="1" 
+                    Grid.Column="0"
+                    Margin="2,2,2,2"
+                    BorderBrush="Gray"
+                    BorderThickness="3">
+                <tools:ImageViewer DataContext="{Binding p_ImageViewer_Top}"
+                                   Width="{PriorityBinding}"
+                                   Height="{PriorityBinding}"/>
+            </Border>
+            <Grid Grid.Row="0" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1"
+                        Content="Left"
+                        Style="{StaticResource Btn}"
+                        Margin="3,0,0,3"
+                        Command="{Binding p_ImageViewer_Left.btnClickOpenImage}">
+                </Button>
+            </Grid>
+            <Border Grid.Row="1" 
+                    Grid.Column="1"
+                    Margin="2,2,2,2"
+                    BorderBrush="Gray"
+                    BorderThickness="3">
+                <tools:ImageViewer DataContext="{Binding p_ImageViewer_Left}"
+                                   Width="{PriorityBinding}"
+                                   Height="{PriorityBinding}"/>
+            </Border>
+            <Grid Grid.Row="0" Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1"
+                        Content="Right"
+                        Style="{StaticResource Btn}"
+                        Margin="3,0,0,3"
+                        Command="{Binding p_ImageViewer_Right.btnClickOpenImage}">
+                </Button>
+            </Grid>
+            <Border Grid.Row="1" 
+                    Grid.Column="2"
+                    Margin="2,2,2,2"
+                    BorderBrush="Gray"
+                    BorderThickness="3">
+                <tools:ImageViewer DataContext="{Binding p_ImageViewer_Right}"
+                                   Width="{PriorityBinding}"
+                                   Height="{PriorityBinding}"/>
+            </Border>
+            <Grid Grid.Row="0" Grid.Column="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1"
+                        Content="Bottom"
+                        Style="{StaticResource Btn}"
+                        Margin="3,0,0,3"
+                        Command="{Binding p_ImageViewer_Bottom.btnClickOpenImage}">
+                </Button>
+            </Grid>
+            <Border Grid.Row="1" 
+                    Grid.Column="3"
+                    Margin="2,2,2,2"
+                    BorderBrush="Gray"
+                    BorderThickness="3">
+                <tools:ImageViewer DataContext="{Binding p_ImageViewer_Bottom}"
+                                   Width="{PriorityBinding}"
+                                   Height="{PriorityBinding}"/>
+            </Border>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>    
+            <GroupBox Header="Inspection"
+                      Margin="10,0,10,10"
+                      Foreground="{StaticResource BtnForeGround}"
+                      FontSize="20">
+                <StackPanel>
+                    <Grid Height="50" Margin="10,5,10,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="7*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1"
+                                   Style="{StaticResource BasicTb}"
+                                   Text="Auto GV"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                        <ToggleButton Grid.Column="0"
+                                      Style="{StaticResource BasicToggle}"
+                                      Content="On"   
+                                      IsChecked="{Binding p_bUseAutoThreshold}">
+                        </ToggleButton>
+                    </Grid>
+                    <Grid Height="50" Margin="10,5,10,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="7*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1"
+                                   Style="{StaticResource BasicTb}"
+                                   Text="B2D"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                        <ToggleButton Grid.Column="0"
+                                      Style="{StaticResource BasicToggle}"
+                                      Content="On"
+                                      IsChecked="{Binding p_bUseB2D}">
+                        </ToggleButton>
+                    </Grid>
+                    <Grid Height="50" Margin="10,5,10,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="7*"/>
+                            <ColumnDefinition Width="1.5*"/>
+                            <ColumnDefinition Width="1.5*"/>
+                        </Grid.ColumnDefinitions>
+                        <Slider Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Maximum="255"
+                                Minimum="0"
+                                Value="{Binding p_nThreshold}"
+                                IsEnabled="{Binding p_bUseAutoThreshold, Converter={StaticResource InverseBooleanConverters}}"
+                                x:Name="slider1"></Slider>
+                        <TextBlock Grid.Column="1"
+                                   Style="{StaticResource BasicTb}"
+                                   Text="{Binding ElementName=slider1, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2"
+                                   Style="{StaticResource BasicTb}"
+                                   Text="GV"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                    <Grid Height="50" Margin="10,5,10,5">
+                        <Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Inspect"
+                                Command="{Binding CommandInspect}"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Row="1"
+                      Header="Color"
+                      Margin="10,0,10,10"
+                      Foreground="{StaticResource BtnForeGround}"
+                      FontSize="20">
+                
+            </GroupBox>
+        </Grid>
+    </Grid>
+</UserControl>
