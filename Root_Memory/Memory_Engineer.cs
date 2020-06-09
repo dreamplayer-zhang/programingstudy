@@ -37,12 +37,11 @@ namespace Root_Memory
 
         #endregion
 
-        public void Init(string id)
+        public void Init()
         {
-            EQ.m_sModel = id;
             LogView.Init();
             m_login.Init();
-            m_memoryTool = new MemoryTool(id, this);
+            m_memoryTool = new MemoryTool(EQ.m_sModel, this, false);
         }
 
         public void ThreadStop()

@@ -19,10 +19,10 @@ namespace RootTools.Memory
         {
             m_memoryTool = memoryTool;
             this.DataContext = memoryTool;
-            treeRootUI.Init(memoryTool.m_treeRoot);
-            memoryTool.RunTree(Tree.eMode.Init); 
-            treeRootSetupUI.Init(memoryTool.m_treeRootSetup);
-            memoryTool.RunSetupTree(Tree.eMode.Init);
+            treeRootUI.Init(memoryTool.m_treeRootRun);
+            memoryTool.RunTreeRun(Tree.eMode.Init); 
+            treeRootMemoryUI.Init(memoryTool.m_treeRootMemory);
+            memoryTool.RunTreeMemory(Tree.eMode.Init);
             m_memoryTool.OnChangeTool += M_memoryTool_OnChangeTool;
             memoryViewerUI.Init(memoryTool.m_viewer); 
             InitTabControl();
@@ -37,7 +37,7 @@ namespace RootTools.Memory
         void InitTabControl()
         {
             tabControlPool.Items.Clear(); 
-            foreach (MemoryPool pool in m_memoryTool.m_aPool)
+            foreach (MemoryPool pool in m_memoryTool.p_aPool)
             {
                 TabItem item = new TabItem();
                 item.Header = pool.p_id;
@@ -46,9 +46,14 @@ namespace RootTools.Memory
             }
         }
 
-        private void ButtonRun_Click(object sender, RoutedEventArgs e)
+        private void buttonSave_Click(object sender, RoutedEventArgs e)
         {
-            m_memoryTool.ButtonRun(); 
+            m_memoryTool.p_sInfo = m_memoryTool.SaveMemory(); 
+        }
+
+        private void buttonRead_Click(object sender, RoutedEventArgs e)
+        {
+            m_memoryTool.p_sInfo = m_memoryTool.ReadMemory();
         }
     }
 }

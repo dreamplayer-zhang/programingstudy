@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Net.Sockets;
 using System.Windows.Controls;
-using System.Windows.Media;
 using RootTools.Trees;
 
 namespace RootTools.Comm

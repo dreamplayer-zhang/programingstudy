@@ -32,7 +32,7 @@
         }
         #endregion
 
-        public TreeRoot(string id, Log log, bool bReadOnly = false)
+        public TreeRoot(string id, Log log, bool bReadOnly = false, string sModel = "")
         {
             p_id = id;
             p_treeRoot = this;
@@ -42,7 +42,7 @@
             p_bExpand = true;
             p_bEnable = !bReadOnly; 
             m_log = log;
-            m_reg = new Registry(id); 
+            m_reg = new Registry(id, sModel); 
         }
     }
 }

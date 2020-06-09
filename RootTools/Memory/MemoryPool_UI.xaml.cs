@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using RootTools.Trees;
+using System.Windows.Controls;
 
 namespace RootTools.Memory
 {
@@ -17,20 +18,13 @@ namespace RootTools.Memory
         {
             m_memoryPool = memoryPool;
             this.DataContext = memoryPool;
-            listViewGroup.ItemsSource = memoryPool.p_aGroup;
-            memoryPool.OnMemoryChanged += MemoryPool_OnMemoryChanged;
-        }
-
-        private void MemoryPool_OnMemoryChanged()
-        {
-            listViewMemory.ItemsSource = null;
-            MemoryGroup group = (MemoryGroup)listViewGroup.SelectedItem;
-            listViewMemory.ItemsSource = (group == null) ? null : group.p_aMemory;
         }
 
         private void ListViewGroup_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MemoryPool_OnMemoryChanged();
+            listViewMemory.ItemsSource = null;
+            MemoryGroup group = (MemoryGroup)listViewGroup.SelectedItem;
+            listViewMemory.ItemsSource = (group == null) ? null : group.p_aMemory;
         }
     }
 }

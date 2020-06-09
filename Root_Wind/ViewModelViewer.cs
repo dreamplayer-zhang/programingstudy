@@ -1293,12 +1293,12 @@ namespace Root_Wind
 
         void m_Timer_Tick(object sender, EventArgs e)
         {
-            if (m_MemoryModule.m_aPool.Count != m_PoolData.Count)
+            if (m_MemoryModule.p_aPool.Count != m_PoolData.Count)
             {
                 m_PoolData.Clear();
                 m_GroupData.Clear();
                 m_MemoryData.Clear();
-                foreach (MemoryPool data in m_MemoryModule.m_aPool)
+                foreach (MemoryPool data in m_MemoryModule.p_aPool)
                     m_PoolData.Add(data);
             }
 

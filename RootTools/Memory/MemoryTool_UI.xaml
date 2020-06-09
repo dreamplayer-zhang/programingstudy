@@ -87,23 +87,23 @@
             </TabItem>
             <TabItem Header="Run">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Orientation="Horizontal">
-                        <Button x:Name="buttonRun" Content="{Binding p_eRun}" Width="100" Margin="3"
-                                Click="ButtonRun_Click" />
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Vertical">
                         <TextBlock Text="{Binding p_sInfo}" Margin="3" VerticalAlignment="Center" />
+                        <Button x:Name="buttonRead" Content="Read Memory" Margin="3" Click="buttonRead_Click"/>
+                        <Button x:Name="buttonSave" Content="Save Memory" Margin="3" Click="buttonSave_Click"/>
                     </StackPanel>
-                    <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" />
+                    <tree:TreeUI Grid.Column="1" x:Name="treeRootUI" />
                 </Grid>
             </TabItem>
             <TabItem Header="NamedPipe">
                 <comm:NamedPipe_UI x:Name="namedPipeUI"/>
             </TabItem>
-            <TabItem Header="Setup" Visibility="Visible">
-                <tree:TreeUI x:Name="treeRootSetupUI"/>
+            <TabItem Header="Memory" Visibility="Hidden">
+                <tree:TreeUI x:Name="treeRootMemoryUI"/>
             </TabItem>
         </TabControl>
     </Grid>
