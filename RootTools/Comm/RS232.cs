@@ -299,7 +299,7 @@ namespace RootTools.Comm
         Log m_log;
         public CommLog m_commLog = null;
         public TreeRoot m_treeRoot;
-        SerialPort m_sp = null;
+        public SerialPort m_sp = null;
         public RS232(string id, Log log)
         {
             p_id = id;

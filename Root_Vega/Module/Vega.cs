@@ -136,7 +136,7 @@ namespace Root_Vega.Module
                 if (aBuf[11] != 0x01) return;
                 if (aBuf[12] != 0x01) return;
                 m_sRFID = ""; 
-                for (int i = sRead.Length - 2; i > 12; i--) m_sRFID += aBuf[i];
+                for (int i = sRead.Length - 5; i > 12; i--) m_sRFID += sRead[i];
                 m_bOnRead = false; 
             }
 
@@ -148,7 +148,7 @@ namespace Root_Vega.Module
                 m_bOnRead = true; 
                 m_aCmd[5] = nCh;
                 CalcSend();
-                m_rs232.Send(m_aSend, 15);
+                m_rs232.m_sp.Write(m_aSend, 0, 15); 
                 while (m_swRead.ElapsedMilliseconds < 2000)
                 {
                     if (m_bOnRead == false)
