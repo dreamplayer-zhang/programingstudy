@@ -177,14 +177,14 @@ namespace Root_Vega
             DPoint ptLT, ptRT, ptLB, ptRB;
 
             // implement
-            for (int i = 0; i<1; i++)
+            for (int i = 0; i<4; i++)
             {
                 if (p_SimpleShapeDrawer_List[i] == null) continue;
                 arcROIs.Clear();
                 aptEdges.Clear();
                 for (int j = 0; j<6; j++)
                 {
-                    if (p_SimpleShapeDrawer_List[i].m_ListRect[j] == null) continue;
+                    if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
                     arcROIs.Add(new Rect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos));
                 }
                 if (arcROIs.Count < 6) continue;
