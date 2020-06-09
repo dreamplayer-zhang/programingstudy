@@ -28,24 +28,7 @@ namespace RootTools.Memory
         #endregion
 
         #region MemoryData
-        public List<string> m_asMemory = new List<string>();
-        void InitMemoryNames()
-        {
-            m_asMemory.Clear();
-            foreach (MemoryData memory in p_aMemory) m_asMemory.Add(memory.p_id);
-        }
-        ObservableCollection<MemoryData> m_aMemory = new ObservableCollection<MemoryData>();
-        public ObservableCollection<MemoryData> p_aMemory
-        {
-            get
-            {
-                return m_aMemory;
-            }
-            set
-            {
-                SetProperty(ref m_aMemory, value);
-            }
-        }
+        public ObservableCollection<MemoryData> p_aMemory { get; set; }
     
         public MemoryData GetMemory(string id)
         {
@@ -72,6 +55,7 @@ namespace RootTools.Memory
             if (p_mbOffset > mbPool) return null; 
             p_aMemory.Add(memory);
             InitAddress();
+            m_pool.m_memoryTool.MemoryChanged();
             return memory; 
         }
 
@@ -81,18 +65,21 @@ namespace RootTools.Memory
             if (memory == null) return "OK";
             p_aMemory.Remove(memory);
             InitAddress();
+            m_pool.m_memoryTool.MemoryChanged();
             return "OK"; 
         }
 
+        public List<string> m_asMemory = new List<string>();
         public void InitAddress()
         {
             _mbOffset = 0;
             foreach (MemoryData memory in p_aMemory) memory.InitAddress(ref _mbOffset);
-            p_mbOffset = _mbOffset; 
-            InitMemoryNames();
+            p_mbOffset = _mbOffset;
+            m_asMemory.Clear();
+            foreach (MemoryData memory in p_aMemory) m_asMemory.Add(memory.p_id);
         }
 
-        public void RunTree(Tree tree, bool bVisible)
+        public void RunTreeMemory(Tree tree, bool bVisible)
         {
             int nMemory = p_aMemory.Count;
             nMemory = tree.Set(nMemory, nMemory, "Count", "Memory Count", bVisible); 
@@ -111,6 +98,7 @@ namespace RootTools.Memory
         public Log m_log; 
         public MemoryGroup(MemoryPool pool, string id)
         {
+            p_aMemory = new ObservableCollection<MemoryData>(); 
             m_pool = pool; 
             m_log = pool.m_log; 
             p_id = id;

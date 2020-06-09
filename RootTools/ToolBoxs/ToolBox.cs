@@ -115,7 +115,7 @@ namespace RootTools.ToolBoxs
         MemoryTool_UI m_memoryToolUI = null;
         void InitMemoryTool()
         {
-            m_memoryTool = new MemoryTool("Memory", m_engineer, false);
+            m_memoryTool = new MemoryTool("Memory", m_engineer);
             m_memoryToolUI = new MemoryTool_UI();
             m_memoryToolUI.Init(m_memoryTool);
             AddToolSet(m_memoryTool, m_memoryToolUI);
@@ -128,7 +128,7 @@ namespace RootTools.ToolBoxs
                 value = m_memoryTool.GetPool(module.p_id + "." + id, true);
                 module.m_aTool.Add(value);
             }
-            value.RunTree(module.m_treeToolBox.GetTree(id));
+            value.RunTreeToolBox(module.m_treeToolBox.GetTree(id));
             return "OK";
         }
         #endregion

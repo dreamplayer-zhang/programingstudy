@@ -6,25 +6,31 @@
         xmlns:local="clr-namespace:Root_Inspect"
         xmlns:tool="clr-namespace:RootTools;assembly=RootTools"
         xmlns:comm="clr-namespace:RootTools.Comm;assembly=RootTools"
-        xmlns:rootMemory="clr-namespace:Root_Memory;assembly=Root_Memory"
+        xmlns:memory="clr-namespace:RootTools.Memory;assembly=RootTools"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="1900" WindowState="Minimized" Closing="Window_Closing">
+        Title="Root_Inspect" Height="900" Width="1900" WindowState="Minimized" Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <local:InspectTool_UI Grid.Column="0" x:Name="inspectToolUI"/>
+        <TabControl Grid.Column="0" x:Name="tabInspect">
+            <TabItem Header="Inspect">
+                <local:InspectTool_UI x:Name="inspectToolUI"/>
+            </TabItem>
+            <TabItem Header="NamedPipe">
+                <comm:NamedPipe_UI x:Name="namedPipeUI"/>
+            </TabItem>
+        </TabControl>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <rootMemory:MemoryTool_UI Grid.Column="2" x:Name="memoryToolUI"/>
-        <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <comm:NamedPipe_UI Grid.Column="4" x:Name="namedPipeUI"/>
-        <GridSplitter Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <tool:LogView_UI Grid.Column="6" x:Name="logViewUI"/>
+        <TabControl Grid.Column="2" x:Name="tabTool">
+            <TabItem Header="Memory">
+                <memory:MemoryTool_UI x:Name="memoryToolUI"/>
+            </TabItem>
+            <TabItem Header="Log">
+                <tool:LogView_UI Grid.Column="6" x:Name="logViewUI"/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

@@ -12,7 +12,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <ListView Grid.Row="0" x:Name="listViewGroup" SelectionChanged="ListViewGroup_SelectionChanged">
+        <ListView Grid.Row="0" x:Name="listViewGroup" ItemsSource="{Binding p_aGroup}" SelectionChanged="ListViewGroup_SelectionChanged">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Group" DisplayMemberBinding="{Binding p_id}"/>

@@ -1,8 +1,7 @@
 ﻿using RootTools;
-using RootTools.Comm;
 using RootTools.Memory;
+using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Root_Memory
 {
@@ -14,30 +13,21 @@ namespace Root_Memory
         public MainWindow()
         {
             InitializeComponent();
+            EQ.m_sModel = Title; 
             Init(); 
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             ThreadStop(); 
         }
 
         Memory_Engineer m_engineer = new Memory_Engineer();
-        MemoryTool m_memoryTool; 
         void Init()
         {
-            string id = "Root_Memory"; 
-            m_engineer.Init(id);
+            m_engineer.Init();
             logViewUI.Init(LogView.m_logView);
-            m_memoryTool = m_engineer.m_memoryTool; 
-            memoryToolUI.Init(m_memoryTool);
-            foreach (NamedPipe namedPipe in m_memoryTool.m_aNamedPipe)
-            {
-                TabItem item = new TabItem();
-                item.Header = namedPipe.p_id;
-                item.Content = namedPipe.p_ui;
-                tabControlNamedPipe.Items.Add(item);
-            }
+            memoryToolUI.Init(m_engineer.m_memoryTool);
         }
 
         void ThreadStop()

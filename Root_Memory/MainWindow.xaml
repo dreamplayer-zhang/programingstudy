@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_Memory"
         xmlns:tool="clr-namespace:RootTools;assembly=RootTools"
+        xmlns:memory="clr-namespace:RootTools.Memory;assembly=RootTools"
         mc:Ignorable="d"
         Title="Root_Memory" Height="900" Width="1500" WindowState="Minimized" Closing="Window_Closing">
     <Grid>
@@ -12,13 +13,9 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <local:MemoryTool_UI Grid.Column="0" x:Name="memoryToolUI"/>
+        <memory:MemoryTool_UI Grid.Column="0" x:Name="memoryToolUI"/>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <TabControl Grid.Column="2" x:Name="tabControlNamedPipe"/>
-        <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <tool:LogView_UI Grid.Column="4" x:Name="logViewUI"/>
+        <tool:LogView_UI Grid.Column="2" x:Name="logViewUI"/>
     </Grid>
 </Window>

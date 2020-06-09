@@ -23,12 +23,10 @@ namespace Root_Inspect
         }
 
         #region Memory
-        MemoryTool m_memoryTool;
-        void InitMemory()
+        void InitMemory(MemoryTool memoryTool)
         {
-            m_memoryTool = m_engineer.m_memoryTool;
-            memoryToolUI.Init(m_memoryTool);
-            namedPipeUI.Init(m_memoryTool.m_aNamedPipe[0]);
+            memoryToolUI.Init(memoryTool);
+            namedPipeUI.Init(memoryTool.m_aNamedPipe[0]);
         }
         #endregion
 
@@ -44,10 +42,9 @@ namespace Root_Inspect
         Inspect_Engineer m_engineer = new Inspect_Engineer();
         void Init()
         {
-            string id = EQ.m_sModel; 
             m_engineer.Init();
             logViewUI.Init(LogView.m_logView);
-            InitMemory();
+            InitMemory(m_engineer.m_memoryTool);
             InitInspect(); 
         }
 
