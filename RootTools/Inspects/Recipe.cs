@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.IO.Packaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace RootTools.Inspects
 {
@@ -19,16 +23,38 @@ namespace RootTools.Inspects
 
 		public Result m_SI;
 		public MapData m_MD;
+		public void Save(string filePath)
+		{
+			//파일에 출력하는 예
+			using (StreamWriter wr = new StreamWriter(filePath))
+			{
+				XmlSerializer xs = new XmlSerializer(typeof(Recipe));
+				xs.Serialize(wr, this);
+			}
+		}
+		public static Recipe Load(string filePath)
+		{
+			XmlSerializer serializer = new XmlSerializer(typeof(Recipe));
+			Recipe result = new Recipe();
+
+			using (Stream reader = new FileStream(filePath, FileMode.Open))
+			{
+				// Call the Deserialize method to restore the object's state.
+				result = (Recipe)serializer.Deserialize(reader);
+			}
+
+			return result;
+		}
 	}
 	public class Result
 	{
 		//DateTime m_StartTime;
 		//DateTime m_EndTime;
-		DefectInfo[] m_DD;
+		List<DefectInfo> m_DD;
 
-		Result(int nCnt = 100000)
+		Result()
 		{
-			m_DD = new DefectInfo[nCnt];
+			m_DD = new List<DefectInfo>();
 		}
 
 		public void MakeCluster(List<DefectInfo> DD, int nRange = 10)
@@ -322,7 +348,7 @@ namespace RootTools.Inspects
 	}
 	public class Feature
 	{
-		public ImageData m_Feature;
+		[XmlIgnore] public ImageData m_Feature;
 		public CRect m_rtRoi = new CRect();
 	}
 	public class Roi : ObservableObject
@@ -331,6 +357,12 @@ namespace RootTools.Inspects
 		{
 			m_sName = name;
 			m_Item = item;
+			m_Origin = new Origin();
+		}
+		public Roi()
+		{
+			m_sName = string.Empty;
+			m_Item = Item.None;
 			m_Origin = new Origin();
 		}
 		string m_sName = "";
@@ -356,7 +388,7 @@ namespace RootTools.Inspects
 		Item m_Item;
 		public enum Item
 		{
-			Test,
+			None,
 			Origin,
 			Position,
 			ReticlePattern,
@@ -419,10 +451,17 @@ namespace RootTools.Inspects
 	}
 	public class MapData
 	{
-		public Unit[,] Map = null;
+		[XmlIgnore] public Unit[,] Map = null;
 		public MapData(int w, int h)
 		{
 			Map = new Unit[w, h];
+		}
+		/// <summary>
+		/// Serialize를 위한 생성자
+		/// </summary>
+		public MapData()
+		{
+			//Map = new Unit[1, 1];//다차원 배열은 시리얼라이즈 할 수 없습니다!
 		}
 		public enum DIR
 		{
