@@ -131,7 +131,7 @@ namespace Root_Vega.Module
             private void M_rs232_OnRecieve(string sRead)
             {
                 if (sRead.Length < 14) return;
-                byte[] aBuf = Encoding.UTF8.GetBytes(sRead);
+                byte[] aBuf = Encoding.ASCII.GetBytes(sRead);
                 if (aBuf[10] != 0x03) return;
                 if (aBuf[11] != 0x01) return;
                 if (aBuf[12] != 0x01) return;

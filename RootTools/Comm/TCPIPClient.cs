@@ -4,6 +4,8 @@ using System.Threading;
 using System.Net.Sockets;
 using System.Windows.Controls;
 using RootTools.Trees;
+using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace RootTools.Comm
 {
@@ -34,7 +36,7 @@ namespace RootTools.Comm
             {
                 TCPIPClient_UI ui = new TCPIPClient_UI();
                 ui.Init(this);
-                return (UserControl)ui;
+                return ui;
             }
         }
         #endregion
@@ -43,16 +45,12 @@ namespace RootTools.Comm
         bool _bUse = false;
         public bool p_bUse
         {
-            get
-            {
-                return _bUse;
-            }
+            get { return _bUse; }
             set
             {
                 if (value == _bUse) return;
                 _bUse = value;
-                if (value) InitSocket();
-                else ThreadStop();
+                OnPropertyChanged();
             }
         }
 
@@ -60,21 +58,122 @@ namespace RootTools.Comm
         public string p_sIP
         {
             get { return _sIP; } 
-            set { _sIP = value; }
+            set 
+            { 
+                _sIP = value;
+                OnPropertyChanged(); 
+            }
         }
 
         int _nPort = 0;
         public int p_nPort
         {
             get { return _nPort; }
-            set { _nPort = value; }
+            set 
+            { 
+                _nPort = value;
+                OnPropertyChanged();
+            }
         }
 
         int _nConnectInterval = 3000;
         public int p_nConnectInterval
         {
             get { return _nConnectInterval; }
-            set { _nConnectInterval = (value < 1000) ? 3000 : value; }
+            set 
+            { 
+                _nConnectInterval = (value < 1000) ? 3000 : value;
+                OnPropertyChanged();
+            }
+        }
+
+        void RunTreeSetting(Tree tree)
+        {
+            p_bUse = tree.Set(_bUse, false, "Use", "Use Server");
+            p_sIP = tree.Set(_sIP, "0.0.0.0", "IP", "IP Address");
+            p_nPort = tree.Set(_nPort, 0, "Port", "Port Number");
+            p_nConnectInterval = tree.Set(_nConnectInterval, 3000, "Interval", "Connection Interval (ms)");
+        }
+        #endregion
+
+        #region Connect
+        Socket m_socket = null;
+
+        public bool p_bConnect
+        {
+            get { return (m_socket == null) ? false : m_socket.Connected; }
+        }
+
+        string Connect()
+        {
+            try
+            {
+                m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+                m_socket.BeginConnect(p_sIP, p_nPort, new AsyncCallback(CallBack_Connect), m_socket);
+                return "OK"; 
+            }
+            catch (SocketException eX) { return "Connect :" + eX.Message; }
+        }
+
+        void CallBack_Connect(IAsyncResult ar)
+        {
+            try
+            {
+                if (((Socket)ar.AsyncState).Connected == false) return;
+                m_socket.EndConnect(ar);
+                m_socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), m_socket);
+                p_sInfo = p_id + " is Connect !!"; 
+            }
+            catch (SocketException eX) { p_sInfo = "CallBack_Connect : " + eX.Message; }
+        }
+        #endregion
+
+        #region Receive & Send
+        byte[] m_aBufRead;
+        void CallBack_Receive(IAsyncResult ar)
+        {
+            try
+            {
+                if (ar == null || !((Socket)(ar.AsyncState)).Connected)
+                {
+                    p_sInfo = p_id + " Is Disconnect !!";
+                    m_socket.Close();
+                    m_socket = null; 
+                    return;
+                }
+                int nRead = m_socket.EndReceive(ar);
+                if (nRead > 0)
+                {
+                    m_commLog.Add(CommLog.eType.Receive, (nRead < 1024) ? Encoding.ASCII.GetString(m_aBufRead, 0, nRead) : "...");
+                    EventReciveData(m_aBufRead, nRead, m_socket);
+                    m_socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), m_socket);
+                }
+            }
+            catch (Exception eX) { p_sInfo = p_id + eX.Message; }
+        }
+
+        Queue<string> m_qSend = new Queue<string>(); 
+        public string Send(string sMsg)
+        {
+            m_qSend.Enqueue(sMsg);
+            return "OK"; 
+        }
+
+        string SendMsg(string sMsg)
+        {
+            try
+            {
+                if (sMsg.Length < 128) m_commLog.Add(CommLog.eType.Send, sMsg);
+                m_socket.Send(Encoding.ASCII.GetBytes(sMsg));
+            }
+            catch (Exception e)
+            {
+                p_sInfo = "Send : " + e.Message;
+                return p_sInfo;
+            }
+            return "OK";
         }
         #endregion
 
@@ -88,163 +187,67 @@ namespace RootTools.Comm
         public void RunTree(Tree.eMode mode)
         {
             m_treeRoot.p_eMode = mode;
-            RunTree(m_treeRoot);
-        }
-
-        void RunTree(Tree treeRoot)
-        {
-            RunSetTree(treeRoot.GetTree("Set"));
-        }
-
-        void RunSetTree(Tree tree)
-        {
-            p_bUse = tree.Set(_bUse, false, "Use", "Use Server");
-            p_sIP = tree.Set(_sIP, "0.0.0.0", "IP", "IP Address");
-            p_nPort = tree.Set(_nPort, 0, "Port", "Port Number");
-            p_nConnectInterval = tree.Set(_nConnectInterval, 3000, "Interval", "Connection Interval (ms)");
-        }
-        #endregion
-
-        #region Socket
-        void InitSocket()
-        {
-            m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
-            m_threadConnect = new Thread(new ThreadStart(RunThreadConnect));
-            m_threadConnect.Start();
-        }
-
-        public string Send(byte[] byteBuf)
-        {
-            if (!m_socket.Connected) return "Disconnect";
-            try
-            {
-                m_commLog.Add(CommLog.eType.Send, Encoding.Default.GetString(byteBuf));
-                m_socket.Send(byteBuf);
-            }
-            catch (Exception e)
-            {
-                p_sInfo = "Send : " + e.Message; 
-                return p_sInfo;
-            }
-            return "OK";
-        }
-
-        public string Send(string sMsg)
-        {
-            if (m_socket == null) return "Null";
-            if (!m_socket.Connected) return "Disconnect";
-            try
-            {
-                byte[] aBuf = Encoding.UTF8.GetBytes(sMsg);
-                m_commLog.Add(CommLog.eType.Send, sMsg); 
-                m_socket.Send(aBuf);
-            }
-            catch (Exception eX)
-            {
-                p_sInfo = "Send : " + eX.Message;
-                return p_sInfo;
-            }
-            return "OK";
+            RunTreeSetting(m_treeRoot.GetTree("Setting"));
         }
         #endregion
 
         #region Thread
-        void RunThreadConnect()
+        bool m_bThread = false; 
+        Thread m_thread; 
+
+        void RunThread()
         {
-            m_bRunConnect = true;
-            Thread.Sleep(5000);
-            while (m_bRunConnect)
+            m_bThread = true;
+            Thread.Sleep(3000);
+            while (m_bThread)
             {
                 Thread.Sleep(10);
-                Thread.Sleep(_nConnectInterval);
                 if (p_bUse)
                 {
-                    if (!m_socket.Connected)
+                    if (p_bConnect == false) p_sInfo = Connect(); 
+                    else if (m_qSend.Count > 0)
                     {
-                        try
-                        {
-                            m_socket.Connect(_sIP, _nPort);
-                            p_sInfo = p_id + " Connect Success !!"; 
-                            if (m_threadRecive != null)
-                            {
-                                m_bRunRecive = false;
-                                m_threadRecive.Join();
-                                m_threadRecive = null;
-                            }
-                            m_threadRecive = new Thread(new ThreadStart(RunThreadRecive));
-                            m_threadRecive.Start();
-                        }
-                        catch (Exception ex)
-                        {
-                            p_sInfo = p_id + " Connect Fail : " + ex.Message; 
-                        }
+                        string sMsg = m_qSend.Peek();
+                        if (SendMsg(sMsg) == "OK") m_qSend.Dequeue(); 
                     }
-                }
-            }
-        }
-
-        void RunThreadRecive()
-        {
-            m_bRunRecive = true;
-            int nSize;
-            byte[] aBuf = new byte[m_nBufRecieve];
-            while (m_socket.Connected)
-            {
-                Thread.Sleep(10);
-                if (!m_bRunRecive) break;
-                try
-                {
-                    nSize = m_socket.Receive(aBuf);
-                    m_commLog.Add(CommLog.eType.Receive, (nSize < 1024) ? Encoding.ASCII.GetString(aBuf, 0, nSize) : "..."); 
-                    if (EventReciveData != null) EventReciveData(aBuf, nSize, m_socket);
-                }
-                catch (Exception ex)
-                {
-                    p_sInfo = "Recive Fail : " + ex.Message; 
                 }
             }
         }
         #endregion
 
         Log m_log;
-        int m_nBufRecieve = 1024 * 1024; 
         public TreeRoot m_treeRoot;
-        Socket m_socket = null;
-        bool m_bRunConnect = false;
-        Thread m_threadConnect;
-        bool m_bRunRecive = false;
-        Thread m_threadRecive;
         public CommLog m_commLog = null;
         public TCPIPClient(string id, Log log, int nBufRecieve = -1)
         {
             p_id = id;
             m_log = log;
-            m_nBufRecieve = (nBufRecieve > 0) ? nBufRecieve : m_nBufRecieve; 
+            m_aBufRead = new byte[(nBufRecieve > 0) ? nBufRecieve : 4096]; 
+
             m_commLog = new CommLog(this, m_log);
 
             m_treeRoot = new TreeRoot(id, log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);
 
-            InitSocket();
+            m_thread = new Thread(new ThreadStart(RunThread));
+            m_thread.Start();
         }
 
         public void ThreadStop()
         {
-            if (m_bRunConnect)
+            if (m_bThread)
             {
-                m_bRunConnect = false;
-                m_threadConnect.Abort();
+                m_bThread = false;
+                m_qSend.Clear();
+                m_thread.Join();
             }
-            if (m_bRunRecive)
+            if (m_socket != null)
             {
-                m_bRunRecive = false;
-                m_threadRecive.Abort();
+                m_socket.Close();
+                m_socket.Dispose();
+                m_socket = null;
             }
-            m_socket.Close();
-            m_socket.Dispose();
         }
     }
 }
