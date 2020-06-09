@@ -4,9 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:tools ="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="726" d:DesignWidth="1442">
     <UserControl.Resources>
+        <Converter:InverseBooleanConverter x:Key="InverseBooleanConverters" />
         <Style TargetType="{x:Type Button}"
                x:Key="Btn">
             <Setter Property="Template">
@@ -159,14 +161,83 @@
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
-            </Grid.RowDefinitions>
-            <TextBox Grid.Row="0"
-                     Text="{Binding p_nThreshold}"></TextBox>
-            <Button Grid.Row="1"
-                Content="Init"
-                Command="{Binding CommandInspect}">
-            </Button>
+            </Grid.RowDefinitions>    
+            <GroupBox Header="Inspection"
+                      Margin="10,0,10,10"
+                      Foreground="{StaticResource BtnForeGround}"
+                      FontSize="20">
+                <StackPanel>
+                    <Grid Height="50" Margin="10,5,10,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="7*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1"
+                                   Style="{StaticResource BasicTb}"
+                                   Text="Auto GV"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                        <ToggleButton Grid.Column="0"
+                                      Style="{StaticResource BasicToggle}"
+                                      Content="On"   
+                                      IsChecked="{Binding p_bUseAutoThreshold}">
+                        </ToggleButton>
+                    </Grid>
+                    <Grid Height="50" Margin="10,5,10,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="7*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="1"
+                                   Style="{StaticResource BasicTb}"
+                                   Text="B2D"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                        <ToggleButton Grid.Column="0"
+                                      Style="{StaticResource BasicToggle}"
+                                      Content="On"
+                                      IsChecked="{Binding p_bUseB2D}">
+                        </ToggleButton>
+                    </Grid>
+                    <Grid Height="50" Margin="10,5,10,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="7*"/>
+                            <ColumnDefinition Width="1.5*"/>
+                            <ColumnDefinition Width="1.5*"/>
+                        </Grid.ColumnDefinitions>
+                        <Slider Grid.Column="0"
+                                VerticalAlignment="Center"
+                                Maximum="255"
+                                Minimum="0"
+                                Value="{Binding p_nThreshold}"
+                                IsEnabled="{Binding p_bUseAutoThreshold, Converter={StaticResource InverseBooleanConverters}}"
+                                x:Name="slider1"></Slider>
+                        <TextBlock Grid.Column="1"
+                                   Style="{StaticResource BasicTb}"
+                                   Text="{Binding ElementName=slider1, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2"
+                                   Style="{StaticResource BasicTb}"
+                                   Text="GV"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                    <Grid Height="50" Margin="10,5,10,5">
+                        <Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Inspect"
+                                Command="{Binding CommandInspect}"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Row="1"
+                      Header="Color"
+                      Margin="10,0,10,10"
+                      Foreground="{StaticResource BtnForeGround}"
+                      FontSize="20">
+                
+            </GroupBox>
         </Grid>
-        
     </Grid>
 </UserControl>

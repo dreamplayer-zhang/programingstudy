@@ -439,7 +439,7 @@ namespace RootTools
 
 		private bool ToolExist = false;
 		bool InformationToolExist = false;
-		private DrawToolVM SelectedTool;
+		public DrawToolVM SelectedTool;
 		public DrawHistoryWorker m_HistoryWorker = new DrawHistoryWorker();
 		public ModifyManager m_ModifyManager;
 		public InformationDrawer informationDrawer;
