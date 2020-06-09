@@ -121,9 +121,11 @@ namespace RootTools.Comm
         {
             try
             {
-                if (((Socket)ar.AsyncState).Connected == false) return;
-                m_socket.EndConnect(ar);
-                m_socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), m_socket);
+                if (ar == null) return; 
+                Socket socket = (Socket)ar.AsyncState; 
+                if (socket.Connected == false) return;
+                socket.EndConnect(ar);
+                socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
                 p_sInfo = p_id + " is Connect !!"; 
             }
             catch (SocketException eX) { p_sInfo = "CallBack_Connect : " + eX.Message; }
@@ -136,19 +138,14 @@ namespace RootTools.Comm
         {
             try
             {
-                if (ar == null || !((Socket)(ar.AsyncState)).Connected)
-                {
-                    p_sInfo = p_id + " Is Disconnect !!";
-                    m_socket.Close();
-                    m_socket = null; 
-                    return;
-                }
-                int nRead = m_socket.EndReceive(ar);
+                if (ar == null) return;
+                Socket socket = (Socket)ar.AsyncState;
+                int nRead = socket.EndReceive(ar);
                 if (nRead > 0)
                 {
                     m_commLog.Add(CommLog.eType.Receive, (nRead < 1024) ? Encoding.ASCII.GetString(m_aBufRead, 0, nRead) : "...");
                     EventReciveData(m_aBufRead, nRead, m_socket);
-                    m_socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), m_socket);
+                    socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
                 }
             }
             catch (Exception eX) { p_sInfo = p_id + eX.Message; }
@@ -207,13 +204,19 @@ namespace RootTools.Comm
                     if (p_bConnect == false)
                     {
                         p_sInfo = Connect();
-                        Thread.Sleep(1000); 
+                        Thread.Sleep(1000);
                     }
                     else if (m_qSend.Count > 0)
                     {
                         string sMsg = m_qSend.Peek();
                         if (SendMsg(sMsg) == "OK") m_qSend.Dequeue();
                     }
+                }
+                else if (m_socket != null)
+                {
+                    m_socket.Close();
+                    m_socket.Dispose();
+                    m_socket = null; 
                 }
             }
         }

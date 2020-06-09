@@ -150,6 +150,7 @@ namespace RootTools.Memory
 
         public void MemoryChanged()
         {
+            if (m_bRegRead) return; 
             RunTreeMemory(Tree.eMode.RegWrite);
             RunTreeMemory(Tree.eMode.Init);
             SendCommand("OnUpdateMemory");
@@ -253,10 +254,13 @@ namespace RootTools.Memory
             RunTreeMemory(Tree.eMode.Init);
         }
 
+        bool m_bRegRead = false; 
         public void RunTreeMemory(Tree.eMode mode)
         {
+            m_bRegRead = (mode == Tree.eMode.RegRead);
             m_treeRootMemory.p_eMode = mode;
-            RunTreeMemory(m_treeRootMemory.GetTree("Memory"), true); 
+            RunTreeMemory(m_treeRootMemory.GetTree("Memory"), true);
+            m_bRegRead = false; 
         }
 
         private void M_treeRootRun_UpdateTree()
