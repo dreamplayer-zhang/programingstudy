@@ -2,7 +2,6 @@
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
-using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Text;
@@ -106,10 +105,10 @@ namespace Root_Vega.Module
 
             ushort CalcCRC(byte[] aByte, int nCount)
             {
-                ushort uCRC = 0xffff;
+                ushort uCRC = 0x0000;
                 for (int n = 0; n < nCount; n++)
                 {
-                    uCRC = (ushort)((uCRC >> 8) ^ m_uCRC[(uCRC ^ aByte[n]) & 0xff]);
+                    uCRC = (ushort)((uCRC << 8) ^ m_uCRC[((uCRC >> 8) ^ aByte[n]) & 0xff]);
                 }
                 return uCRC;
             }
@@ -131,7 +130,13 @@ namespace Root_Vega.Module
             string m_sRFID = ""; 
             private void M_rs232_OnRecieve(string sRead)
             {
-                m_sRFID = sRead; //forget
+                if (sRead.Length < 14) return;
+                byte[] aBuf = Encoding.UTF8.GetBytes(sRead);
+                if (aBuf[10] != 0x03) return;
+                if (aBuf[11] != 0x01) return;
+                if (aBuf[12] != 0x01) return;
+                m_sRFID = ""; 
+                for (int i = sRead.Length - 2; i > 12; i--) m_sRFID += aBuf[i];
                 m_bOnRead = false; 
             }
 
