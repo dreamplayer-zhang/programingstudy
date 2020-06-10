@@ -22,6 +22,8 @@ namespace Root_Vega.ManualJob
         {
             m_JobSchedule = jobschdule;
             this.DataContext = jobschdule.m_loadport.m_infoPod;
+            textBoxLotID.DataContext = jobschdule.m_loadport.m_infoPod.m_aGemSlot[0];
+            textBoxSlotID.DataContext = jobschdule.m_loadport.m_infoPod.m_aGemSlot[0];
             InitRecipeList();
         }
 
@@ -51,7 +53,8 @@ namespace Root_Vega.ManualJob
             string sRecipe = (string)comboRecipeID.SelectedValue;
             if (sRecipe == null) return;
             m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.m_sManualRecipe = sRecipe;
-            m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.RecipeOpen(sRecipe); 
+            m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.RecipeOpen(sRecipe);
+            m_JobSchedule.m_loadport.m_infoPod.StartProcess(); 
         }
         #endregion
     }

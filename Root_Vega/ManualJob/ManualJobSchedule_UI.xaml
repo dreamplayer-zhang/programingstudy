@@ -79,15 +79,15 @@
                             </StackPanel>
                             <StackPanel Grid.Row="1" Orientation="Horizontal">
                                 <TextBlock Text=" Lot ID = " VerticalAlignment="Center"/>
-                                <TextBox Text="{Binding p_sLotID}" VerticalAlignment="Center" TextAlignment="Left" />
+                                <TextBox x:Name="textBoxLotID" Text="{Binding p_sLotID}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left" />
                             </StackPanel>
                             <StackPanel Grid.Row="2" Orientation="Horizontal">
                                 <TextBlock Text=" Pod ID = " VerticalAlignment="Center"/>
-                                <TextBox Text="{Binding p_sCarrierID}" VerticalAlignment="Center" TextAlignment="Left"/>
+                                <TextBox Text="{Binding p_sCarrierID}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left"/>
                             </StackPanel>
                             <StackPanel Grid.Row="3" Orientation="Horizontal">
                                 <TextBlock Text=" Reticle ID = " VerticalAlignment="Center"/>
-                                <TextBox Text="{Binding p_sSlotID}" VerticalAlignment="Center" TextAlignment="Left" />
+                                <TextBox x:Name="textBoxSlotID" Text="{Binding p_sSlotID}" MinWidth="50" VerticalAlignment="Center" TextAlignment="Left" />
                             </StackPanel>
                         </Grid>
                     </GroupBox>
@@ -96,7 +96,7 @@
                     <GroupBox FontSize="20" Header="Recipe Select" Height="100" Foreground="White">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text=" Recipe ID = " VerticalAlignment="Center"/>
-                            <ComboBox x:Name="comboRecipeID" VerticalAlignment="Center" SelectionChanged="comboRecipeID_SelectionChanged"/>
+                            <ComboBox x:Name="comboRecipeID" MinWidth="50" VerticalAlignment="Center" SelectionChanged="comboRecipeID_SelectionChanged"/>
                         </StackPanel>
                     </GroupBox>
                 </Grid>
