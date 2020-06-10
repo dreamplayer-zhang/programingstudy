@@ -57,5 +57,10 @@ namespace Root_Vega.ManualJob
             m_JobSchedule.m_loadport.m_infoPod.StartProcess(); 
         }
         #endregion
+
+        private void ButtonRun_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = true;
+        }
     }
 }

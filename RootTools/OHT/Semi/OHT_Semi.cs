@@ -368,8 +368,8 @@ namespace RootTools.OHT.Semi
                 _bModuleReady = value;
                 if (value == false)
                 {
-                    p_sInfo = "Loadport State not Ready";
-                    p_eState = eState.All_Off;
+                    //p_sInfo = "Loadport State not Ready";
+                    //p_eState = eState.All_Off;
                 }
             }
         }
