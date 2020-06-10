@@ -23,10 +23,9 @@ namespace RootTools.Memory
             memoryTool.RunTreeRun(Tree.eMode.Init); 
             treeRootMemoryUI.Init(memoryTool.m_treeRootMemory);
             memoryTool.RunTreeMemory(Tree.eMode.Init);
-            m_memoryTool.OnChangeTool += M_memoryTool_OnChangeTool;
+            m_memoryTool.OnChangeMemoryPool += M_memoryTool_OnChangeTool;
             memoryViewerUI.Init(memoryTool.m_viewer); 
             InitTabControl();
-            namedPipeUI.Init(memoryTool.m_aNamedPipe[0]); 
         }
 
         private void M_memoryTool_OnChangeTool()

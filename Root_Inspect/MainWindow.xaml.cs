@@ -22,14 +22,6 @@ namespace Root_Inspect
             ThreadStop();
         }
 
-        #region Memory
-        void InitMemory(MemoryTool memoryTool)
-        {
-            memoryToolUI.Init(memoryTool);
-            namedPipeUI.Init(memoryTool.m_aNamedPipe[0]);
-        }
-        #endregion
-
         #region Inspect
         InspectTool m_inspectTool;
         void InitInspect()
@@ -44,8 +36,9 @@ namespace Root_Inspect
         {
             m_engineer.Init();
             logViewUI.Init(LogView.m_logView);
-            InitMemory(m_engineer.m_memoryTool);
-            InitInspect(); 
+            memoryToolUI.Init(m_engineer.m_memoryTool);
+            InitInspect();
+            namedPipeUI.Init(m_inspectTool.m_namedPipe);
         }
 
         void ThreadStop()

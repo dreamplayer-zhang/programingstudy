@@ -37,8 +37,7 @@ namespace RootTools.Inspects
         public NamedPipe m_namedPipe;
         void InitNamedPipe(bool bHost)
         {
-            if (bHost) m_namedPipe = m_memoryTool.AddNamedPipe(p_id);
-            else m_namedPipe = m_memoryTool.m_aNamedPipe[0];
+            m_namedPipe = new NamedPipe(p_id, m_log); 
             m_namedPipe.ReadMsg += M_namedPipe_ReadMsg;
         }
 
@@ -97,35 +96,15 @@ namespace RootTools.Inspects
         void InitThreadProcess()
         {
             if (m_bHost == false) return;
-            InitKillProcess();
             m_threadProcess = new Thread(new ThreadStart(RunThreadProcess));
             m_threadProcess.Start();
-        }
-
-        static List<int> m_aValidProcessID = new List<int>();
-        void InitKillProcess()
-        {
-            Process[] aProcess = Process.GetProcessesByName(m_idProcess);
-            foreach (Process process in aProcess)
-            {
-                if (IsInvalidProcess(process.Id)) process.Kill();
-            }
-        }
-
-        bool IsInvalidProcess(int nID)
-        {
-            foreach (int nValidID in m_aValidProcessID)
-            {
-                if (nID == nValidID) return false;
-            }
-            return true;
         }
 
         int m_nProcessID = -1;
         void RunThreadProcess()
         {
             m_bThreadProcess = true;
-            Thread.Sleep(1000);
+            Thread.Sleep(10000);
             while (m_bThreadProcess)
             {
                 Thread.Sleep(100);
@@ -137,7 +116,6 @@ namespace RootTools.Inspects
                         {
                             Process process = Process.Start(m_sProcessFile, p_id);
                             m_nProcessID = process.Id;
-                            m_aValidProcessID.Add(process.Id);
                             m_bRemoteInspect = false;
                         }
                     }
@@ -158,7 +136,7 @@ namespace RootTools.Inspects
         }
 
         bool m_bStartProcess = false;
-        string m_idProcess = "Root_Inspect";
+        public static string m_idProcess = "Root_Inspect";
         string m_sProcessFile = "";
         void RunProcessTree(Tree tree, bool bVisible)
         {
@@ -399,7 +377,6 @@ namespace RootTools.Inspects
             m_engineer = engineer;
             m_bHost = bHost;
             m_memoryTool = engineer.ClassMemoryTool();
-            m_memoryTool.AddNamedPipe(p_id + ".Memory");
             m_log = LogView.GetLog(id);
             m_memoryPool = null;
             m_treeRoot = new TreeRoot(id, m_log);

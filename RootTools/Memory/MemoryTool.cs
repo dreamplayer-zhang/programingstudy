@@ -1,4 +1,5 @@
 ﻿using RootTools.Comm;
+using RootTools.Inspects;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,6 @@ namespace RootTools.Memory
     public class MemoryTool : ObservableObject, IToolSet
     {
         const double c_fGB = 1024 * 1024 * 1024;
-        public delegate void dgOnChangeTool();
-        public event dgOnChangeTool OnChangeTool;
 
         #region Property
         string _sInfo = "OK";
@@ -55,15 +54,18 @@ namespace RootTools.Memory
         #endregion
 
         #region Memory Pool
+        public delegate void dgOnChangeMemoryPool();
+        public event dgOnChangeMemoryPool OnChangeMemoryPool;
+
         public List<string> m_asPool = new List<string>(); 
         public void MemoryPoolChanged()
         {
             m_asPool.Clear();
             foreach (MemoryPool pool in p_aPool) m_asPool.Add(pool.p_id);
-            if (OnChangeTool != null) OnChangeTool(); 
+            if (OnChangeMemoryPool != null) OnChangeMemoryPool(); 
         }
 
-        public ObservableCollection<MemoryPool> _aPool = new ObservableCollection<MemoryPool>();
+        ObservableCollection<MemoryPool> _aPool = new ObservableCollection<MemoryPool>();
         public ObservableCollection<MemoryPool> p_aPool
         {
             get { return _aPool; }
@@ -110,50 +112,20 @@ namespace RootTools.Memory
         }
         #endregion
 
-        #region NamedPipe
-        public List<NamedPipe> m_aNamedPipe = new List<NamedPipe>();
-        public NamedPipe AddNamedPipe(string id)
+        #region Memoey
+        public void MemoryChanged()
         {
-            foreach (NamedPipe pipe in m_aNamedPipe)
-            {
-                if (pipe.p_id == id) return pipe;
-            }
-            NamedPipe namedPipe = new NamedPipe(id, m_log);
-            m_aNamedPipe.Add(namedPipe);
-            namedPipe.ReadMsg += NamedPipe_ReadMsg;
-            return namedPipe;
+            if (m_bMaster == false) return;
+            RunTreeMemory(Tree.eMode.RegWrite); 
+            Process[] aProcess = Process.GetProcessesByName(m_idProcess);
+            foreach (Process process in aProcess) process.Kill();
+            KillInspectProcess(); 
         }
 
-        void SendCommand(string sMsg)
-        {
-            if (m_bStartProcess == false) return;
-            foreach (NamedPipe pipe in m_aNamedPipe) pipe.Send(sMsg);
-        }
-
-        private void NamedPipe_ReadMsg(string sMsg)
-        {
-            if (sMsg.Contains("OnUpdateMemory"))
-            {
-                p_aPool.Clear();
-                RunTreeMemory(Tree.eMode.RegRead);
-                RunTreeMemory(Tree.eMode.Init);
-            }
-        }
-        #endregion
-
-        #region Memory
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
         {
             MemoryPool pool = GetPool(sPool, false);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
-        }
-
-        public void MemoryChanged()
-        {
-            if (m_bRegRead) return; 
-            RunTreeMemory(Tree.eMode.RegWrite);
-            RunTreeMemory(Tree.eMode.Init);
-            SendCommand("OnUpdateMemory");
         }
         #endregion
 
@@ -181,6 +153,7 @@ namespace RootTools.Memory
         void RunThreadProcess()
         {
             m_bThreadProcess = true;
+            Thread.Sleep(10000);
             while (m_bThreadProcess)
             {
                 Thread.Sleep(100);
@@ -279,6 +252,15 @@ namespace RootTools.Memory
         }
         #endregion
 
+        #region Inspect Process
+        public void KillInspectProcess()
+        {
+            if (m_bMaster == false) return; 
+            Process[] aProcess = Process.GetProcessesByName(InspectTool.m_idProcess);
+            foreach (Process process in aProcess) process.Kill();
+        }
+        #endregion
+
         public string p_id { get; set; }
         bool m_bMaster = true; 
         IEngineer m_engineer;
@@ -306,9 +288,9 @@ namespace RootTools.Memory
                 RunTreeMemory(Tree.eMode.Init);
             }
             RunTreeRun(Tree.eMode.RegRead);
-            m_viewer = new MemoryViewer(id, this, m_log); 
+            m_viewer = new MemoryViewer(id, this, m_log);
+            KillInspectProcess();
             InitThreadProcess();
-            AddNamedPipe(id); 
         }
 
         public void ThreadStop()
@@ -318,7 +300,6 @@ namespace RootTools.Memory
                 m_bThreadProcess = false;
                 m_threadProcess.Join(); 
             }
-            foreach (NamedPipe pipe in m_aNamedPipe) pipe.ThreadStop(); 
         }
 
         #region MemCheck
