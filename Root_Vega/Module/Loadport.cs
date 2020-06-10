@@ -1,7 +1,5 @@
 ﻿using RootTools;
-using RootTools.Comm;
 using RootTools.Control;
-using RootTools.DMC;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
@@ -20,7 +18,6 @@ namespace Root_Vega.Module
         public DIO_I m_diPresent;
         public DIO_I m_diLoad;
         public DIO_I m_diUnload; 
-        DMCControl m_dmc;
         public OHT_Semi m_OHT;
         public override void GetTools(bool bInit)
         {
@@ -28,7 +25,6 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
             p_sInfo = m_toolBox.Get(ref m_diLoad, this, "Load");
             p_sInfo = m_toolBox.Get(ref m_diUnload, this, "Unload");
-            p_sInfo = m_toolBox.Get(ref m_dmc, this, "DMC");
             p_sInfo = m_toolBox.Get(ref m_OHT, this, m_infoPod, "OHT");
         }
         #endregion
@@ -50,98 +46,6 @@ namespace Root_Vega.Module
                 case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
             }
             return m_svidPlaced.p_value;
-        }
-        #endregion
-
-        #region Protocol
-        public enum eCmd
-        {
-            None,
-            PodOpen,
-            Load,
-            Unload,
-            PodClose,
-            Init,
-        };
-        public class Command
-        {
-            public eCmd m_cmd;
-            string m_sCmd;
-            double m_secRun = 10;
-
-            public void RunTree(Tree tree)
-            {
-                m_sCmd = tree.Set(m_sCmd, m_sCmd, "Command", "DMC Excute Command String");
-                m_secRun = tree.Set(m_secRun, m_secRun, "Timeout", "DMC Run Timeout (sec)");
-            }
-
-            public string Run(DMCControl dmc)
-            {
-                string sCmd = m_cmd.ToString(); 
-                string sSend = dmc.Send(m_sCmd);
-                if (sSend != "OK") return sSend;
-                StopWatch sw = new StopWatch();
-                int msWait = (int)(1000 * m_secRun);
-                Thread.Sleep(100);
-                while (dmc.p_eState == DMCControl.eState.Running)
-                {
-                    Thread.Sleep(10);
-                    if (sw.ElapsedMilliseconds > msWait)
-                    {
-                        //forget
-                        return "DMC Run Timeout : " + sCmd;
-                    }
-                }
-                switch (dmc.p_eState)
-                {
-                    case DMCControl.eState.Error: return "DMC Run Error : " + sCmd;
-                    case DMCControl.eState.Running: return "DMC Run Timeout : " + sCmd;
-                    default: return "OK";
-                }
-            }
-
-            public Command(eCmd cmd)
-            {
-                m_cmd = cmd;
-                m_sCmd = cmd.ToString().ToLower();
-            }
-        }
-
-        List<Command> m_aCmd = new List<Command>(); 
-        Command GetCommand(eCmd cmd)
-        {
-            foreach (Command command in m_aCmd)
-            {
-                if (cmd == command.m_cmd) return command; 
-            }
-            return null; 
-        }
-
-        void InitCmd()
-        {
-            foreach (eCmd cmd in Enum.GetValues(typeof(eCmd))) m_aCmd.Add(new Command(cmd));
-        }
-
-        void RunTreeCmd(Tree tree)
-        {
-            foreach (Command command in m_aCmd) command.RunTree(tree.GetTree(command.m_cmd.ToString(), false)); 
-        }
-        #endregion
-
-        #region DMC
-        string WriteCmd(eCmd cmd)
-        {
-            if (EQ.IsStop()) return "EQ Stop";
-            switch (m_dmc.p_eState)
-            {
-                case DMCControl.eState.Error: return "DMC State is Error, Cancel : " + cmd.ToString();
-                case DMCControl.eState.Running: return "DMC Task is Running : " + m_dmc.p_sTask + ", Cancel : " + cmd.ToString();
-            }
-            Thread.Sleep(10);
-            if (EQ.IsStop()) return "EQ Stop";
-            Command command = GetCommand(cmd);
-            if (command == null) return "Command not Found : " + cmd.ToString();
-            return command.Run(m_dmc); 
         }
         #endregion
 
@@ -253,7 +157,7 @@ namespace Root_Vega.Module
         {
             if (EQ.p_bSimulate == false)
             {
-                p_sInfo = WriteCmd(eCmd.Init);
+                //p_sInfo = WriteCmd(eCmd.Init);
                 if (p_sInfo != "OK") return p_sInfo; 
             }
             m_infoPod.AfterHome(); 
@@ -304,7 +208,6 @@ namespace Root_Vega.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeCmd(tree.GetTree("DMC Command", false)); 
         }
         #endregion
 
@@ -317,7 +220,6 @@ namespace Root_Vega.Module
             m_infoPod = new InfoPod(this, sLocID, engineer);
             m_RFID = ((Vega_Engineer)engineer).m_handler.m_vega.m_RFID; 
             m_aTool.Add(m_infoPod);
-            InitCmd();
             base.InitBase(id, engineer);
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
@@ -414,7 +316,7 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
-                if (m_module.Run(m_module.WriteCmd(eCmd.PodOpen))) return p_sInfo;
+                //if (m_module.Run(m_module.WriteCmd(eCmd.PodOpen))) return p_sInfo;
                 //m_infoPod.p_eState = InfoPod.eState.Placed;
                 return "OK";
             }
@@ -443,7 +345,7 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
-                if (m_module.Run(m_module.WriteCmd(eCmd.Load))) return p_sInfo;
+                //if (m_module.Run(m_module.WriteCmd(eCmd.Load))) return p_sInfo;
                 m_infoPod.p_eState = InfoPod.eState.Load;
                 m_module.m_ceidLoad.Send();
                 m_module.m_ceidOpen.Send();
@@ -476,7 +378,7 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
-                if (m_module.Run(m_module.WriteCmd(eCmd.Unload))) return p_sInfo;
+                //if (m_module.Run(m_module.WriteCmd(eCmd.Unload))) return p_sInfo;
                 m_infoPod.p_eState = InfoPod.eState.Placed;
                 m_module.m_ceidClose.Send();
                 m_module.m_ceidUnload.Send();
@@ -507,7 +409,7 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
-                if (m_module.Run(m_module.WriteCmd(eCmd.PodClose))) return p_sInfo;
+                //if (m_module.Run(m_module.WriteCmd(eCmd.PodClose))) return p_sInfo;
                 //m_infoPod.p_eState = InfoPod.eState.Placed;
                 return "OK";
             }

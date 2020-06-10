@@ -37,7 +37,6 @@ namespace Root.Module
             p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
             p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
-            m_memoryGroup = m_memoryPool.GetGroup(p_id);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             foreach (eCam cam in Enum.GetValues(typeof(eCam))) m_lineScan[cam].GetTool(this);
             foreach (eCam cam in Enum.GetValues(typeof(eCam))) m_areaScan[cam].GetTool(this); 
@@ -158,8 +157,9 @@ namespace Root.Module
         #endregion
 
         #region Memory
-        void InitMemory()
+        public override void InitMemorys()
         {
+            m_memoryGroup = m_memoryPool.GetGroup(p_id);
             foreach (eCam cam in Enum.GetValues(typeof(eCam))) m_lineScan[cam].InitMemory(this, m_szDalsaGrab);
             foreach (eCam cam in Enum.GetValues(typeof(eCam))) m_areaScan[cam].InitMemory(this, m_nBaslerGrab);
         }
@@ -223,7 +223,6 @@ namespace Root.Module
             InitLineScan();
             InitAreaScan(); 
             base.InitBase(id, engineer);
-            InitMemory(); 
         }
 
         public override void ThreadStop()

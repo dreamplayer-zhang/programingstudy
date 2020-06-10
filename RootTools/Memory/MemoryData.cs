@@ -443,11 +443,17 @@ namespace RootTools.Memory
         #endregion
 
         #region Tree
-        public void RunTree(Tree tree, bool bVisible)
+        public bool RunTree(Tree tree, bool bVisible)
         {
+            int nCount = p_nCount;
+            int nByte = p_nByte;
+            CPoint sz = new CPoint(p_sz); 
             p_nCount = tree.Set(p_nCount, p_nCount, "Count", "Memory Count", bVisible);
             p_nByte = tree.Set(p_nByte, p_nByte, "Byte", "Memory Depth Byte (byte)", bVisible);
             p_sz = tree.Set(p_sz, p_sz, "Size", "Memory Size", bVisible);
+            if (nCount != p_nCount) return true;
+            if (nByte != p_nByte) return true;
+            return sz != p_sz; 
         }
         #endregion
 

@@ -72,20 +72,15 @@ namespace Root_Vega
                 return m_sMemoryData;
             }
         }
-        int m_nByte = 1;
-        CPoint m_szROI = new CPoint(1024, 1024);
+
         void RunTreeMemory(Tree tree, bool bVisible, bool bReadOnly)
         {
-            if (m_sMemoryGroup == "")
-                m_sMemoryGroup = p_sName;
-            m_sMemoryGroup = tree.Set(m_sMemoryGroup, m_sMemoryGroup, "Group", "Memory Group Name", bVisible, bReadOnly);
+            if (m_sMemoryGroup == "") m_sMemoryGroup = p_sName;
+            m_sMemoryGroup = tree.Set(m_sMemoryGroup, m_sMemoryGroup, m_memoryPool.m_asGroup, "Group", "Memory Group Name", bVisible, bReadOnly);
             m_memoryGroup = m_memoryPool.GetGroup(m_sMemoryGroup);
-            if (m_memoryGroup == null)
-                return;
-            m_sMemoryData = tree.Set(m_sMemoryData, m_sMemoryData, "Data", "Memory Data Name", bVisible, bReadOnly);
-            m_szROI = tree.Set(m_szROI, m_szROI, "Size", "Image Size (pixel)", bVisible, bReadOnly);
-            m_nByte = tree.Set(m_nByte, m_nByte, "Depth", "Image Depth (RGB = 3, 256 Gray = 1)", bVisible, bReadOnly);
-            m_memoryData = m_memoryGroup.CreateMemory(m_sMemoryData, 1, m_nByte, m_szROI);
+            if (m_memoryGroup == null) return;
+            m_sMemoryData = tree.Set(m_sMemoryData, m_sMemoryData, m_memoryGroup.m_asMemory, "Data", "Memory Data Name", bVisible, bReadOnly);
+            m_memoryData = m_memoryGroup.GetMemory(m_sMemoryData); 
         }
         #endregion
 

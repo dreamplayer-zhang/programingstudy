@@ -336,7 +336,7 @@ namespace RootTools.Memory
         #endregion 
     }
 
-
+    #region Converter
     public class TestConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -390,4 +390,5 @@ namespace RootTools.Memory
             throw new NotSupportedException("Cannot convert back");
         }
     }
+    #endregion 
 }

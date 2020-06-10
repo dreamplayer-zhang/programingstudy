@@ -26,7 +26,6 @@ namespace Root_Siltron.Module
             p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
             p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
-            m_memoryGroup = m_memoryPool.GetGroup(p_id);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
         }
         #endregion
@@ -63,6 +62,12 @@ namespace Root_Siltron.Module
         {
             base.Reset();
         }
+
+        public override void InitMemorys()
+        {
+            m_memoryGroup = m_memoryPool.GetGroup(p_id);
+        }
+
         #endregion
 
         #region Axis

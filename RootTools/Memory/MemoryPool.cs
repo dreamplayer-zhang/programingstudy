@@ -106,17 +106,24 @@ namespace RootTools.Memory
         }
         #endregion
 
-        #region Tree from ToolBox
+        #region RunTree
         public void RunTreeToolBox(Tree tree)
         {
             p_gbPool = tree.Set(p_gbPool, 1, "Pool Size", "Memory Pool Size (GB)");
-            foreach (MemoryGroup group in p_aGroup) RunTreeGroup(tree.GetTree(group.p_id, false), group); 
-            if (tree.p_treeRoot.p_eMode == Tree.eMode.RegWrite) m_memoryTool.MemoryChanged();
         }
 
-        void RunTreeGroup(Tree tree, MemoryGroup group)
+        public void RunTreeModule(Tree tree)
         {
-            foreach (MemoryData memory in group.p_aMemory) memory.RunTree(tree.GetTree(memory.p_id, false), true);
+            bool bChanged = false; 
+            foreach (MemoryGroup group in p_aGroup) bChanged = (bChanged || RunTreeGroup(tree.GetTree(group.p_id, false), group));
+            if (bChanged) m_memoryTool.MemoryChanged();
+        }
+
+        bool RunTreeGroup(Tree tree, MemoryGroup group)
+        {
+            bool bChanged = false; 
+            foreach (MemoryData memory in group.p_aMemory) bChanged = (bChanged || memory.RunTree(tree.GetTree(memory.p_id, false), true));
+            return bChanged; 
         }
         #endregion
 

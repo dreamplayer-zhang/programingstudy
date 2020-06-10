@@ -67,6 +67,11 @@ namespace Root_Vega.Module
         {
             p_sInfo = data.p_sInfo; 
         }
+
+        public override void InitMemorys()
+        {
+            //forget
+        }
         #endregion
 
         #region DIO Function
@@ -258,6 +263,7 @@ namespace Root_Vega.Module
         void RunTreeSetup(Tree tree)
         {
             RunTreeDIODelay(tree.GetTree("DIO Delay", false));
+            m_memoryPool.RunTreeModule(tree.GetTree("Memory", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
         }
         #endregion

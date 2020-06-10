@@ -13,7 +13,6 @@ namespace RootTools.RADS
 	public class RADS : ObservableObject
 	{
 		Log m_log;
-		string m_strID;
 		IEngineer m_engineer;
 
 		public RADS(IEngineer engineer)

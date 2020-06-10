@@ -305,6 +305,7 @@ namespace Root_Wind.Module
         void RunTreeSetup(Tree tree)
         {
             RunTreeDIODelay(tree.GetTree("DIO Delay", false));
+            m_memoryPool.RunTreeModule(tree.GetTree("Memory", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
             m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
         }

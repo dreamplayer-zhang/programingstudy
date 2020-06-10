@@ -76,9 +76,8 @@ namespace RootTools.Module
             }
         }
 
-        public virtual void GetTools(bool bInit)
-        {
-        }
+        public virtual void GetTools(bool bInit) { }
+        public virtual void InitMemorys() { }
 
         public virtual void Reset()
         {
@@ -417,6 +416,8 @@ namespace RootTools.Module
             m_treeToolBox = new TreeRoot(id + ".ToolBox", m_log);
             m_treeToolBox.UpdateTree += M_treeToolBox_UpdateTree;
             RunToolTree(Tree.eMode.RegRead);
+
+            InitMemorys(); 
 
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;

@@ -12,8 +12,6 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Configuration;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
@@ -338,12 +336,6 @@ namespace Root_Vega.Module
         #endregion
 
         #region Inspect
-        void InitInspect()
-        {
-            InitMemory();
-            InitThreadInspect();
-        }
-
         int m_lMaxGrab = 3000;
         CPoint m_szAlignROI = new CPoint();
 		MemoryData m_memoryGrab;
@@ -356,17 +348,12 @@ namespace Root_Vega.Module
 
         public ushort[] m_aHeight;
         double m_fScaleH = 0;
-        void InitMemory()
+        public override void InitMemorys()
         {
             m_szAlignROI = p_CamLADS.p_szROI;
 			m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
 			m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
 			m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-            //m_memoryTop = m_memoryPool.GetGroup(p_id).CreateMemory("Top", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-            //m_memoryLeft = m_memoryPool.GetGroup(p_id).CreateMemory("Left", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-            //m_memoryRight = m_memoryPool.GetGroup(p_id).CreateMemory("Right", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-            //m_memoryBottom = m_memoryPool.GetGroup(p_id).CreateMemory("Bottom", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-
 
             m_memoryTop = m_memoryPool.GetGroup(p_id).CreateMemory("Top", 1, 1, 6000, 150000);
             m_memoryLeft = m_memoryPool.GetGroup(p_id).CreateMemory("Left", 1, 1, 6000, 150000);
@@ -494,6 +481,7 @@ namespace Root_Vega.Module
         void RunTreeSetup(Tree tree)
         {
             RunTreeDIODelay(tree.GetTree("DIO Delay", false));
+            m_memoryPool.RunTreeModule(tree.GetTree("Memory", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
             RunTreeInspect(tree.GetTree("Inspect", false));
         }
@@ -502,7 +490,7 @@ namespace Root_Vega.Module
         public SideVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
-            InitInspect();
+            InitThreadInspect();
             InitPosAlign();
             InitAutoFocus();
         }

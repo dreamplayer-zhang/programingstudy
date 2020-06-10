@@ -152,7 +152,8 @@ namespace RootTools
 
         }
         public ImageData(MemoryData data)
-        {       
+        {
+            if (data == null) return; 
             m_eMode = eMode.MemoryRead;
             m_ptrImg = data.GetPtr();
             p_Size = data.p_sz;
