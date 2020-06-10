@@ -39,7 +39,6 @@ namespace RootTools.Memory
         {
             m_asGroup.Clear();
             foreach (MemoryGroup group in p_aGroup) m_asGroup.Add(group.p_id);
-            m_memoryTool.MemoryChanged(); 
         }
 
         public ObservableCollection<MemoryGroup> p_aGroup { get; set; }
@@ -112,7 +111,7 @@ namespace RootTools.Memory
         {
             p_gbPool = tree.Set(p_gbPool, 1, "Pool Size", "Memory Pool Size (GB)");
             foreach (MemoryGroup group in p_aGroup) RunTreeGroup(tree.GetTree(group.p_id, false), group); 
-            if (tree.p_treeRoot.p_eMode == Tree.eMode.Update) m_memoryTool.MemoryChanged();
+            if (tree.p_treeRoot.p_eMode == Tree.eMode.RegWrite) m_memoryTool.MemoryChanged();
         }
 
         void RunTreeGroup(Tree tree, MemoryGroup group)
