@@ -81,15 +81,12 @@ namespace RootTools.Trees
         #region TreeGroup
         public Tree GetTree(string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false)
         {
-            foreach (Tree item in p_aLastChild)
+            Tree item = FindTreeItem(sName);
+            if (item != null)
             {
-                if (item.p_sName == sName)
-                {
-                    item.p_bVisible = bVisible;
-                    item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
-                    AddTreeItem(item);
-                    return item;
-                }
+                item.p_bVisible = bVisible;
+                item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
+                return item;
             }
             Tree newGroup = new TreeGroup(sName, this, m_log, bExpand, bVisible, bReadOnly);
             AddTreeItem(newGroup);
@@ -98,15 +95,12 @@ namespace RootTools.Trees
 
         public Tree GetTree(int nIndex, string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false)
         {
-            foreach (Tree item in p_aChild)
+            Tree item = FindTreeItem(sName);
+            if (item != null)
             {
-                if ((item.p_sName == sName) && (item.p_nIndex == nIndex))
-                {
-                    item.p_bVisible = bVisible;
-                    item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
-                    AddTreeItem(item);
-                    return item;
-                }
+                item.p_bVisible = bVisible;
+                item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
+                return item;
             }
             Tree newGroup = new TreeGroup(nIndex, sName, this, m_log, bExpand, bVisible, bReadOnly);
             AddTreeItem(newGroup);
@@ -117,14 +111,8 @@ namespace RootTools.Trees
         #region TreeItem
         public Tree GetItem(string sName, dynamic value, string sDesc)
         {
-            foreach (Tree item in p_aChild)
-            {
-                if (item.p_sName == sName)
-                {
-                    AddTreeItem(item);
-                    return item;
-                }
-            }
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item;
             Tree newItem = NewItem(sName, value, sDesc);
             AddTreeItem(newItem);
             return newItem;
@@ -145,14 +133,11 @@ namespace RootTools.Trees
 
         Tree GetItem(string sName, string value, List<string> list, string sDesc)
         {
-            foreach (Tree item in p_aChild)
+            Tree item = FindTreeItem(sName);
+            if (item != null)
             {
-                if (item.p_sName == sName)
-                {
-                    ((TreeItem_stringList)(item)).SetList(list);
-                    AddTreeItem(item);
-                    return item;
-                }
+                ((TreeItem_stringList)(item)).SetList(list);
+                return item;
             }
             Tree newitem = new TreeItem_stringList(sName, this, value, list, sDesc, m_log);
             AddTreeItem(newitem);
@@ -161,14 +146,8 @@ namespace RootTools.Trees
 
         Tree GetItemFile(string sName, string value, string sExt, string sDesc)
         {
-            foreach (Tree item in p_aChild)
-            {
-                if (item.p_sName == sName)
-                {
-                    AddTreeItem(item);
-                    return item;
-                }
-            }
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item;
             Tree newitem = new TreeItem_FileName(sName, this, value, sExt, sDesc, m_log);
             AddTreeItem(newitem);
             return newitem;
@@ -176,14 +155,8 @@ namespace RootTools.Trees
 
         Tree GetItemPassword(string sName, string value, string sDesc)
         {
-            foreach (Tree item in p_aChild)
-            {
-                if (item.p_sName == sName)
-                {
-                    AddTreeItem(item);
-                    return item;
-                }
-            }
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item;
             Tree newitem = new TreeItem_Password(sName, this, value, sDesc, m_log);
             AddTreeItem(newitem);
             return newitem;
@@ -191,7 +164,20 @@ namespace RootTools.Trees
 
         Tree GetItemICommand(string sName, RelayCommand value, string sButtonName, string sDesc)
         {
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item; 
+            Tree newitem = new TreeItem_ICommand(sName, this, value, sButtonName, sDesc, m_log);
+            AddTreeItem(newitem);
+            return newitem;
+        }
+
+        Tree FindTreeItem(string sName)
+        {
             foreach (Tree item in p_aChild)
+            {
+                if (item.p_sName == sName) return item;
+            }
+            foreach (Tree item in p_aLastChild)
             {
                 if (item.p_sName == sName)
                 {
@@ -199,9 +185,7 @@ namespace RootTools.Trees
                     return item;
                 }
             }
-            Tree newitem = new TreeItem_ICommand(sName, this, value, sButtonName, sDesc, m_log);
-            AddTreeItem(newitem);
-            return newitem;
+            return null; 
         }
 
         void AddTreeItem(Tree treeItem)
