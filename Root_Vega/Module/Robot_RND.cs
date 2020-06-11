@@ -883,6 +883,7 @@ namespace Root_Vega.Module
                 if (EQ.p_bSimulate) return "OK"; 
                 int posRobot = m_module.m_teachOCR;
                 if (m_module.Run(m_module.WriteCmd(eCmd.PutReady, posRobot, 1, 1))) return p_sInfo;
+                if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 if (m_module.Run(m_module.WriteCmd(eCmd.Extend, posRobot, 1))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 if (m_module.Run(ReadOCR(m_nRetry))) return p_sInfo;

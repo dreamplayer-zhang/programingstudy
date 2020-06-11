@@ -114,7 +114,7 @@ namespace RootTools.Camera.CognexOCR
             StopWatch sw = new StopWatch();
             try
             {
-                while (sw.ElapsedMilliseconds > msWaitReply)
+                while (sw.ElapsedMilliseconds < msWaitReply)
                 {
                     if (m_bSendCmd == false) return "OK"; 
                     Thread.Sleep(10);
