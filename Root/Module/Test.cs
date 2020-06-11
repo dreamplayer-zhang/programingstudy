@@ -117,6 +117,7 @@ namespace Root.Module
 
             public override string Run()
             {
+                //m_module.RunTree(Tree.eMode.Init); 
                 m_log.Info(p_id + " : Test Start");
                 Thread.Sleep(2000);
                 m_log.Info(p_id + " : Test End");
@@ -147,7 +148,7 @@ namespace Root.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_nTry = tree.Set(m_nTry, 3, "Try", "Try Count", bVisible);
-                m_runTest.RunTree(tree.GetTree("Test"), bVisible);
+                m_runTest.RunTree(tree.GetTree("Test", true, bVisible), bVisible);
             }
 
             public override string Run()
