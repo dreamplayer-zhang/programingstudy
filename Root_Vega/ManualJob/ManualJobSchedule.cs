@@ -59,7 +59,9 @@ namespace Root_Vega.ManualJob
             if (ManualJobSchedule_UI.m_bShow) return false;
             ManualJobSchedule_UI jobschedulePopup = new ManualJobSchedule_UI();
             jobschedulePopup.Init(this);
-            return jobschedulePopup.ShowDialog() == true;
+            jobschedulePopup.ShowDialog();
+            //return jobschedulePopup.ShowDialog() == true;
+            return jobschedulePopup.DialogResult == true;
         }
     }
 }
