@@ -15,16 +15,16 @@ namespace RootTools.Inspects
 {
 	public class Recipe : ObservableObject
 	{
-		public string m_Name;
-		RecipeData m_RecipeData = new RecipeData();
-		public RecipeData p_RecipeData
+		public string RecipeName;
+		RecipeData recipeData = new RecipeData();
+		public RecipeData RecipeData
 		{
-			get { return m_RecipeData; }
-			set { SetProperty(ref m_RecipeData, value); }
+			get { return recipeData; }
+			set { SetProperty(ref recipeData, value); }
 		}
 
-		public Result m_SI;
-		public MapData m_MD;
+		[XmlIgnore] public Result m_SI;
+		public MapData MapData;
 		public void Save(string filePath)
 		{
 			//Serialize가능한 내용을 xml로 저장
@@ -34,25 +34,25 @@ namespace RootTools.Inspects
 				xs.Serialize(wr, this);
 			}
 			//Feature 저장
-			if (p_RecipeData != null)
+			if (RecipeData != null)
 			{
-				foreach (var roi in p_RecipeData.p_Roi)
-				{
-					if (roi != null)
-					{
-						foreach (var feature in roi.m_Position.m_ListFeature)
-						{
-							if (feature != null)
-							{
-								feature.m_Feature.SaveWholeImage(feature.m_sFeaturePath);
-							}
-						}
-					}
-				}
+				//foreach (var roi in p_RecipeData.p_Roi)
+				//{
+				//	if (roi != null)
+				//	{
+				//		foreach (var feature in roi.m_Position.m_ListFeature)
+				//		{
+				//			if (feature != null)
+				//			{
+				//				feature.m_Feature.SaveWholeImage(feature.m_sFeaturePath);
+				//			}
+				//		}
+				//	}
+				//}
 			}
-			if (m_MD != null)
+			if (MapData != null)
 			{
-				m_MD.Save();
+				//m_MD.Save();
 			}
 		}
 		public static Recipe Load(string filePath)
@@ -73,11 +73,11 @@ namespace RootTools.Inspects
 	{
 		//DateTime m_StartTime;
 		//DateTime m_EndTime;
-		List<DefectInfo> m_DD;
+		public List<DefectInfo> DefectInfoList;
 
 		Result()
 		{
-			m_DD = new List<DefectInfo>();
+			DefectInfoList = new List<DefectInfo>();
 		}
 
 		public void MakeCluster(List<DefectInfo> DD, int nRange = 10)
@@ -119,52 +119,52 @@ namespace RootTools.Inspects
 	{
 		public RecipeData()
 		{
-			m_bDefectMerge = false;
-			m_nMergeDistance = new Param<int>(10, 0, int.MaxValue);//최대치는 나중에 정하기
-			m_Roi = new ObservableCollection<Roi>();
+			_useDefectMerge = false;
+			_mergeDistance = new Param<int>(10, 0, int.MaxValue);//최대치는 나중에 정하기
+			_roiList = new ObservableCollection<Roi>();
 		}
 
 		#region p_Roi
 
-		ObservableCollection<Roi> m_Roi;
-		public ObservableCollection<Roi> p_Roi
+		ObservableCollection<Roi> _roiList;
+		public ObservableCollection<Roi> RoiList
 		{
 			get
 			{
-				return m_Roi;
+				return _roiList;
 			}
 			set
 			{
-				SetProperty(ref m_Roi, value);
+				SetProperty(ref _roiList, value);
 			}
 		}
 		#endregion
 
-		#region p_bDefectMerge
-		bool m_bDefectMerge;
-		public bool p_bDefectMerge
+		#region UseDefectMerge
+		bool _useDefectMerge;
+		public bool UseDefectMerge
 		{
-			get { return m_bDefectMerge; }
+			get { return _useDefectMerge; }
 			set
 			{
-				SetProperty(ref m_bDefectMerge, value);
+				SetProperty(ref _useDefectMerge, value);
 			}
 		}
 		#endregion
 
-		#region p_nMergeDistance
-		Param<int> m_nMergeDistance;
-		public int p_nMergeDistance
+		#region MergeDistance
+		Param<int> _mergeDistance;
+		public int MergeDistance
 		{
 			get
 			{
-				return m_nMergeDistance._value;
+				return _mergeDistance._value;
 			}
 			set
 			{
-				if (m_nMergeDistance._value == value)
+				if (_mergeDistance._value == value)
 					return;
-				m_nMergeDistance._value = value;
+				_mergeDistance._value = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -205,37 +205,37 @@ namespace RootTools.Inspects
 	}
 	public class BaseParamData : ObservableObject
 	{
-		#region p_GV
-		protected Param<int> GV;
-		public int p_GV
+		#region TargetGV
+		protected Param<int> _targetGV;
+		public int TargetGV
 		{
 			get
 			{
-				return GV._value;
+				return _targetGV._value;
 			}
 			set
 			{
-				if (GV._value == value)
+				if (_targetGV._value == value)
 					return;
-				GV._value = value;
+				_targetGV._value = value;
 				RaisePropertyChanged();
 			}
 		}
 		#endregion
 
-		#region p_DefectSize
-		protected Param<int> DefectSize;
-		public int p_DefectSize
+		#region DefectSize
+		protected Param<int> _defectSize;
+		public int DefectSize
 		{
 			get
 			{
-				return DefectSize._value;
+				return _defectSize._value;
 			}
 			set
 			{
-				if (DefectSize._value == value)
+				if (_defectSize._value == value)
 					return;
-				DefectSize._value = value;
+				_defectSize._value = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -265,34 +265,34 @@ namespace RootTools.Inspects
 	{
 		public SurfaceParamData()
 		{
-			p_bDarkInspection = true;
-			p_bAbsoluteInspection = true;
-			GV = new Param<int>(70, 0, 255);
-			DefectSize = new Param<int>(10, 1, int.MaxValue);
+			UseDarkInspection = true;
+			UseAbsoluteInspection = true;
+			_targetGV = new Param<int>(70, 0, 255);
+			_defectSize = new Param<int>(10, 1, int.MaxValue);
 		}
 
-		#region p_bDarkInspection
-		bool bDarkInspection;
-		public bool p_bDarkInspection
+		#region UseDarkInspection
+		bool _useDarkInspection;
+		public bool UseDarkInspection
 		{
 			get
 			{
-				return bDarkInspection;
+				return _useDarkInspection;
 			}
 			set
 			{
-				SetProperty(ref bDarkInspection, value);
+				SetProperty(ref _useDarkInspection, value);
 			}
 		}
 		#endregion
 
-		#region p_bAbsoluteInspection
-		bool bAbsoluteInspection;
-		public bool p_bAbsoluteInspection
+		#region UseAbsoluteInspection
+		bool _useAbsoluteInspection;
+		public bool UseAbsoluteInspection
 		{
 			get
 			{
-				return bAbsoluteInspection;
+				return _useAbsoluteInspection;
 			}
 			set
 			{
@@ -304,7 +304,7 @@ namespace RootTools.Inspects
 				{
 					TargetLabelText = "Difference(%)";
 				}
-				SetProperty(ref bAbsoluteInspection, value);
+				SetProperty(ref _useAbsoluteInspection, value);
 			}
 		}
 		#endregion
@@ -313,44 +313,44 @@ namespace RootTools.Inspects
 	{
 		public StripParamData()
 		{
-			GV = new Param<int>(70, 0, 255);
-			DefectSize = new Param<int>(10, 1, int.MaxValue);
-			bandwidth = new Param<int>(10, 0, 255);
-			intensity = new Param<int>(120, 0, int.MaxValue);
+			_targetGV = new Param<int>(70, 0, 255);
+			_defectSize = new Param<int>(10, 1, int.MaxValue);
+			_bandwidth = new Param<int>(10, 0, 255);
+			_intensity = new Param<int>(120, 0, int.MaxValue);
 			TargetLabelText = "GV";//Strip은 무조건 절대검사
 		}
 
-		#region p_Intensity
-		Param<int> intensity;
-		public int p_Intensity
+		#region Intensity
+		Param<int> _intensity;
+		public int Intensity
 		{
 			get
 			{
-				return intensity._value;
+				return _intensity._value;
 			}
 			set
 			{
-				if (intensity._value == value)
+				if (_intensity._value == value)
 					return;
-				intensity._value = value;
+				_intensity._value = value;
 				RaisePropertyChanged();
 			}
 		}
 		#endregion
 
-		#region p_Bandwidth
-		Param<int> bandwidth;
-		public int p_Bandwidth
+		#region Bandwidth
+		Param<int> _bandwidth;
+		public int Bandwidth
 		{
 			get
 			{
-				return bandwidth._value;
+				return _bandwidth._value;
 			}
 			set
 			{
-				if (bandwidth._value == value)
+				if (_bandwidth._value == value)
 					return;
-				bandwidth._value = value;
+				_bandwidth._value = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -359,60 +359,60 @@ namespace RootTools.Inspects
 
 	public class Origin
 	{
-		public CRect m_rtOrigin;
-		public CPoint m_ptLeftBottom;
-		public RPoint m_ptPitch;
-		public Position m_Position;
+		public CRect OriginRect;
+		public CPoint LeftBottom;
+		public RPoint Pitch;
+		public Position Position;
 	}
 	public class Position
 	{
-		public List<Feature> m_ListFeature = new List<Feature>();
-		public int m_nScore;
+		public List<Feature> FeatureList = new List<Feature>();
+		public int ScoreValue;
 	}
 	public class Feature
 	{
 		[XmlIgnore] public ImageData m_Feature;
-		public CRect m_rtRoi = new CRect();
+		public CRect RoiRect = new CRect();
 		/// <summary>
 		/// Feature Image의 경로. 파일 확장자는 bmp
 		/// </summary>
-		public string m_sFeaturePath;
+		public string FeatureFilePath;
 	}
 	public class Roi : ObservableObject
 	{
 		public Roi(String name, Item item)
 		{
-			m_sName = name;
-			m_Item = item;
-			m_Origin = new Origin();
+			_name = name;
+			RoiType = item;
+			Origin = new Origin();
 		}
 		public Roi()
 		{
-			m_sName = string.Empty;
-			m_Item = Item.None;
-			m_Origin = new Origin();
+			_name = string.Empty;
+			RoiType = Item.None;
+			Origin = new Origin();
 		}
-		string m_sName = "";
-		public string p_sName
+		string _name = "";
+		public string Name
 		{
 			get
 			{
-				return m_sName;
+				return _name;
 			}
 			set
 			{
-				SetProperty(ref m_sName, value);
+				SetProperty(ref _name, value);
 			}
 		}
-		public Origin m_Origin = new Origin();
-		public Position m_Position = new Position();
-		public Surface m_Surface = new Surface();
-		public Strip m_Strip = new Strip();
-		public Bump m_Bump = new Bump();
+		public Origin Origin = new Origin();
+		public Position Position = new Position();
+		public Surface Surface = new Surface();
+		public Strip Strip = new Strip();
+		public Bump Bump = new Bump();
 		//DeadLine m_DeadLine;
 
 
-		Item m_Item;
+		public Item RoiType;
 		public enum Item
 		{
 			None,
@@ -430,51 +430,51 @@ namespace RootTools.Inspects
 
 	public class Surface : ItemParent
 	{
-		public List<Pattern> m_Pattern;
-		public List<NonPattern> m_NonPattern;
-		ObservableCollection<SurfaceParamData> m_Parameter = new ObservableCollection<SurfaceParamData>();
-		public ObservableCollection<SurfaceParamData> p_Parameter
+		public List<Pattern> PatternList;
+		public List<NonPattern> NonPatternList;
+		ObservableCollection<SurfaceParamData> _parameterList = new ObservableCollection<SurfaceParamData>();
+		public ObservableCollection<SurfaceParamData> ParameterList
 		{
 			get
 			{
-				return m_Parameter;
+				return _parameterList;
 			}
 			set
 			{
-				SetProperty(ref m_Parameter, value);
+				SetProperty(ref _parameterList, value);
 			}
 		}
 	}
 	public class Strip : ItemParent
 	{
-		public List<Pattern> m_Pattern;
-		public List<NonPattern> m_NonPattern;
-		ObservableCollection<StripParamData> m_Parameter = new ObservableCollection<StripParamData>();
-		public ObservableCollection<StripParamData> p_Parameter
+		public List<Pattern> PatternList;
+		public List<NonPattern> NonPatternList;
+		ObservableCollection<StripParamData> _parameterList = new ObservableCollection<StripParamData>();
+		public ObservableCollection<StripParamData> ParameterList
 		{
 			get
 			{
-				return m_Parameter;
+				return _parameterList;
 			}
 			set
 			{
-				SetProperty(ref m_Parameter, value);
+				SetProperty(ref _parameterList, value);
 			}
 		}
 	}
 
 	public class Bump : ItemParent
 	{
-		public List<CPoint> m_ptBump;
+		public List<CPoint> BumpList;
 	}
 	public class Pattern
 	{
-		public CPoint m_pt;
-		public int m_len;
+		public CPoint Point;
+		public int Length;
 	}
 	public class NonPattern
 	{
-		public CRect m_rt;
+		public CRect Area;
 	}
 	public class MapData
 	{
@@ -484,43 +484,23 @@ namespace RootTools.Inspects
 		/// <summary>
 		/// Map 레시피의 경로. 파일 확장자는 csv
 		/// </summary>
-		public string m_sMapFilePath;
+		public string MapFilePath;
 
-		internal void Save()
+		private void Save()
 		{
 			StringBuilder stbr = new StringBuilder();
-			for (int y = 0; y < nHeightCount; y++)
+			for (int h = 0; h < nHeightCount; h++)
 			{
-				for (int x = 0; x < nWidthCount; x++)
+				for (int w = 0; w < nWidthCount; w++)
 				{
-					stbr.Append(Map[y, x]);
-					if (x < nWidthCount - 1) stbr.Append(",");
+					//w, h, Exist, Selected, Result, Progress
+					stbr.Append(w.ToString() + "," + h.ToString() + "," + Map[h, w].ToString());
 				}
-				if (y < nHeightCount - 1) stbr.AppendLine();
 			}
-			File.WriteAllText(m_sMapFilePath, stbr.ToString());
+			File.WriteAllText(MapFilePath, stbr.ToString());
 		}
-		internal void Load(int nRoiIdx, int nFeaturIdx)
+		private void Load()
 		{
-			if (!File.Exists(m_sMapFilePath))
-			{
-				if (m_sMapFilePath == string.Empty || m_sMapFilePath == null)
-				{
-					//신규 경로에 맵 파일을 생성
-				}
-			}
-			var lines = File.ReadAllLines(m_sMapFilePath);
-
-			nHeightCount = lines.Length;
-			nWidthCount = lines.First().Split(',').Count();
-
-			for (int y = 0; y < nHeightCount; y++)
-			{
-				for (int x = 0; x < nWidthCount; x++)
-				{
-					Map[y, x] = lines[y].Split(',')[x];
-				}
-			}
 
 		}
 		public MapData(int w, int h)
@@ -567,18 +547,41 @@ namespace RootTools.Inspects
 		public UnitResult Result;
 		public UnitProgress Progress;
 
+		public Unit(string input)
+		{
+
+		}
+		public Unit()
+		{
+
+		}
 		public enum UnitResult
 		{
-			Good,
-			Bad
+			Good = 0,
+			Bad = 1
 		}
 		public enum UnitProgress
 		{
-			Ready,
-			Mapping,
-			Processing,
-			Done,
+			Ready = 0,
+			Mapping = 1,
+			Processing = 2,
+			Done = 3,
 		}
 		//TODO : 손쉬운 저장/로드를 위한 ToString의 override등이 필요할 수 있음
+		public override string ToString()
+		{
+			//Exist, Selected, Result, Progress
+			//bool, bool, int, int
+			StringBuilder stbr = new StringBuilder();
+			stbr.Append(Exist.ToString());
+			stbr.Append(",");
+			stbr.Append(Selected.ToString());
+			stbr.Append(",");
+			stbr.Append((int)Result);
+			stbr.Append(",");
+			stbr.Append((int)Progress);
+
+			return stbr.ToString();
+		}
 	}
 }

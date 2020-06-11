@@ -100,10 +100,10 @@ namespace RootTools.Inspects
 								m_InspProp.p_Rect.Bottom,
 								m_nWholeImageWidth,
 								m_nWholeImageHeight,
-								m_InspProp.p_surfaceParam.p_GV,
-								m_InspProp.p_surfaceParam.p_DefectSize,
-								m_InspProp.p_surfaceParam.p_bDarkInspection,
-								m_InspProp.p_surfaceParam.p_bAbsoluteInspection);
+								m_InspProp.p_surfaceParam.TargetGV,
+								m_InspProp.p_surfaceParam.DefectSize,
+								m_InspProp.p_surfaceParam.UseDarkInspection,
+								m_InspProp.p_surfaceParam.UseAbsoluteInspection);
 							foreach (var item in temp)
 							{
 								arrDefects.Add(new DefectDataWrapper(item));
@@ -123,10 +123,10 @@ namespace RootTools.Inspects
 									   m_InspProp.p_Rect.Bottom,
 									   m_nWholeImageWidth,
 									   m_nWholeImageHeight,
-									   m_InspProp.p_StripParam.p_GV,
-									   m_InspProp.p_StripParam.p_DefectSize,
-									   m_InspProp.p_StripParam.p_Intensity,
-									   m_InspProp.p_StripParam.p_Bandwidth);
+									   m_InspProp.p_StripParam.TargetGV,
+									   m_InspProp.p_StripParam.DefectSize,
+									   m_InspProp.p_StripParam.Intensity,
+									   m_InspProp.p_StripParam.Bandwidth);
 							foreach (var item in temp)
 							{
 								arrDefects.Add(new DefectDataWrapper(item));

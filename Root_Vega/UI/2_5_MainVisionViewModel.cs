@@ -206,27 +206,27 @@ namespace Root_Vega
 			//m_Recipe.m_RD.p_Roi = new List<Roi>(); //Mask#1, Mask#2... New List Mask
 			Roi Mask, Mask2;
 			Mask = new Roi("Strip MASK1", Roi.Item.ReticlePattern);  // Mask Number.. New Mask
-			Mask.m_Strip.p_Parameter = new ObservableCollection<StripParamData>();
-			Mask.m_Strip.m_NonPattern = new List<NonPattern>(); // List Rect in Mask
+			Mask.Strip.ParameterList = new ObservableCollection<StripParamData>();
+			Mask.Strip.NonPatternList = new List<NonPattern>(); // List Rect in Mask
 			NonPattern rect = new NonPattern(); // New Rect
-			rect.m_rt = new CRect(); // Rect Info
+			rect.Area = new CRect(); // Rect Info
 			StripParamData param = new StripParamData();
-			Mask.m_Strip.p_Parameter.Add(param);
-			Mask.m_Strip.m_NonPattern.Add(rect); // Add Rect to Rect List
+			Mask.Strip.ParameterList.Add(param);
+			Mask.Strip.NonPatternList.Add(rect); // Add Rect to Rect List
 												 //m_Recipe.m_RD.p_Roi.Add(Mask);
 												 //p_ListRoi.Add(m_Mask);
 
 			Mask2 = new Roi("Strip MASK2", Roi.Item.ReticlePattern);  // Mask Number.. New Mask
-			Mask2.m_Strip.p_Parameter = new ObservableCollection<StripParamData>();
-			Mask2.m_Strip.m_NonPattern = new List<NonPattern>(); // List Rect in Mask
+			Mask2.Strip.ParameterList = new ObservableCollection<StripParamData>();
+			Mask2.Strip.NonPatternList = new List<NonPattern>(); // List Rect in Mask
 			NonPattern rect2 = new NonPattern(); // New Rect
-			rect2.m_rt = new CRect(); // Rect Info
+			rect2.Area = new CRect(); // Rect Info
 			StripParamData param2 = new StripParamData();
-			Mask2.m_Strip.p_Parameter.Add(param2);
-			Mask2.m_Strip.m_NonPattern.Add(rect2); // Add Rect to Rect List
+			Mask2.Strip.ParameterList.Add(param2);
+			Mask2.Strip.NonPatternList.Add(rect2); // Add Rect to Rect List
 
-			p_Recipe.p_RecipeData.p_Roi.Add(Mask);
-			p_Recipe.p_RecipeData.p_Roi.Add(Mask2);
+			p_Recipe.RecipeData.RoiList.Add(Mask);
+			p_Recipe.RecipeData.RoiList.Add(Mask2);
 		}
 
 		#region Property
@@ -234,9 +234,9 @@ namespace Root_Vega
 		{
 			get
 			{
-				if (m_Recipe.p_RecipeData != null)
+				if (m_Recipe.RecipeData != null)
 				{
-					return m_Recipe.p_RecipeData;
+					return m_Recipe.RecipeData;
 				}
 				else
 				{
@@ -245,9 +245,9 @@ namespace Root_Vega
 			}
 			set
 			{
-				if (m_Recipe.p_RecipeData != null)
+				if (m_Recipe.RecipeData != null)
 				{
-					m_Recipe.p_RecipeData = value;
+					m_Recipe.RecipeData = value;
 					RaisePropertyChanged();
 				}
 			}
@@ -256,15 +256,15 @@ namespace Root_Vega
 		{
 			get
 			{
-				if (m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.p_Parameter.Count != 0)
-					return m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.p_Parameter[0];
+				if (m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList.Count != 0)
+					return m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList[0];
 				else
 					return new StripParamData();
 			}
 			set
 			{
-				if (m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.p_Parameter.Count != 0)
-					m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.p_Parameter[0] = value;
+				if (m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList.Count != 0)
+					m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList[0] = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -297,7 +297,7 @@ namespace Root_Vega
 				p_ImageViewer.SetDrawer((DrawToolVM)p_SimpleShapeDrawer[_IndexMask]);
 				p_ImageViewer.m_HistoryWorker = m_DrawHistoryWorker_List[_IndexMask];
 				p_ImageViewer.SetImageSource();
-				p_StripParamData = p_Recipe.p_RecipeData.p_Roi[_IndexMask].m_Strip.p_Parameter[0];
+				p_StripParamData = p_Recipe.RecipeData.RoiList[_IndexMask].Strip.ParameterList[0];
 
 			}
 		}
@@ -403,7 +403,7 @@ namespace Root_Vega
 			int right = (int)temp.EndPos.X;
 			int bot = (int)temp.EndPos.Y;
 			CRect rect = new CRect(left, top, right, bot);
-			p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.m_NonPattern[0].m_rt = rect;
+			p_Recipe.RecipeData.RoiList[p_IndexMask].Strip.NonPatternList[0].Area = rect;
 
 		}
 
@@ -476,7 +476,7 @@ namespace Root_Vega
 		}
 		private void _btnClear()
 		{
-			p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.m_NonPattern[0].m_rt = new CRect();
+			p_Recipe.RecipeData.RoiList[p_IndexMask].Strip.NonPatternList[0].Area = new CRect();
 
 			p_ImageViewer.ClearShape();
 			p_ImageViewer.SetImageSource();
@@ -509,7 +509,7 @@ namespace Root_Vega
 			currentSnap = 0;
 			m_Engineer.m_InspManager.ClearInspection();
 
-			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Strip.m_NonPattern[0].m_rt;
+			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
 			int nblocksize = 500;
 
 			int AreaWidth = Mask_Rect.Width;
@@ -518,8 +518,8 @@ namespace Root_Vega
 			System.Diagnostics.Debug.WriteLine(string.Format("Set wLimit : {0}", wLimit));
 
 			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
-				p_Recipe.p_RecipeData.p_Roi[0].m_Strip.p_Parameter[0],
-				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance, currentSnap, currentSnap + 1);
+				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
+				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance, currentSnap, currentSnap + 1);
 
 			currentSnap++;//한줄 추가
 
@@ -564,12 +564,12 @@ namespace Root_Vega
 				return;
 			}
 
-			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Strip.m_NonPattern[0].m_rt;
+			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
 			int nblocksize = 500;
 
 			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
-				p_Recipe.p_RecipeData.p_Roi[0].m_Strip.p_Parameter[0],
-				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance, currentSnap, currentSnap + 1);
+				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
+				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance, currentSnap, currentSnap + 1);
 
 			currentSnap++;//한줄 추가
 			m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
@@ -589,12 +589,12 @@ namespace Root_Vega
 
 			currentDefectIdx = 0;
 
-			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Strip.m_NonPattern[0].m_rt;
+			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
 			int nblocksize = 500;
 
 			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
-				p_Recipe.p_RecipeData.p_Roi[0].m_Strip.p_Parameter[0],
-				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance);
+				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
+				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance);
 
 			//for (int i = 0; i < DrawRectList.Count; i++)
 			//{
