@@ -14,27 +14,61 @@ namespace Root_Vega.Module
     public class Loadport : ModuleBase, IRobotChild
     {
         #region ToolBox
-        public DIO_I m_diPlaced;
-        public DIO_I m_diPresent;
-        public DIO_I m_diLoad;
-        public DIO_I m_diUnload; 
+        Axis m_axisZ;
+        Axis m_axisPodOpen;
+        Axis[] m_axisPodLifter = new Axis[2];
+        Axis[] m_axisReticleLifter = new Axis[2];
+        public DIO_IO m_dioPlaced;
+        public DIO_IO m_dioPresent;
+        public DIO_I m_diFront;
+        public DIO_I m_diBack;
+        public DIO_I m_diReticle;
+        public DIO_I m_diTilt;
+        public DIO_I m_diEmpty;
+        public DIO_O m_doManual;
+        public DIO_O m_doAuto;
+        public DIO_IO m_dioLoad;
+        public DIO_IO m_dioUnload;
+        public DIO_O m_doAlarm;
+        public DIO_Os m_doPodCylinder;
         public OHT_Semi m_OHT;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Placed");
-            p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
-            p_sInfo = m_toolBox.Get(ref m_diLoad, this, "Load");
-            p_sInfo = m_toolBox.Get(ref m_diUnload, this, "Unload");
+            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Z");
+            p_sInfo = m_toolBox.Get(ref m_axisPodOpen, this, "Pod Open");
+            p_sInfo = m_toolBox.Get(ref m_axisPodLifter[0], this, "Pod Lifter 0");
+            p_sInfo = m_toolBox.Get(ref m_axisPodLifter[1], this, "Pod Lifter 1");
+            p_sInfo = m_toolBox.Get(ref m_axisReticleLifter[0], this, "Reticle Lifter 0");
+            p_sInfo = m_toolBox.Get(ref m_axisReticleLifter[1], this, "Reticle Lifter 1");
+            p_sInfo = m_toolBox.Get(ref m_dioPlaced, this, "Placed");
+            p_sInfo = m_toolBox.Get(ref m_dioPresent, this, "Present");
+            p_sInfo = m_toolBox.Get(ref m_diFront, this, "Front");
+            p_sInfo = m_toolBox.Get(ref m_diBack, this, "Back");
+            p_sInfo = m_toolBox.Get(ref m_diReticle, this, "Reticle");
+            p_sInfo = m_toolBox.Get(ref m_diTilt, this, "Tilt");
+            p_sInfo = m_toolBox.Get(ref m_diEmpty, this, "Empty");
+            p_sInfo = m_toolBox.Get(ref m_doManual, this, "Manual");
+            p_sInfo = m_toolBox.Get(ref m_doAuto, this, "Auto");
+            p_sInfo = m_toolBox.Get(ref m_dioLoad, this, "Load");
+            p_sInfo = m_toolBox.Get(ref m_dioUnload, this, "Unload");
+            p_sInfo = m_toolBox.Get(ref m_doAlarm, this, "Alarm");
+            p_sInfo = m_toolBox.Get(ref m_doPodCylinder, this, "Alarm", Enum.GetNames(typeof(ePodCylinder)));
             p_sInfo = m_toolBox.Get(ref m_OHT, this, m_infoPod, "OHT");
         }
         #endregion
 
         #region DIO Function
+        enum ePodCylinder
+        {
+            Open,
+            Close
+        }
+
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present;
-            if (m_diPlaced.p_bIn != m_diPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
-            else present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            if (m_dioPlaced.p_bIn != m_dioPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
+            else present = m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
             if (m_infoPod.CheckPlaced(present) != "OK")
             {
                 m_alidPlaced.p_sMsg = "Placed Sensor Remain Checked while Pod State = " + m_infoPod.p_eState;
