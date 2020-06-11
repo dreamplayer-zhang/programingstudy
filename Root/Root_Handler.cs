@@ -19,8 +19,8 @@ namespace Root
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
-            //m_test = new Test("Test", m_enginner);
-            //InitModule(m_test);
+            m_test = new Test("Test", m_enginner);
+            InitModule(m_test);
             //m_scarecrow =new ScareCrow("ScareCrow", m_enginner);
             //InitModule(m_scarecrow);
             m_siltron = new Siltron("Siltrion", m_enginner);

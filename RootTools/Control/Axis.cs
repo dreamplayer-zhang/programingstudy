@@ -110,7 +110,8 @@ namespace RootTools.Control
         public string RunTree(Tree tree)
         {
             int nAxis0 = (p_axis == null) ? -1 : p_axis.p_nAxisID; 
-            int nAxis1 = tree.Set(nAxis0, -1, "Axis", "Axis Number"); 
+            int nAxis1 = tree.Set(nAxis0, -1, "Axis", "Axis Number");
+            if (nAxis1 >= m_toolAxis.Count) return "Axis Index not Valid"; 
             if (nAxis0 != nAxis1)
             {
                 if (IsAssignOK(nAxis1)) return "Can't Assign Exist Axis : " + m_id;

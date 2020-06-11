@@ -53,10 +53,10 @@ namespace Root_Vega
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            borderPlaced.Background = m_loadport.m_diPlaced.p_bIn ? Brushes.LightGreen : null;
-            borderPresent.Background = m_loadport.m_diPresent.p_bIn ? Brushes.LightGreen : null;
-            borderLoad.Background = m_loadport.m_diLoad.p_bIn ? Brushes.LightGreen : null;
-            borderUnload.Background = m_loadport.m_diUnload.p_bIn ? Brushes.LightGreen : null;
+            borderPlaced.Background = m_loadport.m_dioPlaced.p_bIn ? Brushes.LightGreen : null;
+            borderPresent.Background = m_loadport.m_dioPresent.p_bIn ? Brushes.LightGreen : null;
+            borderLoad.Background = m_loadport.m_dioLoad.p_bIn ? Brushes.LightGreen : null;
+            borderUnload.Background = m_loadport.m_dioUnload.p_bIn ? Brushes.LightGreen : null;
             borderAlarm.Background = (m_loadport.p_eState == ModuleBase.eState.Error) ? Brushes.Red : null;
             bool bAuto = (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto); 
             borderAccessAuto.Background = bAuto ? Brushes.LightGreen : null;
@@ -111,7 +111,6 @@ namespace Root_Vega
             }
         }
         #endregion
-
 
         #region Button Unload
         bool IsEnableUnload()

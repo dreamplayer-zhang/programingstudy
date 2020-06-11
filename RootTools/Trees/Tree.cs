@@ -36,28 +36,25 @@ namespace RootTools.Trees
 
         public bool p_bExpand { get; set; }
 
-        bool _bUse = false; 
-        public bool p_bUse 
-        { 
-            get { return _bUse; }
-            set
-            {
-                _bUse = value;
-                OnPropertyChanged("p_bVisible"); 
-            }
-        }
-
         bool _bVisible = true;
         public bool p_bVisible
         {
-            get { return _bVisible && p_bUse; }
+            get { return _bVisible; }
             set
             {
-                p_bUse = true;
                 if (_bVisible == value) return;
                 _bVisible = value;
                 OnPropertyChanged(); 
             }
+        }
+        #endregion
+
+        #region RunTreeInit
+        public void RunTreeInit()
+        {
+            p_aLastChild = p_aChild;
+            foreach (Tree tree in p_aLastChild) tree.RunTreeInit();
+            p_aChild.Clear(); 
         }
         #endregion
 
@@ -66,14 +63,14 @@ namespace RootTools.Trees
         protected void ClearUpdated()
         {
             m_bUpdated = false;
-            foreach (Tree treeItem in p_childs) treeItem.ClearUpdated();
+            foreach (Tree treeItem in p_aChild) treeItem.ClearUpdated();
         }
 
         public bool IsUpdated()
         {
             if (p_treeRoot.p_eMode != eMode.Update) return false;
             if (m_bUpdated) return true;
-            foreach (Tree treeItem in p_childs)
+            foreach (Tree treeItem in p_aChild)
             {
                 if (treeItem.IsUpdated()) return true;
             }
@@ -81,55 +78,32 @@ namespace RootTools.Trees
         }
         #endregion
 
-        #region Remove UnUse
-        protected void RemoveUnUseTreeItem()
-        {
-            try
-            {
-                for (int n = p_childs.Count - 1; n >= 0; n--)
-                {
-                    if (p_childs[n].p_bUse == false) p_childs.RemoveAt(n);
-                    else
-                    {
-                        p_childs[n].RemoveUnUseTreeItem();
-                        p_childs[n].p_bUse = false;
-                    }
-                }
-            }
-            catch { }
-        }
-        #endregion
-
         #region TreeGroup
         public Tree GetTree(string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false)
         {
-            foreach (Tree item in p_childs)
+            Tree item = FindTreeItem(sName);
+            if (item != null)
             {
-                if (item.p_sName == sName)
-                {
-                    item.p_bVisible = bVisible;
-                    item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable; 
-                    return item;
-                }
+                item.p_bVisible = bVisible;
+                item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
+                return item;
             }
             Tree newGroup = new TreeGroup(sName, this, m_log, bExpand, bVisible, bReadOnly);
-            p_childs.Add(newGroup);
+            AddTreeItem(newGroup);
             return newGroup;
         }
 
         public Tree GetTree(int nIndex, string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false)
         {
-            foreach (Tree item in p_childs)
+            Tree item = FindTreeItem(sName);
+            if (item != null)
             {
-                if ((item.p_sName == sName) && (item.p_nIndex == nIndex))
-                {
-                    item.p_bVisible = bVisible;
-                    item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
-                    return item;
-                }
+                item.p_bVisible = bVisible;
+                item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
+                return item;
             }
             Tree newGroup = new TreeGroup(nIndex, sName, this, m_log, bExpand, bVisible, bReadOnly);
-            p_childs.Add(newGroup);
+            AddTreeItem(newGroup);
             return newGroup;
         }
         #endregion
@@ -137,12 +111,10 @@ namespace RootTools.Trees
         #region TreeItem
         public Tree GetItem(string sName, dynamic value, string sDesc)
         {
-            foreach (Tree item in p_childs)
-            {
-                if (item.p_sName == sName) return item;
-            }
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item;
             Tree newItem = NewItem(sName, value, sDesc);
-            p_childs.Add(newItem);
+            AddTreeItem(newItem);
             return newItem;
         }
 
@@ -161,50 +133,65 @@ namespace RootTools.Trees
 
         Tree GetItem(string sName, string value, List<string> list, string sDesc)
         {
-            foreach (Tree item in p_childs)
+            Tree item = FindTreeItem(sName);
+            if (item != null)
             {
-                if (item.p_sName == sName)
-                {
-                    ((TreeItem_stringList)(item)).SetList(list);
-                    return item;
-                }
+                ((TreeItem_stringList)(item)).SetList(list);
+                return item;
             }
             Tree newitem = new TreeItem_stringList(sName, this, value, list, sDesc, m_log);
-            p_childs.Add(newitem);
+            AddTreeItem(newitem);
             return newitem;
         }
 
         Tree GetItemFile(string sName, string value, string sExt, string sDesc)
         {
-            foreach (Tree item in p_childs)
-            {
-                if (item.p_sName == sName) return item;
-            }
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item;
             Tree newitem = new TreeItem_FileName(sName, this, value, sExt, sDesc, m_log);
-            p_childs.Add(newitem);
+            AddTreeItem(newitem);
             return newitem;
         }
 
         Tree GetItemPassword(string sName, string value, string sDesc)
         {
-            foreach (Tree item in p_childs)
-            {
-                if (item.p_sName == sName) return item;
-            }
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item;
             Tree newitem = new TreeItem_Password(sName, this, value, sDesc, m_log);
-            p_childs.Add(newitem);
+            AddTreeItem(newitem);
             return newitem;
         }
 
         Tree GetItemICommand(string sName, RelayCommand value, string sButtonName, string sDesc)
         {
-            foreach (Tree item in p_childs)
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item; 
+            Tree newitem = new TreeItem_ICommand(sName, this, value, sButtonName, sDesc, m_log);
+            AddTreeItem(newitem);
+            return newitem;
+        }
+
+        Tree FindTreeItem(string sName)
+        {
+            foreach (Tree item in p_aChild)
             {
                 if (item.p_sName == sName) return item;
             }
-            Tree newitem = new TreeItem_ICommand(sName, this, value, sButtonName, sDesc, m_log);
-            p_childs.Add(newitem);
-            return newitem;
+            foreach (Tree item in p_aLastChild)
+            {
+                if (item.p_sName == sName)
+                {
+                    AddTreeItem(item);
+                    return item;
+                }
+            }
+            return null; 
+        }
+
+        void AddTreeItem(Tree treeItem)
+        {
+            if (p_treeRoot.p_eMode != eMode.Init) return; 
+            p_treeRoot.AddQueue(p_aChild, treeItem); 
         }
         #endregion
 
@@ -333,7 +320,7 @@ namespace RootTools.Trees
 
         public void HideAllItem()
         {
-            foreach (Tree item in p_childs)
+            foreach (Tree item in p_aChild)
             {
                 item.p_bVisible = false;
             }
@@ -343,10 +330,12 @@ namespace RootTools.Trees
         public Registry m_reg = null;
         public Job m_job = null;
 
-        public ObservableCollection<Tree> p_childs { get; set; }
+        public ObservableCollection<Tree> p_aChild { get; set; }
+        public ObservableCollection<Tree> p_aLastChild { get; set; }
         public Tree()
         {
-            p_childs = new ObservableCollection<Tree>(); 
+            p_aChild = new ObservableCollection<Tree>();
+            p_aLastChild = new ObservableCollection<Tree>();
         }
     }
 }
