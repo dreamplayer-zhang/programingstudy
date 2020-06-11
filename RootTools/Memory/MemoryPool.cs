@@ -114,16 +114,13 @@ namespace RootTools.Memory
 
         public void RunTreeModule(Tree tree)
         {
-            bool bChanged = false; 
-            foreach (MemoryGroup group in p_aGroup) bChanged = (bChanged || RunTreeGroup(tree.GetTree(group.p_id, false), group));
-            if (bChanged) m_memoryTool.MemoryChanged();
+            foreach (MemoryGroup group in p_aGroup) RunTreeGroup(tree.GetTree(group.p_id, false), group);
+            if (tree.IsUpdated()) m_memoryTool.MemoryChanged();
         }
 
-        bool RunTreeGroup(Tree tree, MemoryGroup group)
+        void RunTreeGroup(Tree tree, MemoryGroup group)
         {
-            bool bChanged = false; 
-            foreach (MemoryData memory in group.p_aMemory) bChanged = (bChanged || memory.RunTree(tree.GetTree(memory.p_id, false), true));
-            return bChanged; 
+            foreach (MemoryData memory in group.p_aMemory) memory.RunTree(tree.GetTree(memory.p_id, false), true);
         }
         #endregion
 
