@@ -34,6 +34,7 @@ namespace Root_Vega
             //toggleButtonAccessLPManual.DataContext = loadport.m_infoPod;
             textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
+            textBoxRecipe.DataContext = loadport.m_infoPod.m_aGemSlot[0];
 
             InitButtonLoad();
             InitTimer(); 
