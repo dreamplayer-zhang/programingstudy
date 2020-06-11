@@ -43,7 +43,7 @@ namespace Root_Vega
 
         private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
-            m_infoPod.StartProcess();
+            m_infoPod.StartProcess(null);
             m_infoPod.RunTreeReticle(Tree.eMode.Init);
         }
     }

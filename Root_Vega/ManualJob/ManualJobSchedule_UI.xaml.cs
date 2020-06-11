@@ -54,7 +54,6 @@ namespace Root_Vega.ManualJob
             if (sRecipe == null) return;
             m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.m_sManualRecipe = sRecipe;
             m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.RecipeOpen(sRecipe);
-            m_JobSchedule.m_loadport.m_infoPod.StartProcess(); 
         }
         #endregion
 

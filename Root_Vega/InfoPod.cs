@@ -168,11 +168,12 @@ namespace Root_Vega
         #endregion
 
         #region Process
-        public void StartProcess()
+        public void StartProcess(ModuleRunBase moduleRun)
         {
-            if (p_infoReticle == null) return; 
-            m_engineer.ClassHandler().AddSequence(p_infoReticle); 
-            m_engineer.ClassHandler().CalcSequence();
+            if (p_infoReticle == null) return;
+            Vega_Handler handler = (Vega_Handler)m_engineer.ClassHandler();
+            handler.AddSequence(p_infoReticle);
+            handler.m_process.ReCalcSequence(moduleRun);
             RunTreeReticle(Tree.eMode.Init);
         }
 

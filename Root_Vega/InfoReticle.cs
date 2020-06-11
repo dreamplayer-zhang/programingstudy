@@ -23,7 +23,7 @@ namespace Root_Vega
                 m_moduleRunList.OpenJob(pj.m_sRecipeID, false);
             }
             m_qProcess.Clear();
-            m_infoPod.StartProcess(); 
+            //m_infoPod.StartProcess(); 
         }
 
         public void RecipeOpen(string sRecipe)
@@ -69,9 +69,12 @@ namespace Root_Vega
         #region Tree
         public override void RunTree(Tree tree)
         {
-            base.RunTree(tree);
-            RunTreeRecipe(tree.GetTree("Recipe", false));
-            RunTreeProcess(tree.GetTree("Process", false));
+            Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                base.RunTree(tree);
+                RunTreeRecipe(tree.GetTree("Recipe", false));
+                RunTreeProcess(tree.GetTree("Process", false));
+            });
         }
         #endregion
 

@@ -148,7 +148,7 @@ namespace Root_Vega
 
         public void CalcSequence()
         {
-            m_process.ReCalcSequence(); 
+            m_process.ReCalcSequence(null); 
         }
         #endregion
 

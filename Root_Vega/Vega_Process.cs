@@ -4,6 +4,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace Root_Vega
 {
@@ -56,7 +57,7 @@ namespace Root_Vega
         {
             m_aInfoReticle.Clear();
             foreach (Locate locate in m_aLocate) locate.ClearInfoReticle(); 
-            ReCalcSequence();
+            ReCalcSequence(null);
             RunTree(Tree.eMode.Init);
         }
         #endregion
@@ -160,7 +161,7 @@ namespace Root_Vega
             m_qSequence.Clear();
             CalcRecoverArm();
             foreach (IRobotChild child in m_robot.m_aChild) CalcRecoverChild(child);
-            ReCalcSequence();
+            ReCalcSequence(null);
             RunTree(Tree.eMode.Init);
         }
 
@@ -196,18 +197,19 @@ namespace Root_Vega
         #region Sequence
         /// <summary> RunThread에서 실행 될 ModuleRun List (from Handler when EQ.p_eState == Run) </summary>
         public Queue<ModuleRunBase> m_qSequence = new Queue<ModuleRunBase>();
-        public string ReCalcSequence()
+        public string ReCalcSequence(ModuleRunBase run)
         {
             m_qSequence.Clear();
             try
             {
-                if (m_aInfoReticle.Count <= 0) return "OK"; 
+                if (m_aInfoReticle.Count <= 0) return "OK";
+                if (run != null) m_qSequence.Enqueue(run);
                 foreach (InfoReticle infoReticle in m_aInfoReticle)
                 {
                     if (infoReticle.m_qProcess.Count > 0)
                     {
                         foreach (ModuleRunBase moduleRun in infoReticle.m_qProcess) m_qSequence.Enqueue(moduleRun);
-                        infoReticle.SetObservableProcess(); 
+                        infoReticle.SetObservableProcess();
                     }
                 }
                 FinishLoadport(m_aInfoReticle[0]);
@@ -231,7 +233,7 @@ namespace Root_Vega
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
         public string RunNextSequence()
         {
-            if (!EQ.p_bSimulate && (EQ.p_eState != EQ.eState.Ready)) return "EQ not Ready"; 
+            if (!EQ.p_bSimulate && (EQ.p_eState != EQ.eState.Run)) return "EQ not Run"; 
             if (m_qSequence.Count == 0) return "OK";
             ModuleRunBase moduleRun = m_qSequence.Peek();
             p_sInfo = moduleRun.Run();
@@ -269,9 +271,12 @@ namespace Root_Vega
 
         public void RunTree(Tree.eMode mode)
         {
-            RunTreeReticle(mode);
-            RunTreeLocate(mode);
-            RunTreeSequence(mode);
+            Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                RunTreeReticle(mode);
+                RunTreeLocate(mode);
+                RunTreeSequence(mode);
+            });
         }
 
         void RunTreeReticle(Tree.eMode mode)
@@ -295,12 +300,13 @@ namespace Root_Vega
         {
             TreeRoot tree = m_treeSequence;
             tree.p_eMode = mode;
-            ModuleRunBase[] aModuleRun = m_qSequence.ToArray(); 
+            ModuleRunBase[] aModuleRun = m_qSequence.ToArray();
             for (int n = 0; n < aModuleRun.Length; n++)
             {
                 ModuleRunBase moduleRun = aModuleRun[n];
                 InfoReticle infoReticle = moduleRun.m_infoObject;
-                string sTree = "(" + infoReticle.p_id + ")." + moduleRun.p_id;
+                string id = (infoReticle != null) ? infoReticle.p_id : "InfoReticle";
+                string sTree = "(" + id + ")." + moduleRun.p_id;
                 moduleRun.RunTree(tree.GetTree(n, sTree, false), true);
             }
         }
