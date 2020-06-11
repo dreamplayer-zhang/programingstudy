@@ -331,15 +331,6 @@ namespace RootTools.Trees
         }
         #endregion
 
-        #region UI
-        ObservableCollection<Tree> _childs = new ObservableCollection<Tree>();
-        public ObservableCollection<Tree> p_childs
-        {
-            get { return _childs; }
-            set { _childs = value; }
-        }
-        #endregion
-
         public void HideAllItem()
         {
             foreach (Tree item in p_childs)
@@ -352,5 +343,10 @@ namespace RootTools.Trees
         public Registry m_reg = null;
         public Job m_job = null;
 
+        public ObservableCollection<Tree> p_childs { get; set; }
+        public Tree()
+        {
+            p_childs = new ObservableCollection<Tree>(); 
+        }
     }
 }

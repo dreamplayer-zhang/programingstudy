@@ -167,6 +167,17 @@ namespace RootTools.Gem
         #endregion
 
         #region GemPJ
+        string _sRecipe = ""; 
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                _sRecipe = value;
+                OnPropertyChanged(); 
+            }
+        }
+
         public List<GemPJ> m_aPJ = new List<GemPJ>(); 
         public void AddPJ(GemPJ pj)
         {

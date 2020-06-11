@@ -16,9 +16,14 @@ namespace Root_Vega
         public ModuleRunList m_moduleRunList;
         protected override void RecipeOpen()
         {
-            m_moduleRunList.Clear(); 
-            foreach (GemPJ pj in m_aPJ) m_moduleRunList.OpenJob(pj.m_sRecipeID, false);
+            m_moduleRunList.Clear();
+            foreach (GemPJ pj in m_aPJ)
+            {
+                p_sRecipe = pj.m_sRecipeID;
+                m_moduleRunList.OpenJob(pj.m_sRecipeID, false);
+            }
             m_qProcess.Clear();
+            m_infoPod.StartProcess(); 
         }
 
         public void RecipeOpen(string sRecipe)
@@ -70,9 +75,11 @@ namespace Root_Vega
         }
         #endregion
 
-        public string m_sLoadport; 
-        public InfoReticle(string id, IEngineer engineer)
+        public string m_sLoadport;
+        InfoPod m_infoPod; 
+        public InfoReticle(string id, InfoPod infoPod, IEngineer engineer)
         {
+            m_infoPod = infoPod; 
             p_aProcess = new ObservableCollection<ModuleRunBase>();
             string[] asID = id.Split('.');
             m_sLoadport = asID[0]; 

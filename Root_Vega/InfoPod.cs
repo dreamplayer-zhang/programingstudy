@@ -116,7 +116,7 @@ namespace Root_Vega
         {
             for (int n = 0; n < c_maxSlot; n++)
             {
-                InfoReticle newSlot = new InfoReticle(p_id + "." + n.ToString("00"), m_engineer);
+                InfoReticle newSlot = new InfoReticle(p_id + "." + n.ToString("00"), this, m_engineer);
                 newSlot.p_eState = GemSlotBase.eState.Empty;
                 newSlot.p_sCarrierID = p_sCarrierID;
                 newSlot.p_sLocID = p_sLocID;

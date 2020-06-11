@@ -100,7 +100,7 @@
                                            Grid.Row="2"
                                            Style="{StaticResource BasicTb}"
                                            Foreground="{StaticResource Black}"/>
-                        <TextBlock Text="Recipe Name"
+                        <TextBlock Text="Recipe Name" x:Name="textBoxRecipe"
                                            Grid.Column="1"
                                            Grid.Row="3"
                                            Style="{StaticResource BasicTb}"
