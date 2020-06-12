@@ -34,7 +34,15 @@ namespace RootTools.Trees
 
         public bool p_bEnable { get; set; }
 
-        public bool p_bExpand { get; set; }
+        bool _bExpand = false; 
+        public bool p_bExpand 
+        { 
+            get { return _bExpand; }
+            set
+            {
+                _bExpand = value; 
+            } 
+        }
 
         bool _bVisible = true;
         public bool p_bVisible
@@ -52,8 +60,12 @@ namespace RootTools.Trees
         #region RunTreeInit
         public void RunTreeInit()
         {
-            p_aLastChild = p_aChild;
-            foreach (Tree tree in p_aLastChild) tree.RunTreeInit();
+            p_aLastChild.Clear();
+            foreach (Tree tree in p_aChild)
+            {
+                tree.RunTreeInit();
+                p_aLastChild.Add(tree); 
+            }
             p_aChild.Clear(); 
         }
         #endregion
@@ -82,12 +94,13 @@ namespace RootTools.Trees
         public Tree GetTree(string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false)
         {
             Tree item = FindTreeItem(sName);
-            if (item != null)
-            {
-                item.p_bVisible = bVisible;
-                item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
-                return item;
-            }
+            if (item != null) return item;
+//            if (item != null)
+//            {
+//                item.p_bVisible = bVisible;
+//                item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
+//                return item;
+//            }
             Tree newGroup = new TreeGroup(sName, this, m_log, bExpand, bVisible, bReadOnly);
             AddTreeItem(newGroup);
             return newGroup;
@@ -96,12 +109,13 @@ namespace RootTools.Trees
         public Tree GetTree(int nIndex, string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false)
         {
             Tree item = FindTreeItem(sName);
-            if (item != null)
-            {
-                item.p_bVisible = bVisible;
-                item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
-                return item;
-            }
+            if (item != null) return item;
+//            if (item != null)
+//            {
+//                item.p_bVisible = bVisible;
+//                item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
+//                return item;
+//            }
             Tree newGroup = new TreeGroup(nIndex, sName, this, m_log, bExpand, bVisible, bReadOnly);
             AddTreeItem(newGroup);
             return newGroup;

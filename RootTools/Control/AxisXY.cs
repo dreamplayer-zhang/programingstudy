@@ -55,6 +55,24 @@ namespace RootTools.Control
             axis.RunTree(Tree.eMode.RegRead);
             axis.RunTree(Tree.eMode.Init);
         }
+
+        public CPoint GetPos(Enum pos)
+        {
+            CPoint cp = new CPoint();
+            cp.X = Convert.ToInt32(p_axisX.GetPos(pos.ToString()));
+            cp.Y = Convert.ToInt32(p_axisY.GetPos(pos.ToString()));
+            return cp; 
+        }
+
+        public bool IsInPos(Enum pos, double posError = 10)
+        {
+            CPoint cp = GetPos(pos); 
+            double dPos = cp.X - p_axisX.p_posCommand;
+            if (Math.Abs(dPos) > posError) return false;
+            dPos = cp.Y - p_axisY.p_posCommand;
+            if (Math.Abs(dPos) > posError) return false;
+            return true; 
+        }
         #endregion
 
         #region Move

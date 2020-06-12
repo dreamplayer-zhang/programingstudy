@@ -33,9 +33,15 @@ namespace RootTools.Control
             p_axis.RunTree(Tree.eMode.Init); 
         }
 
-        public int GetPos(Enum Position)
+        public int GetPos(Enum pos)
         {
-            return Convert.ToInt32(p_axis.GetPos(Position.ToString()));
+            return Convert.ToInt32(p_axis.GetPos(pos.ToString()));
+        }
+
+        public bool IsInPos(Enum pos, double posError = 10)
+        {
+            double dPos = GetPos(pos) - p_axis.p_posCommand;
+            return Math.Abs(dPos) <= posError; 
         }
         #endregion
 
