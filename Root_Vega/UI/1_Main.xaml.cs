@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Vega.ManualJob;
+using RootTools;
 using System;
 using System.Windows;
 using System.Windows.Controls;

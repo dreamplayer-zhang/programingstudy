@@ -2,6 +2,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
+using System.Windows.Media;
+using System;
 
 namespace Root_Vega.ManualJob
 {
@@ -11,10 +14,30 @@ namespace Root_Vega.ManualJob
     public partial class ManualJobSchedule_UI : Window
     {
         static public bool m_bShow = false;
+        DispatcherTimer m_UIBackTimer = new DispatcherTimer();
+        Color UIBackColorT = Color.FromArgb(255, 67, 67, 122);
+        Brush UIBackBrushT;
+        Color UIBackColorF = Color.FromArgb(255, 45, 45, 48);
+        Brush UIBackBrushF;
+        bool bChangUI = false;
         public ManualJobSchedule_UI()
         {
             m_bShow = true;
             InitializeComponent();
+
+            UIBackBrushT = new SolidColorBrush(UIBackColorT);
+            UIBackBrushF = new SolidColorBrush(UIBackColorF);
+
+            m_UIBackTimer.Interval = TimeSpan.FromMilliseconds(1500);
+            m_UIBackTimer.Tick += m_UIBackTimer_Tick;
+            m_UIBackTimer.Start();
+        }
+
+        private void m_UIBackTimer_Tick(object sender, EventArgs e)
+        {
+            if (bChangUI) gridMain.Background = UIBackBrushT;
+            else gridMain.Background = UIBackBrushF;
+            bChangUI = !bChangUI;
         }
 
         ManualJobSchedule m_JobSchedule;

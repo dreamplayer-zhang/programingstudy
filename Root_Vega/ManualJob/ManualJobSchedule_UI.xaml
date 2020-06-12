@@ -33,9 +33,48 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="{x:Type CheckBox}" TargetType="{x:Type CheckBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Border x:Name="Border" Width="25" Height="25" CornerRadius="0" Background="White" BorderThickness="1" BorderBrush="#404040">
+                                    <Path Width="14" Height="14" x:Name="CheckMark" SnapsToDevicePixels="False" Stroke="#404040" StrokeThickness="3" Data="M 0 0 L 7 14 M 7 14 L 14 0" />
+                                </Border>
+                            </BulletDecorator.Bullet>
+                            <ContentPresenter Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" RecognizesAccessKey="True"/>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="false">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="{x:Null}">
+                                <Setter TargetName="CheckMark" Property="Data" Value="M 0 7 L 7 0" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#808080" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#E0E0E0" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#606060" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter TargetName="Border" Property="Background" Value="#EEEEEE" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#AAAAAA" />
+                                <Setter Property="Foreground" Value="#888888"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     
-    <Grid Background="{Binding p_brushJobSchedule}">
+    <Grid x:Name="gridMain">
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="9*"/>
@@ -45,7 +84,7 @@
                 <ColumnDefinition Width="9*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Manual Job Schedule" Foreground="White" VerticalAlignment="Center" FontSize="20" Margin="10"/>
+            <TextBlock Grid.Column="0" Text="Manual Job Schedule" Foreground="White" VerticalAlignment="Center" FontSize="20" Margin="10" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"/>
             <Button Grid.Column="1" Style="{StaticResource SystemButton}" x:Name="btnClose" Foreground="White" 
                     Width="34" Height="26" 
                     VerticalAlignment="Center"
@@ -102,8 +141,8 @@
                 </Grid>
                 <Grid Grid.Row="2" Height="auto">
                     <GroupBox FontSize="20" Header="Option" Height="auto" Foreground="White">
-                        <StackPanel Orientation="Horizontal">
-
+                        <StackPanel Orientation="Vertical">
+                            <CheckBox Content="RNR Mode" Foreground="White" VerticalAlignment="Center" Margin="10"/>
                         </StackPanel>
                     </GroupBox>
                 </Grid>
