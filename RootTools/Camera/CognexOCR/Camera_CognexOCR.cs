@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Controls;
 using RootTools.Trees;
+using System.Windows.Media.Imaging;
 
 namespace RootTools.Camera.CognexOCR
 {
@@ -137,20 +138,25 @@ namespace RootTools.Camera.CognexOCR
         #endregion
 
         #region FTP
-        void ReadImage()
+        public BitmapImage ReadImage()
         {
             try
             {
-                FtpWebRequest ftp = (FtpWebRequest)WebRequest.Create("ftp://" + m_tcpip.p_sIP + "/image.bmp");
-                ftp.Method = WebRequestMethods.Ftp.DownloadFile;
+                WebClient ftp = new WebClient();
                 ftp.Credentials = new NetworkCredential(m_sUserName, m_sPassword);
-                using (FtpWebResponse resp = (FtpWebResponse)ftp.GetResponse())
-                {
-                    Stream stream = resp.GetResponseStream();
-//                    bitmap = new Bitmap(stream);
-                }
+
+                Thread.Sleep(100);
+                BitmapImage image = new BitmapImage(new Uri("ftp://" + m_tcpip.p_sIP + "/image.bmp"));
+
+//                Thread.Sleep(1000);
+//                ftp.DownloadFile("ftp://" + m_tcpip.p_sIP + "/image.bmp", "c:\\Log\\CognexOCR.bmp");
+//                Thread.Sleep(100);
+//                BitmapImage image = new BitmapImage(new Uri("c:\\Log\\CognexOCR.bmp")); 
+
+                return image;
             }
             catch (Exception e) { p_sInfo = "Read Image Error : " + e.Message; }
+            return null; 
         }
 
         string m_sUserName = "admin"; 
