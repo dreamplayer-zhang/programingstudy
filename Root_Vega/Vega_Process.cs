@@ -237,7 +237,8 @@ namespace Root_Vega
             if (m_qSequence.Count == 0) return "OK";
             ModuleRunBase moduleRun = m_qSequence.Peek();
             p_sInfo = moduleRun.Run();
-            if (p_sInfo == "OK")
+            if (p_sInfo != "OK") EQ.p_bStop = true;
+            else
             {
                 m_qSequence.Dequeue();
                 InfoReticle infoReticle = moduleRun.m_infoObject;
