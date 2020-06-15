@@ -54,6 +54,7 @@ namespace RootTools.Control.Ajin
             set
             {
                 _sID = p_nAxisID.ToString("00") + "." + value;
+                m_ajinListAxis.InvalidAxisList(); 
                 RaisePropertyChanged();
             }
         }
@@ -1203,7 +1204,6 @@ namespace RootTools.Control.Ajin
 
         public void RunTree(Tree.eMode mode)
         {
-            //bool bReadOnly = (m_engineer.p_user.m_eLevel < Login.eLevel.Operator);
             bool bReadOnly = false;
             p_treeRootMain.p_eMode = mode;
             RunPosTree(p_treeRootMain.GetTree("Position"), bReadOnly);
@@ -1217,12 +1217,6 @@ namespace RootTools.Control.Ajin
             p_treeRootSub.p_eMode = mode;
             RunSpeedTree(p_treeRootSub.GetTree("Speed"), bReadOnly);
             RunAccTree(p_treeRootSub.GetTree("Accelation"), bReadOnly);
-            //bool bReadOnly = (m_engineer.p_user.m_eLevel < Login.eLevel.Operator);
-            //m_treeRootSpeed.p_eMode = mode;
-            //RunMoveTree(m_treeRootSpeed.GetTree("Move"), bReadOnly);
-            //RunRepeatTree(m_treeRootSpeed.GetTree("Repeat"), bReadOnly);
-            //RunJogTree(m_treeRootSpeed.GetTree("Jog"), bReadOnly);
-            //RunHomeTree(m_treeRootSpeed.GetTree("Home"), bReadOnly);
         }
 
         private void M_treeSetup_UpdateTree()
@@ -1289,10 +1283,12 @@ namespace RootTools.Control.Ajin
             set { SetProperty(ref m_treeSetup, value); }
         }
 
-        public void Init(string id, int nAxisID, IEngineer engineer, bool bEnable)
+        AjinListAxis m_ajinListAxis; 
+        public void Init(string id, AjinListAxis ajinListAxis, IEngineer engineer, bool bEnable)
         {
-            m_id = id + "." + nAxisID.ToString("00");
-            p_nAxisID = nAxisID;
+            m_ajinListAxis = ajinListAxis;
+            p_nAxisID = ajinListAxis.m_aAxis.Count; 
+            m_id = id + "." + p_nAxisID.ToString("00");
             p_sID = "Axis";
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
@@ -1666,7 +1662,7 @@ namespace RootTools.Control.Ajin
                 bool bUseLimit = false;
                 double dLimit_M = 0;
                 double dLimit_P = 0;
-                RootTools.Control.Ajin.AjinAxis axis = (RootTools.Control.Ajin.AjinAxis)(((TabControl)values[2]).DataContext);
+                AjinAxis axis = (AjinAxis)(((TabControl)values[2]).DataContext);
                 double pos = axis.GetPos((string)values[0]);
                 bUseLimit = axis.p_bSWLimit[0] && axis.p_bSWLimit[1];
                 if (bUseLimit)

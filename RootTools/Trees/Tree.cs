@@ -44,6 +44,8 @@ namespace RootTools.Trees
             } 
         }
 
+        public bool p_bRemove { get; set; }
+
         bool _bVisible = true;
         public bool p_bVisible
         {
@@ -193,7 +195,7 @@ namespace RootTools.Trees
         void AddTreeItem(Tree treeItem)
         {
             if (p_treeRoot.p_eMode != eMode.Init) return; 
-            p_treeRoot.AddQueue(p_aChild, treeItem); 
+            p_treeRoot.AddQueue(this, treeItem); 
         }
         #endregion
 
