@@ -82,6 +82,11 @@ namespace Root_Vega
             _Main.Init(m_engineer);
 
             InitTimer(); 
+
+            if(!System.IO.Directory.Exists(@"C:\VEGA\Recipe"))
+			{
+                System.IO.Directory.CreateDirectory(@"C:\VEGA\Recipe");
+			}
         }
 
         void ConnectViewModel(IDialogService dialogService)

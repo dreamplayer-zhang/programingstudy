@@ -44,14 +44,14 @@ namespace Root_Wind
             m_Image = new ImageData(memoryPool.GetMemory(sGroup, sMem));
             p_ImageViewer = new ImageViewer_ViewModel(m_Image, dialogService);
 
-            p_ListRoi = new ObservableCollection<Roi>(m_Recipe.p_RecipeData.p_Roi);
+            p_ListRoi = new ObservableCollection<Roi>(m_Recipe.RecipeData.RoiList);
             //m_Recipe.m_RD.p_Roi = new List<Roi>(); //Mask#1, Mask#2... New List Mask
             m_Mask = new Roi("MASK1", Roi.Item.None);  // Mask Number.. New Mask
 
-            m_Mask.m_Surface.m_NonPattern = new List<NonPattern>(); // List Rect in Mask
+            m_Mask.Surface.NonPatternList = new List<NonPattern>(); // List Rect in Mask
             NonPattern rect = new NonPattern(); // New Rect
-            rect.m_rt = new CRect(); // Rect Info
-            m_Mask.m_Surface.m_NonPattern.Add(rect); // Add Rect to Rect List
+            rect.Area = new CRect(); // Rect Info
+            m_Mask.Surface.NonPatternList.Add(rect); // Add Rect to Rect List
             //m_Recipe.m_RD.p_Roi.Add(Mask);
             p_ListRoi.Add(m_Mask);
             
@@ -732,31 +732,31 @@ namespace Root_Wind
         private void DrawingRectDone()
         {
             NonPattern nonPattern = new NonPattern(); // New Rect
-            nonPattern.m_rt = new CRect(); // Rect Info
+            nonPattern.Area = new CRect(); // Rect Info
 
-            nonPattern.m_rt.Left = m_DrawHelper.Rect_StartPt.X;
-            nonPattern.m_rt.Top = m_DrawHelper.Rect_StartPt.Y;
-            nonPattern.m_rt.Right = m_DrawHelper.Rect_EndPt.X;
-            nonPattern.m_rt.Bottom = m_DrawHelper.Rect_EndPt.Y;
+            nonPattern.Area.Left = m_DrawHelper.Rect_StartPt.X;
+            nonPattern.Area.Top = m_DrawHelper.Rect_StartPt.Y;
+            nonPattern.Area.Right = m_DrawHelper.Rect_EndPt.X;
+            nonPattern.Area.Bottom = m_DrawHelper.Rect_EndPt.Y;
 
 
 
             if (m_DrawHelper.Rect_EndPt.X < m_DrawHelper.Rect_StartPt.X)
             {
-                nonPattern.m_rt.Left = m_DrawHelper.Rect_EndPt.X;
-                nonPattern.m_rt.Right = m_DrawHelper.Rect_StartPt.X;
+                nonPattern.Area.Left = m_DrawHelper.Rect_EndPt.X;
+                nonPattern.Area.Right = m_DrawHelper.Rect_StartPt.X;
 
             }
             if (m_DrawHelper.Rect_EndPt.Y < m_DrawHelper.Rect_StartPt.Y)
             {
-                nonPattern.m_rt.Top = m_DrawHelper.Rect_EndPt.Y;
-                nonPattern.m_rt.Bottom = m_DrawHelper.Rect_StartPt.Y;
+                nonPattern.Area.Top = m_DrawHelper.Rect_EndPt.Y;
+                nonPattern.Area.Bottom = m_DrawHelper.Rect_StartPt.Y;
 
             }
             m_DrawHelper.NowRect.StrokeDashArray = new DoubleCollection(1);
 
             m_DrawHelper.CanvasRectList.Add(m_DrawHelper.NowRect);
-            m_Mask.m_Surface.m_NonPattern.Add(nonPattern); // Add Rect to Rect List
+            m_Mask.Surface.NonPatternList.Add(nonPattern); // Add Rect to Rect List
         }
 
         //private void RedrawRect()

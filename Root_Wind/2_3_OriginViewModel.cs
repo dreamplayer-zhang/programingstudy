@@ -671,11 +671,11 @@ namespace Root_Wind
             }
             m_DrawHelper.DrawnRect.StrokeDashArray = new DoubleCollection(1);
 
-            if(m_Recipe.p_RecipeData.p_Roi == null)
-                m_Recipe.p_RecipeData.p_Roi = new ObservableCollection<Roi>();
+            if(m_Recipe.RecipeData.RoiList == null)
+                m_Recipe.RecipeData.RoiList = new ObservableCollection<Roi>();
             Roi OriginRoi = new Roi("Origin", Roi.Item.None);
-            OriginRoi.m_Origin.m_rtOrigin = m_DD.m_OriginData.m_rt;
-            m_Recipe.p_RecipeData.p_Roi.Add(OriginRoi);
+            OriginRoi.Origin.OriginRect = m_DD.m_OriginData.m_rt;
+            m_Recipe.RecipeData.RoiList.Add(OriginRoi);
            
            
 

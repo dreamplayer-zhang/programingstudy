@@ -18,6 +18,8 @@ using RootTools.Memory;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
+using Emgu.CV.Dnn;
 
 namespace RootTools
 {
@@ -120,7 +122,9 @@ namespace RootTools
             set
             {
                 m_nProgress = value;
-                UpdateOpenProgress(m_nProgress);
+
+                if(UpdateOpenProgress!=null)
+                    UpdateOpenProgress(m_nProgress);
             }
         }
 
@@ -328,8 +332,25 @@ namespace RootTools
                 Worker_MemorySave.RunWorkerAsync(arguments);
             }
         }
-        
-        void Worker_MemorySave_DoWork(object sender, DoWorkEventArgs e)
+		public void SaveWholeImage(string targetPath)
+		{
+			List<object> arguments = new List<object>();
+			arguments.Add(targetPath);
+			arguments.Add(new CRect(0, 0, p_Size.X, p_Size.Y));
+
+			BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+			Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
+			Worker_MemorySave.RunWorkerAsync(arguments);
+		}
+        /// <summary>
+        /// 비동기 이미지 Load
+        /// </summary>
+        public void LoadImageSync(string filePath, CPoint offset)
+		{
+            OpenBMPFile(filePath, null, offset);
+        }
+
+		void Worker_MemorySave_DoWork(object sender, DoWorkEventArgs e)
         {
             List<object> arguments = (List<object>)(e.Argument);
 
@@ -345,41 +366,36 @@ namespace RootTools
             {
                 rect.Right += 4 - rect.Width % 4;
             }
-            if (rect.Height % 4 != 0)
-            {
-                rect.Bottom+= 4 - rect.Height % 4;
-            }
 
             FileStream fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
             BinaryWriter bw = new BinaryWriter(fs);
 
-            bw.Write(Convert.ToUInt16(0x4d42));
-			if (p_nByte==1)
+            bw.Write(Convert.ToUInt16(0x4d42));//ushort bfType = br.ReadUInt16();
+            if (p_nByte==1)
 				bw.Write(Convert.ToUInt32(54 + 1024 + p_nByte * rect.Width * rect.Height));
 			else if(p_nByte==3)
-				bw.Write(Convert.ToUInt32(54 + p_nByte * rect.Width * rect.Height));
-			
+				bw.Write(Convert.ToUInt32(54 + p_nByte * rect.Width * rect.Height));//uint bfSize = br.ReadUInt32();
+
             //image 크기 bw.Write();   bmfh.bfSize = sizeof(14byte) + nSizeHdr + rect.right * rect.bottom;
-            bw.Write(Convert.ToUInt16(0));   //reserved
-            bw.Write(Convert.ToUInt16(0));   //reserved
-			if (p_nByte == 1)
+            bw.Write(Convert.ToUInt16(0));   //reserved // br.ReadUInt16();
+            bw.Write(Convert.ToUInt16(0));   //reserved //br.ReadUInt16();
+            if (p_nByte == 1)
 				bw.Write(Convert.ToUInt32(1078));
 			else if (p_nByte == 3)
-				bw.Write(Convert.ToUInt32(54));
-			
+				bw.Write(Convert.ToUInt32(54));//uint bfOffBits = br.ReadUInt32();
 
-            bw.Write(Convert.ToUInt32(40));
-            bw.Write(Convert.ToInt32(rect.Width));
-            bw.Write(Convert.ToInt32(rect.Height));
-            bw.Write(Convert.ToUInt16(1));
-            bw.Write(Convert.ToUInt16(8*p_nByte));     //byte                      
-            bw.Write(Convert.ToUInt32(0));      //compress
-            bw.Write(Convert.ToUInt32(rect.Width * rect.Height));
-            bw.Write(Convert.ToInt32(0));
-            bw.Write(Convert.ToInt32(0));
-            bw.Write(Convert.ToUInt32(256));      //color
-            bw.Write(Convert.ToUInt32(256));      //import
-			if (p_nByte == 1)
+            bw.Write(Convert.ToUInt32(40));// uint biSize = br.ReadUInt32();
+            bw.Write(Convert.ToInt32(rect.Width));// nWidth = br.ReadInt32();
+            bw.Write(Convert.ToInt32(rect.Height));// nHeight = br.ReadInt32();
+            bw.Write(Convert.ToUInt16(1));// a = br.ReadUInt16();
+            bw.Write(Convert.ToUInt16(8*p_nByte));     //byte       // nByte = br.ReadUInt16() / 8;                
+            bw.Write(Convert.ToUInt32(0));      //compress //b = br.ReadUInt32();
+            bw.Write(Convert.ToUInt32(rect.Width * rect.Height));// b = br.ReadUInt32();
+            bw.Write(Convert.ToInt32(0));//a = br.ReadInt32();
+            bw.Write(Convert.ToInt32(0));// a = br.ReadInt32();
+            bw.Write(Convert.ToUInt32(256));      //color //b = br.ReadUInt32();
+            bw.Write(Convert.ToUInt32(256));      //import // b = br.ReadUInt32();
+            if (p_nByte == 1)
 			{
 				for (int i = 0; i < 256; i++)
 				{
@@ -392,7 +408,7 @@ namespace RootTools
 			byte[] aBuf = new byte[p_nByte * rect.Width];
 			for (int i = rect.Height - 1; i >= 0; i--)
 			{
-				Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * p_Size.X * p_nByte), aBuf, 0, rect.Width);
+				Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * p_Size.X * p_nByte), aBuf, 0, rect.Width * p_nByte);
 				bw.Write(aBuf);
 				p_nProgress = Convert.ToInt32(((double)(rect.Height - i) / rect.Height) * 100);
 			}
@@ -465,7 +481,14 @@ namespace RootTools
             }
         }
 
-        void Worker_MemoryClear_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+		public void SaveImageSync(string targetPath)
+		{
+            IntPtr unmanagedPointer = Marshal.AllocHGlobal(m_aBuf.Length);
+            Marshal.Copy(m_aBuf, 0, unmanagedPointer, m_aBuf.Length);
+            FileSaveBMP(targetPath, unmanagedPointer, new CRect(0,0, m_Size.X, m_Size.Y));
+        }
+
+		void Worker_MemoryClear_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             p_nProgress = 100;
             OnCreateNewImage();
@@ -531,14 +554,17 @@ namespace RootTools
                 }
                 else
                 {
+                p_nByte = nByte;
+                if(p_nByte !=3)
+                {
                     byte[] hRGB = br.ReadBytes(256 * 4);
-                    p_nByte = nByte;
+                }
                     p_Size = new CPoint(nWidth + offset.X, nHeight + offset.Y);
                     ReAllocate(p_Size, _nByte);
                     for (int y = p_Size.Y - 1; y >= 0; y--)
                     {
-                        byte[] pBuf = br.ReadBytes((int) nWidth);
-                        Buffer.BlockCopy(pBuf, 0, m_aBuf, (int)(offset.X + (offset.Y + y) * p_Stride), (int)nWidth);
+                        byte[] pBuf = br.ReadBytes((int) nWidth* nByte);
+                        Buffer.BlockCopy(pBuf, 0, m_aBuf, (int)(offset.X + (offset.Y + y) * p_Stride), (int)nWidth* nByte);
                         p_nProgress = Convert.ToInt32(((double)(p_Size.Y-y) / p_Size.Y) * 100);
                        
                     }

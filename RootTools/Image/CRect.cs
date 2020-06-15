@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Xml.Serialization;
 
 namespace RootTools
 {
     public class CRect
     {
         int _x;
+        [XmlIgnore]
         public int X
         {
             get { return _x; }
@@ -12,6 +14,7 @@ namespace RootTools
         }
 
         int _y;
+        [XmlIgnore]
         public int Y
         {
             get { return _y; }
@@ -42,6 +45,7 @@ namespace RootTools
             set { _bottom = value; }
         }
 
+        [XmlIgnore]
         public int Width
         {
             get
@@ -53,6 +57,7 @@ namespace RootTools
                 Right = value + Left;
             }
         }
+        [XmlIgnore]
         public int Height
         {
             get

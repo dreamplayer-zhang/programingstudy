@@ -1,10 +1,13 @@
 ﻿using ATI;
+using Microsoft.Win32;
 using RootTools;
 using RootTools.Inspects;
 using RootTools.Memory;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -206,27 +209,27 @@ namespace Root_Vega
 			//m_Recipe.m_RD.p_Roi = new List<Roi>(); //Mask#1, Mask#2... New List Mask
 			Roi Mask, Mask2;
 			Mask = new Roi("Strip MASK1", Roi.Item.ReticlePattern);  // Mask Number.. New Mask
-			Mask.m_Strip.p_Parameter = new ObservableCollection<StripParamData>();
-			Mask.m_Strip.m_NonPattern = new List<NonPattern>(); // List Rect in Mask
+			Mask.Strip.ParameterList = new ObservableCollection<StripParamData>();
+			Mask.Strip.NonPatternList = new List<NonPattern>(); // List Rect in Mask
 			NonPattern rect = new NonPattern(); // New Rect
-			rect.m_rt = new CRect(); // Rect Info
+			rect.Area = new CRect(); // Rect Info
 			StripParamData param = new StripParamData();
-			Mask.m_Strip.p_Parameter.Add(param);
-			Mask.m_Strip.m_NonPattern.Add(rect); // Add Rect to Rect List
+			Mask.Strip.ParameterList.Add(param);
+			Mask.Strip.NonPatternList.Add(rect); // Add Rect to Rect List
 												 //m_Recipe.m_RD.p_Roi.Add(Mask);
 												 //p_ListRoi.Add(m_Mask);
 
 			Mask2 = new Roi("Strip MASK2", Roi.Item.ReticlePattern);  // Mask Number.. New Mask
-			Mask2.m_Strip.p_Parameter = new ObservableCollection<StripParamData>();
-			Mask2.m_Strip.m_NonPattern = new List<NonPattern>(); // List Rect in Mask
+			Mask2.Strip.ParameterList = new ObservableCollection<StripParamData>();
+			Mask2.Strip.NonPatternList = new List<NonPattern>(); // List Rect in Mask
 			NonPattern rect2 = new NonPattern(); // New Rect
-			rect2.m_rt = new CRect(); // Rect Info
+			rect2.Area = new CRect(); // Rect Info
 			StripParamData param2 = new StripParamData();
-			Mask2.m_Strip.p_Parameter.Add(param2);
-			Mask2.m_Strip.m_NonPattern.Add(rect2); // Add Rect to Rect List
+			Mask2.Strip.ParameterList.Add(param2);
+			Mask2.Strip.NonPatternList.Add(rect2); // Add Rect to Rect List
 
-			p_Recipe.p_RecipeData.p_Roi.Add(Mask);
-			p_Recipe.p_RecipeData.p_Roi.Add(Mask2);
+			p_Recipe.RecipeData.RoiList.Add(Mask);
+			p_Recipe.RecipeData.RoiList.Add(Mask2);
 		}
 
 		#region Property
@@ -234,9 +237,9 @@ namespace Root_Vega
 		{
 			get
 			{
-				if (m_Recipe.p_RecipeData != null)
+				if (m_Recipe.RecipeData != null)
 				{
-					return m_Recipe.p_RecipeData;
+					return m_Recipe.RecipeData;
 				}
 				else
 				{
@@ -245,9 +248,9 @@ namespace Root_Vega
 			}
 			set
 			{
-				if (m_Recipe.p_RecipeData != null)
+				if (m_Recipe.RecipeData != null)
 				{
-					m_Recipe.p_RecipeData = value;
+					m_Recipe.RecipeData = value;
 					RaisePropertyChanged();
 				}
 			}
@@ -256,15 +259,15 @@ namespace Root_Vega
 		{
 			get
 			{
-				if (m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.p_Parameter.Count != 0)
-					return m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.p_Parameter[0];
+				if (m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList.Count != 0)
+					return m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList[0];
 				else
 					return new StripParamData();
 			}
 			set
 			{
-				if (m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.p_Parameter.Count != 0)
-					m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.p_Parameter[0] = value;
+				if (m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList.Count != 0)
+					m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList[0] = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -297,7 +300,7 @@ namespace Root_Vega
 				p_ImageViewer.SetDrawer((DrawToolVM)p_SimpleShapeDrawer[_IndexMask]);
 				p_ImageViewer.m_HistoryWorker = m_DrawHistoryWorker_List[_IndexMask];
 				p_ImageViewer.SetImageSource();
-				p_StripParamData = p_Recipe.p_RecipeData.p_Roi[_IndexMask].m_Strip.p_Parameter[0];
+				p_StripParamData = p_Recipe.RecipeData.RoiList[_IndexMask].Strip.ParameterList[0];
 
 			}
 		}
@@ -403,7 +406,7 @@ namespace Root_Vega
 			int right = (int)temp.EndPos.X;
 			int bot = (int)temp.EndPos.Y;
 			CRect rect = new CRect(left, top, right, bot);
-			p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.m_NonPattern[0].m_rt = rect;
+			p_Recipe.RecipeData.RoiList[p_IndexMask].Strip.NonPatternList[0].Area = rect;
 
 		}
 
@@ -459,6 +462,13 @@ namespace Root_Vega
 				return new RelayCommand(_btnRcpSaveTest);
 			}
 		}
+		public ICommand btnRcpLoadTest
+		{
+			get
+			{
+				return new RelayCommand(_btnRcpLoadTest);
+			}
+		}
 		public RelayCommand CommandSaveMask
 		{
 			get
@@ -476,7 +486,7 @@ namespace Root_Vega
 		}
 		private void _btnClear()
 		{
-			p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Strip.m_NonPattern[0].m_rt = new CRect();
+			p_Recipe.RecipeData.RoiList[p_IndexMask].Strip.NonPatternList[0].Area = new CRect();
 
 			p_ImageViewer.ClearShape();
 			p_ImageViewer.SetImageSource();
@@ -509,7 +519,7 @@ namespace Root_Vega
 			currentSnap = 0;
 			m_Engineer.m_InspManager.ClearInspection();
 
-			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Strip.m_NonPattern[0].m_rt;
+			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
 			int nblocksize = 500;
 
 			int AreaWidth = Mask_Rect.Width;
@@ -518,8 +528,8 @@ namespace Root_Vega
 			System.Diagnostics.Debug.WriteLine(string.Format("Set wLimit : {0}", wLimit));
 
 			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
-				p_Recipe.p_RecipeData.p_Roi[0].m_Strip.p_Parameter[0],
-				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance, currentSnap, currentSnap + 1);
+				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
+				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance, currentSnap, currentSnap + 1);
 
 			currentSnap++;//한줄 추가
 
@@ -551,10 +561,79 @@ namespace Root_Vega
 			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 			m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
 		}
+		private void _btnRcpLoadTest()
+		{
+			OpenFileDialog dlg = new OpenFileDialog();
+			dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
+			dlg.InitialDirectory = @"C:\VEGA\Recipe";
+			if (dlg.ShowDialog() == true)
+			{
+				this.p_Recipe = Recipe.Load(dlg.FileName);
+			}
+
+		}
 		private void _btnRcpSaveTest()
 		{
-			//this.p_Recipe.Save("D:\\Tstrcp.VegaVision");
-			this.p_Recipe = Recipe.Load("D:\\Tstrcp.VegaVision");
+			this.p_Recipe.MapData = new MapData(50, 50);
+
+			foreach (var item in p_Recipe.RecipeData.RoiList)
+			{
+				item.Position = new Position();
+				item.Position.FeatureList = new List<Feature>();
+
+				Feature data = new Feature();
+				System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(@"D:\test.bmp");
+				data.m_Feature = new ImageData(bmp.Width, bmp.Height);
+				data.RoiRect.Top = 0;
+				data.RoiRect.Left = 0;
+				data.RoiRect.Bottom = bmp.Height;
+				data.RoiRect.Right = bmp.Width;
+				bmp.Dispose();
+				data.m_Feature.LoadImageSync(@"D:\test.bmp", new CPoint(0, 0));
+				item.Position.FeatureList.Add(data);
+
+				Feature data2 = new Feature();
+				System.Drawing.Bitmap bmp2 = new System.Drawing.Bitmap(@"D:\test2.bmp");
+				data2.m_Feature = new ImageData(bmp2.Width, bmp2.Height);
+				data2.RoiRect.Top = 0;
+				data2.RoiRect.Left = 0;
+				data2.RoiRect.Bottom = bmp2.Height;
+				data2.RoiRect.Right = bmp2.Width;
+				bmp.Dispose();
+				data2.m_Feature.LoadImageSync(@"D:\test2.bmp", new CPoint(0, 0));
+				item.Position.FeatureList.Add(data2);
+			}
+
+			System.Threading.Tasks.Parallel.For(0, 50, y =>
+			{
+				System.Threading.Tasks.Parallel.For(0, 50, x =>
+				{
+					var temp = new Unit();
+					temp.X = x;
+					temp.Y = y;
+
+					Random rand = new Random();
+					Thread.Sleep(1);
+					temp.Exist = Convert.ToBoolean(rand.Next(0, 2));
+					Thread.Sleep(1);
+					temp.Selected = Convert.ToBoolean(rand.Next(0, 2));
+					Thread.Sleep(1);
+					temp.Progress = (Unit.UnitProgress)rand.Next(0, 4);
+					Thread.Sleep(1);
+					temp.Result = (Unit.UnitResult)rand.Next(0, 2);
+					Thread.Sleep(1);
+					this.p_Recipe.MapData.Map[y, x] = temp;
+				});
+			});
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+			dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
+			dlg.InitialDirectory = @"C:\VEGA\Recipe";
+			if (dlg.ShowDialog() == true)
+			{
+				var target = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(dlg.FileName), System.IO.Path.GetFileNameWithoutExtension(dlg.FileName));
+				this.p_Recipe.Save(target);
+			}
+			//this.p_Recipe.Save();
 		}
 		private void _btnNextSnap()
 		{
@@ -564,12 +643,12 @@ namespace Root_Vega
 				return;
 			}
 
-			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Strip.m_NonPattern[0].m_rt;
+			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
 			int nblocksize = 500;
 
 			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
-				p_Recipe.p_RecipeData.p_Roi[0].m_Strip.p_Parameter[0],
-				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance, currentSnap, currentSnap + 1);
+				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
+				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance, currentSnap, currentSnap + 1);
 
 			currentSnap++;//한줄 추가
 			m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
@@ -589,12 +668,12 @@ namespace Root_Vega
 
 			currentDefectIdx = 0;
 
-			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Strip.m_NonPattern[0].m_rt;
+			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
 			int nblocksize = 500;
 
 			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
-				p_Recipe.p_RecipeData.p_Roi[0].m_Strip.p_Parameter[0],
-				p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance);
+				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
+				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance);
 
 			//for (int i = 0; i < DrawRectList.Count; i++)
 			//{

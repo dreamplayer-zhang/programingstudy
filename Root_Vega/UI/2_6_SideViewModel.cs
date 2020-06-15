@@ -241,15 +241,15 @@ namespace Root_Vega
 		{
 			get
 			{
-				if (m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.p_Parameter.Count != 0)
-					return m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.p_Parameter[0];
+				if (m_Recipe.RecipeData.RoiList[p_IndexMask].Surface.ParameterList.Count != 0)
+					return m_Recipe.RecipeData.RoiList[p_IndexMask].Surface.ParameterList[0];
 				else
 					return new SurfaceParamData();
 			}
 			set
 			{
-				if (m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.p_Parameter.Count != 0)
-					m_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.p_Parameter[0] = value;
+				if (m_Recipe.RecipeData.RoiList[p_IndexMask].Surface.ParameterList.Count != 0)
+					m_Recipe.RecipeData.RoiList[p_IndexMask].Surface.ParameterList[0] = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -280,13 +280,13 @@ namespace Root_Vega
 			{
 				SetProperty(ref _IndexMask, value);
 
-				p_SurFace_ParamData = p_Recipe.p_RecipeData.p_Roi[_IndexMask].m_Surface.p_Parameter[0];
+				p_SurFace_ParamData = p_Recipe.RecipeData.RoiList[_IndexMask].Surface.ParameterList[0];
                 for (int i = 0; i < 4;i++ )
                 {
                     p_ImageViewer_List[i].SetDrawer((DrawToolVM)p_SimpleShapeDrawer_List[_IndexMask][i]);
                     p_ImageViewer_List[i].m_HistoryWorker = m_DrawHistoryWorker_List[_IndexMask];
                     p_ImageViewer_List[i].SetImageSource();
-                    p_SurFace_ParamData = p_Recipe.p_RecipeData.p_Roi[_IndexMask].m_Surface.p_Parameter[0];
+                    p_SurFace_ParamData = p_Recipe.RecipeData.RoiList[_IndexMask].Surface.ParameterList[0];
                 }
 
 			}
@@ -448,7 +448,7 @@ namespace Root_Vega
 		}
 		private void _btnClear()
 		{
-			p_Recipe.p_RecipeData.p_Roi[p_IndexMask].m_Surface.m_NonPattern[0].m_rt = new CRect();
+			p_Recipe.RecipeData.RoiList[p_IndexMask].Surface.NonPatternList[0].Area = new CRect();
 
 			foreach (var viewer in p_ImageViewer_List)
 			{
@@ -479,7 +479,7 @@ namespace Root_Vega
 
 			currentDefectIdx = 0;
 
-			CRect Mask_Rect = p_Recipe.p_RecipeData.p_Roi[0].m_Surface.m_NonPattern[0].m_rt;
+			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Surface.NonPatternList[0].Area;
 			int nblocksize = 500;
 
 
