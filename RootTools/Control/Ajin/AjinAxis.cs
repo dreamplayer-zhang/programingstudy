@@ -1191,6 +1191,7 @@ namespace RootTools.Control.Ajin
         {
             RunTree(Tree.eMode.Update);
             RunTree(Tree.eMode.RegWrite);
+            RunTree(Tree.eMode.Init);
             RaisePropertyChanged("p_aPos");
         }
 
@@ -1198,6 +1199,7 @@ namespace RootTools.Control.Ajin
         {
             RunSubTree(Tree.eMode.Update);
             RunSubTree(Tree.eMode.RegWrite);
+            RunSubTree(Tree.eMode.Init);
             RaisePropertyChanged("p_aSpeed");
        
         }

@@ -44,7 +44,7 @@ namespace RootTools.Trees
             } 
         }
 
-        public bool p_bRemove { get; set; }
+        public bool m_bUse = true; 
 
         bool _bVisible = true;
         public bool p_bVisible
@@ -62,13 +62,12 @@ namespace RootTools.Trees
         #region RunTreeInit
         public void RunTreeInit()
         {
-            p_aLastChild.Clear();
-            foreach (Tree tree in p_aChild)
+            foreach (Tree tree in p_aChild) tree.RunTreeInit();
+            for (int n = p_aChild.Count - 1; n >= 0; n--)
             {
-                tree.RunTreeInit();
-                p_aLastChild.Add(tree); 
+                if (p_aChild[n].m_bUse == false) p_aChild.RemoveAt(n); 
             }
-            p_aChild.Clear(); 
+            m_bUse = false; 
         }
         #endregion
 
@@ -181,20 +180,14 @@ namespace RootTools.Trees
             {
                 if (item.p_sName == sName) return item;
             }
-            foreach (Tree item in p_aLastChild)
-            {
-                if (item.p_sName == sName)
-                {
-                    AddTreeItem(item);
-                    return item;
-                }
-            }
             return null; 
         }
 
         void AddTreeItem(Tree treeItem)
         {
-            if (p_treeRoot.p_eMode != eMode.Init) return; 
+            if (p_treeRoot.p_eMode != eMode.Init) return;
+            m_bUse = true;
+            treeItem.m_bUse = true; 
             p_treeRoot.AddQueue(this, treeItem); 
         }
         #endregion
@@ -335,11 +328,9 @@ namespace RootTools.Trees
         public Job m_job = null;
 
         public ObservableCollection<Tree> p_aChild { get; set; }
-        public ObservableCollection<Tree> p_aLastChild { get; set; }
         public Tree()
         {
             p_aChild = new ObservableCollection<Tree>();
-            p_aLastChild = new ObservableCollection<Tree>();
         }
     }
 }
