@@ -2,12 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.IO.Packaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -15,7 +18,7 @@ namespace RootTools.Inspects
 {
 	public class Recipe : ObservableObject
 	{
-		public string RecipeName;
+		[XmlIgnore] public string RecipeName { get; private set; }
 		RecipeData recipeData = new RecipeData();
 		public RecipeData RecipeData
 		{
@@ -25,36 +28,62 @@ namespace RootTools.Inspects
 
 		[XmlIgnore] public Result m_SI;
 		public MapData MapData;
-		public void Save(string filePath)
+		/// <summary>
+		/// 레시피를 저장한다
+		/// </summary>
+		/// <param name="recipeDir">레시피가 저장될 폴더명</param>
+		public bool Save(string recipeDir, bool overwrite = false)
 		{
+			this.RecipeName = recipeDir.Split('\\').Last();
+			if (!Directory.Exists(recipeDir))
+			{
+				Directory.CreateDirectory(recipeDir);
+			}
+			else
+			{
+				//이 경우 덮어씌울지에 대한 error처리가 필요할 수도 있음
+			}
+
+			string paramPath = Path.Combine(recipeDir, "Parameter.VegaVision");
+
+			//Feature 저장
+			if (RecipeData != null)
+			{
+				foreach (var roi in RecipeData.RoiList)
+				{
+					int featureIdx = 0;
+					if (roi != null)
+					{
+						foreach (var feature in roi.Position.FeatureList)
+						{
+							if (feature != null)
+							{
+								feature.FeatureFileName = roi.Name + "_" + featureIdx.ToString() + ".bmp";
+								feature.m_Feature.SaveImageSync(Path.Combine(recipeDir, feature.FeatureFileName));
+								featureIdx++;
+							}
+						}
+					}
+				}
+			}
+			if (MapData != null)
+			{
+				MapData.Save(recipeDir, "MapData.csv");
+			}
+
 			//Serialize가능한 내용을 xml로 저장
-			using (StreamWriter wr = new StreamWriter(filePath))
+			using (StreamWriter wr = new StreamWriter(paramPath))
 			{
 				XmlSerializer xs = new XmlSerializer(typeof(Recipe));
 				xs.Serialize(wr, this);
 			}
-			//Feature 저장
-			if (RecipeData != null)
-			{
-				//foreach (var roi in p_RecipeData.p_Roi)
-				//{
-				//	if (roi != null)
-				//	{
-				//		foreach (var feature in roi.m_Position.m_ListFeature)
-				//		{
-				//			if (feature != null)
-				//			{
-				//				feature.m_Feature.SaveWholeImage(feature.m_sFeaturePath);
-				//			}
-				//		}
-				//	}
-				//}
-			}
-			if (MapData != null)
-			{
-				//m_MD.Save();
-			}
+			return true;
 		}
+		/// <summary>
+		/// VEGA Vision Recipe를 로드한다
+		/// </summary>
+		/// <param name="filePath">.VegaVision File경로</param>
+		/// <returns></returns>
 		public static Recipe Load(string filePath)
 		{
 			XmlSerializer serializer = new XmlSerializer(typeof(Recipe));
@@ -65,6 +94,23 @@ namespace RootTools.Inspects
 				// Call the Deserialize method to restore the object's state.
 				result = (Recipe)serializer.Deserialize(reader);
 			}
+
+			//feature data load
+			foreach (var roi in result.recipeData.RoiList)
+			{
+				foreach (var feature in roi.Position.FeatureList)
+				{
+					//TODO : Image 정보를 별도로 넣는 것이 효율적일 것으로 보임
+					feature.m_Feature = new ImageData(feature.RoiRect.Width, feature.RoiRect.Height);
+					feature.m_Feature.LoadImageSync(feature.FeatureFileName, new CPoint(0, 0));
+				}
+			}
+
+			//map data load
+			var currentName = Path.GetDirectoryName(filePath).Split('\\').Last();
+			result.RecipeName = currentName;
+
+			result.MapData.Load(Path.GetDirectoryName(filePath));
 
 			return result;
 		}
@@ -374,9 +420,9 @@ namespace RootTools.Inspects
 		[XmlIgnore] public ImageData m_Feature;
 		public CRect RoiRect = new CRect();
 		/// <summary>
-		/// Feature Image의 경로. 파일 확장자는 bmp
+		/// Feature Image의 파일명. 확장자 포함
 		/// </summary>
-		public string FeatureFilePath;
+		public string FeatureFileName;
 	}
 	public class Roi : ObservableObject
 	{
@@ -479,44 +525,72 @@ namespace RootTools.Inspects
 	public class MapData
 	{
 		[XmlIgnore] public Unit[,] Map = null;
-		int nWidthCount;
-		int nHeightCount;
-		/// <summary>
-		/// Map 레시피의 경로. 파일 확장자는 csv
-		/// </summary>
-		public string MapFilePath;
-
-		private void Save()
+		public int ColumnCount = -1;
+		public int RowCount = -1;
+		public bool IsInitialized
 		{
-			StringBuilder stbr = new StringBuilder();
-			for (int h = 0; h < nHeightCount; h++)
+			get
 			{
-				for (int w = 0; w < nWidthCount; w++)
+				if (ColumnCount > 0 && RowCount > 0)
 				{
-					//w, h, Exist, Selected, Result, Progress
-					stbr.Append(w.ToString() + "," + h.ToString() + "," + Map[h, w].ToString());
+					return true;
+				}
+				else
+				{
+					return false;
 				}
 			}
-			File.WriteAllText(MapFilePath, stbr.ToString());
 		}
-		private void Load()
-		{
+		/// <summary>
+		/// Map 레시피 파일명. 확장자 포함
+		/// </summary>
+		public string MapFileName { get; set; }
 
+		internal void Save(string recipeDir, string fileName)
+		{
+			MapFileName = fileName;
+
+			StringBuilder stbr = new StringBuilder();
+			for (int h = 0; h < RowCount; h++)
+			{
+				for (int w = 0; w < ColumnCount; w++)
+				{
+					//x, y, Exist, Selected, Result, Progress
+					stbr.AppendLine(Map[h, w].ToString());//저장, 로드할때 비효율적이라고 생각됨. 우선은 이렇게 구현
+				}
+			}
+			File.WriteAllText(Path.Combine(recipeDir, MapFileName), stbr.ToString());
+		}
+		internal void Load(string dirPath)
+		{
+			//기본 Parameter Load가 되지 않은 상태에서 불러오게되면 죽을 가능성이 높음. 구조 개선 필요
+			//우선 땜빵
+			if (!IsInitialized)
+				return;
+
+			var lines = File.ReadAllLines(Path.Combine(dirPath, MapFileName));
+			Map = new Unit[RowCount, ColumnCount];
+
+			foreach (var line in lines)
+			{
+				var temp = Unit.Parse(line);
+				Map[temp.Y, temp.X] = temp;
+			}
 		}
 		public MapData(int w, int h)
 		{
 			Map = new Unit[w, h];
-			nWidthCount = w;
-			nHeightCount = h;
+			ColumnCount = w;
+			RowCount = h;
 		}
 		/// <summary>
 		/// Serialize를 위한 생성자
 		/// </summary>
 		public MapData()
 		{
-			Map = new Unit[1, 1];//다차원 배열은 시리얼라이즈 할 수 없습니다!
-			nWidthCount = 1;
-			nHeightCount = 1;
+			//Map = new Unit[1, 1];//다차원 배열은 시리얼라이즈 할 수 없습니다!
+			//ColumnCount = 1;
+			//RowCount = 1;
 		}
 		public enum DIR
 		{
@@ -546,10 +620,29 @@ namespace RootTools.Inspects
 		public bool Selected;
 		public UnitResult Result;
 		public UnitProgress Progress;
+		public int X;
+		public int Y;
 
-		public Unit(string input)
+		/// <summary>
+		/// Unit Class 기준으로 string을 Parsing합니다. 좌표 정보는 포함되어 있지 않습니다
+		/// </summary>
+		/// <param name="input"></param>
+		/// <returns></returns>
+		public static Unit Parse(string input)
 		{
+			Unit result = new Unit();
 
+			//X, Y, Exist, Selected, Result, Progress
+			var values = input.Split(',');
+
+			result.X = Convert.ToInt32(values[0]);
+			result.Y = Convert.ToInt32(values[1]);
+			result.Exist = Convert.ToBoolean(values[2]);
+			result.Selected = Convert.ToBoolean(values[3]);
+			result.Result = (UnitResult)Convert.ToInt32(values[4]);
+			result.Progress = (UnitProgress)Convert.ToInt32(values[5]);
+
+			return result;
 		}
 		public Unit()
 		{
@@ -570,9 +663,13 @@ namespace RootTools.Inspects
 		//TODO : 손쉬운 저장/로드를 위한 ToString의 override등이 필요할 수 있음
 		public override string ToString()
 		{
-			//Exist, Selected, Result, Progress
-			//bool, bool, int, int
+			//X, Y, Exist, Selected, Result, Progress
+			//int, int, bool, bool, int, int
 			StringBuilder stbr = new StringBuilder();
+			stbr.Append(X.ToString());
+			stbr.Append(",");
+			stbr.Append(Y.ToString());
+			stbr.Append(",");
 			stbr.Append(Exist.ToString());
 			stbr.Append(",");
 			stbr.Append(Selected.ToString());

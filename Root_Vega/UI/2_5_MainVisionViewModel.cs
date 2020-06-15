@@ -1,10 +1,13 @@
 ﻿using ATI;
+using Microsoft.Win32;
 using RootTools;
 using RootTools.Inspects;
 using RootTools.Memory;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -459,6 +462,13 @@ namespace Root_Vega
 				return new RelayCommand(_btnRcpSaveTest);
 			}
 		}
+		public ICommand btnRcpLoadTest
+		{
+			get
+			{
+				return new RelayCommand(_btnRcpLoadTest);
+			}
+		}
 		public RelayCommand CommandSaveMask
 		{
 			get
@@ -551,10 +561,79 @@ namespace Root_Vega
 			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 			m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
 		}
+		private void _btnRcpLoadTest()
+		{
+			OpenFileDialog dlg = new OpenFileDialog();
+			dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
+			dlg.InitialDirectory = @"C:\VEGA\Recipe";
+			if (dlg.ShowDialog() == true)
+			{
+				this.p_Recipe = Recipe.Load(dlg.FileName);
+			}
+
+		}
 		private void _btnRcpSaveTest()
 		{
-			this.p_Recipe.Save("D:\\Tstrcp.VegaVision");
-			//this.p_Recipe = Recipe.Load("D:\\Tstrcp.VegaVision");
+			this.p_Recipe.MapData = new MapData(50, 50);
+
+			foreach (var item in p_Recipe.RecipeData.RoiList)
+			{
+				item.Position = new Position();
+				item.Position.FeatureList = new List<Feature>();
+
+				Feature data = new Feature();
+				System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(@"D:\test.bmp");
+				data.m_Feature = new ImageData(bmp.Width, bmp.Height);
+				data.RoiRect.Top = 0;
+				data.RoiRect.Left = 0;
+				data.RoiRect.Bottom = bmp.Height;
+				data.RoiRect.Right = bmp.Width;
+				bmp.Dispose();
+				data.m_Feature.LoadImageSync(@"D:\test.bmp", new CPoint(0, 0));
+				item.Position.FeatureList.Add(data);
+
+				Feature data2 = new Feature();
+				System.Drawing.Bitmap bmp2 = new System.Drawing.Bitmap(@"D:\test2.bmp");
+				data2.m_Feature = new ImageData(bmp2.Width, bmp2.Height);
+				data2.RoiRect.Top = 0;
+				data2.RoiRect.Left = 0;
+				data2.RoiRect.Bottom = bmp2.Height;
+				data2.RoiRect.Right = bmp2.Width;
+				bmp.Dispose();
+				data2.m_Feature.LoadImageSync(@"D:\test2.bmp", new CPoint(0, 0));
+				item.Position.FeatureList.Add(data2);
+			}
+
+			System.Threading.Tasks.Parallel.For(0, 50, y =>
+			{
+				System.Threading.Tasks.Parallel.For(0, 50, x =>
+				{
+					var temp = new Unit();
+					temp.X = x;
+					temp.Y = y;
+
+					Random rand = new Random();
+					Thread.Sleep(1);
+					temp.Exist = Convert.ToBoolean(rand.Next(0, 2));
+					Thread.Sleep(1);
+					temp.Selected = Convert.ToBoolean(rand.Next(0, 2));
+					Thread.Sleep(1);
+					temp.Progress = (Unit.UnitProgress)rand.Next(0, 4);
+					Thread.Sleep(1);
+					temp.Result = (Unit.UnitResult)rand.Next(0, 2);
+					Thread.Sleep(1);
+					this.p_Recipe.MapData.Map[y, x] = temp;
+				});
+			});
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+			dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
+			dlg.InitialDirectory = @"C:\VEGA\Recipe";
+			if (dlg.ShowDialog() == true)
+			{
+				var target = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(dlg.FileName), System.IO.Path.GetFileNameWithoutExtension(dlg.FileName));
+				this.p_Recipe.Save(target);
+			}
+			//this.p_Recipe.Save();
 		}
 		private void _btnNextSnap()
 		{
