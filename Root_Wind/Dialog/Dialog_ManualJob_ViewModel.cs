@@ -93,7 +93,6 @@ namespace Root_Wind
             SetRecipeList();
         }
         
-
         void SetRecipeList()
         {
             p_sRecipeName.Clear();
