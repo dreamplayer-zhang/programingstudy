@@ -28,6 +28,7 @@ namespace Root_Vega
 
         public void RecipeOpen(string sRecipe)
         {
+            p_sRecipe = sRecipe; 
             m_moduleRunList.OpenJob(sRecipe, true);
             m_qProcess.Clear(); 
         }

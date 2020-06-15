@@ -5,6 +5,8 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using System.Windows.Media;
 using System;
+using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace Root_Vega.ManualJob
 {
@@ -55,7 +57,7 @@ namespace Root_Vega.ManualJob
             this.Close();
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             m_bShow = false;
         }
@@ -68,7 +70,10 @@ namespace Root_Vega.ManualJob
         #region Recipe
         void InitRecipeList()
         {
-            string[] asRecipeFile = Directory.GetFiles("c:\\Recipe");
+            DirectoryInfo info = new DirectoryInfo("c:\\Recipe");
+            FileInfo[] files = info.GetFiles("*.Vega");
+            List<string> asRecipeFile = new List<string>(); 
+            foreach (FileInfo fileInfo in files) asRecipeFile.Add(fileInfo.FullName);
             comboRecipeID.ItemsSource = asRecipeFile;
         }
         private void comboRecipeID_SelectionChanged(object sender, SelectionChangedEventArgs e)
