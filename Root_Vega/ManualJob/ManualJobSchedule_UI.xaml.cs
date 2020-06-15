@@ -60,11 +60,6 @@ namespace Root_Vega.ManualJob
             m_bShow = false;
         }
 
-        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            this.DragMove();
-        }
-
         #region Recipe
         void InitRecipeList()
         {
