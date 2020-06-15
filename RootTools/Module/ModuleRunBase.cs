@@ -47,7 +47,6 @@ namespace RootTools.Module
         public string m_sModuleRun;
         protected Log m_log;
         public ModuleBase m_moduleBase = null;
-        public dynamic m_infoObject;
         public GemPJ m_pj = null;
 
         protected string p_sInfo
