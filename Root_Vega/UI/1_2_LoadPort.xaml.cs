@@ -30,8 +30,6 @@ namespace Root_Vega
             m_loadport = loadport;
             this.DataContext = loadport;
             textBoxPodID.DataContext = loadport.m_infoPod;
-            //toggleButtonAccessLPAuto.DataContext = loadport.m_infoPod;
-            //toggleButtonAccessLPManual.DataContext = loadport.m_infoPod;
             textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxRecipe.DataContext = loadport.m_infoPod.m_aGemSlot[0];
@@ -104,9 +102,8 @@ namespace Root_Vega
                 case ModuleBase.eState.Ready:
                     if (m_manualjob.ShowPopup() == false) return;
                     ModuleRunBase moduleRun = m_loadport.m_runLoad.Clone();
-                    moduleRun.m_infoObject = m_loadport.m_infoPod.p_infoReticle; 
                     EQ.p_eState = EQ.eState.Run;
-                    m_loadport.m_infoPod.StartProcess(moduleRun);
+                    m_loadport.m_infoPod.StartProcess(new Vega_Process.Sequence(moduleRun, m_loadport.m_infoPod.p_infoReticle));
                     break; 
             }
         }

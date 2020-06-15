@@ -75,6 +75,10 @@
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnRcpSaveTest}"
                             Margin="0,0,0,10" />
+					<Button Content="Recipe Load Test"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding btnRcpLoadTest}"
+                            Margin="0,0,0,10" />
 					<!--<StackPanel>
                         <WrapPanel Margin="3">
                             <TextBlock Text="(X,Y) = " />

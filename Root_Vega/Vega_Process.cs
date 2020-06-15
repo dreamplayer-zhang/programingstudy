@@ -41,7 +41,6 @@ namespace Root_Vega
                 if (bGet && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sChild));
             }
             qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sLoadport));
-            foreach (ModuleRunBase data in qProcess) data.m_infoObject = infoReticle;
             infoReticle.SetObservableProcess(); 
             m_aInfoReticle.Add(infoReticle);
         }
@@ -173,7 +172,6 @@ namespace Root_Vega
             m_aInfoReticle.Add(infoReticle);
             infoReticle.m_qProcess.Clear();
             ModuleRunBase moduleRun = m_robot.GetRunMotion(Robot_RND.eMotion.Put, infoReticle.m_sLoadport);
-            moduleRun.m_infoObject = infoReticle;
             infoReticle.m_qProcess.Enqueue(moduleRun);
         }
 
@@ -186,29 +184,37 @@ namespace Root_Vega
             m_aInfoReticle.Add(infoReticle);
             infoReticle.m_qProcess.Clear();
             ModuleRunBase moduleRunGet = m_robot.GetRunMotion(Robot_RND.eMotion.Get, child.p_id);
-            moduleRunGet.m_infoObject = infoReticle;
             infoReticle.m_qProcess.Enqueue(moduleRunGet);
             ModuleRunBase moduleRunPut = m_robot.GetRunMotion(Robot_RND.eMotion.Put, infoReticle.m_sLoadport);
-            moduleRunPut.m_infoObject = infoReticle;
             infoReticle.m_qProcess.Enqueue(moduleRunPut);
         }
         #endregion
 
         #region Sequence
+        public class Sequence
+        {
+            public ModuleRunBase m_moduleRun;
+            public InfoReticle m_infoReticle; 
+            public Sequence(ModuleRunBase moduleRun, InfoReticle infoReticle)
+            {
+                m_moduleRun = moduleRun;
+                m_infoReticle = infoReticle; 
+            }
+        }
         /// <summary> RunThread에서 실행 될 ModuleRun List (from Handler when EQ.p_eState == Run) </summary>
-        public Queue<ModuleRunBase> m_qSequence = new Queue<ModuleRunBase>();
-        public string ReCalcSequence(ModuleRunBase run)
+        public Queue<Sequence> m_qSequence = new Queue<Sequence>();
+        public string ReCalcSequence(Sequence sequence)
         {
             m_qSequence.Clear();
             try
             {
                 if (m_aInfoReticle.Count <= 0) return "OK";
-                if (run != null) m_qSequence.Enqueue(run);
+                if (sequence != null) m_qSequence.Enqueue(sequence);
                 foreach (InfoReticle infoReticle in m_aInfoReticle)
                 {
                     if (infoReticle.m_qProcess.Count > 0)
                     {
-                        foreach (ModuleRunBase moduleRun in infoReticle.m_qProcess) m_qSequence.Enqueue(moduleRun);
+                        foreach (ModuleRunBase moduleRun in infoReticle.m_qProcess) m_qSequence.Enqueue(new Sequence(moduleRun, infoReticle));
                         infoReticle.SetObservableProcess();
                     }
                 }
@@ -226,8 +232,7 @@ namespace Root_Vega
         {
             ModuleBase module = m_handler.m_moduleList.GetModule(infoReticlePut.m_sLoadport);
             ModuleRunBase moduleRun = ((Loadport)module).GetRunUndocking();
-            moduleRun.m_infoObject = infoReticlePut;
-            m_qSequence.Enqueue(moduleRun);
+            m_qSequence.Enqueue(new Sequence(moduleRun, infoReticlePut));
         }
 
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
@@ -235,13 +240,13 @@ namespace Root_Vega
         {
             if (!EQ.p_bSimulate && (EQ.p_eState != EQ.eState.Run)) return "EQ not Run"; 
             if (m_qSequence.Count == 0) return "OK";
-            ModuleRunBase moduleRun = m_qSequence.Peek();
-            p_sInfo = moduleRun.Run();
-            if (p_sInfo == "OK")
+            Sequence sequence = m_qSequence.Peek();
+            p_sInfo = sequence.m_moduleRun.Run();
+            if (p_sInfo != "OK") EQ.p_bStop = true;
+            else
             {
                 m_qSequence.Dequeue();
-                InfoReticle infoReticle = moduleRun.m_infoObject;
-                if (infoReticle.m_qProcess.Count > 0) infoReticle.m_qProcess.Dequeue(); 
+                if (sequence.m_infoReticle.m_qProcess.Count > 0) sequence.m_infoReticle.m_qProcess.Dequeue(); 
                 if (m_qSequence.Count == 0) ClearInfoReticle(); 
             }
             RunTree(Tree.eMode.Init);
@@ -300,11 +305,11 @@ namespace Root_Vega
         {
             TreeRoot tree = m_treeSequence;
             tree.p_eMode = mode;
-            ModuleRunBase[] aModuleRun = m_qSequence.ToArray();
-            for (int n = 0; n < aModuleRun.Length; n++)
+            Sequence[] aSequence = m_qSequence.ToArray();
+            for (int n = 0; n < aSequence.Length; n++)
             {
-                ModuleRunBase moduleRun = aModuleRun[n];
-                InfoReticle infoReticle = moduleRun.m_infoObject;
+                ModuleRunBase moduleRun = aSequence[n].m_moduleRun;
+                InfoReticle infoReticle = aSequence[n].m_infoReticle;
                 string id = (infoReticle != null) ? infoReticle.p_id : "InfoReticle";
                 string sTree = "(" + id + ")." + moduleRun.p_id;
                 moduleRun.RunTree(tree.GetTree(n, sTree, false), true);

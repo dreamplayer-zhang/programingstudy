@@ -95,12 +95,6 @@ namespace RootTools.Trees
         {
             Tree item = FindTreeItem(sName);
             if (item != null) return item;
-//            if (item != null)
-//            {
-//                item.p_bVisible = bVisible;
-//                item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
-//                return item;
-//            }
             Tree newGroup = new TreeGroup(sName, this, m_log, bExpand, bVisible, bReadOnly);
             AddTreeItem(newGroup);
             return newGroup;
@@ -110,12 +104,6 @@ namespace RootTools.Trees
         {
             Tree item = FindTreeItem(sName);
             if (item != null) return item;
-//            if (item != null)
-//            {
-//                item.p_bVisible = bVisible;
-//                item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
-//                return item;
-//            }
             Tree newGroup = new TreeGroup(nIndex, sName, this, m_log, bExpand, bVisible, bReadOnly);
             AddTreeItem(newGroup);
             return newGroup;

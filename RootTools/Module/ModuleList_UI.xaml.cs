@@ -63,22 +63,22 @@ namespace RootTools.Module
         string m_sPath = "c:\\Recipe\\";
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
-            string sModel = EQ.m_sModel;
+            string sModel = "Run" + EQ.m_sModel;
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.InitialDirectory = m_sPath;
             dlg.DefaultExt = "." + sModel;
-            dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
+            dlg.Filter = sModel + " ModuleRunList (." + sModel + ")|*." + sModel;
             if (dlg.ShowDialog() == true) m_moduleRunList.SaveJob(dlg.FileName);
         }
 
         private void ButtonOpen_Click(object sender, RoutedEventArgs e)
         {
             m_moduleList.p_visibleRnR = Visibility.Hidden;
-            string sModel = EQ.m_sModel;
+            string sModel = "Run" + EQ.m_sModel;
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.InitialDirectory = m_sPath;
             dlg.DefaultExt = "." + sModel;
-            dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
+            dlg.Filter = sModel + " ModuleRunList (." + sModel + ")|*." + sModel;
             if (dlg.ShowDialog() == true) m_moduleRunList.OpenJob(dlg.FileName);
             InitModuleRunNames();
         }

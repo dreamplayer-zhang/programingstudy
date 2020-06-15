@@ -427,7 +427,7 @@ namespace Root_Vega.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_nCh = tree.Set(m_nCh, m_nCh, "Channel", "RFID Channel"); 
+                m_nCh = tree.Set(m_nCh, m_nCh, "Channel", "RFID Channel", bVisible); 
                 m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible && EQ.p_bSimulate);
             }
 

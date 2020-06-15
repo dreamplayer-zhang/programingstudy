@@ -147,6 +147,10 @@
     <Compile Include="Dialog\Dialog_SettingFDC.xaml.cs">
       <DependentUpon>Dialog_SettingFDC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ManualJob\ManualOCR.cs" />
+    <Compile Include="ManualJob\ManualOCR_UI.xaml.cs">
+      <DependentUpon>ManualOCR_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Setting\Setting_FDC.xaml.cs">
       <DependentUpon>Setting_FDC.xaml</DependentUpon>
     </Compile>
@@ -323,6 +327,10 @@
     <Page Include="Dialog\Dialog_SettingFDC.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ManualJob\ManualOCR_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Setting\Setting_FDC.xaml">
       <Generator>MSBuild:Compile</Generator>

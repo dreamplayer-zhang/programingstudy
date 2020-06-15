@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Vega.ManualJob;
+using RootTools;
 using RootTools.Camera.CognexOCR;
 using RootTools.Comm;
 using RootTools.Control;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Root_Vega.Module
 {
@@ -914,7 +916,12 @@ namespace Root_Vega.Module
                         sOCRMax = sOCR; 
                     }
                 }
-                return "ReadOCR Score Error : " + fScoreMax.ToString() + "%, " + sOCRMax;
+                m_module.p_sInfo = "ReadOCR Score Error : " + fScoreMax.ToString() + "%, " + sOCRMax;
+                EQ.p_eState = EQ.eState.Ready; 
+                BitmapImage image = m_module.m_camOCR.ReadImage();
+                ManualOCR memualOCR = new ManualOCR(m_module.p_infoReticle, image);
+                memualOCR.ShowOCR(); 
+                return "OK"; 
             }
         }
         #endregion

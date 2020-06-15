@@ -60,9 +60,9 @@ namespace Root_Vega
         void TimerLamp()
         {
             Vega vega = m_engineer.m_handler.m_vega;
-            gridLampR.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Red) ? Brushes.Red : Brushes.DarkRed;
-            gridLampY.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Yellow) ? Brushes.LightYellow : Brushes.YellowGreen;
-            gridLampG.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Green) ? Brushes.LightGreen : Brushes.DarkGreen;
+            gridLampR.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Red) ? Brushes.Red : Brushes.Black;
+            gridLampY.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Yellow) ? Brushes.LightYellow : Brushes.Black;
+            gridLampG.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Green) ? Brushes.LightGreen : Brushes.Black;
         }
         #endregion
 
@@ -82,6 +82,11 @@ namespace Root_Vega
             _Main.Init(m_engineer);
 
             InitTimer(); 
+
+            if(!System.IO.Directory.Exists(@"C:\VEGA\Recipe"))
+			{
+                System.IO.Directory.CreateDirectory(@"C:\VEGA\Recipe");
+			}
         }
 
         void ConnectViewModel(IDialogService dialogService)
