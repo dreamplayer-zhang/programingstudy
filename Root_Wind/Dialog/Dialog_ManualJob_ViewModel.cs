@@ -120,7 +120,7 @@ namespace Root_Wind
             if (p_SelectedInfoWafer != null)
             {
                 p_Process.AddInfoWafer(p_SelectedInfoWafer);
-                p_Process.ReCalcSequence();
+                p_Process.ReCalcSequence(null);
             }
         }
 

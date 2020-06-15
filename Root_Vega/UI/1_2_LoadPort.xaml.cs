@@ -104,9 +104,8 @@ namespace Root_Vega
                 case ModuleBase.eState.Ready:
                     if (m_manualjob.ShowPopup() == false) return;
                     ModuleRunBase moduleRun = m_loadport.m_runLoad.Clone();
-                    moduleRun.m_infoObject = m_loadport.m_infoPod.p_infoReticle; 
                     EQ.p_eState = EQ.eState.Run;
-                    m_loadport.m_infoPod.StartProcess(moduleRun);
+                    m_loadport.m_infoPod.StartProcess(new Vega_Process.Sequence(moduleRun, m_loadport.m_infoPod.p_infoReticle));
                     break; 
             }
         }
