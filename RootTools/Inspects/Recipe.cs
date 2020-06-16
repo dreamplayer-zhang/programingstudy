@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.IO.Packaging;
@@ -18,7 +19,15 @@ namespace RootTools.Inspects
 {
 	public class Recipe : ObservableObject
 	{
-		[XmlIgnore] public string RecipeName { get; private set; }
+		#region EventHandler
+		/// <summary>
+		/// 이벤트 핸들러
+		/// </summary>
+		public delegate void EventHandler();
+		[XmlIgnore] public EventHandler LoadComplete;
+		#endregion
+
+		[XmlIgnore] public string RecipeName { get; set; }
 		RecipeData recipeData = new RecipeData();
 		public RecipeData RecipeData
 		{
@@ -32,16 +41,17 @@ namespace RootTools.Inspects
 		/// 레시피를 저장한다
 		/// </summary>
 		/// <param name="recipeDir">레시피가 저장될 폴더명</param>
-		public bool Save(string recipeDir, bool overwrite = false)
+		public bool Save(string recipeDir)
 		{
+			if(File.Exists(recipeDir))
+			{
+				//파일 경로가 들어오면 안됩니다!
+				return false;
+			}
 			this.RecipeName = recipeDir.Split('\\').Last();
 			if (!Directory.Exists(recipeDir))
 			{
 				Directory.CreateDirectory(recipeDir);
-			}
-			else
-			{
-				//이 경우 덮어씌울지에 대한 error처리가 필요할 수도 있음
 			}
 
 			string paramPath = Path.Combine(recipeDir, "Parameter.VegaVision");
@@ -84,7 +94,7 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="filePath">.VegaVision File경로</param>
 		/// <returns></returns>
-		public static Recipe Load(string filePath)
+		public void Load(string filePath)
 		{
 			XmlSerializer serializer = new XmlSerializer(typeof(Recipe));
 			Recipe result = new Recipe();
@@ -94,15 +104,20 @@ namespace RootTools.Inspects
 				// Call the Deserialize method to restore the object's state.
 				result = (Recipe)serializer.Deserialize(reader);
 			}
+			this.MapData = result.MapData;
+			this.m_SI = result.m_SI;
+			this.RecipeData = result.RecipeData;
+			this.RecipeName = Path.GetDirectoryName(filePath).Split('\\').Last();
 
 			//feature data load
 			foreach (var roi in result.recipeData.RoiList)
 			{
 				foreach (var feature in roi.Position.FeatureList)
 				{
+					string imageTargetPath = System.IO.Path.Combine(Path.GetDirectoryName(filePath), feature.FeatureFileName);
 					//TODO : Image 정보를 별도로 넣는 것이 효율적일 것으로 보임
 					feature.m_Feature = new ImageData(feature.RoiRect.Width, feature.RoiRect.Height);
-					feature.m_Feature.LoadImageSync(feature.FeatureFileName, new CPoint(0, 0));
+					feature.m_Feature.LoadImageSync(imageTargetPath, new CPoint(0, 0));
 				}
 			}
 
@@ -110,9 +125,19 @@ namespace RootTools.Inspects
 			var currentName = Path.GetDirectoryName(filePath).Split('\\').Last();
 			result.RecipeName = currentName;
 
-			result.MapData.Load(Path.GetDirectoryName(filePath));
+			if (result.MapData != null)
+			{
+				result.MapData.Load(Path.GetDirectoryName(filePath));
+			}
+			else
+			{
+				result.MapData = new MapData(1, 1);
+			}
 
-			return result;
+			if (LoadComplete != null)
+			{
+				LoadComplete();
+			}
 		}
 	}
 	public class Result
@@ -414,13 +439,28 @@ namespace RootTools.Inspects
 	{
 		public EdgeBox()
 		{
-			EdgeList = new List<CRect>();
+			EdgeList = new List<EdgeElement>();
 			UseAutoGV = true;
 			SearchBrightToDark = true;
 		}
-		public List<CRect> EdgeList;
+		public List<EdgeElement> EdgeList;
 		public bool UseAutoGV;
 		public bool SearchBrightToDark;
+	}
+	public class EdgeElement
+	{
+		public CRect Rect;
+		public int SavePoint;
+		public EdgeElement(int savePoint, CRect rect)
+		{
+			Rect = rect;
+			SavePoint = savePoint;
+		}
+		public EdgeElement()
+		{
+			Rect = new CRect();
+			SavePoint = -1;
+		}
 	}
 	public class Position
 	{
