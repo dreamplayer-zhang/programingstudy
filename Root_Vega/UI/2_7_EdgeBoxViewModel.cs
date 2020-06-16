@@ -164,7 +164,10 @@ namespace Root_Vega
 				SetProperty(ref m_ImageViewer_Bottom, value);
 			}
 		}
-
+		public void _saveRcp()
+		{
+			//여기서 그려진 모든 rect목록을 현재 엔지니어가 들고있는 레시피에 저장한다
+		}
 
 		void Inspect()
 		{
@@ -607,6 +610,13 @@ namespace Root_Vega
 			}
 			set
 			{
+			}
+		}
+		public RelayCommand CommandSave
+		{
+			get
+			{
+				return new RelayCommand(_saveRcp);
 			}
 		}
 		#endregion

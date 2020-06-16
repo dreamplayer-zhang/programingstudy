@@ -228,8 +228,14 @@
                                 Style="{StaticResource BasicBtn}"
                                 Content="Inspect"
                                 Command="{Binding CommandInspect}"/>
-                    </Grid>
-                </StackPanel>
+					</Grid>
+					<Grid Height="50" Margin="10,5,10,5">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Save Edge to Recipe"
+                                Command="{Binding CommandSave}"/>
+					</Grid>
+				</StackPanel>
             </GroupBox>
             <GroupBox Grid.Row="1"
                       Header="Color"
