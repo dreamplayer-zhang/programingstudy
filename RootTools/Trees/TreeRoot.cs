@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Windows.Threading;
 
 namespace RootTools.Trees
@@ -28,6 +27,7 @@ namespace RootTools.Trees
                 {
                     case eMode.Init:
                         RunTreeInit();
+                        m_timer.Start(); 
                         break;
                     case eMode.Update:
                         ClearUpdated();
@@ -40,35 +40,36 @@ namespace RootTools.Trees
         #region Timer Init
         class Link
         {
-            ObservableCollection<Tree> m_aChild;
+            Tree m_tree;
             Tree m_treeChild; 
 
             public void RunLink()
             {
-                foreach (Tree tree in m_aChild)
+                foreach (Tree tree in m_tree.p_aChild)
                 {
                     if (tree.p_id == m_treeChild.p_id) return; 
                 }
-                m_aChild.Add(m_treeChild); 
+                m_tree.p_aChild.Add(m_treeChild); 
             }
 
-            public Link(ObservableCollection<Tree> aChild, Tree treeChild)
+            public Link(Tree tree, Tree treeChild)
             {
-                m_aChild = aChild;
+                m_tree = tree;
                 m_treeChild = treeChild; 
             }
         }
         Queue<Link> m_qLink = new Queue<Link>(); 
 
-        public void AddQueue(ObservableCollection<Tree> aChild, Tree treeChild)
+        public void AddQueue(Tree tree, Tree treeChild)
         {
-             m_qLink.Enqueue(new Link(aChild, treeChild)); 
+             m_qLink.Enqueue(new Link(tree, treeChild)); 
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
         private void M_timer_Tick(object sender, EventArgs e)
         {
             while (m_qLink.Count > 0) m_qLink.Dequeue().RunLink();
+            m_timer.Stop(); 
         }
         #endregion
 
@@ -84,9 +85,8 @@ namespace RootTools.Trees
             m_log = log;
             m_reg = new Registry(id, sModel);
 
-            m_timer.Interval = TimeSpan.FromMilliseconds(20);
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
             m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
         }
 
     }

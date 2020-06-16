@@ -495,7 +495,7 @@ namespace Root_Wind.Module
 
         #region StateHome
         bool m_bNeedHome = true;
-        public override string StateHome() //forget
+        public override string StateHome() 
         {
             if (EQ.p_bSimulate == false)
             {
@@ -519,7 +519,7 @@ namespace Root_Wind.Module
         #endregion
 
         #region StateReady
-        public override string StateReady() //forget
+        public override string StateReady() 
         {
             CheckPlaced();
 //            if (m_infoCarrier.m_bReqReadCarrierID)

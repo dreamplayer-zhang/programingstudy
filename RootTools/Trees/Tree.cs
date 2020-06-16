@@ -44,6 +44,8 @@ namespace RootTools.Trees
             } 
         }
 
+        public bool m_bUse = true; 
+
         bool _bVisible = true;
         public bool p_bVisible
         {
@@ -60,13 +62,12 @@ namespace RootTools.Trees
         #region RunTreeInit
         public void RunTreeInit()
         {
-            p_aLastChild.Clear();
-            foreach (Tree tree in p_aChild)
+            for (int n = p_aChild.Count - 1; n >= 0; n--)
             {
-                tree.RunTreeInit();
-                p_aLastChild.Add(tree); 
+                if (p_aChild[n].m_bUse) p_aChild[n].RunTreeInit(); 
+                else p_aChild.RemoveAt(n);
             }
-            p_aChild.Clear(); 
+            m_bUse = false; 
         }
         #endregion
 
@@ -87,6 +88,29 @@ namespace RootTools.Trees
                 if (treeItem.IsUpdated()) return true;
             }
             return false;
+        }
+        #endregion
+
+        #region Find Tree
+        Tree FindTreeItem(string sName)
+        {
+            foreach (Tree item in p_aChild)
+            {
+                if (item.p_sName == sName)
+                {
+                    item.m_bUse = true;
+                    return item;
+                }
+            }
+            return null;
+        }
+
+        void AddTreeItem(Tree treeItem)
+        {
+            if (p_treeRoot.p_eMode != eMode.Init) return;
+            m_bUse = true;
+            treeItem.m_bUse = true;
+            p_treeRoot.AddQueue(this, treeItem);
         }
         #endregion
 
@@ -171,29 +195,6 @@ namespace RootTools.Trees
             Tree newitem = new TreeItem_ICommand(sName, this, value, sButtonName, sDesc, m_log);
             AddTreeItem(newitem);
             return newitem;
-        }
-
-        Tree FindTreeItem(string sName)
-        {
-            foreach (Tree item in p_aChild)
-            {
-                if (item.p_sName == sName) return item;
-            }
-            foreach (Tree item in p_aLastChild)
-            {
-                if (item.p_sName == sName)
-                {
-                    AddTreeItem(item);
-                    return item;
-                }
-            }
-            return null; 
-        }
-
-        void AddTreeItem(Tree treeItem)
-        {
-            if (p_treeRoot.p_eMode != eMode.Init) return; 
-            p_treeRoot.AddQueue(p_aChild, treeItem); 
         }
         #endregion
 
@@ -333,11 +334,9 @@ namespace RootTools.Trees
         public Job m_job = null;
 
         public ObservableCollection<Tree> p_aChild { get; set; }
-        public ObservableCollection<Tree> p_aLastChild { get; set; }
         public Tree()
         {
             p_aChild = new ObservableCollection<Tree>();
-            p_aLastChild = new ObservableCollection<Tree>();
         }
     }
 }
