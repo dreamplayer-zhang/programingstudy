@@ -162,26 +162,10 @@ namespace RootTools.Camera.Dalsa
         }
         void RunTree(Tree treeRoot)
         {
-            try
+            RunSetTree(treeRoot.GetTree("Connect Set"));
+            if (m_sapXfer != null)
             {
-                Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    RunSetTree(treeRoot.GetTree("Connect Set"));
-                    if (m_sapXfer != null)
-                    {
-                        RunImageRoiTree(treeRoot.GetTree("Buffer Image ROI"));
-                    }
-                    //RunBasicTiming(treeRoot.GetTree("BasicTiming"));
-                    //RunAnalogControlTree(treeRoot.GetTree("Analog Control", false, p_CamInfo._OpenStatus));
-                    //RunAOIControlsTree(treeRoot.GetTree("AOI Contorls", false, p_CamInfo._OpenStatus));
-                    //RunDeviceInfomationTree(treeRoot.GetTree("Device Infomation", false, p_CamInfo._OpenStatus));
-                    //RunConfigurationSetTree(treeRoot.GetTree("Configuration Set", false, p_CamInfo._OpenStatus));
-                    //RunHostTransportLayerTree(treeRoot.GetTree("HostTransportLayer", false, p_CamInfo._OpenStatus));
-                });
-            }
-            catch (Exception eee)
-            {
-                MessageBox.Show(eee.ToString());
+                RunImageRoiTree(treeRoot.GetTree("Buffer Image ROI"));
             }
         }
 
@@ -420,10 +404,7 @@ namespace RootTools.Camera.Dalsa
                         //Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
                     }
                     iBlock++;
-                    //Application.Current.Dispatcher.Invoke((Action)delegate
-                    //{
-                        p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
-                    //});
+                    p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;
@@ -464,9 +445,9 @@ namespace RootTools.Camera.Dalsa
                     }
                     iBlock++;
                     Application.Current.Dispatcher.Invoke((Action)delegate
-               {
-                   m_ImageLive.UpdateImage();
-               });
+                    {
+                        m_ImageLive.UpdateImage();
+                    });
                 }
             }
         }

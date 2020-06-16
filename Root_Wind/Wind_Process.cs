@@ -437,12 +437,9 @@ namespace Root_Wind
 
         public void RunTree(Tree.eMode mode)
         {
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                RunTreeWafer(mode);
-                RunTreeLocate(mode);
-                RunTreeSequence(mode);
-            });
+            RunTreeWafer(mode);
+            RunTreeLocate(mode);
+            RunTreeSequence(mode);
         }
 
         void RunTreeWafer(Tree.eMode mode)
