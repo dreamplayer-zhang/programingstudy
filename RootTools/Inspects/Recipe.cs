@@ -410,6 +410,18 @@ namespace RootTools.Inspects
 		public RPoint Pitch;
 		public Position Position;
 	}
+	public class EdgeBox
+	{
+		public EdgeBox()
+		{
+			EdgeList = new List<CRect>();
+			UseAutoGV = true;
+			SearchBrightToDark = true;
+		}
+		public List<CRect> EdgeList;
+		public bool UseAutoGV;
+		public bool SearchBrightToDark;
+	}
 	public class Position
 	{
 		public List<Feature> FeatureList = new List<Feature>();
@@ -455,6 +467,7 @@ namespace RootTools.Inspects
 		public Surface Surface = new Surface();
 		public Strip Strip = new Strip();
 		public Bump Bump = new Bump();
+		public EdgeBox EdgeBox = new EdgeBox();
 		//DeadLine m_DeadLine;
 
 
