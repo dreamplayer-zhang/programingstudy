@@ -201,7 +201,11 @@ namespace Root_Vega.Module
             Safety,
             Grab,
         }
-
+        public enum eAxisPosXY
+        {
+            Ready,
+            Safety,
+        }
 
         void InitPosAlign()
         {
@@ -209,6 +213,9 @@ namespace Root_Vega.Module
             m_axisTheta.AddPosDone();
             m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPosZ)));
             m_axisZ.AddPosDone();
+
+            m_axisXY.AddPos(Enum.GetNames(typeof(eAxisPosXY)));
+            m_axisXY.AddPosDone();
         }
 
         #endregion
@@ -253,6 +260,21 @@ namespace Root_Vega.Module
 
         public string BeforeGet()
         {
+            // 레티클 유무체크 Software
+            
+
+            // X,Y,Z,Theta Get Position으로 이동
+            if (Run(m_axisXY.Move(eAxisPosXY.Safety))) return p_sInfo;
+            if (Run(m_axisZ.Move(eAxisPosZ.Safety))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+            if (Run(m_axisZ.WaitReady())) return p_sInfo;
+            if (Run(m_axisTheta.Move(eAxisPosTheta.Ready))) return p_sInfo;
+            if (Run(m_axisTheta.WaitReady())) return p_sInfo;
+            if (Run(m_axisXY.Move(eAxisPosXY.Ready))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+
+
             if (p_infoReticle == null) return p_id + " BeforeGet : InfoReticle = null";
             return CheckGetPut();
         }
@@ -338,12 +360,12 @@ namespace Root_Vega.Module
         #region Inspect
         int m_lMaxGrab = 3000;
         CPoint m_szAlignROI = new CPoint();
-		MemoryData m_memoryGrab;
-		MemoryData m_memoryHeight;
-		MemoryData m_memoryBright;
-		MemoryData m_memoryTop;
-		MemoryData m_memoryLeft;
-		MemoryData m_memoryRight;
+        MemoryData m_memoryGrab;
+        MemoryData m_memoryHeight;
+        MemoryData m_memoryBright;
+        MemoryData m_memoryTop;
+        MemoryData m_memoryLeft;
+        MemoryData m_memoryRight;
         MemoryData m_memoryBottom;
 
         public ushort[] m_aHeight;
@@ -351,9 +373,9 @@ namespace Root_Vega.Module
         public override void InitMemorys()
         {
             m_szAlignROI = p_CamLADS.p_szROI;
-			m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
-			m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-			m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
+            m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
 
             m_memoryTop = m_memoryPool.GetGroup(p_id).CreateMemory("Top", 1, 1, 6000, 150000);
             m_memoryLeft = m_memoryPool.GetGroup(p_id).CreateMemory("Left", 1, 1, 6000, 150000);
@@ -448,7 +470,7 @@ namespace Root_Vega.Module
             if (EQ.p_bSimulate) return "OK";
             p_bStageVac = true;
             Thread.Sleep(200);
-            
+
             m_axisXY.p_axisX.HomeStart();
             if (m_axisXY.WaitReady() != "OK")
                 p_bStageVac = false;
@@ -505,7 +527,7 @@ namespace Root_Vega.Module
             }
             base.ThreadStop();
         }
-         
+
         #region ModuleRun
         protected override void InitModuleRuns()
         {
@@ -705,7 +727,7 @@ namespace Root_Vega.Module
                         /* Trigger Set*/
                         double yTrigger0 = m_rpAxis.Y - yAxis / 2;
                         double yTrigger1 = m_rpAxis.Y + yAxis / 2;
-                        m_module.p_axisXY.p_axisY.SetTrigger(yPos1, yTrigger1+100000, m_grabMode.m_dTrigger, true);
+                        m_module.p_axisXY.p_axisY.SetTrigger(yPos1, yTrigger1 + 100000, m_grabMode.m_dTrigger, true);
 
                         /* 메모리 위치도 가져오게는 좀 다시 하자.*/
                         string sPool = "pool";
@@ -969,7 +991,7 @@ namespace Root_Vega.Module
             public int m_nStep = 0;
             public int m_nVarianceSize = 0;
             public bool m_bUsingSobel = true;
-           
+
             public Run_AutoFocus(SideVision module)
             {
                 m_module = module;
@@ -1123,7 +1145,7 @@ namespace Root_Vega.Module
                     string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dRightStartPosX + (m_nStep * i)), dRightCurrentScore);
                     System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
-                    
+
                     //p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
 
                     //Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
