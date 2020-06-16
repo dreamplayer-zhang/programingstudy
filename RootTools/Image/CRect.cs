@@ -108,14 +108,54 @@ namespace RootTools
             Top = Y - height / 2;
             Bottom = Y + height / 2;
         }
-        public CRect(int l,int t,int r,int b)
-        {
-            X = (r - l / 2);
-            Y = (b - t / 2);
-            Left = l;
-            Right = r;
-            Top = t;
-            Bottom = b;
+		public CRect(int l, int t, int r, int b)
+		{
+			Left = l;
+			Right = r;
+			Top = t;
+			Bottom = b;
+
+			if (l > r)
+			{
+				Left = r;
+				Right = l;
+			}
+			if (b < t)
+			{
+				Bottom = t;
+				Top = b;
+			}
+			X = ((Right - Left) / 2);
+			Y = ((Bottom - Top) / 2);
+		}
+        /// <summary>
+        /// Top,Left,Bottom,Right를 위치에 맞게 재정렬한다
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <returns></returns>
+        public static CRect ReAllocate(CRect rect)
+		{
+            CRect result = new CRect();
+
+            result.Left = rect.Left;
+            result.Right = rect.Right;
+            result.Top = rect.Top;
+            result.Bottom = rect.Bottom;
+
+            if (rect.Left > rect.Right)
+            {
+                result.Left = rect.Right;
+                result.Right = rect.Left;
+            }
+            if (rect.Bottom < rect.Top)
+            {
+                result.Bottom = rect.Top;
+                result.Top = rect.Bottom;
+            }
+            result.X = ((result.Right - result.Left) / 2);
+            result.Y = ((result.Bottom - result.Top) / 2);
+
+            return result;
         }
         public CRect(string str, Log log)
         {
