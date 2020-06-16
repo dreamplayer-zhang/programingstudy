@@ -27,6 +27,7 @@ namespace RootTools.Trees
                 {
                     case eMode.Init:
                         RunTreeInit();
+                        m_timer.Start(); 
                         break;
                     case eMode.Update:
                         ClearUpdated();
@@ -68,6 +69,7 @@ namespace RootTools.Trees
         private void M_timer_Tick(object sender, EventArgs e)
         {
             while (m_qLink.Count > 0) m_qLink.Dequeue().RunLink();
+            m_timer.Stop(); 
         }
         #endregion
 
@@ -83,9 +85,8 @@ namespace RootTools.Trees
             m_log = log;
             m_reg = new Registry(id, sModel);
 
-            m_timer.Interval = TimeSpan.FromMilliseconds(20);
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
             m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
         }
 
     }
