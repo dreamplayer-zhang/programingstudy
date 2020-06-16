@@ -159,7 +159,7 @@
         </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>    
             <GroupBox Header="Inspection"
@@ -228,6 +228,26 @@
                                 Style="{StaticResource BasicBtn}"
                                 Content="Inspect"
                                 Command="{Binding CommandInspect}"/>
+					</Grid>
+					<ListView ItemsSource="{Binding p_SideRoiList}"
+                              Height="100"
+                              Margin="0,0,0,10"
+                              Background="#FF1B1B1C"
+                              SelectedItem="{Binding SelectedROI}">
+						<ListView.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Name}"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           FontSize="13" />
+							</DataTemplate>
+						</ListView.ItemTemplate>
+					</ListView>
+					<Grid Height="50" Margin="10,5,10,5">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Add Side Insp ROI"
+                                Command="{Binding CommandAddRoi}"/>
 					</Grid>
 					<Grid Height="50" Margin="10,5,10,5">
 						<Button Grid.Column="0"

@@ -1,13 +1,16 @@
 ﻿using Root_Vega.Module;
 using RootTools;
+using RootTools.Inspects;
 using RootTools.Memory;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using DPoint = System.Drawing.Point;
@@ -60,6 +63,47 @@ namespace Root_Vega
 			}
 		}
 
+		#region p_SideRoiList
+
+		ObservableCollection<Roi> _SideRoiList;
+		public ObservableCollection<Roi> p_SideRoiList
+		{
+			get { return _SideRoiList; }
+			set
+			{
+				SetProperty(ref _SideRoiList, value);
+			}
+		}
+		#endregion
+
+		#region SelectedROI
+		Roi _SelectedROI;
+		public Roi SelectedROI
+		{
+			get { return _SelectedROI; }
+			set
+			{
+				if (value != null)
+				{
+					for (int i = 0; i < 4; i++)
+					{
+						if (p_SimpleShapeDrawer_List[i] == null) continue;
+						p_SimpleShapeDrawer_List[i].m_ListRect.Clear();
+						var targetList = value.EdgeBox.EdgeList.Where(x => x.SavePoint == i).ToList();
+						foreach (EdgeElement item in targetList)
+						{
+							var temp = new UIElementInfo(new Point(item.Rect.Left, item.Rect.Top), new Point(item.Rect.Right, item.Rect.Bottom));
+							p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
+						}
+					}
+				}
+
+				SetProperty(ref _SelectedROI, value);
+			}
+		}
+		#endregion
+
+
 		public _2_7_EdgeBoxViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
 			_dispatcher = Dispatcher.CurrentDispatcher;
@@ -96,6 +140,10 @@ namespace Root_Vega
 				p_ImageViewer_Right = p_ImageViewer_List[2];
 				p_ImageViewer_Bottom = p_ImageViewer_List[3];
 			}
+			m_Engineer.m_recipe.LoadComplete += () =>
+			{
+				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+			};
 
 			return;
 		}
@@ -166,7 +214,34 @@ namespace Root_Vega
 		}
 		public void _saveRcp()
 		{
-			//여기서 그려진 모든 rect목록을 현재 엔지니어가 들고있는 레시피에 저장한다
+			if (SelectedROI == null)
+			{
+				//ERROR가 뜨면서 저장 방지
+				return;
+			}
+			//여기서 그려진 모든 rect목록을 현재 엔지니어가 들고있는 레시피에 반영한다
+			for (int i = 0; i < 4; i++)
+			{
+				if (p_SimpleShapeDrawer_List[i] == null) continue;
+				for (int j = 0; j < 6; j++)
+				{
+					if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
+					SelectedROI.EdgeBox.EdgeList.Add(new EdgeElement(i, new CRect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos)));
+				}
+			}
+
+			var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
+			m_Engineer.m_recipe.Save(target);
+		}
+		public void _addRoi()
+		{
+			int roiCount = m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide).Count();
+			string defaultName = string.Format("Side ROI #{0}", roiCount);
+
+			Roi temp = new Roi(defaultName, Roi.Item.ReticleSide);
+			m_Engineer.m_recipe.RecipeData.RoiList.Add(temp);
+
+			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
 		}
 
 		void Inspect()
@@ -618,6 +693,10 @@ namespace Root_Vega
 			{
 				return new RelayCommand(_saveRcp);
 			}
+		}
+		public RelayCommand CommandAddRoi
+		{
+			get { return new RelayCommand(_addRoi); }
 		}
 		#endregion
 	}

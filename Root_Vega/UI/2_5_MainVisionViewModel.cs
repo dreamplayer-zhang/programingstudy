@@ -568,7 +568,8 @@ namespace Root_Vega
 			dlg.InitialDirectory = @"C:\VEGA\Recipe";
 			if (dlg.ShowDialog() == true)
 			{
-				this.p_Recipe = Recipe.Load(dlg.FileName);
+				m_Engineer.m_recipe.Load(dlg.FileName);
+				p_Recipe = m_Engineer.m_recipe;
 			}
 
 		}
