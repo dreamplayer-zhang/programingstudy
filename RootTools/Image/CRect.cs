@@ -78,6 +78,16 @@ namespace RootTools
             X = 0;
             Y = 0;
         }
+        public CRect(System.Windows.Point startPoint, System.Windows.Point endPoint)
+		{
+            Left = (int)startPoint.X;
+            Top = (int)startPoint.Y;
+            Right = (int)endPoint.X;
+            Bottom = (int)endPoint.Y;
+
+            X = ((Right - Left) / 2);
+            Y = ((Bottom - Top) / 2);
+        }
 
         public CRect(int cenx, int ceny, int size)
         {
