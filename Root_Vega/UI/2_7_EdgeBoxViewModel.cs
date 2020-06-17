@@ -341,6 +341,8 @@ namespace Root_Vega
 				DrawCross(ptRight1, System.Windows.Media.Brushes.Yellow, i);
 				DrawCross(ptRight2, System.Windows.Media.Brushes.Yellow, i);
 				DrawCross(ptTop, System.Windows.Media.Brushes.Yellow, i);
+
+				p_ImageViewer_List[i].SetRoiRect();
 			}
 		}
 		void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor, int nTLRB)
