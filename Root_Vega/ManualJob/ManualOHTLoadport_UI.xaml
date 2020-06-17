@@ -47,15 +47,16 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Image Grid.Column="0" Source="/Resources/OutPod.png" Margin="1"/>
+                    <Image Grid.Column="0" x:Name="imageOutPod" Source="/Resources/OutPod.png" Margin="1"/>
+                    <Image Grid.Column="0" x:Name="imageInPod" Source="/Resources/InPod.png" Margin="1" Visibility="Hidden"/>
                     <Grid Grid.Column="1">
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Text="Placed" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                        <TextBlock Grid.Row="0" x:Name="textBlockPlaced" Text="Placed" HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    FontSize="15" Foreground="White" Margin="0,10,22,0"/>
-                        <TextBlock Grid.Row="1" Text="Present" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                        <TextBlock Grid.Row="1" x:Name="textBlockPresent" Text="Present" HorizontalAlignment="Center" VerticalAlignment="Center" 
                                    FontSize="15" Foreground="White" Margin="0,0,16,10"/>
                     </Grid>
                 </Grid>
