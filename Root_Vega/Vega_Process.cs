@@ -41,7 +41,6 @@ namespace Root_Vega
                 if (bGet && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sChild));
             }
             qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sLoadport));
-            infoReticle.SetObservableProcess(); 
             m_aInfoReticle.Add(infoReticle);
         }
 
@@ -215,7 +214,6 @@ namespace Root_Vega
                     if (infoReticle.m_qProcess.Count > 0)
                     {
                         foreach (ModuleRunBase moduleRun in infoReticle.m_qProcess) m_qSequence.Enqueue(new Sequence(moduleRun, infoReticle));
-                        infoReticle.SetObservableProcess();
                     }
                 }
                 FinishLoadport(m_aInfoReticle[0]);
