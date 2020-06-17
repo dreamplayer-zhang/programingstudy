@@ -55,16 +55,6 @@ namespace Root_Vega
                 moduleRun.RunTree(tree.GetTree(n, moduleRun.p_id, false), true);
             }
         }
-
-        ObservableCollection<ModuleRunBase> p_aProcess { get; set; }
-        public void SetObservableProcess()
-        {
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                p_aProcess.Clear();
-                foreach (ModuleRunBase moduleRun in m_qProcess) p_aProcess.Add(moduleRun); 
-            }); 
-        }
         #endregion
 
         #region Tree
@@ -81,7 +71,6 @@ namespace Root_Vega
         public InfoReticle(string id, InfoPod infoPod, IEngineer engineer)
         {
             m_infoPod = infoPod; 
-            p_aProcess = new ObservableCollection<ModuleRunBase>();
             string[] asID = id.Split('.');
             m_sLoadport = asID[0]; 
             InitBase(id, engineer);

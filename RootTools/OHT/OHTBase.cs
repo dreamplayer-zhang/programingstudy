@@ -51,7 +51,7 @@ namespace RootTools.OHT
             void RunTreeToolBox(Tree tree, OHTBase oht);
         }
 
-        protected class DI : IDIO
+        public class DI : IDIO
         {
             public DIO_I m_di = null;
 
@@ -91,7 +91,7 @@ namespace RootTools.OHT
             }
         }
 
-        protected class DO : IDIO
+        public class DO : IDIO
         {
             public DIO_O m_do = null;
 
@@ -102,6 +102,11 @@ namespace RootTools.OHT
             {
                 get { return (m_do == null) ? false : m_do.p_bOut; }
                 set { m_do.Write(value); }
+            }
+
+            public void Toggle()
+            {
+                p_bOn = !p_bOn; 
             }
 
             public void RunTree(Tree tree) { }

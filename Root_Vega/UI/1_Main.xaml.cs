@@ -111,5 +111,14 @@ namespace Root_Vega
             EQ.p_eState = EQ.eState.Run; 
         }
         #endregion
+
+        #region Button OHT
+        private void buttonOHT_Click(object sender, RoutedEventArgs e)
+        {
+            ManualOHT_UI ui = new ManualOHT_UI();
+            ui.Init(m_handler); 
+            ui.Show(); 
+        }
+        #endregion
     }
 }
