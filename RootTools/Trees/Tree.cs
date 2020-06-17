@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.CompilerServices;
 
 namespace RootTools.Trees
 {
@@ -59,7 +58,7 @@ namespace RootTools.Trees
         }
         #endregion
 
-        #region RunTreeInit
+        #region RunTree Init
         public void RunTreeRemove()
         {
             for (int n = p_aChild.Count - 1; n >= 0; n--)
@@ -99,7 +98,7 @@ namespace RootTools.Trees
         }
         #endregion
 
-        #region Update
+        #region RunTree Update
         public bool m_bUpdated = false;
         protected void ClearUpdated()
         {
@@ -119,7 +118,7 @@ namespace RootTools.Trees
         }
         #endregion
 
-        #region Find Tree
+        #region Find Tree List<>
         Tree FindTreeItem(string sName)
         {
             foreach (Tree item in m_aChildRunInit)
@@ -361,8 +360,12 @@ namespace RootTools.Trees
         public Registry m_reg = null;
         public Job m_job = null;
 
+        /// <summary> TreeUI Binging 용</summary>
         public ObservableCollection<Tree> p_aChild { get; set; }
+        
+        /// <summary> RunTree(Init)를 Thread에서 사용할 수 있게 List<Tree> 로 Copy 후 작업</summary>
         public List<Tree> m_aChildRunInit = new List<Tree>(); 
+        
         public Tree()
         {
             p_aChild = new ObservableCollection<Tree>();
