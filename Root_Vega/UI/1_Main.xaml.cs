@@ -116,6 +116,7 @@ namespace Root_Vega
         private void buttonOHT_Click(object sender, RoutedEventArgs e)
         {
             ManualOHT_UI ui = new ManualOHT_UI();
+            ui.Init(m_handler); 
             ui.Show(); 
         }
         #endregion

@@ -25,8 +25,8 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="Manual" Margin="5"/>
-                <Button Grid.Column="1" Content="Auto" Margin="5"/>
+                <Button Grid.Column="0" x:Name="buttonAccessManual" Content="Manual" Margin="5" Click="buttonAccessManual_Click"/>
+                <Button Grid.Column="1" x:Name="buttonAccessAuto" Content="Auto" Margin="5" Click="buttonAccessAuto_Click"/>
             </Grid>
         </Grid>
 
@@ -47,14 +47,8 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Background="{DynamicResource Yellow}" Margin="4">
-                        <TextBlock Text="Loading" FontSize="15" FontWeight="Bold" Foreground="White" 
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Grid>
-                    <Grid Grid.Row="1" Background="{DynamicResource DarkGray}" Margin="4">
-                        <TextBlock Text="Unloading" FontSize="15" FontWeight="Bold" Foreground="White" 
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Grid>
+                    <Button Grid.Row="0" x:Name="buttonStateLoading" Content="Loading" Margin="4"/>
+                    <Button Grid.Row="1" x:Name="buttonStateUnloading" Content="Unloading" Margin="4"/>
                 </Grid>
             </Grid>
         </Grid>
@@ -81,14 +75,14 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" Content="1.Valid" Margin="5" Background="{DynamicResource Yellow}" Foreground="White"/>
-                    <Button Grid.Row="1" Content="2.CS-0" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
-                    <Button Grid.Row="2" Content="3.CS-1" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="0" x:Name="buttonDIValid" Content="1.Valid" Margin="5" Background="{DynamicResource Yellow}" Foreground="White"/>
+                    <Button Grid.Row="1" x:Name="buttonDICS0" Content="2.CS-0" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="2" x:Name="buttonDICS1" Content="3.CS-1" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
                     <Button Grid.Row="3" Content="4.N/C" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
-                    <Button Grid.Row="4" Content="5.TR-REQ" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
-                    <Button Grid.Row="5" Content="6.BUSY" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
-                    <Button Grid.Row="6" Content="7.COMPT" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
-                    <Button Grid.Row="7" Content="8.CONT" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="4" x:Name="buttonDITrReq" Content="5.TR-REQ" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="5" x:Name="buttonDIBusy" Content="6.BUSY" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="6" x:Name="buttonDICompt" Content="7.COMPT" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="7" x:Name="buttonDICont" Content="8.CONT" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
                 </Grid>
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
@@ -101,14 +95,14 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" Content="1.L-REQ" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
-                    <Button Grid.Row="1" Content="2.U-REQ" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="0" x:Name="buttonDOLReq" Content="1.L-REQ" Margin="5" Click="buttonDOLReq_Click"/>
+                    <Button Grid.Row="1" x:Name="buttonDOUReq" Content="2.U-REQ" Margin="5" Click="buttonDOUReq_Click"/>
                     <Button Grid.Row="2" Content="3.N/C" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
-                    <Button Grid.Row="3" Content="4.READY" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="3" x:Name="buttonDOReady" Content="4.READY" Margin="5" Click="buttonDOReady_Click"/>
                     <Button Grid.Row="4" Content="5.N/C" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
                     <Button Grid.Row="5" Content="6.N/C" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
-                    <Button Grid.Row="6" Content="7.HO-AVBL" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
-                    <Button Grid.Row="7" Content="8.ES" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="6" x:Name="buttonDOHoAvbl" Content="7.HO-AVBL" Margin="5" Click="buttonDOHoAvbl_Click"/>
+                    <Button Grid.Row="7" x:Name="buttonDOES" Content="8.ES" Margin="5" Click="buttonDOES_Click"/>
                 </Grid>
             </Grid>
         </Grid>
@@ -121,8 +115,8 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Error State" FontSize="15" FontWeight="Bold" Foreground="White" 
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            <TextBox Grid.Row="1" Background="White" Text="Test" FontSize="16" Margin="1"/>
-            <Button Grid.Row="2" Content="Retry Key" Margin="3" FontWeight="Bold"/>
+            <TextBox Grid.Row="1" Background="White" Text="{Binding p_sInfo}" FontSize="16" Margin="1" IsEnabled="False"/>
+            <Button Grid.Row="2" x:Name="buttonRetry" Content="Retry Key" Margin="3" FontWeight="Bold" Click="buttonRetry_Click"/>
         </Grid>
     </Grid>
 </UserControl>

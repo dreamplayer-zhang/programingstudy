@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_Vega.ManualJob"
         mc:Ignorable="d"
-        Title="ManualOHT_UI" Height="700" Width="700" WindowStyle="ToolWindow" Background="#FF2D2D30">
+        Title="ManualOHT_UI" Height="700" Width="700" WindowStyle="ToolWindow" Background="#FF2D2D30" Topmost="True">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>

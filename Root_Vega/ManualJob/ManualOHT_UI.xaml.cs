@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using System.Windows;
 
 namespace Root_Vega.ManualJob
 {
@@ -22,6 +10,12 @@ namespace Root_Vega.ManualJob
         public ManualOHT_UI()
         {
             InitializeComponent();
+        }
+
+        public void Init(Vega_Handler handler)
+        {
+            manualOHTA.Init(handler.m_aLoadport[0]);
+            manualOHTB.Init(handler.m_aLoadport[1]);
         }
     }
 }
