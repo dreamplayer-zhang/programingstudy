@@ -26,6 +26,7 @@ namespace RootTools.Trees
                 switch (_eMode)
                 {
                     case eMode.Init:
+                        RunTreeRemove(); 
                         RunTreeInit();
                         m_timer.Start(); 
                         break;
@@ -38,37 +39,10 @@ namespace RootTools.Trees
         #endregion
 
         #region Timer Init
-        class Link
-        {
-            Tree m_tree;
-            Tree m_treeChild; 
-
-            public void RunLink()
-            {
-                foreach (Tree tree in m_tree.p_aChild)
-                {
-                    if (tree.p_id == m_treeChild.p_id) return; 
-                }
-                m_tree.p_aChild.Add(m_treeChild); 
-            }
-
-            public Link(Tree tree, Tree treeChild)
-            {
-                m_tree = tree;
-                m_treeChild = treeChild; 
-            }
-        }
-        Queue<Link> m_qLink = new Queue<Link>(); 
-
-        public void AddQueue(Tree tree, Tree treeChild)
-        {
-             m_qLink.Enqueue(new Link(tree, treeChild)); 
-        }
-
         DispatcherTimer m_timer = new DispatcherTimer();
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            while (m_qLink.Count > 0) m_qLink.Dequeue().RunLink();
+            RunTreeDone(); 
             m_timer.Stop(); 
         }
         #endregion

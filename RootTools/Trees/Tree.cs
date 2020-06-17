@@ -60,14 +60,42 @@ namespace RootTools.Trees
         #endregion
 
         #region RunTreeInit
-        public void RunTreeInit()
+        public void RunTreeRemove()
         {
             for (int n = p_aChild.Count - 1; n >= 0; n--)
             {
-                if (p_aChild[n].m_bUse) p_aChild[n].RunTreeInit(); 
+                if (p_aChild[n].m_bUse) p_aChild[n].RunTreeRemove();
                 else p_aChild.RemoveAt(n);
             }
-            m_bUse = false; 
+            m_bUse = false;
+        }
+
+        public void RunTreeInit()
+        {
+            m_aChildRunInit.Clear();
+            foreach (Tree tree in p_aChild)
+            {
+                m_aChildRunInit.Add(tree);
+                tree.RunTreeInit(); 
+            }
+        }
+
+        public void RunTreeDone()
+        {
+            foreach (Tree tree in m_aChildRunInit)
+            {
+                if (IsAlreadyExistatChild(tree.p_id) == false) p_aChild.Add(tree);
+                tree.RunTreeDone(); 
+            }
+        }
+
+        bool IsAlreadyExistatChild(string treeID)
+        {
+            foreach (Tree tree in p_aChild)
+            {
+                if (tree.p_id == treeID) return true; 
+            }
+            return false; 
         }
         #endregion
 
@@ -94,7 +122,7 @@ namespace RootTools.Trees
         #region Find Tree
         Tree FindTreeItem(string sName)
         {
-            foreach (Tree item in p_aChild)
+            foreach (Tree item in m_aChildRunInit)
             {
                 if (item.p_sName == sName)
                 {
@@ -110,7 +138,7 @@ namespace RootTools.Trees
             if (p_treeRoot.p_eMode != eMode.Init) return;
             m_bUse = true;
             treeItem.m_bUse = true;
-            p_treeRoot.AddQueue(this, treeItem);
+            m_aChildRunInit.Add(treeItem); 
         }
         #endregion
 
@@ -334,6 +362,7 @@ namespace RootTools.Trees
         public Job m_job = null;
 
         public ObservableCollection<Tree> p_aChild { get; set; }
+        public List<Tree> m_aChildRunInit = new List<Tree>(); 
         public Tree()
         {
             p_aChild = new ObservableCollection<Tree>();
