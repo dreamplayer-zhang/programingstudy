@@ -5,7 +5,128 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local  ="clr-namespace:Root_Vega"
              mc:Ignorable="d" 
-             d:DesignHeight="756" d:DesignWidth="1876"
+             d:DesignHeight="600" d:DesignWidth="350"
              Background="#FF2D2D30">
-    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="3.3*"/>
+            <RowDefinition Height="1.2*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="2.5*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Access Mode" FontSize="15" FontWeight="Bold" Foreground="White" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Manual" Margin="5"/>
+                <Button Grid.Column="1" Content="Auto" Margin="5"/>
+            </Grid>
+        </Grid>
+        
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="2.5*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Loadport State" FontSize="15" FontWeight="Bold" Foreground="White" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Background="{DynamicResource Yellow}" Margin="4">
+                        <TextBlock Text="Loading" FontSize="15" FontWeight="Bold" Foreground="White" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    <Grid Grid.Row="1" Background="{DynamicResource DarkGray}" Margin="4">
+                        <TextBlock Text="Unloading" FontSize="15" FontWeight="Bold" Foreground="White" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="8*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="PIO State" FontSize="15" FontWeight="Bold" Foreground="White" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0" Content="1.Valid" Margin="5" Background="{DynamicResource Yellow}" Foreground="White"/>
+                    <Button Grid.Row="1" Content="2.CS-0" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="2" Content="3.CS-1" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="3" Content="4.N/C" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="4" Content="5.TR-REQ" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="5" Content="6.BUSY" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="6" Content="7.COMPT" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="7" Content="8.CONT" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0" Content="1.L-REQ" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="1" Content="2.U-REQ" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="2" Content="3.N/C" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="3" Content="4.READY" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="4" Content="5.N/C" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="5" Content="6.N/C" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="6" Content="7.HO-AVBL" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                    <Button Grid.Row="7" Content="8.ES" Margin="5" Background="{DynamicResource DarkGray}" Foreground="White"/>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Error State" FontSize="15" FontWeight="Bold" Foreground="White" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TextBox Grid.Row="1" Background="White" Text="Test" FontSize="16" Margin="1"/>
+            <Button Grid.Row="2" Content="Retry Key" Margin="3" FontWeight="Bold"/>
+        </Grid>
+    </Grid>
 </UserControl>
+    
+
+    
