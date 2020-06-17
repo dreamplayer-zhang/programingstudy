@@ -237,6 +237,9 @@ namespace Root_Vega.Module
             if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Align))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
+            // 조명 켜기
+            GetGrabMode("MainGrab").SetLight(true);
+
             // 레티클 유무체크
             m_CamAlign1.Grab();
             m_CamAlign2.Grab();
@@ -244,6 +247,9 @@ namespace Root_Vega.Module
             if (bRet == false) return "Reticle Not Exist";
             bRet = ReticleExistCheck(m_CamAlign2);
             if (bRet == false) return "Reticle Not Exist";
+
+            // 조명 끄기
+            GetGrabMode("MainGrab").SetLight(false);
 
             // 모든 축 Ready 위치로 이동
             if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Safety))) return p_sInfo;
@@ -281,6 +287,9 @@ namespace Root_Vega.Module
             if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Align))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
+            // 조명 켜기
+            GetGrabMode("MainGrab").SetLight(true);
+
             // 레티클 유무체크
             m_CamAlign1.Grab();
             m_CamAlign2.Grab();
@@ -288,6 +297,9 @@ namespace Root_Vega.Module
             if (bRet == true) return "Reticle Exist";
             bRet = ReticleExistCheck(m_CamAlign2);
             if (bRet == true) return "Reticle Exist";
+
+            // 조명 끄기
+            GetGrabMode("MainGrab").SetLight(false);
 
             // 모든 축 Ready 위치로 이동
             if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Safety))) return p_sInfo;
