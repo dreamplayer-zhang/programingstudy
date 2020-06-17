@@ -10,17 +10,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_Vega
+namespace Root_Vega.ManualJob
 {
     /// <summary>
-    /// _8_OHT.xaml에 대한 상호 작용 논리
+    /// ManualOHT_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class _8_OHT : UserControl
+    public partial class ManualOHT_UI : Window
     {
-        public _8_OHT()
+        public ManualOHT_UI()
         {
             InitializeComponent();
         }

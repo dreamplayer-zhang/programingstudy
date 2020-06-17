@@ -151,6 +151,12 @@
     <Compile Include="ManualJob\ManualOCR_UI.xaml.cs">
       <DependentUpon>ManualOCR_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ManualJob\ManualOHTLoadport_UI.xaml.cs">
+      <DependentUpon>ManualOHTLoadport_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ManualJob\ManualOHT_UI.xaml.cs">
+      <DependentUpon>ManualOHT_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Setting\Setting_FDC.xaml.cs">
       <DependentUpon>Setting_FDC.xaml</DependentUpon>
     </Compile>
@@ -227,10 +233,6 @@
       <DependentUpon>Optic_SideVision.xaml</DependentUpon>
     </Compile>
     <Compile Include="Setting\Optic_SideVisionViewModel.cs" />
-    <Compile Include="UI\8_OHT.xaml.cs">
-      <DependentUpon>8_OHT.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\8_OHT_ViewModel.cs" />
     <Compile Include="UI\9_Yield.xaml.cs">
       <DependentUpon>9_Yield.xaml</DependentUpon>
     </Compile>
@@ -332,6 +334,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ManualJob\ManualOHTLoadport_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ManualJob\ManualOHT_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Setting\Setting_FDC.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -409,10 +419,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Setting\Optic_SideVision.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\8_OHT.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
