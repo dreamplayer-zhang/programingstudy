@@ -43,7 +43,21 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
-                    <Image Source="/Resources/OutPod.png"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0" Source="/Resources/OutPod.png" Margin="1"/>
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Placed" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   FontSize="15" Foreground="White" Margin="0,10,22,0"/>
+                        <TextBlock Grid.Row="1" Text="Present" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   FontSize="15" Foreground="White" Margin="0,0,16,10"/>
+                    </Grid>
                 </Grid>
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
@@ -118,13 +132,8 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Error State" FontSize="15" FontWeight="Bold" Foreground="White" 
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-<<<<<<< HEAD:Root_Vega/UI/8_OHT.xaml
-            <TextBox Grid.Row="1" Background="White" Text="Test" FontSize="16" Margin="1" IsReadOnly="True"/>
-            <Button Grid.Row="2" Content="Retry Key" Margin="3" FontWeight="Bold"/>
-=======
             <TextBox Grid.Row="1" Background="White" Text="{Binding p_sInfo}" FontSize="16" Margin="1" IsEnabled="False"/>
             <Button Grid.Row="2" x:Name="buttonRetry" Content="Retry Key" Margin="3" FontWeight="Bold" Click="buttonRetry_Click"/>
->>>>>>> 16080b799267a05cb1fac2d6451943927587a9df:Root_Vega/ManualJob/ManualOHTLoadport_UI.xaml
         </Grid>
     </Grid>
 </UserControl>
