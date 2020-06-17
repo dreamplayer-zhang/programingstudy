@@ -93,8 +93,20 @@ namespace Root_Vega
 						foreach (EdgeElement item in targetList)
 						{
 							var temp = new UIElementInfo(new Point(item.Rect.Left, item.Rect.Top), new Point(item.Rect.Right, item.Rect.Bottom));
+
+							System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+							rect.Width = item.Rect.Width;
+							rect.Height = item.Rect.Height;
+							System.Windows.Controls.Canvas.SetLeft(rect, item.Rect.Left);
+							System.Windows.Controls.Canvas.SetTop(rect, item.Rect.Top);
+							rect.StrokeThickness = 2;
+							rect.Stroke = MBrushes.Red;
+
+							p_SimpleShapeDrawer_List[i].m_ListShape.Add(rect);
+							p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
 							p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
 						}
+						p_ImageViewer_List[i].SetRoiRect();
 					}
 				}
 
