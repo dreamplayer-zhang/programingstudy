@@ -46,7 +46,7 @@ namespace Root_Wind
             {
                 ModuleRunBase moduleRun = infoWafer.m_moduleRunList.m_aModuleRun[n];
                 string sChild = moduleRun.m_moduleBase.p_id;
-                string sChildID = "01"; //forget
+                string sChildID = "01"; 
                 bool bGetPut = (sChild != m_wtr.p_id);
                 bool bPut = !IsSameModule(infoWafer.m_moduleRunList, n - 1, n);
                 if (bPut && bGetPut) aProcess.Add(wtr.GetRunMotion(ref iWTRMotion, WTR_RND.eMotion.Put, sChild, sChildID));
@@ -212,7 +212,7 @@ namespace Root_Wind
             infoWafer.m_aProcess.Clear();
             int iWTRMotion = 0;
             string sChild = child.p_id;
-            string sChildID = "01"; //forget
+            string sChildID = "01"; 
             ModuleRunBase moduleRunGet = wtr.GetRunMotion(ref iWTRMotion, WTR_RND.eMotion.Get, sChild, sChildID);
             infoWafer.m_aProcess.Add(moduleRunGet);
             string[] asInfoWafer = infoWafer.p_id.Split('.');
@@ -437,12 +437,9 @@ namespace Root_Wind
 
         public void RunTree(Tree.eMode mode)
         {
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                RunTreeWafer(mode);
-                RunTreeLocate(mode);
-                RunTreeSequence(mode);
-            });
+            RunTreeWafer(mode);
+            RunTreeLocate(mode);
+            RunTreeSequence(mode);
         }
 
         void RunTreeWafer(Tree.eMode mode)

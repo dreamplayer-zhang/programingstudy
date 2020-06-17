@@ -276,12 +276,9 @@ namespace Root_Vega
 
         public void RunTree(Tree.eMode mode)
         {
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                RunTreeReticle(mode);
-                RunTreeLocate(mode);
-                RunTreeSequence(mode);
-            });
+            RunTreeReticle(mode);
+            RunTreeLocate(mode);
+            RunTreeSequence(mode);
         }
 
         void RunTreeReticle(Tree.eMode mode)

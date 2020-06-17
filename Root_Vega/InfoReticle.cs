@@ -70,12 +70,9 @@ namespace Root_Vega
         #region Tree
         public override void RunTree(Tree tree)
         {
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                base.RunTree(tree);
-                RunTreeRecipe(tree.GetTree("Recipe", false));
-                RunTreeProcess(tree.GetTree("Process", false));
-            });
+            base.RunTree(tree);
+            RunTreeRecipe(tree.GetTree("Recipe", false));
+            RunTreeProcess(tree.GetTree("Process", false));
         }
         #endregion
 

@@ -32,10 +32,15 @@ namespace RootTools.Control.Ajin
             while (m_aAxis.Count < m_lAxis)
             {
                 AjinAxis axis = new AjinAxis();
-                axis.Init(m_id, m_aAxis.Count, m_engineer, m_bEnable);
+                axis.Init(m_id, this, m_engineer, m_bEnable);
                 m_aAxis.Add(axis);
             }
-            if (OnChangeAxisList != null) OnChangeAxisList(); 
+            InvalidAxisList(); 
+        }
+
+        public void InvalidAxisList()
+        {
+            if (OnChangeAxisList != null) OnChangeAxisList();
         }
         #endregion
 
