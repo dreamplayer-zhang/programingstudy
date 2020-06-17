@@ -44,6 +44,7 @@ namespace Root_Vega.Module
 
         public LightSet m_lightSet;
         MemoryPool m_memoryPool;
+        MemoryData m_memoryMain;
         InspectTool m_inspectTool;
         ZoomLens m_ZoomLens;
         public ZoomLens p_ZoomLens;
@@ -71,6 +72,7 @@ namespace Root_Vega.Module
         public override void InitMemorys()
         {
             //forget
+            m_memoryMain = m_memoryPool.GetGroup("PatternVision").CreateMemory("Main", 1, 1, 1000, 1000);
         }
         #endregion
 

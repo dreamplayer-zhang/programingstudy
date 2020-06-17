@@ -91,6 +91,15 @@ namespace Root_Vega
         public int m_ScanStartLine = 0;
         #endregion
 
+        public enum eScanPos
+        {
+            Bottom = 0,
+            Left,
+            Top,
+            Right,
+        }
+        public eScanPos m_eScanPos = eScanPos.Bottom;
+
         public string p_id
         {
             get;

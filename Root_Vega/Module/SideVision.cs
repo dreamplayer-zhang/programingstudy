@@ -341,24 +341,34 @@ namespace Root_Vega.Module
 		MemoryData m_memoryGrab;
 		MemoryData m_memoryHeight;
 		MemoryData m_memoryBright;
-		MemoryData m_memoryTop;
-		MemoryData m_memoryLeft;
-		MemoryData m_memoryRight;
-        MemoryData m_memoryBottom;
+		
+        MemoryData m_memorySideTop;
+        MemoryData m_memorySideLeft;
+        MemoryData m_memorySideRight;
+        MemoryData m_memorySideBottom;
+        MemoryData m_memoryBevelTop;
+        MemoryData m_memoryBevelLeft;
+        MemoryData m_memoryBevelRight;
+        MemoryData m_memoryBevelBottom;
 
         public ushort[] m_aHeight;
         double m_fScaleH = 0;
         public override void InitMemorys()
         {
             m_szAlignROI = p_CamLADS.p_szROI;
-			m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
-			m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-			m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+			//m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
+			//m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+			//m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
 
-            m_memoryTop = m_memoryPool.GetGroup(p_id).CreateMemory("Top", 1, 1, 6000, 150000);
-            m_memoryLeft = m_memoryPool.GetGroup(p_id).CreateMemory("Left", 1, 1, 6000, 150000);
-            m_memoryRight = m_memoryPool.GetGroup(p_id).CreateMemory("Right", 1, 1, 6000, 150000);
-            m_memoryBottom = m_memoryPool.GetGroup(p_id).CreateMemory("Bottom", 1, 1, 6000, 150000);
+            m_memorySideTop = m_memoryPool.GetGroup("Side").CreateMemory("Top", 1, 1, 1000, 1000);
+            m_memorySideLeft = m_memoryPool.GetGroup("Side").CreateMemory("Left", 1, 1, 1000, 1000);
+            m_memorySideRight = m_memoryPool.GetGroup("Side").CreateMemory("Right", 1, 1, 1000, 1000);
+            m_memorySideBottom = m_memoryPool.GetGroup("Side").CreateMemory("Bottom", 1, 1, 1000, 1000);
+
+            m_memoryBevelTop = m_memoryPool.GetGroup("Bevel").CreateMemory("Top", 1, 1, 1000, 1000);
+            m_memoryBevelLeft = m_memoryPool.GetGroup("Bevel").CreateMemory("Left", 1, 1, 1000, 1000);
+            m_memoryBevelRight = m_memoryPool.GetGroup("Bevel").CreateMemory("Right", 1, 1, 1000, 1000);
+            m_memoryBevelBottom = m_memoryPool.GetGroup("Bevel").CreateMemory("Bottom", 1, 1, 1000, 1000);
 
             m_aHeight = new ushort[m_szAlignROI.X * m_lMaxGrab];
             m_fScaleH = 65535.0 / m_szAlignROI.Y;
@@ -707,10 +717,10 @@ namespace Root_Vega.Module
                         double yTrigger1 = m_rpAxis.Y + yAxis / 2;
                         m_module.p_axisXY.p_axisY.SetTrigger(yPos1, yTrigger1+100000, m_grabMode.m_dTrigger, true);
 
-                        /* 메모리 위치도 가져오게는 좀 다시 하자.*/
-                        string sPool = "pool";
-                        string sGroup = "group";
-                        string sMem = "mem";
+                        string sPool = "SideVision.Memory";
+                        string sGroup = "Side";
+                        string sMem = m_eScanPos.ToString();
+                        
                         MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, sMem);
 
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
@@ -865,9 +875,9 @@ namespace Root_Vega.Module
                         m_module.p_axisXY.p_axisY.SetTrigger(yPos1, yTrigger1, m_grabMode.m_dTrigger, true);
 
                         /* 메모리 위치도 가져오게는 좀 다시 하자.*/
-                        string sPool = "pool";
-                        string sGroup = "group";
-                        string sMem = "mem";
+                        string sPool = "SideVision.Memory";
+                        string sGroup = "Bevel";
+                        string sMem = m_eScanPos.ToString();
                         MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, sMem);
 
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
