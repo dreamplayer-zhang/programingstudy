@@ -652,7 +652,7 @@ namespace Root_Vega
 			for (int i = 0; i < (int)dRatio; i++)
 			{
 				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i).ToPointer());
-				for (int j = 0; j < rcROI.Width; j++)
+				for (int j = 0; j < rcROI.Height; j++)
 				{
 					nSum += *bp;
 					bp += img.p_Stride;
@@ -667,7 +667,7 @@ namespace Root_Vega
 			for (int i = 0; i < (int)dRatio; i++)
 			{
 				byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
-				for (int j = 0; j < rcROI.Height; j++)
+				for (int j = 0; j < rcROI.Width; j++)
 				{
 					nSum += *bp;
 					bp++;
