@@ -105,7 +105,11 @@ namespace Root_Vega
             get;
             set;
         }
-        
+        void RunTreeScanPos(Tree tree, bool bVisible, bool bReadOnly)
+        {
+            m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
+        }
+
         public string p_sName{get;set;}
         public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool)
         {
@@ -129,6 +133,7 @@ namespace Root_Vega
             RunTreeCamera(tree, bVisible, bReadOnly);
             RunTreeLight(tree.GetTree("LightPower", false), bVisible, bReadOnly);
             RunTreeMemory(tree.GetTree("Memory", false), bVisible, bReadOnly);
+            RunTreeScanPos(tree.GetTree("ScanPos", false), bVisible, bReadOnly);
         }
     }
 }
