@@ -596,6 +596,12 @@
   <ItemGroup>
     <Resource Include="Resources\AJINModule.JPG" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\InPod.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OutPod.PNG" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

@@ -43,6 +43,9 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Image Source="/Resources/OutPod.png"/>
+                </Grid>
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
@@ -122,7 +125,7 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Error State" FontSize="15" FontWeight="Bold" Foreground="White" 
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            <TextBox Grid.Row="1" Background="White" Text="Test" FontSize="16" Margin="1"/>
+            <TextBox Grid.Row="1" Background="White" Text="Test" FontSize="16" Margin="1" IsReadOnly="True"/>
             <Button Grid.Row="2" Content="Retry Key" Margin="3" FontWeight="Bold"/>
         </Grid>
     </Grid>
