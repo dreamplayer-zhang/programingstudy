@@ -441,20 +441,20 @@ namespace Root_Vega
 				return new RelayCommand(_btnInspTest);
 			}
 		}
-		public ICommand btnStartInsp
-		{
-			get
-			{
-				return new RelayCommand(_btnStartInsp);
-			}
-		}
-		public ICommand btnNextSnap
-		{
-			get
-			{
-				return new RelayCommand(_btnNextSnap);
-			}
-		}
+		//public ICommand btnStartInsp
+		//{
+		//	get
+		//	{
+		//		return new RelayCommand(_btnStartInsp);
+		//	}
+		//}
+		//public ICommand btnNextSnap
+		//{
+		//	get
+		//	{
+		//		return new RelayCommand(_btnNextSnap);
+		//	}
+		//}
 		public ICommand btnRcpSaveTest
 		{
 			get
@@ -508,59 +508,59 @@ namespace Root_Vega
 			Draw_IsChecked = false;
 			RecipeCursor = Cursors.Arrow;
 		}
-		private void _btnStartInsp()
-		{
-			ClearUI();//재검사 전 UI 정리
+		//private void _btnStartInsp()
+		//{
+		//	ClearUI();//재검사 전 UI 정리
 
-			if (DrawRectList != null)
-				DrawRectList.Clear();//검사영역 draw용 Rect List 정리
+		//	if (DrawRectList != null)
+		//		DrawRectList.Clear();//검사영역 draw용 Rect List 정리
 
-			currentDefectIdx = 0;
-			currentSnap = 0;
-			m_Engineer.m_InspManager.ClearInspection();
+		//	currentDefectIdx = 0;
+		//	currentSnap = 0;
+		//	m_Engineer.m_InspManager.ClearInspection();
 
-			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
-			int nblocksize = 500;
+		//	CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
+		//	int nblocksize = 500;
 
-			int AreaWidth = Mask_Rect.Width;
+		//	int AreaWidth = Mask_Rect.Width;
 
-			wLimit = AreaWidth / nblocksize;
-			System.Diagnostics.Debug.WriteLine(string.Format("Set wLimit : {0}", wLimit));
+		//	wLimit = AreaWidth / nblocksize;
+		//	System.Diagnostics.Debug.WriteLine(string.Format("Set wLimit : {0}", wLimit));
 
-			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
-				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
-				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance, currentSnap, currentSnap + 1);
+		//	DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
+		//		p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
+		//		p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance, currentSnap, currentSnap + 1);
 
-			currentSnap++;//한줄 추가
+		//	currentSnap++;//한줄 추가
 
-			System.Diagnostics.Debug.WriteLine("Start Insp");
+		//	System.Diagnostics.Debug.WriteLine("Start Insp");
 
-			inspDefaultDir = @"C:\vsdb";
-			if (!System.IO.Directory.Exists(inspDefaultDir))
-			{
-				System.IO.Directory.CreateDirectory(inspDefaultDir);
-			}
-			inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
-			var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
-			string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
+		//	inspDefaultDir = @"C:\vsdb";
+		//	if (!System.IO.Directory.Exists(inspDefaultDir))
+		//	{
+		//		System.IO.Directory.CreateDirectory(inspDefaultDir);
+		//	}
+		//	inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+		//	var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
+		//	string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
 
-			if (VSDBManager != null && VSDBManager.IsConnected)
-			{
-				VSDBManager.Disconnect();
-			}
-			VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+		//	if (VSDBManager != null && VSDBManager.IsConnected)
+		//	{
+		//		VSDBManager.Disconnect();
+		//	}
+		//	VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
 
-			if (VSDBManager.Connect())
-			{
-				VSDBManager.CreateTable("Datainfo");
-				VSDBManager.CreateTable("Data");
+		//	if (VSDBManager.Connect())
+		//	{
+		//		VSDBManager.CreateTable("Datainfo");
+		//		VSDBManager.CreateTable("Data");
 
-				VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
-				VSDataDT = VSDBManager.GetDataTable("Data");
-			}
-			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
-			m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
-		}
+		//		VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
+		//		VSDataDT = VSDBManager.GetDataTable("Data");
+		//	}
+		//	int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
+		//	m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
+		//}
 		private void _btnRcpLoadTest()
 		{
 			OpenFileDialog dlg = new OpenFileDialog();
@@ -568,7 +568,8 @@ namespace Root_Vega
 			dlg.InitialDirectory = @"C:\VEGA\Recipe";
 			if (dlg.ShowDialog() == true)
 			{
-				this.p_Recipe = Recipe.Load(dlg.FileName);
+				m_Engineer.m_recipe.Load(dlg.FileName);
+				p_Recipe = m_Engineer.m_recipe;
 			}
 
 		}
@@ -635,24 +636,24 @@ namespace Root_Vega
 			}
 			//this.p_Recipe.Save();
 		}
-		private void _btnNextSnap()
-		{
-			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
-			if (wLimit == currentSnap)
-			{
-				return;
-			}
+		//private void _btnNextSnap()
+		//{
+		//	int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
+		//	if (wLimit == currentSnap)
+		//	{
+		//		return;
+		//	}
 
-			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
-			int nblocksize = 500;
+		//	CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
+		//	int nblocksize = 500;
 
-			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
-				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
-				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance, currentSnap, currentSnap + 1);
+		//	DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
+		//		p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
+		//		p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance, currentSnap, currentSnap + 1);
 
-			currentSnap++;//한줄 추가
-			m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
-		}
+		//	currentSnap++;//한줄 추가
+		//	m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
+		//}
 		List<CRect> DrawRectList;
 		private void _btnInspTest()
 		{
@@ -673,6 +674,7 @@ namespace Root_Vega
 
 			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
 				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
+				InspectionType.Strip,
 				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance);
 
 			//for (int i = 0; i < DrawRectList.Count; i++)

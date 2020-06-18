@@ -1,13 +1,17 @@
-﻿using Root_Vega.Module;
+﻿using ATI;
+using Root_Vega.Module;
 using RootTools;
+using RootTools.Inspects;
 using RootTools.Memory;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using DPoint = System.Drawing.Point;
@@ -60,6 +64,59 @@ namespace Root_Vega
 			}
 		}
 
+		#region p_SideRoiList
+
+		ObservableCollection<Roi> _SideRoiList;
+		public ObservableCollection<Roi> p_SideRoiList
+		{
+			get { return _SideRoiList; }
+			set
+			{
+				SetProperty(ref _SideRoiList, value);
+			}
+		}
+		#endregion
+
+		#region SelectedROI
+		Roi _SelectedROI;
+		public Roi SelectedROI
+		{
+			get { return _SelectedROI; }
+			set
+			{
+				if (value != null)
+				{
+					for (int i = 0; i < 4; i++)
+					{
+						if (p_SimpleShapeDrawer_List[i] == null) continue;
+						p_SimpleShapeDrawer_List[i].m_ListRect.Clear();
+						var targetList = value.EdgeBox.EdgeList.Where(x => x.SavePoint == i).ToList();
+						foreach (EdgeElement item in targetList)
+						{
+							var temp = new UIElementInfo(new Point(item.Rect.Left, item.Rect.Top), new Point(item.Rect.Right, item.Rect.Bottom));
+
+							System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+							rect.Width = item.Rect.Width;
+							rect.Height = item.Rect.Height;
+							System.Windows.Controls.Canvas.SetLeft(rect, item.Rect.Left);
+							System.Windows.Controls.Canvas.SetTop(rect, item.Rect.Top);
+							rect.StrokeThickness = 2;
+							rect.Stroke = MBrushes.Red;
+
+							p_SimpleShapeDrawer_List[i].m_ListShape.Add(rect);
+							p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
+							p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
+						}
+						p_ImageViewer_List[i].SetRoiRect();
+					}
+				}
+
+				SetProperty(ref _SelectedROI, value);
+			}
+		}
+		#endregion
+
+
 		public _2_7_EdgeBoxViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
 			_dispatcher = Dispatcher.CurrentDispatcher;
@@ -96,6 +153,10 @@ namespace Root_Vega
 				p_ImageViewer_Right = p_ImageViewer_List[2];
 				p_ImageViewer_Bottom = p_ImageViewer_List[3];
 			}
+			m_Engineer.m_recipe.LoadComplete += () =>
+			{
+				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+			};
 
 			return;
 		}
@@ -153,6 +214,13 @@ namespace Root_Vega
 		}
 
 		private ImageViewer_ViewModel m_ImageViewer_Bottom;
+		private string inspDefaultDir;
+		private string inspFileName;
+		SqliteDataDB VSDBManager;
+		int currentDefectIdx;
+		System.Data.DataTable VSDataInfoDT;
+		System.Data.DataTable VSDataDT;
+
 		public ImageViewer_ViewModel p_ImageViewer_Bottom
 		{
 			get
@@ -164,7 +232,37 @@ namespace Root_Vega
 				SetProperty(ref m_ImageViewer_Bottom, value);
 			}
 		}
+		public void _saveRcp()
+		{
+			if (SelectedROI == null)
+			{
+				//ERROR가 뜨면서 저장 방지
+				return;
+			}
+			//여기서 그려진 모든 rect목록을 현재 엔지니어가 들고있는 레시피에 반영한다
+			for (int i = 0; i < 4; i++)
+			{
+				if (p_SimpleShapeDrawer_List[i] == null) continue;
+				for (int j = 0; j < 6; j++)
+				{
+					if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
+					SelectedROI.EdgeBox.EdgeList.Add(new EdgeElement(i, new CRect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos)));
+				}
+			}
 
+			var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
+			m_Engineer.m_recipe.Save(target);
+		}
+		public void _addRoi()
+		{
+			int roiCount = m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide).Count();
+			string defaultName = string.Format("Side ROI #{0}", roiCount);
+
+			Roi temp = new Roi(defaultName, Roi.Item.ReticleSide);
+			m_Engineer.m_recipe.RecipeData.RoiList.Add(temp);
+
+			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+		}
 
 		void Inspect()
 		{
@@ -240,17 +338,70 @@ namespace Root_Vega
 				ptRB = new DPoint(ptRight2.X, ptBottom.Y);
 				ptRT = new DPoint(ptRight1.X, ptTop.Y);
 
+				if (false)//Merge를 위한 동작 방지 코드
+				{
+					//TODO : 여기서 생성되는 사각형 정보를 engineer한테 넘겨서 검사를 진행할 수 있도록 만들어야 함
+					m_Engineer.m_InspManager.ClearInspection();
+
+					CRect inspArea = new CRect(ptLT.X, ptLT.Y, ptRB.X, ptRB.Y);
+					List<CRect> DrawRectList = new List<CRect>();
+
+
+					System.Diagnostics.Debug.WriteLine("Start Insp");
+
+					inspDefaultDir = @"C:\vsdb";
+					if (!System.IO.Directory.Exists(inspDefaultDir))
+					{
+						System.IO.Directory.CreateDirectory(inspDefaultDir);
+					}
+					inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+					var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
+					string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
+
+					if (VSDBManager != null && VSDBManager.IsConnected)
+					{
+						VSDBManager.Disconnect();
+					}
+					VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+
+					if (VSDBManager.Connect())
+					{
+						VSDBManager.CreateTable("Datainfo");
+						VSDBManager.CreateTable("Data");
+
+						VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
+						VSDataDT = VSDBManager.GetDataTable("Data");
+					}
+
+					foreach (var param in SelectedROI.Surface.ParameterList)
+					{
+						InspectionType type = InspectionType.AbsoluteSurface;
+
+						if (!param.UseAbsoluteInspection)
+						{
+							type = InspectionType.RelativeSurface;
+						}
+						//TODO Image 메모리 영역을 참조하는 부분이 보이지 않음. 하드코딩 되어있을 가능성이 높음
+						DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea(inspArea, 500, param, type, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
+
+						int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspection + 1 + i, type, 0);
+						m_Engineer.m_InspManager.StartInspection(nDefectCode, p_ImageViewer_List[i].p_ImageData.p_Size.X, p_ImageViewer_List[i].p_ImageData.p_Size.Y);
+					}
+				}
+
 				DrawLine(ptLT, ptLB, MBrushes.Lime, i);
 				DrawLine(ptRB, ptRT, MBrushes.Lime, i);
 				DrawLine(ptLT, ptRT, MBrushes.Lime, i);
 				DrawLine(ptLB, ptRB, MBrushes.Lime, i);
 
-				DrawCross(ptLeft1, System.Windows.Media.Brushes.Yellow, i);
-				DrawCross(ptLeft2, System.Windows.Media.Brushes.Yellow, i);
-				DrawCross(ptBottom, System.Windows.Media.Brushes.Yellow, i);
-				DrawCross(ptRight1, System.Windows.Media.Brushes.Yellow, i);
-				DrawCross(ptRight2, System.Windows.Media.Brushes.Yellow, i);
-				DrawCross(ptTop, System.Windows.Media.Brushes.Yellow, i);
+				DrawCross(ptLeft1, MBrushes.Yellow, i);
+				DrawCross(ptLeft2, MBrushes.Yellow, i);
+				DrawCross(ptBottom, MBrushes.Yellow, i);
+				DrawCross(ptRight1, MBrushes.Yellow, i);
+				DrawCross(ptRight2, MBrushes.Yellow, i);
+				DrawCross(ptTop, MBrushes.Yellow, i);
+
+				p_ImageViewer_List[i].SetRoiRect();
 			}
 		}
 		void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor, int nTLRB)
@@ -562,7 +713,7 @@ namespace Root_Vega
 			for (int i = 0; i < (int)dRatio; i++)
 			{
 				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i).ToPointer());
-				for (int j = 0; j < rcROI.Width; j++)
+				for (int j = 0; j < rcROI.Height; j++)
 				{
 					nSum += *bp;
 					bp += img.p_Stride;
@@ -577,7 +728,7 @@ namespace Root_Vega
 			for (int i = 0; i < (int)dRatio; i++)
 			{
 				byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
-				for (int j = 0; j < rcROI.Height; j++)
+				for (int j = 0; j < rcROI.Width; j++)
 				{
 					nSum += *bp;
 					bp++;
@@ -608,6 +759,17 @@ namespace Root_Vega
 			set
 			{
 			}
+		}
+		public RelayCommand CommandSave
+		{
+			get
+			{
+				return new RelayCommand(_saveRcp);
+			}
+		}
+		public RelayCommand CommandAddRoi
+		{
+			get { return new RelayCommand(_addRoi); }
 		}
 		#endregion
 	}

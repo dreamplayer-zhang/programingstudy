@@ -211,17 +211,15 @@ namespace RootTools.Inspects
 			p_qInspection.Clear();
 		}
 		/// <summary>
-		/// nStart와 nStop은 테스트용으로 만든 argument이므로 테스트 종료후에는 정리합시다
+		/// 
 		/// </summary>
 		/// <param name="WholeInspArea"></param>
 		/// <param name="blocksize"></param>
 		/// <param name="param"></param>
 		/// <param name="bDefectMerge"></param>
 		/// <param name="nMergeDistance"></param>
-		/// <param name="nStart"></param>
-		/// <param name="nStop"></param>
 		/// <returns></returns>
-		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, StripParamData param, bool bDefectMerge, int nMergeDistance, int nStart = -1, int nStop = -1)
+		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, BaseParamData param, RootTools.Inspects.InspectionType insptype, bool bDefectMerge, int nMergeDistance)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -244,11 +242,11 @@ namespace RootTools.Inspects
 			int wStart = 0;
 			int wStop = iw;
 
-			if (nStart != -1 && nStop != -1)//검사영역을 제한하는 기능
-			{
-				wStart = nStart;
-				wStop = nStop;
-			}
+			//if (nStart != -1 && nStop != -1)//검사영역을 제한하는 기능
+			//{
+			//	wStart = nStart;
+			//	wStop = nStop;
+			//}
 
 			if (wStop == 0 || ih == 0)
 			{
@@ -273,11 +271,18 @@ namespace RootTools.Inspects
 						else ey = AreaEndY;
 
 						InspectionProperty ip = new InspectionProperty();
-						ip.p_InspType = RootTools.Inspects.InspectionType.Strip;
+						ip.p_InspType = insptype;
 
 						CRect inspblock = new CRect(sx, sy, ex, ey);
 						ip.p_Rect = inspblock;
-						ip.p_StripParam = param;
+						if (insptype == InspectionType.Strip)
+						{
+							ip.p_StripParam = (StripParamData)param;
+						}
+						else if (insptype == InspectionType.AbsoluteSurface || insptype == InspectionType.AbsoluteSurface)
+						{
+							ip.p_surfaceParam = (SurfaceParamData)param;
+						}
 						ip.p_index = blockcount;
 						AddInspection(ip, bDefectMerge, nMergeDistance);
 						blockcount++;

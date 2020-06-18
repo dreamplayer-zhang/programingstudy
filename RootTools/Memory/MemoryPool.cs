@@ -109,7 +109,7 @@ namespace RootTools.Memory
         #region RunTree
         public void RunTreeToolBox(Tree tree)
         {
-            p_gbPool = tree.Set(p_gbPool, 1, "Pool Size", "Memory Pool Size (GB)");
+            p_gbPool = tree.Set(p_gbPool, 10, "Pool Size", "Memory Pool Size (GB)");
         }
 
         public void RunTreeModule(Tree tree)

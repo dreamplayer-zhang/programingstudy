@@ -41,7 +41,7 @@ namespace RootTools_CLR
 			targetRect.top = RoiTop;
 			targetRect.bottom = RoiBottom;
 
-			m_InspConn->GetImagePool("pool", memwidth, memHeight);
+			m_InspConn->GetImagePool("pool", memwidth, memHeight);//TODO 수정필요
 			int bufferwidth = memwidth;
 			int bufferheight = memHeight;
 
@@ -88,7 +88,7 @@ namespace RootTools_CLR
 			targetRect.top = RoiTop;
 			targetRect.bottom = RoiBottom;
 
-			m_InspConn->GetImagePool("pool", memwidth, memHeight);
+			m_InspConn->GetImagePool("pool", memwidth, memHeight);//TODO 수정필요
 			int bufferwidth = memwidth;
 			int bufferheight = memHeight;
 
