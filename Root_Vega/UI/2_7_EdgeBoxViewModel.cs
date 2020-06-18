@@ -1,4 +1,5 @@
-﻿using Root_Vega.Module;
+﻿using ATI;
+using Root_Vega.Module;
 using RootTools;
 using RootTools.Inspects;
 using RootTools.Memory;
@@ -213,6 +214,13 @@ namespace Root_Vega
 		}
 
 		private ImageViewer_ViewModel m_ImageViewer_Bottom;
+		private string inspDefaultDir;
+		private string inspFileName;
+		SqliteDataDB VSDBManager;
+		int currentDefectIdx;
+		System.Data.DataTable VSDataInfoDT;
+		System.Data.DataTable VSDataDT;
+
 		public ImageViewer_ViewModel p_ImageViewer_Bottom
 		{
 			get
@@ -329,8 +337,54 @@ namespace Root_Vega
 				ptLB = new DPoint(ptLeft2.X, ptBottom.Y);
 				ptRB = new DPoint(ptRight2.X, ptBottom.Y);
 				ptRT = new DPoint(ptRight1.X, ptTop.Y);
+
 				//TODO : 여기서 생성되는 사각형 정보를 engineer한테 넘겨서 검사를 진행할 수 있도록 만들어야 함
-				//m_Engineer.m_InspManager.CreateInspArea()
+				m_Engineer.m_InspManager.ClearInspection();
+
+				CRect inspArea = new CRect(ptLT.X, ptLT.Y, ptRB.X, ptRB.Y);
+				List<CRect> DrawRectList = new List<CRect>();
+
+
+				System.Diagnostics.Debug.WriteLine("Start Insp");
+
+				inspDefaultDir = @"C:\vsdb";
+				if (!System.IO.Directory.Exists(inspDefaultDir))
+				{
+					System.IO.Directory.CreateDirectory(inspDefaultDir);
+				}
+				inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+				var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
+				string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
+
+				if (VSDBManager != null && VSDBManager.IsConnected)
+				{
+					VSDBManager.Disconnect();
+				}
+				VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+
+				if (VSDBManager.Connect())
+				{
+					VSDBManager.CreateTable("Datainfo");
+					VSDBManager.CreateTable("Data");
+
+					VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
+					VSDataDT = VSDBManager.GetDataTable("Data");
+				}
+
+				foreach (var param in SelectedROI.Surface.ParameterList)
+				{
+					InspectionType type = InspectionType.AbsoluteSurface;
+
+					if (!param.UseAbsoluteInspection)
+					{
+						type = InspectionType.RelativeSurface;
+					}
+					//TODO Image 메모리 영역을 참조하는 부분이 보이지 않음. 하드코딩 되어있을 가능성이 높음
+					DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea(inspArea, 500, param, type, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
+
+					int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspection + 1 + i, type, 0);
+					m_Engineer.m_InspManager.StartInspection(nDefectCode, p_ImageViewer_List[i].p_ImageData.p_Size.X, p_ImageViewer_List[i].p_ImageData.p_Size.Y);
+				}
 
 				DrawLine(ptLT, ptLB, MBrushes.Lime, i);
 				DrawLine(ptRB, ptRT, MBrushes.Lime, i);
