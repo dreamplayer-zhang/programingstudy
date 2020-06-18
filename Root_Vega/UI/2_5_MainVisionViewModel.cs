@@ -674,6 +674,7 @@ namespace Root_Vega
 
 			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
 				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
+				InspectionType.Strip,
 				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance);
 
 			//for (int i = 0; i < DrawRectList.Count; i++)

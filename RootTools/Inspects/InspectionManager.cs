@@ -219,7 +219,7 @@ namespace RootTools.Inspects
 		/// <param name="bDefectMerge"></param>
 		/// <param name="nMergeDistance"></param>
 		/// <returns></returns>
-		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, StripParamData param, bool bDefectMerge, int nMergeDistance)
+		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, BaseParamData param, RootTools.Inspects.InspectionType insptype, bool bDefectMerge, int nMergeDistance)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -271,11 +271,18 @@ namespace RootTools.Inspects
 						else ey = AreaEndY;
 
 						InspectionProperty ip = new InspectionProperty();
-						ip.p_InspType = RootTools.Inspects.InspectionType.Strip;
+						ip.p_InspType = insptype;
 
 						CRect inspblock = new CRect(sx, sy, ex, ey);
 						ip.p_Rect = inspblock;
-						ip.p_StripParam = param;
+						if (insptype == InspectionType.Strip)
+						{
+							ip.p_StripParam = (StripParamData)param;
+						}
+						else if (insptype == InspectionType.AbsoluteSurface || insptype == InspectionType.AbsoluteSurface)
+						{
+							ip.p_surfaceParam = (SurfaceParamData)param;
+						}
 						ip.p_index = blockcount;
 						AddInspection(ip, bDefectMerge, nMergeDistance);
 						blockcount++;
