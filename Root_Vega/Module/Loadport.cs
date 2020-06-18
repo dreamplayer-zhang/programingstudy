@@ -61,10 +61,10 @@ namespace Root_Vega.Module
         {
             Ready,
             InnerPod,
+            Reticle,
+            Check,
             ReticleReady,
-            Reticle, 
             Load,
-            Check
         }
         void InitPosZ()
         {
@@ -317,17 +317,66 @@ namespace Root_Vega.Module
         #endregion
 
         #region State Home & Ready
+        double[] m_aShiftReticle = new double[2] { 0, 0 };
         public override string StateHome()
         {
             if (EQ.p_bSimulate == false)
             {
-                p_sInfo = StateHome(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
-                if (p_sInfo != "OK") return p_sInfo;
-                p_sInfo = StateHome(m_axisZ.p_axis, m_axisTheta.p_axis);
-                if (p_sInfo != "OK") return p_sInfo; 
+                //JWS 200616 ADD
+                if (GetdZPos(ePosZ.InnerPod) < 0)
+                {
+                    p_sInfo = StateHome(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                    if (p_sInfo != "OK") return p_sInfo;
+                    if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
+                }
+                else if (GetdZPos(ePosZ.Reticle) < 0)
+                {
+                    p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                    if (p_sInfo != "OK") return p_sInfo;
+                    if (Run(Home_Innerpod())) return p_sInfo;
+                }
+                else
+                {
+                    if (Run(MoveZ(ePosZ.Check))) return p_sInfo;
+                    if (Run(Home_Reticle())) return p_sInfo;
+                }
             }
-            m_infoPod.AfterHome(); 
+            m_infoPod.AfterHome();
             return "OK";
+        }
+
+        public string Home_Innerpod() // JWS 200616 ADD
+        {
+            if (m_diInnerPod.p_bIn) return "No InnerPod";
+            if (Run(MoveZ(ePosZ.InnerPod))) return p_sInfo;
+            p_sInfo = StateHome(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY);
+            if (p_sInfo != "OK") return p_sInfo;
+            return MoveZ(ePosZ.Ready); 
+        }
+
+        public string Home_Reticle() // JWS 200616 ADD
+        {
+            if (m_axisZ.IsInPos(ePosZ.Check) == false) return "AxisZ Position Not Check Pos";
+            if (m_diReticle.p_bIn)//(reticle 센서 감지)
+            {
+                if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
+                //3,4번 축 상대치 이동하는 함수 넣기
+                if (Run(ShiftReticleLifter(m_aShiftReticle[0], m_aShiftReticle[1]))) return p_sInfo;
+                if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
+                p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                if (p_sInfo != "OK") return p_sInfo;
+            }
+            else
+            {
+                p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                if (p_sInfo != "OK") return p_sInfo;
+            }
+            return Home_Innerpod();
+        }
+
+        double GetdZPos(ePosZ pos)
+        {
+            return m_axisZ.p_axis.p_posActual - m_axisZ.p_axis.GetPos(pos.ToString()) + m_dInposZ;
         }
 
         public override string StateReady()
@@ -349,6 +398,12 @@ namespace Root_Vega.Module
                 StartRun(m_runUnLoad);
             }
             return "OK";
+        }
+
+        void RunTreeHome(Tree tree)
+        {
+            m_aShiftReticle[0] = tree.Set(m_aShiftReticle[0], m_aShiftReticle[0], "Shift Reticle Lifter X", "Shift Reticle Lifter (pulse)");
+            m_aShiftReticle[1] = tree.Set(m_aShiftReticle[1], m_aShiftReticle[1], "Shift Reticle Lifter Y", "Shift Reticle Lifter (pulse)");
         }
         #endregion
 
@@ -374,7 +429,8 @@ namespace Root_Vega.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeAxis(tree.GetTree("Axis InPos", false)); 
+            RunTreeAxis(tree.GetTree("Axis InPos", false));
+            RunTreeHome(tree.GetTree("Home Option", false)); 
         }
         
         void RunTreeAxis(Tree tree)
