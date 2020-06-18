@@ -251,9 +251,9 @@ namespace Root_Vega.Module
             m_axisZ.AddPosDone();
             m_axisClamp.AddPos(Enum.GetNames(typeof(eAxisPosClamp)));
             m_axisClamp.AddPosDone();
-    
-            ((AjinAxis)m_axisXY.p_axisX).AddPos(Enum.GetNames(typeof(eAxisPosX)));
-            ((AjinAxis)m_axisXY.p_axisY).AddPos(Enum.GetNames(typeof(eAxisPosY)));
+
+            if (m_axisXY.p_axisX != null) ((AjinAxis)m_axisXY.p_axisX).AddPos(Enum.GetNames(typeof(eAxisPosX)));
+            if (m_axisXY.p_axisX != null) ((AjinAxis)m_axisXY.p_axisY).AddPos(Enum.GetNames(typeof(eAxisPosY)));
         }
 
         #endregion
