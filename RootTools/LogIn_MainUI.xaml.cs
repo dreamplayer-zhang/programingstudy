@@ -19,35 +19,35 @@ namespace RootTools
         {
             m_login = login;
             DataContext = login;
+            login.OnChangeUser += Login_OnChangeUser;
             InvalidUI(); 
+        }
+
+        private void Login_OnChangeUser()
+        {
+            InvalidUI();
         }
 
         void InvalidUI()
         {
             bool bLogout = (m_login.p_user.m_eLevel == Login.eLevel.Logout);
             gridUser.Visibility = bLogout ? Visibility.Hidden : Visibility.Visible;
+            gridLogin.Visibility = bLogout ? Visibility.Visible : Visibility.Hidden;
             bool bUseID = m_login.m_bCheckUserName;
-            gridPassword.Visibility = bLogout && !bUseID ? Visibility.Visible : Visibility.Hidden;
-            gridLogin.Visibility = bLogout && bUseID ? Visibility.Visible : Visibility.Hidden;
+            labelPassword.Visibility = bUseID ? Visibility.Hidden : Visibility.Visible;
+            comboBoxName.Visibility = bUseID ? Visibility.Visible : Visibility.Hidden; 
         }
 
         private void Label_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (m_login.p_eLevel == Login.eLevel.Logout) return;
             m_login.Logout();
-            InvalidUI();
-        }
-
-        private void passwordBoxPassword_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            m_login.CheckLogin(passwordBoxPassword.Password);
-            InvalidUI();
+            passwordBoxLogin.Password = "";
         }
 
         private void passwordBoxLogin_PasswordChanged(object sender, RoutedEventArgs e)
         {
             m_login.CheckLogin(passwordBoxLogin.Password);
-            InvalidUI();
         }
     }
 }

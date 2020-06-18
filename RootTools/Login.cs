@@ -7,6 +7,11 @@ namespace RootTools
 {
     public class Login : NotifyProperty
     {
+        #region Deligate
+        public delegate void dgOnChangeUser();
+        public event dgOnChangeUser OnChangeUser;
+        #endregion
+
         public enum eLevel
         {
             Logout,
@@ -143,7 +148,8 @@ namespace RootTools
         #region public
         public void Logout()
         {
-            p_user = m_userLogout; 
+            p_user = m_userLogout;
+            if (OnChangeUser != null) OnChangeUser();
         }
 
         public bool m_bCheckUserName = false;
@@ -152,6 +158,7 @@ namespace RootTools
             if (sPassword == m_userATI.m_sPassword)
             {
                 p_user = m_userATI;
+                if (OnChangeUser != null) OnChangeUser();
                 return;
             }
             string sUserName = m_bCheckUserName ? p_sComboName : ""; 
@@ -160,6 +167,7 @@ namespace RootTools
                 if (user.CheckLogin(sPassword, sUserName))
                 {
                     p_user = user;
+                    if (OnChangeUser != null) OnChangeUser();
                     return; 
                 }
             }

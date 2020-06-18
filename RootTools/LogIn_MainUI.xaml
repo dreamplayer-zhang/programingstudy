@@ -6,20 +6,21 @@
              xmlns:local="clr-namespace:RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="{Binding p_colorLevel}" Margin="0">
+    <Grid Background="{Binding p_colorLevel}" Margin="0,0,0,3">
         <Grid x:Name="gridUser" Margin="0">
-            <Label Content="{Binding p_sUserName}" MouseLeftButtonDown="Label_MouseLeftButtonDown"/>
-        </Grid>
-        <Grid x:Name="gridPassword" Margin="0" Visibility="Hidden">
-            <PasswordBox x:Name="passwordBoxPassword" HorizontalContentAlignment="Center" PasswordChanged="passwordBoxPassword_PasswordChanged"/>
+            <Label Content="{Binding p_sUserName}" MouseLeftButtonDown="Label_MouseLeftButtonDown"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
         <Grid x:Name="gridLogin" Margin="0" Visibility="Hidden">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <ComboBox Grid.Column="0" x:Name="comboBoxName" Text="{Binding p_sComboName}" ItemsSource="{Binding p_asUserName}"/>
-            <PasswordBox Grid.Column="1" x:Name="passwordBoxLogin" HorizontalContentAlignment="Center" PasswordChanged="passwordBoxLogin_PasswordChanged"/>
+            <ComboBox Grid.Column="0" x:Name="comboBoxName" VerticalAlignment="Center"
+                      Text="{Binding p_sComboName}" ItemsSource="{Binding p_asUserName}"/>
+            <Label Grid.Column="0" x:Name="labelPassword" Content="Password" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <PasswordBox Grid.Column="1" x:Name="passwordBoxLogin" PasswordChanged="passwordBoxLogin_PasswordChanged"
+                         HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="2"/>
         </Grid>
     </Grid>
 </UserControl>
