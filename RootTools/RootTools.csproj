@@ -267,6 +267,9 @@
     <Compile Include="Inspects\RecipeManager.cs" />
     <Compile Include="Inspects\Singleton.cs" />
     <Compile Include="Inspects\SqliteDataDB.cs" />
+    <Compile Include="LogIn_MainUI.xaml.cs">
+      <DependentUpon>LogIn_MainUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Logs\ILogGroup.cs" />
     <Compile Include="Logs\Log.cs" />
     <Compile Include="Logs\LogMars.cs" />
@@ -627,6 +630,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Light\LightTool_LVS_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LogIn_MainUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

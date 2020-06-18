@@ -41,8 +41,8 @@ namespace Root_Vega.ManualJob
         int m_nBlink = 0; 
         void TimerLoadportState()
         {
-            SetBrush(buttonStateLoading, m_OHT.m_doLoadReq.p_bOn); 
-            SetBrush(buttonStateUnloading, m_OHT.m_doUnloadReq.p_bOn);
+            SetBrush(buttonStateLoading, m_OHT.m_doLoadReq.p_bOn && (m_nBlink < 5)); 
+            SetBrush(buttonStateUnloading, m_OHT.m_doUnloadReq.p_bOn && (m_nBlink < 5));
             textBlockPlaced.Foreground = m_loadport.m_dioPlaced.p_bIn ? Brushes.White : Brushes.Gray;
             textBlockPresent.Foreground = m_loadport.m_dioPresent.p_bIn ? Brushes.White : Brushes.Gray;
             bool bPodIn = (m_nBlink < 5) ? m_loadport.m_dioPlaced.p_bIn : m_loadport.m_dioPresent.p_bIn;
