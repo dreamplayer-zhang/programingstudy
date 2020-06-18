@@ -7,6 +7,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System;
+using System.Security.RightsManagement;
 
 namespace RootTools.Inspects
 {
@@ -219,7 +220,7 @@ namespace RootTools.Inspects
 		/// <param name="bDefectMerge"></param>
 		/// <param name="nMergeDistance"></param>
 		/// <returns></returns>
-		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, BaseParamData param, RootTools.Inspects.InspectionType insptype, bool bDefectMerge, int nMergeDistance)
+		public List<CRect> CreateInspArea(string poolName, ulong memOffset, CRect WholeInspArea, int blocksize, BaseParamData param, RootTools.Inspects.InspectionType insptype, bool bDefectMerge, int nMergeDistance)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -283,7 +284,11 @@ namespace RootTools.Inspects
 						{
 							ip.p_surfaceParam = (SurfaceParamData)param;
 						}
+						//TODO : Memory pool 이름, offset 계산하여 AddInspection 하기 전에 InspectionProperty로 넘겨줘야 함
 						ip.p_index = blockcount;
+						ip.MemoryPoolName = poolName;
+						ip.MemoryOffset = memOffset;
+
 						AddInspection(ip, bDefectMerge, nMergeDistance);
 						blockcount++;
 
@@ -458,5 +463,7 @@ namespace RootTools.Inspects
 				SetProperty(ref index, value);
 			}
 		}
+		public string MemoryPoolName { get; set; }
+		public ulong MemoryOffset { get; set; }
 	}
 }

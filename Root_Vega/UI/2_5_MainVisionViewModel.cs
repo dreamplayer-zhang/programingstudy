@@ -6,6 +6,7 @@ using RootTools.Memory;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -462,6 +463,13 @@ namespace Root_Vega
 				return new RelayCommand(_btnRcpSaveTest);
 			}
 		}
+		public ICommand btnMemOffset
+		{
+			get
+			{
+				return new RelayCommand(_btnMemOffset);
+			}
+		}
 		public ICommand btnRcpLoadTest
 		{
 			get
@@ -573,6 +581,11 @@ namespace Root_Vega
 			}
 
 		}
+		private void _btnMemOffset()
+		{
+			ulong offset;
+			m_Engineer.GetMemoryOffset("SideVision.Memory", "SideVision", "Top", out offset);
+		}
 		private void _btnRcpSaveTest()
 		{
 			this.p_Recipe.MapData = new MapData(50, 50);
@@ -672,7 +685,10 @@ namespace Root_Vega
 			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
 			int nblocksize = 500;
 
-			DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
+			ulong memOffset;
+			m_Engineer.GetMemoryOffset("pool", "group", "mem", out memOffset);
+
+			DrawRectList = m_Engineer.m_InspManager.CreateInspArea("pool", memOffset, Mask_Rect, nblocksize,
 				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
 				InspectionType.Strip,
 				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance);

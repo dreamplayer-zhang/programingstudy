@@ -12,7 +12,7 @@ namespace RootTools_CLR
 			CLR_InspConnector(int processornum);//검사 멀티쓰레드로 돌릴 시 각 쓰레드별 할당된 번호(visionworks처럼)
 			virtual ~CLR_InspConnector();
 
-			void GetImagePool(std::string memoryname,int pool_w, int pool_h);
+			void GetImagePool(std::string memoryname, long offset , int pool_w, int pool_h);
 
 			int Width(RECT rect);
 			int Height(RECT rect);

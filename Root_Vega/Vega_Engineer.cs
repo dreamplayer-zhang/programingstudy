@@ -7,6 +7,8 @@ using RootTools.Inspects;
 using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
+using System.Windows.Media.Animation;
+using System;
 
 namespace Root_Vega
 {
@@ -35,10 +37,34 @@ namespace Root_Vega
             MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool, false);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
         }
-        #endregion
+		public void GetMemoryOffset(string sPool, string sGroup, string sMemory, out ulong memOffset)
+		{
+			memOffset = 0;
 
-        #region Ajin
-        public Ajin m_ajin = new Ajin();
+			foreach (var group in m_toolBox.m_memoryTool.GetPool(sPool, false).p_aGroup)
+			{
+				foreach (var memory in group.p_aMemory)
+				{
+					if (m_toolBox.m_memoryTool.GetPool(sPool, false).p_id == sPool && group.p_id == sGroup && memory.p_id == sMemory)
+					{
+						//이제 멈출때가 된거야
+						//여기서부터 high low 이진법 계산을 시작한다
+						string nullStr = "";
+
+						return;
+					}
+					else
+					{
+						//계속 더한다~!
+						memOffset = memOffset + Convert.ToUInt64(memory.p_lSize);
+					}
+				}
+			}
+		}
+		#endregion
+
+		#region Ajin
+		public Ajin m_ajin = new Ajin();
         Ajin_UI m_ajinUI = new Ajin_UI();
         void InitAjin()
         {

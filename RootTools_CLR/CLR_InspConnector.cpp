@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "CLR_InspConnector.h"
 
+#include <intsafe.h>
+
+//#define LODWORD(_qw)    ((DWORD)(_qw))
+//#define HIDWORD(_qw)    ((DWORD)(((_qw) >> 32) & 0xffffffff))
+
 namespace RootTools_CLR
 {
 	CLR_InspConnector::CLR_InspConnector(int processornum)
@@ -22,7 +27,7 @@ namespace RootTools_CLR
 		return (byte*)ImgPool;
 	}
 
-	void CLR_InspConnector::GetImagePool(std::string memoryname, int pool_w, int pool_h)
+	void CLR_InspConnector::GetImagePool(std::string memoryname, long offset , int pool_w, int pool_h)
 	{
 		ImgPool_Width = pool_w;
 		ImgPool_Height = pool_h;
@@ -31,7 +36,7 @@ namespace RootTools_CLR
 		t.assign(mmfName.begin(), mmfName.end());
 		HANDLE hMapping;
 		hMapping = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, t.c_str());
-		ImgPool = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0, 0, ImgPool_Width * ImgPool_Height);
+		ImgPool = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, HIWORD(offset), LOWORD(offset), ImgPool_Width * ImgPool_Height);
 
 
 	}

@@ -9,6 +9,11 @@
 #include "..\RootTools_Cpp\\InspectionReticle.h"
 #include "DefectData.h"
 
+#include <vcclr.h> // for PtrToStringChars 
+#include <stdio.h> // for wprintf
+#include <msclr\marshal_cppstd.h>
+
+
 namespace RootTools_CLR
 {
 	public ref class CLR_Inspection
@@ -31,7 +36,7 @@ namespace RootTools_CLR
 			delete pInspReticle;
 		}
 
-		array<DefectData^>^ SurfaceInspection(int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
+		array<DefectData^>^ SurfaceInspection(System::String^ poolName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -41,7 +46,9 @@ namespace RootTools_CLR
 			targetRect.top = RoiTop;
 			targetRect.bottom = RoiBottom;
 
-			m_InspConn->GetImagePool("pool", memwidth, memHeight);//TODO 수정필요
+			std::string pool = msclr::interop::marshal_as<std::string>(poolName);
+
+			m_InspConn->GetImagePool(pool, memOffset, memwidth, memHeight);//TODO 수정필요
 			int bufferwidth = memwidth;
 			int bufferheight = memHeight;
 
@@ -78,7 +85,7 @@ namespace RootTools_CLR
 
 			return local;
 		}
-		array<DefectData^>^ StripInspection(int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
+		array<DefectData^>^ StripInspection(System::String^ poolName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -88,7 +95,9 @@ namespace RootTools_CLR
 			targetRect.top = RoiTop;
 			targetRect.bottom = RoiBottom;
 
-			m_InspConn->GetImagePool("pool", memwidth, memHeight);//TODO 수정필요
+			std::string pool = msclr::interop::marshal_as<std::string>(poolName);
+
+			m_InspConn->GetImagePool(pool, memOffset, memwidth, memHeight);//TODO 수정필요
 			int bufferwidth = memwidth;
 			int bufferheight = memHeight;
 

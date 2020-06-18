@@ -92,6 +92,8 @@ namespace RootTools.Inspects
 						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
 						{
 							var temp = clrInsp.SurfaceInspection(
+								m_InspProp.MemoryPoolName,
+								m_InspProp.MemoryOffset,
 								ThreadIndex,
 								m_InspProp.m_nDefectCode,
 								m_InspProp.p_Rect.Left,
@@ -115,18 +117,20 @@ namespace RootTools.Inspects
 						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
 						{
 							var temp = clrInsp.StripInspection(
-									   ThreadIndex,
-									   m_InspProp.m_nDefectCode,
-									   m_InspProp.p_Rect.Left,
-									   m_InspProp.p_Rect.Top,
-									   m_InspProp.p_Rect.Right,
-									   m_InspProp.p_Rect.Bottom,
-									   m_nWholeImageWidth,
-									   m_nWholeImageHeight,
-									   m_InspProp.p_StripParam.TargetGV,
-									   m_InspProp.p_StripParam.DefectSize,
-									   m_InspProp.p_StripParam.Intensity,
-									   m_InspProp.p_StripParam.Bandwidth);
+								m_InspProp.MemoryPoolName,
+								m_InspProp.MemoryOffset,
+								ThreadIndex,
+								m_InspProp.m_nDefectCode,
+								m_InspProp.p_Rect.Left,
+								m_InspProp.p_Rect.Top,
+								m_InspProp.p_Rect.Right,
+								m_InspProp.p_Rect.Bottom,
+								m_nWholeImageWidth,
+								m_nWholeImageHeight,
+								m_InspProp.p_StripParam.TargetGV,
+								m_InspProp.p_StripParam.DefectSize,
+								m_InspProp.p_StripParam.Intensity,
+								m_InspProp.p_StripParam.Bandwidth);
 							foreach (var item in temp)
 							{
 								arrDefects.Add(new DefectDataWrapper(item));
