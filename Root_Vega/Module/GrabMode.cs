@@ -3,6 +3,7 @@ using RootTools.Camera;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 
 namespace Root_Vega
@@ -48,6 +49,29 @@ namespace Root_Vega
             for (int n = 0; n < m_aLightPower.Count; n++)
             {  
                 m_lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
+            }
+        }
+
+        public int GetLightByName(string str)
+        {
+            for (int i = 0; i < m_lightSet.m_aLight.Count; i++)
+            {
+                if (m_lightSet.m_aLight[i].m_sName.IndexOf(str) >= 0)
+                {
+                    return Convert.ToInt32(m_lightSet.m_aLight[i].p_fPower);
+                }
+            }
+            return 0;
+        }
+
+        public void SetLightByName(string str, int nValue)
+        {
+            for (int i = 0; i < m_lightSet.m_aLight.Count; i++)
+            {
+                if (m_lightSet.m_aLight[i].m_sName.IndexOf(str) >= 0)
+                {
+                    m_lightSet.m_aLight[i].m_light.p_fSetPower = nValue;
+                }
             }
         }
         #endregion
