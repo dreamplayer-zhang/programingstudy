@@ -238,7 +238,9 @@ namespace Root_Vega.Module
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // 조명 켜기
-            GetGrabMode("MainGrab").SetLight(true);
+            string strLightName = "VRS";
+            int nRetValue = GetGrabMode("MainGrab").GetLightByName(strLightName);
+            GetGrabMode("MainGrab").SetLightByName(strLightName, nRetValue);
 
             // 레티클 유무체크
             m_CamAlign1.Grab();
@@ -249,7 +251,7 @@ namespace Root_Vega.Module
             if (bRet == false) return "Reticle Not Exist";
 
             // 조명 끄기
-            GetGrabMode("MainGrab").SetLight(false);
+            GetGrabMode("MainGrab").SetLightByName(strLightName, 0);
 
             // 모든 축 Ready 위치로 이동
             if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Safety))) return p_sInfo;
@@ -288,7 +290,9 @@ namespace Root_Vega.Module
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // 조명 켜기
-            GetGrabMode("MainGrab").SetLight(true);
+            string strLightName = "VRS";
+            int nRetValue = GetGrabMode("MainGrab").GetLightByName(strLightName);
+            GetGrabMode("MainGrab").SetLightByName(strLightName, nRetValue);
 
             // 레티클 유무체크
             m_CamAlign1.Grab();
@@ -299,7 +303,7 @@ namespace Root_Vega.Module
             if (bRet == true) return "Reticle Exist";
 
             // 조명 끄기
-            GetGrabMode("MainGrab").SetLight(false);
+            GetGrabMode("MainGrab").SetLightByName(strLightName, 0);
 
             // 모든 축 Ready 위치로 이동
             if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Safety))) return p_sInfo;

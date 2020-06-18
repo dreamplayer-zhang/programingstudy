@@ -319,7 +319,9 @@ namespace Root_Vega.Module
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // Align 조명 켜기
-            GetGrabMode("Side").SetLight(true);
+            string strLightName = "SideVRS Side";
+            int nRetValue = GetGrabMode("Side").GetLightByName(strLightName);
+            GetGrabMode("Side").SetLightByName(strLightName, nRetValue);
 
             // 레티클 유무체크
             m_CamAlign1.Grab();
@@ -375,7 +377,9 @@ namespace Root_Vega.Module
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // Align 조명 켜기
-            GetGrabMode("Side").SetLight(true);
+            string strLightName = "SideVRS Side";
+            int nRetValue = GetGrabMode("Side").GetLightByName(strLightName);
+            GetGrabMode("Side").SetLightByName(strLightName, nRetValue);
 
             // 레티클 유무체크
             m_CamAlign1.Grab();
@@ -386,7 +390,7 @@ namespace Root_Vega.Module
             if (bRet == true) return "Reticle Exist";
 
             // Align 조명 끄기
-            GetGrabMode("Side").SetLight(false);
+            GetGrabMode("Side").SetLightByName(strLightName, 0);
 
             // 모든 축 Ready 위치로 이동
             if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Safety))) return p_sInfo;
