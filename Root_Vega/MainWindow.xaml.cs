@@ -52,7 +52,17 @@ namespace Root_Vega
         private void M_timer_Tick(object sender, EventArgs e)
         {
             textBoxDateTime.Text = DateTime.Now.ToString();
-            TimerLamp(); 
+            TimerLamp();
+            TimerUI(m_engineer.m_login.p_eLevel); 
+        }
+
+        void TimerUI(Login.eLevel level)
+        {
+            _Recipe.Visibility = (level >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Hidden;
+            _Maint.Visibility = (level >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Hidden; 
+            _Viewer.Visibility = (level >= Login.eLevel.Worker) ? Visibility.Visible : Visibility.Hidden;
+            _Result.Visibility = (level >= Login.eLevel.Worker) ? Visibility.Visible : Visibility.Hidden;
+            _Setting.Visibility = (level >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Hidden;
         }
         #endregion
 
@@ -80,6 +90,7 @@ namespace Root_Vega
             textLastError.DataContext = m_engineer.m_gaf.m_listALID;
 
             _Main.Init(m_engineer);
+            loginMaunUI.Init(m_engineer.m_login); 
 
             InitTimer(); 
 

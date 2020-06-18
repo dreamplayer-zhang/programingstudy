@@ -58,6 +58,9 @@
                         <dio:ListDIO_ShortID_UI Grid.Column="1" x:Name="listDOUI"/>
                     </Grid>
                 </TabItem>
+                <TabItem Header="Axis" Background="DarkSalmon">
+                    <TabControl x:Name="tabAxis"/>
+                </TabItem>
             </TabControl>
         </Grid>
     </Grid>
