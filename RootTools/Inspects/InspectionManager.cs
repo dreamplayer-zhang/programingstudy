@@ -211,15 +211,13 @@ namespace RootTools.Inspects
 			p_qInspection.Clear();
 		}
 		/// <summary>
-		/// nStart와 nStop은 테스트용으로 만든 argument이므로 테스트 종료후에는 정리합시다
+		/// 
 		/// </summary>
 		/// <param name="WholeInspArea"></param>
 		/// <param name="blocksize"></param>
 		/// <param name="param"></param>
 		/// <param name="bDefectMerge"></param>
 		/// <param name="nMergeDistance"></param>
-		/// <param name="nStart"></param>
-		/// <param name="nStop"></param>
 		/// <returns></returns>
 		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, StripParamData param, bool bDefectMerge, int nMergeDistance)
 		{
