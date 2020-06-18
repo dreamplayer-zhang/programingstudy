@@ -50,6 +50,7 @@ namespace RootTools.Module
         void InitTabControl()
         {
             while (tabControlTools.Items.Count > m_minTabControl) tabControlTools.Items.RemoveAt(m_minTabControl);
+            tabAxis.Items.Clear(); 
             foreach (IAxis axis in m_module.m_listAxis)
             {
                 if (axis != null)
