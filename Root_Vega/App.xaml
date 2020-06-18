@@ -22,6 +22,7 @@
         <SolidColorBrush x:Key="LightGray" Color="LightGray"/>-->
         <SolidColorBrush x:Key="BtnBorderBrush"
                          Color="Gray" />
+        
         <SolidColorBrush x:Key="BtnBackGround"
                          Color="DimGray" />
         <SolidColorBrush x:Key="BtnMouseOver"
