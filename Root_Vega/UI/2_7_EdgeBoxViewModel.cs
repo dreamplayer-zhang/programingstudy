@@ -335,12 +335,12 @@ namespace Root_Vega
 				DrawLine(ptLT, ptRT, MBrushes.Lime, i);
 				DrawLine(ptLB, ptRB, MBrushes.Lime, i);
 
-				DrawCross(ptLeft1, System.Windows.Media.Brushes.Yellow, i);
-				DrawCross(ptLeft2, System.Windows.Media.Brushes.Yellow, i);
-				DrawCross(ptBottom, System.Windows.Media.Brushes.Yellow, i);
-				DrawCross(ptRight1, System.Windows.Media.Brushes.Yellow, i);
-				DrawCross(ptRight2, System.Windows.Media.Brushes.Yellow, i);
-				DrawCross(ptTop, System.Windows.Media.Brushes.Yellow, i);
+				DrawCross(ptLeft1, MBrushes.Yellow, i);
+				DrawCross(ptLeft2, MBrushes.Yellow, i);
+				DrawCross(ptBottom, MBrushes.Yellow, i);
+				DrawCross(ptRight1, MBrushes.Yellow, i);
+				DrawCross(ptRight2, MBrushes.Yellow, i);
+				DrawCross(ptTop, MBrushes.Yellow, i);
 
 				p_ImageViewer_List[i].SetRoiRect();
 			}
