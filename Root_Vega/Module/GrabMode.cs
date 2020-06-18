@@ -53,8 +53,8 @@ namespace Root_Vega
         #endregion
 
         #region Memory
-        MemoryPool m_memoryPool;
-        MemoryGroup m_memoryGroup;
+        public MemoryPool m_memoryPool;
+        public MemoryGroup m_memoryGroup;
         public MemoryData m_memoryData;
         string m_sMemoryGroup = "";
         public string p_sMemoryGroup

@@ -722,11 +722,10 @@ namespace Root_Vega.Module
                         double yTrigger1 = m_rpAxis.Y + yAxis / 2;
                         m_module.p_axisXY.p_axisY.SetTrigger(yPos1, yTrigger1+100000, m_grabMode.m_dTrigger, true);
 
-                        string sPool = "SideVision.Memory";
-                        string sGroup = "Side";
+                        string sPool = m_grabMode.m_memoryPool.p_id;
+                        string sGroup = m_grabMode.m_memoryGroup.p_id;
                         string sMem = m_grabMode.m_eScanPos.ToString();
                         //string sMem = m_eScanPos.ToString();
-
                         MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, sMem);
 
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
@@ -882,9 +881,8 @@ namespace Root_Vega.Module
                         double yTrigger1 = m_rpAxis.Y + yAxis / 2;
                         m_module.p_axisXY.p_axisY.SetTrigger(yPos1, yTrigger1, m_grabMode.m_dTrigger, true);
 
-                        /* 메모리 위치도 가져오게는 좀 다시 하자.*/
-                        string sPool = "SideVision.Memory";
-                        string sGroup = "Bevel";
+                        string sPool = m_grabMode.m_memoryPool.p_id;
+                        string sGroup = m_grabMode.m_memoryGroup.p_id;
                         string sMem = m_grabMode.m_eScanPos.ToString();
                         //string sMem = m_eScanPos.ToString();
                         MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, sMem);

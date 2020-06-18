@@ -477,10 +477,9 @@ namespace Root_Vega.Module
                         double yTrigger1 = m_rpAxis.Y + yAxis / 2;
                         m_module.p_axisXY.p_axisY.SetTrigger(yTrigger0 - 100000, yTrigger1, m_grabMode.m_dTrigger, true);
 
-                        /* 메모리 위치도 가져오게는 좀 다시 하자.*/
-                        string sPool = "pool";
-                        string sGroup = "group";
-                        string sMem = "mem";
+                        string sPool = m_grabMode.m_memoryPool.p_id;
+                        string sGroup = m_grabMode.m_memoryGroup.p_id;
+                        string sMem = m_grabMode.m_memoryData.p_id;
                         MemoryData mem = m_module.m_engineer.GetMemory(sPool, sGroup, sMem);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
 
