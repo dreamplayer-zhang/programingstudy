@@ -329,6 +329,8 @@ namespace Root_Vega
 				ptLB = new DPoint(ptLeft2.X, ptBottom.Y);
 				ptRB = new DPoint(ptRight2.X, ptBottom.Y);
 				ptRT = new DPoint(ptRight1.X, ptTop.Y);
+				//TODO : 여기서 생성되는 사각형 정보를 engineer한테 넘겨서 검사를 진행할 수 있도록 만들어야 함
+				//m_Engineer.m_InspManager.CreateInspArea()
 
 				DrawLine(ptLT, ptLB, MBrushes.Lime, i);
 				DrawLine(ptRB, ptRT, MBrushes.Lime, i);

@@ -221,7 +221,7 @@ namespace RootTools.Inspects
 		/// <param name="nStart"></param>
 		/// <param name="nStop"></param>
 		/// <returns></returns>
-		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, StripParamData param, bool bDefectMerge, int nMergeDistance, int nStart = -1, int nStop = -1)
+		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, StripParamData param, bool bDefectMerge, int nMergeDistance)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -244,11 +244,11 @@ namespace RootTools.Inspects
 			int wStart = 0;
 			int wStop = iw;
 
-			if (nStart != -1 && nStop != -1)//검사영역을 제한하는 기능
-			{
-				wStart = nStart;
-				wStop = nStop;
-			}
+			//if (nStart != -1 && nStop != -1)//검사영역을 제한하는 기능
+			//{
+			//	wStart = nStart;
+			//	wStop = nStop;
+			//}
 
 			if (wStop == 0 || ih == 0)
 			{
