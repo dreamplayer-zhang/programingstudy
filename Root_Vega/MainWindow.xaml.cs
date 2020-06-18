@@ -58,12 +58,11 @@ namespace Root_Vega
 
         void TimerUI(Login.eLevel level)
         {
-            _Main.IsEnabled = level >= Login.eLevel.Worker;
-            _Recipe.IsEnabled = level >= Login.eLevel.Operator;
-            _Maint.IsEnabled = level >= Login.eLevel.Admin;
-            _Viewer.IsEnabled = level >= Login.eLevel.Worker;
-            _Result.IsEnabled = level >= Login.eLevel.Worker;
-            _Setting.IsEnabled = level >= Login.eLevel.Admin; 
+            _Recipe.Visibility = (level >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Hidden;
+            _Maint.Visibility = (level >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Hidden; 
+            _Viewer.Visibility = (level >= Login.eLevel.Worker) ? Visibility.Visible : Visibility.Hidden;
+            _Result.Visibility = (level >= Login.eLevel.Worker) ? Visibility.Visible : Visibility.Hidden;
+            _Setting.Visibility = (level >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Hidden;
         }
         #endregion
 

@@ -23,7 +23,12 @@ namespace RootTools.Trees
 
         public Tree p_treeParent { get; set; }
 
-        public int p_nIndex { get; set; }
+        int _nIndex = 0; 
+        public int p_nIndex 
+        { 
+            get { return _nIndex; }
+            set { _nIndex = value; } 
+        }
 
         public string p_id { get; set; }
 
@@ -83,16 +88,16 @@ namespace RootTools.Trees
         {
             foreach (Tree tree in m_aChildRunInit)
             {
-                if (IsAlreadyExistatChild(tree.p_id) == false) p_aChild.Add(tree);
+                if (IsAlreadyExistatChild(tree) == false) p_aChild.Add(tree);
                 tree.RunTreeDone(); 
             }
         }
 
-        bool IsAlreadyExistatChild(string treeID)
+        bool IsAlreadyExistatChild(Tree treeChild)
         {
             foreach (Tree tree in p_aChild)
             {
-                if (tree.p_id == treeID) return true; 
+                if ((tree.p_id == treeChild.p_id) && (tree.p_nIndex == treeChild.p_nIndex)) return true; 
             }
             return false; 
         }
@@ -119,11 +124,11 @@ namespace RootTools.Trees
         #endregion
 
         #region Find Tree List<>
-        Tree FindTreeItem(string sName)
+        Tree FindTreeItem(string sName, int nIndex = 0)
         {
             foreach (Tree item in m_aChildRunInit)
             {
-                if (item.p_sName == sName)
+                if ((item.p_sName == sName) && (item.p_nIndex == nIndex))
                 {
                     item.m_bUse = true;
                     return item;
@@ -153,7 +158,7 @@ namespace RootTools.Trees
 
         public Tree GetTree(int nIndex, string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false)
         {
-            Tree item = FindTreeItem(sName);
+            Tree item = FindTreeItem(sName, nIndex);
             if (item != null) return item;
             Tree newGroup = new TreeGroup(nIndex, sName, this, m_log, bExpand, bVisible, bReadOnly);
             AddTreeItem(newGroup);
