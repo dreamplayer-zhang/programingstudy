@@ -20,11 +20,8 @@ namespace Root_Vega.Module
         AxisXY m_axisReticleLifter;
         public DIO_IO m_dioPlaced;
         public DIO_IO m_dioPresent;
-        public DIO_I m_diFront;
-        public DIO_I m_diBack;
         public DIO_I m_diReticle;
-        public DIO_I m_diTilt;
-        public DIO_I m_diEmpty;
+        public DIO_I m_diInnerPod;
         public DIO_O m_doManual;
         public DIO_O m_doAuto;
         public DIO_IO m_dioLoad;
@@ -40,11 +37,8 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_axisReticleLifter, this, "Reticle Lifter");
             p_sInfo = m_toolBox.Get(ref m_dioPlaced, this, "Placed");
             p_sInfo = m_toolBox.Get(ref m_dioPresent, this, "Present");
-            p_sInfo = m_toolBox.Get(ref m_diFront, this, "Front");
-            p_sInfo = m_toolBox.Get(ref m_diBack, this, "Back");
+            p_sInfo = m_toolBox.Get(ref m_diInnerPod, this, "InnerPod");
             p_sInfo = m_toolBox.Get(ref m_diReticle, this, "Reticle");
-            p_sInfo = m_toolBox.Get(ref m_diTilt, this, "Tilt");
-            p_sInfo = m_toolBox.Get(ref m_diEmpty, this, "Empty");
             p_sInfo = m_toolBox.Get(ref m_doManual, this, "Manual");
             p_sInfo = m_toolBox.Get(ref m_doAuto, this, "Auto");
             p_sInfo = m_toolBox.Get(ref m_dioLoad, this, "Load");
@@ -69,7 +63,8 @@ namespace Root_Vega.Module
             InnerPod,
             ReticleReady,
             Reticle, 
-            Load
+            Load,
+            Check
         }
         void InitPosZ()
         {
@@ -77,11 +72,12 @@ namespace Root_Vega.Module
             m_axisZ.AddPosDone(); 
         }
 
+        double m_dInposZ = -1; 
         public string MoveZ(ePosZ pos)
         {
             string sMove = m_axisZ.Move(pos);
             if (sMove != "OK") return sMove;
-            return m_axisZ.WaitReady(); 
+            return m_axisZ.WaitReady(m_dInposZ); 
         }
         #endregion
 
@@ -97,11 +93,12 @@ namespace Root_Vega.Module
             m_axisTheta.AddPosDone();
         }
 
+        double m_dInposTheta = -1;
         public string MoveTheta(ePosTheta pos)
         {
             string sMove = m_axisTheta.Move(pos);
             if (sMove != "OK") return sMove;
-            return m_axisTheta.WaitReady();
+            return m_axisTheta.WaitReady(m_dInposTheta);
         }
         #endregion
 
@@ -117,11 +114,12 @@ namespace Root_Vega.Module
             m_axisPodLifter.AddPosDone();
         }
 
+        double m_dInposLifter = -1;
         public string MovePodLifter(ePosPodLifter pos)
         {
             string sMove = m_axisPodLifter.Move(pos);
             if (sMove != "OK") return sMove;
-            return m_axisPodLifter.WaitReady();
+            return m_axisPodLifter.WaitReady(m_dInposLifter);
         }
         #endregion
 
@@ -138,11 +136,21 @@ namespace Root_Vega.Module
             m_axisReticleLifter.AddPosDone();
         }
 
+        double m_dInposReticle = -1;
         public string MoveReticleLifter(ePosReticleLifter pos)
         {
             string sMove = m_axisReticleLifter.Move(pos);
             if (sMove != "OK") return sMove;
-            return m_axisReticleLifter.WaitReady();
+            return m_axisReticleLifter.WaitReady(m_dInposReticle);
+        }
+
+        public string ShiftReticleLifter(double dPosX, double dPosY)
+        {
+            RPoint rpActual = new RPoint(m_axisReticleLifter.p_axisX.p_posActual, m_axisReticleLifter.p_axisY.p_posActual);
+            RPoint rpMove = new RPoint(rpActual.X - dPosX, rpActual.Y - dPosY);
+            string sMove = m_axisReticleLifter.Move(rpMove);
+            if (sMove != "OK") return sMove;
+            return m_axisReticleLifter.WaitReady(m_dInposReticle);
         }
         #endregion
 
@@ -260,10 +268,12 @@ namespace Root_Vega.Module
         public string RunLoad()
         {
             if (m_axisZ.IsInPos(ePosZ.Ready) == false) return "AxisZ Position not Ready";
-            if (m_axisTheta.IsInPos(ePosTheta.Close) == false) return "AxisTheta Position not Close";
             if (m_axisPodLifter.IsInPos(ePosPodLifter.Ready) == false) return "AxisPodLifter Position not Ready";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Ready) == false) return "AxisReticleLifter Position not Ready";
-            if (Run(MoveTheta(ePosTheta.Open))) return p_sInfo;
+            if (m_axisTheta.IsInPos(ePosTheta.Open) == false)
+            {
+                if (Run(MoveTheta(ePosTheta.Open))) return p_sInfo;
+            }
             if (Run(MoveZ(ePosZ.InnerPod))) return p_sInfo;
             if (Run(MovePodLifter(ePosPodLifter.Lifting))) return p_sInfo;
             if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
@@ -277,9 +287,10 @@ namespace Root_Vega.Module
         public string RunUnload()
         {
             if (m_axisZ.IsInPos(ePosZ.Load) == false) return "AxisZ Position not Load";
-            if (m_axisTheta.IsInPos(ePosTheta.Open) == false) return "AxisTheta Position not Open";
             if (m_axisPodLifter.IsInPos(ePosPodLifter.Lifting) == false) return "AxisPodLifter Position not Lifting";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting) == false) return "AxisReticleLifter Position not Lifting";
+            if (m_axisTheta.IsInPos(ePosTheta.Open) == false) return "AxisTheta Position not Open";
+            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
             if (Run(MoveReticleLifter(ePosReticleLifter.Mid))) return p_sInfo;
             if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
@@ -363,6 +374,15 @@ namespace Root_Vega.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
+            RunTreeAxis(tree.GetTree("Axis InPos", false)); 
+        }
+        
+        void RunTreeAxis(Tree tree)
+        {
+            m_dInposZ = tree.Set(m_dInposZ, m_dInposZ, "Z", "InPosition Pos Error");
+            m_dInposTheta = tree.Set(m_dInposTheta, m_dInposTheta, "Theta", "InPosition Pos Error");
+            m_dInposLifter = tree.Set(m_dInposLifter, m_dInposLifter, "Lifter", "InPosition Pos Error");
+            m_dInposReticle = tree.Set(m_dInposReticle, m_dInposReticle, "Reticle", "InPosition Pos Error");
         }
         #endregion
 

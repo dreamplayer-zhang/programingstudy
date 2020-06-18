@@ -64,6 +64,14 @@ namespace RootTools.Control
             return cp; 
         }
 
+        CPoint GetPos(string sPos)
+        {
+            CPoint cp = new CPoint();
+            cp.X = Convert.ToInt32(p_axisX.GetPos(sPos));
+            cp.Y = Convert.ToInt32(p_axisY.GetPos(sPos));
+            return cp;
+        }
+
         public bool IsInPos(Enum pos, double posError = 10)
         {
             CPoint cp = GetPos(pos); 
@@ -101,6 +109,7 @@ namespace RootTools.Control
             return "OK";
         }
 
+        CPoint m_cpDst = new CPoint(); 
         public string Move(Enum pos, RPoint rpOffset = null, double vMove = -1, double secAcc = -1, double secDec = -1)
         {
             return Move(pos.ToString(), rpOffset, vMove, secAcc, secDec); 
@@ -113,8 +122,6 @@ namespace RootTools.Control
 
         public string Move(string pos, RPoint rpOffset = null, double vMove = -1, double secAcc = -1, double secDec = -1)
         {
-            //if (rpOffset == null) rpOffset = new RPoint(0, 0);
-            
             return Move(pos, 0, 0, vMove, secAcc, secDec); 
         }
 
@@ -122,6 +129,7 @@ namespace RootTools.Control
         {
             if (p_axisX == null) return "AxisX == null";
             if (p_axisY == null) return "AxisY == null";
+            m_cpDst = GetPos(pos);
             string xInfo = p_axisX.Move(pos, xOffset, vMove, secAcc, secDec);
             string yInfo = p_axisY.Move(pos, yOffset, vMove, secAcc, secDec);
             if (xInfo != "OK") return "AxisMove X Error : " + xInfo;
@@ -129,21 +137,26 @@ namespace RootTools.Control
             return "OK";
         }
 
-        public string WaitReady()
+        public string WaitReady(double dInPos = -1)
         {
-            string sInfo = WaitReady(p_axisX);
+            string sInfo = WaitReady(p_axisX, m_cpDst.X, dInPos);
             if (sInfo != "OK") return sInfo;
-            return WaitReady(p_axisY); 
+            return WaitReady(p_axisY, m_cpDst.Y, dInPos); 
         }
 
-        string WaitReady(IAxis axis)
+        string WaitReady(IAxis axis, double posDst, double dInPos = -1)
         {
             if (axis == null) return "Axis == null";
-            while (axis.p_eState == Axis.eState.Move || axis.p_eState == Axis.eState.Home) 
-                Thread.Sleep(10);
+            while (axis.p_eState == Axis.eState.Move || axis.p_eState == Axis.eState.Home) Thread.Sleep(10);
             switch (axis.p_eState)
             {
-                case Axis.eState.Ready: return "OK";
+                case Axis.eState.Ready: 
+                    if (dInPos >= 0)
+                    {
+                        double dPos = posDst - axis.p_posActual;
+                        if (Math.Abs(dPos) > dInPos) return "WaitReady InPosition Error : " + dPos.ToString();
+                    }
+                    return "OK";
                 default: return "WaitReady Error " + axis.p_sID + " : p_eState = " + axis.p_eState.ToString();
             }
         }

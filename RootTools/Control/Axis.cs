@@ -59,15 +59,18 @@ namespace RootTools.Control
             }
         }
 
+        double m_posDst = 0; 
         public string Move(double fPos, double vMove = -1, double secAcc = -1, double secDec = -1)
         {
             if (p_axis == null) return "Axis == null";
+            m_posDst = fPos; 
             return p_axis.Move(fPos, vMove, secAcc, secDec); 
         }
 
         public string Move(string pos, double fOffset = 0, double vMove = -1, double secAcc = -1, double secDec = -1)
         {
             if (p_axis == null) return "Axis == null";
+            m_posDst = p_axis.GetPos(pos); 
             return p_axis.Move(pos, fOffset, vMove, secAcc, secDec); 
         }
 
@@ -76,14 +79,19 @@ namespace RootTools.Control
             return Move(pos.ToString(), fOffset, vMove, secAcc, secDec); 
         }
 
-        public string WaitReady()
+        public string WaitReady(double dInPos = -1)
         {
             if (p_axis == null) return "Axis == null";
-            while (p_axis.p_eState == eState.Move || p_axis.p_eState == eState.Home) 
-                Thread.Sleep(10);
+            while (p_axis.p_eState == eState.Move || p_axis.p_eState == eState.Home) Thread.Sleep(10);
             switch (p_axis.p_eState)
             {
-                case eState.Ready: return "OK";
+                case eState.Ready: 
+                    if (dInPos >= 0)
+                    {
+                        double dPos = m_posDst - p_axis.p_posActual;
+                        if (Math.Abs(dPos) > dInPos) return "WaitReady InPosition Error : " + dPos.ToString(); 
+                    }
+                    return "OK";
                 default: return "WaitReady Error p_eState = " + p_axis.p_eState.ToString(); 
             }
         }
