@@ -468,7 +468,7 @@ namespace Root_Vega.Module
 
         public ModuleRunBase GetRunUndocking()
         {
-            return CloneModuleRun("Undocking");
+            return CloneModuleRun("Unload");
         }
 
         #region ModuleRun

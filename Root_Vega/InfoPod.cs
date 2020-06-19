@@ -112,7 +112,7 @@ namespace Root_Vega
 
         #region InfoReticle
         const int c_maxSlot = 1;
-        void InitSlot()
+        public void InitSlot()
         {
             for (int n = 0; n < c_maxSlot; n++)
             {

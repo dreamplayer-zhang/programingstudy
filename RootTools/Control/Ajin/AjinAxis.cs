@@ -106,6 +106,11 @@ namespace RootTools.Control.Ajin
             InitPosition();
         }
 
+        public void AddPos(params dynamic[] aPos)
+        {
+            foreach (dynamic value in aPos) p_aPos.Add(value.ToString(), 0);
+        }
+
         public void AddPos(string sPosName)
         {
             foreach (KeyValuePair<string, double> sKeyPos in p_aPos)
@@ -1034,6 +1039,11 @@ namespace RootTools.Control.Ajin
         {
             double fPos = GetPos(pos) + fOffset;
             return Move(fPos, vMove, secAcc, secDec);
+        }
+
+        public string Move(Enum pos, double fOffset = 0, double vMove = -1, double secAcc = -1, double secDec = -1)
+        {
+            return Move(pos.ToString(), fOffset, vMove, secAcc, secDec);
         }
         #endregion
 

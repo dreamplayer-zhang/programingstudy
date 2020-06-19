@@ -163,14 +163,7 @@
                             </TextBlock.BitmapEffect>
                         </TextBlock>
                     </Grid>
-                    <Grid Grid.Column="2">
-                        <Label Content="Login"
-                               Style="{StaticResource BasicLabel}"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               FontSize="15"
-                               FontFamily="Arial"/>
-                    </Grid>
+                    <tools:LogIn_MainUI Grid.Column="2" x:Name="loginMaunUI"/>
                     <Grid Grid.Row="0">
                         <TextBlock x:Name="textBoxDateTime" Text="Date"
                                    Style="{StaticResource BasicTb}"

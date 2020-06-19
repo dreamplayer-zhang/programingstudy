@@ -50,6 +50,7 @@ namespace RootTools.Module
         void InitTabControl()
         {
             while (tabControlTools.Items.Count > m_minTabControl) tabControlTools.Items.RemoveAt(m_minTabControl);
+            tabAxis.Items.Clear(); 
             foreach (IAxis axis in m_module.m_listAxis)
             {
                 if (axis != null)
@@ -58,7 +59,7 @@ namespace RootTools.Module
                     tabItem.Header = axis.p_sID.Replace(m_module.p_id + ".", "");
                     tabItem.Content = axis.p_ui;
                     tabItem.Background = Brushes.DarkSalmon;
-                    tabControlTools.Items.Add(tabItem);
+                    tabAxis.Items.Add(tabItem);
                 }
             }
             foreach (ITool tool in m_module.m_aTool)
