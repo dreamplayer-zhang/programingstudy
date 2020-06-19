@@ -138,7 +138,7 @@ namespace Root_Vega
 		/// </summary>
 		/// <param name="source">UI에 추가할 Defect List</param>
 		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
-		private void M_InspManager_AddDefect(DefectDataWrapper[] source, int nDCode)
+		private void M_InspManager_AddDefect(DefectDataWrapper item, int nDCode)
 		{
 			if (InspectionManager.GetInspectionType(nDCode) != InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(nDCode) != InspectionType.RelativeSurface)
 			{
@@ -146,47 +146,44 @@ namespace Root_Vega
 			}
 			//string tempInspDir = @"C:\vsdb\TEMP_IMAGE";
 
-			foreach (var item in source)
+			System.Data.DataRow dataRow = VSDataDT.NewRow();
+
+			//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+
+			dataRow["No"] = currentDefectIdx;
+			currentDefectIdx++;
+			dataRow["DCode"] = item.nClassifyCode;
+			dataRow["AreaSize"] = item.fAreaSize;
+			dataRow["Length"] = item.nLength;
+			dataRow["Width"] = item.nWidth;
+			dataRow["Height"] = item.nHeight;
+			//dataRow["FOV"] = item.FOV;
+			dataRow["PosX"] = item.fPosX;
+			dataRow["PosY"] = item.fPosY;
+
+			VSDataDT.Rows.Add(dataRow);
+			_dispatcher.Invoke(new Action(delegate ()
 			{
-				System.Data.DataRow dataRow = VSDataDT.NewRow();
+				int targetIdx = InspectionManager.GetInspectionTarget(item.nClassifyCode) - InspectionTarget.SideInspection;
 
-				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+				p_InformationDrawerList[targetIdx].AddDefectInfo(item);
 
-				dataRow["No"] = currentDefectIdx;
-				currentDefectIdx++;
-				dataRow["DCode"] = item.nClassifyCode;
-				dataRow["AreaSize"] = item.fAreaSize;
-				dataRow["Length"] = item.nLength;
-				dataRow["Width"] = item.nWidth;
-				dataRow["Height"] = item.nHeight;
-				//dataRow["FOV"] = item.FOV;
-				dataRow["PosX"] = item.fPosX;
-				dataRow["PosY"] = item.fPosY;
-
-				VSDataDT.Rows.Add(dataRow);
-				_dispatcher.Invoke(new Action(delegate ()
+				switch (targetIdx)
 				{
-					int targetIdx = InspectionManager.GetInspectionTarget(item.nClassifyCode) - InspectionTarget.SideInspection;
-
-					p_InformationDrawerList[targetIdx].AddDefectInfo(item);
-
-					switch (targetIdx)
-					{
-						case 0:
-							p_ImageViewer_Top.RedrawingElement();
-							break;
-						case 1:
-							p_ImageViewer_Left.RedrawingElement();
-							break;
-						case 2:
-							p_ImageViewer_Right.RedrawingElement();
-							break;
-						case 3:
-							p_ImageViewer_Bottom.RedrawingElement();
-							break;
-					}
-				}));
-			}
+					case 0:
+						p_ImageViewer_Top.RedrawingElement();
+						break;
+					case 1:
+						p_ImageViewer_Left.RedrawingElement();
+						break;
+					case 2:
+						p_ImageViewer_Right.RedrawingElement();
+						break;
+					case 3:
+						p_ImageViewer_Bottom.RedrawingElement();
+						break;
+				}
+			}));
 		}
 
 		public _2_7_EdgeBoxViewModel(Vega_Engineer engineer, IDialogService dialogService)
@@ -197,71 +194,71 @@ namespace Root_Vega
 			Init(dialogService);
 
 			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
-			m_Engineer.m_InspManager.InspectionComplete += (nDCode) =>
-			{
-				if (InspectionManager.GetInspectionType(nDCode) != InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(nDCode) != InspectionType.RelativeSurface)
-				{
-					return;
-				}
-				//VSDBManager.Commit();
+			//m_Engineer.m_InspManager.InspectionComplete += () =>
+			//{
+			//	if (InspectionManager.GetInspectionType(nDCode) != InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(nDCode) != InspectionType.RelativeSurface)
+			//	{
+			//		return;
+			//	}
+			//	//VSDBManager.Commit();
 
-				//여기서부터 DB Table데이터를 기준으로 tif 이미지 파일을 생성하는 구간
-				//해당 기능은 여러개의 pool을 사용하는 경우에 대해서는 테스트가 진행되지 않았습니다
-				//Concept은 검사 결과가 저장될 시점에 가지고 있던 Data Table을 저장하기 전 Image를 저장하는 형태
-				int stride = tempImageWidth / 8;
-				string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
+			//	//여기서부터 DB Table데이터를 기준으로 tif 이미지 파일을 생성하는 구간
+			//	//해당 기능은 여러개의 pool을 사용하는 경우에 대해서는 테스트가 진행되지 않았습니다
+			//	//Concept은 검사 결과가 저장될 시점에 가지고 있던 Data Table을 저장하기 전 Image를 저장하는 형태
+			//	int stride = tempImageWidth / 8;
+			//	string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
 
-				System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
+			//	System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
 
-				System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
-				System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
-				encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
+			//	System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
+			//	System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
+			//	encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
 
-				foreach (System.Data.DataRow row in VSDataDT.Rows)
-				{
-					//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-					double fPosX = Convert.ToDouble(row["PosX"]);
-					double fPosY = Convert.ToDouble(row["PosY"]);
+			//	foreach (System.Data.DataRow row in VSDataDT.Rows)
+			//	{
+			//		//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+			//		double fPosX = Convert.ToDouble(row["PosX"]);
+			//		double fPosY = Convert.ToDouble(row["PosY"]);
 
-					CRect ImageSizeBlock = new CRect(
-						(int)fPosX - tempImageWidth / 2,
-						(int)fPosY - tempImageHeight / 2,
-						(int)fPosX + tempImageWidth / 2,
-						(int)fPosY + tempImageHeight / 2);
+			//		CRect ImageSizeBlock = new CRect(
+			//			(int)fPosX - tempImageWidth / 2,
+			//			(int)fPosY - tempImageHeight / 2,
+			//			(int)fPosX + tempImageWidth / 2,
+			//			(int)fPosY + tempImageHeight / 2);
 
-					int targetIdx = InspectionManager.GetInspectionTarget(Convert.ToInt32(row["DCode"])) - InspectionTarget.SideInspection;
+			//		int targetIdx = InspectionManager.GetInspectionTarget(Convert.ToInt32(row["DCode"])) - InspectionTarget.SideInspection;
 
-					switch (targetIdx)
-					{
-						case 0:
-							encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Top.p_ImageData.GetRectImage(ImageSizeBlock))));
-							break;
-						case 1:
-							encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Left.p_ImageData.GetRectImage(ImageSizeBlock))));
-							break;
-						case 2:
-							encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Right.p_ImageData.GetRectImage(ImageSizeBlock))));
-							break;
-						case 3:
-							encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Bottom.p_ImageData.GetRectImage(ImageSizeBlock))));
-							break;
-					}
-				}
-				if (VSDataDT.Rows.Count > 0)
-				{
-					encoder.Save(stream);
-				}
-				stream.Dispose();
-				//이미지 저장 완료
+			//		switch (targetIdx)
+			//		{
+			//			case 0:
+			//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Top.p_ImageData.GetRectImage(ImageSizeBlock))));
+			//				break;
+			//			case 1:
+			//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Left.p_ImageData.GetRectImage(ImageSizeBlock))));
+			//				break;
+			//			case 2:
+			//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Right.p_ImageData.GetRectImage(ImageSizeBlock))));
+			//				break;
+			//			case 3:
+			//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Bottom.p_ImageData.GetRectImage(ImageSizeBlock))));
+			//				break;
+			//		}
+			//	}
+			//	if (VSDataDT.Rows.Count > 0)
+			//	{
+			//		encoder.Save(stream);
+			//	}
+			//	stream.Dispose();
+			//	//이미지 저장 완료
 
-				//Data Table 저장 시작
-				VSDBManager.SetDataTable(VSDataInfoDT);
-				VSDBManager.SetDataTable(VSDataDT);
-				VSDBManager.Disconnect();
-				//Data Table 저장 완료
-				m_Engineer.m_InspManager.Dispose();
-				VSDataDT.Clear();
-			};
+			//	//Data Table 저장 시작
+			//	VSDBManager.SetDataTable(VSDataInfoDT);
+			//	VSDBManager.SetDataTable(VSDataDT);
+			//	VSDBManager.Disconnect();
+			//	//Data Table 저장 완료
+			//	m_Engineer.m_InspManager.Dispose();
+			//	VSDataDT.Clear();
+			//};
 		}
 
 		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
@@ -548,10 +545,12 @@ namespace Root_Vega
 						//TODO Image 메모리 영역을 참조하는 부분이 보이지 않음. 하드코딩 되어있을 가능성이 높음
 						ulong temp;
 						m_Engineer.GetMemoryOffset("SideVision.Memory", "SideVision", m_astrMem[i], out temp);
-						DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", temp, inspArea, 500, param, type, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
+						DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", temp, 
+							m_Engineer.GetMemory("SideVision.Memory", "SideVision", m_astrMem[i]).p_sz.X,
+							m_Engineer.GetMemory("SideVision.Memory", "SideVision", m_astrMem[i]).p_sz.Y, 
+							inspArea, 500, param, type, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
 
 						int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspection + 1 + i, type, 0);
-						m_Engineer.m_InspManager.StartInspection(nDefectCode, p_ImageViewer_List[i].p_ImageData.p_Size.X, p_ImageViewer_List[i].p_ImageData.p_Size.Y);
 					}
 				}
 
@@ -569,6 +568,7 @@ namespace Root_Vega
 
 				p_ImageViewer_List[i].SetRoiRect();
 			}
+			m_Engineer.m_InspManager.StartInspection();
 		}
 		void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor, int nTLRB)
 		{
