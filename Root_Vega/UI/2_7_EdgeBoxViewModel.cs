@@ -138,9 +138,9 @@ namespace Root_Vega
 		/// </summary>
 		/// <param name="source">UI에 추가할 Defect List</param>
 		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
-		private void M_InspManager_AddDefect(DefectDataWrapper item, int nDCode)
+		private void M_InspManager_AddDefect(DefectDataWrapper item)
 		{
-			if (InspectionManager.GetInspectionType(nDCode) != InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(nDCode) != InspectionType.RelativeSurface)
+			if (InspectionManager.GetInspectionType(item.nClassifyCode) != InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) != InspectionType.RelativeSurface)
 			{
 				return;
 			}
@@ -542,15 +542,14 @@ namespace Root_Vega
 						{
 							type = InspectionType.RelativeSurface;
 						}
+						int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspection + 1 + i, type, 0);
 						//TODO Image 메모리 영역을 참조하는 부분이 보이지 않음. 하드코딩 되어있을 가능성이 높음
 						ulong temp;
 						m_Engineer.GetMemoryOffset("SideVision.Memory", "SideVision", m_astrMem[i], out temp);
 						DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", temp, 
 							m_Engineer.GetMemory("SideVision.Memory", "SideVision", m_astrMem[i]).p_sz.X,
 							m_Engineer.GetMemory("SideVision.Memory", "SideVision", m_astrMem[i]).p_sz.Y, 
-							inspArea, 500, param, type, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
-
-						int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspection + 1 + i, type, 0);
+							inspArea, 500, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
 					}
 				}
 

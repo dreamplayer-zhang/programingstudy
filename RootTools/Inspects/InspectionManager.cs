@@ -19,7 +19,7 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="item">Defect Information</param>
 		/// <param name="args">arguments. 필요한 경우 수정해서 사용</param>
-		public delegate void ChangeDefectInfoEventHanlder(DefectDataWrapper item, int nDCode);
+		public delegate void ChangeDefectInfoEventHanlder(DefectDataWrapper item);
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
@@ -133,11 +133,11 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="source">DefectData array</param>
 		/// <param name="args">추후 arguments가 필요하면 사용할것</param>
-		private void InspectionManager_AddDefect(DefectDataWrapper item, int nDCode)
+		private void InspectionManager_AddDefect(DefectDataWrapper item)
 		{
 			if (AddDefect != null)
 			{
-				AddDefect(item, nDCode);
+				AddDefect(item);
 			}
 		}
 
@@ -196,7 +196,7 @@ namespace RootTools.Inspects
 		/// <param name="bDefectMerge"></param>
 		/// <param name="nMergeDistance"></param>
 		/// <returns></returns>
-		public List<CRect> CreateInspArea(string poolName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, RootTools.Inspects.InspectionType insptype, bool bDefectMerge, int nMergeDistance)
+		public List<CRect> CreateInspArea(string poolName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int defectCode, bool bDefectMerge, int nMergeDistance)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -248,24 +248,24 @@ namespace RootTools.Inspects
 						else ey = AreaEndY;
 
 						InspectionProperty ip = new InspectionProperty();
-						ip.p_InspType = insptype;
-
-						CRect inspblock = new CRect(sx, sy, ex, ey);
-						ip.p_Rect = inspblock;
-						if (insptype == InspectionType.Strip)
-						{
-							ip.p_StripParam = (StripParamData)param;
-						}
-						else if (insptype == InspectionType.AbsoluteSurface || insptype == InspectionType.AbsoluteSurface)
-						{
-							ip.p_surfaceParam = (SurfaceParamData)param;
-						}
-						//TODO : Memory pool 이름, offset 계산하여 AddInspection 하기 전에 InspectionProperty로 넘겨줘야 함
+						ip.p_InspType = GetInspectionType(defectCode);
+						ip.m_nDefectCode = defectCode;
 						ip.p_index = blockcount;
 						ip.MemoryPoolName = poolName;
 						ip.MemoryOffset = memOffset;
 						ip.p_TargetMemWidth = memWidth;
 						ip.p_TargetMemHeight = memHeight;
+
+						CRect inspblock = new CRect(sx, sy, ex, ey);
+						ip.p_Rect = inspblock;
+						if (ip.p_InspType == InspectionType.Strip)
+						{
+							ip.p_StripParam = (StripParamData)param;
+						}
+						else if (ip.p_InspType == InspectionType.AbsoluteSurface || ip.p_InspType == InspectionType.AbsoluteSurface)
+						{
+							ip.p_surfaceParam = (SurfaceParamData)param;
+						}
 
 						AddInspection(ip, bDefectMerge, nMergeDistance);
 						blockcount++;

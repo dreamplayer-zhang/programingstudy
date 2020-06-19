@@ -18,7 +18,7 @@ namespace RootTools.Inspects
 		public delegate void EventHandler();
 		public EventHandler InspectionStart;
 		public EventHandler InspectionComplete;
-		public delegate void ChangeDefectInfoEventHander(DefectDataWrapper item, int nDCode);
+		public delegate void ChangeDefectInfoEventHander(DefectDataWrapper item);
 		public event ChangeDefectInfoEventHander AddDefect;
 		#endregion
 
@@ -141,7 +141,7 @@ namespace RootTools.Inspects
 					{
 						foreach (var item in arrDefects)
 						{
-							AddDefect(item, item.nClassifyCode);
+							AddDefect(item);
 						}
 					}
 					arrDefects.Clear();
