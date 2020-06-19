@@ -274,6 +274,7 @@ namespace Root_Vega.Module
             {
                 if (Run(MoveTheta(ePosTheta.Open))) return p_sInfo;
             }
+
             if (Run(MoveZ(ePosZ.InnerPod))) return p_sInfo;
             if (Run(MovePodLifter(ePosPodLifter.Lifting))) return p_sInfo;
             if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
