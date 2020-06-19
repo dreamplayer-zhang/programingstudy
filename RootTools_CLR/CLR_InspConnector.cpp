@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "CLR_InspConnector.h"
 
+#include <intsafe.h>
+
+//#define LODWORD(_qw)    ((DWORD)(_qw))
+//#define HIDWORD(_qw)    ((DWORD)(((_qw) >> 32) & 0xffffffff))
+
 namespace RootTools_CLR
 {
 	CLR_InspConnector::CLR_InspConnector(int processornum)
@@ -17,23 +22,32 @@ namespace RootTools_CLR
 	{
 	}
 
-	byte* CLR_InspConnector::GetBuffer()
+	/*byte* CLR_InspConnector::GetBuffer()
 	{
 		return (byte*)ImgPool;
-	}
+	}*/
 
-	void CLR_InspConnector::GetImagePool(std::string memoryname, int pool_w, int pool_h)
+	byte* CLR_InspConnector::GetImagePool(std::string memoryname, unsigned __int64 offset , int pool_w, int pool_h)
 	{
 		ImgPool_Width = pool_w;
 		ImgPool_Height = pool_h;
+		DWORD errorCode;
 		std::string mmfName = memoryname;
 		std::wstring t;
 		t.assign(mmfName.begin(), mmfName.end());
 		HANDLE hMapping;
 		hMapping = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, t.c_str());
-		ImgPool = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0, 0, ImgPool_Width * ImgPool_Height);
 
+		LPVOID buf = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0,0, ImgPool_Width * ImgPool_Height + offset);
 
+		if (buf == NULL)
+		{
+			errorCode = GetLastError();
+		}
+
+		byte* temp = ((byte*)buf) + offset;
+
+		return temp;
 	}
 	/// <summary>
 	/// 실제 suface 검사를 진행

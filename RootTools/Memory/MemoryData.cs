@@ -140,7 +140,10 @@ namespace RootTools.Memory
             catch (Exception e) { m_log.Error(e, "Create Buffer Memory Error"); }
             mbOffset += (int)Math.Ceiling(p_nCount * p_lSize / c_fMB);
         }
-
+		public ulong GetMBOffset()
+		{
+            return (ulong)Math.Ceiling(p_mbOffset * c_fMB);
+        }
         string CheckParamOK()
         {
             if (p_nCount < 1) return "p_nCount = " + p_nCount.ToString();

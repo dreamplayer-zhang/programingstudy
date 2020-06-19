@@ -547,14 +547,26 @@ namespace Root_Vega.Module
         public override void InitMemorys()
         {
             m_szAlignROI = p_CamLADS.p_szROI;
-            m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
-            m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-            m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+			//m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
+			//m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+			//m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
 
             m_memoryTop = m_memoryPool.GetGroup(p_id).CreateMemory("Top", 1, 1, 6000, 150000);
             m_memoryLeft = m_memoryPool.GetGroup(p_id).CreateMemory("Left", 1, 1, 6000, 150000);
             m_memoryRight = m_memoryPool.GetGroup(p_id).CreateMemory("Right", 1, 1, 6000, 150000);
             m_memoryBottom = m_memoryPool.GetGroup(p_id).CreateMemory("Bottom", 1, 1, 6000, 150000);
+            //m_engineer.ClassMemoryTool().GetPool("Top", true);
+            //m_engineer.ClassMemoryTool().GetPool("Top", false).p_gbPool = 3;
+            //m_memoryTop = m_engineer.ClassMemoryTool().GetPool("Top",false).GetGroup("Top", true).CreateMemory("Top", 1, 1, 6000, 150000);
+            //m_engineer.ClassMemoryTool().GetPool("Left", true);
+            //m_engineer.ClassMemoryTool().GetPool("Left", false).p_gbPool = 3;
+            //m_memoryLeft = m_engineer.ClassMemoryTool().GetPool("Left", false).GetGroup("Left", true).CreateMemory("Left", 1, 1, 6000, 150000);
+            //m_engineer.ClassMemoryTool().GetPool("Right", true);
+            //m_engineer.ClassMemoryTool().GetPool("Right", false).p_gbPool = 3;
+            //m_memoryRight = m_engineer.ClassMemoryTool().GetPool("Right", false).GetGroup("Right", true).CreateMemory("Right", 1, 1, 6000, 150000);
+            //m_engineer.ClassMemoryTool().GetPool("Bottom", true);
+            //m_engineer.ClassMemoryTool().GetPool("Bottom", false).p_gbPool = 3;
+            //m_memoryBottom = m_engineer.ClassMemoryTool().GetPool("Bottom", false).GetGroup("Bottom", true).CreateMemory("Bottom", 1, 1, 6000, 150000);
 
             m_aHeight = new ushort[m_szAlignROI.X * m_lMaxGrab];
             m_fScaleH = 65535.0 / m_szAlignROI.Y;
