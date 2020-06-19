@@ -78,12 +78,12 @@ namespace RootTools.Inspects
 			{
 				if (bState == InspectionState.Run)
 				{
-					Console.WriteLine(string.Format("Inspection ID : {0} Thread Index {1}", InspectionID, ThreadIndex));
+					//Console.WriteLine(string.Format("Inspection ID : {0} Thread Index {1}", InspectionID, ThreadIndex));
 					bState = InspectionState.Running;
 
 
 					List<DefectDataWrapper> arrDefects = new List<DefectDataWrapper>();
-					if (m_InspProp.p_InspType == InspectionType.AbsoluteSurface && m_InspProp.p_InspType == InspectionType.RelativeSurface)
+					if (m_InspProp.p_InspType == InspectionType.AbsoluteSurface || m_InspProp.p_InspType == InspectionType.RelativeSurface)
 					{
 						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
 						{

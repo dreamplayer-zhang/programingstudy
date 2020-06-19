@@ -12,7 +12,7 @@ void CInspectionReticle::SetParams(byte* buffer, int bufferwidth, int bufferheig
 	SetDefectSize(nSize);
 }
 
-std::vector<DefectDataStruct> CInspectionReticle::StripInspection(int nBandwidth, int nIntensity)
+std::vector<DefectDataStruct> CInspectionReticle::StripInspection(int nBandwidth, int nIntensity, int nClassifyCode)
 {
 	std::vector<DefectDataStruct> vResult;
 	bool bInspResult = false;
@@ -41,7 +41,7 @@ std::vector<DefectDataStruct> CInspectionReticle::StripInspection(int nBandwidth
 
 	if (nGrayLevel > 0)//절대검사 먼저
 	{
-		std::vector<DefectDataStruct> tempResult = SurfaceInspection(true);
+		std::vector<DefectDataStruct> tempResult = SurfaceInspection(true, nClassifyCode);
 		for (int i = 0; i < tempResult.size(); i++)
 		{
 			vResult.push_back(tempResult[i]);
@@ -53,7 +53,7 @@ std::vector<DefectDataStruct> CInspectionReticle::StripInspection(int nBandwidth
 
 	if (nPL > 0)
 	{
-		std::vector<DefectDataStruct> tempResult = SurfaceInspection(true);
+		std::vector<DefectDataStruct> tempResult = SurfaceInspection(true, nClassifyCode);
 		for (int i = 0; i < tempResult.size(); i++)
 		{
 			vResult.push_back(tempResult[i]);

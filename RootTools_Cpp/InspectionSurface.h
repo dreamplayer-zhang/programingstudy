@@ -5,6 +5,6 @@ class CInspectionSurface : public InspectionBase
 {
 public:
 	virtual void SetParams(byte* buffer, int bufferwidth, int bufferheight, RECT roi,  int defectCode, int grayLevel, int defectSize, bool bDarkInspection, int threadindex);
-	std::vector<DefectDataStruct> SurfaceInspection(bool bAbsolute);
+	std::vector<DefectDataStruct> SurfaceInspection(bool bAbsolute, int nClassifyCode);
 	CInspectionSurface(int nWidth, int nHeight);
 };

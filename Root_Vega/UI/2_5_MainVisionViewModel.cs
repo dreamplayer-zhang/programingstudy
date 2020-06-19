@@ -675,9 +675,8 @@ namespace Root_Vega
 
 			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
 			int nblocksize = 500;
-
-			ulong memOffset;
-			m_Engineer.GetMemoryOffset("pool", "group", "mem", out memOffset);
+					
+			var memOffset = m_Engineer.GetMemory("pool", "group", "mem").GetMBOffset();
 			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 
 			DrawRectList = m_Engineer.m_InspManager.CreateInspArea("pool", memOffset,

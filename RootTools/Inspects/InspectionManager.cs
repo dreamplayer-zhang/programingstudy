@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System;
 using System.Security.RightsManagement;
+using System.Threading.Tasks;
 
 namespace RootTools.Inspects
 {
@@ -32,20 +33,12 @@ namespace RootTools.Inspects
 		int nThreadNum = 10;
 		int nInspectionCount = 0;
 
-		//int m_nDefectCode;
-
-		//int m_nMemWidth;
-		//int m_nMemHeight;
-
 		bool m_bProgress;
 
 		public bool IsInitialized { get; private set; }
 
 		public void StartInspection()
 		{
-			//m_nDefectCode = nDefectCode;
-			//m_nMemWidth = nMemWidth;
-			//m_nMemHeight = nMemHegiht;
 			m_bProgress = false;
 			nInspectionCount = 0;
 
@@ -77,16 +70,16 @@ namespace RootTools.Inspects
 			int nInspDoneNum = 0;
 			InsepctionThread = new Inspection[nThreadNum];
 
-			//if (InspectionStart != null)
-			//{
-			//	InspectionStart(m_nDefectCode);//DB Write 준비 시작
-			//}
-
-			for (int i = 0; i < nThreadNum; i++)
+			Parallel.For(0, nThreadNum, i =>
 			{
 				InsepctionThread[i] = new Inspection(nThreadNum);
 				InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
-			}
+			});
+			//for (int i = 0; i < nThreadNum; i++)
+			//{
+			//	InsepctionThread[i] = new Inspection(nThreadNum);
+			//	InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
+			//}
 
 			m_bProgress = true;
 
@@ -196,7 +189,7 @@ namespace RootTools.Inspects
 		/// <param name="bDefectMerge"></param>
 		/// <param name="nMergeDistance"></param>
 		/// <returns></returns>
-		public List<CRect> CreateInspArea(string poolName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int defectCode, bool bDefectMerge, int nMergeDistance)
+		public List<CRect> CreateInspArea(string poolName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int dCode, bool bDefectMerge, int nMergeDistance)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -248,8 +241,8 @@ namespace RootTools.Inspects
 						else ey = AreaEndY;
 
 						InspectionProperty ip = new InspectionProperty();
-						ip.p_InspType = GetInspectionType(defectCode);
-						ip.m_nDefectCode = defectCode;
+						ip.p_InspType = GetInspectionType(dCode);
+						ip.m_nDefectCode = dCode;
 						ip.p_index = blockcount;
 						ip.MemoryPoolName = poolName;
 						ip.MemoryOffset = memOffset;
@@ -461,5 +454,10 @@ namespace RootTools.Inspects
 		}
 		public string MemoryPoolName { get; set; }
 		public ulong MemoryOffset { get; set; }
+	}
+	public class MemInfo
+	{
+
+
 	}
 }
