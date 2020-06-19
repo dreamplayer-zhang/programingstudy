@@ -274,14 +274,16 @@ namespace Root_Vega.Module
             {
                 if (Run(MoveTheta(ePosTheta.Open))) return p_sInfo;
             }
-
             if (Run(MoveZ(ePosZ.InnerPod))) return p_sInfo;
             if (Run(MovePodLifter(ePosPodLifter.Lifting))) return p_sInfo;
+            if (m_diInnerPod.p_bIn == false) return "InnerPod Sensor not Detected";
             if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
             if (Run(MoveReticleLifter(ePosReticleLifter.Mid))) return p_sInfo;
             if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
             if (Run(MoveReticleLifter(ePosReticleLifter.Lifting))) return p_sInfo;
             if (Run(MoveZ(ePosZ.Load))) return p_sInfo;
+            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
+
             return "OK"; 
         }
 
