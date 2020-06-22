@@ -473,6 +473,38 @@ namespace Root_Vega.Module
         }
         #endregion
 
+        #region RelayCommand
+        void Jog_Plus_Fast()
+        {
+            // Interlock Check
+            if (p_axisClamp.p_axis.p_sensorHome == false) return;
+            ((AjinAxis)(p_axisXY.p_axisY)).Jog_Plus_Fast();
+        }
+
+        public void Jog_Minus_Fast()
+        {
+            // Interlock Check
+            if (p_axisClamp.p_axis.p_sensorHome == false) return;
+            ((AjinAxis)(p_axisXY.p_axisY)).Jog_Minus_Fast();
+        }
+
+        public RelayCommand PJogFastCommand
+        {
+            get
+            {
+                return new RelayCommand(Jog_Plus_Fast);
+            }
+        }
+
+        public RelayCommand MJogFastCommand
+        {
+            get
+            {
+                return new RelayCommand(Jog_Minus_Fast);
+            }
+        }
+        #endregion
+
         public PatternVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);

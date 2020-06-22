@@ -876,7 +876,7 @@
                                                 <Button Grid.Column="1"
                                                         Margin="5"
                                                         Style="{StaticResource BasicBtn}"
-                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                        DataContext="{Binding p_PatternVision}"
                                                         Command="{Binding PJogFastCommand}">
                                                     <Button.Content>
                                                         <material:PackIcon Kind="ArrowUpBox"
@@ -920,7 +920,7 @@
                                                 <Button Grid.Column="1"
                                                         Margin="5"
                                                         Style="{StaticResource BasicBtn}"
-                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                        DataContext="{Binding p_PatternVision}"
                                                         Command="{Binding MJogFastCommand}">
                                                     <Button.Content>
                                                         <material:PackIcon Kind="ArrowDownBox"

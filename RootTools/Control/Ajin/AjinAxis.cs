@@ -955,7 +955,7 @@ namespace RootTools.Control.Ajin
         }
         StopWatch m_swJogContinuos = new StopWatch();
 
-        void Jog_Plus_Fast()
+        public void Jog_Plus_Fast()
         {
             if (p_eState == Axis.eState.Jog)
             {
@@ -973,7 +973,7 @@ namespace RootTools.Control.Ajin
             else
                 Jog(GetSpeed(eSpeed.JogMove) / 10);
         }
-        void Jog_Minus_Fast()
+        public void Jog_Minus_Fast()
         {
             if (p_eState == Axis.eState.Jog)
             {
