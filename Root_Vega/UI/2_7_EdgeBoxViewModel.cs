@@ -91,34 +91,95 @@ namespace Root_Vega
 			get { return _SelectedROI; }
 			set
 			{
+				SetProperty(ref _SelectedROI, value);
+
 				if (value != null)
 				{
-					for (int i = 0; i < 4; i++)
+					this.UseCustomEdgeBox = value.EdgeBox.UseCustomEdgeBox;
+					this.SearchBrightToDark = value.EdgeBox.SearchBrightToDark;
+					this.UseAutoGV = value.EdgeBox.UseAutoGV;
+
+					if(this.UseCustomEdgeBox)
 					{
-						if (p_SimpleShapeDrawer_List[i] == null) continue;
-						p_SimpleShapeDrawer_List[i].m_ListRect.Clear();
-						var targetList = value.EdgeBox.EdgeList.Where(x => x.SavePoint == i).ToList();
-						foreach (EdgeElement item in targetList)
+						//Recipe에서 불러온다
+						for (int i = 0; i < 4; i++)
 						{
-							var temp = new UIElementInfo(new Point(item.Rect.Left, item.Rect.Top), new Point(item.Rect.Right, item.Rect.Bottom));
+							if (p_SimpleShapeDrawer_List[i] == null) continue;
+							p_SimpleShapeDrawer_List[i].m_ListRect.Clear();
+							var targetList = value.EdgeBox.EdgeList.Where(x => x.SavePoint == i).ToList();
+							foreach (EdgeElement item in targetList)
+							{
+								var temp = new UIElementInfo(new Point(item.Rect.Left, item.Rect.Top), new Point(item.Rect.Right, item.Rect.Bottom));
 
-							System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-							rect.Width = item.Rect.Width;
-							rect.Height = item.Rect.Height;
-							System.Windows.Controls.Canvas.SetLeft(rect, item.Rect.Left);
-							System.Windows.Controls.Canvas.SetTop(rect, item.Rect.Top);
-							rect.StrokeThickness = 2;
-							rect.Stroke = MBrushes.Red;
+								System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+								rect.Width = item.Rect.Width;
+								rect.Height = item.Rect.Height;
+								System.Windows.Controls.Canvas.SetLeft(rect, item.Rect.Left);
+								System.Windows.Controls.Canvas.SetTop(rect, item.Rect.Top);
+								rect.StrokeThickness = 2;
+								rect.Stroke = MBrushes.Red;
 
-							p_SimpleShapeDrawer_List[i].m_ListShape.Add(rect);
-							p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
-							p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
+								p_SimpleShapeDrawer_List[i].m_ListShape.Add(rect);
+								p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
+								p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
+							}
+							p_ImageViewer_List[i].SetRoiRect();
 						}
-						p_ImageViewer_List[i].SetRoiRect();
+					}
+					else
+					{
+						//Init에서 불러온다
+						m_Engineer.ClassToolBox().GetToolSet("VegaSideVisionEdge");
 					}
 				}
+			}
+		}
+		#endregion
 
-				SetProperty(ref _SelectedROI, value);
+		#region SearchBrightToDark
+		private bool _SearchBrightToDark;
+		public bool SearchBrightToDark
+		{
+			get { return this._SearchBrightToDark; }
+			set
+			{
+				if (SelectedROI != null)
+				{
+					SetProperty(ref _SearchBrightToDark, value);
+					SelectedROI.EdgeBox.SearchBrightToDark = value;
+				}
+			}
+		}
+		#endregion
+
+		#region UseCustomEdgeBox
+		private bool _UseCustomEdgeBox;
+		public bool UseCustomEdgeBox
+		{
+			get { return this._UseCustomEdgeBox; }
+			set
+			{
+				if (SelectedROI != null)
+				{
+					SetProperty(ref _UseCustomEdgeBox, value);
+					SelectedROI.EdgeBox.UseCustomEdgeBox = value;
+				}
+			}
+		}
+		#endregion
+
+		#region UseAutoGV
+		private bool _UseAutoGV;
+		public bool UseAutoGV
+		{
+			get { return this._UseAutoGV; }
+			set
+			{
+				if (SelectedROI != null)
+				{
+					SetProperty(ref _UseAutoGV, value);
+					SelectedROI.EdgeBox.UseAutoGV = value;
+				}
 			}
 		}
 		#endregion
@@ -332,6 +393,20 @@ namespace Root_Vega
 			set
 			{
 				SetProperty(ref m_ImageViewer_Bottom, value);
+			}
+		}
+		private void _saveInit()
+		{
+			//여기서 그려진 모든 rect목록을 Init에 반영한다
+			for (int i = 0; i < 4; i++)
+			{
+				if (p_SimpleShapeDrawer_List[i] == null) continue;
+				for (int j = 0; j < 6; j++)
+				{
+					if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
+					//SelectedROI.EdgeBox.EdgeList.Add();
+					var temp = new EdgeElement(i, new CRect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos));
+				}
 			}
 		}
 		public void _saveRcp()
@@ -944,6 +1019,13 @@ namespace Root_Vega
 			get
 			{
 				return new RelayCommand(_saveRcp);
+			}
+		}
+		public RelayCommand CommandInitSave
+		{
+			get
+			{
+				return new RelayCommand(_saveInit);
 			}
 		}
 		public RelayCommand CommandAddRoi
