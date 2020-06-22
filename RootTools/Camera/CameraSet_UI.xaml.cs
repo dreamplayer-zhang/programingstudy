@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Collections.Generic;
+using System.Windows.Controls;
 
 namespace RootTools.Camera
 {
@@ -26,16 +27,28 @@ namespace RootTools.Camera
             InitTabControl();
         }
 
+        List<string> m_asCamera = new List<string>();
         void InitTabControl()
         {
             tabControl.Items.Clear();
+            m_asCamera.Clear();
+            comboCamera.ItemsSource = null;
             foreach (ICamera camera in m_cameraSet.m_aCamera)
             {
                 TabItem tabItem = new TabItem();
                 tabItem.Header = camera.p_id.Replace(m_cameraSet.m_sModule + ".", "");
                 tabItem.Content = camera.p_ui;
                 tabControl.Items.Add(tabItem);
+                m_asCamera.Add(camera.p_id.Replace(m_cameraSet.m_sModule + ".", ""));
             }
+            comboCamera.ItemsSource = m_asCamera;
+            comboCamera.SelectedIndex = 0;
+        }
+
+        private void comboCamera_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (comboCamera.SelectedIndex < 0) return;
+            tabControl.SelectedIndex = comboCamera.SelectedIndex;
         }
     }
 }

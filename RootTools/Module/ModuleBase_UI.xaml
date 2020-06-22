@@ -59,7 +59,14 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="Axis" Background="DarkSalmon">
-                    <TabControl x:Name="tabAxis"/>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <ComboBox Grid.Row="0" x:Name="comboAxis" SelectionChanged="comboAxis_SelectionChanged"/>
+                        <TabControl Grid.Row="1" x:Name="tabAxis"/>
+                    </Grid>
                 </TabItem>
             </TabControl>
         </Grid>

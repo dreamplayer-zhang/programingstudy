@@ -24,7 +24,6 @@ namespace Root_Wind.Module
         DIO_I2O2 m_dioLift;
         DIO_I m_diWaferExist;
         MemoryPool m_memoryPool;
-        MemoryViewer m_memoryViewer; 
         Camera_Basler m_camAlign;
         Camera_CognexOCR m_camOCR; 
 
@@ -40,7 +39,6 @@ namespace Root_Wind.Module
             p_sInfo = m_toolBox.Get(ref m_dioLift, this, "Lift", "Down", "Up");
             p_sInfo = m_toolBox.Get(ref m_diWaferExist, this, "WaferExist");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
-            p_sInfo = m_toolBox.Get(ref m_memoryViewer, this, "Viewer");
             p_sInfo = m_toolBox.Get(ref m_camAlign, this, "Align");
             p_sInfo = m_toolBox.Get(ref m_camOCR, this, "OCR");
             if (bInit) InitTools();
@@ -566,8 +564,6 @@ namespace Root_Wind.Module
             {
                 m_aoiInspect = RunTreeAOI(tree.GetTree("AOI"), bVisible); 
                 m_aoiParam.RunTree(tree.GetTree("Inspect"), bVisible, bRecipe);
-                if (m_aoiInspect != null) m_module.m_memoryViewer.SetMemory(m_aoiInspect.m_memory, m_nAOI); 
-                else m_module.m_memoryViewer.SetMemory(null, m_nAOI);
             }
 
             eAOI m_eAOI = eAOI.Grab;
