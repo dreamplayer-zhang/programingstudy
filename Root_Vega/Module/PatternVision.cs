@@ -476,16 +476,28 @@ namespace Root_Vega.Module
         #region RelayCommand
         void Jog_Plus_Fast()
         {
-            // Interlock Check
             if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)(p_axisXY.p_axisY)).Jog_Plus_Fast();
+            ((AjinAxis)p_axisXY.p_axisY).Jog_Plus_Fast();
         }
-
-        public void Jog_Minus_Fast()
+        void Jog_Minus_Fast()
         {
-            // Interlock Check
             if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)(p_axisXY.p_axisY)).Jog_Minus_Fast();
+            ((AjinAxis)p_axisXY.p_axisY).Jog_Minus_Fast();
+        }
+        public void MovePosition()
+        {
+            if (p_axisClamp.p_axis.p_sensorHome == false) return;
+            ((AjinAxis)p_axisXY.p_axisY).MovePosition();
+        }
+        public void PlusRelativeMove()
+        {
+            if (p_axisClamp.p_axis.p_sensorHome == false) return;
+            ((AjinAxis)p_axisXY.p_axisY).PlusRelativeMove();
+        }
+        public void MinusRelativeMove()
+        {
+            if (p_axisClamp.p_axis.p_sensorHome == false) return;
+            ((AjinAxis)p_axisXY.p_axisY).MinusRelativeMove();
         }
 
         public RelayCommand PJogFastCommand
@@ -495,12 +507,32 @@ namespace Root_Vega.Module
                 return new RelayCommand(Jog_Plus_Fast);
             }
         }
-
         public RelayCommand MJogFastCommand
         {
             get
             {
                 return new RelayCommand(Jog_Minus_Fast);
+            }
+        }
+        public RelayCommand MoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MovePosition);
+            }
+        }
+        public RelayCommand PlusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(PlusRelativeMove);
+            }
+        }
+        public RelayCommand MinusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MinusRelativeMove);
             }
         }
         #endregion
