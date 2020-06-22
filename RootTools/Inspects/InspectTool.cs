@@ -138,11 +138,23 @@ namespace RootTools.Inspects
         bool m_bStartProcess = false;
         public static string m_idProcess = "Root_Inspect";
         string m_sProcessFile = "";
-        void RunProcessTree(Tree tree, bool bVisible)
+
+        #region Vision Parameter
+        int[] nTopLeftXLIst;
+        int[] nTopLeftYLIst;
+        int[] nWidthLIst;
+		int[] nHeighLIst;
+		#endregion
+
+		void RunProcessTree(Tree tree, bool bVisible)
         {
             m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process", bVisible);
             m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "Inspect Process ID", bVisible && m_bStartProcess);
             m_sProcessFile = tree.SetFile(m_sProcessFile, m_sProcessFile, "exe", "File", "Process File Name", bVisible && m_bStartProcess);
+        }
+        void RunCommonParamTree(Tree tree, bool bVisible)
+        {
+            //test3 = tree.GetTree("TreeParamTest").GetTree("TreeParamTest2").Set(test3, test3, "TreeParamTest3", "for test", bVisible);
         }
         #endregion
 
@@ -163,6 +175,7 @@ namespace RootTools.Inspects
             //            }
             bool bVisible = (m_engineer.p_user.m_eLevel >= Login.eLevel.Admin);
             RunProcessTree(m_treeRoot.GetTree("Process", false), bVisible);
+            RunCommonParamTree(m_treeRoot.GetTree("CommonParameter", false), bVisible);
         }
         #endregion
 
