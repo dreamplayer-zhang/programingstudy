@@ -1680,7 +1680,8 @@
                                         <RowDefinition Height="4*"></RowDefinition>
                                         <RowDefinition Height="4*"></RowDefinition>
                                     </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0">
+                                    <Grid Grid.Row="0"
+                                          DataContext="{Binding p_SideVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition></ColumnDefinition>
                                             <ColumnDefinition></ColumnDefinition>
@@ -1692,6 +1693,7 @@
                                                    Text="Axis X" />
                                         <Button Grid.Column="1"
                                                 Style="{StaticResource BasicBtn}"
+                                                Command="{Binding MinusRelativeMoveCommand}"
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
@@ -1706,13 +1708,14 @@
                                         <Border Grid.Column="2">
                                             <TextBox VerticalAlignment="Center"
                                                      Background="{PriorityBinding}"
-                                                     Text="111111"
+                                                     Text="{Binding p_dRelPos}"
                                                      Foreground="White"
                                                      HorizontalAlignment="Center"
                                                      FontSize="20" />
                                         </Border>
                                         <Button Grid.Column="3"
                                                 Style="{StaticResource BasicBtn}"
+                                                Command="{Binding PlusRelativeMoveCommand}"
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
@@ -1725,7 +1728,8 @@
                                             </Button.Content>
                                         </Button>
                                     </Grid>
-                                    <Grid Grid.Row="1">
+                                    <Grid Grid.Row="1"
+                                          DataContext="{Binding p_SideVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition></ColumnDefinition>
                                             <ColumnDefinition></ColumnDefinition>
@@ -1737,6 +1741,7 @@
                                                    Text="Axis Y" />
                                         <Button Grid.Column="1"
                                                 Style="{StaticResource BasicBtn}"
+                                                Command="{Binding MinusRelativeMoveCommand}"
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
@@ -1751,13 +1756,14 @@
                                         <Border Grid.Column="2">
                                             <TextBox VerticalAlignment="Center"
                                                      Background="{PriorityBinding}"
-                                                     Text="111111"
+                                                     Text="{Binding p_dRelPos}"
                                                      Foreground="White"
                                                      HorizontalAlignment="Center"
                                                      FontSize="20" />
                                         </Border>
                                         <Button Grid.Column="3"
                                                 Style="{StaticResource BasicBtn}"
+                                                Command="{Binding PlusRelativeMoveCommand}"
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
@@ -1770,7 +1776,8 @@
                                             </Button.Content>
                                         </Button>
                                     </Grid>
-                                    <Grid Grid.Row="2">
+                                    <Grid Grid.Row="2"
+                                          DataContext="{Binding p_SideVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition></ColumnDefinition>
                                             <ColumnDefinition></ColumnDefinition>
@@ -1782,6 +1789,7 @@
                                                    Text="Axis Z" />
                                         <Button Grid.Column="1"
                                                 Style="{StaticResource BasicBtn}"
+                                                Command="{Binding MinusRelativeMoveCommand}"
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
@@ -1796,13 +1804,14 @@
                                         <Border Grid.Column="2">
                                             <TextBox VerticalAlignment="Center"
                                                      Background="{PriorityBinding}"
-                                                     Text="111111"
+                                                     Text="{Binding p_dRelPos}"
                                                      Foreground="White"
                                                      HorizontalAlignment="Center"
                                                      FontSize="20" />
                                         </Border>
                                         <Button Grid.Column="3"
                                                 Style="{StaticResource BasicBtn}"
+                                                Command="{Binding PlusRelativeMoveCommand}"
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
@@ -1815,7 +1824,8 @@
                                             </Button.Content>
                                         </Button>
                                     </Grid>
-                                    <Grid Grid.Row="3">
+                                    <Grid Grid.Row="3"
+                                          DataContext="{Binding p_SideVision.p_axisTheta.p_axis, Converter={StaticResource AjinAxisToIAxiss}}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition></ColumnDefinition>
                                             <ColumnDefinition></ColumnDefinition>
@@ -1827,6 +1837,7 @@
                                                    Text="Theta" />
                                         <Button Grid.Column="1"
                                                 Style="{StaticResource BasicBtn}"
+                                                Command="{Binding MinusRelativeMoveCommand}"
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
@@ -1841,13 +1852,14 @@
                                         <Border Grid.Column="2">
                                             <TextBox VerticalAlignment="Center"
                                                      Background="{PriorityBinding}"
-                                                     Text="111111"
+                                                     Text="{Binding p_dRelPos}"
                                                      Foreground="White"
                                                      HorizontalAlignment="Center"
                                                      FontSize="20" />
                                         </Border>
                                         <Button Grid.Column="3"
                                                 Style="{StaticResource BasicBtn}"
+                                                Command="{Binding PlusRelativeMoveCommand}"
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
