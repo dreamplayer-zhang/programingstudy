@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using static Root_Vega.GrabMode;
 
 namespace Root_Vega
 {
@@ -118,13 +118,15 @@ namespace Root_Vega
             if(p_SelGrabMode.p_sName.IndexOf("SIDE") >=0)
             {
                 m_RunSideGrab.m_grabMode = p_SelGrabMode;
-                m_RunSideGrab.m_eScanPos = p_eSelScanPos;
+                m_RunSideGrab.m_grabMode.m_eScanPos = p_eSelScanPos;
+                //m_RunSideGrab.m_eScanPos = p_eSelScanPos;
                 m_RunBevelGrab.m_grabMode = null;
             }
             else if( p_SelGrabMode.p_sName.IndexOf("BEVEL")>=0)
             {
                 m_RunBevelGrab.m_grabMode = p_SelGrabMode;
-                m_RunBevelGrab.m_eScanPos = p_eSelScanPos;
+                m_RunBevelGrab.m_grabMode.m_eScanPos = p_eSelScanPos;
+                //m_RunBevelGrab.m_eScanPos = p_eSelScanPos;
                 m_RunSideGrab.m_grabMode = null;
             }
             CloseRequested(this, new DialogCloseRequestedEventArgs(true));

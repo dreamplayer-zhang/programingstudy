@@ -23,6 +23,8 @@ namespace Root_Vega
             m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan 동작시 Y 이미지 Offset 설정");
             m_sCamera = tree.Set(m_sCamera, m_sCamera, m_cameraSet.p_asCamera, "Camera", "Select Camera", bVisible, bReadOnly);
             m_camera = m_cameraSet.Get(m_sCamera);
+            m_ScanLineNum = tree.Set(m_ScanLineNum, m_ScanLineNum, "Scan Line Number", "Scan Line Number");
+            m_ScanStartLine = tree.Set(m_ScanStartLine, m_ScanStartLine, "Scan Start Line", "Scan Start Line");
         }
 
         public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
@@ -77,8 +79,8 @@ namespace Root_Vega
         #endregion
 
         #region Memory
-        MemoryPool m_memoryPool;
-        MemoryGroup m_memoryGroup;
+        public MemoryPool m_memoryPool;
+        public MemoryGroup m_memoryGroup;
         public MemoryData m_memoryData;
         string m_sMemoryGroup = "";
         public string p_sMemoryGroup
@@ -115,12 +117,25 @@ namespace Root_Vega
         public int m_ScanStartLine = 0;
         #endregion
 
+        public enum eScanPos
+        {
+            Bottom = 0,
+            Left,
+            Top,
+            Right,
+        }
+        public eScanPos m_eScanPos = eScanPos.Bottom;
+
         public string p_id
         {
             get;
             set;
         }
-        
+        void RunTreeScanPos(Tree tree, bool bVisible, bool bReadOnly)
+        {
+            m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
+        }
+
         public string p_sName{get;set;}
         public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool)
         {
@@ -144,6 +159,7 @@ namespace Root_Vega
             RunTreeCamera(tree, bVisible, bReadOnly);
             RunTreeLight(tree.GetTree("LightPower", false), bVisible, bReadOnly);
             RunTreeMemory(tree.GetTree("Memory", false), bVisible, bReadOnly);
+            RunTreeScanPos(tree.GetTree("ScanPos", false), bVisible, bReadOnly);
         }
     }
 }
