@@ -75,9 +75,9 @@ namespace RootTools.Control
         public bool IsInPos(Enum pos, double posError = 10)
         {
             CPoint cp = GetPos(pos); 
-            double dPos = cp.X - p_axisX.p_posCommand;
+            double dPos = cp.X - p_axisX.p_posActual;
             if (Math.Abs(dPos) > posError) return false;
-            dPos = cp.Y - p_axisY.p_posCommand;
+            dPos = cp.Y - p_axisY.p_posActual;
             if (Math.Abs(dPos) > posError) return false;
             return true; 
         }
