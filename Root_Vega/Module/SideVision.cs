@@ -22,7 +22,6 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using static Root_Vega.GrabMode;
 
 namespace Root_Vega.Module
 {
@@ -979,7 +978,7 @@ namespace Root_Vega.Module
             public int m_nMaxFrame = 100;  // Camera max Frame 스펙
             public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
 
-            public eScanPos m_eScanPos = eScanPos.Bottom;
+            public GrabMode.eScanPos m_eScanPos = GrabMode.eScanPos.Bottom;
             public override ModuleRunBase Clone()
             {
                 Run_BevelGrab run = new Run_BevelGrab(m_module);

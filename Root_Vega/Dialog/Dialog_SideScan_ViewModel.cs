@@ -6,7 +6,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Root_Vega.GrabMode;
 
 namespace Root_Vega
 {
@@ -56,8 +55,8 @@ namespace Root_Vega
             }
         }
 
-        eScanPos m_eSelScanPos = eScanPos.Bottom;
-        public eScanPos p_eSelScanPos
+        GrabMode.eScanPos m_eSelScanPos = GrabMode.eScanPos.Bottom;
+        public GrabMode.eScanPos p_eSelScanPos
         {
             get
             {
