@@ -99,7 +99,7 @@ namespace Root_Vega
 					this.SearchBrightToDark = value.EdgeBox.SearchBrightToDark;
 					this.UseAutoGV = value.EdgeBox.UseAutoGV;
 
-					DrawEdgeBox(value,value. EdgeBox.UseCustomEdgeBox);
+					DrawEdgeBox(value, value.EdgeBox.UseCustomEdgeBox);
 				}
 			}
 		}
@@ -114,7 +114,7 @@ namespace Root_Vega
 			{
 				if (SelectedROI != null)
 				{
-					if(_SearchBrightToDark != value)
+					if (_SearchBrightToDark != value)
 					{
 						SetProperty(ref _SearchBrightToDark, value);
 						SelectedROI.EdgeBox.SearchBrightToDark = value;
@@ -166,6 +166,9 @@ namespace Root_Vega
 			{
 				p_SimpleShapeDrawer_List[i].Clear();
 				p_InformationDrawerList[i].Clear();
+
+				p_ImageViewer_List[i].SetRoiRect();
+				p_InformationDrawerList[i].Redrawing();
 			}
 		}
 		void DrawEdgeBox(Roi roi, bool useRecipeEdgeBox)
@@ -437,7 +440,7 @@ namespace Root_Vega
 			var tempToolset = (InspectToolSet)m_Engineer.ClassToolBox().GetToolSet("Inspect");
 			var tempInspect = tempToolset.GetInspect("SideVision.Inspect");
 
-			//여기서 그려진 모든 rect목록을 Init에 반영한다
+			//현재 화면에서 보이는 rect목록을 Init에 반영한다
 			for (int i = 0; i < 4; i++)
 			{
 				if (p_SimpleShapeDrawer_List[i] == null) continue;
@@ -458,28 +461,61 @@ namespace Root_Vega
 
 			tempInspect.UpdateRegData();
 		}
-		public void _saveRcp()
+		void _commandDeleteEdgeInfo()
 		{
+			ClearDrawList();
+		}
+		public void _saveEdgeRcp()
+		{
+			int checkCount = 0;
+			for (int i = 0; i < 4; i++)
+			{
+				checkCount += p_SimpleShapeDrawer_List[i].m_ListRect.Count;
+			}
+			if (checkCount != 24)
+			{
+				//현재 그려진 Rect를 기준으로 저장 시퀀스에 들어간다. rect 구성이 정상적이지 않으면 에러가 발생하고 저장진행을 중단한다
+				return;
+			}
+
 			if (SelectedROI == null)
 			{
 				//ERROR가 뜨면서 저장 방지
 				return;
 			}
+			//커스텀 EdgeBox 설정이 켜져있을 때만 recipe에 EdgeList를 업데이트한다
 			if (SelectedROI.EdgeBox != null && SelectedROI.EdgeBox.EdgeList != null)
 			{
-				SelectedROI.EdgeBox.EdgeList.Clear();
-			}
-			//여기서 그려진 모든 rect목록을 현재 엔지니어가 들고있는 레시피에 반영한다
-			for (int i = 0; i < 4; i++)
-			{
-				if (p_SimpleShapeDrawer_List[i] == null) continue;
-				for (int j = 0; j < 6; j++)
+				if (SelectedROI.EdgeBox.UseCustomEdgeBox)
 				{
-					if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
-					SelectedROI.EdgeBox.EdgeList.Add(new EdgeElement(i, new CRect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos)));
+					SelectedROI.EdgeBox.EdgeList.Clear();
 				}
 			}
+			if (SelectedROI.EdgeBox.UseCustomEdgeBox)
+			{
+				//여기서 그려진 모든 rect목록을 현재 엔지니어가 들고있는 레시피에 반영한다
+				for (int i = 0; i < 4; i++)
+				{
+					if (p_SimpleShapeDrawer_List[i] == null) continue;
+					for (int j = 0; j < 6; j++)
+					{
+						if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
+						SelectedROI.EdgeBox.EdgeList.Add(new EdgeElement(i, new CRect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos)));
 
+					}
+				}
+			}
+			else
+			{
+				_saveInit();
+			}
+
+			//TODO : 원하는 파라메터만 갱신해서 저장할 수 있는 기능이 있으면 좋을 것 같음!
+			var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
+			m_Engineer.m_recipe.Save(target);
+		}
+		void _commandSaveRcpParamOnly()
+		{
 			var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
 			m_Engineer.m_recipe.Save(target);
 		}
@@ -493,75 +529,75 @@ namespace Root_Vega
 
 			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
 		}
-		void _InspectComplete()
-		{
-			if (!bUsingInspection)
-			{
-				return;
-			}
-			else
-			{
-				bUsingInspection = false;
-			}
-			//VSDBManager.Commit();
+		//void _InspectComplete()
+		//{
+		//	if (!bUsingInspection)
+		//	{
+		//		return;
+		//	}
+		//	else
+		//	{
+		//		bUsingInspection = false;
+		//	}
+		//	//VSDBManager.Commit();
 
-			//여기서부터 DB Table데이터를 기준으로 tif 이미지 파일을 생성하는 구간
-			//해당 기능은 여러개의 pool을 사용하는 경우에 대해서는 테스트가 진행되지 않았습니다
-			//Concept은 검사 결과가 저장될 시점에 가지고 있던 Data Table을 저장하기 전 Image를 저장하는 형태
-			int stride = tempImageWidth / 8;
-			string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
+		//	//여기서부터 DB Table데이터를 기준으로 tif 이미지 파일을 생성하는 구간
+		//	//해당 기능은 여러개의 pool을 사용하는 경우에 대해서는 테스트가 진행되지 않았습니다
+		//	//Concept은 검사 결과가 저장될 시점에 가지고 있던 Data Table을 저장하기 전 Image를 저장하는 형태
+		//	int stride = tempImageWidth / 8;
+		//	string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
 
-			System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
+		//	System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
 
-			System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
-			System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
-			encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
+		//	System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
+		//	System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
+		//	encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
 
-			foreach (System.Data.DataRow row in VSDataDT.Rows)
-			{
-				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-				double fPosX = Convert.ToDouble(row["PosX"]);
-				double fPosY = Convert.ToDouble(row["PosY"]);
+		//	foreach (System.Data.DataRow row in VSDataDT.Rows)
+		//	{
+		//		//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+		//		double fPosX = Convert.ToDouble(row["PosX"]);
+		//		double fPosY = Convert.ToDouble(row["PosY"]);
 
-				CRect ImageSizeBlock = new CRect(
-					(int)fPosX - tempImageWidth / 2,
-					(int)fPosY - tempImageHeight / 2,
-					(int)fPosX + tempImageWidth / 2,
-					(int)fPosY + tempImageHeight / 2);
+		//		CRect ImageSizeBlock = new CRect(
+		//			(int)fPosX - tempImageWidth / 2,
+		//			(int)fPosY - tempImageHeight / 2,
+		//			(int)fPosX + tempImageWidth / 2,
+		//			(int)fPosY + tempImageHeight / 2);
 
-				int targetIdx = InspectionManager.GetInspectionTarget(Convert.ToInt32(row["DCode"])) - InspectionTarget.SideInspection - 1;
+		//		int targetIdx = InspectionManager.GetInspectionTarget(Convert.ToInt32(row["DCode"])) - InspectionTarget.SideInspection - 1;
 
-				switch (targetIdx)
-				{
-					case 0:
-						encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Top.p_ImageData.GetRectImage(ImageSizeBlock))));
-						break;
-					case 1:
-						encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Left.p_ImageData.GetRectImage(ImageSizeBlock))));
-						break;
-					case 2:
-						encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Right.p_ImageData.GetRectImage(ImageSizeBlock))));
-						break;
-					case 3:
-						encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Bottom.p_ImageData.GetRectImage(ImageSizeBlock))));
-						break;
-				}
-			}
-			if (VSDataDT.Rows.Count > 0)
-			{
-				encoder.Save(stream);
-			}
-			stream.Dispose();
-			//이미지 저장 완료
+		//		switch (targetIdx)
+		//		{
+		//			case 0:
+		//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Top.p_ImageData.GetRectImage(ImageSizeBlock))));
+		//				break;
+		//			case 1:
+		//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Left.p_ImageData.GetRectImage(ImageSizeBlock))));
+		//				break;
+		//			case 2:
+		//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Right.p_ImageData.GetRectImage(ImageSizeBlock))));
+		//				break;
+		//			case 3:
+		//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Bottom.p_ImageData.GetRectImage(ImageSizeBlock))));
+		//				break;
+		//		}
+		//	}
+		//	if (VSDataDT.Rows.Count > 0)
+		//	{
+		//		encoder.Save(stream);
+		//	}
+		//	stream.Dispose();
+		//	//이미지 저장 완료
 
-			//Data Table 저장 시작
-			VSDBManager.SetDataTable(VSDataInfoDT);
-			VSDBManager.SetDataTable(VSDataDT);
-			VSDBManager.Disconnect();
-			//Data Table 저장 완료
-			m_Engineer.m_InspManager.Dispose();
-			VSDataDT.Clear();
-		}
+		//	//Data Table 저장 시작
+		//	VSDBManager.SetDataTable(VSDataInfoDT);
+		//	VSDBManager.SetDataTable(VSDataDT);
+		//	VSDBManager.Disconnect();
+		//	//Data Table 저장 완료
+		//	m_Engineer.m_InspManager.Dispose();
+		//	VSDataDT.Clear();
+		//}
 		void searchArea()
 		{
 			// variable
@@ -1060,25 +1096,25 @@ namespace Root_Vega
 				return new RelayCommand(searchArea);
 			}
 		}
-		public RelayCommand CommandInspectComplete
+		public RelayCommand CommandSaveRcpParamOnly
 		{
 			get
 			{
-				return new RelayCommand(_InspectComplete);
+				return new RelayCommand(_commandSaveRcpParamOnly);
+			}
+		}
+		public RelayCommand CommandDeleteEdgeInfo
+		{
+			get
+			{
+				return new RelayCommand(_commandDeleteEdgeInfo);
 			}
 		}
 		public RelayCommand CommandSave
 		{
 			get
 			{
-				return new RelayCommand(_saveRcp);
-			}
-		}
-		public RelayCommand CommandInitSave
-		{
-			get
-			{
-				return new RelayCommand(_saveInit);
+				return new RelayCommand(_saveEdgeRcp);
 			}
 		}
 		public RelayCommand CommandAddRoi

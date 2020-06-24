@@ -245,6 +245,18 @@
                                 Content="Search Edge Area"
                                 Command="{Binding CommandSearch}"/>
 					</Grid>
+					<Grid Height="50" Margin="10,5,10,5">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Save Edge"
+                                Command="{Binding CommandSave}"/>
+					</Grid>
+					<Grid Height="50" Margin="10,5,10,5">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Delete Current Edge"
+                                Command="{Binding CommandDeleteEdgeInfo}"/>
+					</Grid>
 					<!--<Grid Height="50" Margin="10,5,10,5">
 						<Button Grid.Column="0"
                                 Style="{StaticResource BasicBtn}"
@@ -274,14 +286,8 @@
 					<Grid Height="50" Margin="10,5,10,5">
 						<Button Grid.Column="0"
                                 Style="{StaticResource BasicBtn}"
-                                Content="Save Edge to Recipe"
-                                Command="{Binding CommandSave}"/>
-					</Grid>
-					<Grid Height="50" Margin="10,5,10,5">
-						<Button Grid.Column="0"
-                                Style="{StaticResource BasicBtn}"
-                                Content="Save Edge to Init"
-                                Command="{Binding CommandInitSave}"/>
+                                Content="Save Recipe Parameter"
+                                Command="{Binding CommandSaveRcpParamOnly}"/>
 					</Grid>
 				</StackPanel>
             </GroupBox>
