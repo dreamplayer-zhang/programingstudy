@@ -38,9 +38,9 @@ namespace RootTools.Control
             return Convert.ToInt32(p_axis.GetPos(pos.ToString()));
         }
 
-        public bool IsInPos(Enum pos, double posError = 10)
+        public bool IsInPos(Enum pos, double posError = 20)
         {
-            double dPos = GetPos(pos) - p_axis.p_posCommand;
+            double dPos = GetPos(pos) - p_axis.p_posActual;
             return Math.Abs(dPos) <= posError; 
         }
         #endregion

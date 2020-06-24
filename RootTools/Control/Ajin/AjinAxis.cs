@@ -662,6 +662,7 @@ namespace RootTools.Control.Ajin
                 if (AXM("AxmSignalWriteOutputBit", CAXM.AxmSignalWriteOutputBit(p_nAxisID, m_nBrakeSignalBit, uOn)) != 0) return;
             }
             if (bOn == false) p_eState = Axis.eState.Init;
+            else p_eState = Axis.eState.Ready;
         }
         #endregion
 
@@ -942,9 +943,9 @@ namespace RootTools.Control.Ajin
             if (CheckSWLimit(vJog))
                 return p_sID + " Check Software Limit";
             if (secAcc < 0)
-                secAcc = 0.1;
+                secAcc = 1;
             if (secDec < 0)
-                secDec = 0.1;// GetAcc(eAcc.MoveAcc);
+                secDec = 1;
             if (AXM("AxmMoveVel", CAXM.AxmMoveVel(p_nAxisID, vJog, secAcc, secDec)) != 0){
                 p_eState = Axis.eState.Init;
                 return p_sID + " Axis Jog Start Error";
@@ -1116,7 +1117,7 @@ namespace RootTools.Control.Ajin
             Thread.Sleep(2000); 
             while (m_bThread)
             {
-                Thread.Sleep(1);
+                Thread.Sleep(100);
                 switch (p_eState)
                 {
                     case Axis.eState.Home:

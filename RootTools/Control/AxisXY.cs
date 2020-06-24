@@ -72,12 +72,12 @@ namespace RootTools.Control
             return cp;
         }
 
-        public bool IsInPos(Enum pos, double posError = 10)
+        public bool IsInPos(Enum pos, double posError = 20)
         {
-            CPoint cp = GetPos(pos); 
-            double dPos = cp.X - p_axisX.p_posCommand;
+            CPoint cp = GetPos(pos);
+            double dPos = cp.X - p_axisX.p_posActual;
             if (Math.Abs(dPos) > posError) return false;
-            dPos = cp.Y - p_axisY.p_posCommand;
+            dPos = cp.Y - p_axisY.p_posActual;
             if (Math.Abs(dPos) > posError) return false;
             return true; 
         }
@@ -102,6 +102,7 @@ namespace RootTools.Control
         {
             if (p_axisX == null) return "AxisX == null";
             if (p_axisY == null) return "AxisY == null";
+            m_cpDst = new CPoint(rpPos);
             string xInfo = p_axisX.Move(rpPos.X, vMove, secAcc, secDec);
             string yInfo = p_axisY.Move(rpPos.Y, vMove, secAcc, secDec);
             if (xInfo != "OK") return "AxisMove X Error : " + xInfo;
