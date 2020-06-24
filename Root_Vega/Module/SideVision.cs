@@ -70,7 +70,32 @@ namespace Root_Vega.Module
             }
         }
 
+        #region Light
         public LightSet m_lightSet;
+        public int GetLightByName(string str)
+        {
+            for (int i = 0; i < m_lightSet.m_aLight.Count; i++)
+            {
+                if (m_lightSet.m_aLight[i].m_sName.IndexOf(str) >= 0)
+                {
+                    return Convert.ToInt32(m_lightSet.m_aLight[i].p_fPower);
+                }
+            }
+            return 0;
+        }
+
+        public void SetLightByName(string str, int nValue)
+        {
+            for (int i = 0; i < m_lightSet.m_aLight.Count; i++)
+            {
+                if (m_lightSet.m_aLight[i].m_sName.IndexOf(str) >= 0)
+                {
+                    m_lightSet.m_aLight[i].m_light.p_fSetPower = nValue;
+                }
+            }
+        }
+        #endregion
+
         MemoryPool m_memoryPool;
         InspectTool m_inspectTool;
         Camera_Dalsa m_CamSide;
@@ -320,8 +345,8 @@ namespace Root_Vega.Module
 
             // Align 조명 켜기
             string strLightName = "SideVRS Side";
-            int nRetValue = GetGrabMode("Side").GetLightByName(strLightName);
-            GetGrabMode("Side").SetLightByName(strLightName, nRetValue);
+            int nLightPower = GetLightByName(strLightName);
+            SetLightByName(strLightName, nLightPower);
 
             // 레티클 유무체크
             m_CamAlign1.Grab();
@@ -332,7 +357,7 @@ namespace Root_Vega.Module
             if (bRet == false) return "Reticle Not Exist";
 
             // Align 조명 끄기
-            GetGrabMode("Side").SetLight(false);
+            SetLightByName(strLightName, 0);
 
             // 모든 축 Ready 위치로 이동
             if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Safety))) return p_sInfo;
@@ -378,8 +403,8 @@ namespace Root_Vega.Module
 
             // Align 조명 켜기
             string strLightName = "SideVRS Side";
-            int nRetValue = GetGrabMode("Side").GetLightByName(strLightName);
-            GetGrabMode("Side").SetLightByName(strLightName, nRetValue);
+            int nLightPower = GetLightByName(strLightName);
+            SetLightByName(strLightName, nLightPower);
 
             // 레티클 유무체크
             m_CamAlign1.Grab();
@@ -390,7 +415,7 @@ namespace Root_Vega.Module
             if (bRet == true) return "Reticle Exist";
 
             // Align 조명 끄기
-            GetGrabMode("Side").SetLightByName(strLightName, 0);
+            SetLightByName(strLightName, 0);
 
             // 모든 축 Ready 위치로 이동
             if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Safety))) return p_sInfo;

@@ -253,6 +253,19 @@ namespace Root_Vega
             }
         }
 
+        public void Test()
+        {
+            p_PatternVision.BeforeGet();
+            p_PatternVision.BeforePut();
+        }
+
+        public RelayCommand CommandTest
+        {
+            get
+            {
+                return new RelayCommand(Test);
+            }
+        }
 
         public RelayCommand CommandScan
         {
