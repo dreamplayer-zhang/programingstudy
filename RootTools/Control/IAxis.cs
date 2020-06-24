@@ -16,6 +16,9 @@ namespace RootTools.Control
             get;
             set;
         }
+        bool p_sensorHome { get; set; }
+        bool p_sensorLimitM { get; set; }
+        bool p_sensorLimitP { get; set; }
 
         void ServoOn(bool bOn, bool bAbsoluteEncoder = false);
 

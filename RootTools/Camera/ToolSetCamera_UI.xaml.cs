@@ -27,6 +27,7 @@ namespace RootTools.Camera
             InitTabControl();
         }
 
+        List<string> m_asCamera = new List<string>();
         void InitTabControl()
         {
             tabControl.Items.Clear();
@@ -41,10 +42,10 @@ namespace RootTools.Camera
                 tabControl.Items.Add(tabItem);
                 m_asCamera.Add(camera.p_id); 
             }
-            comboCamera.ItemsSource = m_asCamera; 
+            comboCamera.ItemsSource = m_asCamera;
+            comboCamera.SelectedIndex = 0; 
         }
 
-        List<string> m_asCamera = new List<string>();
         private void comboCamera_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (comboCamera.SelectedIndex < 0) return; 

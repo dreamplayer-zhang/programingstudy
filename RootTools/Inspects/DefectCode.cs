@@ -20,8 +20,8 @@ namespace RootTools.Inspects
 		SideInspection = 9,
 		SideInspectionTop = 10,
 		SideInspectionLeft = 11,
-		SideInspectionBottom = 12,
-		SideInspectionRight = 13,
+		SideInspectionRight = 12,
+		SideInspectionBottom = 13,
 	}
 	public enum InspectionType
 	{

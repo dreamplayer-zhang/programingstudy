@@ -1,4 +1,5 @@
 ﻿using ATI;
+using Emgu.CV;
 using Root_Vega.Module;
 using RootTools;
 using RootTools.Inspects;
@@ -6,6 +7,7 @@ using RootTools.Memory;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +27,11 @@ namespace Root_Vega
 		enum eBrightSide { LEFT, TOP, RIGHT, BOTTOM };
 
 		bool m_bUseB2D = true;
+		bool bUsingInspection;
+
+		int tempImageWidth = 640;
+		int tempImageHeight = 480;
+
 		public bool p_bUseB2D
 		{
 			get { return m_bUseB2D; }
@@ -84,38 +91,167 @@ namespace Root_Vega
 			get { return _SelectedROI; }
 			set
 			{
+				SetProperty(ref _SelectedROI, value);
+
 				if (value != null)
 				{
-					for (int i = 0; i < 4; i++)
+					this.UseCustomEdgeBox = value.EdgeBox.UseCustomEdgeBox;
+					this.SearchBrightToDark = value.EdgeBox.SearchBrightToDark;
+					this.UseAutoGV = value.EdgeBox.UseAutoGV;
+
+					if(this.UseCustomEdgeBox)
 					{
-						if (p_SimpleShapeDrawer_List[i] == null) continue;
-						p_SimpleShapeDrawer_List[i].m_ListRect.Clear();
-						var targetList = value.EdgeBox.EdgeList.Where(x => x.SavePoint == i).ToList();
-						foreach (EdgeElement item in targetList)
+						//Recipe에서 불러온다
+						for (int i = 0; i < 4; i++)
 						{
-							var temp = new UIElementInfo(new Point(item.Rect.Left, item.Rect.Top), new Point(item.Rect.Right, item.Rect.Bottom));
+							if (p_SimpleShapeDrawer_List[i] == null) continue;
+							p_SimpleShapeDrawer_List[i].m_ListRect.Clear();
+							var targetList = value.EdgeBox.EdgeList.Where(x => x.SavePoint == i).ToList();
+							foreach (EdgeElement item in targetList)
+							{
+								var temp = new UIElementInfo(new Point(item.Rect.Left, item.Rect.Top), new Point(item.Rect.Right, item.Rect.Bottom));
 
-							System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-							rect.Width = item.Rect.Width;
-							rect.Height = item.Rect.Height;
-							System.Windows.Controls.Canvas.SetLeft(rect, item.Rect.Left);
-							System.Windows.Controls.Canvas.SetTop(rect, item.Rect.Top);
-							rect.StrokeThickness = 2;
-							rect.Stroke = MBrushes.Red;
+								System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+								rect.Width = item.Rect.Width;
+								rect.Height = item.Rect.Height;
+								System.Windows.Controls.Canvas.SetLeft(rect, item.Rect.Left);
+								System.Windows.Controls.Canvas.SetTop(rect, item.Rect.Top);
+								rect.StrokeThickness = 2;
+								rect.Stroke = MBrushes.Red;
 
-							p_SimpleShapeDrawer_List[i].m_ListShape.Add(rect);
-							p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
-							p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
+								p_SimpleShapeDrawer_List[i].m_ListShape.Add(rect);
+								p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
+								p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
+							}
+							p_ImageViewer_List[i].SetRoiRect();
 						}
-						p_ImageViewer_List[i].SetRoiRect();
+					}
+					else
+					{
+						//Init에서 불러온다
+						m_Engineer.ClassToolBox().GetToolSet("VegaSideVisionEdge");
 					}
 				}
-
-				SetProperty(ref _SelectedROI, value);
 			}
 		}
 		#endregion
 
+		#region SearchBrightToDark
+		private bool _SearchBrightToDark;
+		public bool SearchBrightToDark
+		{
+			get { return this._SearchBrightToDark; }
+			set
+			{
+				if (SelectedROI != null)
+				{
+					SetProperty(ref _SearchBrightToDark, value);
+					SelectedROI.EdgeBox.SearchBrightToDark = value;
+				}
+			}
+		}
+		#endregion
+
+		#region UseCustomEdgeBox
+		private bool _UseCustomEdgeBox;
+		public bool UseCustomEdgeBox
+		{
+			get { return this._UseCustomEdgeBox; }
+			set
+			{
+				if (SelectedROI != null)
+				{
+					SetProperty(ref _UseCustomEdgeBox, value);
+					SelectedROI.EdgeBox.UseCustomEdgeBox = value;
+				}
+			}
+		}
+		#endregion
+
+		#region UseAutoGV
+		private bool _UseAutoGV;
+		public bool UseAutoGV
+		{
+			get { return this._UseAutoGV; }
+			set
+			{
+				if (SelectedROI != null)
+				{
+					SetProperty(ref _UseAutoGV, value);
+					SelectedROI.EdgeBox.UseAutoGV = value;
+				}
+			}
+		}
+		#endregion
+
+
+		private List<InformationDrawer> informationDrawerList;
+		public List<InformationDrawer> p_InformationDrawerList
+		{
+			get
+			{
+				return informationDrawerList;
+			}
+			set
+			{
+				SetProperty(ref informationDrawerList, value);
+			}
+		}
+		/// <summary>
+		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
+		/// </summary>
+		/// <param name="source">UI에 추가할 Defect List</param>
+		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
+		private void M_InspManager_AddDefect(DefectDataWrapper item)
+		{
+			if (InspectionManager.GetInspectionType(item.nClassifyCode) != InspectionType.AbsoluteSurface && InspectionManager.GetInspectionType(item.nClassifyCode) != InspectionType.RelativeSurface)
+			{
+				return;
+			}
+			//string tempInspDir = @"C:\vsdb\TEMP_IMAGE";
+			lock(VSDataDT)
+			{
+				System.Data.DataRow dataRow = VSDataDT.NewRow();
+
+				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+
+				dataRow["No"] = currentDefectIdx;
+				currentDefectIdx++;
+				dataRow["DCode"] = item.nClassifyCode;
+				dataRow["AreaSize"] = item.fAreaSize;
+				dataRow["Length"] = item.nLength;
+				dataRow["Width"] = item.nWidth;
+				dataRow["Height"] = item.nHeight;
+				//dataRow["FOV"] = item.FOV;
+				dataRow["PosX"] = item.fPosX;
+				dataRow["PosY"] = item.fPosY;
+
+				VSDataDT.Rows.Add(dataRow);
+				_dispatcher.Invoke(new Action(delegate ()
+				{
+					int targetIdx = InspectionManager.GetInspectionTarget(item.nClassifyCode) - InspectionTarget.SideInspection - 1;
+					//System.Diagnostics.Debug.WriteLine(string.Format("GetInspectionTarget() - targetIdx : {0}", targetIdx));
+
+					p_InformationDrawerList[targetIdx].AddDefectInfo(item);
+
+					switch (targetIdx)
+					{
+						case 0:
+							p_ImageViewer_Top.RedrawingElement();
+							break;
+						case 1:
+							p_ImageViewer_Left.RedrawingElement();
+							break;
+						case 2:
+							p_ImageViewer_Right.RedrawingElement();
+							break;
+						case 3:
+							p_ImageViewer_Bottom.RedrawingElement();
+							break;
+					}
+				}));
+			}
+		}
 
 		public _2_7_EdgeBoxViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
@@ -123,8 +259,26 @@ namespace Root_Vega
 			m_Engineer = engineer;
 			m_DialogService = (DialogService)dialogService;
 			Init(dialogService);
+
+			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
+			bUsingInspection = false;
 		}
 
+		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
+		{
+			var bitmapData = bitmap.LockBits(
+				new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+				System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+			var bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
+				bitmapData.Width, bitmapData.Height,
+				bitmap.HorizontalResolution, bitmap.VerticalResolution,
+				System.Windows.Media.PixelFormats.Gray8, null,
+				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+
+			bitmap.UnlockBits(bitmapData);
+			return bitmapSource;
+		}
 		void Init(IDialogService dialogService)
 		{
 			m_MemoryModule = m_Engineer.ClassMemoryTool();
@@ -132,7 +286,7 @@ namespace Root_Vega
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					p_ImageViewer_List.Add(new ImageViewer_ViewModel(new ImageData(m_MemoryModule.GetMemory("SideVision.Memory", "SideVision", m_astrMem[i])), dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
+					p_ImageViewer_List.Add(new ImageViewer_ViewModel(new ImageData(m_MemoryModule.GetMemory("SideVision.Memory", "Side", m_astrMem[i])), dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
 					m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
 				}
 
@@ -152,11 +306,20 @@ namespace Root_Vega
 				p_ImageViewer_Left = p_ImageViewer_List[1];
 				p_ImageViewer_Right = p_ImageViewer_List[2];
 				p_ImageViewer_Bottom = p_ImageViewer_List[3];
+
+
+				p_InformationDrawerList = new List<InformationDrawer>();
+				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Top));
+				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Left));
+				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Right));
+				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Bottom));
+				//p_InformationDrawer[0] = new InformationDrawer(p_ImageViewer);
 			}
 			m_Engineer.m_recipe.LoadComplete += () =>
 			{
 				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
 			};
+
 
 			return;
 		}
@@ -232,6 +395,20 @@ namespace Root_Vega
 				SetProperty(ref m_ImageViewer_Bottom, value);
 			}
 		}
+		private void _saveInit()
+		{
+			//여기서 그려진 모든 rect목록을 Init에 반영한다
+			for (int i = 0; i < 4; i++)
+			{
+				if (p_SimpleShapeDrawer_List[i] == null) continue;
+				for (int j = 0; j < 6; j++)
+				{
+					if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
+					//SelectedROI.EdgeBox.EdgeList.Add();
+					var temp = new EdgeElement(i, new CRect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos));
+				}
+			}
+		}
 		public void _saveRcp()
 		{
 			if (SelectedROI == null)
@@ -263,7 +440,75 @@ namespace Root_Vega
 
 			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
 		}
+		void _InspectComplete()
+		{
+			if (!bUsingInspection)
+			{
+				return;
+			}
+			else
+			{
+				bUsingInspection = false;
+			}
+			//VSDBManager.Commit();
 
+			//여기서부터 DB Table데이터를 기준으로 tif 이미지 파일을 생성하는 구간
+			//해당 기능은 여러개의 pool을 사용하는 경우에 대해서는 테스트가 진행되지 않았습니다
+			//Concept은 검사 결과가 저장될 시점에 가지고 있던 Data Table을 저장하기 전 Image를 저장하는 형태
+			int stride = tempImageWidth / 8;
+			 string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
+
+			 System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
+
+			 System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
+			 System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
+			 encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
+
+			 foreach (System.Data.DataRow row in VSDataDT.Rows)
+			 {
+				 //Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+				 double fPosX = Convert.ToDouble(row["PosX"]);
+				 double fPosY = Convert.ToDouble(row["PosY"]);
+
+				 CRect ImageSizeBlock = new CRect(
+					 (int)fPosX - tempImageWidth / 2,
+					 (int)fPosY - tempImageHeight / 2,
+					 (int)fPosX + tempImageWidth / 2,
+					 (int)fPosY + tempImageHeight / 2);
+
+				 int targetIdx = InspectionManager.GetInspectionTarget(Convert.ToInt32(row["DCode"])) - InspectionTarget.SideInspection - 1;
+
+				 switch (targetIdx)
+				 {
+					 case 0:
+						 encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Top.p_ImageData.GetRectImage(ImageSizeBlock))));
+						 break;
+					 case 1:
+						 encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Left.p_ImageData.GetRectImage(ImageSizeBlock))));
+						 break;
+					 case 2:
+						 encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Right.p_ImageData.GetRectImage(ImageSizeBlock))));
+						 break;
+					 case 3:
+						 encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Bottom.p_ImageData.GetRectImage(ImageSizeBlock))));
+						 break;
+				 }
+			 }
+			 if (VSDataDT.Rows.Count > 0)
+			 {
+				 encoder.Save(stream);
+			 }
+			 stream.Dispose();
+			 //이미지 저장 완료
+
+			 //Data Table 저장 시작
+			 VSDBManager.SetDataTable(VSDataInfoDT);
+			 VSDBManager.SetDataTable(VSDataDT);
+			 VSDBManager.Disconnect();
+			 //Data Table 저장 완료
+			 m_Engineer.m_InspManager.Dispose();
+			 VSDataDT.Clear();
+		}
 		void Inspect()
 		{
 			// variable
@@ -273,6 +518,33 @@ namespace Root_Vega
 			eEdgeFindDirection eTempDirection = eEdgeFindDirection.TOP;
 			DPoint ptLeft1, ptLeft2, ptBottom, ptRight1, ptRight2, ptTop;
 			DPoint ptLT, ptRT, ptLB, ptRB;
+			System.Diagnostics.Debug.WriteLine("Start Insp");
+			bUsingInspection = true;
+
+			inspDefaultDir = @"C:\vsdb";
+			if (!System.IO.Directory.Exists(inspDefaultDir))
+			{
+				System.IO.Directory.CreateDirectory(inspDefaultDir);
+			}
+			inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+			var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
+			string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
+
+			if (VSDBManager != null && VSDBManager.IsConnected)
+			{
+				VSDBManager.Disconnect();
+			}
+			VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+
+			if (VSDBManager.Connect())
+			{
+				VSDBManager.CreateTable("Datainfo");
+				VSDBManager.CreateTable("Data");
+
+				VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
+				VSDataDT = VSDBManager.GetDataTable("Data");
+			}
+			m_Engineer.m_InspManager.ClearInspection();
 
 			// implement
 			for (int i = 0; i < 4; i++)
@@ -338,40 +610,16 @@ namespace Root_Vega
 				ptRB = new DPoint(ptRight2.X, ptBottom.Y);
 				ptRT = new DPoint(ptRight1.X, ptTop.Y);
 
-				if (false)//Merge를 위한 동작 방지 코드
+				if (true)//Merge를 위한 동작 방지 코드
 				{
 					//TODO : 여기서 생성되는 사각형 정보를 engineer한테 넘겨서 검사를 진행할 수 있도록 만들어야 함
-					m_Engineer.m_InspManager.ClearInspection();
 
 					CRect inspArea = new CRect(ptLT.X, ptLT.Y, ptRB.X, ptRB.Y);
 					List<CRect> DrawRectList = new List<CRect>();
 
-
-					System.Diagnostics.Debug.WriteLine("Start Insp");
-
-					inspDefaultDir = @"C:\vsdb";
-					if (!System.IO.Directory.Exists(inspDefaultDir))
-					{
-						System.IO.Directory.CreateDirectory(inspDefaultDir);
-					}
-					inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
-					var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
-					string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
-
-					if (VSDBManager != null && VSDBManager.IsConnected)
-					{
-						VSDBManager.Disconnect();
-					}
-					VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
-
-					if (VSDBManager.Connect())
-					{
-						VSDBManager.CreateTable("Datainfo");
-						VSDBManager.CreateTable("Data");
-
-						VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
-						VSDataDT = VSDBManager.GetDataTable("Data");
-					}
+					//TODO : 일단 테스트로 강제로 서페이스 검사 파라메터를 생성한다. 추후 설정창 필요함!
+					SurfaceParamData paramTemp = new SurfaceParamData();
+					SelectedROI.Surface.ParameterList.Add(paramTemp);
 
 					foreach (var param in SelectedROI.Surface.ParameterList)
 					{
@@ -381,11 +629,12 @@ namespace Root_Vega
 						{
 							type = InspectionType.RelativeSurface;
 						}
-						//TODO Image 메모리 영역을 참조하는 부분이 보이지 않음. 하드코딩 되어있을 가능성이 높음
-						DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea(inspArea, 500, param, type, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
+						int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(10 + i), type, 0);
 
-						int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspection + 1 + i, type, 0);
-						m_Engineer.m_InspManager.StartInspection(nDefectCode, p_ImageViewer_List[i].p_ImageData.p_Size.X, p_ImageViewer_List[i].p_ImageData.p_Size.Y);
+						DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).GetMBOffset(),
+							m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.X,
+							m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.Y,
+							inspArea, 500, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
 					}
 				}
 
@@ -403,6 +652,7 @@ namespace Root_Vega
 
 				p_ImageViewer_List[i].SetRoiRect();
 			}
+			m_Engineer.m_InspManager.StartInspection();
 		}
 		void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor, int nTLRB)
 		{
@@ -756,8 +1006,12 @@ namespace Root_Vega
 			{
 				return new RelayCommand(Inspect);
 			}
-			set
+		}
+		public RelayCommand CommandInspectComplete
+		{
+			get
 			{
+				return new RelayCommand(_InspectComplete);
 			}
 		}
 		public RelayCommand CommandSave
@@ -765,6 +1019,13 @@ namespace Root_Vega
 			get
 			{
 				return new RelayCommand(_saveRcp);
+			}
+		}
+		public RelayCommand CommandInitSave
+		{
+			get
+			{
+				return new RelayCommand(_saveInit);
 			}
 		}
 		public RelayCommand CommandAddRoi

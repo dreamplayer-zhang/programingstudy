@@ -131,18 +131,6 @@ namespace RootTools.ToolBoxs
         }
         #endregion
 
-        #region ITool MemoryViewer
-        public string Get(ref MemoryViewer value, ModuleBase module, string id)
-        {
-            if (value == null)
-            {
-                value = new MemoryViewer(module.p_id + "." + id, m_memoryTool, module.m_log);
-                module.m_aTool.Add(value);
-            }
-            return "OK";
-        }
-        #endregion
-
         #region ITool Inspect
         InspectToolSet m_inspectToolSet = null; 
         InspectToolSet_UI m_inspectToolSetUI = null;

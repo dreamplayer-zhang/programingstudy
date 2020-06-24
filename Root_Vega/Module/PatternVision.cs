@@ -59,6 +59,7 @@ namespace Root_Vega.Module
 
         public LightSet m_lightSet;
         MemoryPool m_memoryPool;
+        MemoryData m_memoryMain;
         InspectTool m_inspectTool;
         ZoomLens m_ZoomLens;
         public ZoomLens p_ZoomLens;
@@ -87,6 +88,7 @@ namespace Root_Vega.Module
         public override void InitMemorys()
         {
             //forget
+            m_memoryMain = m_memoryPool.GetGroup("PatternVision").CreateMemory("Main", 1, 1, 1000, 1000);
         }
         #endregion
 
@@ -473,6 +475,70 @@ namespace Root_Vega.Module
         }
         #endregion
 
+        #region RelayCommand
+        void Jog_Plus_Fast()
+        {
+            if (p_axisClamp.p_axis.p_sensorHome == false) return;
+            ((AjinAxis)p_axisXY.p_axisY).Jog_Plus_Fast();
+        }
+        void Jog_Minus_Fast()
+        {
+            if (p_axisClamp.p_axis.p_sensorHome == false) return;
+            ((AjinAxis)p_axisXY.p_axisY).Jog_Minus_Fast();
+        }
+        void MovePosition()
+        {
+            if (p_axisClamp.p_axis.p_sensorHome == false) return;
+            ((AjinAxis)p_axisXY.p_axisY).MovePosition();
+        }
+        void PlusRelativeMove()
+        {
+            if (p_axisClamp.p_axis.p_sensorHome == false) return;
+            ((AjinAxis)p_axisXY.p_axisY).PlusRelativeMove();
+        }
+        void MinusRelativeMove()
+        {
+            if (p_axisClamp.p_axis.p_sensorHome == false) return;
+            ((AjinAxis)p_axisXY.p_axisY).MinusRelativeMove();
+        }
+
+        public RelayCommand PJogFastCommand
+        {
+            get
+            {
+                return new RelayCommand(Jog_Plus_Fast);
+            }
+        }
+        public RelayCommand MJogFastCommand
+        {
+            get
+            {
+                return new RelayCommand(Jog_Minus_Fast);
+            }
+        }
+        public RelayCommand MoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MovePosition);
+            }
+        }
+        public RelayCommand PlusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(PlusRelativeMove);
+            }
+        }
+        public RelayCommand MinusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MinusRelativeMove);
+            }
+        }
+        #endregion
+
         public PatternVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
@@ -681,10 +747,9 @@ namespace Root_Vega.Module
                         double yTrigger1 = m_rpAxis.Y + yAxis / 2;
                         m_module.p_axisXY.p_axisY.SetTrigger(yTrigger0 - 100000, yTrigger1, m_grabMode.m_dTrigger, true);
 
-                        /* 메모리 위치도 가져오게는 좀 다시 하자.*/
-                        string sPool = "pool";
-                        string sGroup = "group";
-                        string sMem = "mem";
+                        string sPool = m_grabMode.m_memoryPool.p_id;
+                        string sGroup = m_grabMode.m_memoryGroup.p_id;
+                        string sMem = m_grabMode.m_memoryData.p_id;
                         MemoryData mem = m_module.m_engineer.GetMemory(sPool, sGroup, sMem);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
 

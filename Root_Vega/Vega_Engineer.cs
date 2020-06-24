@@ -7,6 +7,8 @@ using RootTools.Inspects;
 using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
+using System.Windows.Media.Animation;
+using System;
 
 namespace Root_Vega
 {
@@ -35,10 +37,10 @@ namespace Root_Vega
             MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool, false);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
         }
-        #endregion
+		#endregion
 
-        #region Ajin
-        public Ajin m_ajin = new Ajin();
+		#region Ajin
+		public Ajin m_ajin = new Ajin();
         Ajin_UI m_ajinUI = new Ajin_UI();
         void InitAjin()
         {

@@ -442,10 +442,12 @@ namespace RootTools.Inspects
 			EdgeList = new List<EdgeElement>();
 			UseAutoGV = true;
 			SearchBrightToDark = true;
+			UseCustomEdgeBox = false;
 		}
 		public List<EdgeElement> EdgeList;
 		public bool UseAutoGV;
 		public bool SearchBrightToDark;
+		public bool UseCustomEdgeBox;
 	}
 	public class EdgeElement
 	{
