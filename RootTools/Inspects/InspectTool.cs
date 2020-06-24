@@ -140,10 +140,10 @@ namespace RootTools.Inspects
 		string m_sProcessFile = "";
 
 		#region Vision Parameter
-		int[] nTopLeftXLIst;
-		int[] nTopLeftYLIst;
-		int[] nWidthLIst;
-		int[] nHeighLIst;
+		public int[] nTopLeftXLIst = new int[24];
+		public int[] nTopLeftYLIst = new int[24];
+		public int[] nWidthLIst = new int[24];
+		public int[] nHeighLIst = new int[24];
 		#endregion
 
 		void RunProcessTree(Tree tree, bool bVisible)
@@ -152,10 +152,26 @@ namespace RootTools.Inspects
 			m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "Inspect Process ID", bVisible && m_bStartProcess);
 			m_sProcessFile = tree.SetFile(m_sProcessFile, m_sProcessFile, "exe", "File", "Process File Name", bVisible && m_bStartProcess);
 		}
-		void RunCommonParamTree(Tree tree, bool bVisible)
+		public void RunCommonParamTree(Tree tree, bool bVisible)
 		{
-			//test3 = tree.GetTree("TreeParamTest").GetTree("TreeParamTest2").Set(test3, test3, "TreeParamTest3", "for test", bVisible);
+			string[] direction = new string[] { "Top", "Left", "Right", "Bottom" };
+			string[] ordinalNumber = new string[] { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
+			int settingCount = 0;
+
+			for (int i = 0; i < 4; i++)
+			{
+				for (int j = 0; j < 6; j++)
+				{
+					nTopLeftXLIst[settingCount] = tree.GetTree(direction[i]).GetTree(ordinalNumber[j]).Set(nTopLeftXLIst[settingCount], nTopLeftXLIst[settingCount], "LeftTopX", "Side EdgeBox's Left-Top X Point", bVisible);
+					nTopLeftYLIst[settingCount] = tree.GetTree(direction[i]).GetTree(ordinalNumber[j]).Set(nTopLeftYLIst[settingCount], nTopLeftYLIst[settingCount], "LeftTopY", "Side EdgeBox's Left-Top Y Point", bVisible);
+					nWidthLIst[settingCount] = tree.GetTree(direction[i]).GetTree(ordinalNumber[j]).Set(nWidthLIst[settingCount], nWidthLIst[settingCount], "RectWidth", "Side EdgeBox's Width Size", bVisible);
+					nHeighLIst[settingCount] = tree.GetTree(direction[i]).GetTree(ordinalNumber[j]).Set(nHeighLIst[settingCount], nHeighLIst[settingCount], "RectHeight", "Side EdgeBox's Height Size", bVisible);
+					settingCount++;
+				}
+			}
 		}
+
+
 		#endregion
 
 		#region Tree
@@ -164,15 +180,19 @@ namespace RootTools.Inspects
 			RunTree(Tree.eMode.Update);
 			RunTree(Tree.eMode.RegWrite);
 		}
+		/// <summary>
+		/// 현재 클래스에 저장된 Parameter들을 Registry에 Update한다
+		/// </summary>
+		public void UpdateRegData()
+		{
+			RunTree(Tree.eMode.Init);
+			RunTree(Tree.eMode.RegWrite);
+		}
 
 		public void RunTree(Tree.eMode mode)
 		{
 			m_treeRoot.p_eMode = mode;
-			//            RunRunTree(m_tree.GetTree("Run"));
-			//            foreach (KeyValuePair<eRun, IRun> kv in m_dicRun)
-			//            {
-			//                kv.Value.RunTree(m_treeRoot.GetTree(kv.Key.ToString()), kv.Key == p_eRun);
-			//            }
+
 			bool bVisible = (m_engineer.p_user.m_eLevel >= Login.eLevel.Admin);
 			RunProcessTree(m_treeRoot.GetTree("Process", false), bVisible);
 			RunCommonParamTree(m_treeRoot.GetTree("CommonParameter", false), bVisible);
