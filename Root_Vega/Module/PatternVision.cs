@@ -280,8 +280,8 @@ namespace Root_Vega.Module
             SetLightByName(strLightName, nLightPower);
 
             // 레티클 유무체크
-            m_CamAlign1.Grab();
-            m_CamAlign2.Grab();
+            m_CamAlign1.GrabOneShot();
+            m_CamAlign2.GrabOneShot();
             bool bRet = ReticleExistCheck(m_CamAlign1);
             if (bRet == false) return "Reticle Not Exist";
             bRet = ReticleExistCheck(m_CamAlign2);
@@ -430,7 +430,7 @@ namespace Root_Vega.Module
             rcROI = new Rect(pt1, pt2);
 
             // Binarization
-            matSrc = new Mat((int)rcROI.Height, (int)rcROI.Width, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr((int)rcROI.Top, (int)rcROI.Left), 6000/*CamAlign의 메모리 Stride로 변경해야함*/);
+            matSrc = new Mat((int)rcROI.Height, (int)rcROI.Width, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr((int)rcROI.Top, (int)rcROI.Left), (int)img.p_Stride);
             matBinary = new Mat();
             CvInvoke.Threshold(matSrc, matBinary, /*p_nThreshold*/200, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
 
