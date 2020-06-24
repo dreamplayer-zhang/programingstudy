@@ -99,50 +99,7 @@ namespace Root_Vega
 					this.SearchBrightToDark = value.EdgeBox.SearchBrightToDark;
 					this.UseAutoGV = value.EdgeBox.UseAutoGV;
 
-					List<EdgeElement> targetList = new List<EdgeElement>();
-					var tempToolset = (InspectToolSet)m_Engineer.ClassToolBox().GetToolSet("Inspect");
-					var tempInspect = tempToolset.GetInspect("SideVision.Inspect");
-
-					for (int i = 0; i < 4; i++)
-					{
-						if (p_SimpleShapeDrawer_List[i] == null) continue;
-						p_SimpleShapeDrawer_List[i].m_ListRect.Clear();
-						//Recipe에서 불러온다
-						targetList = value.EdgeBox.EdgeList.Where(x => x.SavePoint == i).ToList();
-
-						if (!this.UseCustomEdgeBox)
-						{
-							//Init에서 정보를 가져온다
-							targetList.Clear();
-							for (int j = 0; j < 6; j++)
-							{
-								var x = tempInspect.nTopLeftXLIst[i * 6 + j];
-								var y = tempInspect.nTopLeftYLIst[i * 6 + j];
-								var w = tempInspect.nWidthLIst[i * 6 + j];
-								var h = tempInspect.nHeighLIst[i * 6 + j];
-								EdgeElement tempElement = new EdgeElement(i, new CRect(x, y, x + w, y + h));
-								targetList.Add(tempElement);
-							}
-						}
-						foreach (EdgeElement item in targetList)
-						{
-							var temp = new UIElementInfo(new Point(item.Rect.Left, item.Rect.Top), new Point(item.Rect.Right, item.Rect.Bottom));
-
-							System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-							rect.Width = item.Rect.Width;
-							rect.Height = item.Rect.Height;
-							System.Windows.Controls.Canvas.SetLeft(rect, item.Rect.Left);
-							System.Windows.Controls.Canvas.SetTop(rect, item.Rect.Top);
-							rect.StrokeThickness = 2;
-							rect.Stroke = MBrushes.Red;
-
-							p_SimpleShapeDrawer_List[i].m_ListShape.Add(rect);
-							p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
-							p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
-						}
-						p_ImageViewer_List[i].SetRoiRect();
-					}
-
+					DrawEdgeBox(value,value. EdgeBox.UseCustomEdgeBox);
 				}
 			}
 		}
@@ -157,8 +114,11 @@ namespace Root_Vega
 			{
 				if (SelectedROI != null)
 				{
-					SetProperty(ref _SearchBrightToDark, value);
-					SelectedROI.EdgeBox.SearchBrightToDark = value;
+					if(_SearchBrightToDark != value)
+					{
+						SetProperty(ref _SearchBrightToDark, value);
+						SelectedROI.EdgeBox.SearchBrightToDark = value;
+					}
 				}
 			}
 		}
@@ -173,8 +133,13 @@ namespace Root_Vega
 			{
 				if (SelectedROI != null)
 				{
-					SetProperty(ref _UseCustomEdgeBox, value);
-					SelectedROI.EdgeBox.UseCustomEdgeBox = value;
+					if (_UseCustomEdgeBox != value)
+					{
+						SetProperty(ref _UseCustomEdgeBox, value);
+						SelectedROI.EdgeBox.UseCustomEdgeBox = value;
+
+						DrawEdgeBox(SelectedROI, value);
+					}
 				}
 			}
 		}
@@ -195,7 +160,67 @@ namespace Root_Vega
 			}
 		}
 		#endregion
+		void ClearDrawList()
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				p_SimpleShapeDrawer_List[i].Clear();
+				p_InformationDrawerList[i].Clear();
+			}
+		}
+		void DrawEdgeBox(Roi roi, bool useRecipeEdgeBox)
+		{
+			List<EdgeElement> targetList = new List<EdgeElement>();
+			var tempToolset = (InspectToolSet)m_Engineer.ClassToolBox().GetToolSet("Inspect");
+			var tempInspect = tempToolset.GetInspect("SideVision.Inspect");
 
+			ClearDrawList();
+
+			for (int i = 0; i < 4; i++)
+			{
+				if (p_SimpleShapeDrawer_List[i] == null) continue;
+
+				if (!useRecipeEdgeBox)
+				{
+					//Init에서 정보를 가져온다
+					targetList.Clear();
+					for (int j = 0; j < 6; j++)
+					{
+						var x = tempInspect.nTopLeftXLIst[i * 6 + j];
+						var y = tempInspect.nTopLeftYLIst[i * 6 + j];
+						var w = tempInspect.nWidthLIst[i * 6 + j];
+						var h = tempInspect.nHeighLIst[i * 6 + j];
+						EdgeElement tempElement = new EdgeElement(i, new CRect(x, y, x + w, y + h));
+						targetList.Add(tempElement);
+					}
+				}
+				else
+				{
+					//Recipe에서 불러온다. 저장된 Parameter가 정상이 아니면 로드하지 않는다
+					if (roi.EdgeBox != null && roi.EdgeBox.EdgeList.Count == 24)
+					{
+						targetList = roi.EdgeBox.EdgeList.Where(x => x.SavePoint == i).ToList();
+					}
+				}
+				foreach (EdgeElement item in targetList)
+				{
+					var temp = new UIElementInfo(new Point(item.Rect.Left, item.Rect.Top), new Point(item.Rect.Right, item.Rect.Bottom));
+
+					System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+					rect.Width = item.Rect.Width;
+					rect.Height = item.Rect.Height;
+					System.Windows.Controls.Canvas.SetLeft(rect, item.Rect.Left);
+					System.Windows.Controls.Canvas.SetTop(rect, item.Rect.Top);
+					rect.StrokeThickness = 2;
+					rect.Stroke = MBrushes.Red;
+
+					p_SimpleShapeDrawer_List[i].m_ListShape.Add(rect);
+					p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
+					p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
+				}
+				p_ImageViewer_List[i].SetRoiRect();
+			}
+		}
 
 		private List<InformationDrawer> informationDrawerList;
 		public List<InformationDrawer> p_InformationDrawerList
@@ -537,7 +562,7 @@ namespace Root_Vega
 			m_Engineer.m_InspManager.Dispose();
 			VSDataDT.Clear();
 		}
-		void Inspect()
+		void searchArea()
 		{
 			// variable
 			List<Rect> arcROIs = new List<Rect>();
@@ -549,30 +574,30 @@ namespace Root_Vega
 			System.Diagnostics.Debug.WriteLine("Start Insp");
 			bUsingInspection = true;
 
-			inspDefaultDir = @"C:\vsdb";
-			if (!System.IO.Directory.Exists(inspDefaultDir))
-			{
-				System.IO.Directory.CreateDirectory(inspDefaultDir);
-			}
-			inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
-			var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
-			string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
+			//inspDefaultDir = @"C:\vsdb";
+			//if (!System.IO.Directory.Exists(inspDefaultDir))
+			//{
+			//	System.IO.Directory.CreateDirectory(inspDefaultDir);
+			//}
+			//inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+			//var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
+			//string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
 
-			if (VSDBManager != null && VSDBManager.IsConnected)
-			{
-				VSDBManager.Disconnect();
-			}
-			VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+			//if (VSDBManager != null && VSDBManager.IsConnected)
+			//{
+			//	VSDBManager.Disconnect();
+			//}
+			//VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
 
-			if (VSDBManager.Connect())
-			{
-				VSDBManager.CreateTable("Datainfo");
-				VSDBManager.CreateTable("Data");
+			//if (VSDBManager.Connect())
+			//{
+			//	VSDBManager.CreateTable("Datainfo");
+			//	VSDBManager.CreateTable("Data");
 
-				VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
-				VSDataDT = VSDBManager.GetDataTable("Data");
-			}
-			m_Engineer.m_InspManager.ClearInspection();
+			//	VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
+			//	VSDataDT = VSDBManager.GetDataTable("Data");
+			//}
+			//m_Engineer.m_InspManager.ClearInspection();
 
 			// implement
 			for (int i = 0; i < 4; i++)
@@ -638,33 +663,33 @@ namespace Root_Vega
 				ptRB = new DPoint(ptRight2.X, ptBottom.Y);
 				ptRT = new DPoint(ptRight1.X, ptTop.Y);
 
-				if (true)//Merge를 위한 동작 방지 코드
-				{
-					//TODO : 여기서 생성되는 사각형 정보를 engineer한테 넘겨서 검사를 진행할 수 있도록 만들어야 함
+				//if (false)//Merge를 위한 동작 방지 코드
+				//{
+				//	//TODO : 여기서 생성되는 사각형 정보를 engineer한테 넘겨서 검사를 진행할 수 있도록 만들어야 함
 
-					CRect inspArea = new CRect(ptLT.X, ptLT.Y, ptRB.X, ptRB.Y);
-					List<CRect> DrawRectList = new List<CRect>();
+				//	CRect inspArea = new CRect(ptLT.X, ptLT.Y, ptRB.X, ptRB.Y);
+				//	List<CRect> DrawRectList = new List<CRect>();
 
-					//TODO : 일단 테스트로 강제로 서페이스 검사 파라메터를 생성한다. 추후 설정창 필요함!
-					SurfaceParamData paramTemp = new SurfaceParamData();
-					SelectedROI.Surface.ParameterList.Add(paramTemp);
+				//	//TODO : 일단 테스트로 강제로 서페이스 검사 파라메터를 생성한다. 추후 설정창 필요함!
+				//	SurfaceParamData paramTemp = new SurfaceParamData();
+				//	SelectedROI.Surface.ParameterList.Add(paramTemp);
 
-					foreach (var param in SelectedROI.Surface.ParameterList)
-					{
-						InspectionType type = InspectionType.AbsoluteSurface;
+				//	foreach (var param in SelectedROI.Surface.ParameterList)
+				//	{
+				//		InspectionType type = InspectionType.AbsoluteSurface;
 
-						if (!param.UseAbsoluteInspection)
-						{
-							type = InspectionType.RelativeSurface;
-						}
-						int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(10 + i), type, 0);
+				//		if (!param.UseAbsoluteInspection)
+				//		{
+				//			type = InspectionType.RelativeSurface;
+				//		}
+				//		int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(10 + i), type, 0);
 
-						DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).GetMBOffset(),
-							m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.X,
-							m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.Y,
-							inspArea, 500, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
-					}
-				}
+				//		DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).GetMBOffset(),
+				//			m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.X,
+				//			m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.Y,
+				//			inspArea, 500, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
+				//	}
+				//}
 
 				DrawLine(ptLT, ptLB, MBrushes.Lime, i);
 				DrawLine(ptRB, ptRT, MBrushes.Lime, i);
@@ -680,7 +705,7 @@ namespace Root_Vega
 
 				p_ImageViewer_List[i].SetRoiRect();
 			}
-			m_Engineer.m_InspManager.StartInspection();
+			//m_Engineer.m_InspManager.StartInspection();
 		}
 		void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor, int nTLRB)
 		{
@@ -1028,11 +1053,11 @@ namespace Root_Vega
 		}
 
 		#region RelayCommand
-		public RelayCommand CommandInspect
+		public RelayCommand CommandSearch
 		{
 			get
 			{
-				return new RelayCommand(Inspect);
+				return new RelayCommand(searchArea);
 			}
 		}
 		public RelayCommand CommandInspectComplete

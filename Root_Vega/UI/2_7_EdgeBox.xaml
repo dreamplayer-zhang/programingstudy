@@ -242,15 +242,15 @@
                     <Grid Height="50" Margin="10,5,10,5">
                         <Button Grid.Column="0"
                                 Style="{StaticResource BasicBtn}"
-                                Content="Inspection Start"
-                                Command="{Binding CommandInspect}"/>
+                                Content="Search Edge Area"
+                                Command="{Binding CommandSearch}"/>
 					</Grid>
-					<Grid Height="50" Margin="10,5,10,5">
+					<!--<Grid Height="50" Margin="10,5,10,5">
 						<Button Grid.Column="0"
                                 Style="{StaticResource BasicBtn}"
                                 Content="Inspection Complete"
                                 Command="{Binding CommandInspectComplete}"/>
-					</Grid>
+					</Grid>-->
 					<ListView ItemsSource="{Binding p_SideRoiList}"
                               Height="100"
                               Margin="0,0,0,10"
