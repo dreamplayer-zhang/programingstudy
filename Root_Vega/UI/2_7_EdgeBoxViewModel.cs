@@ -286,7 +286,7 @@ namespace Root_Vega
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					p_ImageViewer_List.Add(new ImageViewer_ViewModel(new ImageData(m_MemoryModule.GetMemory("SideVision.Memory", "SideVision", m_astrMem[i])), dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
+					p_ImageViewer_List.Add(new ImageViewer_ViewModel(new ImageData(m_MemoryModule.GetMemory("SideVision.Memory", "Side", m_astrMem[i])), dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
 					m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
 				}
 
@@ -631,9 +631,9 @@ namespace Root_Vega
 						}
 						int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(10 + i), type, 0);
 
-						DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", m_Engineer.GetMemory("SideVision.Memory", "SideVision", m_astrMem[i]).GetMBOffset(),
-							m_Engineer.GetMemory("SideVision.Memory", "SideVision", m_astrMem[i]).p_sz.X,
-							m_Engineer.GetMemory("SideVision.Memory", "SideVision", m_astrMem[i]).p_sz.Y,
+						DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).GetMBOffset(),
+							m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.X,
+							m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.Y,
 							inspArea, 500, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
 					}
 				}
