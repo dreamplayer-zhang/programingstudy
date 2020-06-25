@@ -225,8 +225,8 @@
                                 VerticalAlignment="Center"
                                 Maximum="255"
                                 Minimum="0"
-                                Value="{Binding p_nThreshold}"
-                                IsEnabled="{Binding p_bUseAutoThreshold, Converter={StaticResource InverseBooleanConverters}}"
+                                Value="{Binding EdgeThreshold}"
+                                IsEnabled="{Binding UseAutoGV, Converter={StaticResource InverseBooleanConverters}}"
                                 x:Name="slider1"></Slider>
                         <TextBlock Grid.Column="1"
                                    Style="{StaticResource BasicTb}"

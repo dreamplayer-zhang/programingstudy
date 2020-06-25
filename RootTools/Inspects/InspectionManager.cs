@@ -353,15 +353,13 @@ namespace RootTools.Inspects
 		}
 		#endregion
 
-		public static unsafe DPoint GetEdge(ImageData img, System.Windows.Rect rcROI, eEdgeFindDirection eDirection, bool bUseAutoThreshold, bool bUseB2D)
+		public static unsafe DPoint GetEdge(ImageData img, System.Windows.Rect rcROI, eEdgeFindDirection eDirection, bool bUseAutoThreshold, bool bUseB2D, int nThreshold)
 		{
 			// variable
 			int nSum = 0;
 			double dAverage = 0.0;
 			int nEdgeY = 0;
 			int nEdgeX = 0;
-
-			int nThreshold = 0;
 
 			// implement
 

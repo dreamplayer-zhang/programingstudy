@@ -16,49 +16,22 @@ using System.Windows.Input;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using DPoint = System.Drawing.Point;
 using MBrushes = System.Windows.Media.Brushes;
+using DPoint = System.Drawing.Point;
 
 namespace Root_Vega
 {
 	class _2_7_EdgeBoxViewModel : ObservableObject
 	{
-		enum eEdgeFindDirection { LEFT, TOP, RIGHT, BOTTOM };
-		enum eBrightSide { LEFT, TOP, RIGHT, BOTTOM };
-
-		bool m_bUseB2D = true;
-		bool bUsingInspection;
-
-		int tempImageWidth = 640;
-		int tempImageHeight = 480;
-
-		public bool p_bUseB2D
-		{
-			get { return m_bUseB2D; }
-			set { SetProperty(ref m_bUseB2D, value); }
-		}
-
-		bool m_bUseAutoThreshold = true;
-		public bool p_bUseAutoThreshold
-		{
-			get { return m_bUseAutoThreshold; }
-			set { SetProperty(ref m_bUseAutoThreshold, value); }
-		}
-
-		int m_nThreshold = 40;
-		public int p_nThreshold
-		{
-			get { return m_nThreshold; }
-			set { SetProperty(ref m_nThreshold, value); }
-		}
-
 		protected Dispatcher _dispatcher;
 		Vega_Engineer m_Engineer;
 		DialogService m_DialogService;
 		MemoryTool m_MemoryModule;
 		List<string> m_astrMem = new List<String> { "Top", "Left", "Right", "Bottom" };
-		public List<DrawHistoryWorker> m_DrawHistoryWorker_List = new List<DrawHistoryWorker>();
-		private List<SimpleShapeDrawerVM> m_SimpleShapeDrawer_List = new List<SimpleShapeDrawerVM>();
+		public List<DrawHistoryWorker> m_DrawHistoryWorker_List;
+
+		#region p_SimpleShapeDrawer_List
+		private List<SimpleShapeDrawerVM> m_SimpleShapeDrawer_List;
 		public List<SimpleShapeDrawerVM> p_SimpleShapeDrawer_List
 		{
 			get
@@ -70,6 +43,7 @@ namespace Root_Vega
 				SetProperty(ref m_SimpleShapeDrawer_List, value);
 			}
 		}
+		#endregion
 
 		#region p_SideRoiList
 
@@ -160,6 +134,114 @@ namespace Root_Vega
 			}
 		}
 		#endregion
+
+		#region EdgeThreshold
+		int edgeThreshold = 40;
+		public int EdgeThreshold
+		{
+			get { return edgeThreshold; }
+			set 
+			{ 
+				SetProperty(ref edgeThreshold, value);
+				SelectedROI.EdgeBox.EdgeThreshold = value;
+			}
+		}
+		#endregion
+
+		#region p_ImageViewer_List
+
+		private List<ImageViewer_ViewModel> m_ImageViewer_List;
+		public List<ImageViewer_ViewModel> p_ImageViewer_List
+		{
+			get
+			{
+				return m_ImageViewer_List;
+			}
+			set
+			{
+				SetProperty(ref m_ImageViewer_List, value);
+			}
+		}
+		#endregion
+
+		#region p_ImageViewer_Left
+		private ImageViewer_ViewModel m_ImageViewer_Left;
+		public ImageViewer_ViewModel p_ImageViewer_Left
+		{
+			get
+			{
+				return m_ImageViewer_Left;
+			}
+			set
+			{
+				SetProperty(ref m_ImageViewer_Left, value);
+			}
+		}
+		#endregion
+
+		#region p_ImageViewer_Top
+
+		private ImageViewer_ViewModel m_ImageViewer_Top;
+		public ImageViewer_ViewModel p_ImageViewer_Top
+		{
+			get
+			{
+				return m_ImageViewer_Top;
+			}
+			set
+			{
+				SetProperty(ref m_ImageViewer_Top, value);
+			}
+		}
+		#endregion
+
+		#region p_ImageViewer_Right
+		private ImageViewer_ViewModel m_ImageViewer_Right;
+		public ImageViewer_ViewModel p_ImageViewer_Right
+		{
+			get
+			{
+				return m_ImageViewer_Right;
+			}
+			set
+			{
+				SetProperty(ref m_ImageViewer_Right, value);
+			}
+		}
+		#endregion
+
+		#region p_ImageViewer_Bottom
+		private ImageViewer_ViewModel m_ImageViewer_Bottom;
+
+		public ImageViewer_ViewModel p_ImageViewer_Bottom
+		{
+			get
+			{
+				return m_ImageViewer_Bottom;
+			}
+			set
+			{
+				SetProperty(ref m_ImageViewer_Bottom, value);
+			}
+		}
+		#endregion
+
+		#region p_InformationDrawerList
+
+		private List<InformationDrawer> informationDrawerList;
+		public List<InformationDrawer> p_InformationDrawerList
+		{
+			get
+			{
+				return informationDrawerList;
+			}
+			set
+			{
+				SetProperty(ref informationDrawerList, value);
+			}
+		}
+		#endregion
+
 		void ClearDrawList()
 		{
 			for (int i = 0; i < 4; i++)
@@ -225,103 +307,20 @@ namespace Root_Vega
 			}
 		}
 
-		private List<InformationDrawer> informationDrawerList;
-		public List<InformationDrawer> p_InformationDrawerList
-		{
-			get
-			{
-				return informationDrawerList;
-			}
-			set
-			{
-				SetProperty(ref informationDrawerList, value);
-			}
-		}
-		/// <summary>
-		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
-		/// </summary>
-		/// <param name="source">UI에 추가할 Defect List</param>
-		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
-		private void M_InspManager_AddDefect(DefectDataWrapper item)
-		{
-			if (InspectionManager.GetInspectionType(item.nClassifyCode) != InspectionType.AbsoluteSurface && InspectionManager.GetInspectionType(item.nClassifyCode) != InspectionType.RelativeSurface)
-			{
-				return;
-			}
-			//string tempInspDir = @"C:\vsdb\TEMP_IMAGE";
-			lock (VSDataDT)
-			{
-				System.Data.DataRow dataRow = VSDataDT.NewRow();
-
-				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-
-				dataRow["No"] = currentDefectIdx;
-				currentDefectIdx++;
-				dataRow["DCode"] = item.nClassifyCode;
-				dataRow["AreaSize"] = item.fAreaSize;
-				dataRow["Length"] = item.nLength;
-				dataRow["Width"] = item.nWidth;
-				dataRow["Height"] = item.nHeight;
-				//dataRow["FOV"] = item.FOV;
-				dataRow["PosX"] = item.fPosX;
-				dataRow["PosY"] = item.fPosY;
-
-				VSDataDT.Rows.Add(dataRow);
-				_dispatcher.Invoke(new Action(delegate ()
-				{
-					int targetIdx = InspectionManager.GetInspectionTarget(item.nClassifyCode) - InspectionTarget.SideInspection - 1;
-					//System.Diagnostics.Debug.WriteLine(string.Format("GetInspectionTarget() - targetIdx : {0}", targetIdx));
-
-					p_InformationDrawerList[targetIdx].AddDefectInfo(item);
-
-					switch (targetIdx)
-					{
-						case 0:
-							p_ImageViewer_Top.RedrawingElement();
-							break;
-						case 1:
-							p_ImageViewer_Left.RedrawingElement();
-							break;
-						case 2:
-							p_ImageViewer_Right.RedrawingElement();
-							break;
-						case 3:
-							p_ImageViewer_Bottom.RedrawingElement();
-							break;
-					}
-				}));
-			}
-		}
-
 		public _2_7_EdgeBoxViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
 			_dispatcher = Dispatcher.CurrentDispatcher;
 			m_Engineer = engineer;
 			m_DialogService = (DialogService)dialogService;
 			Init(dialogService);
-
-			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
-			bUsingInspection = false;
-		}
-
-		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
-		{
-			var bitmapData = bitmap.LockBits(
-				new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-				System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
-
-			var bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
-				bitmapData.Width, bitmapData.Height,
-				bitmap.HorizontalResolution, bitmap.VerticalResolution,
-				System.Windows.Media.PixelFormats.Gray8, null,
-				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
-
-			bitmap.UnlockBits(bitmapData);
-			return bitmapSource;
 		}
 		void Init(IDialogService dialogService)
 		{
 			m_MemoryModule = m_Engineer.ClassMemoryTool();
+			m_ImageViewer_List = new List<ImageViewer_ViewModel>();
+			m_DrawHistoryWorker_List = new List<DrawHistoryWorker>();
+			m_SimpleShapeDrawer_List = new List<SimpleShapeDrawerVM>();
+
 			if (m_MemoryModule != null)
 			{
 				for (int i = 0; i < 4; i++)
@@ -353,7 +352,6 @@ namespace Root_Vega
 				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Left));
 				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Right));
 				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Bottom));
-				//p_InformationDrawer[0] = new InformationDrawer(p_ImageViewer);
 			}
 			m_Engineer.m_recipe.LoadComplete += () =>
 			{
@@ -364,77 +362,6 @@ namespace Root_Vega
 			return;
 		}
 
-		private List<ImageViewer_ViewModel> m_ImageViewer_List = new List<ImageViewer_ViewModel>();
-		public List<ImageViewer_ViewModel> p_ImageViewer_List
-		{
-			get
-			{
-				return m_ImageViewer_List;
-			}
-			set
-			{
-				SetProperty(ref m_ImageViewer_List, value);
-			}
-		}
-
-		private ImageViewer_ViewModel m_ImageViewer_Left;
-		public ImageViewer_ViewModel p_ImageViewer_Left
-		{
-			get
-			{
-				return m_ImageViewer_Left;
-			}
-			set
-			{
-				SetProperty(ref m_ImageViewer_Left, value);
-			}
-		}
-
-		private ImageViewer_ViewModel m_ImageViewer_Top;
-		public ImageViewer_ViewModel p_ImageViewer_Top
-		{
-			get
-			{
-				return m_ImageViewer_Top;
-			}
-			set
-			{
-				SetProperty(ref m_ImageViewer_Top, value);
-			}
-		}
-
-		private ImageViewer_ViewModel m_ImageViewer_Right;
-		public ImageViewer_ViewModel p_ImageViewer_Right
-		{
-			get
-			{
-				return m_ImageViewer_Right;
-			}
-			set
-			{
-				SetProperty(ref m_ImageViewer_Right, value);
-			}
-		}
-
-		private ImageViewer_ViewModel m_ImageViewer_Bottom;
-		private string inspDefaultDir;
-		private string inspFileName;
-		SqliteDataDB VSDBManager;
-		int currentDefectIdx;
-		System.Data.DataTable VSDataInfoDT;
-		System.Data.DataTable VSDataDT;
-
-		public ImageViewer_ViewModel p_ImageViewer_Bottom
-		{
-			get
-			{
-				return m_ImageViewer_Bottom;
-			}
-			set
-			{
-				SetProperty(ref m_ImageViewer_Bottom, value);
-			}
-		}
 		private void _saveInit()
 		{
 			var tempToolset = (InspectToolSet)m_Engineer.ClassToolBox().GetToolSet("Inspect");
@@ -529,75 +456,6 @@ namespace Root_Vega
 
 			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
 		}
-		//void _InspectComplete()
-		//{
-		//	if (!bUsingInspection)
-		//	{
-		//		return;
-		//	}
-		//	else
-		//	{
-		//		bUsingInspection = false;
-		//	}
-		//	//VSDBManager.Commit();
-
-		//	//여기서부터 DB Table데이터를 기준으로 tif 이미지 파일을 생성하는 구간
-		//	//해당 기능은 여러개의 pool을 사용하는 경우에 대해서는 테스트가 진행되지 않았습니다
-		//	//Concept은 검사 결과가 저장될 시점에 가지고 있던 Data Table을 저장하기 전 Image를 저장하는 형태
-		//	int stride = tempImageWidth / 8;
-		//	string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
-
-		//	System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
-
-		//	System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
-		//	System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
-		//	encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
-
-		//	foreach (System.Data.DataRow row in VSDataDT.Rows)
-		//	{
-		//		//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-		//		double fPosX = Convert.ToDouble(row["PosX"]);
-		//		double fPosY = Convert.ToDouble(row["PosY"]);
-
-		//		CRect ImageSizeBlock = new CRect(
-		//			(int)fPosX - tempImageWidth / 2,
-		//			(int)fPosY - tempImageHeight / 2,
-		//			(int)fPosX + tempImageWidth / 2,
-		//			(int)fPosY + tempImageHeight / 2);
-
-		//		int targetIdx = InspectionManager.GetInspectionTarget(Convert.ToInt32(row["DCode"])) - InspectionTarget.SideInspection - 1;
-
-		//		switch (targetIdx)
-		//		{
-		//			case 0:
-		//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Top.p_ImageData.GetRectImage(ImageSizeBlock))));
-		//				break;
-		//			case 1:
-		//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Left.p_ImageData.GetRectImage(ImageSizeBlock))));
-		//				break;
-		//			case 2:
-		//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Right.p_ImageData.GetRectImage(ImageSizeBlock))));
-		//				break;
-		//			case 3:
-		//				encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(p_ImageViewer_Bottom.p_ImageData.GetRectImage(ImageSizeBlock))));
-		//				break;
-		//		}
-		//	}
-		//	if (VSDataDT.Rows.Count > 0)
-		//	{
-		//		encoder.Save(stream);
-		//	}
-		//	stream.Dispose();
-		//	//이미지 저장 완료
-
-		//	//Data Table 저장 시작
-		//	VSDBManager.SetDataTable(VSDataInfoDT);
-		//	VSDBManager.SetDataTable(VSDataDT);
-		//	VSDBManager.Disconnect();
-		//	//Data Table 저장 완료
-		//	m_Engineer.m_InspManager.Dispose();
-		//	VSDataDT.Clear();
-		//}
 		void searchArea()
 		{
 			// variable
@@ -607,33 +465,6 @@ namespace Root_Vega
 			eEdgeFindDirection eTempDirection = eEdgeFindDirection.TOP;
 			DPoint ptLeft1, ptLeft2, ptBottom, ptRight1, ptRight2, ptTop;
 			DPoint ptLT, ptRT, ptLB, ptRB;
-			System.Diagnostics.Debug.WriteLine("Start Insp");
-			bUsingInspection = true;
-
-			//inspDefaultDir = @"C:\vsdb";
-			//if (!System.IO.Directory.Exists(inspDefaultDir))
-			//{
-			//	System.IO.Directory.CreateDirectory(inspDefaultDir);
-			//}
-			//inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
-			//var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
-			//string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
-
-			//if (VSDBManager != null && VSDBManager.IsConnected)
-			//{
-			//	VSDBManager.Disconnect();
-			//}
-			//VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
-
-			//if (VSDBManager.Connect())
-			//{
-			//	VSDBManager.CreateTable("Datainfo");
-			//	VSDBManager.CreateTable("Data");
-
-			//	VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
-			//	VSDataDT = VSDBManager.GetDataTable("Data");
-			//}
-			//m_Engineer.m_InspManager.ClearInspection();
 
 			// implement
 			for (int i = 0; i < 4; i++)
@@ -665,8 +496,8 @@ namespace Root_Vega
 				}
 				for (int j = 0; j < arcROIs.Count; j++)
 				{
-					eTempDirection = GetDirection(ivvm.p_ImageData, arcROIs[j]);
-					aptEdges.Add(GetEdge(ivvm.p_ImageData, arcROIs[j], eTempDirection));
+					eTempDirection = InspectionManager.GetDirection(ivvm.p_ImageData, arcROIs[j]);
+					aptEdges.Add(InspectionManager.GetEdge(ivvm.p_ImageData, arcROIs[j], eTempDirection, UseAutoGV, SearchBrightToDark, EdgeThreshold));
 				}
 				// aptEeges에 있는 DPoint들을 좌표에 맞게 분배
 				List<DPoint> aSortedByX = aptEdges.OrderBy(x => x.X).ToList();
@@ -698,34 +529,6 @@ namespace Root_Vega
 				ptLB = new DPoint(ptLeft2.X, ptBottom.Y);
 				ptRB = new DPoint(ptRight2.X, ptBottom.Y);
 				ptRT = new DPoint(ptRight1.X, ptTop.Y);
-
-				//if (false)//Merge를 위한 동작 방지 코드
-				//{
-				//	//TODO : 여기서 생성되는 사각형 정보를 engineer한테 넘겨서 검사를 진행할 수 있도록 만들어야 함
-
-				//	CRect inspArea = new CRect(ptLT.X, ptLT.Y, ptRB.X, ptRB.Y);
-				//	List<CRect> DrawRectList = new List<CRect>();
-
-				//	//TODO : 일단 테스트로 강제로 서페이스 검사 파라메터를 생성한다. 추후 설정창 필요함!
-				//	SurfaceParamData paramTemp = new SurfaceParamData();
-				//	SelectedROI.Surface.ParameterList.Add(paramTemp);
-
-				//	foreach (var param in SelectedROI.Surface.ParameterList)
-				//	{
-				//		InspectionType type = InspectionType.AbsoluteSurface;
-
-				//		if (!param.UseAbsoluteInspection)
-				//		{
-				//			type = InspectionType.RelativeSurface;
-				//		}
-				//		int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(10 + i), type, 0);
-
-				//		DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).GetMBOffset(),
-				//			m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.X,
-				//			m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.Y,
-				//			inspArea, 500, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
-				//	}
-				//}
 
 				DrawLine(ptLT, ptLB, MBrushes.Lime, i);
 				DrawLine(ptRB, ptRT, MBrushes.Lime, i);
@@ -782,310 +585,6 @@ namespace Root_Vega
 			UIElementInfo uei = new UIElementInfo(new System.Windows.Point(myLine.X1, myLine.Y1), new System.Windows.Point(myLine.X2, myLine.Y2));
 			ivvm.SelectedTool.m_ListRect.Add(uei);
 			ivvm.SelectedTool.m_Element.Add(myLine);
-		}
-		unsafe DPoint GetEdge(ImageData img, Rect rcROI, eEdgeFindDirection eDirection)
-		{
-			// variable
-			int nSum = 0;
-			double dAverage = 0.0;
-			int nEdgeY = 0;
-			int nEdgeX = 0;
-
-			// implement
-
-			if (p_bUseAutoThreshold == true)
-			{
-				p_nThreshold = GetThresholdAverage(img, rcROI, eDirection);
-			}
-
-			switch (eDirection)
-			{
-				case eEdgeFindDirection.TOP:
-					for (int i = 0; i < rcROI.Height; i++)
-					{
-						byte* bp;
-						if (p_bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
-						else bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
-						for (int j = 0; j < rcROI.Width; j++)
-						{
-							nSum += *bp;
-							bp++;
-						}
-						dAverage = nSum / rcROI.Width;
-						if (p_bUseB2D == true)
-						{
-							if (dAverage < p_nThreshold)
-							{
-								nEdgeY = (int)rcROI.Bottom - i;
-								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
-								break;
-							}
-						}
-						else
-						{
-							if (dAverage > p_nThreshold)
-							{
-								nEdgeY = (int)rcROI.Top + i;
-								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
-								break;
-							}
-						}
-						nSum = 0;
-					}
-					break;
-				case eEdgeFindDirection.LEFT:
-					for (int i = 0; i < rcROI.Width; i++)
-					{
-						byte* bp;
-						if (p_bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
-						else bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
-						for (int j = 0; j < rcROI.Height; j++)
-						{
-							nSum += *bp;
-							bp += img.p_Stride;
-						}
-						dAverage = nSum / rcROI.Height;
-						if (p_bUseB2D == true)
-						{
-							if (dAverage < p_nThreshold)
-							{
-								nEdgeX = (int)rcROI.Right - i;
-								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
-								break;
-							}
-						}
-						else
-						{
-							if (dAverage > p_nThreshold)
-							{
-								nEdgeX = (int)rcROI.Left + i;
-								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
-								break;
-							}
-						}
-						nSum = 0;
-					}
-					break;
-				case eEdgeFindDirection.RIGHT:
-					for (int i = 0; i < rcROI.Width; i++)
-					{
-						byte* bp;
-						if (p_bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
-						else bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
-						for (int j = 0; j < rcROI.Height; j++)
-						{
-							nSum += *bp;
-							bp += img.p_Stride;
-						}
-						dAverage = nSum / rcROI.Height;
-						if (p_bUseB2D == true)
-						{
-							if (dAverage < p_nThreshold)
-							{
-								nEdgeX = (int)rcROI.Left + i;
-								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
-								break;
-							}
-						}
-						else
-						{
-							if (dAverage > p_nThreshold)
-							{
-								nEdgeX = (int)rcROI.Right - i;
-								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
-								break;
-							}
-						}
-						nSum = 0;
-					}
-					break;
-				case eEdgeFindDirection.BOTTOM:
-					for (int i = 0; i < rcROI.Height; i++)
-					{
-						byte* bp;
-						if (p_bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
-						else bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
-						for (int j = 0; j < rcROI.Width; j++)
-						{
-							nSum += *bp;
-							bp++;
-						}
-						dAverage = nSum / rcROI.Width;
-						if (p_bUseB2D == true)
-						{
-							if (dAverage < p_nThreshold)
-							{
-								nEdgeY = (int)rcROI.Top + i;
-								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
-								break;
-							}
-						}
-						else
-						{
-							if (dAverage > p_nThreshold)
-							{
-								nEdgeY = (int)rcROI.Bottom - i;
-								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
-								break;
-							}
-						}
-
-						nSum = 0;
-					}
-					break;
-			}
-
-			return new System.Drawing.Point(nEdgeX, nEdgeY);
-		}
-		unsafe int GetThresholdAverage(ImageData img, Rect rcROI, eEdgeFindDirection eDirection)
-		{
-			// variable
-			int nSum = 0;
-			int nThreshold = 40;
-
-			// implement
-
-			if (eDirection == eEdgeFindDirection.TOP || eDirection == eEdgeFindDirection.BOTTOM)
-			{
-				double dRatio = rcROI.Height * 0.1;
-				double dAverage1 = 0.0;
-				double dAverage2 = 0.0;
-				for (int i = 0; i < (int)dRatio; i++)
-				{
-					byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
-					for (int j = 0; j < rcROI.Width; j++)
-					{
-						nSum += *bp;
-						bp++;
-					}
-				}
-				dAverage1 = nSum / (rcROI.Width * (int)dRatio);
-				nSum = 0;
-				for (int i = 0; i < (int)dRatio; i++)
-				{
-					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
-					for (int j = 0; j < rcROI.Width; j++)
-					{
-						nSum += *bp;
-						bp++;
-					}
-				}
-				dAverage2 = nSum / (rcROI.Width * (int)dRatio);
-				nSum = 0;
-				////////////////////////////////////////////////
-				nThreshold = (int)(dAverage1 + dAverage2) / 2;
-			}
-			else
-			{
-				double dRatio = rcROI.Width * 0.1;
-				double dAverage1 = 0.0;
-				double dAverage2 = 0.0;
-				for (int i = 0; i < (int)dRatio; i++)
-				{
-					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
-					for (int j = 0; j < rcROI.Height; j++)
-					{
-						nSum += *bp;
-						bp += img.p_Stride;
-					}
-				}
-				dAverage1 = nSum / (rcROI.Height * (int)dRatio);
-				nSum = 0;
-				for (int i = 0; i < (int)dRatio; i++)
-				{
-					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
-					for (int j = 0; j < rcROI.Height; j++)
-					{
-						nSum += *bp;
-						bp += img.p_Stride;
-					}
-				}
-				dAverage2 = nSum / (rcROI.Height * (int)dRatio);
-				nSum = 0;
-				////////////////////////////////////////////////
-				nThreshold = (int)(dAverage1 + dAverage2) / 2;
-			}
-
-			return nThreshold;
-		}
-		unsafe eEdgeFindDirection GetDirection(ImageData img, Rect rcROI)
-		{
-			// variable
-			double dRatio = 0.0;
-			int nSum = 0;
-			double dAverageTemp = 0.0;
-			Dictionary<eBrightSide, double> dic = new Dictionary<eBrightSide, double>();
-
-			// implement
-			// Left
-			dRatio = rcROI.Width * 0.1;
-			for (int i = 0; i < (int)dRatio; i++)
-			{
-				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
-				for (int j = 0; j < rcROI.Height; j++)
-				{
-					nSum += *bp;
-					bp += img.p_Stride;
-				}
-			}
-			dAverageTemp = nSum / (rcROI.Height * (int)dRatio);
-			dic.Add(eBrightSide.LEFT, dAverageTemp);
-			nSum = 0;
-
-			// Top
-			dRatio = rcROI.Height * 0.1;
-			for (int i = 0; i < (int)dRatio; i++)
-			{
-				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
-				for (int j = 0; j < rcROI.Width; j++)
-				{
-					nSum += *bp;
-					bp++;
-				}
-			}
-			dAverageTemp = nSum / (rcROI.Width * (int)dRatio);
-			dic.Add(eBrightSide.TOP, dAverageTemp);
-			nSum = 0;
-
-			// Right
-			dRatio = rcROI.Width * 0.1;
-			for (int i = 0; i < (int)dRatio; i++)
-			{
-				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i).ToPointer());
-				for (int j = 0; j < rcROI.Height; j++)
-				{
-					nSum += *bp;
-					bp += img.p_Stride;
-				}
-			}
-			dAverageTemp = nSum / (rcROI.Height * (int)dRatio);
-			dic.Add(eBrightSide.RIGHT, dAverageTemp);
-			nSum = 0;
-
-			// Bottom
-			dRatio = rcROI.Height * 0.1;
-			for (int i = 0; i < (int)dRatio; i++)
-			{
-				byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
-				for (int j = 0; j < rcROI.Width; j++)
-				{
-					nSum += *bp;
-					bp++;
-				}
-			}
-			dAverageTemp = nSum / (rcROI.Width * (int)dRatio);
-			dic.Add(eBrightSide.BOTTOM, dAverageTemp);
-			nSum = 0;
-
-			var maxKey = dic.Keys.Max();
-			var maxValue = dic.Values.Max();
-			// Value값이 가장 큰 Key값 찾기
-			var keyOfMaxValue = dic.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
-
-			if (keyOfMaxValue == eBrightSide.TOP) return eEdgeFindDirection.BOTTOM;
-			else if (keyOfMaxValue == eBrightSide.BOTTOM) return eEdgeFindDirection.TOP;
-			else if (keyOfMaxValue == eBrightSide.LEFT) return eEdgeFindDirection.RIGHT;
-			else return eEdgeFindDirection.LEFT;
 		}
 
 		#region RelayCommand

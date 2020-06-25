@@ -448,6 +448,7 @@ namespace RootTools.Inspects
 		public bool UseAutoGV;
 		public bool SearchBrightToDark;
 		public bool UseCustomEdgeBox;
+		public int EdgeThreshold;
 	}
 	public class EdgeElement
 	{
