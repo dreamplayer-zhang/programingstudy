@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace RootTools.Trees
 {
@@ -66,12 +67,15 @@ namespace RootTools.Trees
         #region RunTree Init
         public void RunTreeRemove()
         {
-            for (int n = p_aChild.Count - 1; n >= 0; n--)
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                if (p_aChild[n].m_bUse) p_aChild[n].RunTreeRemove();
-                else p_aChild.RemoveAt(n);
-            }
-            m_bUse = false;
+                for (int n = p_aChild.Count - 1; n >= 0; n--)
+                {
+                    if (p_aChild[n].m_bUse) p_aChild[n].RunTreeRemove();
+                    else p_aChild.RemoveAt(n);
+                }
+                m_bUse = false;
+            });
         }
 
         public void RunTreeInit()

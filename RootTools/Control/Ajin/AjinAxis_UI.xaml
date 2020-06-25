@@ -171,7 +171,7 @@
                                     <ColumnDefinition Width="1*"/>
                                 </Grid.ColumnDefinitions>
                                 <ProgressBar Grid.Column="0" Margin="5" Orientation="Vertical" Value="{Binding p_prgHome}" />
-                                <Button Grid.Column="1" Content="Home" Margin="3"/>
+                                <Button Grid.Column="1" Content="Home" Margin="3" Command="{Binding HomeClickCommand}"/>
                             </Grid>
                         </GroupBox>
                         <GroupBox Grid.Row="1" BorderBrush="Black" BorderThickness="1">
