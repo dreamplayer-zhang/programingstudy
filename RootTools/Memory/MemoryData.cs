@@ -23,9 +23,12 @@ namespace RootTools.Memory
             get { return _nCount; }
             set
             {
-                _nCount = value;
-                OnPropertyChanged();
-                m_group.InitAddress();
+                if (_nCount != value)
+                {
+                    _nCount = value;
+                    OnPropertyChanged();
+                    m_group.InitAddress();
+                }
             }
         }
 
@@ -35,10 +38,13 @@ namespace RootTools.Memory
             get { return _nByte; }
             set
             {
-                _nByte = value;
-                OnPropertyChanged();
-                OnPropertyChanged("p_sSize");
-                m_group.InitAddress();
+                if (_nByte != value)
+                {
+                    _nByte = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("p_sSize");
+                    m_group.InitAddress();
+                }
             }
         }
 
@@ -48,10 +54,13 @@ namespace RootTools.Memory
             get { return _sz; }
             set
             {
-                _sz = value;
-                OnPropertyChanged();
-                OnPropertyChanged("p_sSize");
-                m_group.InitAddress();
+                if (_sz != value)
+                {
+                    _sz = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("p_sSize");
+                    m_group.InitAddress();
+                }
             }
         }
 
