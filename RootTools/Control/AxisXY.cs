@@ -140,9 +140,22 @@ namespace RootTools.Control
 
         public string WaitReady(double dInPos = -1)
         {
+            Thread.Sleep(200);
             string sInfo = WaitReady(p_axisX, m_cpDst.X, dInPos);
             if (sInfo != "OK") return sInfo;
             return WaitReady(p_axisY, m_cpDst.Y, dInPos); 
+        }
+
+        public string WaitReadyXAxis(double dInPos = -1)
+        {
+            Thread.Sleep(200);
+            return WaitReady(p_axisX, m_cpDst.X, dInPos);
+        }
+
+        public string WaitReadyYAxis(double dInPos = -1)
+        {
+            Thread.Sleep(200);
+            return WaitReady(p_axisY, m_cpDst.Y, dInPos);
         }
 
         string WaitReady(IAxis axis, double posDst, double dInPos = -1)
