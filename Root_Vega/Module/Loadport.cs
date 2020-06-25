@@ -401,6 +401,16 @@ namespace Root_Vega.Module
             return p_sInfo;
         }
 
+        public string HomeToMinusLimit(params IAxis[] aAxis) //JWS 200625 ADD
+        {
+            p_sInfo = StateHome(aAxis);
+            if (p_sInfo != "OK") return p_sInfo;
+            foreach (IAxis axis in aAxis)
+                if (!axis.p_sensorLimitM) return axis.ToString() + " not home done.";
+
+            return p_sInfo;
+        }
+
         double GetdZPos(ePosZ pos)
         {
             return m_axisZ.p_axis.p_posActual - m_axisZ.p_axis.GetPos(pos.ToString()) + m_dInposZ;
