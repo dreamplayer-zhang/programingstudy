@@ -662,7 +662,11 @@ namespace RootTools.Control.Ajin
                 if (AXM("AxmSignalWriteOutputBit", CAXM.AxmSignalWriteOutputBit(p_nAxisID, m_nBrakeSignalBit, uOn)) != 0) return;
             }
             if (bOn == false) p_eState = Axis.eState.Init;
+<<<<<<< HEAD
             else p_eState = Axis.eState.Ready;
+=======
+           //else p_eState = Axis.eState.Ready;
+>>>>>>> limit-interlock
         }
         #endregion
 
