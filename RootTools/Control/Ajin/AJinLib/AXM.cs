@@ -43,14 +43,6 @@ public class CAXM
     //========== 보드 및 모듈 확인함수(Info) - Infomation ===============================================================
     // 해당 축의 보드번호, 모듈 위치, 모듈 아이디를 반환한다.
     [DllImport("AXL.dll")] public static extern uint AxmInfoGetAxis(int nAxisNo, ref int npBoardNo, ref int npModulePos, ref uint upModuleID);
-    //지정한 모듈 번호로 해당 모듈의 Sub ID, 모듈 Name, 모듈 설명을 확인한다.
-    //======================================================/
-    // 지원 제품            : EtherCAT
-    // upModuleSubID        : EtherCAT 모듈을 구분하기 위한 SubID
-    // szModuleName            : 모듈의 모델명(50 Bytes)
-    // szModuleDescription  : 모듈에 대한 설명(80 Bytes)
-    //======================================================//
-    [DllImport("AXL.dll")] public static extern uint AxmInfoGetAxisEx(int nAxisNo, ref uint upModuleSubID, System.Text.StringBuilder szModuleName, System.Text.StringBuilder szModuleDescription);
     // 모션 모듈이 존재하는지 반환한다.
     [DllImport("AXL.dll")] public static extern uint AxmInfoIsMotionModule(ref uint upStatus);
     // 해당 축이 유효한지 반환한다.
@@ -62,7 +54,7 @@ public class CAXM
     // 해당 보드/모듈의 첫번째 축번호를 반환한다.
     [DllImport("AXL.dll")] public static extern uint AxmInfoGetFirstAxisNo(int nBoardNo, int nModulePos, ref int npAxisNo);
     // 해당 보드의 첫번째 축번호를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmInfoGetBoardFirstAxisNo(int nBoardNo, int nModulePos, ref int npAxisNo);
+    [DllImport("AXL.dll")] public static extern uint AxmInfoGetBoardFirstAxisNo(int lBoardNo, int lModulePos, ref int lpAxisNo);
 
     //========= 가상 축 함수 ============================================================================================
     // 초기 상태에서 AXM 모든 함수의 축번호 설정은 0 ~ (실제 시스템에 장착된 축수 - 1) 범위에서 유효하지만
@@ -74,9 +66,9 @@ public class CAXM
     //            나머지 같은 가상축 번호로 맵핑된 축은 제어가 불가능한 경우가 발생 할 수 있다.
 
     // 가상축을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmVirtualSetAxisNoMap(int nReanAxisNo, int nVirtuanAxisNo);
+    [DllImport("AXL.dll")] public static extern uint AxmVirtualSetAxisNoMap(int nRealAxisNo, int nVirtualAxisNo);
     // 설정한 가상채널(축) 번호를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmVirtualGetAxisNoMap(int nReanAxisNo, ref int npVirtuanAxisNo);
+    [DllImport("AXL.dll")] public static extern uint AxmVirtualGetAxisNoMap(int nRealAxisNo, ref int npVirtualAxisNo);
     // 멀티 가상축을 설정한다.
     [DllImport("AXL.dll")] public static extern uint AxmVirtualSetMultiAxisNoMap(int nSize, int[] npRealAxesNo, int[] npVirtualAxesNo);
     // 설정한 멀티 가상채널(축) 번호를 반환한다.
@@ -119,13 +111,13 @@ public class CAXM
     // lBank         : 인터럽트 뱅크 번호 (0 - 1) 설정가능.
     // uInterruptNum : 인터럽트 번호 설정 비트번호로 설정 hex값 혹은 define된값을 설정
     // AXHS.h파일에 INTERRUPT_BANK1, 2 DEF를 확인한다.
-    [DllImport("AXL.dll")] public static extern uint AxmInterruptSetUserEnable(int nAxisNo, int nBank, uint uInterruptNum);
+    [DllImport("AXL.dll")] public static extern uint AxmInterruptSetUserEnable(int nAxisNo, int lBank, uint uInterruptNum);
 
     // 지정 축의 사용자가 설정한 인터럽트 발생 여부를 확인한다.
-    [DllImport("AXL.dll")] public static extern uint AxmInterruptGetUserEnable(int nAxisNo, int nBank, ref uint upInterruptNum);
+    [DllImport("AXL.dll")] public static extern uint AxmInterruptGetUserEnable(int nAxisNo, int lBank, ref uint upInterruptNum);
 
     //======== 모션 파라메타 설정 =======================================================================================
-    // AxmMotLoadParaAll로 파일을 Load 시키지 않으면 초기 파라메타 설정시 기본 파라메타 설정. 
+    // AxmMotLoadParaAll로 파일을 Load 시키지 않으면 초기 파라메타 설정시 기본 파라메타 설정. po
     // 현재 PC에 사용되는 모든축에 똑같이 적용된다. 기본파라메타는 아래와 같다. 
     // 00:AXIS_NO.             =0          01:PULSE_OUT_METHOD.    =4         02:ENC_INPUT_METHOD.    =3     03:INPOSITION.          =2
     // 04:ALARM.               =1          05:NEG_END_LIMIT.       =1         06:POS_END_LIMIT.       =1     07:MIN_VELOCITY.        =1
@@ -175,8 +167,7 @@ public class CAXM
     // 39=[SOFT_LIMIT_ENABLE   ]: 0 = DISABLE, 1 = ENABLE
 
     // AxmMotSaveParaAll로 저장 되어진 .mot파일을 불러온다. 해당 파일은 사용자가 Edit 하여 사용 가능하다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotLoadParaAll(string szFilePath);           // string
-    [DllImport("AXL.dll")] public static extern uint AxmMotLoadParaAll(char[] szFilePath);           // char[]
+    [DllImport("AXL.dll")] public static extern uint AxmMotLoadParaAll(string szFilePath);
     // 모든축에 대한 모든 파라메타를 축별로 저장한다. .mot파일로 저장한다.
     [DllImport("AXL.dll")] public static extern uint AxmMotSaveParaAll(string szFilePath);
 
@@ -272,7 +263,7 @@ public class CAXM
     //               ASYM_TRAP_M3_SW_MODE   '6' - 비대칭 Trapezode : MLIII 내부 S/W Profile
     //               SYM_S_M3_SW_MODE       '7' - 대칭 S Curve : MLIII 내부 S/W Profile
     //               ASYM_S_M3_SW_MODE      '8' - asymmetric S Curve : MLIII 내부 S/W Profile
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetProfileMode(int nAxisNo, uint uProfileMode);
+    [DllImport("AXL.dll")] public static extern uint AxmMotSetProfileMode(int lAxisNo, uint uProfileMode);
     // 지정 축의 설정한 구동 속도 프로파일 모드를 반환한다.
     [DllImport("AXL.dll")] public static extern uint AxmMotGetProfileMode(int nAxisNo, ref uint upProfileMode);
 
@@ -386,10 +377,6 @@ public class CAXM
     [DllImport("AXL.dll")] public static extern uint AxmSignalWriteOutput(int nAxisNo, uint uValue);
     // 범용 출력값을 반환한다.
     [DllImport("AXL.dll")] public static extern uint AxmSignalReadOutput(int nAxisNo, ref uint upValue);
-    
-    // ML3 전용 합수
-    // 지정축의 Brake sensor의 상태를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmSignalReadBrakeOn(int nAxisNo, ref uint upOnOff);
 
     // lBitNo : Bit Number(0 - 4)
     // uOnOff : FALSE(0), TRUE(1)
@@ -409,12 +396,6 @@ public class CAXM
     // uSignal: END_LIMIT(0), INP_ALARM(1), UIN_00_01(2), UIN_02_04(3)
     // dBandwidthUsec: 0.2uSec~26666usec
     [DllImport("AXL.dll")] public static extern uint AxmSignalSetFilterBandwidth(int nAxisNo, uint uSignal, double dBandwidthUsec);
-    
-    // 범용 입력의 비트 수를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmSignalGetInputBitCount(int nAxisNo, ref uint upInputCount);
-    
-    // 범용 출력의 비트 수를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmSignalGetOutputBitCount(int nAxisNo, ref uint upOutputCount);
 
     //========== 모션 구동중 및 구동후에 상태 확인하는 함수======================================================
     // (구동상태)모션 구동 중인가를 확인
@@ -456,8 +437,6 @@ public class CAXM
     [DllImport("AXL.dll")] public static extern uint AxmStatusGetPosType(int nAxisNo, ref uint upPosType, ref double dpPositivePos, ref double dpNegativePos);
     // 지정 축의 절대치 엔코더 원점 Offset 위치를 설정한다.[PCI-R1604-MLII 전용]
     [DllImport("AXL.dll")] public static extern uint AxmStatusSetAbsOrgOffset(int nAxisNo, double dOrgOffsetPos);
-    // 지정 축의 절대치 엔코더 원점 Offset 위치를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmStatusGetAbsOrgOffset(int nAxisNo, ref double dpOrgOffsetPos);
 
     // 지정 축의 Actual 위치를 설정한다.
     [DllImport("AXL.dll")] public static extern uint AxmStatusSetActPos(int nAxisNo, double dPos);
@@ -543,9 +522,9 @@ public class CAXM
     // lLevelScanTime[100msec]: 2번째 Step(원점센서를 빠져나가는 동작)에서 Level상태를 확인할 Scan시간을 설정(단위는 msec[1~1000]).
     // uFineSearchUse[USE]: 기본 원점검색시 5 Step를 사용하는데 3 Step만 사용하도록 변경할때 0으로 설정.
     // uHomeClrUse[USE]: 원점검색 후 지령값과 Encoder값을 0으로 자동 설정여부를 설정.
-    [DllImport("AXL.dll")] public static extern uint AxmHomeSetFineAdjust(int nAxisNo, double dHomeDogLength, uint uLevelScanTime, uint uFineSearchUse, uint uHomeClrUse);
+    [DllImport("AXL.dll")] public static extern uint AxmHomeSetFineAdjust(int nAxisNo, double dHomeDogLength, uint lLevelScanTime, uint uFineSearchUse, uint uHomeClrUse);
     // 설정되어있는 홈 관련 미세조정 파라메타들을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmHomeGetFineAdjust(int nAxisNo, ref double dpHomeDogLength, ref uint upLevelScanTime, ref uint upFineSearchUse, ref uint upHomeClrUse);
+    [DllImport("AXL.dll")] public static extern uint AxmHomeGetFineAdjust(int nAxisNo, ref double dpHomeDogLength, ref uint lpLevelScanTime, ref uint upFineSearchUse, ref uint upHomeClrUse);
 
     // 원점을 빠르고 정밀하게 검색하기 위해 여러 단계의 스탭으로 검출한다. 이때 각 스탭에 사용 될 속도를 설정한다. 
     // 이 속도들의 설정값에 따라 원점검색 시간과, 원점검색 정밀도가 결정된다. 
@@ -628,18 +607,18 @@ public class CAXM
     // 지정된 다축에 대하여 설정된 속도와 가속율로 지속적으로 속도 모드 구동을 한다.
     // 펄스 출력이 시작되는 시점에서 함수를 벗어난다.
     // Vel값이 양수이면 CW, 음수이면 CCW 방향으로 구동.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveStartMultiVel(int nArraySize, int[] npAxesNo, double[] dVel, double[] dAccel, double[] dDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveStartMultiVel(int lArraySize, int[] lpAxesNo, double[] dVel, double[] dAccel, double[] dDecel);
 
     // 지정된 다축에 대하여 설정된 속도와 가속율, SyncMode에 따라 지속적으로 속도 모드 구동을 한다.
     // 펄스 출력이 시작되는 시점에서 함수를 벗어난다.
     // Vel값이 양수이면 CW, 음수이면 CCW 방향으로 구동.
     // uSyncMode    : 동기정지기능 사용안함(0), 동기정지 기능만 사용(1), 알람에 대해서도 동기 정기기능 사용(2)
-    [DllImport("AXL.dll")] public static extern uint AxmMoveStartMultiVelEx(int nArraySize, int[] npAxesNo, double[] dpVel, double[] dpAccel, double[] dpDecel, uint uSyncMode);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveStartMultiVelEx(int lArraySize, int[] lpAxesNo, double[] dpVel, double[] dpAccel, double[] dpDecel, uint uSyncMode);
 
     // 지정된 다축에 대하여 설정된 속도와 가속율로 지속적으로 속도 모드 구동을 한다.
     // 펄스 출력이 시작되는 시점에서 함수를 벗어나며 Master축은(Distance가 가장 큰) dVel속도로 움직이며, 나머지 축들의 Distance비율로 움직인다. 
     // 속도는 해당 Chip중 축 번호가 가장 낮은 축의 속도만 읽힘
-    [DllImport("AXL.dll")] public static extern uint AxmMoveStartLineVel(int nArraySize, int[] npAxesNo, double[] dpDis, double dVel, double dAccel, double dDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveStartLineVel(int lArraySize, int[] lpAxesNo, double[] dpDis, double dVel, double dAccel, double dDecel);
 
     // 특정 Input 신호의 Edge를 검출하여 즉정지 또는 감속정지하는 함수.
     // lDetect Signal : edge 검출할 입력 신호 선택.
@@ -654,14 +633,14 @@ public class CAXM
 
     // 특정 Input 신호의 Edge를 검출하여 사용자가 지정함 위치 값만큼 이동하는 함수.(MLIII : Sigma-5/7 전용)
     // dVel           : 구동 속도 설정, 양수이면 CW, 음수이면 CCW.
-    // dAccel         : 구동 가속도 설정
-    // dDecel         : 구동 감속도 설정, 일반적으로 dAccel의 50배로 설정함.
+	// dAccel         : 구동 가속도 설정
+	// dDecel         : 구동 감속도 설정, 일반적으로 dAccel의 50배로 설정함.
     // lDetectSignal  : HomeSensor(4)
     // dDis           : 입력 신호의 검출 위치를 기준으로 사용자가 지정한 위치만큼 상대 구동됨.
     // 주의사항:        
-    //          - 구동방향과 반대 방향으로 dDis 값 입력시 역방향으로 구동 될 수 있음.
+	//          - 구동방향과 반대 방향으로 dDis 값 입력시 역방향으로 구동 될 수 있음.
     //          - 속도가 빠르고, dDis 값이 작은 경우 모터가 신호 감지해서 정지한 이후에 최종 위치로 가기 위해서 역방향으로 구동될 수 있음
-    //          - 해당 함수를 사용하기 전에 원점 센서는 반드시 LOW 또는 HIGH로 설정되어 있어야함.
+	//          - 해당 함수를 사용하기 전에 원점 센서는 반드시 LOW 또는 HIGH로 설정되어 있어야함.
     [DllImport("AXL.dll")] public static extern uint AxmMoveSignalSearchAtDis(int nAxisNo, double dVel, double dAccel, double dDecel, int nDetectSignal, double dDis);
 
     // 지정 축에서 설정된 신호를 검출하고 그 위치를 저장하기 위해 이동하는 함수이다.
@@ -696,19 +675,11 @@ public class CAXM
     // uAccFilterSel  : LINEAR_ACCDCEL(0), EXPO_ACCELDCEL(1), SCURVE_ACCELDECEL(2)
     // uGainSel       : GAIN_1ST(0), GAIN_2ND(1)
     // uSpdLoopSel    : PI_LOOP(0), P_LOOP(1)
-
-    // PCIe-Rxx05-MLIII
-    // dTorque        : 최대 출력 토크에 대한 %값 (단위: %)
-    //                  dTorque 값이 양수지면 CW, 음수이면 CCW 방향으로 구동
-    // dVel           : 구동 속도 (단위: pps)
-    // dwAccFilterSel : 사용하지 않음
-    // dwGainSel      : 사용하지 않음
-    // dwSpdLoopSel   : 사용하지 않음
-    [DllImport("AXL.dll")] public static extern uint AxmMoveStartTorque(int nAxisNo, double dTorque, double dVel, uint uAccFilterSel, uint uGainSel, uint uSpdLoopSel);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveStartTorque(int lAxisNo, double dTorque, double dVel, uint uAccFilterSel, uint uGainSel, uint uSpdLoopSel);
 
     // 지정 축의 토크 구동을 정지 한다.
     // AxmMoveStartTorque후 반드시 AxmMoveTorqueStop를 실행하여야 한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveTorqueStop(int nAxisNo, uint uMethod);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveTorqueStop(int lAxisNo, uint uMethod);
 
     // 설정한 거리만큼 또는 위치까지 이동한다.
     // 지정 축의 절대 좌표/상대좌표로 설정된 위치까지 설정된 속도/가속율로 구동을 한다.
@@ -728,7 +699,7 @@ public class CAXM
     // dVel[3] = 500., dAccel[3] = 0.,   dDecel[3] = 150.;  <== 감속
     // dVel[4] = 200., dAccel[4] = 0.,   dDecel[4] = 350.;  <== 감속
     // 펄스 출력이 종료되는 시점에서 함수를 벗어난다
-    [DllImport("AXL.dll")] public static extern uint AxmMoveStartPosWithList(int nAxisNo, double dPosition, double[] dpVel, double[] dpAccel, double[] dpDecel, int nListNum);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveStartPosWithList(int lAxisNo, double dPosition, double[] dpVel, double[] dpAccel, double[] dpDecel, int lListNum);
 
     // 설정한 거리만큼 또는 위치까지 대상 축의 위치가 증감할 때 이동을 시작한다.
     // lEvnetAxisNo    : 시작 조건 발생 축
@@ -736,7 +707,7 @@ public class CAXM
     // uPositionSource : 시작 조건 발생 축의 조건 발생 위치 기준 선택 => COMMAND(0), ACTUAL(1)
     // 예약 후 취소는 AxmMoveStop, AxmMoveEStop, AxmMoveSStop를 사용
     // 이동 축과 시작 조건 발생 축은 4축 단위 하나의 그룹(2V04의 경우 같은 모듈)에 존재하여야 합니다.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveStartPosWithPosEvent(int nAxisNo, double dPos, double dVel, double dAccel, double dDecel, int nEventAxisNo, double dComparePosition, uint uPositionSource);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveStartPosWithPosEvent(int lAxisNo, double dPos, double dVel, double dAccel, double dDecel, int lEventAxisNo, double dComparePosition, uint uPositionSource);
 
     // 지정 축을 설정한 감속도로 감속 정지 한다.
     // dDecel : 정지 시 감속율값
@@ -747,7 +718,7 @@ public class CAXM
     // dDecel : 정지 시 감속율값
     // 주의 : 감속율값은 최초 설정 감속율보다 크거나 같아야 한다.
     // 주의 : 감속 설정을 시간으로 하였을 경우 최초 설정 감속 시간보다 작거나 같아야 한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveStopEx(int nAxisNo, double dDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveStopEx(int lAxisNo, double dDecel);
     // 지정 축을 급 정지 한다.
     [DllImport("AXL.dll")] public static extern uint AxmMoveEStop(int nAxisNo);
     // 지정 축을 감속 정지한다.
@@ -803,14 +774,14 @@ public class CAXM
     // dwOverrideMode : 오버라이드 시작 방법을 지정함.
     //                : OVERRIDE_POS_START(0) 지정한 위치에서 지정한 속도로 오버라이드 시작함  
     //                : OVERRIDE_POS_END(1) 지정한 위치에서 지정한 속도가 되도록 미리 오버라이드 시작함
-    [DllImport("AXL.dll")] public static extern uint AxmOverrideVelAtMultiPos2(int nAxisNo, double dPos, double dVel, double dAccel, double dDecel, long lArraySize, double[] dpOverridePos, double[] dpOverrideVel, double[] dpOverrideAccelDecel, int nTarget, uint dwOverrideMode);
+    [DllImport("AXL.dll")] public static extern uint AxmOverrideVelAtMultiPos2(int lAxisNo, double dPos, double dVel, double dAccel, double dDecel, int lArraySize, double[] dpOverridePos, double[] dpOverrideVel, double[] dpOverrideAccelDecel, int lTarget, uint dwOverrideMode);
     
     //========= 마스터, 슬레이브  기어비로 구동 함수 ====================================================================
     // Electric Gear 모드에서 Master 축과 Slave 축과의 기어비를 설정한다.
     // dSlaveRatio : 마스터축에 대한 슬레이브의 기어비( 0 : 0% , 0.5 : 50%, 1 : 100%)
     [DllImport("AXL.dll")] public static extern uint AxmLinkSetMode(int nMasterAxisNo, int nSlaveAxisNo, double dSlaveRatio);
     // Electric Gear 모드에서 설정된 Master 축과 Slave 축과의 기어비를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmLinkGetMode(int nMasterAxisNo, ref uint uSlaveAxisNo, ref double dpGearRatio);
+    [DllImport("AXL.dll")] public static extern uint AxmLinkGetMode(int nMasterAxisNo, ref uint nSlaveAxisNo, ref double dpGearRatio);
     // Master 축과 Slave축간의 전자기어비를 설정 해제 한다.
     [DllImport("AXL.dll")] public static extern uint AxmLinkResetMode(int nMasterAxisNo);
 
@@ -846,9 +817,9 @@ public class CAXM
     // 모션 모듈은 두 축이 기구적으로 Link되어있는 겐트리 구동시스템 제어 중 동기 보상 기능을 설정한다.
     // lMasterGain, lSlaveGain : 두 축간 위치 편차에 대한 보상 값 반영 비율을 % 값으로 입력한다.
     // lMasterGain, lSlaveGain : 0을 입력하면 두 축간 위치 편차 보상 기능을 사용하지 않음. 기본값 : 0%
-    [DllImport("AXL.dll")] public static extern uint AxmGantrySetCompensationGain(int nMasterAxisNo, int nMasterGain, int nSlaveGain);
+    [DllImport("AXL.dll")] public static extern uint AxmGantrySetCompensationGain(int lMasterAxisNo, int lMasterGain, int lSlaveGain);
     // 모션 모듈은 두 축이 기구적으로 Link되어있는 겐트리 구동시스템 제어 중 동기 보상 기능을 설정을 확인한다.
-    [DllImport("AXL.dll")] public static extern uint AxmGantryGetCompensationGain(int nMasterAxisNo, ref int nMasterGain, ref int nSlaveGain);
+    [DllImport("AXL.dll")] public static extern uint AxmGantryGetCompensationGain(int lMasterAxisNo, ref int lMasterGain, ref int lSlaveGain);
 
     // Master 와 Slave 간 오차 범위를 설정 하고 오차범위 이상이면 Read 함수의 Status에 TRUE를 반환 한다.
     // PCI-R1604 / PCI-R3200-MLIII 전용 함수
@@ -857,21 +828,21 @@ public class CAXM
     // uUse : 모드 설정
     //      ( 0 : Disable)
     //      ( 1 : User 감시 모드)
-    //      ( 2 : Flag Latch 모드)
-    //      ( 3 : Flag Latch 모드 + Error 발생시 SSTOP)
+	//      ( 2 : Flag Latch 모드)
+	//      ( 3 : Flag Latch 모드 + Error 발생시 SSTOP)
     //      ( 4 : Flag Latch 모드 + Error 발생시 ESTOP)
-    [DllImport("AXL.dll")] public static extern uint AxmGantrySetErrorRange(int nMasterAxisNo, double dErrorRange, uint uUse);
+    [DllImport("AXL.dll")] public static extern uint AxmGantrySetErrorRange(int lMasterAxisNo, double dErrorRange, uint uUse);
     // Master 와 Slave 간의 오차 범위 설정값을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmGantryGetErrorRange(int nMasterAxisNo, ref double dpErrorRange, ref uint upUse);
+    [DllImport("AXL.dll")] public static extern uint AxmGantryGetErrorRange(int lMasterAxisNo, ref double dpErrorRange, ref uint upUse);
     // Master 와 Slave 간의 오차값 비교 결과를 반환 한다.
     // dwpStatus : FALSE(0) -> Master 와 Slave 사이의 오차범위가 설정한 오차범위 보다 작다. (정상상태)
     //             TRUE(1) -> Master 와 Slave 사이의 오차범위가 설정한 오차범위 보다 크다. (비정상상태)
     // AxmGantryReadErrorRangeStatus 함수의 경우 InMotion && Gantry Enable && Master/Slave Servo On 상태를 만족 할 때만
     // AXT_RT_SUCCESS를 Return 하며 위의 상태를 만족하지 않으면 Error Code를 Return 한다.
-    [DllImport("AXL.dll")] public static extern uint AxmGantryReadErrorRangeStatus(int nMasterAxisNo, ref uint dwpStatus);
+    [DllImport("AXL.dll")] public static extern uint AxmGantryReadErrorRangeStatus(int lMasterAxisNo, ref uint dwpStatus);
     // Master 와 Slave 간의 오차값을 반환 한다.
     // Flag Latch 모드 일때 Latch 된 값을 사용자가 읽어 간 후 다음 Error가 발생 되기 전까지 Error가 발생 했을 때의 값을 유지 하게 됩니다.
-    [DllImport("AXL.dll")] public static extern uint AxmGantryReadErrorRangeComparePos(int nMasterAxisNo, ref double dpComparePos);
+    [DllImport("AXL.dll")] public static extern uint AxmGantryReadErrorRangeComparePos(int lMasterAxisNo, ref double dpComparePos);
 
     //====일반 보간함수 =================================================================================================
     // 주의사항1: AxmContiSetAxisMap함수를 이용하여 축맵핑후에 낮은순서축부터 맵핑을 하면서 사용해야된다.
@@ -890,11 +861,11 @@ public class CAXM
     // 시작점과 종료점을 지정하여 다축 직선 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmContiBeginNode, AxmContiEndNode와 같이사용시 지정된 좌표계에 시작점과 종료점을 지정하여 직선 보간 구동하는 Queue에 저장함수가된다. 
     // 직선 프로파일 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmContiStart함수를 사용해서 시작한다.
-    [DllImport("AXL.dll")] public static extern uint AxmLineMove(int nCoord, double[] dPos, double dVel, double dAccel, double dDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmLineMove(int lCoord, double[] dPos, double dVel, double dAccel, double dDecel);
 
     // 2축 단위 직선 보간 한다.(Software 방식)
     // 시작점과 종료점을 지정하여 다축 직선 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
-    [DllImport("AXL.dll")] public static extern uint AxmLineMoveEx2(int nCoord, double[] dpEndPos, double dVel, double dAccel, double dDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmLineMoveEx2(int lCoord, double[] dpEndPos, double dVel, double dAccel, double dDecel);
 
     // 2축 원호보간 한다.
     // 시작점, 종료점과 중심점을 지정하여 원호 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
@@ -902,30 +873,27 @@ public class CAXM
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dCenterPos = 중심점 X,Y 배열 , dEndPos = 종료점 X,Y 배열.
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmCircleCenterMove(int nCoord, int[] nAxisNo, double[] dCenterPos, double[] dEndPos, double dVel, double dAccel, double dDecel, uint uCWDir);
+    [DllImport("AXL.dll")] public static extern uint AxmCircleCenterMove(int lCoord, int[] lAxisNo, double[] dCenterPos, double[] dEndPos, double dVel, double dAccel, double dDecel, uint uCWDir);
 
     // 중간점, 종료점을 지정하여 원호 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmContiBeginNode, AxmContiEndNode와 같이사용시 지정된 좌표계에 중간점, 종료점을 지정하여 구동하는 원호 보간 Queue에 저장함수가된다.
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dMidPos = 중간점 X,Y 배열 , dEndPos = 종료점 X,Y 배열, lArcCircle = 아크(0), 원(1)
-    [DllImport("AXL.dll")] public static extern uint AxmCirclePointMove(int nCoord, int[] nAxisNo, double[] dMidPos, double[] dEndPos, double dVel, double dAccel, double dDecel, int nArcCircle);
+    [DllImport("AXL.dll")] public static extern uint AxmCirclePointMove(int lCoord, int[] lAxisNo, double[] dMidPos, double[] dEndPos, double dVel, double dAccel, double dDecel, int lArcCircle);
 
-    // 중간점, 종료점을 지정하여 3차원 원/원호 보간을 지원한다. 구동 시작 후 함수를 벗어난다.
-    // 축 매핑은 3축이상 가능하며 3축 이상의 축들은 Linear Interpolation된다.
-    [DllImport("AXL.dll")] public static extern uint AxmCirclePointMoveEx(int nCoordNo,  ref int nAxisNo,  ref double dpMidPos, ref double dpEndPos, double dVel, double dAccel, double dDecel, int nArcCircle, int nArraySize);
     // 시작점, 종료점과 반지름을 지정하여 원호 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmContiBeginNode, AxmContiEndNode와 같이사용시 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 원호 보간 구동하는 Queue에 저장함수가된다.
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dRadius = 반지름, dEndPos = 종료점 X,Y 배열 , uShortDistance = 작은원(0), 큰원(1)
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmCircleRadiusMove(int nCoord, int[] nAxisNo, double dRadius, double[] dEndPos, double dVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance);
+    [DllImport("AXL.dll")] public static extern uint AxmCircleRadiusMove(int lCoord, int[] lAxisNo, double dRadius, double[] dEndPos, double dVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance);
 
     // 시작점, 회전각도와 반지름을 지정하여 원호 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmContiBeginNode, AxmContiEndNode와 같이사용시 지정된 좌표계에 시작점, 회전각도와 반지름을 지정하여 원호 보간 구동하는 Queue에 저장함수가된다.
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dCenterPos = 중심점 X,Y 배열 , dAngle = 각도.
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmCircleAngleMove(int nCoord, int[] nAxisNo, double[] dCenterPos, double dAngle, double dVel, double dAccel, double dDecel, uint uCWDir);
+    [DllImport("AXL.dll")] public static extern uint AxmCircleAngleMove(int lCoord, int[] lAxisNo, double[] dCenterPos, double dAngle, double dVel, double dAccel, double dDecel, uint uCWDir);
 
     //====연속 보간 함수 ================================================================================================
     // 지정된 좌표계에 연속보간 축 맵핑을 설정한다.
@@ -934,44 +902,44 @@ public class CAXM
     //         가상축 맵핑 함수를 사용하였을 때 가상축번호를 실제 축번호가 작은 값 부터 lpAxesNo의 낮은 인텍스에 입력하여야 한다.
     //         가상축 맵핑 함수를 사용하였을 때 가상축번호에 해당하는 실제 축번호가 다른 값이라야 한다.
     //         같은 축을 다른 Coordinate에 중복 맵핑하지 말아야 한다.
-    [DllImport("AXL.dll")] public static extern uint AxmContiSetAxisMap(int nCoord, uint uSize, int[] npRealAxesNo);
+    [DllImport("AXL.dll")] public static extern uint AxmContiSetAxisMap(int lCoord, uint lSize, int[] lpRealAxesNo);
     //지정된 좌표계에 연속보간 축 맵핑을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmContiGetAxisMap(int nCoord, ref uint uSize, ref int npRealAxesNo);
+    [DllImport("AXL.dll")] public static extern uint AxmContiGetAxisMap(int lCoord, ref uint lSize, ref int lpRealAxesNo);
 
     // 지정된 좌표계에 연속보간 축 절대/상대 모드를 설정한다.
     // (주의점 : 반드시 축맵핑 하고 사용가능)
     // 지정 축의 이동 거리 계산 모드를 설정한다.
     // uAbsRelMode : POS_ABS_MODE '0' - 절대 좌표계
     //               POS_REL_MODE '1' - 상대 좌표계
-    [DllImport("AXL.dll")] public static extern uint AxmContiSetAbsRelMode(int nCoord, uint uAbsRelMode);
+    [DllImport("AXL.dll")] public static extern uint AxmContiSetAbsRelMode(int lCoord, uint uAbsRelMode);
     // 지정된 좌표계에 연속보간 축 절대/상대 모드를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmContiGetAbsRelMode(int nCoord, ref uint upAbsRelMode);
+    [DllImport("AXL.dll")] public static extern uint AxmContiGetAbsRelMode(int lCoord, ref uint upAbsRelMode);
 
     // 지정된 좌표계에 보간 구동을 위한 내부 Queue가 비어 있는지 확인하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmContiReadFree(int nCoord, ref uint upQueueFree);
+    [DllImport("AXL.dll")] public static extern uint AxmContiReadFree(int lCoord, ref uint upQueueFree);
     // 지정된 좌표계에 보간 구동을 위한 내부 Queue에 저장되어 있는 보간 구동 개수를 확인하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmContiReadIndex(int nCoord, ref int npQueueIndex);
+    [DllImport("AXL.dll")] public static extern uint AxmContiReadIndex(int lCoord, ref int npQueueIndex);
 
     // 지정된 좌표계에 연속 보간 구동을 위해 저장된 내부 Queue를 모두 삭제하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmContiWriteClear(int nCoord);
+    [DllImport("AXL.dll")] public static extern uint AxmContiWriteClear(int lCoord);
 
     // 지정된 좌표계에 연속보간에서 수행할 작업들의 등록을 시작한다. 이함수를 호출한후,
     // AxmContiEndNode함수가 호출되기 전까지 수행되는 모든 모션작업은 실제 모션을 수행하는 것이 아니라 연속보간 모션으로 등록 되는 것이며,
     // AxmContiStart 함수가 호출될 때 비로소 등록된모션이 실제로 수행된다.
-    [DllImport("AXL.dll")] public static extern uint AxmContiBeginNode(int nCoord);
+    [DllImport("AXL.dll")] public static extern uint AxmContiBeginNode(int lCoord);
     // 지정된 좌표계에서 연속보간을 수행할 작업들의 등록을 종료한다.
-    [DllImport("AXL.dll")] public static extern uint AxmContiEndNode(int nCoord);
+    [DllImport("AXL.dll")] public static extern uint AxmContiEndNode(int lCoord);
 
     // 연속 보간 시작 한다.
     // uProfileset(CONTI_NODE_VELOCITY(0) : 연속 보간 사용, CONTI_NODE_MANUAL(1) : 프로파일 보간 사용, CONTI_NODE_AUTO(2) : 자동 프로파일 보간, 3 : 속도보상 모드 사용) 
-    [DllImport("AXL.dll")] public static extern uint AxmContiStart(int nCoord, uint uProfileset, int nAngle);
+    [DllImport("AXL.dll")] public static extern uint AxmContiStart(int lCoord, uint uProfileset, int lAngle);
     // 지정된 좌표계에 연속 보간 구동 중인지 확인하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmContiIsMotion(int nCoord, ref uint upInMotion);
+    [DllImport("AXL.dll")] public static extern uint AxmContiIsMotion(int lCoord, ref uint upInMotion);
 
     // 지정된 좌표계에 연속 보간 구동 중 현재 구동중인 연속 보간 인덱스 번호를 확인하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmContiGetNodeNum(int nCoord, ref int npNodeNum);
+    [DllImport("AXL.dll")] public static extern uint AxmContiGetNodeNum(int lCoord, ref int npNodeNum);
     // 지정된 좌표계에 설정한 연속 보간 구동 총 인덱스 갯수를 확인하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmContiGetTotalNodeNum(int nCoord, ref int npNodeNum);
+    [DllImport("AXL.dll")] public static extern uint AxmContiGetTotalNodeNum(int lCoord, ref int npNodeNum);
 
     //====================트리거 함수 ===================================================================================
     // 주의사항: 트리거 위치를 설정할경우 반드시 UNIT/PULSE의 맞추어서 설정한다.
@@ -985,9 +953,9 @@ public class CAXM
     // uInterrupt      : 인터럽트 설정         => DISABLE(0), ENABLE(1)
 
     // 지정 축에 트리거 신호 지속 시간 및 트리거 출력 레벨, 트리거 출력방법을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmTriggerSetTimeLevel(int nAxisNo, double dTrigTime, uint uTriggerLevel, uint uSelect, uint uInterrupt);
+    [DllImport("AXL.dll")] public static extern uint AxmTriggerSetTimeLevel(int lAxisNo, double dTrigTime, uint uTriggerLevel, uint uSelect, uint uInterrupt);
     // 지정 축에 트리거 신호 지속 시간 및 트리거 출력 레벨, 트리거 출력방법을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmTriggerGetTimeLevel(int nAxisNo, ref double dTrigTime, ref uint uTriggerLevel, ref uint uSelect, ref uint uInterrupt);
+    [DllImport("AXL.dll")] public static extern uint AxmTriggerGetTimeLevel(int lAxisNo, ref double dTrigTime, ref uint uTriggerLevel, ref uint uSelect, ref uint uInterrupt);
 
     // 지정 축의 트리거 출력 기능을 설정한다.
     // uMethod : PERIOD_MODE  0x0 : 현재 위치를 기준으로 dPos를 위치 주기로 사용한 주기 트리거 방식
@@ -1064,27 +1032,27 @@ public class CAXM
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다)
     // dCenterPos = 중심점 X,Y  , dEndPos = 종료점 X,Y
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmHelixCenterMove(int nCoord, double dCenterXPos, double dCenterYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dAccel, double dDecel, uint uCWDir);
+    [DllImport("AXL.dll")] public static extern uint AxmHelixCenterMove(int lCoord, double dCenterXPos, double dCenterYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dAccel, double dDecel, uint uCWDir);
 
     // 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 헬리컬 보간 구동하는 함수이다. 
     // AxmContiBeginNode, AxmContiEndNode와 같이사용시 지정된 좌표계에 중간점, 종료점을 지정하여 헬리컬연속 보간 구동하는 함수이다. 
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다.)
     // dMidPos = 중간점 X,Y  , dEndPos = 종료점 X,Y
-    [DllImport("AXL.dll")] public static extern uint AxmHelixPointMove(int nCoord, double dMidXPos, double dMidYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dAccel, double dDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmHelixPointMove(int lCoord, double dMidXPos, double dMidYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dAccel, double dDecel);
 
     // 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 헬리컬 보간 구동하는 함수이다.
     // AxmContiBeginNode, AxmContiEndNode와 같이사용시 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 헬리컬연속 보간 구동하는 함수이다. 
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다.)
     // dRadius = 반지름, dEndPos = 종료점 X,Y  , uShortDistance = 작은원(0), 큰원(1)
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmHelixRadiusMove(int nCoord, double dRadius, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance);
+    [DllImport("AXL.dll")] public static extern uint AxmHelixRadiusMove(int lCoord, double dRadius, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance);
 
     // 지정된 좌표계에 시작점, 회전각도와 반지름을 지정하여 헬리컬 보간 구동하는 함수이다
     // AxmContiBeginNode, AxmContiEndNode와 같이사용시 지정된 좌표계에 시작점, 회전각도와 반지름을 지정하여 헬리컬연속 보간 구동하는 함수이다. 
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다.)
     //dCenterPos = 중심점 X,Y  , dAngle = 각도.
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmHelixAngleMove(int nCoord, double dCenterXPos, double dCenterYPos, double dAngle, double dZPos, double dVel, double dAccel, double dDecel, uint uCWDir);
+    [DllImport("AXL.dll")] public static extern uint AxmHelixAngleMove(int lCoord, double dCenterXPos, double dCenterYPos, double dAngle, double dZPos, double dVel, double dAccel, double dDecel, uint uCWDir);
 
     //======== 스플라인 이동 ============================================================================================
     // 주의사항 : Spline를 연속보간 사용시 Helix , 직선보간과 원호보간을 같이 사용할수없다.
@@ -1095,7 +1063,7 @@ public class CAXM
     // lPosSize : 최소 3개 이상.
     // 2축으로 사용시 dPoZ값을 0으로 넣어주면 됨.
     // 3축으로 사용시 축맵핑을 3개및 dPosZ 값을 넣어준다.
-    [DllImport("AXL.dll")] public static extern uint AxmSplineWrite(int nCoord, int nPosSize, double[] dPosX, double[] dPosY, double dVel, double dAccel, double dDecel, double dPosZ, int nPointFactor);
+    [DllImport("AXL.dll")] public static extern uint AxmSplineWrite(int lCoord, int lPosSize, double[] dPosX, double[] dPosY, double dVel, double dAccel, double dDecel, double dPosZ, int lPointFactor);
 
     //======== PCI-R1604-MLII/SIIIH, PCIe-Rxx04-SIIIH 전용 함수 ================================================================================== 
     // 위치 보정 테이블 기능에 필요한 내용을 설정한다.
@@ -1108,7 +1076,7 @@ public class CAXM
     // 위치 보정 테이블 기능의 사용유무에 대한 설정 상태를 반환한다.
     [DllImport("AXL.dll")] public static extern uint AxmCompensationIsEnable(int nAxisNo, ref uint upEnable);
     // 현재 지령 위치에서의 보정값을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationGetCorrection(int nAxisNo, ref double dpCorrection);
+    [DllImport("AXL.dll")] public static extern uint AxmCompensationGetCorrection(int lAxisNo, ref double dpCorrection);
 
 
     	// Backlash에 관련된 설정을하는 함수
@@ -1124,9 +1092,9 @@ public class CAXM
 	// > dBacklash: 기구부에서 진행 방향과 반대반향으로 방향전환시 발생되는 Backlash양을 설정함
 	// { RETURN VALUE } 
 	//   - [0] -> Backlash 설정이 성공했을 때
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationSetBacklash(int nAxisNo, int lBacklashDir, double dBacklash);
+    [DllImport("AXL.dll")] public static extern uint AxmCompensationSetBacklash(int lAxisNo, int lBacklashDir, double dBacklash);
 	// Backlash에 관련된 설정 내용을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationGetBacklash(int nAxisNo, ref int lpBacklashDir, ref double dpBacklash);
+    [DllImport("AXL.dll")] public static extern uint AxmCompensationGetBacklash(int lAxisNo, ref int lpBacklashDir, ref double dpBacklash);
 	// Backlash사용유무를 설정/확인하는 함수
 	// > dwEnable: Backlash보정 사용유무를 지정
 	//   - [0]DISABLE -> Backlash보정을 사용안함    
@@ -1134,8 +1102,8 @@ public class CAXM
 	// { RETURN VALUE } 
 	//   - [0] -> Backlash 설정반환이 성공했을 때
     //   - [4303] -> Backlash 보정기능이 설정되어있지않을 때
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationEnableBacklash(int nAxisNo, uint dwEnable);
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationIsEnableBacklash(int nAxisNo, ref uint dwpEnable);
+    [DllImport("AXL.dll")] public static extern uint AxmCompensationEnableBacklash(int lAxisNo, uint dwEnable);
+    [DllImport("AXL.dll")] public static extern uint AxmCompensationIsEnableBacklash(int lAxisNo, ref uint dwpEnable);
    	// Backlash보정기능을 사용할 때 Backlash양 만큼 좌우로 이동하여 기구물의 위치를 자동 정렬함(서보 온 동작 이후 한번 사용함)
 	// > dVel: 이동 속도[unit / sec]
 	// > dAccel: 이동가속도[unit / sec^2]
@@ -1148,12 +1116,12 @@ public class CAXM
 
     // ECAM 기능에 필요한 내용을 설정한다.
     [DllImport("AXL.dll")] public static extern uint AxmEcamSet(int nAxisNo, int nMasterAxisNo, int nNumEntry, double dMasterStartPos, ref double dpMasterPos, ref double dpSlavePos);
-    // ECAM 기능에 필요한 내용을 CMD/ACT Source와 함께 설정한다. (PCIe-Rxx04-SIIIH 전용 함수)
-    [DllImport("AXL.dll")] public static extern uint AxmEcamSetWithSource(int nAxisNo, int nMasterAxis, int nNumEntry, double dMasterStartPos, ref double dpMasterPos, ref double dpSlavePos, uint dwSource);
+	// ECAM 기능에 필요한 내용을 CMD/ACT Source와 함께 설정한다. (PCIe-Rxx04-SIIIH 전용 함수)
+	[DllImport("AXL.dll")] public static extern uint AxmEcamSetWithSource(int lAxisNo, int lMasterAxis, int lNumEntry, double dMasterStartPos, ref double dpMasterPos, ref double dpSlavePos, uint dwSource);
     // ECAM 기능 설정 내용을 반환한다.
     [DllImport("AXL.dll")] public static extern uint AxmEcamGet(int nAxisNo, ref int npMasterAxisNo, ref int npNumEntry, ref double dpMasterStartPos, ref double dpMasterPos, ref double dpSlavePos);
-    // ECAM 기능 설정 내용을 CMD/ACT Source와 함께 반환한다. (PCIe-Rxx04-SIIIH 전용 함수)
-    [DllImport("AXL.dll")] public static extern uint AxmEcamGetWithSource(int nAxisNo, ref int npMasterAxis, ref int npNumEntry, ref double dpMasterStartPos, ref double dpMasterPos, ref double dpSlavePos, ref uint dwpSource);
+	// ECAM 기능 설정 내용을 CMD/ACT Source와 함께 반환한다. (PCIe-Rxx04-SIIIH 전용 함수)
+	[DllImport("AXL.dll")] public static extern uint AxmEcamGetWithSource(int lAxisNo, ref int lpMasterAxis, ref int lpNumEntry, ref double dpMasterStartPos, ref double dpMasterPos, ref double dpSlavePos, ref uint dwpSource);
 
     // ECAM 기능의 사용 유무를 설정한다.
     [DllImport("AXL.dll")] public static extern uint AxmEcamEnableBySlave(int nAxisNo, uint uEnable);
@@ -1202,16 +1170,16 @@ public class CAXM
     //     [1] : Regeneration load factor(%)
     //     [2] : Effective load factor(%)
     //     [3] : Peak load factor(%)
-    //     [4] : Current feedback(0.1%)    
-    [DllImport("AXL.dll")] public static extern uint AxmStatusSetReadServoLoadRatio(int nAxisNo, uint dwSelMon);
+    //     [4] : Current feedback(0.1%)	
+    [DllImport("AXL.dll")] public static extern uint AxmStatusSetReadServoLoadRatio(int lAxisNo, uint dwSelMon);
      // 지정 축의 부하율을 반환한다.(MLII : Sigma-5, SIIIH : MR_J4_xxB 전용)
-    [DllImport("AXL.dll")] public static extern uint AxmStatusReadServoLoadRatio(int nAxisNo, ref double dpMonitorValue);
+    [DllImport("AXL.dll")] public static extern uint AxmStatusReadServoLoadRatio(int lAxisNo, ref double dpMonitorValue);
 
 //======== PCI-R1604-RTEX 전용 함수==================================================================================
     // RTEX A4Nx 관련 Scale Coefficient를 설정한다.(RTEX, A4Nx 전용)
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetScaleCoeff(int nAxisNo, int nScaleCoeff);
+    [DllImport("AXL.dll")] public static extern uint AxmMotSetScaleCoeff(int nAxisNo, int lScaleCoeff);
     // RTEX A4Nx 관련 Scale Coefficient 를 확인한다.(RTEX, A4Nx 전용)
-    [DllImport("AXL.dll")] public static extern uint AxmMotGetScaleCoeff(int nAxisNo, ref int npScaleCoeff);
+    [DllImport("AXL.dll")] public static extern uint AxmMotGetScaleCoeff(int nAxisNo, ref int lpScaleCoeff);
     // 특정 Input 신호의 Edge를 검출하여 즉정지 또는 감속정지하는 함수.
     // lDetect Signal : edge 검출할 입력 신호 선택.
     // lDetectSignal  : PosEndLimit(0), NegEndLimit(1), HomeSensor(4), EncodZPhase(5), UniInput02(6), UniInput03(7)
@@ -1229,9 +1197,9 @@ public class CAXM
     // 속도 프로파일은 사라디꼴 전용으로 구동한다.
     // 펄스가 출력되는 시점에서 함수를 벗어난다.
     // 항상 위치 및 속도, 가감속도를 변경 가능하며, 반대방향 위치 변경 기능을 포함한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveToAbsPos(int nAxisNo, double dPos, double dVel, double dAccel, double dDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveToAbsPos(int lAxisNo, double dPos, double dVel, double dAccel, double dDecel);
     // 지정 축의 현재 구동 속도를 읽어온다.
-    [DllImport("AXL.dll")] public static extern uint AxmStatusReadVelEx(int nAxisNo, ref double dpVel);
+    [DllImport("AXL.dll")] public static extern uint AxmStatusReadVelEx(int lAxisNo, ref double dpVel);
 //-------------------------------------------------------------------------------------------------------------------
 
 //========  PCI-R1604-SIIIH, PCIe-Rxx04-SIIIH 전용 함수 ==================================================================================
@@ -1251,41 +1219,21 @@ public class CAXM
     // ==> lNumerator = 2^22, lDenominator = 36000(360 / 0.01)
     // AxmMotSetMoveUnitPerPulse에서 Unit/Pulse = 1/1로 설정하였다면, 모든 함수의 위치 단위 : 0.01도, 속도 단위 : 0.01도/sec, 가감속도 단뒤 : 0.01도/sec^2이 된다.
     // AxmMotSetMoveUnitPerPulse에서 Unit/Pulse = 1/100로 설정하였다면, 모든 함수의 위치 단위 : 1도, 속도 단위 : 1도/sec, 가감속도 단뒤 : 1도/sec^2이 된다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetElectricGearRatio(int nAxisNo, int nNumerator, int nDenominator);
+    [DllImport("AXL.dll")] public static extern uint AxmMotSetElectricGearRatio(int lAxisNo, int lNumerator, int lDenominator);
     // 지정 축의 전자 기어비 설정을 확인한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotGetElectricGearRatio(int nAxisNo, ref int npNumerator, ref int npDenominator);
+    [DllImport("AXL.dll")] public static extern uint AxmMotGetElectricGearRatio(int lAxisNo, ref int lpNumerator, ref int lpDenominator);
 
     // 지정 축의 토크 리미트 값을 설정 합니다.
     // 정방향, 역방향 구동시의 토크 값을 제한하는 함수. 
     // 설정 값은 1 ~ 1000까지 설정
     // 최대 토크의 0.1% 단위로 제어 함.
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetTorqueLimit(int nAxisNo, double dbPluseDirTorqueLimit, double dbMinusDirTorqueLimit);
+    [DllImport("AXL.dll")] public static extern uint AxmMotSetTorqueLimit(int lAxisNo, double dbPluseDirTorqueLimit, double dbMinusDirTorqueLimit);
 
     // 지정 축의 토크 리미트 값을 확인 합니다.
     // 정방향, 역방향 구동시의 토크 값을 읽어 오는 함수.
     // 설정 값은 1 ~ 1000까지 설정
     // 최대 토크의 0.1% 단위로 제어 함.
-    [DllImport("AXL.dll")] public static extern uint AxmMotGetTorqueLimit(int nAxisNo, ref double dbpPluseDirTorqueLimit, ref double dbpMinusDirTorqueLimit);
-
-    // 토크 리미트 기능을 Enable/Disable 한다. (PCI-R1604 RTEX 전용 함수)
-    // PCI-R1604의 경우 토크 리미트 값을 설정하고 기능을 Enable 해야 토크 리미트 기능이 동작합니다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetTorqueLimitEnable(int nAxisNo, uint uUse);
-
-    // 토크 리미트 기능의 사용유무를 확인 한다. (PCI-R1604 RTEX 전용 함수)
-    [DllImport("AXL.dll")] public static extern uint AxmMotGetTorqueLimitEnable(int nAxisNo, ref uint upUse);
-
-    // 지정된 축의 Position 범위 마다 TorqueLimit을 설정한다.
-    // Position 개수는 lSize, TorqueLimit 개수는 lSize - 1
-    // Position은 오름차순으로 입력되어야만 한다
-    // EtherCAT은 PlusTorqueLimit만으로 양쪽 다 같은 TorqueLimit을 건다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetMultiTorqueLimit(int nAxisNo, int nSize, double[] dpPosition, double[] dpPlusTorqueLimit, double[] dpMinusTorqueLimit, int nTarget);
-
-    // 지정된 축의 Multi TorqueLimit을 Enable or Disable 한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotMultiTorqueLimitEnable(int nAxisNo, uint dwEnable);
-
-    // 지정된 축의 Multi TorqueLimit이 Enable 되어있는지 읽어온다. 
-    [DllImport("AXL.dll")] public static extern uint AxmMotMultiTorqueLimitIsEnable(int nAxisNo, ref uint dwpEnable);
-
+    [DllImport("AXL.dll")] public static extern uint AxmMotGetTorqueLimit(int lAxisNo, ref double dbpPluseDirTorqueLimit, ref double dbpMinusDirTorqueLimit);
 
     // 지정 축의 AxmOverridePos에 대한 특수 기능 사용 유무를 설정한다.
     // dwUsage        : AxmOverridPos 적용 가능 위치 판단 기능 사용 유무.
@@ -1293,76 +1241,76 @@ public class CAXM
     //                  ENABLE(1) : AxmMoveStartPos 설정한 구동 중 위치 변경 가능 위치를 감속 거리의 lDecelPosRatio(%)을 기준으로 판단한다.
     // lDecelPosRatio : 감속 거리에 대한 %값.
     // dReserved      : 사용하지 않음.
-    [DllImport("AXL.dll")] public static extern uint AxmOverridePosSetFunction(int nAxisNo, uint dwUsage, int nDecelPosRatio, double dReserved);
+    [DllImport("AXL.dll")] public static extern uint AxmOverridePosSetFunction(int lAxisNo, uint dwUsage, int lDecelPosRatio, double dReserved);
     // 지정 축의 AxmOverridePos에 대한 특수 기능 사용 유무를 확인 한다.
-    [DllImport("AXL.dll")] public static extern uint AxmOverridePosGetFunction(int nAxisNo, ref uint dwpUsage, ref int npDecelPosRatio, ref double dpReserved);
+    [DllImport("AXL.dll")] public static extern uint AxmOverridePosGetFunction(int lAxisNo, ref uint dwpUsage, ref int lpDecelPosRatio, ref double dpReserved);
 
 //-------------------------------------------------------------------------------------------------------------------
 
 //======== PCI-R3200-MLIII 전용 함수==================================================================================
     // 잔류 진동 억제(VST) 특수 함수    
-    // 사용전에 반드시 코디에 대해서 축을 할당을 해야하며, 코디 한개에 1개의 축만 맵핑을 해야한다.
-    // 아래 함수 실행전에 반드시 Servo ON 상태에서 사용한다.
-    // lCoordnate        : 입력 성형 적용 코디 번호를 입력한다. 각 보드별 첫번째 부터 10번째의 코디에 축을 할당해서 사용해야 한다.
-    //                     MLIII 마스터 보드는 보드 번호를 기준으로 16 ~ 31까지 보드 별로 순차적으로 16씩 증가된다.
-    //                     MLIII B/D 0 : 16 ~ 31
-    //                     MLIII B/D 1 : 31 ~ 47
-    // cISTSize          : 입력 성형 사용 주파수 개수에 대해서 입력한다. 1로 값을 고정해서 사용한다.
-    // dbpFrequency,     : 10H ~ 500Hz
-    //                     1차 주파수 부터 순서데로 입력한다.(저주파부터 고주파).
-    // dbpDampingRatio   : 0.001 ~ 0.9
-    // dwpImpulseCount   : 2 ~ 5
-    [DllImport("AXL.dll")] public static extern uint AxmAdvVSTSetParameter(int nCoordinate, uint dwISTSize, double[] dbpFrequency, double[] dbpDampingRatio, ref uint dwpImpulseCount);
-    [DllImport("AXL.dll")] public static extern uint AxmAdvVSTGetParameter(int nCoordinate, ref uint dwpISTSize, double[] dbpFrequency, double[] dbpDampingRatio, ref uint dwpImpulseCount);
+	// 사용전에 반드시 코디에 대해서 축을 할당을 해야하며, 코디 한개에 1개의 축만 맵핑을 해야한다.
+	// 아래 함수 실행전에 반드시 Servo ON 상태에서 사용한다.
+	// lCoordnate        : 입력 성형 적용 코디 번호를 입력한다. 각 보드별 첫번째 부터 10번째의 코디에 축을 할당해서 사용해야 한다.
+	//                     MLIII 마스터 보드는 보드 번호를 기준으로 16 ~ 31까지 보드 별로 순차적으로 16씩 증가된다.
+	//                     MLIII B/D 0 : 16 ~ 31
+	//                     MLIII B/D 1 : 31 ~ 47
+	// cISTSize          : 입력 성형 사용 주파수 개수에 대해서 입력한다. 1로 값을 고정해서 사용한다.
+	// dbpFrequency,	 : 10H ~ 500Hz
+	//                     1차 주파수 부터 순서데로 입력한다.(저주파부터 고주파).
+	// dbpDampingRatio   : 0.001 ~ 0.9
+	// dwpImpulseCount   : 2 ~ 5
+    [DllImport("AXL.dll")] public static extern uint AxmAdvVSTSetParameter(int lCoordinate, uint dwISTSize, double[] dbpFrequency, double[] dbpDampingRatio, ref uint dwpImpulseCount);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvVSTGetParameter(int lCoordinate, ref uint dwpISTSize, double[] dbpFrequency, double[] dbpDampingRatio, ref uint dwpImpulseCount);
     // lCoordnate        : 입력 성형 코디 번호를 입력한다.
     // dwISTEnable       : 입력 성형 사용 유무를 결정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvVSTSetEnabele(int nCoordinate, uint dwISTEnable);
-    [DllImport("AXL.dll")] public static extern uint AxmAdvVSTGetEnabele(int nCoordinate, ref uint dwISTEnable);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvVSTSetEnabele(int lCoordinate, uint dwISTEnable);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvVSTGetEnabele(int lCoordinate, ref uint dwISTEnable);
 
-//====일반 보간함수 =================================================================================================    
+//====일반 보간함수 =================================================================================================	
     // 직선 보간 한다.
     // 시작점과 종료점을 지정하여 다축 직선 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점과 종료점을 지정하여 직선 보간 구동하는 Queue에 저장함수가된다. 
     // 직선 프로파일 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmAdvContiStart함수를 사용해서 시작한다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvLineMove(int nCoordinate, double[] dPosition, double dMaxVelocity, double dStartVel, double dStopVel, double dMaxAccel, double dMaxDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvLineMove(int lCoordinate, double[] dPosition, double dMaxVelocity, double dStartVel, double dStopVel, double dMaxAccel, double dMaxDecel);
     // 지정된 좌표계에 시작점과 종료점을 지정하는 다축 직선 보간 오버라이드하는 함수이다.
     // 현재 진행중인 보간구동을 지정된 속도 및 위치로 직선 보간 오버라이드 하며, 다음 노드에 대한 직선 보간 구동 예약도 가능한다.
     // IOverrideMode = 0일 경우, 구동중인 보간이 직선, 원호 보간에 관계없이 현재 구동 노드에서 직선 보간으로 즉시 오버라이드 되고, 
     // IOverrideMode = 1이면 현재 구동 노드 다음의 노드부터 직선보간이 차례로 예약된다.
     // IOverrideMode = 1로 본 함수를 호출할때마다 최소 1개에서 최대 8개까지 오버라이드 큐에 증가되면서 자동적으로 예약이 되며, 예약 후 마지막에 IOverrideMode = 0으로 본 함수가 호출되면
     // 내부적으로 오버라이드 큐에 있는 예약 보간들이 연속보간 큐로 저장되고, 직선 오버라이드 구동과 이후의 예약된 연속보간이 순차적으로 실행된다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvOvrLineMove(int nCoordinate, double[] dPosition, double dMaxVelocity, double dStartVel, double dStopVel, double dMaxAccel, double dMaxDecel, int nOverrideMode);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvOvrLineMove(int lCoordinate, double[] dPosition, double dMaxVelocity, double dStartVel, double dStopVel, double dMaxAccel, double dMaxDecel, int lOverrideMode);
     // 2축 원호보간 한다.
     // 시작점, 종료점과 중심점을 지정하여 원호 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode, 와 같이사용시 지정된 좌표계에 시작점, 종료점과 중심점을 지정하여 구동하는 원호 보간 Queue에 저장함수가된다.
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmAdvContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dCenterPos = 중심점 X,Y 배열 , dEndPos = 종료점 X,Y 배열.
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmAdvCircleCenterMove(int nCoord, int[] nAxisNo, double[] dCenterPos, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvCircleCenterMove(int lCoord, int[] lAxisNo, double[] dCenterPos, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir);
     // 중간점, 종료점을 지정하여 원호 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 중간점, 종료점을 지정하여 구동하는 원호 보간 Queue에 저장함수가된다.
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmAdvContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dMidPos = 중간점 X,Y 배열 , dEndPos = 종료점 X,Y 배열, lArcCircle = 아크(0), 원(1)
-    [DllImport("AXL.dll")] public static extern uint AxmAdvCirclePointMove(int nCoord, int[] nAxisNo, double[] dMidPos, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, int nArcCircle);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvCirclePointMove(int lCoord, int[] lAxisNo, double[] dMidPos, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, int lArcCircle);
     // 시작점, 회전각도와 반지름을 지정하여 원호 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점, 회전각도와 반지름을 지정하여 원호 보간 구동하는 Queue에 저장함수가된다.
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmAdvContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dCenterPos = 중심점 X,Y 배열 , dAngle = 각도.
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmAdvCircleAngleMove(int nCoord, int[] nAxisNo, double[] dCenterPos, double dAngle, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvCircleAngleMove(int lCoord, int[] lAxisNo, double[] dCenterPos, double dAngle, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir);
     // 시작점, 종료점과 반지름을 지정하여 원호 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 원호 보간 구동하는 Queue에 저장함수가된다.
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmAdvContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dRadius = 반지름, dEndPos = 종료점 X,Y 배열 , uShortDistance = 작은원(0), 큰원(1)
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmAdvCircleRadiusMove(int nCoord, int[] nAxisNo, double dRadius, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvCircleRadiusMove(int lCoord, int[] lAxisNo, double dRadius, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance);
     // 지정된 좌표계에 시작점과 종료점을 지정하여 2축 원호 보간 오버라이드 구동한다.
     // 현재 진행중인 보간구동을 지정된 속도 및 위치로 원호 보간 오버라이드 하며, 다음 노드에 대한 원호 보간 구동 예약도 가능한다.
     // IOverrideMode = 0일 경우, 구동중인 보간이 직선, 원호 보간에 관계없이 현재 구동 노드에서 원호 보간으로 즉시 오버라이드 되고, 
     // IOverrideMode = 1이면 현재 구동 노드 다음의 노드부터 원호보간이 차례로 예약된다.
     // IOverrideMode = 1로 본 함수를 호출할때마다 최소 1개에서 최대 8개까지 오버라이드 큐에 증가되면서 자동적으로 예약이 되며, 예약 후 마지막에 IOverrideMode = 0으로 본 함수가 호출되면
     // 내부적으로 오버라이드 큐에 있는 예약 보간들이 연속보간 큐로 저장되고, 원호 오버라이드 구동과 이후의 예약된 연속보간이 순차적으로 실행된다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvOvrCircleRadiusMove(int nCoord, int[] nAxisNo, double dRadius, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, int nOverrideMode);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvOvrCircleRadiusMove(int lCoord, int[] lAxisNo, double dRadius, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, int lOverrideMode);
 
 //======= 헬리컬 이동 ===============================================================================================
     // 주의사항 : Helix를 연속보간 사용시 Spline, 직선보간과 원호보간을 같이 사용할수없다.
@@ -1371,77 +1319,77 @@ public class CAXM
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점, 종료점과 중심점을 지정하여 헬리컬 연속보간 구동하는 함수이다. 
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmAdvContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다)
     // dCenterPos = 중심점 X,Y  , dEndPos = 종료점 X,Y .
-    // uCWDir DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향        
-    [DllImport("AXL.dll")] public static extern uint AxmAdvHelixCenterMove(int nCoord, double dCenterXPos, double dCenterYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir);
+    // uCWDir DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향    	
+    [DllImport("AXL.dll")] public static extern uint AxmAdvHelixCenterMove(int lCoord, double dCenterXPos, double dCenterYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir);
     // 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 헬리컬 보간 구동하는 함수이다. 
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 중간점, 종료점을 지정하여 헬리컬연속 보간 구동하는 함수이다. 
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmAdvContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다.)
     // dMidPos = 중간점 X,Y  , dEndPos = 종료점 X,Y 
-    [DllImport("AXL.dll")] public static extern uint AxmAdvHelixPointMove(int nCoord, double dMidXPos, double dMidYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvHelixPointMove(int lCoord, double dMidXPos, double dMidYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel);
     // 지정된 좌표계에 시작점, 회전각도와 반지름을 지정하여 헬리컬 보간 구동하는 함수이다
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점, 회전각도와 반지름을 지정하여 헬리컬연속 보간 구동하는 함수이다. 
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmAdvContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다.)
     //dCenterPos = 중심점 X,Y  , dAngle = 각도.
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmAdvHelixAngleMove(int nCoord, double dCenterXPos, double dCenterYPos, double dAngle, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvHelixAngleMove(int lCoord, double dCenterXPos, double dCenterYPos, double dAngle, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir);
     // 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 헬리컬 보간 구동하는 함수이다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 헬리컬연속 보간 구동하는 함수이다. 
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmAdvContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다.)
     // dRadius = 반지름, dEndPos = 종료점 X,Y  , uShortDistance = 작은원(0), 큰원(1)
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향   
-    [DllImport("AXL.dll")] public static extern uint AxmAdvHelixRadiusMove(int nCoord, double dRadius, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvHelixRadiusMove(int lCoord, double dRadius, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance);
     // 지정된 좌표계에 시작점과 종료점을 지정하여 3축 헬리컬 보간 오버라이드 구동한다.
     // 현재 진행중인 보간구동을 지정된 속도 및 위치로 헬리컬 보간 오버라이드 하며, 다음 노드에 대한 헬리컬 보간 구동 예약도 가능한다.
     // IOverrideMode = 0일 경우, 구동중인 보간이 직선, 원호 보간에 관계없이 현재 구동 노드에서 헬리컬 보간으로 즉시 오버라이드 되고, 
     // IOverrideMode = 1이면 현재 구동 노드 다음의 노드부터 헬리컬 보간이 차례로 예약된다.
     // IOverrideMode = 1로 본 함수를 호출할때마다 최소 1개에서 최대 8개까지 오버라이드 큐에 증가되면서 자동적으로 예약이 되며, 예약 후 마지막에 IOverrideMode = 0으로 본 함수가 호출되면
     // 내부적으로 오버라이드 큐에 있는 예약 보간들이 연속보간 큐로 저장되고, 헬리컬 오버라이드 구동과 이후의 예약된 연속보간이 순차적으로 실행된다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvOvrHelixRadiusMove(int nCoord, double dRadius, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, int nOverrideMode);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvOvrHelixRadiusMove(int lCoord, double dRadius, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, int lOverrideMode);
 
 //====일반 보간함수 =================================================================================================
     // 직선 보간을 예약 구동한다.
     // 시작점과 종료점을 지정하여 다축 직선 보간을 예약 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점과 종료점을 지정하여 직선 보간 구동하는 Queue에 저장함수가된다. 
     // 직선 프로파일 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmAdvContiStart함수를 사용해서 시작한다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptLineMove(int nCoordinate, double[] dPosition, double dMaxVelocity, double dStartVel, double dStopVel, double dMaxAccel, double dMaxDecel, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptLineMove(int lCoordinate, double[] dPosition, double dMaxVelocity, double dStartVel, double dStopVel, double dMaxAccel, double dMaxDecel, uint dwScript, int lScirptAxisNo, double dScriptPos);
     // 지정된 좌표계에 시작점과 종료점을 지정하는 다축 직선 보간 오버라이드를 예약 구동하는 함수이다.
     // 현재 진행중인 보간구동을 지정된 속도 및 위치로 직선 보간 오버라이드를 예약 구동 하며, 다음 노드에 대한 직선 보간 구동 예약이 가능한다.
     // IOverrideMode = 0일 경우, 구동중인 보간이 직선, 원호 보간에 관계없이 현재 구동 노드에서 직선 보간으로 즉시 오버라이드 되고, 
     // IOverrideMode = 1이면 현재 구동 노드 다음의 노드부터 직선보간이 차례로 예약된다.
     // IOverrideMode = 1로 본 함수를 호출할때마다 최소 1개에서 최대 8개까지 오버라이드 큐에 증가되면서 자동적으로 예약이 되며, 예약 후 마지막에 IOverrideMode = 0으로 본 함수가 호출되면
     // 내부적으로 오버라이드 큐에 있는 예약 보간들이 연속보간 큐로 저장되고, 직선 오버라이드 구동과 이후의 예약된 연속보간이 순차적으로 실행된다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptOvrLineMove(int nCoordinate, double[] dPosition, double dMaxVelocity, double dStartVel, double dStopVel, double dMaxAccel, double dMaxDecel, int nOverrideMode, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptOvrLineMove(int lCoordinate, double[] dPosition, double dMaxVelocity, double dStartVel, double dStopVel, double dMaxAccel, double dMaxDecel, int lOverrideMode, uint dwScript, int lScirptAxisNo, double dScriptPos);
     // 2축 원호보간을 예약 구동한다.
     // 시작점, 종료점과 중심점을 지정하여 원호 보간을 예약 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode, 와 같이사용시 지정된 좌표계에 시작점, 종료점과 중심점을 지정하여 구동하는 원호 보간 Queue에 저장함수가된다.
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmAdvContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dCenterPos = 중심점 X,Y 배열 , dEndPos = 종료점 X,Y 배열.
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptCircleCenterMove(int nCoord, int[] nAxisNo, double[] dCenterPos, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptCircleCenterMove(int lCoord, int[] lAxisNo, double[] dCenterPos, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint dwScript, int lScirptAxisNo, double dScriptPos);
     // 중간점, 종료점을 지정하여 원호 보간을 예약 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 중간점, 종료점을 지정하여 구동하는 원호 보간 Queue에 저장함수가된다.
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmAdvContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dMidPos = 중간점 X,Y 배열 , dEndPos = 종료점 X,Y 배열, lArcCircle = 아크(0), 원(1)
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptCirclePointMove(int nCoord, int[] nAxisNo, double[] dMidPos, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, int nArcCircle, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptCirclePointMove(int lCoord, int[] lAxisNo, double[] dMidPos, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, int lArcCircle, uint dwScript, int lScirptAxisNo, double dScriptPos);
     // 시작점, 회전각도와 반지름을 지정하여 원호 보간을 예약 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점, 회전각도와 반지름을 지정하여 원호 보간 구동하는 Queue에 저장함수가된다.
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmAdvContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dCenterPos = 중심점 X,Y 배열 , dAngle = 각도.
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptCircleAngleMove(int nCoord, int[] nAxisNo, double[] dCenterPos, double dAngle, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptCircleAngleMove(int lCoord, int[] lAxisNo, double[] dCenterPos, double dAngle, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint dwScript, int lScirptAxisNo, double dScriptPos);
     // 시작점, 종료점과 반지름을 지정하여 원호 보간을 예약 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 원호 보간 구동하는 Queue에 저장함수가된다.
     // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmAdvContiStart함수를 사용해서 시작한다.
     // lAxisNo = 두축 배열 , dRadius = 반지름, dEndPos = 종료점 X,Y 배열 , uShortDistance = 작은원(0), 큰원(1)
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptCircleRadiusMove(int nCoord, int[] nAxisNo, double dRadius, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptCircleRadiusMove(int lCoord, int[] lAxisNo, double dRadius, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, uint dwScript, int lScirptAxisNo, double dScriptPos);
     // 지정된 좌표계에 시작점과 종료점을 지정하여 2축 원호 보간 오버라이드를 예약 구동한다.
     // 현재 진행중인 보간구동을 지정된 속도 및 위치로 원호 보간 오버라이드을 예약 구동하며, 다음 노드에 대한 원호 보간 구동 예약이 가능한다.
     // IOverrideMode = 0일 경우, 구동중인 보간이 직선, 원호 보간에 관계없이 현재 구동 노드에서 원호 보간으로 즉시 오버라이드 되고, 
     // IOverrideMode = 1이면 현재 구동 노드 다음의 노드부터 원호보간이 차례로 예약된다.
     // IOverrideMode = 1로 본 함수를 호출할때마다 최소 1개에서 최대 8개까지 오버라이드 큐에 증가되면서 자동적으로 예약이 되며, 예약 후 마지막에 IOverrideMode = 0으로 본 함수가 호출되면
     // 내부적으로 오버라이드 큐에 있는 예약 보간들이 연속보간 큐로 저장되고, 원호 오버라이드 구동과 이후의 예약된 연속보간이 순차적으로 실행된다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptOvrCircleRadiusMove(int nCoord, int[] nAxisNo, double dRadius, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, int nOverrideMode, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptOvrCircleRadiusMove(int lCoord, int[] lAxisNo, double dRadius, double[] dEndPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, int lOverrideMode, uint dwScript, int lScirptAxisNo, double dScriptPos);
 
 //======= 헬리컬 이동 ===============================================================================================
     // 주의사항 : Helix를 연속보간 사용시 Spline, 직선보간과 원호보간을 같이 사용할수없다.
@@ -1450,429 +1398,239 @@ public class CAXM
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점, 종료점과 중심점을 지정하여 헬리컬 연속보간을 예약 구동하는 함수이다. 
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmAdvContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다)
     // dCenterPos = 중심점 X,Y  , dEndPos = 종료점 X,Y .
-    // uCWDir DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향    
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptHelixCenterMove(int nCoord, double dCenterXPos, double dCenterYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    // uCWDir DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향	
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptHelixCenterMove(int lCoord, double dCenterXPos, double dCenterYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint dwScript, int lScirptAxisNo, double dScriptPos);
     // 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 헬리컬 보간을 예약 구동하는 함수이다. 
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 중간점, 종료점을 지정하여 헬리컬연속 보간을 예약 구동하는 함수이다. 
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmAdvContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다.)
     // dMidPos = 중간점 X,Y  , dEndPos = 종료점 X,Y
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptHelixPointMove(int nCoord, double dMidXPos, double dMidYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptHelixPointMove(int lCoord, double dMidXPos, double dMidYPos, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint dwScript, int lScirptAxisNo, double dScriptPos);
     // 지정된 좌표계에 시작점, 회전각도와 반지름을 지정하여 헬리컬 보간을 예약 구동하는 함수이다
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점, 회전각도와 반지름을 지정하여 헬리컬연속 보간을 예약 구동하는 함수이다. 
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmAdvContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다.)
     //dCenterPos = 중심점 X,Y  , dAngle = 각도.
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptHelixAngleMove(int nCoord, double dCenterXPos, double dCenterYPos, double dAngle, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptHelixAngleMove(int lCoord, double dCenterXPos, double dCenterYPos, double dAngle, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint dwScript, int lScirptAxisNo, double dScriptPos);
     // 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 헬리컬 보간을 예약 구동하는 함수이다.
     // AxmAdvContiBeginNode, AxmAdvContiEndNode와 같이사용시 지정된 좌표계에 시작점, 종료점과 반지름을 지정하여 헬리컬연속 보간을 예약 구동하는 함수이다. 
     // 원호 연속 보간 구동을 위해 내부 Queue에 저장하는 함수이다. AxmAdvContiStart함수를 사용해서 시작한다. (연속보간 함수와 같이 이용한다.)
     // dRadius = 반지름, dEndPos = 종료점 X,Y  , uShortDistance = 작은원(0), 큰원(1)
     // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향  
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptHelixRadiusMove(int nCoord, double dRadius, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptHelixRadiusMove(int lCoord, double dRadius, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, uint dwScript, int lScirptAxisNo, double dScriptPos);
     // 지정된 좌표계에 시작점과 종료점을 지정하여 3축 헬리컬 보간 오버라이드를 예약 구동한다.
     // 현재 진행중인 보간구동을 지정된 속도 및 위치로 헬리컬 보간 오버라이드를 예약 구동한다.
     // IOverrideMode = 0일 경우, 구동중인 보간이 직선, 원호 보간에 관계없이 현재 구동 노드에서 헬리컬 보간으로 즉시 오버라이드 되고, 
     // IOverrideMode = 1이면 현재 구동 노드 다음의 노드부터 헬리컬 보간이 차례로 예약된다.
     // IOverrideMode = 1로 본 함수를 호출할때마다 최소 1개에서 최대 8개까지 오버라이드 큐에 증가되면서 자동적으로 예약이 되며, 예약 후 마지막에 IOverrideMode = 0으로 본 함수가 호출되면
     // 내부적으로 오버라이드 큐에 있는 예약 보간들이 연속보간 큐로 저장되고, 헬리컬 오버라이드 구동과 이후의 예약된 연속보간이 순차적으로 실행된다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptOvrHelixRadiusMove(int nCoord, double dRadius, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, int nOverrideMode, uint dwScript, int nScirptAxisNo, double dScriptPos);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvScriptOvrHelixRadiusMove(int lCoord, double dRadius, double dEndXPos, double dEndYPos, double dZPos, double dVel, double dStartVel, double dStopVel, double dAccel, double dDecel, uint uCWDir, uint uShortDistance, int lOverrideMode, uint dwScript, int lScirptAxisNo, double dScriptPos);
 
 //====연속 보간 함수 ================================================================================================
     // 지정된 좌표계에 연속 보간 구동 중 현재 구동중인 연속 보간 인덱스 번호를 확인하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiGetNodeNum(int nCoordinate, ref int npNodeNum);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiGetNodeNum(int lCoordinate, ref int lpNodeNum);
     // 지정된 좌표계에 설정한 연속 보간 구동 총 인덱스 갯수를 확인하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiGetTotalNodeNum(int nCoordinate, ref int npNodeNum);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiGetTotalNodeNum(int lCoordinate, ref int lpNodeNum);
     // 지정된 좌표계에 보간 구동을 위한 내부 Queue에 저장되어 있는 보간 구동 개수를 확인하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiReadIndex(int nCoordinate, ref int npQueueIndex);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiReadIndex(int lCoordinate, ref int lpQueueIndex);
     // 지정된 좌표계에 보간 구동을 위한 내부 Queue가 비어 있는지 확인하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiReadFree(int nCoordinate, ref uint upQueueFree);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiReadFree(int lCoordinate, ref uint upQueueFree);
     // 지정된 좌표계에 연속 보간 구동을 위해 저장된 내부 Queue를 모두 삭제하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiWriteClear(int nCoordinate);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiWriteClear(int lCoordinate);
     // 지정된 좌표계에 연속 보간 오버라이드 구동을 위해 예약된 오버라이드용 큐를 모두 삭제하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvOvrContiWriteClear(int nCoordinate);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvOvrContiWriteClear(int lCoordinate);
     // 연속 보간 시작 한다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiStart(int nCoord, uint dwProfileset, int nAngle); 
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiStart(int lCoord, uint dwProfileset, int lAngle); 
     // 연속 보간 정지 한다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiStop(int nCoordinate, double dDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiStop(int lCoordinate, double dDecel);
     //지정된 좌표계에 연속보간 축 맵핑을 설정한다.
     //(축맵핑 번호는 0 부터 시작))
     // 주의점:  축맵핑할때는 반드시 실제 축번호가 작은 숫자부터 큰숫자를 넣는다.
     //          가상축 맵핑 함수를 사용하였을 때 가상축번호를 실제 축번호가 작은 값 부터 lpAxesNo의 낮은 인텍스에 입력하여야 한다.
     //          가상축 맵핑 함수를 사용하였을 때 가상축번호에 해당하는 실제 축번호가 다른 값이라야 한다.
     //          같은 축을 다른 Coordinate에 중복 맵핑하지 말아야 한다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiSetAxisMap(int nCoord, int nSize, int[] npAxesNo);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiSetAxisMap(int lCoord, int lSize, int[] lpAxesNo);
     //지정된 좌표계에 연속보간 축 맵핑을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiGetAxisMap(int nCoord, ref int npSize, ref int npAxesNo);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiGetAxisMap(int lCoord, ref int lpSize, ref int lpAxesNo);
     // 지정된 좌표계에 연속보간 축 절대/상대 모드를 설정한다.
     // (주의점 : 반드시 축맵핑 하고 사용가능)
     // 지정 축의 이동 거리 계산 모드를 설정한다.
     //uAbsRelMode : POS_ABS_MODE '0' - 절대 좌표계
     //              POS_REL_MODE '1' - 상대 좌표계
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiSetAbsRelMode(int nCoord, uint uAbsRelMode);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiSetAbsRelMode(int lCoord, uint uAbsRelMode);
     // 지정된 좌표계에 연속보간 축 절대/상대 모드를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiGetAbsRelMode(int nCoord, ref uint uAbsRelMode);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiGetAbsRelMode(int lCoord, ref uint uAbsRelMode);
     // 지정된 좌표계에 연속 보간 구동 중인지 확인하는 함수이다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiIsMotion(int nCoordinate, ref uint upInMotion);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiIsMotion(int lCoordinate, ref uint upInMotion);
     // 지정된 좌표계에 연속보간에서 수행할 작업들의 등록을 시작한다. 이함수를 호출한후,
     // AxmAdvContiEndNode함수가 호출되기 전까지 수행되는 모든 모션작업은 실제 모션을 수행하는 것이 아니라 연속보간 모션으로 등록 되는 것이며,
     // AxmAdvContiStart 함수가 호출될 때 비로소 등록된모션이 실제로 수행된다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiBeginNode(int nCoord);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiBeginNode(int lCoord);
     // 지정된 좌표계에서 연속보간을 수행할 작업들의 등록을 종료한다.
-    [DllImport("AXL.dll")] public static extern uint AxmAdvContiEndNode(int nCoord);
+    [DllImport("AXL.dll")] public static extern uint AxmAdvContiEndNode(int lCoord);
     
     // 지정한 다축을 설정한 감속도로 동기 감속 정지한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveMultiStop(int nArraySize, int[] npAxesNo, double[] dMaxDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveMultiStop(int lArraySize, int[] lpAxesNo, double[] dMaxDecel);
     // 지정한 다축을 동기 급 정지한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveMultiEStop(int nArraySize, int[] npAxesNo);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveMultiEStop(int lArraySize, int[] lpAxesNo);
     // 지정한 다축을 동기 감속 정지한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveMultiSStop(int nArraySize, int[] npAxesNo);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveMultiSStop(int lArraySize, int[] lpAxesNo);
 
     // 지정한 축의 실제 구동 속도를 읽어온다.
-    [DllImport("AXL.dll")] public static extern uint AxmStatusReadActVel(int nAxisNo, ref double dpVel);          //2010.10.11
+    [DllImport("AXL.dll")] public static extern uint AxmStatusReadActVel(int lAxisNo, ref double dpVel);          //2010.10.11
     // 서보 타입 슬레이브 기기의 SVCMD_STAT 커맨드 값을 읽는다.
-    [DllImport("AXL.dll")] public static extern uint AxmStatusReadServoCmdStat(int nAxisNo, ref uint upStatus);
+    [DllImport("AXL.dll")] public static extern uint AxmStatusReadServoCmdStat(int lAxisNo, ref uint upStatus);
     // 서보 타입 슬레이브 기기의 SVCMD_CTRL 커맨드 값을 읽는다.
-    [DllImport("AXL.dll")] public static extern uint AxmStatusReadServoCmdCtrl(int nAxisNo, ref uint upStatus);
+    [DllImport("AXL.dll")] public static extern uint AxmStatusReadServoCmdCtrl(int lAxisNo, ref uint upStatus);
     
     // 겐트리 구동시 마스터 축과 슬레이브 축 간의 위치 차에 대한 설정된 오차 한계값을 반환한다.    
-    [DllImport("AXL.dll")] public static extern uint AxmGantryGetMstToSlvOverDist(int nAxisNo, ref double dpPosition);
+    [DllImport("AXL.dll")] public static extern uint AxmGantryGetMstToSlvOverDist(int lAxisNo, ref double dpPosition);
     // 겐트리 구동시 마스터 축과 슬레이브 축 간의 위치 차에 대한 오차 한계값을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmGantrySetMstToSlvOverDist(int nAxisNo, double dPosition);
+    [DllImport("AXL.dll")] public static extern uint AxmGantrySetMstToSlvOverDist(int lAxisNo, double dPosition);
 
     // 지정 축의 알람 신호의 코드 상태를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmSignalReadServoAlarmCode(int nAxisNo, ref ushort upCodeStatus);
+    [DllImport("AXL.dll")] public static extern uint AxmSignalReadServoAlarmCode(int lAxisNo, ref ushort upCodeStatus);
     
     // 서보 타입 슬레이브 기기의 좌표계 설정을 실시한다. (MLIII 전용)
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoCoordinatesSet(int nAxisNo, uint dwPosData, uint dwPos_sel, uint dwRefe);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoCoordinatesSet(int lAxisNo, uint dwPosData, uint dwPos_sel, uint dwRefe);
     // 서보 타입 슬레이브 기기의 브레이크 작동 신호를 출력한다. (MLIII 전용)
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoBreakOn(int nAxisNo);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoBreakOn(int lAxisNo);
     // 서보 타입 슬레이브 기기의 브레이크 작동 신호를 해제한다. (MLIII 전용)
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoBreakOff(int nAxisNo);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoBreakOff(int lAxisNo);
     // 서보 타입 슬레이브 기기의 
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoConfig(int nAxisNo, uint dwCfMode);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoConfig(int lAxisNo, uint dwCfMode);
     // 서보 타입 슬레이브 기기의 센서 종보 초기화를 요구한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSensOn(int nAxisNo);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSensOn(int lAxisNo);
     // 서보 타입 슬레이브 기기의 센서전원 OFF를 요구한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSensOff(int nAxisNo);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSensOff(int lAxisNo);
     // 서보 타입 슬레이브 기기의 SMON 커맨드를 실행한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSmon(int nAxisNo);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSmon(int lAxisNo);
     // 서보 타입 슬레이브 기기의 모니터 정보나 입출력 신호의 상태를 읽는다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetSmon(int nAxisNo, ref uint pbParam);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetSmon(int lAxisNo, ref uint pbParam);
     // 서보 타입 슬레이브 기기에 서보 ON을 요구한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSvOn(int nAxisNo);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSvOn(int lAxisNo);
     // 서보 타입 슬레이브 기기에 서보 OFF를 요구한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSvOff(int nAxisNo);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSvOff(int lAxisNo);
     // 서보 타입 슬레이브 기기가 지정된 보간 위치로 보간이동을 실시한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoInterpolate(int nAxisNo, uint dwTPOS, uint dwVFF, uint dwTFF, uint dwTLIM);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoInterpolate(int lAxisNo, uint dwTPOS, uint dwVFF, uint dwTFF, uint dwTLIM);
     // 서보 타입 슬레이브 기기가 지정한 위치로 위치이송을 실시한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoPosing(int nAxisNo, uint dwTPOS, uint dwSPD, uint dwACCR, uint dwDECR, uint dwTLIM);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoPosing(int lAxisNo, uint dwTPOS, uint dwSPD, uint dwACCR, uint dwDECR, uint dwTLIM);
     // 서보 타입 슬레이브 기기가 지정된 이동속도로 정속이송을 실시한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoFeed(int nAxisNo, uint dwSPD, uint dwACCR, uint dwDECR, uint dwTLIM);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoFeed(int lAxisNo, uint dwSPD, uint dwACCR, uint dwDECR, uint dwTLIM);
     // 서보 타입 슬레이브 기기가 이송중 외부 위치결정 신호의 입력에 의해 위치이송을 실시한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoExFeed(int nAxisNo, uint dwSPD, uint dwACCR, uint dwDECR, uint dwTLIM, uint dwExSig1, uint dwExSig2);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoExFeed(int lAxisNo, uint dwSPD, uint dwACCR, uint dwDECR, uint dwTLIM, uint dwExSig1, uint dwExSig2);
     // 서보 타입 슬레이브 기기가 외부 위치결정 신호 입력에 의해 위치이송을 실시한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoExPosing(int nAxisNo, uint dwTPOS, uint dwSPD, uint dwACCR, uint dwDECR, uint dwTLIM, uint dwExSig1, uint dwExSig2);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoExPosing(int lAxisNo, uint dwTPOS, uint dwSPD, uint dwACCR, uint dwDECR, uint dwTLIM, uint dwExSig1, uint dwExSig2);
     // 서보 타입 슬레이브 기기가 원점 복귀를 실시한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoZret(int nAxisNo, uint dwSPD, uint dwACCR, uint dwDECR, uint dwTLIM, uint dwExSig1, uint dwExSig2, uint bHomeDir, uint bHomeType);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoZret(int lAxisNo, uint dwSPD, uint dwACCR, uint dwDECR, uint dwTLIM, uint dwExSig1, uint dwExSig2, uint bHomeDir, uint bHomeType);
     // 서보 타입 슬레이브 기기가 속도제어를 실시한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoVelctrl(int nAxisNo, uint dwTFF, uint dwVREF, uint dwACCR, uint dwDECR, uint dwTLIM);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoVelctrl(int lAxisNo, uint dwTFF, uint dwVREF, uint dwACCR, uint dwDECR, uint dwTLIM);
     // 서보 타입 슬레이브 기기가 토크제어를 실시한다.    
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoTrqctrl(int nAxisNo, uint dwVLIM, int nTQREF);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoTrqctrl(int lAxisNo, uint dwVLIM, int lTQREF);
     // bmode 0x00 : common parameters ram
     // bmode 0x01 : common parameters flash
     // bmode 0x10 : device parameters ram
     // bmode 0x11 : device parameters flash
     // 서보 타입 슬레이브 기기의 서보팩 특정 파라미터 설정값을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetParameter(int nAxisNo, uint wNo, uint bSize, uint bMode, ref uint pbParam);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetParameter(int lAxisNo, uint wNo, uint bSize, uint bMode, ref uint pbParam);
     // 서보 타입 슬레이브 기기의 서보팩 특정 파라미터 값을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSetParameter(int nAxisNo, uint wNo, uint bSize, uint bMode, ref uint pbParam);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSetParameter(int lAxisNo, uint wNo, uint bSize, uint bMode, ref uint pbParam);
+
     // M3 서보팩에 Command Execution을 실행한다
     [DllImport("AXL.dll")] public static extern uint AxmServoCmdExecution(int lAxisNo, uint dwCommand, uint dwSize, ref uint pdwExcData);
     // 서보 타입 슬레이브 기기의 설정된 토크 제한 값을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetTorqLimit(int nAxisNo, ref uint dwpTorqLimit);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetTorqLimit(int lAxisNo, ref uint dwpTorqLimit);
     // 서보 타입 슬레이브 기기에 토크 제한 값을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSetTorqLimit(int nAxisNo, uint dwTorqLimit);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSetTorqLimit(int lAxisNo, uint dwTorqLimit);
 
     // 서보 타입 슬레이브 기기에 설정된 SVCMD_IO 커맨드 값을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetSendSvCmdIOOutput(int nAxisNo, ref uint dwData);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetSendSvCmdIOOutput(int lAxisNo, ref uint dwData);
     // 서보 타입 슬레이브 기기에 SVCMD_IO 커맨드 값을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSetSendSvCmdIOOutput(int nAxisNo, uint dwData);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSetSendSvCmdIOOutput(int lAxisNo, uint dwData);
   
     // 서보 타입 슬레이브 기기에 설정된 SVCMD_CTRL 커맨드 값을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetSvCmdCtrl(int nAxisNo, ref uint dwData);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetSvCmdCtrl(int lAxisNo, ref uint dwData);
     // 서보 타입 슬레이브 기기에 SVCMD_CTRL 커맨드 값을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSetSvCmdCtrl(int nAxisNo, uint dwData);
+    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSetSvCmdCtrl(int lAxisNo, uint dwData);
 
     // MLIII adjustment operation을 설정 한다.
     // dwReqCode == 0x1005 : parameter initialization : 20sec
     // dwReqCode == 0x1008 : absolute encoder reset   : 5sec
     // dwReqCode == 0x100E : automatic offset adjustment of motor current detection signals  : 5sec
     // dwReqCode == 0x1013 : Multiturn limit setting  : 5sec
-    [DllImport("AXL.dll")] public static extern uint AxmM3AdjustmentOperation(int nAxisNo, uint dwReqCode);
+	[DllImport("AXL.dll")] public static extern uint AxmM3AdjustmentOperation(int lAxisNo, uint dwReqCode);
     // 서보 축 추가 모니터링 채널별 선택 값을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSetMonSel(int nAxisNo, uint dwMon0, uint dwMon1, uint dwMon2);
+	[DllImport("AXL.dll")] public static extern uint AxmM3ServoSetMonSel(int lAxisNo, uint dwMon0, uint dwMon1, uint dwMon2);
     // 서보 축 추가 모니터링 채널별 설정 값을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetMonSel(int nAxisNo, ref uint upMon0, ref uint upMon1, ref uint upMon2);
+	[DllImport("AXL.dll")] public static extern uint AxmM3ServoGetMonSel(int lAxisNo, ref uint upMon0, ref uint upMon1, ref uint upMon2);
     // 서보 축 추가 모니터링 채널별 설정 값을 기준으로 현재 상태를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoReadMonData(int nAxisNo, uint dwMonSel, ref uint dwpMonData);
+	[DllImport("AXL.dll")] public static extern uint AxmM3ServoReadMonData(int lAxisNo, uint dwMonSel, ref uint dwpMonData);
     // 제어할 토크 축 설정
-    [DllImport("AXL.dll")] public static extern uint AxmAdvTorqueContiSetAxisMap(int nCoord, int nSize, int[] npAxesNo, uint dwTLIM, uint dwConMode);
-    // 2014.04.28
-    // 토크 프로파일 설정 파라미터
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoSetTorqProfile(int nCoord, int nAxisNo, int TorqueSign, uint dwVLIM, uint dwProfileMode, uint dwStdTorq, uint dwStopTorq);
+	[DllImport("AXL.dll")] public static extern uint AxmAdvTorqueContiSetAxisMap(int lCoord, int lSize, int[] lpAxesNo, uint dwTLIM, uint dwConMode);
+	// 2014.04.28
+	// 토크 프로파일 설정 파라미터
+	[DllImport("AXL.dll")] public static extern uint AxmM3ServoSetTorqProfile(int lCoord, int lAxisNo, int TorqueSign, uint dwVLIM, uint dwProfileMode, uint dwStdTorq, uint dwStopTorq);
     // 토크 프로파일 확인 파라미터
-    [DllImport("AXL.dll")] public static extern uint AxmM3ServoGetTorqProfile(int nCoord, int nAxisNo, ref int npTorqueSign, ref uint updwVLIM, ref uint upProfileMode, ref uint upStdTorq, ref uint upStopTorq);
+	[DllImport("AXL.dll")] public static extern uint AxmM3ServoGetTorqProfile(int lCoord, int lAxisNo, ref int lpTorqueSign, ref uint updwVLIM, ref uint upProfileMode, ref uint upStdTorq, ref uint upStopTorq);
 //-------------------------------------------------------------------------------------------------------------------
-
-    //======== EtherCAT 전용 함수 =======================================================================================
+    	//======== SMP 전용 함수 =======================================================================================
     // Inposition 신호의 Range를 설정한다. (dInposRange > 0)
-    [DllImport("AXL.dll")] public static extern uint AxmSignalSetInposRange(int nAxisNo, double dInposRange);
+    [DllImport("AXL.dll")] public static extern uint AxmSignalSetInposRange(int lAxisNo, double dInposRange);
     // Inposition 신호의 Range를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmSignalGetInposRange(int nAxisNo, ref double dpInposRange);    
-	
-    // 절대 엔코더 위치를 dPositiond로 지정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmStatusSetEncClear(int nAxisNo, double dPosition);
-    
-    // 지정 축에 해당하는 서보팩의 지령 위치와 실체 위치를 dPos 값으로 일치 시킨다.
-    // Reserved
-    //[DllImport("AXL.dll")] public static extern uint AxmStatusSetMotorPosMatch(int nAxisNo);
-    
-    // Work 좌표계를 설정한다. 디폴트값은 World Coordinate와 일치한다.
-    // lCoordNo : 좌표계번호(0~7)
-    // dpOrigin : World Coordinate를 기준으로하는 Work 좌표계 원점위치
-    // dpXPos   : World Coordinate를 기준으로하는 Work 좌표계 X축상의 임의의 위치
-    // dpYPos   : World Coordinate를 기준으로하는 Work 좌표계 Y축상의 임의의 위치
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetWorkCoordinate(int nCoordNo, ref double dpOrigin, ref double dpXPos, ref double dpYPos);
-    // 설정된 Work 좌표계를 읽어온다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotGetWorkCoordinate(int nCoordNo, ref double dpOrigin, ref double dpXPos, ref double dpYPos);
-    // 오버라이드 할 때 위치속성(절대/상대)을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetOverridePosMode(int nAxisNo, uint dwAbsRelMode);
-    // 오버라이드 할 때 위치속성(절대/상대)을 읽어온다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotGetOverridePosMode(int nAxisNo, ref uint dwpAbsRelMode);
+    [DllImport("AXL.dll")] public static extern uint AxmSignalGetInposRange(int lAxisNo, ref double dpInposRange);
+
+    // 오버라이드할때 위치속성(절대/상대)을 설정한다.
+    [DllImport("AXL.dll")] public static extern uint AxmMotSetOverridePosMode(int lAxisNo, uint dwAbsRelMode);
+    // 오버라이드할때 위치속성(절대/상대)을 읽어온다.
+    [DllImport("AXL.dll")] public static extern uint AxmMotGetOverridePosMode(int lAxisNo, ref uint dwpAbsRelMode);
     // LineMove 오버라이드할때 위치속성(절대/상대)을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetOverrideLinePosMode(int nCoordNo, uint dwAbsRelMode);
+    [DllImport("AXL.dll")] public static extern uint AxmMotSetOverrideLinePosMode(int lCoordNo, uint dwAbsRelMode);
     // LineMove 오버라이드할때 위치속성(절대/상대)을 읽어온다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotGetOverrideLinePosMode(int nCoordNo, ref uint dwpAbsRelMode);
-    
-    // 지정된 축의 Vibration Control 설정값(주파수, 댐핑계수, 임펄스 개수)을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetVibrationControl(int nAxisNo, int nSize, ref double pdFrequency, ref double pdDampingRatio, ref int npImpulseCount);
-    
-    // 지정된 축의 Vibration Control을 Enable or Disable 한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotVibrationControlEnable(int nAxisNo, uint dwEnable);
-    
-    // 지정된 축의 Vibration Control이 Enable 되어있는지 읽어온다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotVibrationControlIsEnable(int nAxisNo, ref uint pdwEnable);
-    
-    // 지정된 좌표계의 Vibration Control을 Enable or Disable 한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotVibrationContronCoordEnable(int nCoordNo, uint dwEnable);
-    
-    // 지정된 좌표계에 Vibration Control이 Enable 되어있는지 읽어온다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotVibrationContronCoordIsEnable(int nCoordNo, ref uint pdwEnable);
-    
+    [DllImport("AXL.dll")] public static extern uint AxmMotGetOverrideLinePosMode(int lCoordNo, ref uint dwpAbsRelMode);
+
     // AxmMoveStartPos와 동일하며 종료속도(EndVel)가 추가되었다.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveStartPosEx(int nAxisNo, double dPos, double dVel, double dAccel, double dDecel, double dEndVel);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveStartPosEx(int lAxisNo, double dPos, double dVel, double dAccel, double dDecel, double dEndVel);
     // AxmMovePos와 동일하며 종료속도(EndVel)가 추가되었다.
-    [DllImport("AXL.dll")] public static extern uint AxmMovePosEx(int nAxisNo, double dPos, double dVel, double dAccel, double dDecel, double dEndVel);
-    // AxmMoveStartMultiPos와 동일하며 종료속도(EndVel)가 추가되었다.
-    // Reserved
-    [DllImport("AXL.dll")] public static extern uint AxmMoveStartMultiPosEx(int nArraySize, ref int npAxisNo, ref double dpPos, ref double dpVel, ref double dpAccel, ref double dpDecel, ref double dpEndVel);
-    // AxmMoveMultiPos와 동일하며 종료속도(EndVel)가 추가되었다.
-    // Reserved
-    //[DllImport("AXL.dll")] public static extern uint AxmMoveMultiPosEx(int nArraySize, ref int npAxisNo, ref double dpPos, ref double dpVel, ref double dpAccel, ref double dpDecel, ref double dpEndVel);
-    
+    [DllImport("AXL.dll")] public static extern uint AxmMovePosEx(int lAxisNo, double dPos, double dVel, double dAccel, double dDecel, double dEndVel);
+
     // Coordinate Motion을 경로상에서 감속정지(dDecel) 시킨다.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveCoordStop(int nCoordNo, double dDecel);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveCoordStop(int lCoordNo, double dDecel); 
     // Coordinate Motion을 급정지 시킨다.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveCoordEStop(int nCoordNo);
+    [DllImport("AXL.dll")] public static extern uint AxmMoveCoordEStop(int lCoordNo);
     // Coordinate Motion을 경로상에서 감속정지 시킨다.
-    [DllImport("AXL.dll")] public static extern uint AxmMoveCoordSStop(int nCoordNo);
-    
-    // AxmMoveStartPosWithPosEvent와 동일하며 종료속도(EndVel)가 추가되었다.
-    // EndVel 관련 Ex함수는 사용하지 않음.
-    //[DllImport("AXL.dll")] public static extern uint AxmMoveStartPosWithPosEventEx(int nAxisNo, double dPos, double dVel, double dAccel, double dDecel, int nEventAxisNo, double dComparePos, uint uPosSource, double dEndVel);
-    
+    [DllImport("AXL.dll")] public static extern uint AxmMoveCoordSStop(int lCoordNo);
+
     // AxmLineMove모션의 위치를 오버라이드 시킨다.
-    [DllImport("AXL.dll")] public static extern uint AxmOverrideLinePos(int nCoordNo, ref double dpOverridePos);
+    [DllImport("AXL.dll")] public static extern uint AxmOverrideLinePos(int lCoordNo, ref double dpOverridePos);
     // AxmLineMove모션의 속도를 오버라이드 시킨다. 각축들의 속도비율은 dpDistance로 결정된다.
-    [DllImport("AXL.dll")] public static extern uint AxmOverrideLineVel(int nCoordNo, double dOverrideVel, ref double dpDistance);
-    
+    [DllImport("AXL.dll")] public static extern uint AxmOverrideLineVel(int lCoordNo, double dOverrideVel, ref double dpDistance);
+
     // AxmLineMove모션의 속도를 오버라이드 시킨다.
     // dMaxAccel  : 오버라이드 가속도
     // dMaxDecel  : 오버라이드 감속도
     // dpDistance : 각축의 속도 비율
-    [DllImport("AXL.dll")] public static extern uint AxmOverrideLineAccelVelDecel(int nCoordNo, double dOverrideVelocity, double dMaxAccel, double dMaxDecel, ref double dpDistance);
+    [DllImport("AXL.dll")] public static extern uint AxmOverrideLineAccelVelDecel(int lCoordNo, double dOverrideVelocity, double dMaxAccel, double dMaxDecel, ref double dpDistance);
     // AxmOverrideVelAtPos에 추가적으로 AccelDecel을 오버라이드 시킨다.
-    [DllImport("AXL.dll")] public static extern uint AxmOverrideAccelVelDecelAtPos(int nAxisNo, double dPos, double dVel, double dAccel, double dDecel, double dOverridePos, double dOverrideVel, double dOverrideAccel, double dOverrideDecel, int nTarget);
-    
+    [DllImport("AXL.dll")] public static extern uint AxmOverrideAccelVelDecelAtPos(int lAxisNo, double dPos, double dVel, double dAccel, double dDecel, double dOverridePos, double dOverrideVel, double dOverrideAccel, double dOverrideDecel, int lTarget);
+
     // 하나의 마스터축에 다수의 슬레이브축들을 연결한다(Electronic Gearing).
     // lMasterAxisNo : 마스터축
     // lSize : 슬레이브축 개수(최대 8)
     // lpSlaveAxisNo : 슬레이브축 번호
-    // dpGearRatio : 마스터축을 기준으로하는 슬레이브축 비율(0%만 제외)
-    [DllImport("AXL.dll")] public static extern uint AxmEGearSet(int nMasterAxisNo, int nSize, ref int npSlaveAxisNo, ref double dpGearRatio);
+    // dpGearRatio : 마스터축을 기준으로하는 슬레이브축 비율(0은 제외, 1 = 100%)
+    [DllImport("AXL.dll")] public static extern uint AxmEGearSet(int lMasterAxisNo, int lSize, ref int lpSlaveAxisNo, ref double dpGearRatio);
     // Electronic Gearing정보를 읽어온다.
-    [DllImport("AXL.dll")] public static extern uint AxmEGearGet(int nMasterAxisNo, ref int npSize, ref int npSlaveAxisNo, ref double dpGearRatio);
+    [DllImport("AXL.dll")] public static extern uint AxmEGearGet(int lMasterAxisNo, ref int lpSize, ref int lpSlaveAxisNo, ref double dpGearRatio);
     // Electronic Gearing을 해제한다.
-    [DllImport("AXL.dll")] public static extern uint AxmEGearReset(int nMasterAxisNo);
+    [DllImport("AXL.dll")] public static extern uint AxmEGearReset(int lMasterAxisNo);
     // Electronic Gearing을 활성/비활성한다.
-    [DllImport("AXL.dll")] public static extern uint AxmEGearEnable(int nMasterAxisNo, uint dwEnable);
+    [DllImport("AXL.dll")] public static extern uint AxmEGearEnable(int lMasterAxisNo, uint dwEnable);
     // Electronic Gearing을 활성/비활성상태를 읽어온다.
-    [DllImport("AXL.dll")] public static extern uint AxmEGearIsEnable(int nMasterAxisNo, uint dwEnable);
-    
-    // AxmLineMove와 동일하며 종료속도(EndVel)가 추가되었다.
-    // EndVel관련 Ex함수는 사용하지 않음
-    //[DllImport("AXL.dll")] public static extern uint AxmLineMoveEx(int nCoordNo, ref double dpEndPos, double dVel, double dAccel, double dDecel, double dEndVel);
-    
-    // AxmCirclePointMove와 사용법은 동일하며 3차원 원/원호 보간을 지원한다.
-    // 축 매핑은 3축이상 가능하며 3축 이상의 축들은 Linear Interpolation된다.
-    // dEndVel : 종료속도
-    //[DllImport("AXL.dll")] public static extern uint AxmCirclePointMoveEx(int nCoordNo, ref int nAxisNo, ref double dpMidPos, ref double dpEndPos, double dVel, double dAccel, double dDecel, int nArcCircle, int nArraySize);
-    
-    // 임의의 축을 중심으로 회전하는 헬리컬 보간 구동을 지원한다.    
-    // dpFirstCenterPos=중심위치, dpSecondCenterPos=반대편 중심위치, dPicth=이동량(mm)/1Revolution, dTraverseDistance=이동량(mm)
-    // dpFirstCenterPos에서 dpSecondCenterPos를 잇는 직선이 회전축이 된다. 중심직선(dpFirstCenterPos-->dpSecondCenterPos)와 시작위치까지의 직선(dpFirstCenterPos-->시작위치)는 서로 수직이다.
-    // dTraverseDistance은 시작위치에서 회전축과 평행한 직선의 거리이다.
-    // 축 매핑은 3축이상 가능하며 3축이상의 축들은 Linear Interpolation된다.
-    [DllImport("AXL.dll")] public static extern uint AxmHelixPitchMove(int nCoordNo, ref double dpFirstCenterPos, ref double dpSecondCenterPos, double dPitch, double dTraverseDistance, double dVel, double dAccel, double dDecel, uint uCWDir);
-    // AxmHelixPitchMove와 동일하며 종료속도(EndVel)가 추가되었다.
-    // EndVel 관련 Ex함수는 사용하지 않음.
-    //[DllImport("AXL.dll")] public static extern uint AxmHelixPitchMoveEx(int nCoordNo, ref double dpFirstCenterPos, ref double dpSecondCenterPos, double dPitch, double dTraverseDistance, double dVel, double dAccel, double dDecel, uint uCWDir, double dEndVel);
-    
-    // 1차원 보정함수 
-    // 보정 테이블 범위를 넘어서 구동할경우 : 보상 테이블의 맨처음과 맨마지막의 보정값은 항상 "0"으로 설정. 즉 pdMotorPosition과 pdLoadPosition이 동일하여야 한다.        
-    // 보정값 측정축(lSourceAxis)과 보정값 적용축(lTargetAxis)에 같은 축, 혹은 다른 축을 설정할수있다.    
-    // 보정 테이블의 위치값은 절대위치로 설정
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationOneDimSet(int nTableNo, int nSourceAxis, int nTargetAxis, int nSize, ref double dpMotorPosition, ref double dpLoadPosition);
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationOneDimGet(int nTableNo, ref int npSourceAxis, ref int npTargetAxis, ref int npSize, ref double dpMotorPosition, ref double dpLoadPosition);
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationOneDimReset(int nTableNo);
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationOneDimEnable(int nTableNo, uint dwEnable);
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationOneDimIsEnable(int nTableNo, ref uint dwpEnable);
-    
-    // 현재 지령 위치에서의 보정값을 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationOneDimGetCorrection(int nTableNo, ref double pdCorrection);
-    
-    // 2차원 보정함수 
-    // 보정 테이블 범위를 넘어서 구동할경우 : 보상 테이블의 테두리 보정값은 항상 "0"으로 설정. 즉 pdMotorPosition과 pdLoadPosition이 동일하다.
-    // pdMotorPosition1는 lAxis[0]의 모터위치,  pdMotorPosition2는 lAxis[1]의 모터위치이다.
-    // pdMotorPosition1의 사이즈는 lPositionSize1, pdMotorPosition2의 사이즈는 lPositionSize2
-    // 보정값 측정축(lSourceAxis)과 보정값 적용축(lTargetAxis)에 같은 축, 혹은 다른 축을 설정할수있다.    
-    // 보정 테이블의 위치값은 절대위치로 설정
-    // Reserved
-    //[DllImport("AXL.dll")] public static extern uint AxmCompensationTwoDimSet(int nTableNo, int nSourceAxis1, int nSourceAxis2, int nTargetAxis1, int nTargetAxis2, int nSize1, int nSize2, ref double dpMotorPosition1, ref double dpMotorPosition2, ref double dpLoadPosition1, ref double dpLoadPosition2);
-    //[DllImport("AXL.dll")] public static extern uint AxmCompensationTwoDimGet(int nTableNo, ref int npSourceAxis1, ref int npSourceAxis2, ref int npTargetAxis1, ref int npTargetAxis2, ref int npSize1, ref int npSize2, ref double dpMotorPosition1, ref double dpLoadPosition2);
-    //[DllImport("AXL.dll")] public static extern uint AxmCompensationTwoDimReset(int nTableNo);
-    //[DllImport("AXL.dll")] public static extern uint AxmCompensationTwoDimEnable(int nTableNo, uint dwEnable);
-    //[DllImport("AXL.dll")] public static extern uint AxmCompensationTwoDimIsEnable(int nTableNo, ref uint dwpEnable);
-    
-    //// Reserved
-    //[DllImport("AXL.dll")] public static extern uint AxmBlendingSet(int nAxisNo, double dValue, uint dwMethod);
-    //[DllImport("AXL.dll")] public static extern uint AxmBlendingGet(int nAxisNo, ref double dpValue, ref uint dwpMethod);
-    //[DllImport("AXL.dll")] public static extern uint AxmBlendingReset(int nAxisNo);
-    //[DllImport("AXL.dll")] public static extern uint AxmBlendingEnable(int nAxisNo, uint dwEnable);
-    //[DllImport("AXL.dll")] public static extern uint AxmBlendingIsEnable(int nAxisNo, ref uint dwpEnable);
-    
-    // Blending 모션을 지원한다.
-    // dValue   : 첫번째 모션 세그먼트의 종료시점을 기준으로하는 블렌딩이 시작되는 시점
-    // dwMethod : 0=거리(mm), 1=시간(msec), 2=거리비율(%)
-    // 자동가감속, 자동원호삽입 모드에서는Blending 모드가 해제된다.
-    [DllImport("AXL.dll")] public static extern uint AxmBlendingCoordSet(int nCoordNo, double dValue, uint dwMethod);
-    [DllImport("AXL.dll")] public static extern uint AxmBlendingCoordGet(int nCoordNo, ref double dpValue, ref uint dwpMethod);
-    [DllImport("AXL.dll")] public static extern uint AxmBlendingCoordReset(int nCoordNo);
-    [DllImport("AXL.dll")] public static extern uint AxmBlendingCoordEnable(int nCoordNo, uint dwEnable);
-    [DllImport("AXL.dll")] public static extern uint AxmBlendingCoordIsEnable(int nCoordNo, ref uint dwpEnable);
-    
-    // 지정 축에서 설정된 신호를 검출하고 그 위치를 저장하기 위해 이동하는 함수이다.
-    // 원하는 신호를 골라 찾아 움직이는 함수 찾을 경우 그 위치를 저장시켜놓고 AxmGetCapturePos사용하여 그값을 읽는다.
-    // Signal Edge   : 선택한 입력 신호의 edge 방향 선택 (rising or falling edge).
-    //                 SIGNAL_DOWN_EDGE(0), SIGNAL_UP_EDGE(1)
-    // 구동방향      : Vel값이 양수이면 CW, 음수이면 CCW.
-    // dPos             : 지정 위치까지 구동하면서 Signal Pos를 저장한다. (Max 256)
-    // lDetect Signal: edge 검출할 입력 신호 선택.SIGNAL_DOWN_EDGE(0), SIGNAL_UP_EDGE(1)
-    // lDetectSignal : PosEndLimit(0), NegEndLimit(1), HomeSensor(4), EncodZPhase(5), UniInput02(6), UniInput03(7)
-    // lTarget       : COMMAND(0), ACTUAL(1)
-    // 주의사항: SignalMethod를 EMERGENCY_STOP(0)로 사용할경우 가감속이 무시되며 지정된 속도로 가속 급정지하게된다.
-    //           PCI-Nx04를 사용할 경우 lDetectSignal이 PosEndLimit , NegEndLimit(0,1) 을 찾을경우 신호의레벨 Active 상태를 검출하게된다.
-    // Reserved
-    //[DllImport("AXL.dll")] public static extern uint AxmMoveMultiSignalCapture(int nAxisNo, double dPos, double dVel, double dAccel, double dDecel, int nDetectSignal, int nSignalEdge, int nTarget);
-    // 'AxmMoveSignalCapture' 함수에서 저장된 위치값을 확인하는 함수이다.
-    // 주의사항: 함수 실행 결과가 "AXT_RT_SUCCESS"일때 저장된 위치가 유효하며, 이 함수를 한번 실행하면 저장 위치값이 초기화된다.
-    // Reserved
-    //[DllImport("AXL.dll")] public static extern uint AxmMoveGetMultiCapturePos(int nAxisNo, ref double dpCapPosition, ref int npSize);
-    
-    // 지정한 축의 서보팩 AlarmCode를 읽어오는 함수.
-    // upAlarmCode      : 해당 서보팩의 Alarm Code참조
-    // uReturnMode      : 함수의 반환 동작조건을 설정
-    // EtherCAT 경우에 uReturnMode는 사용하지 않음.    
-    //DWORD    __stdcall AxmStatusReadServoAlarm(long lAxisNo, DWORD uReturnMode, DWORD *upAlarmCode);
+    [DllImport("AXL.dll")] public static extern uint AxmEGearIsEnable(int lMasterAxisNo, ref uint dwpEnable);    
 
-    // 지정한 에러코드에 해당하는 Alarm String을 받아오는 함수
-    //DWORD    __stdcall AxmStatusGetServoAlarmString(long lAxisNo, DWORD uAlarmCode, long lAlarmStringSize, char *szAlarmString);
-
-    // 지정한 축의 서보팩 AlarmCode를 읽어오는 함수.
-    // upAlarmCode      : 해당 서보팩의 Alarm Code참조
-    // uReturnMode      : 함수의 반환 동작조건을 설정
-    // EtherCAT 경우에 uReturnMode는 사용하지 않음.    
-    //DWORD    __stdcall AxmStatusReadServoAlarm(long lAxisNo, DWORD uReturnMode, DWORD *upAlarmCode);
-
-    [DllImport("AXL.dll")] public static extern uint AxmStatusReadTorque(int nAxisNo, ref double pdTorque);
-
-    // 지정한 에러코드에 해당하는 Alarm String을 받아오는 함수
-    //DWORD    __stdcall AxmStatusGetServoAlarmString(long lAxisNo, DWORD uAlarmCode, long lAlarmStringSize, char *szAlarmString);
-    
-    //해당 축의 EtherCAT Operation Mode를 지정한다.
-    //ProfilePosition Mode            = 1,
-    //Velocity Mode                    = 2,
-    //ProfileVelocity Mode            = 3,
-    //ProfileTorque Mode            = 4,
-    //Homing Mode                    = 6,
-    //InterpolatedPosition Mode        = 7,    
-    //CyclicSyncPosition Mode        = 8,
-    //CyclicSyncVelocity Mode        = 9,
-    //CyclicSyncTorque Mode            = 10,
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetOperationMode(int nAxisNo, uint dwOperationMode);
-    
-    //해당 축의 EtherCAT Operation Mode를 가져온다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotGetOperationMode(int nAxisNo, ref uint pdwOperationMode);
-    
     // 주의사항: 입력한 종료속도가 '0'미만이면 '0'으로, 'AxmMotSetMaxVel'로 설정한 최대속도를 초과하면 'MaxVel'로 재설정된다. 
     // 지정 축에 종료속도를 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotSetEndVel(int nAxisNo, double dEndVelocity);
-    
+    [DllImport("AXL.dll")] public static extern uint AxmMotSetEndVel(int lAxisNo, double dEndVelocity);
     // 지정 축의 종료속도를 반환한다.
-    [DllImport("AXL.dll")] public static extern uint AxmMotGetEndVel(int nAxisNo, ref double dpEndVelocity);
-    // 특정 모션 세그먼트에서 I/O출력
-    // AxmContiBeginNode 함수와 AxmContiEndNode 함수 사이에서 사용하여야 된다.
-    // 다음 연속 보간 구동 함수(ex: AxmLineMove, AxmCircleCenterMove, etc...)에 대해서만 유효하다.
-    // Digital I/O 출력 시점은 다음 연속 보간 구동함수의 종점을 기준으로 조건(dpDistTime, lpDistTimeMode)만큼 이전에 출력한다.
-    //
-    // lSize :  동시에 출력할 IO 접점 수 (1 ~ 8)
-    // lModuleNo : dwModuleType=0 일때 는 축번호, dwModuleType=1일 경우는 Digital I/O Module No.
-    // dwModuleType : 0=Motion I/O Output(Slave 자체의 출력), 1=Digital I/O Output
-    // 
-    // % 아래 4개의 매개 변수는 lSize 만큼의 배열로 입력해서 여러 출력 접점을 동시에 제어할 수 있다.
-    // lpBit : 출력 접점에 대한 Offset 위치
-    // lpOffOn : 해당 출력 접점의 출력값 [LOW(0), HIGH(1)]
-    // dpDistTime : 거리 값(pulse), 시간 값(msec) => 모션 프로파일 종점을 기준으로 한다.
-    // lpDistTimeMode : 0=거리 모드, 1=시간모드 => 모션 프로파일 종점을 기준으로 한다.
-    // %
-    [DllImport("AXL.dll")] public static extern uint AxmContiDigitalOutputBit(int nCoord, int nSize, int nModuleType, ref int npModuleNo, ref int npBit, ref int npOffOn, ref int dpDistTime, ref int npDistTimeMode);
+    [DllImport("AXL.dll")] public static extern uint AxmMotGetEndVel(int lAxisNo, ref double dpEndVelocity);
 
-    // 직선 보간 한다.
-    // 시작점과 종료점을 지정하여 다축 직선 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
-    // AxmContiBeginNode, AxmContiEndNode와 같이사용시 지정된 좌표계에 시작점과 종료점을 지정하여 직선 보간 구동하는 Queue에 저장함수가된다. 
-    // 직선 프로파일 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmContiStart함수를 사용해서 시작한다.
-    // lpAxisNo의 축 배열에 해당하는 축들은 직선 보간을 하며, 나머지 Coordinate의 축들은 직선 보간 비율에 맞게 단축 구동을 수행한다.
-    [DllImport("AXL.dll")] public static extern uint AxmLineMoveWithAxes(int nCoord, int nArraySize, ref int npAxisNo, ref double dpEndPos, double dVel, double dAccel, double dDecel);
-
-    // 2차원/3차원 원호보간 및 그 이상의 축에 대해서 직선보간을 한다.
-    // 시작점, 종료점과 중심점을 지정하여 원호 보간 구동하는 함수이다. 구동 시작 후 함수를 벗어난다.
-    // AxmContiBeginNode, AxmContiEndNode, 와 같이사용시 지정된 좌표계에 시작점, 종료점과 중심점을 지정하여 구동하는 원호 보간 Queue에 저장함수가된다.
-    // 프로파일 원호 연속 보간 구동을 위해 내부 Queue에 저장하여 AxmContiStart함수를 사용해서 시작한다.
-    // lAxisNo = 축 배열 , dCenterPosition = 중심점 X,Y 배열/X, Y, Z 배열, dEndPos = 종료점 X,Y 배열/X, Y, Z배열
-    // 2차원/3차원 이상의 축에 대해서는 직선보간을 할 때 dEndPosition의 값을 Targetposition으로 사용한다.
-    // uCWDir   DIR_CCW(0): 반시계방향, DIR_CW(1) 시계방향
-    // b3DCircle(0) = 2차원 원호보간 및 그 이상의 축에 대해서 직선보간
-    // b3DCircle(1) = 3차원 원호보간 및 그 이상의 축에 대해서 직선보간
-    [DllImport("AXL.dll")] public static extern uint AxmCircleCenterMoveWithAxes(int nCoord, int nArraySize, ref int npAxisNo, ref double dCenterPosition, ref double dEndPosition, double dMaxVelocity, double dMaxAccel, double dMaxDecel, uint uCWDir, bool b3DCircle);
-    
 }

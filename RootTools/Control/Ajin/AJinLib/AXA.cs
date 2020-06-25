@@ -69,15 +69,6 @@ public class CAXA
     //지정한 모듈 번호로 베이스 보드 번호, 모듈 위치, 모듈 ID를 확인한다.
     [DllImport("AXL.dll")] public static extern uint AxaInfoGetModule(int lModuleNo, ref int lpBoardNo, ref int lpModulePos, ref uint upModuleID);
     
-    //지정한 모듈 번호로 해당 모듈의 Sub ID, 모듈 Name, 모듈 설명을 확인한다.
-    //======================================================/
-    // 지원 제품            : EtherCAT
-    // upModuleSubID        : EtherCAT 모듈을 구분하기 위한 SubID
-    // szModuleName            : 모듈의 모델명(50 Bytes)
-    // szModuleDescription  : 모듈에 대한 설명(80 Bytes)
-    //======================================================//
-    [DllImport("AXL.dll")] public static extern uint AxaInfoGetModuleEx(int lModuleNo, ref uint upModuleSubID, System.Text.StringBuilder szModuleName, System.Text.StringBuilder szModuleDescription);
-    
     // 해당 모듈이 제어가 가능한 상태인지 반환한다.
     [DllImport("AXL.dll")] public static extern uint AxaInfoGetModuleStatus(int lModuleNo);
     
@@ -351,12 +342,6 @@ public class CAXA
     //지정한 여러 입력 채널에 H/W타이머를 이용한 A/D변환을 시작한다.
     [DllImport("AXL.dll")] public static extern uint AxaiHwStartMultiChannel(int lSize, int[] lpChannelNo, int lBuffSize);
     
-    //지정한 입력 채널에 H/W타이머를 이용한 A/D변환을 시작한다.
-    [DllImport("AXL.dll")] public static extern uint AxaiHwStartSingleChannelAdc(int lChannelNo, int lBuffSize);
-    
-    //H/W타이머를 이용한 연속 신호 A/D변환을 중지한다.
-    [DllImport("AXL.dll")] public static extern uint AxaiHwStopSingleChannelAdc(int lChannelNo);
-    
     //지정한 여러 입력 채널에 A/D변환을 시작 후 지정한 개수만큼 필터 처리해서 전압으로 반환한다.
     //==================================================================================================//
     // lSize          : 사용할 입력 채널의 개수
@@ -429,7 +414,7 @@ public class CAXA
     // *lpRetDataSize : A/D변환된 값이 Data Buffer에 실제 할당된 갯수
     // *dwpStatus     : A/D변환된 값을 Fifo(H/W Buffer)로 부터 읽을 때 Fifo상태를 반환함.
     [DllImport("AXL.dll")] public static extern uint AxaiExternalReadVoltage(int lModuleNo, int lSize, ref int lpChannelPos, int lDataSize, int lBuffSize, int lStartDataPos, double[,] dpVolt, ref int lpRetDataSize, ref uint upStatus);
-    
+	
 //========== 출력 모듈 정보 검색 함수 ====================================================================================
     //지정한 출력 채널 번호로 모듈 번호를 확인한다.
     [DllImport("AXL.dll")] public static extern uint AxaoInfoGetModuleNoOfChannelNo(int lChannelNo, ref int lpModuleNo);
@@ -473,62 +458,5 @@ public class CAXA
     
     //지정한 여러 출력 채널에 출력되는 전압 값을 확인한다.
     [DllImport("AXL.dll")] public static extern uint AxaoReadMultiVoltage(int lSize, int[] lpChannelNo, double[] dpVolt);
-    
-    //============================ AXA User Define Pattern Generator ============================
-    // Channel User Define Pattern Generator를 설정 하는 함수 이다.
-    // AxaoPgSetUserInterval에 설정딘 시간 마다 Pattern을 순차적으로 출력한다.
-    // lLoopCnt       : '0'(입력된 패턴을 무한대로 반복), 'value' : 지정된 횟수 만큼 입력 패턴 출력 후 마지막 패턴 유지
-    //                : (MAX : 60000)
-    // lPatternSize   : 입력 패턴 갯수(MAX : 8192)
-    [DllImport("AXL.dll")] public static extern uint AxaoPgSetUserPatternGenerator(int lChannelNo, int lLoopCnt, int lPatternSize, ref double dpPattern);
-    
-    // User Define Pattern Generator를 확인 하는 함수 이다.
-    [DllImport("AXL.dll")] public static extern uint AxaoPgGetUserPatternGenerator(int lChannelNo, ref int lpLoopCnt, ref int lpPatternSize, ref double dpPattern);
-    
-    // 해당 Channel의 Pattern Generator Interval을 설정 하는 함수 이다.
-    // 단위는 us(기본 Resolution : 500uSec)
-    [DllImport("AXL.dll")] public static extern uint AxaoPgSetUserInterval(int lChannelNo, double dInterval);
-    
-    // 해당 Channel의 Pattern Generator Interval을 확인 하는 함수 이다.
-    [DllImport("AXL.dll")] public static extern uint AxaoPgGetUserInterval(int lChannelNo, ref double dpInterval);
-    
-    // 해당 Channel의 Pattern Index / Loop Cnt를 확인 하는 함수 이다.
-    // Status의 경우 아래의 Status를 확인 할 수 있다.
-    // lpIndexNum : 현재 User Pattern의 Index
-    // lpLoopCnt : 현재 구동중인 Loop 횟수
-    // dwpInBusy : Pattern Generator의 구동 유무
-    [DllImport("AXL.dll")] public static extern uint AxaoPgGetStatus(int lChannelNo, ref int lpIndexNum, ref int lpLoopCnt, ref uint dwpInBusy);
-    
-    // 해당 Channel의 User Define Pattern Generator를 시작 하는 함수이다. (AO 출력 시작)
-    // Start Channel 번호를 배열로 입력
-    // 입력된 채널에 대하여 동시에 패턴 생성 기능을 시작한다.
-    [DllImport("AXL.dll")] public static extern uint AxaoPgSetUserStart(ref int lpChannelNo, int lSize);
-    
-    // 해당 Channel의 User Define Pattern Generator를 정지 하는 함수이다. (AO 출력 정지)
-    // 출력 정지시 출력값은 0Volt로 전환된다.
-    [DllImport("AXL.dll")] public static extern uint AxaoPgSetUserStop(ref int lpChannelNo, int lSize);
-    
-    // Pattern Data를 Clear 하는 함수. (0x00으로 모든 영역을 Reset)
-    [DllImport("AXL.dll")] public static extern uint AxaPgSetUserDataReset(int lChannelNo);
-    
-    // 지정한 출력 모듈의 Network이 끊어 졌을 경우 출력 상태를 채널 별로 설정하는 함수이다.
-    //===============================================================================================//
-    // lChannelNo  : 채널 번호(분산형 슬레이브 제품만 지원 함)
-    // dwSetValue  : 설정 할 변수 값(Default는 Network 끊어 지기 전 상태 유지)
-    //             : 1 --> Analog Max 
-    //             : 2 --> Analog MIN 
-    //             : 3 --> User Vaule(Default user value는 0V로 설정됨, AxaoSetNetworkErrorUserValue() 함수로 변경가능)
-    //             : 4 --> Analog 0 V
-    //===============================================================================================//
-    [DllImport("AXL.dll")] public static extern uint AxaoSetNetworkErrorAct(int lChannelNo, uint dwSetValue);
-    
-    // 지정한 출력 모듈의 Network이 끊어 졌을 경우 출력 상태를 출력 Byte 단위로 설정한다.
-    //===============================================================================================//
-    // lChannelNo  : 채널 번호(분산형 슬레이브 제품만 지원 함)
-    // dVolt       : 사용자 정의 아날로그 출력 전압 값
-    //===============================================================================================//
-    [DllImport("AXL.dll")] public static extern uint AxaoSetNetworkErrorUserValue(int lChannelNo, uint dVolt);
-    
-    
 }
 

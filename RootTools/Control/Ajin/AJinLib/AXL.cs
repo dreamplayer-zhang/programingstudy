@@ -70,7 +70,7 @@ public class CAXL
     // *wpLockMode  : DISABLE(0), ENABLE(1)
     [DllImport("AXL.dll")] public static extern uint AxlGetLockMode(int nBoardNo, ref uint upLockMode);
 
-    /*[DllImport("AXL.dll")]
+    [DllImport("AXL.dll")]
     public static extern uint AxlSetLockMode(int nBoardNo, uint upLockMode);
 
     // Network 제품의 ScanTime 상태를 설정한다.
@@ -79,7 +79,7 @@ public class CAXL
 
     // Network 제품의 ScanTime 상태를 반환한다.
     [DllImport("AXL.dll")]
-    public static extern uint AxlGetNetComTime(int nBoardNo, ref byte szNetComTime);*/
+    public static extern uint AxlGetNetComTime(int nBoardNo, ref byte szNetComTime);
 //========= 로그 레벨 =================================================================================
 
     // EzSpy에 출력할 메시지 레벨 설정

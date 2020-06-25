@@ -269,10 +269,10 @@ namespace Root_Vega.Module
         #region Load & Unload
         public string RunLoad()
         {
-            if (m_axisZ.IsInPos(ePosZ.Ready, m_dInposZ) == false) return "AxisZ Position not Ready";
-            if (m_axisPodLifter.IsInPos(ePosPodLifter.Ready, m_dInposLifter) == false) return "AxisPodLifter Position not Ready";
-            if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Ready, m_dInposReticle) == false) return "AxisReticleLifter Position not Ready";
-            if (m_axisTheta.IsInPos(ePosTheta.Open,m_dInposTheta) == false)
+            if (m_axisZ.IsInPos(ePosZ.Ready) == false) return "AxisZ Position not Ready";
+            if (m_axisPodLifter.IsInPos(ePosPodLifter.Ready) == false) return "AxisPodLifter Position not Ready";
+            if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Ready) == false) return "AxisReticleLifter Position not Ready";
+            if (m_axisTheta.IsInPos(ePosTheta.Open) == false)
             {
                 if (Run(MoveTheta(ePosTheta.Open))) return p_sInfo;
             }
@@ -291,10 +291,10 @@ namespace Root_Vega.Module
 
         public string RunUnload()
         {
-            if (m_axisZ.IsInPos(ePosZ.Load,m_dInposZ) == false) return "AxisZ Position not Load";
-            if (m_axisPodLifter.IsInPos(ePosPodLifter.Lifting,m_dInposLifter) == false) return "AxisPodLifter Position not Lifting";
-            if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting,m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
-            if (m_axisTheta.IsInPos(ePosTheta.Open,m_dInposTheta) == false) return "AxisTheta Position not Open";
+            if (m_axisZ.IsInPos(ePosZ.Load) == false) return "AxisZ Position not Load";
+            if (m_axisPodLifter.IsInPos(ePosPodLifter.Lifting) == false) return "AxisPodLifter Position not Lifting";
+            if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting) == false) return "AxisReticleLifter Position not Lifting";
+            if (m_axisTheta.IsInPos(ePosTheta.Open) == false) return "AxisTheta Position not Open";
             if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
             if (Run(MoveReticleLifter(ePosReticleLifter.Mid))) return p_sInfo;
@@ -343,13 +343,13 @@ namespace Root_Vega.Module
                 //JWS 200616 ADD
                 if (GetdZPos(ePosZ.InnerPod) < 0)
                 {
-                    p_sInfo = StateHome(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                    p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                     if (p_sInfo != "OK") return p_sInfo;
                     if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
                 }
                 else if (GetdZPos(ePosZ.Reticle) < 0)
                 {
-                    p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                    p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                     if (p_sInfo != "OK") return p_sInfo;
                     if (Run(Home_Innerpod())) return p_sInfo;
                 }
@@ -365,32 +365,43 @@ namespace Root_Vega.Module
 
         public string Home_Innerpod() // JWS 200616 ADD
         {
-            if (m_diInnerPod.p_bIn ==false) return "No InnerPod";
+            if (m_diInnerPod.p_bIn) return "No InnerPod";
             if (Run(MoveZ(ePosZ.InnerPod))) return p_sInfo;
-            p_sInfo = StateHome(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY);
+            p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY);
             if (p_sInfo != "OK") return p_sInfo;
             return MoveZ(ePosZ.Ready); 
         }
 
         public string Home_Reticle() // JWS 200616 ADD
         {
-            if (m_axisZ.IsInPos(ePosZ.Check,m_dInposZ) == false) return "AxisZ Position Not Check Pos";
+            if (m_axisZ.IsInPos(ePosZ.Check) == false) return "AxisZ Position Not Check Pos";
             if (m_diReticle.p_bIn)//(reticle 센서 감지)
             {
                 if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
                 //3,4번 축 상대치 이동하는 함수 넣기
                 if (Run(ShiftReticleLifter(m_aShiftReticle[0], m_aShiftReticle[1]))) return p_sInfo;
                 if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
-                p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                 if (p_sInfo != "OK") return p_sInfo;
             }
             else
             {
-                p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                 if (p_sInfo != "OK") return p_sInfo;
             }
             return Home_Innerpod();
         }
+
+        public string HomeToMinusLimit(params IAxis[] aAxis) //JWS 200625 ADD
+        {
+            p_sInfo = StateHome(aAxis);
+            if (p_sInfo != "OK") return p_sInfo;
+            foreach (IAxis axis in aAxis)
+                if (!axis.p_sensorLimitM) return axis.ToString() + " not home done.";
+
+            return p_sInfo;
+        }
+
 
         double GetdZPos(ePosZ pos)
         {

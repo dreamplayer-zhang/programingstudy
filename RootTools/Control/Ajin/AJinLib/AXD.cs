@@ -61,15 +61,6 @@ public class CAXD
     
     // 지정한 모듈 번호로 베이스 보드 번호, 모듈 위치, 모듈 ID 확인
     [DllImport("AXL.dll")] public static extern uint AxdInfoGetModule(int lModuleNo, ref int lpBoardNo, ref int lpModulePos, ref uint upModuleID);
-    
-    //지정한 모듈 번호로 해당 모듈의 Sub ID, 모듈 Name, 모듈 설명을 확인한다.
-    //======================================================/
-    // 지원 제품            : EtherCAT
-    // upModuleSubID        : EtherCAT 모듈을 구분하기 위한 SubID
-    // szModuleName            : 모듈의 모델명(50 Bytes)
-    // szModuleDescription  : 모듈에 대한 설명(80 Bytes)
-    //======================================================//
-    [DllImport("AXL.dll")] public static extern uint AxdInfoGetModuleEx(int lModuleNo, ref uint upModuleSubID, System.Text.StringBuilder szModuleName, System.Text.StringBuilder szModuleDescription);
 
     // 해당 모듈이 제어가 가능한 상태인지 반환한다.
     [DllImport("AXL.dll")] public static extern uint AxdInfoGetModuleStatus(int lModuleNo);
@@ -768,50 +759,9 @@ public class CAXD
     //             : 2 --> Off
     //===============================================================================================//
     [DllImport("AXL.dll")] public static extern uint AxdoSetNetworkErrorAct(int lModuleNo, uint dwSize, ref uint dwaSetValue);
-    
-    // 지정한 출력 모듈의 Network이 끊어 졌을 경우 출력 값을 사용자가 정의한 출력값을 Byte 단위로 설정한다.
-    //===============================================================================================//
-    // lModuleNo   : 모듈 번호(분산형 슬레이브 제품만 지원 함)
-    // dwOffset    : 출력 접점에 대한 Offset 위치, BYTE 단위로 증가(지정범위:0, 1, 2, 3)
-    // dwValue     : 출력 접점 값(00 ~ FFH)
-    //             : AxdoSetNetworkErrorAct() 함수로 해당 Offset에 대해서 User Value 로 설정되어야 동작한다.
-    //===============================================================================================//
-    [DllImport("AXL.dll")] public static extern uint AxdoSetNetworkErrorUserValue(int lModuleNo, uint dwOffset, uint dwValue);
 
-    // 지정한 모듈의 연결 Number를 설정한다.
     [DllImport("AXL.dll")] public static extern uint AxdSetContactNum(int lModuleNo, uint dwInputNum, uint dwOutputNum);
 
-    // 지정한 모듈의 연결 Number를 확인한다.
     [DllImport("AXL.dll")] public static extern uint AxdGetContactNum(int lModuleNo, ref uint dwpInputNum, ref uint dwpOutputNum);
-    
-    //== EtherCAT 전용 함수.
-
-    // 지정한 출력 모듈의 Bit Offset 위치에서 Bit Length 단위로 데이터를 출력
-    //===============================================================================================//
-    // lModuleNo        : 모듈 번호
-    // dwBitOffset      : 출력 접점에 대한 Bit Offset 위치
-    // dwDataBitLength  : 출력할 Data의 Bit Length
-    // pbyData          : 출력할 Data의 포인터('1'로 설정 된 비트는 HIGH, '0'으로 설정 된 비트는 LOW)
-    //===============================================================================================//
-    [DllImport("AXL.dll")] public static extern uint AxdoWriteOutportByBitOffset(int lModuleNo, uint dwBitOffset, uint dwDataBitLength, ref byte pbyData);
-    
-    //지정한 입력 모듈의 Bit Offset 위치에서 Bit Length 단위로 데이터를 읽기
-    //===============================================================================================//
-    // lModuleNo        : 모듈 번호
-    // dwBitOffset      : 입력 접점에 대한 Bit Offset 위치
-    // dwDataBitLength  : 입력 받을 Data의 Bit Length
-    // pbyData          : 입력 받을 Data 포인터('1'로 설정 된 비트는 HIGH, '0'으로 설정 된 비트는 LOW)
-    //===============================================================================================//
-    [DllImport("AXL.dll")] public static extern uint AxdiReadInportByBitOffset(int lModuleNo, uint dwBitOffset, uint dwDataBitLength, ref byte pbyData);
-    
-    // 지정한 출력 모듈의 Bit Offset 위치에서 Bit Length 단위로 데이터를 읽기
-    //===============================================================================================//
-    // lModuleNo        : 모듈 번호
-    // dwBitOffset      : 출력 접점에 대한 Bit Offset 위치
-    // dwDataBitLength  : 입력 받을 Data의 Bit Length
-    // pbyData          : 입력 받을 Data 포인터('1'로 설정 된 비트는 HIGH, '0'으로 설정 된 비트는 LOW)
-    //===============================================================================================//
-    [DllImport("AXL.dll")] public static extern uint AxdoReadOutportByBitOffset(int lModuleNo, uint dwBitOffset, uint dwDataBitLength, ref byte pbyData);
-    
 }
 
