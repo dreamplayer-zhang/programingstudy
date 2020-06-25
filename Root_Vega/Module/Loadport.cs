@@ -402,7 +402,6 @@ namespace Root_Vega.Module
             return p_sInfo;
         }
 
-
         double GetdZPos(ePosZ pos)
         {
             return m_axisZ.p_axis.p_posActual - m_axisZ.p_axis.GetPos(pos.ToString()) + m_dInposZ;
