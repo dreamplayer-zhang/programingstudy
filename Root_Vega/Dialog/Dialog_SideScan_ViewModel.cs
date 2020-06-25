@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
 namespace Root_Vega
 {
     class Dialog_SideScan_ViewModel: ObservableObject, IDialogRequestClose
@@ -56,8 +55,8 @@ namespace Root_Vega
             }
         }
 
-        eScanPos m_eSelScanPos = eScanPos.Bottom;
-        public eScanPos p_eSelScanPos
+        GrabMode.eScanPos m_eSelScanPos = GrabMode.eScanPos.Bottom;
+        public GrabMode.eScanPos p_eSelScanPos
         {
             get
             {
@@ -118,13 +117,15 @@ namespace Root_Vega
             if(p_SelGrabMode.p_sName.IndexOf("SIDE") >=0)
             {
                 m_RunSideGrab.m_grabMode = p_SelGrabMode;
-                m_RunSideGrab.m_eScanPos = p_eSelScanPos;
+                m_RunSideGrab.m_grabMode.m_eScanPos = p_eSelScanPos;
+                //m_RunSideGrab.m_eScanPos = p_eSelScanPos;
                 m_RunBevelGrab.m_grabMode = null;
             }
             else if( p_SelGrabMode.p_sName.IndexOf("BEVEL")>=0)
             {
                 m_RunBevelGrab.m_grabMode = p_SelGrabMode;
-                m_RunBevelGrab.m_eScanPos = p_eSelScanPos;
+                m_RunBevelGrab.m_grabMode.m_eScanPos = p_eSelScanPos;
+                //m_RunBevelGrab.m_eScanPos = p_eSelScanPos;
                 m_RunSideGrab.m_grabMode = null;
             }
             CloseRequested(this, new DialogCloseRequestedEventArgs(true));

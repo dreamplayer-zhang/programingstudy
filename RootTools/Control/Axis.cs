@@ -170,7 +170,7 @@ namespace RootTools.Control
             }
         }
 
-        public bool IsInPos(Enum pos, double posError = 10)
+        public bool IsInPos(Enum pos, double posError = 20)
         {
             double dPos = GetPosValue(pos) - p_posCommand;
             return Math.Abs(dPos) <= posError;

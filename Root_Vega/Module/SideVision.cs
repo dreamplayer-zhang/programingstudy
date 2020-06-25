@@ -25,13 +25,13 @@ using System.Windows.Threading;
 
 namespace Root_Vega.Module
 {
-    public enum eScanPos
-    {
-        Bottom = 0,
-        Left,
-        Top,
-        Right,
-    }
+    //public enum eScanPos
+    //{
+    //    Bottom = 0,
+    //    Left,
+    //    Top,
+    //    Right,
+    //}
 
     public class SideVision : ModuleBase, IRobotChild
     {
@@ -531,13 +531,18 @@ namespace Root_Vega.Module
         #region Inspect
         int m_lMaxGrab = 3000;
         CPoint m_szAlignROI = new CPoint();
-        MemoryData m_memoryGrab;
-        MemoryData m_memoryHeight;
-        MemoryData m_memoryBright;
-        MemoryData m_memoryTop;
-        MemoryData m_memoryLeft;
-        MemoryData m_memoryRight;
-        MemoryData m_memoryBottom;
+		MemoryData m_memoryGrab;
+		MemoryData m_memoryHeight;
+		MemoryData m_memoryBright;
+		
+        MemoryData m_memorySideTop;
+        MemoryData m_memorySideLeft;
+        MemoryData m_memorySideRight;
+        MemoryData m_memorySideBottom;
+        MemoryData m_memoryBevelTop;
+        MemoryData m_memoryBevelLeft;
+        MemoryData m_memoryBevelRight;
+        MemoryData m_memoryBevelBottom;
 
         public ushort[] m_aHeight;
         double m_fScaleH = 0;
@@ -547,23 +552,15 @@ namespace Root_Vega.Module
 			//m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
 			//m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
 			//m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
+            m_memorySideTop = m_memoryPool.GetGroup("Side").CreateMemory("Top", 1, 1, 1000, 1000);
+            m_memorySideLeft = m_memoryPool.GetGroup("Side").CreateMemory("Left", 1, 1, 1000, 1000);
+            m_memorySideRight = m_memoryPool.GetGroup("Side").CreateMemory("Right", 1, 1, 1000, 1000);
+            m_memorySideBottom = m_memoryPool.GetGroup("Side").CreateMemory("Bottom", 1, 1, 1000, 1000);
 
-            m_memoryTop = m_memoryPool.GetGroup(p_id).CreateMemory("Top", 1, 1, 6000, 150000);
-            m_memoryLeft = m_memoryPool.GetGroup(p_id).CreateMemory("Left", 1, 1, 6000, 150000);
-            m_memoryRight = m_memoryPool.GetGroup(p_id).CreateMemory("Right", 1, 1, 6000, 150000);
-            m_memoryBottom = m_memoryPool.GetGroup(p_id).CreateMemory("Bottom", 1, 1, 6000, 150000);
-            //m_engineer.ClassMemoryTool().GetPool("Top", true);
-            //m_engineer.ClassMemoryTool().GetPool("Top", false).p_gbPool = 3;
-            //m_memoryTop = m_engineer.ClassMemoryTool().GetPool("Top",false).GetGroup("Top", true).CreateMemory("Top", 1, 1, 6000, 150000);
-            //m_engineer.ClassMemoryTool().GetPool("Left", true);
-            //m_engineer.ClassMemoryTool().GetPool("Left", false).p_gbPool = 3;
-            //m_memoryLeft = m_engineer.ClassMemoryTool().GetPool("Left", false).GetGroup("Left", true).CreateMemory("Left", 1, 1, 6000, 150000);
-            //m_engineer.ClassMemoryTool().GetPool("Right", true);
-            //m_engineer.ClassMemoryTool().GetPool("Right", false).p_gbPool = 3;
-            //m_memoryRight = m_engineer.ClassMemoryTool().GetPool("Right", false).GetGroup("Right", true).CreateMemory("Right", 1, 1, 6000, 150000);
-            //m_engineer.ClassMemoryTool().GetPool("Bottom", true);
-            //m_engineer.ClassMemoryTool().GetPool("Bottom", false).p_gbPool = 3;
-            //m_memoryBottom = m_engineer.ClassMemoryTool().GetPool("Bottom", false).GetGroup("Bottom", true).CreateMemory("Bottom", 1, 1, 6000, 150000);
+            m_memoryBevelTop = m_memoryPool.GetGroup("Bevel").CreateMemory("Top", 1, 1, 1000, 1000);
+            m_memoryBevelLeft = m_memoryPool.GetGroup("Bevel").CreateMemory("Left", 1, 1, 1000, 1000);
+            m_memoryBevelRight = m_memoryPool.GetGroup("Bevel").CreateMemory("Right", 1, 1, 1000, 1000);
+            m_memoryBevelBottom = m_memoryPool.GetGroup("Bevel").CreateMemory("Bottom", 1, 1, 1000, 1000);
 
             m_aHeight = new ushort[m_szAlignROI.X * m_lMaxGrab];
             m_fScaleH = 65535.0 / m_szAlignROI.Y;
@@ -818,7 +815,7 @@ namespace Root_Vega.Module
             public int m_nMaxFrame = 100;  // Camera max Frame 스펙
             public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
 
-            public eScanPos m_eScanPos = eScanPos.Bottom;
+            //public eScanPos m_eScanPos = eScanPos.Bottom;
             public override ModuleRunBase Clone()
             {
                 Run_SideGrab run = new Run_SideGrab(m_module);
@@ -830,8 +827,10 @@ namespace Root_Vega.Module
                 run.m_yLine = m_yLine;
                 run.m_xLine = m_xLine;
                 run.m_nMaxFrame = m_nMaxFrame;
-                run.m_nScanRate = m_nScanRate;
-                run.m_eScanPos = m_eScanPos;
+                run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
+                //run.m_nScanRate = m_nScanRate;
+                run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
+                //run.m_eScanPos = m_eScanPos;
                 run.m_nScanGap = m_nScanGap;
                 return run;
             }
@@ -845,7 +844,7 @@ namespace Root_Vega.Module
                 m_nScanGap = tree.Set(m_nScanGap, m_nScanGap, "Scan Gab", "Scan 방향간의 Memory 상 Gab (Bottom, Left 간의 Memory 위치 차이)", bVisible);
                 m_yLine = tree.Set(m_yLine, m_yLine, "Reticle YSize", "# of Grab Lines", bVisible);
                 m_xLine = tree.Set(m_xLine, m_xLine, "Reticle XSize", "# of Grab Lines", bVisible);
-                m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
+                //m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
@@ -869,8 +868,8 @@ namespace Root_Vega.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fRes);        // 축해상도 0.1um로 하드코딩. 트리거 발생 주기.
                     int nLinesY = Convert.ToInt32(m_yLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
                     int nLinesX = Convert.ToInt32(m_xLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
-                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X + (int)m_eScanPos * (nLinesX + m_nScanGap);
-
+                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X + (int)m_grabMode.m_eScanPos * (nLinesX + m_nScanGap);
+                    //m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X + (int)m_eScanPos * (nLinesX + m_nScanGap);
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
@@ -886,7 +885,7 @@ namespace Root_Vega.Module
                         double nPosZ = m_nFocusPos + nLinesX * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
                         //double nPosZ = m_nFocusPos;
                         //double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
-                        double fPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_eScanPos * 360000 / 4;
+                        double fPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
@@ -912,10 +911,10 @@ namespace Root_Vega.Module
                         double yTrigger1 = m_rpAxis.Y + yAxis / 2;
                         m_module.p_axisXY.p_axisY.SetTrigger(yPos1, yTrigger1 + 100000, m_grabMode.m_dTrigger, true);
 
-                        /* 메모리 위치도 가져오게는 좀 다시 하자.*/
-                        string sPool = "pool";
-                        string sGroup = "group";
-                        string sMem = "mem";
+                        string sPool = m_grabMode.m_memoryPool.p_id;
+                        string sGroup = m_grabMode.m_memoryGroup.p_id;
+                        string sMem = m_grabMode.m_eScanPos.ToString();
+                        //string sMem = m_eScanPos.ToString();
                         MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, sMem);
 
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
@@ -975,7 +974,7 @@ namespace Root_Vega.Module
             public int m_nMaxFrame = 100;  // Camera max Frame 스펙
             public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
 
-            public eScanPos m_eScanPos = eScanPos.Bottom;
+            public GrabMode.eScanPos m_eScanPos = GrabMode.eScanPos.Bottom;
             public override ModuleRunBase Clone()
             {
                 Run_BevelGrab run = new Run_BevelGrab(m_module);
@@ -988,7 +987,8 @@ namespace Root_Vega.Module
                 run.m_xLine = m_xLine;
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanRate = m_nScanRate;
-                run.m_eScanPos = m_eScanPos;
+                run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
+                //run.m_eScanPos = m_eScanPos;
                 run.m_nScanGap = m_nScanGap;
                 return run;
             }
@@ -1002,7 +1002,7 @@ namespace Root_Vega.Module
                 m_nScanGap = tree.Set(m_nScanGap, m_nScanGap, "Scan Gab", "Scan 방향간의 Memory 상 Gab (Bottom, Left 간의 Memory 위치 차이)", bVisible);
                 m_yLine = tree.Set(m_yLine, m_yLine, "Reticle YSize", "# of Grab Lines", bVisible);
                 m_xLine = tree.Set(m_xLine, m_xLine, "Reticle XSize", "# of Grab Lines", bVisible);
-                m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
+                //m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
@@ -1026,7 +1026,8 @@ namespace Root_Vega.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fRes);        // 축해상도 0.1um로 하드코딩. 트리거 발생 주기.
                     int nLinesY = Convert.ToInt32(m_yLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
                     int nLinesX = Convert.ToInt32(m_xLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
-                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X + (int)m_eScanPos * (nLinesX + m_nScanGap);
+                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X + (int)m_grabMode.m_eScanPos * (nLinesX + m_nScanGap);
+                    //m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X + (int)m_eScanPos * (nLinesX + m_nScanGap);
 
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
@@ -1043,7 +1044,7 @@ namespace Root_Vega.Module
                         //double nPosZ = m_nFocusPos + nLinesX * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
                         double nPosZ = m_nFocusPos;
                         //double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
-                        double fPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_eScanPos * 360000 / 4;
+                        double fPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
@@ -1070,10 +1071,10 @@ namespace Root_Vega.Module
                         
                         m_module.p_axisXY.p_axisY.SetTrigger(yPos1, yTrigger1, m_grabMode.m_dTrigger, true);
 
-                        /* 메모리 위치도 가져오게는 좀 다시 하자.*/
-                        string sPool = "pool";
-                        string sGroup = "group";
-                        string sMem = "mem";
+                        string sPool = m_grabMode.m_memoryPool.p_id;
+                        string sGroup = m_grabMode.m_memoryGroup.p_id;
+                        string sMem = m_grabMode.m_eScanPos.ToString();
+                        //string sMem = m_eScanPos.ToString();
                         MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, sMem);
 
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);

@@ -45,7 +45,7 @@ namespace Root_Vega
 			}
 		}
 		string sPool = "SideVision.Memory";
-        string sGroup = "SideVision";
+        string sGroup = "Side";
 		List<string> sMem = new List<String>{"Top", "Left", "Right", "Bottom"};
 
 		//int tempImageWidth = 640;

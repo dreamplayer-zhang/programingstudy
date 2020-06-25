@@ -14,9 +14,15 @@ namespace RootTools.GAFs
         {
             m_bShow = true; 
             InitializeComponent();
+			Application.Current.MainWindow.Closed += MainWindow_Closed;
         }
 
-        ALIDList m_listALID;
+		private void MainWindow_Closed(object sender, System.EventArgs e)
+		{
+            this.Close();
+		}
+
+		ALIDList m_listALID;
         public void Init(ALIDList listALID)
         {
             m_listALID = listALID;

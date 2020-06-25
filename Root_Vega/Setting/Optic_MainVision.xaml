@@ -18,6 +18,7 @@
         <Dalsa:CameraNotConnectStateConverter x:Key="CameraNotConnectStateConverters"/>
         <Converter:AjinAxisToIAxis x:Key="AjinAxisToIAxiss" />
         <Converter:DictionaryItemKeysConverter x:Key="DictionaryItemKeysConverters" />
+        <Axis:DictionaryItemGetPosConverter x:Key="DictionaryItemGetPosConverters" />
         <LinearGradientBrush x:Key="TabitemBackground"
                              StartPoint="0,0"
                              EndPoint="0,1">
@@ -872,26 +873,34 @@
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
-                                                <Button Grid.Column="1"
+                                                <RepeatButton Grid.Column="1"
                                                         Margin="5"
-                                                        Style="{StaticResource BasicBtn}">
-                                                    <Button.Content>
+                                                        Style="{StaticResource BasicRepeatBtn}"
+                                                        DataContext="{Binding p_PatternVision}"
+                                                        Command="{Binding PJogFastCommand}"
+                                                        Interval="100" 
+                                                        Delay="100">
+                                                    <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowUpBox"
                                                                            Width="{PriorityBinding}"
                                                                            Height="{PriorityBinding}"
                                                                            Foreground="White"></material:PackIcon>
-                                                    </Button.Content>
-                                                </Button>
-                                                <Button Grid.Column="3"
+                                                    </RepeatButton.Content>
+                                                </RepeatButton>
+                                                <RepeatButton Grid.Column="3"
                                                         Margin="5"
-                                                        Style="{StaticResource BasicBtn}">
-                                                    <Button.Content>
+                                                        Style="{StaticResource BasicRepeatBtn}"
+                                                        DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                        Command="{Binding PJogFastCommand}"
+                                                        Interval="100" 
+                                                        Delay="100">
+                                                    <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowUpBox"
                                                                            Width="{PriorityBinding}"
                                                                            Height="{PriorityBinding}"
                                                                            Foreground="Green"></material:PackIcon>
-                                                    </Button.Content>
-                                                </Button>
+                                                    </RepeatButton.Content>
+                                                </RepeatButton>
                                             </Grid>
                                             <Grid Grid.Row="3">
                                                 <Grid.ColumnDefinitions>
@@ -900,46 +909,62 @@
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
-                                                <Button Grid.Column="0"
+                                                <RepeatButton Grid.Column="0"
                                                         Margin="5"
-                                                        Style="{StaticResource BasicBtn}">
-                                                    <Button.Content>
+                                                        Style="{StaticResource BasicRepeatBtn}"
+                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                        Command="{Binding MJogFastCommand}"
+                                                        Interval="100" 
+                                                        Delay="100">
+                                                    <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowLeftBox"
                                                                            Width="{PriorityBinding}"
                                                                            Height="{PriorityBinding}"
                                                                            Foreground="White"></material:PackIcon>
-                                                    </Button.Content>
-                                                </Button>
-                                                <Button Grid.Column="1"
+                                                    </RepeatButton.Content>
+                                                </RepeatButton>
+                                                <RepeatButton Grid.Column="1"
                                                         Margin="5"
-                                                        Style="{StaticResource BasicBtn}">
-                                                    <Button.Content>
+                                                        Style="{StaticResource BasicRepeatBtn}"
+                                                        DataContext="{Binding p_PatternVision}"
+                                                        Command="{Binding MJogFastCommand}"
+                                                        Interval="100" 
+                                                        Delay="100">
+                                                    <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowDownBox"
                                                                            Width="{PriorityBinding}"
                                                                            Height="{PriorityBinding}"
                                                                            Foreground="White"></material:PackIcon>
-                                                    </Button.Content>
-                                                </Button>
-                                                <Button Grid.Column="2"
+                                                    </RepeatButton.Content>
+                                                </RepeatButton>
+                                                <RepeatButton Grid.Column="2"
                                                         Margin="5"
-                                                        Style="{StaticResource BasicBtn}">
-                                                    <Button.Content>
+                                                        Style="{StaticResource BasicRepeatBtn}"
+                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                        Command="{Binding PJogFastCommand}"
+                                                        Interval="100" 
+                                                        Delay="100">
+                                                    <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowRightBox"
                                                                            Width="{PriorityBinding}"
                                                                            Height="{PriorityBinding}"
                                                                            Foreground="White"></material:PackIcon>
-                                                    </Button.Content>
-                                                </Button>
-                                                <Button Grid.Column="3"
+                                                    </RepeatButton.Content>
+                                                </RepeatButton>
+                                                <RepeatButton Grid.Column="3"
                                                         Margin="5"
-                                                        Style="{StaticResource BasicBtn}">
-                                                    <Button.Content>
+                                                        Style="{StaticResource BasicRepeatBtn}"
+                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                        Command="{Binding MJogFastCommand}"
+                                                        Interval="100" 
+                                                        Delay="100">
+                                                    <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowDownBox"
                                                                            Width="{PriorityBinding}"
                                                                            Height="{PriorityBinding}"
                                                                            Foreground="Green"></material:PackIcon>
-                                                    </Button.Content>
-                                                </Button>
+                                                    </RepeatButton.Content>
+                                                </RepeatButton>
                                             </Grid>
                                         </Grid>
                                     </TabItem>
@@ -969,7 +994,8 @@
                                                             DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
-                                            <Grid Grid.Row="1">
+                                            <Grid Grid.Row="1"
+                                                  DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -982,10 +1008,17 @@
                                                           ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
-                                                            FontSize="15"
-                                                            Text="1010101010" />
+                                                            FontSize="15">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource DictionaryItemGetPosConverters}">
+                                                            <Binding Path=" p_aPos" />
+                                                            <Binding Path=" p_SelMovePos" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding MoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1001,6 +1034,8 @@
                                                 </Button>
                                                 <Button Grid.Column="3"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding SavePosCommand}"
+                                                        CommandParameter="{Binding p_SelMovePos}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1029,7 +1064,8 @@
                                                             DataContext="{Binding p_PatternVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
-                                            <Grid Grid.Row="3">
+                                            <Grid Grid.Row="3"
+                                                  DataContext="{Binding p_PatternVision}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -1038,14 +1074,21 @@
                                                 </Grid.ColumnDefinitions>
                                                 <ComboBox Margin="10"
                                                           Grid.Column="0"
-                                                          SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
-                                                          ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                                          SelectedItem="{Binding p_axisXY.p_axisY.p_SelMovePos, Mode=TwoWay}"
+                                                          ItemsSource="{Binding p_axisXY.p_axisY.p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
-                                                            FontSize="15"
-                                                            Text="1010101010" />
+                                                            FontSize="15">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource DictionaryItemGetPosConverters}">
+                                                            <Binding Path="p_axisXY.p_axisY.p_aPos" />
+                                                            <Binding Path="p_axisXY.p_axisY.p_SelMovePos" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding MoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1061,6 +1104,8 @@
                                                 </Button>
                                                 <Button Grid.Column="3"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding SavePosCommand}"
+                                                        CommandParameter="{Binding p_axisXY.p_axisY.p_SelMovePos}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1089,7 +1134,8 @@
                                                             DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
-                                            <Grid Grid.Row="5">
+                                            <Grid Grid.Row="5"
+                                                  DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -1102,10 +1148,17 @@
                                                           ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
-                                                            FontSize="15"
-                                                            Text="1010101010" />
+                                                            FontSize="15">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource DictionaryItemGetPosConverters}">
+                                                            <Binding Path=" p_aPos" />
+                                                            <Binding Path=" p_SelMovePos" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding MoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1121,6 +1174,8 @@
                                                 </Button>
                                                 <Button Grid.Column="3"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding SavePosCommand}"
+                                                        CommandParameter="{Binding p_SelMovePos}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1163,7 +1218,8 @@
                                                             DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
-                                            <Grid Grid.Row="1">
+                                            <Grid Grid.Row="1"
+                                                  DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -1171,6 +1227,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <Button Grid.Column="0"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding MinusRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1185,13 +1242,14 @@
                                                 <Border Grid.Column="1">
                                                     <TextBox VerticalAlignment="Center"
                                                              Background="{PriorityBinding}"
-                                                             Text="111111"
+                                                             Text="{Binding p_dRelPos}"
                                                              Foreground="White"
                                                              HorizontalAlignment="Center"
                                                              FontSize="20" />
                                                 </Border>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding PlusRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1218,7 +1276,8 @@
                                                             DataContext="{Binding p_PatternVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
-                                            <Grid Grid.Row="3">
+                                            <Grid Grid.Row="3"
+                                                  DataContext="{Binding p_PatternVision}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -1226,6 +1285,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <Button Grid.Column="0"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding MinusRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1240,13 +1300,14 @@
                                                 <Border Grid.Column="1">
                                                     <TextBox VerticalAlignment="Center"
                                                              Background="{PriorityBinding}"
-                                                             Text="111111"
+                                                             Text="{Binding p_axisXY.p_axisY.p_dRelPos}"
                                                              Foreground="White"
                                                              HorizontalAlignment="Center"
                                                              FontSize="20" />
                                                 </Border>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding PlusRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1273,7 +1334,8 @@
                                                             DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
-                                            <Grid Grid.Row="5">
+                                            <Grid Grid.Row="5"
+                                                  DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -1281,6 +1343,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <Button Grid.Column="0"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding MinusRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1295,13 +1358,14 @@
                                                 <Border Grid.Column="1">
                                                     <TextBox VerticalAlignment="Center"
                                                              Background="{PriorityBinding}"
-                                                             Text="111111"
+                                                             Text="{Binding p_dRelPos}"
                                                              Foreground="White"
                                                              HorizontalAlignment="Center"
                                                              FontSize="20" />
                                                 </Border>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
+                                                        Command="{Binding PlusRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
