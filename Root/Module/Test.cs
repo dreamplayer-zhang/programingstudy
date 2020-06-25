@@ -186,7 +186,7 @@ namespace Root.Module
             public override string Run()
             {
                 if (m_module.Run(m_module.m_axisXY.Move(m_sPosXY))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisZ.Move(m_sPosZ))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisZ.StartMove(m_sPosZ))) return p_sInfo;
                 return "OK";
             }
 

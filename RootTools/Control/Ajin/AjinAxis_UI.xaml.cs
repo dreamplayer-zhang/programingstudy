@@ -19,8 +19,8 @@ namespace RootTools.Control.Ajin
             this.DataContext = axis;
             m_axis = axis;
             //treeRootMainUI.Init(axis.p_treeRootMain);
-            axis.RunTree(Tree.eMode.Init);
-            axis.RunSetupTree(Tree.eMode.Init); 
+            //axis.RunTree(Tree.eMode.Init);
+            //axis.RunSetupTree(Tree.eMode.Init); 
         }
     }
 }

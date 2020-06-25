@@ -8,6 +8,7 @@ using RootTools;
 using MaterialDesignThemes.Wpf;
 using System.Globalization;
 using RootTools.Control.Ajin;
+using RootTools.Control;
 
 namespace ViewConverter
 {
@@ -467,8 +468,8 @@ namespace ViewConverter
             }
             AjinAxis axis = (AjinAxis)values[0];
             double dStageLength = (double)values[1];
-            double dMinusLimit = (double)axis.p_posLimitSW[0];
-            double dPlusLimit = (double)axis.p_posLimitSW[1];
+            double dMinusLimit = axis.GetPosValue(Axis.ePosition.SWLimit_Minus);
+            double dPlusLimit = axis.GetPosValue(Axis.ePosition.SWLimit_Plus); 
             double dActualPos = axis.p_posActual;
             double dScaled = 0.0;
             double dControlLength = 0.0;    // Control별 사이즈, 스테이지 영역을 넘어가지 않게 하기 위해 빼주는 값

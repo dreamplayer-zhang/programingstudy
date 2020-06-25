@@ -75,7 +75,7 @@ namespace Root_Vega.Module
         double m_dInposZ = -1; 
         public string MoveZ(ePosZ pos)
         {
-            string sMove = m_axisZ.Move(pos);
+            string sMove = m_axisZ.StartMove(pos);
             if (sMove != "OK") return sMove;
             return m_axisZ.WaitReady(m_dInposZ); 
         }
@@ -96,7 +96,7 @@ namespace Root_Vega.Module
         double m_dInposTheta = -1;
         public string MoveTheta(ePosTheta pos)
         {
-            string sMove = m_axisTheta.Move(pos);
+            string sMove = m_axisTheta.StartMove(pos);
             if (sMove != "OK") return sMove;
             return m_axisTheta.WaitReady(m_dInposTheta);
         }
@@ -117,7 +117,7 @@ namespace Root_Vega.Module
         double m_dInposLifter = -1;
         public string MovePodLifter(ePosPodLifter pos)
         {
-            string sMove = m_axisPodLifter.Move(pos);
+            string sMove = m_axisPodLifter.StartMove(pos);
             if (sMove != "OK") return sMove;
             return m_axisPodLifter.WaitReady(m_dInposLifter);
         }
@@ -139,7 +139,7 @@ namespace Root_Vega.Module
         double m_dInposReticle = -1;
         public string MoveReticleLifter(ePosReticleLifter pos)
         {
-            string sMove = m_axisReticleLifter.Move(pos);
+            string sMove = m_axisReticleLifter.StartMove(pos);
             if (sMove != "OK") return sMove;
             return m_axisReticleLifter.WaitReady(m_dInposReticle);
         }
@@ -148,7 +148,7 @@ namespace Root_Vega.Module
         {
             RPoint rpActual = new RPoint(m_axisReticleLifter.p_axisX.p_posActual, m_axisReticleLifter.p_axisY.p_posActual);
             RPoint rpMove = new RPoint(rpActual.X - dPosX, rpActual.Y - dPosY);
-            string sMove = m_axisReticleLifter.Move(rpMove);
+            string sMove = m_axisReticleLifter.StartMove(rpMove);
             if (sMove != "OK") return sMove;
             return m_axisReticleLifter.WaitReady(m_dInposReticle);
         }

@@ -465,7 +465,7 @@ namespace Root_Wind.Module
                         //m_grabMode.SetLight(true);
                         double nPosX = m_rpAxis.X - (nScanLine+ m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.p_sz.X* m_grabMode.m_dTrigger; //해상도추가필요
 
-                        if (m_module.Run(axisXY.Move(new RPoint(nPosX, yPos0))))
+                        if (m_module.Run(axisXY.StartMove(new RPoint(nPosX, yPos0))))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;

@@ -167,7 +167,6 @@
     <Compile Include="Camera\Dalsa\Camera_Dalse_Classes.cs" />
     <Compile Include="Control\Axis.cs" />
     <Compile Include="Control\AxisXY.cs" />
-    <Compile Include="Control\IAxis.cs" />
     <Compile Include="Comm\CommLog.cs" />
     <Compile Include="Comm\CommLog_UI.xaml.cs">
       <DependentUpon>CommLog_UI.xaml</DependentUpon>

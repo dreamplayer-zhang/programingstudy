@@ -1,33 +1,19 @@
 ﻿using Microsoft.Win32;
 using RootTools.Trees;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 
 namespace RootTools.Control.Ajin
 {
     public class AjinListAxis : NotifyProperty
     {
-        #region V Rate
-        public static double s_vRate = 1;
-        public double p_vRate
-        {
-            get { return s_vRate; }
-            set
-            {
-                m_log.Info("V Rate Change : " + s_vRate.ToString() + " -> " + value.ToString());
-                s_vRate = value;
-                for (int n = 0; n < m_aAxis.Count; n++) m_aAxis[n].OverrideV();
-            }
-        }
-        #endregion
-
         #region List Axis
         public delegate void dgOnChangeAxisList();
         public event dgOnChangeAxisList OnChangeAxisList; 
 
-        int m_lAxis = 0;
-        public List<IAxis> m_aAxis = new List<IAxis>();
-        void InitAxisList()
+        public List<AjinAxis> m_aAxis = new List<AjinAxis>();
+/*        void InitAxisList()
         {
             while (m_aAxis.Count < m_lAxis)
             {
@@ -35,13 +21,8 @@ namespace RootTools.Control.Ajin
                 axis.Init(m_id, this, m_engineer, m_bEnable);
                 m_aAxis.Add(axis);
             }
-            InvalidAxisList(); 
-        }
-
-        public void InvalidAxisList()
-        {
             if (OnChangeAxisList != null) OnChangeAxisList();
-        }
+        } */ //forget
         #endregion
 
         #region AXM Info
@@ -84,23 +65,29 @@ namespace RootTools.Control.Ajin
         #endregion
 
         #region InitAxis
+        BackgroundWorker m_bgwInit = new BackgroundWorker();
         int m_lAxisAjin = 0;
         string InitAxis()
         {
             AXM("AxmInfoGetAxisCount", CAXM.AxmInfoGetAxisCount(ref m_lAxisAjin));
             if (m_bAXL == false) return "Init Axis Skip : AXL";
-            m_bEnable = false;
-            m_threadInitAxis = new Thread(new ThreadStart(RunThread_InitAxis));
-            m_threadInitAxis.Start();
+            m_bgwInit.DoWork += M_bgwInit_DoWork;
+            m_bgwInit.RunWorkerCompleted += M_bgwInit_RunWorkerCompleted;
             return "OK";
         }
 
-        bool m_bInitAxis = false;
-        Thread m_threadInitAxis;
+        private void M_bgwInit_DoWork(object sender, DoWorkEventArgs e)
+        {
+            for (int n = 0; n < m_lAxisAjin; n++) (m_aAxis[n]).SetAxisStatus();
+        }
+
+        private void M_bgwInit_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            throw new System.NotImplementedException();
+        }
+
         void RunThread_InitAxis()
         {
-            m_bInitAxis = true;
-            for (int n = 0; n < m_lAxis; n++) ((AjinAxis)m_aAxis[n]).SetAxisStatus();
             m_bEnable = true;
             m_log.Info("RunThread_InitAxis - Done.");
         }
@@ -145,7 +132,6 @@ namespace RootTools.Control.Ajin
         Log m_log;
         IEngineer m_engineer;
         bool m_bAXL = false;
-        bool m_bEnable = false;
         string m_strMotFile = @"C:\VEGA\Init\VEGA.mot";
         public void Init(string id, IEngineer engineer, bool bAXL)
         {

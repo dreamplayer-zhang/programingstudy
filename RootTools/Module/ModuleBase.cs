@@ -98,7 +98,7 @@ namespace RootTools.Module
         protected virtual void StopHome()
         {
             EQ.p_bStop = true;
-            foreach (IAxis axis in m_listAxis) if (axis != null) axis.ServoOn(false);
+            foreach (Axis axis in m_listAxis) if (axis != null) axis.p_bServoOn = false;
             p_eState = eState.Init;
         }
 
@@ -260,35 +260,35 @@ namespace RootTools.Module
             m_listDO.Init(ListDIO.eDIO.Output);
         }
 
-        public List<IAxis> m_listAxis = new List<IAxis>();
+        public List<Axis> m_listAxis = new List<Axis>();
         public List<ITool> m_aTool = new List<ITool>();
 
         public CameraSet m_cameraSet = null;
         #endregion
 
         #region Home
-        public string StateHome(params IAxis[] aAxis)
+        public string StateHome(params Axis[] aAxis)
         {
-            List<IAxis> listAxis = new List<IAxis>();
-            foreach (IAxis axis in aAxis) listAxis.Add(axis);
+            List<Axis> listAxis = new List<Axis>();
+            foreach (Axis axis in aAxis) listAxis.Add(axis);
             return StateHome(listAxis);
         }
 
-        string StateHome(List<IAxis> aAxis)
+        string StateHome(List<Axis> aAxis)
         {
             if (aAxis.Count == 0) return "OK";
             if (p_eState == eState.Run) return "Invalid State : Run";
             if (EQ.IsStop()) return "Home Stop";
 
-            foreach (IAxis axis in aAxis)
+            foreach (Axis axis in aAxis)
             {
-                if (axis != null) axis.ServoOn(true);
+                if (axis != null) axis.p_bServoOn = true; 
             }
             Thread.Sleep(200);
             if (EQ.IsStop()) return "Home Stop";
-            foreach (IAxis axis in aAxis)
+            foreach (Axis axis in aAxis)
             {
-                if (axis != null) p_sInfo = axis.HomeStart();
+                if (axis != null) p_sInfo = axis.StartHome();
             }
 
             while (true)
@@ -296,7 +296,7 @@ namespace RootTools.Module
                 Thread.Sleep(10);
                 if (EQ.IsStop(1000)) return "Home Stop";
                 bool bDone = true;
-                foreach (IAxis axis in aAxis)
+                foreach (Axis axis in aAxis)
                 {
                     if ((axis != null) && (axis.p_eState == Axis.eState.Home)) bDone = false;
                 }

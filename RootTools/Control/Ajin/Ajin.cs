@@ -1,9 +1,6 @@
-﻿using MaterialDesignThemes.Wpf;
-using RootTools.Trees;
-using System;
+﻿using RootTools.Trees;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Windows.Data;
 
 namespace RootTools.Control.Ajin
 {
@@ -170,18 +167,6 @@ namespace RootTools.Control.Ajin
             m_dio.ThreadStop();
             CAXL.AxlClose();
         }
-    }
-
-    public enum eRange16
-    {
-        Range0To15,
-        Range16To31,
-        Range32To47,
-        Range48To63,
-        Range64To79,
-        Range80To95,
-        Range96To111,
-        Range112To137,
     }
 
     public class AJINModule : ObservableObject
