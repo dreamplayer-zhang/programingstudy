@@ -140,8 +140,8 @@ namespace Root_Vega
 		public int EdgeThreshold
 		{
 			get { return edgeThreshold; }
-			set 
-			{ 
+			set
+			{
 				SetProperty(ref edgeThreshold, value);
 				SelectedROI.EdgeBox.EdgeThreshold = value;
 			}
@@ -394,6 +394,7 @@ namespace Root_Vega
 		}
 		public void _saveEdgeRcp()
 		{
+			//recipe에 저장되는 것 한정임. Init에 있는걸 레시피로 복사하는건 별도 기능으로 구현해야 함
 			int checkCount = 0;
 			for (int i = 0; i < 4; i++)
 			{
@@ -418,23 +419,16 @@ namespace Root_Vega
 					SelectedROI.EdgeBox.EdgeList.Clear();
 				}
 			}
-			if (SelectedROI.EdgeBox.UseCustomEdgeBox)
+			//여기서 그려진 모든 rect목록을 현재 엔지니어가 들고있는 레시피에 반영한다
+			for (int i = 0; i < 4; i++)
 			{
-				//여기서 그려진 모든 rect목록을 현재 엔지니어가 들고있는 레시피에 반영한다
-				for (int i = 0; i < 4; i++)
+				if (p_SimpleShapeDrawer_List[i] == null) continue;
+				for (int j = 0; j < 6; j++)
 				{
-					if (p_SimpleShapeDrawer_List[i] == null) continue;
-					for (int j = 0; j < 6; j++)
-					{
-						if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
-						SelectedROI.EdgeBox.EdgeList.Add(new EdgeElement(i, new CRect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos)));
+					if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
+					SelectedROI.EdgeBox.EdgeList.Add(new EdgeElement(i, new CRect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos)));
 
-					}
 				}
-			}
-			else
-			{
-				_saveInit();
 			}
 
 			//TODO : 원하는 파라메터만 갱신해서 저장할 수 있는 기능이 있으면 좋을 것 같음!
