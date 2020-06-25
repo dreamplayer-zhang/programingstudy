@@ -37,207 +37,12 @@
 *****************************************************************************
 */
 
-using System;
 using System.Runtime.InteropServices;
-using System.Collections.Specialized;
-
-
-// DCB 구조 정의
-
-public struct DCB
-{
-    public uint DCBLength;
-    public uint BaudRate;
-    public BitVector32 Flags;
-
-    public ushort wReserved;        // not currently used 
-    public ushort XonLim;           // transmit XON threshold 
-    public ushort XoffLim;          // transmit XOFF threshold             
-
-    public byte ByteSize;
-    public byte Parity;
-    public byte StopBits;
-
-    public sbyte XonChar;          // Tx and Rx XON character 
-    public sbyte XoffChar;         // Tx and Rx XOFF character 
-    public sbyte ErrorChar;        // error replacement character 
-    public sbyte EofChar;          // end of input character 
-    public sbyte EvtChar;          // received event character 
-    public ushort wReserved1;       // reserved; do not use     
-
-    public static readonly int fBinary;
-    public static readonly int fParity;
-    public static readonly int fOutxCtsFlow;
-    public static readonly int fOutxDsrFlow;
-    public static readonly BitVector32.Section fDtrControl;
-    public static readonly int fDsrSensitivity;
-    public static readonly int fTXContinueOnXoff;
-    public static readonly int fOutX;
-    public static readonly int fInX;
-    public static readonly int fErrorChar;
-    public static readonly int fNull;
-    public static readonly BitVector32.Section fRtsControl;
-    public static readonly int fAbortOnError;
-
-    static DCB()
-    {
-        // Create Boolean Mask
-        int previousMask;
-        fBinary = BitVector32.CreateMask();
-        fParity = BitVector32.CreateMask(fBinary);
-        fOutxCtsFlow = BitVector32.CreateMask(fParity);
-        fOutxDsrFlow = BitVector32.CreateMask(fOutxCtsFlow);
-        previousMask = BitVector32.CreateMask(fOutxDsrFlow);
-        previousMask = BitVector32.CreateMask(previousMask);
-        fDsrSensitivity = BitVector32.CreateMask(previousMask);
-        fTXContinueOnXoff = BitVector32.CreateMask(fDsrSensitivity);
-        fOutX = BitVector32.CreateMask(fTXContinueOnXoff);
-        fInX = BitVector32.CreateMask(fOutX);
-        fErrorChar = BitVector32.CreateMask(fInX);
-        fNull = BitVector32.CreateMask(fErrorChar);
-        previousMask = BitVector32.CreateMask(fNull);
-        previousMask = BitVector32.CreateMask(previousMask);
-        fAbortOnError = BitVector32.CreateMask(previousMask);
-
-        // Create section Mask
-        BitVector32.Section previousSection;
-        previousSection = BitVector32.CreateSection(1);
-        previousSection = BitVector32.CreateSection(1, previousSection);
-        previousSection = BitVector32.CreateSection(1, previousSection);
-        previousSection = BitVector32.CreateSection(1, previousSection);
-        fDtrControl = BitVector32.CreateSection(2, previousSection);
-        previousSection = BitVector32.CreateSection(1, fDtrControl);
-        previousSection = BitVector32.CreateSection(1, previousSection);
-        previousSection = BitVector32.CreateSection(1, previousSection);
-        previousSection = BitVector32.CreateSection(1, previousSection);
-        previousSection = BitVector32.CreateSection(1, previousSection);
-        previousSection = BitVector32.CreateSection(1, previousSection);
-        fRtsControl = BitVector32.CreateSection(3, previousSection);
-        previousSection = BitVector32.CreateSection(1, fRtsControl);
-    }
-
-    public bool Binary
-    {
-        get { return Flags[fBinary]; }
-        set { Flags[fBinary] = value; }
-    }
-
-    public bool CheckParity
-    {
-        get { return Flags[fParity]; }
-        set { Flags[fParity] = value; }
-    }
-
-    public bool OutxCtsFlow
-    {
-        get { return Flags[fOutxCtsFlow]; }
-        set { Flags[fOutxCtsFlow] = value; }
-    }
-
-    public bool OutxDsrFlow
-    {
-        get { return Flags[fOutxDsrFlow]; }
-        set { Flags[fOutxDsrFlow]  = value; }
-    }
-
-    public int DtrControl
-    {
-        get { return Flags[fDtrControl]; }
-        set { Flags[fDtrControl] = (int)value; }
-    }
-
-    public bool DsrSensitivity
-    {
-        get { return Flags[fDsrSensitivity]; }
-        set { Flags[fDsrSensitivity] = value; }
-    }
-
-    public bool TxContinueOnXoff
-    {
-        get { return Flags[fTXContinueOnXoff]; }
-        set { Flags[fTXContinueOnXoff] = value; }
-    }
-
-    public bool OutX
-    {
-        get { return Flags[fOutX]; }
-        set { Flags[fOutX] = value; }
-    }
-
-    public bool InX
-    {
-        get { return Flags[fInX]; }
-        set { Flags[fInX] = value; }
-    }
-
-    public bool ReplaceErrorChar
-    {
-        get { return Flags[fErrorChar]; }
-        set { Flags[fErrorChar] = value; }
-    }
-
-    public bool Null
-    {
-        get { return Flags[fNull]; }
-        set { Flags[fNull] = value; }
-    }
-
-    public int RtsControl
-    {
-        get { return Flags[fRtsControl]; }
-        set { Flags[fRtsControl]  = (int)value; }
-    }
-
-    public bool AbortOnError
-    {
-        get { return Flags[fAbortOnError]; }
-        set { Flags[fAbortOnError] = value; }
-    }
-}
-
-
-
-// COMMTIMEOUTS 구조 정의
-public struct COMMTIMEOUTS
-{
-    public int ReadIntervalTimeout;
-    public int ReadTotalTimeoutMultiplier;
-    public int ReadTotalTimeoutConstant;
-    public int WriteTotalTimeoutMultiplier;
-    public int WriteTotalTimeoutConstant;
-}
-
-// OVERLAPPED 구조 정의
-public struct OVERLAPPED
-{
-    public uint Internal;
-    public uint InternalHigh;
-    public uint Offset;
-    public uint OffsetHigh;
-    public IntPtr Pointer;
-    public IntPtr hEvent;
-}
-
-// COMSTAT 구조 정의
-public struct COMSTAT
-{
-    public const uint fCtsHold = 0x1;
-    public const uint fDsrHold = 0x2;
-    public const uint fRlsdHold = 0x4;
-    public const uint fXoffHold = 0x8;
-    public const uint fXoffSent = 0x10;
-    public const uint fEof = 0x20;
-    public const uint fTxim = 0x40;
-    public UInt32 Flags;
-    public UInt32 cbInQue;
-    public UInt32 cbOutQue;
-}
-
 
 // 베이스보드 정의
 public enum AXT_BASE_BOARD:uint
 {
-    AXT_UNKNOWN                                             = 0x00,    // Unknown Baseboard
+   AXT_UNKNOWN                                              = 0x00,    // Unknown Baseboard
     AXT_BIHR                                                = 0x01,    // ISA bus, Half size
     AXT_BIFR                                                = 0x02,    // ISA bus, Full size
     AXT_BPHR                                                = 0x03,    // PCI bus, Half size
@@ -256,7 +61,6 @@ public enum AXT_BASE_BOARD:uint
     AXT_PCIE_DO64R                                          = 0x54,    // PCIe bus, Digital OUT 64점
     AXT_PCI_DB64R                                           = 0x63,    // PCI bus, Digital IN 32점, OUT 32점
     AXT_PCIE_DB64R                                          = 0x64,    // PCIe bus, Digital IN 32점, OUT 32점
-    AXT_BPFR_COM                                            = 0x70,    // PCI bus, Full size, For serial function modules.
     AXT_PCIN204                                             = 0x82,    // PCI bus, Half size On-Board 2 Axis controller.
     AXT_BPHD                                                = 0x83,    // PCI bus, Half size, DB-32T
     AXT_PCIN404                                             = 0x84,    // PCI bus, Half size On-Board 4 Axis controller.    
@@ -284,7 +88,7 @@ public enum AXT_BASE_BOARD:uint
     AXT_ETHERCAT_RTOSV5                                     = 0xD2,    // EtherCAT, RTOS(On Time), Version 5.29
     AXT_PCI_Nx04_A                                          = 0xD3,	   // PCI bus, Half size On-Board x Axis controller For Rtos.
     AXT_PCI_R3200MLIII_IO                                   = 0xD4,    // PCI Board, Mechatrolink III AXT, PCI Bus[PCI9030], Half size, Max.32 IO only	controller
-    AXT_PCIE_Rxx05MLIII                                     = 0xD5,    // PCIe bus, Half size, Mechatrolink III / H Max. 32-axis(DSP Based) controller.
+    AXT_PCIE_R3205MLIII                                     = 0xD5,    // PCIe bus, Half size, Mechatrolink III / H Max. 32-axis(DSP Based) controller.
     AXT_PCIE_Rxx05SIIIH                                     = 0xD6,    // PCIe bus, Half size, Sscnet III / H  32 axis(DSP Based) controller.
     AXT_PCIE_Rxx05RTEX                                      = 0xD7,    // PCIe bus, Half size, RTEX 32 axis(DSP Based) controller.
     AXT_PCIE_Rxx05ECAT                                      = 0xD8,    // PCIe bus, Half size, ECAT(DSP Based) controller.
@@ -296,8 +100,8 @@ public enum AXT_BASE_BOARD:uint
                                                 
 // 모듈 정의                                    
 public enum AXT_MODULE:uint                     
-{
-    AXT_UNKNOWN                                             = 0x00,    // Unknown Baseboard                                         
+{                                               
+    AXT_UNKNOWN                                             = 0x00,    // Unknown Baseboard                                            
     AXT_SMC_2V01                                            = 0x01,    // CAMC-5M, 2 Axis
     AXT_SMC_2V02                                            = 0x02,    // CAMC-FS, 2 Axis
     AXT_SMC_1V01                                            = 0x03,    // CAMC-5M, 1 Axis
@@ -316,37 +120,31 @@ public enum AXT_MODULE:uint
     AXT_SMC_R1V04PM2Q                                       = 0x10,    // CAMC-QI, 2 Axis, For RTEX SLAVE only(Pulse Output Module)
     AXT_SMC_R1V04PM2QE                                      = 0x11,    // CAMC-QI, 4 Axis, For RTEX SLAVE only(Pulse Output Module)
     AXT_SMC_R1V04MLIIORI                                    = 0x12,    // CAMC-QI, 1 Axis, For MLII Oriental Step Driver only
-    AXT_SMC_R1V04A6                                         = 0x13,    // CAMC-QI, 1 Axis, For RTEX A5N slave only
     AXT_SMC_R1V04SIIIHMIV                                   = 0x14,    // CAMC-QI, 1 Axis, For SSCNETIII/H MRJ4
     AXT_SMC_R1V04SIIIHMIV_R                                 = 0x15,    // CAMC-QI, 1 Axis, For SSCNETIII/H MRJ4
-    AXT_SMC_R1V04SIIIHME                                    = 0x16,    // CAMC-QI, 1 Axis, For SSCNETIII/H MRJE
-    AXT_SMC_R1V04SIIIHME_R                                  = 0x17,    // CAMC-QI, 1 Axis, For SSCNETIII/H MRJE
-    AXT_SMC_R1V04MLIIS7                                     = 0x1D,    // CAMC-QI, 1 Axis, For ML-II/YASKWA Sigma7(SGD7S)
     AXT_SMC_R1V04MLIIISV                                    = 0x20,    // DSP, 1 Axis, For ML-3 SigmaV/YASKAWA only 
     AXT_SMC_R1V04MLIIIPM                                    = 0x21,    // DSP, 1 Axis, For ML-3 SLAVE/AJINEXTEK only(Pulse Output Module)
     AXT_SMC_R1V04MLIIISV_MD                                 = 0x22,    // DSP, 1 Axis, For ML-3 SigmaV-MD/YASKAWA only (Multi-Axis Control amp)
     AXT_SMC_R1V04MLIIIS7S                                   = 0x23,    // DSP, 1 Axis, For ML-3 Sigma7S/YASKAWA only
     AXT_SMC_R1V04MLIIIS7W                                   = 0x24,    // DSP, 2 Axis, For ML-3 Sigma7W/YASKAWA only(Dual-Axis control amp)
     AXT_SMC_R1V04MLIIIRS2                                   = 0x25,    // DSP, 1 Axis, For ML-3 RS2A/SANYO DENKY
-    AXT_SMC_R1V04MLIIIS7_MD                                 = 0x26,    // DSP, 1 Axis, For ML-3 Sigma7-MD/YASKAWA only (Multi-Axis Control amp)
-    AXT_SMC_R1V04MLIIIAZ                                    = 0x27,    // DSP, 4 Axis, For ML-3 AZD/ORIENTAL only (Multi-Axis Control amp)
-    AXT_SMC_R1V04MLIIIPCON                                  = 0x28,    // DSP, 1 Axis, For ML-3 PCON/IAI only
-    AXT_SMC_R1V04PM2QSIIIH                                  = 0x60,    // CAMC-QI, 2Axis For SSCNETIII/H SLAVE only(Pulse Output Module)
-    AXT_SMC_R1V04PM4QSIIIH                                  = 0x61,    // CAMC-QI, 4Axis For SSCNETIII/H SLAVE only(Pulse Output Module)
-    AXT_SIO_RCNT2SIIIH                                      = 0x62,    // Counter slave module, Reversible counter, 2 channels, For SSCNETIII/H Only
-    AXT_SIO_RDI32SIIIH                                      = 0x63,    // DI slave module, SSCNETIII AXT, IN 32-Channel
-    AXT_SIO_RDO32SIIIH                                      = 0x64,    // DO slave module, SSCNETIII AXT, OUT 32-Channel
-    AXT_SIO_RDB32SIIIH                                      = 0x65,    // DB slave module, SSCNETIII AXT, IN 16-Channel, OUT 16-Channel
-    AXT_SIO_RAI16SIIIH                                      = 0x66,    // AI slave module, SSCNETIII AXT, Analog IN 16ch, 16 bit
-    AXT_SIO_RAO08SIIIH                                      = 0x67,    // A0 slave module, SSCNETIII AXT, Analog OUT 8ch, 16 bit
-    AXT_SMC_R1V04PM2QSIIIH_R                                = 0x68,    // CAMC-QI, 2Axis For SSCNETIII/H SLAVE only(Pulse Output Module) 
-    AXT_SMC_R1V04PM4QSIIIH_R                                = 0x69,    // CAMC-QI, 4Axis For SSCNETIII/H SLAVE only(Pulse Output Module) 
-    AXT_SIO_RCNT2SIIIH_R                                    = 0x6A,    // Counter slave module, Reversible counter, 2 channels, For SSCNETIII/H Only 
-    AXT_SIO_RDI32SIIIH_R                                    = 0x6B,    // DI slave module, SSCNETIII AXT, IN 32-Channel 
-    AXT_SIO_RDO32SIIIH_R                                    = 0x6C,    // DO slave module, SSCNETIII AXT, OUT 32-Channel 
-    AXT_SIO_RDB32SIIIH_R                                    = 0x6D,    // DB slave module, SSCNETIII AXT, IN 16-Channel, OUT 16-Channel 
-    AXT_SIO_RAI16SIIIH_R                                    = 0x6E,    // AI slave module, SSCNETIII AXT, Analog IN 16ch, 16 bit 
-    AXT_SIO_RAO08SIIIH_R                                    = 0x6F,    // A0 slave module, SSCNETIII AXT, Analog OUT 8ch, 16 bit 
+	AXT_SMC_R1V04MLIIIS7_MD                                 = 0x26,    // DSP, 1 Axis, For ML-3 Sigma7-MD/YASKAWA only (Multi-Axis Control amp)
+    AXT_SMC_PM2QSIIIH                                       = 0X60,    // CAMC-QI, 2Axis For SSCNETIII/H SLAVE only(Pulse Output Module)
+    AXT_SMC_PM4QSIIIH                                       = 0X61,    // CAMC-QI, 4Axis For SSCNETIII/H SLAVE only(Pulse Output Module)
+    AXT_SIO_CNT2SIIIH                                       = 0X62,    // Counter slave module, Reversible counter, 2 channels, For SSCNETIII/H Only
+    AXT_SIO_DI32SIIIH                                       = 0X63,    // DI slave module, SSCNETIII AXT, IN 32-Channel
+    AXT_SIO_DO32SIIIH                                       = 0X64,    // DO slave module, SSCNETIII AXT, OUT 32-Channel
+    AXT_SIO_DB32SIIIH                                       = 0X65,    // DB slave module, SSCNETIII AXT, IN 16-Channel, OUT 16-Channel
+    AXT_SIO_AI16SIIIH                                       = 0X66,    // AI slave module, SSCNETIII AXT, Analog IN 16ch, 16 bit
+    AXT_SIO_AO08SIIIH                                       = 0X67,    // A0 slave module, SSCNETIII AXT, Analog OUT 8ch, 16 bit
+    AXT_SMC_PM2QSIIIH_R                                     = 0X68,    // CAMC-QI, 2Axis For SSCNETIII/H SLAVE only(Pulse Output Module) 
+    AXT_SMC_PM4QSIIIH_R                                     = 0X69,    // CAMC-QI, 4Axis For SSCNETIII/H SLAVE only(Pulse Output Module) 
+    AXT_SIO_CNT2SIIIH_R                                     = 0X6A,    // Counter slave module, Reversible counter, 2 channels, For SSCNETIII/H Only 
+    AXT_SIO_DI32SIIIH_R                                     = 0X6B,    // DI slave module, SSCNETIII AXT, IN 32-Channel 
+    AXT_SIO_DO32SIIIH_R                                     = 0X6C,    // DO slave module, SSCNETIII AXT, OUT 32-Channel 
+    AXT_SIO_DB32SIIIH_R                                     = 0X6D,    // DB slave module, SSCNETIII AXT, IN 16-Channel, OUT 16-Channel 
+    AXT_SIO_AI16SIIIH_R                                     = 0X6E,    // AI slave module, SSCNETIII AXT, Analog IN 16ch, 16 bit 
+    AXT_SIO_AO08SIIIH_R                                     = 0X6F,    // A0 slave module, SSCNETIII AXT, Analog OUT 8ch, 16 bit 
     AXT_SIO_RDI32MLIII                                      = 0x70,    // DI slave module, MechatroLink III AXT, IN 32-Channel NPN
     AXT_SIO_RDO32MLIII                                      = 0x71,    // DO slave module, MechatroLink III AXT, OUT 32-Channel  NPN
     AXT_SIO_RDB32MLIII                                      = 0x72,    // DB slave module, MechatroLink III AXT, IN 16-Channel, OUT 16-Channel  NPN
@@ -357,11 +155,11 @@ public enum AXT_MODULE:uint
     AXT_SIO_RDB32PMLIII                                     = 0x77,    // DB slave module, MechatroLink III AXT, IN 16-Channel, OUT 16-Channel  PNP
     AXT_SIO_RDI16MLIII                                      = 0x78,    // DI slave module, MechatroLink III M-SYSTEM, IN 16-Channel
     AXT_SIO_UNDEFINEMLIII                                   = 0x79,    // IO slave module, MechatroLink III Any, Max. IN 480-Channel, Max. OUT 480-Channel
-    AXT_SIO_RDI32MLIIISFA                                   = 0x7A,    // DI slave module, MechatroLink III AXT(SFA), IN 32-Channel NPN
-    AXT_SIO_RDO32MLIIISFA                                   = 0x7B,    // DO slave module, MechatroLink III AXT(SFA), OUT 32-Channel  NPN
-    AXT_SIO_RDB32MLIIISFA                                   = 0x7C,    // DB slave module, MechatroLink III AXT(SFA), IN 16-Channel, OUT 16-Channel  NPN
+    AXT_SIO_RDI32MLIIISFA	                                = 0x7A,    // DI slave module, MechatroLink III AXT(SFA), IN 32-Channel NPN
+	AXT_SIO_RDO32MLIIISFA	                                = 0x7B,    // DO slave module, MechatroLink III AXT(SFA), OUT 32-Channel  NPN
+	AXT_SIO_RDB32MLIIISFA	                                = 0x7C,    // DB slave module, MechatroLink III AXT(SFA), IN 16-Channel, OUT 16-Channel  NPN
     AXT_SIO_RDB128MLIIIAI                                   = 0x7D,    // Intelligent I/O (Product by IAI), For MLII only
-    AXT_SIO_RSIMPLEIOMLII                                   = 0x7E,    // Digital IN/Out xx점, Simple I/O series, MLII 전용.
+    AXT_SIO_RSIMPLEIOMLII                                   = 0x7E,    // Digital IN/Out xx점, Simple I/O sereies, MLII 전용.
     AXT_SIO_RDO16AMLIII                                     = 0x7F,    // DO slave module, MechatroLink III M-SYSTEM, OUT 16-Channel, NPN
     AXT_SIO_RDI16MLII                                       = 0x80,    // DISCRETE INPUT MODULE, 16 points (Product by M-SYSTEM), For MLII only
     AXT_SIO_RDO16AMLII                                      = 0x81,    // NPN TRANSISTOR OUTPUT MODULE, 16 points (Product by M-SYSTEM), For MLII only
@@ -370,10 +168,7 @@ public enum AXT_MODULE:uint
     AXT_SIO_RDO32RTEX                                       = 0x84,    // Digital OUT  32점
     AXT_SIO_RDI32RTEX                                       = 0x85,    // Digital IN  32점
     AXT_SIO_RDB32RTEX                                       = 0x86,    // Digital IN/OUT  32점
-    AXT_SIO_RDO32RTEXNT1_D1                                 = 0x87,    // Digital OUT 32점 IntekPlus 전용
-    AXT_SIO_RDI32RTEXNT1_D1                                 = 0x88,    // Digital IN 32점 IntekPlus 전용
-    AXT_SIO_RDB32RTEXNT1_D1                                 = 0x89,    // Digital IN/OUT 32점 IntekPlus 전용
-    AXT_SIO_RDO16BMLIII                                     = 0x8A,    // DO slave module, MechatroLink III M-SYSTEM, OUT 16-Channel, PNP
+    AXT_SIO_RDO16BMLIII                                   	= 0x8A,    // DO slave module, MechatroLink III M-SYSTEM, OUT 16-Channel, PNP
     AXT_SIO_RDB32ML2NT1                                     = 0x8B,    // DB slave module, MechatroLink2 AJINEXTEK NT1 Series
     AXT_SIO_RDB128YSMLIII                                   = 0x8C,    // IO slave module, MechatroLink III Any, Max. IN 480-Channel, Max. OUT 480-Channel
     AXT_SIO_DI32_P                                          = 0x92,    // Digital IN  32점, PNP type(source type)
@@ -406,8 +201,8 @@ public enum AXT_MODULE:uint
     AXT_SIO_RCNT2MLII                                       = 0xB0,    // Counter slave module, Reversible counter, 2 channels (Product by YASKWA), For MLII only
     AXT_SIO_CN2CH                                           = 0xB1,    // Counter Module, 2 channels, Remapped ID, Actual ID is (0xA8)
     AXT_SIO_RCNT2RTEX                                       = 0xB2,    // Counter slave module, Reversible counter, 2 channels, For RTEX Only
-    AXT_SIO_RCNT2MLIII                                      = 0xB3,    // Counter slave module, MechatroLink III AXT, 2 ch, Trigger per channel
-    AXT_SIO_RHPC4MLIII                                      = 0xB4,    // Counter slave module, MechatroLink III AXT, 4 ch
+    AXT_SIO_RCNT2MLIII                                      = 0xB3,    // Counter slave moudle, MechatroLink III AXT, 2 ch, Trigger per channel
+    AXT_SIO_RHPC4MLIII                                      = 0xB4,    // Counter slave moudle, MechatroLink III AXT, 4 ch
     AXT_SIO_RAI16RTEX                                       = 0xC0,    // ANALOG VOLTAGE INPUT(+- 10V) 16 Channel RTEX 
     AXT_SIO_RAO08RTEX                                       = 0xC1,    // ANALOG VOLTAGE OUTPUT(+- 10V) 08 Channel RTEX
     AXT_SIO_RAI8MLIII                                       = 0xC2,    // AI slave module, MechatroLink III AXT, Analog IN 8ch, 16 bit
@@ -415,29 +210,19 @@ public enum AXT_MODULE:uint
     AXT_SIO_RAO4MLIII                                       = 0xC4,    // A0 slave module, MechatroLink III AXT, Analog OUT 4ch, 16 bit
     AXT_SIO_RAO8MLIII                                       = 0xC5,    // A0 slave module, MechatroLink III AXT, Analog OUT 8ch, 16 bit
     AXT_SIO_RAVO4MLII                                       = 0xC6,    // DC VOLTAGE OUTPUT MODULE, 4 points (Product by M-SYSTEM), For MLII only
-    AXT_SIO_RAV04MLIII                                      = 0xC7,    // AO Slave module, MechatroLink III M-SYSTEM Voltage output module
-    AXT_SIO_RAVI4MLIII                                      = 0xC8,    // AI Slave module, MechatroLink III M-SYSTEM Voltage/Current input module
+	AXT_SIO_RAV04MLIII										= 0xC7,    // AO Slave module, MechatroLink III M-SYSTEM Voltage output module
+	AXT_SIO_RAVI4MLIII										= 0xC8,    // AI Slave module, MechatroLink III M-SYSTEM Voltage/Current input module
     AXT_SIO_RAI16MLIIISFA                                   = 0xC9,    // AI slave module, MechatroLink III AXT(SFA), Analog IN 16ch, 16 bit
     AXT_SIO_RDB32MSMLIII                                    = 0xCA,    // DIO slave module, MechatroLink III M-SYSTEM, IN 16-Channel, OUT 16-Channel
     AXT_SIO_RAVI4MLII                                       = 0xCB,    // DC VOLTAGE/CURRENT INPUT MODULE, 4 points (Product by M-SYSTEM), For MLII only
     AXT_SIO_RMEMORY_MLIII                                   = 0xCC,    // Memory Access type module, MechatroLink III
-    AXT_SIO_RAVCI8MLII                                      = 0xCE,    // DC VOLTAGE/CURRENT INPUT MODULE, 8 points (Product by M-SYSTEM), For MLII only
     AXT_COM_234R                                            = 0xD3,    // COM-234R
     AXT_COM_484R                                            = 0xD4,    // COM-484R
-    AXT_COM_234IDS                                          = 0xD5,    // COM-234IDS
-    AXT_COM_484IDS                                          = 0xD6,    // COM-484IDS
+    AXT_SIO_RPI2                                            = 0xD5,    // Pulse counter module(JEPMC-2900)
+    AXT_SIO_HPC4                                            = 0xD6,    // External Encoder module for 4Channel with Trigger function.
     AXT_SIO_AO4F                                            = 0xD7,    // AO 4Ch, 16 bit
     AXT_SIO_AI8F                                            = 0xD8,    // AI 8Ch, 16 bit
-    AXT_SIO_AI8AO4F                                         = 0xD9,    // AI 8Ch, AO 4Ch, 16 bit
-    AXT_SIO_HPC4                                            = 0xDA,    // External Encoder module for 4Channel with Trigger function.
-    AXT_ECAT_MOTION                                         = 0xE1,    // EtherCAT Motion Module
-    AXT_ECAT_DIO                                            = 0xE2,    // EtherCAT DIO Module 
-    AXT_ECAT_AIO                                            = 0xE3,    // EtherCAT AIO Module
-    AXT_ECAT_COM                                            = 0xE4,    // EtherCAT Serial COM(RS232C) Module
-    AXT_ECAT_COUPLER                                        = 0xE5,    // EtherCAT Coupler Module
-    AXT_ECAT_CNT                                            = 0xE6,    // EtherCAT Count Module        
-    AXT_ECAT_UNKNOWN                                        = 0xE7,    // EtherCAT Unknown Module
-    AXT_SMC_4V04_A                                          = 0xEA,    // Nx04_A
+    AXT_SIO_AI8AO4F                                         = 0xD9     // AI 8Ch, AO 4Ch, 16 bit
 }
 
 public enum AXT_FUNC_RESULT:uint
@@ -445,31 +230,17 @@ public enum AXT_FUNC_RESULT:uint
     AXT_RT_SUCCESS                              = 0,        // API 함수 수행 성공
     AXT_RT_OPEN_ERROR                           = 1001,     // 라이브러리 오픈 되지않음
     AXT_RT_OPEN_ALREADY                         = 1002,     // 라이브러리 오픈 되어있고 사용 중임
-    AXT_RT_NOT_INITIAL                                      = 1052,    // Serial module이 초기화되어있지 않음
     AXT_RT_NOT_OPEN                             = 1053,     // 라이브러리 초기화 실패
-
     AXT_RT_NOT_SUPPORT_VERSION                  = 1054,     // 지원하지않는 하드웨어
     AXT_RT_LOCK_FILE_MISMATCH                   = 1055,     // Lock파일과 현재 Scan정보가 일치하지 않음
-    AXT_RT_MASTER_VERSION_MISMATCH                          = 1056,    // Library와 EtherCAT Master 버젼이 일치하지 않음
-    AXT_RT_NOT_RUN_EZMANAGER                                = 1057,    // EzManager가 실행되지않음
-    AXT_RT_NOT_FIND_BIN_FILE                                = 1058,    // BIN 파일을 찾을 수 없음
-    AXT_RT_NOT_FIND_ENI_FILE                                = 1059,    // ENI 파일을 찾을 수 없음
-    AXT_RT_NOT_FIND_CONFIG_FILE                             = 1060,    // Config 파일을 찾을 수 없음
-    AXT_RT_RTOS_OPEN_ERROR                                  = 1061,    // RTOS Open 실패
-    AXT_RT_SLAVE_CONFIG_ERROR                               = 1062,    // RTOS Slave Config 실패     
-    AXT_RT_SLAVE_OP_TIMEOUT_WARNING                         = 1063,    // Slave들이 OP 모드가 될 때까지 대기중 Timeout이 발생
-    AXT_RT_SLAVE_NOT_OP                                     = 1064,    // OP 모드가 아닌 Slave가 존재함
 
-    AXT_RT_INVALID_HARDWARE                                 = 1100,    // 유효하지 않는 보드
     AXT_RT_INVALID_BOARD_NO                     = 1101,     // 유효하지 않는 보드 번호
     AXT_RT_INVALID_MODULE_POS                   = 1102,     // 유효하지 않는 모듈 위치
     AXT_RT_INVALID_LEVEL                        = 1103,     // 유효하지 않는 레벨
     AXT_RT_INVALID_VARIABLE                     = 1104,     // 유효하지 않는 변수
-    AXT_RT_INVALID_MODULE_NO                    = 1105,    // 유효하지 않는 모듈
-    AXT_RT_INVALID_NO                           = 1106,    // 유효하지 않는 번호
     AXT_RT_ERROR_VERSION_READ                   = 1151,     // 라이브러리 버전을 읽을수 없음
     AXT_RT_NETWORK_ERROR                        = 1152,     // 하드웨어 네트워크 에러
-    AXT_RT_NETWORK_LOCK_MISMATCH                = 1153,     // 보드 Lock정보와 현재 Scan정보가 일치하지 않음 
+    AXT_RT_NETWORK_LOCK_MISMATCH                = 1153,     // 보드 Lock정보와 현재 Scan정보가 일치하지 않음
     
     AXT_RT_1ST_BELOW_MIN_VALUE                  = 1160,     // 첫번째 인자값이 최소값보다 더 작음
     AXT_RT_1ST_ABOVE_MAX_VALUE                  = 1161,     // 첫번째 인자값이 최대값보다 더 큼
@@ -491,8 +262,6 @@ public enum AXT_FUNC_RESULT:uint
     AXT_RT_9TH_ABOVE_MAX_VALUE                  = 1241,     // 아홉번째 인자값이 최대값보다 더 큼
     AXT_RT_10TH_BELOW_MIN_VALUE                 = 1250,     // 열번째 인자값이 최소값보다 더 작음
     AXT_RT_10TH_ABOVE_MAX_VALUE                 = 1251,     // 열번째 인자값이 최대값보다 더 큼
-    AXT_RT_11TH_BELOW_MIN_VALUE                 = 1252,    // 열한번째 인자값이 최소값보다 더 작음
-    AXT_RT_11TH_ABOVE_MAX_VALUE                 = 1253,    // 열한번째 인자값이 최대값보다 더 큼
     
     AXT_RT_AIO_OPEN_ERROR                       = 2001,     // AIO 모듈 오픈실패
     AXT_RT_AIO_NOT_MODULE                       = 2051,     // AIO 모듈 없음
@@ -503,7 +272,6 @@ public enum AXT_FUNC_RESULT:uint
     AXT_RT_AIO_INVALID_TRIGGER_MODE             = 2107,     // 유효하지않는 트리거 모드
     AXT_RT_AIO_EXTERNAL_DATA_EMPTY              = 2108,     // 외부 데이터 값이 없을 경우
     AXT_RT_AIO_INVALID_VALUE                    = 2109,     // 유효하지않는 값 설정
-    AXT_RT_AIO_UPG_ALEADY_ENABLED               = 2110,    // AO UPG 기능 사용중 설정됨
 
     AXT_RT_DIO_OPEN_ERROR                       = 3001,     // DIO 모듈 오픈실패
     AXT_RT_DIO_NOT_MODULE                       = 3051,     // DIO 모듈 없음
@@ -526,19 +294,6 @@ public enum AXT_FUNC_RESULT:uint
     AXT_RT_CNT_INVALID_VALUE                    = 3306,     // 유효하지않는 값 설정
     AXT_RT_CNT_INVALID_USE                      = 3307,     // CNT 함수 사용못함
     
-    AXT_RT_COM_OPEN_ERROR                                   = 3401,    // COM 포트 오픈실패
-    AXT_RT_COM_NOT_OPEN                                     = 3402,    // COM 포트 오픈되지 않음
-    AXT_RT_COM_ALREADY_IN_USE                               = 3403,    // COM 포트 사용중
-    AXT_RT_COM_NOT_MODULE                                   = 3451,    // COM 포트 없음
-    AXT_RT_COM_NOT_INTERRUPT                                = 3452,    // COM 인터럽트 설정안됨
-    AXT_RT_COM_INVALID_MODULE_NO                            = 3501,    // 유효하지않는 COM 모듈 번호
-    AXT_RT_COM_INVALID_PORT_NO                              = 3502,    // 유효하지않는 채널 번호
-    AXT_RT_COM_INVALID_OFFSET_NO                            = 3503,    // 유효하지않는 COM OFFSET 번호
-    AXT_RT_COM_INVALID_LEVEL                                = 3504,    // 유효하지않는 COM 레벨
-    AXT_RT_COM_INVALID_MODE                                 = 3505,    // 유효하지않는 COM 모드
-    AXT_RT_COM_INVALID_VALUE                                = 3506,    // 유효하지않는 값 설정
-    AXT_RT_COM_INVALID_USE                                  = 3507,    // COM 함수 사용못함
-    AXT_RT_COM_INVALID_BAUDRATE                             = 3508,    // 유효하지않는 값 설정
     AXT_RT_MOTION_OPEN_ERROR                    = 4001,     // 모션 라이브러리 Open 실패
     AXT_RT_MOTION_NOT_MODULE                    = 4051,     // 시스템에 장착된 모션 모듈이 없음
     AXT_RT_MOTION_NOT_INTERRUPT                 = 4052,     // 인터럽트 결과 읽기 실패
@@ -606,7 +361,7 @@ public enum AXT_FUNC_RESULT:uint
     AXT_RT_MOTION_READ_ALARM_FAILED             = 4213,     // 서보팩 알람읽기에 실패 했을 때
     AXT_RT_MOTION_READ_ALARM_UNKNOWN            = 4220,     // 알람코드가 알수없는 코드일 때
     AXT_RT_MOTION_READ_ALARM_FILES              = 4221,     // 알람정보 파일이 정해진위치에 존재하지 않을 때 
-    AXT_RT_MOTION_READ_ALARM_NOT_DETECTED       = 4222,     // 알람코드 Read 시, 알람이 발생하지 않았을 때    
+    
     AXT_RT_MOTION_POSITION_OUTOFBOUND           = 4251,     // 설정한 위치값이 설정 최대값보다 크거나 최소값보다 작은값임 
     AXT_RT_MOTION_PROFILE_INVALID               = 4252,     // 구동 속도 프로파일 설정이 잘못됨
     AXT_RT_MOTION_VELOCITY_OUTOFBOUND           = 4253,     // 구동 속도값이 최대값보다 크게 설정됨
@@ -630,7 +385,7 @@ public enum AXT_FUNC_RESULT:uint
     AXT_RT_COMPENSATION_NOT_INIT                = 4301,     // 보정테이블 기능 초기화 되지않음
     AXT_RT_COMPENSATION_POS_OUTOFBOUND          = 4302,     // 위치 값이 범위내에 존재하지 않음
     AXT_RT_COMPENSATION_BACKLASH_NOT_INIT       = 4303,     // 백래쉬 보정기능 초기화 되지않음
-    AXT_RT_COMPENSATION_INVALID_ENTRY           = 4304,     // 보정테이블 개수가 잘못 입력되었음.
+    AXT_RT_COMPENSATION_INVALID_ENTRY           = 4304,     //
 
     AXT_RT_SEQ_NOT_IN_SERVICE                   = 4400,     // 순차 구동 함수 실행 중 자원 할당 실패
     AXT_ERROR_SEQ_INVALID_MAP_NO                = 4401,     // 순차 구동 함수 실행 중 맵핑 번호 이상.
@@ -638,15 +393,8 @@ public enum AXT_FUNC_RESULT:uint
     AXT_RT_ERROR_NOT_SEQ_NODE_BEGIN             = 4403,     // 순차 구동 노드 입력 시작 함수를 호출하지 않음.
     AXT_RT_ERROR_NOT_SEQ_NODE_END               = 4404,     // 순차 구동 노드 입력 종료 함수를 호출하지 않음.
     AXT_RT_ERROR_NO_NODE                        = 4405,     // 순차 구동 노드 입력이 없음.
-    AXT_RT_ERROR_SEQ_STOP_TIMEOUT               = 4406,     // 순차 구동 함수 종료 시 TimeOut 발생
-    AXT_RT_ERROR_INVALID_SEQ_MASTER_AXIS_NO     = 4407,     // 순차 구동 Master 축이 유효하지 않음.
+    AXT_RT_ERROR_SEQ_STOP_TIMEOUT               = 4406,
 
-    AXT_RT_ERROR_RING_COUNTER_ENABLE            = 4420,    // Ring Counter 기능이 사용 중
-    AXT_RT_ERROR_RING_COUNTER_OUT_OF_RANGE      = 4421,    // Ring Counter 사용 중 범위 밖 명령 위치 호출(POS_ABS_LONG_MODE or POS_ABS_SHORT_MODE 일 경우)
-    AXT_RT_ERROR_SOFT_LIMIT_ENABLE              = 4430,    // Software Limit 기능이 사용 중
-    AXT_RT_ERROR_SOFT_LIMIT_NEGATIVE            = 4431,    // 이동할 위치가 Negative Software Limit을 벗어남
-    AXT_RT_ERROR_SOFT_LIMIT_POSITIVE            = 4432,    // 이동할 위치가 Positive Software Limit을 벗어남
-    
     AXT_RT_M3_COMMUNICATION_FAILED              = 4500,    // ML3 통신 기준, 통신 실패
     AXT_RT_MOTION_ONE_OF_AXES_IS_NOT_M3         = 4501,    // ML3 통신 기준, 구성된 ML3 노드 중에서 모션 노드 없음 
     AXT_RT_MOTION_BIGGER_VEL_THEN_MAX_VEL       = 4502,    // ML3 통신 기준, 지정된 축의 설정된 최대 속도보다 큼
@@ -692,254 +440,13 @@ public enum AXT_FUNC_RESULT:uint
     AXT_RT_PROTECTED_DURING_INMOTION            = 4543,    // in_motion 되어 있는 상태에서 사용 못 함
 
     AXT_RT_DATA_FLASH_NOT_EXIST                 = 5000,
-    AXT_RT_DATA_FLASH_BUSY                      = 5001,
-    
-    AXT_RT_QUEUE_CMD_ERROR                                  = 5010,
-    AXT_RT_QUEUE_CMD_WAIT_ERROR                             = 5011,
-    AXT_RT_QUEUE_CMD_WAIT_TIMEOUT                           = 5012,
-
-    AXT_RT_QUEUE_RSP_ERROR                                  = 5015,
-    AXT_RT_QUEUE_RSP_WAIT_ERROR                             = 5016,
-    AXT_RT_QUEUE_RSP_WAIT_TIMEOUT                           = 5017,
-
-    AXT_RT_MOTION_STILL_CONTI_MOTION                        = 5018,        // 연속보간 구동중에 WriteClear나 SetAxisMpa등의 함수를 호출 하였음.
-    AXT_RT_MOTION_INVALD_SET                                = 6000,    
-    AXT_RT_MOTION_INVALD_RESET                              = 6001,    
-    AXT_RT_MOTION_INVALD_ENABLE                             = 6002,
-
-    AXT_RT_LICENSE_INVALID                                  = 6500,        // 유효하지않은 License
-
-    AXT_RT_MONITOR_IN_OPERATION                             = 6600,        // 현재 Monitor 기능이 동작중에 있음
-    AXT_RT_MONITOR_NOT_OPERATION                            = 6601,        // 현재 Monitor 기능이 동작중이지 않음
-    AXT_RT_MONITOR_EMPTY_QUEUE                              = 6602,        // Monitor data queue가 비어있음
-    AXT_RT_MONITOR_INVALID_TRIGGER_OPTION                   = 6603,        // 트리거 설정이 유효하지 않음
-    AXT_RT_MONITOR_EMPTY_ITEM                               = 6604,        // Item이 비어 있음
-    AXT_RT_MACRO_INVALID_MACRO_NO                           = 6700,
-    AXT_RT_MACRO_INVALID_NODE_NO                            = 6701,
-    AXT_RT_MACRO_INVALID_STOP_MODE                          = 6702,
-	AXT_RT_MACRO_MEMORY_MISMATCH							= 6703,
-	AXT_RT_MACRO_CONTROL_LOCKED								= 6704,
-    AXT_RT_MACRO_NOT_NODE_BEGIN                             = 6710,        // 
-    AXT_RT_MACRO_NOT_NODE_END                               = 6711,        // 
-    AXT_RT_MACRO_ALREADY_BEGIN                              = 6712,  
-    AXT_RT_MACRO_NODE_EMPTY                                 = 6713,        // 
-    AXT_RT_MACRO_IN_OPERATION                               = 6714,        // 
-    AXT_RT_MACRO_NOT_OPERATION                              = 6715,        //           
-    AXP_RT_MACRO_NOT_SUPPORT_FUNCTION                       = 6716,        // 
-    AXP_RT_MACRO_NODE_FULL                                  = 6717,        // 
-    AXP_RT_MACRO_NODE_CHECK_ERROR                           = 6720,        // 
-    AXT_RT_MACRO_NOT_CHECKED                                = 6721,        //     
-
-    AXT_MK_RT_INVALID_AXIS                                  = 7100,
-    AXT_MK_RT_INVALID_AXIS_SIZE                             = 7101,
-    AXT_MK_RT_INVALID_COORD                                 = 7102,
-    AXT_MK_RT_INVALID_COORD_SIZE                            = 7103,
-    AXT_MK_RT_INVALID_AXIS_MAP                              = 7104,
-    AXT_MK_RT_INVALID_AXIS_MAP_SIZE                         = 7105,
-    AXT_MK_RT_INVALID_VEL                                   = 7106,
-    AXT_MK_RT_INVALID_END_VEL                               = 7107,
-    AXT_MK_RT_INVALID_ACCEL                                 = 7108,
-    AXT_MK_RT_INVALID_DECEL                                 = 7109,
-    AXT_MK_RT_INVALID_ABS_REL                               = 7110,
-    AXT_MK_RT_INVALID_PROFILE                               = 7111,
-    AXT_MK_RT_INVALID_STOP_DECEL                            = 7112,
-    AXT_MK_RT_INVALID_STOP_TIME                             = 7113,
-    AXT_MK_RT_INVALID_ACCEL_JERK_RATE                       = 7114,
-    AXT_MK_RT_INVALID_DECEL_JERK_RATE                       = 7115,
-    AXT_MK_RT_INVALID_ACCEL_UNIT                            = 7116,
-    AXT_MK_RT_INVALID_DISTANCE                              = 7117,
-    AXT_MK_RT_INVALID_ANGLE                                 = 7118,
-    AXT_MK_RT_INVALID_BIT                                   = 7119,
-    AXT_MK_RT_INVALID_PORT                                  = 7120,
-    AXT_MK_RT_INVALID_SPLINE_INDEX                          = 7121,
-    AXT_MK_RT_INVALID_THREAD                                = 7122,
-    AXT_MK_RT_INVALID_TIMER                                 = 7123,
-    AXT_MK_RT_INVALID_SEGMENT_COUNT                         = 7124,
-    AXT_MK_RT_INVALID_SEGMENT_NO                            = 7125,
-    AXT_MK_RT_INVALID_NODE_NO                               = 7126,
-    AXT_MK_RT_INVALID_HWQ_COUNT                             = 7127,
-    AXT_MK_RT_INVALID_NODE_SIZE                             = 7128,
-    AXT_MK_RT_INVALID_STOP_NODE_SIZE                        = 7129,
-    AXT_MK_RT_INVALID_SPLINE_SIZE                           = 7130,
-    AXT_MK_RT_INVALID_LINE_LINE_FILLET                      = 7131,
-    AXT_MK_RT_INVALID_LINE_ARC_FILLET                       = 7132,
-    AXT_MK_RT_INVALID_ARC_LINE_FILLET                       = 7133,
-    AXT_MK_RT_INVALID_ARC_ARC_FILLET                        = 7134,
-    AXT_MK_RT_INVALID_RESET_FILLET                          = 7135,
-    AXT_MK_RT_INVALID_TASK                                  = 7136,
-    AXT_MK_RT_INVALID_ROUND_INDEX                           = 7137,
-    AXT_MK_RT_INVALID_LOG_DATA                              = 7138,
-    AXT_MK_RT_INVALID_LOG10_DATA                            = 7139,
-    AXT_MK_RT_INVALID_PORT_NO                               = 7140,
-    AXT_MK_RT_INVALID_BAUD_RATE                             = 7141,
-    AXT_MK_RT_INVALID_STOP_BIT                              = 7142,
-    AXT_MK_RT_INVALID_PARITY                                = 7143,
-    AXT_MK_RT_INVALID_EDGE                                  = 7144,
-    AXT_MK_RT_INVALID_STOP_MODE                             = 7145,
-    AXT_MK_RT_INVALID_TRIGGER_TIME                          = 7146,
-    AXT_MK_RT_INVALID_TRIGGER_LEVEL                         = 7147,
-    AXT_MK_RT_INVALID_TRIGGER_SELECT                        = 7148,
-    AXT_MK_RT_INVALID_TRIGGER_INTERRUPT                     = 7149,
-    AXT_MK_RT_INVALID_TRIGGER_METHOD                        = 7150,
-    AXT_MK_RT_INVALID_TRIGGER_POSITION                      = 7151,
-    AXT_MK_RT_INVALID_TRIGGER_INDEX                         = 7152,
-    AXT_MK_RT_INVALID_ECAM_DATA                             = 7153,
-    AXT_MK_RT_INVALID_ECAM_POSITION                         = 7154,
-    AXT_MK_RT_INVALID_EGEAR_SIZE                            = 7155,
-    AXT_MK_RT_INVALID_INDEX                                 = 7156,
-    AXT_MK_RT_INVALID_MOTION_MODE                           = 7157,
-    AXT_MK_RT_INVALID_SIGNAL                                = 7158,
-    AXT_MK_RT_INVALID_STOP_DISTANCE                         = 7159,
-    AXT_MK_RT_INVALID_DIRECTION                             = 7160,
-    AXT_MK_RT_INVALID_ZERO_VELOCITY                         = 7161,
-    AXT_MK_RT_INVALID_COORDINATE_INMOTION                   = 7162,
-    AXT_MK_RT_INVALID_COORDINATE_MOTIONDONE                 = 7163,
-    AXT_MK_RT_INVALID_BLENDING_MODE                         = 7164,
-    AXT_MK_RT_INVALID_BLENDING_VALUE                        = 7165,
-    AXT_MK_RT_INVALID_BLENDING_RATIO                        = 7166,
-    AXT_MK_RT_INVALID_EGEAR_RATIO                           = 7167,
-    AXT_MK_RT_INVALID_SLAVE_AXIS                            = 7168,
-    AXT_MK_RT_INVALID_OPERATION_MODE                        = 7169,
-
-    AXT_MK_RT_INVALID_CONTIQ_DISABLE                        = 7170,
-    AXT_MK_RT_INVALID_CONTIQ_MODE                           = 7171,
-    AXT_MK_RT_INVALID_CONTIQ_ANGLE                          = 7172,
-    AXT_MK_RT_INVALID_CONTIQ_VELRATE                        = 7173,
-    AXT_MK_RT_INVALID_CONTIQ_FILLET                         = 7174,
-
-    AXT_MK_RT_CONTIQ_AUTO_VEL                               = 7175,
-    AXT_MK_RT_CONTIQ_AUTO_ARC                               = 7176,
-    AXT_MK_RT_CONTIQ_LINE                                   = 7177,
-    AXT_MK_RT_CONTIQ_CIRCLE                                 = 7178,
-    AXT_MK_RT_CONTIQ_ARC                                    = 7179,
-    AXT_MK_RT_CONTIQ_SYNC_SLAVE                             = 7180,
-    AXT_MK_RT_INVALID_SEGMENT_OUTPUT_SIZE                   = 7181,
-    AXT_MK_RT_INVALID_SEGMENT_NUMBER                        = 7182,
-    AXT_MK_RT_INVALID_TRIG_COUNT                            = 7183,
-    AXT_MK_RT_INVALID_TRIG_TIME                             = 7184,
-    AXT_MK_RT_NOT_CAPTURED                                  = 7185,
-    AXT_MK_RT_INVALID_CAPTURE_INDEX                         = 7186,
-    AXT_MK_RT_INVALID_LEVEL                                 = 7187,
-    AXT_MK_RT_INVALID_SEGMENT_OUTPUT_MODE                   = 7188,
-    AXT_MK_RT_INVALID_SEGMENT_OUTPUT_VALUE                  = 7189,
-    AXT_MK_RT_INVALID_SEGMENT_OUTPUT_RATIO                  = 7190,
-
-    AXT_MK_RT_INVALID_SPLINE_POINT_SIZE                     = 7191,
-    AXT_MK_RT_INVALID_INMOTION                              = 7192,
-
-    AXT_MK_RT_ENABLE_CONTIQ                                 = 7200,
-    AXT_MK_RT_DISABLE_CONTIQ                                = 7201,
-    AXT_MK_RT_ENABLE_CONTIQ_SYNC                            = 7202,
-    AXT_MK_RT_DISABLE_CONTIQ_SYNC                           = 7203,
-    AXT_MK_RT_ENABLE_CONTI                                  = 7204,
-    AXT_MK_RT_DISABLE_CONTI                                 = 7205,
-    AXT_MK_RT_ENABLE_EGEAR                                  = 7206,
-    AXT_MK_RT_DISABLE_EGEAR                                 = 7207,
-    AXT_MK_RT_ENABLE_TASK                                   = 7208,
-    AXT_MK_RT_DISABLE_TASK                                  = 7209,
-    AXT_MK_RT_DISABLE_PORT_NO                               = 7210,
-
-    AXT_MK_RT_ALREADY_OPEN                                  = 7300,
-    AXT_MK_RT_ALREADY_CLOSE                                 = 7301,
-
-    AXT_MK_RT_ERROR_HOME                                    = 7400,
-    AXT_MK_RT_ERROR_MOTION                                  = 7401,
-    AXT_MK_RT_ERROR_INSTOPPING                              = 7402,
-    AXT_MK_RT_ERROR_TIME_OUT                                = 7403,
-    AXT_MK_RT_ERROR_BUFFER_FULL                             = 7404,
-    AXT_MK_RT_ERROR_DATA_CREATE                             = 7405,
-    AXT_MK_RT_ERROR_CALCULATION                             = 7406,
-
-    AXT_MK_RT_ERROR_QUEUE_FULL                              = 7500,
-    AXT_MK_RT_ERROR_QUEUE_NULL                              = 7501,
-
-    AXT_MK_RT_ERROR_ECAM_TABLE                              = 7502,
-
-    AXT_MK_RT_ERROR_SPLINE_POSITION                         = 7503,
-
-    AXT_MK_RT_INVALID_CIRCULAR_POINT                        = 7510,
-    AXT_MK_RT_INVALID_POINT                                 = 7511,
-    AXT_MK_RT_INVALID_QUEUE_SIZE                            = 7512,
-    AXT_MK_RT_INVALID_POSITION                              = 7513,
-    AXT_MK_RT_INVALID_ROTATION                              = 7514,
-
-    AXT_MK_RT_INVALID_TABLE                                 = 7600,
-    AXT_MK_RT_INVALID_TABLE_NO                              = 7601,
-    AXT_MK_RT_INVALID_TABLE_DATA                            = 7602,
-    AXT_MK_RT_INVALID_POSITION_SIZE                         = 7603,
-
-    AXT_MK_RT_INVALID_TABLE_ENABLED                         = 7604,
-    AXT_MK_RT_INVALID_TABLE_NOT_ENABLED                     = 7605,
-    AXT_MK_RT_INVALID_TABLE_NONE                            = 7606,
-    AXT_MK_RT_INVALID_GET_TABLE                             = 7607,
-    AXT_MK_RT_INVALID_ENABLE_TABLE                          = 7608,
-    AXT_MK_RT_INVALID_DISABLE_TABLE                         = 7609,
-
-    AXT_MK_RT_INVALID_SET                                   = 7610,
-    AXT_MK_RT_INVALID_RESET                                 = 7611,
-    AXT_MK_RT_INVALID_ENABLE                                = 7612,
-
-    AXT_MK_RT_NOT_SUPPORT                                   = 7900,
-    AXT_MK_RT_ERROR                                         = 7901,
-    AXT_MK_RT_INVLID_FUNCTION_TYPE                          = 7902,
-
-    AXT_MK_RT_INVALID_ROBOT_SIZE                            = 7700,
-    AXT_MK_RT_INVALID_ROBOT_AXIS_SIZE                       = 7701,
-    AXT_MK_RT_INVALID_ROBOT_COORD_SIZE                      = 7702,
-    AXT_MK_RT_INVALID_ROBOT_NO                              = 7703,
-    AXT_MK_RT_INVALID_ROBOT_COORD                           = 7704,
-    AXT_MK_RT_INVALID_ROBOT_LIMIT                           = 7705,
-    AXT_MK_RT_INVALID_ROBOT_POS_LIMIT                       = 7706,
-    AXT_MK_RT_INVALID_ROBOT_NEG_LIMIT                       = 7707,
-    AXT_MK_RT_INVALID_ROBOT_VEL_LIMIT                       = 7708,
-    AXT_MK_RT_INVALID_ROBOT_ACCEL_LIMIT                     = 7709,
-    AXT_MK_RT_INVALID_ROBOT_DECEL_LIMIT                     = 7710,
-    AXT_MK_RT_ERROR_ROBOT_CALCULATION                       = 7711,
-    AXT_MK_RT_INVALID_FRAME                                 = 7712,
-    AXT_MK_RT_INVALID_FRAME_NO                              = 7713,
-    AXT_MK_RT_INVALID_FRAME_TYPE                            = 7714,
-    AXT_MK_RT_INVALID_OBJECT_NO                             = 7715,
-    AXT_MK_RT_INVALID_ROBOT_SYNC                            = 7716,
-    AXT_MK_RT_INVALID_ROBOT_SYNC_MOTION                     = 7717,
-    AXT_MK_RT_INVALID_ROBOT_SYNC_ENABLE                     = 7718,
-    AXT_MK_RT_INVALID_ROBOT_SYNC_DISABLE                    = 7719,
-    AXT_MK_RT_INVALID_ROBOT_SYNC_MOTION_MODE                = 7720,
-    AXT_MK_RT_INVALID_ROBOT_SYNC_WORK_COORD                 = 7721,
-    AXT_MK_RT_INVALID_CAPTURE_POS_NO                        = 7722,
-    
-    AXT_MK_RT_INVALID_ROBOT_CAPTURE_POS                     = 7730,
-    AXT_MK_RT_INVALID_ROBOT_AXIS                            = 7731,
-    AXT_MK_RT_INVALID_WORK_NEGATIVE_LIMIT                   = 7732,
-    AXT_MK_RT_INVALID_WORK_POSITIVE_LIMIT                   = 7733,
-
-    AXT_MK_RT_INVALID_TOOL_NO                               = 7740,
-
-    AXT_MK_RT_INVALID_FREQUENCY_SIZE                        = 7800,
-    AXT_MK_RT_INVALID_IMPULSE_COUNT                         = 7801,
-    AXT_MK_RT_INVALID_AMPLITUDE                             = 7802,
-
-    AXT_MK_RT_INVALID_INPUT_SHAPER__NONE                    = 7803,
-    AXT_MK_RT_INVALID_INPUT_SHAPER_ENABLED                  = 7804,
-
-    AXT_MK_RT_INVALID_ARRAY_SIZE                            = 7805
+    AXT_RT_DATA_FLASH_BUSY                      = 5001
 }
 
 public enum AXT_BOOLEAN:uint
 {
     FALSE,
     TRUE
-}
-
-public enum AXT_NETWORK_TYPE:uint
-{
-    NETWORK_TYPE_MIN    = 0,
-    NETWORK_TYPE_ALL    = NETWORK_TYPE_MIN,
-    NETWORK_TYPE_RTEX,
-    NETWORK_TYPE_MLII,
-    NETWORK_TYPE_MLIII,
-    NETWORK_TYPE_SIIIH,
-    NETWORK_TYPE_ECAT,
-    NETWORK_TYPE_MAX    = NETWORK_TYPE_ECAT
 }
 
 public enum AXT_LOG_LEVEL:uint
@@ -980,14 +487,14 @@ public enum AXT_AIO_EVENT_MASK:uint
 {
     DATA_EMPTY      = 0x01,
     DATA_MANY       = 0x02,
-    DATA_SMALL      = 0x04,
+    DATA_SMAL       = 0x04,
     DATA_FULL       = 0x08
 }
 
 public enum AXT_AIO_INTERRUPT_MASK:uint
 {
-    ADC_DONE        = 0x00,
-    SCAN_END        = 0x01,
+    ADC_DONE        = 0x01,
+    SCAN_END        = 0x02,
     FIFO_HALF_FULL  = 0x02,
     NO_SIGNAL       = 0x03
 }
@@ -1068,15 +575,7 @@ public enum AXT_MOTION_ABSREL:uint
 {
     POS_ABS_MODE,
     POS_REL_MODE,
-    POS_ABS_LONG_MODE,
-    POS_ABS_SHORT_MODE
-}
-
-public enum AXT_MOTION_ENCODER_TYPE:uint
-{
-    ENCODER_TYPE_INCREMENTAL,
-    ENCODER_TYPE_ABSOLUTE,
-    ENCODER_TYPE_NONE
+    POS_ABS_LONG_MODE
 }
 
 public enum AXT_MOTION_PROFILE_MODE:uint
@@ -1085,11 +584,7 @@ public enum AXT_MOTION_PROFILE_MODE:uint
     ASYM_TRAPEZOIDE_MODE,
     QUASI_S_CURVE_MODE,
     SYM_S_CURVE_MODE,
-    ASYM_S_CURVE_MODE,
-    SYM_TRAP_M3_SW_MODE,     //ML-3 Only, Support Velocity profile
-    ASYM_TRAP_M3_SW_MODE,    //ML-3 Only, Support Velocity profile
-    SYM_S_M3_SW_MODE,        //ML-3 Only, Support Velocity profile
-    ASYM_S_M3_SW_MODE        //ML-3 Only, Support Velocity profile
+    ASYM_S_CURVE_MODE
 }
 
 public enum AXT_MOTION_SIGNAL_LEVEL:uint
@@ -1114,7 +609,6 @@ public enum AXT_MOTION_HOME_RESULT:uint
     HOME_ERR_SERVO_OFF  = 0x18,    // 서보 Off일경우
     HOME_ERR_TIMEOUT    = 0x20,    // 지정된 시간 초과 발생으로 오류 발생 
     HOME_ERR_FUNCALL    = 0x30,    // 함수 호출 실패
-    HOME_ERR_HOME_METHOD= 0x31,    // 지원하지않는 원점검색 방법임.
     HOME_ERR_COUPLING   = 0x40,    // Gantry Master to Slave Over Distance protection
     HOME_ERR_UNKNOWN    = 0xFF     // 미지정 에러
 }
@@ -1147,29 +641,28 @@ public enum AXT_MOTION_DETECT_DOWN_START_POINT:uint
 
 public enum AXT_MOTION_PULSE_OUTPUT:uint
 {
-    OneHighLowHigh                                          = 0x0,    // 1펄스 방식, PULSE(Active High), 정방향(DIR=Low)  / 역방향(DIR=High)
-    OneHighHighLow                                          = 0x1,    // 1펄스 방식, PULSE(Active High), 정방향(DIR=High) / 역방향(DIR=Low)
-    OneLowLowHigh                                           = 0x2,    // 1펄스 방식, PULSE(Active Low),  정방향(DIR=Low)  / 역방향(DIR=High)
-    OneLowHighLow                                           = 0x3,    // 1펄스 방식, PULSE(Active Low),  정방향(DIR=High) / 역방향(DIR=Low)
-    TwoCcwCwHigh                                            = 0x4,    // 2펄스 방식, PULSE(CCW:역방향),  DIR(CW:정방향),  Active High     
-    TwoCcwCwLow                                             = 0x5,    // 2펄스 방식, PULSE(CCW:역방향),  DIR(CW:정방향),  Active Low     
-    TwoCwCcwHigh                                            = 0x6,    // 2펄스 방식, PULSE(CW:정방향),   DIR(CCW:역방향), Active High
-    TwoCwCcwLow                                             = 0x7,    // 2펄스 방식, PULSE(CW:정방향),   DIR(CCW:역방향), Active Low
-    TwoPhase                                                = 0x8,    // 2상(90' 위상차),  PULSE lead DIR(CW: 정방향), PULSE lag DIR(CCW:역방향)
-    TwoPhaseReverse                                         = 0x9     // 2상(90' 위상차),  PULSE lead DIR(CCW: 정방향), PULSE lag DIR(CW:역방향)
+    OneHighLowHigh,                // 1펄스 방식, PULSE(Active High), 정방향(DIR=Low)  / 역방향(DIR=High)
+    OneHighHighLow,                 // 1펄스 방식, PULSE(Active High), 정방향(DIR=High) / 역방향(DIR=Low)
+    OneLowLowHigh,                  // 1펄스 방식, PULSE(Active Low),  정방향(DIR=Low)  / 역방향(DIR=High)
+    OneLowHighLow,                  // 1펄스 방식, PULSE(Active Low),  정방향(DIR=High) / 역방향(DIR=Low)
+    TwoCcwCwHigh,                   // 2펄스 방식, PULSE(CCW:역방향),  DIR(CW:정방향),  Active High     
+    TwoCcwCwLow,                    // 2펄스 방식, PULSE(CCW:역방향),  DIR(CW:정방향),  Active Low     
+    TwoCwCcwHigh,                   // 2펄스 방식, PULSE(CW:정방향),   DIR(CCW:역방향), Active High
+    TwoCwCcwLow,                    // 2펄스 방식, PULSE(CW:정방향),   DIR(CCW:역방향), Active Low
+    TwoPhase,                       // 2상(90' 위상차),  PULSE lead DIR(CW: 정방향), PULSE lag DIR(CCW:역방향)
+    TwoPhaseReverse                 // 2상(90' 위상차),  PULSE lead DIR(CCW: 정방향), PULSE lag DIR(CW:역방향)
 }
 
 public enum AXT_MOTION_EXTERNAL_COUNTER_INPUT:uint
 {
-    ObverseUpDownMode                                       = 0x0,    // 정방향 Up/Down
-    ObverseSqr1Mode                                         = 0x1,    // 정방향 1체배
-    ObverseSqr2Mode                                         = 0x2,    // 정방향 2체배
-    ObverseSqr4Mode                                         = 0x3,    // 정방향 4체배
-    ReverseUpDownMode                                       = 0x4,    // 역방향 Up/Down
-    ReverseSqr1Mode                                         = 0x5,    // 역방향 1체배
-    ReverseSqr2Mode                                         = 0x6,    // 역방향 2체배
-    ReverseSqr4Mode                                         = 0x7     // 역방향 4체배
-
+    ObverseUpDownMode,              // 정방향 Up/Down
+    ObverseSqr1Mode,                // 정방향 1체배
+    ObverseSqr2Mode,                // 정방향 2체배
+    ObverseSqr4Mode,                // 정방향 4체배
+    ReverseUpDownMode,              // 역방향 Up/Down
+    ReverseSqr1Mode,                // 역방향 1체배
+    ReverseSqr2Mode,                // 역방향 2체배
+    ReverseSqr4Mode                 // 역방향 4체배
 }
 
 public enum AXT_MOTION_ACC_UNIT:uint
@@ -1212,30 +705,24 @@ public enum AXT_MOTION_CONTISTART_NODE:uint
 
 public enum AXT_MOTION_HOME_DETECT:uint
 {
-    PosEndLimit                            = 0x0,    // +Elm(End limit) +방향 리미트 센서 신호
-    NegEndLimit                            = 0x1,    // -Elm(End limit) -방향 리미트 센서 신호
-    PosSloLimit                            = 0x2,    // +Slm(Slow Down limit) 신호 - 사용하지 않음
-    NegSloLimit                            = 0x3,    // -Slm(Slow Down limit) 신호 - 사용하지 않음
-    HomeSensor                             = 0x4,    // IN0(ORG)  원점 센서 신호
-    EncodZPhase                            = 0x5,    // IN1(Z상)  Encoder Z상 신호
-    UniInput02                             = 0x6,    // IN2(범용) 범용 입력 2번 신호
-    UniInput03                             = 0x7,    // IN3(범용) 범용 입력 3번 신호
-    UniInput04                             = 0x8,    // IN4(범용) 범용 입력 4번 신호
-    UniInput05                             = 0x9,    // IN5(범용) 범용 입력 5번 신호
-    TorqueLimit                            = 0x10,   // Motor Torque Limit 신호를 이용 
-    HomingMethod                           = 0x64,   // Homing Method Base
-    HomingMethod_01                        = 0x65,   // Homing Method Start(90 ~ 137) 
-    //...
-    HomingMethod_37                        = 0x89,   // Homing Method Start(90 ~ 137)
+    PosEndLimit                            = 0x0,           // +Elm(End limit) +방향 리미트 센서 신호
+    NegEndLimit                            = 0x1,           // -Elm(End limit) -방향 리미트 센서 신호
+    PosSloLimit                            = 0x2,           // +Slm(Slow Down limit) 신호 - 사용하지 않음
+    NegSloLimit                            = 0x3,           // -Slm(Slow Down limit) 신호 - 사용하지 않음
+    HomeSensor                             = 0x4,           // IN0(ORG)  원점 센서 신호
+    EncodZPhase                            = 0x5,           // IN1(Z상)  Encoder Z상 신호
+    UniInput02                             = 0x6,           // IN2(범용) 범용 입력 2번 신호
+    UniInput03                             = 0x7,           // IN3(범용) 범용 입력 3번 신호
+    UniInput04                             = 0x8,           // IN4(범용) 범용 입력 4번 신호
+    UniInput05                             = 0x9            // IN5(범용) 범용 입력 5번 신호
 }
 
 public enum AXT_MOTION_INPUT_FILTER_SIGNAL_DEF:uint
 {
-    END_LIMIT                              = 0x10,    // End limit +/-방향 리미트 센서 신호
-    INP_ALARM                              = 0x11,    // Inposition/Alarm 신호
-    UIN_00_01                              = 0x12,    // Home/Z-Phase 신호
-    UIN_02_04                              = 0x13,    // UIN 2, 3, 4 신호 
-
+    END_LIMIT                              = 0x10,          // 위치클리어 사용않함, 잔여펄스 클리어 사용 안함
+    INP_ALARM                              = 0x11,          // 위치클리어 사용함, 잔여펄스 클리어 사용 안함
+    UIN_00_01                              = 0x12,          // 위치클리어 사용안함, 잔여펄스 클리어 사용함
+    UIN_02_04                              = 0x13           // 위치클리어 사용함, 잔여펄스 클리어 사용함
 }
 
 public enum AXT_MOTION_MPG_INPUT_METHOD:uint
@@ -1290,7 +777,7 @@ public enum AXT_MOTION_IPEND_STATUS:uint
     IPEND_STATUS_SLM                       = 0x0001,        // Bit 0, limit 감속정지 신호 입력에 의한 종료
     IPEND_STATUS_ELM                       = 0x0002,        // Bit 1, limit 급정지 신호 입력에 의한 종료
     IPEND_STATUS_SSTOP_SIGNAL              = 0x0004,        // Bit 2, 감속 정지 신호 입력에 의한 종료
-    IPEND_STATUS_ESTOP_SIGNAL              = 0x0008,        // Bit 3, 급정지 신호 입력에 의한 종료
+    IPEND_STATUS_ESTOP_SIGANL              = 0x0008,        // Bit 3, 급정지 신호 입력에 의한 종료
     IPEND_STATUS_SSTOP_COMMAND             = 0x0010,        // Bit 4, 감속 정지 명령에 의한 종료
     IPEND_STATUS_ESTOP_COMMAND             = 0x0020,        // Bit 5, 급정지 정지 명령에 의한 종료
     IPEND_STATUS_ALARM_SIGNAL              = 0x0040,        // Bit 6, Alarm 신호 입력에 희한 종료
@@ -1302,7 +789,7 @@ public enum AXT_MOTION_IPEND_STATUS:uint
     IPEND_STATUS_SENSOR_PULSE_DRIVE        = 0x1000,        // Bit 12, Sensor pulse drive 종료
     IPEND_STATUS_LIMIT                     = 0x2000,        // Bit 13, Limit 완전정지에 의한 종료
     IPEND_STATUS_SOFTLIMIT                 = 0x4000,        // Bit 14, Soft limit에 의한 종료
-    IPEND_STATUS_INTERPOLATION_DRIVE       = 0x8000         // Bit 15, 보간 드라이브에 의한 종료
+    IPEND_STATUS_INTERPOLATION_DRIVE       = 0x8000         // Bit 15, Soft limit에 의한 종료
 }
 
 public enum AXT_MOTION_IPDRIVE_STATUS:uint
@@ -1572,7 +1059,7 @@ public enum AXT_MOTION_QIINTERRUPT_BANK2:uint
     QIINTBANK2_5                           = 0x00000020,    // Bit 5,  스크립트 #2 의 예약 명령어 중 실행 시 인터럽트 발생으로 설정된 명령어 실행됨.
     QIINTBANK2_6                           = 0x00000040,    // Bit 6,  스크립트 #3 의 예약 명령어 실행 시 인터럽트 발생으로 설정된 명령어 실행됨.
     QIINTBANK2_7                           = 0x00000080,    // Bit 7,  스크립트 #4 의 예약 명령어 실행 시 인터럽트 발생으로 설정된 명령어 실행됨.
-    QIINTBANK2_8                           = 0x00000100,    // Bit 8,  구동중 다음 구동명령이 실행될 때
+    QIINTBANK2_8                           = 0x00000100,    // Bit 8,  구동 시작
     QIINTBANK2_9                           = 0x00000200,    // Bit 9,  서보 위치 결정 완료(Inposition)기능을 사용한 구동,종료 조건 발생.
     QIINTBANK2_10                          = 0x00000400,    // Bit 10, 이벤트 카운터로 동작 시 사용할 이벤트 선택 #1 조건 발생.
     QIINTBANK2_11                          = 0x00000800,    // Bit 11, 이벤트 카운터로 동작 시 사용할 이벤트 선택 #2 조건 발생.
@@ -1610,23 +1097,10 @@ public enum AXT_NETWORK_STATUS : uint
     NET_STATUS_CONNECTED     = 6
 }
 
-public struct MOTION_INFO
-{
-    public double dCmdPos;      // Command 위치[0x01]
-    public double dActPos;      // Encoder 위치[0x02]
-    public uint uMechSig;       // Mechanical Signal[0x04]
-    public uint uDrvStat;       // Driver Status[0x08]
-    public uint uInput;         // Universal Signal Input[0x10]
-    public uint uOutput;        // Universal Signal Output[0x10]
-    public uint uMask;          // 읽기 설정 Mask Ex) 0x1F, 모든정보 읽기
-}
-
-
 public enum AXT_MOTION_OVERRIDE_MODE : uint
 {
     OVERRIDE_POS_START       = 0,
-    OVERRIDE_POS_END         = 1,
-    OVERRIDE_POS_AUTO        = 2
+    OVERRIDE_POS_END         = 1
 }
 
 public enum AXT_MOTION_PROFILE_PRIORITY : uint
@@ -1642,38 +1116,15 @@ public enum AXT_MOTION_FUNC_RETURN_MODE_DEF : uint
     FUNC_RETURN_NON_BLOCKING    = 2
 }
 
-public enum AXT_MOTION_BACKLASH_DIR : uint
+public struct MOTION_INFO
 {
-	BACKLASH_DIR_P   = 0,
-	BACKLASH_DIR_N   = 1,
-	BACKLASH_DIR_U   = 2
-}
-
-public enum AXT_MOTION_MLIII_CONNECTION_STATUS : uint
-{
-    COM_CONNECT                 = 0,
-    COM_DISCONNECT              = 1,
-    COM_OFFLINE                 = 2
-}
-
-public enum MONITOR_SELECT_INFORMATION : uint
-{
-    _MONI_APOS_ = 0,     // feedback position  : current position of the motor
-    _MONI_CPOS_,         // command position   : command position after acceleration/deceleration filter
-    _MONI_PERR_,         // position error     : Position error of the control loop
-    _MONI_LPOS1_,        // latched position 1 : motor position 1 latched by the latch signal 
-    _MONI_LPOS2_,        // latched position 2 : motor position 2 latched by the latch signal
-    _MONI_FSPD_,         // feedback speed     : current speed of the motor 
-    _MONI_CSPD_,         // reference speed    : command speed of the motor
-    _MONI_TRQ_,          // torque(force) reference : command torque(force) of the motor
-    _MONI_ALARM_,        // detailed information on the current alarm : current alarm/warning (2-byte data, higher 2 bytes fixed as 0x0000)
-    _MONI_MPOS_,         // command position(optional) : the details of the monitor data are specified in the product specifications. example : internal command position of the control loop
-    _MONI_RES1_,         // reserved
-    _MONI_RES2_,         // reserved
-    _MONI_CMN1_,         // common monitor 1 : selects the monitor data specified at common parameter 89.(for the contents of the monitor data, refer to common parameter 89)
-    _MONI_CMN2_,         // common monitor 2 : selects the monitor data specified at common parameter 8A.(for the contents of the monitor data, refer to common parameter 8A)
-    _MONI_OMN1_,         // optional monitor 1 : selects the monitor data specified by parameter.(the contents of the monitor data depend on the product specifications)
-    _MONI_OMN2_          // optional monitor 2 : selects the monitor data specified by parameter.(the contents of the monitor data depend on the product specifications)
+    public double dCmdPos;      // Command 위치[0x01]
+    public double dActPos;      // Encoder 위치[0x02]
+    public uint uMechSig;       // Mechanical Signal[0x04]
+    public uint uDrvStat;       // Driver Status[0x08]
+    public uint uInput;         // Universal Signal Input[0x10]
+    public uint uOutput;        // Universal Signal Output[0x10]
+    public uint uMask;          // 읽기 설정 Mask Ex) 0x1F, 모든정보 읽기
 }
 
 public class CAXHS
@@ -1817,371 +1268,4 @@ public enum _CNTCOMMAND
     CnRamDataWithRamAddress                             = 0x30,                         // READ RAM DATA WITH RAM ADDR PORT ADDRESS
     CnRamDataWrite                                      = 0xB0,                         // RAM DATA WRITE
     CnRamDataRead                                       = 0x31                          // RAM DATA READ, 32BIT
-}
-
-
-public enum AXT_MOTION_JOINT_MODE : uint
-{
-    AxisMode         = 0x0,
-    JointMode        = 0x1,
-    ToolMode         = 0x2
-}
-
-public enum AXT_MONITOR_SIGNAL_TYPE
-{
-    // Motion 
-    eMonitorSignalType_CmdPos = 0,
-    eMonitorSignalType_ActPos,
-    eMonitorSignalType_CmdVel,
-    eMonitorSignalType_ActVel,    
-    eMonitorSignalType_CmdAccDec,
-    eMonitorSignalType_ActAccDec,
-    eMonitorSignalType_PosErr,
-    eMonitorSignalType_InMotion,
-    eMonitorSignalType_ActTorque,
-    eMonitorSignalType_PositionDemand,
-    eMonitorSignalType_VelocityDemand,
-    eMonitorSignalType_TorqueDemand,
-    eMonitorSignalType_MotionAiValue,
-    eMonitorSignalType_MotionDiValue,
-    eMonitorSignalType_MotionDoValue,
-    eMonitorSignalType_Event_ContiEndNode,
-
-    // Digital I/O
-    eMonitorSignalType_DiValue,
-    eMonitorSignalType_DoValue,
-
-    // Analog I/O
-    eMonitorSignalType_AiValue,
-    eMonitorSignalType_AoValue,
-    MAX_eMonitorSignalType
-}
-
-public enum AXT_MONITOR_OPERATOR_TYPE
-{
-    eMonitorOperationType_Grater = 0,
-    eMonitorOperationType_Smaller,
-    eMonitorOperationType_RisingEdge,
-    eMonitorOperationType_FallingEdge,
-    MAX_eMonitorOperationType
-}
-
-public enum AXT_MONITOR_START_OPTION
-{
-    eMonitorStartOption_Immediately = 0,
-    eMonitorStartOption_Trigger,
-    MAX_eMonitorStartOption
-}
-
-public enum AXT_MONITOR_OVERFLOW_OPTION
-{
-    eMonitorOverflowOption_IgnoreQueueFull = 0,
-    eMonitorOverflowOption_WaitQueueFull,
-    MAX_eMonitorOverflowOption
-}
-
-public enum _HPCPORT_DATA_WRITE : uint
-{
-    HpcReset          = 0x06,            // Software reset.
-    HpcCommand        = 0x10,
-    HpcData12         = 0x12,            // MSB of data port(31 ~ 16 bit)
-    HpcData34         = 0x14,            // LSB of data port(15 ~ 0 bit)
-    HpcCmStatus       = 0x1C
-}
-
-public enum _HPCPORT_CH_STAUTS : uint
-{
-    HpcCh1Mech        = 0x20,
-    HpcCh1Status      = 0x22,
-    HpcCh2Mech        = 0x30,
-    HpcCh2Status      = 0x32,
-    HpcCh3Mech        = 0x40,
-    HpcCh3Status      = 0x42,
-    HpcCh4Mech        = 0x50,
-    HpcCh4Status      = 0x52
-}
-
-public enum _HPCPORT_ETC : uint
-{
-    HpcDiIntFlag      = 0x60,
-    HpcDiIntRiseMask  = 0x62,
-    HpcDiIntFallMask  = 0x64,
-    HpcCompIntFlag    = 0x66,
-    HpcCompIntMask    = 0x68,
-    HpcDinData        = 0x6A,
-    HpcDoutData       = 0x6C
-}
-
-public enum _HPCRAM_DATA : uint
-{
-    HpcRamAddr1        = 0x70,            // MSB of Ram address(31  ~ 16 bit)
-    HpcRamAddr2        = 0x72            // LSB of Ram address(15  ~ 0 bit)
-}
-
-// CNT COMMAND LIST
-public enum _HPCCOMMAND
-{
-    // CH-1 Group Register
-    HpcCh1CounterRead                   = 0x10,                // CH1 COUNTER READ, 32BIT
-    HpcCh1CounterWrite                  = 0x90,                // CH1 COUNTER WRITE, 32BIT
-    HpcCh1CounterModeRead               = 0x11,                // CH1 COUNTER MODE READ, 4BIT
-    HpcCh1CounterModeWrite              = 0x91,                // CH1 COUNTER MODE WRITE, 4BIT
-    HpcCh1TriggerRegionLowerDataRead    = 0x12,                // CH1 TRIGGER REGION LOWER DATA READ, 31BIT
-    HpcCh1TriggerRegionLowerDataWrite   = 0x92,                // CH1 TRIGGER REGION LOWER DATA WRITE
-    HpcCh1TriggerRegionUpperDataRead    = 0x13,                // CH1 TRIGGER REGION UPPER DATA READ, 31BIT
-    HpcCh1TriggerRegionUpperDataWrite   = 0x93,                // CH1 TRIGGER REGION UPPER DATA WRITE
-    HpcCh1TriggerPeriodRead             = 0x14,                // CH1 TRIGGER PERIOD READ, 31BIT
-    HpcCh1TriggerPeriodWrite            = 0x94,                // CH1 TRIGGER PERIOD WRITE
-    HpcCh1TriggerPulseWidthRead         = 0x15,                // CH1 TRIGGER PULSE WIDTH READ, 31BIT
-    HpcCh1TriggerPulseWidthWrite        = 0x95,                // CH1 RIGGER PULSE WIDTH WRITE
-    HpcCh1TriggerModeRead               = 0x16,                // CH1 TRIGGER MODE READ, 8BIT
-    HpcCh1TriggerModeWrite              = 0x96,                // CH1 RIGGER MODE WRITE
-    HpcCh1TriggerStatusRead             = 0x17,                // CH1 TRIGGER STATUS READ, 8BIT
-    HpcCh1NoOperation_97                = 0x97,                // Reserved.
-    HpcCh1NoOperation_18                = 0x17,                // Reserved.
-    HpcCh1TriggerEnable                 = 0x98,                // CH1 TRIGGER ENABLE.
-    HpcCh1NoOperation_19                = 0x19,                // Reserved.
-    HpcCh1TriggerDisable                = 0x99,                // CH1 TRIGGER DISABLE.
-    HpcCh1TimeTriggerFrequencyRead      = 0x1A,                // CH1 TRIGGER FREQUNCE INFO. WRITE, 28BIT
-    HpcCh1TimeTriggerFrequencyWrite     = 0x9A,                // CH1 TRIGGER FREQUNCE INFO. READ
-    HpcCh1Comparator1ValueRead          = 0x1B,                // CH1 COMPAREATOR1 READ, 31BIT
-    HpcCh1Comparator1ValueWrite         = 0x9B,                // CH1 COMPAREATOR1 WRITE, 31BIT
-    HpcCh1Comparator2ValueRead          = 0x1C,                // CH1 COMPAREATOR2 READ, 31BIT
-    HpcCh1Comparator2ValueWrite         = 0x9C,                // CH1 COMPAREATOR2 WRITE, 31BIT
-    HpcCh1CompareatorConditionRead      = 0x1D,                // CH1 COMPAREATOR CONDITION READ, 4BIT
-    HpcCh1CompareatorConditionWrite     = 0x9D,                // CH1 COMPAREATOR CONDITION WRITE, 4BIT
-    HpcCh1AbsTriggerTopPositionRead     = 0x1E,                // CH1 ABS TRIGGER POSITION READ, 31BIT
-    HpcCh1AbsTriggerPositionWrite       = 0x9E,                // CH1 ABS TRIGGER POSITION WRITE, 31BIT
-    HpcCh1AbsTriggerFifoStatusRead      = 0x1F,                // CH1 ABS TRIGGER POSITION FIFO STATUS READ, 16BIT
-    HpcCh1AbsTriggerPositionClear       = 0x9F,                // CH1 ABS TRIGGER POSITION FIFO CLEAR
-
-    // CH-2 Group Register
-    HpcCh2CounterRead                   = 0x20,                // CH2 COUNTER READ, 32BIT
-    HpcCh2CounterWrite                  = 0xA0,                // CH2 COUNTER WRITE, 32BIT
-    HpcCh2CounterModeRead               = 0x21,                // CH2 COUNTER MODE READ, 4BIT
-    HpcCh2CounterModeWrite              = 0xA1,                // CH2 COUNTER MODE WRITE, 4BIT
-    HpcCh2TriggerRegionLowerDataRead    = 0x22,                // CH2 TRIGGER REGION LOWER DATA READ, 31BIT
-    HpcCh2TriggerRegionLowerDataWrite   = 0xA2,                // CH2 TRIGGER REGION LOWER DATA WRITE
-    HpcCh2TriggerRegionUpperDataRead    = 0x23,                // CH2 TRIGGER REGION UPPER DATA READ, 31BIT
-    HpcCh2TriggerRegionUpperDataWrite   = 0xA3,                // CH2 TRIGGER REGION UPPER DATA WRITE
-    HpcCh2TriggerPeriodRead             = 0x24,                // CH2 TRIGGER PERIOD READ, 31BIT
-    HpcCh2TriggerPeriodWrite            = 0xA4,                // CH2 TRIGGER PERIOD WRITE
-    HpcCh2TriggerPulseWidthRead         = 0x25,                // CH2 TRIGGER PULSE WIDTH READ, 31BIT
-    HpcCh2TriggerPulseWidthWrite        = 0xA5,                // CH2 RIGGER PULSE WIDTH WRITE
-    HpcCh2TriggerModeRead               = 0x26,                // CH2 TRIGGER MODE READ, 8BIT
-    HpcCh2TriggerModeWrite              = 0xA6,                // CH2 RIGGER MODE WRITE
-    HpcCh2TriggerStatusRead             = 0x27,                // CH2 TRIGGER STATUS READ, 8BIT
-    HpcCh2NoOperation_97                = 0xA7,                // Reserved.
-    HpcCh2NoOperation_18                = 0x27,                // Reserved.
-    HpcCh2TriggerEnable                 = 0xA8,                // CH2 TRIGGER ENABLE.
-    HpcCh2NoOperation_19                = 0x29,                // Reserved.
-    HpcCh2TriggerDisable                = 0xA9,                // CH2 TRIGGER DISABLE.
-    HpcCh2TimeTriggerFrequencyRead      = 0x2A,                // CH2 TRIGGER FREQUNCE INFO. WRITE, 28BIT
-    HpcCh2TimeTriggerFrequencyWrite     = 0xAA,                // CH2 TRIGGER FREQUNCE INFO. READ
-    HpcCh2Comparator1ValueRead          = 0x2B,                // CH2 COMPAREATOR1 READ, 31BIT
-    HpcCh2Comparator1ValueWrite         = 0xAB,                // CH2 COMPAREATOR1 WRITE, 31BIT
-    HpcCh2Comparator2ValueRead          = 0x2C,                // CH2 COMPAREATOR2 READ, 31BIT
-    HpcCh2Comparator2ValueWrite         = 0xAC,                // CH2 COMPAREATOR2 WRITE, 31BIT
-    HpcCh2CompareatorConditionRead      = 0x2D,                // CH2 COMPAREATOR CONDITION READ, 4BIT
-    HpcCh2CompareatorConditionWrite     = 0xAD,                // CH2 COMPAREATOR CONDITION WRITE, 4BIT
-    HpcCh2AbsTriggerTopPositionRead     = 0x2E,                // CH2 ABS TRIGGER POSITION READ, 31BIT
-    HpcCh2AbsTriggerPositionWrite       = 0xAE,                // CH2 ABS TRIGGER POSITION WRITE, 31BIT
-    HpcCh2AbsTriggerFifoStatusRead      = 0x2F,                // CH2 ABS TRIGGER POSITION FIFO STATUS READ, 16BIT
-    HpcCh2AbsTriggerPositionClear       = 0xAF,                // CH2 ABS TRIGGER POSITION FIFO CLEAR
-
-    // CH-3 Group Register
-    HpcCh3CounterRead                   = 0x30,                // CH3 COUNTER READ, 32BIT
-    HpcCh3CounterWrite                  = 0xB0,                // CH3 COUNTER WRITE, 32BIT
-    HpcCh3CounterModeRead               = 0x31,                // CH3 COUNTER MODE READ, 4BIT
-    HpcCh3CounterModeWrite              = 0xB1,                // CH3 COUNTER MODE WRITE, 4BIT
-    HpcCh3TriggerRegionLowerDataRead    = 0x32,                // CH3 TRIGGER REGION LOWER DATA READ, 31BIT
-    HpcCh3TriggerRegionLowerDataWrite   = 0xB2,                // CH3 TRIGGER REGION LOWER DATA WRITE
-    HpcCh3TriggerRegionUpperDataRead    = 0x33,                // CH3 TRIGGER REGION UPPER DATA READ, 31BIT
-    HpcCh3TriggerRegionUpperDataWrite   = 0xB3,                // CH3 TRIGGER REGION UPPER DATA WRITE
-    HpcCh3TriggerPeriodRead             = 0x34,                // CH3 TRIGGER PERIOD READ, 31BIT
-    HpcCh3TriggerPeriodWrite            = 0xB4,                // CH3 TRIGGER PERIOD WRITE
-    HpcCh3TriggerPulseWidthRead         = 0x35,                // CH3 TRIGGER PULSE WIDTH READ, 31BIT
-    HpcCh3TriggerPulseWidthWrite        = 0xB5,                // CH3 RIGGER PULSE WIDTH WRITE
-    HpcCh3TriggerModeRead               = 0x36,                // CH3 TRIGGER MODE READ, 8BIT
-    HpcCh3TriggerModeWrite              = 0xB6,                // CH3 RIGGER MODE WRITE
-    HpcCh3TriggerStatusRead             = 0x37,                // CH3 TRIGGER STATUS READ, 8BIT
-    HpcCh3NoOperation_97                = 0xB7,                // Reserved.
-    HpcCh3NoOperation_18                = 0x37,                // Reserved.
-    HpcCh3TriggerEnable                 = 0xB8,                // CH3 TRIGGER ENABLE.
-    HpcCh3NoOperation_19                = 0x39,                // Reserved.
-    HpcCh3TriggerDisable                = 0xB9,                // CH3 TRIGGER DISABLE.
-    HpcCh3TimeTriggerFrequencyRead      = 0x3A,                // CH3 TRIGGER FREQUNCE INFO. WRITE, 28BIT
-    HpcCh3TimeTriggerFrequencyWrite     = 0xBA,                // CH3 TRIGGER FREQUNCE INFO. READ
-    HpcCh3Comparator1ValueRead          = 0x3B,                // CH3 COMPAREATOR1 READ, 31BIT
-    HpcCh3Comparator1ValueWrite         = 0xBB,                // CH3 COMPAREATOR1 WRITE, 31BIT
-    HpcCh3Comparator2ValueRead          = 0x3C,                // CH3 COMPAREATOR2 READ, 31BIT
-    HpcCh3Comparator2ValueWrite         = 0xBC,                // CH3 COMPAREATOR2 WRITE, 31BIT
-    HpcCh3CompareatorConditionRead      = 0x3D,                // CH3 COMPAREATOR CONDITION READ, 4BIT
-    HpcCh3CompareatorConditionWrite     = 0xBD,                // CH3 COMPAREATOR CONDITION WRITE, 4BIT
-    HpcCh3AbsTriggerTopPositionRead     = 0x3E,                // CH3 ABS TRIGGER POSITION READ, 31BIT
-    HpcCh3AbsTriggerPositionWrite       = 0xBE,                // CH3 ABS TRIGGER POSITION WRITE, 31BIT
-    HpcCh3AbsTriggerFifoStatusRead      = 0x3F,                // CH3 ABS TRIGGER POSITION FIFO STATUS READ, 16BIT
-    HpcCh3AbsTriggerPositionClear       = 0xBF,                // CH3 ABS TRIGGER POSITION FIFO CLEAR
-
-    // CH-4 Group Register
-    HpcCh4CounterRead                   = 0x40,                // CH4 COUNTER READ, 32BIT
-    HpcCh4CounterWrite                  = 0xC0,                // CH4 COUNTER WRITE, 32BIT
-    HpcCh4CounterModeRead               = 0x41,                // CH4 COUNTER MODE READ, 4BIT
-    HpcCh4CounterModeWrite              = 0xC1,                // CH4 COUNTER MODE WRITE, 4BIT
-    HpcCh4TriggerRegionLowerDataRead    = 0x42,                // CH4 TRIGGER REGION LOWER DATA READ, 31BIT
-    HpcCh4TriggerRegionLowerDataWrite   = 0xC2,                // CH4 TRIGGER REGION LOWER DATA WRITE
-    HpcCh4TriggerRegionUpperDataRead    = 0x43,                // CH4 TRIGGER REGION UPPER DATA READ, 31BIT
-    HpcCh4TriggerRegionUpperDataWrite   = 0xC3,                // CH4 TRIGGER REGION UPPER DATA WRITE
-    HpcCh4TriggerPeriodRead             = 0x44,                // CH4 TRIGGER PERIOD READ, 31BIT
-    HpcCh4TriggerPeriodWrite            = 0xC4,                // CH4 TRIGGER PERIOD WRITE
-    HpcCh4TriggerPulseWidthRead         = 0x45,                // CH4 TRIGGER PULSE WIDTH READ, 31BIT
-    HpcCh4TriggerPulseWidthWrite        = 0xC5,                // CH4 RIGGER PULSE WIDTH WRITE
-    HpcCh4TriggerModeRead               = 0x46,                // CH4 TRIGGER MODE READ, 8BIT
-    HpcCh4TriggerModeWrite              = 0xC6,                // CH4 RIGGER MODE WRITE
-    HpcCh4TriggerStatusRead             = 0x47,                // CH4 TRIGGER STATUS READ, 8BIT
-    HpcCh4NoOperation_97                = 0xC7,                // Reserved.
-    HpcCh4NoOperation_18                = 0x47,                // Reserved.
-    HpcCh4TriggerEnable                 = 0xC8,                // CH4 TRIGGER ENABLE.
-    HpcCh4NoOperation_19                = 0x49,                // Reserved.
-    HpcCh4TriggerDisable                = 0xC9,                // CH4 TRIGGER DISABLE.
-    HpcCh4TimeTriggerFrequencyRead      = 0x4A,                // CH4 TRIGGER FREQUNCE INFO. WRITE, 28BIT
-    HpcCh4TimeTriggerFrequencyWrite     = 0xCA,                // CH4 TRIGGER FREQUNCE INFO. READ
-    HpcCh4Comparator1ValueRead          = 0x4B,                // CH4 COMPAREATOR1 READ, 31BIT
-    HpcCh4Comparator1ValueWrite         = 0xCB,                // CH4 COMPAREATOR1 WRITE, 31BIT
-    HpcCh4Comparator2ValueRead          = 0x4C,                // CH4 COMPAREATOR2 READ, 31BIT
-    HpcCh4Comparator2ValueWrite         = 0xCC,                // CH4 COMPAREATOR2 WRITE, 31BIT
-    HpcCh4CompareatorConditionRead      = 0x4D,                // CH4 COMPAREATOR CONDITION READ, 4BIT
-    HpcCh4CompareatorConditionWrite     = 0xCD,                // CH4 COMPAREATOR CONDITION WRITE, 4BIT
-    HpcCh4AbsTriggerTopPositionRead     = 0x4E,                // CH4 ABS TRIGGER POSITION READ, 31BIT
-    HpcCh4AbsTriggerPositionWrite       = 0xCE,                // CH4 ABS TRIGGER POSITION WRITE, 31BIT
-    HpcCh4AbsTriggerFifoStatusRead      = 0x4F,                // CH4 ABS TRIGGER POSITION FIFO STATUS READ, 16BIT
-    HpcCh4AbsTriggerPositionClear       = 0xCF,                // CH4 ABS TRIGGER POSITION FIFO CLEAR
-
-    // Ram Access Group Register
-    HpcRamDataWithRamAddress            = 0x51,                // READ RAM DATA WITH RAM ADDR PORT ADDRESS
-    HpcRamDataWrite                     = 0xD0,                // RAM DATA WRITE
-    HpcRamDataRead                      = 0x50,                // RAM DATA READ, 32BIT
-
-    // Debugging Registers    
-    HpcCh1TrigPosIndexRead              = 0x60,                // CH1 Current RAM trigger index position on 32Bit data, 8BIT
-    HpcCh1TrigBackwardDataRead          = 0x61,                // CH1 Current RAM trigger backward position data, 32BIT
-    HpcCh1TrigCurrentDataRead           = 0x62,                // CH1 Current RAM trigger current position data, 32BIT
-    HpcCh1TrigForwardDataRead           = 0x63,                // CH1 Current RAM trigger next position data, 32BIT
-    HpcCh1TrigRamAddressRead            = 0x64,                // CH1 Current RAM trigger address, 20BIT
-
-    HpcCh2TrigPosIndexRead              = 0x65,                // CH2 Current RAM trigger index position on 32Bit data, 8BIT
-    HpcCh2TrigBackwardDataRead          = 0x66,                // CH2 Current RAM trigger backward position data, 32BIT
-    HpcCh2TrigCurrentDataRead           = 0x67,                // CH2 Current RAM trigger current position data, 32BIT
-    HpcCh2TrigForwardDataRead           = 0x68,                // CH2 Current RAM trigger next position data, 32BIT
-    HpcCh2TrigRamAddressRead            = 0x69,                // CH2 Current RAM trigger address, 20BIT
-
-    HpcCh3TrigPosIndexRead              = 0x70,                // CH3 Current RAM trigger index position on 32Bit data, 8BIT
-    HpcCh3TrigBackwardDataRead          = 0x71,                // CH3 Current RAM trigger backward position data, 32BIT
-    HpcCh3TrigCurrentDataRead           = 0x72,                // CH3 Current RAM trigger current position data, 32BIT
-    HpcCh3TrigForwardDataRead           = 0x73,                // CH3 Current RAM trigger next position data, 32BIT
-    HpcCh3TrigRamAddressRead            = 0x74,                // CH3 Current RAM trigger address, 20BIT
-
-    HpcCh4TrigPosIndexRead              = 0x75,                // CH4 Current RAM trigger index position on 32Bit data, 8BIT
-    HpcCh4TrigBackwardDataRead          = 0x76,                // CH4 Current RAM trigger backward position data, 32BIT
-    HpcCh4TrigCurrentDataRead           = 0x77,                // CH4 Current RAM trigger current position data, 32BIT
-    HpcCh4TrigForwardDataRead           = 0x78,                // CH4 Current RAM trigger next position data, 32BIT
-    HpcCh4TrigRamAddressRead            = 0x79,                // CH4 Current RAM trigger address, 20BIT
-
-    HpcCh1TestEnable                    = 0x81,                // CH1 test enable(Manufacturer only)
-    HpcCh2TestEnable                    = 0x82,                // CH2 test enable(Manufacturer only)
-    HpcCh3TestEnable                    = 0x83,                // CH3 test enable(Manufacturer only)
-    HpcCh4TestEnable                    = 0x84,                // CH4 test enable(Manufacturer only)
-
-    HpcTestFrequency                    = 0x8C,                // Test counter output frequency(32bit)
-    HpcTestCountStart                   = 0x8D,                // Start test counter output with position(32bit signed).
-    HpcTestCountEnd                     = 0x8E,                // End counter output.
-
-    HpcCh1TrigVectorTopDataOfFifo       = 0x54,                // CH1 UnitVector X positin of FIFO top.
-    HpcCh1TrigVectorFifoStatus          = 0x55,                // CH1 UnitVector X FIFO Status.
-    HpcCh2TrigVectorTopDataOfFifo       = 0x56,                // CH2 UnitVector Y positin of FIFO top.
-    HpcCh2TrigVectorFifoStatus          = 0x57,                // CH2 UnitVector Y FIFO Status.
-    HpcCh1TrigVectorFifoPush            = 0xD2,                // CH1 UnitVector X position, fifo data push.
-    HpcCh2TrigVectorFifoPush            = 0xD3                // CH2 UnitVector Y position, fifo data push.
-}
-
-public enum AXT_MAX_MACRO:uint
-{
-    AXP_MAX_MACRO_SIZE      = 8,
-    AXP_MAX_MACRO_NODE_NUM  = 64,
-	AXP_MAX_MACRO_SET_ARG   = 16,
-	AXP_MAX_MACRO_GET_DATA  = 16,
-	AXP_MAX_MACRO_DATA_BYTE = 12
-}
-
-public enum AXT_MACRO_FUNCTION:uint
-{
-    MACRO_FUNC_CALL          = 0,
-    MACRO_FUNC_JUMP          = 1,
-    MACRO_FUNC_RETURN        = 2,
-    MACRO_FUNC_REPEAT        = 3,
-    MACRO_FUNC_SET_OUTPUT    = 4,
-    MACRO_FUNC_WAIT          = 5,
-    MACRO_FUNC_STOP          = 6,
-    MACRO_FUNC_MAX
-}
-
-public enum AXT_MACRO_JUMP_TYPE:uint
-{
-    MACRO_JUMP_MACRO    = 0,
-    MACRO_JUMP_NODE     = 1
-}
-
-public enum AXT_MACRO_SET_OUTPUT_TYPE:uint
-{
-    MACRO_DIGITAL_OUTPUT    = 0,
-    MACRO_ANALOG_OUTPUT     = 1,   
-    MACRO_MOTION_OUTPUT     = 2
-}
-
-public enum AXT_MACRO_SET_DATA_TYPE:uint
-{
-    MACRO_DATA_BIT          = 0,
-    MACRO_DATA_BYTE         = 1,   
-    MACRO_DATA_WORD         = 2,
-    MACRO_DATA_DWORD        = 3,
-    MACRO_DATA_BYTE12       = 4,
-    MACRO_DATA_VOLTAGE      = 5,
-    MACRO_DATA_DIGIT        = 6
-}
-
-public enum AXT_MACRO_STOP_MODE:uint
-{
-    MACRO_QUICK_STOP        = 0,
-    MACRO_SLOW_STOP         = 1
-}
-
-
-public enum AXT_MACRO_START_CONDITION:uint
-{
-    MACRO_START_READY       = 0,   
-    MACRO_START_IMMEDIATE   = 1,
-}
-
-public enum AXT_MACRO_RUN_STATUS:uint
-{
-    MACRO_STATUS_STOP   = 0,   
-    MACRO_STATUS_READY  = 1,
-    MACRO_STATUS_RUN    = 2,
-    MACRO_STATUS_ERROR  = 3
-}
-
-public enum AXT_MACRO_ERROR_CODE:uint
-{
-    ERROR_INVALID_MACRO_NO          = 1,
-    ERROR_INVALID_NODE_NO           = 2,
-    ERROR_INVALID_MODULE_NO         = 3,
-    ERROR_INVALID_AXIS_NO           = 4,
-    ERROR_INVALID_CHANNEL_NO        = 5,
-    ERROR_INVALID_JUMP_TYPE         = 6,
-    ERROR_INVALID_OUTPUT_TYPE       = 7,
-    ERROR_INVALID_OFFSET            = 8,
-    ERROR_INVALID_STOP_MODE         = 9,
-    ERROR_INVALID_START_CONDITION   = 10,
-    ERROR_NOT_SUPPORT_MODULE        = 11,
-    ERROR_NOT_READY_MACRO           = 12
 }

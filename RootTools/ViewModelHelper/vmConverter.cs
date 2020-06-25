@@ -460,47 +460,38 @@ namespace ViewConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            try
-            {
-
-
-                // variable
-                if (values[0] == null)
-                {
-                    return 0.0f;
-                }
-                AjinAxis axis = (AjinAxis)values[0];
-                double dStageLength = (double)values[1];
-                double dMinusLimit = (double)axis.p_posLimitSW[0];
-                double dPlusLimit = (double)axis.p_posLimitSW[1];
-                double dActualPos = axis.p_posActual;
-                double dScaled = 0.0;
-                double dControlLength = 0.0;    // Control별 사이즈, 스테이지 영역을 넘어가지 않게 하기 위해 빼주는 값
-                string strAxis = (string)parameter;
-
-                // implement
-                if (strAxis == "AxisX")
-                    dControlLength = 150.0;
-                else if (strAxis == "AxisY")
-                    dControlLength = 100.0;
-                else if (strAxis == "AxisZ")
-                    dControlLength = 30.0;
-                else if (strAxis == "AxisTheta")
-                {
-                    dMinusLimit = -180000.0;
-                    dPlusLimit = 180000.0;
-                    dStageLength = 360.0;
-                    dControlLength = 0.0;
-                }
-
-                dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, 0.0, dStageLength - dControlLength);
-
-                return dScaled;
-            }
-            catch
+            // variable
+            if(values[0] == null)
             {
                 return 0.0f;
             }
+            AjinAxis axis = (AjinAxis)values[0];
+            double dStageLength = (double)values[1];
+            double dMinusLimit = (double)axis.p_posLimitSW[0];
+            double dPlusLimit = (double)axis.p_posLimitSW[1];
+            double dActualPos = axis.p_posActual;
+            double dScaled = 0.0;
+            double dControlLength = 0.0;    // Control별 사이즈, 스테이지 영역을 넘어가지 않게 하기 위해 빼주는 값
+            string strAxis = (string)parameter;
+
+            // implement
+            if (strAxis == "AxisX") 
+                dControlLength = 150.0;
+            else if (strAxis == "AxisY") 
+                dControlLength = 100.0;
+            else if (strAxis == "AxisZ") 
+                dControlLength = 30.0;
+            else if (strAxis == "AxisTheta")
+            {
+                dMinusLimit = -180000.0;
+                dPlusLimit = 180000.0;
+                dStageLength = 360.0;
+                dControlLength = 0.0;
+            }
+
+            dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, 0.0, dStageLength-dControlLength);
+            
+            return dScaled;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

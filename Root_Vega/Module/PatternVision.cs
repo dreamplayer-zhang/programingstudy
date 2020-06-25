@@ -486,17 +486,17 @@ namespace Root_Vega.Module
             if (p_axisClamp.p_axis.p_sensorHome == false) return;
             ((AjinAxis)p_axisXY.p_axisY).Jog_Minus_Fast();
         }
-        void MovePosition()
+        public void MovePosition()
         {
             if (p_axisClamp.p_axis.p_sensorHome == false) return;
             ((AjinAxis)p_axisXY.p_axisY).MovePosition();
         }
-        void PlusRelativeMove()
+        public void PlusRelativeMove()
         {
             if (p_axisClamp.p_axis.p_sensorHome == false) return;
             ((AjinAxis)p_axisXY.p_axisY).PlusRelativeMove();
         }
-        void MinusRelativeMove()
+        public void MinusRelativeMove()
         {
             if (p_axisClamp.p_axis.p_sensorHome == false) return;
             ((AjinAxis)p_axisXY.p_axisY).MinusRelativeMove();
