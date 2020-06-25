@@ -328,13 +328,13 @@ namespace Root_Vega.Module
                 //JWS 200616 ADD
                 if (GetdZPos(ePosZ.InnerPod) < 0)
                 {
-                    p_sInfo = StateHome(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                    p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                     if (p_sInfo != "OK") return p_sInfo;
                     if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
                 }
                 else if (GetdZPos(ePosZ.Reticle) < 0)
                 {
-                    p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                    p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                     if (p_sInfo != "OK") return p_sInfo;
                     if (Run(Home_Innerpod())) return p_sInfo;
                 }
@@ -352,7 +352,7 @@ namespace Root_Vega.Module
         {
             if (m_diInnerPod.p_bIn) return "No InnerPod";
             if (Run(MoveZ(ePosZ.InnerPod))) return p_sInfo;
-            p_sInfo = StateHome(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY);
+            p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY);
             if (p_sInfo != "OK") return p_sInfo;
             return MoveZ(ePosZ.Ready); 
         }
@@ -366,16 +366,27 @@ namespace Root_Vega.Module
                 //3,4번 축 상대치 이동하는 함수 넣기
                 if (Run(ShiftReticleLifter(m_aShiftReticle[0], m_aShiftReticle[1]))) return p_sInfo;
                 if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
-                p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                 if (p_sInfo != "OK") return p_sInfo;
             }
             else
             {
-                p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                 if (p_sInfo != "OK") return p_sInfo;
             }
             return Home_Innerpod();
         }
+
+        public string HomeToMinusLimit(params IAxis[] aAxis) //JWS 200625 ADD
+        {
+            p_sInfo = StateHome(aAxis);
+            if (p_sInfo != "OK") return p_sInfo;
+            foreach (IAxis axis in aAxis)
+                if (!axis.p_sensorLimitM) return axis.ToString() + " not home done.";
+
+            return p_sInfo;
+        }
+
 
         double GetdZPos(ePosZ pos)
         {
