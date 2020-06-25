@@ -26,11 +26,11 @@ namespace RootTools.Memory
 
         void CreatePool(int gbPool)
         {
-			//StopWatch sw = new StopWatch();
-			//long nPool = (long)Math.Ceiling(gbPool * c_fGB);
-			//m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool);
-			//m_log.Info(p_id + " Memory Pool Allocate Done " + sw.ElapsedMilliseconds.ToString() + " ms");
-		}
+            StopWatch sw = new StopWatch();
+            long nPool = (long)Math.Ceiling(gbPool * c_fGB);
+            m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool);
+            m_log.Info(p_id + " Memory Pool Allocate Done " + sw.ElapsedMilliseconds.ToString() + " ms");
+        }
         #endregion
 
         #region MemoryGroup
