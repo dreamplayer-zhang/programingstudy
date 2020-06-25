@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace RootTools.AutoFocus
+namespace RootTools.ImageProcess
 {
     public enum eImageState { GRAY_SCALE, COLOR_RGB, COLOR_RGBA };
     public class AutoFocus
@@ -273,6 +273,7 @@ namespace RootTools.AutoFocus
         {
             Emgu.CV.Mat matSrc = new Emgu.CV.Mat(img.p_Size.X, img.p_Size.Y, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
             Emgu.CV.Mat matGrad = new Emgu.CV.Mat();
+
             int nScale = 1;
             int nDelta = 0;
             //int ddepth = (int)Emgu.CV.CvEnum.DepthType.Cv8U;

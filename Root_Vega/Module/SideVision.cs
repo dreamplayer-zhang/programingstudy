@@ -2,7 +2,7 @@
 using Emgu.CV.Cvb;
 using Emgu.CV.Structure;
 using RootTools;
-using RootTools.AutoFocus;
+using RootTools.ImageProcess;
 using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
