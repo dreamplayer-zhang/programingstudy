@@ -297,10 +297,10 @@ namespace RootTools.Module
                 if (EQ.IsStop(1000)) return "Home Stop";
                 bool bDone = true;
                 foreach (IAxis axis in aAxis)
-                {
-                    if ((axis != null) && (axis.p_eState == Axis.eState.Home)) bDone = false;
-                }
-                if (bDone) return "OK";
+				{
+					if ((axis != null) && (axis.p_eState == Axis.eState.Home)) bDone = false;
+				}
+				if (bDone) return "OK";
             }
         }
         #endregion
