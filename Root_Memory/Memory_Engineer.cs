@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Memory;
@@ -17,6 +18,8 @@ namespace Root_Memory
         }
 
         public IGem ClassGem() { return null; }
+
+        public IControl ClassControl() { return null; }
 
         public GAF ClassGAF() { return null; }
 
@@ -50,5 +53,6 @@ namespace Root_Memory
             m_login.ThreadStop();
             LogView.ThreadStop();
         }
+
     }
 }

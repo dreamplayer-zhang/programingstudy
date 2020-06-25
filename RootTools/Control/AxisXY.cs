@@ -1,7 +1,5 @@
-﻿using RootTools.Trees;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace RootTools.Control
 {

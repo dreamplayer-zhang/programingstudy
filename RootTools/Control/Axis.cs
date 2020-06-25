@@ -3,6 +3,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Windows.Controls;
 
 namespace RootTools.Control
 {
@@ -20,32 +21,16 @@ namespace RootTools.Control
             Jog,
             Error
         }
-        eState _eState = eState.Init; 
+        eState _eState = eState.Init;
         public eState p_eState
-        { 
+        {
             get { return _eState; }
             set
             {
                 if (_eState == value) return;
-                p_log.Info(p_sName + " State : " + _eState.ToString() + " -> " + value.ToString());
+                p_log.Info(p_id + " State : " + _eState.ToString() + " -> " + value.ToString());
                 _eState = value;
                 OnPropertyChanged();
-            }
-        }
-
-        public delegate void dgOnChangeAxis();
-        public event dgOnChangeAxis OnChangeAxis;
-
-        string _sName = "";
-        public string p_sName
-        {
-            get { return _sName; }
-            set
-            {
-                if (_sName == value) return;
-                _sName = value;
-                OnPropertyChanged(); 
-                if (OnChangeAxis != null) OnChangeAxis(); 
             }
         }
 
@@ -66,7 +51,7 @@ namespace RootTools.Control
             }
         }
 
-        Log _log; 
+        Log _log;
         public Log p_log
         {
             get { return _log; }
@@ -78,6 +63,10 @@ namespace RootTools.Control
                 if (m_treeRootSetting != null) m_treeRootSetting.m_log = value;
             }
         }
+        #endregion
+
+        #region UI
+        public virtual UserControl p_ui { get; }
         #endregion
 
         #region Position & Velocity
@@ -203,7 +192,7 @@ namespace RootTools.Control
             RunTreePos(Tree.eMode.Init);
         }
 
-        void RunTreePos(Tree.eMode mode)
+        public void RunTreePos(Tree.eMode mode)
         {
             m_treeRootPos.p_eMode = mode;
             RunTreePosLimit(m_treeRootPos.GetTree("SW Limit"));
@@ -260,9 +249,9 @@ namespace RootTools.Control
         {
             double fPos = p_posActual;
             bool bSWLimit0 = m_bSWLimit[0] && (fPos > m_aPos[m_asPos[0]]);
-            if (bSWLimit0) p_sInfo = p_sName + ": Servo SW limit(-) !!";
+            if (bSWLimit0) p_sInfo = p_id + ": Servo SW limit(-) !!";
             bool bSWLimit1 = m_bSWLimit[1] && (fPos > m_aPos[m_asPos[1]]);
-            if (bSWLimit1) p_sInfo = p_sName + ": Servo SW limit(+) !!";
+            if (bSWLimit1) p_sInfo = p_id + ": Servo SW limit(+) !!";
             if (bSWLimit0 || bSWLimit1) StopAxis();
         }
 
@@ -276,14 +265,14 @@ namespace RootTools.Control
         #region List Speed
         public class Speed
         {
-            public string m_id; 
+            public string m_id;
             public double m_v = 1000;
             public double m_acc = 0.5;
             public double m_dec = 0.5;
 
             public Speed(string id)
             {
-                m_id = id; 
+                m_id = id;
             }
 
             public void RunTree(Tree tree)
@@ -336,9 +325,9 @@ namespace RootTools.Control
         public TreeRoot m_treeRootSpeed = null;
         void InitSpeed()
         {
-            p_fJogScale = 100; 
+            p_fJogScale = 100;
             m_treeRootSpeed = new TreeRoot(p_id + ".Speed", p_log);
-            m_treeRootSpeed.UpdateTree += M_treeRootSpeed_UpdateTree; 
+            m_treeRootSpeed.UpdateTree += M_treeRootSpeed_UpdateTree;
             for (int i = 0; i < Enum.GetNames(typeof(eSpeed)).Length; i++)
             {
                 AddSpeed(((eSpeed)i).ToString());
@@ -353,10 +342,10 @@ namespace RootTools.Control
             RunTreeSpeed(Tree.eMode.Init);
         }
 
-        void RunTreeSpeed(Tree.eMode mode)
+        public void RunTreeSpeed(Tree.eMode mode)
         {
             m_treeRootSpeed.p_eMode = mode;
-            foreach (Speed speed in m_aSpeed) speed.RunTree(m_treeRootSpeed.GetTree(speed.m_id, false)); 
+            foreach (Speed speed in m_aSpeed) speed.RunTree(m_treeRootSpeed.GetTree(speed.m_id, false));
         }
         #endregion
 
@@ -369,9 +358,9 @@ namespace RootTools.Control
         {
             m_speedNow = (speed == null) ? GetSpeedValue(eSpeed.Move) : speed;
             m_swMove.Start();
-            if (EQ.IsStop()) return p_sName + " EQ Stop";
+            if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
-            if (p_eState != eState.Ready) return p_sName + " Axis State not Ready : " + p_eState.ToString();
+            if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
             return CheckSWLimit(fScale * m_speedNow.m_v);
         }
 
@@ -381,7 +370,7 @@ namespace RootTools.Control
         #region Move
         public string StartMove(Enum pos, double fOffset = 0, Enum speed = null)
         {
-            return StartMove(pos.ToString(), fOffset, speed); 
+            return StartMove(pos.ToString(), fOffset, speed);
         }
 
         public string StartMove(string sPos, double fOffset = 0, Enum speed = null)
@@ -397,9 +386,9 @@ namespace RootTools.Control
             m_posDst = fPos;
             m_speedNow = (sSpeed == null) ? GetSpeedValue(eSpeed.Move) : GetSpeedValue(sSpeed);
             m_swMove.Start();
-            if (EQ.IsStop()) return p_sName + " EQ Stop";
+            if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
-            if (p_eState != eState.Ready) return p_sName + " Axis State not Ready : " + p_eState.ToString();
+            if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
             double dPos = fPos - p_posCommand;
             m_msMoveTime = (int)(1000 * (dPos / m_speedNow.m_v + m_speedNow.m_acc + m_speedNow.m_dec + 1));
             return CheckSWLimit(ref fPos);
@@ -410,9 +399,9 @@ namespace RootTools.Control
             m_posDst = fPos;
             m_speedNow = null;
             m_swMove.Start();
-            if (EQ.IsStop()) return p_sName + " EQ Stop";
+            if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
-            if (p_eState != eState.Ready) return p_sName + " Axis State not Ready : " + p_eState.ToString();
+            if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
             double dPos = fPos - p_posCommand;
             m_msMoveTime = (int)(1000 * (dPos / v + acc + dec + 1));
             return CheckSWLimit(ref fPos);
@@ -426,7 +415,7 @@ namespace RootTools.Control
                 if (m_swMove.ElapsedMilliseconds > m_msMoveTime)
                 {
                     p_eState = eState.Init;
-                    return p_sName + " Axis Move Timeout";
+                    return p_id + " Axis Move Timeout";
                 }
             }
             switch (p_eState)
@@ -445,32 +434,125 @@ namespace RootTools.Control
         private void M_EQ_OnDoorOpen()
         {
             if (p_eState != eState.Move) return;
-            if (m_speedNow == null) return; 
+            if (m_speedNow == null) return;
             if (m_speedNow.m_id != eSpeed.Move.ToString()) return;
-            m_speedNow = GetSpeedValue(eSpeed.Move_DoorOpen); 
+            m_speedNow = GetSpeedValue(eSpeed.Move_DoorOpen);
             OverrideVelocity(m_speedNow.m_v);
         }
         #endregion
 
         #region Home
+        bool _sensorHome = false; 
+        public virtual bool p_sensorHome 
+        { 
+            get { return _sensorHome; }
+            set 
+            {
+                if (_sensorHome == value) return;
+                _sensorHome = value;
+                p_sInfo = "Sensor Home = " + value.ToString();
+                OnPropertyChanged(); 
+            }
+        }
+
         public virtual string StartHome()
         {
             switch (p_eState)
             {
                 case eState.Home:
                 case eState.Move:
-                case eState.Jog: return p_sName + " StartHome Error, eState = " + p_eState.ToString();
+                case eState.Jog: return p_id + " StartHome Error, eState = " + p_eState.ToString();
             }
             m_swMove.Start();
             string sStartHome = ResetAlarm();
-            p_bServoOn = true;
-            if (p_bServoOn == false) return p_sName + " ServoOn Error";
+            ServoOn(true); 
+            if (p_bSeroOn == false) return p_id + " ServoOn Error";
             return "OK";
         }
 
-        public virtual bool p_bServoOn { get; set; }
+        bool _bServoOn = false; 
+        public bool p_bSeroOn 
+        { 
+            get { return _bServoOn; }
+            set
+            {
+                if (_bServoOn == value) return;
+                _bServoOn = value;
+                p_sInfo = p_id + " Servo On = " + value.ToString();
+                OnPropertyChanged(); 
+            }
+        }
+
+        public virtual void ServoOn(bool bOn) { }
 
         public virtual string ResetAlarm() { return "OK"; }
+        #endregion
+
+        #region Sensor
+        bool _sensorMinusLimit = false;
+        public virtual bool p_sensorMinusLimit
+        {
+            get { return _sensorMinusLimit; }
+            set
+            {
+                if (_sensorMinusLimit == value) return;
+                _sensorMinusLimit = value;
+                p_sInfo = "Sensor Minus Limit = " + value.ToString();
+                OnPropertyChanged();
+            }
+        }
+
+        bool _sensorPlusLimit = false;
+        public virtual bool p_sensorPlusLimit
+        {
+            get { return _sensorPlusLimit; }
+            set
+            {
+                if (_sensorPlusLimit == value) return;
+                _sensorPlusLimit = value;
+                p_sInfo = "Sensor Plus Limit = " + value.ToString();
+                OnPropertyChanged();
+            }
+        }
+
+        bool _sensorInPos = false;
+        public virtual bool p_sensorInPos
+        {
+            get { return _sensorInPos; }
+            set
+            {
+                if (_sensorInPos == value) return;
+                _sensorInPos = value;
+                p_sInfo = "Sensor InPosition = " + value.ToString();
+                OnPropertyChanged();
+            }
+        }
+
+        bool _sensorAlarm = false;
+        public virtual bool p_sensorAlarm
+        {
+            get { return _sensorAlarm; }
+            set
+            {
+                if (_sensorAlarm == value) return;
+                _sensorAlarm = value;
+                p_sInfo = "Sensor Alarm = " + value.ToString();
+                OnPropertyChanged();
+            }
+        }
+
+        bool _sensorEmergency = false;
+        public virtual bool p_sensorEmergency
+        {
+            get { return _sensorEmergency; }
+            set
+            {
+                if (_sensorEmergency == value) return;
+                _sensorEmergency = value;
+                p_sInfo = "Sensor Emergency = " + value.ToString();
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         #region Setting
@@ -526,7 +608,7 @@ namespace RootTools.Control
         public virtual void RunTrigger(bool bOn) { }
         #endregion
 
-        public void Init(string id, Log log)
+        protected void InitBase(string id, Log log)
         {
             p_id = id;
             p_log = log;

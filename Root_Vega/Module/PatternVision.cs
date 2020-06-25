@@ -173,9 +173,7 @@ namespace Root_Vega.Module
         void InitPosAlign()
         {
             m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPosZ)));
-            m_axisZ.AddPosDone();
             m_axisClamp.AddPos(Enum.GetNames(typeof(eAxisPosClamp)));
-            m_axisClamp.AddPosDone();
 
             if(m_axisXY.p_axisX != null)
             {
@@ -478,28 +476,28 @@ namespace Root_Vega.Module
         #region RelayCommand
         void Jog_Plus_Fast()
         {
-            if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)p_axisXY.p_axisY).Jog_Plus_Fast();
+            if (p_axisClamp.p_sensorHome == false) return;
+            p_axisClamp.Jog(1); 
         }
         void Jog_Minus_Fast()
         {
-            if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)p_axisXY.p_axisY).Jog_Minus_Fast();
+            if (p_axisClamp.p_sensorHome == false) return;
+            p_axisClamp.Jog(-1);
         }
         void MovePosition()
         {
-            if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)p_axisXY.p_axisY).MovePosition();
+            if (p_axisClamp.p_sensorHome == false) return;
+            //            ((AjinAxis)p_axisXY.p_axisY).MovePosition();
         }
         void PlusRelativeMove()
         {
-            if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)p_axisXY.p_axisY).PlusRelativeMove();
+            if (p_axisClamp.p_sensorHome == false) return;
+            //            ((AjinAxis)p_axisXY.p_axisY).PlusRelativeMove();
         }
         void MinusRelativeMove()
         {
-            if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)p_axisXY.p_axisY).MinusRelativeMove();
+            if (p_axisClamp.p_sensorHome == false) return;
+            //            ((AjinAxis)p_axisXY.p_axisY).MinusRelativeMove();
         }
 
         public RelayCommand PJogFastCommand
@@ -755,11 +753,11 @@ namespace Root_Vega.Module
 
                         /* 방향 바꾸는 코드 들어가야함*/
                         m_grabMode.StartGrab(mem, m_cpMemory, nLines, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
-                        if (m_module.Run(axisXY.p_axisY.Move(yPos1, nScanSpeed)))
+                        if (m_module.Run(axisXY.p_axisY.StartMove(yPos1, nScanSpeed)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                        axisXY.p_axisY.ResetTrigger();
+                        axisXY.p_axisY.RunTrigger(false);
 
                         nScanLine++;
                         m_cpMemory.X += m_grabMode.m_camera.GetRoiSize().X;

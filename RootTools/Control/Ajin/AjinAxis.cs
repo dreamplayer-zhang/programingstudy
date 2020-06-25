@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System.Threading;
 using System.Windows.Controls;
 using RootTools.Trees;
 
@@ -13,8 +11,10 @@ namespace RootTools.Control.Ajin
         bool m_bAbsoluteEncoder = false;
         void RunTreeSettingProperty(Tree tree)
         {
+            int nAxis = m_nAxis;
             m_nAxis = tree.Set(m_nAxis, m_nAxis, "Axis Number", "Ajin Axis Number");
             m_bAbsoluteEncoder = tree.Set(m_bAbsoluteEncoder, m_bAbsoluteEncoder, "Absolute Encoder", "Absolute Encoder");
+            if (nAxis != m_nAxis) m_listAxis.m_qSetAxis.Enqueue(this);
         }
         #endregion
 
@@ -36,7 +36,7 @@ namespace RootTools.Control.Ajin
 
         void RunThreadCheck_Position()
         {
-            double dRead = 0; 
+            double dRead = 0;
             AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetCmdPos(m_nAxis, ref dRead));
             p_posCommand = dRead;
             AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetActPos(m_nAxis, ref dRead));
@@ -51,11 +51,11 @@ namespace RootTools.Control.Ajin
         {
             p_sInfo = base.Jog(fScale, speed);
             if (p_sInfo != "OK") return p_sInfo;
-            if (m_nAxis < 0) return p_sName + " Axis not Assigned";
+            if (m_nAxis < 0) return p_id + " Axis not Assigned";
             if (AXM("AxmMoveVel", CAXM.AxmMoveVel(m_nAxis, fScale * m_speedNow.m_v, m_speedNow.m_acc, m_speedNow.m_dec)) != 0)
             {
                 p_eState = eState.Init;
-                p_sInfo = p_sName + " Axis Jog Start Error";
+                p_sInfo = p_id + " Axis Jog Start Error";
                 return p_sInfo;
             }
             p_eState = eState.Jog;
@@ -75,11 +75,11 @@ namespace RootTools.Control.Ajin
         {
             p_sInfo = base.StartMove(fPos, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
-            if (m_nAxis < 0) return p_sName + " Axis not Assigned";
+            if (m_nAxis < 0) return p_id + " Axis not Assigned";
             if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos, m_speedNow.m_v, m_speedNow.m_acc, m_speedNow.m_dec)) != 0)
             {
                 p_eState = eState.Init;
-                p_sInfo = p_sName + " Axis MoveStartPos Error";
+                p_sInfo = p_id + " Axis MoveStartPos Error";
                 return p_sInfo;
             }
             p_eState = eState.Move;
@@ -93,11 +93,11 @@ namespace RootTools.Control.Ajin
             dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
             p_sInfo = base.StartMove(fPos, v, acc, dec);
             if (p_sInfo != "OK") return p_sInfo;
-            if (m_nAxis < 0) return p_sName + " Axis not Assigned";
+            if (m_nAxis < 0) return p_id + " Axis not Assigned";
             if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos, v, acc, dec)) != 0)
             {
                 p_eState = eState.Init;
-                p_sInfo = p_sName + " Axis MoveStartPos Error";
+                p_sInfo = p_id + " Axis MoveStartPos Error";
                 return p_sInfo;
             }
             p_eState = eState.Move;
@@ -126,7 +126,7 @@ namespace RootTools.Control.Ajin
         public override string ResetAlarm()
         {
             uint nOutput = 0;
-            if (m_aSensor[eSensor.Alarm] == false) return "OK";
+            if (p_sensorAlarm == false) return "OK";
             p_sInfo = "Reset Alarm";
             if (AXM("AxmSignalReadOutput", CAXM.AxmSignalReadOutput(m_nAxis, ref nOutput)) != 0) return p_sInfo;
             nOutput |= c_nAlarmReset;
@@ -139,25 +139,7 @@ namespace RootTools.Control.Ajin
             return "OK";
         }
 
-        public override bool p_bServoOn
-        {
-            get
-            {
-                if (EQ.p_bSimulate) return true;
-                uint uOn = 0;
-                AXM("AxmSignalIsServoOn", CAXM.AxmSignalIsServoOn(m_nAxis, ref uOn));
-                return (uOn > 0);
-            }
-            set
-            {
-                if (p_bServoOn == value) return;
-                p_sInfo = "ServoOn : " + value;
-                ServoOn(value);
-                OnPropertyChanged();
-            }
-        }
-
-        void ServoOn(bool bOn)
+        public override void ServoOn(bool bOn)
         {
             if (EQ.p_bSimulate) return;
             if (bOn && m_bAbsoluteEncoder) AXM("AxmM3ServoSensOn", CAXM.AxmM3ServoSensOn(m_nAxis));
@@ -390,7 +372,7 @@ namespace RootTools.Control.Ajin
         #endregion
 
         #region UI Binding
-        public UserControl p_ui
+        public override UserControl p_ui
         {
             get
             {
@@ -405,10 +387,9 @@ namespace RootTools.Control.Ajin
         public void GetAxisStatus()
         {
             if (m_nAxis < 0) return;
-            GetAxisStatusMode();
             GetAxisStatusHome();
+            GetAxisStatusMode();
             GetAxisStatusSensor();
-            RunTreeSetting(Tree.eMode.RegWrite);
             RunTreeSetting(Tree.eMode.Init);
         }
 
@@ -446,7 +427,7 @@ namespace RootTools.Control.Ajin
         public string SetGantry(AjinAxis axisSlave)
         {
             if (m_nAxis < 0) return "Axis not Assigned";
-            if (axisSlave == null) return p_sName + " SetGentry Slave Axis is null";
+            if (axisSlave == null) return p_id + " SetGentry Slave Axis is null";
             if (axisSlave.m_nAxis < 0) return "Axis Slave not Assigned";
             if (AXM("AxmLinkResetMode", CAXM.AxmLinkResetMode(0)) != 0) return p_sInfo;
             if (AXM("AxmGantrySetDisable", CAXM.AxmGantrySetDisable(m_nAxis, axisSlave.m_nAxis)) != 0) return p_sInfo;
@@ -497,7 +478,7 @@ namespace RootTools.Control.Ajin
                         if (EQ.IsStop())
                         {
                             StopAxis();
-                            p_bServoOn = false;
+                            ServoOn(false);
                             p_eState = eState.Init;
                         }
                         else
@@ -505,7 +486,7 @@ namespace RootTools.Control.Ajin
                             AXM("AxmHomeGetResult", CAXM.AxmHomeGetResult(m_nAxis, ref nStat));
                             if (nStat == 1)
                             {
-                                p_sInfo = p_sName + " -> Home Finished " + (m_swMove.ElapsedMilliseconds / 1000).ToString("0.0 sec");
+                                p_sInfo = p_id + " -> Home Finished " + (m_swMove.ElapsedMilliseconds / 1000).ToString("0.0 sec");
                                 p_eState = eState.Ready;
                             }
                         }
@@ -545,69 +526,53 @@ namespace RootTools.Control.Ajin
         #endregion
 
         #region Thread Sensor
-        public enum eSensor
-        {
-            Home,
-            Limit_Minus,
-            Limit_Plus,
-            InPos,
-            Alarm,
-            Emergency,
-        }
-        public Dictionary<eSensor, bool> m_aSensor = new Dictionary<eSensor, bool>(); 
-        void InitSensorInput()
-        {
-            foreach (eSensor sensor in Enum.GetValues(typeof(eSensor)))
-            {
-                m_aSensor.Add(sensor, false);
-            }
-        }
-
         void RunThreadCheck_Sensor()
         {
             uint uRead = 0;
             uint uReadM = 0;
+            AXM("AxmSignalIsServoOn", CAXM.AxmSignalIsServoOn(m_nAxis, ref uRead));
+            p_bSeroOn = (uRead > 0);
             AXM("AxmHomeReadSignal", CAXM.AxmHomeReadSignal(m_nAxis, ref uRead));
-            SetSensor(eSensor.Home, uRead > 0, p_sName + " Home Sensor = "); 
+            p_sensorHome = (uRead > 0); 
             AXM("AxmSignalReadLimit", CAXM.AxmSignalReadLimit(m_nAxis, ref uRead, ref uReadM));
-            SetSensor(eSensor.Limit_Minus, uReadM > 0, p_sName + " HW limit(-) = ");
-            SetSensor(eSensor.Limit_Plus, uRead > 0, p_sName + " HW limit(+) = ");
+            p_sensorMinusLimit = (uReadM > 0); 
+            p_sensorPlusLimit = (uRead > 0);
+            p_sensorPlusLimit = true;
             AXM("AxmSignalReadInpos", CAXM.AxmSignalReadInpos(m_nAxis, ref uRead));
-            SetSensor(eSensor.InPos, uRead > 0, p_sName + " InPosition = ");
+            p_sensorInPos = (uRead > 0);
             AXM("AxmSignalReadServoAlarm", CAXM.AxmSignalReadServoAlarm(m_nAxis, ref uRead));
-            SetSensor(eSensor.Alarm, uRead > 0, p_sName + " Alarm = ");
+            p_sensorAlarm = (uRead > 0);
             if (m_eEmergency != eSensorMethod.UNUSED)
             {
                 AXM("AxmSignalReadStop", CAXM.AxmSignalReadStop(m_nAxis, ref uRead));
-                SetSensor(eSensor.Emergency, uRead > 0, p_sName + " Emergency = ");
+                p_sensorEmergency = (uRead > 0);
             }
-            if (m_aSensor[eSensor.Emergency] || m_aSensor[eSensor.Alarm])
+            if (p_sensorEmergency || p_sensorEmergency)
             {
                 p_eState = eState.Init;
                 Thread.Sleep(100);
             }
         }
-
-        void SetSensor(eSensor sensor, bool bOn, string sMsg)
-        {
-            if (bOn != m_aSensor[sensor]) p_sInfo = sMsg + bOn.ToString();
-            m_aSensor[sensor] = bOn; 
-        }
         #endregion
 
-        public void Init(string id)
+        public void RunTree(Tree.eMode mode)
         {
-            p_id = id + "." + p_nAxisID.ToString("00");
-            p_sName = "Axis";
-            p_log = LogView.GetLog(p_id);
+            RunTreePos(mode); 
+            RunTreeSetting(mode);
+            RunTreeSpeed(mode); 
+        }
 
-            InitTrigger();
+        AjinListAxis m_listAxis; 
+        public void Init(AjinListAxis listAxis, string id, Log log)
+        {
+            m_listAxis = listAxis; 
+            InitBase(id, log); 
             InitThread(); 
         }
 
         public void ThreadStop()
         {
-            p_bServoOn = false; 
+            ServoOn(false); 
             if (m_bThread)
             {
                 m_bThread = false;

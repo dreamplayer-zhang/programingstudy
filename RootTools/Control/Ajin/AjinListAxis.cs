@@ -1,7 +1,6 @@
 ﻿using Microsoft.Win32;
 using RootTools.Trees;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading;
 
 namespace RootTools.Control.Ajin
@@ -13,16 +12,24 @@ namespace RootTools.Control.Ajin
         public event dgOnChangeAxisList OnChangeAxisList; 
 
         public List<AjinAxis> m_aAxis = new List<AjinAxis>();
-/*        void InitAxisList()
+
+        public Axis GetAxis(string id, Log log)
         {
-            while (m_aAxis.Count < m_lAxis)
-            {
-                AjinAxis axis = new AjinAxis();
-                axis.Init(m_id, this, m_engineer, m_bEnable);
-                m_aAxis.Add(axis);
-            }
+            AjinAxis axis = new AjinAxis();
+            axis.Init(this, id, log);
+            m_aAxis.Add(axis);
+            m_qSetAxis.Enqueue(axis);
             if (OnChangeAxisList != null) OnChangeAxisList();
-        } */ //forget
+            return axis;
+        }
+
+        public AxisXY GetAxisXY(string id, Log log)
+        {
+            AxisXY axisXY = new AxisXY();
+            axisXY.p_axisX = GetAxis(id + "X", log);
+            axisXY.p_axisY = GetAxis(id + "Y", log);
+            return axisXY;
+        }
         #endregion
 
         #region AXM Info
@@ -64,32 +71,33 @@ namespace RootTools.Control.Ajin
         }
         #endregion
 
-        #region InitAxis
-        BackgroundWorker m_bgwInit = new BackgroundWorker();
+        #region Thread InitAxis
+        public Queue<AjinAxis> m_qSetAxis = new Queue<AjinAxis>(); 
         int m_lAxisAjin = 0;
         string InitAxis()
         {
             AXM("AxmInfoGetAxisCount", CAXM.AxmInfoGetAxisCount(ref m_lAxisAjin));
             if (m_bAXL == false) return "Init Axis Skip : AXL";
-            m_bgwInit.DoWork += M_bgwInit_DoWork;
-            m_bgwInit.RunWorkerCompleted += M_bgwInit_RunWorkerCompleted;
+            m_thread = new Thread(new ThreadStart(RunThread));
+            m_thread.Start();
             return "OK";
         }
 
-        private void M_bgwInit_DoWork(object sender, DoWorkEventArgs e)
+        bool m_bThread = false;
+        Thread m_thread; 
+        void RunThread()
         {
-            for (int n = 0; n < m_lAxisAjin; n++) (m_aAxis[n]).SetAxisStatus();
-        }
-
-        private void M_bgwInit_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        void RunThread_InitAxis()
-        {
-            m_bEnable = true;
-            m_log.Info("RunThread_InitAxis - Done.");
+            m_bThread = true; 
+            LoadMotFile();
+            while (m_bThread)
+            {
+                Thread.Sleep(10); 
+                if (m_qSetAxis.Count > 0)
+                {
+                    AjinAxis axis = m_qSetAxis.Dequeue();
+                    axis.GetAxisStatus(); 
+                }
+            }
         }
         #endregion
 
@@ -105,18 +113,12 @@ namespace RootTools.Control.Ajin
                 m_log.Error("AxmMotLoadParaAll Error : " + nError.ToString());
                 return;
             }
-            for (int n = 0; n < m_lAxis; n++) ((AjinAxis)m_aAxis[n]).GetAxisStatus();
         }
 
         public void LoadMotFile()
         {
             uint nError = CAXM.AxmMotLoadParaAll(m_strMotFile);
-            if (nError > 0)
-            {
-                m_log.Error("AxmMotLoadParaAll Error : " + m_strMotFile + "  " + nError.ToString());
-                return;
-            }
-            for (int n = 0; n < m_lAxis; n++) ((AjinAxis)m_aAxis[n]).GetAxisStatus();
+            if (nError > 0) m_log.Error("AxmMotLoadParaAll Error : " + m_strMotFile + "  " + nError.ToString());
         }
 
         public void SaveMot()
@@ -145,34 +147,24 @@ namespace RootTools.Control.Ajin
         public void ThreadStop()
         {
             m_log.Info("ThreadStop Start");
-            if (m_bInitAxis)
+            if (m_bThread)
             {
-                m_bInitAxis = false;
-                m_threadInitAxis.Join();
+                m_bThread = false;
+                m_thread.Join();
             }
-            for (int n = 0; n < m_aAxis.Count; n++) ((AjinAxis)m_aAxis[n]).ThreadStop();
+            foreach (AjinAxis axis in m_aAxis) axis.ThreadStop();
             m_log.Info("ThreadStop Done");
         }
 
         public void RunTree(Tree tree)
         {
             m_strMotFile = tree.SetFile(m_strMotFile, m_strMotFile, "mot", "MotFile", "Motor 설정  File 위치");
-            p_vRate = tree.Set(p_vRate, 1, "V Rate", "All Axis V Rate (0.1 ~ 1)");
-            if (p_vRate < 0.1) p_vRate = 0.1;
-            if (p_vRate > 1) p_vRate = 1;
-            RunCountTree(tree.GetTree("Count")); 
-        }
-
-        void RunCountTree(Tree tree)
-        {
             m_lAxisAjin = tree.Set(m_lAxisAjin, m_lAxisAjin, "Detect", "Detected Axis Count", true, true);
-            m_lAxis = tree.Set(m_lAxis, 0, "Set", "Axis Count Set");
-            InitAxisList();
         }
 
         public void RunEmergency()
         {
-            for (int n = 0; n < m_lAxis; n++) m_aAxis[n].ServoOn(false);
+            foreach (AjinAxis axis in m_aAxis) axis.ServoOn(false); 
         }
     }
 }

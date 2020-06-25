@@ -483,11 +483,11 @@ namespace Root_Wind.Module
                         /* 방향 바꾸는 코드 들어가야함*/
                        
                         m_grabMode.StartGrab(mem, m_cpMemory, m_yLine, m_grabMode.m_eGrabDirection == GrabMode.eDirection.BackWard);
-                        if (m_module.Run(axisXY.p_axisY.Move(yPos1)))
+                        if (m_module.Run(axisXY.p_axisY.StartMove(yPos1)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                        axisXY.p_axisY.ResetTrigger();
+                        axisXY.p_axisY.RunTrigger(false);
 
                         nScanLine++;
                         m_cpMemory.X += m_grabMode.m_camera.p_sz.X;

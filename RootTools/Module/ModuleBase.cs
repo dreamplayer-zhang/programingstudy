@@ -98,7 +98,7 @@ namespace RootTools.Module
         protected virtual void StopHome()
         {
             EQ.p_bStop = true;
-            foreach (Axis axis in m_listAxis) if (axis != null) axis.p_bServoOn = false;
+            foreach (Axis axis in m_listAxis) if (axis != null) axis.ServoOn(false);
             p_eState = eState.Init;
         }
 
@@ -282,7 +282,7 @@ namespace RootTools.Module
 
             foreach (Axis axis in aAxis)
             {
-                if (axis != null) axis.p_bServoOn = true; 
+                if (axis != null) axis.ServoOn(true); 
             }
             Thread.Sleep(200);
             if (EQ.IsStop()) return "Home Stop";

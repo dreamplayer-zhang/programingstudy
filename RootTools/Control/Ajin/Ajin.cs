@@ -4,7 +4,7 @@ using System.IO;
 
 namespace RootTools.Control.Ajin
 {
-    public class Ajin : ObservableObject, IToolSet
+    public class Ajin : ObservableObject, IToolSet, IControl
     {
         #region Init AXL
         bool InitCAXL(ref int nInputModule, ref int nOutputModule)
@@ -26,15 +26,32 @@ namespace RootTools.Control.Ajin
             return false;
         }
 
-        void TestModule(ref int nInputModule, ref int nOutputModule)
+        bool CopyDllFile(string sPath)
         {
-            nInputModule = 0;
-            nOutputModule = 0;
+            DirectoryInfo dir = new DirectoryInfo(sPath);
+            if (dir.Exists == false) return false;
+            FileInfo[] file = dir.GetFiles();
+            for (int i = 0; i < file.Length; i++)
+            {
+                file[i].CopyTo(Directory.GetCurrentDirectory() + @"\" + file[i].Name, true);
+            }
+            return true;
+        }
+        void CopyDllFile()
+        {
+            string[] sFindDll = Directory.GetFiles(Directory.GetCurrentDirectory(), "AXL.dll");
+            if (sFindDll.Length != 0) return;
+            if (CopyDllFile(@"C:\Program Files (x86)\EzSoftware UC\AXL(Library)\Library\64Bit")) return;
+            if (CopyDllFile(@"C:\Program Files (x86)\EzSoftware RM\AXL(Library)\Library\64Bit")) return;
+        }
+        #endregion
 
-            p_SearchModule.Add(new AJINModule(AXT_MODULE.AXT_SIO_DI32.ToString(), 0));
-            p_SearchModule.Add(new AJINModule(AXT_MODULE.AXT_SIO_RDI32MLIII.ToString(), 1));
-            p_SearchModule.Add(new AJINModule(AXT_MODULE.AXT_SIO_DO32P.ToString(), 2));
-            p_SearchModule.Add(new AJINModule(AXT_MODULE.AXT_SIO_DB32P.ToString(), 3));
+        #region Search DIO Module
+        ObservableCollection<AJINModule> m_SearchModule = new ObservableCollection<AJINModule>();
+        public ObservableCollection<AJINModule> p_SearchModule
+        {
+            get { return m_SearchModule; }
+            set { SetProperty(ref m_SearchModule, value); }
         }
 
         void CheckModuleNum(ref int nInputModule, ref int nOutputModule)
@@ -65,7 +82,7 @@ namespace RootTools.Control.Ajin
                                     case AXT_MODULE.AXT_SIO_RDI32MLIII:
                                     case AXT_MODULE.AXT_SIO_RDI32PMLIII:
                                         p_SearchModule.Add(new AJINModule(AXT_MODULE.AXT_SIO_DI32.ToString(), nBoardNo));
-                                        nInputModule++; 
+                                        nInputModule++;
                                         break;
                                     case AXT_MODULE.AXT_SIO_DO32P:
                                     case AXT_MODULE.AXT_SIO_RDO32MLIII:
@@ -87,28 +104,32 @@ namespace RootTools.Control.Ajin
             }
         }
 
-        bool CopyDllFile(string sPath)
+        void TestModule(ref int nInputModule, ref int nOutputModule)
         {
-            DirectoryInfo dir = new DirectoryInfo(sPath);
-            if (dir.Exists == false) return false;
-            FileInfo[] file = dir.GetFiles();
-            for (int i = 0; i < file.Length; i++)
-            {
-                file[i].CopyTo(Directory.GetCurrentDirectory() + @"\" + file[i].Name, true);
-            }
-            return true;
-        }
-        void CopyDllFile()
-        {
-            string[] sFindDll = Directory.GetFiles(Directory.GetCurrentDirectory(), "AXL.dll");
-            if (sFindDll.Length != 0) return;
-            if (CopyDllFile(@"C:\Program Files (x86)\EzSoftware UC\AXL(Library)\Library\64Bit")) return;
-            if (CopyDllFile(@"C:\Program Files (x86)\EzSoftware RM\AXL(Library)\Library\64Bit")) return;
+            nInputModule = 0;
+            nOutputModule = 0;
+
+            p_SearchModule.Add(new AJINModule(AXT_MODULE.AXT_SIO_DI32.ToString(), 0));
+            p_SearchModule.Add(new AJINModule(AXT_MODULE.AXT_SIO_RDI32MLIII.ToString(), 1));
+            p_SearchModule.Add(new AJINModule(AXT_MODULE.AXT_SIO_DO32P.ToString(), 2));
+            p_SearchModule.Add(new AJINModule(AXT_MODULE.AXT_SIO_DB32P.ToString(), 3));
         }
         #endregion
 
         #region ITool
         public string p_id { get; set; }
+        #endregion
+
+        #region IControl
+        public Axis GetAxis(string id, Log log)
+        {
+            return m_listAxis.GetAxis(id, log); 
+        }
+
+        public AxisXY GetAxisXY(string id, Log log)
+        {
+            return m_listAxis.GetAxisXY(id, log);
+        }
         #endregion
 
         #region Tree
@@ -132,18 +153,6 @@ namespace RootTools.Control.Ajin
         public TreeRoot m_treeRoot;
         public AjinDIO m_dio = new AjinDIO();
         public AjinListAxis m_listAxis = new AjinListAxis();
-        ObservableCollection<AJINModule> m_SearchModule = new ObservableCollection<AJINModule>();
-        public ObservableCollection<AJINModule> p_SearchModule
-        {
-            get
-            {
-                return m_SearchModule;
-            }
-            set
-            {
-                SetProperty(ref m_SearchModule, value);
-            }
-        }
 
         public void Init(string id, IEngineer engineer)
         {
@@ -157,7 +166,6 @@ namespace RootTools.Control.Ajin
             m_dio.Init(id + ".DIO", nInput, nOutput);
             m_listAxis.Init(id + ".Axis", engineer, bAXL); 
             RunTree(Tree.eMode.RegRead);
-            m_listAxis.LoadMotFile();
             RunTree(Tree.eMode.Init);
         }
 

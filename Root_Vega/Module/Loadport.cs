@@ -69,7 +69,6 @@ namespace Root_Vega.Module
         void InitPosZ()
         {
             m_axisZ.AddPos(Enum.GetNames(typeof(ePosZ)));
-            m_axisZ.AddPosDone(); 
         }
 
         double m_dInposZ = -1; 
@@ -90,7 +89,6 @@ namespace Root_Vega.Module
         void InitPosPod()
         {
             m_axisTheta.AddPos(Enum.GetNames(typeof(ePosTheta)));
-            m_axisTheta.AddPosDone();
         }
 
         double m_dInposTheta = -1;
@@ -111,7 +109,6 @@ namespace Root_Vega.Module
         void InitPosPodLifter()
         {
             m_axisPodLifter.AddPos(Enum.GetNames(typeof(ePosPodLifter)));
-            m_axisPodLifter.AddPosDone();
         }
 
         double m_dInposLifter = -1;
@@ -133,7 +130,6 @@ namespace Root_Vega.Module
         void InitPosReticleLifter()
         {
             m_axisReticleLifter.AddPos(Enum.GetNames(typeof(ePosReticleLifter)));
-            m_axisReticleLifter.AddPosDone();
         }
 
         double m_dInposReticle = -1;
@@ -379,7 +375,7 @@ namespace Root_Vega.Module
 
         double GetdZPos(ePosZ pos)
         {
-            return m_axisZ.p_axis.p_posActual - m_axisZ.p_axis.GetPos(pos.ToString()) + m_dInposZ;
+            return m_axisZ.p_posActual - m_axisZ.GetPosValue(pos.ToString()) + m_dInposZ;
         }
 
         public override string StateReady()
