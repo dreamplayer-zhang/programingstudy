@@ -9,9 +9,13 @@ using System.Text;
 using System;
 using System.Security.RightsManagement;
 using System.Threading.Tasks;
+using System.Linq;
+using DPoint = System.Drawing.Point;
 
 namespace RootTools.Inspects
 {
+	public enum eEdgeFindDirection { LEFT, TOP, RIGHT, BOTTOM };
+	public enum eBrightSide { LEFT, TOP, RIGHT, BOTTOM };
 	public class InspectionManager : Singleton<InspectionManager>, INotifyPropertyChanged
 	{
 		#region EventHandler
@@ -128,6 +132,7 @@ namespace RootTools.Inspects
 		/// <param name="args">추후 arguments가 필요하면 사용할것</param>
 		private void InspectionManager_AddDefect(DefectDataWrapper item)
 		{
+			//여기서 DB 에 추가되는 등의 동작을 해야함!
 			if (AddDefect != null)
 			{
 				AddDefect(item);
@@ -136,6 +141,8 @@ namespace RootTools.Inspects
 
 		public void InspectionDone()
 		{
+			//여기서 DB관련동작 이하생략!
+
 			////TODO : 해당 Queue로 들어온 검사가 완전 종료되었을때 발동. 여기서 DB를 닫으면 될 것으로 보임
 			//if (InspectionComplete != null)
 			//{
@@ -345,6 +352,320 @@ namespace RootTools.Inspects
 				PropertyChanged(this, new PropertyChangedEventArgs(proertyName));
 		}
 		#endregion
+
+		public static unsafe DPoint GetEdge(ImageData img, System.Windows.Rect rcROI, eEdgeFindDirection eDirection, bool bUseAutoThreshold, bool bUseB2D)
+		{
+			// variable
+			int nSum = 0;
+			double dAverage = 0.0;
+			int nEdgeY = 0;
+			int nEdgeX = 0;
+
+			int nThreshold = 0;
+
+			// implement
+
+			if (bUseAutoThreshold == true)
+			{
+				nThreshold = GetThresholdAverage(img, rcROI, eDirection);
+			}
+
+			switch (eDirection)
+			{
+				case eEdgeFindDirection.TOP:
+					for (int i = 0; i < rcROI.Height; i++)
+					{
+						byte* bp;
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
+						else bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
+						for (int j = 0; j < rcROI.Width; j++)
+						{
+							nSum += *bp;
+							bp++;
+						}
+						dAverage = nSum / rcROI.Width;
+						if (bUseB2D == true)
+						{
+							if (dAverage < nThreshold)
+							{
+								nEdgeY = (int)rcROI.Bottom - i;
+								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
+								break;
+							}
+						}
+						else
+						{
+							if (dAverage > nThreshold)
+							{
+								nEdgeY = (int)rcROI.Top + i;
+								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
+								break;
+							}
+						}
+						nSum = 0;
+					}
+					break;
+				case eEdgeFindDirection.LEFT:
+					for (int i = 0; i < rcROI.Width; i++)
+					{
+						byte* bp;
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
+						else bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
+						for (int j = 0; j < rcROI.Height; j++)
+						{
+							nSum += *bp;
+							bp += img.p_Stride;
+						}
+						dAverage = nSum / rcROI.Height;
+						if (bUseB2D == true)
+						{
+							if (dAverage < nThreshold)
+							{
+								nEdgeX = (int)rcROI.Right - i;
+								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
+								break;
+							}
+						}
+						else
+						{
+							if (dAverage > nThreshold)
+							{
+								nEdgeX = (int)rcROI.Left + i;
+								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
+								break;
+							}
+						}
+						nSum = 0;
+					}
+					break;
+				case eEdgeFindDirection.RIGHT:
+					for (int i = 0; i < rcROI.Width; i++)
+					{
+						byte* bp;
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
+						else bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
+						for (int j = 0; j < rcROI.Height; j++)
+						{
+							nSum += *bp;
+							bp += img.p_Stride;
+						}
+						dAverage = nSum / rcROI.Height;
+						if (bUseB2D == true)
+						{
+							if (dAverage < nThreshold)
+							{
+								nEdgeX = (int)rcROI.Left + i;
+								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
+								break;
+							}
+						}
+						else
+						{
+							if (dAverage > nThreshold)
+							{
+								nEdgeX = (int)rcROI.Right - i;
+								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
+								break;
+							}
+						}
+						nSum = 0;
+					}
+					break;
+				case eEdgeFindDirection.BOTTOM:
+					for (int i = 0; i < rcROI.Height; i++)
+					{
+						byte* bp;
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
+						else bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
+						for (int j = 0; j < rcROI.Width; j++)
+						{
+							nSum += *bp;
+							bp++;
+						}
+						dAverage = nSum / rcROI.Width;
+						if (bUseB2D == true)
+						{
+							if (dAverage < nThreshold)
+							{
+								nEdgeY = (int)rcROI.Top + i;
+								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
+								break;
+							}
+						}
+						else
+						{
+							if (dAverage > nThreshold)
+							{
+								nEdgeY = (int)rcROI.Bottom - i;
+								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
+								break;
+							}
+						}
+
+						nSum = 0;
+					}
+					break;
+			}
+
+			return new System.Drawing.Point(nEdgeX, nEdgeY);
+		}
+
+		static unsafe int GetThresholdAverage(ImageData img, System.Windows.Rect rcROI, eEdgeFindDirection eDirection)
+		{
+			// variable
+			int nSum = 0;
+			int nThreshold = 40;
+
+			// implement
+
+			if (eDirection == eEdgeFindDirection.TOP || eDirection == eEdgeFindDirection.BOTTOM)
+			{
+				double dRatio = rcROI.Height * 0.1;
+				double dAverage1 = 0.0;
+				double dAverage2 = 0.0;
+				for (int i = 0; i < (int)dRatio; i++)
+				{
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
+					for (int j = 0; j < rcROI.Width; j++)
+					{
+						nSum += *bp;
+						bp++;
+					}
+				}
+				dAverage1 = nSum / (rcROI.Width * (int)dRatio);
+				nSum = 0;
+				for (int i = 0; i < (int)dRatio; i++)
+				{
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
+					for (int j = 0; j < rcROI.Width; j++)
+					{
+						nSum += *bp;
+						bp++;
+					}
+				}
+				dAverage2 = nSum / (rcROI.Width * (int)dRatio);
+				nSum = 0;
+				////////////////////////////////////////////////
+				nThreshold = (int)(dAverage1 + dAverage2) / 2;
+			}
+			else
+			{
+				double dRatio = rcROI.Width * 0.1;
+				double dAverage1 = 0.0;
+				double dAverage2 = 0.0;
+				for (int i = 0; i < (int)dRatio; i++)
+				{
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
+					for (int j = 0; j < rcROI.Height; j++)
+					{
+						nSum += *bp;
+						bp += img.p_Stride;
+					}
+				}
+				dAverage1 = nSum / (rcROI.Height * (int)dRatio);
+				nSum = 0;
+				for (int i = 0; i < (int)dRatio; i++)
+				{
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
+					for (int j = 0; j < rcROI.Height; j++)
+					{
+						nSum += *bp;
+						bp += img.p_Stride;
+					}
+				}
+				dAverage2 = nSum / (rcROI.Height * (int)dRatio);
+				nSum = 0;
+				////////////////////////////////////////////////
+				nThreshold = (int)(dAverage1 + dAverage2) / 2;
+			}
+
+			return nThreshold;
+		}
+		/// <summary>
+		/// ROI 영역 내의 성분 방향을 획득하여 반환한다
+		/// </summary>
+		/// <param name="img"></param>
+		/// <param name="rcROI"></param>
+		/// <returns></returns>
+		public static unsafe eEdgeFindDirection GetDirection(ImageData img, System.Windows.Rect rcROI)
+		{
+			// variable
+			double dRatio = 0.0;
+			int nSum = 0;
+			double dAverageTemp = 0.0;
+			Dictionary<eBrightSide, double> dic = new Dictionary<eBrightSide, double>();
+
+			// implement
+			// Left
+			dRatio = rcROI.Width * 0.1;
+			for (int i = 0; i < (int)dRatio; i++)
+			{
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
+				for (int j = 0; j < rcROI.Height; j++)
+				{
+					nSum += *bp;
+					bp += img.p_Stride;
+				}
+			}
+			dAverageTemp = nSum / (rcROI.Height * (int)dRatio);
+			dic.Add(eBrightSide.LEFT, dAverageTemp);
+			nSum = 0;
+
+			// Top
+			dRatio = rcROI.Height * 0.1;
+			for (int i = 0; i < (int)dRatio; i++)
+			{
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
+				for (int j = 0; j < rcROI.Width; j++)
+				{
+					nSum += *bp;
+					bp++;
+				}
+			}
+			dAverageTemp = nSum / (rcROI.Width * (int)dRatio);
+			dic.Add(eBrightSide.TOP, dAverageTemp);
+			nSum = 0;
+
+			// Right
+			dRatio = rcROI.Width * 0.1;
+			for (int i = 0; i < (int)dRatio; i++)
+			{
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i).ToPointer());
+				for (int j = 0; j < rcROI.Height; j++)
+				{
+					nSum += *bp;
+					bp += img.p_Stride;
+				}
+			}
+			dAverageTemp = nSum / (rcROI.Height * (int)dRatio);
+			dic.Add(eBrightSide.RIGHT, dAverageTemp);
+			nSum = 0;
+
+			// Bottom
+			dRatio = rcROI.Height * 0.1;
+			for (int i = 0; i < (int)dRatio; i++)
+			{
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
+				for (int j = 0; j < rcROI.Width; j++)
+				{
+					nSum += *bp;
+					bp++;
+				}
+			}
+			dAverageTemp = nSum / (rcROI.Width * (int)dRatio);
+			dic.Add(eBrightSide.BOTTOM, dAverageTemp);
+			nSum = 0;
+
+			var maxKey = dic.Keys.Max();
+			var maxValue = dic.Values.Max();
+			// Value값이 가장 큰 Key값 찾기
+			var keyOfMaxValue = dic.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+
+			if (keyOfMaxValue == eBrightSide.TOP) return eEdgeFindDirection.BOTTOM;
+			else if (keyOfMaxValue == eBrightSide.BOTTOM) return eEdgeFindDirection.TOP;
+			else if (keyOfMaxValue == eBrightSide.LEFT) return eEdgeFindDirection.RIGHT;
+			else return eEdgeFindDirection.LEFT;
+		}
 	}
 
 	public class InspectionProperty : ObservableObject
