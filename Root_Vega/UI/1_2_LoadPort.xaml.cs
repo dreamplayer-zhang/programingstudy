@@ -23,7 +23,6 @@ namespace Root_Vega
         {
             InitializeComponent();
         }
-
         Loadport m_loadport; 
         public void Init(Loadport loadport)
         {
@@ -94,7 +93,7 @@ namespace Root_Vega
             Thread.Sleep(100);
             while (m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10); 
         }
-
+        
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             switch (m_loadport.p_eState)
@@ -102,8 +101,10 @@ namespace Root_Vega
                 case ModuleBase.eState.Ready:
                     if (m_manualjob.ShowPopup() == false) return;
                     ModuleRunBase moduleRun = m_loadport.m_runLoad.Clone();
+                    //m_Handler.m_moduleList.StartModuleRuns();
                     EQ.p_eState = EQ.eState.Run;
                     m_loadport.m_infoPod.StartProcess(new Vega_Process.Sequence(moduleRun, m_loadport.m_infoPod.p_infoReticle));
+                    
                     break; 
             }
         }

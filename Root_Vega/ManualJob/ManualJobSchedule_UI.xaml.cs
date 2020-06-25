@@ -65,7 +65,7 @@ namespace Root_Vega.ManualJob
         #region Recipe
         void InitRecipeList()
         {
-            DirectoryInfo info = new DirectoryInfo("c:\\Recipe");
+            DirectoryInfo info = new DirectoryInfo("c:\\Vega\\Recipe");
             FileInfo[] files = info.GetFiles("*.Vega");
             List<string> asRecipeFile = new List<string>(); 
             foreach (FileInfo fileInfo in files) asRecipeFile.Add(fileInfo.FullName);

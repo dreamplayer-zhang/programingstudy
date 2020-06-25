@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.Control.Ajin;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
@@ -75,6 +76,7 @@ namespace Root_Vega.Module
         double m_dInposZ = -1; 
         public string MoveZ(ePosZ pos)
         {
+            Thread.Sleep(200);
             string sMove = m_axisZ.Move(pos);
             if (sMove != "OK") return sMove;
             return m_axisZ.WaitReady(m_dInposZ); 
@@ -325,6 +327,19 @@ namespace Root_Vega.Module
         {
             if (EQ.p_bSimulate == false)
             {
+                ((AjinAxis)m_axisZ.p_axis).ServoOn(true, true);
+                ((AjinAxis)m_axisTheta.p_axis).ServoOn(true, true);
+                ((AjinAxis)m_axisPodLifter.p_axisX).ServoOn(true, true);
+                ((AjinAxis)m_axisPodLifter.p_axisY).ServoOn(true, true);
+                ((AjinAxis)m_axisReticleLifter.p_axisX).ServoOn(true, true);
+                ((AjinAxis)m_axisReticleLifter.p_axisY).ServoOn(true, true);
+                Thread.Sleep(1000);
+                ((AjinAxis)m_axisZ.p_axis).p_eState = Axis.eState.Ready;
+                ((AjinAxis)m_axisTheta.p_axis).p_eState = Axis.eState.Ready;
+                ((AjinAxis)m_axisPodLifter.p_axisX).p_eState = Axis.eState.Ready;
+                ((AjinAxis)m_axisPodLifter.p_axisY).p_eState = Axis.eState.Ready;
+                ((AjinAxis)m_axisReticleLifter.p_axisX).p_eState = Axis.eState.Ready;
+                ((AjinAxis)m_axisReticleLifter.p_axisY).p_eState = Axis.eState.Ready;
                 //JWS 200616 ADD
                 if (GetdZPos(ePosZ.InnerPod) < 0)
                 {
