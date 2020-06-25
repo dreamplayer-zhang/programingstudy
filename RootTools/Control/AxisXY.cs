@@ -102,6 +102,7 @@ namespace RootTools.Control
         {
             if (p_axisX == null) return "AxisX == null";
             if (p_axisY == null) return "AxisY == null";
+            m_cpDst = new CPoint(rpPos);
             string xInfo = p_axisX.Move(rpPos.X, vMove, secAcc, secDec);
             string yInfo = p_axisY.Move(rpPos.Y, vMove, secAcc, secDec);
             if (xInfo != "OK") return "AxisMove X Error : " + xInfo;
