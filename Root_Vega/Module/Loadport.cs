@@ -391,6 +391,15 @@ namespace Root_Vega.Module
             }
             return Home_Innerpod();
         }
+        public string HomeToMinusLimit(params IAxis[] aAxis) //JWS 200625 ADD
+        {
+            p_sInfo = StateHome(aAxis);
+            if (p_sInfo != "OK") return p_sInfo;
+            foreach (IAxis axis in aAxis)
+                if (!axis.p_sensorLimitM) return axis.ToString() + " not home done.";
+
+            return p_sInfo;
+        }
 
         public string HomeToMinusLimit(params IAxis[] aAxis) //JWS 200625 ADD
         {
