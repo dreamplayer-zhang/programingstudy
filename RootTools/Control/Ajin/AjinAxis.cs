@@ -1745,7 +1745,8 @@ namespace RootTools.Control.Ajin
             }
             else
             {
-                backColor = (Brush)bc.ConvertFrom("#FFBBBBBB");
+                //backColor = (Brush)bc.ConvertFrom("#FFBBBBBB");
+                backColor = (Brush)bc.ConvertFrom("#FFFFFFFF");
             }
             return backColor;
         }
@@ -1769,7 +1770,7 @@ namespace RootTools.Control.Ajin
             }
             else
             {
-                backColor = (Brush)bc.ConvertFrom("#FFBBBBBB");
+                backColor = (Brush)bc.ConvertFrom("#FFFFFFFF");
             }
             return backColor;
         }
