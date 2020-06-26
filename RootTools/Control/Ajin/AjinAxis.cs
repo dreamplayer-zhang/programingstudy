@@ -662,7 +662,8 @@ namespace RootTools.Control.Ajin
                 if (AXM("AxmSignalWriteOutputBit", CAXM.AxmSignalWriteOutputBit(p_nAxisID, m_nBrakeSignalBit, uOn)) != 0) return;
             }
             if (bOn == false) p_eState = Axis.eState.Init;
-            else p_eState = Axis.eState.Ready;
+            //else p_eState = Axis.eState.Ready;
+
         }
         #endregion
 
@@ -1745,7 +1746,8 @@ namespace RootTools.Control.Ajin
             }
             else
             {
-                backColor = (Brush)bc.ConvertFrom("#FFBBBBBB");
+                //backColor = (Brush)bc.ConvertFrom("#FFBBBBBB");
+                backColor = (Brush)bc.ConvertFrom("#FFFFFFFF");
             }
             return backColor;
         }
@@ -1769,7 +1771,7 @@ namespace RootTools.Control.Ajin
             }
             else
             {
-                backColor = (Brush)bc.ConvertFrom("#FFBBBBBB");
+                backColor = (Brush)bc.ConvertFrom("#FFFFFFFF");
             }
             return backColor;
         }

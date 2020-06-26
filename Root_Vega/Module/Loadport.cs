@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.Control.Ajin;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
@@ -75,6 +76,7 @@ namespace Root_Vega.Module
         double m_dInposZ = -1; 
         public string MoveZ(ePosZ pos)
         {
+            Thread.Sleep(200);
             string sMove = m_axisZ.Move(pos);
             if (sMove != "OK") return sMove;
             return m_axisZ.WaitReady(m_dInposZ); 
@@ -325,16 +327,29 @@ namespace Root_Vega.Module
         {
             if (EQ.p_bSimulate == false)
             {
+                ((AjinAxis)m_axisZ.p_axis).ServoOn(true, true);
+                ((AjinAxis)m_axisTheta.p_axis).ServoOn(true, true);
+                ((AjinAxis)m_axisPodLifter.p_axisX).ServoOn(true, true);
+                ((AjinAxis)m_axisPodLifter.p_axisY).ServoOn(true, true);
+                ((AjinAxis)m_axisReticleLifter.p_axisX).ServoOn(true, true);
+                ((AjinAxis)m_axisReticleLifter.p_axisY).ServoOn(true, true);
+                Thread.Sleep(1000);
+                ((AjinAxis)m_axisZ.p_axis).p_eState = Axis.eState.Ready;
+                ((AjinAxis)m_axisTheta.p_axis).p_eState = Axis.eState.Ready;
+                ((AjinAxis)m_axisPodLifter.p_axisX).p_eState = Axis.eState.Ready;
+                ((AjinAxis)m_axisPodLifter.p_axisY).p_eState = Axis.eState.Ready;
+                ((AjinAxis)m_axisReticleLifter.p_axisX).p_eState = Axis.eState.Ready;
+                ((AjinAxis)m_axisReticleLifter.p_axisY).p_eState = Axis.eState.Ready;
                 //JWS 200616 ADD
                 if (GetdZPos(ePosZ.InnerPod) < 0)
                 {
-                    p_sInfo = StateHome(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                    p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                     if (p_sInfo != "OK") return p_sInfo;
                     if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
                 }
                 else if (GetdZPos(ePosZ.Reticle) < 0)
                 {
-                    p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                    p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                     if (p_sInfo != "OK") return p_sInfo;
                     if (Run(Home_Innerpod())) return p_sInfo;
                 }
@@ -352,7 +367,7 @@ namespace Root_Vega.Module
         {
             if (m_diInnerPod.p_bIn ==false) return "No InnerPod";
             if (Run(MoveZ(ePosZ.InnerPod))) return p_sInfo;
-            p_sInfo = StateHome(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY);
+            p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY);
             if (p_sInfo != "OK") return p_sInfo;
             return MoveZ(ePosZ.Ready); 
         }
@@ -366,15 +381,25 @@ namespace Root_Vega.Module
                 //3,4번 축 상대치 이동하는 함수 넣기
                 if (Run(ShiftReticleLifter(m_aShiftReticle[0], m_aShiftReticle[1]))) return p_sInfo;
                 if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
-                p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                 if (p_sInfo != "OK") return p_sInfo;
             }
             else
             {
-                p_sInfo = StateHome(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
                 if (p_sInfo != "OK") return p_sInfo;
             }
             return Home_Innerpod();
+        }
+
+        public string HomeToMinusLimit(params IAxis[] aAxis) //JWS 200625 ADD
+        {
+            p_sInfo = StateHome(aAxis);
+            if (p_sInfo != "OK") return p_sInfo;
+            foreach (IAxis axis in aAxis)
+                if (!axis.p_sensorLimitM) return axis.ToString() + " not home done.";
+
+            return p_sInfo;
         }
 
         double GetdZPos(ePosZ pos)
