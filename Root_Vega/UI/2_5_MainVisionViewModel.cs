@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -145,30 +146,30 @@ namespace Root_Vega
 
 			//p_ListRoi = m_Recipe.m_RD.p_Roi;
 
-			//m_Recipe.m_RD.p_Roi = new List<Roi>(); //Mask#1, Mask#2... New List Mask
-			Roi Mask, Mask2;
-			Mask = new Roi("Strip MASK1", Roi.Item.ReticlePattern);  // Mask Number.. New Mask
-			Mask.Strip.ParameterList = new ObservableCollection<StripParamData>();
-			Mask.Strip.NonPatternList = new List<NonPattern>(); // List Rect in Mask
-			NonPattern rect = new NonPattern(); // New Rect
-			rect.Area = new CRect(); // Rect Info
-			StripParamData param = new StripParamData();
-			Mask.Strip.ParameterList.Add(param);
-			Mask.Strip.NonPatternList.Add(rect); // Add Rect to Rect List
-												 //m_Recipe.m_RD.p_Roi.Add(Mask);
-												 //p_ListRoi.Add(m_Mask);
+			////m_Recipe.m_RD.p_Roi = new List<Roi>(); //Mask#1, Mask#2... New List Mask
+			//Roi Mask, Mask2;
+			//Mask = new Roi("Strip MASK1", Roi.Item.ReticlePattern);  // Mask Number.. New Mask
+			//Mask.Strip.ParameterList = new ObservableCollection<StripParamData>();
+			//Mask.Strip.NonPatternList = new List<NonPattern>(); // List Rect in Mask
+			//NonPattern rect = new NonPattern(); // New Rect
+			//rect.Area = new CRect(); // Rect Info
+			//StripParamData param = new StripParamData();
+			//Mask.Strip.ParameterList.Add(param);
+			//Mask.Strip.NonPatternList.Add(rect); // Add Rect to Rect List
+			//									 //m_Recipe.m_RD.p_Roi.Add(Mask);
+			//									 //p_ListRoi.Add(m_Mask);
 
-			Mask2 = new Roi("Strip MASK2", Roi.Item.ReticlePattern);  // Mask Number.. New Mask
-			Mask2.Strip.ParameterList = new ObservableCollection<StripParamData>();
-			Mask2.Strip.NonPatternList = new List<NonPattern>(); // List Rect in Mask
-			NonPattern rect2 = new NonPattern(); // New Rect
-			rect2.Area = new CRect(); // Rect Info
-			StripParamData param2 = new StripParamData();
-			Mask2.Strip.ParameterList.Add(param2);
-			Mask2.Strip.NonPatternList.Add(rect2); // Add Rect to Rect List
+			//Mask2 = new Roi("Strip MASK2", Roi.Item.ReticlePattern);  // Mask Number.. New Mask
+			//Mask2.Strip.ParameterList = new ObservableCollection<StripParamData>();
+			//Mask2.Strip.NonPatternList = new List<NonPattern>(); // List Rect in Mask
+			//NonPattern rect2 = new NonPattern(); // New Rect
+			//rect2.Area = new CRect(); // Rect Info
+			//StripParamData param2 = new StripParamData();
+			//Mask2.Strip.ParameterList.Add(param2);
+			//Mask2.Strip.NonPatternList.Add(rect2); // Add Rect to Rect List
 
-			p_Recipe.RecipeData.RoiList.Add(Mask);
-			p_Recipe.RecipeData.RoiList.Add(Mask2);
+			//p_Recipe.RecipeData.RoiList.Add(Mask);
+			//p_Recipe.RecipeData.RoiList.Add(Mask2);
 		}
 
 		#region Property
@@ -349,6 +350,15 @@ namespace Root_Vega
 
 		}
 
+		private void _currentRcpSave()
+		{
+			if (m_Engineer.m_recipe.Loaded)
+			{
+				var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
+				m_Engineer.m_recipe.Save(target);
+			}
+		}
+
 
 		#region Command
 
@@ -380,6 +390,14 @@ namespace Root_Vega
 				return new RelayCommand(_btnInspTest);
 			}
 		}
+		public RelayCommand btnRcpSave
+		{
+			get
+			{
+				return new RelayCommand(_currentRcpSave);
+			}
+		}
+
 		//public ICommand btnStartInsp
 		//{
 		//	get
@@ -675,7 +693,7 @@ namespace Root_Vega
 
 			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
 			int nblocksize = 500;
-					
+
 			var memOffset = m_Engineer.GetMemory("pool", "group", "mem").GetMBOffset();
 			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 

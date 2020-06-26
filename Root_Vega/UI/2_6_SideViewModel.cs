@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using MBrushes = System.Windows.Media.Brushes;
 using DPoint = System.Drawing.Point;
+using System.Configuration;
 
 namespace Root_Vega
 {
@@ -205,6 +206,18 @@ namespace Root_Vega
 		}
 		#endregion
 
+		#region SelectedRecipe
+		Recipe _SelectedRecipe;
+		public Recipe SelectedRecipe
+		{
+			get { return _SelectedRecipe; }
+			set
+			{
+				SetProperty(ref _SelectedRecipe, value);
+			}
+		}
+		#endregion
+
 		#endregion
 
 		public _2_6_SideViewModel(Vega_Engineer engineer, IDialogService dialogService)
@@ -257,9 +270,11 @@ namespace Root_Vega
 			}
 			m_Engineer.m_recipe.LoadComplete += () =>
 			{
+				SelectedRecipe = m_Engineer.m_recipe;
 				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
-				_SelectedROI = null;
 				SideParamList = new ObservableCollection<SurfaceParamData>();
+
+				_SelectedROI = null;
 
 				SelectedParam = new SurfaceParamData();//UI 초기화를 위한 코드
 				SelectedParam = null;
@@ -336,6 +351,15 @@ namespace Root_Vega
 		{
 
 		}
+		public void _currentRcpSave()
+		{
+			if(m_Engineer.m_recipe.Loaded)
+			{
+				var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
+				m_Engineer.m_recipe.Save(target);
+			}
+		}
+
 
 		private void _startInsp()
 		{
@@ -606,6 +630,13 @@ namespace Root_Vega
 		public RelayCommand CommandAddParam
 		{
 			get { return new RelayCommand(_addParam); }
+		}
+		public RelayCommand btnRcpSave
+		{
+			get
+			{
+				return new RelayCommand(_currentRcpSave);
+			}
 		}
 		#endregion
 	}

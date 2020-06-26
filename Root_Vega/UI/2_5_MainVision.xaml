@@ -63,6 +63,10 @@
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnInspTest}"
                             Margin="0,0,0,10" />
+					<Button Content="Inspection Done"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding btnInspDone}"
+                            Margin="0,0,0,10" />
 					<!--<Button Content="Start Insp Test"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnStartInsp}"
@@ -71,17 +75,17 @@
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnNextSnap}"
                             Margin="0,0,0,10" />-->
-					<Button Content="Recipe Save Test"
+					<Button Content="Recipe Save"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding btnRcpSave}"
+                            Margin="0,0,0,10" />
+					<Button Content="Recipe Save As"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnRcpSaveTest}"
                             Margin="0,0,0,10" />
-					<Button Content="Recipe Load Test"
+					<Button Content="Recipe Load"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnRcpLoadTest}"
-                            Margin="0,0,0,10" />
-					<Button Content="Inspection Done"
-                            Style="{StaticResource BasicBtn}"
-                            Command="{Binding btnInspDone}"
                             Margin="0,0,0,10" />
 					<!--<StackPanel>
                         <WrapPanel Margin="3">

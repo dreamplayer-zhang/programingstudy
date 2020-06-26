@@ -11,7 +11,7 @@
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes" 
              mc:Ignorable="d" Cursor="{Binding RecipeCursor}"
-             d:DesignHeight="726" d:DesignWidth="1442">
+             d:DesignHeight="900" d:DesignWidth="1442">
 	<Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="75*"/>
@@ -121,11 +121,31 @@
 							</DataTemplate>
 						</ListView.ItemTemplate>
 					</ListView>
+					<StackPanel DataContext="{Binding SelectedRecipe}">
+						<UniformGrid Columns="2" Margin="0,10,0,10">
+							<TextBlock  Text="Use Defect Merge"
+											Style="{StaticResource BasicTb}"/>
+							<ToggleButton Content="{Binding RecipeData.UseDefectMerge}"
+											  Style="{StaticResource BasicToggle}"
+											  IsChecked="{Binding RecipeData.UseDefectMerge}"/>
+						</UniformGrid>
+						<UniformGrid Columns="2" Margin="0,0,0,10">
+							<TextBlock Text="Defect Merge Distance(pxl)"
+										   Style="{StaticResource BasicTb}"/>
+							<TextBox Text="{Binding RecipeData.MergeDistance}"
+										 Style="{StaticResource BasicTbox}"/>
+						</UniformGrid>
+					</StackPanel>
 					<Button Grid.Column="0"
-							Margin="0,10,0,40"
+							Margin="0,10,0,0"
 							Style="{StaticResource BasicBtn}"
 							Content="Add Side Insp ROI"
 							Command="{Binding CommandAddRoi}"/>
+					<Button Grid.Column="0"
+							Margin="0,10,0,40"
+							Content="Recipe Save"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding btnRcpSave}"/>
 					<Button Content="Clear Result"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding CommandClearInspResult}"
@@ -139,58 +159,63 @@
                             Command="{Binding CommandEndInsp}"
                             Margin="0,0,0,10" />
 				</StackPanel>
-            </Grid>
-			<Grid Grid.Row="1">
-				<StackPanel Margin="10,0,10,0">
-					<TextBlock Text="Parameter List"
+			</Grid>
+			<ScrollViewer VerticalScrollBarVisibility="Auto"
+						  Background="{DynamicResource BtnMouseOver}" 
+						  Grid.Row="1">
+
+				<Grid >
+					<StackPanel Margin="10,0,10,0">
+						<TextBlock Text="Parameter List"
 							   Foreground="White"/>
-					<ListView ItemsSource="{Binding SideParamList}"
+						<ListView ItemsSource="{Binding SideParamList}"
                               Height="100"
                               Background="#FF1B1B1C"
                               SelectedItem="{Binding SelectedParam}">
-						<ListView.ItemTemplate>
-							<DataTemplate>
-								<TextBlock Text="{Binding Name}"
+							<ListView.ItemTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Name}"
                                            Foreground="White"
                                            FontWeight="Bold"
                                            FontSize="13" />
-							</DataTemplate>
-						</ListView.ItemTemplate>
-					</ListView>
-					<Button Content="Add Parameter"
+								</DataTemplate>
+							</ListView.ItemTemplate>
+						</ListView>
+						<Button Content="Add Parameter"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding CommandAddParam}"
                             Margin="0,10,0,10" />
-					<StackPanel DataContext="{Binding SelectedParam}">
-						<UniformGrid Columns="2" Margin="0,10,0,10">
-							<TextBlock  Text="Dark Inspection"
+						<StackPanel DataContext="{Binding SelectedParam}">
+							<UniformGrid Columns="2" Margin="0,10,0,10">
+								<TextBlock  Text="Dark Inspection"
                                         Style="{StaticResource BasicTb}"/>
-							<ToggleButton Content="{Binding UseDarkInspection}"
+								<ToggleButton Content="{Binding UseDarkInspection}"
                                           Style="{StaticResource BasicToggle}"
                                           IsChecked="{Binding UseDarkInspection}"/>
-						</UniformGrid>
-						<UniformGrid Columns="2" Margin="0,0,0,10">
-							<TextBlock  Text="Absolute Inspection"
+							</UniformGrid>
+							<UniformGrid Columns="2" Margin="0,0,0,10">
+								<TextBlock  Text="Absolute Inspection"
                                         Style="{StaticResource BasicTb}"/>
-							<ToggleButton Content="{Binding UseAbsoluteInspection}"
+								<ToggleButton Content="{Binding UseAbsoluteInspection}"
                                           Style="{StaticResource BasicToggle}"
                                           IsChecked="{Binding UseAbsoluteInspection}"/>
-						</UniformGrid>
-						<UniformGrid Columns="2" Margin="0,0,0,10">
-							<TextBlock  Text="{Binding TargetLabelText}"
+							</UniformGrid>
+							<UniformGrid Columns="2" Margin="0,0,0,10">
+								<TextBlock  Text="{Binding TargetLabelText}"
                                         Style="{StaticResource BasicTb}"/>
-							<TextBox Text="{Binding TargetGV}"
+								<TextBox Text="{Binding TargetGV}"
                                      Style="{StaticResource BasicTbox}"/>
-						</UniformGrid>
-						<UniformGrid Columns="2" Margin="0,0,0,10">
-							<TextBlock  Text="DefectSize"
+							</UniformGrid>
+							<UniformGrid Columns="2" Margin="0,0,0,10">
+								<TextBlock  Text="DefectSize"
                                         Style="{StaticResource BasicTb}"/>
-							<TextBox Text="{Binding DefectSize}"
+								<TextBox Text="{Binding DefectSize}"
                                      Style="{StaticResource BasicTbox}"/>
-						</UniformGrid>
+							</UniformGrid>
+						</StackPanel>
 					</StackPanel>
-				</StackPanel>
-			</Grid>
+				</Grid>
+			</ScrollViewer>
             <!--<Canvas Grid.Row="1" obs:SizeObserver.Observe="true" Focusable="True"
                     obs:SizeObserver.ObservedWidth="{Binding p_ImageViewer.p_ThumbWidth, Mode=OneWayToSource}"
                     obs:SizeObserver.ObservedHeight="{Binding p_ImageViewer.p_ThumbHeight, Mode=OneWayToSource}"
