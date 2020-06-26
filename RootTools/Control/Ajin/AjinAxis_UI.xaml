@@ -13,6 +13,8 @@
         <converter:DictionaryItemConverter x:Key="DictionaryItemConverters" />
         <converter:DictionaryItemKeysConverter x:Key="DictionaryItemKeysConverters" />
         <local:DictionaryItemValueCanvasConverter x:Key="DictionaryItemValueCanvasConverters" />
+        <local:ColorToBoolConverter x:Key="ColorToBoolConverters"/>
+        <local:ColorToBoolConverterRed x:Key="ColorToBoolConverterReds"/>
         <Style TargetType="Button">
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Background" Value="Beige"/>
@@ -21,108 +23,20 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Background" Value="Beige"/>
         </Style>
-    </UserControl.Resources>
-    <!--<UserControl.Resources>
-        <converter:TabSizeConverter x:Key="tabSizeConverter" />
-        <converter:DictionaryItemConverter x:Key="DictionaryItemConverters" />
-        <converter:DictionaryItemKeysConverter x:Key="DictionaryItemKeysConverters" />
-        <local:DictionaryItemValueCanvasConverter x:Key="DictionaryItemValueCanvasConverters" />
-        <local:ColorToBoolConverter x:Key="ColorToBoolConverters" />
-        <local:ColorToBoolConverterRed x:Key="ColorToBoolConverterReds" />
-        <LinearGradientBrush x:Key="TabitemBackground" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#FF3C3C3C" Offset="0" />
-            <GradientStop Color="#FF6E6E6E" Offset="1" />
-        </LinearGradientBrush>
-        <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="VerticalAlignment" Value="Center"></Setter>
-        </Style>
-        <Style TargetType="{x:Type TextBox}">
-            <Setter Property="VerticalAlignment" Value="Center"></Setter>
-        </Style>
-        <Style TargetType="{x:Type TabItem}">
-            <Setter Property="Background" Value="{StaticResource  TabitemBackground}"></Setter>
-            <Setter Property="Width">
-                <Setter.Value>
-                    <MultiBinding Converter="{StaticResource tabSizeConverter}">
-                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-            AncestorType={x:Type TabControl}}" />
-                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-            AncestorType={x:Type TabControl}}" Path="ActualWidth" />
-                    </MultiBinding>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="TextElement.Foreground">
-                        <Setter.Value>
-                            <SolidColorBrush Color="Black" />
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-                <Trigger Property="Selector.IsSelected" Value="False">
-                    <Setter Property="Foreground" Value="White"></Setter>
-                    <Setter Property="TextElement.Foreground">
-                        <Setter.Value>
-                            <SolidColorBrush Color="White" />
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <Style TargetType="{x:Type Button}" x:Key="StatusButton">
-            <Setter Property="Height" Value="30"></Setter>
-            <Setter Property="Width" Value="30"></Setter>
-            <Setter Property="BorderThickness" Value="0"></Setter>
-            <Setter Property="Background" Value="{PriorityBinding}"></Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid Background="Transparent" Name="grd" Grid.Column="1" Margin="{TemplateBinding Padding}" VerticalAlignment="Stretch"
-                                    Width="{Binding Path=ActualHeight, Mode=OneWay, RelativeSource={RelativeSource Self}}">
-                                <Ellipse x:Name="ellipse" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="2" Stretch="Uniform" Fill="{TemplateBinding  Background}"></Ellipse>
-                            </Grid>
-                            <ContentPresenter x:Name="content" Grid.Column="0" RecognizesAccessKey="True" TextElement.FontSize="10" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="{x:Type ToggleButton}">
-            <Setter Property="Height" Value="30"></Setter>
-            <Setter Property="Width" Value="30"></Setter>
-            <Setter Property="BorderThickness" Value="0"></Setter>
-            <Setter Property="Background" Value="{PriorityBinding}"></Setter>
+        <Style TargetType="ToggleButton">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ToggleButton">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid Background="Transparent" Name="grd" Grid.Column="1" Margin="{TemplateBinding Padding}" VerticalAlignment="Stretch"
-                                    Width="{Binding Path=ActualHeight, Mode=OneWay, RelativeSource={RelativeSource Self}}">
-                                <Ellipse x:Name="ellipse" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="2" Stretch="Uniform" Fill="{TemplateBinding  Background}"></Ellipse>
-                            </Grid>
-                            <ContentPresenter x:Name="content" Grid.Column="0" RecognizesAccessKey="True" TextElement.FontSize="10" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
-                        </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="ellipse" Property="Fill" Value="#FFBBBBBB" />
+                                <Setter Property="Background" Value="#FFFFFFFF"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-    </UserControl.Resources>-->
+    </UserControl.Resources>
     
     <TabControl>
         <TabItem>
@@ -170,7 +84,7 @@
                                     <ColumnDefinition Width="1.2*"/>
                                     <ColumnDefinition Width="1*"/>
                                 </Grid.ColumnDefinitions>
-                                <ProgressBar Grid.Column="0" Margin="5" Orientation="Vertical" Value="{Binding p_prgHome}" />
+                                <ProgressBar Grid.Column="0" Margin="5" Orientation="Horizontal" Value="{Binding p_prgHome}" />
                                 <Button Grid.Column="1" Content="Home" Margin="3" Command="{Binding HomeClickCommand}"/>
                             </Grid>
                         </GroupBox>
@@ -192,9 +106,9 @@
                                               Command="{Binding MJogFastCommand}" Interval="100" Delay="100"/>
                                 <RepeatButton Grid.Column="1" Content="◀" Margin="4,3,4,3" 
                                               Command="{Binding MJogSlowCommand}" Interval="100" Delay="100"/>
-                                <Button Grid.Column="2" Content="-" Margin="4,3,4,3"/>
-                                <TextBox Grid.Column="3" Margin="4,3,4,3"/>
-                                <Button Grid.Column="4" Content="+" Margin="4,3,4,3"/>
+                                <Button Grid.Column="2" Content="-" Margin="4,3,4,3" Command="{Binding MinusRelativeMoveCommand}"/>
+                                <TextBox Grid.Column="3" Margin="4,3,4,3" TextAlignment="Center" Text="{Binding p_dRelPos}"/>
+                                <Button Grid.Column="4" Content="+" Margin="4,3,4,3" Command="{Binding PlusRelativeMoveCommand}"/>
                                 <RepeatButton Grid.Column="5" Content="▶" Margin="4,3,4,3" 
                                               Command="{Binding PJogSlowCommand}" Interval="100" Delay="100"/>
                                 <RepeatButton Grid.Column="6" Content="▶▶" Margin="4,3,4,3" 
@@ -236,11 +150,24 @@
                         </GroupBox>
                         <Grid Grid.Row="3">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="STOP" Margin="5" Command="{Binding StopCommand}"/>
-                            <Button Grid.Column="1" Content="Position Clear" Margin="5"/>
+                            <GroupBox Grid.Column="0" BorderBrush="Black" BorderThickness="1">
+                                <GroupBox.Header>
+                                    <TextBlock Grid.Column="1" Text="Move Position" Foreground="Black" FontWeight="Bold"/>
+                                </GroupBox.Header>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1.2*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox Margin="1,3,1,0" Grid.Column="0" SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
+                                              ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"/>
+                                    <Button Margin="5,3,1,0" Grid.Column="1" Content="Move" Command="{Binding MoveCommand}"/>
+                                </Grid>
+                            </GroupBox>
+                            <Button Grid.Column="1" Content="STOP" Margin="5" Command="{Binding StopCommand}"/>
                         </Grid>
                     </Grid>
                     <GroupBox Grid.Row="1" BorderBrush="Black" BorderThickness="1">
@@ -256,14 +183,26 @@
                                 <ColumnDefinition></ColumnDefinition>
                                 <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Button Content="Servo" Width="Auto" Background="{Binding p_bServo}"
-                                    Grid.Column="0" Command="{Binding ServoOnCommand}"></Button>
-                            <Button Content="Alarm" Width="Auto" Background="{Binding p_sensorAlarm}"
-                                    Grid.Column="1" Command="{Binding AlarmOffCommand}" />
-                            <ToggleButton Content="InPos" Width="Auto" IsChecked="{Binding p_sensorInPos}" Grid.Column="2" Background="#FF68E03A" IsEnabled="False" />
+                            <Button Content="Servo" Width="Auto" Background="{Binding p_bServoOn, Converter={StaticResource ColorToBoolConverters}}"
+                                    Grid.Column="0" Command="{Binding ServoOnCommand}"/>
+                            <Button Content="Alarm" Width="Auto" Background="{Binding p_sensorAlarm, Converter={StaticResource ColorToBoolConverterReds}}"
+                                    Grid.Column="1" Command="{Binding AlarmOffCommand}"/>
+                            <!--<ToggleButton Content="InPos" Width="Auto" IsChecked="{Binding p_sensorInPos}" Grid.Column="2" Background="#FF68E03A" IsEnabled="False" />
                             <ToggleButton Content="-" Width="Auto" IsChecked="{Binding p_sensorLimitM}" Grid.Column="3" Background="#FFC94A4A" IsEnabled="False" />
                             <ToggleButton Content="H" Width="Auto" IsChecked="{Binding p_sensorHome}" Grid.Column="4" Background="#FF68E03A" IsEnabled="False" />
-                            <ToggleButton Content="+" Width="Auto" IsChecked="{Binding p_sensorLimitP}" Grid.Column="5" Background="#FFC94A4A" IsEnabled="False" />
+                            <ToggleButton Content="+" Width="Auto" IsChecked="{Binding p_sensorLimitP}" Grid.Column="5" Background="#FFC94A4A" IsEnabled="False" />-->
+                            <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1" Background="{Binding p_sensorInPos, Converter={StaticResource ColorToBoolConverters}}">
+                                <TextBlock Text="InPos" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="12" FontWeight="Bold"/>
+                            </Border>
+                            <Border Grid.Column="3" BorderBrush="Black" BorderThickness="1" Background="{Binding p_sensorLimitM, Converter={StaticResource ColorToBoolConverterReds}}">
+                                <TextBlock Text="-" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="12" FontWeight="Bold"/>
+                            </Border>
+                            <Border Grid.Column="4" BorderBrush="Black" BorderThickness="1" Background="{Binding p_sensorHome, Converter={StaticResource ColorToBoolConverters}}">
+                                <TextBlock Text="H" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="12" FontWeight="Bold"/>
+                            </Border>
+                            <Border Grid.Column="5" BorderBrush="Black" BorderThickness="1" Background="{Binding p_sensorLimitP, Converter={StaticResource ColorToBoolConverterReds}}">
+                                <TextBlock Text="+" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="12" FontWeight="Bold"/>
+                            </Border>
                         </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="2" BorderBrush="Black" BorderThickness="1">
