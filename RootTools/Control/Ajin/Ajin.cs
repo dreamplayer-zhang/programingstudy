@@ -223,6 +223,4 @@ namespace RootTools.Control.Ajin
             m_nModuleNum = module;
         }
     }
-
-   
 }

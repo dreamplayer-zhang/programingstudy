@@ -47,9 +47,9 @@ namespace RootTools.Control.Ajin
         #endregion
 
         #region Jog
-        public override string Jog(double fScale, Speed speed = null)
+        public override string Jog(double fScale, string sSpeed = null)
         {
-            p_sInfo = base.Jog(fScale, speed);
+            p_sInfo = base.Jog(fScale, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
             if (m_nAxis < 0) return p_id + " Axis not Assigned";
             if (AXM("AxmMoveVel", CAXM.AxmMoveVel(m_nAxis, fScale * m_speedNow.m_v, m_speedNow.m_acc, m_speedNow.m_dec)) != 0)
@@ -117,7 +117,9 @@ namespace RootTools.Control.Ajin
             p_sInfo = base.StartHome();
             if (p_sInfo != "OK") return p_sInfo;
             if (AXM("AxmHomeSetMethod", CAXM.AxmHomeSetMethod(m_nAxis, (int)m_eHomeDir, (uint)m_eHomeSignal, (uint)m_eHomeZPhase, 1000, 0)) != 0) return p_sInfo;
-            if (AXM("AxmHomeSetVel", CAXM.AxmHomeSetVel(m_nAxis, m_vHome[0], m_vHome[0], m_vHome[1], m_vHome[1], m_accHome[0], m_accHome[1])) != 0) return p_sInfo;
+            Speed v0 = GetSpeedValue(eSpeed.Home_First); 
+            Speed v1 = GetSpeedValue(eSpeed.Home_Last);
+            if (AXM("AxmHomeSetVel", CAXM.AxmHomeSetVel(m_nAxis, v0.m_v, v0.m_v, v1.m_v, v1.m_v, v0.m_acc, v1.m_acc)) != 0) return p_sInfo;
             if (AXM("AxmHomeSetStart", CAXM.AxmHomeSetStart(m_nAxis)) != 0) return p_sInfo;
             return "OK";
         }
@@ -153,14 +155,15 @@ namespace RootTools.Control.Ajin
             Thread.Sleep(100);
         }
 
-        public int p_nHomeProgress
+        int _progressHome = 0; 
+        public int p_progressHome
         {
-            get
+            get { return _progressHome; }
+            set
             {
-                if (p_eState != eState.Home) return 0;
-                uint uMainStep = 0, uStep = 0; 
-                CAXM.AxmHomeGetRate(m_nAxis, ref uMainStep, ref uStep);
-                return (int)uStep; 
+                if (_progressHome == value) return;
+                _progressHome = value;
+                OnPropertyChanged(); 
             }
         }
 
@@ -201,39 +204,11 @@ namespace RootTools.Control.Ajin
             m_eHomeZPhase = (eHomeZPhase)u1;
         }
 
-        void RunTreeHome(Tree tree)
+        void RunTreeSettingHome(Tree tree)
         {
             m_eHomeDir = (eMoveDir)tree.Set(m_eHomeDir, m_eHomeDir, "Dir", "Search Home Direction");
             m_eHomeSignal = (eHomeSignal)tree.Set(m_eHomeSignal, m_eHomeSignal, "Signal", "Search Home Sensor");
             m_eHomeZPhase = (eHomeZPhase)tree.Set(m_eHomeZPhase, m_eHomeZPhase, "ZPhase", "Search Home ZPhase");
-        }
-
-        double[] m_vHome = new double[2] { 1000, 100 };
-        double[] m_accHome = new double[2] { 0.7, 1 };
-        void RunTreeHomeSpeed(Tree tree, int n)
-        {
-            m_vHome[n] = tree.Set(m_vHome[n], m_vHome[n], "Velocity", "Home Velocity (pulse/sec)");
-            m_accHome[n] = tree.Set(m_accHome[n], m_accHome[n], "Acceleration", "Home Acceleration Time (sec)");
-        }
-
-        public void RunTreeSettingHome(Tree tree)
-        {
-            RunTreeHome(tree.GetTree("Home"));
-            RunTreeHomeSpeed(tree.GetTree("Speed").GetTree("First"), 0);
-            RunTreeHomeSpeed(tree.GetTree("Speed").GetTree("Second"), 1);
-        }
-        #endregion
-
-        #region Setting
-        public override void RunTreeSetting(Tree.eMode mode)
-        {
-            m_treeRootSetting.p_eMode = mode;
-            RunTreeSettingProperty(m_treeRootSetting.GetTree("Property"));
-            RunTreeSettingHome(m_treeRootSetting.GetTree("Home"));
-            RunTreeSettingMode(m_treeRootSetting.GetTree("Mode"));
-            RunTreeSettingSensor(m_treeRootSetting.GetTree("Sensor"));
-            RunTreeTrigger(m_treeRootSetting.GetTree("Trigger"));
-            if (mode == Tree.eMode.Update) SetAxisStatus();
         }
         #endregion
 
@@ -362,12 +337,10 @@ namespace RootTools.Control.Ajin
             AXM("AxmTriggerSetBlock", CAXM.AxmTriggerSetBlock(m_nAxis, m_trigger.m_aPos[0], m_trigger.m_aPos[1], m_trigger.m_dPos));
         }
 
-        public void RunTreeTrigger(Tree tree)
+        public void RunTreeSettingTrigger(Tree tree)
         {
-            m_trigger.RunTree(tree); 
-            Tree treeSet = tree.GetTree("Setting");
-            m_bLevel = treeSet.Set(m_bLevel, m_bLevel, "Trigger Level", "Trigger Level (true = Active High)");
-            m_dTrigTime = treeSet.Set(m_dTrigTime, m_dTrigTime, "Trigger Time", "Trigger Out Time (ms)");
+            m_bLevel = tree.Set(m_bLevel, m_bLevel, "Level", "Trigger Level (true = Active High)");
+            m_dTrigTime = tree.Set(m_dTrigTime, m_dTrigTime, "Time", "Trigger Out Time (ms)");
         }
         #endregion
 
@@ -475,6 +448,9 @@ namespace RootTools.Control.Ajin
                 switch (p_eState)
                 {
                     case eState.Home:
+                        uint uMainStep = 0, uStep = 0;
+                        CAXM.AxmHomeGetRate(m_nAxis, ref uMainStep, ref uStep);
+                        p_progressHome = (int)uStep;
                         if (EQ.IsStop())
                         {
                             StopAxis();
@@ -555,12 +531,26 @@ namespace RootTools.Control.Ajin
         }
         #endregion
 
-        public void RunTree(Tree.eMode mode)
+        #region Tree
+        public override void RunTree(Tree.eMode mode)
         {
-            RunTreePos(mode); 
-            RunTreeSetting(mode);
-            RunTreeSpeed(mode); 
+            m_treeRoot.p_eMode = mode;
+            RunTreeSpeed(m_treeRoot.GetTree("Speed"));
+            RunTreePos(m_treeRoot.GetTree("Position"));
+            m_trigger.RunTree(m_treeRoot.GetTree("Trigger"));
         }
+
+        public override void RunTreeSetting(Tree.eMode mode)
+        {
+            m_treeRootSetting.p_eMode = mode;
+            RunTreeSettingProperty(m_treeRootSetting.GetTree("Property"));
+            RunTreeSettingHome(m_treeRootSetting.GetTree("Home"));
+            RunTreeSettingMode(m_treeRootSetting.GetTree("Mode"));
+            RunTreeSettingSensor(m_treeRootSetting.GetTree("Sensor"));
+            RunTreeSettingTrigger(m_treeRootSetting.GetTree("Trigger"));
+            if (mode == Tree.eMode.Update) SetAxisStatus();
+        }
+        #endregion
 
         AjinListAxis m_listAxis; 
         public void Init(AjinListAxis listAxis, string id, Log log)

@@ -2,6 +2,7 @@
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows.Controls;
 
@@ -51,18 +52,7 @@ namespace RootTools.Control
             }
         }
 
-        Log _log;
-        public Log p_log
-        {
-            get { return _log; }
-            set
-            {
-                _log = value;
-                if (m_treeRootPos != null) m_treeRootPos.m_log = value;
-                if (m_treeRootSpeed != null) m_treeRootSpeed.m_log = value;
-                if (m_treeRootSetting != null) m_treeRootSetting.m_log = value;
-            }
-        }
+        public Log p_log { get; set; }
         #endregion
 
         #region UI
@@ -113,13 +103,14 @@ namespace RootTools.Control
 
         #region List Position
         Dictionary<string, double> m_aPos = new Dictionary<string, double>();
-        public List<string> m_asPos = new List<string>();
+        public List<string> m_asPos = new List<string>(); 
+        public ObservableCollection<string> p_asPos { get; set; }
 
         public void AddPos(params dynamic[] aPos)
         {
             foreach (dynamic value in aPos) AddPos(value.ToString());
-            RunTreePos(Tree.eMode.RegRead);
-            RunTreePos(Tree.eMode.Init);
+            RunTree(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.Init);
         }
 
         void AddPos(string sPos)
@@ -129,7 +120,8 @@ namespace RootTools.Control
                 if (sKey == sPos) return;
             }
             m_aPos.Add(sPos, 0);
-            m_asPos.Add(sPos);
+            p_asPos.Add(sPos);
+            m_asPos.Add(sPos); 
         }
 
         public double GetPosValue(Enum pos)
@@ -139,7 +131,7 @@ namespace RootTools.Control
 
         public double GetPosValue(string sPos)
         {
-            foreach (string sKey in m_asPos)
+            foreach (string sKey in p_asPos)
             {
                 if (sKey == sPos) return m_aPos[sPos];
             }
@@ -148,13 +140,13 @@ namespace RootTools.Control
 
         public void SetPositionValue(string sPos, bool bCommand = true)
         {
-            foreach (string sKey in m_asPos)
+            foreach (string sKey in p_asPos)
             {
                 if (sKey == sPos)
                 {
                     m_aPos[sPos] = bCommand ? p_posCommand : p_posActual;
-                    RunTreePos(Tree.eMode.RegWrite);
-                    RunTreePos(Tree.eMode.Init);
+                    RunTree(Tree.eMode.RegWrite);
+                    RunTree(Tree.eMode.Init);
                 }
             }
         }
@@ -173,39 +165,29 @@ namespace RootTools.Control
             Position_1,
             Position_2,
         }
-        public TreeRoot m_treeRootPos = null;
         void InitPosition()
         {
-            m_treeRootPos = new TreeRoot(p_id + ".Position", p_log);
-            m_treeRootPos.UpdateTree += M_treeRootPos_UpdateTree;
+            p_asPos = new ObservableCollection<string>(); 
             for (int i = 0; i < Enum.GetNames(typeof(ePosition)).Length; i++)
             {
                 AddPos(((ePosition)i).ToString());
             }
-            RunTreePos(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.RegRead);
         }
 
-        private void M_treeRootPos_UpdateTree()
+        public void RunTreePos(Tree tree)
         {
-            RunTreePos(Tree.eMode.Update);
-            RunTreePos(Tree.eMode.RegWrite);
-            RunTreePos(Tree.eMode.Init);
+            RunTreePosLimit(tree.GetTree("SW Limit", false));
+            RunTreePosition(tree.GetTree("Position"));
         }
 
-        public void RunTreePos(Tree.eMode mode)
+        void RunTreePosition(Tree tree)
         {
-            m_treeRootPos.p_eMode = mode;
-            RunTreePosLimit(m_treeRootPos.GetTree("SW Limit"));
-            RunTreePos(m_treeRootPos.GetTree("Position"));
-        }
-
-        void RunTreePos(Tree tree)
-        {
-            m_aPos[m_asPos[0]] = tree.Set(m_aPos[m_asPos[0]], 0, m_asPos[0], "Axis Position (pulse)", m_bSWLimit[0]);
-            m_aPos[m_asPos[1]] = tree.Set(m_aPos[m_asPos[1]], 0, m_asPos[1], "Axis Position (pulse)", m_bSWLimit[1]);
-            for (int n = 2; n < m_asPos.Count; n++)
+            m_aPos[p_asPos[0]] = tree.Set(m_aPos[p_asPos[0]], 0, p_asPos[0], "Axis Position (pulse)", m_bSWLimit[0]);
+            m_aPos[p_asPos[1]] = tree.Set(m_aPos[p_asPos[1]], 0, p_asPos[1], "Axis Position (pulse)", m_bSWLimit[1]);
+            for (int n = 2; n < p_asPos.Count; n++)
             {
-                m_aPos[m_asPos[n]] = tree.Set(m_aPos[m_asPos[n]], 0, m_asPos[n], "Axis Position (pulse)");
+                m_aPos[p_asPos[n]] = tree.Set(m_aPos[p_asPos[n]], 0, p_asPos[n], "Axis Position (pulse)");
             }
         }
         #endregion
@@ -217,7 +199,7 @@ namespace RootTools.Control
         {
             if (EQ.p_bSimulate) return "OK";
             double fPosNow = p_posCommand;
-            double fPosMinusLimit = m_aPos[m_asPos[0]];
+            double fPosMinusLimit = m_aPos[p_asPos[0]];
             if (m_bSWLimit[0])
             {
                 if (fPosDst >= fPosMinusLimit) return "OK";
@@ -225,7 +207,7 @@ namespace RootTools.Control
                 fPosDst = fPosMinusLimit;
                 return "OK";
             }
-            double fPosPlusLimit = m_aPos[m_asPos[1]];
+            double fPosPlusLimit = m_aPos[p_asPos[1]];
             if (m_bSWLimit[1])
             {
                 if (fPosDst <= fPosPlusLimit) return "OK";
@@ -240,17 +222,17 @@ namespace RootTools.Control
         {
             if (vJog == 0) return "OK";
             double fPosNow = p_posCommand;
-            if (m_bSWLimit[0] && (vJog < 0) && (fPosNow <= m_aPos[m_asPos[0]])) return "SW Minus Limit Error";
-            if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[m_asPos[2]])) return "SW Plus Limit Error";
+            if (m_bSWLimit[0] && (vJog < 0) && (fPosNow <= m_aPos[p_asPos[0]])) return "SW Minus Limit Error";
+            if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[p_asPos[2]])) return "SW Plus Limit Error";
             return "OK";
         }
 
         void ThreadCheck_SWLimit()
         {
             double fPos = p_posActual;
-            bool bSWLimit0 = m_bSWLimit[0] && (fPos > m_aPos[m_asPos[0]]);
+            bool bSWLimit0 = m_bSWLimit[0] && (fPos > m_aPos[p_asPos[0]]);
             if (bSWLimit0) p_sInfo = p_id + ": Servo SW limit(-) !!";
-            bool bSWLimit1 = m_bSWLimit[1] && (fPos > m_aPos[m_asPos[1]]);
+            bool bSWLimit1 = m_bSWLimit[1] && (fPos > m_aPos[p_asPos[1]]);
             if (bSWLimit1) p_sInfo = p_id + ": Servo SW limit(+) !!";
             if (bSWLimit0 || bSWLimit1) StopAxis();
         }
@@ -258,7 +240,7 @@ namespace RootTools.Control
         void RunTreePosLimit(Tree tree)
         {
             m_bSWLimit[0] = tree.Set(m_bSWLimit[0], m_bSWLimit[0], "Minus", "Use SW Minus Limit");
-            m_bSWLimit[1] = tree.Set(m_bSWLimit[1], m_bSWLimit[1], "Minus", "Use SW Minus Limit");
+            m_bSWLimit[1] = tree.Set(m_bSWLimit[1], m_bSWLimit[1], "Plus", "Use SW Plus Limit");
         }
         #endregion
 
@@ -283,22 +265,24 @@ namespace RootTools.Control
             }
         }
         List<Speed> m_aSpeed = new List<Speed>();
-        public List<string> m_asSpeed = new List<string>();
+        public List<string> m_asSpeed = new List<string>(); 
+        public ObservableCollection<string> p_asSpeed { get; set; }
 
         public void AddSpeed(params dynamic[] aSpeed)
         {
             foreach (dynamic value in aSpeed) AddSpeed(value.ToString());
-            RunTreeSpeed(Tree.eMode.RegRead);
-            RunTreeSpeed(Tree.eMode.Init);
+            RunTree(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.Init);
         }
 
         void AddSpeed(string sSpeed)
         {
-            foreach (string sKey in m_asSpeed)
+            foreach (string sKey in p_asSpeed)
             {
                 if (sKey == sSpeed) return;
             }
             m_aSpeed.Add(new Speed(sSpeed));
+            p_asSpeed.Add(sSpeed);
             m_asSpeed.Add(sSpeed);
         }
 
@@ -318,34 +302,26 @@ namespace RootTools.Control
 
         public enum eSpeed
         {
+            Home_First,
+            Home_Last,
             Jog,
             Move,
             Move_DoorOpen,
         }
-        public TreeRoot m_treeRootSpeed = null;
         void InitSpeed()
         {
+            p_asSpeed = new ObservableCollection<string>();
             p_fJogScale = 100;
-            m_treeRootSpeed = new TreeRoot(p_id + ".Speed", p_log);
-            m_treeRootSpeed.UpdateTree += M_treeRootSpeed_UpdateTree;
             for (int i = 0; i < Enum.GetNames(typeof(eSpeed)).Length; i++)
             {
                 AddSpeed(((eSpeed)i).ToString());
             }
-            RunTreeSpeed(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.RegRead);
         }
 
-        private void M_treeRootSpeed_UpdateTree()
+        public void RunTreeSpeed(Tree tree)
         {
-            RunTreeSpeed(Tree.eMode.Update);
-            RunTreeSpeed(Tree.eMode.RegWrite);
-            RunTreeSpeed(Tree.eMode.Init);
-        }
-
-        public void RunTreeSpeed(Tree.eMode mode)
-        {
-            m_treeRootSpeed.p_eMode = mode;
-            foreach (Speed speed in m_aSpeed) speed.RunTree(m_treeRootSpeed.GetTree(speed.m_id, false));
+            foreach (Speed speed in m_aSpeed) speed.RunTree(tree.GetTree(speed.m_id, false));
         }
         #endregion
 
@@ -354,9 +330,9 @@ namespace RootTools.Control
         protected StopWatch m_swMove = new StopWatch();
         public int p_fJogScale { get; set; }
 
-        public virtual string Jog(double fScale, Speed speed = null)
+        public virtual string Jog(double fScale, string sSpeed = null)
         {
-            m_speedNow = (speed == null) ? GetSpeedValue(eSpeed.Move) : speed;
+            m_speedNow = (sSpeed != null) ? GetSpeedValue(sSpeed) : GetSpeedValue(eSpeed.Move);
             m_swMove.Start();
             if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
@@ -370,13 +346,13 @@ namespace RootTools.Control
         #region Move
         public string StartMove(Enum pos, double fOffset = 0, Enum speed = null)
         {
-            return StartMove(pos.ToString(), fOffset, speed);
+            return StartMove(pos.ToString(), fOffset, (speed != null) ? speed.ToString() : null);
         }
 
-        public string StartMove(string sPos, double fOffset = 0, Enum speed = null)
+        public string StartMove(string sPos, double fOffset = 0, string sSpeed = null)
         {
             double fPos = GetPosValue(sPos) + fOffset;
-            return StartMove(fPos, (speed == null) ? null : speed.ToString());
+            return StartMove(fPos, sSpeed);
         }
 
         double m_posDst = 0;
@@ -384,7 +360,7 @@ namespace RootTools.Control
         public virtual string StartMove(double fPos, string sSpeed = null)
         {
             m_posDst = fPos;
-            m_speedNow = (sSpeed == null) ? GetSpeedValue(eSpeed.Move) : GetSpeedValue(sSpeed);
+            m_speedNow = (sSpeed != null) ? GetSpeedValue(sSpeed) : GetSpeedValue(EQ.p_bDoorOpen ? eSpeed.Move_DoorOpen : eSpeed.Move);
             m_swMove.Start();
             if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
@@ -555,25 +531,6 @@ namespace RootTools.Control
         }
         #endregion
 
-        #region Setting
-        public TreeRoot m_treeRootSetting = null;
-        void InitSetting()
-        {
-            m_treeRootSetting = new TreeRoot(p_id + ".Setting", p_log);
-            m_treeRootSetting.UpdateTree += M_treeRootSetting_UpdateTree;
-            RunTreeSetting(Tree.eMode.RegRead); 
-        }
-
-        private void M_treeRootSetting_UpdateTree()
-        {
-            RunTreeSetting(Tree.eMode.Update);
-            RunTreeSetting(Tree.eMode.RegWrite);
-            RunTreeSetting(Tree.eMode.Init);
-        }
-
-        public virtual void RunTreeSetting(Tree.eMode mode) { }
-        #endregion
-
         #region Trigger
         protected class Trigger
         {
@@ -608,12 +565,49 @@ namespace RootTools.Control
         public virtual void RunTrigger(bool bOn) { }
         #endregion
 
+        #region Tree
+        public TreeRoot m_treeRoot = null;
+        void InitTree()
+        {
+            m_treeRoot = new TreeRoot(p_id, p_log);
+            m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
+
+            InitPosition();
+            InitSpeed();
+        }
+
+        private void M_treeRoot_UpdateTree()
+        {
+            RunTree(Tree.eMode.Update);
+            RunTree(Tree.eMode.RegWrite);
+            RunTree(Tree.eMode.Init);
+        }
+
+        public virtual void RunTree(Tree.eMode mode) { }
+
+        public TreeRoot m_treeRootSetting = null;
+        void InitSetting()
+        {
+            m_treeRootSetting = new TreeRoot(p_id + ".Setting", p_log);
+            m_treeRootSetting.UpdateTree += M_treeRootSetting_UpdateTree;
+            RunTreeSetting(Tree.eMode.RegRead);
+        }
+
+        private void M_treeRootSetting_UpdateTree()
+        {
+            RunTreeSetting(Tree.eMode.Update);
+            RunTreeSetting(Tree.eMode.RegWrite);
+            RunTreeSetting(Tree.eMode.Init);
+        }
+
+        public virtual void RunTreeSetting(Tree.eMode mode) { }
+        #endregion
+
         protected void InitBase(string id, Log log)
         {
             p_id = id;
             p_log = log;
-            InitPosition();
-            InitSpeed();
+            InitTree(); 
             InitSetting();
             EQ.m_EQ.OnDoorOpen += M_EQ_OnDoorOpen;
         }
