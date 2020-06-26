@@ -361,8 +361,62 @@ namespace Root_Vega
 
 			return;
 		}
+		void _commandDeleteEdgeInfo()
+		{
+			ClearDrawList();
+		}
+		public void _saveEdgeRcp()
+		{
+			//recipe에 저장되는 것 한정임. Init에 있는걸 레시피로 복사하는건 별도 기능으로 구현해야 함
+			int checkCount = 0;
+			for (int i = 0; i < 4; i++)
+			{
+				checkCount += p_SimpleShapeDrawer_List[i].m_ListRect.Count;
+			}
+			if (checkCount != 24 && checkCount != 0)
+			{
+				//현재 그려진 Rect를 기준으로 저장 시퀀스에 들어간다. rect 구성이 정상적이지 않으면 에러가 발생하고 저장진행을 중단한다
+				return;
+			}
 
-		private void _saveInit()
+			if (SelectedROI == null)
+			{
+				//ERROR가 뜨면서 저장 방지
+				return;
+			}
+			//커스텀 EdgeBox 설정이 켜져있을 때만 recipe에 EdgeList를 업데이트한다
+			if (SelectedROI.EdgeBox != null && SelectedROI.EdgeBox.EdgeList != null)
+			{
+				SelectedROI.EdgeBox.EdgeList.Clear();
+
+				//여기서 그려진 모든 rect목록을 현재 엔지니어가 들고있는 레시피에 반영한다
+				for (int i = 0; i < 4; i++)
+				{
+					if (p_SimpleShapeDrawer_List[i] == null) continue;
+					for (int j = 0; j < 6; j++)
+					{
+						if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
+						SelectedROI.EdgeBox.EdgeList.Add(new EdgeElement(i, new CRect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos)));
+
+					}
+				}
+			}
+
+			//TODO : 원하는 파라메터만 갱신해서 저장할 수 있는 기능이 있으면 좋을 것 같음!
+			var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
+			m_Engineer.m_recipe.Save(target);
+		}
+		public void _addRoi()
+		{
+			int roiCount = m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide).Count();
+			string defaultName = string.Format("Side ROI #{0}", roiCount);
+
+			Roi temp = new Roi(defaultName, Roi.Item.ReticleSide);
+			m_Engineer.m_recipe.RecipeData.RoiList.Add(temp);
+
+			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+		}
+		private void _initSave()
 		{
 			var tempToolset = (InspectToolSet)m_Engineer.ClassToolBox().GetToolSet("Inspect");
 			var tempInspect = tempToolset.GetInspect("SideVision.Inspect");
@@ -388,67 +442,105 @@ namespace Root_Vega
 
 			tempInspect.UpdateRegData();
 		}
-		void _commandDeleteEdgeInfo()
+		private void _copyInitToRcp()
 		{
-			ClearDrawList();
-		}
-		public void _saveEdgeRcp()
-		{
-			//recipe에 저장되는 것 한정임. Init에 있는걸 레시피로 복사하는건 별도 기능으로 구현해야 함
-			int checkCount = 0;
-			for (int i = 0; i < 4; i++)
+			//Init의 edge 데이터를 현재 선택된 ROI Recipe Data에 덮어쓴다
+			if (!m_Engineer.m_recipe.Loaded)
 			{
-				checkCount += p_SimpleShapeDrawer_List[i].m_ListRect.Count;
+				return;
 			}
-			if (checkCount != 24)
+			if (SelectedROI == null)
 			{
-				//현재 그려진 Rect를 기준으로 저장 시퀀스에 들어간다. rect 구성이 정상적이지 않으면 에러가 발생하고 저장진행을 중단한다
+				return;
+			}
+			if (SelectedROI.EdgeBox == null)
+			{
+				return;
+			}
+			if (SelectedROI.EdgeBox.EdgeList == null)
+			{
 				return;
 			}
 
-			if (SelectedROI == null)
-			{
-				//ERROR가 뜨면서 저장 방지
-				return;
-			}
-			//커스텀 EdgeBox 설정이 켜져있을 때만 recipe에 EdgeList를 업데이트한다
-			if (SelectedROI.EdgeBox != null && SelectedROI.EdgeBox.EdgeList != null)
-			{
-				if (SelectedROI.EdgeBox.UseCustomEdgeBox)
-				{
-					SelectedROI.EdgeBox.EdgeList.Clear();
-				}
-			}
-			//여기서 그려진 모든 rect목록을 현재 엔지니어가 들고있는 레시피에 반영한다
+			SelectedROI.EdgeBox.EdgeList.Clear();
+
+			var tempToolset = (InspectToolSet)m_Engineer.ClassToolBox().GetToolSet("Inspect");
+			var tempInspect = tempToolset.GetInspect("SideVision.Inspect");
+
+
 			for (int i = 0; i < 4; i++)
 			{
 				if (p_SimpleShapeDrawer_List[i] == null) continue;
 				for (int j = 0; j < 6; j++)
 				{
-					if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
-					SelectedROI.EdgeBox.EdgeList.Add(new EdgeElement(i, new CRect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos)));
+					var temp = new EdgeElement(i, new CRect(
+						new Point(tempInspect.nTopLeftXLIst[i * 6 + j], tempInspect.nTopLeftYLIst[i * 6 + j]),
+						new Point(tempInspect.nTopLeftXLIst[i * 6 + j] + tempInspect.nWidthLIst[i * 6 + j], tempInspect.nTopLeftYLIst[i * 6 + j] + tempInspect.nHeighLIst[i * 6 + j])));
+					SelectedROI.EdgeBox.EdgeList.Add(temp);
 
+					var tempElement = new UIElementInfo(new Point(temp.Rect.Left, temp.Rect.Top), new Point(temp.Rect.Right, temp.Rect.Bottom));
+
+					System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+					rect.Width = temp.Rect.Width;
+					rect.Height = temp.Rect.Height;
+					System.Windows.Controls.Canvas.SetLeft(rect, temp.Rect.Left);
+					System.Windows.Controls.Canvas.SetTop(rect, temp.Rect.Top);
+					rect.StrokeThickness = 2;
+					rect.Stroke = MBrushes.Red;
+
+					p_SimpleShapeDrawer_List[i].m_ListShape.Add(rect);
+					p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
+					p_SimpleShapeDrawer_List[i].m_ListRect.Add(tempElement);
 				}
+				p_ImageViewer_List[i].SetRoiRect();
+			}
+		}
+		private void _copyRcpToInit()
+		{
+			//현재 선택된 ROI Recipe Data에 Init의 edge 데이터를 덮어쓴다
+			if (!m_Engineer.m_recipe.Loaded)
+			{
+				return;
+			}
+			if (SelectedROI == null)
+			{
+				return;
+			}
+			if (SelectedROI.EdgeBox == null)
+			{
+				return;
+			}
+			if (SelectedROI.EdgeBox.EdgeList == null)
+			{
+				return;
+			}
+			if (SelectedROI.EdgeBox.EdgeList.Count != 24)
+			{
+				return;
 			}
 
-			//TODO : 원하는 파라메터만 갱신해서 저장할 수 있는 기능이 있으면 좋을 것 같음!
-			var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
-			m_Engineer.m_recipe.Save(target);
-		}
-		void _commandSaveRcpParamOnly()
-		{
-			var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
-			m_Engineer.m_recipe.Save(target);
-		}
-		public void _addRoi()
-		{
-			int roiCount = m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide).Count();
-			string defaultName = string.Format("Side ROI #{0}", roiCount);
+			var tempToolset = (InspectToolSet)m_Engineer.ClassToolBox().GetToolSet("Inspect");
+			var tempInspect = tempToolset.GetInspect("SideVision.Inspect");
 
-			Roi temp = new Roi(defaultName, Roi.Item.ReticleSide);
-			m_Engineer.m_recipe.RecipeData.RoiList.Add(temp);
+			int count = 0;
+			foreach (var item in SelectedROI.EdgeBox.EdgeList)
+			{
+				if (count >= 6)
+				{
+					count = 0;
+				}
+				var temp = new EdgeElement(item.SavePoint, new CRect(new Point(item.Rect.Left, item.Rect.Top), new Point(item.Rect.Right, item.Rect.Bottom)));
 
-			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+				tempInspect.nTopLeftXLIst[temp.SavePoint * 6 + count] = temp.Rect.Left;
+				tempInspect.nTopLeftYLIst[temp.SavePoint * 6 + count] = temp.Rect.Top;
+				tempInspect.nWidthLIst[temp.SavePoint * 6 + count] = temp.Rect.Width;
+				tempInspect.nHeighLIst[temp.SavePoint * 6 + count] = temp.Rect.Height;
+				count++;
+			}
+
+			bool bVisible = (m_Engineer.p_user.m_eLevel >= Login.eLevel.Admin);
+
+			tempInspect.UpdateRegData();
 		}
 		void searchArea()
 		{
@@ -589,11 +681,11 @@ namespace Root_Vega
 				return new RelayCommand(searchArea);
 			}
 		}
-		public RelayCommand CommandSaveRcpParamOnly
+		public RelayCommand CommandSave
 		{
 			get
 			{
-				return new RelayCommand(_commandSaveRcpParamOnly);
+				return new RelayCommand(_saveEdgeRcp);
 			}
 		}
 		public RelayCommand CommandDeleteEdgeInfo
@@ -603,16 +695,30 @@ namespace Root_Vega
 				return new RelayCommand(_commandDeleteEdgeInfo);
 			}
 		}
-		public RelayCommand CommandSave
-		{
-			get
-			{
-				return new RelayCommand(_saveEdgeRcp);
-			}
-		}
 		public RelayCommand CommandAddRoi
 		{
 			get { return new RelayCommand(_addRoi); }
+		}
+		public RelayCommand CmdCopyRecipeToInit
+		{
+			get
+			{
+				return new RelayCommand(_copyRcpToInit);
+			}
+		}
+		public RelayCommand CommandInitSave
+		{
+			get
+			{
+				return new RelayCommand(_initSave);
+			}
+		}
+		public RelayCommand CmdCopyInitToRecipe
+		{
+			get
+			{
+				return new RelayCommand(_copyInitToRcp);
+			}
 		}
 		#endregion
 	}

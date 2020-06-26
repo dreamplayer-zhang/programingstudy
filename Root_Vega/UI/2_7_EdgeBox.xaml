@@ -6,7 +6,7 @@
              xmlns:tools ="clr-namespace:RootTools;assembly=RootTools"
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
              mc:Ignorable="d" 
-             d:DesignHeight="726" d:DesignWidth="1442">
+             d:DesignHeight="900" d:DesignWidth="1442">
     <UserControl.Resources>
         <Converter:InverseBooleanConverter x:Key="InverseBooleanConverters" />
         <Style TargetType="{x:Type Button}"
@@ -158,16 +158,57 @@
             </Border>
         </Grid>
         <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>    
-            <GroupBox Header="Inspection"
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+			</Grid.RowDefinitions>
+			<GroupBox Header="General"
                       Margin="10,0,10,10"
                       Foreground="{StaticResource BtnForeGround}"
                       FontSize="20">
 				<StackPanel>
-					<Grid Height="50" Margin="10,5,10,5">
+					<Grid Margin="10,0">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Search Edge Area"
+                                Command="{Binding CommandSearch}"/>
+					</Grid>
+					<Grid  Margin="10,5,10,5">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Delete Current Edge"
+                                Command="{Binding CommandDeleteEdgeInfo}"/>
+					</Grid>
+				</StackPanel>
+			</GroupBox>
+			<GroupBox Header="Recipe"
+					  Grid.Row="1"
+                      Margin="10,0,10,10"
+                      Foreground="{StaticResource BtnForeGround}"
+                      FontSize="20">
+				<StackPanel>
+					<ListView ItemsSource="{Binding p_SideRoiList}"
+                              Height="100"
+                              Margin="10,0,10,5"
+                              Background="#FF1B1B1C"
+                              SelectedItem="{Binding SelectedROI}">
+						<ListView.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Name}"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           FontSize="13" />
+							</DataTemplate>
+						</ListView.ItemTemplate>
+					</ListView>
+					<Grid  Margin="10,5,10,20">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Add Side Insp ROI"
+                                Command="{Binding CommandAddRoi}"/>
+					</Grid>
+					<Grid Margin="10,5,10,5">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*"/>
 							<ColumnDefinition Width="130"/>
@@ -183,7 +224,7 @@
                                       IsChecked="{Binding UseCustomEdgeBox}">
 						</ToggleButton>
 					</Grid>
-					<Grid Height="50" Margin="10,5,10,5">
+					<Grid Margin="10,5,10,5">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*"/>
 							<ColumnDefinition Width="130"/>
@@ -199,7 +240,7 @@
                                       IsChecked="{Binding UseAutoGV}">
                         </ToggleButton>
                     </Grid>
-                    <Grid Height="50" Margin="10,5,10,5">
+                    <Grid  Margin="10,5,10,5">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*"/>
 							<ColumnDefinition Width="130"/>
@@ -215,7 +256,7 @@
                                       IsChecked="{Binding SearchBrightToDark}">
                         </ToggleButton>
                     </Grid>
-                    <Grid Height="50" Margin="10,5,10,5">
+                    <Grid  Margin="10,5,10,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="7*"/>
                             <ColumnDefinition Width="1.5*"/>
@@ -239,58 +280,41 @@
                                    TextAlignment="Center"
                                    VerticalAlignment="Center"/>
                     </Grid>
-                    <Grid Height="50" Margin="10,5,10,5">
-                        <Button Grid.Column="0"
-                                Style="{StaticResource BasicBtn}"
-                                Content="Search Edge Area"
-                                Command="{Binding CommandSearch}"/>
-					</Grid>
-					<Grid Height="50" Margin="10,5,10,5">
+                    
+					<Grid  Margin="10,5,10,5">
 						<Button Grid.Column="0"
                                 Style="{StaticResource BasicBtn}"
                                 Content="Save Edge"
                                 Command="{Binding CommandSave}"/>
 					</Grid>
-					<Grid Height="50" Margin="10,5,10,5">
+					<Grid  Margin="10,5,10,5">
 						<Button Grid.Column="0"
                                 Style="{StaticResource BasicBtn}"
-                                Content="Delete Current Edge"
-                                Command="{Binding CommandDeleteEdgeInfo}"/>
-					</Grid>
-					<!--<Grid Height="50" Margin="10,5,10,5">
-						<Button Grid.Column="0"
-                                Style="{StaticResource BasicBtn}"
-                                Content="Inspection Complete"
-                                Command="{Binding CommandInspectComplete}"/>
-					</Grid>-->
-					<ListView ItemsSource="{Binding p_SideRoiList}"
-                              Height="100"
-                              Margin="0,0,0,10"
-                              Background="#FF1B1B1C"
-                              SelectedItem="{Binding SelectedROI}">
-						<ListView.ItemTemplate>
-							<DataTemplate>
-								<TextBlock Text="{Binding Name}"
-                                           Foreground="White"
-                                           FontWeight="Bold"
-                                           FontSize="13" />
-							</DataTemplate>
-						</ListView.ItemTemplate>
-					</ListView>
-					<Grid Height="50" Margin="10,5,10,5">
-						<Button Grid.Column="0"
-                                Style="{StaticResource BasicBtn}"
-                                Content="Add Side Insp ROI"
-                                Command="{Binding CommandAddRoi}"/>
-					</Grid>
-					<Grid Height="50" Margin="10,5,10,5">
-						<Button Grid.Column="0"
-                                Style="{StaticResource BasicBtn}"
-                                Content="Save Recipe Parameter"
-                                Command="{Binding CommandSaveRcpParamOnly}"/>
+                                Content="Edge Copy (Recipe 🡆 Init)"
+                                Command="{Binding CmdCopyRecipeToInit}"/>
 					</Grid>
 				</StackPanel>
             </GroupBox>
+			<GroupBox Header="Init"
+					  Grid.Row="2"
+                      Margin="10,0,10,10"
+                      Foreground="{StaticResource BtnForeGround}"
+                      FontSize="20">
+				<StackPanel>
+					<Grid  Margin="10,5,10,5">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Save Edge"
+                                Command="{Binding CommandInitSave}"/>
+					</Grid>
+					<Grid  Margin="10,5,10,5">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Edge Copy (Init 🡆 Recipe)"
+                                Command="{Binding CmdCopyInitToRecipe}"/>
+					</Grid>
+				</StackPanel>
+			</GroupBox>
             <!--<GroupBox Grid.Row="1"
                       Header="Color"
                       Margin="10,0,10,10"

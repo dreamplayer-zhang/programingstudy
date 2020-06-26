@@ -38,6 +38,10 @@ namespace RootTools.Inspects
 		[XmlIgnore] public Result m_SI;
 		public MapData MapData;
 		/// <summary>
+		/// 레시피가 로드된 상태를 표시한다
+		/// </summary>
+		[XmlIgnore] public bool Loaded { get; private set; }
+		/// <summary>
 		/// 레시피를 저장한다
 		/// </summary>
 		/// <param name="recipeDir">레시피가 저장될 폴더명</param>
@@ -96,6 +100,8 @@ namespace RootTools.Inspects
 		/// <returns></returns>
 		public void Load(string filePath)
 		{
+			Loaded = false;
+
 			XmlSerializer serializer = new XmlSerializer(typeof(Recipe));
 			Recipe result = new Recipe();
 
@@ -138,6 +144,8 @@ namespace RootTools.Inspects
 			{
 				LoadComplete();
 			}
+
+			Loaded = true;
 		}
 	}
 	public class Result
