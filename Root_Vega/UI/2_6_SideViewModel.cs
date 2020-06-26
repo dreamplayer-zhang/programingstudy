@@ -12,6 +12,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using MBrushes = System.Windows.Media.Brushes;
+using DPoint = System.Drawing.Point;
+
 namespace Root_Vega
 {
 	class _2_6_SideViewModel : ObservableObject
@@ -155,19 +158,54 @@ namespace Root_Vega
 		}
 		#endregion
 
-		#endregion
 
-		void ClearDrawList()
+
+		#region SideParamList
+
+		ObservableCollection<SurfaceParamData> _SideParamList;
+		public ObservableCollection<SurfaceParamData> SideParamList
 		{
-			for (int i = 0; i < 4; i++)
+			get { return _SideParamList; }
+			set
 			{
-				p_SimpleShapeDrawer_List[i].Clear();
-				p_InformationDrawerList[i].Clear();
-
-				p_ImageViewer_List[i].SetRoiRect();
-				p_InformationDrawerList[i].Redrawing();
+				SetProperty(ref _SideParamList, value);
 			}
 		}
+		#endregion
+
+		#region SelectedROI
+		Roi _SelectedROI;
+		public Roi SelectedROI
+		{
+			get { return _SelectedROI; }
+			set
+			{
+				SetProperty(ref _SelectedROI, value);
+
+				if (value != null)
+				{
+					SideParamList = new ObservableCollection<SurfaceParamData>(value.Surface.ParameterList);
+				}
+			}
+		}
+		#endregion
+
+		#region SelectedParam
+		SurfaceParamData _SelectedParam;
+		public SurfaceParamData SelectedParam
+		{
+			get { return _SelectedParam; }
+			set
+			{
+				if (value != null)
+				{
+					SetProperty(ref _SelectedParam, value);
+				}
+			}
+		}
+		#endregion
+
+		#endregion
 
 		public _2_6_SideViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
@@ -178,6 +216,59 @@ namespace Root_Vega
 			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
 			bUsingInspection = false;
 		}
+		void Init(IDialogService dialogService)
+		{
+			m_MemoryModule = m_Engineer.ClassMemoryTool();
+			m_ImageViewer_List = new List<ImageViewer_ViewModel>();
+			m_DrawHistoryWorker_List = new List<DrawHistoryWorker>();
+			m_SimpleShapeDrawer_List = new List<SimpleShapeDrawerVM>();
+
+			if (m_MemoryModule != null)
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					p_ImageViewer_List.Add(new ImageViewer_ViewModel(new ImageData(m_MemoryModule.GetMemory("SideVision.Memory", "Side", m_astrMem[i])), dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
+					m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
+				}
+
+				for (int i = 0; i < 4; i++)
+				{
+					p_SimpleShapeDrawer_List.Add(new SimpleShapeDrawerVM(p_ImageViewer_List[i]));
+					p_SimpleShapeDrawer_List[i].RectangleKeyValue = Key.D1;
+				}
+
+				for (int i = 0; i < 4; i++)
+				{
+					p_ImageViewer_List[i].SetDrawer(p_SimpleShapeDrawer_List[i]);
+					p_ImageViewer_List[i].m_HistoryWorker = m_DrawHistoryWorker_List[i];
+				}
+
+				p_ImageViewer_Top = p_ImageViewer_List[0];
+				p_ImageViewer_Left = p_ImageViewer_List[1];
+				p_ImageViewer_Right = p_ImageViewer_List[2];
+				p_ImageViewer_Bottom = p_ImageViewer_List[3];
+
+
+				p_InformationDrawerList = new List<InformationDrawer>();
+				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Top));
+				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Left));
+				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Right));
+				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Bottom));
+			}
+			m_Engineer.m_recipe.LoadComplete += () =>
+			{
+				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+				_SelectedROI = null;
+				SideParamList = new ObservableCollection<SurfaceParamData>();
+
+				SelectedParam = new SurfaceParamData();//UI 초기화를 위한 코드
+				SelectedParam = null;
+			};
+
+
+			return;
+		}
+
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
 		/// </summary>
@@ -230,52 +321,252 @@ namespace Root_Vega
 			}));
 		}
 
-		void Init(IDialogService dialogService)
+		void ClearDrawList()
 		{
-			m_MemoryModule = m_Engineer.ClassMemoryTool();
-			m_ImageViewer_List = new List<ImageViewer_ViewModel>();
-			m_DrawHistoryWorker_List = new List<DrawHistoryWorker>();
-			m_SimpleShapeDrawer_List = new List<SimpleShapeDrawerVM>();
-
-			if (m_MemoryModule != null)
+			for (int i = 0; i < 4; i++)
 			{
-				for (int i = 0; i < 4; i++)
-				{
-					p_ImageViewer_List.Add(new ImageViewer_ViewModel(new ImageData(m_MemoryModule.GetMemory("SideVision.Memory", "Side", m_astrMem[i])), dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
-					m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
-				}
+				p_SimpleShapeDrawer_List[i].Clear();
+				p_InformationDrawerList[i].Clear();
 
-				for (int i = 0; i < 4; i++)
-				{
-					p_SimpleShapeDrawer_List.Add(new SimpleShapeDrawerVM(p_ImageViewer_List[i]));
-					p_SimpleShapeDrawer_List[i].RectangleKeyValue = Key.D1;
-				}
-
-				for (int i = 0; i < 4; i++)
-				{
-					p_ImageViewer_List[i].SetDrawer((DrawToolVM)p_SimpleShapeDrawer_List[i]);
-					p_ImageViewer_List[i].m_HistoryWorker = m_DrawHistoryWorker_List[i];
-				}
-
-				p_ImageViewer_Top = p_ImageViewer_List[0];
-				p_ImageViewer_Left = p_ImageViewer_List[1];
-				p_ImageViewer_Right = p_ImageViewer_List[2];
-				p_ImageViewer_Bottom = p_ImageViewer_List[3];
-
-
-				p_InformationDrawerList = new List<InformationDrawer>();
-				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Top));
-				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Left));
-				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Right));
-				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Bottom));
+				p_ImageViewer_List[i].SetRoiRect();
+				p_InformationDrawerList[i].Redrawing();
 			}
-			m_Engineer.m_recipe.LoadComplete += () =>
+		}
+		void _clearInspReslut()
+		{
+
+		}
+
+		private void _startInsp()
+		{
+			//TODO EdgeboxViewModel과 SideViewModel에 중복된 메소드가 존재하므로 통합이 가능한경우 정리하도록 합시다
+			if (!m_Engineer.m_recipe.Loaded)
+				return;
+			if (SelectedROI == null)
+				return;
+
+			//1. edge box정보를 가져와서 edge 확보 후 전체 검사영역을 그린다
+			DrawEdgeBox(SelectedROI, SelectedROI.EdgeBox.UseCustomEdgeBox);
+			searchArea();
+
+			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
+		}
+		void DrawEdgeBox(Roi roi, bool useRecipeEdgeBox)
+		{
+			List<EdgeElement> targetList = new List<EdgeElement>();
+			var tempToolset = (InspectToolSet)m_Engineer.ClassToolBox().GetToolSet("Inspect");
+			var tempInspect = tempToolset.GetInspect("SideVision.Inspect");
+
+			ClearDrawList();
+
+			for (int i = 0; i < 4; i++)
 			{
-				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
-			};
+				if (p_SimpleShapeDrawer_List[i] == null) continue;
 
+				if (!useRecipeEdgeBox)
+				{
+					//Init에서 정보를 가져온다
+					targetList.Clear();
+					for (int j = 0; j < 6; j++)
+					{
+						var x = tempInspect.nTopLeftXLIst[i * 6 + j];
+						var y = tempInspect.nTopLeftYLIst[i * 6 + j];
+						var w = tempInspect.nWidthLIst[i * 6 + j];
+						var h = tempInspect.nHeighLIst[i * 6 + j];
+						EdgeElement tempElement = new EdgeElement(i, new CRect(x, y, x + w, y + h));
+						targetList.Add(tempElement);
+					}
+				}
+				else
+				{
+					//Recipe에서 불러온다. 저장된 Parameter가 정상이 아니면 로드하지 않는다
+					if (roi.EdgeBox != null && roi.EdgeBox.EdgeList.Count == 24)
+					{
+						targetList = roi.EdgeBox.EdgeList.Where(x => x.SavePoint == i).ToList();
+					}
+				}
+				foreach (EdgeElement item in targetList)
+				{
+					var temp = new UIElementInfo(new Point(item.Rect.Left, item.Rect.Top), new Point(item.Rect.Right, item.Rect.Bottom));
 
-			return;
+					System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+					rect.Width = item.Rect.Width;
+					rect.Height = item.Rect.Height;
+					System.Windows.Controls.Canvas.SetLeft(rect, item.Rect.Left);
+					System.Windows.Controls.Canvas.SetTop(rect, item.Rect.Top);
+					rect.StrokeThickness = 2;
+					rect.Stroke = MBrushes.Red;
+
+					p_SimpleShapeDrawer_List[i].m_ListShape.Add(rect);
+					p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
+					p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
+				}
+				p_ImageViewer_List[i].SetRoiRect();
+			}
+		}
+
+		private void _endInsp()
+		{
+
+		}
+
+		public void _addRoi()
+		{
+			if (!m_Engineer.m_recipe.Loaded)
+				return;
+
+			int roiCount = m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide).Count();
+			string defaultName = string.Format("Side ROI #{0}", roiCount);
+
+			Roi temp = new Roi(defaultName, Roi.Item.ReticleSide);
+			m_Engineer.m_recipe.RecipeData.RoiList.Add(temp);
+
+			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+		}
+		void _addParam()
+		{
+			if (!m_Engineer.m_recipe.Loaded)
+				return;
+
+			int paramCount = SelectedROI.Surface.ParameterList.Count;
+			string defaultName = string.Format("SurfaceParam #{0}", paramCount);
+
+			SurfaceParamData temp = new SurfaceParamData();
+			temp.Name = defaultName;
+
+			SelectedROI.Surface.ParameterList.Add(temp);
+
+			SideParamList = new ObservableCollection<SurfaceParamData>(SelectedROI.Surface.ParameterList);
+		}
+		void searchArea()
+		{
+			// variable
+			List<Rect> arcROIs = new List<Rect>();
+			List<DPoint> aptEdges = new List<DPoint>();
+			ImageViewer_ViewModel ivvm = p_ImageViewer_Top;
+			eEdgeFindDirection eTempDirection = eEdgeFindDirection.TOP;
+			DPoint ptLeft1, ptLeft2, ptBottom, ptRight1, ptRight2, ptTop;
+			DPoint ptLT, ptRT, ptLB, ptRB;
+
+			// implement
+			for (int i = 0; i < 4; i++)
+			{
+				if (p_SimpleShapeDrawer_List[i] == null) continue;
+				arcROIs.Clear();
+				aptEdges.Clear();
+				for (int j = 0; j < 6; j++)
+				{
+					if (p_SimpleShapeDrawer_List[i].m_ListRect.Count < 6) break;
+					arcROIs.Add(new Rect(p_SimpleShapeDrawer_List[i].m_ListRect[j].StartPos, p_SimpleShapeDrawer_List[i].m_ListRect[j].EndPos));
+				}
+				if (arcROIs.Count < 6) continue;
+				switch (i)
+				{
+					case 1:
+						ivvm = p_ImageViewer_Left;
+						break;
+					case 2:
+						ivvm = p_ImageViewer_Right;
+						break;
+					case 3:
+						ivvm = p_ImageViewer_Bottom;
+						break;
+					case 0:
+					default:
+						ivvm = p_ImageViewer_Top;
+						break;
+				}
+				for (int j = 0; j < arcROIs.Count; j++)
+				{
+					eTempDirection = InspectionManager.GetDirection(ivvm.p_ImageData, arcROIs[j]);
+					aptEdges.Add(InspectionManager.GetEdge(ivvm.p_ImageData, arcROIs[j], eTempDirection, SelectedROI.EdgeBox.UseAutoGV, SelectedROI.EdgeBox.SearchBrightToDark, SelectedROI.EdgeBox.EdgeThreshold));
+				}
+				// aptEeges에 있는 DPoint들을 좌표에 맞게 분배
+				List<DPoint> aSortedByX = aptEdges.OrderBy(x => x.X).ToList();
+				List<DPoint> aSortedByY = aptEdges.OrderBy(x => x.Y).ToList();
+				if (aSortedByX[0].Y < aSortedByX[1].Y)
+				{
+					ptLeft1 = aSortedByX[0];
+					ptLeft2 = aSortedByX[1];
+				}
+				else
+				{
+					ptLeft1 = aSortedByX[1];
+					ptLeft2 = aSortedByX[0];
+				}
+				if (aSortedByX[4].Y < aSortedByX[5].Y)
+				{
+					ptRight1 = aSortedByX[4];
+					ptRight2 = aSortedByX[5];
+				}
+				else
+				{
+					ptRight1 = aSortedByX[5];
+					ptRight2 = aSortedByX[4];
+				}
+				ptTop = aSortedByY[0];
+				ptBottom = aSortedByY[5];
+
+				ptLT = new DPoint(ptLeft1.X, ptTop.Y);
+				ptLB = new DPoint(ptLeft2.X, ptBottom.Y);
+				ptRB = new DPoint(ptRight2.X, ptBottom.Y);
+				ptRT = new DPoint(ptRight1.X, ptTop.Y);
+
+				DrawLine(ptLT, ptLB, MBrushes.Lime, i);
+				DrawLine(ptRB, ptRT, MBrushes.Lime, i);
+				DrawLine(ptLT, ptRT, MBrushes.Lime, i);
+				DrawLine(ptLB, ptRB, MBrushes.Lime, i);
+
+				DrawCross(ptLeft1, MBrushes.Yellow, i);
+				DrawCross(ptLeft2, MBrushes.Yellow, i);
+				DrawCross(ptBottom, MBrushes.Yellow, i);
+				DrawCross(ptRight1, MBrushes.Yellow, i);
+				DrawCross(ptRight2, MBrushes.Yellow, i);
+				DrawCross(ptTop, MBrushes.Yellow, i);
+
+				p_ImageViewer_List[i].SetRoiRect();
+			}
+			//m_Engineer.m_InspManager.StartInspection();
+		}
+		void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor, int nTLRB)
+		{
+			DPoint ptLT = new DPoint(pt.X - 40, pt.Y - 40);
+			DPoint ptRB = new DPoint(pt.X + 40, pt.Y + 40);
+			DPoint ptLB = new DPoint(pt.X - 40, pt.Y + 40);
+			DPoint ptRT = new DPoint(pt.X + 40, pt.Y - 40);
+
+			DrawLine(ptLT, ptRB, brsColor, nTLRB);
+			DrawLine(ptLB, ptRT, brsColor, nTLRB);
+		}
+		void DrawLine(System.Drawing.Point pt1, System.Drawing.Point pt2, System.Windows.Media.SolidColorBrush brsColor, int nTLRB)
+		{
+			// variable
+			ImageViewer_ViewModel ivvm;
+
+			// implement
+			Line myLine = new Line();
+			myLine.Stroke = brsColor;
+			myLine.X1 = pt1.X;
+			myLine.X2 = pt2.X;
+			myLine.Y1 = pt1.Y;
+			myLine.Y2 = pt2.Y;
+			myLine.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+			myLine.VerticalAlignment = VerticalAlignment.Center;
+			myLine.StrokeThickness = 2;
+
+			switch (nTLRB)
+			{
+				case 0: ivvm = m_ImageViewer_Top; break;
+				case 1: ivvm = m_ImageViewer_Left; break;
+				case 2: ivvm = m_ImageViewer_Right; break;
+				case 3: ivvm = m_ImageViewer_Bottom; break;
+				default: ivvm = m_ImageViewer_Top; break;
+			}
+
+			ivvm.SelectedTool.m_ListShape.Add(myLine);
+			UIElementInfo uei = new UIElementInfo(new System.Windows.Point(myLine.X1, myLine.Y1), new System.Windows.Point(myLine.X2, myLine.Y2));
+			ivvm.SelectedTool.m_ListRect.Add(uei);
+			ivvm.SelectedTool.m_Element.Add(myLine);
 		}
 
 
@@ -296,63 +587,25 @@ namespace Root_Vega
 		//}
 
 		#region Command
-		public ICommand btnInspTest
+		public RelayCommand CommandClearInspResult
 		{
-			get
-			{
-				return new RelayCommand(_btnInspTest);
-			}
+			get { return new RelayCommand(_clearInspReslut); }
 		}
-		private void _btnInspTest()
+		public RelayCommand CommandStartInsp
 		{
-			//currentDefectIdx = 0;
-
-			//CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Surface.NonPatternList[0].Area;
-			//int nblocksize = 500;
-
-
-			////DrawRectList = m_Engineer.m_InspManager.CreateInspArea(Mask_Rect, nblocksize,
-			////	p_Recipe.p_RecipeData.p_Roi[0].m_Surface.p_Parameter[0],
-			////	p_Recipe.p_RecipeData.p_bDefectMerge, p_Recipe.p_RecipeData.p_nMergeDistance);
-
-			//for (int i = 0; i < DrawRectList.Count; i++)
-			//{
-			//	CRect inspblock = DrawRectList[i];
-			//	m_DD.AddRectData(inspblock, System.Drawing.Color.Orange);
-
-			//}
-			//System.Diagnostics.Debug.WriteLine("Start Insp");
-
-			//inspDefaultDir = @"C:\vsdb";
-			//if (!System.IO.Directory.Exists(inspDefaultDir))
-			//{
-			//	System.IO.Directory.CreateDirectory(inspDefaultDir);
-			//}
-			//inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
-			//var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
-			//string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
-
-			//if (VSDBManager == null)
-			//{
-			//	VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
-			//}
-			//else if (VSDBManager.IsConnected)
-			//{
-			//	VSDBManager.Disconnect();
-			//	VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
-			//}
-			//if (VSDBManager.Connect())
-			//{
-			//	VSDBManager.CreateTable("Datainfo");
-			//	VSDBManager.CreateTable("Data");
-
-			//	VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
-			//	VSDataDT = VSDBManager.GetDataTable("Data");
-			//}
-
-			////m_Engineer.m_InspManager.StartInspection(InspectionType.Surface, m_Image.p_Size.X, m_Image.p_Size.Y);//사용 예시
-
-			//return;
+			get { return new RelayCommand(_startInsp); }
+		}
+		public RelayCommand CommandEndInsp
+		{
+			get { return new RelayCommand(_endInsp); }
+		}
+		public RelayCommand CommandAddRoi
+		{
+			get { return new RelayCommand(_addRoi); }
+		}
+		public RelayCommand CommandAddParam
+		{
+			get { return new RelayCommand(_addParam); }
 		}
 		#endregion
 	}

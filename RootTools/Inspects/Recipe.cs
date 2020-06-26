@@ -339,6 +339,24 @@ namespace RootTools.Inspects
 		}
 
 		#endregion
+
+		#region Name
+		protected string _Name;
+		public string Name
+		{
+			get
+			{
+				return _Name;
+			}
+			set
+			{
+				if (_Name == value)
+					return;
+				_Name = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
 	}
 	public class SurfaceParamData : BaseParamData
 	{
@@ -348,6 +366,7 @@ namespace RootTools.Inspects
 			UseAbsoluteInspection = true;
 			_targetGV = new Param<int>(70, 0, 255);
 			_defectSize = new Param<int>(10, 1, int.MaxValue);
+			Name = "SurfaceParameter";
 		}
 
 		#region UseDarkInspection
@@ -397,6 +416,7 @@ namespace RootTools.Inspects
 			_bandwidth = new Param<int>(10, 0, 255);
 			_intensity = new Param<int>(120, 0, int.MaxValue);
 			TargetLabelText = "GV";//Strip은 무조건 절대검사
+			Name = "StripParameter";
 		}
 
 		#region Intensity

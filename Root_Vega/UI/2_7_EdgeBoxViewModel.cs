@@ -408,6 +408,9 @@ namespace Root_Vega
 		}
 		public void _addRoi()
 		{
+			if (!m_Engineer.m_recipe.Loaded)
+				return;
+
 			int roiCount = m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide).Count();
 			string defaultName = string.Format("Side ROI #{0}", roiCount);
 
