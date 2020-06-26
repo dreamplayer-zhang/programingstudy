@@ -84,7 +84,7 @@
                                     <ColumnDefinition Width="1.2*"/>
                                     <ColumnDefinition Width="1*"/>
                                 </Grid.ColumnDefinitions>
-                                <ProgressBar Grid.Column="0" Margin="5" Orientation="Vertical" Value="{Binding p_prgHome}" />
+                                <ProgressBar Grid.Column="0" Margin="5" Orientation="Horizontal" Value="{Binding p_prgHome}" />
                                 <Button Grid.Column="1" Content="Home" Margin="3" Command="{Binding HomeClickCommand}"/>
                             </Grid>
                         </GroupBox>
@@ -106,9 +106,9 @@
                                               Command="{Binding MJogFastCommand}" Interval="100" Delay="100"/>
                                 <RepeatButton Grid.Column="1" Content="◀" Margin="4,3,4,3" 
                                               Command="{Binding MJogSlowCommand}" Interval="100" Delay="100"/>
-                                <Button Grid.Column="2" Content="-" Margin="4,3,4,3"/>
-                                <TextBox Grid.Column="3" Margin="4,3,4,3"/>
-                                <Button Grid.Column="4" Content="+" Margin="4,3,4,3"/>
+                                <Button Grid.Column="2" Content="-" Margin="4,3,4,3" Command="{Binding MinusRelativeMoveCommand}"/>
+                                <TextBox Grid.Column="3" Margin="4,3,4,3" TextAlignment="Center" Text="{Binding p_dRelPos}"/>
+                                <Button Grid.Column="4" Content="+" Margin="4,3,4,3" Command="{Binding PlusRelativeMoveCommand}"/>
                                 <RepeatButton Grid.Column="5" Content="▶" Margin="4,3,4,3" 
                                               Command="{Binding PJogSlowCommand}" Interval="100" Delay="100"/>
                                 <RepeatButton Grid.Column="6" Content="▶▶" Margin="4,3,4,3" 
