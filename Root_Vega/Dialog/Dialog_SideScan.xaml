@@ -84,9 +84,8 @@
                 </ListBox.Template>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal">
-                            
-                        </WrapPanel>
+                        <WrapPanel Orientation="Horizontal"
+                                    ></WrapPanel>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
                 <ListBox.ItemContainerStyle>
@@ -103,13 +102,13 @@
                                  Background="#FF1B1B1C"
                                  Height="65"
                                  CornerRadius="5">
-                            <Border.Width>
+                            <!--<Border.Width>
                                 <MultiBinding Converter="{StaticResource ListViewContentsWidthConverters}">
                                     <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}" />
                                     <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}"
                                              Path="ActualWidth" />
                                 </MultiBinding>
-                            </Border.Width>
+                            </Border.Width>-->
                             <TextBlock HorizontalAlignment="Center"
                                        Height="Auto"
                                        TextWrapping="Wrap"

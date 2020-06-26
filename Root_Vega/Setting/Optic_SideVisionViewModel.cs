@@ -279,12 +279,52 @@ namespace Root_Vega
                     if (Grab.m_grabMode == null && BevelGrab.m_grabMode == null)
                     {
                         CameraSet cameraSet = p_SideVision.m_cameraSet;
-
-                        // SideGrab
                         MemoryPool memoryPool = m_Engineer.ClassMemoryTool().GetPool("SideVision.Memory", false);
 
+                        // SideGrab
                         SideVision.Run_SideGrab GrabSideBottom = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
                         GrabMode grabModeSideBottom = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
+                        SideVision.Run_SideGrab GrabSideLeft = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
+                        GrabMode grabModeSideLeft = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
+                        SideVision.Run_SideGrab GrabSideTop = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
+                        GrabMode grabModeSideTop = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
+                        SideVision.Run_SideGrab GrabSideRight = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
+                        GrabMode grabModeSideRight = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
+
+                        GrabMode grabModeTemp = null;
+                        for (int i = 0; i<4; i++)
+                        {
+                            switch(i)
+                            {
+                                case (int)eScanPos.Bottom:
+                                    grabModeTemp = grabModeSideBottom;
+                                    grabModeTemp.m_eScanPos = eScanPos.Bottom;
+                                    break;
+                                case (int)eScanPos.Left:
+                                    grabModeTemp = grabModeSideLeft;
+                                    grabModeTemp.m_eScanPos = eScanPos.Left;
+                                    break;
+                                case (int)eScanPos.Right:
+                                    grabModeTemp = grabModeSideRight;
+                                    grabModeTemp.m_eScanPos = eScanPos.Right;
+                                    break;
+                                case (int)eScanPos.Top:
+                                    grabModeTemp = grabModeSideTop;
+                                    grabModeTemp.m_eScanPos = eScanPos.Top;
+                                    break;
+                                default:
+                                    return;
+                                    break;
+                            }
+                            grabModeTemp.m_memoryGroup = memoryPool.GetGroup("Grab");
+                            grabModeTemp.m_ScanStartLine = 0;
+                            grabModeTemp.m_ScanLineNum = 3;
+                            grabModeTemp.m_camera = p_SideVision.p_CamSide;
+
+                        }
+
+                        //SideVision.Run_SideGrab GrabSideBottom = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
+                        //GrabMode grabModeSideBottom = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
                         grabModeSideBottom.m_memoryGroup = memoryPool.GetGroup("Grab");
                         grabModeSideBottom.m_ScanStartLine = 0;
                         grabModeSideBottom.m_ScanLineNum = 3;
@@ -293,8 +333,8 @@ namespace Root_Vega
                         GrabSideBottom.m_grabMode = grabModeSideBottom;
                         Sidevision.StartRun(GrabSideBottom);
 
-                        SideVision.Run_SideGrab GrabSideLeft = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-                        GrabMode grabModeSideLeft = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
+                        //SideVision.Run_SideGrab GrabSideLeft = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
+                        //GrabMode grabModeSideLeft = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
                         grabModeSideLeft.m_memoryGroup = memoryPool.GetGroup("Grab");
                         grabModeSideLeft.m_ScanStartLine = 0;
                         grabModeSideLeft.m_ScanLineNum = 3;
@@ -303,8 +343,8 @@ namespace Root_Vega
                         GrabSideLeft.m_grabMode = grabModeSideLeft;
                         Sidevision.StartRun(GrabSideLeft);
 
-                        SideVision.Run_SideGrab GrabSideTop = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-                        GrabMode grabModeSideTop = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
+                        //SideVision.Run_SideGrab GrabSideTop = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
+                        //GrabMode grabModeSideTop = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
                         grabModeSideTop.m_memoryGroup = memoryPool.GetGroup("Grab");
                         grabModeSideTop.m_ScanStartLine = 0;
                         grabModeSideTop.m_ScanLineNum = 3;
@@ -314,8 +354,8 @@ namespace Root_Vega
                         Sidevision.StartRun(GrabSideTop);
 
 
-                        SideVision.Run_SideGrab GrabSideRight = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-                        GrabMode grabModeSideRight = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
+                        //SideVision.Run_SideGrab GrabSideRight = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
+                        //GrabMode grabModeSideRight = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
                         grabModeSideRight.m_memoryGroup = memoryPool.GetGroup("Grab");
                         grabModeSideRight.m_ScanStartLine = 0;
                         grabModeSideRight.m_ScanLineNum = 3;
