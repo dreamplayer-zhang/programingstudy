@@ -55,19 +55,6 @@ namespace Root_Vega
             }
         }
 
-        eScanPos m_eSelScanPos = eScanPos.Bottom;
-        public eScanPos p_eSelScanPos
-        {
-            get
-            {
-                return m_eSelScanPos;
-            }
-            set
-            {
-                SetProperty(ref m_eSelScanPos, value);
-            }
-        }
-
         ObservableCollection<GrabMode> m_GrabMode= new ObservableCollection<GrabMode>();
         public ObservableCollection<GrabMode> p_GrabMode
         {
@@ -125,15 +112,11 @@ namespace Root_Vega
             if(p_SelGrabMode.p_sName.IndexOf("Side") >=0)
             {
                 m_RunSideGrab.m_grabMode = p_SelGrabMode;
-                m_RunSideGrab.m_grabMode.m_eScanPos = p_eSelScanPos;
-                //m_RunSideGrab.m_eScanPos = p_eSelScanPos;
                 m_RunBevelGrab.m_grabMode = null;
             }
             else if( p_SelGrabMode.p_sName.IndexOf("Bevel")>=0)
             {
                 m_RunBevelGrab.m_grabMode = p_SelGrabMode;
-                m_RunBevelGrab.m_grabMode.m_eScanPos = p_eSelScanPos;
-                //m_RunBevelGrab.m_eScanPos = p_eSelScanPos;
                 m_RunSideGrab.m_grabMode = null;
             }
             CloseRequested(this, new DialogCloseRequestedEventArgs(true));
