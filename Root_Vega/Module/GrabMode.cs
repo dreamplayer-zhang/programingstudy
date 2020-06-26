@@ -150,8 +150,8 @@ namespace Root_Vega
         {
             string sName = p_sName;
             p_sName = tree.Set(p_sName, p_sName, p_id, "Grab Mode Name");
-            if (sName != p_sName)
-                m_sMemoryGroup = p_sName;
+            //if (sName != p_sName)
+            //    m_sMemoryGroup = p_sName;
         }
 
         public void RunTree(Tree tree, bool bVisible, bool bReadOnly)

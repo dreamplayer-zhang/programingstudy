@@ -137,7 +137,7 @@
     <Compile Include="Camera\BaslerPylon\CameraBasler_UI.xaml.cs">
       <DependentUpon>CameraBasler_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AutoFocus\AutoFocus.cs" />
+    <Compile Include="ImageProcess\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_Classes.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_UI.xaml.cs">
@@ -228,6 +228,7 @@
       <DependentUpon>XGem_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="IHandler.cs" />
+    <Compile Include="ImageProcess\FocusStacking.cs" />
     <Compile Include="Image\CRect.cs" />
     <Compile Include="Comm\CyUSBTool.cs" />
     <Compile Include="Comm\CyUSBTool_UI.xaml.cs">
