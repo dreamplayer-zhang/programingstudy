@@ -252,9 +252,9 @@ namespace Root_Vega.Module
         public string BeforeGet()
         {
             // Clamp축 Home
-            if (Run(m_axisClamp.Move(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
-            if (m_axisClamp.p_axis.p_sensorHome == false)   // 인터락 추가
+            if (m_axisClamp.p_sensorHome == false)   // 인터락 추가
             {
                 p_sInfo = "Clamp Home이 완료되지 않았습니다.";
                 return p_sInfo;
@@ -303,7 +303,7 @@ namespace Root_Vega.Module
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // Clamp 축 열기
-            if (Run(m_axisClamp.Move(eAxisPosClamp.Open))) return p_sInfo;
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Open))) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
 
             if (p_infoReticle == null) return p_id + " BeforeGet : InfoReticle = null";
@@ -313,7 +313,7 @@ namespace Root_Vega.Module
         public string BeforePut()
         {
             // Clamp축 Home
-            if (Run(m_axisClamp.Move(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
 
             // 레티클 유무체크 촬영위치 이동
@@ -359,7 +359,7 @@ namespace Root_Vega.Module
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // Clamp 축 열기
-            if (Run(m_axisClamp.Move(eAxisPosClamp.Open))) return p_sInfo;
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Open))) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
 
             if (p_infoReticle != null) return p_id + " BeforePut : InfoReticle != null";
@@ -369,7 +369,7 @@ namespace Root_Vega.Module
         public string AfterGet()
         {
             // Clamp축 Home
-            if (Run(m_axisClamp.Move(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
 
             return CheckGetPut();
@@ -378,7 +378,7 @@ namespace Root_Vega.Module
         public string AfterPut()
         {
             // Clamp Home
-            if (Run(m_axisClamp.Move(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
 
             return CheckGetPut();
