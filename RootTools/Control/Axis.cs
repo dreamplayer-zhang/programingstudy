@@ -106,9 +106,9 @@ namespace RootTools.Control
         public List<string> m_asPos = new List<string>(); 
         public ObservableCollection<string> p_asPos { get; set; }
 
-        public void AddPos(params dynamic[] aPos)
+        public void AddPos(params string[] asPos)
         {
-            foreach (dynamic value in aPos) AddPos(value.ToString());
+            foreach (string sPos in asPos) AddPos(sPos);
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
         }
@@ -268,9 +268,9 @@ namespace RootTools.Control
         public List<string> m_asSpeed = new List<string>(); 
         public ObservableCollection<string> p_asSpeed { get; set; }
 
-        public void AddSpeed(params dynamic[] aSpeed)
+        public void AddSpeed(params string[] asSpeed)
         {
-            foreach (dynamic value in aSpeed) AddSpeed(value.ToString());
+            foreach (string sSpeed in asSpeed) AddSpeed(sSpeed);
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
         }

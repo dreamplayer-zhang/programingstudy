@@ -28,11 +28,11 @@ namespace RootTools.Control
 
         #region List Position
         public List<string> m_asPos = new List<string>();
-        public void AddPos(params dynamic[] aPos)
+        public void AddPos(params string[] asPos)
         {
-            p_axisX.AddPos(aPos);
-            p_axisY.AddPos(aPos);
-            foreach (dynamic value in aPos) m_asPos.Add(value.ToString()); 
+            p_axisX.AddPos(asPos);
+            p_axisY.AddPos(asPos);
+            foreach (string sPos in asPos) m_asPos.Add(sPos); 
         }
 
         public RPoint GetPosValue(Enum pos)
@@ -53,10 +53,10 @@ namespace RootTools.Control
         #endregion
 
         #region List Speed
-        public void AddSpeed(params dynamic[] aSpeed)
+        public void AddSpeed(params string[] asSpeed)
         {
-            p_axisX.AddPos(aSpeed);
-            p_axisY.AddPos(aSpeed);
+            p_axisX.AddPos(asSpeed);
+            p_axisY.AddPos(asSpeed);
         }
         #endregion
 
