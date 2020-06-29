@@ -93,13 +93,20 @@ namespace RootTools.Control
         }
         #endregion
 
+        #region Functions
+        public void ServoOn(bool bOn)
+        {
+            p_axisX.ServoOn(bOn);
+            p_axisY.ServoOn(bOn); 
+        }
+        #endregion
+
         public Axis p_axisX { get; set; }
         public Axis p_axisY { get; set; }
 
         public void Init(string id, Log log)
         {
             p_id = id;
-//            m_log = log;
         }
     }
 }

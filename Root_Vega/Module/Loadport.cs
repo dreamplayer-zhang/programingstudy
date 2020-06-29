@@ -323,19 +323,17 @@ namespace Root_Vega.Module
         {
             if (EQ.p_bSimulate == false)
             {
-                ((AjinAxis)m_axisZ.p_axis).ServoOn(true, true);
-                ((AjinAxis)m_axisTheta.p_axis).ServoOn(true, true);
-                ((AjinAxis)m_axisPodLifter.p_axisX).ServoOn(true, true);
-                ((AjinAxis)m_axisPodLifter.p_axisY).ServoOn(true, true);
-                ((AjinAxis)m_axisReticleLifter.p_axisX).ServoOn(true, true);
-                ((AjinAxis)m_axisReticleLifter.p_axisY).ServoOn(true, true);
+                m_axisZ.ServoOn(true);
+                m_axisTheta.ServoOn(true);
+                m_axisPodLifter.ServoOn(true); 
+                m_axisReticleLifter.ServoOn(true);
                 Thread.Sleep(1000);
-                ((AjinAxis)m_axisZ.p_axis).p_eState = Axis.eState.Ready;
-                ((AjinAxis)m_axisTheta.p_axis).p_eState = Axis.eState.Ready;
-                ((AjinAxis)m_axisPodLifter.p_axisX).p_eState = Axis.eState.Ready;
-                ((AjinAxis)m_axisPodLifter.p_axisY).p_eState = Axis.eState.Ready;
-                ((AjinAxis)m_axisReticleLifter.p_axisX).p_eState = Axis.eState.Ready;
-                ((AjinAxis)m_axisReticleLifter.p_axisY).p_eState = Axis.eState.Ready;
+                m_axisZ.p_eState = Axis.eState.Ready;
+                m_axisTheta.p_eState = Axis.eState.Ready;
+                m_axisPodLifter.p_axisX.p_eState = Axis.eState.Ready;
+                m_axisPodLifter.p_axisY.p_eState = Axis.eState.Ready;
+                m_axisReticleLifter.p_axisX.p_eState = Axis.eState.Ready;
+                m_axisReticleLifter.p_axisY.p_eState = Axis.eState.Ready;
                 //JWS 200616 ADD
                 if (GetdZPos(ePosZ.InnerPod) < 0)
                 {
@@ -388,13 +386,14 @@ namespace Root_Vega.Module
             return Home_Innerpod();
         }
 
-        public string HomeToMinusLimit(params IAxis[] aAxis) //JWS 200625 ADD
+        public string HomeToMinusLimit(params Axis[] aAxis) //JWS 200625 ADD
         {
             p_sInfo = StateHome(aAxis);
             if (p_sInfo != "OK") return p_sInfo;
-            foreach (IAxis axis in aAxis)
-                if (!axis.p_sensorLimitM) return axis.ToString() + " not home done.";
-
+            foreach (Axis axis in aAxis)
+            {
+                if (!axis.p_sensorMinusLimit) return axis.ToString() + " not home done.";
+            }
             return p_sInfo;
         }
 
