@@ -281,129 +281,50 @@ namespace Root_Vega
                         CameraSet cameraSet = p_SideVision.m_cameraSet;
                         MemoryPool memoryPool = m_Engineer.ClassMemoryTool().GetPool("SideVision.Memory", false);
 
-                        // SideGrab
-                        SideVision.Run_SideGrab GrabSideBottom = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-                        GrabMode grabModeSideBottom = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-                        SideVision.Run_SideGrab GrabSideLeft = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-                        GrabMode grabModeSideLeft = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-                        SideVision.Run_SideGrab GrabSideTop = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-                        GrabMode grabModeSideTop = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-                        SideVision.Run_SideGrab GrabSideRight = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-                        GrabMode grabModeSideRight = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-
-                        GrabMode grabModeTemp = null;
+                        List<SideVision.Run_SideGrab> aSideGrabs = new List<SideVision.Run_SideGrab>();
+                        List<GrabMode> aSideModes = new List<GrabMode>();
+                        List<SideVision.Run_BevelGrab> aBevelGrabs = new List<SideVision.Run_BevelGrab>();
+                        List<GrabMode> aBevelModes = new List<GrabMode>();
+                        
                         for (int i = 0; i<4; i++)
                         {
-                            switch(i)
+                            aSideGrabs.Add((SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab"));
+                            aSideModes.Add(new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool));
+                            aBevelGrabs.Add((SideVision.Run_BevelGrab)Sidevision.CloneModuleRun("BevelGrab"));
+                            aBevelModes.Add(new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool));
+
+                            // SideGrab
+                            aSideModes[i].m_memoryGroup = memoryPool.GetGroup("Grab");
+                            aSideModes[i].m_ScanStartLine = 0;
+                            aSideModes[i].m_ScanLineNum = 3;
+                            aSideModes[i].m_camera = p_SideVision.p_CamSide;
+
+                            switch (i)
                             {
-                                case (int)eScanPos.Bottom:
-                                    grabModeTemp = grabModeSideBottom;
-                                    grabModeTemp.m_eScanPos = eScanPos.Bottom;
-                                    break;
-                                case (int)eScanPos.Left:
-                                    grabModeTemp = grabModeSideLeft;
-                                    grabModeTemp.m_eScanPos = eScanPos.Left;
-                                    break;
-                                case (int)eScanPos.Right:
-                                    grabModeTemp = grabModeSideRight;
-                                    grabModeTemp.m_eScanPos = eScanPos.Right;
-                                    break;
-                                case (int)eScanPos.Top:
-                                    grabModeTemp = grabModeSideTop;
-                                    grabModeTemp.m_eScanPos = eScanPos.Top;
-                                    break;
-                                default:
-                                    return;
-                                    break;
+                                case (int)eScanPos.Bottom: aSideModes[i].m_eScanPos = eScanPos.Bottom; break;
+                                case (int)eScanPos.Left: aSideModes[i].m_eScanPos = eScanPos.Left; break;
+                                case (int)eScanPos.Right: aSideModes[i].m_eScanPos = eScanPos.Right; break;
+                                case (int)eScanPos.Top: aSideModes[i].m_eScanPos = eScanPos.Top; break;
                             }
-                            grabModeTemp.m_memoryGroup = memoryPool.GetGroup("Grab");
-                            grabModeTemp.m_ScanStartLine = 0;
-                            grabModeTemp.m_ScanLineNum = 3;
-                            grabModeTemp.m_camera = p_SideVision.p_CamSide;
+                            aSideGrabs[i].m_grabMode = aSideModes[i];
+                            Sidevision.StartRun(aSideGrabs[i]);
 
+                            // BevelGrab
+                            aBevelModes[i].m_memoryGroup = memoryPool.GetGroup("Grab");
+                            aBevelModes[i].m_ScanStartLine = 0;
+                            aBevelModes[i].m_ScanLineNum = 1;
+                            aBevelModes[i].m_camera = p_SideVision.p_CamBevel;
+
+                            switch (i)
+                            {
+                                case (int)eScanPos.Bottom: aBevelModes[i].m_eScanPos = eScanPos.Bottom; break;
+                                case (int)eScanPos.Left: aBevelModes[i].m_eScanPos = eScanPos.Left; break;
+                                case (int)eScanPos.Right: aBevelModes[i].m_eScanPos = eScanPos.Right; break;
+                                case (int)eScanPos.Top: aBevelModes[i].m_eScanPos = eScanPos.Top; break;
+                            }
+                            aBevelGrabs[i].m_grabMode = aBevelModes[i];
+                            Sidevision.StartRun(aBevelGrabs[i]);
                         }
-
-                        //SideVision.Run_SideGrab GrabSideBottom = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-                        //GrabMode grabModeSideBottom = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-                        grabModeSideBottom.m_memoryGroup = memoryPool.GetGroup("Grab");
-                        grabModeSideBottom.m_ScanStartLine = 0;
-                        grabModeSideBottom.m_ScanLineNum = 3;
-                        grabModeSideBottom.m_camera = p_SideVision.p_CamSide;
-                        grabModeSideBottom.m_eScanPos = eScanPos.Bottom;
-                        GrabSideBottom.m_grabMode = grabModeSideBottom;
-                        Sidevision.StartRun(GrabSideBottom);
-
-                        //SideVision.Run_SideGrab GrabSideLeft = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-                        //GrabMode grabModeSideLeft = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-                        grabModeSideLeft.m_memoryGroup = memoryPool.GetGroup("Grab");
-                        grabModeSideLeft.m_ScanStartLine = 0;
-                        grabModeSideLeft.m_ScanLineNum = 3;
-                        grabModeSideLeft.m_camera = p_SideVision.p_CamSide;
-                        grabModeSideLeft.m_eScanPos = eScanPos.Left;
-                        GrabSideLeft.m_grabMode = grabModeSideLeft;
-                        Sidevision.StartRun(GrabSideLeft);
-
-                        //SideVision.Run_SideGrab GrabSideTop = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-                        //GrabMode grabModeSideTop = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-                        grabModeSideTop.m_memoryGroup = memoryPool.GetGroup("Grab");
-                        grabModeSideTop.m_ScanStartLine = 0;
-                        grabModeSideTop.m_ScanLineNum = 3;
-                        grabModeSideTop.m_camera = p_SideVision.p_CamSide;
-                        grabModeSideTop.m_eScanPos = eScanPos.Top;
-                        GrabSideTop.m_grabMode = grabModeSideTop;
-                        Sidevision.StartRun(GrabSideTop);
-
-
-                        //SideVision.Run_SideGrab GrabSideRight = (SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab");
-                        //GrabMode grabModeSideRight = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-                        grabModeSideRight.m_memoryGroup = memoryPool.GetGroup("Grab");
-                        grabModeSideRight.m_ScanStartLine = 0;
-                        grabModeSideRight.m_ScanLineNum = 3;
-                        grabModeSideRight.m_camera = p_SideVision.p_CamSide;
-                        grabModeSideRight.m_eScanPos = eScanPos.Right;
-                        GrabSideRight.m_grabMode = grabModeSideRight;
-                        Sidevision.StartRun(GrabSideRight);
-
-                        //// BevelGrab
-                        SideVision.Run_BevelGrab GrabBevelBottom = (SideVision.Run_BevelGrab)Sidevision.CloneModuleRun("BevelGrab");
-                        GrabMode grabModeBevelBottom = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-                        grabModeBevelBottom.m_memoryGroup = memoryPool.GetGroup("Grab");
-                        grabModeBevelBottom.m_ScanStartLine = 0;
-                        grabModeBevelBottom.m_ScanLineNum = 1;
-                        grabModeBevelBottom.m_camera = p_SideVision.p_CamBevel;
-                        grabModeBevelBottom.m_eScanPos = eScanPos.Bottom;
-                        GrabBevelBottom.m_grabMode = grabModeBevelBottom;
-                        Sidevision.StartRun(GrabBevelBottom);
-
-                        SideVision.Run_BevelGrab GrabBevelLeft = (SideVision.Run_BevelGrab)Sidevision.CloneModuleRun("BevelGrab");
-                        GrabMode grabModeBevelLeft = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-                        grabModeBevelLeft.m_memoryGroup = memoryPool.GetGroup("Grab");
-                        grabModeBevelLeft.m_ScanStartLine = 0;
-                        grabModeBevelLeft.m_ScanLineNum = 1;
-                        grabModeBevelLeft.m_camera = p_SideVision.p_CamBevel;
-                        grabModeBevelLeft.m_eScanPos = eScanPos.Left;
-                        GrabBevelLeft.m_grabMode = grabModeBevelLeft;
-                        Sidevision.StartRun(GrabBevelLeft);
-
-                        SideVision.Run_BevelGrab GrabBevelTop = (SideVision.Run_BevelGrab)Sidevision.CloneModuleRun("BevelGrab");
-                        GrabMode grabModeBevelTop = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-                        grabModeBevelTop.m_memoryGroup = memoryPool.GetGroup("Grab");
-                        grabModeBevelTop.m_ScanStartLine = 0;
-                        grabModeBevelTop.m_ScanLineNum = 1;
-                        grabModeBevelTop.m_camera = p_SideVision.p_CamBevel;
-                        grabModeBevelTop.m_eScanPos = eScanPos.Top;
-                        GrabBevelTop.m_grabMode = grabModeBevelTop;
-                        Sidevision.StartRun(GrabBevelTop);
-
-                        SideVision.Run_BevelGrab GrabBevelRight = (SideVision.Run_BevelGrab)Sidevision.CloneModuleRun("BevelGrab");
-                        GrabMode grabModeBevelRight = new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool);
-                        grabModeBevelRight.m_memoryGroup = memoryPool.GetGroup("Grab");
-                        grabModeBevelRight.m_ScanStartLine = 0;
-                        grabModeBevelRight.m_ScanLineNum = 1;
-                        grabModeBevelRight.m_camera = p_SideVision.p_CamBevel;
-                        grabModeBevelRight.m_eScanPos = eScanPos.Right;
-                        GrabBevelRight.m_grabMode = grabModeBevelRight;
-                        Sidevision.StartRun(GrabBevelRight);
                     }
                     else if (Grab.m_grabMode != null)
                         Sidevision.StartRun(Grab);
