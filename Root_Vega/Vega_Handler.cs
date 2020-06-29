@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace Root_Vega
 {
-    public class Vega_Handler : ObservableObject, IHandler
+    public class Vega_Handler : IHandler
     {
         #region UI Binding
         public Brush p_brushHandler 

@@ -1295,7 +1295,7 @@ namespace RootTools.Gem.XGem
             if (m_xGem == null) return;
             try
             {
-                if (m_bStart == false) return; //forget 정산 종료 조건 ??
+                if (m_bStart == false) return; //forget 정상 종료 조건 ??
                 m_xGem.Stop();
                 m_xGem.Close();
             }

@@ -1,5 +1,4 @@
-﻿using Root_Wind.Module;
-using RootTools;
+﻿using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
@@ -8,9 +7,9 @@ using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Root_Wind
+namespace Root_EFEM
 {
-    public class Wind_Handler : NotifyProperty, IHandler
+    public class EFEM_Handler : IHandler
     {
         #region UI Binding
         public Brush p_brushHandler
@@ -28,52 +27,31 @@ namespace Root_Wind
 
         #region Module
         public ModuleList m_moduleList;
-        public Wind_Recipe m_recipe;
-        public Wind_Process m_process;
-        WTR_RND _wtr = null;
-        public WTR_RND p_wtr 
-        { 
-            get { return _wtr;} 
-            set { _wtr = value; } 
-        }
-        Loadport_RND[] _aLoadport = new Loadport_RND[2];
-        public Loadport_RND[] p_aLoadport
-        { 
-            get {return _aLoadport;}
-            set { _aLoadport = value; }
-        }
-        Aligner_ATI _aligner = null;
-        public Aligner_ATI p_aligner
-        {
-            get { return _aligner; }
-            set { _aligner = value; }
-        }
-        Vision _vision=null;
-        public Vision p_vision 
-        {
-            get { return _vision; }
-            set { _vision = value; } 
-        }
+        public EFEM_Recipe m_recipe;
+//        public EFEM_Process m_process;
+//        public EFEM m_efem;
+//        public Robot_RND m_robot;
+//        public Loadport[] m_aLoadport = new Loadport[2];
+//        public FDC m_FDC;
 
         void InitModule()
-        {  
+        {
             m_moduleList = new ModuleList(m_engineer);
-            p_wtr = new WTR_RND("WTR", m_engineer);
-            InitModule(p_wtr);
-            p_aLoadport[0] = new Loadport_RND("LoadportA", "LP1", m_engineer);
-            InitModule(p_aLoadport[0]);
-            p_aLoadport[1] = new Loadport_RND("LoadportB", "LP2", m_engineer);
-            InitModule(p_aLoadport[1]);
-            p_aligner = new Aligner_ATI("Aligner", m_engineer);
-            InitModule(p_aligner);
-            p_vision = new Vision("Vision", m_engineer);
-            InitModule(p_vision);
-            p_wtr.AddChild(p_aLoadport[0], p_aLoadport[1], p_aligner, p_vision);
-            p_wtr.ReadInfoWafer_Registry();
-
-            m_recipe = new Wind_Recipe("Recipe", m_engineer);
-            m_recipe.AddModule(p_aligner, p_vision);
-            m_process = new Wind_Process("Process", m_engineer, this);
+//            m_efem = new EFEM("EFEM", m_engineer);
+//            InitModule(m_efem);
+//            m_robot = new Robot_RND("Robot", m_engineer);
+//            InitModule(m_robot);
+//            m_aLoadport[0] = new Loadport("LoadportA", "LP1", m_engineer);
+//            InitModule(m_aLoadport[0]);
+//            m_aLoadport[1] = new Loadport("LoadportB", "LP2", m_engineer);
+//            InitModule(m_aLoadport[1]);
+//            m_FDC = new FDC("FDC", m_engineer);
+//            InitModule(m_FDC);
+//            m_robot.AddChild(m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision);
+//            m_robot.ReadInfoReticle_Registry();
+            m_recipe = new EFEM_Recipe("Recipe", m_engineer);
+            m_recipe.AddModule();
+//            m_process = new EFEM_Process("Process", m_engineer, this);
         }
 
         void InitModule(ModuleBase module)
@@ -85,21 +63,17 @@ namespace Root_Wind
 
         public bool IsEnableRecovery()
         {
-            if (p_aligner.p_infoWafer != null) return true;
-            if (p_vision.p_infoWafer != null) return true;
-            if (p_wtr.m_dicArm[WTR_RND.eArm.Lower].p_infoWafer != null) return true;
-            if (p_wtr.m_dicArm[WTR_RND.eArm.Upper].p_infoWafer != null) return true;
-            return false; 
+//            if (m_robot.p_infoReticle != null) return true;
+//            if (m_sideVision.p_infoReticle != null) return true;
+//            if (m_patternVision.p_infoReticle != null) return true;
+            return false;
         }
-
         #endregion
 
-        #region StateHome 
+        #region StateHome
         public string StateHome()
         {
-            string sInfo = StateHome(p_wtr);
-            if (sInfo != "OK") return sInfo;
-            sInfo = StateHome(p_aLoadport[0], p_aLoadport[1], p_aligner, p_vision);
+            string sInfo = StateHome(m_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
@@ -161,13 +135,13 @@ namespace Root_Wind
         #region Calc Sequence
         public string AddSequence(dynamic infoSlot)
         {
-            m_process.AddInfoWafer(infoSlot);
+//            m_process.AddInfoWafer(infoSlot);
             return "OK";
         }
 
         public void CalcSequence()
         {
-            m_process.ReCalcSequence(null);
+//            m_process.ReCalcSequence(null);
         }
         #endregion
 
@@ -175,7 +149,7 @@ namespace Root_Wind
         public void CheckFinish()
         {
             if (m_gem.p_cjRun == null) return;
-            if (m_process.m_qSequence.Count > 0) return;
+//            if (m_process.m_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
                 if (m_gem != null) m_gem.SendPJComplete(pj.m_sPJobID);
@@ -185,14 +159,14 @@ namespace Root_Wind
 
         public dynamic GetGemSlot(string sSlot)
         {
-            foreach (Loadport_RND loadport in p_aLoadport)
-            {
-                foreach (GemSlotBase slot in loadport.m_infoCarrier.m_aGemSlot)
-                {
-                    if (slot.p_id == sSlot) return slot;
-                }
-            }
-            return null; 
+//            foreach (Loadport loadport in m_aLoadport)
+//            {
+//                foreach (GemSlotBase slot in loadport.m_infoPod.m_aGemSlot)
+//                {
+//                    if (slot.p_id == sSlot) return slot;
+//                }
+//            }
+            return null;
         }
         #endregion
 
@@ -202,13 +176,13 @@ namespace Root_Wind
         void InitThread()
         {
             m_thread = new Thread(new ThreadStart(RunThread));
-            m_thread.Start(); 
+            m_thread.Start();
         }
 
         void RunThread()
         {
-            m_bThread = true; 
-            Thread.Sleep(3000); 
+            m_bThread = true;
+            Thread.Sleep(100);
             while (m_bThread)
             {
                 Thread.Sleep(10);
@@ -216,22 +190,22 @@ namespace Root_Wind
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
-                        m_process.p_sInfo = m_process.RunNextSequence(); 
-                        break; 
+//                        m_process.p_sInfo = m_process.RunNextSequence();
+                        break;
                 }
             }
         }
         #endregion
 
         string m_id;
-        public Wind_Engineer m_engineer;
+        public EFEM_Engineer m_engineer;
         public GAF m_gaf;
         IGem m_gem;
 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_engineer = (Wind_Engineer)engineer;
+            m_engineer = (EFEM_Engineer)engineer;
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();
@@ -246,7 +220,7 @@ namespace Root_Wind
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            m_moduleList.ThreadStop(); 
+            m_moduleList.ThreadStop();
             foreach (ModuleBase module in m_moduleList.m_aModule.Keys) module.ThreadStop();
         }
     }
