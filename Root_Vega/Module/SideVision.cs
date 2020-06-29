@@ -1278,18 +1278,22 @@ namespace Root_Vega.Module
                     string strRet = cam.Grab();
 
                     // Calculating Score
-                    if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img);
-                    else dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                    System.Drawing.Bitmap bmp = null;
+                    if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
+                    else
+                    {
+                        dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                        bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    }
+
+                    string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
+                    BitmapSource bmpSrc = GetBitmapSource(bmp);
 
                     if (dLeftCurrentScore > dLeftMaxScore)
                     {
                         dLeftMaxScore = dLeftCurrentScore;
                         dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
                     }
-
-                    string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
-                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                    BitmapSource bmpSrc = GetBitmapSource(bmp);
 
                     //p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
 
@@ -1319,8 +1323,13 @@ namespace Root_Vega.Module
                     string strRet = cam.Grab();
 
                     // Calculating Score
-                    if (m_bUsingSobel) dRightCurrentScore = af.GetImageFocusScoreWithSobel(img);
-                    else dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                    System.Drawing.Bitmap bmp = null;
+                    if (m_bUsingSobel) dRightCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
+                    else
+                    {
+                        dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                        bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    }
 
                     if (dRightCurrentScore > dRightMaxScore)
                     {
@@ -1329,7 +1338,6 @@ namespace Root_Vega.Module
                     }
 
                     string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dRightStartPosX + (m_nStep * i)), dRightCurrentScore);
-                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                     BitmapSource bmpSrc = GetBitmapSource(bmp);
 
                     //p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));

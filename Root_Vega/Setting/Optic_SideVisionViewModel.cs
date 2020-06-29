@@ -14,6 +14,7 @@ using RootTools.Control.Ajin;
 using RootTools.Control;
 using System.Threading;
 using System.ComponentModel;
+using System.Drawing;
 
 namespace Root_Vega
 {
@@ -287,6 +288,10 @@ namespace Root_Vega
 
         public void AutoFocus()
         {
+            ImageData img = new ImageData(m_Engineer.GetMemory("pool", "group", "mem"));
+            p_SideVision.p_AutoFocus.GetImageFocusScoreWithSobel(img);
+            return;
+
             EQ.p_bStop = false;
             SideVision Sidevision = ((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision;
             SideVision.Run_AutoFocus af = (SideVision.Run_AutoFocus)Sidevision.CloneModuleRun("AutoFocus");
