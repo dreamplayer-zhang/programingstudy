@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Control;
 using RootTools.Control.Ajin;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -16,6 +17,8 @@ namespace Root_Siltron
         public Login.User p_user { get { return m_login.p_user; } }
 
         public IGem ClassGem() { return m_xGem; }
+
+        public IControl ClassControl() { return m_ajin; }
 
         public GAF m_gaf = new GAF();
         public GAF ClassGAF() { return m_gaf; }
@@ -45,7 +48,6 @@ namespace Root_Siltron
             m_ajinUI.Init(m_ajin);
             m_toolBox.AddToolSet(m_ajin, m_ajinUI);
             m_toolBox.m_toolDIO = m_ajin.m_dio;
-            m_toolBox.m_toolAxis = m_ajin.m_listAxis.m_aAxis;
         }
         #endregion
 

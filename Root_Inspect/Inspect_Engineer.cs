@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Memory;
@@ -14,6 +15,8 @@ namespace Root_Inspect
         public Login.User p_user { get { return m_login.p_user; } }
 
         public IGem ClassGem() { return null; }
+
+        public IControl ClassControl() { return null; }
 
         public GAF ClassGAF() { return null; }
 

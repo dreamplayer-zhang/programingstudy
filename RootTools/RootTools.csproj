@@ -167,7 +167,6 @@
     <Compile Include="Camera\Dalsa\Camera_Dalse_Classes.cs" />
     <Compile Include="Control\Axis.cs" />
     <Compile Include="Control\AxisXY.cs" />
-    <Compile Include="Control\IAxis.cs" />
     <Compile Include="Comm\CommLog.cs" />
     <Compile Include="Comm\CommLog_UI.xaml.cs">
       <DependentUpon>CommLog_UI.xaml</DependentUpon>
@@ -198,6 +197,7 @@
     <Compile Include="Control\Ajin\Ajin_UI.xaml.cs">
       <DependentUpon>Ajin_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\IControl.cs" />
     <Compile Include="DrawData.cs" />
     <Compile Include="GAFs\ALID.cs" />
     <Compile Include="GAFs\ALIDList.cs" />

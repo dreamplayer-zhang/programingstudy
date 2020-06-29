@@ -70,14 +70,13 @@ namespace Root_Vega.Module
         void InitPosZ()
         {
             m_axisZ.AddPos(Enum.GetNames(typeof(ePosZ)));
-            m_axisZ.AddPosDone(); 
         }
 
         double m_dInposZ = -1; 
         public string MoveZ(ePosZ pos)
         {
-            Thread.Sleep(200);
-            string sMove = m_axisZ.Move(pos);
+            Thread.Sleep(200); 
+            string sMove = m_axisZ.StartMove(pos);
             if (sMove != "OK") return sMove;
             return m_axisZ.WaitReady(m_dInposZ); 
         }
@@ -92,13 +91,12 @@ namespace Root_Vega.Module
         void InitPosPod()
         {
             m_axisTheta.AddPos(Enum.GetNames(typeof(ePosTheta)));
-            m_axisTheta.AddPosDone();
         }
 
         double m_dInposTheta = -1;
         public string MoveTheta(ePosTheta pos)
         {
-            string sMove = m_axisTheta.Move(pos);
+            string sMove = m_axisTheta.StartMove(pos);
             if (sMove != "OK") return sMove;
             return m_axisTheta.WaitReady(m_dInposTheta);
         }
@@ -113,13 +111,12 @@ namespace Root_Vega.Module
         void InitPosPodLifter()
         {
             m_axisPodLifter.AddPos(Enum.GetNames(typeof(ePosPodLifter)));
-            m_axisPodLifter.AddPosDone();
         }
 
         double m_dInposLifter = -1;
         public string MovePodLifter(ePosPodLifter pos)
         {
-            string sMove = m_axisPodLifter.Move(pos);
+            string sMove = m_axisPodLifter.StartMove(pos);
             if (sMove != "OK") return sMove;
             return m_axisPodLifter.WaitReady(m_dInposLifter);
         }
@@ -135,13 +132,12 @@ namespace Root_Vega.Module
         void InitPosReticleLifter()
         {
             m_axisReticleLifter.AddPos(Enum.GetNames(typeof(ePosReticleLifter)));
-            m_axisReticleLifter.AddPosDone();
         }
 
         double m_dInposReticle = -1;
         public string MoveReticleLifter(ePosReticleLifter pos)
         {
-            string sMove = m_axisReticleLifter.Move(pos);
+            string sMove = m_axisReticleLifter.StartMove(pos);
             if (sMove != "OK") return sMove;
             return m_axisReticleLifter.WaitReady(m_dInposReticle);
         }
@@ -150,7 +146,7 @@ namespace Root_Vega.Module
         {
             RPoint rpActual = new RPoint(m_axisReticleLifter.p_axisX.p_posActual, m_axisReticleLifter.p_axisY.p_posActual);
             RPoint rpMove = new RPoint(rpActual.X - dPosX, rpActual.Y - dPosY);
-            string sMove = m_axisReticleLifter.Move(rpMove);
+            string sMove = m_axisReticleLifter.StartMove(rpMove);
             if (sMove != "OK") return sMove;
             return m_axisReticleLifter.WaitReady(m_dInposReticle);
         }
@@ -327,19 +323,17 @@ namespace Root_Vega.Module
         {
             if (EQ.p_bSimulate == false)
             {
-                ((AjinAxis)m_axisZ.p_axis).ServoOn(true, true);
-                ((AjinAxis)m_axisTheta.p_axis).ServoOn(true, true);
-                ((AjinAxis)m_axisPodLifter.p_axisX).ServoOn(true, true);
-                ((AjinAxis)m_axisPodLifter.p_axisY).ServoOn(true, true);
-                ((AjinAxis)m_axisReticleLifter.p_axisX).ServoOn(true, true);
-                ((AjinAxis)m_axisReticleLifter.p_axisY).ServoOn(true, true);
+                m_axisZ.ServoOn(true);
+                m_axisTheta.ServoOn(true);
+                m_axisPodLifter.ServoOn(true); 
+                m_axisReticleLifter.ServoOn(true);
                 Thread.Sleep(1000);
-                ((AjinAxis)m_axisZ.p_axis).p_eState = Axis.eState.Ready;
-                ((AjinAxis)m_axisTheta.p_axis).p_eState = Axis.eState.Ready;
-                ((AjinAxis)m_axisPodLifter.p_axisX).p_eState = Axis.eState.Ready;
-                ((AjinAxis)m_axisPodLifter.p_axisY).p_eState = Axis.eState.Ready;
-                ((AjinAxis)m_axisReticleLifter.p_axisX).p_eState = Axis.eState.Ready;
-                ((AjinAxis)m_axisReticleLifter.p_axisY).p_eState = Axis.eState.Ready;
+                m_axisZ.p_eState = Axis.eState.Ready;
+                m_axisTheta.p_eState = Axis.eState.Ready;
+                m_axisPodLifter.p_axisX.p_eState = Axis.eState.Ready;
+                m_axisPodLifter.p_axisY.p_eState = Axis.eState.Ready;
+                m_axisReticleLifter.p_axisX.p_eState = Axis.eState.Ready;
+                m_axisReticleLifter.p_axisY.p_eState = Axis.eState.Ready;
                 //JWS 200616 ADD
                 if (GetdZPos(ePosZ.InnerPod) < 0)
                 {
@@ -392,19 +386,20 @@ namespace Root_Vega.Module
             return Home_Innerpod();
         }
 
-        public string HomeToMinusLimit(params IAxis[] aAxis) //JWS 200625 ADD
+        public string HomeToMinusLimit(params Axis[] aAxis) //JWS 200625 ADD
         {
             p_sInfo = StateHome(aAxis);
             if (p_sInfo != "OK") return p_sInfo;
-            foreach (IAxis axis in aAxis)
-                if (!axis.p_sensorLimitM) return axis.ToString() + " not home done.";
-
+            foreach (Axis axis in aAxis)
+            {
+                if (!axis.p_sensorMinusLimit) return axis.ToString() + " not home done.";
+            }
             return p_sInfo;
         }
 
         double GetdZPos(ePosZ pos)
         {
-            return m_axisZ.p_axis.p_posActual - m_axisZ.p_axis.GetPos(pos.ToString()) + m_dInposZ;
+            return m_axisZ.p_posActual - m_axisZ.GetPosValue(pos.ToString()) + m_dInposZ;
         }
 
         public override string StateReady()

@@ -1,12 +1,13 @@
 ﻿using RootTools;
+using RootTools.Control;
 using RootTools.Control.Ajin;
-using RootTools.Gem;
-using RootTools.Memory;
-using RootTools.Gem.XGem;
 using RootTools.GAFs;
-using RootTools.ToolBoxs;
+using RootTools.Gem;
+using RootTools.Gem.XGem;
 using RootTools.Inspects;
+using RootTools.Memory;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 
 namespace Root_Wind
 {
@@ -17,6 +18,8 @@ namespace Root_Wind
         public Login.User p_user { get { return m_login.p_user; } }
 
         public IGem ClassGem() { return m_xGem; }
+
+        public IControl ClassControl() { return m_ajin; }
 
         GAF m_gaf = new GAF();
         public GAF ClassGAF() { return m_gaf; }
@@ -47,7 +50,6 @@ namespace Root_Wind
             m_ajinUI.Init(m_ajin);
             m_toolBox.AddToolSet(m_ajin, m_ajinUI);
             m_toolBox.m_toolDIO = m_ajin.m_dio;
-            m_toolBox.m_toolAxis = m_ajin.m_listAxis.m_aAxis;
         }
         #endregion
 
@@ -88,5 +90,6 @@ namespace Root_Wind
             LogView.ThreadStop();
             //m_GAF.ThreadStop();
         }
+
     }
 }
