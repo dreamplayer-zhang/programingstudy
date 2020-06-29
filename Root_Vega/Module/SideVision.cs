@@ -241,6 +241,7 @@ namespace Root_Vega.Module
             Open,
             Close,
             Safety,
+            Home,
         }
 
         void InitPosAlign()
