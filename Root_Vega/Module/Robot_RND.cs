@@ -8,6 +8,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -920,7 +921,7 @@ namespace Root_Vega.Module
                 EQ.p_eState = EQ.eState.Ready; 
                 BitmapImage image = m_module.m_camOCR.ReadImage();
                 ManualOCR memualOCR = new ManualOCR(m_module.p_infoReticle, image);
-                memualOCR.ShowOCR(); 
+                Application.Current.Dispatcher.Invoke(delegate { memualOCR.ShowOCR(); });
                 return "OK"; 
             }
         }
