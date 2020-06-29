@@ -4,13 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:ajin="clr-namespace:RootTools.Control.Ajin;assembly=RootTools"
+             xmlns:vmConverter="clr-namespace:ViewConverter;assembly=RootTools"
              mc:Ignorable="d"
              d:DesignHeight="726"
              d:DesignWidth="1651">
     <UserControl.Resources>
-        <!--ajin:AjinModuleToPackIconConverter x:Key="AjinModuleToPackIconConverters" />
-        <ajin:DataContextToVisibleConverter x:Key="DataContextToVisibleConverters" /-->
+        <vmConverter:AjinModuleToPackIconConverter x:Key="AjinModuleToPackIconConverters" />
+        <vmConverter:DataContextToVisibleConverter x:Key="DataContextToVisibleConverters" />
     </UserControl.Resources>
     <Grid >
         <Grid.ColumnDefinitions>

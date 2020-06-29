@@ -515,4 +515,59 @@ namespace ViewConverter
             return dScaled;
         }
     }
+
+    public class AjinModuleToPackIconConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            PackIconKind result = PackIconKind.AlphaXBox;
+            string str = value.ToString();
+            AXT_MODULE type = AXT_MODULE.AXT_SIO_DI32;
+            if (Enum.TryParse(value.ToString(), out type))
+            {
+                switch (type)
+                {
+                    case AXT_MODULE.AXT_SIO_DI32:
+                    case AXT_MODULE.AXT_SIO_RDI32MLIII:
+                    case AXT_MODULE.AXT_SIO_RDI32PMLIII:
+                        result = PackIconKind.AlphaIBox;
+                        break;
+                    case AXT_MODULE.AXT_SIO_DO32P:
+                    case AXT_MODULE.AXT_SIO_RDO32MLIII:
+                    case AXT_MODULE.AXT_SIO_RDO32PMLIII:
+                        result = PackIconKind.AlphaOBox;
+                        break;
+                    case AXT_MODULE.AXT_SIO_DB32P:
+                    case AXT_MODULE.AXT_SIO_RDB32MLIII:
+                    case AXT_MODULE.AXT_SIO_RDB32PMLIII:
+                        result = PackIconKind.AlphaBBox;
+                        break;
+                }
+            }
+            return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class DataContextToVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Visibility result = Visibility.Visible;
+            if (value == null)
+            {
+                result = Visibility.Hidden;
+            }
+            return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
 }
