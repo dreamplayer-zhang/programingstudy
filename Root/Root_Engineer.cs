@@ -5,6 +5,7 @@ using RootTools.Memory;
 using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
+using RootTools.Control;
 
 namespace Root
 {
@@ -15,6 +16,10 @@ namespace Root
         public Login.User p_user { get { return m_login.p_user; } }
 
         public IGem ClassGem() { return null; }
+
+        Ajin m_ajin = new Ajin();
+        Ajin_UI m_ajinUI = new Ajin_UI();
+        public IControl ClassControl() { return m_ajin; }
 
         GAF m_gaf = new GAF();
         public GAF ClassGAF() { return m_gaf; }
@@ -37,15 +42,12 @@ namespace Root
         #endregion
 
         #region ToolBox
-        Ajin m_ajin = new Ajin();
-        Ajin_UI m_ajinUI = new Ajin_UI(); 
         void InitAjin()
         {
             m_ajin.Init("Ajin", this);
             m_ajinUI.Init(m_ajin);
             m_toolBox.AddToolSet(m_ajin, m_ajinUI); 
             m_toolBox.m_toolDIO = m_ajin.m_dio;
-            m_toolBox.m_toolAxis = m_ajin.m_listAxis.m_aAxis; 
         }
         #endregion
 
@@ -67,5 +69,6 @@ namespace Root
             m_login.ThreadStop();
             LogView.ThreadStop();
         }
+
     }
 }

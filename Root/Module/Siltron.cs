@@ -291,12 +291,12 @@ namespace Root.Module
                 int pulseRound = m_module.m_pulseRound;
                 Axis axis = m_module.m_axisRotate; 
                 int pulse = (int)Math.Round(m_module.m_pulseRound * m_fDeg / 360);
-                while (pulse < axis.p_axis.p_posCommand) pulse += pulseRound; 
+                while (pulse < axis.p_posCommand) pulse += pulseRound; 
                 {
-                    axis.p_axis.p_posCommand -= pulseRound;
-                    axis.p_axis.p_posActual -= pulseRound;
+                    axis.p_posCommand -= pulseRound;
+                    axis.p_posActual -= pulseRound;
                 }
-                if (m_module.Run(axis.p_axis.Move(pulse))) return p_sInfo;
+                if (m_module.Run(axis.StartMove(pulse))) return p_sInfo;
                 return axis.WaitReady(); 
             }
         }

@@ -1,10 +1,8 @@
 ﻿using RootTools.Trees;
-using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Threading;
 
 namespace RootTools.Control.Ajin
 {
@@ -41,15 +39,15 @@ namespace RootTools.Control.Ajin
             foreach (AjinAxis axis in m_listAxis.m_aAxis)
             {
                 TabItem tabItem = new TabItem();
-                Binding bindingHeader = new Binding("p_sID");
+                Binding bindingHeader = new Binding("p_sName");
                 bindingHeader.Source = axis;
                 tabItem.SetBinding(TabItem.HeaderProperty, bindingHeader); 
                 tabItem.Content = axis.p_ui;
-                m_asAxis.Add(axis.p_sID); 
+                m_asAxis.Add(axis.p_id); 
                 tabItem.Height = 0;
                 tabControlAxis.Items.Add(tabItem);
-                axis.RunTree(Tree.eMode.RegRead);
                 axis.RunTree(Tree.eMode.Init);
+                axis.RunTreeSetting(Tree.eMode.Init); 
             }
             comboAxis.ItemsSource = m_asAxis; 
         }

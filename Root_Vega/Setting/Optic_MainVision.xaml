@@ -18,7 +18,7 @@
         <Dalsa:CameraNotConnectStateConverter x:Key="CameraNotConnectStateConverters"/>
         <Converter:AjinAxisToIAxis x:Key="AjinAxisToIAxiss" />
         <Converter:DictionaryItemKeysConverter x:Key="DictionaryItemKeysConverters" />
-        <Axis:DictionaryItemGetPosConverter x:Key="DictionaryItemGetPosConverters" />
+        <!--Axis:DictionaryItemGetPosConverter x:Key="DictionaryItemGetPosConverters" /-->
         <LinearGradientBrush x:Key="TabitemBackground"
                              StartPoint="0,0"
                              EndPoint="0,1">
@@ -1009,12 +1009,12 @@
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15">
-                                                    <TextBlock.Text>
+                                                    <!--TextBlock.Text>
                                                         <MultiBinding Converter="{StaticResource DictionaryItemGetPosConverters}">
                                                             <Binding Path=" p_aPos" />
                                                             <Binding Path=" p_SelMovePos" />
                                                         </MultiBinding>
-                                                    </TextBlock.Text>
+                                                    </-->
                                                 </TextBlock>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
@@ -1079,12 +1079,12 @@
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15">
-                                                    <TextBlock.Text>
+                                                    <!--TextBlock.Text>
                                                         <MultiBinding Converter="{StaticResource DictionaryItemGetPosConverters}">
                                                             <Binding Path="p_axisXY.p_axisY.p_aPos" />
                                                             <Binding Path="p_axisXY.p_axisY.p_SelMovePos" />
                                                         </MultiBinding>
-                                                    </TextBlock.Text>
+                                                    </-->
                                                 </TextBlock>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
@@ -1149,12 +1149,12 @@
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15">
-                                                    <TextBlock.Text>
+                                                    <!--TextBlock.Text>
                                                         <MultiBinding Converter="{StaticResource DictionaryItemGetPosConverters}">
                                                             <Binding Path=" p_aPos" />
                                                             <Binding Path=" p_SelMovePos" />
                                                         </MultiBinding>
-                                                    </TextBlock.Text>
+                                                    </-->
                                                 </TextBlock>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"

@@ -63,10 +63,8 @@ namespace Root.Module
         {
             m_axisXY.AddPos(Enum.GetNames(typeof(ePosXY)));
             m_axisXY.AddPos("Center");
-            m_axisXY.AddPosDone();
             m_axisZ.AddPos(Enum.GetNames(typeof(ePosZ)));
             m_axisZ.AddPos("First", "Second");
-            m_axisZ.AddPosDone();
         }
         #endregion
         public Test(string id, IEngineer engineer)
@@ -185,8 +183,8 @@ namespace Root.Module
 
             public override string Run()
             {
-                if (m_module.Run(m_module.m_axisXY.Move(m_sPosXY))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisZ.Move(m_sPosZ))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisXY.StartMove(m_sPosXY))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisZ.StartMove(m_sPosZ))) return p_sInfo;
                 return "OK";
             }
 

@@ -173,9 +173,7 @@ namespace Root_Vega.Module
         void InitPosAlign()
         {
             m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPosZ)));
-            m_axisZ.AddPosDone();
             m_axisClamp.AddPos(Enum.GetNames(typeof(eAxisPosClamp)));
-            m_axisClamp.AddPosDone();
 
             if(m_axisXY.p_axisX != null)
             {
@@ -229,20 +227,20 @@ namespace Root_Vega.Module
         public string BeforeGet()
         {
             // Clamp축 Open
-            if (Run(m_axisClamp.Move(eAxisPosClamp.Open))) return p_sInfo;
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Open))) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
 
             // 레티클 유무체크 촬영위치 이동
-            if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Safety))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
-            if (Run(((AjinAxis)m_axisXY.p_axisY).Move(eAxisPosY.Align))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Align))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
-            if (Run(m_axisZ.Move(eAxisPosZ.Align))) return p_sInfo;
+            if (Run(m_axisZ.StartMove(eAxisPosZ.Align))) return p_sInfo;
             if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
-            if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Align))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Align))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // 조명 켜기
@@ -262,16 +260,16 @@ namespace Root_Vega.Module
             GetGrabMode("MainGrab").SetLightByName(strLightName, 0);
 
             // 모든 축 Ready 위치로 이동
-            if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Safety))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
-            if (Run(((AjinAxis)m_axisXY.p_axisY).Move(eAxisPosY.Ready))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Ready))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
-            if (Run(m_axisZ.Move(eAxisPosZ.Ready))) return p_sInfo;
+            if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
             if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
-            if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Ready))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Ready))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             if (p_infoReticle == null) return p_id + " BeforeGet : InfoReticle = null";
@@ -281,20 +279,20 @@ namespace Root_Vega.Module
         public string BeforePut()
         {
             // Clamp축 Open
-            if (Run(m_axisClamp.Move(eAxisPosClamp.Open))) return p_sInfo;
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Open))) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
 
             // 레티클 유무체크 촬영위치 이동
-            if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Safety))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
-            if (Run(((AjinAxis)m_axisXY.p_axisY).Move(eAxisPosY.Align))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Align))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
-            if (Run(m_axisZ.Move(eAxisPosZ.Align))) return p_sInfo;
+            if (Run(m_axisZ.StartMove(eAxisPosZ.Align))) return p_sInfo;
             if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
-            if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Align))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Align))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // 조명 켜기
@@ -314,16 +312,16 @@ namespace Root_Vega.Module
             GetGrabMode("MainGrab").SetLightByName(strLightName, 0);
 
             // 모든 축 Ready 위치로 이동
-            if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Safety))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
-            if (Run(((AjinAxis)m_axisXY.p_axisY).Move(eAxisPosY.Ready))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Ready))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
-            if (Run(m_axisZ.Move(eAxisPosZ.Ready))) return p_sInfo;
+            if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
             if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
-            if (Run(((AjinAxis)m_axisXY.p_axisX).Move(eAxisPosX.Ready))) return p_sInfo;
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Ready))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             if (p_infoReticle != null) return p_id + " BeforePut : InfoReticle != null";
@@ -338,7 +336,7 @@ namespace Root_Vega.Module
         public string AfterPut()
         {
             // Clamp Close
-            if (Run(m_axisClamp.Move(eAxisPosClamp.Close))) return p_sInfo;
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Close))) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
 
             return CheckGetPut();
@@ -478,28 +476,28 @@ namespace Root_Vega.Module
         #region RelayCommand
         void Jog_Plus_Fast()
         {
-            if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)p_axisXY.p_axisY).Jog_Plus_Fast();
+            if (p_axisClamp.p_sensorHome == false) return;
+            p_axisClamp.Jog(1); 
         }
         void Jog_Minus_Fast()
         {
-            if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)p_axisXY.p_axisY).Jog_Minus_Fast();
+            if (p_axisClamp.p_sensorHome == false) return;
+            p_axisClamp.Jog(-1);
         }
         void MovePosition()
         {
-            if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)p_axisXY.p_axisY).MovePosition();
+            if (p_axisClamp.p_sensorHome == false) return;
+            //            ((AjinAxis)p_axisXY.p_axisY).MovePosition();
         }
         void PlusRelativeMove()
         {
-            if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)p_axisXY.p_axisY).PlusRelativeMove();
+            if (p_axisClamp.p_sensorHome == false) return;
+            //            ((AjinAxis)p_axisXY.p_axisY).PlusRelativeMove();
         }
         void MinusRelativeMove()
         {
-            if (p_axisClamp.p_axis.p_sensorHome == false) return;
-            ((AjinAxis)p_axisXY.p_axisY).MinusRelativeMove();
+            if (p_axisClamp.p_sensorHome == false) return;
+            //            ((AjinAxis)p_axisXY.p_axisY).MinusRelativeMove();
         }
 
         public RelayCommand PJogFastCommand
@@ -734,9 +732,9 @@ namespace Root_Vega.Module
                         //m_grabMode.SetLight(true);
                         double nPosX = m_rpAxis.X + nLines * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * XScal; //해상도추가필요
 
-                        if (m_module.Run(axisZ.Move(m_nFocusPos)))
+                        if (m_module.Run(axisZ.StartMove(m_nFocusPos)))
                             return p_sInfo;
-                        if (m_module.Run(axisXY.Move(new RPoint(nPosX, yPos0))))
+                        if (m_module.Run(axisXY.StartMove(new RPoint(nPosX, yPos0))))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
@@ -755,11 +753,11 @@ namespace Root_Vega.Module
 
                         /* 방향 바꾸는 코드 들어가야함*/
                         m_grabMode.StartGrab(mem, m_cpMemory, nLines, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
-                        if (m_module.Run(axisXY.p_axisY.Move(yPos1, nScanSpeed)))
+                        if (m_module.Run(axisXY.p_axisY.StartMove(yPos1, nScanSpeed)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                        axisXY.p_axisY.ResetTrigger();
+                        axisXY.p_axisY.RunTrigger(false);
 
                         nScanLine++;
                         m_cpMemory.X += m_grabMode.m_camera.GetRoiSize().X;

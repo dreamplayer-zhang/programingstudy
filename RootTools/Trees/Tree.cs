@@ -365,7 +365,7 @@ namespace RootTools.Trees
             }
         }
 
-        protected Log m_log;
+        public Log m_log;
         public Registry m_reg = null;
         public Job m_job = null;
 

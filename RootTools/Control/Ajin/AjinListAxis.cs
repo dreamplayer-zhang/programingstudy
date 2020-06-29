@@ -7,40 +7,28 @@ namespace RootTools.Control.Ajin
 {
     public class AjinListAxis : NotifyProperty
     {
-        #region V Rate
-        public static double s_vRate = 1;
-        public double p_vRate
-        {
-            get { return s_vRate; }
-            set
-            {
-                m_log.Info("V Rate Change : " + s_vRate.ToString() + " -> " + value.ToString());
-                s_vRate = value;
-                for (int n = 0; n < m_aAxis.Count; n++) m_aAxis[n].OverrideV();
-            }
-        }
-        #endregion
-
         #region List Axis
         public delegate void dgOnChangeAxisList();
         public event dgOnChangeAxisList OnChangeAxisList; 
 
-        int m_lAxis = 0;
-        public List<IAxis> m_aAxis = new List<IAxis>();
-        void InitAxisList()
+        public List<AjinAxis> m_aAxis = new List<AjinAxis>();
+
+        public Axis GetAxis(string id, Log log)
         {
-            while (m_aAxis.Count < m_lAxis)
-            {
-                AjinAxis axis = new AjinAxis();
-                axis.Init(m_id, this, m_engineer, m_bEnable);
-                m_aAxis.Add(axis);
-            }
-            InvalidAxisList(); 
+            AjinAxis axis = new AjinAxis();
+            axis.Init(this, id, log);
+            m_aAxis.Add(axis);
+            m_qSetAxis.Enqueue(axis);
+            if (OnChangeAxisList != null) OnChangeAxisList();
+            return axis;
         }
 
-        public void InvalidAxisList()
+        public AxisXY GetAxisXY(string id, Log log)
         {
-            if (OnChangeAxisList != null) OnChangeAxisList();
+            AxisXY axisXY = new AxisXY();
+            axisXY.p_axisX = GetAxis(id + "X", log);
+            axisXY.p_axisY = GetAxis(id + "Y", log);
+            return axisXY;
         }
         #endregion
 
@@ -83,26 +71,33 @@ namespace RootTools.Control.Ajin
         }
         #endregion
 
-        #region InitAxis
+        #region Thread InitAxis
+        public Queue<AjinAxis> m_qSetAxis = new Queue<AjinAxis>(); 
         int m_lAxisAjin = 0;
         string InitAxis()
         {
             AXM("AxmInfoGetAxisCount", CAXM.AxmInfoGetAxisCount(ref m_lAxisAjin));
             if (m_bAXL == false) return "Init Axis Skip : AXL";
-            m_bEnable = false;
-            m_threadInitAxis = new Thread(new ThreadStart(RunThread_InitAxis));
-            m_threadInitAxis.Start();
+            m_thread = new Thread(new ThreadStart(RunThread));
+            m_thread.Start();
             return "OK";
         }
 
-        bool m_bInitAxis = false;
-        Thread m_threadInitAxis;
-        void RunThread_InitAxis()
+        bool m_bThread = false;
+        Thread m_thread; 
+        void RunThread()
         {
-            m_bInitAxis = true;
-            for (int n = 0; n < m_lAxis; n++) ((AjinAxis)m_aAxis[n]).SetAxisStatus();
-            m_bEnable = true;
-            m_log.Info("RunThread_InitAxis - Done.");
+            m_bThread = true; 
+            LoadMotFile();
+            while (m_bThread)
+            {
+                Thread.Sleep(10); 
+                if (m_qSetAxis.Count > 0)
+                {
+                    AjinAxis axis = m_qSetAxis.Dequeue();
+                    axis.GetAxisStatus(); 
+                }
+            }
         }
         #endregion
 
@@ -118,18 +113,12 @@ namespace RootTools.Control.Ajin
                 m_log.Error("AxmMotLoadParaAll Error : " + nError.ToString());
                 return;
             }
-            for (int n = 0; n < m_lAxis; n++) ((AjinAxis)m_aAxis[n]).GetAxisStatus();
         }
 
         public void LoadMotFile()
         {
             uint nError = CAXM.AxmMotLoadParaAll(m_strMotFile);
-            if (nError > 0)
-            {
-                m_log.Error("AxmMotLoadParaAll Error : " + m_strMotFile + "  " + nError.ToString());
-                return;
-            }
-            for (int n = 0; n < m_lAxis; n++) ((AjinAxis)m_aAxis[n]).GetAxisStatus();
+            if (nError > 0) m_log.Error("AxmMotLoadParaAll Error : " + m_strMotFile + "  " + nError.ToString());
         }
 
         public void SaveMot()
@@ -145,7 +134,6 @@ namespace RootTools.Control.Ajin
         Log m_log;
         IEngineer m_engineer;
         bool m_bAXL = false;
-        bool m_bEnable = false;
         string m_strMotFile = @"C:\VEGA\Init\VEGA.mot";
         public void Init(string id, IEngineer engineer, bool bAXL)
         {
@@ -159,34 +147,24 @@ namespace RootTools.Control.Ajin
         public void ThreadStop()
         {
             m_log.Info("ThreadStop Start");
-            if (m_bInitAxis)
+            if (m_bThread)
             {
-                m_bInitAxis = false;
-                m_threadInitAxis.Join();
+                m_bThread = false;
+                m_thread.Join();
             }
-            for (int n = 0; n < m_aAxis.Count; n++) ((AjinAxis)m_aAxis[n]).ThreadStop();
+            foreach (AjinAxis axis in m_aAxis) axis.ThreadStop();
             m_log.Info("ThreadStop Done");
         }
 
         public void RunTree(Tree tree)
         {
             m_strMotFile = tree.SetFile(m_strMotFile, m_strMotFile, "mot", "MotFile", "Motor 설정  File 위치");
-            p_vRate = tree.Set(p_vRate, 1, "V Rate", "All Axis V Rate (0.1 ~ 1)");
-            if (p_vRate < 0.1) p_vRate = 0.1;
-            if (p_vRate > 1) p_vRate = 1;
-            RunCountTree(tree.GetTree("Count")); 
-        }
-
-        void RunCountTree(Tree tree)
-        {
             m_lAxisAjin = tree.Set(m_lAxisAjin, m_lAxisAjin, "Detect", "Detected Axis Count", true, true);
-            m_lAxis = tree.Set(m_lAxis, 0, "Set", "Axis Count Set");
-            InitAxisList();
         }
 
         public void RunEmergency()
         {
-            for (int n = 0; n < m_lAxis; n++) m_aAxis[n].ServoOn(false);
+            foreach (AjinAxis axis in m_aAxis) axis.ServoOn(false); 
         }
     }
 }

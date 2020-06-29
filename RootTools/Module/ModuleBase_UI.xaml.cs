@@ -55,17 +55,17 @@ namespace RootTools.Module
             tabAxis.Items.Clear();
             m_asAxis.Clear(); 
             comboAxis.ItemsSource = null; 
-            foreach (IAxis axis in m_module.m_listAxis)
+            foreach (Axis axis in m_module.m_listAxis)
             {
                 if (axis != null)
                 {
                     TabItem tabItem = new TabItem();
-                    tabItem.Header = axis.p_sID.Replace(m_module.p_id + ".", "");
+                    tabItem.Header = axis.p_id.Replace(m_module.p_id + ".", "");
                     tabItem.Height = 0; 
                     tabItem.Content = axis.p_ui;
                     tabItem.Background = Brushes.DarkSalmon;
                     tabAxis.Items.Add(tabItem);
-                    m_asAxis.Add(axis.p_sID.Replace(m_module.p_id + ".", "")); 
+                    m_asAxis.Add(axis.p_id.Replace(m_module.p_id + ".", "")); 
                 }
             }
             comboAxis.ItemsSource = m_asAxis;
