@@ -11,6 +11,8 @@ using System.Security.RightsManagement;
 using System.Threading.Tasks;
 using System.Linq;
 using DPoint = System.Drawing.Point;
+using RootTools_CLR;
+using System.Diagnostics;
 
 namespace RootTools.Inspects
 {
@@ -40,7 +42,72 @@ namespace RootTools.Inspects
 		bool m_bProgress;
 
 		public bool IsInitialized { get; private set; }
+		public void DBConnectTest()
+		{
+			//RootTools_CLR.DBTest test = new DBTest();
+			//uint errorCode = test.OpenDatabase();
+			//if (errorCode == 0)
+			//{
+			//	Stopwatch sw = new Stopwatch();
+			//	sw.Start();
+			//	//정상동작함
+			//	for (int i = 0; i < 1000; i++)
+			//	{
+			//		var err = test.RunQuery(string.Format("INSERT INTO fortest(intTemp, fortestcol) VALUES({0},'{1}');", i, "Test!"));
+			//		if (err == 0)
+			//		{
+			//		}
+			//		else if (err == 1146)//table이 없음. 생성 후 재시도
+			//		{
+			//			/*
+						 
+			//			*/
+			//			err = test.RunQuery(string.Format("CREATE TABLE fortest (intTemp INT NULL, fortestcol VARCHAR(45) NULL);"));
+			//			if (err != 0)
+			//			{
+			//				Debug.WriteLine(string.Format("ERROR : {0}", err));
+			//			}
+			//			else
+			//			{
+			//				err = test.RunQuery(string.Format("INSERT INTO fortest(intTemp, fortestcol) VALUES({0},'{1}');", i, "Test!"));
 
+			//				if (err != 0)
+			//				{
+			//					Debug.WriteLine(string.Format("ERROR : {0}", err));
+			//				}
+			//			}
+			//		}
+			//		else
+			//		{
+			//			Debug.WriteLine(string.Format("ERROR : {0}", err));
+			//		}
+			//	}
+			//	sw.Stop();
+			//	Debug.WriteLine(string.Format("100000 sync ElapsedMilliseconds: {0}", sw.ElapsedMilliseconds));
+
+			//	//sw.Reset();
+			//	//sw.Start();
+			//	////10만회를 시행하는 경우 약 14000회에서 문제가 발생함. 병목때문이 아닐까싶음
+			//	//Parallel.For(0, 10000, i =>
+			//	//{
+			//	//	var err = test.Insert(string.Format("INSERT INTO fortest(intTemp, fortestcol) VALUES({0},'{1}');", i + 100000, "Test!"));
+			//	//	if (err != 0)
+			//	//	{
+			//	//		Debug.WriteLine(string.Format("ERROR : {0}", err));
+			//	//	}
+			//	//});
+			//	//sw.Stop();
+			//	//Debug.WriteLine(string.Format("100000 async ElapsedMilliseconds: {0}", sw.ElapsedMilliseconds));
+			//}
+			//else
+			//{
+			//	/*
+			//	 errorCode
+			//	0: 정상
+			//	이거 이외에는 MYSQL 에러코드를 따름
+			//	 */
+			//}
+		}
 		public void StartInspection()
 		{
 			m_bProgress = false;

@@ -353,7 +353,7 @@ namespace Root_Vega
 		}
 		public void _currentRcpSave()
 		{
-			if(m_Engineer.m_recipe.Loaded)
+			if (m_Engineer.m_recipe.Loaded)
 			{
 				var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
 				m_Engineer.m_recipe.Save(target);
@@ -371,9 +371,10 @@ namespace Root_Vega
 
 			//1. edge box정보를 가져와서 edge 확보 후 전체 검사영역을 그린다
 			DrawEdgeBox(SelectedROI, SelectedROI.EdgeBox.UseCustomEdgeBox);
-			searchArea();
+			var inspAreaList = searchArea();
 
 			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
+			//m_Engineer.m_InspManager.CreateInspArea(sPool,)
 		}
 		void DrawEdgeBox(Roi roi, bool useRecipeEdgeBox)
 		{
@@ -431,7 +432,7 @@ namespace Root_Vega
 
 		private void _endInsp()
 		{
-
+			m_Engineer.m_InspManager.DBConnectTest();
 		}
 
 		public void _addRoi()
@@ -462,9 +463,11 @@ namespace Root_Vega
 
 			SideParamList = new ObservableCollection<SurfaceParamData>(SelectedROI.Surface.ParameterList);
 		}
-		void searchArea()
+		List<CRect> searchArea()
 		{
 			// variable
+			List<CRect> result = new List<CRect>();
+
 			List<Rect> arcROIs = new List<Rect>();
 			List<DPoint> aptEdges = new List<DPoint>();
 			ImageViewer_ViewModel ivvm = p_ImageViewer_Top;
@@ -548,9 +551,11 @@ namespace Root_Vega
 				DrawCross(ptRight2, MBrushes.Yellow, i);
 				DrawCross(ptTop, MBrushes.Yellow, i);
 
+				result.Add(new CRect(new Point(ptLT.X, ptLT.Y), new Point(ptRB.X, ptRB.Y)));
+
 				p_ImageViewer_List[i].SetRoiRect();
 			}
-			//m_Engineer.m_InspManager.StartInspection();
+			return result;
 		}
 		void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor, int nTLRB)
 		{
