@@ -82,8 +82,8 @@ namespace RootTools_CLR
 							//DB Open성공
 
 							System::String^ query;
-							query->Format("INSERT INTO tempdata (idx, ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
-								vTempResult[i].nIdx, vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
+							query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
+								vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
 
 							errorCode = connector->RunQuery(query);
 
@@ -95,13 +95,13 @@ namespace RootTools_CLR
 							{
 								//table이 없음
 								//table생성 후 재시도
-								query->Format("CREATE TABLE tempdata(idx INT NOT NULL, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
+								query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
 								errorCode = connector->RunQuery(query);
 								if (errorCode == 0)
 								{
 									//insert재실행
-									query->Format("INSERT INTO tempdata (idx, ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
-										vTempResult[i].nIdx, vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
+									query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
+										vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
 
 									errorCode = connector->RunQuery(query);
 									if (errorCode != 0)
@@ -171,8 +171,8 @@ namespace RootTools_CLR
 						//DB Open성공
 
 						System::String^ query;
-						query->Format("INSERT INTO tempdata (idx, ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
-							vTempResult[i].nIdx, vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
+						query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
+							vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
 
 						errorCode = connector->RunQuery(query);
 
@@ -184,13 +184,13 @@ namespace RootTools_CLR
 						{
 							//table이 없음
 							//table생성 후 재시도
-							query->Format("CREATE TABLE tempdata(idx INT NOT NULL, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
+							query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
 							errorCode = connector->RunQuery(query);
 							if (errorCode == 0)
 							{
 								//insert재실행
-								query->Format("INSERT INTO tempdata (idx, ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
-									vTempResult[i].nIdx, vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
+								query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
+									vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
 
 								errorCode = connector->RunQuery(query);
 								if (errorCode != 0)

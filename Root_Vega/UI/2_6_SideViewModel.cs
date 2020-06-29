@@ -374,7 +374,26 @@ namespace Root_Vega
 			var inspAreaList = searchArea();
 
 			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
-			//m_Engineer.m_InspManager.CreateInspArea(sPool,)
+			for (int i = 0; i < inspAreaList.Count; i++)
+			{
+				for (int j = 0; j < SelectedROI.Surface.ParameterList.Count; j++)
+				{
+					var param = SelectedROI.Surface.ParameterList[j];
+					InspectionType type = InspectionType.AbsoluteSurface;
+
+					if (!param.UseAbsoluteInspection)
+					{
+						type = InspectionType.RelativeSurface;
+					}
+					int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(10 + i), type, 0);
+
+					m_Engineer.m_InspManager.CreateInspArea(sPool, m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).GetMBOffset(),
+						m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.X,
+						m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.Y,
+						inspAreaList[i], 1000, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance);
+				}
+			}
+			m_Engineer.m_InspManager.StartInspection();
 		}
 		void DrawEdgeBox(Roi roi, bool useRecipeEdgeBox)
 		{
@@ -432,7 +451,7 @@ namespace Root_Vega
 
 		private void _endInsp()
 		{
-			m_Engineer.m_InspManager.DBConnectTest();
+
 		}
 
 		public void _addRoi()

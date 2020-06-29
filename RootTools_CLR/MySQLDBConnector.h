@@ -28,6 +28,7 @@ namespace RootTools_CLR
 				//1049 DB가 업서요
 				//1064 쿼리문이 잘못됨
 				//1146 Table이 없음
+				//1136 컬럼개수가 일치하지않음
 				if (error_code == 1049)
 				{
 					if (!mysql_real_connect(mysql, "localhost", "root", "`ati5344", NULL, 0, "/tmp/mysql.sock", 0))
