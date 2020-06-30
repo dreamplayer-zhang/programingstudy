@@ -41,7 +41,7 @@ namespace Root_Wind
 
             m_MemoryModule = engineer.ClassMemoryTool();
             MemoryPool memoryPool = m_MemoryModule.GetPool(sPool, true);
-            memoryPool.p_gbPool = 8;
+            memoryPool.p_gbPool = 1;
             memoryPool.GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
 
             m_Image = new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem));

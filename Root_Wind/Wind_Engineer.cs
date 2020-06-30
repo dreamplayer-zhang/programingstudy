@@ -72,7 +72,6 @@ namespace Root_Wind
             EQ.m_sModel = id;
             LogView.Init();
             m_login.Init();
-            //m_GAF.Init(this);
             m_toolBox.Init(id, this);
             InitAjin();
             InitXGem();
@@ -83,12 +82,11 @@ namespace Root_Wind
         public void ThreadStop()
         {
             m_gaf.ThreadStop();
-            m_xGem.ThreadStop();
+            //m_xGem.ThreadStop();
             m_handler.ThreadStop();
             m_toolBox.ThreadStop();
             m_login.ThreadStop();
             LogView.ThreadStop();
-            //m_GAF.ThreadStop();
         }
 
     }

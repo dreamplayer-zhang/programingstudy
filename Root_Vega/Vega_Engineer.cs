@@ -7,8 +7,6 @@ using RootTools.Inspects;
 using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
-using System.Windows.Media.Animation;
-using System;
 using RootTools.Control;
 
 namespace Root_Vega
