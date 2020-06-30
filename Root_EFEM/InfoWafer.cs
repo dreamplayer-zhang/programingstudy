@@ -124,7 +124,7 @@ namespace Root_EFEM
                 public string m_sWaferSize;
                 public bool m_bEnable = false;
                 public int m_lWafer = 1;
-                public int m_nTeachWTR = -1;
+                public int m_teachWTR = -1;
 
                 public Data(eWaferSize waferSize)
                 {
@@ -144,7 +144,7 @@ namespace Root_EFEM
 
                 public void RunTreeTeach(Tree tree)
                 {
-                    m_nTeachWTR = tree.Set(m_nTeachWTR, m_nTeachWTR, m_sWaferSize, "WTR Teach Index", m_bEnable);
+                    m_teachWTR = tree.Set(m_teachWTR, m_teachWTR, m_sWaferSize, "WTR Teach Index", m_bEnable);
                 }
             }
             List<Data> m_aData = new List<Data>();
@@ -266,7 +266,6 @@ namespace Root_EFEM
         #endregion
 
         public string m_sLoadport;
-        InfoCarrier m_infoCarrier;
         public InfoWafer(string id, IEngineer engineer)
         {
             string[] asID = id.Split('.');

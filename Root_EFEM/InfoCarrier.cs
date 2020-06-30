@@ -89,30 +89,29 @@ namespace Root_EFEM
             return p_id + " eState = " + p_eState.ToString();
         }
 
-        public string IsGetOK(int nID)
+        public string IsGetOK(int nID, ref int teachWTR)
         {
             string sOK = IsRunOK();
             if (sOK != "OK") return sOK;
             if (GetInfoWafer(nID) == null) return p_id + " IsGetOK : InfoWafer not Exist";
+            teachWTR = m_waferSize.GetData(p_eWaferSize).m_teachWTR;
             return "OK";
         }
 
-        public string IsPutOK(int nID)
+        public string IsPutOK(int nID, ref int teachWTR)
         {
             string sOK = IsRunOK();
             if (sOK != "OK") return sOK;
             if (GetInfoWafer(nID) != null) return p_id + " IsPutOK : InfoWafer Exist";
+            teachWTR = m_waferSize.GetData(p_eWaferSize).m_teachWTR;
             return "OK";
-        }
-
-        public int GetWTRTeach()
-        {
-            return m_waferSize.GetData(p_eWaferSize).m_nTeachWTR;
         }
         #endregion
 
-        #region Slot
+        #region GemSlot
         const int c_maxSlot = 25;
+        /// <summary> m_GemSlot.p_id List </summary>
+        public List<string> m_asGemSlot = new List<string>();  
         void InitSlot()
         {
             for (int n = 0; n < c_maxSlot; n++)
@@ -122,9 +121,9 @@ namespace Root_EFEM
                 newSlot.p_sCarrierID = p_sCarrierID;
                 newSlot.p_sLocID = p_sLocID;
                 m_aGemSlot.Add(newSlot);
-                p_aInfoWafer.Add(null);
+                m_asGemSlot.Add(newSlot.p_id); 
+                m_aInfoWafer.Add(null);
             }
-            InitChildID();
         }
 
         int _lWafer = c_maxSlot;
@@ -137,43 +136,10 @@ namespace Root_EFEM
                 if (value > c_maxSlot) return;
                 m_log.Info(p_id + " lWafer : " + _lWafer.ToString() + " -> " + value.ToString());
                 _lWafer = value;
-                InitChildID();
             }
         }
 
-        public enum eSlotType
-        {
-            Up,
-            Down
-        }
-        eSlotType _eSlotType = eSlotType.Up;
-        public eSlotType p_eSlotType
-        {
-            get { return _eSlotType; }
-            set
-            {
-                if (_eSlotType == value) return;
-                if (m_log != null) m_log.Info(p_id + " SlotTyper : " + _eSlotType.ToString() + " -> " + value.ToString());
-                _eSlotType = value;
-                InitChildID();
-            }
-        }
-
-        void InitChildID()
-        {
-            m_asInfoWafer.Clear();
-            for (int n = 0; n < p_lWafer; n++)
-            {
-                switch (p_eSlotType)
-                {
-                    case eSlotType.Down: m_aGemSlot[n].p_id = p_sModule + "." + (p_lWafer - n).ToString("00"); break;
-                    case eSlotType.Up: m_aGemSlot[n].p_id = p_sModule + "." + (n + 1).ToString("00"); break;
-                }
-                m_asInfoWafer.Add(m_aGemSlot[n].p_id);
-            }
-        }
-
-        InfoWafer.eWaferSize _eWaferSize = InfoWafer.eWaferSize.eError;
+        InfoWafer.eWaferSize _eWaferSize = InfoWafer.eWaferSize.e300mm;
         public InfoWafer.eWaferSize p_eWaferSize
         {
             get { return _eWaferSize; }
@@ -196,24 +162,10 @@ namespace Root_EFEM
         #endregion
 
         #region InfoWafer
-        /// <summary> InfoWafer.p_id List </summary>
-        public List<string> m_asInfoWafer = new List<string>();
-        ObservableCollection<InfoWafer> _aInfoWafer = new ObservableCollection<InfoWafer>();
-        /// <summary> InfoWafer List </summary>
-        public ObservableCollection<InfoWafer> p_aInfoWafer
-        {
-            get { return _aInfoWafer; }
-            set
-            {
-                if (_aInfoWafer == value) return;
-                _aInfoWafer = value;
-                OnPropertyChanged();
-            }
-        }
-
+        List<InfoWafer> m_aInfoWafer = new List<InfoWafer>();
         InfoWafer GetInfoWafer(string sWafer)
         {
-            foreach (InfoWafer infoWafer in p_aInfoWafer)
+            foreach (InfoWafer infoWafer in m_aInfoWafer)
             {
                 if (infoWafer != null)
                 {
@@ -225,7 +177,7 @@ namespace Root_EFEM
 
         public void ClearInfoWafer()
         {
-            for (int n = 0; n < p_aInfoWafer.Count; n++) SetInfoWafer(n, null);
+            for (int n = 0; n < m_aInfoWafer.Count; n++) SetInfoWafer(n, null);
         }
 
         Registry m_reg = null;
@@ -237,7 +189,7 @@ namespace Root_EFEM
             for (int n = 0; n < p_lWafer; n++)
             {
                 string sInfoWafer = m_reg.Read("sInfoWafer." + n.ToString("00"), "");
-                if (sInfoWafer != "") p_aInfoWafer[n] = (InfoWafer)m_aGemSlot[n];
+                if (sInfoWafer != "") m_aInfoWafer[n] = (InfoWafer)m_aGemSlot[n];
                 m_aGemSlot[n].p_eState = (sInfoWafer != "") ? GemSlotBase.eState.Exist : GemSlotBase.eState.Empty;
             }
             RunTreeWafer(Tree.eMode.Init);
@@ -247,7 +199,7 @@ namespace Root_EFEM
         {
             if (m_reg == null) return;
             m_reg.Write("p_iWafer", p_lWafer);
-            string sInfoWafer = (p_aInfoWafer[nID] == null) ? "" : p_aInfoWafer[nID].p_id;
+            string sInfoWafer = (m_aInfoWafer[nID] == null) ? "" : m_aInfoWafer[nID].p_id;
             m_reg.Write("sInfoWafer." + nID.ToString("00"), sInfoWafer);
         }
 
@@ -255,14 +207,14 @@ namespace Root_EFEM
         {
             if (nID < 0) return null;
             if (nID >= p_lWafer) return null;
-            return p_aInfoWafer[nID];
+            return m_aInfoWafer[nID];
         }
 
         public void SetInfoWafer(int nID, InfoWafer infoWafer)
         {
             if (nID < 0) return;
             if (nID >= p_lWafer) return;
-            p_aInfoWafer[nID] = infoWafer;
+            m_aInfoWafer[nID] = infoWafer;
             SaveInfoWafer(nID);
         }
 
@@ -270,7 +222,7 @@ namespace Root_EFEM
         {
             if (nID < 0) return;
             if (nID >= p_lWafer) return;
-            p_aInfoWafer[nID] = (InfoWafer)m_aGemSlot[nID];
+            m_aInfoWafer[nID] = (InfoWafer)m_aGemSlot[nID];
             SaveInfoWafer(nID);
         }
         #endregion
@@ -287,7 +239,7 @@ namespace Root_EFEM
         {
             for (int n = 0; n < p_lWafer; n++)
             {
-                if (p_aInfoWafer[n] != null) m_engineer.ClassHandler().AddSequence(p_aInfoWafer[n]);
+                if (m_aInfoWafer[n] != null) m_engineer.ClassHandler().AddSequence(m_aInfoWafer[n]);
             }
             m_engineer.ClassHandler().CalcSequence();
             RunTreeWafer(Tree.eMode.Init);
@@ -312,8 +264,7 @@ namespace Root_EFEM
             if (p_lWafer != aSlotState.Count) return "SetMapData Lendth Error";
             for (int n = 0; n < p_lWafer; n++)
             {
-                GemSlotBase.eState state = aSlotState[n];
-                if (state == GemSlotBase.eState.Exist) SetInfoWafer(n);
+                if (aSlotState[n] == GemSlotBase.eState.Exist) SetInfoWafer(n);
                 else SetInfoWafer(n, null);
             }
             return "OK";
@@ -327,16 +278,15 @@ namespace Root_EFEM
             {
                 InfoCarrier_UI ui = new InfoCarrier_UI();
                 ui.Init(this);
-                return (UserControl)ui;
+                return ui;
             }
         }
         #endregion
 
         #region Tree
         public InfoWafer.WaferSize m_waferSize;
-        public void RunTreeSetup(Tree tree)
+        public void RunTreeWaferSize(Tree tree)
         {
-            p_eSlotType = (eSlotType)tree.Set(p_eSlotType, p_eSlotType, "Slot Type", "Slot Numbering Type");
             m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
         }
 
@@ -351,10 +301,10 @@ namespace Root_EFEM
         public void RunTreeWafer(Tree.eMode mode)
         {
             m_treeRootWafer.p_eMode = mode;
-            for (int n = 0; n < p_aInfoWafer.Count; n++)
+            for (int n = 0; n < m_aInfoWafer.Count; n++)
             {
-                InfoWafer infoWafer = p_aInfoWafer[n];
-                if (infoWafer != null) infoWafer.RunTree(m_treeRootWafer.GetTree(m_asInfoWafer[n], false));
+                InfoWafer infoWafer = m_aInfoWafer[n];
+                if (infoWafer != null) infoWafer.RunTree(m_treeRootWafer.GetTree(m_asGemSlot[n], false));
                 if (mode == Tree.eMode.RegWrite) SaveInfoWafer(n);
             }
         }

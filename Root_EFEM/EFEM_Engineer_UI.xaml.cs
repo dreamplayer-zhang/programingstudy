@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Trees;
 using System.Windows.Controls;
 
 namespace Root_EFEM
@@ -18,9 +19,11 @@ namespace Root_EFEM
         {
             m_engineer = engineer;
             logViewUI.Init(LogView.m_logView);
+            treeRootUI.Init(engineer.m_treeRoot);
             loginUI.Init(engineer.m_login);
             toolBoxUI.Init(engineer.ClassToolBox());
             handlerUI.Init(engineer.m_handler);
+            engineer.RunTree(Tree.eMode.Init); 
         }
     }
 }

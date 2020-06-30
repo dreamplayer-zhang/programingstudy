@@ -23,14 +23,14 @@ namespace Root_EFEM
             infoCarrier.RunTreeWafer(Tree.eMode.Init);
             treeUI.Init(infoCarrier.m_treeRoot);
             infoCarrier.RunTree(Tree.eMode.Init);
-            comboBoxIndex.ItemsSource = infoCarrier.m_asInfoWafer;
+            comboBoxIndex.ItemsSource = infoCarrier.m_asGemSlot;
         }
 
         int GetIndex(string sWafer)
         {
-            for (int n = 0; n < m_infoCarrier.m_asInfoWafer.Count; n++)
+            for (int n = 0; n < m_infoCarrier.m_asGemSlot.Count; n++)
             {
-                if (sWafer == m_infoCarrier.m_asInfoWafer[n]) return n;
+                if (sWafer == m_infoCarrier.m_asGemSlot[n]) return n;
             }
             return -1;
         }
