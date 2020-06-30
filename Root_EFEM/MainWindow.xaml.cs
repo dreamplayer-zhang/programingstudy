@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Root_EFEM
 {
@@ -24,5 +13,32 @@ namespace Root_EFEM
         {
             InitializeComponent();
         }
+
+        #region Window Event
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!Directory.Exists(@"C:\EFEM\Recipe")) Directory.CreateDirectory(@"C:\EFEM\Recipe");
+            Init(); 
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            ThreadStop(); 
+        }
+        #endregion
+
+        EFEM_Engineer m_engineer = new EFEM_Engineer();
+        void Init()
+        {
+            m_engineer.Init("EFEM");
+            engineerUI.Init(m_engineer); 
+        }
+
+        void ThreadStop()
+        {
+            m_engineer.ThreadStop();
+        }
+
+
     }
 }

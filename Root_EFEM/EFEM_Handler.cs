@@ -28,7 +28,7 @@ namespace Root_EFEM
         #region Module
         public ModuleList m_moduleList;
         public EFEM_Recipe m_recipe;
-//        public EFEM_Process m_process;
+        public EFEM_Process m_process;
 //        public EFEM m_efem;
 //        public Robot_RND m_robot;
 //        public Loadport[] m_aLoadport = new Loadport[2];

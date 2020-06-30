@@ -38,6 +38,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -56,7 +57,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="EFEM_Engineer_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EFEM_Handler_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EFEM_Process_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="EFEM_Recipe_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InfoCarrier_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -69,13 +86,25 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="EFEM_Engineer.cs" />
+    <Compile Include="EFEM_Engineer_UI.xaml.cs">
+      <DependentUpon>EFEM_Engineer_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EFEM_Handler.cs" />
+    <Compile Include="EFEM_Handler_UI.xaml.cs">
+      <DependentUpon>EFEM_Handler_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EFEM_Process.cs" />
+    <Compile Include="EFEM_Process_UI.xaml.cs">
+      <DependentUpon>EFEM_Process_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EFEM_Recipe.cs" />
     <Compile Include="EFEM_Recipe_UI.xaml.cs">
       <DependentUpon>EFEM_Recipe_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoCarrier.cs" />
+    <Compile Include="InfoCarrier_UI.xaml.cs">
+      <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="InfoWafer.cs" />
     <Compile Include="IWTRChild.cs" />
     <Compile Include="MainWindow.xaml.cs">

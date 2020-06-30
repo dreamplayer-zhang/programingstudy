@@ -5,8 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_EFEM"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Loaded="Window_Loaded"
+        Closing="Window_Closing"
+        Title="MainWindow" Height="1000" Width="1920" WindowState="Maximized">
     <Grid>
-        
+        <local:EFEM_Engineer_UI x:Name="engineerUI"/>
     </Grid>
 </Window>
