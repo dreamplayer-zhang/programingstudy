@@ -4,6 +4,7 @@ using RootTools;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -13,6 +14,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interactivity;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using static Root_Vega.Module.SideVision.Run_AutoFocus;
 
 namespace Root_Vega
 {
@@ -71,14 +74,14 @@ namespace Root_Vega
             get { return m_afs; }
             set { SetProperty(ref m_afs, value); }
         }
-        SideVision.Run_AutoFocus.CStepInfoList m_lstLeftStepInfo;
-        public SideVision.Run_AutoFocus.CStepInfoList p_lstLeftStepInfo
+        ObservableCollection<CStepInfo> m_lstLeftStepInfo;
+        public ObservableCollection<CStepInfo> p_lstLeftStepInfo
         {
             get { return m_lstLeftStepInfo; }
             set { SetProperty(ref m_lstLeftStepInfo, value); }
         }
-        SideVision.Run_AutoFocus.CStepInfoList m_lstRightStepInfo;
-        public SideVision.Run_AutoFocus.CStepInfoList p_lstRightStepInfo
+        ObservableCollection<CStepInfo> m_lstRightStepInfo;
+        public ObservableCollection<CStepInfo> p_lstRightStepInfo
         {
             get { return m_lstRightStepInfo; }
             set { SetProperty(ref m_lstRightStepInfo, value); }
@@ -100,6 +103,7 @@ namespace Root_Vega
         {
             m_Vision = vision;
             m_RunAutoFocus = af;
+            m_RunAutoFocus._dispatcher = Dispatcher.CurrentDispatcher;
             p_lstLeftStepInfo = af.p_lstLeftStepInfo;
             p_lstRightStepInfo = af.p_lstRightStepInfo;
             p_afs = af.p_afs;
