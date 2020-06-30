@@ -235,7 +235,8 @@ namespace Root_EFEM
         void RunTreeRecipe(Tree tree)
         {
             string sRecipe = m_sManualRecipe;
-            m_sManualRecipe = tree.SetFile(m_sManualRecipe, m_sManualRecipe, EQ.m_sModel, "Recipe", "Recipe Name", m_gem.p_bOffline);
+            bool bOffline = (m_gem == null) ? true : m_gem.p_bOffline; 
+            m_sManualRecipe = tree.SetFile(m_sManualRecipe, m_sManualRecipe, EQ.m_sModel, "Recipe", "Recipe Name", bOffline);
             if (sRecipe != m_sManualRecipe) RecipeOpen(m_sManualRecipe);
             if (m_moduleRunList != null) m_moduleRunList.RunTree(tree);
         }

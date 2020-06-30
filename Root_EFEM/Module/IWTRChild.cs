@@ -1,7 +1,7 @@
 ﻿using RootTools.Trees;
 using System.Collections.Generic;
 
-namespace Root_EFEM
+namespace Root_EFEM.Module
 {
     public interface IWTRChild
     {

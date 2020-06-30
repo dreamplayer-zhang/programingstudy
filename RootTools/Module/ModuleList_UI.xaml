@@ -15,7 +15,7 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Orientation="Vertical">
             <StackPanel Orientation="Horizontal"  Margin="2">
-                <Label Content="EQ State:"/>
+                <Label Content="EQ :"/>
                 <Label x:Name="labelEQState" Content="{Binding p_eState}"/>
             </StackPanel>
             <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="2"/>

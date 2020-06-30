@@ -111,13 +111,17 @@ namespace Root_EFEM
         {
             RunTree(Tree.eMode.Update);
             RunTree(Tree.eMode.RegWrite);
+            RunTree(Tree.eMode.Init);
         }
 
         public void RunTree(Tree.eMode mode)
         {
             m_treeRoot.p_eMode = mode;
             RunTreeControl(m_treeRoot.GetTree("Control"));
-            RunTreeXGem(m_treeRoot.GetTree("XGem")); 
+            RunTreeXGem(m_treeRoot.GetTree("XGem"));
+            m_handler.RunTreeWTR(m_treeRoot.GetTree("WTR"));
+            m_handler.RunTreeLoadport(m_treeRoot.GetTree("Loadport"));
+            m_handler.RunTreeAligner(m_treeRoot.GetTree("Aligner"));
         }
         #endregion
 
