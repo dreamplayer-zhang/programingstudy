@@ -1,7 +1,9 @@
-﻿using RootTools;
+﻿using Root_EFEM.Module;
+using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
@@ -31,24 +33,19 @@ namespace Root_EFEM
         public EFEM_Process m_process;
 //        public EFEM m_efem;
 //        public Robot_RND m_robot;
-//        public Loadport[] m_aLoadport = new Loadport[2];
 //        public FDC m_FDC;
 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
-//            m_efem = new EFEM("EFEM", m_engineer);
-//            InitModule(m_efem);
-//            m_robot = new Robot_RND("Robot", m_engineer);
-//            InitModule(m_robot);
-//            m_aLoadport[0] = new Loadport("LoadportA", "LP1", m_engineer);
-//            InitModule(m_aLoadport[0]);
-//            m_aLoadport[1] = new Loadport("LoadportB", "LP2", m_engineer);
-//            InitModule(m_aLoadport[1]);
-//            m_FDC = new FDC("FDC", m_engineer);
-//            InitModule(m_FDC);
-//            m_robot.AddChild(m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision);
-//            m_robot.ReadInfoReticle_Registry();
+            //            m_efem = new EFEM("EFEM", m_engineer);
+            //            InitModule(m_efem);
+            InitWTR(); 
+            InitLoadport();
+            InitAligner(); 
+            //            m_FDC = new FDC("FDC", m_engineer);
+            //            InitModule(m_FDC);
+            ((IWTR)m_wtr).ReadInfoReticle_Registry(); 
             m_recipe = new EFEM_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
 //            m_process = new EFEM_Process("Process", m_engineer, this);
@@ -67,6 +64,93 @@ namespace Root_EFEM
 //            if (m_sideVision.p_infoReticle != null) return true;
 //            if (m_patternVision.p_infoReticle != null) return true;
             return false;
+        }
+        #endregion
+
+        #region Module WTR
+        enum eWTR
+        {
+            RND
+        }
+        eWTR m_eWTR = eWTR.RND;
+        ModuleBase m_wtr;
+        void InitWTR()
+        {
+            switch (m_eWTR)
+            {
+                case eWTR.RND:
+                default: m_wtr = new WTR_RND("WTR", m_engineer); break;
+            }
+            InitModule(m_wtr); 
+        }
+
+        public void RunTreeWTR(Tree tree)
+        {
+            m_eWTR = (eWTR)tree.Set(m_eWTR, m_eWTR, "Type", "WTR Type"); 
+        }
+        #endregion
+
+        #region Module Loadport
+        enum eLoadport
+        { 
+            RND,
+        }
+        List<eLoadport> m_aLoadportType = new List<eLoadport>(); 
+        int m_nLoadport = 2; 
+
+        void InitLoadport()
+        {
+            ModuleBase module;
+            char cLP = 'A'; 
+            for (int n = 0; n < m_nLoadport; n++, cLP++)
+            {
+                string sID = "Loadport" + cLP;
+                switch (m_aLoadportType[n])
+                {
+                    case eLoadport.RND:
+                    default: module = new Loadport_RND(sID, m_engineer); break;
+                }
+                InitModule(module);
+                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+            }
+        }
+
+        public void RunTreeLoadport(Tree tree)
+        {
+            m_nLoadport = tree.Set(m_nLoadport, m_nLoadport, "Count", "Loadport Count");
+            while (m_aLoadportType.Count < m_nLoadport) m_aLoadportType.Add(eLoadport.RND);
+            Tree treeType = tree.GetTree("Type"); 
+            for (int n = 0; n < m_nLoadport; n++)
+            {
+                m_aLoadportType[n] = (eLoadport)treeType.Set(m_aLoadportType[n], m_aLoadportType[n], n.ToString("00"), "Loadport Type"); 
+            }
+        }
+        #endregion
+
+        #region Module Aligner
+        enum eAligner
+        { 
+            None,
+            ATI
+        }
+        eAligner m_eAligner = eAligner.ATI;
+        void InitAligner()
+        {
+            ModuleBase module = null; 
+            switch (m_eAligner)
+            {
+                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break; 
+            }
+            if (module != null)
+            {
+                InitModule(module);
+                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+            }
+        }
+
+        public void RunTreeAligner(Tree tree)
+        {
+            m_eAligner = (eAligner)tree.Set(m_eAligner, m_eAligner, "Type", "Aligner Type");
         }
         #endregion
 

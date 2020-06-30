@@ -115,13 +115,17 @@
       <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoWafer.cs" />
-    <Compile Include="IWTRChild.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\Aligner_ATI.cs" />
+    <Compile Include="Module\IWTR.cs" />
+    <Compile Include="Module\IWTRChild.cs" />
+    <Compile Include="Module\Loadport_RND.cs" />
+    <Compile Include="Module\WTR_RND.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -154,8 +158,6 @@
       <Name>RootTools</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Module\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

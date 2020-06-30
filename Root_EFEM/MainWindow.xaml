@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
-        Title="MainWindow" Height="1000" Width="1920" WindowState="Maximized">
+        Title="Root EFEM" Height="1000" Width="1920" WindowState="Maximized">
     <Grid>
         <local:EFEM_Engineer_UI x:Name="engineerUI"/>
     </Grid>
