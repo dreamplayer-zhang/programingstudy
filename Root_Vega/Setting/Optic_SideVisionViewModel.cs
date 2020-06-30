@@ -289,7 +289,7 @@ namespace Root_Vega
         public void AutoFocus()
         {
             ImageData img = new ImageData(m_Engineer.GetMemory("pool", "group", "mem"));
-            p_SideVision.p_AutoFocus.GetImageFocusScoreWithSobel(img);
+           // p_SideVision.p_AutoFocus.GetImageFocusScoreWithSobel(img);
             return;
 
             EQ.p_bStop = false;
