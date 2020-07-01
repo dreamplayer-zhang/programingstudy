@@ -56,7 +56,7 @@ namespace RootTools.Control
         #endregion
 
         #region UI
-        public virtual UserControl p_ui { get; }
+        public virtual UserControl p_ui { get; set; }
         #endregion
 
         #region Position & Velocity
