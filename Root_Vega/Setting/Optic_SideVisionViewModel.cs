@@ -288,10 +288,6 @@ namespace Root_Vega
 
         public void AutoFocus()
         {
-            ImageData img = new ImageData(m_Engineer.GetMemory("pool", "group", "mem"));
-           // p_SideVision.p_AutoFocus.GetImageFocusScoreWithSobel(img);
-            return;
-
             EQ.p_bStop = false;
             SideVision Sidevision = ((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision;
             SideVision.Run_AutoFocus af = (SideVision.Run_AutoFocus)Sidevision.CloneModuleRun("AutoFocus");
@@ -305,10 +301,9 @@ namespace Root_Vega
                 }
                 else
                 {
-                    // Cancelled
+
                 }
             }
-            //m_DialogServiceTest.Show<Dialog_AutoFocus>(this, viewModel);
             
             return;
         }

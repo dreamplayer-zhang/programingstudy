@@ -1100,10 +1100,12 @@ namespace Root_Vega.Module
                 }
             }
         }
+        
 
         public class Run_AutoFocus : ModuleRunBase
         {
-            public class CStepInfoList : ObservableCollection<CStepInfo> { }
+            public Dispatcher _dispatcher;
+            //public class CStepInfoList : ObservableCollection<CStepInfo> { }
             public class CStepInfo : ObservableObject
             {
                 string m_strInfo;
@@ -1125,14 +1127,14 @@ namespace Root_Vega.Module
                     p_img = img;
                 }
             }
-            CStepInfoList m_lstLeftStepInfo;
-            public CStepInfoList p_lstLeftStepInfo
+            ObservableCollection<CStepInfo> m_lstLeftStepInfo;
+            public ObservableCollection<CStepInfo> p_lstLeftStepInfo
             {
                 get { return m_lstLeftStepInfo; }
                 set { SetProperty(ref m_lstLeftStepInfo, value); }
             }
-            CStepInfoList m_lstRightStepInfo;
-            public CStepInfoList p_lstRightStepInfo
+            ObservableCollection<CStepInfo> m_lstRightStepInfo;
+            public ObservableCollection<CStepInfo> p_lstRightStepInfo
             {
                 get { return m_lstRightStepInfo; }
                 set { SetProperty(ref m_lstRightStepInfo, value); }
@@ -1182,8 +1184,8 @@ namespace Root_Vega.Module
             {
                 m_module = module;
                 InitModuleRun(module);
-                p_lstLeftStepInfo = new CStepInfoList();
-                p_lstRightStepInfo = new CStepInfoList();
+                p_lstLeftStepInfo = new ObservableCollection<CStepInfo>();
+                p_lstRightStepInfo = new ObservableCollection<CStepInfo>();
                 p_afs = new CAutoFocusStatus(0.0, "Ready");
             }
 
@@ -1248,20 +1250,11 @@ namespace Root_Vega.Module
                 p_afs.p_dTheta = 0.0;
                 p_afs.p_strStatus = "Ready";
 
-                //p_lstLeftStepInfo.Clear();
-                //p_lstRightStepInfo.Clear();
-
-                //Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
-                //{
-                //    p_lstLeftStepInfo.Clear();
-                //    p_lstRightStepInfo.Clear();
-                //}));
-
-                //DispatcherService.Invoke((System.Action)(() =>
-                //{
-                //    p_lstLeftStepInfo.Clear();
-                //    p_lstRightStepInfo.Clear();
-                //}));
+                _dispatcher.Invoke(new Action(delegate ()
+                {
+                    p_lstLeftStepInfo.Clear();
+                    p_lstRightStepInfo.Clear();
+                }));
 
                 //1.Reticle 좌측 위치로 이동 후 AF
                 int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
@@ -1286,26 +1279,18 @@ namespace Root_Vega.Module
                         bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                     }
 
-                    string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
-                    BitmapSource bmpSrc = GetBitmapSource(bmp);
+                    _dispatcher.Invoke(new Action(delegate ()
+                    {
+                        string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
+                        BitmapSource bmpSrc = GetBitmapSource(bmp);
+                        p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    }));
 
                     if (dLeftCurrentScore > dLeftMaxScore)
                     {
                         dLeftMaxScore = dLeftCurrentScore;
                         dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
                     }
-
-                    //p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-
-                    //Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
-                    //{
-                    //    p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    //}));
-
-                    //DispatcherService.Invoke((System.Action)(() =>
-                    //{
-                    //    p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    //}));
                 }
 
                 // 2. Reticle 우측 위치로 이동 후 AF
@@ -1337,20 +1322,12 @@ namespace Root_Vega.Module
                         dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
                     }
 
-                    string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dRightStartPosX + (m_nStep * i)), dRightCurrentScore);
-                    BitmapSource bmpSrc = GetBitmapSource(bmp);
-
-                    //p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-
-                    //Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
-                    //{
-                    //    p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    //}));
-
-                    //DispatcherService.Invoke((System.Action)(() =>
-                    //{
-                    //    p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    //}));
+                    _dispatcher.Invoke(new Action(delegate ()
+                    {
+                        string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dRightStartPosX + (m_nStep * i)), dRightCurrentScore);
+                        BitmapSource bmpSrc = GetBitmapSource(bmp);
+                        p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    }));
                 }
 
                 // 3. 좌우측 AF편차 구하기

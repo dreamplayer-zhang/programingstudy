@@ -33,9 +33,9 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-        public bool p_bLock { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool p_bLock { get; set; }
 
-        public List<string> p_asChildID => throw new NotImplementedException();
+        public List<string> p_asChildID { get; set; }
 
         public string AfterGet(int nID)
         {
