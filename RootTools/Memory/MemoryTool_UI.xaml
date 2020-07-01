@@ -99,7 +99,7 @@
                     <tree:TreeUI Grid.Column="1" x:Name="treeRootUI" />
                 </Grid>
             </TabItem>
-            <TabItem Header="Memory" Visibility="Hidden">
+            <TabItem Header="Memory" Visibility="Visible">
                 <tree:TreeUI x:Name="treeRootMemoryUI"/>
             </TabItem>
         </TabControl>
