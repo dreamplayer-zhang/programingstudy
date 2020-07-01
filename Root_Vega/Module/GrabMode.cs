@@ -101,7 +101,7 @@ namespace Root_Vega
 
         void RunTreeMemory(Tree tree, bool bVisible, bool bReadOnly)
         {
-            if (m_sMemoryGroup == "") m_sMemoryGroup = p_sName;
+            if (m_sMemoryGroup == "") m_sMemoryGroup = m_memoryPool.m_asGroup[0];
             m_sMemoryGroup = tree.Set(m_sMemoryGroup, m_sMemoryGroup, m_memoryPool.m_asGroup, "Group", "Memory Group Name", bVisible, bReadOnly);
             m_memoryGroup = m_memoryPool.GetGroup(m_sMemoryGroup);
             if (m_memoryGroup == null) return;
