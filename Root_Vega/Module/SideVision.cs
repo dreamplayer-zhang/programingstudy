@@ -828,10 +828,8 @@ namespace Root_Vega.Module
                 run.m_yLine = m_yLine;
                 run.m_xLine = m_xLine;
                 run.m_nMaxFrame = m_nMaxFrame;
-                run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
-                //run.m_nScanRate = m_nScanRate;
-                run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
-                //run.m_eScanPos = m_eScanPos;
+                if (m_grabMode != null)
+                    run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
                 run.m_nScanGap = m_nScanGap;
                 return run;
             }
@@ -988,8 +986,8 @@ namespace Root_Vega.Module
                 run.m_xLine = m_xLine;
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanRate = m_nScanRate;
-                run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
-                //run.m_eScanPos = m_eScanPos;
+                if (m_grabMode != null)
+                    run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
                 run.m_nScanGap = m_nScanGap;
                 return run;
             }
