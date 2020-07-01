@@ -279,7 +279,7 @@ namespace RootTools.Memory
             m_engineer = engineer;
             m_bMaster = bMaster; 
             m_log = LogView.GetLog(id);
-            m_treeRootMemory = new TreeRoot("Memory", m_log, false, "Memory");
+            m_treeRootMemory = new TreeRoot("Memory", m_log, true, "Memory");
             m_treeRootMemory.UpdateTree += M_treeRootMemory_UpdateTree;
             m_treeRootRun = new TreeRoot(id, m_log);
             m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
