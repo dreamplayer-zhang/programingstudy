@@ -15,7 +15,6 @@ using System.Windows;
 using System.Windows.Interactivity;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using static Root_Vega.Module.SideVision.Run_AutoFocus;
 
 namespace Root_Vega
 {
@@ -74,14 +73,14 @@ namespace Root_Vega
             get { return m_afs; }
             set { SetProperty(ref m_afs, value); }
         }
-        ObservableCollection<CStepInfo> m_lstLeftStepInfo;
-        public ObservableCollection<CStepInfo> p_lstLeftStepInfo
+        ObservableCollection<SideVision.Run_AutoFocus.CStepInfo> m_lstLeftStepInfo;
+        public ObservableCollection<SideVision.Run_AutoFocus.CStepInfo> p_lstLeftStepInfo
         {
             get { return m_lstLeftStepInfo; }
             set { SetProperty(ref m_lstLeftStepInfo, value); }
         }
-        ObservableCollection<CStepInfo> m_lstRightStepInfo;
-        public ObservableCollection<CStepInfo> p_lstRightStepInfo
+        ObservableCollection<SideVision.Run_AutoFocus.CStepInfo> m_lstRightStepInfo;
+        public ObservableCollection<SideVision.Run_AutoFocus.CStepInfo> p_lstRightStepInfo
         {
             get { return m_lstRightStepInfo; }
             set { SetProperty(ref m_lstRightStepInfo, value); }
