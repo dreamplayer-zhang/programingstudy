@@ -616,28 +616,25 @@ namespace Root_Vega.Module
 
         unsafe void RunThreadInspect(int iInspect)
         {
-            System.Windows.MessageBox.Show(" unsafe void RunThreadInspect(int iInspect) 주석처리되어있는 부분 확인바람.", "처리되지않음.", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
-
-            //byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
-            //byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
-            //byte* pBright = (byte*)m_memoryBright.GetPtr(0, 0, iInspect).ToPointer();
-            //for (int x = 0; x < m_szAlignROI.X; x++, pSrc++, pHeight++, pBright++)
-            //{
-            //    byte* pSrcY = pSrc;
-            //    int nSum = 0;
-            //    int nYSum = 0;
-            //    for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
-            //    {
-            //        nSum += *pSrcY;
-            //        nYSum = *pSrcY * y;
-            //    }
-            //    int nAdd = x + iInspect * m_szAlignROI.X;
-            //    m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
-            //    *pHeight = (byte)(m_aHeight[nAdd] >> 8);
-            //    int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
-            //    *pBright = pSrc[x + yAve * m_szAlignROI.X];
-
-            //}
+            byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
+            byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
+            byte* pBright = (byte*)m_memoryBright.GetPtr(0, 0, iInspect).ToPointer();
+            for (int x = 0; x < m_szAlignROI.X; x++, pSrc++, pHeight++, pBright++)
+            {
+                byte* pSrcY = pSrc;
+                int nSum = 0;
+                int nYSum = 0;
+                for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
+                {
+                    nSum += *pSrcY;
+                    nYSum = *pSrcY * y;
+                }
+                int nAdd = x + iInspect * m_szAlignROI.X;
+                m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
+                *pHeight = (byte)(m_aHeight[nAdd] >> 8);
+                int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
+                *pBright = pSrc[x + yAve * m_szAlignROI.X];
+            }
         }
 
         void StartInspect(int iInspect)
@@ -742,6 +739,7 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
             AddModuleRunList(new Run_BevelGrab(this), true, "Bevel Grab");
             AddModuleRunList(new Run_AutoFocus(this), true, "Auto Focus");
+            AddModuleRunList(new Run_LADS(this), true, "LADS");
         }
 
         public class Run_Delay : ModuleRunBase

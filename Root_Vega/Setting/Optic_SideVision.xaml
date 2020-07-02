@@ -1218,24 +1218,47 @@
                                             </StackPanel>
                                         </Button.Content>
                                     </Button>
-                                    <Button Grid.Column="1"
-                                            Grid.Row="1"
+                                    <Grid Grid.Column="1"
+                                          Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button Grid.Column="0"
                                             Margin="5"
                                             Command="{Binding CommandAutoFocus}"
                                             Style="{StaticResource BasicBtn}">
-                                        <Button.Content>
-                                            <StackPanel Orientation="Vertical">
-                                                <material:PackIcon Kind="ZoomInOutline"
+                                            <Button.Content>
+                                                <StackPanel Orientation="Vertical">
+                                                    <material:PackIcon Kind="ZoomInOutline"
                                                                    Width="25"
                                                                    HorizontalAlignment="Center"
                                                                    Height="25"
                                                                    Foreground="White"></material:PackIcon>
-                                                <TextBlock Style="{StaticResource BasicTb}"
+                                                    <TextBlock Style="{StaticResource BasicTb}"
                                                            Text="AutoFocus"
                                                            FontSize="15"></TextBlock>
-                                            </StackPanel>
-                                        </Button.Content>
-                                    </Button>
+                                                </StackPanel>
+                                            </Button.Content>
+                                        </Button>
+                                        <Button Grid.Column="1"
+                                            Margin="5"
+                                            Command="{Binding CommandLADS}"
+                                            Style="{StaticResource BasicBtn}">
+                                            <Button.Content>
+                                                <StackPanel Orientation="Vertical">
+                                                    <material:PackIcon Kind="ZoomInOutline"
+                                                                   Width="25"
+                                                                   HorizontalAlignment="Center"
+                                                                   Height="25"
+                                                                   Foreground="White"></material:PackIcon>
+                                                    <TextBlock Style="{StaticResource BasicTb}"
+                                                           Text="LADS"
+                                                           FontSize="15"></TextBlock>
+                                                </StackPanel>
+                                            </Button.Content>
+                                        </Button>
+                                    </Grid>
                                 </Grid>
                                 <Grid Grid.Row="1">
                                     <Grid.RowDefinitions>

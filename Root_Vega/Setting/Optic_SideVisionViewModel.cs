@@ -361,6 +361,26 @@ namespace Root_Vega
             return;
         }
 
+        public void LADS()
+        {
+            EQ.p_bStop = false;
+            SideVision Sidevision = ((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision;
+            Run_LADS lads = (Run_LADS)Sidevision.CloneModuleRun("LADS");
+            var viewModel = new Dialog_LADS_ViewModel(Sidevision, lads);
+            Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+            if (result.HasValue)
+            {
+                if (result.Value)
+                {
+
+                }
+                else
+                {
+
+                }
+            }
+        }
+
         private void ViewModel_CloseRequested(object sender, DialogCloseRequestedEventArgs e)
         {
             throw new NotImplementedException();
@@ -372,6 +392,13 @@ namespace Root_Vega
             get
             {
                 return new RelayCommand(AutoFocus);
+            }
+        }
+        public RelayCommand CommandLADS
+        {
+            get
+            {
+                return new RelayCommand(LADS);
             }
         }
         public RelayCommand CommandScan

@@ -143,6 +143,10 @@
     <Compile Include="Controls\FDC_Control.xaml.cs">
       <DependentUpon>FDC_Control.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\Dialog_LADS.xaml.cs">
+      <DependentUpon>Dialog_LADS.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Dialog_LADS_ViewModel.cs" />
     <Compile Include="Dialog\Dialog_SettingFDC.cs" />
     <Compile Include="Dialog\Dialog_SettingFDC.xaml.cs">
       <DependentUpon>Dialog_SettingFDC.xaml</DependentUpon>
@@ -157,6 +161,7 @@
     <Compile Include="ManualJob\ManualOHT_UI.xaml.cs">
       <DependentUpon>ManualOHT_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\Run_LADS.cs" />
     <Compile Include="Setting\Setting_FDC.xaml.cs">
       <DependentUpon>Setting_FDC.xaml</DependentUpon>
     </Compile>
@@ -329,6 +334,10 @@
     <Page Include="Controls\FDC_Control.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialog\Dialog_LADS.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\Dialog_SettingFDC.xaml">
       <Generator>MSBuild:Compile</Generator>
