@@ -4,7 +4,6 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows.Controls;
 
@@ -20,7 +19,7 @@ namespace Root_EFEM
         {
             Empty,
             Placed,
-            Load,
+            Dock,
             Run,
         }
         eState _eState = eState.Empty;
@@ -32,7 +31,7 @@ namespace Root_EFEM
                 if (_eState == value) return;
                 m_log.Info(p_id + " eState : " + _eState.ToString() + " -> " + value.ToString());
                 _eState = value;
-                if (_eState == eState.Load) m_timeLotStart = DateTime.Now;
+                if (_eState == eState.Dock) m_timeLotStart = DateTime.Now;
                 OnPropertyChanged();
             }
         }
@@ -83,27 +82,30 @@ namespace Root_EFEM
         {
             switch (p_eState)
             {
-                case eState.Load:
+                case eState.Dock:
                 case eState.Run: return "OK";
             }
             return p_id + " eState = " + p_eState.ToString();
         }
 
-        public string IsGetOK(int nID, ref int teachWTR)
+        public int GetTeachWTR(InfoWafer infoWafer = null)
+        {
+            return m_waferSize.GetData(p_eWaferSize).m_teachWTR;
+        }
+
+        public string IsGetOK(int nID)
         {
             string sOK = IsRunOK();
             if (sOK != "OK") return sOK;
             if (GetInfoWafer(nID) == null) return p_id + " IsGetOK : InfoWafer not Exist";
-            teachWTR = m_waferSize.GetData(p_eWaferSize).m_teachWTR;
             return "OK";
         }
 
-        public string IsPutOK(int nID, ref int teachWTR)
+        public string IsPutOK(int nID)
         {
             string sOK = IsRunOK();
             if (sOK != "OK") return sOK;
             if (GetInfoWafer(nID) != null) return p_id + " IsPutOK : InfoWafer Exist";
-            teachWTR = m_waferSize.GetData(p_eWaferSize).m_teachWTR;
             return "OK";
         }
         #endregion
@@ -254,7 +256,7 @@ namespace Root_EFEM
                 else Thread.Sleep(10);
             }
             p_eReqTransfer = (p_ePresentSensor == ePresent.Exist) ? eTransfer.ReadyToUnload : eTransfer.ReadyToLoad;
-            if (p_ePresentSensor == ePresent.Empty) m_gem.RemoveCarrierInfo(p_sLocID);
+            if ((p_ePresentSensor == ePresent.Empty) && (m_gem != null)) m_gem.RemoveCarrierInfo(p_sLocID);
         }
         #endregion
 
@@ -285,11 +287,6 @@ namespace Root_EFEM
 
         #region Tree
         public InfoWafer.WaferSize m_waferSize;
-        public void RunTreeWaferSize(Tree tree)
-        {
-            m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
-        }
-
         public TreeRoot m_treeRootWafer;
         private void M_treeRootWafer_UpdateTree()
         {
@@ -334,7 +331,6 @@ namespace Root_EFEM
             InitSlot();
             InitBase();
         }
-
 
         public void ThreadStop()
         {

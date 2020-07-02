@@ -154,7 +154,11 @@ namespace RootTools.Trees
         public Tree GetTree(string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false)
         {
             Tree item = FindTreeItem(sName);
-            if (item != null) return item;
+            if (item != null)
+            {
+                item.p_bVisible = bVisible;
+                return item;
+            }
             Tree newGroup = new TreeGroup(sName, this, m_log, bExpand, bVisible, bReadOnly);
             AddTreeItem(newGroup);
             return newGroup;
@@ -163,7 +167,11 @@ namespace RootTools.Trees
         public Tree GetTree(int nIndex, string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false)
         {
             Tree item = FindTreeItem(sName, nIndex);
-            if (item != null) return item;
+            if (item != null)
+            {
+                item.p_bVisible = bVisible;
+                return item;
+            }
             Tree newGroup = new TreeGroup(nIndex, sName, this, m_log, bExpand, bVisible, bReadOnly);
             AddTreeItem(newGroup);
             return newGroup;

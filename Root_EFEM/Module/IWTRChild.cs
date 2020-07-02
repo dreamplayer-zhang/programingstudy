@@ -1,4 +1,5 @@
-﻿using RootTools.Trees;
+﻿using RootTools.Module;
+using RootTools.Trees;
 using System.Collections.Generic;
 
 namespace Root_EFEM.Module
@@ -7,15 +8,21 @@ namespace Root_EFEM.Module
     {
         string p_id { get; set; }
 
+        ModuleBase.eState p_eState { get; }
+
         bool p_bLock { get; set; }
+
+        List<string> p_asChildSlotID { get; }
 
         InfoWafer GetInfoWafer(int nID);
 
         void SetInfoWafer(int nID, InfoWafer infoWafer);
 
-        string IsGetOK(int nID, ref int teachWTR);
+        int GetTeachWTR(InfoWafer infoWafer = null);
 
-        string IsPutOK(int nID, InfoWafer infoWafer, ref int teachWTR);
+        string IsGetOK(int nID);
+
+        string IsPutOK(InfoWafer infoWafer, int nID);
 
         string BeforeGet(int nID);
 
@@ -25,12 +32,10 @@ namespace Root_EFEM.Module
 
         string AfterPut(int nID);
 
-        bool IsWaferExist(int nID, bool bIgnoreExistSensor = false);
+        bool IsWaferExist(int nID, bool bUseSensor = true);
 
         void RunTreeTeach(Tree tree);
 
         void ReadInfoWafer_Registry();
-
-        List<string> p_asChildID { get; }
     }
 }
