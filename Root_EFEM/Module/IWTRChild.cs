@@ -1,4 +1,5 @@
-﻿using RootTools.Trees;
+﻿using RootTools.Module;
+using RootTools.Trees;
 using System.Collections.Generic;
 
 namespace Root_EFEM.Module
@@ -6,6 +7,8 @@ namespace Root_EFEM.Module
     public interface IWTRChild
     {
         string p_id { get; set; }
+
+        ModuleBase.eState p_eState { get; }
 
         bool p_bLock { get; set; }
 
@@ -15,9 +18,11 @@ namespace Root_EFEM.Module
 
         void SetInfoWafer(int nID, InfoWafer infoWafer);
 
-        string IsGetOK(int nID, ref int teachWTR);
+        int GetTeachWTR(InfoWafer infoWafer = null);
 
-        string IsPutOK(int nID, InfoWafer infoWafer, ref int teachWTR);
+        string IsGetOK(int nID);
+
+        string IsPutOK(InfoWafer infoWafer, int nID);
 
         string BeforeGet(int nID);
 

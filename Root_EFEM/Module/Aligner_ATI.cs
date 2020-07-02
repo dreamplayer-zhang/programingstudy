@@ -40,12 +40,17 @@ namespace Root_EFEM.Module
             throw new NotImplementedException();
         }
 
-        public string IsGetOK(int nID, ref int teachWTR)
+        public int GetTeachWTR(InfoWafer infoWafer = null)
+        {
+            return 0; 
+        }
+
+        public string IsGetOK(int nID)
         {
             throw new NotImplementedException();
         }
 
-        public string IsPutOK(int nID, InfoWafer infoWafer, ref int teachWTR)
+        public string IsPutOK(InfoWafer infoWafer, int nID = 0)
         {
             throw new NotImplementedException();
         }

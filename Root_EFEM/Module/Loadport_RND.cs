@@ -82,16 +82,21 @@ namespace Root_EFEM.Module
             m_infoCarrier.SetInfoWafer(nID, infoWafer);
         }
 
-        public string IsGetOK(int nID, ref int teachWTR)
+        public int GetTeachWTR(InfoWafer infoWafer = null)
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            return m_infoCarrier.IsGetOK(nID, ref teachWTR);
+            return m_infoCarrier.GetTeachWTR(infoWafer); 
         }
 
-        public string IsPutOK(int nID, InfoWafer infoWafer, ref int teachWTR)
+        public string IsGetOK(int nID)
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            return m_infoCarrier.IsPutOK(nID, ref teachWTR);
+            return m_infoCarrier.IsGetOK(nID);
+        }
+
+        public string IsPutOK(InfoWafer infoWafer, int nID)
+        {
+            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            return m_infoCarrier.IsPutOK(nID);
         }
 
         public string BeforeGet(int nID)

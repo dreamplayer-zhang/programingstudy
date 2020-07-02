@@ -106,7 +106,7 @@ namespace RootTools.Gem
 
         void CMSDelCarrierInfo()
         {
-            m_gem.CMSDelCarrierInfo(this);
+            if (m_gem != null) m_gem.CMSDelCarrierInfo(this);
         }
 
         void RunTreeCarrier(Tree tree)
