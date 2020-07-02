@@ -6,8 +6,15 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 
-namespace Root_Vega
-{  
+namespace Root_Vega.Module
+{
+    public enum eScanPos
+    {
+        Bottom = 0,
+        Left,
+        Top,
+        Right,
+    }
     public class GrabMode
     {
         #region Camera
@@ -117,13 +124,6 @@ namespace Root_Vega
         public int m_ScanStartLine = 0;
         #endregion
 
-        public enum eScanPos
-        {
-            Bottom = 0,
-            Left,
-            Top,
-            Right,
-        }
         public eScanPos m_eScanPos = eScanPos.Bottom;
 
         public string p_id

@@ -194,6 +194,10 @@
       <DependentUpon>2_7_EdgeBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\2_7_EdgeBoxViewModel.cs" />
+    <Compile Include="UI\2_9_Bevel.xaml.cs">
+      <DependentUpon>2_9_Bevel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_9_BevelViewModel.cs" />
     <Compile Include="UI\2_Recipe.xaml.cs">
       <DependentUpon>2_Recipe.xaml</DependentUpon>
     </Compile>
@@ -379,6 +383,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\2_7_EdgeBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2_9_Bevel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

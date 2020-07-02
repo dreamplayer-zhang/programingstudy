@@ -56,7 +56,7 @@ namespace Root_Vega
 		Vega_Engineer m_Engineer;
 		DialogService m_DialogService;
 		MemoryTool m_MemoryModule;
-		List<string> m_astrMem = new List<String> { "Top", "Left", "Right", "Bottom" };
+		List<string> m_astrMem = new List<String> { "SideTop", "SideLeft", "SideRight", "SideBottom" };
 		public List<DrawHistoryWorker> m_DrawHistoryWorker_List = new List<DrawHistoryWorker>();
 		private List<SimpleShapeDrawerVM> m_SimpleShapeDrawer_List = new List<SimpleShapeDrawerVM>();
 		public List<SimpleShapeDrawerVM> p_SimpleShapeDrawer_List
@@ -659,9 +659,9 @@ namespace Root_Vega
 						}
 						int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(10 + i), type, 0);
 
-						DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).GetMBOffset(),
-							m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.X,
-							m_Engineer.GetMemory("SideVision.Memory", "Side", m_astrMem[i]).p_sz.Y,
+						DrawRectList.AddRange(m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).GetMBOffset(),
+							m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).p_sz.X,
+							m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).p_sz.Y,
 							inspArea, 500, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance));
 					}
 				}
