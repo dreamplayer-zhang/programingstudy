@@ -4,7 +4,6 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows.Controls;
 
@@ -20,7 +19,7 @@ namespace Root_EFEM
         {
             Empty,
             Placed,
-            Load,
+            Dock,
             Run,
         }
         eState _eState = eState.Empty;
@@ -32,7 +31,7 @@ namespace Root_EFEM
                 if (_eState == value) return;
                 m_log.Info(p_id + " eState : " + _eState.ToString() + " -> " + value.ToString());
                 _eState = value;
-                if (_eState == eState.Load) m_timeLotStart = DateTime.Now;
+                if (_eState == eState.Dock) m_timeLotStart = DateTime.Now;
                 OnPropertyChanged();
             }
         }
@@ -83,7 +82,7 @@ namespace Root_EFEM
         {
             switch (p_eState)
             {
-                case eState.Load:
+                case eState.Dock:
                 case eState.Run: return "OK";
             }
             return p_id + " eState = " + p_eState.ToString();
@@ -285,11 +284,6 @@ namespace Root_EFEM
 
         #region Tree
         public InfoWafer.WaferSize m_waferSize;
-        public void RunTreeWaferSize(Tree tree)
-        {
-            m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
-        }
-
         public TreeRoot m_treeRootWafer;
         private void M_treeRootWafer_UpdateTree()
         {

@@ -190,7 +190,7 @@ namespace Root_EFEM
                 }
             }
 
-            public void RunTeachTree(Tree tree)
+            public void RunTreeTeach(Tree tree)
             {
                 foreach (Data data in m_aData)
                 {

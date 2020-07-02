@@ -9,6 +9,8 @@ namespace Root_EFEM.Module
 
         bool p_bLock { get; set; }
 
+        List<string> p_asChildSlotID { get; }
+
         InfoWafer GetInfoWafer(int nID);
 
         void SetInfoWafer(int nID, InfoWafer infoWafer);
@@ -25,12 +27,10 @@ namespace Root_EFEM.Module
 
         string AfterPut(int nID);
 
-        bool IsWaferExist(int nID, bool bIgnoreExistSensor = false);
+        bool IsWaferExist(int nID, bool bUseSensor = true);
 
         void RunTreeTeach(Tree tree);
 
         void ReadInfoWafer_Registry();
-
-        List<string> p_asChildID { get; }
     }
 }

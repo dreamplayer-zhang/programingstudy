@@ -13,7 +13,7 @@ namespace Root_EFEM.Module
     {
         public bool p_bLock { get; set; }
 
-        public List<string> p_asChildID { get; set; }
+        public List<string> p_asChildSlotID { get; }
 
         public string AfterGet(int nID)
         {
