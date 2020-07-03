@@ -90,7 +90,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Aligner_ATI_AOI.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -123,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Module\Aligner_ATI.cs" />
+    <Compile Include="Module\Aligner_ATI_AOI.cs" />
     <Compile Include="Module\IWTR.cs" />
     <Compile Include="Module\IWTRChild.cs" />
     <Compile Include="Module\Loadport_RND.cs" />

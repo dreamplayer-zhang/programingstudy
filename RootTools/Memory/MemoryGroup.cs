@@ -78,10 +78,10 @@ namespace RootTools.Memory
             foreach (MemoryData memory in p_aMemory) m_asMemory.Add(memory.p_id);
         }
 
-        public void RunTreeMemory(Tree tree, bool bVisible)
+        public void RunTreeMemory(Tree tree, bool bCount, bool bVisible)
         {
             int nMemory = p_aMemory.Count;
-            nMemory = tree.Set(nMemory, nMemory, "Count", "Memory Count", bVisible); 
+            if (bCount) nMemory = tree.Set(nMemory, nMemory, "Count", "Memory Count", bVisible); 
             for (int n = 0; n < nMemory; n++)
             {
                 string sMemory = (p_aMemory.Count > n) ? p_aMemory[n].p_id : "Memory";

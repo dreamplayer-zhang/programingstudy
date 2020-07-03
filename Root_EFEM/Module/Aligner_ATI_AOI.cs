@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Root_EFEM
+namespace Root_EFEM.Module
 {
     public class Aligner_ATI_AOI
     {
@@ -87,7 +87,7 @@ namespace Root_EFEM
 
             public List<int> m_aEdge = new List<int>();
             public List<int> m_aCalc = new List<int>();
-            public List<int> m_aCircle = new List<int>(); 
+            public List<int> m_aCircle = new List<int>();
             public List<bool> m_abEdge = new List<bool>();
             public void InitBuffer()
             {
@@ -359,7 +359,7 @@ namespace Root_EFEM
             m_abEdge = m_aoi.m_abEdge;
             m_aNotch = m_aoi.m_aNotch;
             m_aNotch.Clear();
-            while (m_abEdge.Count < m_szMem.X) m_abEdge.Add(false); 
+            while (m_abEdge.Count < m_szMem.X) m_abEdge.Add(false);
             for (int x = 0; x < m_szMem.X; x++) m_abEdge[x] = true;
             for (int n = 0; n < 10; n++)
             {

@@ -10,6 +10,30 @@ namespace RootTools.Memory
     {
         #region Property
         public string p_id { get; set; }
+
+        string _sGroup = ""; 
+        public string p_sGroup
+        { 
+            get { return _sGroup; }
+            set
+            {
+                if (_sGroup == value) return;
+                _sGroup = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        string _sMemory = "";
+        public string p_sMemory
+        {
+            get { return _sMemory; }
+            set
+            {
+                if (_sMemory == value) return;
+                _sMemory = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         #region MemoryData
@@ -299,12 +323,12 @@ namespace RootTools.Memory
         }
         #endregion
 
-        public MemoryTool m_memoryTool;
+        public MemoryPool m_memoryPool;
         Log m_log; 
-        public MemoryViewer(string id, MemoryTool memoryTool, Log log)
+        public MemoryViewer(string id, MemoryPool memoryPool, Log log)
         {
             p_id = id; 
-            m_memoryTool = memoryTool;
+            m_memoryPool = memoryPool;
             m_log = log; 
         }
 

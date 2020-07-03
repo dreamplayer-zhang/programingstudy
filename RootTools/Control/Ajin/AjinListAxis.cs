@@ -95,7 +95,8 @@ namespace RootTools.Control.Ajin
                 if (m_qSetAxis.Count > 0)
                 {
                     AjinAxis axis = m_qSetAxis.Dequeue();
-                    axis.GetAxisStatus(); 
+                    axis.GetAxisStatus();
+                    axis.RunTreeSetting(Tree.eMode.Init); 
                 }
             }
         }
@@ -113,6 +114,7 @@ namespace RootTools.Control.Ajin
                 m_log.Error("AxmMotLoadParaAll Error : " + nError.ToString());
                 return;
             }
+            foreach (AjinAxis axis in m_aAxis) m_qSetAxis.Enqueue(axis); 
         }
 
         public void LoadMotFile()
