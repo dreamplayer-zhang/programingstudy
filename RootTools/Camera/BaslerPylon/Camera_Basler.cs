@@ -337,6 +337,7 @@ namespace RootTools.Camera.BaslerPylon
                 return p_id + " Camera not Connected";
             try
             {
+
                 m_cam.StreamGrabber.Start();
                 IGrabResult result = m_cam.StreamGrabber.RetrieveResult(m_nGrabTimeout, TimeoutHandling.ThrowException);
                 using (result)
@@ -420,7 +421,7 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
-        private void GrabOneShot()
+        public void GrabOneShot()
         {
             try
             {

@@ -109,13 +109,13 @@ namespace RootTools.Memory
         #region RunTree
         public void RunTreeToolBox(Tree tree)
         {
-            p_gbPool = tree.Set(p_gbPool, 10, "Pool Size", "Memory Pool Size (GB)");
+            p_gbPool = tree.Set(p_gbPool, 1, "Pool Size", "Memory Pool Size (Giga Byte)");
         }
 
         public void RunTreeModule(Tree tree)
         {
             foreach (MemoryGroup group in p_aGroup) RunTreeGroup(tree.GetTree(group.p_id, false), group);
-            if (tree.IsUpdated()) m_memoryTool.MemoryChanged();
+            if (tree.IsUpdated()) m_memoryTool.MemoryChanged(true);
         }
 
         void RunTreeGroup(Tree tree, MemoryGroup group)

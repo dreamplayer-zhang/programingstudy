@@ -55,6 +55,7 @@ namespace RootTools.Memory
             if (p_mbOffset > mbPool) return null; 
             p_aMemory.Add(memory);
             InitAddress();
+            m_pool.m_memoryTool.MemoryChanged(false); 
             return memory; 
         }
 

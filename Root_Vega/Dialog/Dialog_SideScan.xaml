@@ -59,7 +59,8 @@
         </Grid.RowDefinitions>
         <GroupBox Header="ScanMode"
                   TextElement.Foreground="White"
-                  BorderThickness="0">
+                  BorderThickness="0"
+                  Grid.RowSpan="2">
             <!--<ListView 
                       Margin="0,5,0,0"
                       Background="#FF1B1B1C"
@@ -83,7 +84,8 @@
                 </ListBox.Template>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal"></StackPanel>
+                        <WrapPanel Orientation="Horizontal"
+                                    ></WrapPanel>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
                 <ListBox.ItemContainerStyle>
@@ -100,90 +102,17 @@
                                  Background="#FF1B1B1C"
                                  Height="65"
                                  CornerRadius="5">
-                            <Border.Width>
+                            <!--<Border.Width>
                                 <MultiBinding Converter="{StaticResource ListViewContentsWidthConverters}">
                                     <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}" />
                                     <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}"
                                              Path="ActualWidth" />
                                 </MultiBinding>
-                            </Border.Width>
+                            </Border.Width>-->
                             <TextBlock HorizontalAlignment="Center"
                                        Height="Auto"
                                        TextWrapping="Wrap"
                                        Text="{Binding p_sName}"
-                                       VerticalAlignment="Center"
-                                       FontSize="17"
-                                       FontWeight="Bold"
-                                       Foreground="White"
-                                       TextAlignment="Center" />
-                        </Border>
-                        <DataTemplate.Triggers>
-                            <Trigger Property="IsMouseOver"
-                                     Value="true">
-                                <Setter TargetName="ItemBorder"
-                                        Property="Background"
-                                        Value="#FF3E3E40"></Setter>
-                            </Trigger>
-                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}"
-                                         Value="True">
-                                <Setter TargetName="ItemBorder"
-                                        Property="Background"
-                                        Value="#FF43437A"></Setter>
-                            </DataTrigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </GroupBox>
-        <GroupBox Header="Scan Pos"
-                  Grid.Row="1"
-                  TextElement.Foreground="White"
-                  BorderThickness="0">
-            <ListBox ItemsSource="{Binding Source={converter:EnumBindingSource {x:Type module:eScanPos}}}"
-                     SelectedItem="{Binding p_eSelScanPos}"
-                     Background="{PriorityBinding}"
-                     BorderBrush="Black"
-                     BorderThickness="0">
-                <ListBox.Template>
-                    <ControlTemplate>
-                        <Border  BorderBrush="Black"
-                                 BorderThickness="2"
-                                 Background="#FF2D2D30"
-                                 CornerRadius="5">
-                            <ItemsPresenter />
-                        </Border>
-                    </ControlTemplate>
-                </ListBox.Template>
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal"></StackPanel>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Padding"
-                                Value="3" />
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Border  BorderThickness="2"
-                                 x:Name="ItemBorder"
-                                 BorderBrush="#FF1B1B1C"
-                                 Background="#FF1B1B1C"
-                                 Height="65"
-                                 CornerRadius="5">
-                            <Border.Width>
-                                <MultiBinding Converter="{StaticResource ListViewContentsWidthConverters}">
-                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}" />
-                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}"
-                                             Path="ActualWidth" />
-                                </MultiBinding>
-                            </Border.Width>
-                            <TextBlock HorizontalAlignment="Center"
-                                       Height="Auto"
-                                       TextWrapping="Wrap"
-                                       Text="{Binding}"
                                        VerticalAlignment="Center"
                                        FontSize="17"
                                        FontWeight="Bold"
@@ -268,13 +197,19 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0"
+                    Style="{StaticResource MyBtn}"
+                    Content="Full Scan"
+                    Command="{Binding FullScanCommand}"
+                    Margin="20,5,20,5"></Button>
+            <Button Grid.Column="1"
                     Style="{StaticResource MyBtn}"
                     Content="Scan Start"
                     Command="{Binding OkCommand}"
                     Margin="20,5,20,5"></Button>
-            <Button Grid.Column="1"
+            <Button Grid.Column="2"
                     Style="{StaticResource MyBtn}"
                     Content="Cancel"
                     Command="{Binding CancelCommand}"

@@ -6,8 +6,15 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 
-namespace Root_Vega
-{  
+namespace Root_Vega.Module
+{
+    public enum eScanPos
+    {
+        Bottom = 0,
+        Left,
+        Top,
+        Right,
+    }
     public class GrabMode
     {
         #region Camera
@@ -101,7 +108,7 @@ namespace Root_Vega
 
         void RunTreeMemory(Tree tree, bool bVisible, bool bReadOnly)
         {
-            if (m_sMemoryGroup == "") m_sMemoryGroup = p_sName;
+            if (m_sMemoryGroup == "") m_sMemoryGroup = m_memoryPool.m_asGroup[0];
             m_sMemoryGroup = tree.Set(m_sMemoryGroup, m_sMemoryGroup, m_memoryPool.m_asGroup, "Group", "Memory Group Name", bVisible, bReadOnly);
             m_memoryGroup = m_memoryPool.GetGroup(m_sMemoryGroup);
             if (m_memoryGroup == null) return;
@@ -117,13 +124,6 @@ namespace Root_Vega
         public int m_ScanStartLine = 0;
         #endregion
 
-        public enum eScanPos
-        {
-            Bottom = 0,
-            Left,
-            Top,
-            Right,
-        }
         public eScanPos m_eScanPos = eScanPos.Bottom;
 
         public string p_id

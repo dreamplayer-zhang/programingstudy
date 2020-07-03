@@ -19,7 +19,6 @@ namespace Root_Wind
         {
             m_handler = handler;
             DataContext = handler;
-            loginUI.Init(handler.m_enginner.m_login);
             moduleListUI.Init(handler.m_moduleList);
             recipeUI.Init(handler.m_recipe);
             processUI.Init(handler.m_process); 

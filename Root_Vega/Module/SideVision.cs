@@ -70,7 +70,32 @@ namespace Root_Vega.Module
             }
         }
 
+        #region Light
         public LightSet m_lightSet;
+        public int GetLightByName(string str)
+        {
+            for (int i = 0; i < m_lightSet.m_aLight.Count; i++)
+            {
+                if (m_lightSet.m_aLight[i].m_sName.IndexOf(str) >= 0)
+                {
+                    return Convert.ToInt32(m_lightSet.m_aLight[i].p_fPower);
+                }
+            }
+            return 0;
+        }
+
+        public void SetLightByName(string str, int nValue)
+        {
+            for (int i = 0; i < m_lightSet.m_aLight.Count; i++)
+            {
+                if (m_lightSet.m_aLight[i].m_sName.IndexOf(str) >= 0)
+                {
+                    m_lightSet.m_aLight[i].m_light.p_fSetPower = nValue;
+                }
+            }
+        }
+        #endregion
+
         MemoryPool m_memoryPool;
         InspectTool m_inspectTool;
         Camera_Dalsa m_CamSide;
@@ -241,6 +266,7 @@ namespace Root_Vega.Module
             Open,
             Close,
             Safety,
+            Home,
         }
 
         void InitPosAlign()
@@ -317,8 +343,8 @@ namespace Root_Vega.Module
 
             // Align 조명 켜기
             string strLightName = "SideVRS Side";
-            int nRetValue = GetGrabMode("Side").GetLightByName(strLightName);
-            GetGrabMode("Side").SetLightByName(strLightName, nRetValue);
+            int nLightPower = GetLightByName(strLightName);
+            SetLightByName(strLightName, nLightPower);
 
             // 레티클 유무체크
             m_CamAlign1.Grab();
@@ -329,7 +355,7 @@ namespace Root_Vega.Module
             if (bRet == false) return "Reticle Not Exist";
 
             // Align 조명 끄기
-            GetGrabMode("Side").SetLight(false);
+            SetLightByName(strLightName, 0);
 
             // 모든 축 Ready 위치로 이동
             if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
@@ -375,8 +401,8 @@ namespace Root_Vega.Module
 
             // Align 조명 켜기
             string strLightName = "SideVRS Side";
-            int nRetValue = GetGrabMode("Side").GetLightByName(strLightName);
-            GetGrabMode("Side").SetLightByName(strLightName, nRetValue);
+            int nLightPower = GetLightByName(strLightName);
+            SetLightByName(strLightName, nLightPower);
 
             // 레티클 유무체크
             m_CamAlign1.Grab();
@@ -387,7 +413,7 @@ namespace Root_Vega.Module
             if (bRet == true) return "Reticle Exist";
 
             // Align 조명 끄기
-            GetGrabMode("Side").SetLightByName(strLightName, 0);
+            SetLightByName(strLightName, 0);
 
             // 모든 축 Ready 위치로 이동
             if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
@@ -549,18 +575,16 @@ namespace Root_Vega.Module
         public override void InitMemorys()
         {
             m_szAlignROI = p_CamLADS.p_szROI;
-			//m_memoryGrab = m_memoryPool.GetGroup(p_id).CreateMemory("Grab", m_lMaxGrab, 1, m_szAlignROI);
-			//m_memoryHeight = m_memoryPool.GetGroup(p_id).CreateMemory("Height", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-			//m_memoryBright = m_memoryPool.GetGroup(p_id).CreateMemory("Bright", 1, 1, m_szAlignROI.X, m_lMaxGrab);
-            m_memorySideTop = m_memoryPool.GetGroup("Side").CreateMemory("Top", 1, 1, 1000, 1000);
-            m_memorySideLeft = m_memoryPool.GetGroup("Side").CreateMemory("Left", 1, 1, 1000, 1000);
-            m_memorySideRight = m_memoryPool.GetGroup("Side").CreateMemory("Right", 1, 1, 1000, 1000);
-            m_memorySideBottom = m_memoryPool.GetGroup("Side").CreateMemory("Bottom", 1, 1, 1000, 1000);
 
-            m_memoryBevelTop = m_memoryPool.GetGroup("Bevel").CreateMemory("Top", 1, 1, 1000, 1000);
-            m_memoryBevelLeft = m_memoryPool.GetGroup("Bevel").CreateMemory("Left", 1, 1, 1000, 1000);
-            m_memoryBevelRight = m_memoryPool.GetGroup("Bevel").CreateMemory("Right", 1, 1, 1000, 1000);
-            m_memoryBevelBottom = m_memoryPool.GetGroup("Bevel").CreateMemory("Bottom", 1, 1, 1000, 1000);
+            m_memorySideTop = m_memoryPool.GetGroup("Grab").CreateMemory("SideTop", 1, 1, 1000, 1000);
+            m_memorySideLeft = m_memoryPool.GetGroup("Grab").CreateMemory("SideLeft", 1, 1, 1000, 1000);
+            m_memorySideRight = m_memoryPool.GetGroup("Grab").CreateMemory("SideRight", 1, 1, 1000, 1000);
+            m_memorySideBottom = m_memoryPool.GetGroup("Grab").CreateMemory("SideBottom", 1, 1, 1000, 1000);
+
+            m_memoryBevelTop = m_memoryPool.GetGroup("Grab").CreateMemory("BevelTop", 1, 1, 1000, 1000);
+            m_memoryBevelLeft = m_memoryPool.GetGroup("Grab").CreateMemory("BevelLeft", 1, 1, 1000, 1000);
+            m_memoryBevelRight = m_memoryPool.GetGroup("Grab").CreateMemory("BevelRight", 1, 1, 1000, 1000);
+            m_memoryBevelBottom = m_memoryPool.GetGroup("Grab").CreateMemory("BevelBottom", 1, 1, 1000, 1000);
 
             m_aHeight = new ushort[m_szAlignROI.X * m_lMaxGrab];
             m_fScaleH = 65535.0 / m_szAlignROI.Y;
@@ -647,6 +671,7 @@ namespace Root_Vega.Module
         #region override Function
         public override string StateHome()
         {
+            p_sInfo = "OK";
             if (EQ.p_bSimulate) return "OK";
             p_bStageVac = true;
             Thread.Sleep(200);
@@ -655,9 +680,9 @@ namespace Root_Vega.Module
             if (m_axisXY.WaitReady() != "OK")
                 p_bStageVac = false;
 
-            //m_axisXY.p_axisX.Move(-50000);
-            //if (m_axisXY.WaitReady() != "OK")
-            //    return "Error";
+            m_axisXY.p_axisX.StartMove(-50000);
+            if (m_axisXY.WaitReady() != "OK")
+                return "Error";
             m_axisXY.p_axisY.StartHome();
             m_axisZ.StartHome();
             m_axisTheta.StartHome();
@@ -827,10 +852,8 @@ namespace Root_Vega.Module
                 run.m_yLine = m_yLine;
                 run.m_xLine = m_xLine;
                 run.m_nMaxFrame = m_nMaxFrame;
-                run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
-                //run.m_nScanRate = m_nScanRate;
-                run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
-                //run.m_eScanPos = m_eScanPos;
+                if (m_grabMode != null)
+                    run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
                 run.m_nScanGap = m_nScanGap;
                 return run;
             }
@@ -865,10 +888,11 @@ namespace Root_Vega.Module
                 {
                     int nScanLine = 0;
                     m_grabMode.SetLight(true);
+                    m_grabMode.SetLightByName("Side Coax", 700);
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fRes);        // 축해상도 0.1um로 하드코딩. 트리거 발생 주기.
                     int nLinesY = Convert.ToInt32(m_yLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
                     int nLinesX = Convert.ToInt32(m_xLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
-                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X + (int)m_grabMode.m_eScanPos * (nLinesX + m_nScanGap);
+                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
                     //m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X + (int)m_eScanPos * (nLinesX + m_nScanGap);
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
@@ -914,8 +938,7 @@ namespace Root_Vega.Module
                         string sPool = m_grabMode.m_memoryPool.p_id;
                         string sGroup = m_grabMode.m_memoryGroup.p_id;
                         string sMem = m_grabMode.m_eScanPos.ToString();
-                        //string sMem = m_eScanPos.ToString();
-                        MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, sMem);
+                        MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, "Side" + sMem);
 
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
                         /* 방향 바꾸는 코드 들어가야함*/
@@ -974,7 +997,7 @@ namespace Root_Vega.Module
             public int m_nMaxFrame = 100;  // Camera max Frame 스펙
             public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
 
-            public GrabMode.eScanPos m_eScanPos = GrabMode.eScanPos.Bottom;
+            public eScanPos m_eScanPos = eScanPos.Bottom;
             public override ModuleRunBase Clone()
             {
                 Run_BevelGrab run = new Run_BevelGrab(m_module);
@@ -987,8 +1010,8 @@ namespace Root_Vega.Module
                 run.m_xLine = m_xLine;
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanRate = m_nScanRate;
-                run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
-                //run.m_eScanPos = m_eScanPos;
+                if (m_grabMode != null)
+                    run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
                 run.m_nScanGap = m_nScanGap;
                 return run;
             }
@@ -1023,10 +1046,11 @@ namespace Root_Vega.Module
                 {
                     int nScanLine = 0;
                     m_grabMode.SetLight(true);
+                    m_grabMode.SetLightByName("Bevel Coax", 700);
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fRes);        // 축해상도 0.1um로 하드코딩. 트리거 발생 주기.
                     int nLinesY = Convert.ToInt32(m_yLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
                     int nLinesX = Convert.ToInt32(m_xLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
-                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X + (int)m_grabMode.m_eScanPos * (nLinesX + m_nScanGap);
+                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
                     //m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X + (int)m_eScanPos * (nLinesX + m_nScanGap);
 
 
@@ -1075,7 +1099,7 @@ namespace Root_Vega.Module
                         string sGroup = m_grabMode.m_memoryGroup.p_id;
                         string sMem = m_grabMode.m_eScanPos.ToString();
                         //string sMem = m_eScanPos.ToString();
-                        MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, sMem);
+                        MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, "Bevel" + sMem);
 
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
                         /* 방향 바꾸는 코드 들어가야함*/
@@ -1099,10 +1123,12 @@ namespace Root_Vega.Module
                 }
             }
         }
+        
 
         public class Run_AutoFocus : ModuleRunBase
         {
-            public class CStepInfoList : ObservableCollection<CStepInfo> { }
+            public Dispatcher _dispatcher;
+            //public class CStepInfoList : ObservableCollection<CStepInfo> { }
             public class CStepInfo : ObservableObject
             {
                 string m_strInfo;
@@ -1124,14 +1150,14 @@ namespace Root_Vega.Module
                     p_img = img;
                 }
             }
-            CStepInfoList m_lstLeftStepInfo;
-            public CStepInfoList p_lstLeftStepInfo
+            ObservableCollection<CStepInfo> m_lstLeftStepInfo;
+            public ObservableCollection<CStepInfo> p_lstLeftStepInfo
             {
                 get { return m_lstLeftStepInfo; }
                 set { SetProperty(ref m_lstLeftStepInfo, value); }
             }
-            CStepInfoList m_lstRightStepInfo;
-            public CStepInfoList p_lstRightStepInfo
+            ObservableCollection<CStepInfo> m_lstRightStepInfo;
+            public ObservableCollection<CStepInfo> p_lstRightStepInfo
             {
                 get { return m_lstRightStepInfo; }
                 set { SetProperty(ref m_lstRightStepInfo, value); }
@@ -1181,8 +1207,8 @@ namespace Root_Vega.Module
             {
                 m_module = module;
                 InitModuleRun(module);
-                p_lstLeftStepInfo = new CStepInfoList();
-                p_lstRightStepInfo = new CStepInfoList();
+                p_lstLeftStepInfo = new ObservableCollection<CStepInfo>();
+                p_lstRightStepInfo = new ObservableCollection<CStepInfo>();
                 p_afs = new CAutoFocusStatus(0.0, "Ready");
             }
 
@@ -1247,20 +1273,11 @@ namespace Root_Vega.Module
                 p_afs.p_dTheta = 0.0;
                 p_afs.p_strStatus = "Ready";
 
-                //p_lstLeftStepInfo.Clear();
-                //p_lstRightStepInfo.Clear();
-
-                //Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
-                //{
-                //    p_lstLeftStepInfo.Clear();
-                //    p_lstRightStepInfo.Clear();
-                //}));
-
-                //DispatcherService.Invoke((System.Action)(() =>
-                //{
-                //    p_lstLeftStepInfo.Clear();
-                //    p_lstRightStepInfo.Clear();
-                //}));
+                _dispatcher.Invoke(new Action(delegate ()
+                {
+                    p_lstLeftStepInfo.Clear();
+                    p_lstRightStepInfo.Clear();
+                }));
 
                 //1.Reticle 좌측 위치로 이동 후 AF
                 int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
@@ -1277,30 +1294,26 @@ namespace Root_Vega.Module
                     string strRet = cam.Grab();
 
                     // Calculating Score
-                    if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img);
-                    else dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                    System.Drawing.Bitmap bmp = null;
+                    if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
+                    else
+                    {
+                        dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                        bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    }
+
+                    _dispatcher.Invoke(new Action(delegate ()
+                    {
+                        string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
+                        BitmapSource bmpSrc = GetBitmapSource(bmp);
+                        p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    }));
 
                     if (dLeftCurrentScore > dLeftMaxScore)
                     {
                         dLeftMaxScore = dLeftCurrentScore;
                         dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
                     }
-
-                    string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
-                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                    BitmapSource bmpSrc = GetBitmapSource(bmp);
-
-                    //p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-
-                    //Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
-                    //{
-                    //    p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    //}));
-
-                    //DispatcherService.Invoke((System.Action)(() =>
-                    //{
-                    //    p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    //}));
                 }
 
                 // 2. Reticle 우측 위치로 이동 후 AF
@@ -1318,8 +1331,13 @@ namespace Root_Vega.Module
                     string strRet = cam.Grab();
 
                     // Calculating Score
-                    if (m_bUsingSobel) dRightCurrentScore = af.GetImageFocusScoreWithSobel(img);
-                    else dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                    System.Drawing.Bitmap bmp = null;
+                    if (m_bUsingSobel) dRightCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
+                    else
+                    {
+                        dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                        bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    }
 
                     if (dRightCurrentScore > dRightMaxScore)
                     {
@@ -1327,21 +1345,12 @@ namespace Root_Vega.Module
                         dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
                     }
 
-                    string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dRightStartPosX + (m_nStep * i)), dRightCurrentScore);
-                    System.Drawing.Bitmap bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                    BitmapSource bmpSrc = GetBitmapSource(bmp);
-
-                    //p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-
-                    //Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
-                    //{
-                    //    p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    //}));
-
-                    //DispatcherService.Invoke((System.Action)(() =>
-                    //{
-                    //    p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    //}));
+                    _dispatcher.Invoke(new Action(delegate ()
+                    {
+                        string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dRightStartPosX + (m_nStep * i)), dRightCurrentScore);
+                        BitmapSource bmpSrc = GetBitmapSource(bmp);
+                        p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    }));
                 }
 
                 // 3. 좌우측 AF편차 구하기

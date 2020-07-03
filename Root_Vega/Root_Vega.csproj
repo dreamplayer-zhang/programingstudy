@@ -194,6 +194,10 @@
       <DependentUpon>2_7_EdgeBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\2_7_EdgeBoxViewModel.cs" />
+    <Compile Include="UI\2_9_Bevel.xaml.cs">
+      <DependentUpon>2_9_Bevel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_9_BevelViewModel.cs" />
     <Compile Include="UI\2_Recipe.xaml.cs">
       <DependentUpon>2_Recipe.xaml</DependentUpon>
     </Compile>
@@ -379,6 +383,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\2_7_EdgeBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2_9_Bevel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -625,6 +633,22 @@ copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectNam
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
 IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
-copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"</PostBuildEvent>
+copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\AXL.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\AXL.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\EzBasicAxl.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.pdb" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.pdb"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\mariadbclient.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\mariadbclient.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\auth_gssapi_client.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\auth_gssapi_client.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\caching_sha2_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\caching_sha2_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\client_ed25519.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\client_ed25519.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\dialog.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\dialog.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\mysql_clear_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\mysql_clear_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_npipe.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_npipe.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_shmem.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_shmem.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\sha256_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\sha256_password.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>
