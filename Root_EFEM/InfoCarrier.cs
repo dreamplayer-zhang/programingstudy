@@ -20,7 +20,6 @@ namespace Root_EFEM
             Empty,
             Placed,
             Dock,
-            Run,
         }
         eState _eState = eState.Empty;
         public eState p_eState
@@ -82,8 +81,7 @@ namespace Root_EFEM
         {
             switch (p_eState)
             {
-                case eState.Dock:
-                case eState.Run: return "OK";
+                case eState.Dock: return "OK";
             }
             return p_id + " eState = " + p_eState.ToString();
         }

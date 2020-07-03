@@ -55,7 +55,7 @@ namespace Root_Vega
         {
             m_aInfoReticle.Clear();
             foreach (Locate locate in m_aLocate) locate.ClearInfoReticle(); 
-            ReCalcSequence(null);
+            ReCalcSequence();
             RunTree(Tree.eMode.Init);
         }
         #endregion
@@ -159,7 +159,7 @@ namespace Root_Vega
             m_qSequence.Clear();
             CalcRecoverArm();
             foreach (IRobotChild child in m_robot.m_aChild) CalcRecoverChild(child);
-            ReCalcSequence(null);
+            ReCalcSequence();
             RunTree(Tree.eMode.Init);
         }
 
@@ -202,21 +202,25 @@ namespace Root_Vega
         }
         /// <summary> RunThread에서 실행 될 ModuleRun List (from Handler when EQ.p_eState == Run) </summary>
         public Queue<Sequence> m_qSequence = new Queue<Sequence>();
-        public string ReCalcSequence(Sequence sequence)
+        public string ReCalcSequence()
         {
             m_qSequence.Clear();
+            m_aSequencePodState.Clear(); 
             try
             {
                 if (m_aInfoReticle.Count <= 0) return "OK";
-                if (sequence != null) m_qSequence.Enqueue(sequence);
-                foreach (InfoReticle infoReticle in m_aInfoReticle)
+                Queue<InfoReticle> qInfoReticle = new Queue<InfoReticle>();
+                foreach (InfoReticle infoReticle in m_aInfoReticle) qInfoReticle.Enqueue(infoReticle); 
+                while (qInfoReticle.Count > 0)
                 {
+                    InfoReticle infoReticle = qInfoReticle.Dequeue();
+                    SequenceLoadPod(infoReticle);
                     if (infoReticle.m_qProcess.Count > 0)
                     {
                         foreach (ModuleRunBase moduleRun in infoReticle.m_qProcess) m_qSequence.Enqueue(new Sequence(moduleRun, infoReticle));
                     }
+                    SequenceUnoadPod(infoReticle, qInfoReticle.ToArray());
                 }
-                FinishLoadport(m_aInfoReticle[0]);
                 RunTree(Tree.eMode.Init);
                 return "OK";
             }
@@ -226,11 +230,46 @@ namespace Root_Vega
             }
         }
 
-        void FinishLoadport(InfoReticle infoReticlePut)
+        void SequenceLoadPod(InfoReticle infoReticle)
         {
-            ModuleBase module = m_handler.m_moduleList.GetModule(infoReticlePut.m_sLoadport);
-            ModuleRunBase moduleRun = ((Loadport)module).GetRunUndocking();
-            m_qSequence.Enqueue(new Sequence(moduleRun, infoReticlePut));
+            PodState podState = GetPodState(infoReticle.m_sLoadport); 
+            if (podState.m_eState == InfoPod.eState.Load) return; 
+            Loadport loadport = (Loadport)m_handler.m_moduleList.GetModule(infoReticle.m_sLoadport);
+            if (loadport.m_infoPod.p_eState == InfoPod.eState.Empty) EQ.p_eState = EQ.eState.Error; 
+            m_qSequence.Enqueue(new Sequence(loadport.m_runLoad.Clone(), infoReticle));
+            podState.m_eState = InfoPod.eState.Load; 
+        }
+
+        void SequenceUnoadPod(InfoReticle infoReticle, InfoReticle[] aInfoReticle)
+        {
+            PodState podState = GetPodState(infoReticle.m_sLoadport);
+            foreach (InfoReticle info in aInfoReticle)
+            {
+                if (info.m_sLoadport == infoReticle.m_sLoadport) return; 
+            }
+            Loadport loadport = (Loadport)m_handler.m_moduleList.GetModule(infoReticle.m_sLoadport);
+            m_qSequence.Enqueue(new Sequence(loadport.m_runUnLoad.Clone(), infoReticle));
+            podState.m_eState = InfoPod.eState.Placed; 
+        }
+
+        class PodState
+        {
+            public string m_sLoadport;
+            public InfoPod.eState m_eState = InfoPod.eState.Empty; 
+        }
+        List<PodState> m_aSequencePodState = new List<PodState>();
+        PodState GetPodState(string sLoadport)
+        {
+            foreach (PodState state in m_aSequencePodState)
+            {
+                if (state.m_sLoadport == sLoadport) return state;
+            }
+            Loadport loadport = (Loadport)m_handler.m_moduleList.GetModule(sLoadport);
+            PodState podState = new PodState();
+            podState.m_sLoadport = sLoadport;
+            podState.m_eState = loadport.m_infoPod.p_eState;
+            m_aSequencePodState.Add(podState);
+            return podState; 
         }
 
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>

@@ -489,15 +489,10 @@ namespace Root_Vega.Module
             //
         }
 
-        public ModuleRunBase GetRunUndocking()
-        {
-            return CloneModuleRun("Unload");
-        }
-
         #region ModuleRun
         public ModuleRunBase m_runReadPodID;
         public ModuleRunBase m_runLoad;
-        ModuleRunBase m_runUnLoad;
+        public ModuleRunBase m_runUnLoad;
         protected override void InitModuleRuns()
         {
             m_runReadPodID = AddModuleRunList(new Run_ReadRFID(this), false, "Read RFID");
