@@ -67,7 +67,7 @@ namespace Root_EFEM.Module
             return true;
         }
 
-        public List<string> p_asChildSlotID
+        public List<string> p_asChildSlot
         {
             get { return m_infoCarrier.m_asGemSlot; }
         }

@@ -551,6 +551,24 @@ namespace Root_EFEM.Module
             return null;
         }
 
+        List<string> GetChildSlotNames(string sChild)
+        {
+            IWTRChild child = GetChild(sChild);
+            if (child == null) return null;
+            return child.p_asChildSlot;
+        }
+
+        int GetChildSlotID(string sChild, string sChildSlot)
+        {
+            List<string> asChildSlot = GetChildSlotNames(sChild);
+            if (asChildSlot == null) return 0;
+            for (int n = 0; n < asChildSlot.Count; n++)
+            {
+                if (sChildSlot == asChildSlot[n]) return n;
+            }
+            return 0;
+        }
+
         public void ReadInfoReticle_Registry()
         {
             m_dicArm[eArm.Lower].ReadInfoWafer_Registry();
@@ -611,7 +629,7 @@ namespace Root_EFEM.Module
             base.ThreadStop();
         }
 
-        public ModuleRunBase GetRunMotion(ref int nID, eMotion motion, string sChild, string sChildID)
+        public ModuleRunBase GetRunMotion(ref int nID, eMotion motion, string sChild, string sChildSlot)
         {
             switch (motion)
             {
@@ -619,21 +637,21 @@ namespace Root_EFEM.Module
                     Run_Get runGet = (Run_Get)CloneModuleRun("Get");
                     runGet.m_eMotion = motion;
                     runGet.m_sChild = sChild;
-                    runGet.p_sChildID = sChildID;
+                    runGet.m_nChildID = GetChildSlotID(sChild, sChildSlot);
                     nID++;
                     return runGet;
                 case eMotion.Put:
                     Run_Put runPut = (Run_Put)CloneModuleRun("Put");
                     runPut.m_eMotion = motion;
                     runPut.m_sChild = sChild;
-                    runPut.p_sChildID = sChildID;
+                    runPut.m_nChildID = GetChildSlotID(sChild, sChildSlot);
                     nID++;
                     return runPut;
                 default:
                     Run_Motion runMotion = (Run_Motion)CloneModuleRun("Motion");
                     runMotion.m_eMotion = motion;
                     runMotion.m_sChild = sChild;
-                    runMotion.p_sChildID = sChildID;
+                    runMotion.m_nChildID = GetChildSlotID(sChild, sChildSlot);
                     nID++;
                     return runMotion;
             }
@@ -715,7 +733,6 @@ namespace Root_EFEM.Module
             public Run_Motion(WTR_RND module)
             {
                 m_module = module;
-                _asChildSlotID.Add("01");
                 InitModuleRun(module);
             }
 
@@ -738,35 +755,13 @@ namespace Root_EFEM.Module
                 m_eMotion = (eMotion)tree.Set(m_eMotion, m_eMotion, "Motion", "Select WTR Motion", bVisible);
                 m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible && !bRecipe);
                 m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
-                p_sChildID = tree.Set(p_sChildID, p_sChildID, p_asChildSlotID, "Child ID", "WTR Child ID", bVisible && (p_asChildSlotID.Count > 1));
-            }
-
-            public string p_sChildID
-            {
-                get
+                List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild); 
+                if ((asChildSlot != null) && (asChildSlot.Count > 0))
                 {
-                    if (m_nChildID >= p_asChildSlotID.Count) m_nChildID = p_asChildSlotID.Count - 1;
-                    if (m_nChildID < 0) m_nChildID = 0;
-                    return p_asChildSlotID[m_nChildID];
-                }
-                set
-                {
-                    for (int n = 0; n < p_asChildSlotID.Count; n++)
-                    {
-                        if (value == p_asChildSlotID[n]) m_nChildID = n;
-                    }
-                }
-            }
-
-            List<string> _asChildSlotID = new List<string>();
-            List<string> p_asChildSlotID
-            {
-                get
-                {
-                    IWTRChild child = m_module.GetChild(m_sChild);
-                    if (child == null) return _asChildSlotID;
-                    if (child.p_asChildSlotID == null) return _asChildSlotID;
-                    return child.p_asChildSlotID;
+                    if ((m_nChildID < 0) || (m_nChildID >= asChildSlot.Count)) m_nChildID = 0; 
+                    string sChildSlot = asChildSlot[m_nChildID];
+                    sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
+                    m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot); 
                 }
             }
 
@@ -831,7 +826,6 @@ namespace Root_EFEM.Module
             public Run_Get(WTR_RND module)
             {
                 m_module = module;
-                _asChildSlotID.Add("01");
                 InitModuleRun(module);
             }
 
@@ -853,35 +847,13 @@ namespace Root_EFEM.Module
             {
                 m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible && !bRecipe);
                 m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
-                p_sChildID = tree.Set(p_sChildID, p_sChildID, p_asChildSlotID, "Child ID", "WTR Child ID", bVisible && (p_asChildSlotID.Count > 1));
-            }
-
-            public string p_sChildID
-            {
-                get
+                List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild);
+                if ((asChildSlot != null) && (asChildSlot.Count > 0))
                 {
-                    if (m_nChildID >= p_asChildSlotID.Count) m_nChildID = p_asChildSlotID.Count - 1;
-                    if (m_nChildID < 0) m_nChildID = 0;
-                    return p_asChildSlotID[m_nChildID];
-                }
-                set
-                {
-                    for (int n = 0; n < p_asChildSlotID.Count; n++)
-                    {
-                        if (value == p_asChildSlotID[n]) m_nChildID = n;
-                    }
-                }
-            }
-
-            List<string> _asChildSlotID = new List<string>();
-            List<string> p_asChildSlotID
-            {
-                get
-                {
-                    IWTRChild child = m_module.GetChild(m_sChild);
-                    if (child == null) return _asChildSlotID;
-                    if (child.p_asChildSlotID == null) return _asChildSlotID;
-                    return child.p_asChildSlotID;
+                    if ((m_nChildID < 0) || (m_nChildID >= asChildSlot.Count)) m_nChildID = 0;
+                    string sChildSlot = asChildSlot[m_nChildID];
+                    sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
+                    m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot);
                 }
             }
 
@@ -929,7 +901,6 @@ namespace Root_EFEM.Module
             public Run_Put(WTR_RND module)
             {
                 m_module = module;
-                _asChildSlotID.Add("01");
                 InitModuleRun(module);
             }
 
@@ -952,35 +923,13 @@ namespace Root_EFEM.Module
             {
                 m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible && !bRecipe);
                 m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
-                p_sChildID = tree.Set(p_sChildID, p_sChildID, p_asChildSlotID, "Child ID", "WTR Child ID", bVisible && (p_asChildSlotID.Count > 1));
-            }
-
-            public string p_sChildID
-            {
-                get
+                List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild);
+                if ((asChildSlot != null) && (asChildSlot.Count > 0))
                 {
-                    if (m_nChildID >= p_asChildSlotID.Count) m_nChildID = p_asChildSlotID.Count - 1;
-                    if (m_nChildID < 0) m_nChildID = 0;
-                    return p_asChildSlotID[m_nChildID];
-                }
-                set
-                {
-                    for (int n = 0; n < p_asChildSlotID.Count; n++)
-                    {
-                        if (value == p_asChildSlotID[n]) m_nChildID = n;
-                    }
-                }
-            }
-
-            List<string> _asChildSlotID = new List<string>();
-            List<string> p_asChildSlotID
-            {
-                get
-                {
-                    IWTRChild child = m_module.GetChild(m_sChild);
-                    if (child == null) return _asChildSlotID;
-                    if (child.p_asChildSlotID == null) return _asChildSlotID;
-                    return child.p_asChildSlotID;
+                    if ((m_nChildID < 0) || (m_nChildID >= asChildSlot.Count)) m_nChildID = 0;
+                    string sChildSlot = asChildSlot[m_nChildID];
+                    sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
+                    m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot);
                 }
             }
 
