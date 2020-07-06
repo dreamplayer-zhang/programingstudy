@@ -9,13 +9,15 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="5*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Orientation="Vertical">
-            <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="2"/>
+            <StackPanel Orientation="Horizontal"  Margin="2">
+                <Label Content="EQ :"/>
+                <Label x:Name="labelEQState" Content="{Binding p_eState}"/>
+            </StackPanel>
             <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="2"/>
             <CheckBox x:Name="checkBoxPause" Content="EQ.Pause" IsChecked="{Binding p_bPause}" Margin="2"/>
             <CheckBox x:Name="checkBoxSimulate" Content="EQ.Simulate" IsChecked="{Binding p_bSimulate}" Margin="2"/>
@@ -39,10 +41,14 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Label Grid.Row="0" Content="{Binding p_sInfo}" Margin="2"/>
-            <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" Margin="2"/>
-        </Grid>
-        <Grid Grid.Column="3">
-            <local:Listp_sInfo_UI x:Name="infoListUI"/>
+            <TabControl Grid.Row="1">
+                <TabItem Header="ModuleRun">
+                    <tree:TreeUI x:Name="treeRootUI" Margin="2"/>
+                </TabItem>
+                <TabItem Header="Info">
+                    <local:Listp_sInfo_UI x:Name="infoListUI"/>
+                </TabItem>
+            </TabControl>
         </Grid>
     </Grid>
 </UserControl>

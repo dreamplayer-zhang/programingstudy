@@ -14,6 +14,10 @@ using RootTools.Control.Ajin;
 using RootTools.Control;
 using System.Threading;
 using System.ComponentModel;
+using System.Drawing;
+using RootTools.Camera;
+using RootTools.Memory;
+using System.Windows.Media.Media3D;
 
 namespace Root_Vega
 {
@@ -273,7 +277,57 @@ namespace Root_Vega
             {
                 if (result.Value)
                 {
-                    if (Grab.m_grabMode != null)
+                    if (Grab.m_grabMode == null && BevelGrab.m_grabMode == null)
+                    {
+                        CameraSet cameraSet = p_SideVision.m_cameraSet;
+                        MemoryPool memoryPool = m_Engineer.ClassMemoryTool().GetPool("SideVision.Memory", false);
+
+                        List<SideVision.Run_SideGrab> aSideGrabs = new List<SideVision.Run_SideGrab>();
+                        List<GrabMode> aSideModes = new List<GrabMode>();
+                        List<SideVision.Run_BevelGrab> aBevelGrabs = new List<SideVision.Run_BevelGrab>();
+                        List<GrabMode> aBevelModes = new List<GrabMode>();
+                        
+                        for (int i = 0; i<4; i++)
+                        {
+                            aSideGrabs.Add((SideVision.Run_SideGrab)Sidevision.CloneModuleRun("SideGrab"));
+                            aSideModes.Add(new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool));
+                            aBevelGrabs.Add((SideVision.Run_BevelGrab)Sidevision.CloneModuleRun("BevelGrab"));
+                            aBevelModes.Add(new GrabMode("FullScan", cameraSet, m_LightSet, memoryPool));
+
+                            // SideGrab
+                            aSideModes[i].m_memoryGroup = memoryPool.GetGroup("Grab");
+                            aSideModes[i].m_ScanStartLine = 0;
+                            aSideModes[i].m_ScanLineNum = 3;
+                            aSideModes[i].m_camera = p_SideVision.p_CamSide;
+
+                            switch (i)
+                            {
+                                case (int)eScanPos.Bottom: aSideModes[i].m_eScanPos = eScanPos.Bottom; break;
+                                case (int)eScanPos.Left: aSideModes[i].m_eScanPos = eScanPos.Left; break;
+                                case (int)eScanPos.Right: aSideModes[i].m_eScanPos = eScanPos.Right; break;
+                                case (int)eScanPos.Top: aSideModes[i].m_eScanPos = eScanPos.Top; break;
+                            }
+                            aSideGrabs[i].m_grabMode = aSideModes[i];
+                            Sidevision.StartRun(aSideGrabs[i]);
+
+                            // BevelGrab
+                            aBevelModes[i].m_memoryGroup = memoryPool.GetGroup("Grab");
+                            aBevelModes[i].m_ScanStartLine = 0;
+                            aBevelModes[i].m_ScanLineNum = 1;
+                            aBevelModes[i].m_camera = p_SideVision.p_CamBevel;
+
+                            switch (i)
+                            {
+                                case (int)eScanPos.Bottom: aBevelModes[i].m_eScanPos = eScanPos.Bottom; break;
+                                case (int)eScanPos.Left: aBevelModes[i].m_eScanPos = eScanPos.Left; break;
+                                case (int)eScanPos.Right: aBevelModes[i].m_eScanPos = eScanPos.Right; break;
+                                case (int)eScanPos.Top: aBevelModes[i].m_eScanPos = eScanPos.Top; break;
+                            }
+                            aBevelGrabs[i].m_grabMode = aBevelModes[i];
+                            Sidevision.StartRun(aBevelGrabs[i]);
+                        }
+                    }
+                    else if (Grab.m_grabMode != null)
                         Sidevision.StartRun(Grab);
                     else if (BevelGrab.m_grabMode != null)
                         Sidevision.StartRun(BevelGrab);
@@ -300,10 +354,9 @@ namespace Root_Vega
                 }
                 else
                 {
-                    // Cancelled
+
                 }
             }
-            //m_DialogServiceTest.Show<Dialog_AutoFocus>(this, viewModel);
             
             return;
         }

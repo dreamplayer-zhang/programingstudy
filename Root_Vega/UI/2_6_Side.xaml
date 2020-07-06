@@ -1,5 +1,4 @@
 ﻿<UserControl x:Class="Root_Vega._2_6_Side"
-
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -36,9 +35,7 @@
                 </Grid.ColumnDefinitions>
                 <Button Content="Top" Grid.Column="1"
                             Command="{Binding p_ImageViewer_Top.btnClickOpenImage}"
-                        
-                            >
-                </Button>
+                            Margin="3,0,0,3" />
             </Grid>
             <Border Grid.Row="1" Margin="2,2,2,2" BorderBrush ="Gray" BorderThickness="3">
 
@@ -245,7 +242,6 @@
                 </i:Interaction.Triggers>
             </Canvas>-->
         </Grid>
-
     </Grid>
 </UserControl>
 

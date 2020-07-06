@@ -27,7 +27,7 @@ namespace Root_Vega
 		Vega_Engineer m_Engineer;
 		DialogService m_DialogService;
 		MemoryTool m_MemoryModule;
-		List<string> m_astrMem = new List<String> { "Top", "Left", "Right", "Bottom" };
+		List<string> m_astrMem = new List<String> { "SideTop", "SideLeft", "SideRight", "SideBottom" };
 		public List<DrawHistoryWorker> m_DrawHistoryWorker_List;
 
 		#region p_SimpleShapeDrawer_List

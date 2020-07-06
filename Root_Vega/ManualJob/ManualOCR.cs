@@ -10,7 +10,7 @@ namespace Root_Vega.ManualJob
 
         public string p_sOCR
         {
-            get { return m_infoRetile.p_sSlotID; }
+            get { return (m_infoRetile != null) ? m_infoRetile.p_sSlotID : ""; }
             set 
             {
                 m_infoRetile.p_sSlotID = value;
@@ -24,7 +24,7 @@ namespace Root_Vega.ManualJob
         {
             ManualOCR_UI ui = new ManualOCR_UI();
             ui.Init(this);
-            ui.Show(); 
+            ui.ShowDialog(); 
         }
         #endregion
 

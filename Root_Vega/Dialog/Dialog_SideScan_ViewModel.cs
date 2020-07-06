@@ -55,19 +55,6 @@ namespace Root_Vega
             }
         }
 
-        GrabMode.eScanPos m_eSelScanPos = GrabMode.eScanPos.Bottom;
-        public GrabMode.eScanPos p_eSelScanPos
-        {
-            get
-            {
-                return m_eSelScanPos;
-            }
-            set
-            {
-                SetProperty(ref m_eSelScanPos, value);
-            }
-        }
-
         ObservableCollection<GrabMode> m_GrabMode= new ObservableCollection<GrabMode>();
         public ObservableCollection<GrabMode> p_GrabMode
         {
@@ -108,24 +95,28 @@ namespace Root_Vega
             //p_StartY = Convert.ToInt32( GrabRun.m_rpAxis.X);
         }
 
+        public void OnFullScanButton()
+        {
+            // Full Scan일 경우 Side/Bevel GrabMode를 모두 null로 Setting
+            m_RunSideGrab.m_grabMode = null;
+            m_RunBevelGrab.m_grabMode = null;
+            CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+        }
+
         public void OnOkButton()
         {
             if (p_SelGrabMode == null)
                 return;
             p_SelGrabMode.m_ScanLineNum = p_ScanNum;
             p_SelGrabMode.m_ScanStartLine = p_StartLine;
-            if(p_SelGrabMode.p_sName.IndexOf("SIDE") >=0)
+            if(p_SelGrabMode.p_sName.IndexOf("Side") >=0)
             {
                 m_RunSideGrab.m_grabMode = p_SelGrabMode;
-                m_RunSideGrab.m_grabMode.m_eScanPos = p_eSelScanPos;
-                //m_RunSideGrab.m_eScanPos = p_eSelScanPos;
                 m_RunBevelGrab.m_grabMode = null;
             }
-            else if( p_SelGrabMode.p_sName.IndexOf("BEVEL")>=0)
+            else if( p_SelGrabMode.p_sName.IndexOf("Bevel")>=0)
             {
                 m_RunBevelGrab.m_grabMode = p_SelGrabMode;
-                m_RunBevelGrab.m_grabMode.m_eScanPos = p_eSelScanPos;
-                //m_RunBevelGrab.m_eScanPos = p_eSelScanPos;
                 m_RunSideGrab.m_grabMode = null;
             }
             CloseRequested(this, new DialogCloseRequestedEventArgs(true));
@@ -186,6 +177,13 @@ namespace Root_Vega
             }
         }
 
+        public RelayCommand FullScanCommand
+        {
+            get
+            {
+                return new RelayCommand(OnFullScanButton);
+            }
+        }
         public RelayCommand OkCommand
         {
             get

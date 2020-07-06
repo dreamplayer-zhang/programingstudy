@@ -19,7 +19,7 @@
         <Dalsa:CameraNotConnectStateConverter x:Key="CameraNotConnectStateConverters" />
         <Converter:AjinAxisToIAxis x:Key="AjinAxisToIAxiss" />
         <Converter:DictionaryItemKeysConverter x:Key="DictionaryItemKeysConverters" />
-        <Axis:DictionaryItemGetPosConverter x:Key="DictionaryItemGetPosConverters" />
+        <!--Axis:DictionaryItemGetPosConverter x:Key="DictionaryItemGetPosConverters" /-->
         <Converter:PositionScalingConverter x:Key="PositionScalingConverters"/>
         <Style TargetType="{x:Type TabControl}"
                x:Key="StackPanelTabControl">
@@ -1063,7 +1063,7 @@
                                            Width="50"
                                            Height="{Binding ActualHeight, ElementName=StageCanvas}"
                                            Canvas.Right="0"/>
-                                <Grid Canvas.Top="125"
+                                <Grid Canvas.Top="100"
                                       RenderTransformOrigin="0.5, 0.5">
                                     <Canvas.Left>
                                         <MultiBinding Converter="{StaticResource PositionScalingConverters}"
@@ -1087,11 +1087,11 @@
                                     </Grid.RenderTransform>
                                     <Rectangle Fill="White"
                                                Opacity="0.5"
-                                               Height="50"
-                                               Width="50"></Rectangle>
+                                               Height="100"
+                                               Width="100"></Rectangle>
                                     <Rectangle Fill="Red"
                                                Width="10"
-                                               Margin="40,0,0,0" />
+                                               Margin="0,0,90,0" />
                                 </Grid>
                                
                                 <Grid Canvas.Right="50"
@@ -1454,12 +1454,13 @@
                                         <TextBlock  Grid.Column="2"
                                                     Style="{StaticResource BasicTb}"
                                                     FontSize="15">
-                                            <TextBlock.Text>
+                                            <!--TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource DictionaryItemGetPosConverters}">
                                                     <Binding Path=" p_aPos" />
                                                     <Binding Path=" p_SelMovePos" />
                                                 </MultiBinding>
-                                            </TextBlock.Text></TextBlock>
+                                            </-->
+                                        </TextBlock>
                                         <Button Grid.Column="3"
                                                 Style="{StaticResource BasicBtn}"
                                                 Command="{Binding MoveCommand}"
@@ -1513,12 +1514,13 @@
                                         <TextBlock  Grid.Column="2"
                                                     Style="{StaticResource BasicTb}"
                                                     FontSize="15">
-                                            <TextBlock.Text>
+                                            <!--TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource DictionaryItemGetPosConverters}">
                                                     <Binding Path=" p_aPos" />
                                                     <Binding Path=" p_SelMovePos" />
                                                 </MultiBinding>
-                                            </TextBlock.Text></TextBlock>
+                                            </-->
+                                        </TextBlock>
                                         <Button Grid.Column="3"
                                                 Style="{StaticResource BasicBtn}"
                                                 Command="{Binding MoveCommand}"
@@ -1571,12 +1573,13 @@
                                         <TextBlock  Grid.Column="2"
                                                     Style="{StaticResource BasicTb}"
                                                     FontSize="15">
-                                            <TextBlock.Text>
+                                            <!--TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource DictionaryItemGetPosConverters}">
                                                     <Binding Path=" p_aPos" />
                                                     <Binding Path=" p_SelMovePos" />
                                                 </MultiBinding>
-                                            </TextBlock.Text></TextBlock>
+                                            </-->
+                                        </TextBlock>
                                         <Button Grid.Column="3"
                                                 Style="{StaticResource BasicBtn}"
                                                 Command="{Binding MoveCommand}"
@@ -1629,12 +1632,13 @@
                                         <TextBlock  Grid.Column="2"
                                                     Style="{StaticResource BasicTb}"
                                                     FontSize="15">
-                                            <TextBlock.Text>
+                                            <!--TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource DictionaryItemGetPosConverters}">
                                                     <Binding Path=" p_aPos" />
                                                     <Binding Path=" p_SelMovePos" />
                                                 </MultiBinding>
-                                            </TextBlock.Text></TextBlock>
+                                            </-->
+                                        </TextBlock>
                                         <Button Grid.Column="3"
                                                 Style="{StaticResource BasicBtn}"
                                                 Command="{Binding MoveCommand}"

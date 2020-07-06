@@ -106,7 +106,7 @@ namespace RootTools.Gem
 
         void CMSDelCarrierInfo()
         {
-            m_gem.CMSDelCarrierInfo(this);
+            if (m_gem != null) m_gem.CMSDelCarrierInfo(this);
         }
 
         void RunTreeCarrier(Tree tree)
@@ -366,7 +366,7 @@ namespace RootTools.Gem
         public IGem m_gem;
         public void InitBase()
         {
-            m_gem.AddGemCarrier(this);
+            if (m_gem != null) m_gem.AddGemCarrier(this);
             foreach (GemSlotBase slot in m_aGemSlot) slot.RegRead();
             m_treeRoot = new TreeRoot(p_sLocID + ".Gem", m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;

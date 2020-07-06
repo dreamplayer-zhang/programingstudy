@@ -1,4 +1,5 @@
-﻿using RootTools.GAFs;
+﻿using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Memory;
 using RootTools.Module;
@@ -15,6 +16,8 @@ namespace RootTools
 
         /// <summary> ClassGAF() : Gem/Alarm/FDC 관리, GAF m_gaf = ClassGAF(); </summary>
         GAF ClassGAF();
+
+        IControl ClassControl(); 
 
         ToolBox ClassToolBox();
 

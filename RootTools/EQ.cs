@@ -47,6 +47,12 @@ namespace RootTools
             get { return m_EQ.p_bSimulate; }
             set { m_EQ.p_bSimulate = value; }
         }
+
+        public static bool p_bDoorOpen
+        { 
+            get { return m_EQ.p_bDoorOpen; }
+            set { m_EQ.p_bDoorOpen = value; }
+        }
         
         public static bool IsStop(int msSimulate = 0)
         {
@@ -70,18 +76,18 @@ namespace RootTools
             }
         }
 
-        string _sInfo = "Last Error"; 
+        string _sInfo = "Last Error";
         public string p_sInfo
         {
             get { return _sInfo; }
             set
             {
                 _sInfo = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
 
-        bool _bStop = false; 
+        bool _bStop = false;
         public bool p_bStop
         {
             get { return _bStop; }
@@ -117,5 +123,20 @@ namespace RootTools
             }
         }
 
+        public delegate void dgOnDoorOpen();
+        public event dgOnDoorOpen OnDoorOpen;
+
+        bool _bDoorOpen = false;
+        public bool p_bDoorOpen
+        {
+            get { return _bDoorOpen; }
+            set
+            {
+                if (_bDoorOpen == value) return;
+                _bDoorOpen = value;
+                OnPropertyChanged();
+                if (OnDoorOpen != null) OnDoorOpen(); 
+            }
+        }
     }
 }

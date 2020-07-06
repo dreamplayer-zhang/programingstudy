@@ -8,6 +8,7 @@ using RootTools;
 using MaterialDesignThemes.Wpf;
 using System.Globalization;
 using RootTools.Control.Ajin;
+using RootTools.Control;
 
 namespace ViewConverter
 {
@@ -471,8 +472,8 @@ namespace ViewConverter
                 }
                 AjinAxis axis = (AjinAxis)values[0];
                 double dStageLength = (double)values[1];
-                double dMinusLimit = (double)axis.p_posLimitSW[0];
-                double dPlusLimit = (double)axis.p_posLimitSW[1];
+                double dMinusLimit = axis.GetPosValue(Axis.ePosition.SWLimit_Minus);
+                double dPlusLimit = axis.GetPosValue(Axis.ePosition.SWLimit_Plus);
                 double dActualPos = axis.p_posActual;
                 double dScaled = 0.0;
                 double dControlLength = 0.0;    // Control별 사이즈, 스테이지 영역을 넘어가지 않게 하기 위해 빼주는 값
@@ -512,6 +513,61 @@ namespace ViewConverter
         {
             double dScaled = dMinScaleValue + (dValue - dMinValue) / (dMaxValue - dMinValue) * (dMaxScaleValue - dMinScaleValue);
             return dScaled;
+        }
+    }
+
+    public class AjinModuleToPackIconConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            PackIconKind result = PackIconKind.AlphaXBox;
+            string str = value.ToString();
+            AXT_MODULE type = AXT_MODULE.AXT_SIO_DI32;
+            if (Enum.TryParse(value.ToString(), out type))
+            {
+                switch (type)
+                {
+                    case AXT_MODULE.AXT_SIO_DI32:
+                    case AXT_MODULE.AXT_SIO_RDI32MLIII:
+                    case AXT_MODULE.AXT_SIO_RDI32PMLIII:
+                        result = PackIconKind.AlphaIBox;
+                        break;
+                    case AXT_MODULE.AXT_SIO_DO32P:
+                    case AXT_MODULE.AXT_SIO_RDO32MLIII:
+                    case AXT_MODULE.AXT_SIO_RDO32PMLIII:
+                        result = PackIconKind.AlphaOBox;
+                        break;
+                    case AXT_MODULE.AXT_SIO_DB32P:
+                    case AXT_MODULE.AXT_SIO_RDB32MLIII:
+                    case AXT_MODULE.AXT_SIO_RDB32PMLIII:
+                        result = PackIconKind.AlphaBBox;
+                        break;
+                }
+            }
+            return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class DataContextToVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Visibility result = Visibility.Visible;
+            if (value == null)
+            {
+                result = Visibility.Hidden;
+            }
+            return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
         }
     }
 }

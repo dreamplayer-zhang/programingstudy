@@ -1,10 +1,13 @@
-﻿using RootTools;
+﻿using Emgu.CV.Structure;
+using RootTools;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Point = System.Drawing.Point;
 
 namespace RootTools.ImageProcess
 {
@@ -269,7 +272,7 @@ namespace RootTools.ImageProcess
             return (byte)((r + g + b) / 3);
         }
 
-        public double GetImageFocusScoreWithSobel(ImageData img)
+        public double GetImageFocusScoreWithSobel(ImageData img, out Bitmap bmpOut)
         {
             Emgu.CV.Mat matSrc = new Emgu.CV.Mat(img.p_Size.X, img.p_Size.Y, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr(), (int)img.p_Stride);
             Emgu.CV.Mat matGrad = new Emgu.CV.Mat();
@@ -288,7 +291,10 @@ namespace RootTools.ImageProcess
             Emgu.CV.CvInvoke.ConvertScaleAbs(matGradX, matAbsGradX, nScale, nDelta);
             Emgu.CV.CvInvoke.ConvertScaleAbs(matGradY, matAbsGradY, nScale, nDelta);
             Emgu.CV.CvInvoke.AddWeighted(matAbsGradX, 0.5, matAbsGradY, 0.5, 0, matGrad);
-            
+
+            System.Drawing.Bitmap bmp = matGrad.Bitmap;
+            bmpOut = bmp;
+
             Emgu.CV.Structure.MCvScalar mu = new Emgu.CV.Structure.MCvScalar();
             Emgu.CV.Structure.MCvScalar sigma = new Emgu.CV.Structure.MCvScalar();
             Emgu.CV.CvInvoke.MeanStdDev(matGrad, ref mu, ref sigma);

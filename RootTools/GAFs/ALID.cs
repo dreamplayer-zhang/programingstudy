@@ -61,6 +61,12 @@ namespace RootTools.GAFs
             }
         }
 
+        public void Run(bool bSet, string sMsg)
+        {
+            p_sMsg = sMsg; 
+            p_bSet = bSet; 
+        }
+
         DateTime _dateTime = DateTime.Now;
         public DateTime p_dateTime
         {

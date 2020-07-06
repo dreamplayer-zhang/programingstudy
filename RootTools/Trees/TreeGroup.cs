@@ -9,7 +9,7 @@
             p_treeRoot = treeParent.p_treeRoot;
             p_id = treeParent.p_id + "." + sName;
             p_bVisible = bVisible;
-            p_bEnable = !bReadOnly;
+            p_bEnable = !bReadOnly && p_treeRoot.p_bEnable;
             m_log = log;
             p_bExpand = bExpand;
         }
@@ -22,7 +22,7 @@
             p_treeRoot = treeParent.p_treeRoot;
             p_id = treeParent.p_id + "." + nIndex.ToString("000") + "." + sName;
             p_bVisible = bVisible;
-            p_bEnable = !bReadOnly; 
+            p_bEnable = !bReadOnly && p_treeRoot.p_bEnable; 
             m_log = log;
             p_bExpand = bExpand;
         }

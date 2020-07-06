@@ -10,22 +10,28 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="5*"/>
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" Orientation="Vertical">
-                <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="2"/>
+                <StackPanel Orientation="Horizontal" Margin="2">
+                    <Label Content="EQ :"/>
+                    <Label x:Name="labelEQState" Content="{Binding p_eState}"/>
+                </StackPanel>
                 <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="2"/>
                 <CheckBox x:Name="checkBoxPause" Content="EQ.Pause" IsChecked="{Binding p_bPause}" Margin="2"/>
                 <CheckBox x:Name="checkBoxSimulate" Content="EQ.Simulate" IsChecked="{Binding p_bSimulate}" Margin="2"/>
-                <Label Content="{Binding p_eState}" Margin="2,22,2,2"/>
+                <StackPanel Orientation="Horizontal" Margin="2,22,2,2">
+                    <Label Content="State :"/>
+                    <Label Content="{Binding p_eState}"/>
+                </StackPanel>
                 <Button x:Name="buttonRun" Content="{Binding p_sRun}" Height="22" Margin="2,12,2,2" Click="ButtonRun_Click"/>
                 <Button x:Name="buttonHome" Content="Home" Height="22" IsEnabled="{Binding p_bEnableHome}" Margin="2,12,2,2"  Click="ButtonHome_Click"/>
             </StackPanel>

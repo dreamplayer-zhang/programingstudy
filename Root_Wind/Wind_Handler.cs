@@ -57,23 +57,23 @@ namespace Root_Wind
 
         void InitModule()
         {  
-            m_moduleList = new ModuleList(m_enginner);
-            p_wtr = new WTR_RND("WTR", m_enginner);
+            m_moduleList = new ModuleList(m_engineer);
+            p_wtr = new WTR_RND("WTR", m_engineer);
             InitModule(p_wtr);
-            p_aLoadport[0] = new Loadport_RND("LoadportA", "LP1", m_enginner);
+            p_aLoadport[0] = new Loadport_RND("LoadportA", "LP1", m_engineer);
             InitModule(p_aLoadport[0]);
-            p_aLoadport[1] = new Loadport_RND("LoadportB", "LP2", m_enginner);
+            p_aLoadport[1] = new Loadport_RND("LoadportB", "LP2", m_engineer);
             InitModule(p_aLoadport[1]);
-            p_aligner = new Aligner_ATI("Aligner", m_enginner);
+            p_aligner = new Aligner_ATI("Aligner", m_engineer);
             InitModule(p_aligner);
-            p_vision = new Vision("Vision", m_enginner);
+            p_vision = new Vision("Vision", m_engineer);
             InitModule(p_vision);
             p_wtr.AddChild(p_aLoadport[0], p_aLoadport[1], p_aligner, p_vision);
             p_wtr.ReadInfoWafer_Registry();
 
-            m_recipe = new Wind_Recipe("Recipe", m_enginner);
+            m_recipe = new Wind_Recipe("Recipe", m_engineer);
             m_recipe.AddModule(p_aligner, p_vision);
-            m_process = new Wind_Process("Process", m_enginner, this);
+            m_process = new Wind_Process("Process", m_engineer, this);
         }
 
         void InitModule(ModuleBase module)
@@ -224,14 +224,14 @@ namespace Root_Wind
         #endregion
 
         string m_id;
-        public Wind_Engineer m_enginner;
+        public Wind_Engineer m_engineer;
         public GAF m_gaf;
         IGem m_gem;
 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_enginner = (Wind_Engineer)engineer;
+            m_engineer = (Wind_Engineer)engineer;
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();
