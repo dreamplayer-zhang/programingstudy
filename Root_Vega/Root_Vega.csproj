@@ -307,6 +307,7 @@
       <DependentUpon>Setting_RADS.xaml</DependentUpon>
     </Compile>
     <Compile Include="Setting\Setting_RADSViewModel.cs" />
+    <Compile Include="UI\2_RecipeViewModel.cs" />
     <Compile Include="Vega_Engineer.cs" />
     <Compile Include="Vega_Engineer_UI.xaml.cs">
       <DependentUpon>Vega_Engineer_UI.xaml</DependentUpon>

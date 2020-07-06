@@ -74,7 +74,7 @@
 					<Button Content="Next Snap Test"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnNextSnap}"
-                            Margin="0,0,0,10" />-->
+                            Margin="0,0,0,10" />
 					<Button Content="Recipe Save"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnRcpSave}"
@@ -87,7 +87,7 @@
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnRcpLoadTest}"
                             Margin="0,0,0,10" />
-					<!--<StackPanel>
+					<StackPanel>
                         <WrapPanel Margin="3">
                             <TextBlock Text="(X,Y) = " />
                             <TextBlock Text="{Binding p_ImageViewer.p_MouseX}" />

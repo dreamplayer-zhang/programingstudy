@@ -137,15 +137,10 @@
 						</UniformGrid>
 					</StackPanel>
 					<Button Grid.Column="0"
-							Margin="0,10,0,0"
+							Margin="0,10,0,40"
 							Style="{StaticResource BasicBtn}"
 							Content="Add Side Insp ROI"
 							Command="{Binding CommandAddRoi}"/>
-					<Button Grid.Column="0"
-							Margin="0,10,0,40"
-							Content="Recipe Save"
-                            Style="{StaticResource BasicBtn}"
-                            Command="{Binding btnRcpSave}"/>
 					<Button Content="Clear Result"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding CommandClearInspResult}"

@@ -24,6 +24,7 @@ namespace Root_Vega
 		/// 외부 Thread에서 UI를 Update하기 위한 Dispatcher
 		/// </summary>
 		protected Dispatcher _dispatcher;
+		System.Threading.Timer resultTimer;
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
 		List<ImageData> m_Image = new List<ImageData>();
@@ -226,7 +227,7 @@ namespace Root_Vega
 			m_Engineer = engineer;
 			Init(dialogService);
 
-			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
+			//m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
 			bUsingInspection = false;
 		}
 		void Init(IDialogService dialogService)
@@ -280,10 +281,21 @@ namespace Root_Vega
 				SelectedParam = null;
 			};
 
+			m_Engineer.m_InspManager.nInspectionCount = 0;//Inspection total count 초기화. 임시 db에서 데이터값을 정상적으로 끌어올때 사용한다
+
+			resultTimer = new System.Threading.Timer(checkAddDefect);
+			resultTimer.Change(0, 1000);
 
 			return;
 		}
+		private void checkAddDefect(object state)
+		{
+			//_dispatcher
+			//concept
+			//db에 주기적으로 접근하여 tempTable의 최대 개수를 확인
+			//최대개수와 currentDefectIndex의 차이가 발생한다면 currentDefectIndex와 최대 개수 사이의 defect UI를 갱신하고 currentDefectIndex를 최대 개수로 변경한다
 
+		}
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
 		/// </summary>
@@ -351,15 +363,6 @@ namespace Root_Vega
 		{
 
 		}
-		public void _currentRcpSave()
-		{
-			if (m_Engineer.m_recipe.Loaded)
-			{
-				var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
-				m_Engineer.m_recipe.Save(target);
-			}
-		}
-
 
 		private void _startInsp()
 		{
@@ -654,13 +657,6 @@ namespace Root_Vega
 		public RelayCommand CommandAddParam
 		{
 			get { return new RelayCommand(_addParam); }
-		}
-		public RelayCommand btnRcpSave
-		{
-			get
-			{
-				return new RelayCommand(_currentRcpSave);
-			}
 		}
 		#endregion
 	}

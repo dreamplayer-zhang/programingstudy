@@ -38,7 +38,7 @@ namespace RootTools.Inspects
 		StopWatch sw;
 
 		int nThreadNum = 10;
-		int nInspectionCount = 0;
+		public int nInspectionCount = 0;
 
 		bool m_bProgress;
 
