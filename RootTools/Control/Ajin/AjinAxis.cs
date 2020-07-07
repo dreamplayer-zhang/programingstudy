@@ -121,6 +121,8 @@ namespace RootTools.Control.Ajin
             Speed v1 = GetSpeedValue(eSpeed.Home_Last);
             if (AXM("AxmHomeSetVel", CAXM.AxmHomeSetVel(m_nAxis, v0.m_v, v0.m_v, v1.m_v, v1.m_v, v0.m_acc, v1.m_acc)) != 0) return p_sInfo;
             if (AXM("AxmHomeSetStart", CAXM.AxmHomeSetStart(m_nAxis)) != 0) return p_sInfo;
+            p_eState = eState.Home;
+            Thread.Sleep(10);
             return "OK";
         }
 
@@ -513,7 +515,6 @@ namespace RootTools.Control.Ajin
             AXM("AxmSignalReadLimit", CAXM.AxmSignalReadLimit(m_nAxis, ref uRead, ref uReadM));
             p_sensorMinusLimit = (uReadM > 0); 
             p_sensorPlusLimit = (uRead > 0);
-            p_sensorPlusLimit = true;
             AXM("AxmSignalReadInpos", CAXM.AxmSignalReadInpos(m_nAxis, ref uRead));
             p_sensorInPos = (uRead > 0);
             AXM("AxmSignalReadServoAlarm", CAXM.AxmSignalReadServoAlarm(m_nAxis, ref uRead));

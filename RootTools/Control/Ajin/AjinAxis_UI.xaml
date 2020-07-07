@@ -85,7 +85,7 @@
                             <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
                         <Button Grid.Column="0" x:Name="buttonRunHome" Content="Home" Margin="3" Click="buttonRunHome_Click"/>
-                        <ProgressBar Grid.Column="1" Margin="3" Orientation="Vertical" Value="{Binding p_progressHome}"/>
+                        <ProgressBar Grid.Column="1" Margin="3" Orientation="Horizontal" Value="{Binding p_progressHome}"/>
                     </Grid>
                 </GroupBox>
                 <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">

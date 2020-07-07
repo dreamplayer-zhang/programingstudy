@@ -477,6 +477,9 @@ namespace Root_Vega.Module
             base.InitBase(id, engineer);
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
+
+            m_axisZ.p_eState = Axis.eState.Ready;
+            m_axisTheta.p_eState = Axis.eState.Ready;
         }
 
         public override void ThreadStop()
