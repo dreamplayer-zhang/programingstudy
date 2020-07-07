@@ -1,15 +1,12 @@
-﻿using System;
+﻿using RootTools.Comm;
+using RootTools.Trees;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 using System.Windows.Controls;
-using System.Windows.Media;
-using RootTools.Trees;
-using RootTools.Comm;
 
 namespace RootTools
 {
@@ -47,7 +44,7 @@ namespace RootTools
         #endregion
 
         #region TCPSocket
-        public class TCPSocket : IComm
+        public class TCPSocket
         {
             public event OnReciveData EventReciveData;
 
@@ -112,7 +109,7 @@ namespace RootTools
                     int nReadLength = socket.EndReceive(ar);
                     if (nReadLength > 0)
                     {
-                        m_commLog.Add(CommLog.eType.Receive, p_id + ((nReadLength < 1024) ? Encoding.ASCII.GetString(m_aReadBuff, 0, nReadLength) : "..."));
+                        m_commLog.Add(CommLog.eType.Receive, (nReadLength < 1024) ? Encoding.ASCII.GetString(m_aReadBuff, 0, nReadLength) : "...");
                         socket.BeginReceive(m_aReadBuff, 0, m_aReadBuff.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
                         if (EventReciveData != null) EventReciveData(m_aReadBuff, nReadLength, socket);
                     }
@@ -130,7 +127,7 @@ namespace RootTools
             {
                 p_id = socket.RemoteEndPoint.ToString(); 
                 m_socket = socket;
-                m_commLog = new CommLog(this, server.m_log);
+                m_commLog = server.m_commLog;
                 m_nBufRecieve = (nBufRecieve > 0) ? nBufRecieve : m_nBufRecieve;
                 if ((m_aReadBuff == null) || (m_aReadBuff.Length != m_nBufRecieve)) m_aReadBuff = new byte[m_nBufRecieve];
                 socket.BeginReceive(m_aReadBuff, 0, m_aReadBuff.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
@@ -148,7 +145,7 @@ namespace RootTools
                 }
             }
         }
-        public List<TCPSocket> m_aSocket = new List<TCPSocket>();
+        public TCPSocket m_tcpSocket = null;
         #endregion
 
         #region Accept
@@ -157,16 +154,18 @@ namespace RootTools
             if (m_socket == null) return; 
             try
             {
+                if (m_tcpSocket != null) m_tcpSocket.ThreadStop(); 
                 m_socket = (Socket)ar.AsyncState;
+                if (m_socket == null) return; 
                 Socket socket = m_socket.EndAccept(ar);
                 m_socket.BeginAccept(new AsyncCallback(CallBack_Accept), m_socket);
                 TCPSocket tcpSocket = new TCPSocket(this, socket);
-                m_aSocket.Add(tcpSocket);
-                m_log.Info(p_id + " is Connect !!");
+                m_tcpSocket = tcpSocket;
+                m_commLog.Add(CommLog.eType.Info, tcpSocket.p_id + " is Connect !!");
             }
             catch (SocketException eX)
             {
-                m_log.Error("CallBack_Accept : " + eX.Message);
+                m_commLog.Add(CommLog.eType.Info, "CallBack_Accept : " + eX.Message);
             }
         }
         #endregion
@@ -202,11 +201,13 @@ namespace RootTools
         int m_nBufRecieve = 1024 * 1024;
         public TreeRoot m_treeRoot;
         Socket m_socket = null;
+        public CommLog m_commLog;
 
         public TCPIPServer(string id, Log log, int nBufRecieve = -1)
         {
             p_id = id;
             m_log = log;
+            m_commLog = new CommLog(this, log); 
             m_nBufRecieve = (nBufRecieve > 0) ? nBufRecieve : m_nBufRecieve;
 
             m_treeRoot = new TreeRoot(id, log);
@@ -237,8 +238,7 @@ namespace RootTools
 
         public void ThreadStop()
         {
-            foreach (TCPSocket tcpSocket in m_aSocket) tcpSocket.ThreadStop();
-            m_aSocket.Clear();
+            if (m_tcpSocket != null) m_tcpSocket.ThreadStop();
             if (m_socket != null)
             {
                 m_socket.Close();
@@ -247,6 +247,10 @@ namespace RootTools
             }
         }
 
-        public string Send(string sMsg) { return "OK"; }
+        public string Send(string sMsg) 
+        {
+            if (m_tcpSocket == null) return "Not Connected"; 
+            return m_tcpSocket.Send(sMsg); 
+        }
     }
 }

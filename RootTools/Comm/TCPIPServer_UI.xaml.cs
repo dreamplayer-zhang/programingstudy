@@ -21,34 +21,10 @@ namespace RootTools
         public void Init(TCPIPServer server)
         {
             m_server = server;
-            this.DataContext = m_server;
-            treeRootUI.Init(m_server.m_treeRoot);
+            this.DataContext = server;
+            commLogUI.Init(server.m_commLog);
+            treeRootUI.Init(server.m_treeRoot);
             m_server.RunTree(Tree.eMode.Init);
-
-            m_timer.Interval = TimeSpan.FromMilliseconds(100);
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start();
-        }
-
-        DispatcherTimer m_timer = new DispatcherTimer();
-        private void M_timer_Tick(object sender, EventArgs e)
-        {
-            if (m_server.m_aSocket.Count == tabComm.Items.Count) return;
-            foreach (TCPIPServer.TCPSocket tcpSocket in m_server.m_aSocket) AddCommLog(tcpSocket);
-        }
-
-        void AddCommLog(TCPIPServer.TCPSocket tcpSocket)
-        {
-            foreach (TabItem item in tabComm.Items)
-            {
-                if ((string)item.Header == tcpSocket.p_id) return;
-            }
-            CommLog_UI commLogUI = new CommLog_UI();
-            commLogUI.Init(tcpSocket.m_commLog);
-            TabItem newItem = new TabItem();
-            newItem.Header = tcpSocket.p_id;
-            newItem.Content = commLogUI;
-            tabComm.Items.Add(newItem);
         }
     }
 }
