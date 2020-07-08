@@ -523,19 +523,22 @@ namespace Root_EFEM.Module
                 return run;
             }
 
-            Aligner_ATI_AOI.AOI m_aoiInspect = null;
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_aoiInspect = RunTreeAOI(tree.GetTree("AOI"), bVisible);
-                m_aoiData.RunTree(tree.GetTree("Inspect"), bVisible, bRecipe);
+                RunTreeAOI(tree.GetTree("AOI", true, bVisible), bVisible);
+                m_aoiData.RunTree(tree.GetTree("Inspect", true, bVisible), bVisible, bRecipe);
             }
 
             eAOI m_eAOI = eAOI.Grab;
             int m_nAOI = 0;
-            Aligner_ATI_AOI.AOI RunTreeAOI(Tree tree, bool bVisible)
+            void RunTreeAOI(Tree tree, bool bVisible)
             {
                 m_eAOI = (eAOI)tree.Set(m_eAOI, m_eAOI, "AOI", "Select AOI", bVisible);
                 m_nAOI = tree.Set(m_nAOI, m_nAOI, "Index", "AOI Index", bVisible);
+            }
+
+            Aligner_ATI_AOI.AOI GetAOI()
+            {
                 if (m_nAOI < 0) return null;
                 List<Aligner_ATI_AOI.AOI> aAOI = (m_eAOI == eAOI.Grab) ? m_module.m_aGrabAOI : m_module.m_aExactAOI;
                 return (m_nAOI < aAOI.Count) ? aAOI[m_nAOI] : null;
@@ -544,7 +547,7 @@ namespace Root_EFEM.Module
             public override string Run()
             {
                 if (EQ.p_bSimulate) return "OK";
-                Aligner_ATI_AOI.AOI aoi = m_aoiInspect;
+                Aligner_ATI_AOI.AOI aoi = GetAOI();
                 if (aoi == null) return "AOI not Selected";
                 m_module.m_aoi.m_data = m_aoiData; 
                 aoi.m_maxNotch = null;
@@ -603,7 +606,7 @@ namespace Root_EFEM.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_degAccuracy = tree.Set(m_degAccuracy, m_degAccuracy, "Accuacy", "Degree of Align Accuracy", bVisible);
-                m_inspect.m_aoiData.RunTree(tree.GetTree("Inspect"), bVisible, bRecipe);
+                m_inspect.m_aoiData.RunTree(tree.GetTree("Inspect", true, bVisible), bVisible, bRecipe);
             }
             public override string Run() //forget
             {
