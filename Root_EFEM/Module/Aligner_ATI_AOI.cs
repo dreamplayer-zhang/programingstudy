@@ -348,7 +348,7 @@ namespace Root_EFEM.Module
             m_xCalc = new int[2] { m_xROI[0] + m_data.m_szNotch.X, m_xROI[1] - m_data.m_szNotch.X };
             for (int x = m_xCalc[0]; x < m_xCalc[1]; x++)
             {
-                m_aCalc[x] = 2 * m_aEdge[x] - (m_aEdge[x - m_data.m_szNotch.X] + m_aEdge[x + m_data.m_szNotch.X]);
+                m_aCalc[x] = (m_aEdge[x - m_data.m_szNotch.X] + m_aEdge[x + m_data.m_szNotch.X]) - 2 * m_aEdge[x];
             }
         }
         #endregion
@@ -560,9 +560,11 @@ namespace Root_EFEM.Module
         {
             MemoryDraw draw = m_aoi.m_memory.m_aDraw[m_aoi.m_nID];
             draw.Clear();
-            draw.AddPolyline(m_aEdge, Brushes.Red);
-            draw.AddPolyline(m_aCalc, m_szMem.Y - m_data.m_szMargin.Y, Brushes.Aqua);
-            draw.AddPolyline(m_aCircle, Brushes.Yellow); 
+            draw.AddPolyline(Brushes.Red, m_aEdge);
+            draw.AddPolyline(Brushes.Aqua, m_aCalc, m_szMem.Y - m_data.m_szMargin.Y, -1);
+            draw.AddPolyline(Brushes.Yellow, m_aCircle);
+            foreach (Notch notch in m_aNotch) draw.AddCross(Brushes.Orange, notch.m_cpNotch, 10);
+            draw.AddText(Brushes.Red, m_aNotch[0].m_cpNotch, "Notch"); 
             draw.InvalidDraw();
         }
         #endregion
