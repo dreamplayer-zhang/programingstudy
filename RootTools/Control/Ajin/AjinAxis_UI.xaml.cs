@@ -97,13 +97,6 @@ namespace RootTools.Control.Ajin
             m_bRepeat = false;
         }
 
-        private void buttonJogM3_Click(object sender, RoutedEventArgs e) { Jog(-1); }
-        private void buttonJogM2_Click(object sender, RoutedEventArgs e) { Jog(-0.31); }
-        private void buttonJogM1_Click(object sender, RoutedEventArgs e) { Jog(-0.1); }
-        private void buttonJogP1_Click(object sender, RoutedEventArgs e) { Jog(0.1); }
-        private void buttonJogP2_Click(object sender, RoutedEventArgs e) { Jog(0.31); }
-        private void buttonJogP3_Click(object sender, RoutedEventArgs e) { Jog(1); }
-
         void Jog(double fScale)
         {
             if (m_bRepeat) return; 
@@ -180,5 +173,12 @@ namespace RootTools.Control.Ajin
             m_bRepeat = false;
             m_axis.StopAxis(); 
         }
+
+        private void buttonJogM3_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(-1); }
+        private void buttonJogM2_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(-0.31); }
+        private void buttonJogM1_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(-0.1); }
+        private void buttonJogP1_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(0.1); }
+        private void buttonJogP2_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(0.31); }
+        private void buttonJogP3_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(1); }
     }
 }

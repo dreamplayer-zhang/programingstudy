@@ -321,37 +321,35 @@ namespace Root_Vega.Module
         double[] m_aShiftReticle = new double[2] { 0, 0 };
         public override string StateHome()
         {
-            if (EQ.p_bSimulate == false)
+            if (EQ.p_bSimulate) return "OK";
+            m_axisZ.ServoOn(true);
+            m_axisTheta.ServoOn(true);
+            m_axisPodLifter.ServoOn(true);
+            m_axisReticleLifter.ServoOn(true);
+            Thread.Sleep(1000);
+            m_axisZ.p_eState = Axis.eState.Ready;
+            m_axisTheta.p_eState = Axis.eState.Ready;
+            m_axisPodLifter.p_axisX.p_eState = Axis.eState.Ready;
+            m_axisPodLifter.p_axisY.p_eState = Axis.eState.Ready;
+            m_axisReticleLifter.p_axisX.p_eState = Axis.eState.Ready;
+            m_axisReticleLifter.p_axisY.p_eState = Axis.eState.Ready;
+            //JWS 200616 ADD
+            if (GetdZPos(ePosZ.InnerPod) < 0)
             {
-                m_axisZ.ServoOn(true);
-                m_axisTheta.ServoOn(true);
-                m_axisPodLifter.ServoOn(true); 
-                m_axisReticleLifter.ServoOn(true);
-                Thread.Sleep(1000);
-                m_axisZ.p_eState = Axis.eState.Ready;
-                m_axisTheta.p_eState = Axis.eState.Ready;
-                m_axisPodLifter.p_axisX.p_eState = Axis.eState.Ready;
-                m_axisPodLifter.p_axisY.p_eState = Axis.eState.Ready;
-                m_axisReticleLifter.p_axisX.p_eState = Axis.eState.Ready;
-                m_axisReticleLifter.p_axisY.p_eState = Axis.eState.Ready;
-                //JWS 200616 ADD
-                if (GetdZPos(ePosZ.InnerPod) < 0)
-                {
-                    p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
-                    if (p_sInfo != "OK") return p_sInfo;
-                    if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
-                }
-                else if (GetdZPos(ePosZ.Reticle) < 0)
-                {
-                    p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
-                    if (p_sInfo != "OK") return p_sInfo;
-                    if (Run(Home_Innerpod())) return p_sInfo;
-                }
-                else
-                {
-                    if (Run(MoveZ(ePosZ.Check))) return p_sInfo;
-                    if (Run(Home_Reticle())) return p_sInfo;
-                }
+                p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                if (p_sInfo != "OK") return p_sInfo;
+                if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
+            }
+            else if (GetdZPos(ePosZ.Reticle) < 0)
+            {
+                p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                if (p_sInfo != "OK") return p_sInfo;
+                if (Run(Home_Innerpod())) return p_sInfo;
+            }
+            else
+            {
+                if (Run(MoveZ(ePosZ.Check))) return p_sInfo;
+                if (Run(Home_Reticle())) return p_sInfo;
             }
             m_infoPod.AfterHome();
             return "OK";

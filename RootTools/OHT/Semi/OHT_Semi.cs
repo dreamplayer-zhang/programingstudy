@@ -385,7 +385,11 @@ namespace RootTools.OHT.Semi
             if (m_module.p_eState == ModuleBase.eState.Error) return;
             bool bExist = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad) ? bDone : !bDone;
             GemCarrierBase.ePresent present = bExist ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            if (m_carrier.p_ePresentSensor == present) return;
+            if (m_carrier.p_ePresentSensor == present)
+            {
+                p_sInfo = "OK";
+                return;
+            }
             p_sInfo = p_id + " Illegal Prosent Sensor";
         }
 
