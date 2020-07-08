@@ -82,9 +82,6 @@
                     <TabControl Grid.Row="2" x:Name="tabControlPool" />
                 </Grid>
             </TabItem>
-            <TabItem Header="Viewer">
-                <local:MemoryViewer_UI x:Name="memoryViewerUI"/>
-            </TabItem>
             <TabItem Header="Run">
                 <Grid>
                     <Grid.ColumnDefinitions>

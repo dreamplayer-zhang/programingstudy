@@ -54,7 +54,7 @@ namespace RootTools.Comm
             }
         }
 
-        string _sIP = "0.0.0.0";
+        string _sIP = "127.0.0.1";
         public string p_sIP
         {
             get { return _sIP; } 
@@ -90,7 +90,7 @@ namespace RootTools.Comm
         void RunTreeSetting(Tree tree)
         {
             p_bUse = tree.Set(_bUse, false, "Use", "Use Server");
-            p_sIP = tree.Set(_sIP, "0.0.0.0", "IP", "IP Address");
+            p_sIP = tree.Set(_sIP, "127.0.0.1", "IP", "IP Address");
             p_nPort = tree.Set(_nPort, 0, "Port", "Port Number");
             p_nConnectInterval = tree.Set(_nConnectInterval, 3000, "Interval", "Connection Interval (ms)");
         }
@@ -144,8 +144,8 @@ namespace RootTools.Comm
                 if (nRead > 0)
                 {
                     m_commLog.Add(CommLog.eType.Receive, (nRead < 1024) ? Encoding.ASCII.GetString(m_aBufRead, 0, nRead) : "...");
-                    EventReciveData(m_aBufRead, nRead, m_socket);
                     socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
+                    if (EventReciveData != null) EventReciveData(m_aBufRead, nRead, socket);
                 }
             }
             catch (Exception eX) { p_sInfo = p_id + eX.Message; }
@@ -209,7 +209,9 @@ namespace RootTools.Comm
                     else if (m_qSend.Count > 0)
                     {
                         string sMsg = m_qSend.Peek();
-                        if (SendMsg(sMsg) == "OK") m_qSend.Dequeue();
+                        string sSend = SendMsg(sMsg);
+                        if (sSend == "OK") m_qSend.Dequeue();
+                        else m_commLog.Add(CommLog.eType.Info, sSend); 
                     }
                 }
                 else if (m_socket != null)

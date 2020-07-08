@@ -12,9 +12,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Background="AliceBlue">
-            <ComboBox x:Name="comboBoxPool" Margin="2" MinWidth="80" SelectionChanged="comboBoxPool_SelectionChanged"/>
-            <ComboBox x:Name="comboBoxGroup" Margin="2" MinWidth="80" SelectionChanged="comboBoxGroup_SelectionChanged"/>
-            <ComboBox x:Name="comboBoxMemory" Margin="2" MinWidth="80" SelectionChanged="comboBoxMemory_SelectionChanged"/>
+            <ComboBox x:Name="comboBoxGroup" SelectedValue="{Binding p_sGroup}" Margin="2" MinWidth="80" SelectionChanged="comboBoxGroup_SelectionChanged"/>
+            <ComboBox x:Name="comboBoxMemory" SelectedValue="{Binding p_sMemory}" Margin="2" MinWidth="80" SelectionChanged="comboBoxMemory_SelectionChanged"/>
             <ComboBox x:Name="comboBoxIndex" SelectedValue="{Binding p_nMemoryIndex}" Margin="2" MinWidth="40"/>
             <Menu VerticalAlignment="Center">
                 <MenuItem Header="File">

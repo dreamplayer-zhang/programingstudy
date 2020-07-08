@@ -18,6 +18,7 @@ namespace RootTools.Memory
         {
             m_memoryPool = memoryPool;
             this.DataContext = memoryPool;
+            memoryViewerUI.Init(memoryPool.m_viewer);
         }
 
         private void ListViewGroup_SelectionChanged(object sender, SelectionChangedEventArgs e)
