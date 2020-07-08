@@ -29,6 +29,7 @@ namespace RootTools.Memory
                     OnPropertyChanged();
                     m_group.InitAddress();
                 }
+                while (m_aDraw.Count < value) m_aDraw.Add(new MemoryDraw(this)); 
             }
         }
 
@@ -464,6 +465,7 @@ namespace RootTools.Memory
         #endregion
 
         public MemoryGroup m_group;
+        public List<MemoryDraw> m_aDraw = new List<MemoryDraw>(); 
         Log m_log;
         public MemoryData(MemoryGroup group, string id, int nCount, int nByte, int xSize, int ySize, ref int gbOffset)
         {

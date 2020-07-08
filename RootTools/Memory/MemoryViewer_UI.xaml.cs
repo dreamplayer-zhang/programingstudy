@@ -24,8 +24,15 @@ namespace RootTools.Memory
             m_pool = memoryViewer.m_memoryPool; 
             this.DataContext = memoryViewer;
             comboBoxGroup.ItemsSource = memoryViewer.m_memoryPool.m_asGroup;
+            memoryViewer.OnInvalidDraw += MemoryViewer_OnInvalidDraw;
         }
 
+        private void MemoryViewer_OnInvalidDraw()
+        {
+            m_viewer.Draw(gridDrawing); 
+        }
+
+        #region File
         private void menuOpen_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
@@ -40,16 +47,20 @@ namespace RootTools.Memory
             dlg.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
             if (dlg.ShowDialog() == true) m_viewer.FileSave(dlg.FileName);
         }
+        #endregion
 
+        #region Image View
         private void gridBitmapSource_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            m_viewer.p_szWindow = new CPoint((int)gridBitmapSource.ActualWidth, (int)gridBitmapSource.ActualHeight); 
+            m_viewer.p_szWindow = new CPoint((int)gridBitmapSource.ActualWidth, (int)gridBitmapSource.ActualHeight);
+            m_viewer.Draw(gridDrawing);
         }
 
         private void gridBitmapSource_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             Point p = e.GetPosition(imageBitmapSource);
-            m_viewer.p_cpWindow = new CPoint((int)p.X, (int)p.Y); 
+            m_viewer.p_cpWindow = new CPoint((int)p.X, (int)p.Y);
+            if (m_viewer.m_bLBD) m_viewer.Draw(gridDrawing);
         }
 
         private void gridBitmapSource_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -57,6 +68,7 @@ namespace RootTools.Memory
             Point p = e.GetPosition(imageBitmapSource);
             if (e.Delta > 0) m_viewer.ZoomIn(new CPoint((int)p.X, (int)p.Y)); 
             else m_viewer.ZoomOut(new CPoint((int)p.X, (int)p.Y));
+            m_viewer.Draw(gridDrawing);
         }
 
         private void gridBitmapSource_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -75,7 +87,9 @@ namespace RootTools.Memory
         {
             m_viewer.m_bLBD = false;
         }
+        #endregion
 
+        #region Select Memory
         private void comboBoxGroup_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             m_viewer.p_memoryData = null;
@@ -104,5 +118,6 @@ namespace RootTools.Memory
             comboBoxIndex.ItemsSource = m_aMemoryIndex;
             comboBoxIndex.SelectedIndex = 0; 
         }
+        #endregion
     }
 }

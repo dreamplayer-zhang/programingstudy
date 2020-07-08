@@ -1,13 +1,48 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace RootTools.Memory
 {
     public class MemoryViewer : NotifyProperty, ITool
     {
+        #region Invalidate
+        public delegate void dgOnInvalidDraw();
+        public event dgOnInvalidDraw OnInvalidDraw;
+
+        public void InvalidDraw()
+        {
+            if (OnInvalidDraw != null) OnInvalidDraw(); 
+        }
+
+        DispatcherTimer m_timer = new DispatcherTimer(); 
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(1);
+            m_timer.Tick += M_timer_Tick;
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            m_timer.Stop();
+            m_gridDraw.Children.Clear();
+            if (p_memoryData == null) return;
+            if (p_nMemoryIndex < 0) return;
+            if (p_nMemoryIndex >= p_memoryData.m_aDraw.Count) return;
+            MemoryDraw draw = p_memoryData.m_aDraw[p_nMemoryIndex];
+            draw.Draw(m_gridDraw, m_cpOffset, p_fZoom);
+        }
+
+        Grid m_gridDraw; 
+        public void Draw(Grid grid)
+        {
+            m_gridDraw = grid;
+            m_timer.Start(); 
+        }
+        #endregion
+
         #region Property
         public string p_id { get; set; }
 
@@ -67,6 +102,7 @@ namespace RootTools.Memory
                 _nMemoryIndex = value; 
                 OnPropertyChanged();
                 UpdateBitmapSource();
+                InvalidDraw(); 
             }
         }
         #endregion
@@ -329,7 +365,8 @@ namespace RootTools.Memory
         {
             p_id = id; 
             m_memoryPool = memoryPool;
-            m_log = log; 
+            m_log = log;
+            InitTimer(); 
         }
 
         public void ThreadStop()

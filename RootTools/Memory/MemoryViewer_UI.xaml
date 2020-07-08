@@ -34,6 +34,7 @@
               PreviewMouseLeftButtonUp="gridBitmapSource_PreviewMouseLeftButtonUp"
               MouseLeave="gridBitmapSource_MouseLeave">
             <Image x:Name="imageBitmapSource" Source="{Binding p_bitmapSrc}"/>
+            <Grid x:Name="gridDrawing"/>
         </Canvas>
     </Grid>
 </UserControl>

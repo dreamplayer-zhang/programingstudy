@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Root_EFEM.Module
 {
@@ -162,6 +163,7 @@ namespace Root_EFEM.Module
             FindNotch();
             CalcNotch();
             CalcCenter();
+            DrawLines(); 
             return "OK";
         }
 
@@ -278,8 +280,9 @@ namespace Root_EFEM.Module
         {
             byte[] aBuf = m_aBuf;
             int yMargin = m_data.m_szMargin.Y;
-            int p = x + yMargin * m_szMem.X;
-            for (int y = yMargin; y < m_szMem.Y - yMargin; y++, p += m_szMem.X)
+            int y0 = m_szMem.Y - yMargin; 
+            int p = x + y0 * m_szMem.X;
+            for (int y = y0; y > yMargin; y--, p -= m_szMem.X)
             {
                 if (aBuf[p] >= m_data.m_gvEdge) aBuf[p] = 255;
                 else
@@ -309,10 +312,10 @@ namespace Root_EFEM.Module
         {
             if (m_aEdge[x] >= m_aEdge[xn]) return;
             byte[] aBuf = m_aBuf;
-            int y = m_aEdge[x] + 1;
+            int y = m_aEdge[x] - 1;
             int p = x + y * m_szMem.X;
             int pn = xn + y * m_szMem.X;
-            while (y <= m_aEdge[xn])
+            while (y >= m_aEdge[xn])
             {
                 if ((aBuf[p] >= m_data.m_gvEdge) && (aBuf[pn] == 255))
                 {
@@ -321,13 +324,13 @@ namespace Root_EFEM.Module
                     {
                         m_aEdge[x] = y;
                         aBuf[p] = 255;
-                        y++;
+                        y--;
                         p += m_szMem.X;
                         pn += m_szMem.X;
 
                     }
                 }
-                y++;
+                y--;
                 p += m_szMem.X;
                 pn += m_szMem.X;
             }
@@ -337,7 +340,6 @@ namespace Root_EFEM.Module
         #region Calc
         int[] m_xCalc;
         List<int> m_aCalc;
-
 
         void FindCalc()
         {
@@ -537,7 +539,7 @@ namespace Root_EFEM.Module
             {
                 double dx = Math.Abs(x - m_rpCenter.X);
                 double dy = Math.Sqrt(m_dR * m_dR - dx * dx);
-                m_aCircle[x] = (int)(m_rpCenter.Y - dy);
+                m_aCircle[x] = (int)(m_rpCenter.Y + dy);
                 if (m_aCircle[x] < 0) m_aCircle[x] = 0;
             }
         }
@@ -550,6 +552,18 @@ namespace Root_EFEM.Module
                 double dy = m_rpCenter.Y - notch.m_cpNotch.Y;
                 notch.m_degNotch = 90 - Math.Atan2(dy, dx) * 180 / Math.PI;
             }
+        }
+        #endregion
+
+        #region DrawLines
+        void DrawLines()
+        {
+            MemoryDraw draw = m_aoi.m_memory.m_aDraw[m_aoi.m_nID];
+            draw.Clear();
+            draw.AddPolyline(m_aEdge, Brushes.Red);
+            draw.AddPolyline(m_aCalc, m_szMem.Y - m_data.m_szMargin.Y, Brushes.Aqua);
+            draw.AddPolyline(m_aCircle, Brushes.Yellow); 
+            draw.InvalidDraw();
         }
         #endregion
 
