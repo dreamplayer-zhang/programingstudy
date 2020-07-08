@@ -15,6 +15,7 @@ using System.Windows.Threading;
 using MBrushes = System.Windows.Media.Brushes;
 using DPoint = System.Drawing.Point;
 using System.Configuration;
+using System.Diagnostics;
 
 namespace Root_Vega
 {
@@ -32,6 +33,7 @@ namespace Root_Vega
 		const string sPool = "SideVision.Memory";
 		const string sGroup = "Grab";
 		bool bUsingInspection;
+		int currentTotalIdx;
 
 
 		#region Property
@@ -295,6 +297,13 @@ namespace Root_Vega
 			//db에 주기적으로 접근하여 tempTable의 최대 개수를 확인
 			//최대개수와 currentDefectIndex의 차이가 발생한다면 currentDefectIndex와 최대 개수 사이의 defect UI를 갱신하고 currentDefectIndex를 최대 개수로 변경한다
 
+			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+			if (connector.Open())
+			{
+				string countQurey = "SELECT COUNT(*) FROM tempdata;";
+				var result = connector.SendQuery(countQurey);
+				Debug.WriteLine(string.Format("tempdata Row Count ERROR : {0}", result));
+			}
 		}
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
@@ -361,7 +370,14 @@ namespace Root_Vega
 		}
 		void _clearInspReslut()
 		{
-
+			currentTotalIdx = 0;
+			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+			if (connector.Open())
+			{
+				string dropQuery = "DROP TABLE tempdata";
+				var result = connector.SendNonQuery(dropQuery);
+				Debug.WriteLine(string.Format("tempdata Table Drop : {0}", result));
+			}
 		}
 
 		private void _startInsp()
@@ -371,6 +387,9 @@ namespace Root_Vega
 				return;
 			if (SelectedROI == null)
 				return;
+
+			//0. 개수 초기화 및 Table Drop
+			_clearInspReslut();
 
 			//1. edge box정보를 가져와서 edge 확보 후 전체 검사영역을 그린다
 			DrawEdgeBox(SelectedROI, SelectedROI.EdgeBox.UseCustomEdgeBox);
@@ -454,7 +473,7 @@ namespace Root_Vega
 
 		private void _endInsp()
 		{
-
+//			m_Engineer.ClassToolBox().
 		}
 
 		public void _addRoi()
