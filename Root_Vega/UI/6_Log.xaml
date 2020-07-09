@@ -9,10 +9,6 @@
              d:DesignHeight="756" d:DesignWidth="1876"
              Background="#FF2D2D30">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="87*"/>
-            <ColumnDefinition Width="13*"/>
-        </Grid.ColumnDefinitions>
         <Border Grid.Column="0">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -399,12 +395,5 @@
 
             </Grid>
         </Border>
-        <StackPanel Grid.Column="1" Margin="0,45,15,15">
-            <Button Content="Test1"
-                    Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"/>
-            <Button Content="Test2"
-                    Style="{StaticResource BasicBtn}"/>
-        </StackPanel>
     </Grid>
 </UserControl>

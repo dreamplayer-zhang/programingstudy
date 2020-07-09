@@ -6,7 +6,13 @@
         xmlns:local="clr-namespace:RootTools.GAFs"
         mc:Ignorable="d"
         Title="Alarm" Height="450" Width="800" WindowStyle="ToolWindow" Visibility="Visible" 
+        Background="{StaticResource BackGround}"
         WindowStartupLocation="CenterScreen" Topmost="True" Closing="Window_Closing">
+    <Window.Resources>
+        <DataTemplate x:Key="header">
+            <TextBlock Text="{Binding}" Foreground="White" Margin="3,0,0,0"/>
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -18,18 +24,23 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Button Grid.Row="0" x:Name="buttonClearALID" Content="Clear All ALID" Margin="2" Click="buttonClearALID_Click"/>
-            <ListView Grid.Row="1" x:Name="listViewALID" Margin="2">
+            <Button Grid.Row="0" x:Name="buttonClearALID" Content="Clear All ALID" Margin="2" Click="buttonClearALID_Click"
+                    Style="{StaticResource BasicBtn}"/>
+            <ListView Grid.Row="1" x:Name="listViewALID" Margin="2"
+                      Background="Transparent"
+                      Foreground="{StaticResource TextForeGround}">
                 <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Time">
+                    <GridView ColumnHeaderContainerStyle="{StaticResource ResourceKey=BasicGridViewColumn}">
+                        <GridViewColumn Header="Time"
+                                        HeaderTemplate="{StaticResource header}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding p_dateTime}" PreviewMouseUp="TextBlock_PreviewMouseUp"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="ALID">
+                        <GridViewColumn Header="ALID"
+                                        HeaderTemplate="{StaticResource header}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding p_nID}" PreviewMouseUp="TextBlock_PreviewMouseUp"/>
