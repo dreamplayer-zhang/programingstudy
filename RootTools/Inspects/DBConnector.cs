@@ -1,7 +1,9 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -78,20 +80,61 @@ namespace RootTools.Inspects
 
 			return 0;
 		}
-		public MySqlDataReader SendQuery(string query)
+		public int SendQuery(string query, ref string result)
 		{
 			if (!IsInitialize)
 			{
-				return null;
+				return -1;
 			}
 			if (!Connected)
 			{
-				return null;
+				return -2;
 			}
 
 			MySqlCommand cmd = new MySqlCommand(query, oCnn);
 
-			return cmd.ExecuteReader();
+			try
+			{
+				using (MySqlDataReader Reader = cmd.ExecuteReader())
+				{
+					while (Reader.Read())
+					{
+						for (int i = 0; i < Reader.FieldCount; i++)
+						{
+							result += Reader.GetString(i);
+						}
+					}
+				}
+			}
+			catch (MySql.Data.MySqlClient.MySqlException ex)
+			{
+				return ex.Number;
+			}
+
+			return 0;
+		}
+
+		public DataSet GetDataSet(string tableName)
+		{
+			//DataSet da;
+			if (!IsInitialize)
+			{
+				return new DataSet();
+			}
+			if (!Connected)
+			{
+				return new DataSet();
+			}
+			DataSet result = new DataSet();
+
+			string query = string.Format("SELECT * FROM inspections.tempdata;");
+			MySqlDataAdapter da = new MySqlDataAdapter();
+			MySqlCommand cmd = oCnn.CreateCommand();
+			cmd.CommandText = query;
+			da.SelectCommand = cmd;
+			da.Fill(result, tableName);
+
+			return result;
 		}
 	}
 }

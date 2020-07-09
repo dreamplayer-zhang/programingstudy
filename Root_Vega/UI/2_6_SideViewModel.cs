@@ -16,6 +16,7 @@ using MBrushes = System.Windows.Media.Brushes;
 using DPoint = System.Drawing.Point;
 using System.Configuration;
 using System.Diagnostics;
+using System.Data;
 
 namespace Root_Vega
 {
@@ -300,9 +301,25 @@ namespace Root_Vega
 			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
 			if (connector.Open())
 			{
-				string countQurey = "SELECT COUNT(*) FROM tempdata;";
-				var result = connector.SendQuery(countQurey);
-				Debug.WriteLine(string.Format("tempdata Row Count ERROR : {0}", result));
+				string query = "SELECT COUNT(*) FROM inspections.tempdata;";
+				string temp = string.Empty;
+				var result = connector.SendQuery(query, ref temp);
+#if DEBUG
+				Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
+				Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
+#endif
+				int count;
+				if(int.TryParse(temp,out count))
+				{
+					if (currentTotalIdx < count)
+					{
+						//current index부터 count까지 defect정보를 가져와 UI에 update하고 current index를 업데이트한다
+
+						//countQurey = string.Format("SELECT * FROM inspections.tempdata WHERE ");//우선순위를 낮춘다. SQLite파일하고 이미지 출력하는게 먼저
+
+						currentTotalIdx = count;
+					}
+				}
 			}
 		}
 		/// <summary>
@@ -371,12 +388,15 @@ namespace Root_Vega
 		void _clearInspReslut()
 		{
 			currentTotalIdx = 0;
+
 			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
 			if (connector.Open())
 			{
-				string dropQuery = "DROP TABLE tempdata";
+				string dropQuery = "DROP TABLE Inspections.tempdata";
 				var result = connector.SendNonQuery(dropQuery);
 				Debug.WriteLine(string.Format("tempdata Table Drop : {0}", result));
+				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
+				Debug.WriteLine(string.Format("Status Clear : {0}", result));
 			}
 		}
 
@@ -473,7 +493,7 @@ namespace Root_Vega
 
 		private void _endInsp()
 		{
-//			m_Engineer.ClassToolBox().
+			//			m_Engineer.ClassToolBox().
 		}
 
 		public void _addRoi()

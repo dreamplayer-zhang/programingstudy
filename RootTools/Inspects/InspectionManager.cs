@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using DPoint = System.Drawing.Point;
 using System.Diagnostics;
+using MySqlX.XDevAPI.Relational;
 
 namespace RootTools.Inspects
 {
@@ -40,6 +41,12 @@ namespace RootTools.Inspects
 		int nThreadNum = 10;
 		public int nInspectionCount = 0;
 
+		private string inspDefaultDir;
+		private string inspFileName;
+		SqliteDataDB VSDBManager;
+		System.Data.DataTable VSDataInfoDT;
+		System.Data.DataTable VSDataDT;
+
 		bool m_bProgress;
 
 		public bool IsInitialized { get; private set; }
@@ -47,8 +54,11 @@ namespace RootTools.Inspects
 		{
 			m_bProgress = false;
 			nInspectionCount = 0;
+#if DEBUG
 			sw = new StopWatch();
 			sw.Start();
+
+#endif
 
 			IsInitialized = true;
 
@@ -81,7 +91,7 @@ namespace RootTools.Inspects
 			Parallel.For(0, nThreadNum, i =>
 			{
 				InsepctionThread[i] = new Inspection(nThreadNum);
-				InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
+				//InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
 			});
 			//for (int i = 0; i < nThreadNum; i++)
 			//{
@@ -134,26 +144,99 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="source">DefectData array</param>
 		/// <param name="args">추후 arguments가 필요하면 사용할것</param>
-		private void InspectionManager_AddDefect(DefectDataWrapper item)
-		{
-			//여기서 DB 에 추가되는 등의 동작을 해야함!
-			if (AddDefect != null)
-			{
-				AddDefect(item);
-			}
-		}
+		//private void InspectionManager_AddDefect(DefectDataWrapper item)
+		//{
+		//	//여기서 DB 에 추가되는 등의 동작을 해야함!
+		//	if (AddDefect != null)
+		//	{
+		//		AddDefect(item);
+		//	}
+		//}
 
 		public void InspectionDone()
 		{
 			//여기서 DB관련동작 이하생략!
+			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+			if (connector.Open())
+			{
+				var result = connector.SendNonQuery("SELECT COUNT(*) FROM inspections.inspstatus;");
+				if (result == (int)MYSQLError.TABLE_IS_MISSING)
+				{
+					//상태용 테이블 작성
+					result = connector.SendNonQuery("CREATE TABLE inspections.inspstatus (idx INT NOT NULL, inspStatusNum INT NULL, PRIMARY KEY (idx));");
+					if (result != 0)
+					{
+						//에러에 대한 추가 예외처리 필요
+					}
+				}
+				//완료 표시
+				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
+				if (result == 0)
+				{
+					//완료. 검사결과 출력
+					DataSet tempSet = connector.GetDataSet("tempdata");
 
-			////TODO : 해당 Queue로 들어온 검사가 완전 종료되었을때 발동. 여기서 DB를 닫으면 될 것으로 보임
-			//if (InspectionComplete != null)
-			//{
-			//	InspectionComplete();
-			//}
+					inspDefaultDir = @"C:\vsdb";
+					if (!System.IO.Directory.Exists(inspDefaultDir))
+					{
+						System.IO.Directory.CreateDirectory(inspDefaultDir);
+					}
+					inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+					var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
+					string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
+
+					if (VSDBManager == null)
+					{
+						VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+					}
+					else if (VSDBManager.IsConnected)
+					{
+						VSDBManager.Disconnect();
+						VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+					}
+					if (VSDBManager.Connect())
+					{
+						VSDBManager.CreateTable("Datainfo");
+						VSDBManager.CreateTable("Data");
+
+						VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
+						VSDataDT = VSDBManager.GetDataTable("Data");
+					}
+
+					//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+					
+					foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
+					{
+						System.Data.DataRow dataRow = VSDataDT.NewRow();
+
+						dataRow["No"] = item["idx"];
+						dataRow["DCode"] = item["ClassifyCode"];
+						dataRow["AreaSize"] = item["AreaSize"];
+						dataRow["Length"] = item["Length"];
+						dataRow["Width"] = item["Width"];
+						dataRow["Height"] = item["Height"];
+						dataRow["FOV"] = item["FOV"];
+						dataRow["PosX"] = item["PosX"];
+						dataRow["PosY"] = item["PosY"];
+						dataRow["TdiImageExist"] = 1;
+						dataRow["VrsImageExist"] = 0;
+
+						VSDataDT.Rows.Add(dataRow);
+					}
+
+					VSDBManager.SetDataTable(VSDataInfoDT);
+					VSDBManager.SetDataTable(VSDataDT);
+					VSDBManager.Disconnect();
+					VSDataDT.Clear();
+					VSDataInfoDT.Clear();
+
+					result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
+				}
+			}
+#if DEBUG
 			sw.Stop();
 			Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
+#endif
 
 		}
 		public void Dispose()
@@ -166,7 +249,7 @@ namespace RootTools.Inspects
 				for (int i = 0; i < InsepctionThread.Length; i++)
 				{
 					//이벤트 핸들러 제거
-					InsepctionThread[i].AddDefect -= InspectionManager_AddDefect;
+					//InsepctionThread[i].AddDefect -= InspectionManager_AddDefect;
 					//InsepctionThread[i].Dispose();
 				}
 			}
