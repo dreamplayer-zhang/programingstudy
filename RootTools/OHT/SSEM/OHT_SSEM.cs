@@ -302,7 +302,7 @@ namespace RootTools.OHT.SSEM
                         break;
                     case eState.Ready_Off:
                         CheckPresent(true);
-                        bool bCS = (m_diCS[0].p_bOn == false) && (m_diCS[1].p_bOn == false);
+                        bool bCS = (m_diCS[0].p_bOn == false) && (m_diCS[1].p_bOn == false) && (m_diCS[2].p_bOn == false) && (m_diCS[3].p_bOn == false);
                         if (bCS && (m_diValid.p_bOn == false) && (m_diComplete.p_bOn == false))
                         {
                             switch (m_carrier.p_eTransfer)

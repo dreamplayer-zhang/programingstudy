@@ -320,7 +320,20 @@ namespace RootTools.OHT.Semi
                         break;
                     case eState.Ready_Off:
                         CheckPresent(true);
-                        if ((m_diCS[0].p_bOn == false) && (m_diCS[1].p_bOn == false) && (m_diValid.p_bOn == false) && (m_diComplete.p_bOn == false)) p_eState = eState.All_Off;
+                        bool bCS = (m_diCS[0].p_bOn == false) && (m_diCS[1].p_bOn == false);
+                        if (bCS && (m_diValid.p_bOn == false) && (m_diComplete.p_bOn == false))
+                        {
+                            switch (m_carrier.p_eTransfer)
+                            {
+                                case GemCarrierBase.eTransfer.ReadyToLoad:
+                                    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                                    break;
+                                case GemCarrierBase.eTransfer.ReadyToUnload:
+                                    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                                    break;
+                            }
+                            p_eState = eState.All_Off;
+                        }
                         CheckDI(m_diTrReq, false);
                         CheckDI(m_diBusy, false);
                         break; 
