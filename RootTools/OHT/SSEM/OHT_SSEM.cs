@@ -302,7 +302,20 @@ namespace RootTools.OHT.SSEM
                         break;
                     case eState.Ready_Off:
                         CheckPresent(true);
-                        if ((m_diCS[0].p_bOn == false) && (m_diCS[1].p_bOn == false) && (m_diValid.p_bOn == false) && (m_diComplete.p_bOn == false)) p_eState = eState.All_Off;
+                        bool bCS = (m_diCS[0].p_bOn == false) && (m_diCS[1].p_bOn == false) && (m_diCS[2].p_bOn == false) && (m_diCS[3].p_bOn == false);
+                        if (bCS && (m_diValid.p_bOn == false) && (m_diComplete.p_bOn == false))
+                        {
+                            switch (m_carrier.p_eTransfer)
+                            {
+                                case GemCarrierBase.eTransfer.ReadyToLoad: 
+                                    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                                    break;
+                                case GemCarrierBase.eTransfer.ReadyToUnload:
+                                    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                                    break;
+                            }
+                            p_eState = eState.All_Off;
+                        }
                         CheckDI(m_diTrReq, false);
                         CheckDI(m_diBusy, false);
                         break;
@@ -372,8 +385,17 @@ namespace RootTools.OHT.SSEM
         void CheckPresent(bool bDone)
         {
             if (m_module.p_eState == ModuleBase.eState.Error) return;
-            bool bExist = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad) ? bDone : !bDone;
-            GemCarrierBase.ePresent present = bExist ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            GemCarrierBase.ePresent present;
+            switch (m_carrier.p_eTransfer)
+            {
+                case GemCarrierBase.eTransfer.ReadyToLoad: 
+                    present = bDone ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+                    break;
+                case GemCarrierBase.eTransfer.ReadyToUnload:
+                    present = bDone ? GemCarrierBase.ePresent.Empty : GemCarrierBase.ePresent.Exist;
+                    break;
+                default: return; 
+            }
             if (m_carrier.p_ePresentSensor == present) return;
             p_sInfo = p_id + " Illegal Prosent Sensor";
         }
