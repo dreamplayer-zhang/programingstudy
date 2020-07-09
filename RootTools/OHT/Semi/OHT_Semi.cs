@@ -383,13 +383,18 @@ namespace RootTools.OHT.Semi
         void CheckPresent(bool bDone)
         {
             if (m_module.p_eState == ModuleBase.eState.Error) return;
-            bool bExist = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad) ? bDone : !bDone;
-            GemCarrierBase.ePresent present = bExist ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            if (m_carrier.p_ePresentSensor == present)
+            GemCarrierBase.ePresent present;
+            switch (m_carrier.p_eTransfer)
             {
-                p_sInfo = "OK";
-                return;
+                case GemCarrierBase.eTransfer.ReadyToLoad:
+                    present = bDone ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+                    break;
+                case GemCarrierBase.eTransfer.ReadyToUnload:
+                    present = bDone ? GemCarrierBase.ePresent.Empty : GemCarrierBase.ePresent.Exist;
+                    break;
+                default: return;
             }
+            if (m_carrier.p_ePresentSensor == present) return;
             p_sInfo = p_id + " Illegal Prosent Sensor";
         }
 
