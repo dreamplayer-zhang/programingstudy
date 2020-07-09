@@ -137,7 +137,14 @@
     <Compile Include="Camera\BaslerPylon\CameraBasler_UI.xaml.cs">
       <DependentUpon>CameraBasler_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AutoFocus\AutoFocus.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXA.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXD.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXDev.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXHD.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXHS.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXL.cs" />
+    <Compile Include="Control\Ajin\AjinLib\AXM.cs" />
+    <Compile Include="ImageProcess\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_Classes.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_UI.xaml.cs">
@@ -167,7 +174,6 @@
     <Compile Include="Camera\Dalsa\Camera_Dalse_Classes.cs" />
     <Compile Include="Control\Axis.cs" />
     <Compile Include="Control\AxisXY.cs" />
-    <Compile Include="Control\IAxis.cs" />
     <Compile Include="Comm\CommLog.cs" />
     <Compile Include="Comm\CommLog_UI.xaml.cs">
       <DependentUpon>CommLog_UI.xaml</DependentUpon>
@@ -183,13 +189,6 @@
     <Compile Include="Control\Ajin\AjinDIO_UI.xaml.cs">
       <DependentUpon>AjinDIO_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Control\Ajin\AjinLib\AXA.cs" />
-    <Compile Include="Control\Ajin\AjinLib\AXD.cs" />
-    <Compile Include="Control\Ajin\AjinLib\AXDev.cs" />
-    <Compile Include="Control\Ajin\AjinLib\AXHD.cs" />
-    <Compile Include="Control\Ajin\AjinLib\AXHS.cs" />
-    <Compile Include="Control\Ajin\AjinLib\AXL.cs" />
-    <Compile Include="Control\Ajin\AjinLib\AXM.cs" />
     <Compile Include="Control\Ajin\AjinListAxis.cs" />
     <Compile Include="Control\Ajin\AjinListAxis_UI.xaml.cs">
       <DependentUpon>AjinListAxis_UI.xaml</DependentUpon>
@@ -198,6 +197,7 @@
     <Compile Include="Control\Ajin\Ajin_UI.xaml.cs">
       <DependentUpon>Ajin_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\IControl.cs" />
     <Compile Include="DrawData.cs" />
     <Compile Include="GAFs\ALID.cs" />
     <Compile Include="GAFs\ALIDList.cs" />
@@ -228,6 +228,7 @@
       <DependentUpon>XGem_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="IHandler.cs" />
+    <Compile Include="ImageProcess\FocusStacking.cs" />
     <Compile Include="Image\CRect.cs" />
     <Compile Include="Comm\CyUSBTool.cs" />
     <Compile Include="Comm\CyUSBTool_UI.xaml.cs">
@@ -267,6 +268,9 @@
     <Compile Include="Inspects\RecipeManager.cs" />
     <Compile Include="Inspects\Singleton.cs" />
     <Compile Include="Inspects\SqliteDataDB.cs" />
+    <Compile Include="LogIn_MainUI.xaml.cs">
+      <DependentUpon>LogIn_MainUI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Logs\ILogGroup.cs" />
     <Compile Include="Logs\Log.cs" />
     <Compile Include="Logs\LogMars.cs" />
@@ -282,6 +286,7 @@
     <Compile Include="Logs\Log_Group_UI.xaml.cs">
       <DependentUpon>Log_Group_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Memory\MemoryDraw.cs" />
     <Compile Include="Memory\MemoryViewer.cs" />
     <Compile Include="Memory\MemoryViewer_UI.xaml.cs">
       <DependentUpon>MemoryViewer_UI.xaml</DependentUpon>
@@ -627,6 +632,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Light\LightTool_LVS_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LogIn_MainUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

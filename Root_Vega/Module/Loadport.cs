@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.Control.Ajin;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
@@ -14,18 +15,140 @@ namespace Root_Vega.Module
     public class Loadport : ModuleBase, IRobotChild
     {
         #region ToolBox
-        public DIO_I m_diPlaced;
-        public DIO_I m_diPresent;
-        public DIO_I m_diLoad;
-        public DIO_I m_diUnload; 
+        Axis m_axisZ;
+        Axis m_axisTheta;
+        AxisXY m_axisPodLifter; 
+        AxisXY m_axisReticleLifter;
+        public DIO_IO m_dioPlaced;
+        public DIO_IO m_dioPresent;
+        public DIO_I m_diReticle;
+        public DIO_I m_diInnerPod;
+        public DIO_O m_doManual;
+        public DIO_O m_doAuto;
+        public DIO_IO m_dioLoad;
+        public DIO_IO m_dioUnload;
+        public DIO_O m_doAlarm;
+//        public DIO_Os m_doPodCylinder;
         public OHT_Semi m_OHT;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Placed");
-            p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
-            p_sInfo = m_toolBox.Get(ref m_diLoad, this, "Load");
-            p_sInfo = m_toolBox.Get(ref m_diUnload, this, "Unload");
+            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Z");
+            p_sInfo = m_toolBox.Get(ref m_axisTheta, this, "Theta");
+            p_sInfo = m_toolBox.Get(ref m_axisPodLifter, this, "Pod Lifter");
+            p_sInfo = m_toolBox.Get(ref m_axisReticleLifter, this, "Reticle Lifter");
+            p_sInfo = m_toolBox.Get(ref m_dioPlaced, this, "Placed");
+            p_sInfo = m_toolBox.Get(ref m_dioPresent, this, "Present");
+            p_sInfo = m_toolBox.Get(ref m_diInnerPod, this, "InnerPod");
+            p_sInfo = m_toolBox.Get(ref m_diReticle, this, "Reticle");
+            p_sInfo = m_toolBox.Get(ref m_doManual, this, "Manual");
+            p_sInfo = m_toolBox.Get(ref m_doAuto, this, "Auto");
+            p_sInfo = m_toolBox.Get(ref m_dioLoad, this, "Load");
+            p_sInfo = m_toolBox.Get(ref m_dioUnload, this, "Unload");
+            p_sInfo = m_toolBox.Get(ref m_doAlarm, this, "Alarm");
+//            p_sInfo = m_toolBox.Get(ref m_doPodCylinder, this, "Alarm", Enum.GetNames(typeof(ePodCylinder)));
             p_sInfo = m_toolBox.Get(ref m_OHT, this, m_infoPod, "OHT");
+            if (bInit)
+            {
+                InitPosZ();
+                InitPosPod();
+                InitPosPodLifter();
+                InitPosReticleLifter(); 
+            }
+        }
+        #endregion
+
+        #region AxisZ
+        public enum ePosZ
+        {
+            Ready,
+            InnerPod,
+            Reticle,
+            Check,
+            ReticleReady,
+            Load,
+        }
+        void InitPosZ()
+        {
+            m_axisZ.AddPos(Enum.GetNames(typeof(ePosZ)));
+        }
+
+        double m_dInposZ = -1; 
+        public string MoveZ(ePosZ pos)
+        {
+            Thread.Sleep(200); 
+            string sMove = m_axisZ.StartMove(pos);
+            if (sMove != "OK") return sMove;
+            return m_axisZ.WaitReady(m_dInposZ); 
+        }
+        #endregion
+
+        #region AxisTheta
+        public enum ePosTheta
+        { 
+            Open,
+            Close
+        }
+        void InitPosPod()
+        {
+            m_axisTheta.AddPos(Enum.GetNames(typeof(ePosTheta)));
+        }
+
+        double m_dInposTheta = -1;
+        public string MoveTheta(ePosTheta pos)
+        {
+            string sMove = m_axisTheta.StartMove(pos);
+            if (sMove != "OK") return sMove;
+            return m_axisTheta.WaitReady(m_dInposTheta);
+        }
+        #endregion
+
+        #region AxisPodLifter
+        public enum ePosPodLifter
+        {
+            Ready,
+            Lifting
+        }
+        void InitPosPodLifter()
+        {
+            m_axisPodLifter.AddPos(Enum.GetNames(typeof(ePosPodLifter)));
+        }
+
+        double m_dInposLifter = -1;
+        public string MovePodLifter(ePosPodLifter pos)
+        {
+            string sMove = m_axisPodLifter.StartMove(pos);
+            if (sMove != "OK") return sMove;
+            return m_axisPodLifter.WaitReady(m_dInposLifter);
+        }
+        #endregion
+
+        #region AxisReticleLifter
+        public enum ePosReticleLifter
+        {
+            Ready,
+            Mid,
+            Lifting
+        }
+        void InitPosReticleLifter()
+        {
+            m_axisReticleLifter.AddPos(Enum.GetNames(typeof(ePosReticleLifter)));
+        }
+
+        double m_dInposReticle = -1;
+        public string MoveReticleLifter(ePosReticleLifter pos)
+        {
+            string sMove = m_axisReticleLifter.StartMove(pos);
+            if (sMove != "OK") return sMove;
+            return m_axisReticleLifter.WaitReady(m_dInposReticle);
+        }
+
+        public string ShiftReticleLifter(double dPosX, double dPosY)
+        {
+            RPoint rpActual = new RPoint(m_axisReticleLifter.p_axisX.p_posActual, m_axisReticleLifter.p_axisY.p_posActual);
+            RPoint rpMove = new RPoint(rpActual.X - dPosX, rpActual.Y - dPosY);
+            string sMove = m_axisReticleLifter.StartMove(rpMove);
+            if (sMove != "OK") return sMove;
+            return m_axisReticleLifter.WaitReady(m_dInposReticle);
         }
         #endregion
 
@@ -33,8 +156,8 @@ namespace Root_Vega.Module
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present;
-            if (m_diPlaced.p_bIn != m_diPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
-            else present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            if (m_dioPlaced.p_bIn != m_dioPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
+            else present = m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
             if (m_infoPod.CheckPlaced(present) != "OK")
             {
                 m_alidPlaced.p_sMsg = "Placed Sensor Remain Checked while Pod State = " + m_infoPod.p_eState;
@@ -139,6 +262,48 @@ namespace Root_Vega.Module
         }
         #endregion
 
+        #region Load & Unload
+        public string RunLoad()
+        {
+            if (m_axisZ.IsInPos(ePosZ.Ready, m_dInposZ) == false) return "AxisZ Position not Ready";
+            if (m_axisPodLifter.IsInPos(ePosPodLifter.Ready, m_dInposLifter) == false) return "AxisPodLifter Position not Ready";
+            if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Ready, m_dInposReticle) == false) return "AxisReticleLifter Position not Ready";
+            if (m_axisTheta.IsInPos(ePosTheta.Open,m_dInposTheta) == false)
+            {
+                if (Run(MoveTheta(ePosTheta.Open))) return p_sInfo;
+            }
+            if (Run(MoveZ(ePosZ.InnerPod))) return p_sInfo;
+            if (Run(MovePodLifter(ePosPodLifter.Lifting))) return p_sInfo;
+            if (m_diInnerPod.p_bIn == false) return "InnerPod Sensor not Detected";
+            if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
+            if (Run(MoveReticleLifter(ePosReticleLifter.Mid))) return p_sInfo;
+            if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
+            if (Run(MoveReticleLifter(ePosReticleLifter.Lifting))) return p_sInfo;
+            if (Run(MoveZ(ePosZ.Load))) return p_sInfo;
+            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
+
+            return "OK"; 
+        }
+
+        public string RunUnload()
+        {
+            if (m_axisZ.IsInPos(ePosZ.Load,m_dInposZ) == false) return "AxisZ Position not Load";
+            if (m_axisPodLifter.IsInPos(ePosPodLifter.Lifting,m_dInposLifter) == false) return "AxisPodLifter Position not Lifting";
+            if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting,m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
+            if (m_axisTheta.IsInPos(ePosTheta.Open,m_dInposTheta) == false) return "AxisTheta Position not Open";
+            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
+            if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
+            if (Run(MoveReticleLifter(ePosReticleLifter.Mid))) return p_sInfo;
+            if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
+            if (Run(MoveReticleLifter(ePosReticleLifter.Ready))) return p_sInfo;
+            if (Run(MoveZ(ePosZ.InnerPod))) return p_sInfo;
+            if (Run(MovePodLifter(ePosPodLifter.Ready))) return p_sInfo;
+            if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
+            if (Run(MoveTheta(ePosTheta.Close))) return p_sInfo;
+            return "OK"; 
+        }
+        #endregion
+
         #region override
         public override void Reset()
         {
@@ -153,15 +318,86 @@ namespace Root_Vega.Module
         #endregion
 
         #region State Home & Ready
+        double[] m_aShiftReticle = new double[2] { 0, 0 };
         public override string StateHome()
         {
-            if (EQ.p_bSimulate == false)
+            if (EQ.p_bSimulate) return "OK";
+            m_axisZ.ServoOn(true);
+            m_axisTheta.ServoOn(true);
+            m_axisPodLifter.ServoOn(true);
+            m_axisReticleLifter.ServoOn(true);
+            Thread.Sleep(1000);
+            m_axisZ.p_eState = Axis.eState.Ready;
+            m_axisTheta.p_eState = Axis.eState.Ready;
+            m_axisPodLifter.p_axisX.p_eState = Axis.eState.Ready;
+            m_axisPodLifter.p_axisY.p_eState = Axis.eState.Ready;
+            m_axisReticleLifter.p_axisX.p_eState = Axis.eState.Ready;
+            m_axisReticleLifter.p_axisY.p_eState = Axis.eState.Ready;
+            //JWS 200616 ADD
+            if (GetdZPos(ePosZ.InnerPod) < 0)
             {
-                //p_sInfo = WriteCmd(eCmd.Init);
-                if (p_sInfo != "OK") return p_sInfo; 
+                p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                if (p_sInfo != "OK") return p_sInfo;
+                if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
             }
-            m_infoPod.AfterHome(); 
+            else if (GetdZPos(ePosZ.Reticle) < 0)
+            {
+                p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                if (p_sInfo != "OK") return p_sInfo;
+                if (Run(Home_Innerpod())) return p_sInfo;
+            }
+            else
+            {
+                if (Run(MoveZ(ePosZ.Check))) return p_sInfo;
+                if (Run(Home_Reticle())) return p_sInfo;
+            }
+            m_infoPod.AfterHome();
             return "OK";
+        }
+
+        public string Home_Innerpod() // JWS 200616 ADD
+        {
+            if (m_diInnerPod.p_bIn ==false) return "No InnerPod";
+            if (Run(MoveZ(ePosZ.InnerPod))) return p_sInfo;
+            p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY);
+            if (p_sInfo != "OK") return p_sInfo;
+            return MoveZ(ePosZ.Ready); 
+        }
+
+        public string Home_Reticle() // JWS 200616 ADD
+        {
+            if (m_axisZ.IsInPos(ePosZ.Check,m_dInposZ) == false) return "AxisZ Position Not Check Pos";
+            if (m_diReticle.p_bIn)//(reticle 센서 감지)
+            {
+                if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
+                //3,4번 축 상대치 이동하는 함수 넣기
+                if (Run(ShiftReticleLifter(m_aShiftReticle[0], m_aShiftReticle[1]))) return p_sInfo;
+                if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
+                p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                if (p_sInfo != "OK") return p_sInfo;
+            }
+            else
+            {
+                p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                if (p_sInfo != "OK") return p_sInfo;
+            }
+            return Home_Innerpod();
+        }
+
+        public string HomeToMinusLimit(params Axis[] aAxis) //JWS 200625 ADD
+        {
+            p_sInfo = StateHome(aAxis);
+            if (p_sInfo != "OK") return p_sInfo;
+            foreach (Axis axis in aAxis)
+            {
+                if (!axis.p_sensorMinusLimit) return axis.ToString() + " not home done.";
+            }
+            return p_sInfo;
+        }
+
+        double GetdZPos(ePosZ pos)
+        {
+            return m_axisZ.p_posActual - m_axisZ.GetPosValue(pos.ToString()) + m_dInposZ;
         }
 
         public override string StateReady()
@@ -183,6 +419,12 @@ namespace Root_Vega.Module
                 StartRun(m_runUnLoad);
             }
             return "OK";
+        }
+
+        void RunTreeHome(Tree tree)
+        {
+            m_aShiftReticle[0] = tree.Set(m_aShiftReticle[0], m_aShiftReticle[0], "Shift Reticle Lifter X", "Shift Reticle Lifter (pulse)");
+            m_aShiftReticle[1] = tree.Set(m_aShiftReticle[1], m_aShiftReticle[1], "Shift Reticle Lifter Y", "Shift Reticle Lifter (pulse)");
         }
         #endregion
 
@@ -208,6 +450,16 @@ namespace Root_Vega.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
+            RunTreeAxis(tree.GetTree("Axis InPos", false));
+            RunTreeHome(tree.GetTree("Home Option", false)); 
+        }
+        
+        void RunTreeAxis(Tree tree)
+        {
+            m_dInposZ = tree.Set(m_dInposZ, m_dInposZ, "Z", "InPosition Pos Error");
+            m_dInposTheta = tree.Set(m_dInposTheta, m_dInposTheta, "Theta", "InPosition Pos Error");
+            m_dInposLifter = tree.Set(m_dInposLifter, m_dInposLifter, "Lifter", "InPosition Pos Error");
+            m_dInposReticle = tree.Set(m_dInposReticle, m_dInposReticle, "Reticle", "InPosition Pos Error");
         }
         #endregion
 
@@ -223,6 +475,9 @@ namespace Root_Vega.Module
             base.InitBase(id, engineer);
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
+
+            m_axisZ.p_eState = Axis.eState.Ready;
+            m_axisTheta.p_eState = Axis.eState.Ready;
         }
 
         public override void ThreadStop()
@@ -235,22 +490,15 @@ namespace Root_Vega.Module
             //
         }
 
-        public ModuleRunBase GetRunUndocking()
-        {
-            return CloneModuleRun("Undocking");
-        }
-
         #region ModuleRun
         public ModuleRunBase m_runReadPodID;
         public ModuleRunBase m_runLoad;
-        ModuleRunBase m_runUnLoad;
+        public ModuleRunBase m_runUnLoad;
         protected override void InitModuleRuns()
         {
             m_runReadPodID = AddModuleRunList(new Run_ReadRFID(this), false, "Read RFID");
-            AddModuleRunList(new Run_PodOpen(this), false, "Pod Open");
             m_runLoad = AddModuleRunList(new Run_Load(this), false, "Load Pod to Work Position");
             m_runUnLoad = AddModuleRunList(new Run_Unload(this), false, "Unload Pod from Work Position");
-            AddModuleRunList(new Run_PodClose(this), false, "Pod Close");
         }
 
         public class Run_ReadRFID : ModuleRunBase
@@ -274,7 +522,7 @@ namespace Root_Vega.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_nCh = tree.Set(m_nCh, m_nCh, "Channel", "RFID Channel"); 
+                m_nCh = tree.Set(m_nCh, m_nCh, "Channel", "RFID Channel", bVisible); 
                 m_sSimulCarrierID = tree.Set(m_sSimulCarrierID, m_sSimulCarrierID, "Simulation CarrierID", "CarrierID When p_bSimulation", bVisible && EQ.p_bSimulate);
             }
 
@@ -290,35 +538,6 @@ namespace Root_Vega.Module
                 }
                 m_module.m_infoPod.SendCarrierID(sCarrierID); 
                 return sResult; 
-            }
-        }
-
-        public class Run_PodOpen : ModuleRunBase
-        {
-            Loadport m_module;
-            InfoPod m_infoPod;
-            public Run_PodOpen(Loadport module)
-            {
-                m_module = module;
-                m_infoPod = module.m_infoPod;
-                InitModuleRun(module);
-            }
-
-            public override ModuleRunBase Clone()
-            {
-                Run_PodOpen run = new Run_PodOpen(m_module);
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-            }
-
-            public override string Run()
-            {
-                //if (m_module.Run(m_module.WriteCmd(eCmd.PodOpen))) return p_sInfo;
-                //m_infoPod.p_eState = InfoPod.eState.Placed;
-                return "OK";
             }
         }
 
@@ -345,7 +564,8 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
-                //if (m_module.Run(m_module.WriteCmd(eCmd.Load))) return p_sInfo;
+                string sRun = m_module.RunLoad();
+                if (sRun != "OK") return "RunLoad Error : " + sRun; 
                 m_infoPod.p_eState = InfoPod.eState.Load;
                 m_module.m_ceidLoad.Send();
                 m_module.m_ceidOpen.Send();
@@ -378,39 +598,11 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
-                //if (m_module.Run(m_module.WriteCmd(eCmd.Unload))) return p_sInfo;
+                string sRun = m_module.RunUnload();
+                if (sRun != "OK") return "RunUnload Error : " + sRun;
                 m_infoPod.p_eState = InfoPod.eState.Placed;
                 m_module.m_ceidClose.Send();
                 m_module.m_ceidUnload.Send();
-                return "OK";
-            }
-        }
-
-        public class Run_PodClose : ModuleRunBase
-        {
-            Loadport m_module;
-            InfoPod m_infoPod;
-            public Run_PodClose(Loadport module)
-            {
-                m_module = module;
-                m_infoPod = module.m_infoPod;
-                InitModuleRun(module);
-            }
-
-            public override ModuleRunBase Clone()
-            {
-                Run_PodClose run = new Run_PodClose(m_module);
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-            }
-
-            public override string Run()
-            {
-                //if (m_module.Run(m_module.WriteCmd(eCmd.PodClose))) return p_sInfo;
-                //m_infoPod.p_eState = InfoPod.eState.Placed;
                 return "OK";
             }
         }

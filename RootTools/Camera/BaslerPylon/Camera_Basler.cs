@@ -143,22 +143,12 @@ namespace RootTools.Camera.BaslerPylon
         }
         void RunTree(Tree treeRoot)
         {
-            try
-            {
-                Application.Current.Dispatcher.Invoke((Action)delegate 
-                {
-                    RunSetTree(treeRoot.GetTree("Connect Set"));
-                    RunAnalogControlTree(treeRoot.GetTree("Analog Control", false, p_CamInfo._OpenStatus));
-                    RunAOIControlsTree(treeRoot.GetTree("AOI Contorls", false, p_CamInfo._OpenStatus));
-                    RunDeviceInfomationTree(treeRoot.GetTree("Device Infomation", false, p_CamInfo._OpenStatus));
-                    RunConfigurationSetTree(treeRoot.GetTree("Configuration Set", false, p_CamInfo._OpenStatus));
-                    RunHostTransportLayerTree(treeRoot.GetTree("HostTransportLayer", false, p_CamInfo._OpenStatus));
-                });
-            }
-            catch (Exception eee)
-            {
-                MessageBox.Show(eee.ToString());
-            }
+            RunSetTree(treeRoot.GetTree("Connect Set"));
+            RunAnalogControlTree(treeRoot.GetTree("Analog Control", false, p_CamInfo._OpenStatus));
+            RunAOIControlsTree(treeRoot.GetTree("AOI Contorls", false, p_CamInfo._OpenStatus));
+            RunDeviceInfomationTree(treeRoot.GetTree("Device Infomation", false, p_CamInfo._OpenStatus));
+            RunConfigurationSetTree(treeRoot.GetTree("Configuration Set", false, p_CamInfo._OpenStatus));
+            RunHostTransportLayerTree(treeRoot.GetTree("HostTransportLayer", false, p_CamInfo._OpenStatus));
         }
 
         void RunConfigurationSetTree(Tree tree)
@@ -347,6 +337,7 @@ namespace RootTools.Camera.BaslerPylon
                 return p_id + " Camera not Connected";
             try
             {
+
                 m_cam.StreamGrabber.Start();
                 IGrabResult result = m_cam.StreamGrabber.RetrieveResult(m_nGrabTimeout, TimeoutHandling.ThrowException);
                 using (result)
@@ -430,7 +421,7 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
-        private void GrabOneShot()
+        public void GrabOneShot()
         {
             try
             {

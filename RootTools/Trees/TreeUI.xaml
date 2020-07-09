@@ -570,11 +570,11 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <local:TreeListView HorizontalAlignment="Stretch" ItemsSource="{Binding p_childs}"
+    <local:TreeListView HorizontalAlignment="Stretch" ItemsSource="{Binding p_aChild}"
                 x:Name="ControlTree" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 PreviewMouseUp="ControlTree_PreviewMouseUp">
         <local:TreeListView.ItemTemplate>
-            <HierarchicalDataTemplate ItemsSource="{Binding p_childs}" />
+            <HierarchicalDataTemplate ItemsSource="{Binding p_aChild}" />
         </local:TreeListView.ItemTemplate>
         <local:TreeListView.Columns>
             <GridViewColumn Header="Name" Width="120" x:Name="Column1"

@@ -11,18 +11,18 @@ namespace RootTools.OHT.Semi
     public class OHT_Semi : OHTBase, ITool
     {
         #region DIO
-        DI m_diValid = new DI("2.Valid.12");
-        DI[] m_diCS = new DI[2] { new DI("1.CS0.14"), new DI("1.CS1.14") };
-        DI m_diTrReq = new DI("4.TrackReq.9");
-        DI m_diBusy = new DI("6.Busy.8");
-        DI m_diComplete = new DI("10.Complete.13");
-        DI m_diContinue = new DI("Continue");
-        DI m_diLightCurtain = new DI("LightCurtain");
-        DO m_doLoadReq = new DO("3.LoadReq.7");
-        DO m_doUnloadReq = new DO("3.UnloadReq.7");
-        DO m_doReady = new DO("5.Ready.11");
-        DO m_doHoAvailable = new DO("HoAvailable");
-        DO m_doES = new DO("ES");
+        public DI m_diValid = new DI("2.Valid.12");
+        public DI[] m_diCS = new DI[2] { new DI("1.CS0.14"), new DI("1.CS1.14") };
+        public DI m_diTrReq = new DI("4.TrackReq.9");
+        public DI m_diBusy = new DI("6.Busy.8");
+        public DI m_diComplete = new DI("10.Complete.13");
+        public DI m_diContinue = new DI("Continue");
+        public DI m_diLightCurtain = new DI("LightCurtain");
+        public DO m_doLoadReq = new DO("3.LoadReq.7");
+        public DO m_doUnloadReq = new DO("3.UnloadReq.7");
+        public DO m_doReady = new DO("5.Ready.11");
+        public DO m_doHoAvailable = new DO("HoAvailable");
+        public DO m_doES = new DO("ES");
         void InitDIO()
         {
             m_aDIO.Add(m_doLoadReq);
@@ -385,7 +385,11 @@ namespace RootTools.OHT.Semi
             if (m_module.p_eState == ModuleBase.eState.Error) return;
             bool bExist = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad) ? bDone : !bDone;
             GemCarrierBase.ePresent present = bExist ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            if (m_carrier.p_ePresentSensor == present) return;
+            if (m_carrier.p_ePresentSensor == present)
+            {
+                p_sInfo = "OK";
+                return;
+            }
             p_sInfo = p_id + " Illegal Prosent Sensor";
         }
 

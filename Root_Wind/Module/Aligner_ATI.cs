@@ -24,7 +24,6 @@ namespace Root_Wind.Module
         DIO_I2O2 m_dioLift;
         DIO_I m_diWaferExist;
         MemoryPool m_memoryPool;
-        MemoryViewer m_memoryViewer; 
         Camera_Basler m_camAlign;
         Camera_CognexOCR m_camOCR; 
 
@@ -40,7 +39,6 @@ namespace Root_Wind.Module
             p_sInfo = m_toolBox.Get(ref m_dioLift, this, "Lift", "Down", "Up");
             p_sInfo = m_toolBox.Get(ref m_diWaferExist, this, "WaferExist");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
-            p_sInfo = m_toolBox.Get(ref m_memoryViewer, this, "Viewer");
             p_sInfo = m_toolBox.Get(ref m_camAlign, this, "Align");
             p_sInfo = m_toolBox.Get(ref m_camOCR, this, "OCR");
             if (bInit) InitTools();
@@ -119,7 +117,6 @@ namespace Root_Wind.Module
         {
             m_axisCamAlign.AddPos(Enum.GetNames(typeof(ePosAlign)));
             m_axisRotate.AddPos(Enum.GetNames(typeof(ePosAlign)));
-            m_axisRotate.AddPosDone();
         }
 
         double m_mmWaferSize = 300;
@@ -134,7 +131,7 @@ namespace Root_Wind.Module
 
         string AxisMoveAlign(ePosAlign pos, double xOffset, double zOffset, bool bWait)
         {
-            m_axisCamAlign.Move(pos, xOffset, zOffset);
+            m_axisCamAlign.StartMove(pos, new RPoint(xOffset, zOffset));
             if (bWait == false) return "OK";
             return m_axisCamAlign.WaitReady(); 
         }
@@ -160,7 +157,7 @@ namespace Root_Wind.Module
         public string AxisMoveOCR(ePosOCR pos, double mmOCR)
         {
             double dx = m_mmWaferSize - p_infoWafer.p_mmWaferSize + mmOCR;
-            m_axisCamOCR.Move(pos, dx);
+            m_axisCamOCR.StartMove(pos, dx);
             return "OK";
         }
         #endregion
@@ -175,7 +172,7 @@ namespace Root_Wind.Module
         int m_lRotate = 40000;
         string Rotate(double fPulse, bool bWait, bool bSmallRotate = false)
         {
-            double fNow = m_axisRotate.p_axis.p_posCommand;
+            double fNow = m_axisRotate.p_posCommand;
             eRotateMode rotateMode = bSmallRotate ? eRotateMode.TwoWay : m_eRotateMode; 
             switch (rotateMode)
             {
@@ -188,9 +185,9 @@ namespace Root_Wind.Module
                     while ((fPulse - fNow) > m_lRotate / 2) fNow += m_lRotate;
                     break; 
             }
-            m_axisRotate.p_axis.p_posActual = fNow;
-            m_axisRotate.p_axis.p_posCommand = fNow; 
-            m_axisRotate.Move(fPulse);
+            m_axisRotate.SetCommandPosition(fNow);
+            m_axisRotate.SetActualPosition(fNow); 
+            m_axisRotate.StartMove(fPulse);
             if (bWait == false) return "OK";
             string sRotate = m_axisRotate.WaitReady();
             if (sRotate == "OK") return sRotate;
@@ -282,8 +279,8 @@ namespace Root_Wind.Module
         public string BeforePut(int nID)
         {
             if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
-            m_axisRotate.p_axis.p_posActual = 0;
-            m_axisRotate.p_axis.p_posCommand = 0; 
+            m_axisRotate.SetCommandPosition(0);
+            m_axisRotate.SetActualPosition(0);
             return CheckGetPut();
         }
 
@@ -390,12 +387,12 @@ namespace Root_Wind.Module
             StopWatch stopWatch = new StopWatch(); 
             double vGrabPulse = m_lRotate * m_vGrabDeg / 360;
             double pulseAcc = vGrabPulse * (m_secGrabAcc + 0.1) / 2;
-            m_axisRotate.p_axis.p_posActual = 0;
-            m_axisRotate.p_axis.p_posCommand = 0;
+            m_axisRotate.SetCommandPosition(0);
+            m_axisRotate.SetActualPosition(0); 
             m_doLightSide.Write(true);
             m_doLightCoaxial.Write(false);
             if (Run(AxisMoveAlign(ePosAlign.Align, true))) return p_sInfo; 
-            m_axisRotate.Move(m_lRotate + pulseAcc);
+            m_axisRotate.StartMove(m_lRotate + pulseAcc);
             double posTrigger = pulseAcc; 
             double dpTrigger = m_lRotate / c_lGrab;
             double dpMax = dpTrigger / 4;
@@ -403,11 +400,11 @@ namespace Root_Wind.Module
             for (int n = 0; n < c_lGrab; )
             {
                 if (stopWatch.ElapsedMilliseconds > msAlign) return "Run Align Timeout";
-                double dp = m_axisRotate.p_axis.p_posCommand - posTrigger;
+                double dp = m_axisRotate.p_posCommand - posTrigger;
                 if (dp > dpMax) return "Run Align Grab Time Error";
                 if (dp >= 0)
                 {
-                    m_aGrabAOI[n].m_posGrab = m_axisRotate.p_axis.p_posCommand;
+                    m_aGrabAOI[n].m_posGrab = m_axisRotate.p_posCommand;
                     //m_camAlign.Grab(m_memoryGrab.GetPtr(n);
                     if (param != null) m_aoi.StartInspect(m_aGrabAOI[n], param); 
                     posTrigger += dpTrigger;
@@ -566,8 +563,6 @@ namespace Root_Wind.Module
             {
                 m_aoiInspect = RunTreeAOI(tree.GetTree("AOI"), bVisible); 
                 m_aoiParam.RunTree(tree.GetTree("Inspect"), bVisible, bRecipe);
-                if (m_aoiInspect != null) m_module.m_memoryViewer.SetMemory(m_aoiInspect.m_memory, m_nAOI); 
-                else m_module.m_memoryViewer.SetMemory(null, m_nAOI);
             }
 
             eAOI m_eAOI = eAOI.Grab;
@@ -649,17 +644,17 @@ namespace Root_Wind.Module
             {
                 if (EQ.p_bSimulate) return "OK";
                 m_module.p_bVac = true;
-                if (m_module.Run(m_module.m_axisCamAlign.Move(ePosAlign.Align))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.Move(ePosAlign.Ready))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisCamAlign.StartMove(ePosAlign.Align))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlign.Ready))) return p_sInfo;
                 if (m_module.Run(m_module.m_axisCamAlign.WaitReady())) return p_sInfo;
                 if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
 
                 m_module.p_bLightCoaxial = true;
-                if (m_module.Run(m_module.m_axisRotate.Move(ePosAlign.Align))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlign.Align))) return p_sInfo;
                 if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
 
-                if (m_module.Run(m_module.m_axisCamAlign.Move(ePosAlign.Ready))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisRotate.Move(ePosAlign.Ready))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisCamAlign.StartMove(ePosAlign.Ready))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisRotate.StartMove(ePosAlign.Ready))) return p_sInfo;
                 if (m_module.Run(m_module.m_axisCamAlign.WaitReady())) return p_sInfo;
                 if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
 

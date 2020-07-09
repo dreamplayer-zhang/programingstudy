@@ -23,15 +23,12 @@ namespace Root_Vega
         {
             InitializeComponent();
         }
-
         Loadport m_loadport; 
         public void Init(Loadport loadport)
         {
             m_loadport = loadport;
             this.DataContext = loadport;
             textBoxPodID.DataContext = loadport.m_infoPod;
-            //toggleButtonAccessLPAuto.DataContext = loadport.m_infoPod;
-            //toggleButtonAccessLPManual.DataContext = loadport.m_infoPod;
             textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxRecipe.DataContext = loadport.m_infoPod.m_aGemSlot[0];
@@ -53,10 +50,10 @@ namespace Root_Vega
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            borderPlaced.Background = m_loadport.m_diPlaced.p_bIn ? Brushes.LightGreen : null;
-            borderPresent.Background = m_loadport.m_diPresent.p_bIn ? Brushes.LightGreen : null;
-            borderLoad.Background = m_loadport.m_diLoad.p_bIn ? Brushes.LightGreen : null;
-            borderUnload.Background = m_loadport.m_diUnload.p_bIn ? Brushes.LightGreen : null;
+            borderPlaced.Background = m_loadport.m_dioPlaced.p_bIn ? Brushes.LightGreen : null;
+            borderPresent.Background = m_loadport.m_dioPresent.p_bIn ? Brushes.LightGreen : null;
+            borderLoad.Background = m_loadport.m_dioLoad.p_bIn ? Brushes.LightGreen : null;
+            borderUnload.Background = m_loadport.m_dioUnload.p_bIn ? Brushes.LightGreen : null;
             borderAlarm.Background = (m_loadport.p_eState == ModuleBase.eState.Error) ? Brushes.Red : null;
             bool bAuto = (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto); 
             borderAccessAuto.Background = bAuto ? Brushes.LightGreen : null;
@@ -96,22 +93,19 @@ namespace Root_Vega
             Thread.Sleep(100);
             while (m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10); 
         }
-
+        
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             switch (m_loadport.p_eState)
             {
                 case ModuleBase.eState.Ready:
                     if (m_manualjob.ShowPopup() == false) return;
-                    ModuleRunBase moduleRun = m_loadport.m_runLoad.Clone();
-                    moduleRun.m_infoObject = m_loadport.m_infoPod.p_infoReticle; 
                     EQ.p_eState = EQ.eState.Run;
-                    m_loadport.m_infoPod.StartProcess(moduleRun);
+                    m_loadport.m_infoPod.StartProcess();
                     break; 
             }
         }
         #endregion
-
 
         #region Button Unload
         bool IsEnableUnload()

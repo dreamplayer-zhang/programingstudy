@@ -17,6 +17,11 @@ namespace RootTools.Inspects
 		FrameBottom = 6,
 		FrameRight = 7,
 		Glass = 8,
+		SideInspection = 9,
+		SideInspectionTop = 10,
+		SideInspectionLeft = 11,
+		SideInspectionRight = 12,
+		SideInspectionBottom = 13,
 	}
 	public enum InspectionType
 	{

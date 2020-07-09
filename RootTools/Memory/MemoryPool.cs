@@ -80,17 +80,17 @@ namespace RootTools.Memory
             return "OK"; 
         }
 
-        public void RunTreeMemory(Tree tree, bool bVisible)
+        public void RunTreeMemory(Tree tree, bool bCount, bool bVisible)
         {
             int nGroup = p_aGroup.Count;
-            nGroup = tree.Set(nGroup, nGroup, "Count", "Group Count", bVisible); 
+            if (bCount) nGroup = tree.Set(nGroup, nGroup, "Count", "Group Count", bVisible); 
             for (int n = 0; n < nGroup; n++)
             {
                 string sGroup = (p_aGroup.Count > n) ? p_aGroup[n].p_id : "Group";
                 sGroup = tree.Set(sGroup, sGroup, "sGroup." + n.ToString(), "Group Name", bVisible);
                 if (p_aGroup.Count <= n) GetGroup(sGroup); 
             }
-            foreach (MemoryGroup group in p_aGroup) group.RunTreeMemory(tree.GetTree(group.p_id), bVisible); 
+            foreach (MemoryGroup group in p_aGroup) group.RunTreeMemory(tree.GetTree(group.p_id), bCount, bVisible); 
         }
         #endregion
 
@@ -109,34 +109,33 @@ namespace RootTools.Memory
         #region RunTree
         public void RunTreeToolBox(Tree tree)
         {
-            p_gbPool = tree.Set(p_gbPool, 1, "Pool Size", "Memory Pool Size (GB)");
+            p_gbPool = tree.Set(p_gbPool, 1, "Pool Size", "Memory Pool Size (Giga Byte)");
         }
 
         public void RunTreeModule(Tree tree)
         {
-            bool bChanged = false; 
-            foreach (MemoryGroup group in p_aGroup) bChanged = (bChanged || RunTreeGroup(tree.GetTree(group.p_id, false), group));
-            if (bChanged) m_memoryTool.MemoryChanged();
+            foreach (MemoryGroup group in p_aGroup) RunTreeGroup(tree.GetTree(group.p_id, false), group);
+            if (tree.IsUpdated()) m_memoryTool.MemoryChanged(true);
         }
 
-        bool RunTreeGroup(Tree tree, MemoryGroup group)
+        void RunTreeGroup(Tree tree, MemoryGroup group)
         {
-            bool bChanged = false; 
-            foreach (MemoryData memory in group.p_aMemory) bChanged = (bChanged || memory.RunTree(tree.GetTree(memory.p_id, false), true));
-            return bChanged; 
+            foreach (MemoryData memory in group.p_aMemory) memory.RunTree(tree.GetTree(memory.p_id, false), true);
         }
         #endregion
 
         public string p_id { get; set; }
         public Log m_log;
         MemoryMappedFile m_MMF = null;
-        public MemoryTool m_memoryTool; 
+        public MemoryTool m_memoryTool;
+        public MemoryViewer m_viewer; 
         public MemoryPool(string id, MemoryTool memoryTool)
         {
             p_aGroup = new ObservableCollection<MemoryGroup>(); 
             p_id = id;
             m_memoryTool = memoryTool; 
             m_log = memoryTool.m_log;
+            m_viewer = new MemoryViewer(id, this, m_log);
         }
 
         public void ThreadStop()

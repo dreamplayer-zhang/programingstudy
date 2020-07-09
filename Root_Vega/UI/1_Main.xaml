@@ -420,10 +420,8 @@
                         Margin="0,0,0,10"
                         Click="buttonRecovery_Click"/>
             </StackPanel>
-            <Button Content="OHT"
-                    VerticalAlignment="Bottom"
-                        Style="{StaticResource BasicBtn}"
-                        Margin="0,0,15,30"/>
+            <Button x:Name="buttonOHT" Content="OHT" VerticalAlignment="Bottom" Style="{StaticResource BasicBtn}" 
+                    Margin="0,0,15,30" Click="buttonOHT_Click"/>
 
         </Grid>
     </Grid>

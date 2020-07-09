@@ -7,6 +7,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System;
+using System.Security.RightsManagement;
+using System.Threading.Tasks;
 
 namespace RootTools.Inspects
 {
@@ -14,17 +16,11 @@ namespace RootTools.Inspects
 	{
 		#region EventHandler
 		/// <summary>
-		/// 이벤트 핸들러
-		/// </summary>
-		public delegate void EventHandler(int nDCode);
-		public EventHandler InspectionStart;
-		public EventHandler InspectionComplete;
-		/// <summary>
 		/// Defect 정보 변경 시 사용할 Event Handler
 		/// </summary>
-		/// <param name="source">Defect List</param>
+		/// <param name="item">Defect Information</param>
 		/// <param name="args">arguments. 필요한 경우 수정해서 사용</param>
-		public delegate void ChangeDefectInfoEventHanlder(DefectDataWrapper[] source, int nDCode);
+		public delegate void ChangeDefectInfoEventHanlder(DefectDataWrapper item);
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
@@ -37,20 +33,12 @@ namespace RootTools.Inspects
 		int nThreadNum = 10;
 		int nInspectionCount = 0;
 
-		int m_nDefectCode;
-
-		int m_nMemWidth;
-		int m_nMemHeight;
-
 		bool m_bProgress;
 
 		public bool IsInitialized { get; private set; }
 
-		public void StartInspection(int nDefectCode, int nMemWidth, int nMemHegiht)
+		public void StartInspection()
 		{
-			m_nDefectCode = nDefectCode;
-			m_nMemWidth = nMemWidth;
-			m_nMemHeight = nMemHegiht;
 			m_bProgress = false;
 			nInspectionCount = 0;
 
@@ -82,16 +70,16 @@ namespace RootTools.Inspects
 			int nInspDoneNum = 0;
 			InsepctionThread = new Inspection[nThreadNum];
 
-			if (InspectionStart != null)
+			Parallel.For(0, nThreadNum, i =>
 			{
-				InspectionStart(m_nDefectCode);//DB Write 준비 시작
-			}
-
-			for (int i = 0; i < nThreadNum; i++)
-			{
-				InsepctionThread[i] = new Inspection(m_nMemWidth, m_nMemHeight, m_nDefectCode, nThreadNum);
+				InsepctionThread[i] = new Inspection(nThreadNum);
 				InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
-			}
+			});
+			//for (int i = 0; i < nThreadNum; i++)
+			//{
+			//	InsepctionThread[i] = new Inspection(nThreadNum);
+			//	InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
+			//}
 
 			m_bProgress = true;
 
@@ -138,39 +126,21 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="source">DefectData array</param>
 		/// <param name="args">추후 arguments가 필요하면 사용할것</param>
-		private void InspectionManager_AddDefect(DefectDataWrapper[] source, int nDCode)
+		private void InspectionManager_AddDefect(DefectDataWrapper item)
 		{
-			#region DEBUG
-
-#if DEBUG
-			foreach (DefectData data in source)
-			{
-				StringBuilder stbr = new StringBuilder();
-				stbr.Append(data.nIdx);
-				stbr.Append(",");
-				stbr.Append(data.fAreaSize);
-				stbr.Append(",");
-				stbr.Append(data.fPosX);
-				stbr.Append(",");
-				stbr.Append(data.fPosY);
-				System.Diagnostics.Debug.WriteLine(stbr.ToString());
-			}
-#endif
-			#endregion
-
 			if (AddDefect != null)
 			{
-				AddDefect(source, nDCode);
+				AddDefect(item);
 			}
 		}
 
 		public void InspectionDone()
 		{
-			//TODO : 해당 Queue로 들어온 검사가 완전 종료되었을때 발동. 여기서 DB를 닫으면 될 것으로 보임
-			if (InspectionComplete != null)
-			{
-				InspectionComplete(m_nDefectCode);
-			}
+			////TODO : 해당 Queue로 들어온 검사가 완전 종료되었을때 발동. 여기서 DB를 닫으면 될 것으로 보임
+			//if (InspectionComplete != null)
+			//{
+			//	InspectionComplete();
+			//}
 		}
 		public void Dispose()
 		{
@@ -211,17 +181,15 @@ namespace RootTools.Inspects
 			p_qInspection.Clear();
 		}
 		/// <summary>
-		/// nStart와 nStop은 테스트용으로 만든 argument이므로 테스트 종료후에는 정리합시다
+		/// 
 		/// </summary>
 		/// <param name="WholeInspArea"></param>
 		/// <param name="blocksize"></param>
 		/// <param name="param"></param>
 		/// <param name="bDefectMerge"></param>
 		/// <param name="nMergeDistance"></param>
-		/// <param name="nStart"></param>
-		/// <param name="nStop"></param>
 		/// <returns></returns>
-		public List<CRect> CreateInspArea(CRect WholeInspArea, int blocksize, StripParamData param, bool bDefectMerge, int nMergeDistance, int nStart = -1, int nStop = -1)
+		public List<CRect> CreateInspArea(string poolName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int dCode, bool bDefectMerge, int nMergeDistance)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -244,11 +212,11 @@ namespace RootTools.Inspects
 			int wStart = 0;
 			int wStop = iw;
 
-			if (nStart != -1 && nStop != -1)//검사영역을 제한하는 기능
-			{
-				wStart = nStart;
-				wStop = nStop;
-			}
+			//if (nStart != -1 && nStop != -1)//검사영역을 제한하는 기능
+			//{
+			//	wStart = nStart;
+			//	wStop = nStop;
+			//}
 
 			if (wStop == 0 || ih == 0)
 			{
@@ -273,12 +241,25 @@ namespace RootTools.Inspects
 						else ey = AreaEndY;
 
 						InspectionProperty ip = new InspectionProperty();
-						ip.p_InspType = RootTools.Inspects.InspectionType.Strip;
+						ip.p_InspType = GetInspectionType(dCode);
+						ip.m_nDefectCode = dCode;
+						ip.p_index = blockcount;
+						ip.MemoryPoolName = poolName;
+						ip.MemoryOffset = memOffset;
+						ip.p_TargetMemWidth = memWidth;
+						ip.p_TargetMemHeight = memHeight;
 
 						CRect inspblock = new CRect(sx, sy, ex, ey);
 						ip.p_Rect = inspblock;
-						ip.p_StripParam = param;
-						ip.p_index = blockcount;
+						if (ip.p_InspType == InspectionType.Strip)
+						{
+							ip.p_StripParam = (StripParamData)param;
+						}
+						else if (ip.p_InspType == InspectionType.AbsoluteSurface || ip.p_InspType == InspectionType.AbsoluteSurface)
+						{
+							ip.p_surfaceParam = (SurfaceParamData)param;
+						}
+
 						AddInspection(ip, bDefectMerge, nMergeDistance);
 						blockcount++;
 
@@ -380,6 +361,24 @@ namespace RootTools.Inspects
 				SetProperty(ref InspType, value);
 			}
 		}
+		int targetMemWidth;
+		public int p_TargetMemWidth
+		{
+			get { return this.targetMemWidth; }
+			set
+			{
+				SetProperty(ref targetMemWidth, value);
+			}
+		}
+		int targetMemHeight;
+		public int p_TargetMemHeight
+		{
+			get { return this.targetMemHeight; }
+			set
+			{
+				SetProperty(ref targetMemHeight, value);
+			}
+		}
 		CRect Rect;
 		public CRect p_Rect
 		{
@@ -453,5 +452,12 @@ namespace RootTools.Inspects
 				SetProperty(ref index, value);
 			}
 		}
+		public string MemoryPoolName { get; set; }
+		public ulong MemoryOffset { get; set; }
+	}
+	public class MemInfo
+	{
+
+
 	}
 }

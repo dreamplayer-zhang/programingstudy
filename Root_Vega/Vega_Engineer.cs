@@ -7,6 +7,7 @@ using RootTools.Inspects;
 using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
+using RootTools.Control;
 
 namespace Root_Vega
 {
@@ -17,6 +18,8 @@ namespace Root_Vega
         public Login.User p_user {  get { return m_login.p_user; } }
 
         public IGem ClassGem() { return m_xGem; }
+
+        public IControl ClassControl() { return m_ajin; }
 
         public GAF m_gaf = new GAF();
         public GAF ClassGAF() { return m_gaf; }
@@ -35,10 +38,10 @@ namespace Root_Vega
             MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool, false);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
         }
-        #endregion
+		#endregion
 
-        #region Ajin
-        public Ajin m_ajin = new Ajin();
+		#region Ajin
+		public Ajin m_ajin = new Ajin();
         Ajin_UI m_ajinUI = new Ajin_UI();
         void InitAjin()
         {
@@ -46,7 +49,6 @@ namespace Root_Vega
             m_ajinUI.Init(m_ajin);
             m_toolBox.AddToolSet(m_ajin, m_ajinUI);
             m_toolBox.m_toolDIO = m_ajin.m_dio;
-            m_toolBox.m_toolAxis = m_ajin.m_listAxis.m_aAxis;
         }
         #endregion
 
@@ -85,5 +87,6 @@ namespace Root_Vega
             m_login.ThreadStop();
             LogView.ThreadStop();
         }
+
     }
 }

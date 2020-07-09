@@ -1,8 +1,12 @@
-﻿using RootTools;
+﻿using Emgu.CV;
+using Emgu.CV.Cvb;
+using Emgu.CV.Structure;
+using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
+using RootTools.Control.Ajin;
 using RootTools.Inspects;
 using RootTools.Light;
 using RootTools.Memory;
@@ -13,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
+using System.Windows;
 using System.Windows.Media;
 
 namespace Root_Vega.Module
@@ -36,14 +41,49 @@ namespace Root_Vega.Module
                 return m_axisZ;
             }
         }
+
+        Axis m_axisClamp;
+        public Axis p_axisClamp
+        {
+            get
+            {
+                return m_axisClamp;
+            }
+        }
+
         public Camera_Dalsa m_CamMain;
         public Camera_Basler m_CamVRS;
         public Camera_Basler m_CamAlign1;
         public Camera_Basler m_CamAlign2;
         public Camera_Basler m_CamRADS;
 
+        #region Light
         public LightSet m_lightSet;
+        public int GetLightByName(string str)
+        {
+            for (int i = 0; i < m_lightSet.m_aLight.Count; i++)
+            {
+                if (m_lightSet.m_aLight[i].m_sName.IndexOf(str) >= 0)
+                {
+                    return Convert.ToInt32(m_lightSet.m_aLight[i].p_fPower);
+                }
+            }
+            return 0;
+        }
+        public void SetLightByName(string str, int nValue)
+        {
+            for (int i = 0; i < m_lightSet.m_aLight.Count; i++)
+            {
+                if (m_lightSet.m_aLight[i].m_sName.IndexOf(str) >= 0)
+                {
+                    m_lightSet.m_aLight[i].m_light.p_fSetPower = nValue;
+                }
+            }
+        }
+        #endregion
+
         MemoryPool m_memoryPool;
+        MemoryData m_memoryMain;
         InspectTool m_inspectTool;
         ZoomLens m_ZoomLens;
         public ZoomLens p_ZoomLens;
@@ -51,6 +91,7 @@ namespace Root_Vega.Module
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
+            p_sInfo = m_toolBox.Get(ref m_axisClamp, this, "StageClamp");
             p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_CamAlign1, this, "Align1");
@@ -71,6 +112,7 @@ namespace Root_Vega.Module
         public override void InitMemorys()
         {
             //forget
+            m_memoryMain = m_memoryPool.GetGroup("PatternVision").CreateMemory("Main", 1, 1, 1000, 1000);
         }
         #endregion
 
@@ -120,6 +162,53 @@ namespace Root_Vega.Module
         }
         #endregion
 
+        #region Axis Function
+        public enum eAxisPosZ
+        {
+            Safety,
+            Grab,
+            Ready,
+            Align,
+        }
+
+        public enum eAxisPosX
+        {
+            Safety,
+            Grab,
+            Ready,
+            Align,
+        }
+
+        public enum eAxisPosY
+        {
+            Safety,
+            Grab,
+            Ready,
+            Align,
+        }
+
+        public enum eAxisPosClamp
+        {
+            Home,
+            Open,
+        }
+
+        void InitPosAlign()
+        {
+            m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPosZ)));
+            m_axisClamp.AddPos(Enum.GetNames(typeof(eAxisPosClamp)));
+
+            if(m_axisXY.p_axisX != null)
+            {
+                ((AjinAxis)m_axisXY.p_axisX).AddPos(Enum.GetNames(typeof(eAxisPosX)));
+            }
+            if(m_axisXY.p_axisY != null)
+            {
+                ((AjinAxis)m_axisXY.p_axisY).AddPos(Enum.GetNames(typeof(eAxisPosY)));
+            }
+        }
+        #endregion
+
         #region IRobotChild
         bool _bLock = false;
         public bool p_bLock
@@ -160,23 +249,146 @@ namespace Root_Vega.Module
 
         public string BeforeGet()
         {
+            // Clamp축 Home
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.WaitReady())) return p_sInfo;
+            if (m_axisClamp.p_sensorHome == false)   // 인터락 추가
+            {
+                p_sInfo = "Clamp Home이 완료되지 않았습니다.";
+                return p_sInfo;
+            }
+
+            // 레티클 유무체크 촬영위치 이동
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Align))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(m_axisZ.StartMove(eAxisPosZ.Align))) return p_sInfo;
+            if (Run(m_axisZ.WaitReady())) return p_sInfo;
+
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Align))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            // 조명 켜기
+            string strLightName = "VRS";
+            int nLightPower = GetLightByName(strLightName);
+            SetLightByName(strLightName, nLightPower);
+
+            // 레티클 유무체크
+            m_CamAlign1.GrabOneShot();
+            m_CamAlign2.GrabOneShot();
+            bool bRet = ReticleExistCheck(m_CamAlign1);
+            if (bRet == false) return "Reticle Not Exist";
+            bRet = ReticleExistCheck(m_CamAlign2);
+            if (bRet == false) return "Reticle Not Exist";
+
+            // 조명 끄기
+            SetLightByName(strLightName, 0);
+
+            // 모든 축 Ready 위치로 이동
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Ready))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
+            if (Run(m_axisZ.WaitReady())) return p_sInfo;
+
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Ready))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            // Clamp 축 열기
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Open))) return p_sInfo;
+            if (Run(m_axisClamp.WaitReady())) return p_sInfo;
+
             if (p_infoReticle == null) return p_id + " BeforeGet : InfoReticle = null";
             return CheckGetPut();
         }
 
         public string BeforePut()
         {
+            // Clamp축 Home
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.WaitReady())) return p_sInfo;
+            if (m_axisClamp.p_sensorHome == false)
+            {
+                p_sInfo = "Clamp축 Home 완료되지 않았습니다.";
+                return p_sInfo;
+            }
+
+            // 레티클 유무체크 촬영위치 이동
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Align))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(m_axisZ.StartMove(eAxisPosZ.Align))) return p_sInfo;
+            if (Run(m_axisZ.WaitReady())) return p_sInfo;
+
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Align))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            // 조명 켜기
+            string strLightName = "VRS";
+            int nLightPower = GetLightByName(strLightName);
+            SetLightByName(strLightName, nLightPower);
+
+            // 레티클 유무체크
+            m_CamAlign1.Grab();
+            m_CamAlign2.Grab();
+            bool bRet = ReticleExistCheck(m_CamAlign1);
+            if (bRet == true) return "Reticle Exist";
+            bRet = ReticleExistCheck(m_CamAlign2);
+            if (bRet == true) return "Reticle Exist";
+
+            // 조명 끄기
+            SetLightByName(strLightName, 0);
+
+            // 모든 축 Ready 위치로 이동
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Ready))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
+            if (Run(m_axisZ.WaitReady())) return p_sInfo;
+
+            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Ready))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            // Clamp 축 열기
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Open))) return p_sInfo;
+            if (Run(m_axisClamp.WaitReady())) return p_sInfo;
+            if (m_axisClamp.p_sensorHome == true)
+            {
+                p_sInfo = "Clamp가 열리지 않았습니다.";
+                return p_sInfo;
+            }
+
             if (p_infoReticle != null) return p_id + " BeforePut : InfoReticle != null";
             return CheckGetPut();
         }
 
         public string AfterGet()
         {
+            // Clamp축 Home
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.WaitReady())) return p_sInfo;
+
             return CheckGetPut();
         }
 
         public string AfterPut()
         {
+            // Clamp Home
+            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.WaitReady())) return p_sInfo;
+
             return CheckGetPut();
         }
 
@@ -197,6 +409,49 @@ namespace Root_Vega.Module
             }
             p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
             return bExist;
+        }
+
+        bool ReticleExistCheck(Camera_Basler cam)
+        {
+            // variable
+            ImageData img = cam.p_ImageViewer.p_ImageData;
+            Point pt1, pt2;
+            Rect rcROI;
+            bool bFindReticle = false;
+            Mat matSrc;
+            Mat matBinary;
+            CvBlobs blobs;
+            CvBlobDetector blobDetector;
+            Image<Gray, Byte> imgSrc;
+
+            // implement
+            if (cam.p_ImageViewer.m_BasicTool.m_ListRect.Count < 1) return false; // ROI 없으면 return
+            pt1 = cam.p_ImageViewer.m_BasicTool.m_ListRect[0].StartPos;
+            pt2 = cam.p_ImageViewer.m_BasicTool.m_ListRect[0].EndPos;
+            rcROI = new Rect(pt1, pt2);
+
+            // Binarization
+            matSrc = new Mat((int)rcROI.Height, (int)rcROI.Width, Emgu.CV.CvEnum.DepthType.Cv8U, img.p_nByte, img.GetPtr((int)rcROI.Top, (int)rcROI.Left), (int)img.p_Stride);
+            matBinary = new Mat();
+            CvInvoke.Threshold(matSrc, matBinary, /*p_nThreshold*/200, 255, Emgu.CV.CvEnum.ThresholdType.Binary);
+
+            // Blob Detection
+            blobs = new CvBlobs();
+            blobDetector = new CvBlobDetector();
+            imgSrc = matBinary.ToImage<Gray, Byte>();
+            blobDetector.Detect(imgSrc, blobs);
+
+            // Bounding Box
+            foreach (CvBlob blob in blobs.Values)
+            {
+                if (blob.BoundingBox.Width == rcROI.Width)
+                {
+                    bFindReticle = true;
+                    break;
+                }
+            }
+
+            return bFindReticle;
         }
 
         Brush _brushReticleExist = Brushes.Green;
@@ -268,9 +523,74 @@ namespace Root_Vega.Module
         }
         #endregion
 
+        #region RelayCommand
+        void Jog_Plus_Fast()
+        {
+            if (p_axisClamp.p_sensorHome == false) return;
+            p_axisClamp.Jog(1); 
+        }
+        void Jog_Minus_Fast()
+        {
+            if (p_axisClamp.p_sensorHome == false) return;
+            p_axisClamp.Jog(-1);
+        }
+        void MovePosition()
+        {
+            if (p_axisClamp.p_sensorHome == false) return;
+            //            ((AjinAxis)p_axisXY.p_axisY).MovePosition();
+        }
+        void PlusRelativeMove()
+        {
+            if (p_axisClamp.p_sensorHome == false) return;
+            //            ((AjinAxis)p_axisXY.p_axisY).PlusRelativeMove();
+        }
+        void MinusRelativeMove()
+        {
+            if (p_axisClamp.p_sensorHome == false) return;
+            //            ((AjinAxis)p_axisXY.p_axisY).MinusRelativeMove();
+        }
+
+        public RelayCommand PJogFastCommand
+        {
+            get
+            {
+                return new RelayCommand(Jog_Plus_Fast);
+            }
+        }
+        public RelayCommand MJogFastCommand
+        {
+            get
+            {
+                return new RelayCommand(Jog_Minus_Fast);
+            }
+        }
+        public RelayCommand MoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MovePosition);
+            }
+        }
+        public RelayCommand PlusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(PlusRelativeMove);
+            }
+        }
+        public RelayCommand MinusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MinusRelativeMove);
+            }
+        }
+        #endregion
+
         public PatternVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
+            InitPosAlign();
         }
 
         public override void ThreadStop()
@@ -462,9 +782,9 @@ namespace Root_Vega.Module
                         //m_grabMode.SetLight(true);
                         double nPosX = m_rpAxis.X + nLines * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * XScal; //해상도추가필요
 
-                        if (m_module.Run(axisZ.Move(m_nFocusPos)))
+                        if (m_module.Run(axisZ.StartMove(m_nFocusPos)))
                             return p_sInfo;
-                        if (m_module.Run(axisXY.Move(new RPoint(nPosX, yPos0))))
+                        if (m_module.Run(axisXY.StartMove(new RPoint(nPosX, yPos0))))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
@@ -475,20 +795,19 @@ namespace Root_Vega.Module
                         double yTrigger1 = m_rpAxis.Y + yAxis / 2;
                         m_module.p_axisXY.p_axisY.SetTrigger(yTrigger0 - 100000, yTrigger1, m_grabMode.m_dTrigger, true);
 
-                        /* 메모리 위치도 가져오게는 좀 다시 하자.*/
-                        string sPool = "pool";
-                        string sGroup = "group";
-                        string sMem = "mem";
+                        string sPool = m_grabMode.m_memoryPool.p_id;
+                        string sGroup = m_grabMode.m_memoryGroup.p_id;
+                        string sMem = m_grabMode.m_memoryData.p_id;
                         MemoryData mem = m_module.m_engineer.GetMemory(sPool, sGroup, sMem);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
 
                         /* 방향 바꾸는 코드 들어가야함*/
                         m_grabMode.StartGrab(mem, m_cpMemory, nLines, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
-                        if (m_module.Run(axisXY.p_axisY.Move(yPos1, nScanSpeed)))
+                        if (m_module.Run(axisXY.p_axisY.StartMove(yPos1, nScanSpeed)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                        axisXY.p_axisY.ResetTrigger();
+                        axisXY.p_axisY.RunTrigger(false);
 
                         nScanLine++;
                         m_cpMemory.X += m_grabMode.m_camera.GetRoiSize().X;

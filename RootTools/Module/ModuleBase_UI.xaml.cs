@@ -1,5 +1,6 @@
 ﻿using RootTools.Control;
 using RootTools.Trees;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -47,20 +48,28 @@ namespace RootTools.Module
         }
 
         int m_minTabControl = 0;
+        List<string> m_asAxis = new List<string>(); 
         void InitTabControl()
         {
             while (tabControlTools.Items.Count > m_minTabControl) tabControlTools.Items.RemoveAt(m_minTabControl);
-            foreach (IAxis axis in m_module.m_listAxis)
+            tabAxis.Items.Clear();
+            m_asAxis.Clear(); 
+            comboAxis.ItemsSource = null; 
+            foreach (Axis axis in m_module.m_listAxis)
             {
                 if (axis != null)
                 {
                     TabItem tabItem = new TabItem();
-                    tabItem.Header = axis.p_sID.Replace(m_module.p_id + ".", "");
+                    tabItem.Header = axis.p_id.Replace(m_module.p_id + ".", "");
+                    tabItem.Height = 0; 
                     tabItem.Content = axis.p_ui;
                     tabItem.Background = Brushes.DarkSalmon;
-                    tabControlTools.Items.Add(tabItem);
+                    tabAxis.Items.Add(tabItem);
+                    m_asAxis.Add(axis.p_id.Replace(m_module.p_id + ".", "")); 
                 }
             }
+            comboAxis.ItemsSource = m_asAxis;
+            comboAxis.SelectedIndex = 0; 
             foreach (ITool tool in m_module.m_aTool)
             {
                 if (tool != null)
@@ -94,6 +103,12 @@ namespace RootTools.Module
         private void ButtonHome_Click(object sender, RoutedEventArgs e)
         {
             m_module.ButtonHome();
+        }
+
+        private void comboAxis_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (comboAxis.SelectedIndex < 0) return;
+            tabAxis.SelectedIndex = comboAxis.SelectedIndex;
         }
     }
 }

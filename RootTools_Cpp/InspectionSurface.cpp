@@ -11,7 +11,7 @@ void CInspectionSurface::SetParams(byte* buffer, int bufferwidth, int bufferheig
 	SetDefectSize(defectSize);
 	SetIsDarkInspection(bDarkInspection);
 }
-std::vector<DefectDataStruct> CInspectionSurface::SurfaceInspection(bool bAbsolute)
+std::vector<DefectDataStruct> CInspectionSurface::SurfaceInspection(bool bAbsolute, int nClassifyCode)
 {
 	std::vector<DefectDataStruct> vResult;
 
@@ -86,7 +86,9 @@ std::vector<DefectDataStruct> CInspectionSurface::SurfaceInspection(bool bAbsolu
 					rt = GetPitsizer()->GetPitRect();
 					if (Functions::GetWidth(rt) >= GetDefectSize() || Functions::GetHeight(rt) >= GetDefectSize())
 					{
-						vResult.push_back(GetDefectData(rt, ptDefectPos, ret));
+						DefectDataStruct tempData = GetDefectData(rt, ptDefectPos, ret);
+						tempData.nClassifyCode = nClassifyCode;
+						vResult.push_back(tempData);
 						bInspResult = true;
 					}
 				}
@@ -94,7 +96,9 @@ std::vector<DefectDataStruct> CInspectionSurface::SurfaceInspection(bool bAbsolu
 				{
 					rt = GetPitsizer()->GetPitRect();
 
-					vResult.push_back(GetDefectData(rt, ptDefectPos, ret));
+					DefectDataStruct tempData = GetDefectData(rt, ptDefectPos, ret);
+					tempData.nClassifyCode = nClassifyCode;
+					vResult.push_back(tempData);
 					bInspResult = true;
 				}
 			}

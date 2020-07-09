@@ -23,9 +23,13 @@ namespace RootTools.Memory
             get { return _nCount; }
             set
             {
-                _nCount = value;
-                OnPropertyChanged();
-                m_group.InitAddress();
+                if (_nCount != value)
+                {
+                    _nCount = value;
+                    OnPropertyChanged();
+                    m_group.InitAddress();
+                }
+                while (m_aDraw.Count < value) m_aDraw.Add(new MemoryDraw(this)); 
             }
         }
 
@@ -35,10 +39,13 @@ namespace RootTools.Memory
             get { return _nByte; }
             set
             {
-                _nByte = value;
-                OnPropertyChanged();
-                OnPropertyChanged("p_sSize");
-                m_group.InitAddress();
+                if (_nByte != value)
+                {
+                    _nByte = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("p_sSize");
+                    m_group.InitAddress();
+                }
             }
         }
 
@@ -48,10 +55,13 @@ namespace RootTools.Memory
             get { return _sz; }
             set
             {
-                _sz = value;
-                OnPropertyChanged();
-                OnPropertyChanged("p_sSize");
-                m_group.InitAddress();
+                if (_sz != value)
+                {
+                    _sz = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged("p_sSize");
+                    m_group.InitAddress();
+                }
             }
         }
 
@@ -140,7 +150,10 @@ namespace RootTools.Memory
             catch (Exception e) { m_log.Error(e, "Create Buffer Memory Error"); }
             mbOffset += (int)Math.Ceiling(p_nCount * p_lSize / c_fMB);
         }
-
+		public ulong GetMBOffset()
+		{
+            return (ulong)Math.Ceiling(p_mbOffset * c_fMB);
+        }
         string CheckParamOK()
         {
             if (p_nCount < 1) return "p_nCount = " + p_nCount.ToString();
@@ -443,21 +456,16 @@ namespace RootTools.Memory
         #endregion
 
         #region Tree
-        public bool RunTree(Tree tree, bool bVisible)
+        public void RunTree(Tree tree, bool bVisible)
         {
-            int nCount = p_nCount;
-            int nByte = p_nByte;
-            CPoint sz = new CPoint(p_sz); 
             p_nCount = tree.Set(p_nCount, p_nCount, "Count", "Memory Count", bVisible);
             p_nByte = tree.Set(p_nByte, p_nByte, "Byte", "Memory Depth Byte (byte)", bVisible);
             p_sz = tree.Set(p_sz, p_sz, "Size", "Memory Size", bVisible);
-            if (nCount != p_nCount) return true;
-            if (nByte != p_nByte) return true;
-            return sz != p_sz; 
         }
         #endregion
 
         public MemoryGroup m_group;
+        public List<MemoryDraw> m_aDraw = new List<MemoryDraw>(); 
         Log m_log;
         public MemoryData(MemoryGroup group, string id, int nCount, int nByte, int xSize, int ySize, ref int gbOffset)
         {

@@ -10,517 +10,250 @@
              mc:Ignorable="d" d:DesignHeight="649.328"
         d:DesignWidth="386.254">
     <UserControl.Resources>
-        <converter:TabSizeConverter x:Key="tabSizeConverter" />
-        <converter:DictionaryItemConverter x:Key="DictionaryItemConverters" />
-        <converter:DictionaryItemKeysConverter x:Key="DictionaryItemKeysConverters" />
-        <local:DictionaryItemValueCanvasConverter x:Key="DictionaryItemValueCanvasConverters" />
-        <local:ColorToBoolConverter x:Key="ColorToBoolConverters" />
-        <local:ColorToBoolConverterRed x:Key="ColorToBoolConverterReds" />
-        <LinearGradientBrush x:Key="TabitemBackground" StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#FF3C3C3C" Offset="0" />
-            <GradientStop Color="#FF6E6E6E" Offset="1" />
-        </LinearGradientBrush>
-        <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="VerticalAlignment" Value="Center"></Setter>
-        </Style>
-        <Style TargetType="{x:Type TextBox}">
-            <Setter Property="VerticalAlignment" Value="Center"></Setter>
-        </Style>
-        <Style TargetType="{x:Type TabItem}">
-            <Setter Property="Background" Value="{StaticResource  TabitemBackground}"></Setter>
-            <Setter Property="Width">
-                <Setter.Value>
-                    <MultiBinding Converter="{StaticResource tabSizeConverter}">
-                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-            AncestorType={x:Type TabControl}}" />
-                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-            AncestorType={x:Type TabControl}}" Path="ActualWidth" />
-                    </MultiBinding>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="TextElement.Foreground">
-                        <Setter.Value>
-                            <SolidColorBrush Color="Black" />
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-                <Trigger Property="Selector.IsSelected" Value="False">
-                    <Setter Property="Foreground" Value="White"></Setter>
-                    <Setter Property="TextElement.Foreground">
-                        <Setter.Value>
-                            <SolidColorBrush Color="White" />
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <Style TargetType="{x:Type Button}" x:Key="StatusButton">
-            <Setter Property="Height" Value="30"></Setter>
-            <Setter Property="Width" Value="30"></Setter>
-            <Setter Property="BorderThickness" Value="0"></Setter>
-            <Setter Property="Background" Value="{PriorityBinding}"></Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid Background="Transparent" Name="grd" Grid.Column="1" Margin="{TemplateBinding Padding}" VerticalAlignment="Stretch"
-                                    Width="{Binding Path=ActualHeight, Mode=OneWay, RelativeSource={RelativeSource Self}}">
-                                <Ellipse x:Name="ellipse" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="2" Stretch="Uniform" Fill="{TemplateBinding  Background}"></Ellipse>
-                            </Grid>
-                            <ContentPresenter x:Name="content" Grid.Column="0" RecognizesAccessKey="True" TextElement.FontSize="10" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="{x:Type ToggleButton}">
-            <Setter Property="Height" Value="30"></Setter>
-            <Setter Property="Width" Value="30"></Setter>
-            <Setter Property="BorderThickness" Value="0"></Setter>
-            <Setter Property="Background" Value="{PriorityBinding}"></Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid Background="Transparent" Name="grd" Grid.Column="1" Margin="{TemplateBinding Padding}" VerticalAlignment="Stretch"
-                                    Width="{Binding Path=ActualHeight, Mode=OneWay, RelativeSource={RelativeSource Self}}">
-                                <Ellipse x:Name="ellipse" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="2" Stretch="Uniform" Fill="{TemplateBinding  Background}"></Ellipse>
-                            </Grid>
-                            <ContentPresenter x:Name="content" Grid.Column="0" RecognizesAccessKey="True" TextElement.FontSize="10" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="ellipse" Property="Fill" Value="#FFBBBBBB" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <Style TargetType="Button">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="Beige"/>
         </Style>
     </UserControl.Resources>
-    <TabControl>
-        <TabItem>
-            <TabItem.Header>
-                <WrapPanel>
-                    <marterial:PackIcon Kind="Car"></marterial:PackIcon>
-                    <TextBlock Text="Motion"></TextBlock>
-                </WrapPanel>
-            </TabItem.Header>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0" BorderBrush="Black" BorderThickness="1">
+            <GroupBox.Header>
+                <TextBlock Text="Status" Foreground="Black" FontWeight="Bold" />
+            </GroupBox.Header>
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="6*"></RowDefinition>
-                    <RowDefinition Height="5*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1*"></RowDefinition>
-                        <RowDefinition Height="10*"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="30"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <!--<Button Margin="5" Grid.Column="1" Content="Stop"></Button>-->
-                    </Grid>
-                    <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Run Text="Axis State : "></Run>
-                        <Run Text="{Binding p_eState}"></Run></TextBlock>
-                    <TabControl Margin="2" Grid.Row="1">
-                        <TabItem Height="30">
-                            <TabItem.Header>
-                                <StackPanel Orientation="Horizontal" Width="Auto">
-                                    <TextBlock Text="Home" VerticalAlignment="Center"></TextBlock>
-                                </StackPanel>
-                            </TabItem.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="6*"></ColumnDefinition>
-                                    <ColumnDefinition Width="4*"></ColumnDefinition>
-                                    <ColumnDefinition Width="30"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <Run Text="Velocity - First : "></Run>
-                                    <Run Text="{Binding p_aSpeed, UpdateSourceTrigger=PropertyChanged,
-                                        Converter={StaticResource DictionaryItemConverters}, 
-                                        ConverterParameter=HomeStart}" />
-                                        <Run Text="um/s"></Run></TextBlock>
-                                    <TextBlock VerticalAlignment="Center" Grid.Row="1" HorizontalAlignment="Center">
-                                        <Run Text="Velocity - Second : "></Run>
-                                    <Run Text="{Binding p_aSpeed, UpdateSourceTrigger=PropertyChanged,
-                                        Converter={StaticResource DictionaryItemConverters}, 
-                                        ConverterParameter=HomeEnd}" />
-                                        <Run Text="um/s"></Run></TextBlock>
-                                    <TextBlock VerticalAlignment="Center" Grid.Row="2" HorizontalAlignment="Center"></TextBlock>
-                                </Grid>
-                                <Grid Grid.Column="1">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition></RowDefinition>
-                                        <RowDefinition></RowDefinition>
-                                    </Grid.RowDefinitions>
-                                    <Button Grid.Row="0" Content="home" Margin="5" Command="{Binding HomeClickCommand}"></Button>
-                                    <Button Grid.Row="1" Content="Stop" Margin="5" Command="{Binding EStopCommand}" Height="31" VerticalAlignment="Bottom"></Button>
-                                </Grid>
-                                <ProgressBar Grid.Column="2" Margin="5" Orientation="Vertical" Value="{Binding p_prgHome}" />
-                            </Grid>
-                        </TabItem>
-                        <TabItem>
-                            <TabItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Jog" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </TabItem.Header>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
-                                </Grid.RowDefinitions>
-                                <Grid>
-                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <Run Text="Jog Speed : "></Run>
-                                    <Run Text="{Binding p_aSpeed, UpdateSourceTrigger=PropertyChanged,
-                                        Converter={StaticResource DictionaryItemConverters}, 
-                                        ConverterParameter=JogMove}" />
-                                        <Run Text=" um/s"></Run></TextBlock>
-                                </Grid>
-                                <Grid Grid.Row="1">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition></ColumnDefinition>
-                                            <ColumnDefinition></ColumnDefinition>
-                                            <ColumnDefinition></ColumnDefinition>
-                                            <ColumnDefinition></ColumnDefinition>
-                                            <ColumnDefinition></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <RepeatButton Grid.Column="0" Content="--" Margin="5" Command="{Binding MJogFastCommand}" Interval="100" Delay="100"/>
-                                        <RepeatButton Grid.Column="1" Content="-" Margin="5" Command="{Binding MJogSlowCommand}" Interval="100" Delay="100"/>
-                                        <Button Grid.Column="2" Content="Stop" Margin="5" Command="{Binding EStopCommand}"/>
-                                        <RepeatButton Grid.Column="3" Content="+" Margin="5" Command="{Binding PJogSlowCommand}" Interval="100" Delay="100"/>
-                                        <RepeatButton Grid.Column="4" Content="++" Margin="5" Command="{Binding PJogFastCommand}" Interval="100" Delay="100"/>
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </TabItem>
-                        <TabItem>
-                            <TabItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Move"></TextBlock>
-                                </StackPanel>
-                            </TabItem.Header>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
-                                </Grid.RowDefinitions>
-                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <Run Text="Move Speed : "></Run>
-                                <Run Text="{Binding p_aSpeed, UpdateSourceTrigger=PropertyChanged,
-                                        Converter={StaticResource DictionaryItemConverters}, 
-                                        ConverterParameter=Move}" />
-                                        <Run Text=" um/s"></Run></TextBlock>
-                                <Grid Grid.Row="1">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <Run Text="Rel."></Run>
-                                        <LineBreak></LineBreak>
-                                        <Run Text="Move"></Run></TextBlock>
-                                    <Button Grid.Column="1" Content="-" Margin="5"
-                                            Command="{Binding MinusRelativeMoveCommand}"></Button>
-                                    <TextBox Grid.Column="2" Margin="5"
-                                             Text="{Binding p_dRelPos}"></TextBox>
-                                    <Button Grid.Column="3" Content="+" Margin="5"
-                                            Command="{Binding PlusRelativeMoveCommand}"></Button>
-                                </Grid>
-                                <Grid Grid.Row="2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <Run Text="Abs."></Run>
-                                        <LineBreak></LineBreak>
-                                        <Run Text="Move"></Run></TextBlock>
-                                    <ComboBox Margin="5"
-                                              Grid.Column="2" 
-                                              SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
-                                            ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
-                                    <Button Grid.Column="3" Content="Go" Margin="5" Command="{Binding MoveCommand}"></Button>
-                                </Grid>
-                            </Grid>
-                        </TabItem>
-                        <TabItem>
-                            <TabItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Repeat"></TextBlock>
-                                </StackPanel>
-                            </TabItem.Header>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
-                                </Grid.RowDefinitions>
-                                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <Run Text="Repeat(Jog) Speed : "></Run>
-                                    <Run Text="{Binding p_aSpeed, UpdateSourceTrigger=PropertyChanged,
-                                        Converter={StaticResource DictionaryItemConverters}, 
-                                        ConverterParameter=JogMove}" />
-                                        <Run Text=" um/s"></Run></TextBlock>
-                                <Grid Grid.Row="1">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-                                    <GroupBox Header="Start">
-                                        <ComboBox Margin="5" 
-                                                  SelectedItem="{Binding p_strRepeatStartPos, Mode=TwoWay}"
-                                                  ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
-                                    </GroupBox>
-                                    <GroupBox Grid.Column="1" Header="End">
-                                        <ComboBox Margin="5"
-                                                  SelectedItem="{Binding p_strRepeatEndPos, Mode=TwoWay}"
-                                                  ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
-                                    </GroupBox>
-                                    <Grid Grid.Column="2">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Button Grid.Column="0" Margin="5" Content="Start"
-                                            Command="{Binding RepeatCommand}"></Button>
-                                            <Button Grid.Column="1" Margin="5" Content="End"
-                                            Command="{Binding StopCommand}"></Button>
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </TabItem>
-                        <TabItem>
-                            <TabItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Trigger"></TextBlock>
-                                </StackPanel>
-                            </TabItem.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition></ColumnDefinition>
-                                    <ColumnDefinition></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <GroupBox Header="Info">
-                                    <Grid DataContext="{Binding p_TrgInfo}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition></ColumnDefinition>
-                                            <ColumnDefinition></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
-                                        </Grid.RowDefinitions>
-                                        <TextBlock Grid.Row="0" Text="Set" />
-                                        <TextBlock Grid.Row="1" Text="UseActPos"></TextBlock>
-                                        <TextBlock Grid.Row="2" Text="Trig.Time(usec)"></TextBlock>
-                                        <TextBlock Grid.Row="3" Text="Trig.Period(um)"></TextBlock>
-                                        <TextBlock Grid.Row="4" Text="Trig.StartPos(um)"></TextBlock>
-                                        <TextBlock Grid.Row="5" Text="Trig.EndPos(um)"></TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="0" Text="" />
-                                        <TextBlock Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Text="{Binding p_bActTrigger}"></TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="2" HorizontalAlignment="Right" Text="{Binding p_bTriggerTime}"></TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="3" HorizontalAlignment="Right" Text="{Binding p_dTrigPeriod}"></TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="4" HorizontalAlignment="Right" Text="{Binding p_dTrigStart}"></TextBlock>
-                                        <TextBlock Grid.Column="1" Grid.Row="5" HorizontalAlignment="Right" Text="{Binding p_dTrigEnd}"></TextBlock>
-                                    </Grid>
-                                </GroupBox>
-                                <GroupBox Header="Set" Grid.Column="1">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition></ColumnDefinition>
-                                            <ColumnDefinition></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
-                                            <RowDefinition></RowDefinition>
-                                        </Grid.RowDefinitions>
-                                        <Button Content="Set" Margin="2" Command="{Binding SetTriggerCommand}"></Button>
-                                        <Button Content="Reset" Grid.Column="1" Margin="2" Command="{Binding ResetTriggerCommand}"></Button>
-                                        <TextBlock Grid.Row="1" Text="UseActPos"></TextBlock>
-                                        <TextBlock Grid.Row="2" Text="Trig.Time(usec)"></TextBlock>
-                                        <TextBlock Grid.Row="3" Text="Trig.Period(um)"></TextBlock>
-                                        <TextBlock Grid.Row="4" Text="Trig.StartPos(um)"></TextBlock>
-                                        <TextBlock Grid.Row="5" Text="Trig.EndPos(um)"></TextBlock>
-                                        <TextBox Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" MinWidth="40" Text="{Binding p_TrgSet.p_bActTrigger}"></TextBox>
-                                        <TextBox Grid.Column="1" Grid.Row="2" HorizontalAlignment="Right" MinWidth="40" Text="{Binding p_TrgSet.p_bTriggerTime}"></TextBox>
-                                        <TextBox Grid.Column="1" Grid.Row="3" HorizontalAlignment="Right" MinWidth="40" Text="{Binding p_TrgSet.p_dTrigPeriod}"></TextBox>
-                                        <TextBox Grid.Column="1" Grid.Row="4" HorizontalAlignment="Right" MinWidth="40" Text="{Binding p_TrgSet.p_dTrigStart}"></TextBox>
-                                        <TextBox Grid.Column="1" Grid.Row="5" HorizontalAlignment="Right" MinWidth="40" Text="{Binding p_TrgSet.p_dTrigEnd}"></TextBox>
-                                    </Grid>
-                                </GroupBox>
-                            </Grid>
-                        </TabItem>
-                    </TabControl>
-                    <GroupBox Grid.Row="2" BorderBrush="Black" BorderThickness="1">
-                        <GroupBox.Header>
-                            <TextBlock Grid.Column="1" Text="Status" Foreground="Black" FontWeight="Bold" />
-                        </GroupBox.Header>
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <!--<contorls:LedControl Content="Servo"  IsChecked="False" IsEnabled="True" />-->
-                            <Button Content="Servo" Width="Auto" Style="{StaticResource StatusButton}" Background="{Binding p_bServoOn, Converter={StaticResource ColorToBoolConverters}}"
-                                    Grid.Column="0" Command="{Binding ServoOnCommand}"></Button>
-                            <Button Content="Alarm" Width="Auto" Style="{StaticResource StatusButton}" Grid.Column="1"
-                                    Background="{Binding p_sensorAlarm, Converter={StaticResource ColorToBoolConverterReds}}" Command="{Binding AlarmOffCommand}" />
-                            <ToggleButton Content="InPos" Width="Auto" IsChecked="{Binding p_sensorInPos}" Grid.Column="2" Background="#FF68E03A" IsEnabled="False" />
-                            <ToggleButton Content="-" Width="Auto" IsChecked="{Binding p_sensorLimitM}" Grid.Column="3" Background="#FFC94A4A" IsEnabled="False" />
-                            <ToggleButton Content="H" Width="Auto" IsChecked="{Binding p_sensorHome}" Grid.Column="4" Background="#FF68E03A" IsEnabled="False" />
-                            <ToggleButton Content="+" Width="Auto" IsChecked="{Binding p_sensorLimitP}" Grid.Column="5" Background="#FFC94A4A" IsEnabled="False" />
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Grid.Row="3" BorderBrush="Black" BorderThickness="1">
-                        <GroupBox.Header>
-                            <TextBlock Grid.Column="1" Text="Pos" Foreground="Black" FontWeight="Bold" />
-                        </GroupBox.Header>
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock>
-                                <Run Text="ACT Pos : "></Run>
-                                <Run Text="{Binding p_posActual}"></Run></TextBlock>
-                            <TextBlock Grid.Column="1">
-                                <Run Text="CMD Pos : "></Run>
-                                <Run Text="{Binding p_posCommand}"></Run></TextBlock>
-                            <TextBlock Grid.Column="2">
-                                <Run Text="VEL : "></Run>
-                                <Run Text="{Binding p_vNow}"></Run></TextBlock>
-                        </Grid>
-                    </GroupBox>
-                    <ItemsControl ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}" Panel.ZIndex="1" Grid.Row="4">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <Canvas Background="{PriorityBinding}"></Canvas>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemContainerStyle>
-                            <Style TargetType="ContentPresenter">
-                                <Setter Property="Canvas.Left">
-                                    <Setter.Value>
-                                        <MultiBinding Converter="{StaticResource DictionaryItemValueCanvasConverters}">
-                                            <Binding></Binding>
-                                            <Binding RelativeSource="{RelativeSource Mode=FindAncestor, 
-                                                AncestorType={x:Type TabControl}}" Path="ActualWidth" />
-                                            <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                AncestorType={x:Type TabControl}}" />
-                                        </MultiBinding>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="Canvas.Top" Value="5" />
-                            </Style>
-                        </ItemsControl.ItemContainerStyle>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Rectangle Width="10" Height="20" Fill="Aquamarine">
-                                    <Rectangle.ToolTip>
-                                        <ToolTip>
-                                            <TextBlock Text="{Binding }"></TextBlock>
-                                        </ToolTip>
-                                    </Rectangle.ToolTip>
-                                </Rectangle>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <Canvas Grid.Row="4" Background="Black" x:Name="canv">
-                        <Line VerticalAlignment="Center" Stroke="Orange" StrokeThickness="3" Stretch="Fill" X1="0" Margin="-2,12,-2,12" X2="{Binding Path=ActualWidth, Mode=OneWay, 
-                             RelativeSource={RelativeSource Mode=FindAncestor,
-                             AncestorType={x:Type Canvas}}}"></Line>
-                    </Canvas>
-                </Grid>
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <tree:TreeUI DataContext="{Binding p_treeRootMain}" />
-                    <tree:TreeUI DataContext="{Binding p_treeRootSub}" Grid.Column="1" />
-                </Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Content="{Binding p_eState}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" x:Name="buttonServoOn" Content="Servo" Margin="2" Click="buttonServoOn_Click"/>
+                <Button Grid.Column="2" x:Name="buttonAlarm" Content="Alarm" Margin="2" Click="buttonAlarm_Click"/>
+                <Button Grid.Column="3" x:Name="buttonInPos" Content="InPos" Margin="2"/>
+                <Button Grid.Column="4" x:Name="buttonLimitM" Content="-" Margin="2"/>
+                <Button Grid.Column="5" x:Name="buttonHome" Content="Home" Margin="2"/>
+                <Button Grid.Column="6" x:Name="buttonLimitP" Content="+" Margin="2"/>
             </Grid>
-        </TabItem>
-        <TabItem>
-            <TabItem.Header>
-                <WrapPanel>
-                    <marterial:PackIcon Kind="Settings" Foreground="Black"></marterial:PackIcon>
-                    <TextBlock Text="Setting"></TextBlock>
-                </WrapPanel>
-            </TabItem.Header>
-            <tree:TreeUI  DataContext="{Binding p_treeSetup}" />
-        </TabItem>
-    </TabControl>
+        </GroupBox>
+        <GroupBox Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
+            <GroupBox.Header>
+                <TextBlock Text="Position and Velocity" Foreground="Black" FontWeight="Bold" />
+            </GroupBox.Header>
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Label Content="Command = " VerticalAlignment="Center"/>
+                    <Label Content="{Binding p_posCommand}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Label Content="Actual = " VerticalAlignment="Center"/>
+                    <Label Content="{Binding p_posActual}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <Label Content="Velocity = " VerticalAlignment="Center"/>
+                    <Label Content="{Binding p_vNow}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Vertical">
+                <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,10">
+                    <GroupBox.Header>
+                        <TextBlock Text="Home" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" x:Name="buttonRunHome" Content="Home" Margin="3" Click="buttonRunHome_Click"/>
+                        <ProgressBar Grid.Column="1" Margin="3" Orientation="Horizontal" Value="{Binding p_progressHome}"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
+                    <GroupBox.Header>
+                        <TextBlock Text="Jog" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Speed" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" x:Name="comboSpeedJog" ItemsSource="{Binding p_asSpeed}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="13*"/>
+                                <ColumnDefinition Width="10*"/>
+                                <ColumnDefinition Width="7*"/>
+                                <ColumnDefinition Width="5*"/>
+                                <ColumnDefinition Width="7*"/>
+                                <ColumnDefinition Width="10*"/>
+                                <ColumnDefinition Width="13*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonJogM3" Margin="3" Content="◀◀◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogM3_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="1" x:Name="buttonJogM2" Margin="3" Content="◀◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogM2_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="2" x:Name="buttonJogM1" Margin="3" Content="◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogM1_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="4" x:Name="buttonJogP1" Margin="3" Content="▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogP1_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="5" x:Name="buttonJogP2" Margin="3" Content="▶▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogP2_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="6" x:Name="buttonJogP3" Margin="3" Content="▶▶▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogP3_PreviewMouseLeftButtonDown"/>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
+                    <GroupBox.Header>
+                        <TextBlock Text="Shift" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Speed" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" x:Name="comboSpeedShift" ItemsSource="{Binding p_asSpeed}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonShiftM" Click="buttonShiftM_Click" Margin="3" Content="◀"/>
+                            <TextBox Grid.Column="1" x:Name="textBoxShift" TextAlignment="Center" Margin="3"/>
+                            <Button Grid.Column="2" x:Name="buttonShiftP" Click="buttonShiftP_Click" Margin="3" Content="▶"/>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
+                    <GroupBox.Header>
+                        <TextBlock Text="Move" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Speed" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" x:Name="comboSpeedMove" ItemsSource="{Binding p_asSpeed}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonMove" Content="Move" Margin="3" Click="buttonMove_Click"/>
+                            <ComboBox Grid.Column="1" x:Name="comboMovePos" ItemsSource="{Binding p_asPos}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="3*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonMoveStop" Content="Stop" Margin="3" Click="buttonMoveStop_Click"/>
+                            <Button Grid.Column="2" x:Name="buttonSetPos" Content="Set Position" Margin="3" Click="buttonSetPos_Click"/>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
+                    <GroupBox.Header>
+                        <TextBlock Text="Repeat" Foreground="Black" FontWeight="Bold" />
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Speed" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" x:Name="comboSpeedRepeat" ItemsSource="{Binding p_asSpeed}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonRepeat" Content="Repeat" Margin="3" Click="buttonRepeat_Click"/>
+                            <ComboBox Grid.Column="1" x:Name="comboRepeatPos0" ItemsSource="{Binding p_asPos}" Margin="3"/>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="buttonRepeatStop" Content="Stop" Margin="3" Click="buttonRepeatStop_Click"/>
+                            <ComboBox Grid.Column="1" x:Name="comboRepeatPos1" ItemsSource="{Binding p_asPos}" Margin="3"/>
+                        </Grid>
+                        <CheckBox Grid.Row="3" x:Name="checkBoxTrigger" Content="Trigger On" Margin="3"/>
+                    </Grid>
+                </GroupBox>
+                <Grid>
+                    <Button x:Name="buttonStop" Content="Stop Axis" Height="30" Margin="3" Click="buttonStop_Click"/>
+                </Grid>
+            </StackPanel>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+            <TabControl Grid.Column="2">
+                <TabItem>
+                    <TabItem.Header>
+                        <WrapPanel>
+                            <marterial:PackIcon Kind="Car"></marterial:PackIcon>
+                            <TextBlock Text="Motion"></TextBlock>
+                        </WrapPanel>
+                    </TabItem.Header>
+                    <tree:TreeUI x:Name="treeRootUI"/>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <WrapPanel>
+                            <marterial:PackIcon Kind="Settings" Foreground="Black"></marterial:PackIcon>
+                            <TextBlock Text="Setting"></TextBlock>
+                        </WrapPanel>
+                    </TabItem.Header>
+                    <tree:TreeUI x:Name="treeRootSettingUI"/>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Grid>
 </UserControl>
-<!--<CheckBox x:Name="checkBoxTree" Content="Setup" Click="CheckBoxTree_Click" />-->
-<!--<tree:TreeUI x:Name="treeSetupUI" Margin="0,20,0,0" Visibility="Hidden" />-->
-<!--<StackPanel Grid.Column="0" Orientation="Vertical">
-            <Label Content="{Binding p_sState}"/>
-            <Label Content="{Binding p_sInfo}"/>
-            <Label Content="{Binding p_sID}"/>
-            <Label Content="{Binding p_nAxisID}"/>
-            <Label Content="{Binding p_posCommand}"/>
-            <Label Content="{Binding p_posActual}"/>
-            <Label Content="{Binding p_vNow}"/>
-            <CheckBox IsChecked="{Binding p_sensorHome}" IsEnabled="False"/>
-            <CheckBox IsChecked="{Binding p_sensorLimitM}" IsEnabled="False"/>
-            <CheckBox IsChecked="{Binding p_sensorLimitP}" IsEnabled="False"/>
-            <CheckBox IsChecked="{Binding p_sensorInPos}" IsEnabled="False"/>
-            <CheckBox IsChecked="{Binding p_sensorAlarm}" IsEnabled="False"/>
-            <CheckBox IsChecked="{Binding p_sensorEmergency}" IsEnabled="False"/>
-            <CheckBox IsChecked="{Binding p_bServoOn}" IsEnabled="False"/>
-            <CheckBox IsChecked="{Binding p_bRepeat}"/>
-            <Button x:Name="buttonHome" Content="Home" Click="ButtonHome_Click"/>
-            <Button x:Name="buttonMove" Content="Move" Click="ButtonMove_Click"/>
-            <Button x:Name="buttonSetPos" Content="SetPos" Click="ButtonSetPos_Click"/>
-            <Button x:Name="buttonJog" Content="Jog ?"/>
-        </StackPanel>-->
+    

@@ -20,13 +20,11 @@ namespace RootTools
         {
             if (m_login.p_eLevel == Login.eLevel.Logout) return;
             m_login.Logout();
-            Resize(); 
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             m_login.CheckLogin(passwordBox.Password);
-            Resize();
             m_login.RunTree(Tree.eMode.Init);
         }
         #endregion
@@ -37,7 +35,13 @@ namespace RootTools
             m_login = login; 
             DataContext = login;
             treeRootUI.Init(login.m_treeRoot);
-            login.RunTree(Tree.eMode.Init); 
+            login.RunTree(Tree.eMode.Init);
+            login.OnChangeUser += Login_OnChangeUser;
+            Resize(); 
+        }
+
+        private void Login_OnChangeUser()
+        {
             Resize(); 
         }
 

@@ -63,10 +63,8 @@ namespace Root.Module
         {
             m_axisXY.AddPos(Enum.GetNames(typeof(ePosXY)));
             m_axisXY.AddPos("Center");
-            m_axisXY.AddPosDone();
             m_axisZ.AddPos(Enum.GetNames(typeof(ePosZ)));
             m_axisZ.AddPos("First", "Second");
-            m_axisZ.AddPosDone();
         }
         #endregion
         public Test(string id, IEngineer engineer)
@@ -117,6 +115,7 @@ namespace Root.Module
 
             public override string Run()
             {
+                //m_module.RunTree(Tree.eMode.Init); 
                 m_log.Info(p_id + " : Test Start");
                 Thread.Sleep(2000);
                 m_log.Info(p_id + " : Test End");
@@ -147,7 +146,7 @@ namespace Root.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_nTry = tree.Set(m_nTry, 3, "Try", "Try Count", bVisible);
-                m_runTest.RunTree(tree.GetTree("Test"), bVisible);
+                m_runTest.RunTree(tree.GetTree("Test", true, bVisible), bVisible);
             }
 
             public override string Run()
@@ -184,8 +183,8 @@ namespace Root.Module
 
             public override string Run()
             {
-                if (m_module.Run(m_module.m_axisXY.Move(m_sPosXY))) return p_sInfo;
-                if (m_module.Run(m_module.m_axisZ.Move(m_sPosZ))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisXY.StartMove(m_sPosXY))) return p_sInfo;
+                if (m_module.Run(m_module.m_axisZ.StartMove(m_sPosZ))) return p_sInfo;
                 return "OK";
             }
 

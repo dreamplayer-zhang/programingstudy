@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace RootTools.Trees
 {
@@ -24,7 +24,12 @@ namespace RootTools.Trees
 
         public Tree p_treeParent { get; set; }
 
-        public int p_nIndex { get; set; }
+        int _nIndex = 0; 
+        public int p_nIndex 
+        { 
+            get { return _nIndex; }
+            set { _nIndex = value; } 
+        }
 
         public string p_id { get; set; }
 
@@ -34,26 +39,24 @@ namespace RootTools.Trees
 
         public bool p_bEnable { get; set; }
 
-        public bool p_bExpand { get; set; }
-
-        bool _bUse = false; 
-        public bool p_bUse 
+        bool _bExpand = false; 
+        public bool p_bExpand 
         { 
-            get { return _bUse; }
+            get { return _bExpand; }
             set
             {
-                _bUse = value;
-                OnPropertyChanged("p_bVisible"); 
-            }
+                _bExpand = value; 
+            } 
         }
+
+        public bool m_bUse = true; 
 
         bool _bVisible = true;
         public bool p_bVisible
         {
-            get { return _bVisible && p_bUse; }
+            get { return _bVisible; }
             set
             {
-                p_bUse = true;
                 if (_bVisible == value) return;
                 _bVisible = value;
                 OnPropertyChanged(); 
@@ -61,19 +64,62 @@ namespace RootTools.Trees
         }
         #endregion
 
-        #region Update
+        #region RunTree Init
+        public void RunTreeRemove()
+        {
+            Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                for (int n = p_aChild.Count - 1; n >= 0; n--)
+                {
+                    if (p_aChild[n].m_bUse) p_aChild[n].RunTreeRemove();
+                    else p_aChild.RemoveAt(n);
+                }
+                m_bUse = false;
+            });
+        }
+
+        public void RunTreeInit()
+        {
+            m_aChildRunInit.Clear();
+            foreach (Tree tree in p_aChild)
+            {
+                m_aChildRunInit.Add(tree);
+                tree.RunTreeInit(); 
+            }
+        }
+
+        public void RunTreeDone()
+        {
+            foreach (Tree tree in m_aChildRunInit)
+            {
+                if (IsAlreadyExistatChild(tree) == false) p_aChild.Add(tree);
+                tree.RunTreeDone(); 
+            }
+        }
+
+        bool IsAlreadyExistatChild(Tree treeChild)
+        {
+            foreach (Tree tree in p_aChild)
+            {
+                if ((tree.p_id == treeChild.p_id) && (tree.p_nIndex == treeChild.p_nIndex)) return true; 
+            }
+            return false; 
+        }
+        #endregion
+
+        #region RunTree Update
         public bool m_bUpdated = false;
         protected void ClearUpdated()
         {
             m_bUpdated = false;
-            foreach (Tree treeItem in p_childs) treeItem.ClearUpdated();
+            foreach (Tree treeItem in p_aChild) treeItem.ClearUpdated();
         }
 
         public bool IsUpdated()
         {
             if (p_treeRoot.p_eMode != eMode.Update) return false;
             if (m_bUpdated) return true;
-            foreach (Tree treeItem in p_childs)
+            foreach (Tree treeItem in p_aChild)
             {
                 if (treeItem.IsUpdated()) return true;
             }
@@ -81,55 +127,53 @@ namespace RootTools.Trees
         }
         #endregion
 
-        #region Remove UnUse
-        protected void RemoveUnUseTreeItem()
+        #region Find Tree List<>
+        Tree FindTreeItem(string sName, int nIndex = 0)
         {
-            try
+            foreach (Tree item in m_aChildRunInit)
             {
-                for (int n = p_childs.Count - 1; n >= 0; n--)
+                if ((item.p_sName == sName) && (item.p_nIndex == nIndex))
                 {
-                    if (p_childs[n].p_bUse == false) p_childs.RemoveAt(n);
-                    else
-                    {
-                        p_childs[n].RemoveUnUseTreeItem();
-                        p_childs[n].p_bUse = false;
-                    }
+                    item.m_bUse = true;
+                    return item;
                 }
             }
-            catch { }
+            return null;
+        }
+
+        void AddTreeItem(Tree treeItem)
+        {
+            if (p_treeRoot.p_eMode != eMode.Init) return;
+            m_bUse = true;
+            treeItem.m_bUse = true;
+            m_aChildRunInit.Add(treeItem); 
         }
         #endregion
 
         #region TreeGroup
         public Tree GetTree(string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false)
         {
-            foreach (Tree item in p_childs)
+            Tree item = FindTreeItem(sName);
+            if (item != null)
             {
-                if (item.p_sName == sName)
-                {
-                    item.p_bVisible = bVisible;
-                    item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable; 
-                    return item;
-                }
+                item.p_bVisible = bVisible;
+                return item;
             }
             Tree newGroup = new TreeGroup(sName, this, m_log, bExpand, bVisible, bReadOnly);
-            p_childs.Add(newGroup);
+            AddTreeItem(newGroup);
             return newGroup;
         }
 
         public Tree GetTree(int nIndex, string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false)
         {
-            foreach (Tree item in p_childs)
+            Tree item = FindTreeItem(sName, nIndex);
+            if (item != null)
             {
-                if ((item.p_sName == sName) && (item.p_nIndex == nIndex))
-                {
-                    item.p_bVisible = bVisible;
-                    item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
-                    return item;
-                }
+                item.p_bVisible = bVisible;
+                return item;
             }
             Tree newGroup = new TreeGroup(nIndex, sName, this, m_log, bExpand, bVisible, bReadOnly);
-            p_childs.Add(newGroup);
+            AddTreeItem(newGroup);
             return newGroup;
         }
         #endregion
@@ -137,12 +181,10 @@ namespace RootTools.Trees
         #region TreeItem
         public Tree GetItem(string sName, dynamic value, string sDesc)
         {
-            foreach (Tree item in p_childs)
-            {
-                if (item.p_sName == sName) return item;
-            }
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item;
             Tree newItem = NewItem(sName, value, sDesc);
-            p_childs.Add(newItem);
+            AddTreeItem(newItem);
             return newItem;
         }
 
@@ -161,49 +203,41 @@ namespace RootTools.Trees
 
         Tree GetItem(string sName, string value, List<string> list, string sDesc)
         {
-            foreach (Tree item in p_childs)
+            Tree item = FindTreeItem(sName);
+            if (item != null)
             {
-                if (item.p_sName == sName)
-                {
-                    ((TreeItem_stringList)(item)).SetList(list);
-                    return item;
-                }
+                ((TreeItem_stringList)(item)).SetList(list);
+                return item;
             }
             Tree newitem = new TreeItem_stringList(sName, this, value, list, sDesc, m_log);
-            p_childs.Add(newitem);
+            AddTreeItem(newitem);
             return newitem;
         }
 
         Tree GetItemFile(string sName, string value, string sExt, string sDesc)
         {
-            foreach (Tree item in p_childs)
-            {
-                if (item.p_sName == sName) return item;
-            }
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item;
             Tree newitem = new TreeItem_FileName(sName, this, value, sExt, sDesc, m_log);
-            p_childs.Add(newitem);
+            AddTreeItem(newitem);
             return newitem;
         }
 
         Tree GetItemPassword(string sName, string value, string sDesc)
         {
-            foreach (Tree item in p_childs)
-            {
-                if (item.p_sName == sName) return item;
-            }
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item;
             Tree newitem = new TreeItem_Password(sName, this, value, sDesc, m_log);
-            p_childs.Add(newitem);
+            AddTreeItem(newitem);
             return newitem;
         }
 
         Tree GetItemICommand(string sName, RelayCommand value, string sButtonName, string sDesc)
         {
-            foreach (Tree item in p_childs)
-            {
-                if (item.p_sName == sName) return item;
-            }
+            Tree item = FindTreeItem(sName);
+            if (item != null) return item; 
             Tree newitem = new TreeItem_ICommand(sName, this, value, sButtonName, sDesc, m_log);
-            p_childs.Add(newitem);
+            AddTreeItem(newitem);
             return newitem;
         }
         #endregion
@@ -333,20 +367,25 @@ namespace RootTools.Trees
 
         public void HideAllItem()
         {
-            foreach (Tree item in p_childs)
+            foreach (Tree item in p_aChild)
             {
                 item.p_bVisible = false;
             }
         }
 
-        protected Log m_log;
+        public Log m_log;
         public Registry m_reg = null;
         public Job m_job = null;
 
-        public ObservableCollection<Tree> p_childs { get; set; }
+        /// <summary> TreeUI Binging 용</summary>
+        public ObservableCollection<Tree> p_aChild { get; set; }
+        
+        /// <summary> RunTree(Init)를 Thread에서 사용할 수 있게 List<Tree> 로 Copy 후 작업</summary>
+        public List<Tree> m_aChildRunInit = new List<Tree>(); 
+        
         public Tree()
         {
-            p_childs = new ObservableCollection<Tree>(); 
+            p_aChild = new ObservableCollection<Tree>();
         }
     }
 }

@@ -1,4 +1,8 @@
-﻿namespace RootTools.Trees
+﻿using System;
+using System.Collections.Generic;
+using System.Windows.Threading;
+
+namespace RootTools.Trees
 {
     public class TreeRoot : Tree
     {
@@ -22,13 +26,24 @@
                 switch (_eMode)
                 {
                     case eMode.Init:
-                        RemoveUnUseTreeItem();
+                        RunTreeRemove(); 
+                        RunTreeInit();
+                        m_timer.Start(); 
                         break;
                     case eMode.Update:
                         ClearUpdated();
                         break;
                 }
             }
+        }
+        #endregion
+
+        #region Timer Init
+        DispatcherTimer m_timer = new DispatcherTimer();
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            RunTreeDone(); 
+            m_timer.Stop(); 
         }
         #endregion
 
@@ -42,7 +57,11 @@
             p_bExpand = true;
             p_bEnable = !bReadOnly; 
             m_log = log;
-            m_reg = new Registry(id, sModel); 
+            m_reg = new Registry(id, sModel);
+
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick;
         }
+
     }
 }

@@ -86,22 +86,16 @@ namespace RootTools.ToolBoxs
         #endregion
 
         #region ITool Axis
-        public List<IAxis> m_toolAxis = null;
-
         public string Get(ref Axis value, ModuleBase module, string id)
         {
-            if (value == null) value = new Axis(m_toolAxis, module.p_id + "." + id, module.m_log);
-            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
-            if (sInfo != "OK") return sInfo;
-            module.m_listAxis.Add(value.p_axis);
+            if (value == null) value = m_control.GetAxis(module.p_id + "." + id, module.m_log);
+            module.m_listAxis.Add(value);
             return "OK";
         }
 
         public string Get(ref AxisXY value, ModuleBase module, string id)
         {
-            if (value == null) value = new AxisXY(m_toolAxis, module.p_id + "." + id, module.m_log);
-            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
-            if (sInfo != "OK") return sInfo;
+            if (value == null) value = m_control.GetAxisXY(module.p_id + "." + id, module.m_log);
             module.m_listAxis.Add(value.p_axisX);
             module.m_listAxis.Add(value.p_axisY);
             return "OK";
@@ -127,18 +121,6 @@ namespace RootTools.ToolBoxs
                 module.m_aTool.Add(value);
             }
             value.RunTreeToolBox(module.m_treeToolBox.GetTree(id));
-            return "OK";
-        }
-        #endregion
-
-        #region ITool MemoryViewer
-        public string Get(ref MemoryViewer value, ModuleBase module, string id)
-        {
-            if (value == null)
-            {
-                value = new MemoryViewer(module.p_id + "." + id, m_memoryTool, module.m_log);
-                module.m_aTool.Add(value);
-            }
             return "OK";
         }
         #endregion
@@ -409,10 +391,12 @@ namespace RootTools.ToolBoxs
 
         string m_id;
         IEngineer m_engineer;
+        IControl m_control; 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer;
+            m_control = engineer.ClassControl(); 
             SQLog.Init(engineer);
             InitStringTable(id); 
             InitMemoryTool();

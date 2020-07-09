@@ -16,19 +16,28 @@ namespace RootTools.Memory
             InitializeComponent();
         }
 
-        MemoryViewer m_memoryViewer; 
+        MemoryViewer m_viewer;
+        MemoryPool m_pool; 
         public void Init(MemoryViewer memoryViewer)
         {
-            m_memoryViewer = memoryViewer;
+            m_viewer = memoryViewer;
+            m_pool = memoryViewer.m_memoryPool; 
             this.DataContext = memoryViewer;
-            comboBoxPool.ItemsSource = memoryViewer.m_memoryTool.m_asPool;
+            comboBoxGroup.ItemsSource = memoryViewer.m_memoryPool.m_asGroup;
+            memoryViewer.OnInvalidDraw += MemoryViewer_OnInvalidDraw;
         }
 
+        private void MemoryViewer_OnInvalidDraw()
+        {
+            m_viewer.Draw(gridDrawing); 
+        }
+
+        #region File
         private void menuOpen_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Filter = "Image Files(*.bmp;*.jpg;*.bayer)|*.bmp;*.jpg;*.bayer";
-            if (dlg.ShowDialog() == true) m_memoryViewer.FileOpen(dlg.FileName); 
+            if (dlg.ShowDialog() == true) m_viewer.FileOpen(dlg.FileName); 
         }
 
         private void memuSave_Click(object sender, RoutedEventArgs e)
@@ -36,65 +45,57 @@ namespace RootTools.Memory
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.DefaultExt = ".bmp";
             dlg.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
-            if (dlg.ShowDialog() == true) m_memoryViewer.FileSave(dlg.FileName);
+            if (dlg.ShowDialog() == true) m_viewer.FileSave(dlg.FileName);
         }
+        #endregion
 
+        #region Image View
         private void gridBitmapSource_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            m_memoryViewer.p_szWindow = new CPoint((int)gridBitmapSource.ActualWidth, (int)gridBitmapSource.ActualHeight); 
+            m_viewer.p_szWindow = new CPoint((int)gridBitmapSource.ActualWidth, (int)gridBitmapSource.ActualHeight);
+            m_viewer.Draw(gridDrawing);
         }
 
         private void gridBitmapSource_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             Point p = e.GetPosition(imageBitmapSource);
-            m_memoryViewer.p_cpWindow = new CPoint((int)p.X, (int)p.Y); 
+            m_viewer.p_cpWindow = new CPoint((int)p.X, (int)p.Y);
+            if (m_viewer.m_bLBD) m_viewer.Draw(gridDrawing);
         }
 
         private void gridBitmapSource_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             Point p = e.GetPosition(imageBitmapSource);
-            if (e.Delta > 0) m_memoryViewer.ZoomIn(new CPoint((int)p.X, (int)p.Y)); 
-            else m_memoryViewer.ZoomOut(new CPoint((int)p.X, (int)p.Y));
+            if (e.Delta > 0) m_viewer.ZoomIn(new CPoint((int)p.X, (int)p.Y)); 
+            else m_viewer.ZoomOut(new CPoint((int)p.X, (int)p.Y));
+            m_viewer.Draw(gridDrawing);
         }
 
         private void gridBitmapSource_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point p = e.GetPosition(imageBitmapSource);
-            m_memoryViewer.m_bLBD = true;
-            m_memoryViewer.p_cpLBD = new CPoint((int)p.X, (int)p.Y);
+            m_viewer.m_bLBD = true;
+            m_viewer.p_cpLBD = new CPoint((int)p.X, (int)p.Y);
         }
 
         private void gridBitmapSource_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            m_memoryViewer.m_bLBD = false;
+            m_viewer.m_bLBD = false;
         }
 
         private void gridBitmapSource_MouseLeave(object sender, MouseEventArgs e)
         {
-            m_memoryViewer.m_bLBD = false;
+            m_viewer.m_bLBD = false;
         }
+        #endregion
 
-        private void comboBoxPool_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            m_memoryViewer.p_memoryData = null;
-            if (comboBoxPool.SelectedValue == null) return; 
-            string sPool = comboBoxPool.SelectedValue.ToString();
-            MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
-            if (pool == null) return;
-            comboBoxGroup.ItemsSource = pool.m_asGroup;
-            comboBoxGroup.SelectedIndex = -1;
-        }
-
+        #region Select Memory
         private void comboBoxGroup_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            m_memoryViewer.p_memoryData = null;
-            if (comboBoxPool.SelectedValue == null) return;
-            string sPool = comboBoxPool.SelectedValue.ToString();
-            MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
-            if (pool == null) return;
+            m_viewer.p_memoryData = null;
             if (comboBoxGroup.SelectedValue == null) return; 
             string sGroup = comboBoxGroup.SelectedValue.ToString();
-            MemoryGroup group = pool.GetGroup(sGroup);
+            MemoryGroup group = m_pool.GetGroup(sGroup);
             if (group == null) return;
             comboBoxMemory.ItemsSource = group.m_asMemory;
             comboBoxMemory.SelectedIndex = -1;
@@ -103,23 +104,20 @@ namespace RootTools.Memory
         List<int> m_aMemoryIndex = new List<int>(); 
         private void comboBoxMemory_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            m_memoryViewer.p_memoryData = null;
-            if (comboBoxPool.SelectedValue == null) return;
-            string sPool = comboBoxPool.SelectedValue.ToString();
-            MemoryPool pool = m_memoryViewer.m_memoryTool.GetPool(sPool, false);
-            if (pool == null) return;
+            m_viewer.p_memoryData = null;
             if (comboBoxGroup.SelectedValue == null) return;
             string sGroup = comboBoxGroup.SelectedValue.ToString();
-            MemoryGroup group = pool.GetGroup(sGroup);
+            MemoryGroup group = m_pool.GetGroup(sGroup);
             if (group == null) return;
             if (comboBoxMemory.SelectedValue == null) return; 
             string sMemory = comboBoxMemory.SelectedValue.ToString();
-            m_memoryViewer.p_memoryData = group.GetMemory(sMemory);
+            m_viewer.p_memoryData = group.GetMemory(sMemory);
             comboBoxIndex.ItemsSource = null;
             m_aMemoryIndex.Clear();
-            for (int n = 0; n < m_memoryViewer.p_memoryData.p_nCount; n++) m_aMemoryIndex.Add(n);
+            for (int n = 0; n < m_viewer.p_memoryData.p_nCount; n++) m_aMemoryIndex.Add(n);
             comboBoxIndex.ItemsSource = m_aMemoryIndex;
             comboBoxIndex.SelectedIndex = 0; 
         }
+        #endregion
     }
 }

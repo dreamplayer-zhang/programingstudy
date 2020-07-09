@@ -29,7 +29,7 @@ namespace Root_Vega
 
         private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
-            if (EQ.p_bSimulate == false) return; 
+            if (EQ.p_bSimulate == false) return;
             m_infoPod.SetInfoReticleExist();
             m_infoPod.RunTreeReticle(Tree.eMode.Init);
         }
@@ -38,12 +38,14 @@ namespace Root_Vega
         {
             if (EQ.p_bSimulate == false) return;
             m_infoPod.p_infoReticle = null;
+            m_infoPod.m_aGemSlot.Clear();
+            m_infoPod.InitSlot(); 
             m_infoPod.RunTreeReticle(Tree.eMode.Init);
         }
 
         private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
-            m_infoPod.StartProcess(null);
+            m_infoPod.StartProcess();
             m_infoPod.RunTreeReticle(Tree.eMode.Init);
         }
     }

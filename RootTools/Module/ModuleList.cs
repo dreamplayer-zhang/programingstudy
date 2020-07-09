@@ -107,15 +107,18 @@ namespace RootTools.Module
                     case EQ.eState.Home: p_sRun = "Stop"; break;
                     case EQ.eState.Ready: p_sRun = "Run"; break;
                     case EQ.eState.Run: p_sRun = "Stop";
-                        if (m_qModuleRun.Count == 0) EQ.p_eState = EQ.eState.Ready;
-                        else
+                        if (m_qModuleRun.Count > 0) 
                         {
                             ModuleRunBase moduleRun = m_qModuleRun.Dequeue();
                             p_iRun = m_qModuleRun.Count;
                             moduleRun.StartRun();
                             Thread.Sleep(100); 
                             while (moduleRun.m_moduleBase.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
-                            if (m_qModuleRun.Count == 0) p_visibleRnR = Visibility.Visible;
+                            if (m_qModuleRun.Count == 0)
+                            {
+                                p_visibleRnR = Visibility.Visible;
+                                EQ.p_eState = EQ.eState.Ready;
+                            }
                         }
                         break;
                     case EQ.eState.Error: p_sRun = "Reset"; break;

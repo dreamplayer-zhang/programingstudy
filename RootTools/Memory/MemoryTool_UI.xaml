@@ -82,9 +82,6 @@
                     <TabControl Grid.Row="2" x:Name="tabControlPool" />
                 </Grid>
             </TabItem>
-            <TabItem Header="Viewer">
-                <local:MemoryViewer_UI x:Name="memoryViewerUI"/>
-            </TabItem>
             <TabItem Header="Run">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -99,7 +96,7 @@
                     <tree:TreeUI Grid.Column="1" x:Name="treeRootUI" />
                 </Grid>
             </TabItem>
-            <TabItem Header="Memory" Visibility="Hidden">
+            <TabItem Header="Memory" Visibility="Visible">
                 <tree:TreeUI x:Name="treeRootMemoryUI"/>
             </TabItem>
         </TabControl>

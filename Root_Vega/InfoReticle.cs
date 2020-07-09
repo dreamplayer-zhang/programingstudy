@@ -28,6 +28,7 @@ namespace Root_Vega
 
         public void RecipeOpen(string sRecipe)
         {
+            p_sRecipe = sRecipe; 
             m_moduleRunList.OpenJob(sRecipe, true);
             m_qProcess.Clear(); 
         }
@@ -54,27 +55,14 @@ namespace Root_Vega
                 moduleRun.RunTree(tree.GetTree(n, moduleRun.p_id, false), true);
             }
         }
-
-        ObservableCollection<ModuleRunBase> p_aProcess { get; set; }
-        public void SetObservableProcess()
-        {
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                p_aProcess.Clear();
-                foreach (ModuleRunBase moduleRun in m_qProcess) p_aProcess.Add(moduleRun); 
-            }); 
-        }
         #endregion
 
         #region Tree
         public override void RunTree(Tree tree)
         {
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                base.RunTree(tree);
-                RunTreeRecipe(tree.GetTree("Recipe", false));
-                RunTreeProcess(tree.GetTree("Process", false));
-            });
+            base.RunTree(tree);
+            RunTreeRecipe(tree.GetTree("Recipe", false));
+            RunTreeProcess(tree.GetTree("Process", false));
         }
         #endregion
 
@@ -83,7 +71,6 @@ namespace Root_Vega
         public InfoReticle(string id, InfoPod infoPod, IEngineer engineer)
         {
             m_infoPod = infoPod; 
-            p_aProcess = new ObservableCollection<ModuleRunBase>();
             string[] asID = id.Split('.');
             m_sLoadport = asID[0]; 
             InitBase(id, engineer);

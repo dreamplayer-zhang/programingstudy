@@ -9,14 +9,15 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="5*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Orientation="Vertical">
-            <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="2"/>
+            <StackPanel Orientation="Horizontal" Margin="2">
+                <Label Content="EQ :"/>
+                <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="2"/>
+            </StackPanel>
             <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="2"/>
             <CheckBox x:Name="checkBoxPause" Content="EQ.Pause" IsChecked="{Binding p_bPause}" Margin="2"/>
             <CheckBox x:Name="checkBoxSimulate" Content="EQ.Simulate" IsChecked="{Binding p_bSimulate}" Margin="2"/>
@@ -33,9 +34,6 @@
             <TabItem Header="Locate">
                 <tree:TreeUI x:Name="treeLocateUI"/>
             </TabItem>
-        </TabControl>
-        <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <TabControl Grid.Column="4">
             <TabItem Header="Sequence">
                 <tree:TreeUI x:Name="treeSequenceUI"/>
             </TabItem>

@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace Root_Vega
 {
-    public class Vega_Handler : ObservableObject, IHandler
+    public class Vega_Handler : IHandler
     {
         #region UI Binding
         public Brush p_brushHandler 
@@ -39,26 +39,26 @@ namespace Root_Vega
 
         void InitModule()
         {
-            m_moduleList = new ModuleList(m_enginner);
-            m_vega = new Vega("Vega", m_enginner);
+            m_moduleList = new ModuleList(m_engineer);
+            m_vega = new Vega("Vega", m_engineer);
             InitModule(m_vega); 
-            m_robot = new Robot_RND("Robot", m_enginner);
+            m_robot = new Robot_RND("Robot", m_engineer);
             InitModule(m_robot);
-            m_aLoadport[0] = new Loadport("LoadportA", "LP1", m_enginner);
+            m_aLoadport[0] = new Loadport("LoadportA", "LP1", m_engineer);
             InitModule(m_aLoadport[0]);
-            m_aLoadport[1] = new Loadport("LoadportB", "LP2", m_enginner);
+            m_aLoadport[1] = new Loadport("LoadportB", "LP2", m_engineer);
             InitModule(m_aLoadport[1]);
-            m_sideVision = new SideVision("SideVision", m_enginner);
+            m_sideVision = new SideVision("SideVision", m_engineer);
             InitModule(m_sideVision);
-            m_patternVision = new PatternVision("PatternVision", m_enginner);
+            m_patternVision = new PatternVision("PatternVision", m_engineer);
             InitModule(m_patternVision);
-            m_FDC = new FDC("FDC", m_enginner);
+            m_FDC = new FDC("FDC", m_engineer);
             InitModule(m_FDC); 
             m_robot.AddChild(m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision);
             m_robot.ReadInfoReticle_Registry();
-            m_recipe = new Vega_Recipe("Recipe", m_enginner);
+            m_recipe = new Vega_Recipe("Recipe", m_engineer);
             m_recipe.AddModule(m_sideVision, m_patternVision, m_robot);
-            m_process = new Vega_Process("Process", m_enginner, this);
+            m_process = new Vega_Process("Process", m_engineer, this);
         }
 
         void InitModule(ModuleBase module)
@@ -148,7 +148,7 @@ namespace Root_Vega
 
         public void CalcSequence()
         {
-            m_process.ReCalcSequence(null); 
+            m_process.ReCalcSequence(); 
         }
         #endregion
 
@@ -205,14 +205,14 @@ namespace Root_Vega
         #endregion
 
         string m_id;
-        public Vega_Engineer m_enginner;
+        public Vega_Engineer m_engineer;
         public GAF m_gaf;
         IGem m_gem; 
 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_enginner = (Vega_Engineer)engineer;
+            m_engineer = (Vega_Engineer)engineer;
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();

@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Vega.ManualJob;
+using RootTools;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -108,6 +109,15 @@ namespace Root_Vega
             if (IsEnableRecovery() == false) return;
             m_handler.m_process.CalcRecover();
             EQ.p_eState = EQ.eState.Run; 
+        }
+        #endregion
+
+        #region Button OHT
+        private void buttonOHT_Click(object sender, RoutedEventArgs e)
+        {
+            ManualOHT_UI ui = new ManualOHT_UI();
+            ui.Init(m_handler); 
+            ui.Show(); 
         }
         #endregion
     }

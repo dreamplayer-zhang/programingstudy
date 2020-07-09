@@ -19,6 +19,7 @@ namespace RootTools
         {
             m_logView = logView;
             DataContext = logView;
+            comboLog.SelectedIndex = 0;
             UpdateLogTab();
             logView.OnChangeTab += LogView_OnChangeTab;
         }

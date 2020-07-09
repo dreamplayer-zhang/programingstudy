@@ -179,6 +179,13 @@
                     <local:_2_6_Side x:Name="_Side"/>
                 </Border>
             </TabItem>
+            <TabItem Header="Bevel"
+                     Style="{StaticResource RcptabItem}">
+                <Border BorderBrush="Gray"
+                        BorderThickness="3">
+                    <local:_2_9_Bevel x:Name="_Bevel"/>
+                </Border>
+            </TabItem>
             <TabItem Header="EdgeBox"
                      Style="{StaticResource RcptabItem}">
                 <Border BorderBrush="Gray"

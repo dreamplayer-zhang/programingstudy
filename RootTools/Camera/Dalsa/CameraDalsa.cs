@@ -417,21 +417,12 @@ namespace RootTools.Camera.Dalsa
 
         public void RunTree(Tree.eMode mode)
         {
-            try
-            {
-                Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    p_treeRoot.p_eMode = mode;
-                    bool bOpen = (m_sapXfer != null); 
-                    RunTreeConnect(p_treeRoot.GetTree("Connect", false));
-                    RunTreeMemory(p_treeRoot.GetTree("Memory", false));
-                    RunTreeGrab(p_treeRoot.GetTree("Start Grab", true, bOpen));
-//                    RunTreeConfigurationSet(p_treeRoot.GetTree("Configuration Set", false, bOpen));
-                    RunTreeAOI(p_treeRoot.GetTree("AOI", false, bOpen));
-//                    RunTreeAnalog(p_treeRoot.GetTree("Analog", false, bOpen));
-                });
-            }
-            catch (Exception) { }
+            p_treeRoot.p_eMode = mode;
+            bool bOpen = (m_sapXfer != null);
+            RunTreeConnect(p_treeRoot.GetTree("Connect", false));
+            RunTreeMemory(p_treeRoot.GetTree("Memory", false));
+            RunTreeGrab(p_treeRoot.GetTree("Start Grab", true, bOpen));
+            RunTreeAOI(p_treeRoot.GetTree("AOI", false, bOpen));
         }
         #endregion
 

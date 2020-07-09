@@ -46,7 +46,7 @@ namespace Root_Wind
             {
                 ModuleRunBase moduleRun = infoWafer.m_moduleRunList.m_aModuleRun[n];
                 string sChild = moduleRun.m_moduleBase.p_id;
-                string sChildID = "01"; //forget
+                string sChildID = "01"; 
                 bool bGetPut = (sChild != m_wtr.p_id);
                 bool bPut = !IsSameModule(infoWafer.m_moduleRunList, n - 1, n);
                 if (bPut && bGetPut) aProcess.Add(wtr.GetRunMotion(ref iWTRMotion, WTR_RND.eMotion.Put, sChild, sChildID));
@@ -55,7 +55,6 @@ namespace Root_Wind
                 if (bGet && bGetPut) aProcess.Add(wtr.GetRunMotion(ref iWTRMotion, WTR_RND.eMotion.Get, sChild, sChildID));
             }
             aProcess.Add(wtr.GetRunMotion(ref iWTRMotion, WTR_RND.eMotion.Put, sLoadport, sLoadportID));
-            foreach (ModuleRunBase moduleRun in aProcess) moduleRun.m_infoObject = infoWafer;
             m_aInfoWafer.Add(infoWafer);
         }
 
@@ -70,7 +69,7 @@ namespace Root_Wind
         {
             m_aInfoWafer.Clear();
             foreach (Locate locate in m_aLocate) locate.ClearInfoWafer();
-            ReCalcSequence();
+            ReCalcSequence(null);
             RunTree(Tree.eMode.Init);
         }
         #endregion
@@ -184,7 +183,7 @@ namespace Root_Wind
             CalcRecoverArm(WTR_RND.eArm.Lower);
             CalcRecoverArm(WTR_RND.eArm.Upper);
             foreach (IWTRChild child in m_handler.p_wtr.m_aChild) CalcRecoverChild(child);
-            ReCalcSequence();
+            ReCalcSequence(null);
             RunTree(Tree.eMode.Init);
         }
 
@@ -200,7 +199,6 @@ namespace Root_Wind
             string sLoadport = asInfoWafer[0];
             string sLoadportID = asInfoWafer[1];
             ModuleRunBase moduleRun = m_handler.p_wtr.GetRunMotion(ref iWTRMotion, WTR_RND.eMotion.Put, sLoadport, sLoadportID);
-            moduleRun.m_infoObject = infoWafer;
             infoWafer.m_aProcess.Add(moduleRun);
         }
 
@@ -214,30 +212,39 @@ namespace Root_Wind
             infoWafer.m_aProcess.Clear();
             int iWTRMotion = 0;
             string sChild = child.p_id;
-            string sChildID = "01"; //forget
+            string sChildID = "01"; 
             ModuleRunBase moduleRunGet = wtr.GetRunMotion(ref iWTRMotion, WTR_RND.eMotion.Get, sChild, sChildID);
-            moduleRunGet.m_infoObject = infoWafer;
             infoWafer.m_aProcess.Add(moduleRunGet);
             string[] asInfoWafer = infoWafer.p_id.Split('.');
             string sLoadport = asInfoWafer[0];
             string sLoadportID = asInfoWafer[1];
             ModuleRunBase moduleRunPut = wtr.GetRunMotion(ref iWTRMotion, WTR_RND.eMotion.Put, sLoadport, sLoadportID);
-            moduleRunPut.m_infoObject = infoWafer;
             infoWafer.m_aProcess.Add(moduleRunPut);
         }
         #endregion
 
         #region Calc Sequence
+        public class Sequence
+        {
+            public ModuleRunBase m_moduleRun;
+            public InfoWafer m_infoWafer;
+            public Sequence(ModuleRunBase moduleRun, InfoWafer infoWafer)
+            {
+                m_moduleRun = moduleRun;
+                m_infoWafer = infoWafer;
+            }
+        }
         /// <summary> Simulation 계산용 InfoWafer List </summary>
         List<InfoWafer> m_aCalcWafer = new List<InfoWafer>();
         /// <summary> RunThread에서 실행 될 ModuleRun List (from Handler when EQ.p_eState == Run) </summary>
-        public Queue<ModuleRunBase> m_qSequence = new Queue<ModuleRunBase>();
+        public Queue<Sequence> m_qSequence = new Queue<Sequence>();
 
-        public string ReCalcSequence()
+        public string ReCalcSequence(Sequence sequence)
         {
             InitCalc(); 
             try
             {
+                if (sequence != null) m_qSequence.Enqueue(sequence);
                 int lProcess = 0;
                 foreach (InfoWafer infoWafer in m_aCalcWafer) lProcess += infoWafer.m_qCalcProcess.Count; 
                 while (CalcSequence()) ;
@@ -246,7 +253,7 @@ namespace Root_Wind
                     InitCalc(); 
                     foreach (InfoWafer infoWafer in m_aCalcWafer)
                     {
-                        foreach (ModuleRunBase moduleRun in infoWafer.m_aProcess) m_qSequence.Enqueue(moduleRun); 
+                        foreach (ModuleRunBase moduleRun in infoWafer.m_aProcess) m_qSequence.Enqueue(new Sequence(moduleRun, infoWafer)); 
                     }
                 }
                 RunTree(Tree.eMode.Init);
@@ -300,11 +307,11 @@ namespace Root_Wind
                 moduleRunGet.m_eArm = armGet;
                 GetLocate(armGet).p_calcWafer = locateChild.p_calcWafer; 
                 locateChild.p_calcWafer = null; 
-                m_qSequence.Enqueue(moduleRunGet); 
+                m_qSequence.Enqueue(new Sequence(moduleRunGet, infoWaferGet)); 
             }
             if (locateChild != null) locateChild.p_calcWafer = infoWaferPut;
             locateArmPut.p_calcWafer = null;
-            m_qSequence.Enqueue(moduleRunPut);
+            m_qSequence.Enqueue(new Sequence(moduleRunPut, infoWaferPut));
             m_aCalcWafer.Remove(infoWaferPut);
             m_aCalcWafer.Add(infoWaferPut); 
             CalcSequenceChild(infoWaferPut); 
@@ -321,7 +328,7 @@ namespace Root_Wind
             ModuleRunBase moduleRun = infoWaferPut.m_qCalcProcess.Peek();
             if (moduleRun == null) return; 
             if (moduleRun.m_moduleBase.p_id == m_wtr.p_id) return;
-            m_qSequence.Enqueue(infoWaferPut.m_qCalcProcess.Dequeue());
+            m_qSequence.Enqueue(new Sequence(infoWaferPut.m_qCalcProcess.Dequeue(), infoWaferPut));
             CalcSequenceChild(infoWaferPut); 
         }
 
@@ -334,8 +341,7 @@ namespace Root_Wind
             }
             ModuleBase module = m_handler.m_moduleList.GetModule(sLoadport[0]);
             ModuleRunBase moduleRun = ((Loadport_RND)module).GetRunUnload();
-            moduleRun.m_infoObject = infoWaferPut;
-            m_qSequence.Enqueue(moduleRun);
+            m_qSequence.Enqueue(new Sequence(moduleRun, infoWaferPut));
         }
 
         bool GetNextInfoWafer()
@@ -370,7 +376,7 @@ namespace Root_Wind
             GetLocate(moduleRunGet.m_eArm).p_calcWafer = infoWaferGet;
             Locate locateChild = GetLocate(moduleRunGet.m_sChild);
             if (locateChild != null) locateChild.p_calcWafer = null;
-            m_qSequence.Enqueue(moduleRunGet);
+            m_qSequence.Enqueue(new Sequence(moduleRunGet, infoWaferGet));
             return true;
         }
 
@@ -395,13 +401,13 @@ namespace Root_Wind
                 EQ.p_eState = EQ.eState.Ready;
                 return "OK";
             }
-            ModuleRunBase moduleRun = m_qSequence.Peek();
-            if (moduleRun.m_moduleBase == m_wtr) p_sInfo = moduleRun.Run(); 
-            else p_sInfo = moduleRun.StartRun();
+            Sequence sequence = m_qSequence.Peek();
+            if (sequence.m_moduleRun.m_moduleBase == m_wtr) p_sInfo = sequence.m_moduleRun.Run(); 
+            else p_sInfo = sequence.m_moduleRun.StartRun();
             if (p_sInfo == "OK")
             {
                 m_qSequence.Dequeue(); 
-                InfoWafer infoWafer = moduleRun.m_infoObject;
+                InfoWafer infoWafer = sequence.m_infoWafer;
                 if (infoWafer.m_aProcess.Count > 0) infoWafer.m_aProcess.RemoveAt(0);
             }
             RunTree(Tree.eMode.Init);
@@ -431,12 +437,9 @@ namespace Root_Wind
 
         public void RunTree(Tree.eMode mode)
         {
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                RunTreeWafer(mode);
-                RunTreeLocate(mode);
-                RunTreeSequence(mode);
-            });
+            RunTreeWafer(mode);
+            RunTreeLocate(mode);
+            RunTreeSequence(mode);
         }
 
         void RunTreeWafer(Tree.eMode mode)
@@ -461,12 +464,12 @@ namespace Root_Wind
         {
             TreeRoot tree = m_treeSequence;
             tree.p_eMode = mode;
-            ModuleRunBase[] aModuleRun = m_qSequence.ToArray(); 
-            for (int n = 0; n < aModuleRun.Length; n++)
+            Sequence[] aSequence = m_qSequence.ToArray(); 
+            for (int n = 0; n < aSequence.Length; n++)
             {
-                ModuleRunBase moduleRun = aModuleRun[n];
+                ModuleRunBase moduleRun = aSequence[n].m_moduleRun;
                 ModuleBase module = moduleRun.m_moduleBase;
-                InfoWafer infoWafer = moduleRun.m_infoObject;
+                InfoWafer infoWafer = aSequence[n].m_infoWafer;
                 string sTree = "(" + infoWafer.p_id + ")." + moduleRun.p_id;
                 switch (moduleRun.m_sModuleRun)
                 {

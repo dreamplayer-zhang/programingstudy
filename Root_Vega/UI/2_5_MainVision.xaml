@@ -32,14 +32,14 @@
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding p_ImageViewer.btnClickOpenImage}"
                             Margin="0,0,0,10" />
-                    <ListView ItemsSource="{Binding p_Recipe.p_RecipeData.p_Roi}"
+                    <ListView ItemsSource="{Binding p_Recipe.RecipeData.RoiList}"
                               Height="100"
                               Margin="0,0,0,10"
                               Background="#FF1B1B1C"
                               SelectedIndex="{Binding p_IndexMask}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding p_sName}"
+                                <TextBlock Text="{Binding Name}"
                                            Foreground="White"
                                            FontWeight="Bold"
                                            FontSize="13" />
@@ -63,17 +63,25 @@
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnInspTest}"
                             Margin="0,0,0,10" />
-					<Button Content="Start Insp Test"
+					<!--<Button Content="Start Insp Test"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnStartInsp}"
                             Margin="0,0,0,10" />
 					<Button Content="Next Snap Test"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnNextSnap}"
-                            Margin="0,0,0,10" />
+                            Margin="0,0,0,10" />-->
 					<Button Content="Recipe Save Test"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnRcpSaveTest}"
+                            Margin="0,0,0,10" />
+					<Button Content="Recipe Load Test"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding btnRcpLoadTest}"
+                            Margin="0,0,0,10" />
+					<Button Content="Inspection Done"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding btnInspDone}"
                             Margin="0,0,0,10" />
 					<!--<StackPanel>
                         <WrapPanel Margin="3">
@@ -114,25 +122,25 @@
 							<UniformGrid Columns="2" Margin="0,10,0,10">
 								<TextBlock  Text="Intensity"
                                         Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding p_Intensity}"
+								<TextBox Text="{Binding Intensity}"
                                      Style="{StaticResource BasicTbox}"/>
 							</UniformGrid>
 							<UniformGrid Columns="2" Margin="0,0,0,10">
 								<TextBlock  Text="Bandwidth"
                                         Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding p_Bandwidth}"
+								<TextBox Text="{Binding Bandwidth}"
                                      Style="{StaticResource BasicTbox}"/>
 							</UniformGrid>
 							<UniformGrid Columns="2" Margin="0,0,0,10">
 								<TextBlock  Text="{Binding TargetLabelText}"
                                         Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding p_GV}"
+								<TextBox Text="{Binding TargetGV}"
                                      Style="{StaticResource BasicTbox}"/>
 							</UniformGrid>
 							<UniformGrid Columns="2" Margin="0,0,0,10">
 								<TextBlock  Text="DefectSize"
                                         Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding p_DefectSize}"
+								<TextBox Text="{Binding DefectSize}"
                                      Style="{StaticResource BasicTbox}"/>
 							</UniformGrid>
 						</StackPanel>
@@ -140,14 +148,14 @@
 							<UniformGrid Columns="2" Margin="0,10,0,10">
 								<TextBlock  Text="Use Defect Merge"
 											Style="{StaticResource BasicTb}"/>
-								<ToggleButton Content="{Binding p_bDefectMerge}"
+								<ToggleButton Content="{Binding UseDefectMerge}"
 											  Style="{StaticResource BasicToggle}"
-											  IsChecked="{Binding p_bDefectMerge}"/>
+											  IsChecked="{Binding UseDefectMerge}"/>
 							</UniformGrid>
 							<UniformGrid Columns="2" Margin="0,0,0,10">
 								<TextBlock Text="Defect Merge Distance(pxl)"
 										   Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding p_nMergeDistance}"
+								<TextBox Text="{Binding MergeDistance}"
 										 Style="{StaticResource BasicTbox}"/>
 							</UniformGrid>
 						</StackPanel>

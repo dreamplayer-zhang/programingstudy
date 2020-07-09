@@ -52,7 +52,17 @@ namespace Root_Vega
         private void M_timer_Tick(object sender, EventArgs e)
         {
             textBoxDateTime.Text = DateTime.Now.ToString();
-            TimerLamp(); 
+            TimerLamp();
+            TimerUI(m_engineer.m_login.p_eLevel); 
+        }
+
+        void TimerUI(Login.eLevel level)
+        {
+            _Recipe.Visibility = (level >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Hidden;
+            _Maint.Visibility = (level >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Hidden; 
+            _Viewer.Visibility = (level >= Login.eLevel.Worker) ? Visibility.Visible : Visibility.Hidden;
+            _Result.Visibility = (level >= Login.eLevel.Worker) ? Visibility.Visible : Visibility.Hidden;
+            _Setting.Visibility = (level >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Hidden;
         }
         #endregion
 
@@ -60,9 +70,9 @@ namespace Root_Vega
         void TimerLamp()
         {
             Vega vega = m_engineer.m_handler.m_vega;
-            gridLampR.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Red) ? Brushes.Red : Brushes.DarkRed;
-            gridLampY.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Yellow) ? Brushes.LightYellow : Brushes.YellowGreen;
-            gridLampG.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Green) ? Brushes.LightGreen : Brushes.DarkGreen;
+            gridLampR.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Red) ? Brushes.Red : Brushes.Black;
+            gridLampY.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Yellow) ? Brushes.LightYellow : Brushes.Black;
+            gridLampG.Background = vega.m_doLamp.ReadDO(Vega.eLamp.Green) ? Brushes.LightGreen : Brushes.Black;
         }
         #endregion
 
@@ -80,8 +90,14 @@ namespace Root_Vega
             textLastError.DataContext = m_engineer.m_gaf.m_listALID;
 
             _Main.Init(m_engineer);
+            loginMaunUI.Init(m_engineer.m_login); 
 
             InitTimer(); 
+
+            if(!System.IO.Directory.Exists(@"C:\VEGA\Recipe"))
+			{
+                System.IO.Directory.CreateDirectory(@"C:\VEGA\Recipe");
+			}
         }
 
         void ConnectViewModel(IDialogService dialogService)
@@ -98,6 +114,9 @@ namespace Root_Vega
 
             _2_6_SideViewModel sivm = new _2_6_SideViewModel(m_engineer, dialogService);
             _Recipe._Side.DataContext = sivm;
+
+            _2_9_BevelViewModel bevm = new _2_9_BevelViewModel(m_engineer, dialogService);
+            _Recipe._Bevel.DataContext = bevm;
 
             _2_7_EdgeBoxViewModel evm = new _2_7_EdgeBoxViewModel(m_engineer, dialogService);
             _Recipe._EdgeBox.DataContext = evm;

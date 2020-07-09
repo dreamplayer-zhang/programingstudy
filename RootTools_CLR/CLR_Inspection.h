@@ -9,6 +9,11 @@
 #include "..\RootTools_Cpp\\InspectionReticle.h"
 #include "DefectData.h"
 
+#include <vcclr.h> // for PtrToStringChars 
+#include <stdio.h> // for wprintf
+#include <msclr\marshal_cppstd.h>
+
+
 namespace RootTools_CLR
 {
 	public ref class CLR_Inspection
@@ -31,7 +36,7 @@ namespace RootTools_CLR
 			delete pInspReticle;
 		}
 
-		array<DefectData^>^ SurfaceInspection(int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
+		array<DefectData^>^ SurfaceInspection(System::String^ poolName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -41,44 +46,55 @@ namespace RootTools_CLR
 			targetRect.top = RoiTop;
 			targetRect.bottom = RoiBottom;
 
-			m_InspConn->GetImagePool("pool", memwidth, memHeight);
-			int bufferwidth = memwidth;
-			int bufferheight = memHeight;
+			msclr::interop::marshal_context context;
+			std::string standardString = context.marshal_as<std::string>(poolName);
 
-			pInspSurface->SetParams(m_InspConn->GetBuffer(), bufferwidth, bufferheight, targetRect, 1, GV, DefectSize, bDark, threadindex);
-			
-			//TODO 여기서 이벤트를 올리는 방식으로 변경한다
-			//여기 들어올때 이미 한 블럭에 대한 정보가 통째로 넘어오는 것이므로 구조 자체를 변경하여 AddDefect이 발생하는 순간을 여기서 포착하도록 수정한다
-			//pInspSurface->Inspection();
-
-			pInspSurface->CheckConditions();
-
-			pInspSurface->CopyImageToBuffer(bDark);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
-			vTempResult = pInspSurface->SurfaceInspection(bAbsolute);//TODO : absolute GV 구현해야함
-			
-			bool bResultExist = vTempResult.size() > 0;
-			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
-
-			if (bResultExist)
+			byte* buffer = m_InspConn->GetImagePool(standardString, memOffset, memwidth, memHeight);
+			if (buffer != NULL)
 			{
-				for (int i = 0; i < vTempResult.size(); i++)
-				{
-					local[i] = gcnew DefectData();
-					local[i]->nIdx = vTempResult[i].nIdx;
-					local[i]->nClassifyCode = nDefectCode;//vTempResult[i].nClassifyCode;
-					local[i]->fAreaSize = vTempResult[i].fAreaSize;
-					local[i]->nLength = vTempResult[i].nLength;
-					local[i]->nWidth = vTempResult[i].nWidth;
-					local[i]->nHeight = vTempResult[i].nHeight;
-					local[i]->nFOV = vTempResult[i].nFOV;
-					local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
-					local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
-				}
-			}
+				int bufferwidth = memwidth;
+				int bufferheight = memHeight;
 
-			return local;
+				pInspSurface->SetParams(buffer, bufferwidth, bufferheight, targetRect, 1, GV, DefectSize, bDark, threadindex);
+
+				//TODO 여기서 이벤트를 올리는 방식으로 변경한다
+				//여기 들어올때 이미 한 블럭에 대한 정보가 통째로 넘어오는 것이므로 구조 자체를 변경하여 AddDefect이 발생하는 순간을 여기서 포착하도록 수정한다
+				//pInspSurface->Inspection();
+
+				pInspSurface->CheckConditions();
+
+				pInspSurface->CopyImageToBuffer(bDark);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
+				vTempResult = pInspSurface->SurfaceInspection(bAbsolute, nDefectCode);//TODO : absolute GV 구현해야함
+
+				bool bResultExist = vTempResult.size() > 0;
+				array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
+
+				if (bResultExist)
+				{
+					for (int i = 0; i < vTempResult.size(); i++)
+					{
+						local[i] = gcnew DefectData();
+						local[i]->nIdx = vTempResult[i].nIdx;
+						local[i]->nClassifyCode = vTempResult[i].nClassifyCode;
+						local[i]->fAreaSize = vTempResult[i].fAreaSize;
+						local[i]->nLength = vTempResult[i].nLength;
+						local[i]->nWidth = vTempResult[i].nWidth;
+						local[i]->nHeight = vTempResult[i].nHeight;
+						local[i]->nFOV = vTempResult[i].nFOV;
+						local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+						local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+					}
+				}
+
+				return local;
+			}
+			else 
+			{
+				array<DefectData^>^ local = gcnew array<DefectData^>(0);
+				return local;
+			}
 		}
-		array<DefectData^>^ StripInspection(int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
+		array<DefectData^>^ StripInspection(System::String^ poolName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -88,15 +104,18 @@ namespace RootTools_CLR
 			targetRect.top = RoiTop;
 			targetRect.bottom = RoiBottom;
 
-			m_InspConn->GetImagePool("pool", memwidth, memHeight);
+			msclr::interop::marshal_context context;
+			std::string standardString = context.marshal_as<std::string>(poolName);
+
+			byte* buffer = m_InspConn->GetImagePool(standardString, memOffset, memwidth, memHeight);//TODO 수정필요
 			int bufferwidth = memwidth;
 			int bufferheight = memHeight;
 
-			pInspReticle->SetParams(m_InspConn->GetBuffer(), bufferwidth, bufferheight, targetRect, 1, threadindex, GV, DefectSize);
+			pInspReticle->SetParams(buffer, bufferwidth, bufferheight, targetRect, 1, threadindex, GV, DefectSize);
 			pInspReticle->CheckConditions();
 
 			pInspReticle->CopyImageToBuffer(true);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
-			vTempResult = pInspReticle->StripInspection(nBandwidth, nIntensity);
+			vTempResult = pInspReticle->StripInspection(nBandwidth, nIntensity, nDefectCode);
 
 			bool bResultExist = vTempResult.size() > 0;
 			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
@@ -107,7 +126,7 @@ namespace RootTools_CLR
 				{
 					local[i] = gcnew DefectData();
 					local[i]->nIdx = vTempResult[i].nIdx;
-					local[i]->nClassifyCode = nDefectCode;//vTempResult[i].nClassifyCode;
+					local[i]->nClassifyCode = vTempResult[i].nClassifyCode;
 					local[i]->fAreaSize = vTempResult[i].fAreaSize;
 					local[i]->nLength = vTempResult[i].nLength;
 					local[i]->nWidth = vTempResult[i].nWidth;

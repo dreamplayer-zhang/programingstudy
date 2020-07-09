@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RootTools.Trees
@@ -24,10 +25,8 @@ namespace RootTools.Trees
                 ((TextBox)sender).MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
         }
 
-        private void UserControl_SizeChanged(object sender, System.Windows.SizeChangedEventArgs e)
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            //double data = ControlTree.ActualWidth - Column1.ActualWidth - 10;
-            //if (data > 0) Column2.Width = data;
             if (ControlTree.ActualWidth < 16) return; 
             Column1.Width = ControlTree.ActualWidth / 2; 
             Column2.Width = ControlTree.ActualWidth / 2;

@@ -191,6 +191,7 @@ namespace Root_Vega
         {
             EQ.p_bStop = false;
             PatternVision vision = ((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision;
+            if (vision.p_axisClamp.p_sensorHome == false) return;    // 8번축(Clamp축)이 Home위치가 아니면 Home 시퀀스 동작하지 않도록 Interlock 추가
             vision.p_eState = ModuleBase.eState.Home;
             //if (vision.m_CamMain.p_CamInfo.p_eState == eCamState.Init)
             //    vision.m_CamMain.Connect();
@@ -252,6 +253,18 @@ namespace Root_Vega
             }
         }
 
+        public void Test()
+        {
+            p_PatternVision.BeforeGet();
+        }
+
+        public RelayCommand CommandTest
+        {
+            get
+            {
+                return new RelayCommand(Test);
+            }
+        }
 
         public RelayCommand CommandScan
         {

@@ -159,19 +159,35 @@
         </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>    
             <GroupBox Header="Inspection"
                       Margin="10,0,10,10"
                       Foreground="{StaticResource BtnForeGround}"
                       FontSize="20">
-                <StackPanel>
-                    <Grid Height="50" Margin="10,5,10,5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="7*"/>
-                            <ColumnDefinition Width="3*"/>
-                        </Grid.ColumnDefinitions>
+				<StackPanel>
+					<Grid Height="50" Margin="10,5,10,5">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="130"/>
+						</Grid.ColumnDefinitions>
+						<TextBlock Grid.Column="1"
+                                   Style="{StaticResource BasicTb}"
+                                   Text="Custom Edge"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"/>
+						<ToggleButton Grid.Column="0"
+                                      Style="{StaticResource BasicToggle}"
+                                      Content="On"   
+                                      IsChecked="{Binding UseCustomEdgeBox}">
+						</ToggleButton>
+					</Grid>
+					<Grid Height="50" Margin="10,5,10,5">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="130"/>
+						</Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="1"
                                    Style="{StaticResource BasicTb}"
                                    Text="Auto GV"
@@ -180,14 +196,14 @@
                         <ToggleButton Grid.Column="0"
                                       Style="{StaticResource BasicToggle}"
                                       Content="On"   
-                                      IsChecked="{Binding p_bUseAutoThreshold}">
+                                      IsChecked="{Binding UseAutoGV}">
                         </ToggleButton>
                     </Grid>
                     <Grid Height="50" Margin="10,5,10,5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="7*"/>
-                            <ColumnDefinition Width="3*"/>
-                        </Grid.ColumnDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="130"/>
+						</Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="1"
                                    Style="{StaticResource BasicTb}"
                                    Text="B2D"
@@ -196,7 +212,7 @@
                         <ToggleButton Grid.Column="0"
                                       Style="{StaticResource BasicToggle}"
                                       Content="On"
-                                      IsChecked="{Binding p_bUseB2D}">
+                                      IsChecked="{Binding SearchBrightToDark}">
                         </ToggleButton>
                     </Grid>
                     <Grid Height="50" Margin="10,5,10,5">
@@ -226,18 +242,56 @@
                     <Grid Height="50" Margin="10,5,10,5">
                         <Button Grid.Column="0"
                                 Style="{StaticResource BasicBtn}"
-                                Content="Inspect"
+                                Content="Inspection Start"
                                 Command="{Binding CommandInspect}"/>
-                    </Grid>
-                </StackPanel>
+					</Grid>
+					<Grid Height="50" Margin="10,5,10,5">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Inspection Complete"
+                                Command="{Binding CommandInspectComplete}"/>
+					</Grid>
+					<ListView ItemsSource="{Binding p_SideRoiList}"
+                              Height="100"
+                              Margin="0,0,0,10"
+                              Background="#FF1B1B1C"
+                              SelectedItem="{Binding SelectedROI}">
+						<ListView.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding Name}"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           FontSize="13" />
+							</DataTemplate>
+						</ListView.ItemTemplate>
+					</ListView>
+					<Grid Height="50" Margin="10,5,10,5">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Add Side Insp ROI"
+                                Command="{Binding CommandAddRoi}"/>
+					</Grid>
+					<Grid Height="50" Margin="10,5,10,5">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Save Edge to Recipe"
+                                Command="{Binding CommandSave}"/>
+					</Grid>
+					<Grid Height="50" Margin="10,5,10,5">
+						<Button Grid.Column="0"
+                                Style="{StaticResource BasicBtn}"
+                                Content="Save Edge to Init"
+                                Command="{Binding CommandInitSave}"/>
+					</Grid>
+				</StackPanel>
             </GroupBox>
-            <GroupBox Grid.Row="1"
+            <!--<GroupBox Grid.Row="1"
                       Header="Color"
                       Margin="10,0,10,10"
                       Foreground="{StaticResource BtnForeGround}"
                       FontSize="20">
                 
-            </GroupBox>
+            </GroupBox>-->
         </Grid>
     </Grid>
 </UserControl>
