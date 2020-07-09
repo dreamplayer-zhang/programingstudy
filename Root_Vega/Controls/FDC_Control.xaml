@@ -6,6 +6,7 @@
              mc:Ignorable="d" 
               xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:MainViewerConverter"
              xmlns:behavior="clr-namespace:mousebehavior;assembly=RootTools"
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              d:DesignHeight="360" d:DesignWidth="300" Margin="25"
@@ -107,7 +108,7 @@ Background="Transparent" >
     </UserControl.Resources>
     <!--<Border Style="{StaticResource Boundery}" CornerRadius="50,50,50,50">-->
     <!--<Grid Width="400" Height="200" Style = "{StaticResource TotalGrid}" Name="GridControl" >-->
-    <Grid Name="GridControl" >
+    <Grid Name="GridControl">
         <Grid.RowDefinitions>
             <RowDefinition Height="300"/>
             <RowDefinition Height="60"/>

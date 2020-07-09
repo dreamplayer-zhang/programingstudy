@@ -207,9 +207,11 @@
                     <Grid Grid.Row="0" x:Name="gridLampR" Background="#FFDE3A3A"/>
                     <Grid Grid.Row="1" x:Name="gridLampY" Background="#FFF3CD6E"/>
                     <Grid Grid.Row="2" x:Name="gridLampG" Background="#FF57AE7D"/>
+                    
                 </Grid>
             </Border>
         </Grid>
+        
         <Line Grid.Row="1"
               Stretch="Fill" Margin="-2,0,-2,0"
               VerticalAlignment="Bottom"
@@ -226,7 +228,7 @@
             </TabItem>
             <TabItem Header="Recipe"
                      Grid.Column="1"
-                     Style="{StaticResource ResourceKey=MainTabItem}">
+                     Style="{StaticResource ResourceKey=MainTabItem}" Margin="10,0,-10,0">
                 <local:_2_Recipe x:Name="_Recipe"/>
             </TabItem>
             <TabItem Header="Maint"

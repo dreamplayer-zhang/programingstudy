@@ -4,6 +4,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using RootTools;
+
 
 namespace Root_Siltron
 {
@@ -12,6 +14,7 @@ namespace Root_Siltron
     /// </summary>
     public partial class MainWindow : Window
     {
+        
         #region Window Event
         public MainWindow()
         {
@@ -54,21 +57,17 @@ namespace Root_Siltron
         Siltron_Engineer m_engineer = new Siltron_Engineer();
         void Init()
         {
-            m_engineer.Init("Siltron");
-            _Maint.engineerUI.Init(m_engineer);
+            m_engineer.Init("Siltron");            
+            //_Maint.engineerUI.Init(m_engineer);
+            //Panel.DataContext = new NavigationManger();
             InitTimer();
         }
+
+
 
         void ThreadStop()
         {
             m_engineer.ThreadStop();
-        }
-
-
-        private void MainTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            TabItem ti = (TabItem)MainTab.SelectedItem;
-            tb_CurrenView.Text = ti.Header.ToString();
         }
 
         #region TitleBar
@@ -124,5 +123,7 @@ namespace Root_Siltron
             m_engineer.m_gaf.m_listALID.ShowPopup();
         }
         #endregion
+
+
     }
 }

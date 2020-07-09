@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="Root_Siltron.NavigationPanelUI.HomeUI.HomePanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:home="clr-namespace:Root_Siltron.NavigationPanelUI.HomeUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="818" d:DesignWidth="1912">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="12*"/>
+            <ColumnDefinition Width="88*"/>
+        </Grid.ColumnDefinitions>
+        <Border Background="#FFCFCFCF"
+                BorderBrush="DimGray" BorderThickness="0,0,1,0">
+            <StackPanel Margin="0,0,0,0">
+                <ToggleButton Content="Summary"    
+                              IsChecked="False"
+                        Command="{Binding btnSummary}"
+                        FontSize="15"
+                        FontWeight="Bold"
+                        Margin="10"
+                        Height="40"/>
+                <Button Content="Inspection"
+                        Command="{Binding btnInspection}"
+                        FontSize="15"
+                        FontWeight="Bold"
+                        Margin="10"
+                        Height="40"/>
+                <Button Content="Recipe Wizard"
+                        Command="{Binding btnRecipeWizard}"
+                        FontSize="15"
+                        FontWeight="Bold"
+                        Margin="10"
+                        Height="40"/>
+                <Button Content="Maintenance"
+                        Command="{Binding btnMaintenance}"
+                        FontSize="15"
+                        FontWeight="Bold"
+                        Margin="10"
+                        Height="40"/>
+                <Button Content="GEM"
+                        Command="{Binding btnGEM}"
+                        FontSize="15"
+                        FontWeight="Bold"
+                        Margin="10"
+                        Height="40"/>
+            </StackPanel>
+        </Border>
+        <Grid Grid.Column="1" x:Name="SubPanel" Background="White"/>
+
+
+
+    </Grid>
+</UserControl>
