@@ -10,21 +10,23 @@
         ResizeMode="CanResizeWithGrip"
         Height="1080"
         Width="1920"
-        Background="#FF2D2D30"
         Title="Siltron"
+        Background="LightGray"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
         WindowState="Maximized">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="9*" />
-            <RowDefinition Height="91*" />
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="85*"/>
+            <RowDefinition Height="3"/>
+            <RowDefinition Height="15*"/>
         </Grid.RowDefinitions>
         <!--Title Bar Start-->
         <Grid Grid.ColumnSpan="100"
               Name="TitleBar"
-              Background="#FF2D2D30"
+              Background="#FF2D2D50"
               MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -34,11 +36,11 @@
             <icons:AtiLogo Width="40"
                            Height="25"
                            Margin="3" />
-            <TextBlock Text="Siltron"
+            <TextBlock Text="ADI"
                        Foreground="White"
                        VerticalAlignment="Center"
                        FontSize="15"
-                       Margin="10"
+                       Margin="10,0,0,0"
                        Grid.Column="1" />
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
                         Orientation="Horizontal"
@@ -74,7 +76,7 @@
                         x:Name="CloseButton"
                         Width="34"
                         Height="26"
-                        Margin="0,0,10,12"
+                        Margin="0,0,10,2"
                         Foreground="White"
                         Click="CloseButton_Click"
                         VerticalAlignment="Bottom">
@@ -83,183 +85,90 @@
             </StackPanel>
         </Grid>
         <!--Title Bar End-->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="7.5*" />
-                <ColumnDefinition Width="7.5*" />
-                <ColumnDefinition Width="65*" />
-                <ColumnDefinition Width="10*" />
-                <ColumnDefinition Width="3*" />
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="0"
-                  Margin="10,5,5,10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <TextBlock Text="CommState"
-                           Style="{StaticResource BasicTb}"
-                           VerticalAlignment="Bottom"
-                           FontSize="13" />
-                <Border Grid.Row="1"
-                        BorderBrush="{StaticResource BorderBrush}"
-                        BorderThickness="3">
-                    <TextBlock x:Name="textGemState"
-                               Text="{Binding p_eComm}"
-                               Style="{StaticResource BasicTb}"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               FontSize="24" />
-                </Border>
-            </Grid>
-            <Grid Grid.Column="1"
-                  Margin="5,5,10,10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <TextBlock Text="ControlState"
-                           Style="{StaticResource BasicTb}"
-                           VerticalAlignment="Bottom"
-                           FontSize="13" />
-                <Border Grid.Row="1"
-                        BorderBrush="{StaticResource BorderBrush}"
-                        BorderThickness="3">
-                    <TextBlock x:Name="textGemControl"
-                               Text="{Binding p_eControl}"
-                               Style="{StaticResource BasicTb}"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               FontSize="24" />
-                </Border>
-            </Grid>
-            <Border Grid.Column="2"
-                    Margin="0,10,10,10"
-                    BorderBrush="{StaticResource BorderBrush}"
-                    BorderThickness="3">
-                <!--Background="{StaticResource BackGround}"-->
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="20*" />
-                        <ColumnDefinition Width="65*" />
-                        <ColumnDefinition Width="15*" />
-                    </Grid.ColumnDefinitions>
-                    <Line Grid.ColumnSpan="3"
-                          Margin="-2,0,-2,0"
-                          VerticalAlignment="Bottom"
-                          Stretch="Fill"
-                          Stroke="{StaticResource BorderBrush}"
-                          StrokeThickness="3"
-                          X2="1" />
-                    <Line Grid.Row="0"
-                          Margin="0,-2,0,-2"
-                          HorizontalAlignment="Right"
-                          Stretch="Fill"
-                          Stroke="{StaticResource BorderBrush}"
-                          StrokeThickness="3"
-                          Y2="1" />
-                    <Line Grid.Column="1"
-                          Margin="0,-1.5,0,-1.5"
-                          HorizontalAlignment="Right"
-                          Stretch="Fill"
-                          Stroke="{StaticResource BorderBrush}"
-                          StrokeThickness="3"
-                          Y2="1" />
-                    <Grid Grid.Column="1">
-                        <TextBlock Text="Current View"
-                                   Style="{StaticResource BasicTb}"
-                                   x:Name="tb_CurrenView"
-                                   FontSize="30"
-                                   FontWeight="ExtraBlack">
-                            <TextBlock.BitmapEffect>
-                                <DropShadowBitmapEffect Color="DimGray"
-                                                        Opacity="0.5" />
-                            </TextBlock.BitmapEffect></TextBlock>
-                    </Grid>
-                    <Grid Grid.Column="2">
-                        <Label Content="Login"
-                               Style="{StaticResource BasicLabel}"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"
-                               FontSize="15"
-                               FontFamily="Arial" />
-                    </Grid>
-                    <Grid Grid.Row="0">
-                        <TextBlock x:Name="textBoxDateTime"
-                                   Text="Date"
-                                   Style="{StaticResource BasicTb}"
-                                   FontSize="20"
-                                   Grid.ColumnSpan="2" />
-                    </Grid>
-                    <TextBlock x:Name="textLastError"
-                               Grid.Row="1"
-                               Grid.ColumnSpan="3"
-                               Style="{StaticResource BasicTb}"
-                               Text="{Binding p_sInfo}"
-                               Foreground="{Binding p_brushAlarm}"
-                               FontSize="20"
-                               MouseLeftButtonUp="textLastError_MouseLeftButtonUp" />
+
+        <Border Grid.Row="1" Margin="0"
+                BorderBrush="DimGray"
+                BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal" Background="Gainsboro">
+                <Grid Width="120">
+                    <Button Content="Save" FontWeight="Bold" FontSize="13" 
+                            BorderThickness="0"
+                            Margin="2"/>                
                 </Grid>
-            </Border>
-            <Border Grid.Column="3"
-                    BorderBrush="{StaticResource BorderBrush}"
-                    Margin="0,10,10,10"
-                    BorderThickness="3">
-                <TextBlock x:Name="textState"
-                           Text="{Binding p_eState}"
-                           Style="{StaticResource BasicTb}"
-                           FontSize="30" />
-            </Border>
-            <Border Grid.Column="4"
-                    Background="White"
-                    BorderBrush="{StaticResource BorderBrush}"
-                    Margin="0,10,10,10"
-                    BorderThickness="3">
-                <Grid Opacity="0.8">
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0"
-                          x:Name="gridLampR"
-                          Background="#FFDE3A3A" />
-                    <Grid Grid.Row="1"
-                          x:Name="gridLampY"
-                          Background="#FFF3CD6E" />
-                    <Grid Grid.Row="2"
-                          x:Name="gridLampG"
-                          Background="#FF57AE7D" />
+                <Grid Width="120">
+                    <Button Content="Load" FontWeight="Bold" FontSize="13" 
+                            BorderThickness="0"
+                            Margin="2"/>
                 </Grid>
-            </Border>
-        </Grid>
-        <Line Grid.Row="1"
-              Stretch="Fill"
-              Margin="-2,0,-2,0"
-              VerticalAlignment="Bottom"
-              Stroke="{StaticResource BorderBrush}"
-              StrokeThickness="3"
-              X2="1" />
-        <TabControl Grid.Row="2"
-                    x:Name="MainTab"
-                    SelectionChanged="MainTab_SelectionChanged"
-                    Style="{StaticResource ResourceKey=MainTabControl}">
-            <TabItem Header="Maint"
-                     Grid.Column="2"
-                     Style="{StaticResource ResourceKey=MainTabItem}">
-                <local:_3_Maint x:Name="_Maint" />
-            </TabItem>
-        </TabControl>
+            </StackPanel>
+        </Border>
+        <Border Grid.Row="2"
+                Background="White">
+            <Grid Grid.Row="1">
+                <Grid.DataContext>
+                    <local:NavigationManger/>
+                </Grid.DataContext>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0"
+                        BorderBrush="DimGray"
+                        BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="12*"/>
+                            <ColumnDefinition Width="88*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0"
+                                BorderBrush="DimGray"
+                                Background="DarkGray"
+                                BorderThickness="0,0,1,0">
+                            <TextBlock Text="Navigation"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontSize="13"/>
+                        </Border>
+                        <Border Grid.Column="1" Background="DarkGray">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Width="120"
+                                        Cursor="Hand"
+                                        Background="LightBlue"
+                                        BorderBrush="{x:Null}"
+                                        Content="Home"/>
+                                <ItemsControl ItemsSource="{Binding p_NaviButtons}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+                <Grid Grid.Row="1">
+                    <ContentControl Content="{Binding p_CurrentPanel}"/>
+                </Grid>
+            </Grid>
+        </Border>
+        <GridSplitter Grid.Row="3" 
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Background="DimGray"
+                      ShowsPreview="True"/>
+        <Border Grid.Row="4">
+            <TabControl Background="Transparent">
+                <TabItem Header="ALL" FontSize="10">
+                    <TextBlock Text="Log Area" Margin="5"/>
+                </TabItem>
+                <TabItem Header="System" FontSize="10"/>
+                <TabItem Header="Inspection" FontSize="10"/>
+                <TabItem Header="I/O" FontSize="10"/>
+                <TabItem Header="Network" FontSize="10"/>
+                <TabItem Header="Result" FontSize="10"/>
+            </TabControl>
+            
+        </Border>
     </Grid>
-    <!--<Grid>
-        <TabControl>
-            <TabItem Header="Engineer">
-                <local:Siltron_Engineer_UI x:Name="engineerUI"/>
-            </TabItem>
-        </TabControl>
-    </Grid>-->
 </Window>

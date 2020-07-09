@@ -281,6 +281,7 @@
                                             Margin="5">
                                         <Button.Content>
                                             <StackPanel Orientation="Horizontal">
+                                                
                                                 <material:PackIcon Kind="LanConnect"
                                                                    Foreground="White"
                                                                    Width="30"

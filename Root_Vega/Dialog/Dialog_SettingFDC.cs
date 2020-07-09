@@ -186,6 +186,7 @@ namespace Root_Vega
             {
                 CVM_manager.Add_CVM();
                 selectedViewModel = CVM_manager.GetLastCVM();
+
 				FDC_Control Cxaml1 = new FDC_Control(selectedViewModel);
                 item.Add(Cxaml1);
             }
