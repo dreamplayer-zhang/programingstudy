@@ -128,7 +128,7 @@ namespace RootTools.Memory
                 Point p = new Point();
                 p.X = (m_cp.X - cpOffset.X) * fZoom;
                 p.Y = (m_cp.Y - cpOffset.Y) * fZoom;
-                label.Margin = new Thickness(p.X, p.Y, p.X, p.Y); 
+                label.Margin = new Thickness(p.X, p.Y, 0, 0); 
                 grid.Children.Add(label);
             }
 
