@@ -60,5 +60,43 @@ namespace RootTools.GAFs
         {
             this.Close();
         }
+
+        #region Title Bar
+
+        private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Maximized;
+            NormalizeButton.Visibility = Visibility.Visible;
+            MaximizeButton.Visibility = Visibility.Collapsed;
+        }
+        private void NormalizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Normal;
+            MaximizeButton.Visibility = Visibility.Visible;
+            NormalizeButton.Visibility = Visibility.Collapsed;
+        }
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                if (this.WindowState == WindowState.Maximized)
+                {
+                    this.WindowState = WindowState.Normal;
+                    MaximizeButton.Visibility = Visibility.Visible;
+                    NormalizeButton.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    this.WindowState = WindowState.Maximized;
+                    NormalizeButton.Visibility = Visibility.Visible;
+                    MaximizeButton.Visibility = Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                this.DragMove();
+            }
+        }
+        #endregion
     }
 }
