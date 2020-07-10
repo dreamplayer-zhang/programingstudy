@@ -10,8 +10,8 @@
         mc:Ignorable="d" d:DesignHeight="450"
         d:DesignWidth="800">
     <UserControl.Resources>
-        <local:TestConverter x:Key="TestConverters"></local:TestConverter>
-        <local:TestConverter2 x:Key="TestConverter2s"></local:TestConverter2>
+        <local:TestConverter x:Key="TestConverters"/>
+        <local:TestConverter2 x:Key="TestConverter2s"/>
     </UserControl.Resources>
     <Grid>
         <TabControl x:Name="tabControlTool">
