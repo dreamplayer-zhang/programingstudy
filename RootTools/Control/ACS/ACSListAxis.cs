@@ -1,10 +1,7 @@
 ﻿using RootTools.Trees;
-using System;
+using SPIIPLUSCOM660Lib;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace RootTools.Control.ACS
 {
@@ -19,7 +16,7 @@ namespace RootTools.Control.ACS
         public Axis GetAxis(string id, Log log)
         {
             ACSAxis axis = new ACSAxis();
-            axis.Init(this, id, log);
+            axis.Init(this, m_channel, id, log);
             m_aAxis.Add(axis);
             m_qSetAxis.Enqueue(axis);
             if (OnChangeAxisList != null) OnChangeAxisList();
@@ -62,7 +59,7 @@ namespace RootTools.Control.ACS
             return uResult;
         }
 
-        string AXM(string sFunc, string sError)
+        string Run(string sFunc, string sError)
         {
             if (sError == "OK") return sError;
             if (m_log == null) return sError;
@@ -79,8 +76,8 @@ namespace RootTools.Control.ACS
         int m_lAxisACS = 0;
         string InitAxis()
         {
-            AXM("AxmInfoGetAxisCount", CAXM.AxmInfoGetAxisCount(ref m_lAxisACS));
-            if (m_bAXL == false) return "Init Axis Skip : AXL";
+            //AXM("AxmInfoGetAxisCount", CAXM.AxmInfoGetAxisCount(ref m_lAxisACS));
+            if (m_bChannel == false) return "Init Axis Skip : AXL";
             m_thread = new Thread(new ThreadStart(RunThread));
             m_thread.Start();
             return "OK";
@@ -140,15 +137,17 @@ namespace RootTools.Control.ACS
         string m_id;
         Log m_log;
         IEngineer m_engineer;
-        bool m_bAXL = false;
+        Channel m_channel; 
+        bool m_bChannel = false;
 //        string m_strMotFile = @"C:\VEGA\Init\VEGA.mot";
-        public void Init(string id, IEngineer engineer, bool bAXL)
+        public void Init(string id, IEngineer engineer, Channel channel, bool bChannel)
         {
             m_id = id;
             m_engineer = engineer;
-            m_bAXL = bAXL;
+            m_channel = channel; 
+            m_bChannel = bChannel;
             m_log = LogView.GetLog(id);
-            AXM("Init Axis Error (ReStart SW) : ", InitAxis());
+            Run("Init Axis Error (ReStart SW) : ", InitAxis());
         }
 
         public void ThreadStop()
@@ -165,7 +164,6 @@ namespace RootTools.Control.ACS
 
         public void RunTree(Tree tree)
         {
-//            m_strMotFile = tree.SetFile(m_strMotFile, m_strMotFile, "mot", "MotFile", "Motor 설정  File 위치");
             tree.Set(m_lAxisACS, m_lAxisACS, "Detect", "Detected Axis Count", true, true);
         }
 

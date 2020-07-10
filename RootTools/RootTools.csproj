@@ -81,6 +81,10 @@
     <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
     </Reference>
+    <Reference Include="Interop.SPIIPLUSCOM660Lib">
+      <HintPath>Control\ACS\DLL\Interop.SPIIPLUSCOM660Lib.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="MaterialDesignThemes.Wpf">
       <HintPath>..\Lib\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
@@ -801,6 +805,8 @@
   <ItemGroup>
     <Resource Include="Resources\OHT_SSEM.JPG" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Control\ACS\DLL\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

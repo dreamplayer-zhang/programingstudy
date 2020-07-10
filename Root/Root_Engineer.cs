@@ -37,7 +37,6 @@ namespace Root
             MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool, false);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
         }
-
         #endregion
 
         #region Ajin

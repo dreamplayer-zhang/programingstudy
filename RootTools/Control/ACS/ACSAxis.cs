@@ -1,4 +1,6 @@
 ﻿using RootTools.Trees;
+using SPIIPLUSCOM660Lib;
+using System;
 using System.Threading;
 using System.Windows.Controls;
 
@@ -21,28 +23,28 @@ namespace RootTools.Control.ACS
         #region Position & Velocity
         public override void SetCommandPosition(double fPos)
         {
-//            AXM("AxmStatusSetActPos", CAXM.AxmStatusSetActPos(m_nAxis, fPos));
+            m_channel.SetRPosition(m_nAxis, fPos);
         }
 
         public override void SetActualPosition(double fPos)
         {
-//            AXM("AxmStatusSetCmdPos", CAXM.AxmStatusSetCmdPos(m_nAxis, fPos));
+            m_channel.SetFPosition(m_nAxis, fPos); 
         }
 
         public override void OverrideVelocity(double v)
         {
-//            AXM("AxmOverrideVel", CAXM.AxmOverrideVel(m_nAxis, v));
+            m_channel.SetVelocityImm(m_nAxis, v); 
         }
 
         void RunThreadCheck_Position()
         {
-//            double dRead = 0;
-//            AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetCmdPos(m_nAxis, ref dRead));
-//            p_posCommand = dRead;
-//            AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetActPos(m_nAxis, ref dRead));
-//            p_posActual = dRead;
-//            AXM("AxmStatusReadVel", CAXM.AxmStatusReadVel(m_nAxis, ref dRead));
-//            p_vNow = dRead;
+            try
+            {
+                p_posCommand = m_channel.GetRPosition(m_nAxis);
+                p_posActual = m_channel.GetFPosition(m_nAxis);
+                p_vNow = m_channel.GetRVelocity(m_nAxis); 
+            }
+            catch (Exception e) { p_sInfo = "Check Position & Velocity Error : " + e.Message; }
         }
         #endregion
 
@@ -554,9 +556,11 @@ namespace RootTools.Control.ACS
         #endregion
 
         ACSListAxis m_listAxis;
-        public void Init(ACSListAxis listAxis, string id, Log log)
+        Channel m_channel;
+        public void Init(ACSListAxis listAxis, Channel channel, string id, Log log)
         {
             m_listAxis = listAxis;
+            m_channel = channel; 
             InitBase(id, log);
             InitThread();
         }
@@ -570,13 +574,6 @@ namespace RootTools.Control.ACS
                 m_threadRun.Join();
                 m_threadCheck.Join();
             }
-        }
-
-        uint AXM(string sFunc, uint uResult)
-        {
-            if (uResult == 0) return uResult;
-            p_sInfo = sFunc + ", Error # = " + uResult.ToString();
-            return uResult;
         }
     }
 }

@@ -1,11 +1,72 @@
 ﻿using RootTools.Trees;
+using SPIIPLUSCOM660Lib;
+using System;
 
 namespace RootTools.Control.ACS
 {
     public class ACS : IToolSet, IControl //forgetACS
     {
+        #region Axis
+        int m_lAxis = 0;
+        void GetAxisCount()
+        {
+            string sAxis = m_channel.Transaction("?SYSINFO(13)");
+            m_lAxis = Convert.ToInt32(sAxis.Trim());
+        }
+        #endregion
+
+        #region Connect
+        Channel m_channel = new Channel();
+        bool m_bSimul = true; 
+        string m_sIP = "10.0.0.100";
+        int m_nPort = 701;
+
+        bool _bConnect = false; 
+        public bool p_bConnect
+        {
+            get { return _bConnect; }
+            set
+            {
+                if (_bConnect == value) return;
+                m_lAxis = 0;
+                _bConnect = value;
+                if (value)
+                {
+                    try
+                    {
+                        if (m_bSimul) m_channel.OpenCommDirect();
+                        else m_channel.OpenCommEthernetTCP(m_sIP, m_nPort);
+                    }
+                    catch (Exception e) 
+                    { 
+                        m_log.Error("ACS Open Error : " + e.Message);
+                        _bConnect = false;
+                    }
+                    GetAxisCount();
+                }
+                else m_channel.CloseComm();
+                RunTree(Tree.eMode.Init);
+            }
+        }
+
+        void Connect()
+        {
+            if (m_bSimul) m_channel.OpenCommDirect();
+            else m_channel.OpenCommEthernetTCP(m_sIP, m_nPort);
+            GetAxisCount(); 
+        }
+
+        void RunTreeConnect(Tree tree)
+        {
+            m_bSimul = tree.Set(m_bSimul, m_bSimul, "Simulation", "Simulation Connect");
+            m_sIP = tree.Set(m_sIP, m_sIP, "IP Address", "ACS Remote IP Address", !m_bSimul);
+            m_nPort = tree.Set(m_nPort, m_nPort, "Port", "ACS Remote Port Number", !m_bSimul); 
+        }
+        #endregion
+
+        //=============================================
         #region Init ACS
-        bool InitCAXL(ref int nInputModule, ref int nOutputModule)
+        bool InitChannel(ref int nInputModule, ref int nOutputModule)
         {
 //            CopyDllFile();
             uint uError = CAXL.AxlOpen(7); //Copy Dll : Root/RootTools.Control.ACS/DLL/*.* -> ?.exe 또는 빌드 옵션에서 32bit설정 제거
@@ -153,11 +214,11 @@ namespace RootTools.Control.ACS
             p_id = id;
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
-            bool bAXL = InitCAXL(ref nInput, ref nOutput);
+            bool bChannel = InitChannel(ref nInput, ref nOutput);
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             m_dio.Init(id + ".DIO", nInput, nOutput);
-            m_listAxis.Init(id + ".Axis", engineer, bAXL);
+            m_listAxis.Init(id + ".Axis", engineer, m_channel, bChannel);
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
         }
