@@ -137,6 +137,24 @@
     <Compile Include="Camera\BaslerPylon\CameraBasler_UI.xaml.cs">
       <DependentUpon>CameraBasler_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\ACS\ACS.cs" />
+    <Compile Include="Control\ACS\ACSAxis.cs" />
+    <Compile Include="Control\ACS\ACSAxis_UI.xaml.cs">
+      <DependentUpon>ACSAxis_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\ACS\ACSBitDO.cs" />
+    <Compile Include="Control\ACS\ACSDIO.cs" />
+    <Compile Include="Control\ACS\ACSDIO_UI.xaml.cs">
+      <DependentUpon>ACSDIO_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\ACS\ACSListAxis.cs" />
+    <Compile Include="Control\ACS\ACSListAxis_UI.xaml.cs">
+      <DependentUpon>ACSListAxis_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\ACS\ACSListDIO.cs" />
+    <Compile Include="Control\ACS\ACS_UI.xaml.cs">
+      <DependentUpon>ACS_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\Ajin\AjinLib\AXA.cs" />
     <Compile Include="Control\Ajin\AjinLib\AXD.cs" />
     <Compile Include="Control\Ajin\AjinLib\AXDev.cs" />
@@ -552,6 +570,22 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Comm\CyUSBTool_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\ACS\ACSAxis_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\ACS\ACSDIO_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\ACS\ACSListAxis_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\ACS\ACS_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

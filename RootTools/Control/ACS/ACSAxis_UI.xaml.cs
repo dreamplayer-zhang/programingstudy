@@ -6,51 +6,51 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace RootTools.Control.Ajin
+namespace RootTools.Control.ACS
 {
     /// <summary>
-    /// UserControl1.xaml에 대한 상호 작용 논리
+    /// ACSAxis_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class AjinAxis_UI : UserControl
+    public partial class ACSAxis_UI : UserControl
     {
-        public AjinAxis_UI()
+        public ACSAxis_UI()
         {
             InitializeComponent();
         }
 
-        AjinAxis m_axis;
-        public void Init(AjinAxis axis)
+        ACSAxis m_axis;
+        public void Init(ACSAxis axis)
         {
             this.DataContext = axis;
             m_axis = axis;
-            comboSpeedJog.SelectedIndex = (int)Axis.eSpeed.Jog; 
+            comboSpeedJog.SelectedIndex = (int)Axis.eSpeed.Jog;
             comboSpeedShift.SelectedIndex = (int)Axis.eSpeed.Move;
             comboSpeedMove.SelectedIndex = (int)Axis.eSpeed.Move;
             comboSpeedRepeat.SelectedIndex = (int)Axis.eSpeed.Move;
             comboMovePos.SelectedIndex = (int)Axis.ePosition.Position_0;
             comboRepeatPos0.SelectedIndex = (int)Axis.ePosition.Position_0;
             comboRepeatPos1.SelectedIndex = (int)Axis.ePosition.Position_1;
-            textBoxShift.Text = "0"; 
+            textBoxShift.Text = "0";
             treeRootUI.Init(axis.m_treeRoot);
             treeRootSettingUI.Init(axis.m_treeRootSetting);
             axis.RunTree(Tree.eMode.Init);
-            axis.RunTreeSetting(Tree.eMode.Init); 
-            StartTimer(); 
+            axis.RunTreeSetting(Tree.eMode.Init);
+            StartTimer();
         }
 
         #region Timer
-        DispatcherTimer m_timer = new DispatcherTimer(); 
+        DispatcherTimer m_timer = new DispatcherTimer();
         void StartTimer()
         {
             m_timer.Interval = TimeSpan.FromSeconds(0.1);
             m_timer.Tick += M_timer_Tick;
-            m_timer.Start(); 
+            m_timer.Start();
         }
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
             Timer_Status();
-            Timer_Repeat(); 
+            Timer_Repeat();
         }
         #endregion
 
@@ -68,7 +68,7 @@ namespace RootTools.Control.Ajin
         void Timer_Status(Button button, bool bOn)
         {
             button.Background = bOn ? Brushes.Yellow : Brushes.LightGray;
-            button.Foreground = bOn ? Brushes.Black : Brushes.DarkGray; 
+            button.Foreground = bOn ? Brushes.Black : Brushes.DarkGray;
         }
 
         private void buttonServoOn_Click(object sender, RoutedEventArgs e)
@@ -78,14 +78,14 @@ namespace RootTools.Control.Ajin
 
         private void buttonAlarm_Click(object sender, RoutedEventArgs e)
         {
-            m_axis.ResetAlarm(); 
+            m_axis.ResetAlarm();
         }
         #endregion
 
         #region Home
         private void buttonRunHome_Click(object sender, RoutedEventArgs e)
         {
-            m_axis.StartHome(); 
+            m_axis.StartHome();
         }
         #endregion
 
@@ -106,9 +106,9 @@ namespace RootTools.Control.Ajin
 
         void Jog(double fScale)
         {
-            if (m_bRepeat) return; 
+            if (m_bRepeat) return;
             if (m_axis.p_eState > Axis.eState.Ready) return;
-            m_axis.Jog(fScale, comboSpeedJog.Text); 
+            m_axis.Jog(fScale, comboSpeedJog.Text);
         }
         #endregion
 
@@ -124,7 +124,7 @@ namespace RootTools.Control.Ajin
             {
                 double dPos = Convert.ToInt32(textBoxShift.Text);
                 double fPos = m_axis.p_posCommand + nDir * dPos;
-                m_axis.StartMove(fPos, comboSpeedShift.Text); 
+                m_axis.StartMove(fPos, comboSpeedShift.Text);
             }
             catch (Exception) { }
         }
@@ -135,14 +135,14 @@ namespace RootTools.Control.Ajin
         {
             if (m_bRepeat) return;
             if (m_axis.p_eState > Axis.eState.Ready) return;
-            m_axis.StartMove(comboMovePos.Text, 0, comboSpeedMove.Text); 
+            m_axis.StartMove(comboMovePos.Text, 0, comboSpeedMove.Text);
         }
 
         private void buttonMoveStop_Click(object sender, RoutedEventArgs e)
         {
             if (m_axis.p_eState != Axis.eState.Move) return;
             m_axis.StopAxis(true);
-            m_bRepeat = false; 
+            m_bRepeat = false;
         }
 
         private void buttonSetPos_Click(object sender, RoutedEventArgs e)
@@ -155,30 +155,30 @@ namespace RootTools.Control.Ajin
         #region Repeat
         private void buttonRepeat_Click(object sender, RoutedEventArgs e)
         {
-            m_bRepeat = true; 
+            m_bRepeat = true;
         }
 
         private void buttonRepeatStop_Click(object sender, RoutedEventArgs e)
         {
-            m_bRepeat = false; 
+            m_bRepeat = false;
         }
 
         bool m_bRepeat = false;
-        bool m_bDstRepeat = false; 
+        bool m_bDstRepeat = false;
         void Timer_Repeat()
         {
             if (m_bRepeat == false) return;
             if (m_axis.p_eState != Axis.eState.Ready) return;
             string sDst = m_bDstRepeat ? comboRepeatPos1.Text : comboRepeatPos0.Text;
             m_axis.StartMove(sDst, 0, comboSpeedRepeat.Text);
-            m_bDstRepeat = !m_bDstRepeat; 
+            m_bDstRepeat = !m_bDstRepeat;
         }
         #endregion
 
         private void buttonStop_Click(object sender, RoutedEventArgs e)
         {
             m_bRepeat = false;
-            m_axis.StopAxis(); 
+            m_axis.StopAxis();
         }
     }
 }

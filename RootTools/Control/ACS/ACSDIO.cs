@@ -3,15 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace RootTools.Control.Ajin
+namespace RootTools.Control.ACS
 {
-    public class AjinDIO : IToolDIO
+    public class ACSDIO : IToolDIO //forgetACS
     {
         #region ListDIO
-        AjinListDIO _listDI = new AjinListDIO();
+        ACSListDIO _listDI = new ACSListDIO();
         public ListDIO p_listDI { get { return _listDI; } }
 
-        AjinListDIO _listDO = new AjinListDIO();
+        ACSListDIO _listDO = new ACSListDIO();
         public ListDIO p_listDO { get { return _listDO; } }
 
         List<IDIO> _listIDIO = new List<IDIO>();
@@ -20,7 +20,28 @@ namespace RootTools.Control.Ajin
         void InitList()
         {
             _listDI.Init(ListDIO.eDIO.Input, m_log);
-            _listDO.Init(ListDIO.eDIO.Output, m_log); 
+            _listDO.Init(ListDIO.eDIO.Output, m_log);
+        }
+        #endregion
+
+        #region Thread
+        bool m_bThread = false;
+        Thread m_thread;
+        void RunThread()
+        {
+            m_bThread = true;
+            Thread.Sleep(5000);
+            while (m_bThread)
+            {
+                try
+                {
+                    Thread.Sleep(2);
+                    _listDI.ReadIO();
+                    _listDO.ReadIO();
+                    foreach (IDIO idio in p_listIDIO) idio.RunDIO();
+                }
+                catch (Exception) { }
+            }
         }
         #endregion
 
@@ -42,29 +63,6 @@ namespace RootTools.Control.Ajin
         }
         #endregion
 
-        #region Thread
-        bool m_bThread = false;
-        Thread m_thread; 
-        void RunThread()
-        {
-            m_bThread = true; 
-            Thread.Sleep(5000); 
-            while (m_bThread)
-            {
-                try
-                {
-                    Thread.Sleep(2);
-                    _listDI.ReadIO();
-                    _listDO.ReadIO();
-                    foreach (IDIO idio in p_listIDIO) idio.RunDIO();
-                }
-                catch (Exception)
-                {
-                }
-            }
-        }
-        #endregion
-
         string m_id;
         Log m_log;
         public int m_nInputModule;
@@ -77,7 +75,7 @@ namespace RootTools.Control.Ajin
             m_nInputModule = nInputModule;
             m_nOutputModule = nOutputModule;
             m_thread = new Thread(new ThreadStart(RunThread));
-            m_thread.Start(); 
+            m_thread.Start();
         }
 
         public void ThreadStop()
@@ -85,7 +83,7 @@ namespace RootTools.Control.Ajin
             if (m_bThread)
             {
                 m_bThread = false;
-                m_thread.Join(); 
+                m_thread.Join();
             }
         }
     }
