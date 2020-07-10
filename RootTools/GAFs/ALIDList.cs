@@ -38,6 +38,7 @@ namespace RootTools.GAFs
                 alid.p_sMsg = "";
                 alid.p_bSet = false;
             }
+            p_alarmBlink = false;
             p_aSetALID.Clear();
         }
         #endregion
@@ -66,7 +67,20 @@ namespace RootTools.GAFs
                 OnPropertyChanged(); 
             }
         }
-
+        private bool _alarmBlink = false;
+        public bool p_alarmBlink
+        {
+            get
+            {
+                return _alarmBlink;
+            }
+            set
+            {
+                if (_alarmBlink == value) return;
+                _alarmBlink = value;
+                OnPropertyChanged();
+            }
+        }
         public void ShowPopup()
         {
             if (ALIDList_PopupUI.m_bShow) return; 
@@ -90,6 +104,9 @@ namespace RootTools.GAFs
             m_qSetALID.Enqueue(alid);
             p_sInfo = alid.p_sModule + " : " + alid.p_sDesc + ", " + alid.p_sMsg;
             p_brushAlarm = Brushes.Red;
+            p_alarmBlink = true;
+
+            
         }
 
         private void M_timerSetALID_Tick(object sender, EventArgs e)

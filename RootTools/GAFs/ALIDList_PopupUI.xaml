@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RootTools.GAFs"
         mc:Ignorable="d"
-        Title="Alarm" Height="450" Width="800" WindowStyle="ToolWindow" Visibility="Visible" 
+        Title="Alarm" Height="800" Width="1200" WindowStyle="None" Visibility="Visible" 
         Background="{StaticResource BackGround}"
         WindowStartupLocation="CenterScreen" Topmost="True" Closing="Window_Closing">
     <Window.Resources>
@@ -13,57 +13,122 @@
             <TextBlock Text="{Binding}" Foreground="White" Margin="3,0,0,0"/>
         </DataTemplate>
     </Window.Resources>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="3*"/>
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Button Grid.Row="0" x:Name="buttonClearALID" Content="Clear All ALID" Margin="2" Click="buttonClearALID_Click"
+    <Grid Background="Crimson">
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <SolidColorBrush Color="Transparent"/>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding p_alarmBlink}" Value="True">
+                        <DataTrigger.EnterActions>
+                            <BeginStoryboard Name="sbBlink">
+                                <Storyboard RepeatBehavior="Forever">
+                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                                    AutoReverse="True"
+                                                                    From="Transparent" To="Crimson" FillBehavior="Stop"
+                                                                    BeginTime="0:0:0" Duration="0:0:0.4" />
+                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                                    From="Crimson" To="Transparent"
+                                                                    BeginTime="0:0:0.4" Duration="0:0:1"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </DataTrigger.EnterActions>
+                        <DataTrigger.ExitActions>
+                            <RemoveStoryboard BeginStoryboardName="sbBlink"/>
+                        </DataTrigger.ExitActions>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
+    <Grid.RowDefinitions>
+            <RowDefinition Height="9*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Margin="10,10,10,0" Background="{StaticResource BackGround}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" x:Name="buttonClearALID" Content="Clear All ALID" Margin="2" Click="buttonClearALID_Click"
                     Style="{StaticResource BasicBtn}"/>
-            <ListView Grid.Row="1" x:Name="listViewALID" Margin="2"
+                <ListView Grid.Row="1" x:Name="listViewALID" Margin="2"
                       Background="Transparent"
                       Foreground="{StaticResource TextForeGround}">
-                <ListView.View>
-                    <GridView ColumnHeaderContainerStyle="{StaticResource ResourceKey=BasicGridViewColumn}">
-                        <GridViewColumn Header="Time"
+                    <ListView.View>
+                        <GridView ColumnHeaderContainerStyle="{StaticResource ResourceKey=BasicGridViewColumn}">
+                            <GridViewColumn Header="Time"
                                         HeaderTemplate="{StaticResource header}">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding p_dateTime}" PreviewMouseUp="TextBlock_PreviewMouseUp"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="ALID"
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding p_dateTime}" PreviewMouseUp="TextBlock_PreviewMouseUp"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="ALID"
                                         HeaderTemplate="{StaticResource header}">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding p_nID}" PreviewMouseUp="TextBlock_PreviewMouseUp"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding p_nID}" PreviewMouseUp="TextBlock_PreviewMouseUp"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Grid>
+            <GridSplitter Grid.Column="1" Grid.Row="1" 
+                      HorizontalAlignment="Center" 
+                      VerticalAlignment="Stretch" 
+                      Background="AliceBlue" 
+                      ShowsPreview="True" 
+                      Width="2"/>
+            <Grid Grid.Column="2" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Background="AliceBlue">
+                    <Label Content=" "/>
+                    <Label x:Name="lableALID" Content="{Binding p_nID}" ToolTip="ALID"/>
+                    <Label x:Name="lableModule" Content="{Binding p_sModule}" ToolTip="Module"/>
+                    <Label x:Name="lableDesc" Content="{Binding p_sDesc}" ToolTip="Description"/>
+                    <Label x:Name="lableMsg" Content="{Binding p_sMsg}" ToolTip="Message"/>
+                </StackPanel>
+                <Image Grid.Row="1" x:Name="imageALID" Stretch="Uniform"  Source="{Binding p_image}"/>
+                <TextBlock Text="Image"
+                           Grid.Row="1"
+                           Style="{StaticResource BasicTb}"/>
+                <Grid Grid.Row="2" Background="DimGray">
+                    <TextBlock Text="Discription"
+                               Foreground="Black"
+                               Style="{StaticResource BasicTb}"/>
+                </Grid>
+            </Grid>
         </Grid>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <Grid Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Background="AliceBlue">
-                <Label x:Name="lableALID" Content="{Binding p_nID}" ToolTip="ALID"/>
-                <Label x:Name="lableModule" Content="{Binding p_sModule}" ToolTip="Module"/>
-                <Label x:Name="lableDesc" Content="{Binding p_sDesc}" ToolTip="Description"/>
-                <Label x:Name="lableMsg" Content="{Binding p_sMsg}" ToolTip="Message"/>
-            </StackPanel>
-            <Image Grid.Row="1" x:Name="imageALID" Stretch="Uniform"  Source="{Binding p_image}"/>
+        <Grid Grid.Row="1" Background="{StaticResource BackGround}" Margin="10,0,10,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Continue" Margin="15" Grid.Column="0" Click="Button_Click"
+                    Style="{StaticResource BasicBtn}"/>
+            <Button Content="Recovery" Margin="15" Grid.Column="1"
+                    Style="{StaticResource BasicBtn}"/>
+            <Button Content="Buzzer Off" Margin="15" Grid.Column="2"
+                    Style="{StaticResource BasicBtn}"/>
+            
         </Grid>
     </Grid>
 </Window>

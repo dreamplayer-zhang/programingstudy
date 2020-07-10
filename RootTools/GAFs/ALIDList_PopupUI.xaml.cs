@@ -55,5 +55,10 @@ namespace RootTools.GAFs
             lableMsg.DataContext = alid;
             imageALID.DataContext = alid; 
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

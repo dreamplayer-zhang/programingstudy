@@ -68,6 +68,7 @@ namespace Root_Siltron
             SetHome();
         }
 
+        #region Panel Chage
         public void SetHome()
         {
             p_NaviButtons.Clear();
@@ -133,7 +134,9 @@ namespace Root_Siltron
             p_CurrentPanel = m_Gem.Main;
             p_CurrentPanel.DataContext = m_Gem;
         }
+        #endregion
 
+        #region UI
         public class HomeUI
         {
             NavigationManger m_Navigation;
@@ -605,6 +608,7 @@ namespace Root_Siltron
                 }
             }
         }
+        #endregion
     }
 
 

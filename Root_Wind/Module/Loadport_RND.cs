@@ -43,7 +43,7 @@ namespace Root_Wind.Module
             GemCarrierBase.ePresent present;
             if (m_diPlaced.p_bIn != m_diPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
             else present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            if (m_infoCarrier.CheckPlaced(present) != "OK")
+            //if (m_infoCarrier.CheckPlaced(present) != "OK")
             {
                 m_alidPlaced.p_sMsg = "Placed Sensor Remain Checked while Pod State = " + m_infoCarrier.p_eState;
                 m_alidPlaced.p_bSet = true;

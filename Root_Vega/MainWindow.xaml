@@ -169,13 +169,49 @@
                                    Style="{StaticResource BasicTb}"
                                        FontSize="20" Grid.ColumnSpan="2"/>
                     </Grid>
+
+
                     <TextBlock x:Name="textLastError" Grid.Row="1"
                                Grid.ColumnSpan="3"
-                               Style="{StaticResource BasicTb}"
                                Text="{Binding p_sInfo}"
                                Foreground="{Binding p_brushAlarm}"
-                               FontSize="20"
-                               MouseLeftButtonUp="textLastError_MouseLeftButtonUp"/>
+                               MouseLeftButtonUp="textLastError_MouseLeftButtonUp"
+                               FontFamily="Arial"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="20">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="Transparent"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding p_alarmBlink}" Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard Name="sbBlink">
+                                                <Storyboard RepeatBehavior="Forever">
+                                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                                    AutoReverse="True"
+                                                                    From="Transparent" To="Yellow" FillBehavior="Stop"
+                                                                    BeginTime="0:0:0" Duration="0:0:0.4" />
+                                                    <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                                    From="Yellow" To="Transparent"
+                                                                    BeginTime="0:0:0.4" Duration="0:0:1"/>  
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <RemoveStoryboard BeginStoryboardName="sbBlink"/>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+
                 </Grid>
             </Border>
             <Border Grid.Column="3"
@@ -221,7 +257,7 @@
             </TabItem>
             <TabItem Header="Recipe"
                      Grid.Column="1"
-                     Style="{StaticResource ResourceKey=MainTabItem}" Margin="10,0,-10,0">
+                     Style="{StaticResource ResourceKey=MainTabItem}">
                 <local:_2_Recipe x:Name="_Recipe"/>
             </TabItem>
             <TabItem Header="Maint"
