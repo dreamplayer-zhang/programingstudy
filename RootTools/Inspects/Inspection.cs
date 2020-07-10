@@ -89,6 +89,8 @@ namespace RootTools.Inspects
 						{
 							clrInsp.SurfaceInspection(
 								m_InspProp.MemoryPoolName,
+								m_InspProp.MemoryGroupName,
+								m_InspProp.MemoryName,
 								m_InspProp.MemoryOffset,
 								ThreadIndex,
 								m_InspProp.m_nDefectCode,
@@ -114,6 +116,8 @@ namespace RootTools.Inspects
 						{
 							clrInsp.StripInspection(
 								m_InspProp.MemoryPoolName,
+								m_InspProp.MemoryGroupName,
+								m_InspProp.MemoryName,
 								m_InspProp.MemoryOffset,
 								ThreadIndex,
 								m_InspProp.m_nDefectCode,

@@ -77,6 +77,8 @@ namespace Root_Vega
             InitXGem(); 
             m_handler.Init(id, this);
             m_gaf.Init(id, this);
+
+            m_InspManager.m_toolBox = m_toolBox;
         }
 
         public void ThreadStop()

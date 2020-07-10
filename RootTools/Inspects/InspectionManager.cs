@@ -13,6 +13,7 @@ using System.Linq;
 using DPoint = System.Drawing.Point;
 using System.Diagnostics;
 using MySqlX.XDevAPI.Relational;
+using RootTools.ToolBoxs;
 
 namespace RootTools.Inspects
 {
@@ -40,6 +41,11 @@ namespace RootTools.Inspects
 
 		int nThreadNum = 10;
 		public int nInspectionCount = 0;
+		int ImageWidth = 640;
+		int ImageHeight = 480;
+		public ToolBox m_toolBox;
+
+
 
 		private string inspDefaultDir;
 		private string inspFileName;
@@ -185,15 +191,8 @@ namespace RootTools.Inspects
 					var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
 					string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
 
-					if (VSDBManager == null)
-					{
-						VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
-					}
-					else if (VSDBManager.IsConnected)
-					{
-						VSDBManager.Disconnect();
-						VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
-					}
+					VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+					
 					if (VSDBManager.Connect())
 					{
 						VSDBManager.CreateTable("Datainfo");
@@ -203,8 +202,17 @@ namespace RootTools.Inspects
 						VSDataDT = VSDBManager.GetDataTable("Data");
 					}
 
+					int stride = ImageWidth / 8;
+					string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
+
+					System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
+
+					System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
+					System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
+					encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
+
 					//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-					
+
 					foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
 					{
 						System.Data.DataRow dataRow = VSDataDT.NewRow();
@@ -222,7 +230,28 @@ namespace RootTools.Inspects
 						dataRow["VrsImageExist"] = 0;
 
 						VSDataDT.Rows.Add(dataRow);
+
+						double fPosX = Convert.ToDouble(item["PosX"]);
+						double fPosY = Convert.ToDouble(item["PosY"]);
+
+						CRect ImageSizeBlock = new CRect(
+							(int)fPosX - ImageWidth / 2,
+							(int)fPosY - ImageHeight / 2,
+							(int)fPosX + ImageWidth / 2,
+							(int)fPosY + ImageHeight / 2);
+						string pool = item["memPOOL"].ToString();
+						string group = item["memGROUP"].ToString();
+						string memory = item["memMEMORY"].ToString();
+						var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
+						var image = new ImageData(tempMem);
+						encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(image.GetRectImage(ImageSizeBlock))));
 					}
+
+					if (VSDataDT.Rows.Count > 0)
+					{
+						encoder.Save(stream);
+					}
+					stream.Dispose();
 
 					VSDBManager.SetDataTable(VSDataInfoDT);
 					VSDBManager.SetDataTable(VSDataDT);
@@ -233,11 +262,27 @@ namespace RootTools.Inspects
 					result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
 				}
 			}
+			nInspectionCount = 0;
 #if DEBUG
 			sw.Stop();
 			Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
 #endif
 
+		}
+		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
+		{
+			var bitmapData = bitmap.LockBits(
+				new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+				System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+			var bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
+				bitmapData.Width, bitmapData.Height,
+				bitmap.HorizontalResolution, bitmap.VerticalResolution,
+				System.Windows.Media.PixelFormats.Gray8, null,
+				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+
+			bitmap.UnlockBits(bitmapData);
+			return bitmapSource;
 		}
 		public void Dispose()
 		{
@@ -286,7 +331,7 @@ namespace RootTools.Inspects
 		/// <param name="bDefectMerge"></param>
 		/// <param name="nMergeDistance"></param>
 		/// <returns></returns>
-		public List<CRect> CreateInspArea(string poolName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int dCode, bool bDefectMerge, int nMergeDistance)
+		public List<CRect> CreateInspArea(string poolName, string groupName, string memoryName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int dCode, bool bDefectMerge, int nMergeDistance)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -342,6 +387,8 @@ namespace RootTools.Inspects
 						ip.m_nDefectCode = dCode;
 						ip.p_index = blockcount;
 						ip.MemoryPoolName = poolName;
+						ip.MemoryGroupName = groupName;
+						ip.MemoryName = memoryName;
 						ip.MemoryOffset = memOffset;
 						ip.p_TargetMemWidth = memWidth;
 						ip.p_TargetMemHeight = memHeight;
@@ -862,6 +909,8 @@ namespace RootTools.Inspects
 			}
 		}
 		public string MemoryPoolName { get; set; }
+		public string MemoryGroupName { get; set; }
+		public string MemoryName { get; set; }
 		public ulong MemoryOffset { get; set; }
 	}
 	public class MemInfo

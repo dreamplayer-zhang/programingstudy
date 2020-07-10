@@ -291,6 +291,10 @@ namespace Root_Vega
 
 			return;
 		}
+		~_2_6_SideViewModel()
+		{
+			resultTimer.Dispose();
+		}
 		private void checkAddDefect(object state)
 		{
 			//_dispatcher
@@ -429,7 +433,7 @@ namespace Root_Vega
 					}
 					int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(10 + i), type, 0);
 
-					m_Engineer.m_InspManager.CreateInspArea(sPool, m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).GetMBOffset(),
+					m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", "Grab", m_astrMem[i], m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).GetMBOffset(),
 						m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).p_sz.X,
 						m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).p_sz.Y,
 						inspAreaList[i], 1000, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance);

@@ -59,21 +59,6 @@ namespace Root_Vega
 
 
         }
-        public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
-        {
-            var bitmapData = bitmap.LockBits(
-                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
-
-            var bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
-                bitmapData.Width, bitmapData.Height,
-                bitmap.HorizontalResolution, bitmap.VerticalResolution,
-                PixelFormats.Gray8, null,
-                bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
-
-            bitmap.UnlockBits(bitmapData);
-            return bitmapSource;
-        }
         /// <summary>
         /// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
         /// </summary>

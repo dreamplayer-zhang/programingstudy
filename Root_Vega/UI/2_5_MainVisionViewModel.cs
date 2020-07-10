@@ -560,7 +560,7 @@ namespace Root_Vega
 			var memOffset = m_Engineer.GetMemory("pool", "group", "mem").GetMBOffset();
 			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 
-			DrawRectList = m_Engineer.m_InspManager.CreateInspArea("pool", memOffset,
+			DrawRectList = m_Engineer.m_InspManager.CreateInspArea("pool", "group", "mem", memOffset,
 				m_Engineer.GetMemory("pool", "group", "mem").p_sz.X,
 				m_Engineer.GetMemory("pool", "group", "mem").p_sz.Y,
 				Mask_Rect, nblocksize,

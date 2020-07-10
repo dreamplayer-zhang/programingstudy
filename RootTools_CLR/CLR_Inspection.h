@@ -38,7 +38,7 @@ namespace RootTools_CLR
 			delete pInspReticle;
 		}
 
-		void SurfaceInspection(System::String^ poolName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
+		void SurfaceInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -82,8 +82,9 @@ namespace RootTools_CLR
 							//DB Open성공
 
 							System::String^ query;
-							query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
-								vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
+							query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
+								vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+								poolName, groupName, memoryName);
 
 							errorCode = connector->RunQuery(query);
 
@@ -95,13 +96,14 @@ namespace RootTools_CLR
 							{
 								//table이 없음
 								//table생성 후 재시도
-								query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
+								query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, memPOOL longtext DEFAULT NULL, memGROUP longtext DEFAULT NULL, memMEMORY longtext DEFAULT NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");								
 								errorCode = connector->RunQuery(query);
 								if (errorCode == 0)
 								{
 									//insert재실행
-									query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
-										vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
+									query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
+										vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+										poolName, groupName, memoryName);
 
 									errorCode = connector->RunQuery(query);
 									if (errorCode != 0)
@@ -114,12 +116,12 @@ namespace RootTools_CLR
 									//예외처리 진행. 될때까지 업로드 시도 시키는게 좋을것으로 보임
 								}
 							}
-							else 
+							else
 							{
 								//예외처리 진행. 될때까지 업로드 시도 시키는게 좋을것으로 보임
 							}
 						}
-						else 
+						else
 						{
 							//DBOpen 실패
 						}
@@ -134,7 +136,7 @@ namespace RootTools_CLR
 				//return local;
 			}
 		}
-		void StripInspection(System::String^ poolName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
+		void StripInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -171,8 +173,9 @@ namespace RootTools_CLR
 						//DB Open성공
 
 						System::String^ query;
-						query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
-							vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
+						query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
+							vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+							poolName, groupName, memoryName);
 
 						errorCode = connector->RunQuery(query);
 
@@ -184,13 +187,14 @@ namespace RootTools_CLR
 						{
 							//table이 없음
 							//table생성 후 재시도
-							query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
+							query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, memPOOL longtext DEFAULT NULL, memGROUP longtext DEFAULT NULL, memMEMORY longtext DEFAULT NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
 							errorCode = connector->RunQuery(query);
 							if (errorCode == 0)
 							{
 								//insert재실행
-								query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}');",
-									vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top);
+								query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10})';",
+									vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+									poolName, groupName, memoryName);
 
 								errorCode = connector->RunQuery(query);
 								if (errorCode != 0)
