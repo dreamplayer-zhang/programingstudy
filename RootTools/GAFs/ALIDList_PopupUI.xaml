@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RootTools.GAFs"
         mc:Ignorable="d"
-        Title="Alarm" Height="800" Width="1200" WindowStyle="None" Visibility="Visible" 
+        Title="Alarm" Height="900" Width="1200" WindowStyle="None" Visibility="Visible" 
         Background="{StaticResource BackGround}"
         WindowStartupLocation="CenterScreen" Topmost="True" Closing="Window_Closing">
     <Window.Resources>
@@ -44,8 +44,8 @@
             </Style>
         </Grid.Style>
     <Grid.RowDefinitions>
-            <RowDefinition Height="9*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="87*"/>
+            <RowDefinition Height="13*"/>
         </Grid.RowDefinitions>
 
         <Grid Margin="10,10,10,0" Background="{StaticResource BackGround}">
@@ -122,11 +122,11 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Button Content="Continue" Margin="15" Grid.Column="0" Click="Button_Click"
-                    Style="{StaticResource BasicBtn}"/>
             <Button Content="Recovery" Margin="15" Grid.Column="1"
                     Style="{StaticResource BasicBtn}"/>
-            <Button Content="Buzzer Off" Margin="15" Grid.Column="2"
+            <Button Content="Buzzer Off" Margin="15" Grid.Column="0"
+                    Style="{StaticResource BasicBtn}"/>
+            <Button Content="Continue" Margin="15" Grid.Column="2" Click="Button_Click"
                     Style="{StaticResource BasicBtn}"/>
             
         </Grid>
