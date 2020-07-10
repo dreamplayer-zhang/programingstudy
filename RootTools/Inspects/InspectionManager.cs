@@ -36,8 +36,9 @@ namespace RootTools.Inspects
 
 		Thread inspThread;
 		Inspection[] InsepctionThread;
-
+#if DEBUG
 		StopWatch sw;
+#endif
 
 		int nThreadNum = 10;
 		public int nInspectionCount = 0;

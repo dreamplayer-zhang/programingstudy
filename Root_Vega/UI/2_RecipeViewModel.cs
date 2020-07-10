@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using RootTools;
+using RootTools.Comm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Windows.Input;
 
 namespace Root_Vega
 {
-	public class _2_RecipeViewModel: ObservableObject
+	public class _2_RecipeViewModel : ObservableObject
 	{
 		Vega_Engineer m_Engineer;
 
@@ -52,6 +53,20 @@ namespace Root_Vega
 				var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
 				m_Engineer.m_recipe.Save(target);
 			}
+			else
+			{
+				_btnRcpSaveAs();
+			}
+		}
+
+		private void _rcpCreate()
+		{
+			m_Engineer.m_recipe.Init();
+
+			if (m_Engineer.m_recipe.LoadComplete != null)
+			{
+				m_Engineer.m_recipe.LoadComplete();
+			}
 		}
 		public ICommand CommandRcpSave
 		{
@@ -72,6 +87,13 @@ namespace Root_Vega
 			get
 			{
 				return new RelayCommand(_btnRcpLoad);
+			}
+		}
+		public ICommand CommandRcpCreate
+		{
+			get
+			{
+				return new RelayCommand(_rcpCreate);
 			}
 		}
 	}

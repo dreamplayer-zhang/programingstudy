@@ -69,21 +69,6 @@ namespace Root_Vega
 			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
 			bUsingInspection = false;
 		}
-		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
-		{
-			var bitmapData = bitmap.LockBits(
-				new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-				System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
-
-			var bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
-				bitmapData.Width, bitmapData.Height,
-				bitmap.HorizontalResolution, bitmap.VerticalResolution,
-				PixelFormats.Gray8, null,
-				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
-
-			bitmap.UnlockBits(bitmapData);
-			return bitmapSource;
-		}
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
 		/// </summary>
@@ -465,60 +450,7 @@ namespace Root_Vega
 		//}
 		private void _btnInspDone()
 		{
-			if (!bUsingInspection)
-			{
-				return;
-			}
-			else
-			{
-				bUsingInspection = false;
-			}
-			if (wLimit <= currentSnap)
-			{
-
-				//VSDBManager.Commit();
-
-				//여기서부터 DB Table데이터를 기준으로 tif 이미지 파일을 생성하는 구간
-				//해당 기능은 여러개의 pool을 사용하는 경우에 대해서는 테스트가 진행되지 않았습니다
-				//Concept은 검사 결과가 저장될 시점에 가지고 있던 Data Table을 저장하기 전 Image를 저장하는 형태
-				int stride = tempImageWidth / 8;
-				string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
-
-				System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
-
-				System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
-				System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
-				encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
-
-				foreach (System.Data.DataRow row in VSDataDT.Rows)
-				{
-					//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-					double fPosX = Convert.ToDouble(row["PosX"]);
-					double fPosY = Convert.ToDouble(row["PosY"]);
-
-					CRect ImageSizeBlock = new CRect(
-						(int)fPosX - tempImageWidth / 2,
-						(int)fPosY - tempImageHeight / 2,
-						(int)fPosX + tempImageWidth / 2,
-						(int)fPosY + tempImageHeight / 2);
-
-					encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(m_ImageViewer.p_ImageData.GetRectImage(ImageSizeBlock))));
-				}
-				if (VSDataDT.Rows.Count > 0)
-				{
-					encoder.Save(stream);
-				}
-				stream.Dispose();
-				//이미지 저장 완료
-
-				//Data Table 저장 시작
-				VSDBManager.SetDataTable(VSDataInfoDT);
-				VSDBManager.SetDataTable(VSDataDT);
-				VSDBManager.Disconnect();
-				//Data Table 저장 완료
-				m_Engineer.m_InspManager.Dispose();
-				VSDataDT.Clear();
-			}
+			
 		}
 		//private void _btnNextSnap()
 		//{
@@ -568,37 +500,7 @@ namespace Root_Vega
 				nDefectCode,
 				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance);
 
-			//for (int i = 0; i < DrawRectList.Count; i++)
-			//{
-			//	CRect inspblock = DrawRectList[i];
-			//	m_DD.AddRectData(inspblock, System.Drawing.Color.Orange);
-
-			//}
 			System.Diagnostics.Debug.WriteLine("Start Insp");
-
-			inspDefaultDir = @"C:\vsdb";
-			if (!System.IO.Directory.Exists(inspDefaultDir))
-			{
-				System.IO.Directory.CreateDirectory(inspDefaultDir);
-			}
-			inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
-			var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
-			string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
-
-			if (VSDBManager != null && VSDBManager.IsConnected)
-			{
-				VSDBManager.Disconnect();
-			}
-			VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
-
-			if (VSDBManager.Connect())
-			{
-				VSDBManager.CreateTable("Datainfo");
-				VSDBManager.CreateTable("Data");
-
-				VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
-				VSDataDT = VSDBManager.GetDataTable("Data");
-			}
 			m_Engineer.m_InspManager.StartInspection();
 
 			return;

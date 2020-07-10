@@ -203,16 +203,18 @@
         </TabControl>
         <StackPanel Grid.Column="1"
                     Margin="0,45,15,15">
-            <!--<Button Content="Create"
-                    Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"/>
+            <!--
             <Button Content="Delete"
                     Style="{StaticResource BasicBtn}"
                     Margin="0,0,0,10"/>
             <Button Content="Modify"
                     Style="{StaticResource BasicBtn}"
                     Margin="0,0,0,10"/>-->
-            <Button Content="Load Recipe"
+			<Button Content="Create Recipe"
+                    Style="{StaticResource BasicBtn}"
+					Command="{Binding CommandRcpCreate}"
+                    Margin="0,0,0,10"/>
+			<Button Content="Load Recipe"
                     Style="{StaticResource BasicBtn}"
 					Command="{Binding CommandRcpLoad}"
                     Margin="0,0,0,10"/>

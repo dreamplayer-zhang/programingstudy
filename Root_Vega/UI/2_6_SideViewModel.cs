@@ -409,34 +409,37 @@ namespace Root_Vega
 			//TODO EdgeboxViewModel과 SideViewModel에 중복된 메소드가 존재하므로 통합이 가능한경우 정리하도록 합시다
 			if (!m_Engineer.m_recipe.Loaded)
 				return;
-			if (SelectedROI == null)
-				return;
 
 			//0. 개수 초기화 및 Table Drop
 			_clearInspReslut();
 
-			//1. edge box정보를 가져와서 edge 확보 후 전체 검사영역을 그린다
-			DrawEdgeBox(SelectedROI, SelectedROI.EdgeBox.UseCustomEdgeBox);
-			var inspAreaList = searchArea();
-
 			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
-			for (int i = 0; i < inspAreaList.Count; i++)
+			for (int i = 0; i < 4; i++)
 			{
-				for (int j = 0; j < SelectedROI.Surface.ParameterList.Count; j++)
+				for (int k = 0; k < p_SideRoiList.Count; k++)
 				{
-					var param = SelectedROI.Surface.ParameterList[j];
-					InspectionType type = InspectionType.AbsoluteSurface;
+					//1. edge box정보를 가져와서 edge 확보 후 전체 검사영역을 그린다//잘 생각해보니 서순인듯
+					DrawEdgeBox(p_SideRoiList[k], p_SideRoiList[k].EdgeBox.UseCustomEdgeBox);
+					var inspAreaList = searchArea(p_SideRoiList[k]);
 
-					if (!param.UseAbsoluteInspection)
+					var tempRoi = p_SideRoiList[k];
+
+					for (int j = 0; j < tempRoi.Surface.ParameterList.Count; j++)
 					{
-						type = InspectionType.RelativeSurface;
-					}
-					int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(10 + i), type, 0);
+						var param = tempRoi.Surface.ParameterList[j];
+						InspectionType type = InspectionType.AbsoluteSurface;
 
-					m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", "Grab", m_astrMem[i], m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).GetMBOffset(),
-						m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).p_sz.X,
-						m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).p_sz.Y,
-						inspAreaList[i], 1000, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance);
+						if (!param.UseAbsoluteInspection)
+						{
+							type = InspectionType.RelativeSurface;
+						}
+						int nDefectCode = InspectionManager.MakeDefectCode(( InspectionTarget)(10 + i), type, 0);
+
+						m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", "Grab", m_astrMem[i], m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).GetMBOffset(),
+							m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).p_sz.X,
+							m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).p_sz.Y,
+							inspAreaList[i], 1000, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance);
+					}
 				}
 			}
 			m_Engineer.m_InspManager.StartInspection();
@@ -528,7 +531,7 @@ namespace Root_Vega
 
 			SideParamList = new ObservableCollection<SurfaceParamData>(SelectedROI.Surface.ParameterList);
 		}
-		List<CRect> searchArea()
+		List<CRect> searchArea(Roi roi)
 		{
 			// variable
 			List<CRect> result = new List<CRect>();
@@ -571,7 +574,7 @@ namespace Root_Vega
 				for (int j = 0; j < arcROIs.Count; j++)
 				{
 					eTempDirection = InspectionManager.GetDirection(ivvm.p_ImageData, arcROIs[j]);
-					aptEdges.Add(InspectionManager.GetEdge(ivvm.p_ImageData, arcROIs[j], eTempDirection, SelectedROI.EdgeBox.UseAutoGV, SelectedROI.EdgeBox.SearchBrightToDark, SelectedROI.EdgeBox.EdgeThreshold));
+					aptEdges.Add(InspectionManager.GetEdge(ivvm.p_ImageData, arcROIs[j], eTempDirection, roi.EdgeBox.UseAutoGV, roi.EdgeBox.SearchBrightToDark, roi.EdgeBox.EdgeThreshold));
 				}
 				// aptEeges에 있는 DPoint들을 좌표에 맞게 분배
 				List<DPoint> aSortedByX = aptEdges.OrderBy(x => x.X).ToList();
@@ -662,23 +665,6 @@ namespace Root_Vega
 			ivvm.SelectedTool.m_ListRect.Add(uei);
 			ivvm.SelectedTool.m_Element.Add(myLine);
 		}
-
-
-		//public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
-		//{
-		//	var bitmapData = bitmap.LockBits(
-		//		new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-		//		System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
-
-		//	var bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
-		//		bitmapData.Width, bitmapData.Height,
-		//		bitmap.HorizontalResolution, bitmap.VerticalResolution,
-		//		PixelFormats.Gray8, null,
-		//		bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
-
-		//	bitmap.UnlockBits(bitmapData);
-		//	return bitmapSource;
-		//}
 
 		#region Command
 		public RelayCommand CommandClearInspResult

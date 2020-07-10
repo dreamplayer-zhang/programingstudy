@@ -41,6 +41,12 @@ namespace RootTools.Inspects
 		/// 레시피가 로드된 상태를 표시한다
 		/// </summary>
 		[XmlIgnore] public bool Loaded { get; private set; }
+		public void Init()
+		{
+			this.RecipeName = "";
+			RecipeData = new RecipeData();
+			MapData = new MapData();
+		}
 		/// <summary>
 		/// 레시피를 저장한다
 		/// </summary>
@@ -93,6 +99,7 @@ namespace RootTools.Inspects
 			}
 			return true;
 		}
+
 		/// <summary>
 		/// VEGA Vision Recipe를 로드한다
 		/// </summary>
