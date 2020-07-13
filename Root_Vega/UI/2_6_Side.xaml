@@ -124,21 +124,21 @@
 						<UniformGrid Columns="2" Margin="0,10,0,10">
 							<TextBlock  Text="Use Defect Merge"
 											Style="{StaticResource BasicTb}"/>
-							<ToggleButton Content="{Binding RecipeData.UseDefectMerge}"
+							<ToggleButton Content="{Binding VegaRecipeData.UseDefectMerge}"
 											  Style="{StaticResource BasicToggle}"
-											  IsChecked="{Binding RecipeData.UseDefectMerge}"/>
+											  IsChecked="{Binding VegaRecipeData.UseDefectMerge}"/>
 						</UniformGrid>
 						<UniformGrid Columns="2" Margin="0,0,0,10">
 							<TextBlock Text="Defect Merge Distance(pxl)"
 										   Style="{StaticResource BasicTb}"/>
-							<TextBox Text="{Binding RecipeData.MergeDistance}"
+							<TextBox Text="{Binding VegaRecipeData.MergeDistance}"
 										 Style="{StaticResource BasicTbox}"/>
 						</UniformGrid>
 						<UniformGrid Columns="2" Margin="0,0,0,10">
 							<TextBlock Text="Overall Inspection Margin"
 										   Style="{StaticResource BasicTb}"/>
 							<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideInspMargin}"/>
+											 Text="{Binding VegaRecipeData.SideInspMargin}"/>
 						</UniformGrid>
 						<Expander Header="Inspection Offset(Top)"
 								  Foreground="White">
@@ -149,7 +149,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideTopUpperOffset}"/>
+											 Text="{Binding VegaRecipeData.SideTopUpperOffset}"/>
 								</UniformGrid>
 								<UniformGrid Columns="2" Margin="0,0,0,5">
 									<TextBlock Text="Center Area Offset"
@@ -157,7 +157,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideTopCenterOffset}"/>
+											 Text="{Binding VegaRecipeData.SideTopCenterOffset}"/>
 								</UniformGrid>
 								<UniformGrid Columns="2" Margin="0,0,0,5">
 									<TextBlock Text="Under Area Offset"
@@ -165,7 +165,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideTopUnderOffset}"/>
+											 Text="{Binding VegaRecipeData.SideTopUnderOffset}"/>
 								</UniformGrid>
 							</StackPanel>
 						</Expander>
@@ -178,7 +178,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideLeftUpperOffset}"/>
+											 Text="{Binding VegaRecipeData.SideLeftUpperOffset}"/>
 								</UniformGrid>
 								<UniformGrid Columns="2" Margin="0,0,0,5">
 									<TextBlock Text="Center Area Offset"
@@ -186,7 +186,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideLeftCenterOffset}"/>
+											 Text="{Binding VegaRecipeData.SideLeftCenterOffset}"/>
 								</UniformGrid>
 								<UniformGrid Columns="2" Margin="0,0,0,5">
 									<TextBlock Text="Under Area Offset"
@@ -194,7 +194,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideLeftUnderOffset}"/>
+											 Text="{Binding VegaRecipeData.SideLeftUnderOffset}"/>
 								</UniformGrid>
 							</StackPanel>
 						</Expander>
@@ -207,7 +207,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideRightUpperOffset}"/>
+											 Text="{Binding VegaRecipeData.SideRightUpperOffset}"/>
 								</UniformGrid>
 								<UniformGrid Columns="2" Margin="0,0,0,5">
 									<TextBlock Text="Center Area Offset"
@@ -215,7 +215,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideRightCenterOffset}"/>
+											 Text="{Binding VegaRecipeData.SideRightCenterOffset}"/>
 								</UniformGrid>
 								<UniformGrid Columns="2" Margin="0,0,0,5">
 									<TextBlock Text="Under Area Offset"
@@ -223,7 +223,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideRightUnderOffset}"/>
+											 Text="{Binding VegaRecipeData.SideRightUnderOffset}"/>
 								</UniformGrid>
 							</StackPanel>
 						</Expander>
@@ -236,7 +236,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideBottomUpperOffset}"/>
+											 Text="{Binding VegaRecipeData.SideBottomUpperOffset}"/>
 								</UniformGrid>
 								<UniformGrid Columns="2" Margin="0,0,0,5">
 									<TextBlock Text="Center Area Offset"
@@ -244,7 +244,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideBottomCenterOffset}"/>
+											 Text="{Binding VegaRecipeData.SideBottomCenterOffset}"/>
 								</UniformGrid>
 								<UniformGrid Columns="2" Margin="0,0,0,5">
 									<TextBlock Text="Under Area Offset"
@@ -252,7 +252,7 @@
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
 									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideBottomUnderOffset}"/>
+											 Text="{Binding VegaRecipeData.SideBottomUnderOffset}"/>
 								</UniformGrid>
 							</StackPanel>
 						</Expander>

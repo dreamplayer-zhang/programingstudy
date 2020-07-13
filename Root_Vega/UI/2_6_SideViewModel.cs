@@ -208,8 +208,8 @@ namespace Root_Vega
 		#endregion
 
 		#region SelectedRecipe
-		Recipe _SelectedRecipe;
-		public Recipe SelectedRecipe
+		VegaRecipe _SelectedRecipe;
+		public VegaRecipe SelectedRecipe
 		{
 			get { return _SelectedRecipe; }
 			set
@@ -410,6 +410,8 @@ namespace Root_Vega
 			//0. 개수 초기화 및 Table Drop
 			_clearInspReslut();
 
+			ClearDrawList();
+
 			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
 			for (int i = 0; i < 4; i++)
 			{
@@ -432,22 +434,93 @@ namespace Root_Vega
 						}
 						int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(10 + i), type, 0);
 
+						int upper = 0;
+						int center = 0;
+						int under = 0;
+						int inspMargin = SelectedRecipe.VegaRecipeData.SideInspMargin;
+
+						switch (i)
+						{
+							case 0://top
+								upper = SelectedRecipe.VegaRecipeData.SideTopUpperOffset;
+								center = SelectedRecipe.VegaRecipeData.SideTopCenterOffset;
+								under = SelectedRecipe.VegaRecipeData.SideTopUnderOffset;
+								break;
+							case 1://left
+								upper = SelectedRecipe.VegaRecipeData.SideLeftUpperOffset;
+								center = SelectedRecipe.VegaRecipeData.SideLeftCenterOffset;
+								under = SelectedRecipe.VegaRecipeData.SideLeftUnderOffset;
+								break;
+							case 2://right
+								upper = SelectedRecipe.VegaRecipeData.SideRightUpperOffset;
+								center = SelectedRecipe.VegaRecipeData.SideRightCenterOffset;
+								under = SelectedRecipe.VegaRecipeData.SideRightUnderOffset;
+								break;
+							case 3://bot
+								upper = SelectedRecipe.VegaRecipeData.SideBottomUpperOffset;
+								center = SelectedRecipe.VegaRecipeData.SideBottomCenterOffset;
+								under = SelectedRecipe.VegaRecipeData.SideBottomUnderOffset;
+								break;
+						}
+						List<CRect> adjustAreaList = AdjustArea(inspAreaList[i], inspMargin, upper, center, under);
+
+						for (int n = 0; n < adjustAreaList.Count; n++)
+						{
+							var temp = new UIElementInfo(new Point(adjustAreaList[n].Left, adjustAreaList[n].Top), new Point(adjustAreaList[n].Right, adjustAreaList[n].Bottom));
+
+							System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+							rect.Width = adjustAreaList[n].Width;
+							rect.Height = adjustAreaList[n].Height;
+							System.Windows.Controls.Canvas.SetLeft(rect, adjustAreaList[n].Left);
+							System.Windows.Controls.Canvas.SetTop(rect, adjustAreaList[n].Top);
+							rect.StrokeThickness = 3;
+							rect.Stroke = MBrushes.Orange;
+
+							p_SimpleShapeDrawer_List[i].m_ListShape.Add(rect);
+							p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
+							p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
+
 						m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_sideMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).GetMBOffset(),
-							m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.X,
-							m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.Y,
-							inspAreaList[i], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
+								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.X,
+								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.Y,
+								adjustAreaList[n], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
+						}
+						p_ImageViewer_List[i].SetRoiRect();
 					}
 				}
 			}
 			m_Engineer.m_InspManager.StartInspection();
 		}
+
+		private List<CRect> AdjustArea(CRect originArea, int inspMargin, int upper, int center, int under)
+		{
+			List<CRect> result = new List<CRect>();
+			//우선 offset만큼 일괄 제거
+			originArea = new CRect(new Point(originArea.Left + inspMargin, originArea.Top + inspMargin), new Point(originArea.Right - inspMargin, originArea.Bottom - inspMargin));
+
+			if (center > 0)
+			{
+				//반갈죽
+				CRect upside = new CRect(new Point(originArea.Left, originArea.Top + upper), new Point(originArea.Right, originArea.Bottom - originArea.Height / 2.0 - center / 2.0));
+				CRect underside = new CRect(new Point(originArea.Left, originArea.Bottom - originArea.Height / 2.0 + center / 2.0), new Point(originArea.Right, originArea.Bottom - under));
+				result.Add(upside);
+				result.Add(underside);
+			}
+			else
+			{
+				//위아래만 빼고 추가
+				CRect temp = new CRect(new Point(originArea.Left, originArea.Top + upper), new Point(originArea.Right, originArea.Bottom - under));
+				result.Add(temp);
+			}
+
+			return result;
+		}
+
 		void DrawEdgeBox(Roi roi, bool useRecipeEdgeBox)
 		{
 			List<EdgeElement> targetList = new List<EdgeElement>();
 			var tempToolset = (InspectToolSet)m_Engineer.ClassToolBox().GetToolSet("Inspect");
 			var tempInspect = tempToolset.GetInspect("SideVision.Inspect");
-
-			ClearDrawList();
 
 			for (int i = 0; i < 4; i++)
 			{
