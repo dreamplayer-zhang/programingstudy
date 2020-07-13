@@ -223,6 +223,7 @@ namespace Root_Vega
         {
             get
             {
+                if (m_Recipe.RoiList.Count == 0) return new SurfaceParamData();
                 if (m_Recipe.RoiList[p_IndexMask].Surface.ParameterList.Count != 0)
                     return m_Recipe.RoiList[p_IndexMask].Surface.ParameterList[0];
                 else

@@ -167,6 +167,7 @@ namespace Root_Vega
 		{
 			get
 			{
+				if (m_Recipe.RecipeData.RoiList.Count == 0) return new StripParamData();
 				if (m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList.Count != 0)
 					return m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList[0];
 				else
