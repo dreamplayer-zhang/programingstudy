@@ -17,7 +17,7 @@ using System.Xml.Serialization;
 
 namespace RootTools.Inspects
 {
-	public class VegaRecipe:Recipe
+	public class VegaRecipe : Recipe
 	{
 		VegaRecipeData vegaRecipeData = new VegaRecipeData();
 		public VegaRecipeData VegaRecipeData
@@ -57,8 +57,8 @@ namespace RootTools.Inspects
 						{
 							if (feature != null)
 							{
-								feature.FeatureFileName = roi.Name + "_" + featureIdx.ToString() + ".bmp";
-								feature.m_Feature.SaveImageSync(Path.Combine(recipeDir, feature.FeatureFileName));
+								feature.Name = roi.Name + "_" + featureIdx.ToString() + ".bmp";
+								feature.m_Feature.SaveImageSync(Path.Combine(recipeDir, feature.Name));
 								featureIdx++;
 							}
 						}
@@ -81,6 +81,7 @@ namespace RootTools.Inspects
 		public override void Load(string filePath)
 		{
 			Loaded = false;
+			RecipePath = filePath;
 
 			XmlSerializer serializer = new XmlSerializer(typeof(VegaRecipe));
 			VegaRecipe result = new VegaRecipe();
@@ -100,7 +101,7 @@ namespace RootTools.Inspects
 			{
 				foreach (var feature in roi.Position.FeatureList)
 				{
-					string imageTargetPath = System.IO.Path.Combine(Path.GetDirectoryName(filePath), feature.FeatureFileName);
+					string imageTargetPath = System.IO.Path.Combine(Path.GetDirectoryName(filePath), feature.Name);
 					//TODO : Image 정보를 별도로 넣는 것이 효율적일 것으로 보임
 					feature.m_Feature = new ImageData(feature.RoiRect.Width, feature.RoiRect.Height);
 					feature.m_Feature.LoadImageSync(imageTargetPath, new CPoint(0, 0));
@@ -139,6 +140,7 @@ namespace RootTools.Inspects
 		#endregion
 
 		[XmlIgnore] public string RecipeName { get; set; }
+		[XmlIgnore] public string RecipePath { get; set; }
 		RecipeData recipeData = new RecipeData();
 		public RecipeData RecipeData
 		{
@@ -798,14 +800,33 @@ namespace RootTools.Inspects
 		public List<Feature> FeatureList = new List<Feature>();
 		public int ScoreValue;
 	}
-	public class Feature
+	public class Feature : ObservableObject
 	{
 		[XmlIgnore] public ImageData m_Feature;
 		public CRect RoiRect = new CRect();
+		public Feature(string name)
+		{
+			_name = name;
+		}
+		public Feature()
+		{
+
+		}
 		/// <summary>
 		/// Feature Image의 파일명. 확장자 포함
 		/// </summary>
-		public string FeatureFileName;
+		string _name = "";
+		public string Name
+		{
+			get
+			{
+				return _name;
+			}
+			set
+			{
+				SetProperty(ref _name, value);
+			}
+		}
 	}
 	public class Roi : ObservableObject
 	{

@@ -20,6 +20,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Emgu.CV.Dnn;
+using System.Drawing.Imaging;
 
 namespace RootTools
 {

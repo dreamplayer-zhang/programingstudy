@@ -19,6 +19,10 @@ namespace Root_Vega
 		public const string sSidePool = "SideVision.Memory";
 		public const string sSideGroup = "Grab";
 
+		public const string sPatternPool = "pool";
+		public const string sPatternGroup = "group";
+		public const string sPatternmem = "mem";
+
 		public static string MainFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
 	}
 }
