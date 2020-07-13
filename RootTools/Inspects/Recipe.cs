@@ -17,43 +17,22 @@ using System.Xml.Serialization;
 
 namespace RootTools.Inspects
 {
-	public class Recipe : ObservableObject
+	public class VegaRecipe:Recipe
 	{
-		#region EventHandler
-		/// <summary>
-		/// 이벤트 핸들러
-		/// </summary>
-		public delegate void EventHandler();
-		[XmlIgnore] public EventHandler LoadComplete;
-		#endregion
-
-		[XmlIgnore] public string RecipeName { get; set; }
-		RecipeData recipeData = new RecipeData();
-		public RecipeData RecipeData
+		VegaRecipeData vegaRecipeData = new VegaRecipeData();
+		public VegaRecipeData VegaRecipeData
 		{
-			get { return recipeData; }
-			set { SetProperty(ref recipeData, value); }
+			get { return vegaRecipeData; }
+			set { SetProperty(ref vegaRecipeData, value); }
 		}
-
-		[XmlIgnore] public Result m_SI;
-		public MapData MapData;
-		/// <summary>
-		/// 레시피가 로드된 상태를 표시한다
-		/// </summary>
-		[XmlIgnore] public bool Loaded { get; private set; }
-		public void Init()
+		public override void Init()
 		{
-			this.RecipeName = "";
-			RecipeData = new RecipeData();
-			MapData = new MapData();
+			base.Init();
+			this.VegaRecipeData = new VegaRecipeData();
 		}
-		/// <summary>
-		/// 레시피를 저장한다
-		/// </summary>
-		/// <param name="recipeDir">레시피가 저장될 폴더명</param>
-		public bool Save(string recipeDir)
+		public override bool Save(string recipeDir)
 		{
-			if(File.Exists(recipeDir))
+			if (File.Exists(recipeDir))
 			{
 				//파일 경로가 들어오면 안됩니다!
 				return false;
@@ -67,9 +46,9 @@ namespace RootTools.Inspects
 			string paramPath = Path.Combine(recipeDir, "Parameter.VegaVision");
 
 			//Feature 저장
-			if (RecipeData != null)
+			if (VegaRecipeData != null)
 			{
-				foreach (var roi in RecipeData.RoiList)
+				foreach (var roi in VegaRecipeData.RoiList)
 				{
 					int featureIdx = 0;
 					if (roi != null)
@@ -94,36 +73,30 @@ namespace RootTools.Inspects
 			//Serialize가능한 내용을 xml로 저장
 			using (StreamWriter wr = new StreamWriter(paramPath))
 			{
-				XmlSerializer xs = new XmlSerializer(typeof(Recipe));
+				XmlSerializer xs = new XmlSerializer(typeof(VegaRecipe));
 				xs.Serialize(wr, this);
 			}
 			return true;
 		}
-
-		/// <summary>
-		/// VEGA Vision Recipe를 로드한다
-		/// </summary>
-		/// <param name="filePath">.VegaVision File경로</param>
-		/// <returns></returns>
-		public void Load(string filePath)
+		public override void Load(string filePath)
 		{
 			Loaded = false;
 
-			XmlSerializer serializer = new XmlSerializer(typeof(Recipe));
-			Recipe result = new Recipe();
+			XmlSerializer serializer = new XmlSerializer(typeof(VegaRecipe));
+			VegaRecipe result = new VegaRecipe();
 
 			using (Stream reader = new FileStream(filePath, FileMode.Open))
 			{
 				// Call the Deserialize method to restore the object's state.
-				result = (Recipe)serializer.Deserialize(reader);
+				result = (VegaRecipe)serializer.Deserialize(reader);
 			}
 			this.MapData = result.MapData;
 			this.m_SI = result.m_SI;
-			this.RecipeData = result.RecipeData;
+			this.VegaRecipeData = result.VegaRecipeData;
 			this.RecipeName = Path.GetDirectoryName(filePath).Split('\\').Last();
 
 			//feature data load
-			foreach (var roi in result.recipeData.RoiList)
+			foreach (var roi in result.vegaRecipeData.RoiList)
 			{
 				foreach (var feature in roi.Position.FeatureList)
 				{
@@ -153,6 +126,55 @@ namespace RootTools.Inspects
 			}
 
 			Loaded = true;
+		}
+	}
+	public class Recipe : ObservableObject
+	{
+		#region EventHandler
+		/// <summary>
+		/// 이벤트 핸들러
+		/// </summary>
+		public delegate void EventHandler();
+		[XmlIgnore] public EventHandler LoadComplete;
+		#endregion
+
+		[XmlIgnore] public string RecipeName { get; set; }
+		RecipeData recipeData = new RecipeData();
+		public RecipeData RecipeData
+		{
+			get { return recipeData; }
+			set { SetProperty(ref recipeData, value); }
+		}
+
+		[XmlIgnore] public Result m_SI;
+		public MapData MapData;
+		/// <summary>
+		/// 레시피가 로드된 상태를 표시한다
+		/// </summary>
+		[XmlIgnore] public bool Loaded { get; protected set; }
+		virtual public void Init()
+		{
+			this.RecipeName = "";
+			RecipeData = new RecipeData();
+			MapData = new MapData();
+		}
+		/// <summary>
+		/// 레시피를 저장한다
+		/// </summary>
+		/// <param name="recipeDir">레시피가 저장될 폴더명</param>
+		virtual public bool Save(string recipeDir)
+		{
+			return true;
+		}
+
+		/// <summary>
+		/// VEGA Vision Recipe를 로드한다
+		/// </summary>
+		/// <param name="filePath">.VegaVision File경로</param>
+		/// <returns></returns>
+		virtual public void Load(string filePath)
+		{
+
 		}
 	}
 	public class Result
@@ -200,6 +222,278 @@ namespace RootTools.Inspects
 		public CRect rtArea;  //외각
 		public string sDefectName;
 		public int sDCode;
+	}
+	public class VegaRecipeData : RecipeData
+	{
+		public VegaRecipeData()
+		{
+			//일단 pixel 단위로 지정
+			_SideInspMargin = new Param<int>(100, 0, int.MaxValue);
+
+			_SideTopUpperOffset = new Param<int>(10000, 0, int.MaxValue);
+			_SideTopCenterOffset = new Param<int>(30000, 0, int.MaxValue);
+			_SideTopUnderOffset = new Param<int>(10000, 0, int.MaxValue);
+
+			_SideLeftUpperOffset = new Param<int>(10000, 0, int.MaxValue);
+			_SideLeftCenterOffset = new Param<int>(30000, 0, int.MaxValue);
+			_SideLeftUnderOffset = new Param<int>(10000, 0, int.MaxValue);
+
+			_SideRightUpperOffset = new Param<int>(10000, 0, int.MaxValue);
+			_SideRightCenterOffset = new Param<int>(30000, 0, int.MaxValue);
+			_SideRightUnderOffset = new Param<int>(10000, 0, int.MaxValue);
+
+			_SideBottomUpperOffset = new Param<int>(10000, 0, int.MaxValue);
+			_SideBottomCenterOffset = new Param<int>(30000, 0, int.MaxValue);
+			_SideBottomUnderOffset = new Param<int>(10000, 0, int.MaxValue);
+		}
+
+		#region SideInspMargin
+
+		Param<int> _SideInspMargin;
+		public int SideInspMargin
+		{
+			get
+			{
+				return _SideInspMargin._value;
+			}
+			set
+			{
+				if (_SideInspMargin._value == value)
+					return;
+				_SideInspMargin._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+
+		#region SideTopUpperOffset
+
+		Param<int> _SideTopUpperOffset;
+		public int SideTopUpperOffset
+		{
+			get
+			{
+				return _SideTopUpperOffset._value;
+			}
+			set
+			{
+				if (_SideTopUpperOffset._value == value)
+					return;
+				_SideTopUpperOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region SideTopCenterOffset
+
+		Param<int> _SideTopCenterOffset;
+		public int SideTopCenterOffset
+		{
+			get
+			{
+				return _SideTopCenterOffset._value;
+			}
+			set
+			{
+				if (_SideTopCenterOffset._value == value)
+					return;
+				_SideTopCenterOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region SideTopUnderOffset
+
+		Param<int> _SideTopUnderOffset;
+		public int SideTopUnderOffset
+		{
+			get
+			{
+				return _SideTopUnderOffset._value;
+			}
+			set
+			{
+				if (_SideTopUnderOffset._value == value)
+					return;
+				_SideTopUnderOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region SideLeftUpperOffset
+
+		Param<int> _SideLeftUpperOffset;
+		public int SideLeftUpperOffset
+		{
+			get
+			{
+				return _SideLeftUpperOffset._value;
+			}
+			set
+			{
+				if (_SideLeftUpperOffset._value == value)
+					return;
+				_SideLeftUpperOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region SideLeftCenterOffset
+
+		Param<int> _SideLeftCenterOffset;
+		public int SideLeftCenterOffset
+		{
+			get
+			{
+				return _SideLeftCenterOffset._value;
+			}
+			set
+			{
+				if (_SideLeftCenterOffset._value == value)
+					return;
+				_SideLeftCenterOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region SideLeftUnderOffset
+
+		Param<int> _SideLeftUnderOffset;
+		public int SideLeftUnderOffset
+		{
+			get
+			{
+				return _SideLeftUnderOffset._value;
+			}
+			set
+			{
+				if (_SideLeftUnderOffset._value == value)
+					return;
+				_SideLeftUnderOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region SideRightUpperOffset
+
+		Param<int> _SideRightUpperOffset;
+		public int SideRightUpperOffset
+		{
+			get
+			{
+				return _SideRightUpperOffset._value;
+			}
+			set
+			{
+				if (_SideRightUpperOffset._value == value)
+					return;
+				_SideRightUpperOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region SideRightCenterOffset
+
+		Param<int> _SideRightCenterOffset;
+		public int SideRightCenterOffset
+		{
+			get
+			{
+				return _SideRightCenterOffset._value;
+			}
+			set
+			{
+				if (_SideRightCenterOffset._value == value)
+					return;
+				_SideRightCenterOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region SideRightUnderOffset
+
+		Param<int> _SideRightUnderOffset;
+		public int SideRightUnderOffset
+		{
+			get
+			{
+				return _SideRightUnderOffset._value;
+			}
+			set
+			{
+				if (_SideRightUnderOffset._value == value)
+					return;
+				_SideRightUnderOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region SideBottomUpperOffset
+
+		Param<int> _SideBottomUpperOffset;
+		public int SideBottomUpperOffset
+		{
+			get
+			{
+				return _SideBottomUpperOffset._value;
+			}
+			set
+			{
+				if (_SideBottomUpperOffset._value == value)
+					return;
+				_SideBottomUpperOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region SideBottomCenterOffset
+
+		Param<int> _SideBottomCenterOffset;
+		public int SideBottomCenterOffset
+		{
+			get
+			{
+				return _SideBottomCenterOffset._value;
+			}
+			set
+			{
+				if (_SideBottomCenterOffset._value == value)
+					return;
+				_SideBottomCenterOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region SideBottomUnderOffset
+
+		Param<int> _SideBottomUnderOffset;
+		public int SideBottomUnderOffset
+		{
+			get
+			{
+				return _SideBottomUnderOffset._value;
+			}
+			set
+			{
+				if (_SideBottomUnderOffset._value == value)
+					return;
+				_SideBottomUnderOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
 	}
 	public class RecipeData : ObservableObject
 	{
@@ -255,7 +549,6 @@ namespace RootTools.Inspects
 			}
 		}
 		#endregion
-
 	}
 	public class Param<T> where T : IComparable
 	{

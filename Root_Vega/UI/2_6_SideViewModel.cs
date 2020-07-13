@@ -30,9 +30,6 @@ namespace Root_Vega
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
 		List<ImageData> m_Image = new List<ImageData>();
-		List<string> m_astrMem = new List<String> { "SideTop", "SideLeft", "SideRight", "SideBottom" };
-		const string sPool = "SideVision.Memory";
-		const string sGroup = "Grab";
 		bool bUsingInspection;
 		int currentTotalIdx;
 
@@ -244,7 +241,7 @@ namespace Root_Vega
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					p_ImageViewer_List.Add(new ImageViewer_ViewModel(new ImageData(m_MemoryModule.GetMemory("SideVision.Memory", "Grab", m_astrMem[i])), dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
+					p_ImageViewer_List.Add(new ImageViewer_ViewModel(new ImageData(m_MemoryModule.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i])), dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
 					m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
 				}
 
@@ -275,7 +272,7 @@ namespace Root_Vega
 			m_Engineer.m_recipe.LoadComplete += () =>
 			{
 				SelectedRecipe = m_Engineer.m_recipe;
-				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
 				SideParamList = new ObservableCollection<SurfaceParamData>();
 
 				_SelectedROI = null;
@@ -313,7 +310,7 @@ namespace Root_Vega
 				Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
 #endif
 				int count;
-				if(int.TryParse(temp,out count))
+				if (int.TryParse(temp, out count))
 				{
 					if (currentTotalIdx < count)
 					{
@@ -433,12 +430,12 @@ namespace Root_Vega
 						{
 							type = InspectionType.RelativeSurface;
 						}
-						int nDefectCode = InspectionManager.MakeDefectCode(( InspectionTarget)(10 + i), type, 0);
+						int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(10 + i), type, 0);
 
-						m_Engineer.m_InspManager.CreateInspArea("SideVision.Memory", "Grab", m_astrMem[i], m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).GetMBOffset(),
-							m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).p_sz.X,
-							m_Engineer.GetMemory("SideVision.Memory", "Grab", m_astrMem[i]).p_sz.Y,
-							inspAreaList[i], 1000, param, nDefectCode, m_Engineer.m_recipe.RecipeData.UseDefectMerge, m_Engineer.m_recipe.RecipeData.MergeDistance);
+						m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_sideMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).GetMBOffset(),
+							m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.X,
+							m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.Y,
+							inspAreaList[i], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
 					}
 				}
 			}
@@ -508,13 +505,13 @@ namespace Root_Vega
 			if (!m_Engineer.m_recipe.Loaded)
 				return;
 
-			int roiCount = m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide).Count();
+			int roiCount = m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide).Count();
 			string defaultName = string.Format("Side ROI #{0}", roiCount);
 
 			Roi temp = new Roi(defaultName, Roi.Item.ReticleSide);
-			m_Engineer.m_recipe.RecipeData.RoiList.Add(temp);
+			m_Engineer.m_recipe.VegaRecipeData.RoiList.Add(temp);
 
-			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
 		}
 		void _addParam()
 		{

@@ -64,7 +64,7 @@ namespace Root_Vega
         }
         #endregion
 
-        public Recipe m_recipe = new Recipe();
+        public VegaRecipe m_recipe = new VegaRecipe();
         public Vega_Handler m_handler = new Vega_Handler();
         public InspectionManager m_InspManager = new InspectionManager();
         public void Init(string id)

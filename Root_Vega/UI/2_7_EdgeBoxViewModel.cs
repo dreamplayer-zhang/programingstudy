@@ -27,7 +27,6 @@ namespace Root_Vega
 		Vega_Engineer m_Engineer;
 		DialogService m_DialogService;
 		MemoryTool m_MemoryModule;
-		List<string> m_astrMem = new List<String> { "SideTop", "SideLeft", "SideRight", "SideBottom" };
 		public List<DrawHistoryWorker> m_DrawHistoryWorker_List;
 
 		#region p_SimpleShapeDrawer_List
@@ -325,7 +324,7 @@ namespace Root_Vega
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					p_ImageViewer_List.Add(new ImageViewer_ViewModel(new ImageData(m_MemoryModule.GetMemory("SideVision.Memory", "Side", m_astrMem[i])), dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
+					p_ImageViewer_List.Add(new ImageViewer_ViewModel(new ImageData(m_MemoryModule.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i])), dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
 					m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
 				}
 
@@ -355,7 +354,7 @@ namespace Root_Vega
 			}
 			m_Engineer.m_recipe.LoadComplete += () =>
 			{
-				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
 			};
 
 
@@ -411,13 +410,13 @@ namespace Root_Vega
 			if (!m_Engineer.m_recipe.Loaded)
 				return;
 
-			int roiCount = m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide).Count();
+			int roiCount = m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide).Count();
 			string defaultName = string.Format("Side ROI #{0}", roiCount);
 
 			Roi temp = new Roi(defaultName, Roi.Item.ReticleSide);
-			m_Engineer.m_recipe.RecipeData.RoiList.Add(temp);
+			m_Engineer.m_recipe.VegaRecipeData.RoiList.Add(temp);
 
-			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
 		}
 		private void _initSave()
 		{

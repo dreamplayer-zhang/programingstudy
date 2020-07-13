@@ -134,6 +134,128 @@
 							<TextBox Text="{Binding RecipeData.MergeDistance}"
 										 Style="{StaticResource BasicTbox}"/>
 						</UniformGrid>
+						<UniformGrid Columns="2" Margin="0,0,0,10">
+							<TextBlock Text="Overall Inspection Margin"
+										   Style="{StaticResource BasicTb}"/>
+							<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideInspMargin}"/>
+						</UniformGrid>
+						<Expander Header="Inspection Offset(Top)"
+								  Foreground="White">
+							<StackPanel>
+								<UniformGrid Columns="2" Margin="0,5,0,5">
+									<TextBlock Text="Upper Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideTopUpperOffset}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,5">
+									<TextBlock Text="Center Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideTopCenterOffset}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,5">
+									<TextBlock Text="Under Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideTopUnderOffset}"/>
+								</UniformGrid>
+							</StackPanel>
+						</Expander>
+						<Expander Header="Inspection Offset(Left)"
+								  Foreground="White">
+							<StackPanel>
+								<UniformGrid Columns="2" Margin="0,5,0,5">
+									<TextBlock Text="Upper Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideLeftUpperOffset}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,5">
+									<TextBlock Text="Center Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideLeftCenterOffset}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,5">
+									<TextBlock Text="Under Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideLeftUnderOffset}"/>
+								</UniformGrid>
+							</StackPanel>
+						</Expander>
+						<Expander Header="Inspection Offset(Right)"
+								  Foreground="White">
+							<StackPanel>
+								<UniformGrid Columns="2" Margin="0,5,0,5">
+									<TextBlock Text="Upper Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideRightUpperOffset}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,5">
+									<TextBlock Text="Center Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideRightCenterOffset}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,5">
+									<TextBlock Text="Under Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideRightUnderOffset}"/>
+								</UniformGrid>
+							</StackPanel>
+						</Expander>
+						<Expander Header="Inspection Offset(Bottom)"
+								  Foreground="White">
+							<StackPanel>
+								<UniformGrid Columns="2" Margin="0,5,0,5">
+									<TextBlock Text="Upper Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideBottomUpperOffset}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,5">
+									<TextBlock Text="Center Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideBottomCenterOffset}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,5">
+									<TextBlock Text="Under Area Offset"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding RecipeData.SideBottomUnderOffset}"/>
+								</UniformGrid>
+							</StackPanel>
+						</Expander>
 					</StackPanel>
 					<Button Grid.Column="0"
 							Margin="0,10,0,40"
@@ -148,10 +270,10 @@
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding CommandStartInsp}"
                             Margin="0,0,0,10" />
-					<Button Content="Inspection Complete"
+					<!--<Button Content="Inspection Complete"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding CommandEndInsp}"
-                            Margin="0,0,0,10" />
+                            Margin="0,0,0,10" />-->
 				</StackPanel>
 			</Grid>
 			<ScrollViewer VerticalScrollBarVisibility="Auto"

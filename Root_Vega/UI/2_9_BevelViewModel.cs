@@ -23,7 +23,7 @@ namespace Root_Vega
         MemoryTool m_MemoryModule;
         List<ImageData> m_Image = new List<ImageData>();
         DrawData m_DD;
-        Recipe m_Recipe;
+        VegaRecipeData m_Recipe;
 
         SqliteDataDB VSDBManager;
         int currentDefectIdx;
@@ -33,7 +33,7 @@ namespace Root_Vega
         private string inspDefaultDir;
         private string inspFileName;
 
-        public Recipe p_Recipe
+        public VegaRecipeData p_Recipe
         {
             get
             {
@@ -44,9 +44,6 @@ namespace Root_Vega
                 SetProperty(ref m_Recipe, value);
             }
         }
-        string sPool = "SideVision.Memory";
-        string sGroup = "Grab";
-        List<string> sMem = new List<String> { "BevelTop", "BevelLeft", "BevelRight", "BevelBottom" };
 
         //int tempImageWidth = 640;
         //int tempImageHeight = 480;
@@ -113,7 +110,7 @@ namespace Root_Vega
         void Init(Vega_Engineer engineer, IDialogService dialogService)
         {
             m_DD = new DrawData();
-            p_Recipe = engineer.m_recipe;
+            p_Recipe = engineer.m_recipe.VegaRecipeData;
 
             m_MemoryModule = engineer.ClassMemoryTool();
             //m_MemoryModule.CreatePool(sPool, 8);
@@ -124,7 +121,7 @@ namespace Root_Vega
 
             for (int i = 0; i < 4; i++)
             {
-                m_Image.Add(new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem[i])));
+                m_Image.Add(new ImageData(m_MemoryModule.GetMemory(App.sSidePool, App.sSideGroup, App.m_bevelMem[i])));
                 p_ImageViewer_List.Add(new ImageViewer_ViewModel(m_Image[i], dialogService)); //!! m_Image 는 추후 각 part에 맞는 이미지가 들어가게 수정.
             }
 
@@ -226,15 +223,15 @@ namespace Root_Vega
         {
             get
             {
-                if (m_Recipe.RecipeData.RoiList[p_IndexMask].Surface.ParameterList.Count != 0)
-                    return m_Recipe.RecipeData.RoiList[p_IndexMask].Surface.ParameterList[0];
+                if (m_Recipe.RoiList[p_IndexMask].Surface.ParameterList.Count != 0)
+                    return m_Recipe.RoiList[p_IndexMask].Surface.ParameterList[0];
                 else
                     return new SurfaceParamData();
             }
             set
             {
-                if (m_Recipe.RecipeData.RoiList[p_IndexMask].Surface.ParameterList.Count != 0)
-                    m_Recipe.RecipeData.RoiList[p_IndexMask].Surface.ParameterList[0] = value;
+                if (m_Recipe.RoiList[p_IndexMask].Surface.ParameterList.Count != 0)
+                    m_Recipe.RoiList[p_IndexMask].Surface.ParameterList[0] = value;
                 RaisePropertyChanged();
             }
         }
@@ -265,13 +262,13 @@ namespace Root_Vega
             {
                 SetProperty(ref _IndexMask, value);
 
-                p_SurFace_ParamData = p_Recipe.RecipeData.RoiList[_IndexMask].Surface.ParameterList[0];
+                p_SurFace_ParamData = p_Recipe.RoiList[_IndexMask].Surface.ParameterList[0];
                 for (int i = 0; i < 4; i++)
                 {
                     p_ImageViewer_List[i].SetDrawer((DrawToolVM)p_SimpleShapeDrawer_List[_IndexMask][i]);
                     p_ImageViewer_List[i].m_HistoryWorker = m_DrawHistoryWorker_List[_IndexMask];
                     p_ImageViewer_List[i].SetImageSource();
-                    p_SurFace_ParamData = p_Recipe.RecipeData.RoiList[_IndexMask].Surface.ParameterList[0];
+                    p_SurFace_ParamData = p_Recipe.RoiList[_IndexMask].Surface.ParameterList[0];
                 }
 
             }
@@ -433,7 +430,7 @@ namespace Root_Vega
         }
         private void _btnClear()
         {
-            p_Recipe.RecipeData.RoiList[p_IndexMask].Surface.NonPatternList[0].Area = new CRect();
+            p_Recipe.RoiList[p_IndexMask].Surface.NonPatternList[0].Area = new CRect();
 
             foreach (var viewer in p_ImageViewer_List)
             {
@@ -464,7 +461,7 @@ namespace Root_Vega
 
             currentDefectIdx = 0;
 
-            CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Surface.NonPatternList[0].Area;
+            CRect Mask_Rect = p_Recipe.RoiList[0].Surface.NonPatternList[0].Area;
             int nblocksize = 500;
 
 
