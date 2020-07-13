@@ -15,14 +15,16 @@ namespace RootTools.RADS
 		Log m_log;
 		IEngineer m_engineer;
 
-		public RADS(IEngineer engineer)
+		string m_strID = "RADS";
+		
+		public RADS()
 		{
 			p_limit = 100;
 			p_reg = new int[16];
-			m_engineer = engineer;
 			//m_log = m_engineer.ClassLogView().GetLog(LogView.eLogType.ENG, "RADS");
-			m_log = LogView.GetLog("", "RADS");
-			m_treeRoot = new TreeRoot("RADS", m_log);
+			//m_log = LogView.GetLog(m_strID, "RADS");
+			m_log = null;
+			m_treeRoot = new TreeRoot(m_strID, m_log);
 			
 			RunTree(Tree.eMode.RegRead);
 			RunTree(Tree.eMode.Init);
@@ -223,6 +225,7 @@ namespace RootTools.RADS
 			}
 			set
 			{
+
 				SetProperty(ref m_nThreshold, value);
 			}
 		}
@@ -262,7 +265,7 @@ namespace RootTools.RADS
 				SetProperty(ref m_wFilterSize, value);
 			}
 		}
-		int m_limit;
+		int m_limit = 123;
 		public int p_limit
 		{
 			get

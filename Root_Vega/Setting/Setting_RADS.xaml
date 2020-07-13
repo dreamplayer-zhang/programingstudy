@@ -62,7 +62,8 @@
                     </Button>
                     <Button Style="{StaticResource BasicBtn}"
                             Margin="5"
-                            Command="{Binding StartADSCommand}">
+                            Command="{Binding StartADSCommand}"
+                            IsEnabled="{Binding p_timerControl.p_IsRun, Converter={StaticResource InverseBooleanConverters}}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <material:PackIcon Kind="RayStartArrow"
@@ -76,7 +77,8 @@
                     </Button>
                     <Button Style="{StaticResource BasicBtn}"
                             Margin="5"
-                            Command="{Binding StopADSCommand}">
+                            Command="{Binding StopADSCommand}"
+                            IsEnabled="{Binding p_timerControl.p_IsRun}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <material:PackIcon Kind="StopCircleOutline"

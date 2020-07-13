@@ -11,6 +11,7 @@ using RootTools.Inspects;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
+using RootTools.RADS;
 using RootTools.Trees;
 using RootTools.ZoomLens;
 using System;
@@ -86,6 +87,7 @@ namespace Root_Vega.Module
         MemoryData m_memoryMain;
         InspectTool m_inspectTool;
         ZoomLens m_ZoomLens;
+        public RADSControl m_RADSControl;
         public ZoomLens p_ZoomLens;
         public override void GetTools(bool bInit)
         {
@@ -101,6 +103,12 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
+            bool bUseRADS = false;
+            foreach (GrabMode gm in m_aGrabMode)
+            {
+                if (gm.GetUseRADS()) bUseRADS = true;
+            }
+            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
             if (bInit) m_inspectTool.OnInspectDone += M_inspectTool_OnInspectDone;
         }
 
@@ -153,7 +161,7 @@ namespace Root_Vega.Module
             while (m_aGrabMode.Count < m_lGrabMode)
             {
                 string id = "Mode." + m_aGrabMode.Count.ToString("00");
-                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool);
+                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool, m_RADSControl);
                 m_aGrabMode.Add(grabMode);
             }
             while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
@@ -749,10 +757,12 @@ namespace Root_Vega.Module
             public override string Run()
             {
                 if (m_grabMode == null) return "Grab Mode == null";
+                bool bUseRADS = m_grabMode.GetUseRADS();
                 try
                 {
                     int nScanLine = 0;
                     m_grabMode.SetLight(true);
+                    if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == false)) m_grabMode.m_RADSControl.StartRADS();
                     AxisXY axisXY = m_module.p_axisXY;
                     Axis axisZ = m_module.p_axisZ;
                     m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
@@ -849,6 +859,7 @@ namespace Root_Vega.Module
                 {
                     //m_grabMode.ResetTrigger(m_module.m_axisXY.m_axisY);
                     m_grabMode.SetLight(false);
+                    if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == true)) m_grabMode.m_RADSControl.StopRADS();
                 }
             }
         }

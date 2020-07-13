@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using RootTools.Trees;
 using RootTools.Camera.BaslerPylon;
 using Root_Vega.Module;
+using System.Threading;
 
 namespace Root_Vega.Setting
 {
@@ -59,11 +60,10 @@ namespace Root_Vega.Setting
         public Setting_RADSViewModel(Vega_Engineer engineer)
         {
             p_strLabel = "NULL";
-            p_timerControl = new RADSControl(engineer);
-            p_timerControl.SearchComplete += SetEvent;
-
             m_Engineer = engineer;
             p_PatternVision = ((Vega_Handler)engineer.ClassHandler()).m_patternVision;
+            p_timerControl = p_PatternVision.m_RADSControl;
+            p_timerControl.SearchComplete += SetEvent;
             p_CamRADS = p_PatternVision.m_CamRADS;
         }
 
@@ -91,7 +91,16 @@ namespace Root_Vega.Setting
 
         void GetDeviceInfo()
         {
-            p_timerControl.UpdateDeviceInfo();
+            bool bUseRADS = false;
+            foreach (GrabMode gm in m_PatternVision.m_aGrabMode)
+            {
+                if (gm.GetUseRADS())
+                {
+                    bUseRADS = true;
+                    break;
+                }
+            }
+            if (bUseRADS) p_timerControl.UpdateDeviceInfo();
         }
 
         public RelayCommand GetDeviceInfoCommand
@@ -117,8 +126,15 @@ namespace Root_Vega.Setting
 
         void StartADS()
         {
-            p_timerControl.StartRADS();
+            Thread thread = new Thread(new ThreadStart(_StartADS));
+            thread.Start();
+            
             return;
+        }
+
+        void _StartADS()
+        {
+            p_timerControl.StartRADS();
         }
 
         public RelayCommand StartADSCommand
