@@ -9,9 +9,16 @@ using System.Text;
 using System;
 using System.Security.RightsManagement;
 using System.Threading.Tasks;
+using System.Linq;
+using DPoint = System.Drawing.Point;
+using System.Diagnostics;
+using MySqlX.XDevAPI.Relational;
+using RootTools.ToolBoxs;
 
 namespace RootTools.Inspects
 {
+	public enum eEdgeFindDirection { LEFT, TOP, RIGHT, BOTTOM };
+	public enum eBrightSide { LEFT, TOP, RIGHT, BOTTOM };
 	public class InspectionManager : Singleton<InspectionManager>, INotifyPropertyChanged
 	{
 		#region EventHandler
@@ -29,18 +36,36 @@ namespace RootTools.Inspects
 
 		Thread inspThread;
 		Inspection[] InsepctionThread;
+#if DEBUG
+		StopWatch sw;
+#endif
 
 		int nThreadNum = 10;
-		int nInspectionCount = 0;
+		public int nInspectionCount = 0;
+		int ImageWidth = 640;
+		int ImageHeight = 480;
+		public ToolBox m_toolBox;
+
+
+
+		private string inspDefaultDir;
+		private string inspFileName;
+		SqliteDataDB VSDBManager;
+		System.Data.DataTable VSDataInfoDT;
+		System.Data.DataTable VSDataDT;
 
 		bool m_bProgress;
 
 		public bool IsInitialized { get; private set; }
-
 		public void StartInspection()
 		{
 			m_bProgress = false;
 			nInspectionCount = 0;
+#if DEBUG
+			sw = new StopWatch();
+			sw.Start();
+
+#endif
 
 			IsInitialized = true;
 
@@ -73,7 +98,7 @@ namespace RootTools.Inspects
 			Parallel.For(0, nThreadNum, i =>
 			{
 				InsepctionThread[i] = new Inspection(nThreadNum);
-				InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
+				//InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
 			});
 			//for (int i = 0; i < nThreadNum; i++)
 			//{
@@ -126,21 +151,139 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="source">DefectData array</param>
 		/// <param name="args">추후 arguments가 필요하면 사용할것</param>
-		private void InspectionManager_AddDefect(DefectDataWrapper item)
-		{
-			if (AddDefect != null)
-			{
-				AddDefect(item);
-			}
-		}
+		//private void InspectionManager_AddDefect(DefectDataWrapper item)
+		//{
+		//	//여기서 DB 에 추가되는 등의 동작을 해야함!
+		//	if (AddDefect != null)
+		//	{
+		//		AddDefect(item);
+		//	}
+		//}
 
 		public void InspectionDone()
 		{
-			////TODO : 해당 Queue로 들어온 검사가 완전 종료되었을때 발동. 여기서 DB를 닫으면 될 것으로 보임
-			//if (InspectionComplete != null)
-			//{
-			//	InspectionComplete();
-			//}
+			//여기서 DB관련동작 이하생략!
+			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+			if (connector.Open())
+			{
+				var result = connector.SendNonQuery("SELECT COUNT(*) FROM inspections.inspstatus;");
+				if (result == (int)MYSQLError.TABLE_IS_MISSING)
+				{
+					//상태용 테이블 작성
+					result = connector.SendNonQuery("CREATE TABLE inspections.inspstatus (idx INT NOT NULL, inspStatusNum INT NULL, PRIMARY KEY (idx));");
+					if (result != 0)
+					{
+						//에러에 대한 추가 예외처리 필요
+					}
+				}
+				//완료 표시
+				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
+				if (result == 0)
+				{
+					//완료. 검사결과 출력
+					DataSet tempSet = connector.GetDataSet("tempdata");
+
+					inspDefaultDir = @"C:\vsdb";
+					if (!System.IO.Directory.Exists(inspDefaultDir))
+					{
+						System.IO.Directory.CreateDirectory(inspDefaultDir);
+					}
+					inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+					var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
+					string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
+
+					VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+					
+					if (VSDBManager.Connect())
+					{
+						VSDBManager.CreateTable("Datainfo");
+						VSDBManager.CreateTable("Data");
+
+						VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
+						VSDataDT = VSDBManager.GetDataTable("Data");
+					}
+
+					int stride = ImageWidth / 8;
+					string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
+
+					System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
+
+					System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
+					System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
+					encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
+
+					//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+
+					foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
+					{
+						System.Data.DataRow dataRow = VSDataDT.NewRow();
+
+						dataRow["No"] = item["idx"];
+						dataRow["DCode"] = item["ClassifyCode"];
+						dataRow["AreaSize"] = item["AreaSize"];
+						dataRow["Length"] = item["Length"];
+						dataRow["Width"] = item["Width"];
+						dataRow["Height"] = item["Height"];
+						dataRow["FOV"] = item["FOV"];
+						dataRow["PosX"] = item["PosX"];
+						dataRow["PosY"] = item["PosY"];
+						dataRow["TdiImageExist"] = 1;
+						dataRow["VrsImageExist"] = 0;
+
+						VSDataDT.Rows.Add(dataRow);
+
+						double fPosX = Convert.ToDouble(item["PosX"]);
+						double fPosY = Convert.ToDouble(item["PosY"]);
+
+						CRect ImageSizeBlock = new CRect(
+							(int)fPosX - ImageWidth / 2,
+							(int)fPosY - ImageHeight / 2,
+							(int)fPosX + ImageWidth / 2,
+							(int)fPosY + ImageHeight / 2);
+						string pool = item["memPOOL"].ToString();
+						string group = item["memGROUP"].ToString();
+						string memory = item["memMEMORY"].ToString();
+						var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
+						var image = new ImageData(tempMem);
+						encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(image.GetRectImage(ImageSizeBlock))));
+					}
+
+					if (VSDataDT.Rows.Count > 0)
+					{
+						encoder.Save(stream);
+					}
+					stream.Dispose();
+
+					VSDBManager.SetDataTable(VSDataInfoDT);
+					VSDBManager.SetDataTable(VSDataDT);
+					VSDBManager.Disconnect();
+					VSDataDT.Clear();
+					VSDataInfoDT.Clear();
+
+					result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
+				}
+			}
+			nInspectionCount = 0;
+#if DEBUG
+			sw.Stop();
+			Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
+#endif
+
+		}
+		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
+		{
+			var bitmapData = bitmap.LockBits(
+				new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+				System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
+
+			var bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
+				bitmapData.Width, bitmapData.Height,
+				bitmap.HorizontalResolution, bitmap.VerticalResolution,
+				System.Windows.Media.PixelFormats.Gray8, null,
+				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+
+			bitmap.UnlockBits(bitmapData);
+			return bitmapSource;
 		}
 		public void Dispose()
 		{
@@ -152,7 +295,7 @@ namespace RootTools.Inspects
 				for (int i = 0; i < InsepctionThread.Length; i++)
 				{
 					//이벤트 핸들러 제거
-					InsepctionThread[i].AddDefect -= InspectionManager_AddDefect;
+					//InsepctionThread[i].AddDefect -= InspectionManager_AddDefect;
 					//InsepctionThread[i].Dispose();
 				}
 			}
@@ -189,7 +332,7 @@ namespace RootTools.Inspects
 		/// <param name="bDefectMerge"></param>
 		/// <param name="nMergeDistance"></param>
 		/// <returns></returns>
-		public List<CRect> CreateInspArea(string poolName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int dCode, bool bDefectMerge, int nMergeDistance)
+		public List<CRect> CreateInspArea(string poolName, string groupName, string memoryName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int dCode, bool bDefectMerge, int nMergeDistance)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
 
@@ -245,6 +388,8 @@ namespace RootTools.Inspects
 						ip.m_nDefectCode = dCode;
 						ip.p_index = blockcount;
 						ip.MemoryPoolName = poolName;
+						ip.MemoryGroupName = groupName;
+						ip.MemoryName = memoryName;
 						ip.MemoryOffset = memOffset;
 						ip.p_TargetMemWidth = memWidth;
 						ip.p_TargetMemHeight = memHeight;
@@ -345,6 +490,318 @@ namespace RootTools.Inspects
 				PropertyChanged(this, new PropertyChangedEventArgs(proertyName));
 		}
 		#endregion
+
+		public static unsafe DPoint GetEdge(ImageData img, System.Windows.Rect rcROI, eEdgeFindDirection eDirection, bool bUseAutoThreshold, bool bUseB2D, int nThreshold)
+		{
+			// variable
+			int nSum = 0;
+			double dAverage = 0.0;
+			int nEdgeY = 0;
+			int nEdgeX = 0;
+
+			// implement
+
+			if (bUseAutoThreshold == true)
+			{
+				nThreshold = GetThresholdAverage(img, rcROI, eDirection);
+			}
+
+			switch (eDirection)
+			{
+				case eEdgeFindDirection.TOP:
+					for (int i = 0; i < rcROI.Height; i++)
+					{
+						byte* bp;
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
+						else bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
+						for (int j = 0; j < rcROI.Width; j++)
+						{
+							nSum += *bp;
+							bp++;
+						}
+						dAverage = nSum / rcROI.Width;
+						if (bUseB2D == true)
+						{
+							if (dAverage < nThreshold)
+							{
+								nEdgeY = (int)rcROI.Bottom - i;
+								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
+								break;
+							}
+						}
+						else
+						{
+							if (dAverage > nThreshold)
+							{
+								nEdgeY = (int)rcROI.Top + i;
+								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
+								break;
+							}
+						}
+						nSum = 0;
+					}
+					break;
+				case eEdgeFindDirection.LEFT:
+					for (int i = 0; i < rcROI.Width; i++)
+					{
+						byte* bp;
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
+						else bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
+						for (int j = 0; j < rcROI.Height; j++)
+						{
+							nSum += *bp;
+							bp += img.p_Stride;
+						}
+						dAverage = nSum / rcROI.Height;
+						if (bUseB2D == true)
+						{
+							if (dAverage < nThreshold)
+							{
+								nEdgeX = (int)rcROI.Right - i;
+								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
+								break;
+							}
+						}
+						else
+						{
+							if (dAverage > nThreshold)
+							{
+								nEdgeX = (int)rcROI.Left + i;
+								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
+								break;
+							}
+						}
+						nSum = 0;
+					}
+					break;
+				case eEdgeFindDirection.RIGHT:
+					for (int i = 0; i < rcROI.Width; i++)
+					{
+						byte* bp;
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
+						else bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
+						for (int j = 0; j < rcROI.Height; j++)
+						{
+							nSum += *bp;
+							bp += img.p_Stride;
+						}
+						dAverage = nSum / rcROI.Height;
+						if (bUseB2D == true)
+						{
+							if (dAverage < nThreshold)
+							{
+								nEdgeX = (int)rcROI.Left + i;
+								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
+								break;
+							}
+						}
+						else
+						{
+							if (dAverage > nThreshold)
+							{
+								nEdgeX = (int)rcROI.Right - i;
+								nEdgeY = (int)(rcROI.Top + (rcROI.Height / 2));
+								break;
+							}
+						}
+						nSum = 0;
+					}
+					break;
+				case eEdgeFindDirection.BOTTOM:
+					for (int i = 0; i < rcROI.Height; i++)
+					{
+						byte* bp;
+						if (bUseB2D == true) bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
+						else bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
+						for (int j = 0; j < rcROI.Width; j++)
+						{
+							nSum += *bp;
+							bp++;
+						}
+						dAverage = nSum / rcROI.Width;
+						if (bUseB2D == true)
+						{
+							if (dAverage < nThreshold)
+							{
+								nEdgeY = (int)rcROI.Top + i;
+								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
+								break;
+							}
+						}
+						else
+						{
+							if (dAverage > nThreshold)
+							{
+								nEdgeY = (int)rcROI.Bottom - i;
+								nEdgeX = (int)(rcROI.Left + (rcROI.Width / 2));
+								break;
+							}
+						}
+
+						nSum = 0;
+					}
+					break;
+			}
+
+			return new System.Drawing.Point(nEdgeX, nEdgeY);
+		}
+
+		static unsafe int GetThresholdAverage(ImageData img, System.Windows.Rect rcROI, eEdgeFindDirection eDirection)
+		{
+			// variable
+			int nSum = 0;
+			int nThreshold = 40;
+
+			// implement
+
+			if (eDirection == eEdgeFindDirection.TOP || eDirection == eEdgeFindDirection.BOTTOM)
+			{
+				double dRatio = rcROI.Height * 0.1;
+				double dAverage1 = 0.0;
+				double dAverage2 = 0.0;
+				for (int i = 0; i < (int)dRatio; i++)
+				{
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
+					for (int j = 0; j < rcROI.Width; j++)
+					{
+						nSum += *bp;
+						bp++;
+					}
+				}
+				dAverage1 = nSum / (rcROI.Width * (int)dRatio);
+				nSum = 0;
+				for (int i = 0; i < (int)dRatio; i++)
+				{
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
+					for (int j = 0; j < rcROI.Width; j++)
+					{
+						nSum += *bp;
+						bp++;
+					}
+				}
+				dAverage2 = nSum / (rcROI.Width * (int)dRatio);
+				nSum = 0;
+				////////////////////////////////////////////////
+				nThreshold = (int)(dAverage1 + dAverage2) / 2;
+			}
+			else
+			{
+				double dRatio = rcROI.Width * 0.1;
+				double dAverage1 = 0.0;
+				double dAverage2 = 0.0;
+				for (int i = 0; i < (int)dRatio; i++)
+				{
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i));
+					for (int j = 0; j < rcROI.Height; j++)
+					{
+						nSum += *bp;
+						bp += img.p_Stride;
+					}
+				}
+				dAverage1 = nSum / (rcROI.Height * (int)dRatio);
+				nSum = 0;
+				for (int i = 0; i < (int)dRatio; i++)
+				{
+					byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
+					for (int j = 0; j < rcROI.Height; j++)
+					{
+						nSum += *bp;
+						bp += img.p_Stride;
+					}
+				}
+				dAverage2 = nSum / (rcROI.Height * (int)dRatio);
+				nSum = 0;
+				////////////////////////////////////////////////
+				nThreshold = (int)(dAverage1 + dAverage2) / 2;
+			}
+
+			return nThreshold;
+		}
+		/// <summary>
+		/// ROI 영역 내의 성분 방향을 획득하여 반환한다
+		/// </summary>
+		/// <param name="img"></param>
+		/// <param name="rcROI"></param>
+		/// <returns></returns>
+		public static unsafe eEdgeFindDirection GetDirection(ImageData img, System.Windows.Rect rcROI)
+		{
+			// variable
+			double dRatio = 0.0;
+			int nSum = 0;
+			double dAverageTemp = 0.0;
+			Dictionary<eBrightSide, double> dic = new Dictionary<eBrightSide, double>();
+
+			// implement
+			// Left
+			dRatio = rcROI.Width * 0.1;
+			for (int i = 0; i < (int)dRatio; i++)
+			{
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Left + i));
+				for (int j = 0; j < rcROI.Height; j++)
+				{
+					nSum += *bp;
+					bp += img.p_Stride;
+				}
+			}
+			dAverageTemp = nSum / (rcROI.Height * (int)dRatio);
+			dic.Add(eBrightSide.LEFT, dAverageTemp);
+			nSum = 0;
+
+			// Top
+			dRatio = rcROI.Height * 0.1;
+			for (int i = 0; i < (int)dRatio; i++)
+			{
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top + i, (int)rcROI.Left).ToPointer());
+				for (int j = 0; j < rcROI.Width; j++)
+				{
+					nSum += *bp;
+					bp++;
+				}
+			}
+			dAverageTemp = nSum / (rcROI.Width * (int)dRatio);
+			dic.Add(eBrightSide.TOP, dAverageTemp);
+			nSum = 0;
+
+			// Right
+			dRatio = rcROI.Width * 0.1;
+			for (int i = 0; i < (int)dRatio; i++)
+			{
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Top, (int)rcROI.Right - i).ToPointer());
+				for (int j = 0; j < rcROI.Height; j++)
+				{
+					nSum += *bp;
+					bp += img.p_Stride;
+				}
+			}
+			dAverageTemp = nSum / (rcROI.Height * (int)dRatio);
+			dic.Add(eBrightSide.RIGHT, dAverageTemp);
+			nSum = 0;
+
+			// Bottom
+			dRatio = rcROI.Height * 0.1;
+			for (int i = 0; i < (int)dRatio; i++)
+			{
+				byte* bp = (byte*)(img.GetPtr((int)rcROI.Bottom - i, (int)rcROI.Left).ToPointer());
+				for (int j = 0; j < rcROI.Width; j++)
+				{
+					nSum += *bp;
+					bp++;
+				}
+			}
+			dAverageTemp = nSum / (rcROI.Width * (int)dRatio);
+			dic.Add(eBrightSide.BOTTOM, dAverageTemp);
+			nSum = 0;
+
+			var maxKey = dic.Keys.Max();
+			var maxValue = dic.Values.Max();
+			// Value값이 가장 큰 Key값 찾기
+			var keyOfMaxValue = dic.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+
+			if (keyOfMaxValue == eBrightSide.TOP) return eEdgeFindDirection.BOTTOM;
+			else if (keyOfMaxValue == eBrightSide.BOTTOM) return eEdgeFindDirection.TOP;
+			else if (keyOfMaxValue == eBrightSide.LEFT) return eEdgeFindDirection.RIGHT;
+			else return eEdgeFindDirection.LEFT;
+		}
 	}
 
 	public class InspectionProperty : ObservableObject
@@ -453,6 +910,8 @@ namespace RootTools.Inspects
 			}
 		}
 		public string MemoryPoolName { get; set; }
+		public string MemoryGroupName { get; set; }
+		public string MemoryName { get; set; }
 		public ulong MemoryOffset { get; set; }
 	}
 	public class MemInfo

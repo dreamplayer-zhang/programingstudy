@@ -13,6 +13,8 @@
 #include <stdio.h> // for wprintf
 #include <msclr\marshal_cppstd.h>
 
+#include "MySQLDBConnector.h"
+
 
 namespace RootTools_CLR
 {
@@ -36,7 +38,7 @@ namespace RootTools_CLR
 			delete pInspReticle;
 		}
 
-		array<DefectData^>^ SurfaceInspection(System::String^ poolName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
+		void SurfaceInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -67,34 +69,74 @@ namespace RootTools_CLR
 				vTempResult = pInspSurface->SurfaceInspection(bAbsolute, nDefectCode);//TODO : absolute GV 구현해야함
 
 				bool bResultExist = vTempResult.size() > 0;
-				array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
 
 				if (bResultExist)
 				{
+					MySQLDBConnector^ connector = gcnew MySQLDBConnector();
+					unsigned int errorCode = connector->OpenDatabase();
+
 					for (int i = 0; i < vTempResult.size(); i++)
 					{
-						local[i] = gcnew DefectData();
-						local[i]->nIdx = vTempResult[i].nIdx;
-						local[i]->nClassifyCode = vTempResult[i].nClassifyCode;
-						local[i]->fAreaSize = vTempResult[i].fAreaSize;
-						local[i]->nLength = vTempResult[i].nLength;
-						local[i]->nWidth = vTempResult[i].nWidth;
-						local[i]->nHeight = vTempResult[i].nHeight;
-						local[i]->nFOV = vTempResult[i].nFOV;
-						local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
-						local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+						if (errorCode == 0)
+						{
+							//DB Open성공
+
+							System::String^ query;
+							query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
+								vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+								poolName, groupName, memoryName);
+
+							errorCode = connector->RunQuery(query);
+
+							if (errorCode == 0)
+							{
+								//success
+							}
+							else if (errorCode == 1146)
+							{
+								//table이 없음
+								//table생성 후 재시도
+								query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, memPOOL longtext DEFAULT NULL, memGROUP longtext DEFAULT NULL, memMEMORY longtext DEFAULT NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");								
+								errorCode = connector->RunQuery(query);
+								if (errorCode == 0)
+								{
+									//insert재실행
+									query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
+										vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+										poolName, groupName, memoryName);
+
+									errorCode = connector->RunQuery(query);
+									if (errorCode != 0)
+									{
+										//예외처리 진행. 될때까지 업로드 시도 시키는게 좋을것으로 보임
+									}
+								}
+								else
+								{
+									//예외처리 진행. 될때까지 업로드 시도 시키는게 좋을것으로 보임
+								}
+							}
+							else
+							{
+								//예외처리 진행. 될때까지 업로드 시도 시키는게 좋을것으로 보임
+							}
+						}
+						else
+						{
+							//DBOpen 실패
+						}
 					}
 				}
 
-				return local;
+				//return local;
 			}
-			else 
+			else
 			{
 				array<DefectData^>^ local = gcnew array<DefectData^>(0);
-				return local;
+				//return local;
 			}
 		}
-		array<DefectData^>^ StripInspection(System::String^ poolName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
+		void StripInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -118,26 +160,66 @@ namespace RootTools_CLR
 			vTempResult = pInspReticle->StripInspection(nBandwidth, nIntensity, nDefectCode);
 
 			bool bResultExist = vTempResult.size() > 0;
-			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
 
 			if (bResultExist)
 			{
+				MySQLDBConnector^ connector = gcnew MySQLDBConnector();
+				unsigned int errorCode = connector->OpenDatabase();
+
 				for (int i = 0; i < vTempResult.size(); i++)
 				{
-					local[i] = gcnew DefectData();
-					local[i]->nIdx = vTempResult[i].nIdx;
-					local[i]->nClassifyCode = vTempResult[i].nClassifyCode;
-					local[i]->fAreaSize = vTempResult[i].fAreaSize;
-					local[i]->nLength = vTempResult[i].nLength;
-					local[i]->nWidth = vTempResult[i].nWidth;
-					local[i]->nHeight = vTempResult[i].nHeight;
-					local[i]->nFOV = vTempResult[i].nFOV;
-					local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
-					local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+					if (errorCode == 0)
+					{
+						//DB Open성공
+
+						System::String^ query;
+						query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
+							vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+							poolName, groupName, memoryName);
+
+						errorCode = connector->RunQuery(query);
+
+						if (errorCode == 0)
+						{
+							//success
+						}
+						else if (errorCode == 1146)
+						{
+							//table이 없음
+							//table생성 후 재시도
+							query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, memPOOL longtext DEFAULT NULL, memGROUP longtext DEFAULT NULL, memMEMORY longtext DEFAULT NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
+							errorCode = connector->RunQuery(query);
+							if (errorCode == 0)
+							{
+								//insert재실행
+								query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10})';",
+									vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+									poolName, groupName, memoryName);
+
+								errorCode = connector->RunQuery(query);
+								if (errorCode != 0)
+								{
+									//예외처리 진행. 될때까지 업로드 시도 시키는게 좋을것으로 보임
+								}
+							}
+							else
+							{
+								//예외처리 진행. 될때까지 업로드 시도 시키는게 좋을것으로 보임
+							}
+						}
+						else
+						{
+							//예외처리 진행. 될때까지 업로드 시도 시키는게 좋을것으로 보임
+						}
+					}
+					else
+					{
+						//DBOpen 실패
+					}
 				}
 			}
 
-			return local;
+			//return local;
 		}
 		void PaintOutline(int nY, int nOutline, byte* pByte, int nX)
 		{

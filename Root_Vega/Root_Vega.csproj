@@ -62,6 +62,9 @@
     <Prefer32Bit>true</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
@@ -310,6 +313,7 @@
       <DependentUpon>Setting_RADS.xaml</DependentUpon>
     </Compile>
     <Compile Include="Setting\Setting_RADSViewModel.cs" />
+    <Compile Include="UI\2_RecipeViewModel.cs" />
     <Compile Include="Vega_Engineer.cs" />
     <Compile Include="Vega_Engineer_UI.xaml.cs">
       <DependentUpon>Vega_Engineer_UI.xaml</DependentUpon>

@@ -105,6 +105,8 @@ namespace Root_Vega
             mvm = new _1_Mainview_ViewModel(m_engineer, dialogService);
             //_Main.DataContext = mvm;
 
+            _Recipe.DataContext = new _2_RecipeViewModel(m_engineer);
+
             _2_3_OriginViewModel ovm = new _2_3_OriginViewModel(m_engineer, dialogService);
             _Recipe._Origin.DataContext = ovm;
             //_recipe._recipeOrigin.DataContext = rovm;

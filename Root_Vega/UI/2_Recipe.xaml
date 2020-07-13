@@ -203,27 +203,35 @@
         </TabControl>
         <StackPanel Grid.Column="1"
                     Margin="0,45,15,15">
-            <Button Content="Create"
-                    Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"/>
+            <!--
             <Button Content="Delete"
                     Style="{StaticResource BasicBtn}"
                     Margin="0,0,0,10"/>
             <Button Content="Modify"
                     Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"/>
-            <Button Content="Load"
+                    Margin="0,0,0,10"/>-->
+			<Button Content="Create Recipe"
                     Style="{StaticResource BasicBtn}"
+					Command="{Binding CommandRcpCreate}"
                     Margin="0,0,0,10"/>
-            <Button Content="Save"
+			<Button Content="Load Recipe"
                     Style="{StaticResource BasicBtn}"
+					Command="{Binding CommandRcpLoad}"
                     Margin="0,0,0,10"/>
-            <Button Content="Reload"
+			<Button Content="Save Recipe"
+                    Style="{StaticResource BasicBtn}"
+					Command="{Binding CommandRcpSave}"
+                    Margin="0,0,0,10"/>
+			<Button Content="Save As Recipe"
+                    Style="{StaticResource BasicBtn}"
+					Command="{Binding CommandRcpSaveAs}"
+                    Margin="0,0,0,10"/>
+            <!--<Button Content="Reload"
                     Style="{StaticResource BasicBtn}"
                     Margin="0,0,0,10"/>
             <Button Content="Image Load"
                     Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"/>
+                    Margin="0,0,0,10"/>-->
         </StackPanel>
     </Grid>
 </UserControl>
