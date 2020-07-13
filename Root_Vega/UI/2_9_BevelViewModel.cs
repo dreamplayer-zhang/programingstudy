@@ -219,22 +219,22 @@ namespace Root_Vega
         //    }
         //}
 
-        public SurfaceParamData p_SurFace_ParamData
-        {
-            get
-            {
-                if (m_Recipe.RoiList[p_IndexMask].Surface.ParameterList.Count != 0)
-                    return m_Recipe.RoiList[p_IndexMask].Surface.ParameterList[0];
-                else
-                    return new SurfaceParamData();
-            }
-            set
-            {
-                if (m_Recipe.RoiList[p_IndexMask].Surface.ParameterList.Count != 0)
-                    m_Recipe.RoiList[p_IndexMask].Surface.ParameterList[0] = value;
-                RaisePropertyChanged();
-            }
-        }
+        //public SurfaceParamData p_SurFace_ParamData
+        //{
+        //    get
+        //    {
+        //        if (m_Recipe.RoiList[p_IndexMask].Surface.ParameterList.Count != 0)
+        //            return m_Recipe.RoiList[p_IndexMask].Surface.ParameterList[0];
+        //        else
+        //            return new SurfaceParamData();
+        //    }
+        //    set
+        //    {
+        //        if (m_Recipe.RoiList[p_IndexMask].Surface.ParameterList.Count != 0)
+        //            m_Recipe.RoiList[p_IndexMask].Surface.ParameterList[0] = value;
+        //        RaisePropertyChanged();
+        //    }
+        //}
 
         private List<List<SimpleShapeDrawerVM>> m_SimpleShapeDrawer_List = new List<List<SimpleShapeDrawerVM>>();
         public List<List<SimpleShapeDrawerVM>> p_SimpleShapeDrawer_List
@@ -251,28 +251,28 @@ namespace Root_Vega
 
         public List<DrawHistoryWorker> m_DrawHistoryWorker_List = new List<DrawHistoryWorker>();
 
-        private int _IndexMask = 0;
-        public int p_IndexMask
-        {
-            get
-            {
-                return _IndexMask;
-            }
-            set
-            {
-                SetProperty(ref _IndexMask, value);
+        //private int _IndexMask = 0;
+        //public int p_IndexMask
+        //{
+        //    get
+        //    {
+        //        return _IndexMask;
+        //    }
+        //    set
+        //    {
+        //        SetProperty(ref _IndexMask, value);
 
-                p_SurFace_ParamData = p_Recipe.RoiList[_IndexMask].Surface.ParameterList[0];
-                for (int i = 0; i < 4; i++)
-                {
-                    p_ImageViewer_List[i].SetDrawer((DrawToolVM)p_SimpleShapeDrawer_List[_IndexMask][i]);
-                    p_ImageViewer_List[i].m_HistoryWorker = m_DrawHistoryWorker_List[_IndexMask];
-                    p_ImageViewer_List[i].SetImageSource();
-                    p_SurFace_ParamData = p_Recipe.RoiList[_IndexMask].Surface.ParameterList[0];
-                }
+        //        p_SurFace_ParamData = p_Recipe.RoiList[_IndexMask].Surface.ParameterList[0];
+        //        for (int i = 0; i < 4; i++)
+        //        {
+        //            p_ImageViewer_List[i].SetDrawer((DrawToolVM)p_SimpleShapeDrawer_List[_IndexMask][i]);
+        //            p_ImageViewer_List[i].m_HistoryWorker = m_DrawHistoryWorker_List[_IndexMask];
+        //            p_ImageViewer_List[i].SetImageSource();
+        //            p_SurFace_ParamData = p_Recipe.RoiList[_IndexMask].Surface.ParameterList[0];
+        //        }
 
-            }
-        }
+        //    }
+        //}
 
         private List<ImageViewer_ViewModel> m_ImageViewer_List = new List<ImageViewer_ViewModel>();
         public List<ImageViewer_ViewModel> p_ImageViewer_List
@@ -430,14 +430,14 @@ namespace Root_Vega
         }
         private void _btnClear()
         {
-            p_Recipe.RoiList[p_IndexMask].Surface.NonPatternList[0].Area = new CRect();
+            //p_Recipe.RoiList[p_IndexMask].Surface.NonPatternList[0].Area = new CRect();
 
-            foreach (var viewer in p_ImageViewer_List)
-            {
-                viewer.ClearShape();
-                viewer.SetImageSource();
-            }
-            p_IndexMask = _IndexMask;
+            //foreach (var viewer in p_ImageViewer_List)
+            //{
+            //    viewer.ClearShape();
+            //    viewer.SetImageSource();
+            //}
+            //p_IndexMask = _IndexMask;
         }
 
 
