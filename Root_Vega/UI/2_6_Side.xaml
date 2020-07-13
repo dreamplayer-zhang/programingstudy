@@ -16,320 +16,322 @@
             <ColumnDefinition Width="75*"/>
             <ColumnDefinition Width="25*"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="20*"/>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0" >
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button Content="Top" Grid.Column="1"
+		<Grid Grid.Column="0" >
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="20*"/>
+			</Grid.RowDefinitions>
+			<Grid Grid.Row="0" >
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="3*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Button Content="Top" Grid.Column="1"
                             Command="{Binding p_ImageViewer_Top.btnClickOpenImage}"
                             Margin="3,0,0,3" />
-            </Grid>
-            <Border Grid.Row="1" Margin="2,2,2,2" BorderBrush ="Gray" BorderThickness="3">
+			</Grid>
+			<Border Grid.Row="1" Margin="2,2,2,2" BorderBrush ="Gray" BorderThickness="3">
 
 
-                <tools:ImageViewer DataContext="{Binding p_ImageViewer_Top}"
+				<tools:ImageViewer DataContext="{Binding p_ImageViewer_Top}"
                                Width="{PriorityBinding}"
                                Height="{PriorityBinding}"/>
-            </Border>
-            <Grid Grid.Row="0" Grid.Column="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button Content="Left" Grid.Column="1"
+			</Border>
+			<Grid Grid.Row="0" Grid.Column="1">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="3*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Button Content="Left" Grid.Column="1"
                             Command="{Binding p_ImageViewer_Left.btnClickOpenImage}"
                             Margin="3,0,0,3" />
-            </Grid>
-            <Border Grid.Row="1" Grid.Column="1" Margin="2,2,2,2" BorderBrush ="Gray" BorderThickness="3">
-                <tools:ImageViewer DataContext="{Binding p_ImageViewer_Left}"
+			</Grid>
+			<Border Grid.Row="1" Grid.Column="1" Margin="2,2,2,2" BorderBrush ="Gray" BorderThickness="3">
+				<tools:ImageViewer DataContext="{Binding p_ImageViewer_Left}"
                                Width="{PriorityBinding}"
                                Height="{PriorityBinding}"/>
-            </Border>
+			</Border>
 
-            <Grid Grid.Row="0" Grid.Column="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button Content="Right" Grid.Column="1"
+			<Grid Grid.Row="0" Grid.Column="2">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="3*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Button Content="Right" Grid.Column="1"
                             Command="{Binding p_ImageViewer_Right.btnClickOpenImage}"
                             Margin="3,0,0,3" />
-            </Grid>
-            <Border Grid.Row="1" Grid.Column="2" Margin="2,2,2,2" BorderBrush ="Gray" BorderThickness="3">
+			</Grid>
+			<Border Grid.Row="1" Grid.Column="2" Margin="2,2,2,2" BorderBrush ="Gray" BorderThickness="3">
 
-                <tools:ImageViewer DataContext="{Binding p_ImageViewer_Right}"
+				<tools:ImageViewer DataContext="{Binding p_ImageViewer_Right}"
                                Width="{PriorityBinding}"
                                Height="{PriorityBinding}"/>
-            </Border>
-            <Grid Grid.Row="0" Grid.Column="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button Content="Bottom" Grid.Column="1"
+			</Border>
+			<Grid Grid.Row="0" Grid.Column="3">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="3*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Button Content="Bottom" Grid.Column="1"
                             Command="{Binding p_ImageViewer_Bottom.btnClickOpenImage}"
                             Margin="3,0,0,3" />
-            </Grid>
-            <Border Grid.Row="1" Grid.Column="3" Margin="2,2,2,2" BorderBrush ="Gray" BorderThickness="3">
+			</Grid>
+			<Border Grid.Row="1" Grid.Column="3" Margin="2,2,2,2" BorderBrush ="Gray" BorderThickness="3">
 
-                <tools:ImageViewer DataContext="{Binding p_ImageViewer_Bottom}"
+				<tools:ImageViewer DataContext="{Binding p_ImageViewer_Bottom}"
                                Width="{PriorityBinding}"
                                Height="{PriorityBinding}"/>
-            </Border>
-        </Grid>
-
-
-
-        <Grid Grid.Column="1" Margin="0,15,15,15">
+			</Border>
+		</Grid>
+		<Grid Grid.Column="1" Margin="0,15,15,15">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition  Height="*"/>
-            </Grid.RowDefinitions>
-			<Grid Grid.Row="0"
+			</Grid.RowDefinitions>
+			<ScrollViewer VerticalScrollBarVisibility="Auto"
+						  Background="{DynamicResource BtnMouseOver}" 
+						  Grid.Row="1">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<Grid Grid.Row="0"
 				  Background="{DynamicResource BtnMouseOver}" >
-				<StackPanel Margin="10,0,10,0">
-					<TextBlock Text="ROI List"
+						<StackPanel Margin="10,0,10,0">
+							<TextBlock Text="ROI List"
 							   Margin="0,10,0,0"
 							   Foreground="White"/>
-					<ListView ItemsSource="{Binding p_SideRoiList}"
+							<ListView ItemsSource="{Binding p_SideRoiList}"
                               Height="100"
                               Background="#FF1B1B1C"
                               SelectedItem="{Binding SelectedROI}">
-						<ListView.ItemTemplate>
-							<DataTemplate>
-								<TextBlock Text="{Binding Name}"
+								<ListView.ItemTemplate>
+									<DataTemplate>
+										<TextBlock Text="{Binding Name}"
                                            Foreground="White"
                                            FontWeight="Bold"
                                            FontSize="13" />
-							</DataTemplate>
-						</ListView.ItemTemplate>
-					</ListView>
-					<StackPanel DataContext="{Binding SelectedRecipe}">
-						<UniformGrid Columns="2" Margin="0,10,0,10">
-							<TextBlock  Text="Use Defect Merge"
+									</DataTemplate>
+								</ListView.ItemTemplate>
+							</ListView>
+							<StackPanel DataContext="{Binding SelectedRecipe}">
+								<UniformGrid Columns="2" Margin="0,10,0,10">
+									<TextBlock  Text="Use Defect Merge"
 											Style="{StaticResource BasicTb}"/>
-							<ToggleButton Content="{Binding RecipeData.UseDefectMerge}"
+									<ToggleButton Content="{Binding VegaRecipeData.UseDefectMerge}"
 											  Style="{StaticResource BasicToggle}"
-											  IsChecked="{Binding RecipeData.UseDefectMerge}"/>
-						</UniformGrid>
-						<UniformGrid Columns="2" Margin="0,0,0,10">
-							<TextBlock Text="Defect Merge Distance(pxl)"
+											  IsChecked="{Binding VegaRecipeData.UseDefectMerge}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,10">
+									<TextBlock Text="Defect Merge Distance(pxl)"
 										   Style="{StaticResource BasicTb}"/>
-							<TextBox Text="{Binding RecipeData.MergeDistance}"
+									<TextBox Text="{Binding VegaRecipeData.MergeDistance}"
 										 Style="{StaticResource BasicTbox}"/>
-						</UniformGrid>
-						<UniformGrid Columns="2" Margin="0,0,0,10">
-							<TextBlock Text="Overall Inspection Margin"
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,10">
+									<TextBlock Text="Overall Inspection Margin"
 										   Style="{StaticResource BasicTb}"/>
-							<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideInspMargin}"/>
-						</UniformGrid>
-						<Expander Header="Inspection Offset(Top)"
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideInspMargin}"/>
+								</UniformGrid>
+								<Expander Header="Inspection Offset(Top)"
 								  Foreground="White">
-							<StackPanel>
-								<UniformGrid Columns="2" Margin="0,5,0,5">
-									<TextBlock Text="Upper Area Offset"
+									<StackPanel>
+										<UniformGrid Columns="2" Margin="0,5,0,5">
+											<TextBlock Text="Upper Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideTopUpperOffset}"/>
-								</UniformGrid>
-								<UniformGrid Columns="2" Margin="0,0,0,5">
-									<TextBlock Text="Center Area Offset"
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideTopUpperOffset}"/>
+										</UniformGrid>
+										<UniformGrid Columns="2" Margin="0,0,0,5">
+											<TextBlock Text="Center Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideTopCenterOffset}"/>
-								</UniformGrid>
-								<UniformGrid Columns="2" Margin="0,0,0,5">
-									<TextBlock Text="Under Area Offset"
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideTopCenterOffset}"/>
+										</UniformGrid>
+										<UniformGrid Columns="2" Margin="0,0,0,5">
+											<TextBlock Text="Under Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideTopUnderOffset}"/>
-								</UniformGrid>
-							</StackPanel>
-						</Expander>
-						<Expander Header="Inspection Offset(Left)"
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideTopUnderOffset}"/>
+										</UniformGrid>
+									</StackPanel>
+								</Expander>
+								<Expander Header="Inspection Offset(Left)"
 								  Foreground="White">
-							<StackPanel>
-								<UniformGrid Columns="2" Margin="0,5,0,5">
-									<TextBlock Text="Upper Area Offset"
+									<StackPanel>
+										<UniformGrid Columns="2" Margin="0,5,0,5">
+											<TextBlock Text="Upper Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideLeftUpperOffset}"/>
-								</UniformGrid>
-								<UniformGrid Columns="2" Margin="0,0,0,5">
-									<TextBlock Text="Center Area Offset"
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideLeftUpperOffset}"/>
+										</UniformGrid>
+										<UniformGrid Columns="2" Margin="0,0,0,5">
+											<TextBlock Text="Center Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideLeftCenterOffset}"/>
-								</UniformGrid>
-								<UniformGrid Columns="2" Margin="0,0,0,5">
-									<TextBlock Text="Under Area Offset"
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideLeftCenterOffset}"/>
+										</UniformGrid>
+										<UniformGrid Columns="2" Margin="0,0,0,5">
+											<TextBlock Text="Under Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideLeftUnderOffset}"/>
-								</UniformGrid>
-							</StackPanel>
-						</Expander>
-						<Expander Header="Inspection Offset(Right)"
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideLeftUnderOffset}"/>
+										</UniformGrid>
+									</StackPanel>
+								</Expander>
+								<Expander Header="Inspection Offset(Right)"
 								  Foreground="White">
-							<StackPanel>
-								<UniformGrid Columns="2" Margin="0,5,0,5">
-									<TextBlock Text="Upper Area Offset"
+									<StackPanel>
+										<UniformGrid Columns="2" Margin="0,5,0,5">
+											<TextBlock Text="Upper Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideRightUpperOffset}"/>
-								</UniformGrid>
-								<UniformGrid Columns="2" Margin="0,0,0,5">
-									<TextBlock Text="Center Area Offset"
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideRightUpperOffset}"/>
+										</UniformGrid>
+										<UniformGrid Columns="2" Margin="0,0,0,5">
+											<TextBlock Text="Center Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideRightCenterOffset}"/>
-								</UniformGrid>
-								<UniformGrid Columns="2" Margin="0,0,0,5">
-									<TextBlock Text="Under Area Offset"
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideRightCenterOffset}"/>
+										</UniformGrid>
+										<UniformGrid Columns="2" Margin="0,0,0,5">
+											<TextBlock Text="Under Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideRightUnderOffset}"/>
-								</UniformGrid>
-							</StackPanel>
-						</Expander>
-						<Expander Header="Inspection Offset(Bottom)"
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideRightUnderOffset}"/>
+										</UniformGrid>
+									</StackPanel>
+								</Expander>
+								<Expander Header="Inspection Offset(Bottom)"
 								  Foreground="White">
-							<StackPanel>
-								<UniformGrid Columns="2" Margin="0,5,0,5">
-									<TextBlock Text="Upper Area Offset"
+									<StackPanel>
+										<UniformGrid Columns="2" Margin="0,5,0,5">
+											<TextBlock Text="Upper Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideBottomUpperOffset}"/>
-								</UniformGrid>
-								<UniformGrid Columns="2" Margin="0,0,0,5">
-									<TextBlock Text="Center Area Offset"
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideBottomUpperOffset}"/>
+										</UniformGrid>
+										<UniformGrid Columns="2" Margin="0,0,0,5">
+											<TextBlock Text="Center Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideBottomCenterOffset}"/>
-								</UniformGrid>
-								<UniformGrid Columns="2" Margin="0,0,0,5">
-									<TextBlock Text="Under Area Offset"
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideBottomCenterOffset}"/>
+										</UniformGrid>
+										<UniformGrid Columns="2" Margin="0,0,0,5">
+											<TextBlock Text="Under Area Offset"
 										   Margin="20,0,0,0"
 										   HorizontalAlignment="Left"
 										   Style="{StaticResource BasicTb}"/>
-									<TextBox Style="{StaticResource BasicTbox}"
-											 Text="{Binding RecipeData.SideBottomUnderOffset}"/>
-								</UniformGrid>
+											<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.SideBottomUnderOffset}"/>
+										</UniformGrid>
+									</StackPanel>
+								</Expander>
 							</StackPanel>
-						</Expander>
-					</StackPanel>
-					<Button Grid.Column="0"
+							<Button Grid.Column="0"
 							Margin="0,10,0,40"
 							Style="{StaticResource BasicBtn}"
 							Content="Add Side Insp ROI"
 							Command="{Binding CommandAddRoi}"/>
-					<Button Content="Clear Result"
+							<Button Content="Clear Result"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding CommandClearInspResult}"
                             Margin="0,0,0,20" />
-					<Button Content="Start Inspection"
+							<Button Content="Start Inspection"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding CommandStartInsp}"
                             Margin="0,0,0,10" />
-					<!--<Button Content="Inspection Complete"
+							<!--<Button Content="Inspection Complete"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding CommandEndInsp}"
                             Margin="0,0,0,10" />-->
-				</StackPanel>
-			</Grid>
-			<ScrollViewer VerticalScrollBarVisibility="Auto"
-						  Background="{DynamicResource BtnMouseOver}" 
-						  Grid.Row="1">
-
-				<Grid >
-					<StackPanel Margin="10,0,10,0">
-						<TextBlock Text="Parameter List"
+						</StackPanel>
+					</Grid>
+					<Grid Grid.Row="1">
+						<StackPanel Margin="10,0,10,0">
+							<TextBlock Text="Parameter List"
 							   Foreground="White"/>
-						<ListView ItemsSource="{Binding SideParamList}"
+							<ListView ItemsSource="{Binding SideParamList}"
                               Height="100"
                               Background="#FF1B1B1C"
                               SelectedItem="{Binding SelectedParam}">
-							<ListView.ItemTemplate>
-								<DataTemplate>
-									<TextBlock Text="{Binding Name}"
+								<ListView.ItemTemplate>
+									<DataTemplate>
+										<TextBlock Text="{Binding Name}"
                                            Foreground="White"
                                            FontWeight="Bold"
                                            FontSize="13" />
-								</DataTemplate>
-							</ListView.ItemTemplate>
-						</ListView>
-						<Button Content="Add Parameter"
+									</DataTemplate>
+								</ListView.ItemTemplate>
+							</ListView>
+							<Button Content="Add Parameter"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding CommandAddParam}"
                             Margin="0,10,0,10" />
-						<StackPanel DataContext="{Binding SelectedParam}">
-							<UniformGrid Columns="2" Margin="0,10,0,10">
-								<TextBlock  Text="Dark Inspection"
+							<StackPanel DataContext="{Binding SelectedParam}">
+								<UniformGrid Columns="2" Margin="0,10,0,10">
+									<TextBlock  Text="Dark Inspection"
                                         Style="{StaticResource BasicTb}"/>
-								<ToggleButton Content="{Binding UseDarkInspection}"
+									<ToggleButton Content="{Binding UseDarkInspection}"
                                           Style="{StaticResource BasicToggle}"
                                           IsChecked="{Binding UseDarkInspection}"/>
-							</UniformGrid>
-							<UniformGrid Columns="2" Margin="0,0,0,10">
-								<TextBlock  Text="Absolute Inspection"
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,10">
+									<TextBlock  Text="Absolute Inspection"
                                         Style="{StaticResource BasicTb}"/>
-								<ToggleButton Content="{Binding UseAbsoluteInspection}"
+									<ToggleButton Content="{Binding UseAbsoluteInspection}"
                                           Style="{StaticResource BasicToggle}"
                                           IsChecked="{Binding UseAbsoluteInspection}"/>
-							</UniformGrid>
-							<UniformGrid Columns="2" Margin="0,0,0,10">
-								<TextBlock  Text="{Binding TargetLabelText}"
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,10">
+									<TextBlock  Text="{Binding TargetLabelText}"
                                         Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding TargetGV}"
+									<TextBox Text="{Binding TargetGV}"
                                      Style="{StaticResource BasicTbox}"/>
-							</UniformGrid>
-							<UniformGrid Columns="2" Margin="0,0,0,10">
-								<TextBlock  Text="DefectSize"
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,10">
+									<TextBlock  Text="DefectSize"
                                         Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding DefectSize}"
+									<TextBox Text="{Binding DefectSize}"
                                      Style="{StaticResource BasicTbox}"/>
-							</UniformGrid>
+								</UniformGrid>
+							</StackPanel>
 						</StackPanel>
-					</StackPanel>
+					</Grid>
 				</Grid>
 			</ScrollViewer>
             <!--<Canvas Grid.Row="1" obs:SizeObserver.Observe="true" Focusable="True"
