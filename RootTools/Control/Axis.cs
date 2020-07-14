@@ -112,6 +112,7 @@ namespace RootTools.Control
             get { return _dRelPos; }
             set
             {
+                if (_dRelPos == value) return;
                 _dRelPos = value;
                 OnPropertyChanged();
             }
