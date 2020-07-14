@@ -16,7 +16,7 @@ namespace RootTools.Control.ACS
         #endregion
 
         #region Connect
-        Channel m_channel = new Channel();
+        public Channel m_channel = new Channel();
         bool m_bSimul = true; 
         string m_sIP = "10.0.0.100";
         int m_nPort = 701;
@@ -63,6 +63,8 @@ namespace RootTools.Control.ACS
             m_nPort = tree.Set(m_nPort, m_nPort, "Port", "ACS Remote Port Number", !m_bSimul); 
         }
         #endregion
+
+
 
         //=============================================
         #region Init ACS
@@ -202,7 +204,7 @@ namespace RootTools.Control.ACS
         #endregion
 
         IEngineer m_engineer;
-        Log m_log;
+        public Log m_log;
         public TreeRoot m_treeRoot;
         public ACSDIO m_dio = new ACSDIO();
         public ACSListAxis m_listAxis = new ACSListAxis();
@@ -217,8 +219,8 @@ namespace RootTools.Control.ACS
             bool bChannel = InitChannel(ref nInput, ref nOutput);
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-            m_dio.Init(id + ".DIO", nInput, nOutput);
-            m_listAxis.Init(id + ".Axis", engineer, m_channel, bChannel);
+            m_dio.Init(id + ".DIO", this);
+            m_listAxis.Init(id + ".Axis", engineer, this, bChannel);
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
         }

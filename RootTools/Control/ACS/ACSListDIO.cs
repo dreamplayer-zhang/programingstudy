@@ -1,28 +1,22 @@
 ﻿using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 
 namespace RootTools.Control.ACS
 {
-    public class ACSListDIO : ListDIO //forgetACS
+    public class ACSListDIO : ListDIO
     {
-        #region Module
-        public int m_nModule = 1;
-        public int p_nBit
-        {
-            get { return 16 * m_nModule; }
-        }
-
-        public List<int> m_aModule = new List<int>();
-        public List<int> m_aOffset = new List<int>();
+        #region Port
+        public int m_lPort = 1;
+        public List<int> m_aPort = new List<int>();
         List<uint> m_aRead = new List<uint>();
         uint[] m_aComp = new uint[16];
         void InitModule()
         {
-            while (m_aModule.Count < m_nModule)
+            while (m_aPort.Count < m_lPort)
             {
-                for (int n = 0, nID = 16 * m_aModule.Count; n < 16; n++, nID++) AddBit(NewBit(nID));
-                m_aModule.Add(-1);
-                m_aOffset.Add(-1);
+                for (int n = 0, nID = 16 * m_aPort.Count; n < 16; n++, nID++) AddBit(NewBit(nID));
+                m_aPort.Add(-1);
                 m_aRead.Add(0);
             }
         }
@@ -36,7 +30,7 @@ namespace RootTools.Control.ACS
                     bitDI.Init(nID, m_log);
                     return bitDI;
                 case eDIO.Output:
-                    ACSBitDO bitDO = new ACSBitDO();
+                    ACSBitDO bitDO = new ACSBitDO(m_acs);
                     bitDO.Init(nID, m_log);
                     return bitDO;
             }
@@ -47,12 +41,12 @@ namespace RootTools.Control.ACS
         {
             if (m_eDIO != eDIO.Output) return;
             int nID = 0;
-            for (int nModule = 0; nModule < m_nModule; nModule++)
+            for (int nPort = 0; nPort < m_lPort; nPort++)
             {
-                for (int nOffset = 0; nOffset < 16; nOffset++, nID++)
+                for (int nBit = 0; nBit < 16; nBit++, nID++)
                 {
-                    ((ACSBitDO)m_aDIO[nID]).m_nModule = m_aModule[nModule];
-                    ((ACSBitDO)m_aDIO[nID]).m_nOffset = 16 * m_aOffset[nModule] + nOffset;
+                    ((ACSBitDO)m_aDIO[nID]).m_nPort = m_aPort[nPort];
+                    ((ACSBitDO)m_aDIO[nID]).m_nBit = nBit;
                 }
             }
         }
@@ -71,61 +65,61 @@ namespace RootTools.Control.ACS
         void ReadInput()
         {
             if (EQ.p_bSimulate) return;
-            for (int n = 0; n < m_nModule; n++)
+            if (m_acs.p_bConnect == false) return; 
+            try
             {
-                if ((m_aModule[n] >= 0) && (m_aOffset[n] >= 0))
+                for (int n = 0; n < m_lPort; n++)
                 {
-                    uint uRead = 0;
-                    //CAXD.AxdiReadInportWord(m_aModule[n], m_aOffset[n], ref uRead);
-                    m_aRead[n] = uRead;
+                    if (m_aPort[n] >= 0) m_aRead[n] = (uint)m_acs.m_channel.GetInputPort(n);
+                    for (int m = 0, nID = 16 * n; m < 16; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aComp[m]) > 0);
                 }
-                for (int m = 0, nID = 16 * n; m < 16; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aComp[m]) > 0);
             }
+            catch (Exception e) { m_log.Error("GetInputPort Error : " + e.Message); }
         }
 
         void ReadOutput()
         {
             if (EQ.p_bSimulate) return;
-            for (int n = 0; n < m_nModule; n++)
+            if (m_acs.p_bConnect == false) return;
+            try
             {
-                if ((m_aModule[n] >= 0) && (m_aOffset[n] >= 0))
+                for (int n = 0; n < m_lPort; n++)
                 {
-                    uint uRead = 0;
-                    //CAXD.AxdoReadOutportWord(m_aModule[n], m_aOffset[n], ref uRead);
-                    m_aRead[n] = uRead;
+                    if (m_aPort[n] >= 0) m_aRead[n] = (uint)m_acs.m_channel.GetOutputPort(n);
+                    for (int m = 0, nID = 16 * n; m < 16; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aComp[m]) > 0);
                 }
-                for (int m = 0, nID = 16 * n; m < 16; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aComp[m]) > 0);
             }
+            catch (Exception e) { m_log.Error("GetOutputPort Error : " + e.Message); }
         }
         #endregion
 
         string m_id;
+        ACS m_acs; 
         Log m_log;
-        public void Init(eDIO dio, Log log)
+        public void Init(eDIO dio, ACS acs)
         {
             m_id = dio.ToString();
             m_eDIO = dio;
-            m_log = log;
+            m_acs = acs; 
+            m_log = acs.m_log;
             m_aComp[0] = 1;
             for (int n = 1; n < 16; n++) m_aComp[n] = 2 * m_aComp[n - 1];
         }
 
         public void RunTree(Tree tree)
         {
-            m_nModule = tree.Set(m_nModule, 1, "Count", "Module Count");
+            m_lPort = tree.Set(m_lPort, 1, "Count", "DIO Port Count");
             InitModule();
-            for (int n = 0; n < m_nModule; n++)
-            {
-                string sTree = m_id + "." + n.ToString("00") + " (" + (16 * n).ToString() + "~" + (16 * n + 15).ToString() + ")";
-                RunTreeModule(n, tree.GetTree(sTree));
-            }
+            RunTreePort(tree.GetTree(m_id + ".Port")); 
             SetModuleOffset();
         }
 
-        void RunTreeModule(int n, Tree tree)
+        void RunTreePort(Tree tree)
         {
-            m_aModule[n] = tree.Set(m_aModule[n], -1, "Module", "Module Number");
-            m_aOffset[n] = tree.Set(m_aOffset[n], -1, "Offset", "Offset Number");
+            for (int n = 0; n < m_lPort; n++)
+            {
+                m_aPort[n] = tree.Set(m_aPort[n], -1, "Port" + n.ToString("00"), "DIO Port Number"); 
+            }
         }
 
     }

@@ -16,9 +16,8 @@ namespace RootTools.Control.ACS
         public Axis GetAxis(string id, Log log)
         {
             ACSAxis axis = new ACSAxis();
-            axis.Init(this, m_channel, id, log);
+            axis.Init(this, id, m_acs);
             m_aAxis.Add(axis);
-            m_qSetAxis.Enqueue(axis);
             if (OnChangeAxisList != null) OnChangeAxisList();
             return axis;
         }
@@ -72,12 +71,11 @@ namespace RootTools.Control.ACS
         #endregion
 
         #region Thread InitAxis
-        public Queue<ACSAxis> m_qSetAxis = new Queue<ACSAxis>();
         int m_lAxisACS = 0;
         string InitAxis()
         {
             //AXM("AxmInfoGetAxisCount", CAXM.AxmInfoGetAxisCount(ref m_lAxisACS));
-            if (m_bChannel == false) return "Init Axis Skip : AXL";
+            if (m_bChannel == false) return "Init Axis Skip : ACS";
             m_thread = new Thread(new ThreadStart(RunThread));
             m_thread.Start();
             return "OK";
@@ -88,63 +86,23 @@ namespace RootTools.Control.ACS
         void RunThread()
         {
             m_bThread = true;
-//            LoadMotFile();
             while (m_bThread)
             {
-                Thread.Sleep(10);
-                if (m_qSetAxis.Count > 0)
-                {
-                    ACSAxis axis = m_qSetAxis.Dequeue();
-                    axis.GetAxisStatus();
-                    axis.RunTreeSetting(Tree.eMode.Init);
-                }
+                Thread.Sleep(1);
             }
         }
-        #endregion
-
-        #region MOT
-        /*
-                public void LoadMot()
-                {
-                    OpenFileDialog dlg = new OpenFileDialog();
-                    dlg.Filter = "Mot Files (*.Mot)|*.Mot";
-                    if (dlg.ShowDialog() == false) return;
-                    uint nError = CAXM.AxmMotLoadParaAll(dlg.FileName);
-                    if (nError > 0)
-                    {
-                        m_log.Error("AxmMotLoadParaAll Error : " + nError.ToString());
-                        return;
-                    }
-                    foreach (ACSAxis axis in m_aAxis) m_qSetAxis.Enqueue(axis);
-                }
-
-                public void LoadMotFile()
-                {
-                    uint nError = CAXM.AxmMotLoadParaAll(m_strMotFile);
-                    if (nError > 0) m_log.Error("AxmMotLoadParaAll Error : " + m_strMotFile + "  " + nError.ToString());
-                }
-
-                public void SaveMot()
-                {
-                    SaveFileDialog dlg = new SaveFileDialog();
-                    dlg.Filter = "Mot Files (*.Mot)|*.Mot";
-                    if (dlg.ShowDialog() == false) return;
-                    AXM("AxmMotSaveParaAll", CAXM.AxmMotSaveParaAll(dlg.FileName));
-                }
-        */
         #endregion
 
         string m_id;
         Log m_log;
         IEngineer m_engineer;
-        Channel m_channel; 
+        ACS m_acs; 
         bool m_bChannel = false;
-//        string m_strMotFile = @"C:\VEGA\Init\VEGA.mot";
-        public void Init(string id, IEngineer engineer, Channel channel, bool bChannel)
+        public void Init(string id, IEngineer engineer, ACS acs, bool bChannel)
         {
             m_id = id;
             m_engineer = engineer;
-            m_channel = channel; 
+            m_acs = acs; 
             m_bChannel = bChannel;
             m_log = LogView.GetLog(id);
             Run("Init Axis Error (ReStart SW) : ", InitAxis());

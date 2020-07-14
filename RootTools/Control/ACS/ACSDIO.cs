@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace RootTools.Control.ACS
 {
-    public class ACSDIO : IToolDIO //forgetACS
+    public class ACSDIO : IToolDIO
     {
         #region ListDIO
         ACSListDIO _listDI = new ACSListDIO();
@@ -19,8 +19,8 @@ namespace RootTools.Control.ACS
 
         void InitList()
         {
-            _listDI.Init(ListDIO.eDIO.Input, m_log);
-            _listDO.Init(ListDIO.eDIO.Output, m_log);
+            _listDI.Init(ListDIO.eDIO.Input, m_acs);
+            _listDO.Init(ListDIO.eDIO.Output, m_acs);
         }
         #endregion
 
@@ -48,32 +48,20 @@ namespace RootTools.Control.ACS
         #region Tree
         public void RunTree(Tree treeRoot)
         {
-            RunInfoTree(treeRoot.GetTree("Info"));
             _listDI.RunTree(treeRoot.GetTree("Input"));
             _listDO.RunTree(treeRoot.GetTree("Output"));
-        }
-
-        public void RunInfoTree(Tree tree)
-        {
-            if (tree.p_treeRoot.p_eMode == Tree.eMode.Init)
-            {
-                m_nInputModule = tree.Set(m_nInputModule, 0, "InputModule", "Input Module Count", true, true);
-                m_nOutputModule = tree.Set(m_nOutputModule, 0, "OuputModule", "Output Module Count", true, true);
-            }
         }
         #endregion
 
         string m_id;
+        ACS m_acs; 
         Log m_log;
-        public int m_nInputModule;
-        public int m_nOutputModule;
-        public void Init(string id, int nInputModule, int nOutputModule)
+        public void Init(string id, ACS acs)
         {
             m_id = id;
-            m_log = LogView.GetLog(id);
+            m_acs = acs; 
+            m_log = acs.m_log;
             InitList();
-            m_nInputModule = nInputModule;
-            m_nOutputModule = nOutputModule;
             m_thread = new Thread(new ThreadStart(RunThread));
             m_thread.Start();
         }
