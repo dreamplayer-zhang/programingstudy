@@ -1277,7 +1277,7 @@
                                                    Text="Axis Z"></TextBlock>
                                         <TextBlock Grid.Column="1"
                                                    Style="{StaticResource BasicTb}"
-                                                   DataContext="{Binding p_SideVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                   DataContext="{Binding p_SideVision.p_axisZ, Converter={StaticResource AjinAxisToIAxiss}}"
                                                    Text="{Binding p_posActual}" />
                                     </Grid>
                                     <Grid Grid.Row="3">
@@ -1289,7 +1289,7 @@
                                                    Text="Theta"></TextBlock>
                                         <TextBlock Grid.Column="1"
                                                    Style="{StaticResource BasicTb}"
-                                                   DataContext="{Binding p_SideVision.p_axisTheta.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                   DataContext="{Binding p_SideVision.p_axisTheta, Converter={StaticResource AjinAxisToIAxiss}}"
                                                    Text="{Binding p_posActual}" />
                                     </Grid>
                                 </Grid>

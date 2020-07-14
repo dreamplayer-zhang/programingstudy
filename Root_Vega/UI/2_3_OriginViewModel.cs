@@ -24,8 +24,8 @@ namespace Root_Vega
 		string sPool = "pool";
 		string sGroup = "group";
 		string sMem = "mem";
-		public int MemWidth = 12400;
-		public int MemHeight = 12400;
+		public int MemWidth = 60000;
+		public int MemHeight = 360000;
 
 		public _2_3_OriginViewModel(Vega_Engineer engineer, IDialogService dialogService)
 		{
@@ -42,7 +42,7 @@ namespace Root_Vega
 			m_MemoryModule = engineer.ClassMemoryTool();
 			//m_MemoryModule.CreatePool(sPool, 8);
 			//m_MemoryModule.GetPool(sPool).CreateGroup(sGroup);
-			m_MemoryModule.GetPool(sPool, true).p_gbPool = 2;
+			m_MemoryModule.GetPool(sPool, true).p_gbPool = 50;
 			m_MemoryModule.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
 			m_MemoryModule.GetMemory(sPool, sGroup, sMem);
 

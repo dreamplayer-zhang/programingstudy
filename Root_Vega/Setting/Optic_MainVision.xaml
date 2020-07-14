@@ -9,6 +9,8 @@
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
              xmlns:Axis="clr-namespace:RootTools.Control.Ajin;assembly=RootTools"
              xmlns:Dalsa="clr-namespace:RootTools.Camera.Dalsa;assembly=RootTools"
+             xmlns:behavior="clr-namespace:mousebehavior"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d"
              d:DesignHeight="726"
              d:DesignWidth="1602">
@@ -870,17 +872,17 @@
                                                     <ColumnDefinition></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Style="{StaticResource BasicTb}"
-                                                           DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                           DataContext="{Binding p_PatternVision.p_axisXY.p_axisX}"
                                                            Text="{Binding p_posActual}"
                                                            FontSize="15" />
                                                 <TextBlock Grid.Column="1"
                                                            Style="{StaticResource BasicTb}"
-                                                           DataContext="{Binding p_PatternVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                           DataContext="{Binding p_PatternVision.p_axisXY.p_axisY}"
                                                            Text="{Binding p_posActual}"
                                                            FontSize="15" />
                                                 <TextBlock Grid.Column="2"
                                                            Style="{StaticResource BasicTb}"
-                                                           DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                           DataContext="{Binding p_PatternVision.p_axisZ}"
                                                            Text="{Binding p_posActual}"
                                                            FontSize="15" />
                                             </Grid>
@@ -894,10 +896,17 @@
                                                 <RepeatButton Grid.Column="1"
                                                         Margin="5"
                                                         Style="{StaticResource BasicRepeatBtn}"
-                                                        DataContext="{Binding p_PatternVision}"
-                                                        Command="{Binding PJogFastCommand}"
+                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisY}"
                                                         Interval="100" 
                                                         Delay="100">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                            <i:InvokeCommandAction Command="{Binding PJogFastCommand}"/>
+                                                        </i:EventTrigger>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                            <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
                                                     <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowUpBox"
                                                                            Width="{PriorityBinding}"
@@ -908,10 +917,17 @@
                                                 <RepeatButton Grid.Column="3"
                                                         Margin="5"
                                                         Style="{StaticResource BasicRepeatBtn}"
-                                                        DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                        Command="{Binding PJogFastCommand}"
+                                                        DataContext="{Binding p_PatternVision.p_axisZ}"
                                                         Interval="100" 
                                                         Delay="100">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                            <i:InvokeCommandAction Command="{Binding PJogFastCommand}"/>
+                                                        </i:EventTrigger>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                            <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
                                                     <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowUpBox"
                                                                            Width="{PriorityBinding}"
@@ -930,10 +946,17 @@
                                                 <RepeatButton Grid.Column="0"
                                                         Margin="5"
                                                         Style="{StaticResource BasicRepeatBtn}"
-                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                        Command="{Binding MJogFastCommand}"
+                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisX}"
                                                         Interval="100" 
                                                         Delay="100">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                            <i:InvokeCommandAction Command="{Binding PJogFastCommand}"/>
+                                                        </i:EventTrigger>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                            <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
                                                     <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowLeftBox"
                                                                            Width="{PriorityBinding}"
@@ -944,10 +967,17 @@
                                                 <RepeatButton Grid.Column="1"
                                                         Margin="5"
                                                         Style="{StaticResource BasicRepeatBtn}"
-                                                        DataContext="{Binding p_PatternVision}"
-                                                        Command="{Binding MJogFastCommand}"
+                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisY}"
                                                         Interval="100" 
                                                         Delay="100">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                            <i:InvokeCommandAction Command="{Binding MJogFastCommand}"/>
+                                                        </i:EventTrigger>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                            <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
                                                     <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowDownBox"
                                                                            Width="{PriorityBinding}"
@@ -958,10 +988,17 @@
                                                 <RepeatButton Grid.Column="2"
                                                         Margin="5"
                                                         Style="{StaticResource BasicRepeatBtn}"
-                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                        Command="{Binding PJogFastCommand}"
+                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisX}"
                                                         Interval="100" 
                                                         Delay="100">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                            <i:InvokeCommandAction Command="{Binding MJogFastCommand}"/>
+                                                        </i:EventTrigger>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                            <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
                                                     <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowRightBox"
                                                                            Width="{PriorityBinding}"
@@ -972,10 +1009,17 @@
                                                 <RepeatButton Grid.Column="3"
                                                         Margin="5"
                                                         Style="{StaticResource BasicRepeatBtn}"
-                                                        DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                        Command="{Binding MJogFastCommand}"
+                                                        DataContext="{Binding p_PatternVision.p_axisZ}"
                                                         Interval="100" 
                                                         Delay="100">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                            <i:InvokeCommandAction Command="{Binding MJogFastCommand}"/>
+                                                        </i:EventTrigger>
+                                                        <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                            <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
                                                     <RepeatButton.Content>
                                                         <material:PackIcon Kind="ArrowDownBox"
                                                                            Width="{PriorityBinding}"
@@ -1009,11 +1053,11 @@
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15"
-                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisX}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
                                             <Grid Grid.Row="1"
-                                                  DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}">
+                                                  DataContext="{Binding p_PatternVision.p_axisXY.p_axisX}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -1022,8 +1066,8 @@
                                                 </Grid.ColumnDefinitions>
                                                 <ComboBox Margin="10"
                                                           Grid.Column="0"
-                                                          SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
-                                                          ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                                          SelectedItem="{Binding p_strSelPos, Mode=TwoWay}"
+                                                          ItemsSource="{Binding p_asPos}"></ComboBox>
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15">
@@ -1079,11 +1123,11 @@
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15"
-                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisY}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
                                             <Grid Grid.Row="3"
-                                                  DataContext="{Binding p_PatternVision}">
+                                                  DataContext="{Binding p_PatternVision.p_axisXY.p_axisY}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -1093,7 +1137,7 @@
                                                 <ComboBox Margin="10"
                                                           Grid.Column="0"
                                                           SelectedItem="{Binding p_axisXY.p_axisY.p_SelMovePos, Mode=TwoWay}"
-                                                          ItemsSource="{Binding p_axisXY.p_axisY.p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                                          ItemsSource="{Binding p_asPos}"></ComboBox>
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15">
@@ -1149,11 +1193,11 @@
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15"
-                                                            DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            DataContext="{Binding p_PatternVision.p_axisZ}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
                                             <Grid Grid.Row="5"
-                                                  DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}">
+                                                  DataContext="{Binding p_PatternVision.p_axisZ}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -1163,7 +1207,7 @@
                                                 <ComboBox Margin="10"
                                                           Grid.Column="0"
                                                           SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
-                                                          ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                                          ItemsSource="{Binding p_asPos}"></ComboBox>
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15">
@@ -1233,11 +1277,11 @@
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15"
-                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisX}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
                                             <Grid Grid.Row="1"
-                                                  DataContext="{Binding p_PatternVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}">
+                                                  DataContext="{Binding p_PatternVision.p_axisXY.p_axisX}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -1291,11 +1335,11 @@
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15"
-                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            DataContext="{Binding p_PatternVision.p_axisXY.p_axisY}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
                                             <Grid Grid.Row="3"
-                                                  DataContext="{Binding p_PatternVision}">
+                                                  DataContext="{Binding p_PatternVision.p_axisXY.p_axisY}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -1349,11 +1393,11 @@
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
                                                             FontSize="15"
-                                                            DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                            DataContext="{Binding p_PatternVision.p_axisZ}"
                                                             Text="{Binding p_posActual}" />
                                             </Grid>
                                             <Grid Grid.Row="5"
-                                                  DataContext="{Binding p_PatternVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}">
+                                                  DataContext="{Binding p_PatternVision.p_axisZ}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
