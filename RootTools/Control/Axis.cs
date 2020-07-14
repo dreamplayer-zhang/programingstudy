@@ -106,7 +106,17 @@ namespace RootTools.Control
         public List<string> m_asPos = new List<string>(); 
         public ObservableCollection<string> p_asPos { get; set; }
         public string p_strSelPos { get; set; }
-        
+        double _dRelPos = 0.0;
+        public double p_dRelPos
+        {
+            get { return _dRelPos; }
+            set
+            {
+                _dRelPos = value;
+                OnPropertyChanged();
+            }
+        }
+
         public void AddPos(params string[] asPos)
         {
             foreach (string sPos in asPos) AddPos(sPos);
@@ -629,6 +639,34 @@ namespace RootTools.Control
             StartMove(p_strSelPos, 0, eSpeed.Move.ToString());
         }
 
+        private void MinusRelativeMove()
+        {
+            int nDir = -1;
+
+            if (p_eState > Axis.eState.Ready) return;
+            try
+            {
+                double dPos = p_dRelPos;
+                double fPos = p_posCommand + nDir * dPos;
+                StartMove(fPos, eSpeed.Move.ToString());
+            }
+            catch (Exception) { }
+        }
+
+        private void PlusRelativeMove()
+        {
+            int nDir = 1;
+
+            if (p_eState > Axis.eState.Ready) return;
+            try
+            {
+                double dPos = p_dRelPos;
+                double fPos = p_posCommand + nDir * dPos;
+                StartMove(fPos, eSpeed.Move.ToString());
+            }
+            catch (Exception) { }
+        }
+
         public RelayCommand MJogFastCommand
         {
             get
@@ -665,6 +703,28 @@ namespace RootTools.Control
             get
             {
                 return new RelayCommand(Move);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand MinusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MinusRelativeMove);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand PlusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(PlusRelativeMove);
             }
             set
             {

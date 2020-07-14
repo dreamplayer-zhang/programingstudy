@@ -1362,7 +1362,7 @@
                                                 <Border Grid.Column="1">
                                                     <TextBox VerticalAlignment="Center"
                                                              Background="{PriorityBinding}"
-                                                             Text="{Binding p_axisXY.p_axisY.p_dRelPos}"
+                                                             Text="{Binding p_dRelPos}"
                                                              Foreground="White"
                                                              HorizontalAlignment="Center"
                                                              FontSize="20" />
