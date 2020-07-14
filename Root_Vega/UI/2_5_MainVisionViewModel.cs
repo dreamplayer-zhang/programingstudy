@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -68,21 +69,6 @@ namespace Root_Vega
 			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
 			bUsingInspection = false;
 		}
-		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
-		{
-			var bitmapData = bitmap.LockBits(
-				new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-				System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
-
-			var bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
-				bitmapData.Width, bitmapData.Height,
-				bitmap.HorizontalResolution, bitmap.VerticalResolution,
-				PixelFormats.Gray8, null,
-				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
-
-			bitmap.UnlockBits(bitmapData);
-			return bitmapSource;
-		}
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
 		/// </summary>
@@ -124,10 +110,7 @@ namespace Root_Vega
 			p_Recipe = engineer.m_recipe;
 
 			m_MemoryModule = engineer.ClassMemoryTool();
-			//m_MemoryModule.CreatePool(sPool, 8);
-			//m_MemoryModule.GetPool(sPool).CreateGroup(sGroup);
 
-			//m_MemoryModule.GetPool(sPool).p_gbPool = 2;
 			m_Image = new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem));
 			p_ImageViewer = new ImageViewer_ViewModel(m_Image, dialogService);
 			m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
@@ -143,32 +126,18 @@ namespace Root_Vega
 			p_ImageViewer.SetInformationViewer(informationDrawer);
 			p_ImageViewer.m_HistoryWorker = m_DrawHistoryWorker_List[0];
 
-			//p_ListRoi = m_Recipe.m_RD.p_Roi;
 
-			//m_Recipe.m_RD.p_Roi = new List<Roi>(); //Mask#1, Mask#2... New List Mask
-			Roi Mask, Mask2;
-			Mask = new Roi("Strip MASK1", Roi.Item.ReticlePattern);  // Mask Number.. New Mask
-			Mask.Strip.ParameterList = new ObservableCollection<StripParamData>();
-			Mask.Strip.NonPatternList = new List<NonPattern>(); // List Rect in Mask
-			NonPattern rect = new NonPattern(); // New Rect
-			rect.Area = new CRect(); // Rect Info
-			StripParamData param = new StripParamData();
-			Mask.Strip.ParameterList.Add(param);
-			Mask.Strip.NonPatternList.Add(rect); // Add Rect to Rect List
-												 //m_Recipe.m_RD.p_Roi.Add(Mask);
-												 //p_ListRoi.Add(m_Mask);
+			m_Engineer.m_recipe.LoadComplete += () =>
+			{
+				p_Recipe = m_Engineer.m_recipe;
+				//p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.RecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+				//SideParamList = new ObservableCollection<SurfaceParamData>();
 
-			Mask2 = new Roi("Strip MASK2", Roi.Item.ReticlePattern);  // Mask Number.. New Mask
-			Mask2.Strip.ParameterList = new ObservableCollection<StripParamData>();
-			Mask2.Strip.NonPatternList = new List<NonPattern>(); // List Rect in Mask
-			NonPattern rect2 = new NonPattern(); // New Rect
-			rect2.Area = new CRect(); // Rect Info
-			StripParamData param2 = new StripParamData();
-			Mask2.Strip.ParameterList.Add(param2);
-			Mask2.Strip.NonPatternList.Add(rect2); // Add Rect to Rect List
+				//_SelectedROI = null;
 
-			p_Recipe.RecipeData.RoiList.Add(Mask);
-			p_Recipe.RecipeData.RoiList.Add(Mask2);
+				//SelectedParam = new SurfaceParamData();//UI 초기화를 위한 코드
+				//SelectedParam = null;
+			};
 		}
 
 		#region Property
@@ -198,6 +167,7 @@ namespace Root_Vega
 		{
 			get
 			{
+				if (m_Recipe.RecipeData.RoiList.Count == 0) return new StripParamData();
 				if (m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList.Count != 0)
 					return m_Recipe.RecipeData.RoiList[p_IndexMask].Strip.ParameterList[0];
 				else
@@ -380,39 +350,11 @@ namespace Root_Vega
 				return new RelayCommand(_btnInspTest);
 			}
 		}
-		//public ICommand btnStartInsp
-		//{
-		//	get
-		//	{
-		//		return new RelayCommand(_btnStartInsp);
-		//	}
-		//}
-		//public ICommand btnNextSnap
-		//{
-		//	get
-		//	{
-		//		return new RelayCommand(_btnNextSnap);
-		//	}
-		//}
-		public ICommand btnRcpSaveTest
-		{
-			get
-			{
-				return new RelayCommand(_btnRcpSaveTest);
-			}
-		}
 		public ICommand btnInspDone
 		{
 			get
 			{
 				return new RelayCommand(_btnInspDone);
-			}
-		}
-		public ICommand btnRcpLoadTest
-		{
-			get
-			{
-				return new RelayCommand(_btnRcpLoadTest);
 			}
 		}
 		public RelayCommand CommandSaveMask
@@ -507,137 +449,9 @@ namespace Root_Vega
 		//	int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 		//	m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
 		//}
-		private void _btnRcpLoadTest()
-		{
-			OpenFileDialog dlg = new OpenFileDialog();
-			dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
-			dlg.InitialDirectory = @"C:\VEGA\Recipe";
-			if (dlg.ShowDialog() == true)
-			{
-				m_Engineer.m_recipe.Load(dlg.FileName);
-				p_Recipe = m_Engineer.m_recipe;
-			}
-
-		}
 		private void _btnInspDone()
 		{
-			if (!bUsingInspection)
-			{
-				return;
-			}
-			else
-			{
-				bUsingInspection = false;
-			}
-			if (wLimit <= currentSnap)
-			{
-
-				//VSDBManager.Commit();
-
-				//여기서부터 DB Table데이터를 기준으로 tif 이미지 파일을 생성하는 구간
-				//해당 기능은 여러개의 pool을 사용하는 경우에 대해서는 테스트가 진행되지 않았습니다
-				//Concept은 검사 결과가 저장될 시점에 가지고 있던 Data Table을 저장하기 전 Image를 저장하는 형태
-				int stride = tempImageWidth / 8;
-				string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
-
-				System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
-
-				System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
-				System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
-				encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
-
-				foreach (System.Data.DataRow row in VSDataDT.Rows)
-				{
-					//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-					double fPosX = Convert.ToDouble(row["PosX"]);
-					double fPosY = Convert.ToDouble(row["PosY"]);
-
-					CRect ImageSizeBlock = new CRect(
-						(int)fPosX - tempImageWidth / 2,
-						(int)fPosY - tempImageHeight / 2,
-						(int)fPosX + tempImageWidth / 2,
-						(int)fPosY + tempImageHeight / 2);
-
-					encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(m_ImageViewer.p_ImageData.GetRectImage(ImageSizeBlock))));
-				}
-				if (VSDataDT.Rows.Count > 0)
-				{
-					encoder.Save(stream);
-				}
-				stream.Dispose();
-				//이미지 저장 완료
-
-				//Data Table 저장 시작
-				VSDBManager.SetDataTable(VSDataInfoDT);
-				VSDBManager.SetDataTable(VSDataDT);
-				VSDBManager.Disconnect();
-				//Data Table 저장 완료
-				m_Engineer.m_InspManager.Dispose();
-				VSDataDT.Clear();
-			}
-		}
-		private void _btnRcpSaveTest()
-		{
-			this.p_Recipe.MapData = new MapData(50, 50);
-
-			foreach (var item in p_Recipe.RecipeData.RoiList)
-			{
-				item.Position = new Position();
-				item.Position.FeatureList = new List<Feature>();
-
-				Feature data = new Feature();
-				System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(@"D:\test.bmp");
-				data.m_Feature = new ImageData(bmp.Width, bmp.Height);
-				data.RoiRect.Top = 0;
-				data.RoiRect.Left = 0;
-				data.RoiRect.Bottom = bmp.Height;
-				data.RoiRect.Right = bmp.Width;
-				bmp.Dispose();
-				data.m_Feature.LoadImageSync(@"D:\test.bmp", new CPoint(0, 0));
-				item.Position.FeatureList.Add(data);
-
-				Feature data2 = new Feature();
-				System.Drawing.Bitmap bmp2 = new System.Drawing.Bitmap(@"D:\test2.bmp");
-				data2.m_Feature = new ImageData(bmp2.Width, bmp2.Height);
-				data2.RoiRect.Top = 0;
-				data2.RoiRect.Left = 0;
-				data2.RoiRect.Bottom = bmp2.Height;
-				data2.RoiRect.Right = bmp2.Width;
-				bmp.Dispose();
-				data2.m_Feature.LoadImageSync(@"D:\test2.bmp", new CPoint(0, 0));
-				item.Position.FeatureList.Add(data2);
-			}
-
-			System.Threading.Tasks.Parallel.For(0, 50, y =>
-			{
-				System.Threading.Tasks.Parallel.For(0, 50, x =>
-				{
-					var temp = new Unit();
-					temp.X = x;
-					temp.Y = y;
-
-					Random rand = new Random();
-					Thread.Sleep(1);
-					temp.Exist = Convert.ToBoolean(rand.Next(0, 2));
-					Thread.Sleep(1);
-					temp.Selected = Convert.ToBoolean(rand.Next(0, 2));
-					Thread.Sleep(1);
-					temp.Progress = (Unit.UnitProgress)rand.Next(0, 4);
-					Thread.Sleep(1);
-					temp.Result = (Unit.UnitResult)rand.Next(0, 2);
-					Thread.Sleep(1);
-					this.p_Recipe.MapData.Map[y, x] = temp;
-				});
-			});
-			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-			dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
-			dlg.InitialDirectory = @"C:\VEGA\Recipe";
-			if (dlg.ShowDialog() == true)
-			{
-				var target = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(dlg.FileName), System.IO.Path.GetFileNameWithoutExtension(dlg.FileName));
-				this.p_Recipe.Save(target);
-			}
-			//this.p_Recipe.Save();
+			
 		}
 		//private void _btnNextSnap()
 		//{
@@ -675,11 +489,11 @@ namespace Root_Vega
 
 			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
 			int nblocksize = 500;
-					
+
 			var memOffset = m_Engineer.GetMemory("pool", "group", "mem").GetMBOffset();
 			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 
-			DrawRectList = m_Engineer.m_InspManager.CreateInspArea("pool", memOffset,
+			DrawRectList = m_Engineer.m_InspManager.CreateInspArea("pool", "group", "mem", memOffset,
 				m_Engineer.GetMemory("pool", "group", "mem").p_sz.X,
 				m_Engineer.GetMemory("pool", "group", "mem").p_sz.Y,
 				Mask_Rect, nblocksize,
@@ -687,37 +501,7 @@ namespace Root_Vega
 				nDefectCode,
 				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance);
 
-			//for (int i = 0; i < DrawRectList.Count; i++)
-			//{
-			//	CRect inspblock = DrawRectList[i];
-			//	m_DD.AddRectData(inspblock, System.Drawing.Color.Orange);
-
-			//}
 			System.Diagnostics.Debug.WriteLine("Start Insp");
-
-			inspDefaultDir = @"C:\vsdb";
-			if (!System.IO.Directory.Exists(inspDefaultDir))
-			{
-				System.IO.Directory.CreateDirectory(inspDefaultDir);
-			}
-			inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
-			var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
-			string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
-
-			if (VSDBManager != null && VSDBManager.IsConnected)
-			{
-				VSDBManager.Disconnect();
-			}
-			VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
-
-			if (VSDBManager.Connect())
-			{
-				VSDBManager.CreateTable("Datainfo");
-				VSDBManager.CreateTable("Data");
-
-				VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
-				VSDataDT = VSDBManager.GetDataTable("Data");
-			}
 			m_Engineer.m_InspManager.StartInspection();
 
 			return;

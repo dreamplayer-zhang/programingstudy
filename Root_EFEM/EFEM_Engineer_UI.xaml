@@ -24,10 +24,10 @@
             <TabItem Header="Log" Background="DarkCyan">
                 <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
             </TabItem>
-            <TabItem Header="Login">
+            <TabItem Header="Login" Background="DarkGreen">
                 <tools:Login_UI x:Name="loginUI"/>
             </TabItem>
-            <TabItem Header="Setup">
+            <TabItem Header="Setup" Background="DarkBlue">
                 <tree:TreeUI x:Name="treeRootUI"/>
             </TabItem>
         </TabControl>

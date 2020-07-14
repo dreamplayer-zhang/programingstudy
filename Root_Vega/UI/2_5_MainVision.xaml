@@ -63,6 +63,10 @@
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnInspTest}"
                             Margin="0,0,0,10" />
+					<Button Content="Inspection Done"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding btnInspDone}"
+                            Margin="0,0,0,10" />
 					<!--<Button Content="Start Insp Test"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnStartInsp}"
@@ -70,20 +74,20 @@
 					<Button Content="Next Snap Test"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnNextSnap}"
-                            Margin="0,0,0,10" />-->
-					<Button Content="Recipe Save Test"
+                            Margin="0,0,0,10" />
+					<Button Content="Recipe Save"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding btnRcpSave}"
+                            Margin="0,0,0,10" />
+					<Button Content="Recipe Save As"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnRcpSaveTest}"
                             Margin="0,0,0,10" />
-					<Button Content="Recipe Load Test"
+					<Button Content="Recipe Load"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding btnRcpLoadTest}"
                             Margin="0,0,0,10" />
-					<Button Content="Inspection Done"
-                            Style="{StaticResource BasicBtn}"
-                            Command="{Binding btnInspDone}"
-                            Margin="0,0,0,10" />
-					<!--<StackPanel>
+					<StackPanel>
                         <WrapPanel Margin="3">
                             <TextBlock Text="(X,Y) = " />
                             <TextBlock Text="{Binding p_ImageViewer.p_MouseX}" />

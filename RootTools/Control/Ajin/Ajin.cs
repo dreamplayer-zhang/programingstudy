@@ -4,24 +4,19 @@ using System.IO;
 
 namespace RootTools.Control.Ajin
 {
-    public class Ajin : ObservableObject, IToolSet, IControl
+    public class Ajin : IToolSet, IControl
     {
         #region Init AXL
         bool InitCAXL(ref int nInputModule, ref int nOutputModule)
         {
             CopyDllFile();
             uint uError = CAXL.AxlOpen(7); //Copy Dll : Root/RootTools.Control.Ajin/DLL/*.* -> ?.exe 또는 빌드 옵션에서 32bit설정 제거
-
             if (uError == 0)
             {
                 CheckModuleNum(ref nInputModule, ref nOutputModule);
                 return true;
             }
-            else
-            {
-                TestModule(ref nInputModule, ref nOutputModule);
-            }
-           
+            else TestModule(ref nInputModule, ref nOutputModule);
             m_log.Error("AXL Init Error (ReStart SW) : " + uError.ToString());
             return false;
         }
@@ -47,12 +42,7 @@ namespace RootTools.Control.Ajin
         #endregion
 
         #region Search DIO Module
-        ObservableCollection<AJINModule> m_SearchModule = new ObservableCollection<AJINModule>();
-        public ObservableCollection<AJINModule> p_SearchModule
-        {
-            get { return m_SearchModule; }
-            set { SetProperty(ref m_SearchModule, value); }
-        }
+        public ObservableCollection<AJINModule> p_SearchModule { get; set; }
 
         void CheckModuleNum(ref int nInputModule, ref int nOutputModule)
         {
@@ -156,6 +146,7 @@ namespace RootTools.Control.Ajin
 
         public void Init(string id, IEngineer engineer)
         {
+            p_SearchModule = new ObservableCollection<AJINModule>(); 
             int nInput=0, nOutput = 0;
             p_id = id;
             m_engineer = engineer;

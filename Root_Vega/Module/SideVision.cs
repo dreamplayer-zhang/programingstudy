@@ -12,6 +12,7 @@ using RootTools.Inspects;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
+using RootTools.RADS;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -96,6 +97,7 @@ namespace Root_Vega.Module
         }
         #endregion
 
+        public RADSControl m_RADSControl;
         MemoryPool m_memoryPool;
         InspectTool m_inspectTool;
         Camera_Dalsa m_CamSide;
@@ -184,7 +186,7 @@ namespace Root_Vega.Module
             while (m_aGrabMode.Count < m_lGrabMode)
             {
                 string id = "Mode." + m_aGrabMode.Count.ToString("00");
-                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool);
+                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool, m_RADSControl);
                 m_aGrabMode.Add(grabMode);
             }
             while (m_aGrabMode.Count > m_lGrabMode)
@@ -203,6 +205,7 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_axisTheta, this, "AxisTheta");
             p_sInfo = m_toolBox.Get(ref m_axisClamp, this, "AxisClamp");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
+            //p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_CamBevel, this, "Bevel Main");

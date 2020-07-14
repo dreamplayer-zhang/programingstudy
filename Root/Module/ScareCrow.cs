@@ -4,6 +4,7 @@ using RootTools.Control;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
+using RootTools.RADS;
 using RootTools.RTC5s.LaserBright;
 using RootTools.Trees;
 using System.Threading;

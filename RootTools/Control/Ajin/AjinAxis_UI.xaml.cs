@@ -90,19 +90,19 @@ namespace RootTools.Control.Ajin
         #endregion
 
         #region Jog
+        private void buttonJogM3_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(-1); }
+        private void buttonJogM2_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(-0.31); }
+        private void buttonJogM1_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(-0.1); }
+        private void buttonJogP1_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(0.1); }
+        private void buttonJogP2_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(0.31); }
+        private void buttonJogP3_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(1); }
+
         private void buttonJog_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (m_axis.p_eState != Axis.eState.Jog) return;
             m_axis.StopAxis(true);
             m_bRepeat = false;
         }
-
-        private void buttonJogM3_Click(object sender, RoutedEventArgs e) { Jog(-1); }
-        private void buttonJogM2_Click(object sender, RoutedEventArgs e) { Jog(-0.31); }
-        private void buttonJogM1_Click(object sender, RoutedEventArgs e) { Jog(-0.1); }
-        private void buttonJogP1_Click(object sender, RoutedEventArgs e) { Jog(0.1); }
-        private void buttonJogP2_Click(object sender, RoutedEventArgs e) { Jog(0.31); }
-        private void buttonJogP3_Click(object sender, RoutedEventArgs e) { Jog(1); }
 
         void Jog(double fScale)
         {

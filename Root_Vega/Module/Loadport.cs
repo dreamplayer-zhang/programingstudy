@@ -158,7 +158,7 @@ namespace Root_Vega.Module
             GemCarrierBase.ePresent present;
             if (m_dioPlaced.p_bIn != m_dioPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
             else present = m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            if (m_infoPod.CheckPlaced(present) != "OK")
+            //if (m_infoPod.CheckPlaced(present) != "OK")
             {
                 m_alidPlaced.p_sMsg = "Placed Sensor Remain Checked while Pod State = " + m_infoPod.p_eState;
                 m_alidPlaced.p_bSet = true;
@@ -321,37 +321,35 @@ namespace Root_Vega.Module
         double[] m_aShiftReticle = new double[2] { 0, 0 };
         public override string StateHome()
         {
-            if (EQ.p_bSimulate == false)
+            if (EQ.p_bSimulate) return "OK";
+            m_axisZ.ServoOn(true);
+            m_axisTheta.ServoOn(true);
+            m_axisPodLifter.ServoOn(true);
+            m_axisReticleLifter.ServoOn(true);
+            Thread.Sleep(1000);
+            m_axisZ.p_eState = Axis.eState.Ready;
+            m_axisTheta.p_eState = Axis.eState.Ready;
+            m_axisPodLifter.p_axisX.p_eState = Axis.eState.Ready;
+            m_axisPodLifter.p_axisY.p_eState = Axis.eState.Ready;
+            m_axisReticleLifter.p_axisX.p_eState = Axis.eState.Ready;
+            m_axisReticleLifter.p_axisY.p_eState = Axis.eState.Ready;
+            //JWS 200616 ADD
+            if (GetdZPos(ePosZ.InnerPod) < 0)
             {
-                m_axisZ.ServoOn(true);
-                m_axisTheta.ServoOn(true);
-                m_axisPodLifter.ServoOn(true); 
-                m_axisReticleLifter.ServoOn(true);
-                Thread.Sleep(1000);
-                m_axisZ.p_eState = Axis.eState.Ready;
-                m_axisTheta.p_eState = Axis.eState.Ready;
-                m_axisPodLifter.p_axisX.p_eState = Axis.eState.Ready;
-                m_axisPodLifter.p_axisY.p_eState = Axis.eState.Ready;
-                m_axisReticleLifter.p_axisX.p_eState = Axis.eState.Ready;
-                m_axisReticleLifter.p_axisY.p_eState = Axis.eState.Ready;
-                //JWS 200616 ADD
-                if (GetdZPos(ePosZ.InnerPod) < 0)
-                {
-                    p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
-                    if (p_sInfo != "OK") return p_sInfo;
-                    if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
-                }
-                else if (GetdZPos(ePosZ.Reticle) < 0)
-                {
-                    p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
-                    if (p_sInfo != "OK") return p_sInfo;
-                    if (Run(Home_Innerpod())) return p_sInfo;
-                }
-                else
-                {
-                    if (Run(MoveZ(ePosZ.Check))) return p_sInfo;
-                    if (Run(Home_Reticle())) return p_sInfo;
-                }
+                p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                if (p_sInfo != "OK") return p_sInfo;
+                if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
+            }
+            else if (GetdZPos(ePosZ.Reticle) < 0)
+            {
+                p_sInfo = HomeToMinusLimit(m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
+                if (p_sInfo != "OK") return p_sInfo;
+                if (Run(Home_Innerpod())) return p_sInfo;
+            }
+            else
+            {
+                if (Run(MoveZ(ePosZ.Check))) return p_sInfo;
+                if (Run(Home_Reticle())) return p_sInfo;
             }
             m_infoPod.AfterHome();
             return "OK";
@@ -477,6 +475,9 @@ namespace Root_Vega.Module
             base.InitBase(id, engineer);
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
+
+            m_axisZ.p_eState = Axis.eState.Ready;
+            m_axisTheta.p_eState = Axis.eState.Ready;
         }
 
         public override void ThreadStop()
@@ -489,15 +490,10 @@ namespace Root_Vega.Module
             //
         }
 
-        public ModuleRunBase GetRunUndocking()
-        {
-            return CloneModuleRun("Unload");
-        }
-
         #region ModuleRun
         public ModuleRunBase m_runReadPodID;
         public ModuleRunBase m_runLoad;
-        ModuleRunBase m_runUnLoad;
+        public ModuleRunBase m_runUnLoad;
         protected override void InitModuleRuns()
         {
             m_runReadPodID = AddModuleRunList(new Run_ReadRFID(this), false, "Read RFID");

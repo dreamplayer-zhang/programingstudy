@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:tree="clr-namespace:RootTools.Trees" 
-             xmlns:converter="clr-namespace:ViewConverter"
              xmlns:local="clr-namespace:RootTools.Control.Ajin" 
              xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes" 
              mc:Ignorable="d" d:DesignHeight="649.328"
@@ -85,7 +84,7 @@
                             <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
                         <Button Grid.Column="0" x:Name="buttonRunHome" Content="Home" Margin="3" Click="buttonRunHome_Click"/>
-                        <ProgressBar Grid.Column="1" Margin="3" Orientation="Vertical" Value="{Binding p_progressHome}"/>
+                        <ProgressBar Grid.Column="1" Margin="3" Orientation="Horizontal" Value="{Binding p_progressHome}"/>
                     </Grid>
                 </GroupBox>
                 <GroupBox BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
@@ -115,12 +114,12 @@
                                 <ColumnDefinition Width="10*"/>
                                 <ColumnDefinition Width="13*"/>
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" x:Name="buttonJogM3" Click="buttonJogM3_Click" Margin="3" Content="◀◀◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp"/>
-                            <Button Grid.Column="1" x:Name="buttonJogM2" Click="buttonJogM2_Click" Margin="3" Content="◀◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp"/>
-                            <Button Grid.Column="2" x:Name="buttonJogM1" Click="buttonJogM1_Click" Margin="3" Content="◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp"/>
-                            <Button Grid.Column="4" x:Name="buttonJogP1" Click="buttonJogP1_Click" Margin="3" Content="▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp"/>
-                            <Button Grid.Column="5" x:Name="buttonJogP2" Click="buttonJogP2_Click" Margin="3" Content="▶▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp"/>
-                            <Button Grid.Column="6" x:Name="buttonJogP3" Click="buttonJogP3_Click" Margin="3" Content="▶▶▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp"/>
+                            <Button Grid.Column="0" x:Name="buttonJogM3" Margin="3" Content="◀◀◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogM3_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="1" x:Name="buttonJogM2" Margin="3" Content="◀◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogM2_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="2" x:Name="buttonJogM1" Margin="3" Content="◀" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogM1_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="4" x:Name="buttonJogP1" Margin="3" Content="▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogP1_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="5" x:Name="buttonJogP2" Margin="3" Content="▶▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogP2_PreviewMouseLeftButtonDown"/>
+                            <Button Grid.Column="6" x:Name="buttonJogP3" Margin="3" Content="▶▶▶" PreviewMouseLeftButtonUp="buttonJog_PreviewMouseLeftButtonUp" PreviewMouseLeftButtonDown="buttonJogP3_PreviewMouseLeftButtonDown"/>
                         </Grid>
                     </Grid>
                 </GroupBox>

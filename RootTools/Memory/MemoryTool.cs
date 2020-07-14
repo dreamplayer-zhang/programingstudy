@@ -1,4 +1,5 @@
-﻿using RootTools.Inspects;
+﻿using Microsoft.Win32;
+using RootTools.Inspects;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -61,7 +62,8 @@ namespace RootTools.Memory
         {
             m_asPool.Clear();
             foreach (MemoryPool pool in p_aPool) m_asPool.Add(pool.p_id);
-            if (OnChangeMemoryPool != null) OnChangeMemoryPool(); 
+            if (OnChangeMemoryPool != null) OnChangeMemoryPool();
+            RunTreeRun(Tree.eMode.Init); 
         }
 
         ObservableCollection<MemoryPool> _aPool = new ObservableCollection<MemoryPool>();
@@ -97,10 +99,10 @@ namespace RootTools.Memory
         void RunTreeMemory(Tree tree, bool bVisible)
         {
             int nPool = p_aPool.Count;
-            bool bPool = (m_bMaster == false) || (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead);
-            if (bPool) nPool = tree.Set(nPool, nPool, "Count", "Pool Count", bVisible);
+            bool bCount = (m_bMaster == false) || (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead);
+            if (bCount) nPool = tree.Set(nPool, nPool, "Count", "Pool Count", bVisible);
             for (int n = 0; n < nPool; n++) RunTreeMemory(tree.GetTree(n.ToString("00")), n, bVisible);
-            foreach (MemoryPool pool in p_aPool) pool.RunTreeMemory(tree.GetTree(pool.p_id), bVisible);
+            foreach (MemoryPool pool in p_aPool) pool.RunTreeMemory(tree.GetTree(pool.p_id), bCount, bVisible);
         }
 
         void RunTreeMemory(Tree tree, int n, bool bVisible)
@@ -123,7 +125,8 @@ namespace RootTools.Memory
             RunTreeMemory(Tree.eMode.Init);
             Process[] aProcess = Process.GetProcessesByName(m_idProcess);
             foreach (Process process in aProcess) process.Kill();
-            KillInspectProcess(); 
+            KillInspectProcess();
+            RunTreeRun(Tree.eMode.Init);
         }
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
@@ -188,22 +191,25 @@ namespace RootTools.Memory
         public string SaveMemory()
         {
             if (m_memory == null) return "Memory not Exist";
-            return m_memory.SaveMemory(m_nIndex, m_cp.X, m_cp.Y, m_cp.X + m_sz.X, m_cp.Y + m_sz.Y);
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Filter = "Image RAW File (*.raw)|*.raw";
+            if (dlg.ShowDialog() == false) return "Save File Dialog not OK";
+            return m_memory.SaveMemory(dlg.FileName);
         }
 
         public string ReadMemory()
         {
             if (m_memory == null) return "Memory not Exist";
-            return m_memory.ReadMemory(m_nIndex);
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "Image RAW File (*.raw)|*.raw";
+            if (dlg.ShowDialog() == false) return "RAW File not Found !!";
+            return m_memory.ReadMemory(dlg.FileName);
         }
 
         string m_sPool = "Pool";
         string m_sGroup = "Group";
         string m_sMemory = "Memory";
-        int m_nIndex = 0;
         MemoryData m_memory = null;
-        CPoint m_cp = new CPoint();
-        CPoint m_sz = new CPoint();
         void RunTreeFile(Tree tree)
         {
             m_memory = null;
@@ -216,10 +222,6 @@ namespace RootTools.Memory
             m_sMemory = tree.Set(m_sMemory, m_sMemory, group.m_asMemory, "Name", "Memory Name");
             m_memory = group.GetMemory(m_sMemory);
             if (m_memory == null) return;
-            if (m_sz.X == 0) m_sz = new CPoint(m_memory.p_sz);
-            m_nIndex = tree.Set(m_nIndex, m_nIndex, "Index", "Memory Index", m_memory.p_nCount > 1);
-            m_cp = tree.Set(m_cp, m_cp, "Org", "Memory ROI Origin Position");
-            m_sz = tree.Set(m_sz, m_sz, "Size", "Memory ROI Size");
         }
         #endregion
 
@@ -240,7 +242,8 @@ namespace RootTools.Memory
         private void M_treeRootRun_UpdateTree()
         {
             RunTreeRun(Tree.eMode.Update);
-            RunTreeRun(Tree.eMode.RegWrite); 
+            RunTreeRun(Tree.eMode.RegWrite);
+            RunTreeRun(Tree.eMode.Init);
         }
 
         public void RunTreeRun(Tree.eMode mode)
@@ -268,7 +271,6 @@ namespace RootTools.Memory
         public Log m_log;
         public TreeRoot m_treeRootMemory;
         public TreeRoot m_treeRootRun;
-        public MemoryViewer m_viewer; 
         public MemoryTool(string id, IEngineer engineer, bool bMaster = true)
         {
             MEMORYSTATUSEX stats = GlobalMemoryStatusEx();
@@ -283,9 +285,8 @@ namespace RootTools.Memory
             m_treeRootMemory.UpdateTree += M_treeRootMemory_UpdateTree;
             m_treeRootRun = new TreeRoot(id, m_log);
             m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
-            RunTreeRun(Tree.eMode.RegRead);
             RunTreeMemory(Tree.eMode.RegRead);
-            m_viewer = new MemoryViewer(id, this, m_log);
+            RunTreeRun(Tree.eMode.RegRead);
             KillInspectProcess();
             InitThreadProcess();
         }

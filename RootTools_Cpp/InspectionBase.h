@@ -15,8 +15,8 @@ class InspectionBase
 public :
 	void CopyImageToBuffer(bool bDark);
 	void CheckConditions() const;
+	static int defectIdx;
 protected:
-
 	int m_nInspOffset = 10;
 	byte inspbuffer[2000][2000];
 	byte inspbuffer2[16000000];

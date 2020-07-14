@@ -2,11 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using RootTools;
 
 namespace RootTools.Control.Ajin
 {
-    public class AjinDIO : ObservableObject, IToolDIO
+    public class AjinDIO : IToolDIO
     {
         #region ListDIO
         AjinListDIO _listDI = new AjinListDIO();
@@ -37,8 +36,8 @@ namespace RootTools.Control.Ajin
         {
             if (tree.p_treeRoot.p_eMode == Tree.eMode.Init)
             {
-                m_nInputModule = tree.Set(m_nInputModule, 0, "InputModule", "Input 모듈 총 갯수", true, true);
-                m_nOutputModule = tree.Set(m_nOutputModule, 0, "OuputModule", "Output 모듈 총 갯수", true, true);
+                m_nInputModule = tree.Set(m_nInputModule, 0, "InputModule", "Input Module Count", true, true);
+                m_nOutputModule = tree.Set(m_nOutputModule, 0, "OuputModule", "Output Module Count", true, true);
             }
         }
         #endregion

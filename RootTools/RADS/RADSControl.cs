@@ -1,15 +1,56 @@
-﻿using System;
+﻿using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Timers;
+using System.Windows.Controls;
 
 namespace RootTools.RADS
 {
-	public class RADSControl : ObservableObject
+	public class RADSControl : ObservableObject, ITool
 	{
-		//기존의 CDlgbRealtimeADS의 역할을 이어받는 클래스
+		public string p_id { get; set; }
+		Log m_log;
+
+		public RADSControl(string id, Log log, bool bUseRADS)
+		{
+			p_id = id;
+			m_log = log;
+
+			p_connect = new RADSConnectControl(this, bUseRADS);
+			p_connect.SearchComplete += OnSearchComplete;
+
+			//if (bUseRADS == true)
+			//{
+			//	p_treeRoot = p_connect.p_CurrentController.p_TreeRoot;
+			//	m_timer = new Timer(100);
+			//	m_timer.Elapsed += Timer_Elapsed;
+			//	m_timer.Start();
+			//}
+		}
+
+		#region Tree
+		TreeRoot m_treeRoot = null;
+		public TreeRoot p_treeRoot
+		{
+			get { return m_treeRoot; }
+			set { SetProperty(ref m_treeRoot, value); }
+		}
+		#endregion
+
+		#region UI
+		public UserControl p_ui
+		{
+			get
+			{
+				RADSControl_UI ui = new RADSControl_UI();
+				ui.Init(this);
+				return (UserControl)ui;
+			}
+		}
+		#endregion
 
 		#region EventHandler
 		/// <summary>
@@ -69,24 +110,6 @@ namespace RootTools.RADS
 		}
 		#endregion
 
-		Timer timer { get; set; }
-
-		RADSConnectControl m_connect;
-		public RADSConnectControl p_connect
-		{
-			get
-			{
-				return m_connect;
-			}
-			set
-			{
-				SetProperty(ref m_connect, value);
-			}
-		}
-		public bool IsRun { get; set; }
-		public int AdsData { get; set; }
-		IEngineer m_engineer;
-
 		#region IsReady
 		/// <summary>
 		/// 컨트롤러와 통신이 완료되었고, 사용할 수 있는 상태인지 확인
@@ -100,18 +123,29 @@ namespace RootTools.RADS
 		}
 		#endregion
 
-		public RADSControl(IEngineer engineer)
-		{
-			m_engineer = engineer;
+		Timer m_timer { get; set; }
 
-			p_connect = new RADSConnectControl(m_engineer);
-			p_connect.SearchComplete += OnSearchComplete;
-			
-			timer = new Timer(100);
-			timer.Elapsed += Timer_Elapsed;
-			timer.Start();
+		RADSConnectControl m_connect;
+		public RADSConnectControl p_connect
+		{
+			get
+			{
+				return m_connect;
+			}
+			set
+			{
+				SetProperty(ref m_connect, value);
+			}
 		}
 
+		bool m_IsRun;
+		public bool p_IsRun
+		{
+			get { return m_IsRun; }
+			set { SetProperty(ref m_IsRun, value); }
+		}
+		public int AdsData { get; set; }
+		
 		private void OnSearchComplete()
 		{
 			if (this.SearchComplete != null)
@@ -128,17 +162,17 @@ namespace RootTools.RADS
 
 				if (p_connect.p_CurrentController.p_ADS_run == 0)
 				{
-					IsRun = false;//"Ready";
+					p_IsRun = false;//"Ready";
 				}
 				else if (p_connect.p_CurrentController.p_ADS_up > 0)
 				{
-					IsRun = true;
+					p_IsRun = true;
                     AdsData = p_connect.p_CurrentController.p_ADS_data * -1;
                     Console.WriteLine("AdsData : {0}", AdsData);
 				}
 				else
 				{
-					IsRun = true;
+					p_IsRun = true;
                     AdsData = p_connect.p_CurrentController.p_ADS_data;
                     Console.WriteLine("AdsData : {0}", AdsData);
 				}
@@ -152,8 +186,8 @@ namespace RootTools.RADS
 
 		public void Dispose()
 		{
-			timer.Stop();
-			timer.Dispose();
+			m_timer.Stop();
+			m_timer.Dispose();
 		}
 
 		public void ResetController()
@@ -187,6 +221,11 @@ namespace RootTools.RADS
 				if (this.Stopped != null)
 					this.Stopped();
 			}
+		}
+
+		public void ThreadStop()
+		{
+			
 		}
 	}
 }

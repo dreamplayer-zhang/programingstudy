@@ -10,8 +10,8 @@
         mc:Ignorable="d" d:DesignHeight="450"
         d:DesignWidth="800">
     <UserControl.Resources>
-        <local:TestConverter x:Key="TestConverters"></local:TestConverter>
-        <local:TestConverter2 x:Key="TestConverter2s"></local:TestConverter2>
+        <local:TestConverter x:Key="TestConverters"/>
+        <local:TestConverter2 x:Key="TestConverter2s"/>
     </UserControl.Resources>
     <Grid>
         <TabControl x:Name="tabControlTool">
@@ -81,9 +81,6 @@
                     <TextBlock Text="Pool 3GB" Grid.Row="1" Panel.ZIndex="10" VerticalAlignment="Center"></TextBlock>-->
                     <TabControl Grid.Row="2" x:Name="tabControlPool" />
                 </Grid>
-            </TabItem>
-            <TabItem Header="Viewer">
-                <local:MemoryViewer_UI x:Name="memoryViewerUI"/>
             </TabItem>
             <TabItem Header="Run">
                 <Grid>

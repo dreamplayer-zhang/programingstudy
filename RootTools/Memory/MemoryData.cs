@@ -29,6 +29,7 @@ namespace RootTools.Memory
                     OnPropertyChanged();
                     m_group.InitAddress();
                 }
+                while (m_aDraw.Count < value) m_aDraw.Add(new MemoryDraw(this)); 
             }
         }
 
@@ -196,98 +197,76 @@ namespace RootTools.Memory
         #endregion
 
         #region File Raw
-        const string c_sPath = "c:\\Memory";
-        public string SaveMemory(int nIndex, string sPath = c_sPath)
+        public string SaveMemory(string sFile)
         {
-            return SaveMemory(nIndex, 0, 0, p_sz.X, p_sz.Y, sPath); 
-        }
-
-        public string SaveMemory(int nIndex, int x0, int y0, int x1, int y1, string sPath = c_sPath)
-        {
-            if (x1 < x0) Swap(ref x0, ref x1);
-            if (y1 < y0) Swap(ref y0, ref y1);
-            if (x0 < 0) x0 = 0;
-            if (y0 < 0) y0 = 0; 
-            if (x1 > p_sz.X) x1 = p_sz.X;
-            if (y1 > p_sz.Y) y1 = p_sz.Y;
-            Directory.CreateDirectory(sPath);
-            string sID = m_group.m_pool.p_id + "." + m_group.p_id + "." + p_id;
-            Directory.CreateDirectory(sPath + "\\" + sID);
-            string sFile = sPath + "\\" + sID + "\\" + sID + "." + nIndex.ToString();
-            FileStream fs = null;
-            BinaryWriter bw = null;
-            try
+            string sTitle = sFile.Replace(".raw", ""); 
+            for (int nIndex = 0; nIndex < p_nCount; nIndex++)
             {
-                fs = new FileStream(sFile + ".raw", FileMode.Create);
-                bw = new BinaryWriter(fs);
-                unsafe
+                FileStream fs = null;
+                BinaryWriter bw = null;
+                try
                 {
-                    bw.Write(p_nByte);
-                    bw.Write(x0);
-                    bw.Write(y0);
-                    bw.Write(x1);
-                    bw.Write(y1);
-                    int w = (x1 - x0) * p_nByte; 
-                    for (int y = y0; y < y1; y++)
+                    fs = new FileStream(sTitle + nIndex.ToString("_000") + ".raw", FileMode.Create);
+                    bw = new BinaryWriter(fs);
+                    unsafe
                     {
-                        byte* p = (byte*)GetPtr(nIndex, x0, y);
-                        for (int n = 0; n < w; n++, p++) bw.Write(*p); 
+                        bw.Write(p_nByte);
+                        bw.Write(p_sz.X);
+                        bw.Write(p_sz.Y);
+                        int w = p_sz.X * p_nByte;
+                        for (int y = 0; y < p_sz.Y; y++)
+                        {
+                            byte* p = (byte*)GetPtr(nIndex, 0, y);
+                            for (int n = 0; n < w; n++, p++) bw.Write(*p);
+                        }
                     }
                 }
-            }
-            catch (Exception e) { return "Save " + sFile + " Error : " + e.Message; }
-            finally
-            {
-                if (bw != null) bw.Close();
-                if (fs != null) fs.Close();
+                catch (Exception e) { return "Save " + sFile + " Error : " + e.Message; }
+                finally
+                {
+                    if (bw != null) bw.Close();
+                    if (fs != null) fs.Close();
+                }
             }
             p_sInfo = "Save Memory Done : " + p_id; 
             return "OK";
         }
 
-        public string ReadMemory(int nIndex, string sPath = c_sPath)
+        public string ReadMemory(string sFile)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Filter = "RAW Files(*.raw)|*.raw";
-            if (dlg.ShowDialog() == false) return "RAW File not Found !!";
-            FileStream fs = null;
-            BinaryReader br = null;
-            try
+            string sTitle = sFile.Substring(0, sFile.Length - 7);
+            for (int nIndex = 0; nIndex < p_nCount; nIndex++)
             {
-                fs = new FileStream(dlg.FileName, FileMode.Open);
-                br = new BinaryReader(fs);
-                unsafe
+                FileStream fs = null;
+                BinaryReader br = null;
+                try
                 {
-                    int nByte = br.ReadInt32();
-                    if (nByte != p_nByte) return "p_nByte not Correct";
-                    int x0 = br.ReadInt32(); 
-                    int y0 = br.ReadInt32();
-                    int x1 = br.ReadInt32();
-                    int y1 = Math.Min(br.ReadInt32(), p_sz.Y);
-                    int wm = (p_sz.X - x0) * p_nByte;
-                    int wr = Math.Max((x1 - x0) * p_nByte - wm, 0); 
-                    for (int y = y0; y < y1; y++)
+                    fs = new FileStream(sTitle + nIndex.ToString("000") + ".raw", FileMode.Open);
+                    br = new BinaryReader(fs);
+                    unsafe
                     {
-                        byte* p = (byte*)GetPtr(nIndex, x0, y);
-                        for (int n = 0; n < wm; n++, p++) *p = br.ReadByte();
-                        for (int n = 0; n < wr; n++) br.ReadByte();
+                        int nByte = br.ReadInt32();
+                        if (nByte != p_nByte) return "p_nByte not Correct";
+                        int sX = Math.Min(br.ReadInt32(), p_sz.X);
+                        int sY = Math.Min(br.ReadInt32(), p_sz.Y);
+                        int wm = p_sz.X * p_nByte;
+                        int wr = Math.Max(sX * p_nByte - wm, 0);
+                        for (int y = 0; y < sY; y++)
+                        {
+                            byte* p = (byte*)GetPtr(nIndex, 0, y);
+                            for (int n = 0; n < wm; n++, p++) *p = br.ReadByte();
+                            for (int n = 0; n < wr; n++) br.ReadByte();
+                        }
                     }
                 }
-            }
-            catch (Exception e) { return "Read " + dlg.FileName + " Error : " + e.Message; }
-            finally
-            {
-                if (br != null) br.Close();
-                if (fs != null) fs.Close();
+                catch (Exception e) { return "Read " + sFile + " Error : " + e.Message; }
+                finally
+                {
+                    if (br != null) br.Close();
+                    if (fs != null) fs.Close();
+                }
             }
             return "OK";
-        }
-
-        void Swap(ref int n0, ref int n1)
-        {
-            int n = n0;
-            n0 = n1;
-            n1 = n; 
         }
         #endregion
 
@@ -464,6 +443,7 @@ namespace RootTools.Memory
         #endregion
 
         public MemoryGroup m_group;
+        public List<MemoryDraw> m_aDraw = new List<MemoryDraw>(); 
         Log m_log;
         public MemoryData(MemoryGroup group, string id, int nCount, int nByte, int xSize, int ySize, ref int gbOffset)
         {

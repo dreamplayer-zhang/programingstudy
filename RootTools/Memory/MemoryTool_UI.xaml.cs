@@ -19,13 +19,12 @@ namespace RootTools.Memory
         {
             m_memoryTool = memoryTool;
             this.DataContext = memoryTool;
-            treeRootUI.Init(memoryTool.m_treeRootRun);
-            memoryTool.RunTreeRun(Tree.eMode.Init); 
             treeRootMemoryUI.Init(memoryTool.m_treeRootMemory);
             memoryTool.RunTreeMemory(Tree.eMode.Init);
             m_memoryTool.OnChangeMemoryPool += M_memoryTool_OnChangeTool;
-            memoryViewerUI.Init(memoryTool.m_viewer); 
             InitTabControl();
+            treeRootUI.Init(memoryTool.m_treeRootRun);
+            memoryTool.RunTreeRun(Tree.eMode.Init);
         }
 
         private void M_memoryTool_OnChangeTool()

@@ -19,7 +19,6 @@ namespace Root_Vega
             Empty,
             Placed,
             Load,
-            Run,
         }
         eState _eState = eState.Empty;
         public eState p_eState
@@ -85,8 +84,7 @@ namespace Root_Vega
         {
             switch (p_eState)
             {
-                case eState.Load:
-                case eState.Run: return "OK";
+                case eState.Load: return "OK";
             }
             return p_id + " eState = " + p_eState.ToString();
         }
@@ -168,12 +166,12 @@ namespace Root_Vega
         #endregion
 
         #region Process
-        public void StartProcess(Vega_Process.Sequence sequence)
+        public void StartProcess()
         {
             if (p_infoReticle == null) return;
             Vega_Handler handler = (Vega_Handler)m_engineer.ClassHandler();
             handler.AddSequence(p_infoReticle);
-            handler.m_process.ReCalcSequence(sequence);
+            handler.m_process.ReCalcSequence();
             RunTreeReticle(Tree.eMode.Init);
         }
 

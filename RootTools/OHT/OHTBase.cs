@@ -17,11 +17,13 @@ namespace RootTools.OHT
             get { return _sInfo; }
             set
             {
-                if (value == "OK") return;
-                if (value == _sInfo) return; 
+                if (value == _sInfo) return;
                 _sInfo = value;
-                m_log.Error(value);
-                m_module.p_eState = ModuleBase.eState.Error; 
+                if (value != "OK")
+                {
+                    m_log.Error(value);
+                    m_module.p_eState = ModuleBase.eState.Error; 
+                }
                 OnPropertyChanged(); 
             }
         }
