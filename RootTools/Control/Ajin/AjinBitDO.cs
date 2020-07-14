@@ -1,6 +1,4 @@
-﻿using RootTools.Control;
-
-namespace RootTools.Control.Ajin
+﻿namespace RootTools.Control.Ajin
 {
     public class AjinBitDO : BitDO
     {
