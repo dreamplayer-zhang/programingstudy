@@ -68,6 +68,8 @@ namespace Root_Vega
 				_AlignFeatureDrawer.m_Stroke = MBrushes.BlueViolet;
 				_AlignFeatureDrawer.RectangleKeyValue = Key.D1;
 				alignEnabled = false;
+				
+				_SetRefDreawer();
 
 				p_ImageViewer.SetDrawer(p_RefFeatureDrawer);
 				p_ImageViewer.m_HistoryWorker = m_DrawHistoryWorker;
@@ -107,8 +109,8 @@ namespace Root_Vega
 				string temp = string.Empty;
 				var result = connector.SendQuery(query, ref temp);
 #if DEBUG
-				Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
-				Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
+				//Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
+				//Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
 #endif
 				int count;
 				if (int.TryParse(temp, out count))
@@ -123,6 +125,7 @@ namespace Root_Vega
 					}
 				}
 			}
+			connector.Close();
 		}
 
 		#region Property
@@ -374,6 +377,7 @@ namespace Root_Vega
 				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
 				Debug.WriteLine(string.Format("Status Clear : {0}", result));
 			}
+			connector.Close();
 		}
 
 		void ClearDrawList()
@@ -422,12 +426,14 @@ namespace Root_Vega
 						var bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
 						Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
 						var laplaceFeature = featureImage.Laplace(1);
+						//laplaceFeature.Save(@"D:\Test\feature.bmp");
 
 						CRect targetRect = new CRect(
 							new Point(feature.RoiRect.Center().X - feature.FeatureFindArea / 2.0, feature.RoiRect.Center().Y - feature.FeatureFindArea / 2.0),
 							new Point(feature.RoiRect.Center().X + feature.FeatureFindArea / 2.0, feature.RoiRect.Center().Y + feature.FeatureFindArea / 2.0));
 						Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImage(targetRect));
 						var laplaceSource = sourceImage.Laplace(1);
+						//laplaceSource.Save(@"D:\Test\source.bmp");
 
 						var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
 
@@ -455,6 +461,8 @@ namespace Root_Vega
 								//matches[y, x, 0] *= 256;
 							}
 						}
+						resultImage.Data = matches;
+						//resultImage.Save(@"D:\Test\result.bmp");
 						if (foundFeature)
 						{
 							//2. feature 중심위치가 확보되면 해당 좌표를 저장
@@ -528,6 +536,7 @@ namespace Root_Vega
 							}
 						}
 					}
+					//TODO : 회전보정은 나중에하기
 					if (alignKeyList.Count != 2)
 					{
 						//align 실패. 에러를 띄우거나 회전 좌표 보정을 하지 않음
@@ -544,7 +553,25 @@ namespace Root_Vega
 					//6. Start Postiion과 End Position, Inspection Offset을 이용하여 검사 영역을 생성한다. 우선은 일괄 생성을 대상으로 한다
 					var inspRect = new CRect(startPos, endPos);
 
+					var temp = new UIElementInfo(new Point(inspRect.Left, inspRect.Top), new Point(inspRect.Right, inspRect.Bottom));
+
+					System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+					rect.Width = inspRect.Width;
+					rect.Height = inspRect.Height;
+					System.Windows.Controls.Canvas.SetLeft(rect, inspRect.Left);
+					System.Windows.Controls.Canvas.SetTop(rect, inspRect.Top);
+					rect.StrokeThickness = 3;
+					rect.Stroke = MBrushes.Orange;
+
+					p_RefFeatureDrawer.m_ListShape.Add(rect);
+					p_RefFeatureDrawer.m_Element.Add(rect);
+					p_RefFeatureDrawer.m_ListRect.Add(temp);
+
+					p_ImageViewer.SetRoiRect();
+
 					int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, k);
+
+					m_Engineer.m_InspManager.SetStandardPos(nDefectCode, standardPos);
 
 					m_Engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
 							m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
@@ -553,7 +580,7 @@ namespace Root_Vega
 					//7. Strip검사를 시작한다
 				}
 			}
-			//m_Engineer.m_InspManager.StartInspection();//검사 시작!
+			m_Engineer.m_InspManager.StartInspection();//검사 시작!
 		}
 		void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor)
 		{
@@ -593,16 +620,19 @@ namespace Root_Vega
 			{
 				for (int i = 0; i < 2; i++)
 				{
-					var featureArea = p_AlignFeatureDrawer.m_ListRect[i];
-					var featureImage = p_ImageViewer.p_ImageData.GetRectImage(new CRect(featureArea.StartPos, featureArea.EndPos));
-					var targetName = string.Format("{0}_Align_{1}.bmp", SelectedROI.Name, SelectedROI.Position.AlignList.Count);
+					var featureArea = p_RefFeatureDrawer.m_ListRect[0];
+					var featureRect = new CRect(featureArea.StartPos, featureArea.EndPos);
+					var featureImageArr = p_ImageViewer.p_ImageData.GetRectByteArray(featureRect);
+					var targetName = string.Format("{0}_Align_{1}.bmp", SelectedROI.Name, SelectedROI.Position.ReferenceList.Count);
 					//TODO 이상하게 구현함. 나중에 수정 필요
-					featureImage.Save(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName), ImageFormat.Bmp);
+					Emgu.CV.Image<Gray, byte> temp = new Emgu.CV.Image<Gray, byte>(featureRect.Width, featureRect.Height);
+					temp.Bytes = featureImageArr;
+					temp.Save(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName));
 
 					AlignData tempFeature = new AlignData();
 					tempFeature.Name = targetName;
 					tempFeature.RoiRect = new CRect(featureArea.StartPos, featureArea.EndPos);
-					tempFeature.m_Feature = new ImageData(featureImage.Width, featureImage.Height);
+					tempFeature.m_Feature = new ImageData(featureRect.Width, featureRect.Height);
 					tempFeature.m_Feature.LoadImageSync(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName), new CPoint(0, 0));
 					SelectedROI.Position.AlignList.Add(tempFeature);
 				}
@@ -620,15 +650,18 @@ namespace Root_Vega
 			if (p_RefFeatureDrawer.m_ListRect.Count >= 1)
 			{
 				var featureArea = p_RefFeatureDrawer.m_ListRect[0];
-				var featureImage = p_ImageViewer.p_ImageData.GetRectImage(new CRect(featureArea.StartPos, featureArea.EndPos));
+				var featureRect = new CRect(featureArea.StartPos, featureArea.EndPos);
+				var featureImageArr = p_ImageViewer.p_ImageData.GetRectByteArray(featureRect);
 				var targetName = string.Format("{0}_Ref_{1}.bmp", SelectedROI.Name, SelectedROI.Position.ReferenceList.Count);
 				//TODO 이상하게 구현함. 나중에 수정 필요
-				featureImage.Save(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName), ImageFormat.Bmp);
+				Emgu.CV.Image<Gray, byte> temp = new Emgu.CV.Image<Gray, byte>(featureRect.Width, featureRect.Height);
+				temp.Bytes = featureImageArr;
+				temp.Save(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName));
 
 				Reference tempFeature = new Reference();
 				tempFeature.Name = targetName;
 				tempFeature.RoiRect = new CRect(featureArea.StartPos, featureArea.EndPos);
-				tempFeature.m_Feature = new ImageData(featureImage.Width, featureImage.Height);
+				tempFeature.m_Feature = new ImageData(featureRect.Width, featureRect.Height);
 				tempFeature.m_Feature.LoadImageSync(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName), new CPoint(0, 0));
 				SelectedROI.Position.ReferenceList.Add(tempFeature);
 

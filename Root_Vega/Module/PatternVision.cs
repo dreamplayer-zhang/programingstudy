@@ -120,7 +120,7 @@ namespace Root_Vega.Module
         public override void InitMemorys()
         {
             //forget
-            m_memoryMain = m_memoryPool.GetGroup("PatternVision").CreateMemory("Main", 1, 1, 1000, 1000);
+            m_memoryMain = m_memoryPool.GetGroup(App.sPatternGroup).CreateMemory(App.sPatternmem, 1, 1, 1000, 1000);
         }
         #endregion
 

@@ -57,7 +57,18 @@ namespace RootTools.Inspects
 						{
 							if (feature != null)
 							{
-								feature.Name = roi.Name + "_" + featureIdx.ToString() + ".bmp";
+								var targetName = string.Format("{0}_Ref_{1}.bmp", roi.Name, featureIdx);
+								feature.Name = targetName;
+								feature.m_Feature.SaveImageSync(Path.Combine(recipeDir, feature.Name));
+								featureIdx++;
+							}
+						}
+						foreach (var feature in roi.Position.AlignList)
+						{
+							if (feature != null)
+							{
+								var targetName = string.Format("{0}_Align_{1}.bmp", roi.Name, featureIdx);
+								feature.Name = targetName;
 								feature.m_Feature.SaveImageSync(Path.Combine(recipeDir, feature.Name));
 								featureIdx++;
 							}

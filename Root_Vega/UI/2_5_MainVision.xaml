@@ -146,6 +146,7 @@
 					</Expander>
 					<Expander Header="Align Parameters"
 							  Margin="0,0,0,10"
+							  Visibility="Collapsed"
 							  Foreground="White">
 						<StackPanel>
 							<Grid Margin="0,0,0,10">

@@ -306,8 +306,8 @@ namespace Root_Vega
 				string temp = string.Empty;
 				var result = connector.SendQuery(query, ref temp);
 #if DEBUG
-				Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
-				Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
+				//Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
+				//Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
 #endif
 				int count;
 				if (int.TryParse(temp, out count))
@@ -322,6 +322,7 @@ namespace Root_Vega
 					}
 				}
 			}
+			connector.Close();
 		}
 		/// <summary>
 		/// UI에 추가된 Defect을 빨간색 상자로 표시할 수 있도록 추가하는 메소드
@@ -399,6 +400,7 @@ namespace Root_Vega
 				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
 				Debug.WriteLine(string.Format("Status Clear : {0}", result));
 			}
+			connector.Close();
 		}
 
 		private void _startInsp()
@@ -480,10 +482,12 @@ namespace Root_Vega
 							p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
 							p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
 
-						m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_sideMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).GetMBOffset(),
-								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.X,
-								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.Y,
-								adjustAreaList[n], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
+							m_Engineer.m_InspManager.SetStandardPos(nDefectCode, new CPoint(inspAreaList[i].Left, inspAreaList[i].Top));
+
+							m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_sideMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).GetMBOffset(),
+									m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.X,
+									m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.Y,
+									adjustAreaList[n], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
 						}
 						p_ImageViewer_List[i].SetRoiRect();
 					}
