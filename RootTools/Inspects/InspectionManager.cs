@@ -36,9 +36,7 @@ namespace RootTools.Inspects
 
 		Thread inspThread;
 		Inspection[] InsepctionThread;
-#if DEBUG
 		StopWatch sw;
-#endif
 
 		int nThreadNum = 10;
 		public int nInspectionCount = 0;
@@ -62,11 +60,8 @@ namespace RootTools.Inspects
 		{
 			m_bProgress = false;
 			nInspectionCount = 0;
-#if DEBUG
 			sw = new StopWatch();
 			sw.Start();
-
-#endif
 
 			IsInitialized = true;
 
@@ -278,10 +273,8 @@ namespace RootTools.Inspects
 				}
 			}
 			nInspectionCount = 0;
-#if DEBUG
 			sw.Stop();
 			Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
-#endif
 			connector.Close();
 		}
 		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)

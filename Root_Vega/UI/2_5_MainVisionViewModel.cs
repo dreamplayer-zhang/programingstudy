@@ -68,7 +68,7 @@ namespace Root_Vega
 				_AlignFeatureDrawer.m_Stroke = MBrushes.BlueViolet;
 				_AlignFeatureDrawer.RectangleKeyValue = Key.D1;
 				alignEnabled = false;
-				
+
 				_SetRefDreawer();
 
 				p_ImageViewer.SetDrawer(p_RefFeatureDrawer);
@@ -102,30 +102,30 @@ namespace Root_Vega
 			//db에 주기적으로 접근하여 tempTable의 최대 개수를 확인
 			//최대개수와 currentDefectIndex의 차이가 발생한다면 currentDefectIndex와 최대 개수 사이의 defect UI를 갱신하고 currentDefectIndex를 최대 개수로 변경한다
 
-			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
-			if (connector.Open())
-			{
-				string query = "SELECT COUNT(*) FROM inspections.tempdata;";
-				string temp = string.Empty;
-				var result = connector.SendQuery(query, ref temp);
-#if DEBUG
-				//Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
-				//Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
-#endif
-				int count;
-				if (int.TryParse(temp, out count))
-				{
-					if (currentTotalIdx < count)
-					{
-						//current index부터 count까지 defect정보를 가져와 UI에 update하고 current index를 업데이트한다
+//			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+//			if (connector.Open())
+//			{
+//				string query = "SELECT COUNT(*) FROM inspections.tempdata;";
+//				string temp = string.Empty;
+//				var result = connector.SendQuery(query, ref temp);
+//#if DEBUG
+//				//Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
+//				//Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
+//#endif
+//				int count;
+//				if (int.TryParse(temp, out count))
+//				{
+//					if (currentTotalIdx < count)
+//					{
+//						//current index부터 count까지 defect정보를 가져와 UI에 update하고 current index를 업데이트한다
 
-						//countQurey = string.Format("SELECT * FROM inspections.tempdata WHERE ");//우선순위를 낮춘다. SQLite파일하고 이미지 출력하는게 먼저
+//						//countQurey = string.Format("SELECT * FROM inspections.tempdata WHERE ");//우선순위를 낮춘다. SQLite파일하고 이미지 출력하는게 먼저
 
-						currentTotalIdx = count;
-					}
-				}
-			}
-			connector.Close();
+//						currentTotalIdx = count;
+//					}
+//				}
+//			}
+//			connector.Close();
 		}
 
 		#region Property
@@ -429,8 +429,8 @@ namespace Root_Vega
 						//laplaceFeature.Save(@"D:\Test\feature.bmp");
 
 						CRect targetRect = new CRect(
-							new Point(feature.RoiRect.Center().X - feature.FeatureFindArea / 2.0, feature.RoiRect.Center().Y - feature.FeatureFindArea / 2.0),
-							new Point(feature.RoiRect.Center().X + feature.FeatureFindArea / 2.0, feature.RoiRect.Center().Y + feature.FeatureFindArea / 2.0));
+							new Point(feature.RoiRect.Center().X - (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Center().Y - (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0),
+							new Point(feature.RoiRect.Center().X + (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Center().Y + (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0));
 						Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImage(targetRect));
 						var laplaceSource = sourceImage.Laplace(1);
 						//laplaceSource.Save(@"D:\Test\source.bmp");

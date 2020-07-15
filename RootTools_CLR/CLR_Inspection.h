@@ -153,51 +153,63 @@ namespace RootTools_CLR
 			int bufferwidth = memwidth;
 			int bufferheight = memHeight;
 
-			pInspReticle->SetParams(buffer, bufferwidth, bufferheight, targetRect, 1, threadindex, GV, DefectSize);
-			pInspReticle->CheckConditions();
 
-			pInspReticle->CopyImageToBuffer(true);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
-			vTempResult = pInspReticle->StripInspection(nBandwidth, nIntensity, nDefectCode);
-
-			bool bResultExist = vTempResult.size() > 0;
-
-			if (bResultExist)
+			if (buffer != NULL)
 			{
-				MySQLDBConnector^ connector = gcnew MySQLDBConnector();
-				unsigned int errorCode = connector->OpenDatabase();
+				int bufferwidth = memwidth;
+				int bufferheight = memHeight;
 
-				for (int i = 0; i < vTempResult.size(); i++)
+				pInspReticle->SetParams(buffer, bufferwidth, bufferheight, targetRect, 1, threadindex, GV, DefectSize);
+				pInspReticle->CheckConditions();
+				pInspReticle->CopyImageToBuffer(true);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
+
+				vTempResult = pInspReticle->StripInspection(nBandwidth, nIntensity, nDefectCode);
+
+				bool bResultExist = vTempResult.size() > 0;
+
+
+				if (bResultExist)
 				{
-					if (errorCode == 0)
+					MySQLDBConnector^ connector = gcnew MySQLDBConnector();
+					unsigned int errorCode = connector->OpenDatabase();
+
+					for (int i = 0; i < vTempResult.size(); i++)
 					{
-						//DB Open성공
-
-						System::String^ query;
-						query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
-							vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
-							poolName, groupName, memoryName);
-
-						errorCode = connector->RunQuery(query);
-
 						if (errorCode == 0)
 						{
-							//success
-						}
-						else if (errorCode == 1146)
-						{
-							//table이 없음
-							//table생성 후 재시도
-							query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, memPOOL longtext DEFAULT NULL, memGROUP longtext DEFAULT NULL, memMEMORY longtext DEFAULT NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
+							//DB Open성공
+
+							System::String^ query;
+							query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
+								vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+								poolName, groupName, memoryName);
+
 							errorCode = connector->RunQuery(query);
+
 							if (errorCode == 0)
 							{
-								//insert재실행
-								query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10})';",
-									vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
-									poolName, groupName, memoryName);
-
+								//success
+							}
+							else if (errorCode == 1146)
+							{
+								//table이 없음
+								//table생성 후 재시도
+								query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, memPOOL longtext DEFAULT NULL, memGROUP longtext DEFAULT NULL, memMEMORY longtext DEFAULT NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
 								errorCode = connector->RunQuery(query);
-								if (errorCode != 0)
+								if (errorCode == 0)
+								{
+									//insert재실행
+									query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10})';",
+										vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+										poolName, groupName, memoryName);
+
+									errorCode = connector->RunQuery(query);
+									if (errorCode != 0)
+									{
+										//예외처리 진행. 될때까지 업로드 시도 시키는게 좋을것으로 보임
+									}
+								}
+								else
 								{
 									//예외처리 진행. 될때까지 업로드 시도 시키는게 좋을것으로 보임
 								}
@@ -209,12 +221,8 @@ namespace RootTools_CLR
 						}
 						else
 						{
-							//예외처리 진행. 될때까지 업로드 시도 시키는게 좋을것으로 보임
+							//DBOpen 실패
 						}
-					}
-					else
-					{
-						//DBOpen 실패
 					}
 				}
 			}
