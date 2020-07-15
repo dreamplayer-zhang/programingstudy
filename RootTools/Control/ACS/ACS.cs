@@ -2,20 +2,20 @@
 using SPIIPLUSCOM660Lib;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace RootTools.Control.ACS
 {
     public class ACS : IToolSet, IControl //forgetACS
     {
         #region Axis
-        int m_lAxis = 0;
         void GetAxisCount()
         {
             if (p_bConnect == false) return; 
             try
             {
                 string sAxis = m_channel.Transaction("?SYSINFO(13)");
-                m_lAxis = Convert.ToInt32(sAxis.Trim());
+                m_listAxis.m_lAxis = Convert.ToInt32(sAxis.Trim());
             }
             catch (Exception e) { m_log.Error("Get Axis Count Error : " + e.Message); }
         }
@@ -34,7 +34,7 @@ namespace RootTools.Control.ACS
             set
             {
                 if (_bConnect == value) return;
-                m_lAxis = 0;
+                m_listAxis.m_lAxis = 0;
                 _bConnect = value;
                 if (value)
                 {
@@ -54,14 +54,6 @@ namespace RootTools.Control.ACS
                 else m_channel.CloseComm();
                 RunTree(Tree.eMode.Init);
             }
-        }
-
-        void Connect()
-        {
-            if (m_bSimul) m_channel.OpenCommDirect();
-            else m_channel.OpenCommEthernetTCP(m_sIP, m_nPort);
-            GetAxisCount();
-            InitBuffer();
         }
 
         void RunTreeConnect(Tree tree)
@@ -130,6 +122,28 @@ namespace RootTools.Control.ACS
                 while (m_aBuffer.Count > nBuffer) m_aBuffer.RemoveAt(m_aBuffer.Count - 1);
             }
             catch (Exception e) { m_log.Error("Get Axis Count Error : " + e.Message); }
+        }
+        #endregion
+
+        #region Thread
+        bool m_bThread = false;
+        Thread m_thread;
+        void InitThread()
+        {
+            m_thread = new Thread(new ThreadStart(RunThread));
+            m_thread.Start(); 
+        }
+
+        void RunThread()
+        {
+            m_bThread = true;
+            Thread.Sleep(2000);
+            while (m_bThread)
+            {
+                Thread.Sleep(1);
+                //forget p_bEnable ??
+                m_dio.RunThread(); 
+            }
         }
         #endregion
 
@@ -290,6 +304,7 @@ namespace RootTools.Control.ACS
             m_listAxis.Init(id + ".Axis", engineer, this, bChannel);
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
+            InitThread(); 
         }
 
         public void ThreadStop()

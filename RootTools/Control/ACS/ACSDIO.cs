@@ -25,23 +25,16 @@ namespace RootTools.Control.ACS
         #endregion
 
         #region Thread
-        bool m_bThread = false;
-        Thread m_thread;
-        void RunThread()
+        public void RunThread()
         {
-            m_bThread = true;
-            Thread.Sleep(5000);
-            while (m_bThread)
+            try
             {
-                try
-                {
-                    Thread.Sleep(2);
-                    _listDI.ReadIO();
-                    _listDO.ReadIO();
-                    foreach (IDIO idio in p_listIDIO) idio.RunDIO();
-                }
-                catch (Exception) { }
+                Thread.Sleep(2);
+                _listDI.ReadIO();
+                _listDO.ReadIO();
+                foreach (IDIO idio in p_listIDIO) idio.RunDIO();
             }
+            catch (Exception) { }
         }
         #endregion
 
@@ -62,17 +55,10 @@ namespace RootTools.Control.ACS
             m_acs = acs; 
             m_log = acs.m_log;
             InitList();
-            m_thread = new Thread(new ThreadStart(RunThread));
-            m_thread.Start();
         }
 
         public void ThreadStop()
         {
-            if (m_bThread)
-            {
-                m_bThread = false;
-                m_thread.Join();
-            }
         }
     }
 }
