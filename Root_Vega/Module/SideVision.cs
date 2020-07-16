@@ -679,22 +679,12 @@ namespace Root_Vega.Module
             p_bStageVac = true;
             Thread.Sleep(200);
 
-            if (m_listAxis.Count == 0) return "OK";
-            if (p_eState == eState.Run) return "Invalid State : Run";
-            if (EQ.IsStop()) return "Home Stop";
-            foreach (Axis axis in m_listAxis)
-            {
-                if (axis != null) axis.ServoOn(true);
-            }
-            Thread.Sleep(200);
-            if (EQ.IsStop()) return "Home Stop";
-
             m_axisXY.p_axisX.StartHome(); 
-            if (m_axisXY.p_axisX.WaitReady() != "OK")
+            if (m_axisXY.WaitReady() != "OK")
                 p_bStageVac = false;
 
             m_axisXY.p_axisX.StartMove(-50000);
-            if (m_axisXY.p_axisX.WaitReady() != "OK")
+            if (m_axisXY.WaitReady() != "OK")
                 return "Error";
             m_axisXY.p_axisY.StartHome();
             m_axisZ.StartHome();
@@ -703,6 +693,10 @@ namespace Root_Vega.Module
                 return "Error";
             if (m_axisTheta.WaitReady() != "OK")
                 return "Error";
+            //m_axisXY.p_axisX.Move(0);
+            //if (m_axisXY.WaitReady() != "OK")
+            //    return "Error";d
+            //p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             p_bStageVac = false;
             return p_sInfo;
@@ -922,9 +916,9 @@ namespace Root_Vega.Module
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
-                        if (m_module.Run(axisXY.p_axisX.StartMove(-50000)))
+                        if (m_module.Run(axisXY.p_axisX.StartMove(-70000)))
                             return p_sInfo;
-                        if (m_module.Run(axisXY.p_axisX.WaitReady()))
+                        if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
                         if (m_module.Run(axisTheta.StartMove(fPosTheta)))
                             return p_sInfo;
@@ -938,10 +932,6 @@ namespace Root_Vega.Module
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                        //if (m_module.Run(axisXY.p_axisX.WaitReady()))
-                        //    return p_sInfo;
-                        //if (m_module.Run(axisXY.p_axisY.WaitReady()))
-                        //    return p_sInfo;
 
                         /* Trigger Set*/
                         double yTrigger0 = m_rpAxis.Y - yAxis / 2;
@@ -958,7 +948,7 @@ namespace Root_Vega.Module
                         m_grabMode.StartGrab(mem, m_cpMemory, nLinesY);
                         if (m_module.Run(axisXY.p_axisY.StartMove(yPos1, nScanSpeed)))
                             return p_sInfo;
-                        if (m_module.Run(axisXY.p_axisY.WaitReady()))
+                        if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 

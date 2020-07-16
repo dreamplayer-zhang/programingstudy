@@ -1,7 +1,6 @@
 ﻿using RootTools.Trees;
-using SPIIPLUSCOM660Lib;
+using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace RootTools.Control.ACS
 {
@@ -45,51 +44,25 @@ namespace RootTools.Control.ACS
                 m_log.Error("p_sInfo = " + value);
             }
         }
-
-        StopWatch m_swAXM = new StopWatch();
-        uint AXM(string sFunc, uint uResult)
-        {
-            if (uResult == 0) return uResult;
-            if (m_log == null) return uResult;
-            if (m_swAXM.ElapsedMilliseconds < 1000) return uResult;
-            p_sInfo = sFunc + " ACS Error = " + uResult.ToString();
-            m_log.Error(m_id + "." + p_sInfo);
-            m_swAXM.Start();
-            return uResult;
-        }
-
-        string Run(string sFunc, string sError)
-        {
-            if (sError == "OK") return sError;
-            if (m_log == null) return sError;
-            if (m_swAXM.ElapsedMilliseconds < 1000) return sError;
-            p_sInfo = sFunc + " ACS Error = " + sError;
-            m_log.Error(m_id + "." + p_sInfo);
-            m_swAXM.Start();
-            return sError;
-        }
         #endregion
 
-        #region Thread InitAxis
-        int m_lAxisACS = 0;
-        string InitAxis()
+        #region Thread Check
+        public void RunThreadCheck()
         {
-            //AXM("AxmInfoGetAxisCount", CAXM.AxmInfoGetAxisCount(ref m_lAxisACS));
-            if (m_bChannel == false) return "Init Axis Skip : ACS";
-            m_thread = new Thread(new ThreadStart(RunThread));
-            m_thread.Start();
-            return "OK";
+            try
+            {
+                Array aLimit = m_acs.m_channel.ReadVariableAsVector("FAULT", -1, 0, m_lAxis); 
+                foreach (ACSAxis axis in m_aAxis) axis.RunThreadCheck(aLimit);
+            }
+            catch (Exception e) { LogError(m_id + "ReadVariableAsVector Error : " + e.Message); }
         }
 
-        bool m_bThread = false;
-        Thread m_thread;
-        void RunThread()
+        StopWatch m_swError = new StopWatch();
+        void LogError(string sError)
         {
-            m_bThread = true;
-            while (m_bThread)
-            {
-                Thread.Sleep(1);
-            }
+            if (m_swError.ElapsedMilliseconds < 5000) return;
+            m_swError.Restart();
+            p_sInfo = sError;
         }
         #endregion
 
@@ -105,24 +78,19 @@ namespace RootTools.Control.ACS
             m_acs = acs; 
             m_bChannel = bChannel;
             m_log = LogView.GetLog(id);
-            Run("Init Axis Error (ReStart SW) : ", InitAxis());
         }
 
         public void ThreadStop()
         {
             m_log.Info("ThreadStop Start");
-            if (m_bThread)
-            {
-                m_bThread = false;
-                m_thread.Join();
-            }
             foreach (ACSAxis axis in m_aAxis) axis.ThreadStop();
             m_log.Info("ThreadStop Done");
         }
 
+        public int m_lAxis = 0;
         public void RunTree(Tree tree)
         {
-            tree.Set(m_lAxisACS, m_lAxisACS, "Detect", "Detected Axis Count", true, true);
+            tree.Set(m_lAxis, m_lAxis, "Detect", "Detected Axis Count", true, true);
         }
 
         public void RunEmergency()

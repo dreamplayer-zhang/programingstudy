@@ -67,7 +67,15 @@ namespace RootTools.Control.ACS
                 p_posActual = m_acs.m_channel.GetFPosition(m_nAxis);
                 p_vNow = m_acs.m_channel.GetRVelocity(m_nAxis); 
             }
-            catch (Exception e) { p_sInfo = p_id + " Check Position & Velocity Error : " + e.Message; }
+            catch (Exception e) { LogErrorPosition(p_id + " Check Position & Velocity Error : " + e.Message); }
+        }
+
+        StopWatch m_swErrorPosition = new StopWatch();
+        void LogErrorPosition(string sError)
+        {
+            if (m_swErrorPosition.ElapsedMilliseconds < 5000) return;
+            m_swErrorPosition.Restart();
+            p_sInfo = sError; 
         }
         #endregion
 
@@ -332,7 +340,7 @@ namespace RootTools.Control.ACS
         #endregion
 
         #region Thread Sensor
-        void RunThreadCheck_Sensor()
+        void RunThreadCheck_Sensor(Array aLimit)
         {
             if (p_bConnect == false) return; 
             try
@@ -340,15 +348,15 @@ namespace RootTools.Control.ACS
                 int nMotor = p_channel.GetMotorState(m_nAxis);
                 p_bSeroOn = ((nMotor & p_channel.ACSC_MST_ENABLE) != 0);
                 p_sensorInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
+                int nLimit = (int)aLimit.GetValue(m_nAxis);
+                p_sensorMinusLimit = (nLimit & p_channel.ACSC_SAFETY_LL) != 0;
+                p_sensorPlusLimit = (nLimit & p_channel.ACSC_SAFETY_RL) != 0;
             }
-            catch (Exception e) { p_sInfo = p_id + " Thread Check Sensor Error : " + e.Message; }
+            catch (Exception e) { LogErrorSensor(p_id + " Thread Check Sensor Error : " + e.Message); }
             //uint uRead = 0;
             //uint uReadM = 0;
             //AXM("AxmHomeReadSignal", CAXM.AxmHomeReadSignal(m_nAxis, ref uRead));
             //p_sensorHome = (uRead > 0);
-            //AXM("AxmSignalReadLimit", CAXM.AxmSignalReadLimit(m_nAxis, ref uRead, ref uReadM));
-            //p_sensorMinusLimit = (uReadM > 0);
-            //p_sensorPlusLimit = (uRead > 0);
             //AXM("AxmSignalReadServoAlarm", CAXM.AxmSignalReadServoAlarm(m_nAxis, ref uRead));
             //p_sensorAlarm = (uRead > 0);
             //if (m_eEmergency != eSensorMethod.UNUSED)
@@ -362,20 +370,25 @@ namespace RootTools.Control.ACS
                 Thread.Sleep(100);
             }
         }
+
+        StopWatch m_swErrorSensor = new StopWatch();
+        void LogErrorSensor(string sError)
+        {
+            if (m_swErrorSensor.ElapsedMilliseconds < 5000) return;
+            m_swErrorSensor.Restart();
+            p_sInfo = sError;
+        }
         #endregion
 
         #region Thread
         bool m_bThread = false;
         Thread m_threadRun;
-        Thread m_threadCheck;
         void InitThread()
         {
             if (m_bThread) return;
             m_bThread = true;
             m_threadRun = new Thread(new ThreadStart(RunThread));
-            m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
             m_threadRun.Start();
-            m_threadCheck.Start();
         }
 
         void RunThread()
@@ -420,18 +433,12 @@ namespace RootTools.Control.ACS
             }
         }
 
-        void RunThreadCheck()
+        public void RunThreadCheck(Array aLimit)
         {
-            //AXM("AxmSignalWriteOutput", CAXM.AxmSignalWriteOutput(m_nAxis, 0));
-            Thread.Sleep(2000);
-            while (m_bThread)
+            if (m_nAxis >= 0)
             {
-                Thread.Sleep(1);
-                if (m_nAxis >= 0)
-                {
-                    RunThreadCheck_Sensor();
-                    RunThreadCheck_Position();
-                }
+                RunThreadCheck_Sensor(aLimit);
+                RunThreadCheck_Position();
             }
         }
         #endregion
@@ -471,7 +478,6 @@ namespace RootTools.Control.ACS
             {
                 m_bThread = false;
                 m_threadRun.Join();
-                m_threadCheck.Join();
             }
         }
     }

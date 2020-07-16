@@ -65,8 +65,6 @@ namespace Root_Vega.Setting
             p_timerControl = p_PatternVision.m_RADSControl;
             p_timerControl.SearchComplete += SetEvent;
             p_CamRADS = p_PatternVision.m_CamRADS;
-
-            //p_timerControl.UpdateDeviceInfo();
         }
 
         string m_strLabel;
@@ -93,7 +91,6 @@ namespace Root_Vega.Setting
 
         void GetDeviceInfo()
         {
-            //p_timerControl.UpdateDeviceInfo();
             bool bUseRADS = false;
             foreach (GrabMode gm in m_PatternVision.m_aGrabMode)
             {
@@ -129,11 +126,15 @@ namespace Root_Vega.Setting
 
         void StartADS()
         {
-            m_timerControl.m_timer.Start();
-            p_timerControl.p_IsRun = true;
-            p_timerControl.StartRADS();
-
+            Thread thread = new Thread(new ThreadStart(_StartADS));
+            thread.Start();
+            
             return;
+        }
+
+        void _StartADS()
+        {
+            p_timerControl.StartRADS();
         }
 
         public RelayCommand StartADSCommand
@@ -146,8 +147,6 @@ namespace Root_Vega.Setting
 
         void StopADS()
         {
-            p_timerControl.m_timer.Stop();
-            p_timerControl.p_IsRun = false;
             p_timerControl.StopRADS();
             return;
         }

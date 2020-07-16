@@ -106,7 +106,18 @@ namespace RootTools.Control
         public List<string> m_asPos = new List<string>(); 
         public ObservableCollection<string> p_asPos { get; set; }
         public string p_strSelPos { get; set; }
-        
+        double _dRelPos = 0.0;
+        public double p_dRelPos
+        {
+            get { return _dRelPos; }
+            set
+            {
+                if (_dRelPos == value) return;
+                _dRelPos = value;
+                OnPropertyChanged();
+            }
+        }
+
         public void AddPos(params string[] asPos)
         {
             foreach (string sPos in asPos) AddPos(sPos);
@@ -224,7 +235,7 @@ namespace RootTools.Control
             if (vJog == 0) return "OK";
             double fPosNow = p_posCommand;
             if (m_bSWLimit[0] && (vJog < 0) && (fPosNow <= m_aPos[p_asPos[0]])) return "SW Minus Limit Error";
-            if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[p_asPos[1]])) return "SW Plus Limit Error";
+            if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[p_asPos[2]])) return "SW Plus Limit Error";
             return "OK";
         }
 
@@ -608,13 +619,13 @@ namespace RootTools.Control
         private void MJogFast()
         {
             if (p_eState > Axis.eState.Ready) return;
-            Jog(-0.31, eSpeed.Jog.ToString());
+            Jog(-0.31);
         }
 
         private void PJogFast()
         {
             if (p_eState > Axis.eState.Ready) return;
-            Jog(0.31, eSpeed.Jog.ToString());
+            Jog(0.31);
         }
 
         private void JogFinish()
@@ -627,6 +638,34 @@ namespace RootTools.Control
         {
             if (p_eState > Axis.eState.Ready) return;
             StartMove(p_strSelPos, 0, eSpeed.Move.ToString());
+        }
+
+        private void MinusRelativeMove()
+        {
+            int nDir = -1;
+
+            if (p_eState > Axis.eState.Ready) return;
+            try
+            {
+                double dPos = p_dRelPos;
+                double fPos = p_posCommand + nDir * dPos;
+                StartMove(fPos, eSpeed.Move.ToString());
+            }
+            catch (Exception) { }
+        }
+
+        private void PlusRelativeMove()
+        {
+            int nDir = 1;
+
+            if (p_eState > Axis.eState.Ready) return;
+            try
+            {
+                double dPos = p_dRelPos;
+                double fPos = p_posCommand + nDir * dPos;
+                StartMove(fPos, eSpeed.Move.ToString());
+            }
+            catch (Exception) { }
         }
 
         public RelayCommand MJogFastCommand
@@ -665,6 +704,28 @@ namespace RootTools.Control
             get
             {
                 return new RelayCommand(Move);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand MinusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MinusRelativeMove);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand PlusRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(PlusRelativeMove);
             }
             set
             {

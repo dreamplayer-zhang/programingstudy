@@ -9,6 +9,7 @@
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
              xmlns:Axis="clr-namespace:RootTools.Control.Ajin;assembly=RootTools"
              xmlns:Dalsa="clr-namespace:RootTools.Camera.Dalsa;assembly=RootTools"
+             xmlns:behavior="clr-namespace:mousebehavior"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d"
              d:DesignHeight="726"
@@ -1361,7 +1362,7 @@
                                                 <Border Grid.Column="1">
                                                     <TextBox VerticalAlignment="Center"
                                                              Background="{PriorityBinding}"
-                                                             Text="{Binding p_axisXY.p_axisY.p_dRelPos}"
+                                                             Text="{Binding p_dRelPos}"
                                                              Foreground="White"
                                                              HorizontalAlignment="Center"
                                                              FontSize="20" />
