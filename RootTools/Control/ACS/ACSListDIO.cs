@@ -118,7 +118,7 @@ namespace RootTools.Control.ACS
         {
             m_lPort = tree.Set(m_lPort, 1, "Count", "DIO Port Count");
             InitModule();
-            RunTreePort(tree.GetTree(m_id + ".Port")); 
+            RunTreePort(tree.GetTree(m_id)); 
             SetModuleOffset();
         }
 
@@ -126,7 +126,7 @@ namespace RootTools.Control.ACS
         {
             for (int n = 0; n < m_lPort; n++)
             {
-                m_aPort[n] = tree.Set(m_aPort[n], -1, "Port" + n.ToString("00"), "DIO Port Number"); 
+                m_aPort[n] = tree.Set(m_aPort[n], -1, n.ToString("00"), "DIO Port Number"); 
             }
         }
 

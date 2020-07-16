@@ -172,8 +172,6 @@ namespace RootTools.Control.ACS
         }
         #endregion
 
-        //=======================================================
-
         #region Home
         public override string StartHome()
         {
@@ -184,30 +182,10 @@ namespace RootTools.Control.ACS
             }
             p_sInfo = base.StartHome();
             if (p_sInfo != "OK") return p_sInfo;
-            //if (AXM("AxmHomeSetMethod", CAXM.AxmHomeSetMethod(m_nAxis, (int)m_eHomeDir, (uint)m_eHomeSignal, (uint)m_eHomeZPhase, 1000, 0)) != 0) return p_sInfo;
-            //Speed v0 = GetSpeedValue(eSpeed.Home_First);
-            //Speed v1 = GetSpeedValue(eSpeed.Home_Last);
-            //if (AXM("AxmHomeSetVel", CAXM.AxmHomeSetVel(m_nAxis, v0.m_v, v0.m_v, v1.m_v, v1.m_v, v0.m_acc, v1.m_acc)) != 0) return p_sInfo;
-            //if (AXM("AxmHomeSetStart", CAXM.AxmHomeSetStart(m_nAxis)) != 0) return p_sInfo;
+            p_sInfo = m_acs.m_aBuffer[m_nAxis].Run();
+            if (p_sInfo != "OK") return p_sInfo;
             p_eState = eState.Home;
             Thread.Sleep(10);
-            return "OK";
-        }
-
-        const uint c_nAlarmReset = 0x02;
-        public override string ResetAlarm()
-        {
-            uint nOutput = 0;
-            if (p_sensorAlarm == false) return "OK";
-            p_sInfo = "Reset Alarm";
-            //if (AXM("AxmSignalReadOutput", CAXM.AxmSignalReadOutput(m_nAxis, ref nOutput)) != 0) return p_sInfo;
-            //nOutput |= c_nAlarmReset;
-            //if (AXM("AxmSignalWriteOutput", CAXM.AxmSignalWriteOutput(m_nAxis, nOutput)) != 0) return p_sInfo;
-            //Thread.Sleep(50);
-            //nOutput -= c_nAlarmReset;
-            //if (AXM("AxmSignalWriteOutput", CAXM.AxmSignalWriteOutput(m_nAxis, nOutput)) != 0) return p_sInfo;
-            p_eState = eState.Init;
-            Thread.Sleep(100);
             return "OK";
         }
 
@@ -219,57 +197,15 @@ namespace RootTools.Control.ACS
             {
                 if (bOn) p_channel.Enable(m_nAxis);
                 else p_channel.Disable(m_nAxis);
-                p_log.Info(p_id + " Servo On = " + bOn.ToString()); 
+                p_log.Info(p_id + " Servo On = " + bOn.ToString());
             }
             catch (Exception e) { p_sInfo = p_id + " ServoOn Error : " + e.Message; }
             if (bOn == false) p_eState = eState.Init;
             Thread.Sleep(100);
         }
-
-        enum eMoveDir
-        {
-            DIR_CCW,
-            DIR_CW
-        }
-        eMoveDir m_eHomeDir = eMoveDir.DIR_CCW;
-
-        enum eHomeSignal
-        {
-            PosEndLimit,
-            NegEndLimit,
-            notUse2,
-            notUse3,
-            HomeSensor,
-            EncodZPhase,
-            UniInput02,
-            UniInput03
-        }
-        eHomeSignal m_eHomeSignal = eHomeSignal.HomeSensor;
-
-        enum eHomeZPhase
-        {
-            NotUse,
-            Plus,
-            Minus
-        }
-        eHomeZPhase m_eHomeZPhase = eHomeZPhase.NotUse;
-
-        void GetAxisStatusHome()
-        {
-            int i = 0; uint u0 = 0, u1 = 0; double f0 = 0, f1 = 0;
-            //AXM("AxmHomeGetMethod", CAXM.AxmHomeGetMethod(m_nAxis, ref i, ref u0, ref u1, ref f0, ref f1));
-            //m_eHomeDir = (eMoveDir)i;
-            //m_eHomeSignal = (eHomeSignal)u0;
-            //m_eHomeZPhase = (eHomeZPhase)u1;
-        }
-
-        void RunTreeSettingHome(Tree tree)
-        {
-            m_eHomeDir = (eMoveDir)tree.Set(m_eHomeDir, m_eHomeDir, "Dir", "Search Home Direction");
-            m_eHomeSignal = (eHomeSignal)tree.Set(m_eHomeSignal, m_eHomeSignal, "Signal", "Search Home Sensor");
-            m_eHomeZPhase = (eHomeZPhase)tree.Set(m_eHomeZPhase, m_eHomeZPhase, "ZPhase", "Search Home ZPhase");
-        }
         #endregion
+
+        //=======================================================
 
         #region Trigger
         bool m_bLevel = true;
@@ -456,7 +392,6 @@ namespace RootTools.Control.ACS
         {
             m_treeRootSetting.p_eMode = mode;
             RunTreeSettingProperty(m_treeRootSetting.GetTree("Property"));
-            RunTreeSettingHome(m_treeRootSetting.GetTree("Home"));
             RunTreeSettingTrigger(m_treeRootSetting.GetTree("Trigger"));
         }
         #endregion

@@ -70,13 +70,11 @@ namespace RootTools.Control.ACS
         Log m_log;
         IEngineer m_engineer;
         ACS m_acs; 
-        bool m_bChannel = false;
-        public void Init(string id, IEngineer engineer, ACS acs, bool bChannel)
+        public void Init(string id, IEngineer engineer, ACS acs)
         {
             m_id = id;
             m_engineer = engineer;
             m_acs = acs; 
-            m_bChannel = bChannel;
             m_log = LogView.GetLog(id);
         }
 
