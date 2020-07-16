@@ -53,6 +53,8 @@ namespace RootTools.Control
         }
 
         public Log p_log { get; set; }
+
+        public double p_dRelPos { get; set; }
         #endregion
 
         #region UI
@@ -629,6 +631,32 @@ namespace RootTools.Control
             StartMove(p_strSelPos, 0, eSpeed.Move.ToString());
         }
 
+        private void MRelativeMove()
+        {
+            int nDir = -1;
+            if (p_eState > Axis.eState.Ready) return;
+            try
+            {
+                double dPos = Convert.ToInt32(p_dRelPos);
+                double fPos = p_posCommand + (nDir * dPos);
+                StartMove(fPos, eSpeed.Move.ToString());
+            }
+            catch (Exception) { }
+        }
+
+        private void PRelativeMove()
+        {
+            int nDir = 1;
+            if (p_eState > Axis.eState.Ready) return;
+            try
+            {
+                double dPos = Convert.ToInt32(p_dRelPos);
+                double fPos = p_posCommand + (nDir * dPos);
+                StartMove(fPos, eSpeed.Move.ToString());
+            }
+            catch (Exception) { }
+        }
+
         public RelayCommand MJogFastCommand
         {
             get
@@ -665,6 +693,28 @@ namespace RootTools.Control
             get
             {
                 return new RelayCommand(Move);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand MRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MRelativeMove);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand PRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(PRelativeMove);
             }
             set
             {
