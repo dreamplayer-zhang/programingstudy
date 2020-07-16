@@ -19,6 +19,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button x:Name="buttonOpenMot" Content="Open Mot" Width="70"  Click="ButtonOpenMot_Click" Margin="3"/>
+            <Button x:Name="buttonSaveMot" Content="Save Mot" Width="70"  Click="ButtonSaveMot_Click" Margin="3"/>
             <Label Content="{Binding p_sInfo}" Margin="3"/>
         </StackPanel>
         <ComboBox Grid.Row="1" x:Name="comboAxis" SelectionChanged="comboAxis_SelectionChanged"/>

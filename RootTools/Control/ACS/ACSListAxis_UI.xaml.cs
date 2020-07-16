@@ -62,6 +62,16 @@ namespace RootTools.Control.ACS
             comboAxis.ItemsSource = m_asAxis;
         }
 
+        private void ButtonOpenMot_Click(object sender, RoutedEventArgs e)
+        {
+            //m_listAxis.LoadMot();
+        }
+
+        private void ButtonSaveMot_Click(object sender, RoutedEventArgs e)
+        {
+            //m_listAxis.SaveMot();
+        }
+
         List<string> m_asAxis = new List<string>();
         private void comboAxis_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

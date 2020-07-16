@@ -1,6 +1,7 @@
 ﻿using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace RootTools.Control.ACS
 {
@@ -24,23 +25,23 @@ namespace RootTools.Control.ACS
         #endregion
 
         #region Thread
-        public void RunThreadCheck()
+        bool m_bThread = false;
+        Thread m_thread;
+        void RunThread()
         {
-            try
+            m_bThread = true;
+            Thread.Sleep(5000);
+            while (m_bThread)
             {
-                _listDI.ReadIO();
-                _listDO.ReadIO();
-                foreach (IDIO idio in p_listIDIO) idio.RunDIO();
+                try
+                {
+                    Thread.Sleep(2);
+                    _listDI.ReadIO();
+                    _listDO.ReadIO();
+                    foreach (IDIO idio in p_listIDIO) idio.RunDIO();
+                }
+                catch (Exception) { }
             }
-            catch (Exception e) { LogError("DIO Thread Check Error : " + e.Message); }
-        }
-
-        StopWatch m_swError = new StopWatch();
-        void LogError(string sError)
-        {
-            if (m_swError.ElapsedMilliseconds < 5000) return;
-            m_swError.Restart();
-            m_log.Error(m_id + " " + sError); 
         }
         #endregion
 
@@ -61,10 +62,17 @@ namespace RootTools.Control.ACS
             m_acs = acs; 
             m_log = acs.m_log;
             InitList();
+            m_thread = new Thread(new ThreadStart(RunThread));
+            m_thread.Start();
         }
 
         public void ThreadStop()
         {
+            if (m_bThread)
+            {
+                m_bThread = false;
+                m_thread.Join();
+            }
         }
     }
 }

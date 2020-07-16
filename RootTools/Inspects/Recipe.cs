@@ -17,7 +17,7 @@ using System.Xml.Serialization;
 
 namespace RootTools.Inspects
 {
-	public class VegaRecipe : Recipe
+	public class VegaRecipe:Recipe
 	{
 		VegaRecipeData vegaRecipeData = new VegaRecipeData();
 		public VegaRecipeData VegaRecipeData
@@ -53,23 +53,12 @@ namespace RootTools.Inspects
 					int featureIdx = 0;
 					if (roi != null)
 					{
-						foreach (var feature in roi.Position.ReferenceList)
+						foreach (var feature in roi.Position.FeatureList)
 						{
 							if (feature != null)
 							{
-								var targetName = string.Format("{0}_Ref_{1}.bmp", roi.Name, featureIdx);
-								feature.Name = targetName;
-								feature.m_Feature.SaveImageSync(Path.Combine(recipeDir, feature.Name));
-								featureIdx++;
-							}
-						}
-						foreach (var feature in roi.Position.AlignList)
-						{
-							if (feature != null)
-							{
-								var targetName = string.Format("{0}_Align_{1}.bmp", roi.Name, featureIdx);
-								feature.Name = targetName;
-								feature.m_Feature.SaveImageSync(Path.Combine(recipeDir, feature.Name));
+								feature.FeatureFileName = roi.Name + "_" + featureIdx.ToString() + ".bmp";
+								feature.m_Feature.SaveImageSync(Path.Combine(recipeDir, feature.FeatureFileName));
 								featureIdx++;
 							}
 						}
@@ -92,7 +81,6 @@ namespace RootTools.Inspects
 		public override void Load(string filePath)
 		{
 			Loaded = false;
-			RecipePath = filePath;
 
 			XmlSerializer serializer = new XmlSerializer(typeof(VegaRecipe));
 			VegaRecipe result = new VegaRecipe();
@@ -110,9 +98,9 @@ namespace RootTools.Inspects
 			//feature data load
 			foreach (var roi in result.vegaRecipeData.RoiList)
 			{
-				foreach (var feature in roi.Position.ReferenceList)
+				foreach (var feature in roi.Position.FeatureList)
 				{
-					string imageTargetPath = System.IO.Path.Combine(Path.GetDirectoryName(filePath), feature.Name);
+					string imageTargetPath = System.IO.Path.Combine(Path.GetDirectoryName(filePath), feature.FeatureFileName);
 					//TODO : Image 정보를 별도로 넣는 것이 효율적일 것으로 보임
 					feature.m_Feature = new ImageData(feature.RoiRect.Width, feature.RoiRect.Height);
 					feature.m_Feature.LoadImageSync(imageTargetPath, new CPoint(0, 0));
@@ -151,7 +139,6 @@ namespace RootTools.Inspects
 		#endregion
 
 		[XmlIgnore] public string RecipeName { get; set; }
-		[XmlIgnore] public string RecipePath { get; set; }
 		RecipeData recipeData = new RecipeData();
 		public RecipeData RecipeData
 		{
@@ -719,7 +706,6 @@ namespace RootTools.Inspects
 			}
 		}
 		#endregion
-
 	}
 	public class StripParamData : BaseParamData
 	{
@@ -731,9 +717,6 @@ namespace RootTools.Inspects
 			_intensity = new Param<int>(120, 0, int.MaxValue);
 			TargetLabelText = "GV";//Strip은 무조건 절대검사
 			Name = "StripParameter";
-
-			_InspAreaWidth = new Param<decimal>(5000, 0, decimal.MaxValue);
-			_InspAreaHeight = new Param<decimal>(5000, 0, decimal.MaxValue);
 		}
 
 		#region Intensity
@@ -770,38 +753,6 @@ namespace RootTools.Inspects
 				RaisePropertyChanged();
 			}
 		}
-		#endregion
-
-		#region InspAreaWidth
-		Param<decimal> _InspAreaWidth;
-		public decimal InspAreaWidth
-		{
-			get { return _InspAreaWidth._value; }
-			set
-			{
-				if (_InspAreaWidth._value == value)
-					return;
-				_InspAreaWidth._value = value;
-				RaisePropertyChanged();
-			}
-		}
-
-		#endregion
-
-		#region InspAreaHeight
-		Param<decimal> _InspAreaHeight;
-		public decimal InspAreaHeight
-		{
-			get { return _InspAreaHeight._value; }
-			set
-			{
-				if (_InspAreaHeight._value == value)
-					return;
-				_InspAreaHeight._value = value;
-				RaisePropertyChanged();
-			}
-		}
-
 		#endregion
 	}
 
@@ -842,157 +793,19 @@ namespace RootTools.Inspects
 			SavePoint = -1;
 		}
 	}
-	public class Position : ObservableObject
+	public class Position
 	{
-		public List<Reference> ReferenceList = new List<Reference>();
-		public List<AlignData> AlignList = new List<AlignData>();
-
-		#region AlignSnapCount
-		Param<int> _AlignSnapCount;
-		public int AlignSnapCount
-		{
-			get { return _AlignSnapCount._value; }
-			set
-			{
-				if (_AlignSnapCount._value == value)
-					return;
-				_AlignSnapCount._value = value;
-				RaisePropertyChanged();
-			}
-		}
-
-		#endregion
-
-		#region AlignPositionIndex
-		Param<int> _AlignPositionIndex;
-		public int AlignPositionIndex
-		{
-			get { return _AlignPositionIndex._value; }
-			set
-			{
-				if (_AlignPositionIndex._value == value)
-					return;
-				_AlignPositionIndex._value = value;
-				RaisePropertyChanged();
-			}
-		}
-
-		#endregion
-
-		public Position()
-		{
-			_AlignSnapCount = new Param<int>(4, 0, int.MaxValue);
-			_AlignPositionIndex = new Param<int>(0, 0, int.MaxValue);
-		}
+		public List<Feature> FeatureList = new List<Feature>();
+		public int ScoreValue;
 	}
-	public class Reference : Feature
-	{
-		public Reference()
-		{
-			_PatternDistX = new Param<int>(1000, 0, int.MaxValue);
-			_PatternDistY = new Param<int>(1000, 0, int.MaxValue);
-		}
-
-		#region PatternDistX
-		Param<int> _PatternDistX;
-		public int PatternDistX
-		{
-			get { return _PatternDistX._value; }
-			set
-			{
-				if (_PatternDistX._value == value)
-					return;
-				_PatternDistX._value = value;
-				RaisePropertyChanged();
-			}
-		}
-
-		#endregion
-
-		#region PatternDistY
-		Param<int> _PatternDistY;
-		public int PatternDistY
-		{
-			get { return _PatternDistY._value; }
-			set
-			{
-				if (_PatternDistY._value == value)
-					return;
-				_PatternDistY._value = value;
-				RaisePropertyChanged();
-			}
-		}
-
-		#endregion
-	}
-	public class AlignData : Feature
-	{
-		public AlignData()
-		{
-
-		}
-	}
-
-	public class Feature : ObservableObject
+	public class Feature
 	{
 		[XmlIgnore] public ImageData m_Feature;
 		public CRect RoiRect = new CRect();
-		public Feature()
-		{
-			_FeatureFindArea = new Param<int>(1000, 0, int.MaxValue);
-			_FeatureTargetScore = new Param<float>(0.4f, 0, 1);
-		}
-
-		#region FeatureFindArea
-		Param<int> _FeatureFindArea;
-		public int FeatureFindArea
-		{
-			get { return _FeatureFindArea._value; }
-			set
-			{
-				if (_FeatureFindArea._value == value)
-					return;
-				_FeatureFindArea._value = value;
-				RaisePropertyChanged();
-			}
-		}
-
-		#endregion
-
-		#region FeatureTargetScore
-		Param<float> _FeatureTargetScore;
-		public float FeatureTargetScore
-		{
-			get { return _FeatureTargetScore._value; }
-			set
-			{
-				if (_FeatureTargetScore._value == value)
-					return;
-				_FeatureTargetScore._value = value;
-				RaisePropertyChanged();
-			}
-		}
-
-		#endregion
-
-		#region Name
-
 		/// <summary>
 		/// Feature Image의 파일명. 확장자 포함
 		/// </summary>
-		string _name = "";
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
-			set
-			{
-				SetProperty(ref _name, value);
-			}
-		}
-		#endregion
+		public string FeatureFileName;
 	}
 	public class Roi : ObservableObject
 	{
@@ -1066,9 +879,6 @@ namespace RootTools.Inspects
 	{
 		public List<Pattern> PatternList;
 		public List<NonPattern> NonPatternList;
-
-		#region ParameterList
-
 		ObservableCollection<StripParamData> _parameterList = new ObservableCollection<StripParamData>();
 		public ObservableCollection<StripParamData> ParameterList
 		{
@@ -1081,7 +891,6 @@ namespace RootTools.Inspects
 				SetProperty(ref _parameterList, value);
 			}
 		}
-		#endregion
 	}
 
 	public class Bump : ItemParent

@@ -31,14 +31,7 @@ namespace RootTools.Inspects
 		public DBConnector(string serverName, string dbName, string uid, string pw)
 		{
 			connectStr = string.Format("SERVER={0};DATABASE={1};UID={2};PASSWORD={3};", serverName, dbName, uid, pw);
-			if(oCnn==null)
-			{
-				oCnn = new MySqlConnection(connectStr);//DB 연결
-			}
-			else
-			{
-				oCnn.ConnectionString = connectStr;
-			}
+			oCnn = new MySqlConnection(connectStr);//DB 연결
 			IsInitialize = true;
 			Connected = false;
 		}
@@ -48,11 +41,6 @@ namespace RootTools.Inspects
 			{
 				oCnn.Close();
 			}
-		}
-		public void Close()
-		{
-			oCnn.Close();
-			oCnn.Dispose();
 		}
 		public bool Open()//TODO : try/catch문으로 error코드를 반환하도록 쉊ㅇ해야 함
 		{
@@ -145,9 +133,6 @@ namespace RootTools.Inspects
 			cmd.CommandText = query;
 			da.SelectCommand = cmd;
 			da.Fill(result, tableName);
-
-			da.Dispose();
-			cmd.Dispose();
 
 			return result;
 		}

@@ -20,7 +20,6 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Emgu.CV.Dnn;
-using System.Drawing.Imaging;
 
 namespace RootTools
 {
@@ -180,7 +179,7 @@ namespace RootTools
 		{
 			OnUpdateImage();
 		}
-		public Bitmap GetByteToBitmap(int width, int height, byte[] imageData)
+		Bitmap GetBitmapToArray(int width, int height, byte[] imageData)
 		{
 			var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
 
@@ -201,24 +200,6 @@ namespace RootTools
 				bmp.UnlockBits(bmpData);
 			}
 			return bmp;
-		}
-		public byte[] GetRectByteArray(CRect rect)
-		{
-			int position = 0;
-
-			if (rect.Width % 4 != 0)
-			{
-				rect.Right += 4 - rect.Width % 4;
-			}
-
-			byte[] aBuf = new byte[rect.Width * p_nByte * rect.Height];
-			//나중에 거꾸로 나왔던것 확인해야 함. 일단 지금은 정순으로 바꿔둠
-			for (int i = 0; i < rect.Height; i++)
-			{
-				Marshal.Copy((IntPtr)((long)GetPtr() + rect.Left + ((long)i + (long)rect.Top) * p_Size.X), aBuf, position, rect.Width * p_nByte);
-				position += (rect.Width * p_nByte);
-			}
-			return aBuf;
 		}
 		public Bitmap GetRectImage(CRect rect)
 		{
@@ -298,11 +279,15 @@ namespace RootTools
 			//}
 			#endregion
 
-			if (rect.Width % 4 != 0)
+			int position = 0;
+			byte[] aBuf = new byte[rect.Width * rect.Height];
+			//나중에 거꾸로 나왔던것 확인해야 함. 일단 지금은 정순으로 바꿔둠
+			for (int i = 0; i < rect.Height; i++)
 			{
-				rect.Right += 4 - rect.Width % 4;
+				Marshal.Copy((IntPtr)((long)GetPtr() + rect.Left + ((long)i + (long)rect.Top) * p_Size.X), aBuf, position, rect.Width);
+				position += rect.Width;
 			}
-			return GetByteToBitmap(rect.Width, rect.Height, GetRectByteArray(rect));
+			return GetBitmapToArray(rect.Width, rect.Height, aBuf);
 		}
 		public void SaveRectImage(CRect memRect)
 		{

@@ -336,7 +336,7 @@ namespace Root_Vega.Controls
 
 		public string[] SignArray = new string[] { ">=", "<=", "=" };
 
-		//string dbFormatFilePath = @"C:\vsdb\init\vsdb.txt";
+		string dbFormatFilePath = @"C:\sqlite\db\vsdb.txt";
 
 		Dictionary<int, Bitmap> TDIImageDictionary { get; set; }
 		Dictionary<int, Bitmap> VRSImageDictionary { get; set; }
@@ -383,7 +383,7 @@ namespace Root_Vega.Controls
 			this.DefectSizeSecond = string.Empty;
 			this.DefectCode = string.Empty;
 
-			DataIndexDB = new SqliteDataDB(dataPath, App.sDBPath);//나중에 수정해야함. 파일 경로 할당을 설정 등으로 제어하는 부분이 필요함
+			DataIndexDB = new SqliteDataDB(dataPath, @"C:\sqlite\db\vsdb.txt");//나중에 수정해야함. 파일 경로 할당을 설정 등으로 제어하는 부분이 필요함
 
 			if (DataIndexDB.Connect())
 			{
@@ -394,7 +394,7 @@ namespace Root_Vega.Controls
 				MakeDictionary(tempTable);
 				tempTable.Dispose();
 				//Data,*No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER),TdiImageExist(INTEGER),VrsImageExist(INTEGER)
-				_OriginResultDataTable = DataIndexDB.GetDataTable("Data", "No", "DCode", "AreaSize", "Length", "Width", "Height", "InspMode", "PosX", "PosY");
+				_OriginResultDataTable = DataIndexDB.GetDataTable("Data", "No", "DCode", "Size", "Length", "Width", "Height", "InspMode", "PosX", "PosY");
 				ResultDataTable = _OriginResultDataTable.Copy();
 
 				//Datainfo,*LotIndexID(INTEGER),InspStartTime(TEXT),BCRID(TEXT)
@@ -554,7 +554,7 @@ namespace Root_Vega.Controls
 		private void SetData(DataRowView selectedDataTable, ImageType type)
 		{
 			int idx = Convert.ToInt32(selectedDataTable["No"]);
-			int size = Convert.ToInt32(selectedDataTable["AreaSize"]);
+			int size = Convert.ToInt32(selectedDataTable["Size"]);
 			int dcode = Convert.ToInt32(selectedDataTable["DCode"]);
 			int posx = Convert.ToInt32(selectedDataTable["PosX"]);
 			int posy = Convert.ToInt32(selectedDataTable["PosY"]);
@@ -639,11 +639,11 @@ namespace Root_Vega.Controls
 			//Inspection Mode
 			//Defect Size
 			//Defect Code
-			if (!File.Exists(this.DBDataPath) || !File.Exists(App.sDBPath))
+			if (!File.Exists(this.DBDataPath) || !File.Exists(dbFormatFilePath))
 				return;
 
-			//if (!IsInitialized)
-			//	return;
+			if (!IsInitialized)
+				return;
 
 			//Data,*No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER),TdiImageExist(INTEGER),VrsImageExist(INTEGER)
 			string dCodeQuery = string.Format("DCode = {0}", DefectCode);
@@ -676,8 +676,8 @@ namespace Root_Vega.Controls
 				secondSearchEnable = true;
 			}
 
-			string defectSizeQuery_1 = string.Format("AreaSize {0} {1}", firstSign, FirstSizeUm);
-			string defectSizeQuery_2 = string.Format("AreaSize {0} {1}", secondSign, SecondSizeUm);
+			string defectSizeQuery_1 = string.Format("Size {0} {1}", firstSign, FirstSizeUm);
+			string defectSizeQuery_2 = string.Format("Size {0} {1}", secondSign, SecondSizeUm);
 
 
 
