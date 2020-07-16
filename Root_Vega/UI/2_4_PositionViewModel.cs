@@ -23,9 +23,9 @@ namespace Root_Vega
         Roi m_Roi;
         Stack<Feature> m_PasteFeature = new Stack<Feature>();
 
-        //string sPool = "pool";
-        //string sGroup = "group";
-        //string sMem = "mem";
+        string sPool = "pool";
+        string sGroup = "group";
+        string sMem = "mem";
 
         public _2_4_PositionViewModel(Vega_Engineer engineer, IDialogService dialogService)
         {
@@ -43,7 +43,7 @@ namespace Root_Vega
             //m_MemoryModule.GetPool(sPool).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
             //m_MemoryModule.GetPool(sPool).GetGroup(sGroup).GetMemory(sMem);
 
-            m_Image = new ImageData(m_MemoryModule.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem));
+            m_Image = new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem));
             p_ImageViewer = new ImageViewer_ViewModel(m_Image, dialogService);
             p_SimpleShapeDrawer = new PositionDrawerVM(p_ImageViewer);
             p_SimpleShapeDrawer.RectangleKeyValue = Key.D1;

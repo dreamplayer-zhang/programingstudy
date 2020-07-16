@@ -45,7 +45,7 @@ namespace Root_Wind
             m_Engineer = engineer;
             Init(engineer, dialogService);
 
-            }
+        }
 
 
         #region Properties
@@ -59,8 +59,8 @@ namespace Root_Wind
             set
             {
                 SetProperty(ref m_ImageViewer, value);
-                    }
-                }
+            }
+        }
 
         private ObservableCollection<UIElement> _UIelement = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> p_UIElement
@@ -101,7 +101,7 @@ namespace Root_Wind
                 SetProperty(ref _test, value);
             }
 
-            }
+        }
         private System.Windows.Input.MouseEventArgs _mouseEvent;
         public System.Windows.Input.MouseEventArgs MouseEvent
         {
@@ -128,7 +128,7 @@ namespace Root_Wind
         {
             if (p_ImageViewer.p_View_Rect.Width > 0 && p_ImageViewer.p_View_Rect.Height > 0)
             {
-                
+
                 int nX = (int)Math.Round((double)(memX - p_ImageViewer.p_View_Rect.X) * p_ImageViewer.p_CanvasWidth / p_ImageViewer.p_View_Rect.Width, MidpointRounding.ToEven);
                 //int xx = (memX - p_ROI_Rect.X) * ViewWidth / p_ROI_Rect.Width;
                 int nY = (int)Math.Round((double)(memY - p_ImageViewer.p_View_Rect.Y) * p_ImageViewer.p_CanvasHeight / p_ImageViewer.p_View_Rect.Height, MidpointRounding.AwayFromZero);
@@ -154,7 +154,7 @@ namespace Root_Wind
             m_DD = new DrawData();
             m_Image = new ImageData(memoryPool.GetMemory(sGroup, sMem));
             p_ImageViewer = new ImageViewer_ViewModel(m_Image, dialogService);
-            }
+        }
 
         private void MouseLeftDown()
         {
@@ -179,12 +179,12 @@ namespace Root_Wind
                     {
                         StartDrawingLine();
                         break;
-            }
+                    }
                 case DrawingMode.Pt:
                     {
                         AddPoint();
                         break;
-        }
+                    }
             }
 
         }
@@ -202,7 +202,7 @@ namespace Root_Wind
             }
             if (p_Mode == DrawingMode.Ruler)
             {
-                    DrawingLineProgress();
+                DrawingLineProgress();
             }
             if (m_DrawHelper != null && m_DrawHelper.DrawnRect != null)
             {
@@ -220,7 +220,7 @@ namespace Root_Wind
             if (p_Mode == DrawingMode.Ruler)
             {
                 DrawLineDone();
-        }
+            }
             else
                 RedrawUIElement();
         }
@@ -245,8 +245,8 @@ namespace Root_Wind
                     RedrawnLine.Y1 = StartPt.Y;
                     RedrawnLine.X2 = EndPt.X;
                     RedrawnLine.Y2 = EndPt.Y;
-            
-                    
+
+
                     RedrawnLine.Stroke = System.Windows.Media.Brushes.Red;
                     RedrawnLine.StrokeThickness = 2;
                     p_UIElement.Add(RedrawnLine);
@@ -311,9 +311,9 @@ namespace Root_Wind
         private void RedrawStr()
         {
             if (m_DD.m_StringData.Count > 0)
-        {
-                for (int i = 0; i < m_DD.m_StringData.Count; i++)
             {
+                for (int i = 0; i < m_DD.m_StringData.Count; i++)
+                {
                     TextBlock RedrawnTB = new TextBlock();
                     CPoint TbPt = GetCanvasPoint(m_DD.m_StringData[i].m_pt.X, m_DD.m_StringData[i].m_pt.Y);
                     RedrawnTB.Text = m_DD.m_StringData[i].m_str;
@@ -370,8 +370,8 @@ namespace Root_Wind
                     p_UIElement.Add(RedrawnTB);
                 }
 
-                }
             }
+        }
 
         private void SetToolMode()
         {
@@ -398,7 +398,7 @@ namespace Root_Wind
 
             m_DrawHelper.RectMemory_StartPt = new CPoint(p_ImageViewer.p_MouseMemX, p_ImageViewer.p_MouseMemY);
             m_DrawHelper.RectCanvas_StartPt = GetCanvasPoint(p_ImageViewer.p_MouseMemX, p_ImageViewer.p_MouseMemY);
-                
+
             Canvas.SetLeft(m_DrawHelper.DrawnRect, m_DrawHelper.RectCanvas_StartPt.X);
             Canvas.SetTop(m_DrawHelper.DrawnRect, m_DrawHelper.RectCanvas_StartPt.Y);
 
@@ -418,19 +418,19 @@ namespace Root_Wind
                 if (m_DrawHelper.RectMemory_EndPt.X < m_DrawHelper.RectMemory_StartPt.X)
                 {
                     Canvas.SetLeft(m_DrawHelper.DrawnRect, m_DrawHelper.RectCanvas_EndPt.X);
-                        }
+                }
                 if (m_DrawHelper.RectMemory_EndPt.Y < m_DrawHelper.RectMemory_StartPt.Y)
-                        {
+                {
                     Canvas.SetTop(m_DrawHelper.DrawnRect, m_DrawHelper.RectCanvas_EndPt.Y);
-                        }
+                }
                 m_DrawHelper.DrawnRect.Width = Math.Abs(m_DrawHelper.RectCanvas_EndPt.X - m_DrawHelper.RectCanvas_StartPt.X);
                 m_DrawHelper.DrawnRect.Height = Math.Abs(m_DrawHelper.RectCanvas_EndPt.Y - m_DrawHelper.RectCanvas_StartPt.Y);
-                    }
-                        }
+            }
+        }
         private void DrawRectDone()
-                        {
+        {
             if (m_DrawHelper.RectMemory_StartPt != m_DrawHelper.RectMemory_EndPt && m_DrawHelper.RectMemory_EndPt != null)
-                    {
+            {
                 m_DrawHelper.RectOrigin = new CRect();
 
                 m_DrawHelper.RectOrigin.Left = m_DrawHelper.RectMemory_StartPt.X;
@@ -439,26 +439,26 @@ namespace Root_Wind
                 m_DrawHelper.RectOrigin.Bottom = m_DrawHelper.RectMemory_EndPt.Y;
 
                 if (m_DrawHelper.RectMemory_EndPt.X < m_DrawHelper.RectMemory_StartPt.X)
-                        {
+                {
                     m_DrawHelper.RectOrigin.Left = m_DrawHelper.RectMemory_EndPt.X;
                     m_DrawHelper.RectOrigin.Right = m_DrawHelper.RectMemory_StartPt.X;
-                        }
+                }
                 if (m_DrawHelper.RectMemory_EndPt.Y < m_DrawHelper.RectMemory_StartPt.Y)
-                        {
+                {
                     m_DrawHelper.RectOrigin.Top = m_DrawHelper.RectMemory_EndPt.Y;
                     m_DrawHelper.RectOrigin.Bottom = m_DrawHelper.RectMemory_StartPt.Y;
-                        }
+                }
                 m_DD.AddRectData(m_DrawHelper.RectOrigin, System.Drawing.Color.Red);
                 m_DrawHelper.DrawnRect.StrokeDashArray = new DoubleCollection(1);
-                    }
-                        else
-                        {
+            }
+            else
+            {
                 m_DrawHelper.DrawnRect = null;
-                        }
-                    }
+            }
+        }
 
         private void AddString()
-                {
+        {
             if (m_DrawHelper == null)
                 m_DrawHelper = new DrawHelper();
 
@@ -478,7 +478,7 @@ namespace Root_Wind
             Canvas.SetLeft(m_DrawHelper.TbOrigin, m_DrawHelper.Str_CanvasPt.X);
             Canvas.SetTop(m_DrawHelper.TbOrigin, m_DrawHelper.Str_CanvasPt.Y);
             p_UIElement.Add(m_DrawHelper.TbOrigin);
-                        }
+        }
         private void StartDrawingLine()
         {
             if (m_DrawHelper == null)
@@ -526,12 +526,12 @@ namespace Root_Wind
         }
 
         private void AddPoint()
-                        {
+        {
             if (m_DrawHelper == null)
                 m_DrawHelper = new DrawHelper();
 
 
-            
+
             m_DrawHelper.DrawnHorizon = new Line();
             m_DrawHelper.DrawnVertical = new Line();
 
@@ -561,21 +561,21 @@ namespace Root_Wind
             m_DrawHelper.DrawnHorizon.Y2 = m_DrawHelper.pt_CanvasPt.Y;
 
             p_UIElement.Add(m_DrawHelper.DrawnHorizon);
-            p_UIElement.Add(m_DrawHelper.DrawnVertical);          
-                    }
+            p_UIElement.Add(m_DrawHelper.DrawnVertical);
+        }
 
         #endregion
 
         #region Command
         public ICommand CanvasMouseMove
-            {
+        {
             get
             {
                 return new RelayCommand(MouseMove);
             }
         }
 
-        
+
         public ICommand CanvasMouseLeftDown
         {
             get
@@ -614,15 +614,15 @@ namespace Root_Wind
         public ICommand btnDrawOrigin
         {
             get
-        {
+            {
                 return new RelayCommand(_btnDrawOrigin);
-                }
-                }
+            }
+        }
         #endregion
 
         #region CommandFunc
         private void _SetModeNone()
-            {
+        {
             p_Mode = DrawingMode.None;
         }
         private void _btnDrawOrigin()
@@ -631,7 +631,7 @@ namespace Root_Wind
         private void _btnDrawStr()
         {
             if (p_Mode == DrawingMode.Str)
-        {
+            {
                 p_Mode = DrawingMode.None;
                 RecipeCursor = System.Windows.Input.Cursors.Arrow;
             }
@@ -677,20 +677,20 @@ namespace Root_Wind
         #endregion
     }
     public enum DrawingMode
-        {
+    {
         None,
         Rectangle,
         Str,
         Pt,
         Ruler
-        }
+    }
     public class DrawHelper
     {
         public Line DrawnHorizon;
         public Line DrawnVertical;
         public CPoint pt_MemoryPt;
         public CPoint pt_CanvasPt;
-  
+
         public Line DrawnLine;
         public CPoint Line_Memory_StartPt;
         public CPoint Line_Memory_EndPt;

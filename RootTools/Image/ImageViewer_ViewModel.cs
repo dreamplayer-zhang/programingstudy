@@ -797,10 +797,10 @@ namespace RootTools
 			}
 			CancelCommand();
 
-			if (m_BasicTool.m_Element.Count == 0 || m_BasicTool.m_Element[0].GetType() != typeof(System.Windows.Shapes.Rectangle))
-				m_ImageData.SaveWholeImage();
-			else
-			{
+			//if (m_BasicTool.m_Element.Count == 0 || m_BasicTool.m_Element[0].GetType() != typeof(System.Windows.Shapes.Rectangle))
+			//	m_ImageData.SaveWholeImage();
+			//else
+			//{
 				var temp = m_BasicTool.m_TempRect;
 				int left = (int)temp.StartPos.X;
 				int top = (int)temp.StartPos.Y;
@@ -809,7 +809,7 @@ namespace RootTools
 				int bot = (int)temp.EndPos.Y;
 
 				m_ImageData.SaveRectImage(new CRect(left, top, right, bot));
-			}
+			//}
 		}
 
 		void ImageClear()

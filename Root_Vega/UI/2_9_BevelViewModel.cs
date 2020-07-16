@@ -484,16 +484,16 @@ namespace Root_Vega
             }
             inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
             var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
-            //string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
+            string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
 
             if (VSDBManager == null)
             {
-                VSDBManager = new SqliteDataDB(targetVsPath, App.sDBPath);
+                VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
             }
             else if (VSDBManager.IsConnected)
             {
                 VSDBManager.Disconnect();
-                VSDBManager = new SqliteDataDB(targetVsPath, App.sDBPath);
+                VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
             }
             if (VSDBManager.Connect())
             {

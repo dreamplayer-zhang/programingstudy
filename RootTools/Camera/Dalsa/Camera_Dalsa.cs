@@ -404,6 +404,7 @@ namespace RootTools.Camera.Dalsa
                         //Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
                     }
                     iBlock++;
+                    if(m_nGrabCount !=0)
                     p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
             }
