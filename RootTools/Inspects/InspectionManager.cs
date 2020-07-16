@@ -36,7 +36,9 @@ namespace RootTools.Inspects
 
 		Thread inspThread;
 		Inspection[] InsepctionThread;
+#if DEBUG
 		StopWatch sw;
+#endif
 
 		int nThreadNum = 10;
 		public int nInspectionCount = 0;
@@ -51,7 +53,6 @@ namespace RootTools.Inspects
 		SqliteDataDB VSDBManager;
 		System.Data.DataTable VSDataInfoDT;
 		System.Data.DataTable VSDataDT;
-		Dictionary<int,CPoint> refPosDictionary;
 
 		bool m_bProgress;
 
@@ -60,8 +61,11 @@ namespace RootTools.Inspects
 		{
 			m_bProgress = false;
 			nInspectionCount = 0;
+#if DEBUG
 			sw = new StopWatch();
 			sw.Start();
+
+#endif
 
 			IsInitialized = true;
 
@@ -221,21 +225,8 @@ namespace RootTools.Inspects
 						dataRow["Width"] = item["Width"];
 						dataRow["Height"] = item["Height"];
 						dataRow["FOV"] = item["FOV"];
-						int posX = Convert.ToInt32(item["PosX"]);
-						int posY = Convert.ToInt32(item["PosY"]);
-
-						if(refPosDictionary!=null)
-						{
-							if (refPosDictionary.ContainsKey(Convert.ToInt32(item["ClassifyCode"])))
-							{
-								//보정 기본 좌표가 있는 경우 보정 기준 좌표를 적용한다
-								posX -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].X;
-								posY -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].Y;
-							}
-						}
-						dataRow["PosX"] = posX;
-						dataRow["PosY"] = posY;
-						
+						dataRow["PosX"] = item["PosX"];
+						dataRow["PosY"] = item["PosY"];
 						dataRow["TdiImageExist"] = 1;
 						dataRow["VrsImageExist"] = 0;
 
@@ -273,9 +264,11 @@ namespace RootTools.Inspects
 				}
 			}
 			nInspectionCount = 0;
+#if DEBUG
 			sw.Stop();
 			Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
-			connector.Close();
+#endif
+
 		}
 		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
 		{
@@ -651,40 +644,6 @@ namespace RootTools.Inspects
 			}
 
 			return new System.Drawing.Point(nEdgeX, nEdgeY);
-		}
-
-		public void SetStandardPos(int nDefectCode, CPoint standardPos)
-		{
-			//DB에도 저장하고 메모리에도 올려둡시다
-			//	//여기서 DB관련동작 이하생략!
-			//	DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
-			//	if (connector.Open())
-			//	{
-			//		var result = connector.SendNonQuery("SELECT COUNT(*) FROM inspections.inspstatus;");
-			//		if (result == (int)MYSQLError.TABLE_IS_MISSING)
-			//		{
-			//			//상태용 테이블 작성
-			//			result = connector.SendNonQuery("CREATE TABLE inspections.inspstatus (idx INT NOT NULL, inspStatusNum INT NULL, PRIMARY KEY (idx));");
-			//			if (result != 0)
-			//			{
-			//				//에러에 대한 추가 예외처리 필요
-			//			}
-			//		}
-			//		//완료 표시
-			//		result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
-			//	}
-			if(refPosDictionary==null)
-			{
-				refPosDictionary = new Dictionary<int, CPoint>();//초기화
-			}
-			if(!refPosDictionary.ContainsKey(nDefectCode))
-			{
-				refPosDictionary.Add(nDefectCode, standardPos);
-			}
-			else
-			{
-				refPosDictionary[nDefectCode] = standardPos;
-			}
 		}
 
 		static unsafe int GetThresholdAverage(ImageData img, System.Windows.Rect rcROI, eEdgeFindDirection eDirection)

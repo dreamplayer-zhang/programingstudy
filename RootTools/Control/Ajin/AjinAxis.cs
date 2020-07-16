@@ -524,7 +524,7 @@ namespace RootTools.Control.Ajin
                 AXM("AxmSignalReadStop", CAXM.AxmSignalReadStop(m_nAxis, ref uRead));
                 p_sensorEmergency = (uRead > 0);
             }
-            if (p_sensorAlarm || p_sensorEmergency)
+            if (p_sensorEmergency || p_sensorEmergency)
             {
                 p_eState = eState.Init;
                 Thread.Sleep(100);

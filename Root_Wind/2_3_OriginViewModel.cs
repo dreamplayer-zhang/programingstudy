@@ -22,11 +22,11 @@ namespace Root_Wind
         DrawData m_DD;
         Recipe m_Recipe;
 
-        //string sPool = "pool";
-        //string sGroup = "group";
-        //string sMem = "mem";
-        //public int MemWidth = 10000;
-        //public int MemHeight = 10000;
+        string sPool = "pool";
+        string sGroup = "group";
+        string sMem = "mem";
+        public int MemWidth = 10000;
+        public int MemHeight = 10000;
 
         public _2_3_OriginViewModel(Wind_Engineer engineer, IDialogService dialogService)
         {
@@ -40,12 +40,12 @@ namespace Root_Wind
             m_Recipe = engineer.m_recipe;
 
             m_MemoryModule = engineer.ClassMemoryTool();
-            //MemoryPool memoryPool = m_MemoryModule.GetPool(sPool, true);
-            //memoryPool.p_gbPool = 1;
-            //memoryPool.GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
+            MemoryPool memoryPool = m_MemoryModule.GetPool(sPool, true);
+            memoryPool.p_gbPool = 1;
+            memoryPool.GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
 
-            //m_Image = new ImageData(m_MemoryModule.GetMemory(App., sGroup, sMem));
-            //p_ImageViewer = new ImageViewer_ViewModel(m_Image, dialogService);
+            m_Image = new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem));
+            p_ImageViewer = new ImageViewer_ViewModel(m_Image, dialogService);
             
             RedrawOrigin();
         }

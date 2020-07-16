@@ -463,14 +463,13 @@ namespace ViewConverter
         {
             try
             {
-
-
                 // variable
                 if (values[0] == null)
                 {
                     return 0.0f;
                 }
-                AjinAxis axis = (AjinAxis)values[0];
+                //AjinAxis axis = (AjinAxis)values[0];
+                Axis axis = (Axis)values[0];
                 double dStageLength = (double)values[1];
                 double dMinusLimit = axis.GetPosValue(Axis.ePosition.SWLimit_Minus);
                 double dPlusLimit = axis.GetPosValue(Axis.ePosition.SWLimit_Plus);

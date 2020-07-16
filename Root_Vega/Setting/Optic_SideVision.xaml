@@ -10,6 +10,7 @@
              xmlns:Axis="clr-namespace:RootTools.Control.Ajin;assembly=RootTools"
              xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d"
              d:DesignHeight="726"
              d:DesignWidth="1602">
@@ -1078,9 +1079,9 @@
                                             <RotateTransform.Angle>
                                                 <MultiBinding Converter="{StaticResource PositionScalingConverters}"
                                                               ConverterParameter="AxisTheta">
-                                                    <Binding Path="p_SideVision.p_axisTheta.p_axis"></Binding>
+                                                    <Binding Path="p_SideVision.p_axisTheta"></Binding>
                                                     <Binding Path="ActualWidth" ElementName="StageCanvas"></Binding>
-                                                    <Binding Path="p_SideVision.p_axisTheta.p_axis.p_posActual"></Binding>
+                                                    <Binding Path="p_SideVision.p_axisTheta.p_posActual"></Binding>
                                                 </MultiBinding>
                                             </RotateTransform.Angle>
                                         </RotateTransform>
@@ -1144,9 +1145,9 @@
                                     <Canvas.Bottom>
                                         <MultiBinding Converter="{StaticResource PositionScalingConverters}"
                                                       ConverterParameter="AxisZ">
-                                            <Binding Path="p_SideVision.p_axisZ.p_axis"></Binding>
+                                            <Binding Path="p_SideVision.p_axisZ"></Binding>
                                             <Binding Path="ActualHeight" ElementName="ZCanvas"></Binding>
-                                            <Binding Path="p_SideVision.p_axisZ.p_axis.p_posActual"></Binding>
+                                            <Binding Path="p_SideVision.p_axisZ.p_posActual"></Binding>
                                         </MultiBinding>
                                     </Canvas.Bottom>
                                 </material:PackIcon>
@@ -1253,7 +1254,7 @@
                                                    Text="Axis X"></TextBlock>
                                         <TextBlock Grid.Column="1"
                                                    Style="{StaticResource BasicTb}"
-                                                   DataContext="{Binding p_SideVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                   DataContext="{Binding p_SideVision.p_axisXY.p_axisX}"
                                                    Text="{Binding p_posActual}" />
                                     </Grid>
                                     <Grid Grid.Row="1">
@@ -1265,7 +1266,7 @@
                                                    Text="Axis Y"></TextBlock>
                                         <TextBlock Grid.Column="1"
                                                    Style="{StaticResource BasicTb}"
-                                                   DataContext="{Binding p_SideVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                   DataContext="{Binding p_SideVision.p_axisXY.p_axisY}"
                                                    Text="{Binding p_posActual}" />
                                     </Grid>
                                     <Grid Grid.Row="2">
@@ -1277,7 +1278,7 @@
                                                    Text="Axis Z"></TextBlock>
                                         <TextBlock Grid.Column="1"
                                                    Style="{StaticResource BasicTb}"
-                                                   DataContext="{Binding p_SideVision.p_axisZ, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                   DataContext="{Binding p_SideVision.p_axisZ}"
                                                    Text="{Binding p_posActual}" />
                                     </Grid>
                                     <Grid Grid.Row="3">
@@ -1289,7 +1290,7 @@
                                                    Text="Theta"></TextBlock>
                                         <TextBlock Grid.Column="1"
                                                    Style="{StaticResource BasicTb}"
-                                                   DataContext="{Binding p_SideVision.p_axisTheta, Converter={StaticResource AjinAxisToIAxiss}}"
+                                                   DataContext="{Binding p_SideVision.p_axisTheta}"
                                                    Text="{Binding p_posActual}" />
                                     </Grid>
                                 </Grid>
@@ -1312,9 +1313,17 @@
                                             <ColumnDefinition></ColumnDefinition>
                                             <ColumnDefinition></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
-                                        <RepeatButton Grid.Column="1"                                                      DataContext="{Binding p_SideVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                      Command="{Binding PJogFastCommand}"
-                                                Style="{StaticResource BasicRepeatBtn}">
+                                        <RepeatButton Grid.Column="1" 
+                                                      DataContext="{Binding p_SideVision.p_axisXY.p_axisY}"
+                                                      Style="{StaticResource BasicRepeatBtn}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                    <i:InvokeCommandAction Command="{Binding MJogFastCommand}"/>
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                    <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                             <RepeatButton.Content>
                                                 <material:PackIcon Kind="ArrowUpBox"
                                                                    Width="{PriorityBinding}"
@@ -1323,9 +1332,16 @@
                                             </RepeatButton.Content>
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="3"
-                                                      DataContext="{Binding p_SideVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                      Command="{Binding PJogFastCommand}"
+                                                      DataContext="{Binding p_SideVision.p_axisZ}"
                                                       Style="{StaticResource BasicRepeatBtn}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                    <i:InvokeCommandAction Command="{Binding MJogFastCommand}"/>
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                    <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                             <RepeatButton.Content>
                                                 <material:PackIcon Kind="ArrowUpBox"
                                                                    Width="{PriorityBinding}"
@@ -1334,9 +1350,16 @@
                                             </RepeatButton.Content>
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="4"
-                                                      DataContext="{Binding p_SideVision.p_axisTheta.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                      Command="{Binding PJogFastCommand}"
+                                                      DataContext="{Binding p_SideVision.p_axisTheta}"
                                                       Style="{StaticResource BasicRepeatBtn}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                    <i:InvokeCommandAction Command="{Binding PJogFastCommand}"/>
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                    <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                             <RepeatButton.Content>
                                                 <material:PackIcon Kind="RotateLeft"
                                                                    Width="{PriorityBinding}"
@@ -1354,9 +1377,16 @@
                                             <ColumnDefinition></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
                                         <RepeatButton Grid.Column="0"
-                                                      DataContext="{Binding p_SideVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                      Command="{Binding MJogFastCommand}"
+                                                      DataContext="{Binding p_SideVision.p_axisXY.p_axisX}"
                                                       Style="{StaticResource BasicRepeatBtn}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                    <i:InvokeCommandAction Command="{Binding MJogFastCommand}"/>
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                    <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                             <RepeatButton.Content>
                                                 <material:PackIcon Kind="ArrowLeftBox"
                                                                    Width="{PriorityBinding}"
@@ -1365,9 +1395,16 @@
                                             </RepeatButton.Content>
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="1"
-                                                      DataContext="{Binding p_SideVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                      Command="{Binding MJogFastCommand}"
+                                                      DataContext="{Binding p_SideVision.p_axisXY.p_axisY}"
                                                       Style="{StaticResource BasicRepeatBtn}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                    <i:InvokeCommandAction Command="{Binding PJogFastCommand}"/>
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                    <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                             <RepeatButton.Content>
                                                 <material:PackIcon Kind="ArrowDownBox"
                                                                    Width="{PriorityBinding}"
@@ -1376,9 +1413,16 @@
                                             </RepeatButton.Content>
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="2"
-                                                      DataContext="{Binding p_SideVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                Command="{Binding PJogFastCommand}"
-                                                Style="{StaticResource BasicRepeatBtn}">
+                                                      DataContext="{Binding p_SideVision.p_axisXY.p_axisX}"
+                                                      Style="{StaticResource BasicRepeatBtn}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                    <i:InvokeCommandAction Command="{Binding PJogFastCommand}"/>
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                    <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                             <RepeatButton.Content>
                                                 <material:PackIcon Kind="ArrowRightBox"
                                                                    Width="{PriorityBinding}"
@@ -1387,9 +1431,16 @@
                                             </RepeatButton.Content>
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="3"
-                                                      DataContext="{Binding p_SideVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                      Command="{Binding MJogFastCommand}"
-                                                Style="{StaticResource BasicRepeatBtn}">
+                                                      DataContext="{Binding p_SideVision.p_axisZ}"
+                                                      Style="{StaticResource BasicRepeatBtn}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                    <i:InvokeCommandAction Command="{Binding PJogFastCommand}"/>
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                    <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                             <RepeatButton.Content>
                                                 <material:PackIcon Kind="ArrowDownBox"
                                                                    Width="{PriorityBinding}"
@@ -1398,9 +1449,16 @@
                                             </RepeatButton.Content>
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="4"
-                                                DataContext="{Binding p_SideVision.p_axisTheta.p_axis, Converter={StaticResource AjinAxisToIAxiss}}"
-                                                Command="{Binding MJogFastCommand}"
-                                                Style="{StaticResource BasicRepeatBtn}">
+                                                      DataContext="{Binding p_SideVision.p_axisTheta}"
+                                                      Style="{StaticResource BasicRepeatBtn}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                    <i:InvokeCommandAction Command="{Binding MJogFastCommand}"/>
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                    <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
                                             <RepeatButton.Content>
                                                 <material:PackIcon Kind="RotateRight"
                                                                    Width="{PriorityBinding}"
@@ -1436,7 +1494,7 @@
                                                     Text="{Binding p_posActual}" />
                                     </Grid>-->
                                     <Grid Grid.Row="0"
-                                          DataContext="{Binding p_SideVision.p_axisXY.p_axisX, Converter={StaticResource AjinAxisToIAxiss}}">
+                                          DataContext="{Binding p_SideVision.p_axisXY.p_axisX}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="1*"></ColumnDefinition>
                                             <ColumnDefinition Width="2*"></ColumnDefinition>
@@ -1449,8 +1507,8 @@
                                                    Text="Axis X" />
                                         <ComboBox Margin="10"
                                                   Grid.Column="1"
-                                                  SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
-                                                  ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                                  SelectedItem="{Binding p_strSelPos, Mode=TwoWay}"
+                                                  ItemsSource="{Binding p_asPos}"></ComboBox>
                                         <TextBlock  Grid.Column="2"
                                                     Style="{StaticResource BasicTb}"
                                                     FontSize="15">
@@ -1496,7 +1554,7 @@
                                         </Button>
                                     </Grid>
                                     <Grid Grid.Row="1"
-                                          DataContext="{Binding p_SideVision.p_axisXY.p_axisY, Converter={StaticResource AjinAxisToIAxiss}}">
+                                          DataContext="{Binding p_SideVision.p_axisXY.p_axisY}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="1*"></ColumnDefinition>
                                             <ColumnDefinition Width="2*"></ColumnDefinition>
@@ -1509,8 +1567,8 @@
                                                    Text="Axis Y" />
                                         <ComboBox Margin="10"
                                                   Grid.Column="1"
-                                                  SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
-                                                  ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                                  SelectedItem="{Binding p_strSelPos, Mode=TwoWay}"
+                                                  ItemsSource="{Binding p_asPos}"></ComboBox>
                                         <TextBlock  Grid.Column="2"
                                                     Style="{StaticResource BasicTb}"
                                                     FontSize="15">
@@ -1555,7 +1613,7 @@
                                         </Button>
                                     </Grid>
                                     <Grid Grid.Row="2"
-                                          DataContext="{Binding p_SideVision.p_axisZ.p_axis, Converter={StaticResource AjinAxisToIAxiss}}">
+                                          DataContext="{Binding p_SideVision.p_axisZ}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="1*"></ColumnDefinition>
                                             <ColumnDefinition Width="2*"></ColumnDefinition>
@@ -1568,8 +1626,8 @@
                                                    Text="Axis Z" />
                                         <ComboBox Margin="10"
                                                   Grid.Column="1"
-                                                  SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
-                                                  ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                                  SelectedItem="{Binding p_strSelPos, Mode=TwoWay}"
+                                                  ItemsSource="{Binding p_asPos}"></ComboBox>
                                         <TextBlock  Grid.Column="2"
                                                     Style="{StaticResource BasicTb}"
                                                     FontSize="15">
@@ -1614,7 +1672,7 @@
                                         </Button>
                                     </Grid>
                                     <Grid Grid.Row="3"
-                                          DataContext="{Binding p_SideVision.p_axisTheta.p_axis, Converter={StaticResource AjinAxisToIAxiss}}">
+                                          DataContext="{Binding p_SideVision.p_axisTheta}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="1*"></ColumnDefinition>
                                             <ColumnDefinition Width="2*"></ColumnDefinition>
@@ -1627,8 +1685,8 @@
                                                    Text="Theta" />
                                         <ComboBox Margin="10"
                                                   Grid.Column="1"
-                                                  SelectedItem="{Binding p_SelMovePos, Mode=TwoWay}"
-                                                  ItemsSource="{Binding p_aPos, Converter={StaticResource DictionaryItemKeysConverters}}"></ComboBox>
+                                                  SelectedItem="{Binding p_strSelPos, Mode=TwoWay}"
+                                                  ItemsSource="{Binding p_asPos}"></ComboBox>
                                         <TextBlock  Grid.Column="2"
                                                     Style="{StaticResource BasicTb}"
                                                     FontSize="15">
