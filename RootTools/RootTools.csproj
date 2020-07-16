@@ -81,10 +81,6 @@
     <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
     </Reference>
-    <Reference Include="Interop.SPIIPLUSCOM660Lib">
-      <HintPath>Control\ACS\DLL\Interop.SPIIPLUSCOM660Lib.dll</HintPath>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="MaterialDesignThemes.Wpf">
       <HintPath>..\Lib\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
@@ -822,6 +818,17 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="SPIIPLUSCOM660Lib">
+      <Guid>{A50D9364-B5CE-4F09-BED2-E460B41671F6}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
