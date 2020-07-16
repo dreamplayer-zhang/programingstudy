@@ -1,4 +1,5 @@
 ﻿using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 
 namespace RootTools.Control.ACS
@@ -45,7 +46,24 @@ namespace RootTools.Control.ACS
         }
         #endregion
 
-        #region Thread InitAxis
+        #region Thread Check
+        public void RunThreadCheck()
+        {
+            try
+            {
+                Array aLimit = m_acs.m_channel.ReadVariableAsVector("FAULT", -1, 0, m_lAxis); 
+                foreach (ACSAxis axis in m_aAxis) axis.RunThreadCheck(aLimit);
+            }
+            catch (Exception e) { LogError(m_id + "ReadVariableAsVector Error : " + e.Message); }
+        }
+
+        StopWatch m_swError = new StopWatch();
+        void LogError(string sError)
+        {
+            if (m_swError.ElapsedMilliseconds < 5000) return;
+            m_swError.Restart();
+            p_sInfo = sError;
+        }
         #endregion
 
         string m_id;

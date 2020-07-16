@@ -141,8 +141,11 @@ namespace RootTools.Control.ACS
             while (m_bThread)
             {
                 Thread.Sleep(1);
-                //forget p_bEnable ??
-                m_dio.RunThread(); 
+                if (p_bConnect)
+                {
+                    m_dio.RunThreadCheck();
+                    m_listAxis.RunThreadCheck();
+                }
             }
         }
         #endregion
