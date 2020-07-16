@@ -1,0 +1,13 @@
+설치 전 해당 ACS_Redistribution_Package폴더를 삭제되거나 이동되지 않을 안전한 위치로 복사하는 것을 추천드립니다
+
+1. 원하는 아키텍쳐(x86 or x64)의 폴더로 들어간다
+
+2. 이하의 실행파일 4개를 관리자 권한으로 실행한다
+ACS.AutoAssemblyRegistration.exe
+ACS.AutoCOMRegistration.exe
+ACS.AutoInstaller.exe
+ACS.AutoPostCompiling.exe
+
+3. 정상적으로 빌드가 진행되는지 확인한다
+
+문제가 있으시면 담당자에게 연락바랍니다
