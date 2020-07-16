@@ -1288,7 +1288,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <Button Grid.Column="0"
                                                         Style="{StaticResource BasicBtn}"
-                                                        Command="{Binding MinusRelativeMoveCommand}"
+                                                        Command="{Binding MRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1306,11 +1306,12 @@
                                                              Text="{Binding p_dRelPos}"
                                                              Foreground="White"
                                                              HorizontalAlignment="Center"
-                                                             FontSize="20" />
+                                                             FontSize="20"
+                                                             MinWidth="40"/>
                                                 </Border>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
-                                                        Command="{Binding PlusRelativeMoveCommand}"
+                                                        Command="{Binding PRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1346,7 +1347,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <Button Grid.Column="0"
                                                         Style="{StaticResource BasicBtn}"
-                                                        Command="{Binding MinusRelativeMoveCommand}"
+                                                        Command="{Binding MRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1364,11 +1365,12 @@
                                                              Text="{Binding p_axisXY.p_axisY.p_dRelPos}"
                                                              Foreground="White"
                                                              HorizontalAlignment="Center"
-                                                             FontSize="20" />
+                                                             FontSize="20" 
+                                                             MinWidth="40"/>
                                                 </Border>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
-                                                        Command="{Binding PlusRelativeMoveCommand}"
+                                                        Command="{Binding PRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1404,7 +1406,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <Button Grid.Column="0"
                                                         Style="{StaticResource BasicBtn}"
-                                                        Command="{Binding MinusRelativeMoveCommand}"
+                                                        Command="{Binding MRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1422,11 +1424,12 @@
                                                              Text="{Binding p_dRelPos}"
                                                              Foreground="White"
                                                              HorizontalAlignment="Center"
-                                                             FontSize="20" />
+                                                             FontSize="20" 
+                                                             MinWidth="40"/>
                                                 </Border>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
-                                                        Command="{Binding PlusRelativeMoveCommand}"
+                                                        Command="{Binding PRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
