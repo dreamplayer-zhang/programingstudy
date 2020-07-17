@@ -468,7 +468,6 @@ namespace RootTools.Camera.BaslerPylon
 
         private Stopwatch stopWatch = new Stopwatch();
 
-        private PixelDataConverter converter = new PixelDataConverter();
         private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
         {
             try
@@ -484,6 +483,7 @@ namespace RootTools.Camera.BaslerPylon
 
                         if (m_ImageGrab.p_nByte == 3)
                         {
+                            PixelDataConverter converter = new PixelDataConverter();
                             converter.OutputPixelFormat = PixelType.BGR8packed;
                             converter.Convert(m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.p_nByte, grabResult);
                         }
