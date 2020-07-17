@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -45,7 +46,16 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
             p_sInfo = m_toolBox.Get(ref m_diInterlockKey, this, "Interlock Key");
             p_sInfo = m_toolBox.Get(ref m_diCDALow, this, "CDA Low");
-            p_sInfo = m_RFID.GetTools(this, bInit); 
+            p_sInfo = m_RFID.GetTools(this, bInit);
+            if (bInit) InitALID(); 
+        }
+        #endregion
+
+        #region GAF
+        ALID m_alidCDALow; 
+        void InitALID()
+        {
+            m_alidCDALow = m_gaf.GetALID(this, p_id + ".CDALow", "CDA Low"); 
         }
         #endregion
 
@@ -58,7 +68,8 @@ namespace Root_Vega.Module
             m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Ready);
             m_eBuzzer = eBuzzer.BuzzerOff; 
             m_doBuzzer.Write(m_eBuzzer);
-            if (m_diEMS.p_bIn) EQ.p_eState = EQ.eState.Error; 
+            if (m_diEMS.p_bIn) EQ.p_eState = EQ.eState.Error;
+            m_alidCDALow.p_bSet = m_diCDALow.p_bIn; 
             //
         }
         #endregion

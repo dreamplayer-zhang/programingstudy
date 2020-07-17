@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Light;
 using RootTools.Module;
 using RootTools.Trees;
