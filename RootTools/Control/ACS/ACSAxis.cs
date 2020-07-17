@@ -67,7 +67,15 @@ namespace RootTools.Control.ACS
                 p_posActual = m_acs.m_channel.GetFPosition(m_nAxis);
                 p_vNow = m_acs.m_channel.GetRVelocity(m_nAxis); 
             }
-            catch (Exception e) { p_sInfo = p_id + " Check Position & Velocity Error : " + e.Message; }
+            catch (Exception e) { LogErrorPosition(p_id + " Check Position & Velocity Error : " + e.Message); }
+        }
+
+        StopWatch m_swErrorPosition = new StopWatch();
+        void LogErrorPosition(string sError)
+        {
+            if (m_swErrorPosition.ElapsedMilliseconds < 5000) return;
+            m_swErrorPosition.Restart();
+            p_sInfo = sError; 
         }
         #endregion
 
@@ -164,8 +172,6 @@ namespace RootTools.Control.ACS
         }
         #endregion
 
-        //=======================================================
-
         #region Home
         public override string StartHome()
         {
@@ -176,30 +182,10 @@ namespace RootTools.Control.ACS
             }
             p_sInfo = base.StartHome();
             if (p_sInfo != "OK") return p_sInfo;
-            //if (AXM("AxmHomeSetMethod", CAXM.AxmHomeSetMethod(m_nAxis, (int)m_eHomeDir, (uint)m_eHomeSignal, (uint)m_eHomeZPhase, 1000, 0)) != 0) return p_sInfo;
-            //Speed v0 = GetSpeedValue(eSpeed.Home_First);
-            //Speed v1 = GetSpeedValue(eSpeed.Home_Last);
-            //if (AXM("AxmHomeSetVel", CAXM.AxmHomeSetVel(m_nAxis, v0.m_v, v0.m_v, v1.m_v, v1.m_v, v0.m_acc, v1.m_acc)) != 0) return p_sInfo;
-            //if (AXM("AxmHomeSetStart", CAXM.AxmHomeSetStart(m_nAxis)) != 0) return p_sInfo;
+            p_sInfo = m_acs.m_aBuffer[m_nAxis].Run();
+            if (p_sInfo != "OK") return p_sInfo;
             p_eState = eState.Home;
             Thread.Sleep(10);
-            return "OK";
-        }
-
-        const uint c_nAlarmReset = 0x02;
-        public override string ResetAlarm()
-        {
-            uint nOutput = 0;
-            if (p_sensorAlarm == false) return "OK";
-            p_sInfo = "Reset Alarm";
-            //if (AXM("AxmSignalReadOutput", CAXM.AxmSignalReadOutput(m_nAxis, ref nOutput)) != 0) return p_sInfo;
-            //nOutput |= c_nAlarmReset;
-            //if (AXM("AxmSignalWriteOutput", CAXM.AxmSignalWriteOutput(m_nAxis, nOutput)) != 0) return p_sInfo;
-            //Thread.Sleep(50);
-            //nOutput -= c_nAlarmReset;
-            //if (AXM("AxmSignalWriteOutput", CAXM.AxmSignalWriteOutput(m_nAxis, nOutput)) != 0) return p_sInfo;
-            p_eState = eState.Init;
-            Thread.Sleep(100);
             return "OK";
         }
 
@@ -211,57 +197,15 @@ namespace RootTools.Control.ACS
             {
                 if (bOn) p_channel.Enable(m_nAxis);
                 else p_channel.Disable(m_nAxis);
-                p_log.Info(p_id + " Servo On = " + bOn.ToString()); 
+                p_log.Info(p_id + " Servo On = " + bOn.ToString());
             }
             catch (Exception e) { p_sInfo = p_id + " ServoOn Error : " + e.Message; }
             if (bOn == false) p_eState = eState.Init;
             Thread.Sleep(100);
         }
-
-        enum eMoveDir
-        {
-            DIR_CCW,
-            DIR_CW
-        }
-        eMoveDir m_eHomeDir = eMoveDir.DIR_CCW;
-
-        enum eHomeSignal
-        {
-            PosEndLimit,
-            NegEndLimit,
-            notUse2,
-            notUse3,
-            HomeSensor,
-            EncodZPhase,
-            UniInput02,
-            UniInput03
-        }
-        eHomeSignal m_eHomeSignal = eHomeSignal.HomeSensor;
-
-        enum eHomeZPhase
-        {
-            NotUse,
-            Plus,
-            Minus
-        }
-        eHomeZPhase m_eHomeZPhase = eHomeZPhase.NotUse;
-
-        void GetAxisStatusHome()
-        {
-            int i = 0; uint u0 = 0, u1 = 0; double f0 = 0, f1 = 0;
-            //AXM("AxmHomeGetMethod", CAXM.AxmHomeGetMethod(m_nAxis, ref i, ref u0, ref u1, ref f0, ref f1));
-            //m_eHomeDir = (eMoveDir)i;
-            //m_eHomeSignal = (eHomeSignal)u0;
-            //m_eHomeZPhase = (eHomeZPhase)u1;
-        }
-
-        void RunTreeSettingHome(Tree tree)
-        {
-            m_eHomeDir = (eMoveDir)tree.Set(m_eHomeDir, m_eHomeDir, "Dir", "Search Home Direction");
-            m_eHomeSignal = (eHomeSignal)tree.Set(m_eHomeSignal, m_eHomeSignal, "Signal", "Search Home Sensor");
-            m_eHomeZPhase = (eHomeZPhase)tree.Set(m_eHomeZPhase, m_eHomeZPhase, "ZPhase", "Search Home ZPhase");
-        }
         #endregion
+
+        //=======================================================
 
         #region Trigger
         bool m_bLevel = true;
@@ -332,7 +276,7 @@ namespace RootTools.Control.ACS
         #endregion
 
         #region Thread Sensor
-        void RunThreadCheck_Sensor()
+        void RunThreadCheck_Sensor(Array aLimit)
         {
             if (p_bConnect == false) return; 
             try
@@ -340,15 +284,15 @@ namespace RootTools.Control.ACS
                 int nMotor = p_channel.GetMotorState(m_nAxis);
                 p_bSeroOn = ((nMotor & p_channel.ACSC_MST_ENABLE) != 0);
                 p_sensorInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
+                int nLimit = (int)aLimit.GetValue(m_nAxis);
+                p_sensorMinusLimit = (nLimit & p_channel.ACSC_SAFETY_LL) != 0;
+                p_sensorPlusLimit = (nLimit & p_channel.ACSC_SAFETY_RL) != 0;
             }
-            catch (Exception e) { p_sInfo = p_id + " Thread Check Sensor Error : " + e.Message; }
+            catch (Exception e) { LogErrorSensor(p_id + " Thread Check Sensor Error : " + e.Message); }
             //uint uRead = 0;
             //uint uReadM = 0;
             //AXM("AxmHomeReadSignal", CAXM.AxmHomeReadSignal(m_nAxis, ref uRead));
             //p_sensorHome = (uRead > 0);
-            //AXM("AxmSignalReadLimit", CAXM.AxmSignalReadLimit(m_nAxis, ref uRead, ref uReadM));
-            //p_sensorMinusLimit = (uReadM > 0);
-            //p_sensorPlusLimit = (uRead > 0);
             //AXM("AxmSignalReadServoAlarm", CAXM.AxmSignalReadServoAlarm(m_nAxis, ref uRead));
             //p_sensorAlarm = (uRead > 0);
             //if (m_eEmergency != eSensorMethod.UNUSED)
@@ -362,20 +306,25 @@ namespace RootTools.Control.ACS
                 Thread.Sleep(100);
             }
         }
+
+        StopWatch m_swErrorSensor = new StopWatch();
+        void LogErrorSensor(string sError)
+        {
+            if (m_swErrorSensor.ElapsedMilliseconds < 5000) return;
+            m_swErrorSensor.Restart();
+            p_sInfo = sError;
+        }
         #endregion
 
         #region Thread
         bool m_bThread = false;
         Thread m_threadRun;
-        Thread m_threadCheck;
         void InitThread()
         {
             if (m_bThread) return;
             m_bThread = true;
             m_threadRun = new Thread(new ThreadStart(RunThread));
-            m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
             m_threadRun.Start();
-            m_threadCheck.Start();
         }
 
         void RunThread()
@@ -420,18 +369,12 @@ namespace RootTools.Control.ACS
             }
         }
 
-        void RunThreadCheck()
+        public void RunThreadCheck(Array aLimit)
         {
-            //AXM("AxmSignalWriteOutput", CAXM.AxmSignalWriteOutput(m_nAxis, 0));
-            Thread.Sleep(2000);
-            while (m_bThread)
+            if (m_nAxis >= 0)
             {
-                Thread.Sleep(1);
-                if (m_nAxis >= 0)
-                {
-                    RunThreadCheck_Sensor();
-                    RunThreadCheck_Position();
-                }
+                RunThreadCheck_Sensor(aLimit);
+                RunThreadCheck_Position();
             }
         }
         #endregion
@@ -449,7 +392,6 @@ namespace RootTools.Control.ACS
         {
             m_treeRootSetting.p_eMode = mode;
             RunTreeSettingProperty(m_treeRootSetting.GetTree("Property"));
-            RunTreeSettingHome(m_treeRootSetting.GetTree("Home"));
             RunTreeSettingTrigger(m_treeRootSetting.GetTree("Trigger"));
         }
         #endregion
@@ -471,7 +413,6 @@ namespace RootTools.Control.ACS
             {
                 m_bThread = false;
                 m_threadRun.Join();
-                m_threadCheck.Join();
             }
         }
     }

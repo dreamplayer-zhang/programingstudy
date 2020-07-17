@@ -25,9 +25,8 @@ namespace RootTools.RADS
 			//if (bUseRADS == true)
 			//{
 			//	p_treeRoot = p_connect.p_CurrentController.p_TreeRoot;
-			//	m_timer = new Timer(100);
-			//	m_timer.Elapsed += Timer_Elapsed;
-			//	m_timer.Start();
+			m_timer = new Timer(100);
+			m_timer.Elapsed += Timer_Elapsed;
 			//}
 		}
 
@@ -123,7 +122,7 @@ namespace RootTools.RADS
 		}
 		#endregion
 
-		Timer m_timer { get; set; }
+		public Timer m_timer { get; set; }
 
 		RADSConnectControl m_connect;
 		public RADSConnectControl p_connect

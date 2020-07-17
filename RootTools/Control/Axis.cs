@@ -53,6 +53,8 @@ namespace RootTools.Control
         }
 
         public Log p_log { get; set; }
+
+        public double p_dRelPos { get; set; }
         #endregion
 
         #region UI
@@ -105,7 +107,8 @@ namespace RootTools.Control
         Dictionary<string, double> m_aPos = new Dictionary<string, double>();
         public List<string> m_asPos = new List<string>(); 
         public ObservableCollection<string> p_asPos { get; set; }
-
+        public string p_strSelPos { get; set; }
+        
         public void AddPos(params string[] asPos)
         {
             foreach (string sPos in asPos) AddPos(sPos);
@@ -223,7 +226,7 @@ namespace RootTools.Control
             if (vJog == 0) return "OK";
             double fPosNow = p_posCommand;
             if (m_bSWLimit[0] && (vJog < 0) && (fPosNow <= m_aPos[p_asPos[0]])) return "SW Minus Limit Error";
-            if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[p_asPos[2]])) return "SW Plus Limit Error";
+            if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[p_asPos[1]])) return "SW Plus Limit Error";
             return "OK";
         }
 
@@ -388,11 +391,11 @@ namespace RootTools.Control
             while (p_eState == eState.Move || p_eState == eState.Home)
             {
                 Thread.Sleep(10);
-                if (m_swMove.ElapsedMilliseconds > m_msMoveTime)
-                {
-                    p_eState = eState.Init;
-                    return p_id + " Axis Move Timeout";
-                }
+                //if (m_swMove.ElapsedMilliseconds > m_msMoveTime)
+                //{
+                //    p_eState = eState.Init;
+                //    return p_id + " Axis Move Timeout";
+                //}
             }
             switch (p_eState)
             {
@@ -601,6 +604,122 @@ namespace RootTools.Control
         }
 
         public virtual void RunTreeSetting(Tree.eMode mode) { }
+        #endregion
+
+        #region RelayCommand
+        private void MJogFast()
+        {
+            if (p_eState > Axis.eState.Ready) return;
+            Jog(-0.31, eSpeed.Jog.ToString());
+        }
+
+        private void PJogFast()
+        {
+            if (p_eState > Axis.eState.Ready) return;
+            Jog(0.31, eSpeed.Jog.ToString());
+        }
+
+        private void JogFinish()
+        {
+            if (p_eState != Axis.eState.Jog) return;
+            StopAxis(true);
+        }
+
+        private void Move()
+        {
+            if (p_eState > Axis.eState.Ready) return;
+            StartMove(p_strSelPos, 0, eSpeed.Move.ToString());
+        }
+
+        private void MRelativeMove()
+        {
+            int nDir = -1;
+            if (p_eState > Axis.eState.Ready) return;
+            try
+            {
+                double dPos = Convert.ToInt32(p_dRelPos);
+                double fPos = p_posCommand + (nDir * dPos);
+                StartMove(fPos, eSpeed.Move.ToString());
+            }
+            catch (Exception) { }
+        }
+
+        private void PRelativeMove()
+        {
+            int nDir = 1;
+            if (p_eState > Axis.eState.Ready) return;
+            try
+            {
+                double dPos = Convert.ToInt32(p_dRelPos);
+                double fPos = p_posCommand + (nDir * dPos);
+                StartMove(fPos, eSpeed.Move.ToString());
+            }
+            catch (Exception) { }
+        }
+
+        public RelayCommand MJogFastCommand
+        {
+            get
+            {
+                return new RelayCommand(MJogFast);
+            }
+            set
+            {
+            }
+        }
+        public RelayCommand PJogFastCommand
+        {
+            get
+            {
+                return new RelayCommand(PJogFast);
+            }
+            set
+            {
+            }
+        }
+        public RelayCommand JogFinishCommand
+        {
+            get
+            {
+                return new RelayCommand(JogFinish);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand MoveCommand
+        {
+            get
+            {
+                return new RelayCommand(Move);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand MRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(MRelativeMove);
+            }
+            set
+            {
+            }
+        }
+
+        public RelayCommand PRelativeMoveCommand
+        {
+            get
+            {
+                return new RelayCommand(PRelativeMove);
+            }
+            set
+            {
+            }
+        }
         #endregion
 
         protected void InitBase(string id, Log log)

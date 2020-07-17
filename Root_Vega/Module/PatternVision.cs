@@ -762,7 +762,11 @@ namespace Root_Vega.Module
                 {
                     int nScanLine = 0;
                     m_grabMode.SetLight(true);
-                    if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == false)) m_grabMode.m_RADSControl.StartRADS();
+                    //if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == false))
+                    //{
+                    //    m_grabMode.m_RADSControl.p_IsRun = true;
+                    //    m_grabMode.m_RADSControl.StartRADS();
+                    //}
                     AxisXY axisXY = m_module.p_axisXY;
                     Axis axisZ = m_module.p_axisZ;
                     m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
@@ -859,7 +863,11 @@ namespace Root_Vega.Module
                 {
                     //m_grabMode.ResetTrigger(m_module.m_axisXY.m_axisY);
                     m_grabMode.SetLight(false);
-                    if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == true)) m_grabMode.m_RADSControl.StopRADS();
+                    //if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == true))
+                    //{
+                    //    m_grabMode.m_RADSControl.p_IsRun = false;
+                    //    m_grabMode.m_RADSControl.StopRADS();
+                    //}
                 }
             }
         }

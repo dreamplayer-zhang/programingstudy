@@ -74,7 +74,7 @@ namespace RootTools.Control.ACS
                     for (int m = 0, nID = 16 * n; m < 16; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aComp[m]) > 0);
                 }
             }
-            catch (Exception e) { m_log.Error("GetInputPort Error : " + e.Message); }
+            catch (Exception e) { LogError("GetInputPort Error : " + e.Message); }
         }
 
         void ReadOutput()
@@ -89,7 +89,15 @@ namespace RootTools.Control.ACS
                     for (int m = 0, nID = 16 * n; m < 16; m++, nID++) m_aDIO[nID].p_bOn = ((m_aRead[n] & m_aComp[m]) > 0);
                 }
             }
-            catch (Exception e) { m_log.Error("GetOutputPort Error : " + e.Message); }
+            catch (Exception e) { LogError("GetOutputPort Error : " + e.Message); }
+        }
+
+        StopWatch m_swError = new StopWatch();
+        void LogError(string sError)
+        {
+            if (m_swError.ElapsedMilliseconds < 5000) return;
+            m_swError.Restart();
+            m_log.Error(m_id + " " + sError);
         }
         #endregion
 
@@ -110,7 +118,7 @@ namespace RootTools.Control.ACS
         {
             m_lPort = tree.Set(m_lPort, 1, "Count", "DIO Port Count");
             InitModule();
-            RunTreePort(tree.GetTree(m_id + ".Port")); 
+            RunTreePort(tree.GetTree(m_id)); 
             SetModuleOffset();
         }
 
@@ -118,7 +126,7 @@ namespace RootTools.Control.ACS
         {
             for (int n = 0; n < m_lPort; n++)
             {
-                m_aPort[n] = tree.Set(m_aPort[n], -1, "Port" + n.ToString("00"), "DIO Port Number"); 
+                m_aPort[n] = tree.Set(m_aPort[n], -1, n.ToString("00"), "DIO Port Number"); 
             }
         }
 
