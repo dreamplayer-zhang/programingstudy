@@ -102,12 +102,26 @@ namespace RootTools.Control.ACS
                 return "OK";
             }
 
-            string p_id { get; set; }
+            string _sComment = ""; 
+            public string p_sComment 
+            {
+                get { return _sComment; }
+                set
+                {
+                    if (_sComment == value) return;
+                    _sComment = value;
+                    m_acs.m_reg.Write(p_id, value); 
+                } 
+            }
+
+            public string p_id { get; set; }
             ACS m_acs = null; 
             public Buffer(ACS acs, int nBuffer)
             {
+                m_acs = acs; 
                 m_nBuffer = nBuffer;
-                p_id = acs.p_id + ".Buffer" + nBuffer.ToString("00"); 
+                p_id = acs.p_id + ".Buffer" + nBuffer.ToString("00");
+                _sComment = acs.m_reg.Read(p_id, "Comment"); 
             }
         }
 
@@ -180,11 +194,13 @@ namespace RootTools.Control.ACS
             m_treeRoot.p_eMode = mode;
             m_listAxis.RunTree(m_treeRoot.GetTree("Axis"));
             m_dio.RunTree(m_treeRoot);
+            RunTreeConnect(m_treeRoot.GetTree("Connect")); 
         }
         #endregion
 
         IEngineer m_engineer;
         public Log m_log;
+        public Registry m_reg; 
         public TreeRoot m_treeRoot;
         public ACSDIO m_dio = new ACSDIO();
         public ACSListAxis m_listAxis = new ACSListAxis();
@@ -194,6 +210,7 @@ namespace RootTools.Control.ACS
             p_id = id;
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
+            m_reg = new Registry(p_id + "BufferComment"); 
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             m_dio.Init(id + ".DIO", this);

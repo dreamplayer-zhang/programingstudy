@@ -205,20 +205,23 @@ namespace RootTools.Control.ACS
         }
         #endregion
 
-        //=======================================================
-
         #region Trigger
         bool m_bLevel = true;
         double m_dTrigTime = 2;
         public override void RunTrigger(bool bOn)
         {
             if (m_nAxis < 0) return;
-            //AXM("AxmTriggerSetReset", CAXM.AxmTriggerSetReset(m_nAxis));
-            //if (bOn == false) return;
-            //uint nLevel = (uint)(m_bLevel ? 1 : 0);
-            //uint nEncoder = (uint)(m_trigger.m_bCmd ? 1 : 0);
-            //AXM("AxmTriggerSetTimeLevel", CAXM.AxmTriggerSetTimeLevel(m_nAxis, m_dTrigTime, nLevel, nEncoder, 0));
-            //AXM("AxmTriggerSetBlock", CAXM.AxmTriggerSetBlock(m_nAxis, m_trigger.m_aPos[0], m_trigger.m_aPos[1], m_trigger.m_dPos));
+            if (p_bConnect == false) return;
+            try
+            {
+                if (bOn == false) p_channel.StopPeg(m_nAxis);
+                else p_channel.PegInc(p_channel.ACSC_AMF_SYNCHRONOUS, m_nAxis, m_dTrigTime, m_trigger.m_aPos[0], m_trigger.m_dPos, m_trigger.m_aPos[1], 0, 0);
+            }
+            catch (Exception e)
+            {
+                p_sInfo = p_id + " Set Trigger Error : " + e.Message;
+                p_eState = eState.Init;
+            }
         }
 
         public void RunTreeSettingTrigger(Tree tree)
@@ -240,82 +243,6 @@ namespace RootTools.Control.ACS
         }
         #endregion
 
-        #region ACS Functions
-        public string SetPosTypeBound(double fPositivePos, double fNegativePos)
-        {
-            if (m_nAxis < 0) return "Axis not Assigned";
-            //if (AXM("AxmStatusSetPosType", CAXM.AxmStatusSetPosType(m_nAxis, 1, fPositivePos, fNegativePos)) != 0) return p_sInfo;
-            return "OK";
-        }
-
-        public string SetGantry(ACSAxis axisSlave)
-        {
-            if (m_nAxis < 0) return "Axis not Assigned";
-            if (axisSlave == null) return p_id + " SetGentry Slave Axis is null";
-            if (axisSlave.m_nAxis < 0) return "Axis Slave not Assigned";
-            //if (AXM("AxmLinkResetMode", CAXM.AxmLinkResetMode(0)) != 0) return p_sInfo;
-            //if (AXM("AxmGantrySetDisable", CAXM.AxmGantrySetDisable(m_nAxis, axisSlave.m_nAxis)) != 0) return p_sInfo;
-            //if (AXM("AxmGantrySetEnable", CAXM.AxmGantrySetEnable(m_nAxis, axisSlave.m_nAxis, 0, 0, 0)) != 0) return p_sInfo;
-            //uint nOn = 0, nHome = 0;
-            //double fOffset = 0, fRange = 0;
-            //if (AXM("AxmGantryGetEnable", CAXM.AxmGantryGetEnable(m_nAxis, ref nHome, ref fOffset, ref fRange, ref nOn)) != 0) return p_sInfo;
-            return "OK";
-        }
-
-        public void SetLoadRatio()
-        {
-            if (m_nAxis < 0) return;
-            //AXM("AxmStatusSetReadServoLoadRatio", CAXM.AxmStatusSetReadServoLoadRatio(m_nAxis, (uint)2));
-        }
-
-        public void ReadLoadRatio(ref double fLoadRatio)
-        {
-            if (m_nAxis < 0) return;
-            //AXM("AxmStatusReadServoLoadRatio", CAXM.AxmStatusReadServoLoadRatio(m_nAxis, ref fLoadRatio));
-        }
-        #endregion
-
-        #region Thread Sensor
-        void RunThreadCheck_Sensor(Array aLimit)
-        {
-            if (p_bConnect == false) return; 
-            try
-            {
-                int nMotor = p_channel.GetMotorState(m_nAxis);
-                p_bSeroOn = ((nMotor & p_channel.ACSC_MST_ENABLE) != 0);
-                p_sensorInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
-                int nLimit = (int)aLimit.GetValue(m_nAxis);
-                p_sensorMinusLimit = (nLimit & p_channel.ACSC_SAFETY_LL) != 0;
-                p_sensorPlusLimit = (nLimit & p_channel.ACSC_SAFETY_RL) != 0;
-            }
-            catch (Exception e) { LogErrorSensor(p_id + " Thread Check Sensor Error : " + e.Message); }
-            //uint uRead = 0;
-            //uint uReadM = 0;
-            //AXM("AxmHomeReadSignal", CAXM.AxmHomeReadSignal(m_nAxis, ref uRead));
-            //p_sensorHome = (uRead > 0);
-            //AXM("AxmSignalReadServoAlarm", CAXM.AxmSignalReadServoAlarm(m_nAxis, ref uRead));
-            //p_sensorAlarm = (uRead > 0);
-            //if (m_eEmergency != eSensorMethod.UNUSED)
-            //{
-            //    AXM("AxmSignalReadStop", CAXM.AxmSignalReadStop(m_nAxis, ref uRead));
-            //    p_sensorEmergency = (uRead > 0);
-            //}
-            if (p_sensorEmergency || p_sensorEmergency)
-            {
-                p_eState = eState.Init;
-                Thread.Sleep(100);
-            }
-        }
-
-        StopWatch m_swErrorSensor = new StopWatch();
-        void LogErrorSensor(string sError)
-        {
-            if (m_swErrorSensor.ElapsedMilliseconds < 5000) return;
-            m_swErrorSensor.Restart();
-            p_sInfo = sError;
-        }
-        #endregion
-
         #region Thread
         bool m_bThread = false;
         Thread m_threadRun;
@@ -329,7 +256,6 @@ namespace RootTools.Control.ACS
 
         void RunThread()
         {
-            uint nStat = 0;
             Thread.Sleep(2000);
             while (m_bThread)
             {
@@ -345,8 +271,7 @@ namespace RootTools.Control.ACS
                         }
                         else
                         {
-                            //AXM("AxmHomeGetResult", CAXM.AxmHomeGetResult(m_nAxis, ref nStat));
-                            if (nStat == 1)
+                            if (m_acs.m_aBuffer[m_nAxis].m_bRun == false)
                             {
                                 p_sInfo = p_id + " -> Home Finished " + (m_swMove.ElapsedMilliseconds / 1000).ToString("0.0 sec");
                                 p_eState = eState.Ready;
@@ -393,6 +318,47 @@ namespace RootTools.Control.ACS
             m_treeRootSetting.p_eMode = mode;
             RunTreeSettingProperty(m_treeRootSetting.GetTree("Property"));
             RunTreeSettingTrigger(m_treeRootSetting.GetTree("Trigger"));
+        }
+        #endregion
+
+        //=======================================================
+
+        #region Thread Sensor
+        void RunThreadCheck_Sensor(Array aLimit)
+        {
+            if (p_bConnect == false) return; 
+            try
+            {
+                int nMotor = p_channel.GetMotorState(m_nAxis);
+                p_bSeroOn = ((nMotor & p_channel.ACSC_MST_ENABLE) != 0);
+                p_sensorInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
+                int nLimit = (int)aLimit.GetValue(m_nAxis);
+                p_sensorMinusLimit = (nLimit & p_channel.ACSC_SAFETY_LL) != 0;
+                p_sensorPlusLimit = (nLimit & p_channel.ACSC_SAFETY_RL) != 0;
+            }
+            catch (Exception e) { LogErrorSensor(p_id + " Thread Check Sensor Error : " + e.Message); }
+            //AXM("AxmHomeReadSignal", CAXM.AxmHomeReadSignal(m_nAxis, ref uRead));
+            //p_sensorHome = (uRead > 0);
+            //AXM("AxmSignalReadServoAlarm", CAXM.AxmSignalReadServoAlarm(m_nAxis, ref uRead));
+            //p_sensorAlarm = (uRead > 0);
+            //if (m_eEmergency != eSensorMethod.UNUSED)
+            //{
+            //    AXM("AxmSignalReadStop", CAXM.AxmSignalReadStop(m_nAxis, ref uRead));
+            //    p_sensorEmergency = (uRead > 0);
+            //}
+            if (p_sensorEmergency || p_sensorEmergency)
+            {
+                p_eState = eState.Init;
+                Thread.Sleep(100);
+            }
+        }
+
+        StopWatch m_swErrorSensor = new StopWatch();
+        void LogErrorSensor(string sError)
+        {
+            if (m_swErrorSensor.ElapsedMilliseconds < 5000) return;
+            m_swErrorSensor.Restart();
+            p_sInfo = sError;
         }
         #endregion
 
