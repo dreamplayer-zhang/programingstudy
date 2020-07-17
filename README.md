@@ -13,4 +13,5 @@ https://ati5344.sharepoint.com/:u:/s/SW1/Ebw10le_SzlPqDMpOOhSw7MBJsuflKh4IcvCAkm
 해당 파일의 복사 행동이 빌드 후 이벤트에 등록되어있으므로 그 부분을 참고하시기 바랍니다
 
 **using SPIIPLUSCOM660Lib 관련 에러가 발생할 시에는 Lib/ACS_Redistribution_Package 폴더를 참조하시기 바랍니다**
+
 **opencv 관련 에러의 경우 C++ include 설정 혹은 구성관리자가 x64나 Any CPU로 설정되어 있는지 확인 바랍니다**
