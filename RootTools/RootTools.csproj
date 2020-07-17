@@ -156,6 +156,9 @@
       <DependentUpon>ACSListAxis_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\ACS\ACSListDIO.cs" />
+    <Compile Include="Control\ACS\ACS_Buffer_UI.xaml.cs">
+      <DependentUpon>ACS_Buffer_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\ACS\ACS_UI.xaml.cs">
       <DependentUpon>ACS_UI.xaml</DependentUpon>
     </Compile>
@@ -590,6 +593,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\ACS\ACSListAxis_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\ACS\ACS_Buffer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
