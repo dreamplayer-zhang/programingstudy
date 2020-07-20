@@ -106,7 +106,7 @@ namespace RootTools.GAFs
         ModuleBase m_module;
         ALIDList m_listALID;
         SQTable_ALID m_sqALID; 
-        string m_sID;
+        public string m_sID;
         Log m_log;
         IGem m_gem;
         public ALID(ModuleBase module, ALIDList listALID, string id, string sDesc)

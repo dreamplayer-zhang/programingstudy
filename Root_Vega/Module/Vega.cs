@@ -62,16 +62,11 @@ namespace Root_Vega.Module
 
         void InitALID()
         {
-			m_alidEMS = m_gaf.GetALID(this, p_id + ".EMS", "EMS Error");
-			m_alidEMS.p_sMsg = "Please Check the EMS Buttons.";
-			m_alidProtectionBar = m_gaf.GetALID(this, p_id + ".ProtectionBar", "ProtectionBar Error");
-            m_alidProtectionBar.p_sMsg = "Please Check State of Protection Bar.";
-            m_alidMCReset = m_gaf.GetALID(this, p_id + ".MC Reset", "MC Reset Error");
-            m_alidMCReset.p_sMsg = "Please Check State of the M/C Reset Button.";
-            m_alidIonizer = m_gaf.GetALID(this, p_id + ".Ionizer", "Ionizer Error");
-            m_alidIonizer.p_sMsg = "Please Check State of the Ionizer.";
-            m_alidCDALow = m_gaf.GetALID(this, p_id + ".CDA Low", "CDA Low Error");
-            m_alidCDALow.p_sMsg = "Please Check Value of CDA.";
+			m_alidEMS = m_gaf.GetALID(this, "EMS", "EMS Error");
+			m_alidProtectionBar = m_gaf.GetALID(this, "ProtectionBar", "ProtectionBar Error");
+            m_alidMCReset = m_gaf.GetALID(this, "MC Reset", "MC Reset Error");
+            m_alidIonizer = m_gaf.GetALID(this, "Ionizer", "Ionizer Error");
+            m_alidCDALow = m_gaf.GetALID(this, "CDA Low", "CDA Low Error");
 		}
 		#endregion
 
@@ -86,13 +81,11 @@ namespace Root_Vega.Module
 			m_doBuzzer.Write(m_eBuzzer);
 			if (m_diEMS.p_bIn) EQ.p_eState = EQ.eState.Error;
 
-			m_alidEMS.p_bSet = true; //JWS 200720 test 용
-			//m_alidEMS.p_bSet = m_diEMS.p_bIn;
-			//m_alidProtectionBar.p_bSet = m_diProtectionBar.p_bIn;
-			m_alidProtectionBar.p_bSet = true; //JWS 200720 test 용
-			m_alidMCReset.p_bSet = m_diMCReset.p_bIn;
-			m_alidIonizer.p_bSet = m_diIonizer.p_bIn;
-			m_alidCDALow.p_bSet = m_diCDALow.p_bIn;
+			m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
+			m_alidProtectionBar.Run(!m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
+			m_alidMCReset.Run(m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
+			m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer");
+			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA");
 		}
 		#endregion
 

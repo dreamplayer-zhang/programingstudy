@@ -94,8 +94,6 @@ namespace RootTools.GAFs
             p_sInfo = alid.p_sModule + " : " + alid.p_sDesc + ", " + alid.p_sMsg;
             p_brushAlarm = Brushes.Red;
             p_alarmBlink = true;
-
-
         }
 
         private void M_timerSetALID_Tick(object sender, EventArgs e)
@@ -119,7 +117,7 @@ namespace RootTools.GAFs
         {
             foreach (ALID al in p_aSetALID)
             {
-                if (al.p_id == alid.p_id) return true;
+                if (al.m_sID == alid.m_sID) return true;
             }
             return false;
         }

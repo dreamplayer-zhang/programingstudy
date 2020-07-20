@@ -442,12 +442,12 @@ namespace Root_Vega.Module
             m_ceidUnload = m_gaf.GetCEID(this, "Unload");
             m_ceidOpen = m_gaf.GetCEID(this, "Door Open");
             m_ceidClose = m_gaf.GetCEID(this, "Door Close");
-            m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked"); 
-        }
-        #endregion
+			m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
+		}
+		#endregion
 
-        #region Tree
-        public override void RunTree(Tree tree)
+		#region Tree
+		public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
             RunTreeAxis(tree.GetTree("Axis InPos", false));

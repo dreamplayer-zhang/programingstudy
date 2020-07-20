@@ -206,17 +206,17 @@ namespace Root_Vega.Module
                 m_aLimit[1] = tree.Set(m_aLimit[1], m_aLimit[1], "Upper Limit", "FDC Upper Limit");
                 if (m_alid[0] == null)
                 {
-                    m_alid[0] = m_module.m_gaf.GetALID(m_module, p_id + ".LowerLimit", "FDC Lower Limit");
+                    m_alid[0] = m_module.m_gaf.GetALID(m_module, ".LowerLimit", "FDC Lower Limit");
                     m_alid[0].p_sMsg = "FDC Value Smaller then Lower Limit";
-                    m_alid[1] = m_module.m_gaf.GetALID(m_module, p_id + ".UpperLimit", "FDC Upper Limit");
+                    m_alid[1] = m_module.m_gaf.GetALID(m_module, ".UpperLimit", "FDC Upper Limit");
                     m_alid[1].p_sMsg = "FDC Value Larger then Upper Limit";
-                    m_alidSend = m_module.m_gaf.GetALID(m_module, p_id + ".Timeout", "FDC Communicate Timeout");
+                    m_alidSend = m_module.m_gaf.GetALID(m_module, ".Timeout", "FDC Communicate Timeout");
                     m_alidSend.p_sMsg = "FDC Communicate Timeout";
                     m_svValue = m_module.m_gaf.GetSVID(m_module, p_id); 
                 }
-                m_alid[0].p_id = p_id + ".LowerLimit";
-                m_alid[1].p_id = p_id + ".UpperLimit";
-                m_alidSend.p_id = p_id + ".Timeout"; 
+                m_alid[0].p_id = "LowerLimit";
+                m_alid[1].p_id = "UpperLimit";
+                m_alidSend.p_id = "Timeout"; 
             }
         }
         #endregion

@@ -160,7 +160,7 @@
                            Grid.Row="1"
                            Style="{StaticResource BasicTb}"/>
                 <Grid Grid.Row="2" Background="DimGray">
-                    <TextBlock Text="Discription"
+                    <TextBlock Text="Description"
                                Foreground="Black"
                                Style="{StaticResource BasicTb}"/>
                 </Grid>
