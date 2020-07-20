@@ -117,11 +117,24 @@ namespace RootTools.GAFs
             }
             while (m_qSetALID.Count > 0)
             {
-                ShowPopup(); 
-                p_aSetALID.Add(m_qSetALID.Dequeue());
+                ALID alid = m_qSetALID.Dequeue(); 
+                if (IsExistinSetALID(alid) == false)
+                {
+                    ShowPopup();
+                    p_aSetALID.Add(alid);
+                }
             }
             p_brushAlarm = (p_aSetALID.Count > 0) ? Brushes.Red : Brushes.White;
         }
+
+        bool IsExistinSetALID(ALID setALID)
+		{
+            foreach (ALID alid in p_aSetALID)
+			{
+                if (alid.p_id == setALID.p_id) return true; 
+			}
+            return false; 
+		}
         #endregion
 
         #region Tree

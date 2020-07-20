@@ -48,6 +48,7 @@ namespace RootTools.GAFs
             set
             {
                 if (_bSet == value) return;
+                if (p_nID < 0) return; 
                 _bSet = value;
                 if (m_log != null) m_log.Error(m_sID + "." + p_sMsg + " = " + _bSet.ToString());
                 if (m_gem != null) m_gem.SetAlarm(this, _bSet);

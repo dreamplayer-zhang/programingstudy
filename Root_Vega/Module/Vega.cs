@@ -35,7 +35,7 @@ namespace Root_Vega.Module
         DIO_I m_diEMS;
         DIO_I m_diProtectionBar;
         DIO_I m_diMCReset;
-        DIO_I m_diInterlockKey;
+        DIO_I m_diIonizer;
         DIO_I m_diCDALow; 
         public override void GetTools(bool bInit)
         {
@@ -44,38 +44,60 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_diEMS, this, "EMS");
             p_sInfo = m_toolBox.Get(ref m_diProtectionBar, this, "ProtectionBar");
             p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
-            p_sInfo = m_toolBox.Get(ref m_diInterlockKey, this, "Interlock Key");
+            p_sInfo = m_toolBox.Get(ref m_diIonizer, this, "Ionizer");
             p_sInfo = m_toolBox.Get(ref m_diCDALow, this, "CDA Low");
             p_sInfo = m_RFID.GetTools(this, bInit);
-            if (bInit) InitALID(); 
+            
+                if (bInit) InitALID(); 
         }
         #endregion
 
         #region GAF
-        ALID m_alidCDALow; 
+        //ALID 생성
+        ALID m_alidEMS;
+        ALID m_alidProtectionBar;
+        ALID m_alidMCReset;
+        ALID m_alidIonizer;
+        ALID m_alidCDALow;
+
         void InitALID()
         {
-            m_alidCDALow = m_gaf.GetALID(this, p_id + ".CDALow", "CDA Low"); 
-        }
-        #endregion
+			m_alidEMS = m_gaf.GetALID(this, p_id + ".EMS", "EMS Error");
+			m_alidEMS.p_sMsg = "Please Check the EMS Buttons.";
+			m_alidProtectionBar = m_gaf.GetALID(this, p_id + ".ProtectionBar", "ProtectionBar Error");
+            m_alidProtectionBar.p_sMsg = "Please Check State of Protection Bar.";
+            m_alidMCReset = m_gaf.GetALID(this, p_id + ".MC Reset", "MC Reset Error");
+            m_alidMCReset.p_sMsg = "Please Check State of the M/C Reset Button.";
+            m_alidIonizer = m_gaf.GetALID(this, p_id + ".Ionizer", "Ionizer Error");
+            m_alidIonizer.p_sMsg = "Please Check State of the Ionizer.";
+            m_alidCDALow = m_gaf.GetALID(this, p_id + ".CDA Low", "CDA Low Error");
+            m_alidCDALow.p_sMsg = "Please Check Value of CDA.";
+		}
+		#endregion
 
-        #region Thread
-        protected override void RunThread()
+		#region Thread
+		protected override void RunThread()
         {
             base.RunThread();
             m_doLamp.Write(eLamp.Red, EQ.p_eState == EQ.eState.Error);
             m_doLamp.Write(eLamp.Yellow, EQ.p_eState == EQ.eState.Run);
             m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Ready);
-            m_eBuzzer = eBuzzer.BuzzerOff; 
-            m_doBuzzer.Write(m_eBuzzer);
-            if (m_diEMS.p_bIn) EQ.p_eState = EQ.eState.Error;
-            m_alidCDALow.p_bSet = m_diCDALow.p_bIn; 
-            //
-        }
-        #endregion
+            m_eBuzzer = eBuzzer.BuzzerOff;
+			m_doBuzzer.Write(m_eBuzzer);
+			if (m_diEMS.p_bIn) EQ.p_eState = EQ.eState.Error;
 
-        #region RFID
-        public class RFID
+			m_alidEMS.p_bSet = true; //JWS 200720 test 용
+			//m_alidEMS.p_bSet = m_diEMS.p_bIn;
+			//m_alidProtectionBar.p_bSet = m_diProtectionBar.p_bIn;
+			m_alidProtectionBar.p_bSet = true; //JWS 200720 test 용
+			m_alidMCReset.p_bSet = m_diMCReset.p_bIn;
+			m_alidIonizer.p_bSet = m_diIonizer.p_bIn;
+			m_alidCDALow.p_bSet = m_diCDALow.p_bIn;
+		}
+		#endregion
+
+		#region RFID
+		public class RFID
         {
             #region CRC
             ushort[] m_uCRC =

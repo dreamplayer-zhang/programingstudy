@@ -48,6 +48,7 @@ namespace RootTools.GAFs
             set
             {
                 if (_value == value) return;
+                //if (p_nID < 0) return;
                 if (m_gem != null) m_gem.SetSV(this, value);
                 if (m_log != null && _value != null) m_log.Info(m_sID + " : " + _value.ToString() + " -> " + value.ToString());
                 _value = value;
