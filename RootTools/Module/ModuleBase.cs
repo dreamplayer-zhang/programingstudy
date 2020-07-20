@@ -376,7 +376,8 @@ namespace RootTools.Module
             if (m_qModuleRun.Count == 0) return "OK";
             ModuleRunBase moduleRun = m_qModuleRun.Dequeue();
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
-            m_swRun.Restart(); 
+            m_swRun.Restart();
+            m_log.Info("ModuleRun : " + moduleRun.p_id + " Start");
             try { p_sInfo = moduleRun.Run(); }
             catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;

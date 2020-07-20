@@ -160,6 +160,7 @@ namespace RootTools.Control.ACS
                 {
                     m_dio.RunThreadCheck();
                     m_listAxis.RunThreadCheck();
+                    foreach (Buffer buffer in m_aBuffer) buffer.CheckState(); 
                 }
             }
         }
