@@ -38,6 +38,7 @@ namespace RootTools.Camera
                 TabItem tabItem = new TabItem();
                 tabItem.Header = camera.p_id.Replace(m_cameraSet.m_sModule + ".", "");
                 tabItem.Content = camera.p_ui;
+                tabItem.Height = 0; 
                 tabControl.Items.Add(tabItem);
                 m_asCamera.Add(camera.p_id.Replace(m_cameraSet.m_sModule + ".", ""));
             }
