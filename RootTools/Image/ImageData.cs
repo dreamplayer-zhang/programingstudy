@@ -182,6 +182,7 @@ namespace RootTools
 		Bitmap GetBitmapToArray(int width, int height, byte[] imageData)
 		{
 			var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+			
 
 			bmp.Palette = mono;
 

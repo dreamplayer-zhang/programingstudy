@@ -818,6 +818,67 @@ namespace RootTools
 				m_ImageData.ClearImage();
 		}
 
+		void LADSTest()
+		{
+			Bitmap bmp = new Bitmap(640, 480);
+			for (int i = 0; i<640; i++)
+			{
+				for (int j = 0; j<480; j++)
+				{
+					bmp.SetPixel(i, j, System.Drawing.Color.Black);
+				}
+			}
+			for (int i = 100; i<540; i++)
+			{
+				bmp.SetPixel(i, 240, System.Drawing.Color.White);
+			}
+			bmp.Save("D:\\BMPTEST.BMP");
+			//byte bMax = 0;
+
+			//if (m_ImageData == null) return;
+			//unsafe
+			//{
+			//	byte* pSrc = (byte*)m_ImageData.GetPtr().ToPointer();
+			//	for (int i = 0; i<640; i++)
+			//	{
+			//		for (int j = 0; j<480; j++)
+			//		{
+			//			byte temp = *pSrc;
+			//			if (temp >= bMax) bMax = temp;
+			//			pSrc++;
+			//		}
+			//	}
+			//	byte bResult = bMax;
+			//}
+
+
+
+
+
+			//byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
+			//byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
+			//byte* pBright = (byte*)m_memoryBright.GetPtr(0, 0, iInspect).ToPointer();
+			//for (int x = 0; x < m_szAlignROI.X; x++, pSrc++, pHeight++, pBright++)
+			//{
+			//	byte* pSrcY = pSrc;
+			//	int nSum = 0;
+			//	int nYSum = 0;
+			//	for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
+			//	{
+			//		nSum += *pSrcY;
+			//		nYSum = *pSrcY * y;
+			//	}
+			//	int nAdd = x + iInspect * m_szAlignROI.X;
+			//	m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
+			//	*pHeight = (byte)(m_aHeight[nAdd] >> 8);
+			//	int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
+			//	*pBright = pSrc[x + yAve * m_szAlignROI.X];
+			//}
+
+
+
+		}
+
 		void CancelCommand()
 		{
 			if (m_ImageData.Worker_MemoryCopy.IsBusy)
@@ -1446,6 +1507,13 @@ namespace RootTools
 			get
 			{
 				return new RelayCommand(ImageClear);
+			}
+		}
+		public ICommand CommandLADSTest
+		{
+			get
+			{
+				return new RelayCommand(LADSTest);
 			}
 		}
 		public ICommand TumbNailMouseMove
