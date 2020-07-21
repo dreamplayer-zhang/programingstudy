@@ -562,7 +562,7 @@ namespace RootTools.Control
         public void SetTrigger(double fPos0, double fPos1, double dPos, bool bCmd)
         {
             m_trigger.Set(fPos0, fPos1, dPos, bCmd);
-            RunTrigger(true); 
+            RunTrigger(true);
         }
 
         public virtual void RunTrigger(bool bOn) { }
