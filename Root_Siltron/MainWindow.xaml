@@ -11,21 +11,20 @@
         Height="1080"
         Width="1920"
         Title="Siltron"
-        Background="LightGray"
+        Background="{StaticResource PanelBackGround}"
         Loaded="Window_Loaded"
         Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
             <RowDefinition Height="85*"/>
-            <RowDefinition Height="3"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="15*"/>
         </Grid.RowDefinitions>
         <!--Title Bar Start-->
-        <Grid Grid.ColumnSpan="100"
+        <Grid Grid.Row="0"
               Name="TitleBar"
-              Background="#FF2D2D50"
+              Background="{StaticResource MainThema}"
               MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -35,7 +34,7 @@
             <icons:AtiLogo Width="40"
                            Height="25"
                            Margin="3" />
-            <TextBlock Text="ADI"
+            <TextBlock Text="WIND2"
                        Foreground="White"
                        VerticalAlignment="Center"
                        FontSize="15"
@@ -84,80 +83,20 @@
             </StackPanel>
         </Grid>
         <!--Title Bar End-->
+        <Grid Grid.Row="1" x:Name="MainPanel">
+            <local:SelectMode/>
+        </Grid>
 
-        <Border Grid.Row="1" Margin="0"
-                BorderBrush="DimGray"
-                BorderThickness="0,0,0,1">
-            <StackPanel Orientation="Horizontal" Background="Gainsboro">
-                <Grid Width="120">
-                    <Button Content="Save" FontWeight="Bold" FontSize="13" 
-                            BorderThickness="0"
-                            Margin="2"/>                
-                </Grid>
-                <Grid Width="120">
-                    <Button Content="Load" FontWeight="Bold" FontSize="13" 
-                            BorderThickness="0"
-                            Margin="2"/>
-                </Grid>
-            </StackPanel>
-        </Border>
-        <Border Grid.Row="2"
-                Background="White">
-            <Grid Grid.Row="1">
-                <Grid.DataContext>
-                    <local:NavigationManger/>
-                </Grid.DataContext>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Border Grid.Row="0"
-                        BorderBrush="DimGray"
-                        BorderThickness="0,0,0,1">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="12*"/>
-                            <ColumnDefinition Width="88*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Grid.Column="0"
-                                BorderBrush="DimGray"
-                                Background="DarkGray"
-                                BorderThickness="0,0,1,0">
-                            <TextBlock Text="Navigation"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                       FontSize="13"/>
-                        </Border>
-                        <Border Grid.Column="1" Background="DarkGray">
-                            <StackPanel Orientation="Horizontal">
-                                <Button Width="120"
-                                        Cursor="Hand"
-                                        Background="LightBlue"
-                                        BorderBrush="{x:Null}"
-                                        Content="Home"/>
-                                <ItemsControl ItemsSource="{Binding p_NaviButtons}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </Border>
-                <Grid Grid.Row="1">
-                    <ContentControl Content="{Binding p_CurrentPanel}"/>
-                </Grid>
-            </Grid>
-        </Border>
-        <GridSplitter Grid.Row="3" 
+        
+        <!--Log Area Start-->
+        <GridSplitter Grid.Row="2" 
+                      Height="3"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
-                      Background="DimGray"
-                      ShowsPreview="True"/>
-        <Border Grid.Row="4">
-            <TabControl Background="Transparent">
+                      Background="{StaticResource Splitter}"
+                      ShowsPreview="True" Grid.ColumnSpan="2"/>
+        <Border Grid.Row="3" Grid.ColumnSpan="2" >
+            <TabControl>
                 <TabItem Header="ALL" FontSize="10">
                     <TextBlock Text="Log Area" Margin="5"/>
                 </TabItem>
@@ -167,7 +106,8 @@
                 <TabItem Header="Network" FontSize="10"/>
                 <TabItem Header="Result" FontSize="10"/>
             </TabControl>
-            
+
         </Border>
+        <!--Log End-->
     </Grid>
 </Window>

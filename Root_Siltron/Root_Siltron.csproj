@@ -57,9 +57,17 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=2.5.1.1345, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Core.Presentation" />
+    <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -69,9 +77,11 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -81,8 +91,18 @@
     <Compile Include="Button\NaviBtn.xaml.cs">
       <DependentUpon>NaviBtn.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationManger.cs" />
-    <Compile Include="MainUI\3_Maint.xaml.cs">
+    <Compile Include="PropertyGrid.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PropertyGrid.Designer.cs">
+      <DependentUpon>PropertyGrid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SelectMode.xaml.cs">
+      <DependentUpon>SelectMode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\Dummy.cs" />
+    <Compile Include="UI\1.Setup\SetupUIManger.cs" />
+    <Compile Include="Engineer\3_Maint.xaml.cs">
       <DependentUpon>3_Maint.xaml</DependentUpon>
     </Compile>
     <Compile Include="Icon\AtiLogo.xaml.cs">
@@ -91,44 +111,59 @@
     <Compile Include="InfoWafer.cs" />
     <Compile Include="IWTRChild.cs" />
     <Compile Include="Module\Vision.cs" />
-    <Compile Include="NavigationPanelUI\GEMUI\GEMPanel.xaml.cs">
+    <Compile Include="UI\1.Setup\AlignmentUI\AlginmentOriginPage.xaml.cs">
+      <DependentUpon>AlginmentOriginPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\AlignmentUI\AlignmentDiePosition.xaml.cs">
+      <DependentUpon>AlignmentDiePosition.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\GEMUI\GEMPanel.xaml.cs">
       <DependentUpon>GEMPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationPanelUI\HomeUI\HomePanel.xaml.cs">
+    <Compile Include="UI\1.Setup\GeneralUI\GeneralAlignRecipePage.xaml.cs">
+      <DependentUpon>GeneralAlignRecipePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\GeneralUI\GeneralMaskPage.xaml.cs">
+      <DependentUpon>GeneralMaskPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\GeneralUI\GeneralSetupPage.xaml.cs">
+      <DependentUpon>GeneralSetupPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\HomeUI\HomePanel.xaml.cs">
       <DependentUpon>HomePanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationPanelUI\HomeUI\HomeSummaryPage.xaml.cs">
+    <Compile Include="UI\1.Setup\HomeUI\HomeSummaryPage.xaml.cs">
       <DependentUpon>HomeSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationPanelUI\AlignmentUI\AlignmentPanel.xaml.cs">
+    <Compile Include="UI\1.Setup\AlignmentUI\AlignmentPanel.xaml.cs">
       <DependentUpon>AlignmentPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationPanelUI\AlignmentUI\AlignmentSetupPage.xaml.cs">
+    <Compile Include="UI\1.Setup\AlignmentUI\AlignmentSetupPage.xaml.cs">
       <DependentUpon>AlignmentSetupPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationPanelUI\AlignmentUI\AlignmentSummaryPage.xaml.cs">
+    <Compile Include="UI\1.Setup\AlignmentUI\AlignmentSummaryPage.xaml.cs">
       <DependentUpon>AlignmentSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationPanelUI\GeneralUI\GeneralPanel.xaml.cs">
+    <Compile Include="UI\1.Setup\GeneralUI\GeneralPanel.xaml.cs">
       <DependentUpon>GeneralPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationPanelUI\GeneralUI\GeneralSummaryPage.xaml.cs">
+    <Compile Include="UI\1.Setup\GeneralUI\GeneralSummaryPage.xaml.cs">
       <DependentUpon>GeneralSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationPanelUI\InspectionUI\InspectionPanel.xaml.cs">
+    <Compile Include="UI\1.Setup\InspectionUI\InspectionPanel.xaml.cs">
       <DependentUpon>InspectionPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationPanelUI\MaintenanceUI\MaintenancePanel.xaml.cs">
+    <Compile Include="UI\1.Setup\MaintenanceUI\MaintenancePanel.xaml.cs">
       <DependentUpon>MaintenancePanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationPanelUI\ModeSelectUI.xaml.cs">
-      <DependentUpon>ModeSelectUI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="NavigationPanelUI\RecipeWizardUI\RecipeSummaryPage.xaml.cs">
+    <Compile Include="UI\1.Setup\RecipeWizardUI\RecipeSummaryPage.xaml.cs">
       <DependentUpon>RecipeSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NavigationPanelUI\RecipeWizardUI\RecipeWizardPanel.xaml.cs">
+    <Compile Include="UI\1.Setup\RecipeWizardUI\RecipeWizardPanel.xaml.cs">
       <DependentUpon>RecipeWizardPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\SetupHome.xaml.cs">
+      <DependentUpon>SetupHome.xaml</DependentUpon>
     </Compile>
     <Compile Include="Siltron_Engineer.cs" />
     <Compile Include="Siltron_Engineer_UI.xaml.cs">
@@ -146,11 +181,12 @@
     <Compile Include="Siltron_Recipe_UI.xaml.cs">
       <DependentUpon>Siltron_Recipe_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WpfPropertyGrid.cs" />
     <Page Include="Button\NaviBtn.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainUI\3_Maint.xaml">
+    <Page Include="Engineer\3_Maint.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -170,55 +206,79 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="NavigationPanelUI\GEMUI\GEMPanel.xaml">
+    <Page Include="UI\SelectMode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\HomeUI\HomePanel.xaml">
+    <Page Include="UI\1.Setup\AlignmentUI\AlginmentOriginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\HomeUI\HomeSummaryPage.xaml">
+    <Page Include="UI\1.Setup\AlignmentUI\AlignmentDiePosition.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\AlignmentUI\AlignmentPanel.xaml">
+    <Page Include="UI\1.Setup\GEMUI\GEMPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\AlignmentUI\AlignmentSetupPage.xaml">
+    <Page Include="UI\1.Setup\GeneralUI\GeneralAlignRecipePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\AlignmentUI\AlignmentSummaryPage.xaml">
+    <Page Include="UI\1.Setup\GeneralUI\GeneralMaskPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\GeneralUI\GeneralPanel.xaml">
+    <Page Include="UI\1.Setup\GeneralUI\GeneralSetupPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\GeneralUI\GeneralSummaryPage.xaml">
+    <Page Include="UI\1.Setup\HomeUI\HomePanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\InspectionUI\InspectionPanel.xaml">
+    <Page Include="UI\1.Setup\HomeUI\HomeSummaryPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\MaintenanceUI\MaintenancePanel.xaml">
+    <Page Include="UI\1.Setup\AlignmentUI\AlignmentPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\ModeSelectUI.xaml">
+    <Page Include="UI\1.Setup\AlignmentUI\AlignmentSetupPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\RecipeWizardUI\RecipeSummaryPage.xaml">
+    <Page Include="UI\1.Setup\AlignmentUI\AlignmentSummaryPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="NavigationPanelUI\RecipeWizardUI\RecipeWizardPanel.xaml">
+    <Page Include="UI\1.Setup\GeneralUI\GeneralPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\GeneralUI\GeneralSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\InspectionUI\InspectionPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\MaintenanceUI\MaintenancePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\RecipeWizardUI\RecipeSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\RecipeWizardUI\RecipeWizardPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\SetupHome.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -258,6 +318,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="PropertyGrid.resx">
+      <DependentUpon>PropertyGrid.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -277,6 +340,19 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\reticlemap.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\WaferMap.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\wafer.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Origin.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UI\ReviewMode\" />
+    <Folder Include="UI\RunMode\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

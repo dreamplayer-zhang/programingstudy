@@ -12,19 +12,20 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
-namespace Root_Siltron.Button
+namespace Root_Siltron
 {
     /// <summary>
-    /// NaviBtn.xaml에 대한 상호 작용 논리
+    /// GeneralSetupPage.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class NaviBtn : UserControl
+    public partial class GeneralSetupPage : UserControl
     {
-        public NaviBtn(string name)
+        public GeneralSetupPage()
         {
             InitializeComponent();
-            Btn.Content = name;
-        
         }
+
+
     }
 }

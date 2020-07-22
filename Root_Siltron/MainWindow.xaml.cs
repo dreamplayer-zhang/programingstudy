@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using RootTools;
+using System.Windows.Media;
 
 
 namespace Root_Siltron
@@ -51,26 +52,11 @@ namespace Root_Siltron
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
+            m_ModeUI.tbDate.Text = DateTime.Now.ToString("HH:mm:ss");
         }
         #endregion
 
-        Siltron_Engineer m_engineer = new Siltron_Engineer();
-        void Init()
-        {
-            m_engineer.Init("Siltron");            
-            //_Maint.engineerUI.Init(m_engineer);
-            //Panel.DataContext = new NavigationManger();
-            InitTimer();
-        }
-
-
-
-        void ThreadStop()
-        {
-            m_engineer.ThreadStop();
-        }
-
-        #region TitleBar
+        #region Title Bar
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
@@ -109,18 +95,70 @@ namespace Root_Siltron
                 this.DragMove();
             }
         }
-
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
+        #endregion
 
 
         private void textLastError_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             m_engineer.m_gaf.m_listALID.ShowPopup();
         }
+
+        #region UI
+        public SetupHome m_SetupUI;
+        private SetupUIManger m_SetupViewModel;
+
+        public SelectMode m_ModeUI;
+
+
         #endregion
+
+        Siltron_Engineer m_engineer = new Siltron_Engineer();
+
+        void Init()
+        {
+            m_engineer.Init("Siltron");
+            //_Maint.engineerUI.Init(m_engineer);
+            //Panel.DataContext = new NavigationManger();
+            InitTimer();
+            InitUI();
+        }
+
+        void InitUI()
+        {
+            m_SetupUI = new SetupHome();
+            ((SetupUIManger)m_SetupUI.DataContext).init(this);
+            m_SetupViewModel = (SetupUIManger)m_SetupUI.DataContext;
+            
+            m_ModeUI = new SelectMode();
+            m_ModeUI.Init(this);
+
+            Home();
+        }
+        void Home()
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(m_ModeUI);
+        }
+        void Setup()
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(m_SetupUI);
+        }
+
+        void ThreadStop()
+        {
+            m_engineer.ThreadStop();
+        }
+
+        
+
+
+
+
 
 
     }
