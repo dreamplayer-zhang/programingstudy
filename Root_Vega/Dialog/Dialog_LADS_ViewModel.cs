@@ -27,10 +27,22 @@ namespace Root_Vega
             m_Vision = vision;
             m_RunLADS = lads;
             p_treeRoot = new TreeRoot("LADS_ViewModel", vision.m_log);
+            lads.RunTree(p_treeRoot, Tree.eMode.RegRead);
+            lads.RunTree(p_treeRoot, Tree.eMode.Init);
+            p_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
+        }
+
+        private void M_treeRoot_UpdateTree()
+        {
+            m_RunLADS.RunTree(p_treeRoot, Tree.eMode.Update);
+            m_RunLADS.RunTree(p_treeRoot, Tree.eMode.Init);
+            m_RunLADS.RunTree(p_treeRoot, Tree.eMode.RegWrite);
         }
 
         void Test()
         {
+            m_Vision.p_eState = RootTools.Module.ModuleBase.eState.Run;
+            m_Vision.StartRun(m_RunLADS);
             return;
         }
 

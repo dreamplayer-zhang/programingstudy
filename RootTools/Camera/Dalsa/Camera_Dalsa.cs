@@ -12,6 +12,8 @@ namespace RootTools.Camera.Dalsa
 {
     public class Camera_Dalsa : ObservableObject, ICamera
     {
+        public event EventHandler Grabed;
+
         #region Property
         public string p_id { get; set; }
 
@@ -367,7 +369,7 @@ namespace RootTools.Camera.Dalsa
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
             m_GrabThread.Start();
         }
-
+        private CRect m_LastROI = new CRect(0, 0, 0, 0);
        unsafe void RunGrabLineScanThread()
         {
             StopWatch swGrab = new StopWatch();
@@ -404,13 +406,29 @@ namespace RootTools.Camera.Dalsa
                         //Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
                     }
                     iBlock++;
-                    if(m_nGrabCount !=0)
-                    p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+
+                    m_LastROI.Left = m_cpScanOffset.X;
+                    m_LastROI.Right = m_cpScanOffset.X + p_CamParam.p_Width;
+                    m_LastROI.Top = m_cpScanOffset.Y;
+                    m_LastROI.Bottom = m_cpScanOffset.Y + p_CamParam.p_Height;
+                    GrabEvent();
+
+                    if (m_nGrabCount !=0)
+                        p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;
         }
-
+        void GrabEvent()
+        {
+            if (Grabed != null)
+                OnGrabed(new GrabedArgs(m_Memory, m_nGrabTrigger, m_LastROI));
+        }
+        protected virtual void OnGrabed(GrabedArgs e)
+        {
+            if (Grabed != null)
+                Grabed.Invoke(this, e);
+        }
         public void GrabArea()
         {
            //p_CamParam.ReadParamter();

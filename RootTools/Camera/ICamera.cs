@@ -11,7 +11,8 @@ namespace RootTools.Camera
     }
 
     public interface ICamera
-    {  
+    {
+        event System.EventHandler Grabed;
         string p_id { get; set; }
 
         int p_nGrabProgress { get; set; }
@@ -29,5 +30,18 @@ namespace RootTools.Camera
         string StopGrab();
 
         void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0);
+    }
+
+    public class GrabedArgs : System.EventArgs
+    {
+        public MemoryData mdMemoryData;
+        public int nFrameCnt;
+        public CRect rtRoi;
+        public GrabedArgs(MemoryData md, int FrameCnt, CRect Roi)
+        {
+            mdMemoryData = md;
+            nFrameCnt = FrameCnt;
+            rtRoi = Roi;
+        }
     }
 }

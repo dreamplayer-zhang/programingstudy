@@ -1410,6 +1410,45 @@ namespace Root_Vega.Module
         }
         #endregion
 
+        //#region Run_LADS
+        //public class Run_LADS : ModuleRunBase
+        //{
+        //    SideVision m_module;
+        //    public Run_LADS(SideVision module)
+        //    {
+        //        m_module = module;
+        //        InitModuleRun(module);
+        //    }
+
+        //    public override ModuleRunBase Clone()
+        //    {
+        //        Run_LADS run = new Run_LADS(m_module);
+        //        return run;
+        //    }
+
+        //    public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+        //    {
+        //        treeRoot.p_eMode = mode;
+        //        RunTree(treeRoot, true);
+        //    }
+        //    public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+        //    {
+        //        base.RunTree(tree, bVisible, bRecipe);
+        //    }
+
+        //    public override string Run()
+        //    {
+        //        Camera_Basler cam = m_module.p_CamLADS;
+        //        ImageData img = cam.p_ImageViewer.p_ImageData;
+        //        AxisXY axisXY = m_module.p_axisXY;
+        //        Axis axisZ = m_module.p_axisZ;
+        //        Axis axisTheta = m_module.p_axisTheta;
+                
+        //        return base.Run();
+        //    }
+        //}
+        //#endregion
+
         public static class DispatcherService
         {
             public static void Invoke(Action action)

@@ -13,6 +13,8 @@ namespace RootTools.Camera.BaslerPylon
 {
     public class Camera_Basler : ObservableObject, RootTools.Camera.ICamera
     {
+        public event System.EventHandler Grabed;
+
         #region Property
         public string p_id { get; set; }
         public int p_nGrabProgress
@@ -448,6 +450,7 @@ namespace RootTools.Camera.BaslerPylon
             {
                 if (m_cam.IsOpen)
                 {
+                    m_bLive = true;
                     stopWatch.Reset();
                     m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
                     // Start the grabbing of images until grabbing is stopped.
@@ -467,7 +470,8 @@ namespace RootTools.Camera.BaslerPylon
         }
 
         private Stopwatch stopWatch = new Stopwatch();
-
+        private bool m_bLive = true;
+        private CRect m_LastROI = new CRect(0, 0, 0, 0);
         private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
         {
             try
@@ -478,27 +482,54 @@ namespace RootTools.Camera.BaslerPylon
                 {
                     if (!stopWatch.IsRunning || stopWatch.ElapsedMilliseconds > 100)
                     {  
-                        m_ImageGrab.p_nByte = ((m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString()) ? 1 : 3);
-                        m_ImageGrab.p_Size = new CPoint((int)m_CamParam._Width, (int)m_CamParam._Height);
-
-                        if (m_ImageGrab.p_nByte == 3)
+                        if (m_bLive)
                         {
-                            PixelDataConverter converter = new PixelDataConverter();
-                            converter.OutputPixelFormat = PixelType.BGR8packed;
-                            converter.Convert(m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.p_nByte, grabResult);
+                            m_ImageGrab.p_nByte = ((m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString()) ? 1 : 3);
+                            m_ImageGrab.p_Size = new CPoint((int)m_CamParam._Width, (int)m_CamParam._Height);
+
+                            if (m_ImageGrab.p_nByte == 3)
+                            {
+                                PixelDataConverter converter = new PixelDataConverter();
+                                converter.OutputPixelFormat = PixelType.BGR8packed;
+                                converter.Convert(m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.p_nByte, grabResult);
+                            }
+                            else
+                            {
+                                byte[] aBuf = grabResult.PixelData as byte[];
+                                Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
+                            }
+
+                            stopWatch.Reset();
+
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                m_ImageGrab.UpdateImage();
+                            });
                         }
                         else
                         {
-                            byte[] aBuf = grabResult.PixelData as byte[];
-                            Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
+                            int nFrameOffsetCntY = m_cpScanOffset.Y + m_nFrameCnt;
+                            if (m_nFrameCnt < m_nFrameTotal)
+                            {
+                                if (m_Memory.p_sz.Y > (nFrameOffsetCntY + 1) * m_ImageGrab.p_Size.Y)
+                                {
+                                    byte[] aBuf = grabResult.PixelData as byte[];
+                                    IntPtr dstPtr = (IntPtr)((long)m_Memory.GetPtr() + m_cpScanOffset.X + (m_ImageGrab.p_Size.Y * (long)m_Memory.W * nFrameOffsetCntY));
+                                    for (int n = 0; n < m_ImageGrab.p_Size.Y; n++, dstPtr = (IntPtr)((long)dstPtr + m_Memory.W))
+                                    {
+                                        Marshal.Copy(aBuf, m_ImageGrab.p_Size.X * n, dstPtr, m_ImageGrab.p_Size.X);
+                                    }
+
+                                    m_LastROI.Left = m_cpScanOffset.X;
+                                    m_LastROI.Right = m_cpScanOffset.X + m_ImageGrab.p_Size.X;
+                                    m_LastROI.Top = m_cpScanOffset.Y;
+                                    m_LastROI.Bottom = m_cpScanOffset.Y + m_ImageGrab.p_Size.Y;
+                                    m_nFrameCnt++;
+                                    GrabEvent();
+                                    p_nGrabProgress = Convert.ToInt32((double)m_nFrameCnt * 100 / m_nFrameTotal);
+                                }
+                            }
                         }
-
-                        stopWatch.Reset();
-
-                        Application.Current.Dispatcher.Invoke((Action)delegate
-                        {
-                            m_ImageGrab.UpdateImage();
-                        });
                     }
                 }
             }
@@ -512,7 +543,16 @@ namespace RootTools.Camera.BaslerPylon
                 e.DisposeGrabResultIfClone();
             }
         }
-
+        void GrabEvent()
+        {
+            if (Grabed != null)
+                OnGrabed(new GrabedArgs(m_Memory, m_nFrameCnt, m_LastROI));
+        }
+        protected virtual void OnGrabed(GrabedArgs e)
+        {
+            if (Grabed != null)
+                Grabed.Invoke(this, e);
+        }
         public void FunctionConnect()
         {
             if (m_cam != null && m_cam.IsOpen)
@@ -552,11 +592,36 @@ namespace RootTools.Camera.BaslerPylon
                 RunTree(Tree.eMode.Init);
             }
         }
+        int m_nFrameCnt;
+        int m_nFrameTotal;
+        MemoryData m_Memory;
+        CPoint m_cpScanOffset;
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReverseOffsetY = 0)
         {
+            try
+            {
+                if (m_cam.IsOpen)
+                {
+                    m_cpScanOffset = cpScanOffset;
+                    m_nFrameCnt = 0;
+                    m_Memory = memory;
+                    m_nFrameTotal = nLine;
+                    m_bLive = false;
+                    stopWatch.Reset();
+                    m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
+                    // Start the grabbing of images until grabbing is stopped.
+                    m_cam.Parameters[PLCamera.TriggerSelector].SetValue(PLCamera.TriggerSelector.AcquisitionStart);
+                    m_cam.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.On);
+                    m_cam.StreamGrabber.Start(GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
+                    p_CamInfo._IsCanGrab = false;
+                }
+            }
+            catch (Exception) { }
         }
         public string StopGrab()
         {
+            GrabStop();
+            m_cam.Parameters[PLCamera.TriggerMode].TrySetValue("Off");
             return "OK"; 
         }
     }
