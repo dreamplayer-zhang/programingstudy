@@ -192,34 +192,6 @@ namespace RootTools.Light
         }
         #endregion
 
-        #region Thread
-        bool m_bThread = false;
-        Thread m_thread;
-
-        void RunThreadCheck()
-        {
-            m_bThread = true;
-            Thread.Sleep(2000);
-            while (m_bThread)
-            {
-                Thread.Sleep(10);
-                //int nDifferent = (int)(m_secDifferent * 100); 
-                //foreach (ILightTool lightTool in m_aLightTool)
-                //{
-                //    foreach (LightBase light in lightTool.p_aLight)
-                //    {
-                //        if (light.p_nDifferent > nDifferent)
-                //        {
-                //            m_log.Warn("Light Power Miss Match : " + light.p_id);
-                //            light.p_fSetPower = light.p_fSetPower;
-                //            EQ.p_bStop = true; 
-                //        }
-                //    }
-                //}
-            }
-        }
-        #endregion
-
         #region Tree
         private void M_treeRoot_UpdateTree()
         {
@@ -288,30 +260,18 @@ namespace RootTools.Light
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);
-
-            m_thread = new Thread(new ThreadStart(RunThreadCheck));
-            m_thread.Start();
         }
 
         public void ThreadStop()
         {
-            if (m_bThread)
-            {
-                m_bThread = false;
-                m_thread.Join();
-            }
         }
 
         public void AddContoroller(Type type)
         {
-            if (type == typeof(LightTool_12ch))
-                m_n12Ch++;
-            else if (type == typeof(LightTool_4ch))
-                m_n4Ch++;
-            else if (type == typeof(LightTool_Kwangwoo))
-                m_nKwangwoo++;
-            else if (type == typeof(LightTool_LVS))
-                m_nLVS++;
+            if (type == typeof(LightTool_12ch)) m_n12Ch++;
+            else if (type == typeof(LightTool_4ch)) m_n4Ch++;
+            else if (type == typeof(LightTool_Kwangwoo)) m_nKwangwoo++;
+            else if (type == typeof(LightTool_LVS)) m_nLVS++;
             RunTree(Tree.eMode.Init);
         }
 

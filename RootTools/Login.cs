@@ -7,7 +7,7 @@ namespace RootTools
 {
     public class Login : NotifyProperty
     {
-        #region Deligate
+        #region deligate
         public delegate void dgOnChangeUser();
         public event dgOnChangeUser OnChangeUser;
         #endregion

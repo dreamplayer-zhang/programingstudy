@@ -41,11 +41,15 @@ namespace RootTools.Camera.Dalsa
         #endregion
 
         #region Connect
+        public delegate void dgOnConnect();
+        public event dgOnConnect OnConnect;
+
         BackgroundWorker m_bgwConnect = new BackgroundWorker();
         void InitConnect()
         {
             m_bgwConnect.DoWork += M_bgwConnect_DoWork;
             m_bgwConnect.RunWorkerCompleted += M_bgwConnect_RunWorkerCompleted;
+            m_bgwConnect.RunWorkerAsync();
         }
 
         private void M_bgwConnect_DoWork(object sender, DoWorkEventArgs e)
@@ -125,6 +129,7 @@ namespace RootTools.Camera.Dalsa
         private void M_bgwConnect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             RunTree(Tree.eMode.Init);
+            if (OnConnect != null) OnConnect(); 
         }
 
         public bool p_bConnect
@@ -180,7 +185,7 @@ namespace RootTools.Camera.Dalsa
         {
             int n = 0; 
             m_sapAcq.GetParameter(SapAcquisition.Prm.PIXEL_DEPTH, out n);
-            p_nByte = n;
+            p_nByte = n / 8;
             m_sapAcq.GetParameter(SapAcquisition.Prm.CROP_WIDTH, out n);
             p_sz.X = n;
             m_sapAcq.GetParameter(SapAcquisition.Prm.CROP_HEIGHT, out n);
@@ -290,7 +295,9 @@ namespace RootTools.Camera.Dalsa
             if (m_sapXfer == null) return "Camera not Connected";
             if (m_memoryData == null) return "MemoryData not Assigned";
             if (m_sapXfer.Grabbing) return "Camera is OnGrabbing";
-            m_bLive = false; 
+            m_bLive = false;
+            m_nXfer = 0; 
+            p_nGrabProgress = 0;
             m_qGrab.Clear(); 
             m_cp0 = cp0;
             m_nLine = nLine;
@@ -298,7 +305,8 @@ namespace RootTools.Camera.Dalsa
             m_yInvOffset = yInvOffset;
             int nGrabCount = (int)Math.Ceiling(1.0 * nLine / p_sz.Y);
             m_sapBuf.Index = 0;
-            m_sapXfer.Snap(nGrabCount); 
+            m_sapXfer.Snap(nGrabCount);
+            m_log.Info("m_sapXfer.Snap = " + nGrabCount.ToString());
             return "OK"; 
         }
 
@@ -324,10 +332,16 @@ namespace RootTools.Camera.Dalsa
             return null;
         }
 
-        Queue<int> m_qGrab = new Queue<int>(); 
+        Queue<int> m_qGrab = new Queue<int>();
+        int m_nXfer = 0; 
         private void M_sapXfer_XferNotify(object sender, SapXferNotifyEventArgs args)
         {
-            m_qGrab.Enqueue(args.EventCount); 
+            for (int n = 0; n < args.EventCount; n++)
+            {
+                m_qGrab.Enqueue(m_nXfer);
+                m_log.Info("Xfer = " + m_nXfer.ToString()); 
+                m_nXfer++;
+            }
         }
 
         CPoint m_cp0 = new CPoint();
@@ -396,7 +410,7 @@ namespace RootTools.Camera.Dalsa
             int wCam = p_nByte * p_sz.X;
             int wMem = m_memoryData.p_nByte * m_memoryData.p_sz.X;
             dMem *= wMem; 
-            IntPtr pSrc = m_aCamBuf[iGrab % p_nCamBuf];
+            IntPtr pSrc = m_aCamBuf[(iGrab + 1) % p_nCamBuf];
             IntPtr pDst = m_memoryData.GetPtr(0, m_cp0.X, y0); 
             for (int y = 0; y < p_sz.Y; y++, pSrc += wCam, pDst += dMem)
             {

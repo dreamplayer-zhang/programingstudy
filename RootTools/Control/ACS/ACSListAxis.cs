@@ -86,9 +86,11 @@ namespace RootTools.Control.ACS
         }
 
         public int m_lAxis = 0;
+        public int m_lAxisDetect = 0;
         public void RunTree(Tree tree)
         {
-            tree.Set(m_lAxis, m_lAxis, "Detect", "Detected Axis Count", true, true);
+            tree.Set(m_lAxisDetect, m_lAxisDetect, "Detect", "Detected Axis Count", true, true);
+            m_lAxis = tree.Set(m_lAxis, m_lAxis, "Set", "Set Axis Count"); 
         }
 
         public void RunEmergency()

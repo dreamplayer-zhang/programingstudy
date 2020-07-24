@@ -145,7 +145,7 @@ namespace RootTools.Memory
             m_threadProcess = new Thread(new ThreadStart(RunThreadProcess));
             m_threadProcess.Start();
 
-            m_timer.Interval = TimeSpan.FromMilliseconds(10000);
+            m_timer.Interval = TimeSpan.FromSeconds(10);
             m_timer.Tick += m_timer_Tick;
             m_timer.Start();
         }
@@ -160,7 +160,7 @@ namespace RootTools.Memory
         void RunThreadProcess()
         {
             m_bThreadProcess = true;
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
             while (m_bThreadProcess)
             {
                 Thread.Sleep(100);

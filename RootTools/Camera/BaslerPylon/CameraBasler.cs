@@ -41,11 +41,15 @@ namespace RootTools.Camera.BaslerPylon
         #endregion
 
         #region Connect
+        public delegate void dgOnConnect();
+        public event dgOnConnect OnConnect;
+
         BackgroundWorker m_bgwConnect = new BackgroundWorker(); 
         void InitConnect()
         {
             m_bgwConnect.DoWork += M_bgwConnect_DoWork;
             m_bgwConnect.RunWorkerCompleted += M_bgwConnect_RunWorkerCompleted;
+            p_bConnect = true; 
         }
 
         private void M_bgwConnect_DoWork(object sender, DoWorkEventArgs e) 
@@ -88,7 +92,8 @@ namespace RootTools.Camera.BaslerPylon
 
         private void M_bgwConnect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) 
         {
-            RunTree(Tree.eMode.Init); 
+            RunTree(Tree.eMode.Init);
+            if (OnConnect != null) OnConnect(); 
         }
 
         public bool p_bConnect
@@ -129,7 +134,6 @@ namespace RootTools.Camera.BaslerPylon
         void RunTreeConnect(Tree tree)
         {
             m_sDeviceUserID = tree.Set(m_sDeviceUserID, m_sDeviceUserID, "DeviceID", "Device User ID");
-            p_bConnect = tree.Set(p_bConnect, p_bConnect, "Connect", "Camera Connected");
             tree.Set(m_sIPAddress, m_sIPAddress, "IP Address", "TCP/IP Address", true, true);
             tree.Set(m_sCamModel, m_sCamModel, "Model", "Camera Model", true, true);
             tree.Set(m_sAccessibility, m_sAccessibility, "Accessibility", "Camera Accessibility", true, true);
@@ -409,7 +413,8 @@ namespace RootTools.Camera.BaslerPylon
             if (m_memoryData == null) return "MemoryData not Assigned";
             if (m_cam.StreamGrabber.IsGrabbing) return "Camera is OnGrabbing";
             m_qGrab.Clear();
-            m_bLive = false; 
+            m_bLive = false;
+            p_nGrabProgress = 0;
             if (nGrab <= 0) nGrab = 1;
             if ((nGrab + nOffset) > m_memoryData.p_nCount) return "Grab Count Larger then Memory Count";
             m_nGrabCount = nGrab; 
@@ -544,6 +549,7 @@ namespace RootTools.Camera.BaslerPylon
 
         string CopyBuf(byte[] aBuf, IntPtr intPtr)
         {
+            if (intPtr == null) return "CopyBuf Error : IntPtr == null"; 
             int nSize = p_sz.X * p_sz.Y * p_nByte;
             Marshal.Copy(aBuf, 0, intPtr, nSize);
             //forget MemoryData Invalid View

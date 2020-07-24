@@ -38,7 +38,7 @@
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Set Power" VerticalAlignment="Center"/>
             <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding p_fSetPower}" TextAlignment="Center" Margin="5" PreviewKeyDown="TextBox_PreviewKeyDown"/>
             <Slider Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" Margin="10" Maximum="100" Minimum="0"
-                        Value="{Binding p_fSetPower}" TickFrequency="0.1"/>
+                        Value="{Binding p_fSetPower}" TickFrequency="0.1" IsEnabled="False"/>
         </Grid>
     </GroupBox>
 </UserControl>
