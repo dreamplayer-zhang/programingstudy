@@ -63,9 +63,9 @@ namespace RootTools.Control.ACS
             if (m_acs.p_bConnect == false) return;
             try
             {
-                p_posCommand = m_acs.m_channel.GetRPosition(m_nAxis);
-                p_posActual = m_acs.m_channel.GetFPosition(m_nAxis);
-                p_vNow = m_acs.m_channel.GetRVelocity(m_nAxis); 
+                p_posCommand = (int)Math.Round(100000 * m_acs.m_channel.GetRPosition(m_nAxis)) / 100000.0;
+                p_posActual = (int)Math.Round(100000 * m_acs.m_channel.GetFPosition(m_nAxis)) / 100000.0;
+                p_vNow = (int)Math.Round(100000 * m_acs.m_channel.GetRVelocity(m_nAxis)) / 100000.0;
             }
             catch (Exception e) { LogErrorPosition(p_id + " Check Position & Velocity Error : " + e.Message); }
         }
@@ -89,8 +89,8 @@ namespace RootTools.Control.ACS
             try
             {
                 double v = fScale * m_speedNow.m_v; 
-                p_channel.SetAccelerationImm(m_nAxis, v / m_speedNow.m_acc);
-                p_channel.SetDecelerationImm(m_nAxis, v / m_speedNow.m_dec);
+                p_channel.SetAccelerationImm(m_nAxis, Math.Abs(v / m_speedNow.m_acc));
+                p_channel.SetDecelerationImm(m_nAxis, Math.Abs(v / m_speedNow.m_dec));
                 p_channel.Jog(p_channel.ACSC_AMF_VELOCITY, m_nAxis, v);
                 p_log.Info(p_id + " Jog Start : " + v.ToString()); 
             }
@@ -110,8 +110,7 @@ namespace RootTools.Control.ACS
             if (p_bConnect == false) return;
             try
             {
-                if (bSlowStop) p_channel.Break(m_nAxis);
-                else p_channel.Halt(m_nAxis);
+                p_channel.Halt(m_nAxis);
                 p_log.Info(p_id + " Jog Stop");
             }
             catch (Exception e) { p_sInfo = p_id + " Jog Start Error : " + e.Message; }
@@ -206,6 +205,7 @@ namespace RootTools.Control.ACS
         #endregion
 
         #region Trigger
+        bool m_bTriggerOn = false; 
         bool m_bLevel = true;
         double m_dTrigTime = 2;
         public override void RunTrigger(bool bOn)
@@ -214,20 +214,32 @@ namespace RootTools.Control.ACS
             if (p_bConnect == false) return;
             try
             {
-                if (bOn == false) p_channel.StopPeg(m_nAxis);
-                else p_channel.PegInc(p_channel.ACSC_AMF_SYNCHRONOUS, m_nAxis, m_dTrigTime, m_trigger.m_aPos[0], m_trigger.m_dPos, m_trigger.m_aPos[1], 0, 0);
+                if (m_bTriggerOn == bOn) return; 
+                if (bOn == false)
+                {
+                    p_channel.StopPeg(m_nAxis);
+                    p_log.Info("Trigger Off");
+                }
+                else
+                {
+                    p_channel.PegInc(p_channel.ACSC_AMF_SYNCHRONOUS, m_nAxis, m_dTrigTime / 1000.0, m_trigger.m_aPos[0], m_trigger.m_dPos, m_trigger.m_aPos[1], 0, 0);
+                    string sTrigger = m_trigger.m_aPos[0].ToString() + " ~ " + m_trigger.m_aPos[1].ToString() + ", " + m_trigger.m_dPos.ToString();
+                    p_log.Info("Trigger On : " + sTrigger + ", " + m_dTrigTime.ToString());
+                }
+                m_bTriggerOn = bOn; 
             }
             catch (Exception e)
             {
                 p_sInfo = p_id + " Set Trigger Error : " + e.Message;
                 p_eState = eState.Init;
+                m_bTriggerOn = false; 
             }
         }
 
         public void RunTreeSettingTrigger(Tree tree)
         {
             m_bLevel = tree.Set(m_bLevel, m_bLevel, "Level", "Trigger Level (true = Active High)");
-            m_dTrigTime = tree.Set(m_dTrigTime, m_dTrigTime, "Time", "Trigger Out Time (ms)");
+            m_dTrigTime = tree.Set(m_dTrigTime, m_dTrigTime, "Time", "Trigger Out Time (us)");
         }
         #endregion
 

@@ -38,17 +38,18 @@ namespace Root_Vega.ManualJob
         #endregion
 
         #region OHT State
-        int m_nBlink = 0; 
+        int _nBlink = 0; 
+        bool p_bBlink { get { return _nBlink < 5; } }
         void TimerLoadportState()
         {
-            SetBrush(buttonStateLoading, m_OHT.m_doLoadReq.p_bOn && (m_nBlink < 5)); 
-            SetBrush(buttonStateUnloading, m_OHT.m_doUnloadReq.p_bOn && (m_nBlink < 5));
+            SetBrush(buttonStateLoading, m_OHT.m_doLoadReq.p_bOn && p_bBlink); 
+            SetBrush(buttonStateUnloading, m_OHT.m_doUnloadReq.p_bOn && p_bBlink);
             textBlockPlaced.Foreground = m_loadport.m_dioPlaced.p_bIn ? Brushes.White : Brushes.Gray;
             textBlockPresent.Foreground = m_loadport.m_dioPresent.p_bIn ? Brushes.White : Brushes.Gray;
-            bool bPodIn = (m_nBlink < 5) ? m_loadport.m_dioPlaced.p_bIn : m_loadport.m_dioPresent.p_bIn;
+            bool bPodIn = p_bBlink ? m_loadport.m_dioPlaced.p_bIn : m_loadport.m_dioPresent.p_bIn;
             imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
             imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;
-            m_nBlink = (m_nBlink + 1) % 10; 
+            _nBlink = (_nBlink + 1) % 10; 
         }
         #endregion
 

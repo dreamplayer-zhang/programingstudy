@@ -59,6 +59,7 @@ namespace RootTools.Comm
                 if (value)
                 {
                     _sInfo = Connect();
+                    m_commLog.Add(CommLog.eType.Info, _sInfo);
                     if (_sInfo != "OK") //ThreadStop();  
                         m_sp = null;
                 }

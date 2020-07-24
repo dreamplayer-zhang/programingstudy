@@ -186,11 +186,11 @@ namespace RootTools.Control
 
         void RunTreePosition(Tree tree)
         {
-            m_aPos[p_asPos[0]] = tree.Set(m_aPos[p_asPos[0]], 0, p_asPos[0], "Axis Position (pulse)", m_bSWLimit[0]);
-            m_aPos[p_asPos[1]] = tree.Set(m_aPos[p_asPos[1]], 0, p_asPos[1], "Axis Position (pulse)", m_bSWLimit[1]);
+            m_aPos[p_asPos[0]] = tree.Set(m_aPos[p_asPos[0]], 0.0, p_asPos[0], "Axis Position (unit)", m_bSWLimit[0]);
+            m_aPos[p_asPos[1]] = tree.Set(m_aPos[p_asPos[1]], 0.0, p_asPos[1], "Axis Position (unit)", m_bSWLimit[1]);
             for (int n = 2; n < p_asPos.Count; n++)
             {
-                m_aPos[p_asPos[n]] = tree.Set(m_aPos[p_asPos[n]], 0, p_asPos[n], "Axis Position (pulse)");
+                m_aPos[p_asPos[n]] = tree.Set(m_aPos[p_asPos[n]], 0.0, p_asPos[n], "Axis Position (unit)");
             }
         }
         #endregion
@@ -262,7 +262,7 @@ namespace RootTools.Control
 
             public void RunTree(Tree tree)
             {
-                m_v = tree.Set(m_v, m_v, "Velociry", "Axis Moving Velocity (pulse / sec)");
+                m_v = tree.Set(m_v, m_v, "Velociry", "Axis Moving Velocity (unit / sec)");
                 m_acc = tree.Set(m_acc, m_acc, "Accelation", "Accelation Time (sec)");
                 m_dec = tree.Set(m_dec, m_dec, "Decelation", "Decelation Time (sec)");
             }

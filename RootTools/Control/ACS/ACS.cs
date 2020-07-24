@@ -15,7 +15,7 @@ namespace RootTools.Control.ACS
             try
             {
                 string sAxis = m_channel.Transaction("?SYSINFO(13)");
-                m_listAxis.m_lAxis = Convert.ToInt32(sAxis.Trim());
+                m_listAxis.m_lAxisDetect = Convert.ToInt32(sAxis.Trim());
             }
             catch (Exception e) { m_log.Error("Get Axis Count Error : " + e.Message); }
         }
@@ -34,7 +34,7 @@ namespace RootTools.Control.ACS
             set
             {
                 if (_bConnect == value) return;
-                m_listAxis.m_lAxis = 0;
+                m_listAxis.m_lAxisDetect = 0;
                 _bConnect = value;
                 if (value)
                 {
@@ -218,6 +218,7 @@ namespace RootTools.Control.ACS
             m_listAxis.Init(id + ".Axis", engineer, this);
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
+            p_bConnect = true; 
             InitThread(); 
         }
 

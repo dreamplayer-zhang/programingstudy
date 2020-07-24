@@ -5,21 +5,36 @@ namespace RootTools.Camera
 {
     public class Bayer2RGB
     {
+        public enum eBayer
+        {
+            Bayer_BG, 
+        }
+
         MemoryData m_memBayer;
         int m_iBayer = 0; 
         MemoryData m_memRGB;
         int m_iRGB = 0; 
-        public string Convert(MemoryData memBayer, int nMemoryIndexBayer, MemoryData memRGB, int nMemoryIndexRGB)
+        public string Convert(MemoryData memBayer, int nMemoryIndexBayer, MemoryData memRGB, int nMemoryIndexRGB, eBayer bayer = eBayer.Bayer_BG)
         {
             if (memBayer.p_sz != memRGB.p_sz) return "ROI Size Mismatch";
             m_memBayer = memBayer;
             m_iBayer = nMemoryIndexBayer; 
             m_memRGB = memRGB;
             m_iRGB = nMemoryIndexRGB;
-            ConvertR(1, 2);
-            ConvertB(2, 1);
-            ConvertGR(1, 1);
-            ConvertGB(2, 2);
+
+            switch (bayer)
+            {
+                case eBayer.Bayer_BG:
+                    ConvertR(1, 1);
+                    ConvertB(2, 2);
+                    ConvertGR(1, 2);
+                    ConvertGB(2, 1);
+                    break;
+            }
+            //ConvertR(1, 2);
+            //ConvertB(2, 1);
+            //ConvertGR(1, 1);
+            //ConvertGB(2, 2);
             return "OK";
         }
 
