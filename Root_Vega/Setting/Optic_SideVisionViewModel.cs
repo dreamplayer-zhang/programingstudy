@@ -373,11 +373,11 @@ namespace Root_Vega
             return;
         }
 
-        public void LADS()
+        unsafe public void LADS()
         {
             EQ.p_bStop = false;
             SideVision Sidevision = ((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision;
-            Run_LADS lads = (Run_LADS)Sidevision.CloneModuleRun("LADS");
+            SideVision.Run_LADS lads = (SideVision.Run_LADS)Sidevision.CloneModuleRun("LADS");
             var viewModel = new Dialog_LADS_ViewModel(Sidevision, lads);
             Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
             if (result.HasValue)

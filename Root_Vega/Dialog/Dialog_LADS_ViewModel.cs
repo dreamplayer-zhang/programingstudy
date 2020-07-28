@@ -14,7 +14,7 @@ namespace Root_Vega
     {
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
         SideVision m_Vision;
-        Run_LADS m_RunLADS;
+        SideVision.Run_LADS m_RunLADS;
         TreeRoot m_treeRoot = null;
         public TreeRoot p_treeRoot
         {
@@ -22,7 +22,7 @@ namespace Root_Vega
             set { SetProperty(ref m_treeRoot, value); }
         }
 
-        public Dialog_LADS_ViewModel(SideVision vision, Run_LADS lads)
+        public Dialog_LADS_ViewModel(SideVision vision, SideVision.Run_LADS lads)
         {
             m_Vision = vision;
             m_RunLADS = lads;

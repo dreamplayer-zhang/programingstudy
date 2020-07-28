@@ -166,7 +166,6 @@
     <Compile Include="ManualJob\ManualOHT_UI.xaml.cs">
       <DependentUpon>ManualOHT_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Module\Run_LADS.cs" />
     <Compile Include="Setting\Setting_FDC.xaml.cs">
       <DependentUpon>Setting_FDC.xaml</DependentUpon>
     </Compile>

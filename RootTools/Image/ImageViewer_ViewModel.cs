@@ -18,6 +18,8 @@ using System.Windows.Controls;
 using System.Windows.Shapes;
 using System.Windows.Media;
 using RootTools.Inspects;
+using RootTools.Memory;
+using MySql.Data.MySqlClient.Authentication;
 
 namespace RootTools
 {
@@ -818,42 +820,9 @@ namespace RootTools
 				m_ImageData.ClearImage();
 		}
 
-		void LADSTest()
+		unsafe void LADSTest()
 		{
-			Bitmap bmp = new Bitmap(640, 480);
-			for (int i = 0; i<640; i++)
-			{
-				for (int j = 0; j<480; j++)
-				{
-					bmp.SetPixel(i, j, System.Drawing.Color.Black);
-				}
-			}
-			for (int i = 100; i<540; i++)
-			{
-				bmp.SetPixel(i, 240, System.Drawing.Color.White);
-			}
-			bmp.Save("D:\\BMPTEST.BMP");
-			//byte bMax = 0;
-
-			//if (m_ImageData == null) return;
-			//unsafe
-			//{
-			//	byte* pSrc = (byte*)m_ImageData.GetPtr().ToPointer();
-			//	for (int i = 0; i<640; i++)
-			//	{
-			//		for (int j = 0; j<480; j++)
-			//		{
-			//			byte temp = *pSrc;
-			//			if (temp >= bMax) bMax = temp;
-			//			pSrc++;
-			//		}
-			//	}
-			//	byte bResult = bMax;
-			//}
-
-
-
-
+			
 
 			//byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
 			//byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
@@ -874,9 +843,6 @@ namespace RootTools
 			//	int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
 			//	*pBright = pSrc[x + yAve * m_szAlignROI.X];
 			//}
-
-
-
 		}
 
 		void CancelCommand()
