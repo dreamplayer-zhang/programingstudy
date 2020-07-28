@@ -98,7 +98,7 @@ namespace Root_Vega.Module
                 int nScanLine = 0;
                 m_grabMode.SetLight(true);
                 m_module.SetLightByName("LADS", 100);
-                m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fRes);        // 축해상도 0.1um로 하드코딩. 트리거 발생 주기.
+                m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fRes) * cam.GetRoiSize().Y;        // 축해상도 0.1um로 하드코딩. 트리거 발생 주기.
                 int nLinesY = Convert.ToInt32(m_yLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
                 int nLinesX = Convert.ToInt32(m_xLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
                 m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;

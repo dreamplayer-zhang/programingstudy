@@ -464,6 +464,7 @@ namespace RootTools.Camera.BaslerPylon
 
         private void GrabStop()
         {
+            if (m_cam == null) return;
             m_cam.StreamGrabber.Stop();
             m_cam.StreamGrabber.ImageGrabbed -= OnImageGrabbed;
             p_CamInfo._IsCanGrab = true;

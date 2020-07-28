@@ -1020,7 +1020,139 @@
                 </TabItem>
                 <TabItem Header="LADS"
                          DataContext="{Binding p_SideVision.p_CamLADS}"
-                         Style="{StaticResource StackPanelTabItem}" />
+                         Style="{StaticResource StackPanelTabItem}" >
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="70"></RowDefinition>
+                            <RowDefinition Height="100"></RowDefinition>
+                            <RowDefinition Height="0"></RowDefinition>
+                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource BasicBtn}"
+                                    IsEnabled="{Binding p_CamInfo._OpenStatus, Converter={StaticResource InverseBooleanConverters}}"
+                                    Command="{Binding ConnectCommand}"
+                                    Margin="5">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <material:PackIcon Kind="LanConnect"
+                                                           Foreground="White"
+                                                           Width="30"
+                                                           Height="30"></material:PackIcon>
+                                        <TextBlock Text="Connect"
+                                                   Style="{StaticResource BasicTb}"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button Style="{StaticResource BasicBtn}"
+                                    IsEnabled="{Binding p_CamInfo._OpenStatus }"
+                                    Command="{Binding ConnectCommand}"
+                                    Margin="5">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <material:PackIcon Kind="LanDisconnect"
+                                                           Foreground="White"
+                                                           Width="30"
+                                                           Height="30"></material:PackIcon>
+                                        <TextBlock Text="DisConnect"
+                                                   Style="{StaticResource BasicTb}"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button Style="{StaticResource BasicBtn}"
+                                    IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                    Command="{Binding GrabCommand}"
+                                    Margin="5">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <material:PackIcon Kind="CreditCard"
+                                                           Foreground="White"
+                                                           Width="30"
+                                                           Height="30"></material:PackIcon>
+                                        <TextBlock Text="One Shot"
+                                                   Style="{StaticResource BasicTb}"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button Style="{StaticResource BasicBtn}"
+                                    IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                    Command="{Binding ContinousGrabCommand}"
+                                    Margin="5">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <material:PackIcon Kind="CreditCardMultiple"
+                                                           Foreground="White"
+                                                           Width="30"
+                                                           Height="30"></material:PackIcon>
+                                        <TextBlock Text="Cont. Shot"
+                                                   Style="{StaticResource BasicTb}"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button Style="{StaticResource BasicBtn}"
+                                    IsEnabled="{Binding p_CamInfo._IsCanGrab, Converter={StaticResource InverseBooleanConverters}}"
+                                    Command="{Binding StopGrabCommand}"
+                                    Margin="5">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <material:PackIcon Kind="StopCircleOutline"
+                                                           Foreground="White"
+                                                           Width="30"
+                                                           Height="30"></material:PackIcon>
+                                        <TextBlock Text="Stop"
+                                                   Style="{StaticResource BasicTb}"></TextBlock>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                        <GroupBox Header="조명"
+                                  Grid.Row="1"
+                                  Margin="10,0,10,10"
+                                  Foreground="{StaticResource BtnForeGround}"
+                                  FontSize="20">
+                            <Grid Height="50"
+                                  Margin="10,0,0,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition Width="150"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Slider VerticalAlignment="Center"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            DataContext="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext}"
+                                            Value="{Binding p_LightLADS}"
+                                            x:Name="slider11"></Slider>
+                                    <TextBlock Grid.Column="1"
+                                               Style="{StaticResource BasicTb}"
+                                               Text="{Binding ElementName=slider11, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2"
+                                               Style="{StaticResource BasicTb}"
+                                               Text="LVS"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Grid>
+                        </GroupBox>
+                        <GridSplitter Grid.Row="3"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Center"
+                                      Background="{StaticResource BorderBrush}"
+                                      ShowsPreview="True"
+                                      Margin="0,-2,0,0"
+                                      Height="2" />
+                        <Grid Grid.Row="4">
+                            <tools:ImageViewer Height="{PriorityBinding}"
+                                               Width="{PriorityBinding}"
+                                               DataContext="{Binding p_ImageViewer}"
+                                               Margin="20,10,20,10"></tools:ImageViewer>
+                        </Grid>
+                    </Grid>
+                </TabItem>
             </TabControl>
         </Grid>
         <Grid Grid.Column="1">

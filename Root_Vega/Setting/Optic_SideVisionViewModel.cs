@@ -162,6 +162,18 @@ namespace Root_Vega
             }
         }
 
+        public int p_LightLADS
+        {
+            get
+            {
+                return GetLightByName("LADS");
+            }
+            set
+            {
+                SetLightByName("LADS", value); 
+            }
+        }
+
         double m_dStageCanvasWidth;
         public double p_dStageCanvasWidth
         {
