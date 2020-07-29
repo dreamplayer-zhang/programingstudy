@@ -20,6 +20,7 @@ namespace Root_Vega.Module
     public class GrabMode
     {
         #region Camera
+        public event System.EventHandler Grabed;
         public bool m_bUseBiDirectionScan = false;
         public int m_nReverseOffsetY = 800;
         public eGrabDirection m_eGrabDirection = eGrabDirection.Forward;
@@ -39,6 +40,19 @@ namespace Root_Vega.Module
         public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
         {
             m_camera.GrabLineScan(memory, cpScanOffset, nLine, bInvY, m_nReverseOffsetY);
+            m_camera.Grabed += m_camera_Grabed;
+        }
+
+        void m_camera_Grabed(object sender, System.EventArgs e)
+        {
+            if (Grabed != null)
+                Grabed.Invoke(sender, e);
+        }
+        public void StopGrab()
+        {
+            m_camera.StopGrab();
+            m_camera.Grabed -= m_camera_Grabed;
+            Grabed = null;
         }
         #endregion
 

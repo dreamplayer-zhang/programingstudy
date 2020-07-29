@@ -14,6 +14,8 @@ namespace RootTools.Camera.CognexOCR
 {
     public class Camera_CognexOCR : ObservableObject, ICamera
     {
+        public event System.EventHandler Grabed;
+
         #region Property
         public string p_id { get; set; }
 
