@@ -124,7 +124,11 @@ namespace RootTools.Memory
             RunTreeMemory(Tree.eMode.RegWrite);
             RunTreeMemory(Tree.eMode.Init);
             Process[] aProcess = Process.GetProcessesByName(m_idProcess);
-            foreach (Process process in aProcess) process.Kill();
+            try
+            {
+                foreach (Process process in aProcess) process.Kill();
+            }
+            catch(Exception e) { }
             KillInspectProcess();
             RunTreeRun(Tree.eMode.Init);
         }
