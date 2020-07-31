@@ -58,6 +58,7 @@ namespace RootTools.Control.ACS
                 tabControlAxis.Items.Add(tabItem);
                 axis.RunTree(Tree.eMode.Init);
                 axis.RunTreeSetting(Tree.eMode.Init);
+                axis.RunTreeInterlock(Tree.eMode.Init);
             }
             comboAxis.ItemsSource = m_asAxis;
         }

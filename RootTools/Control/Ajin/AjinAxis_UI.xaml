@@ -251,6 +251,15 @@
                     </TabItem.Header>
                     <tree:TreeUI x:Name="treeRootSettingUI"/>
                 </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <WrapPanel>
+                            <marterial:PackIcon Kind="Safe" Foreground="Black"></marterial:PackIcon>
+                            <TextBlock Text="Interlock"></TextBlock>
+                        </WrapPanel>
+                    </TabItem.Header>
+                    <tree:TreeUI x:Name="treeRootInterlockUI"/>
+                </TabItem>
             </TabControl>
         </Grid>
     </Grid>

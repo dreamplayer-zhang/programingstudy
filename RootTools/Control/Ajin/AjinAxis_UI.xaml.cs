@@ -33,8 +33,10 @@ namespace RootTools.Control.Ajin
             textBoxShift.Text = "0"; 
             treeRootUI.Init(axis.m_treeRoot);
             treeRootSettingUI.Init(axis.m_treeRootSetting);
+            treeRootInterlockUI.Init(axis.m_treeRootInterlock);
             axis.RunTree(Tree.eMode.Init);
-            axis.RunTreeSetting(Tree.eMode.Init); 
+            axis.RunTreeSetting(Tree.eMode.Init);
+            axis.RunTreeInterlock(Tree.eMode.Init);
             StartTimer(); 
         }
 

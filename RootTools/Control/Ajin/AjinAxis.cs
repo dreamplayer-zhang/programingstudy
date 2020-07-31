@@ -1,5 +1,7 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using RootTools.Trees;
 
 namespace RootTools.Control.Ajin
@@ -7,7 +9,7 @@ namespace RootTools.Control.Ajin
     public class AjinAxis : Axis
     {
         #region Property
-        int m_nAxis = -1;
+        public int m_nAxis = -1;
         bool m_bAbsoluteEncoder = false;
         void RunTreeSettingProperty(Tree tree)
         {
@@ -49,6 +51,9 @@ namespace RootTools.Control.Ajin
         #region Jog
         public override string Jog(double fScale, string sSpeed = null)
         {
+            bool bRet = CheckInterlock();
+            if (bRet == false) return "Check Interlock Please";
+
             p_sInfo = base.Jog(fScale, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
             if (m_nAxis < 0) return p_id + " Axis not Assigned";
@@ -73,6 +78,9 @@ namespace RootTools.Control.Ajin
         #region Move
         public override string StartMove(double fPos, string sSpeed = null)
         {
+            bool bRet = CheckInterlock();
+            if (bRet == false) return "Check Interlock Please";
+
             p_sInfo = base.StartMove(fPos, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
             if (m_nAxis < 0) return p_id + " Axis not Assigned";
@@ -89,6 +97,9 @@ namespace RootTools.Control.Ajin
 
         public override string StartMove(double fPos, double v, double acc = -1, double dec = -1)
         {
+            bool bRet = CheckInterlock();
+            if (bRet == false) return "Check Interlock Please";
+
             acc = (acc < 0) ? GetSpeedValue(eSpeed.Move).m_acc : acc;
             dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
             p_sInfo = base.StartMove(fPos, v, acc, dec);
@@ -109,6 +120,9 @@ namespace RootTools.Control.Ajin
         #region Home
         public override string StartHome()
         {
+            bool bRet = CheckInterlock();
+            if (bRet == false) return "Check Interlock Please";
+
             if (m_bAbsoluteEncoder)
             {
                 p_eState = eState.Ready;
@@ -551,9 +565,77 @@ namespace RootTools.Control.Ajin
             RunTreeSettingTrigger(m_treeRootSetting.GetTree("Trigger"));
             if (mode == Tree.eMode.Update) SetAxisStatus();
         }
+
+        public override void RunTreeInterlock(Tree.eMode mode)
+        {
+            m_treeRootInterlock.p_eMode = mode;
+            RunTreeInterlockAxis(m_treeRootInterlock.GetTree("Axis"));
+        }
+
+        void RunTreeInterlockAxis(Tree tree)
+        {
+            for (int i = 0; i<m_listAxis.m_aAxis.Count; i++)
+            {
+                CSensor sensor = new CSensor(m_listAxis.m_aAxis[i].p_id);
+                int iIndex = m_aSensors.FindIndex(x => x.m_strAxisName == m_listAxis.m_aAxis[i].p_id);
+                if (iIndex < 0) m_aSensors.Add(sensor);
+                RunTreeSensor(m_treeRootInterlock.GetTree(m_aSensors[i].m_strAxisName), i);
+            }
+        }
+
+        void RunTreeSensor(Tree tree, int iIndex)
+        {
+            m_aSensors[iIndex].m_bHome  = tree.Set(m_aSensors[iIndex].m_bHome , m_aSensors[iIndex].m_bHome , "Home" , "Home Sensor");
+            m_aSensors[iIndex].m_bPlus  = tree.Set(m_aSensors[iIndex].m_bPlus , m_aSensors[iIndex].m_bPlus , "Plus" , "Plus Sensor");
+            m_aSensors[iIndex].m_bMinus = tree.Set(m_aSensors[iIndex].m_bMinus, m_aSensors[iIndex].m_bMinus, "Minus", "Minus Sensor");
+        }
+        /// <summary>
+        /// ///////////////
+        /// </summary>
+        public class CSensor
+        {
+            public bool m_bHome = false;
+            public bool m_bPlus = false;
+            public bool m_bMinus = false;
+            public string m_strAxisName = "";
+            public CSensor(string strAxisName)
+            {
+                m_strAxisName = strAxisName;
+            }
+        }
+        
+        public List<CSensor> m_aSensors = new List<CSensor>();
+
+        public bool CheckInterlock()
+        {
+            // variable
+
+            // implement
+            for (int i = 0; i<m_aSensors.Count; i++)
+            {
+                if (m_aSensors[i].m_bHome == true)
+                {
+                    if (!m_listAxis.m_aAxis[i].p_sensorHome) return false;
+                }
+                if (m_aSensors[i].m_bPlus == true)
+                {
+                    if (!m_listAxis.m_aAxis[i].p_sensorPlusLimit) return false;
+                }
+                if (m_aSensors[i].m_bMinus == true)
+                {
+                    if (!m_listAxis.m_aAxis[i].p_sensorMinusLimit) return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// ///////////////
+        /// </summary>
         #endregion
 
-        AjinListAxis m_listAxis; 
+        public AjinListAxis m_listAxis; 
         public void Init(AjinListAxis listAxis, string id, Log log)
         {
             m_listAxis = listAxis; 

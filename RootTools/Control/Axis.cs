@@ -604,6 +604,23 @@ namespace RootTools.Control
         }
 
         public virtual void RunTreeSetting(Tree.eMode mode) { }
+
+        public TreeRoot m_treeRootInterlock = null;
+        void InitInterlock()
+        {
+            m_treeRootInterlock = new TreeRoot(p_id + ".Interlock", p_log);
+            m_treeRootInterlock.UpdateTree += M_treeRootInterlock_UpdateTree;
+            RunTreeInterlock(Tree.eMode.RegRead);
+        }
+
+        private void M_treeRootInterlock_UpdateTree()
+        {
+            RunTreeInterlock(Tree.eMode.Update);
+            RunTreeInterlock(Tree.eMode.RegWrite);
+            RunTreeInterlock(Tree.eMode.Init);
+        }
+
+        public virtual void RunTreeInterlock(Tree.eMode mode) { }
         #endregion
 
         #region RelayCommand
@@ -728,6 +745,7 @@ namespace RootTools.Control
             p_log = log;
             InitTree(); 
             InitSetting();
+            InitInterlock();
             EQ.m_EQ.OnDoorOpen += M_EQ_OnDoorOpen;
         }
     }
