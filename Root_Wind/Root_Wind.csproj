@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8D3AD7D9-AA3C-4747-AD6D-84DE17A16196}</ProjectGuid>
+    <ProjectGuid>{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Root_Wind</RootNamespace>
-    <AssemblyName>Root_Wind</AssemblyName>
+    <RootNamespace>Root_WIND2</RootNamespace>
+    <AssemblyName>Root_WIND2</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -16,22 +16,6 @@
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
-    <PublishUrl>게시\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -43,7 +27,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -53,8 +36,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -62,9 +43,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -72,10 +53,10 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
@@ -99,6 +80,9 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Core.Presentation" />
+    <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Drawing.Common, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -122,171 +106,100 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="ZedGraph, Version=5.1.7.430, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
-      <HintPath>..\packages\ZedGraph.5.1.7\lib\net35-Client\ZedGraph.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="1_Main.xaml.cs">
-      <DependentUpon>1_Main.xaml</DependentUpon>
+    <Compile Include="Module\InfoWafer.cs" />
+    <Compile Include="Converter.cs" />
+    <Compile Include="UI\1.Setup\GeneralUI\General_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\InspectionItem.cs" />
+    <Compile Include="UI\1.Setup\Mask.cs" />
+    <Compile Include="UI\1.Setup\AlignmentUI\AlignmentMapPage.xaml.cs">
+      <DependentUpon>AlignmentMapPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="2_3_Origin.xaml.cs">
-      <DependentUpon>2_3_Origin.xaml</DependentUpon>
+    <Compile Include="Button\NaviBtn.xaml.cs">
+      <DependentUpon>NaviBtn.xaml</DependentUpon>
     </Compile>
-    <Compile Include="2_3_OriginViewModel.cs" />
-    <Compile Include="2_4_Surface.xaml.cs">
-      <DependentUpon>2_4_Surface.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\InspectionMethod.cs" />
+    <Compile Include="UI\SelectMode.xaml.cs">
+      <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
-    <Compile Include="2_4_SurfaceViewModel.cs" />
-    <Compile Include="2_Recipe.xaml.cs">
-      <DependentUpon>2_Recipe.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\Dummy.cs" />
+    <Compile Include="UI\1.Setup\Setup_ViewModel.cs" />
+    <Compile Include="Icon\AtiLogo.xaml.cs">
+      <DependentUpon>AtiLogo.xaml</DependentUpon>
     </Compile>
-    <Compile Include="2_DrawToolTest.xaml.cs">
-      <DependentUpon>2_DrawToolTest.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\AlignmentUI\AlginmentOriginPage.xaml.cs">
+      <DependentUpon>AlginmentOriginPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="2_DrawToolTest_ViewModel.cs" />
-    <Compile Include="3_Maint.xaml.cs">
-      <DependentUpon>3_Maint.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\AlignmentUI\AlignmentDiePositionPage.xaml.cs">
+      <DependentUpon>AlignmentDiePositionPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="4_Viewer.xaml.cs">
-      <DependentUpon>4_Viewer.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\GEMUI\GEMPanel.xaml.cs">
+      <DependentUpon>GEMPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="5_Result.xaml.cs">
-      <DependentUpon>5_Result.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\GeneralUI\GeneralMaskPage.xaml.cs">
+      <DependentUpon>GeneralMaskPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="6_Log.xaml.cs">
-      <DependentUpon>6_Log.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\GeneralUI\GeneralSetupPage.xaml.cs">
+      <DependentUpon>GeneralSetupPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="7_Alarm.xaml.cs">
-      <DependentUpon>7_Alarm.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\HomeUI\HomePanel.xaml.cs">
+      <DependentUpon>HomePanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="8_OHT.xaml.cs">
-      <DependentUpon>8_OHT.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\HomeUI\HomeSummaryPage.xaml.cs">
+      <DependentUpon>HomeSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="99_Test.xaml.cs">
-      <DependentUpon>99_Test.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\AlignmentUI\AlignmentPanel.xaml.cs">
+      <DependentUpon>AlignmentPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="9_Yield.xaml.cs">
-      <DependentUpon>9_Yield.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\AlignmentUI\AlignmentSetupPage.xaml.cs">
+      <DependentUpon>AlignmentSetupPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialog\Dialog_Scan.xaml.cs">
-      <DependentUpon>Dialog_Scan.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\AlignmentUI\AlignmentSummaryPage.xaml.cs">
+      <DependentUpon>AlignmentSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialog\Dialog_Scan_ViewModel.cs" />
-    <Compile Include="Dialog\Dialog_ManualJob.xaml.cs">
-      <DependentUpon>Dialog_ManualJob.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\GeneralUI\GeneralPanel.xaml.cs">
+      <DependentUpon>GeneralPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialog\Dialog_ManualJob_ViewModel.cs" />
-    <Compile Include="Dialog\Dialog_ManualAlign.xaml.cs">
-      <DependentUpon>Dialog_ManualAlign.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\GeneralUI\GeneralSummaryPage.xaml.cs">
+      <DependentUpon>GeneralSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialog\Dialog_ManualAlign_ViewModel.cs" />
-    <Compile Include="DrawData.cs" />
-    <Compile Include="1_Mainview_ViewModel.cs" />
-    <Compile Include="Module\GrabMode.cs" />
-    <Compile Include="InfoCarrier.cs" />
-    <Compile Include="InfoCarrier_UI.xaml.cs">
-      <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
+    <Compile Include="UI\1.Setup\InspectionUI\InspectionPanel.xaml.cs">
+      <DependentUpon>InspectionPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IWTRChild.cs" />
-    <Compile Include="InfoWafer.cs" />
-    <Compile Include="Module\Aligner_ATI.cs" />
-    <Compile Include="Module\Aligner_ATI_AOI.cs" />
-    <Compile Include="Module\Loadport_RND.cs" />
+    <Compile Include="UI\1.Setup\MaintenanceUI\MaintenancePanel.xaml.cs">
+      <DependentUpon>MaintenancePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\RecipeWizardUI\RecipeSummaryPage.xaml.cs">
+      <DependentUpon>RecipeSummaryPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\RecipeWizardUI\RecipeWizardPanel.xaml.cs">
+      <DependentUpon>RecipeWizardPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\SetupHome.xaml.cs">
+      <DependentUpon>SetupHome.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PropertyGrid\WpfPropertyGrid.cs" />
     <Compile Include="Module\Vision.cs" />
-    <Compile Include="Module\VisionRun_Run.cs" />
-    <Compile Include="Module\WTR_RND.cs" />
-    <Compile Include="ViewModelViewer.cs" />
-    <Compile Include="WaferSize.cs" />
-    <Compile Include="Wind_Engineer.cs" />
-    <Compile Include="Wind_Engineer_UI.xaml.cs">
-      <DependentUpon>Wind_Engineer_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Wind_Handler.cs" />
-    <Compile Include="Wind_Handler_UI.xaml.cs">
-      <DependentUpon>Wind_Handler_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Wind_Process.cs" />
-    <Compile Include="Wind_Process_UI.xaml.cs">
-      <DependentUpon>Wind_Process_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Wind_Recipe.cs" />
-    <Compile Include="Wind_Recipe_UI.xaml.cs">
-      <DependentUpon>Wind_Recipe_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="4_Viewer_ViewModel.cs" />
-    <Page Include="1_Main.xaml">
+    <Compile Include="Engineer\WIND_Engineer.cs" />
+    <Compile Include="Engineer\WIND_Handler.cs" />
+    <Compile Include="Engineer\WIND_Process.cs" />
+    <Compile Include="Engineer\WIND_recipe.cs" />
+    <Page Include="UI\1.Setup\AlignmentUI\AlignmentMapPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="2_3_Origin.xaml">
+    <Page Include="Button\NaviBtn.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="2_4_Surface.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Icon\AtiLogo.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="2_Recipe.xaml">
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="2_DrawToolTest.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="3_Maint.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="4_Viewer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="5_Result.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="6_Log.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="7_Alarm.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="8_OHT.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="99_Test.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="9_Yield.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\Dialog_Scan.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\Dialog_ManualJob.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\Dialog_ManualAlign.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="InfoCarrier_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -300,19 +213,75 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Wind_Engineer_UI.xaml">
+    <Page Include="UI\SelectMode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Wind_Handler_UI.xaml">
+    <Page Include="UI\1.Setup\AlignmentUI\AlginmentOriginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Wind_Process_UI.xaml">
+    <Page Include="UI\1.Setup\AlignmentUI\AlignmentDiePositionPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Wind_Recipe_UI.xaml">
+    <Page Include="UI\1.Setup\GEMUI\GEMPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\GeneralUI\GeneralMaskPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\GeneralUI\GeneralSetupPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\HomeUI\HomePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\HomeUI\HomeSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\AlignmentUI\AlignmentPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\AlignmentUI\AlignmentSetupPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\AlignmentUI\AlignmentSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\GeneralUI\GeneralPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\GeneralUI\GeneralSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\InspectionUI\InspectionPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\MaintenanceUI\MaintenancePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\RecipeWizardUI\RecipeSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\RecipeWizardUI\RecipeWizardPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\SetupHome.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -334,6 +303,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -342,67 +312,32 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\aa.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\reticlemap.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\WaferMap.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\wafer.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Origin.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UI\ReviewMode\" />
+    <Folder Include="UI\RunMode\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RootTools\RootTools.csproj">
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
-    <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
-      <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
-      <Name>RootTools_CLR</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ResourceDictionary\" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.7.2%28x86 및 x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="License-LGPL.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
-copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
-copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
-copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
-IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
-copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
-copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"
-copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
-copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
-copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
-IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
-copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
-copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\AXL.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
-copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\AXL.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
-copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\EzBasicAxl.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
-IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.dll"
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.lib"
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.pdb" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.pdb"
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\mariadbclient.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\mariadbclient.lib"
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\auth_gssapi_client.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\auth_gssapi_client.dll"
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\caching_sha2_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\caching_sha2_password.dll"
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\client_ed25519.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\client_ed25519.dll"
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\dialog.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\dialog.dll"
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\mysql_clear_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\mysql_clear_password.dll"
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_npipe.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_npipe.dll"
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_shmem.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_shmem.dll"
-copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\sha256_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\sha256_password.dll"</PostBuildEvent>
-  </PropertyGroup>
 </Project>

@@ -75,12 +75,12 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
-            <i:Interaction.Behaviors>
+            <!--<i:Interaction.Behaviors>
                 <behavior:KeyBehaviour KeyEvent="{Binding KeyEvent, Mode=OneWayToSource}"/>
                 <behavior:MouseBehaviour MouseEvent="{Binding MouseEvent, Mode=OneWayToSource}" />
                 <behavior:MouseBehaviour MouseX="{Binding p_MouseX, Mode=OneWayToSource}"
                         MouseY="{Binding p_MouseY, Mode=OneWayToSource}" />
-            </i:Interaction.Behaviors>
+            </i:Interaction.Behaviors>-->
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseLeftButtonUp">
                     <i:InvokeCommandAction Command="{Binding CanvasMouseLeftUp}" />

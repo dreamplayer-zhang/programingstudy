@@ -1,34 +1,32 @@
-﻿using RootTools;
+﻿using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Threading;
+using System.Windows.Media;
+using Root_WIND2;
 
-namespace Root_Wind
+namespace Root_WIND
 {
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : Window
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public EQ.eState p_eState
-        {
-            get
-            {
-                return EQ.p_eState;
-            }
-        }
-
+        
         #region Window Event
         public MainWindow()
         {
             InitializeComponent();
+            if (this.WindowState == WindowState.Maximized)
+            {
+                MaximizeButton.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                NormalizeButton.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -42,52 +40,110 @@ namespace Root_Wind
         }
         #endregion
 
-        Wind_Engineer m_engineer = new Wind_Engineer();
-    
-        void Init()
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
         {
-            this.DataContext = this;
-
-            IDialogService dialogService = new DialogService(this);
-            DialogInit(dialogService);
-            m_engineer.Init("Wind");
-            Maint.engineerUI.Init(m_engineer);
-
-            _1_Mainview_ViewModel mvm = new _1_Mainview_ViewModel(m_engineer, dialogService);
-            MainPage.DataContext = mvm;
-
-            _2_3_OriginViewModel ovm = new _2_3_OriginViewModel(m_engineer, dialogService);
-            _recipe._Origin.DataContext = ovm;
-            //_recipe._recipeOrigin.DataContext = rovm;
-
-            _2_4_SurfaceViewModel svm = new _2_4_SurfaceViewModel(m_engineer, dialogService);
-            _recipe._Surface.DataContext = svm;
-
-            _4_Viewer_ViewModel vvm = new _4_Viewer_ViewModel(m_engineer, dialogService);
-            MainViewer.DataContext = vvm;
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
         }
 
-        void DialogInit(IDialogService dialogService)
+        private void M_timer_Tick(object sender, EventArgs e)
         {
-            dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
-            dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
-            dialogService.Register<Dialog_ManualJob_ViewModel, Dialog_ManualJob>();
+            m_SelectModeUI.tbDate.Text = DateTime.Now.ToString("HH:mm:ss");
+        }
+        #endregion
+
+        #region Title Bar
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+        private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Maximized;
+            NormalizeButton.Visibility = Visibility.Visible;
+            MaximizeButton.Visibility = Visibility.Collapsed;
+        }
+        private void NormalizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Normal;
+            MaximizeButton.Visibility = Visibility.Visible;
+            NormalizeButton.Visibility = Visibility.Collapsed;
+        }
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                if (this.WindowState == WindowState.Maximized)
+                {
+                    this.WindowState = WindowState.Normal;
+                    MaximizeButton.Visibility = Visibility.Visible;
+                    NormalizeButton.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    this.WindowState = WindowState.Maximized;
+                    NormalizeButton.Visibility = Visibility.Visible;
+                    MaximizeButton.Visibility = Visibility.Collapsed;
+                }
+            }
+            else
+            {
+                this.DragMove();
+            }
+        }
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+        #endregion
+
+        #region UI
+        public SelectMode m_SelectModeUI;
+        public SetupHome m_SetupUI;
+        private Setup_ViewModel m_SetupViewModel;
+        #endregion
+
+
+        WIND_Engineer m_engineer = new WIND_Engineer();
+        void Init()
+        {
+            m_engineer.Init("WIND");
+            //_Maint.engineerUI.Init(m_engineer);
+            InitTimer();
+            InitUI();
+        }
+
+        void InitUI()
+        {
+            m_SetupUI = new SetupHome();
+            ((Setup_ViewModel)m_SetupUI.DataContext).init(this);
+            m_SetupViewModel = (Setup_ViewModel)m_SetupUI.DataContext;
+            
+            m_SelectModeUI = new SelectMode();
+            m_SelectModeUI.Init(this);
+
+            Home();
+        }
+        void Home()
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(m_SelectModeUI);
         }
 
         void ThreadStop()
         {
-            m_engineer.ThreadStop();
+            //m_engineer.ThreadStop();
         }
 
-        private void TabControl_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            TabControl ff = (TabControl)sender;
-            TabItem ti = (TabItem) ff.SelectedItem;
-            tbViewName.Text = ti.Header.ToString();
-            
+        
 
-        }
+
+
+
+
+
     }
-
-    
 }
