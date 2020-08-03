@@ -266,47 +266,35 @@ namespace Root_Vega.Module
                 return p_sInfo;
             }
 
-            // 레티클 유무체크 촬영위치 이동
-            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
-
-            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Align))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
-
-            if (Run(m_axisZ.StartMove(eAxisPosZ.Align))) return p_sInfo;
-            if (Run(m_axisZ.WaitReady())) return p_sInfo;
-
-            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Align))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
-
-            // 조명 켜기
-            string strLightName = "VRS";
-            int nLightPower = GetLightByName(strLightName);
-            SetLightByName(strLightName, nLightPower);
-
-            // 레티클 유무체크
+            // 레티클 유무 체크
+            string strLightName = "Align1_1";
+            SetLightByName(strLightName, 10);
+            Thread.Sleep(100);
             m_CamAlign1.GrabOneShot();
+            Thread.Sleep(100);
+            SetLightByName(strLightName, 0);
+
+            strLightName = "Align2_1";
+            SetLightByName(strLightName, 10);
+            Thread.Sleep(100);
             m_CamAlign2.GrabOneShot();
+            Thread.Sleep(100);
+            SetLightByName(strLightName, 0);
+
             bool bRet = ReticleExistCheck(m_CamAlign1);
             if (bRet == false) return "Reticle Not Exist";
             bRet = ReticleExistCheck(m_CamAlign2);
             if (bRet == false) return "Reticle Not Exist";
 
-            // 조명 끄기
-            SetLightByName(strLightName, 0);
-
             // 모든 축 Ready 위치로 이동
-            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
+            if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
-            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Ready))) return p_sInfo;
+            if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
             if (Run(m_axisZ.WaitReady())) return p_sInfo;
-
-            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Ready))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // Clamp 축 열기
             if (Run(m_axisClamp.StartMove(eAxisPosClamp.Open))) return p_sInfo;
@@ -327,56 +315,34 @@ namespace Root_Vega.Module
                 return p_sInfo;
             }
 
-            // 레티클 유무체크 촬영위치 이동
-            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+            // 레티클 유무 체크
+            string strLightName = "Align1_1";
+            SetLightByName(strLightName, 10);
+            Thread.Sleep(100);
+            m_CamAlign1.GrabOneShot();
+            Thread.Sleep(100);
+            SetLightByName(strLightName, 0);
 
-            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Align))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
-
-            if (Run(m_axisZ.StartMove(eAxisPosZ.Align))) return p_sInfo;
-            if (Run(m_axisZ.WaitReady())) return p_sInfo;
-
-            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Align))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
-
-            // 조명 켜기
-            string strLightName = "VRS";
-            int nLightPower = GetLightByName(strLightName);
-            SetLightByName(strLightName, nLightPower);
-
-            // 레티클 유무체크
-            m_CamAlign1.Grab();
-            m_CamAlign2.Grab();
-            bool bRet = ReticleExistCheck(m_CamAlign1);
-            if (bRet == true) return "Reticle Exist";
-            bRet = ReticleExistCheck(m_CamAlign2);
-            if (bRet == true) return "Reticle Exist";
-
-            // 조명 끄기
+            strLightName = "Align2_1";
+            SetLightByName(strLightName, 10);
+            Thread.Sleep(100);
+            m_CamAlign2.GrabOneShot();
+            Thread.Sleep(100);
             SetLightByName(strLightName, 0);
 
             // 모든 축 Ready 위치로 이동
-            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Safety))) return p_sInfo;
+            if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
-            if (Run(((AjinAxis)m_axisXY.p_axisY).StartMove(eAxisPosY.Ready))) return p_sInfo;
+            if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
             if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
-            if (Run(((AjinAxis)m_axisXY.p_axisX).StartMove(eAxisPosX.Ready))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
-
             // Clamp 축 열기
             if (Run(m_axisClamp.StartMove(eAxisPosClamp.Open))) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
-            if (m_axisClamp.p_sensorHome == true)
-            {
-                p_sInfo = "Clamp가 열리지 않았습니다.";
-                return p_sInfo;
-            }
 
             if (p_infoReticle != null) return p_id + " BeforePut : InfoReticle != null";
             return CheckGetPut();
@@ -384,8 +350,8 @@ namespace Root_Vega.Module
 
         public string AfterGet()
         {
-            // Clamp축 Home
-            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            // Clamp Home
+            if (Run(m_axisClamp.StartHome())) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
 
             return CheckGetPut();
@@ -394,7 +360,7 @@ namespace Root_Vega.Module
         public string AfterPut()
         {
             // Clamp Home
-            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.StartHome())) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
 
             return CheckGetPut();
@@ -448,6 +414,9 @@ namespace Root_Vega.Module
             blobDetector = new CvBlobDetector();
             imgSrc = matBinary.ToImage<Gray, Byte>();
             blobDetector.Detect(imgSrc, blobs);
+
+            matSrc.Save($"D:\\SRC.BMP");
+            matBinary.Save($"D:\\BINARY.BMP");
 
             // Bounding Box
             foreach (CvBlob blob in blobs.Values)

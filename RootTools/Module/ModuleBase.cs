@@ -244,6 +244,12 @@ namespace RootTools.Module
             m_listDO.m_aDIO.Clear();
             m_listAxis.Clear();
             GetTools(mode == Tree.eMode.RegRead);
+
+            for (int i = 0; i<m_listAxis.Count; i++)
+            {
+                m_listAxis[i].RunTreeInterlock(Tree.eMode.RegRead);
+            }
+
             if (OnChangeTool != null) OnChangeTool();
         }
 

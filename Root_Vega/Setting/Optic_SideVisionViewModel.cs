@@ -393,6 +393,13 @@ namespace Root_Vega
             }
         }
 
+        public void Test()
+        {
+            //p_SideVision.BeforeGet();
+            p_SideVision.BeforePut();
+            return;
+        }
+
         private void ViewModel_CloseRequested(object sender, DialogCloseRequestedEventArgs e)
         {
             throw new NotImplementedException();

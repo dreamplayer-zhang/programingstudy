@@ -56,6 +56,7 @@ namespace RootTools.Control.ACS
                 m_asAxis.Add(axis.p_id);
                 tabItem.Height = 0;
                 tabControlAxis.Items.Add(tabItem);
+                axis.RunTreeInterlock(Tree.eMode.RegRead);
                 axis.RunTree(Tree.eMode.Init);
                 axis.RunTreeSetting(Tree.eMode.Init);
                 axis.RunTreeInterlock(Tree.eMode.Init);
