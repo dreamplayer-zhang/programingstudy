@@ -356,17 +356,17 @@ namespace RootTools.OHT.Semi
                     CheckDI(m_diBusy, false);
                     CheckDI(m_diComplete, false);
                     p_eState = eState.All_Off;
-                    if (_eAccessLP == value) return;
-                    _eAccessLP = value;
-                    if (value == GemCarrierBase.eAccessLP.Auto)
-                    {
-                        InvalidAccess(m_diCS[0].p_bOn, "CS_0");
-                        InvalidAccess(m_diCS[1].p_bOn, "CS_1");
-                        InvalidAccess(m_diValid.p_bOn, "VALID");
-                        InvalidAccess(m_diTrReq.p_bOn, "TR_REQ");
-                        InvalidAccess(m_diBusy.p_bOn, "BUSY");
-                        InvalidAccess(m_diComplete.p_bOn, "COMPT");
-                    }
+                }
+                if (_eAccessLP == value) return;
+                _eAccessLP = value;
+                if (value == GemCarrierBase.eAccessLP.Auto)
+                {
+                    InvalidAccess(m_diCS[0].p_bOn, "CS_0");
+                    InvalidAccess(m_diCS[1].p_bOn, "CS_1");
+                    InvalidAccess(m_diValid.p_bOn, "VALID");
+                    InvalidAccess(m_diTrReq.p_bOn, "TR_REQ");
+                    InvalidAccess(m_diBusy.p_bOn, "BUSY");
+                    InvalidAccess(m_diComplete.p_bOn, "COMPT");
                 }
             }
         }

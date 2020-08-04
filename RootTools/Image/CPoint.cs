@@ -60,7 +60,7 @@ namespace RootTools
             }
         }
 
-        public CPoint(System.Windows.Point pos)
+        public CPoint(Point pos)
         {
             X = (int)pos.X;
             Y = (int)pos.Y;
@@ -93,11 +93,13 @@ namespace RootTools
 
         public static bool operator ==(CPoint cp0, CPoint cp1)
         {
+            if (cp0 == null) return (cp1 == null); 
             return cp0.Equals(cp1);
         }
 
         public static bool operator !=(CPoint cp0, CPoint cp1)
         {
+            if (cp0 == null) return (cp1 != null);
             return !cp0.Equals(cp1);
         }
 
