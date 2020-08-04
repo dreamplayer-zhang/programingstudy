@@ -395,8 +395,8 @@ namespace Root_Vega
 
         public void Test()
         {
-            //p_SideVision.BeforeGet();
-            p_SideVision.BeforePut();
+            p_SideVision.BeforeGet();
+            //p_SideVision.BeforePut();
             return;
         }
 
@@ -417,7 +417,7 @@ namespace Root_Vega
         {
             get
             {
-                return new RelayCommand(LADS);
+                return new RelayCommand(Test);
             }
         }
         public RelayCommand CommandScan

@@ -258,7 +258,8 @@ namespace Root_Vega.Module
         public string BeforeGet()
         {
             // Clamp축 Home
-            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            //if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.StartHome())) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
             if (m_axisClamp.p_sensorHome == false)   // 인터락 추가
             {
@@ -281,10 +282,10 @@ namespace Root_Vega.Module
             Thread.Sleep(100);
             SetLightByName(strLightName, 0);
 
-            bool bRet = ReticleExistCheck(m_CamAlign1);
-            if (bRet == false) return "Reticle Not Exist";
-            bRet = ReticleExistCheck(m_CamAlign2);
-            if (bRet == false) return "Reticle Not Exist";
+            //bool bRet = ReticleExistCheck(m_CamAlign1);
+            //if (bRet == false) return "Reticle Not Exist";
+            //bRet = ReticleExistCheck(m_CamAlign2);
+            //if (bRet == false) return "Reticle Not Exist";
 
             // 모든 축 Ready 위치로 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
@@ -307,7 +308,8 @@ namespace Root_Vega.Module
         public string BeforePut()
         {
             // Clamp축 Home
-            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            //if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.StartHome())) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
             if (m_axisClamp.p_sensorHome == false)
             {
@@ -475,12 +477,68 @@ namespace Root_Vega.Module
         #endregion
 
         #region override Function
-        public override string StateHome()
+        //public override string StateHome()
+        //{
+        //    if (EQ.p_bSimulate) return "OK";
+        //    p_bStageVac = true;
+        //    Thread.Sleep(200);
+        //    p_sInfo = base.StateHome();
+        //    p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+        //    p_bStageVac = false;
+        //    return p_sInfo;
+        //}
+
+        public override string StateHome()  // 200804 ESCHO - 기존 Home Sequence의 경우 축들이 동시에 Home을 하기 때문에 충돌위험이 SideVision과 동일하게 새로 만듦.
         {
+            p_sInfo = "OK";
             if (EQ.p_bSimulate) return "OK";
             p_bStageVac = true;
             Thread.Sleep(200);
-            p_sInfo = base.StateHome();
+
+            if (m_listAxis.Count == 0) return "OK";
+            if (p_eState == eState.Run) return "Invalid State : Run";
+            if (EQ.IsStop()) return "Home Stop";
+            foreach (Axis axis in m_listAxis)
+            {
+                if (axis != null) axis.ServoOn(true);
+            }
+            Thread.Sleep(200);
+            if (EQ.IsStop()) return "Home Stop";
+
+            m_axisClamp.StartHome();
+            if (m_axisClamp.WaitReady() != "OK")
+            {
+                p_bStageVac = false;
+                p_eState = eState.Error;
+                p_sInfo = "AxisClamp Home Error";
+                return p_sInfo;
+            }
+
+            m_axisXY.p_axisX.StartHome();
+            m_axisXY.p_axisY.StartHome();
+            m_axisZ.StartHome();
+
+            if (m_axisXY.p_axisX.WaitReady() != "OK")
+            {
+                p_bStageVac = false;
+                p_eState = eState.Error;
+                return "AxisX Home Error";
+            }
+
+            if (m_axisXY.p_axisY.WaitReady() != "OK")
+            {
+                p_bStageVac = false;
+                p_eState = eState.Error;
+                return "AxisY Home Error";
+            }
+
+            if (m_axisZ.WaitReady() != "OK")
+            {
+                p_bStageVac = false;
+                p_eState = eState.Error;
+                return "AxisZ Home Error";
+            }
+
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             p_bStageVac = false;
             return p_sInfo;

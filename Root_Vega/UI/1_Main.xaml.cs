@@ -91,7 +91,8 @@ namespace Root_Vega
         }
         private void buttonInitialization_Click(object sender, RoutedEventArgs e)
         {
-            if (IsEnableInitialization() == false) return; 
+            if (IsEnableInitialization() == false) return;
+            EQ.p_bStop = false; 
             m_handler.m_process.m_qSequence.Clear(); //forget 
             EQ.p_eState = EQ.eState.Home; 
         }
