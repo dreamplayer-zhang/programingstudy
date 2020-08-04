@@ -35,6 +35,7 @@ namespace RootTools.Trees
 
         public string p_sDescription { get; set; }
 
+        public string m_sGroup = ""; 
         public string p_sName { get; set; }
 
         public bool p_bEnable { get; set; }
@@ -132,7 +133,7 @@ namespace RootTools.Trees
         {
             foreach (Tree item in m_aChildRunInit)
             {
-                if ((item.p_sName == sName) && (item.p_nIndex == nIndex))
+                if ((item.m_sGroup == sName) && (item.p_nIndex == nIndex))
                 {
                     item.m_bUse = true;
                     return item;

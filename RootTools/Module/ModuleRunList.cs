@@ -130,7 +130,7 @@ namespace RootTools.Module
             for (int n = 0; n < m_aModuleRun.Count; n++)
             {
                 ModuleRunBase moduleRun = m_aModuleRun[n];
-                moduleRun.RunTree(tree.GetTree(n, string.Format("{0:00}", n) +  moduleRun.p_id, false), true);
+                moduleRun.RunTree(tree.GetTree(n, moduleRun.p_id, false), true);
             }
         }
         #endregion
