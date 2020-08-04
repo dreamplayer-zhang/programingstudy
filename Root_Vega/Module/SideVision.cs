@@ -324,6 +324,9 @@ namespace Root_Vega.Module
 
         public string BeforeGet()
         {
+            //m_CamAlign1.FunctionConnect();
+            m_CamAlign2.FunctionConnect();
+
             // 레티클 유무체크 촬영위치 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Safety))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
@@ -386,6 +389,9 @@ namespace Root_Vega.Module
 
         public string BeforePut()
         {
+            //m_CamAlign1.FunctionConnect();
+            m_CamAlign2.FunctionConnect();
+
             // 레티클 유무체크 촬영위치 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Safety))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
@@ -701,9 +707,9 @@ namespace Root_Vega.Module
             Thread.Sleep(200);
             if (EQ.IsStop()) return "Home Stop";
 
-            m_axisClamp.StartHome();
-            if (m_axisClamp.WaitReady() != "OK")
-                return "Error";
+            //m_axisClamp.StartHome();
+            //if (m_axisClamp.WaitReady() != "OK")
+            //    return "Error";
 
             m_axisXY.p_axisX.StartHome();
             if (m_axisXY.p_axisX.WaitReady() != "OK")

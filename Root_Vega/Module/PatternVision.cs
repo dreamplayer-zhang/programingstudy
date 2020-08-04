@@ -258,7 +258,8 @@ namespace Root_Vega.Module
         public string BeforeGet()
         {
             // Clamp축 Home
-            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            //if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.StartHome())) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
             if (m_axisClamp.p_sensorHome == false)   // 인터락 추가
             {
@@ -281,10 +282,10 @@ namespace Root_Vega.Module
             Thread.Sleep(100);
             SetLightByName(strLightName, 0);
 
-            bool bRet = ReticleExistCheck(m_CamAlign1);
-            if (bRet == false) return "Reticle Not Exist";
-            bRet = ReticleExistCheck(m_CamAlign2);
-            if (bRet == false) return "Reticle Not Exist";
+            //bool bRet = ReticleExistCheck(m_CamAlign1);
+            //if (bRet == false) return "Reticle Not Exist";
+            //bRet = ReticleExistCheck(m_CamAlign2);
+            //if (bRet == false) return "Reticle Not Exist";
 
             // 모든 축 Ready 위치로 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
@@ -307,7 +308,8 @@ namespace Root_Vega.Module
         public string BeforePut()
         {
             // Clamp축 Home
-            if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            //if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
+            if (Run(m_axisClamp.StartHome())) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
             if (m_axisClamp.p_sensorHome == false)
             {

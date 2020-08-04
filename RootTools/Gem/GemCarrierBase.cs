@@ -269,7 +269,7 @@ namespace RootTools.Gem
         #region CarrierID
         public void SendCarrierID(string sCarrierID)
         {
-            if (m_gem == null) return;
+            if (m_gem == null) return; //jws
             m_gem.SendCarrierID(this, sCarrierID);
             p_sCarrierID = sCarrierID; 
             m_log.Info("Send CarrierID : " + sCarrierID);
