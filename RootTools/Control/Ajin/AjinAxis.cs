@@ -52,7 +52,7 @@ namespace RootTools.Control.Ajin
         public override string Jog(double fScale, string sSpeed = null)
         {
             bool bRet = CheckInterlock();
-            if (bRet == false) return "Check Interlock Please";
+            if (bRet == false) return p_id + " - Check Interlock Please";
 
             p_sInfo = base.Jog(fScale, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
@@ -79,7 +79,7 @@ namespace RootTools.Control.Ajin
         public override string StartMove(double fPos, string sSpeed = null)
         {
             bool bRet = CheckInterlock();
-            if (bRet == false) return "Check Interlock Please";
+            if (bRet == false) return p_id + " - Check Interlock Please";
 
             p_sInfo = base.StartMove(fPos, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
@@ -98,7 +98,7 @@ namespace RootTools.Control.Ajin
         public override string StartMove(double fPos, double v, double acc = -1, double dec = -1)
         {
             bool bRet = CheckInterlock();
-            if (bRet == false) return "Check Interlock Please";
+            if (bRet == false) return p_id + " - Check Interlock Please";
 
             acc = (acc < 0) ? GetSpeedValue(eSpeed.Move).m_acc : acc;
             dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
@@ -121,7 +121,7 @@ namespace RootTools.Control.Ajin
         public override string StartHome()
         {
             bool bRet = CheckInterlock();
-            if (bRet == false) return "Check Interlock Please";
+            if (bRet == false) return p_id + " - Check Interlock Please";
 
             if (m_bAbsoluteEncoder)
             {
