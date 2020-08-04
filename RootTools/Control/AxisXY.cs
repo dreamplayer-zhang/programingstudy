@@ -63,12 +63,12 @@ namespace RootTools.Control
         #region Move
         public string StartMove(Enum pos, RPoint rpOffset = null, Enum speed = null)
         {
-            return StartMove(pos, rpOffset, speed);
+            return StartMove(pos.ToString(), rpOffset, speed);
         }
 
         public string StartMove(string sPos, RPoint rpOffset = null, Enum speed = null)
         {
-            RPoint rp = GetPosValue(sPos) + rpOffset;
+            RPoint rp = GetPosValue(sPos) + (rpOffset ?? new RPoint());
             return StartMove(rp, (speed == null) ? null : speed.ToString());
         }
 
