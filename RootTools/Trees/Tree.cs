@@ -24,18 +24,10 @@ namespace RootTools.Trees
 
         public Tree p_treeParent { get; set; }
 
-        int _nIndex = 0; 
-        public int p_nIndex 
-        { 
-            get { return _nIndex; }
-            set { _nIndex = value; } 
-        }
-
         public string p_id { get; set; }
 
         public string p_sDescription { get; set; }
 
-        public string m_sGroup = ""; 
         public string p_sName { get; set; }
 
         public bool p_bEnable { get; set; }
@@ -102,7 +94,7 @@ namespace RootTools.Trees
         {
             foreach (Tree tree in p_aChild)
             {
-                if ((tree.p_id == treeChild.p_id) && (tree.p_nIndex == treeChild.p_nIndex)) return true; 
+                if (tree.p_id == treeChild.p_id) return true; 
             }
             return false; 
         }
@@ -129,17 +121,22 @@ namespace RootTools.Trees
         #endregion
 
         #region Find Tree List<>
-        Tree FindTreeItem(string sName, int nIndex = 0)
+        Tree FindTreeItem(string sName)
         {
             foreach (Tree item in m_aChildRunInit)
             {
-                if ((item.m_sGroup == sName) && (item.p_nIndex == nIndex))
+                if (item.p_sName == sName)
                 {
                     item.m_bUse = true;
                     return item;
                 }
             }
             return null;
+        }
+
+        Tree FindTreeItem(string sName, int nIndex)
+        {
+            return FindTreeItem(nIndex.ToString("000") + "." + sName); 
         }
 
         void AddTreeItem(Tree treeItem)
