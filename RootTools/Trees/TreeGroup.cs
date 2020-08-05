@@ -4,6 +4,8 @@
     {
         public TreeGroup(string sName, Tree treeParent, Log log, bool bExpand, bool bVisible, bool bReadOnly)
         {
+            p_nIndex = 0;
+            m_sGroup = sName; 
             p_sName = sName;
             p_treeParent = treeParent;
             p_treeRoot = treeParent.p_treeRoot;
@@ -16,7 +18,8 @@
 
         public TreeGroup(int nIndex, string sName, Tree treeParent, Log log, bool bExpand, bool bVisible, bool bReadOnly)
         {
-            p_nIndex = nIndex; 
+            p_nIndex = nIndex;
+            m_sGroup = sName;
             p_sName = sName;
             p_treeParent = treeParent;
             p_treeRoot = treeParent.p_treeRoot;

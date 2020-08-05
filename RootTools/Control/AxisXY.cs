@@ -68,8 +68,7 @@ namespace RootTools.Control
 
         public string StartMove(string sPos, RPoint rpOffset = null, Enum speed = null)
         {
-            RPoint rp = GetPosValue(sPos);
-            //if (rpOffset != null) rp += rpOffset; 
+            RPoint rp = GetPosValue(sPos) + (rpOffset ?? new RPoint());
             return StartMove(rp, (speed == null) ? null : speed.ToString());
         }
 

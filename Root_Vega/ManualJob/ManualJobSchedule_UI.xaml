@@ -131,7 +131,7 @@
                 </Grid>
             </Grid>
             <StackPanel Grid.Column="1" Margin="10">
-                <Button Height="100" Margin="5" Content="Run" IsDefault="True" Click="ButtonRun_Click"/>
+                <Button x:Name="buttonRun" Height="100" Margin="5" Content="Run" IsDefault="True" Visibility="Hidden" Click="ButtonRun_Click"/>
                 <Button Height="100" Margin="5" Content="Cancel" IsCancel="True"/>
             </StackPanel>
         </Grid>

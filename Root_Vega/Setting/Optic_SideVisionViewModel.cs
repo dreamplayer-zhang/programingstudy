@@ -396,7 +396,6 @@ namespace Root_Vega
         public void Test()
         {
             p_SideVision.BeforeGet();
-            //p_SideVision.BeforePut();
             return;
         }
 

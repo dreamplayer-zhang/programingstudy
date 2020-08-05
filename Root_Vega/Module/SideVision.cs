@@ -37,6 +37,8 @@ namespace Root_Vega.Module
     public class SideVision : ModuleBase, IRobotChild
     {
         #region ToolBox
+        public DIO_I m_diSideReticleExistSensor;
+        
         AxisXY m_axisXY;
         public AxisXY p_axisXY
         {
@@ -215,6 +217,9 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_CamSideVRS, this, "Side VRS");
             p_sInfo = m_toolBox.Get(ref m_CamAlign1, this, "Side_Align1");
             p_sInfo = m_toolBox.Get(ref m_CamAlign2, this, "Side_Align2");
+
+            p_sInfo = m_toolBox.Get(ref m_diSideReticleExistSensor, this, "Side Reticle Sensor");
+            
             if (bInit) m_inspectTool.OnInspectDone += M_inspectTool_OnInspectDone;
         }
 
@@ -337,7 +342,8 @@ namespace Root_Vega.Module
             if (Run(m_axisZ.StartMove(eAxisPosZ.Align))) return p_sInfo;
             if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
-            if (Run(m_axisTheta.StartMove(eAxisPosTheta.Align))) return p_sInfo;
+            //if (Run(m_axisTheta.StartMove(eAxisPosTheta.Align))) return p_sInfo;
+            if (Run(m_axisTheta.StartHome())) return p_sInfo;
             if (Run(m_axisTheta.WaitReady())) return p_sInfo;
 
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Align))) return p_sInfo;
@@ -360,8 +366,10 @@ namespace Root_Vega.Module
 
             //bool bRet = ReticleExistCheck(m_CamAlign1);
             //if (bRet == false) return "Reticle Not Exist";
-            bool bRet = ReticleExistCheck(m_CamAlign2);
-            if (bRet == false) return "Reticle Not Exist";
+            //bool bRet = ReticleExistCheck(m_CamAlign2);
+            //if (bRet == false) return "Reticle Not Exist";
+
+            if (m_diSideReticleExistSensor.p_bIn == true) return "Reticle Not Exist";
 
             // 모든 축 Ready 위치로 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Safety))) return p_sInfo;
@@ -402,7 +410,8 @@ namespace Root_Vega.Module
             if (Run(m_axisZ.StartMove(eAxisPosZ.Align))) return p_sInfo;
             if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
-            if (Run(m_axisTheta.StartMove(eAxisPosTheta.Align))) return p_sInfo;
+            //if (Run(m_axisTheta.StartMove(eAxisPosTheta.Align))) return p_sInfo;
+            if (Run(m_axisTheta.StartHome())) return p_sInfo;
             if (Run(m_axisTheta.WaitReady())) return p_sInfo;
 
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Align))) return p_sInfo;
@@ -425,8 +434,10 @@ namespace Root_Vega.Module
 
             //bool bRet = ReticleExistCheck(m_CamAlign1);
             //if (bRet == false) return "Reticle Not Exist";
-            bool bRet = ReticleExistCheck(m_CamAlign2);
-            if (bRet == false) return "Reticle Not Exist";
+            //bool bRet = ReticleExistCheck(m_CamAlign2);
+            //if (bRet == false) return "Reticle Not Exist";
+
+            if (m_diSideReticleExistSensor.p_bIn == false) return "Reticle Exist";
 
             // 모든 축 Ready 위치로 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Safety))) return p_sInfo;
@@ -707,9 +718,9 @@ namespace Root_Vega.Module
             Thread.Sleep(200);
             if (EQ.IsStop()) return "Home Stop";
 
-            //m_axisClamp.StartHome();
-            //if (m_axisClamp.WaitReady() != "OK")
-            //    return "Error";
+            m_axisClamp.StartHome();
+            if (m_axisClamp.WaitReady() != "OK")
+                return "Error";
 
             m_axisXY.p_axisX.StartHome();
             if (m_axisXY.p_axisX.WaitReady() != "OK")

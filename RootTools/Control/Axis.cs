@@ -402,6 +402,7 @@ namespace RootTools.Control
                 case eState.Ready:
                     if (dInPos >= 0)
                     {
+                        Thread.Sleep(10);
                         double dPos = m_posDst - p_posActual;
                         if (Math.Abs(dPos) > dInPos) return "WaitReady InPosition Error : " + dPos.ToString();
                     }

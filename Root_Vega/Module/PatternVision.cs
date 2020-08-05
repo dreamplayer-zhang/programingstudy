@@ -26,6 +26,8 @@ namespace Root_Vega.Module
     public class PatternVision : ModuleBase, IRobotChild
     {
         #region ToolBox
+        public DIO_I m_diPatternReticleExistSensor;
+
         AxisXY m_axisXY;
         public AxisXY p_axisXY
         {
@@ -103,6 +105,9 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
+
+            p_sInfo = m_toolBox.Get(ref m_diPatternReticleExistSensor, this, "Pattern Reticle Sensor");
+
             bool bUseRADS = false;
             foreach (GrabMode gm in m_aGrabMode)
             {
@@ -287,6 +292,8 @@ namespace Root_Vega.Module
             //bRet = ReticleExistCheck(m_CamAlign2);
             //if (bRet == false) return "Reticle Not Exist";
 
+            if (m_diPatternReticleExistSensor.p_bIn == false) return "Reticle Not Exist";
+
             // 모든 축 Ready 위치로 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
@@ -331,6 +338,13 @@ namespace Root_Vega.Module
             m_CamAlign2.GrabOneShot();
             Thread.Sleep(100);
             SetLightByName(strLightName, 0);
+
+            //bool bRet = ReticleExistCheck(m_CamAlign1);
+            //if (bRet == false) return "Reticle Not Exist";
+            //bRet = ReticleExistCheck(m_CamAlign2);
+            //if (bRet == false) return "Reticle Not Exist";
+
+            if (m_diPatternReticleExistSensor.p_bIn == true) return "Reticle Exist";
 
             // 모든 축 Ready 위치로 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
