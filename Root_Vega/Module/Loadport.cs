@@ -281,7 +281,6 @@ namespace Root_Vega.Module
             if (Run(MoveReticleLifter(ePosReticleLifter.Lifting))) return p_sInfo;
             if (Run(MoveZ(ePosZ.Load))) return p_sInfo;
             if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
-
             return "OK"; 
         }
 
@@ -560,6 +559,8 @@ namespace Root_Vega.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                string sLoad = "Load";
+                tree.Set(sLoad, sLoad, "Load", "Load", true, true); 
             }
 
             public override string Run()
