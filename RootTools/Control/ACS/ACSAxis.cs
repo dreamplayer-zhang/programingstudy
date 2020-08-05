@@ -324,7 +324,7 @@ namespace RootTools.Control.ACS
             m_treeRoot.p_eMode = mode;
             RunTreeSpeed(m_treeRoot.GetTree("Speed"), m_sUnit);
             RunTreePos(m_treeRoot.GetTree("Position"), m_sUnit);
-            m_trigger.RunTree(m_treeRoot.GetTree("Trigger"));
+            m_trigger.RunTree(m_treeRoot.GetTree("Trigger"), m_sUnit);
         }
 
         public override void RunTreeSetting(Tree.eMode mode)

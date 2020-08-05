@@ -104,7 +104,7 @@ namespace RootTools.Control
         #endregion
 
         #region List Position
-        Dictionary<string, double> m_aPos = new Dictionary<string, double>();
+        protected Dictionary<string, double> m_aPos = new Dictionary<string, double>();
         public List<string> m_asPos = new List<string>(); 
         public ObservableCollection<string> p_asPos { get; set; }
         public string p_strSelPos { get; set; }
@@ -263,12 +263,14 @@ namespace RootTools.Control
 
             public void RunTree(Tree tree, string sUnit)
             {
-                m_v = tree.Set(m_v, m_v, "Velocity", "Axis Moving Velocity (" + sUnit + " / sec)");
+                string sV = (tree.p_treeRoot.p_eMode == Tree.eMode.RegRead) ? "Velociry" : "Velocity"; 
+                m_v = tree.Set(m_v, m_v, sV, "Axis Moving Velocity (" + sUnit + " / sec)"); //forget Vericiry
+                //m_v = tree.Set(m_v, m_v, "Velocity", "Axis Moving Velocity (" + sUnit + " / sec)");
                 m_acc = tree.Set(m_acc, m_acc, "Accelation", "Accelation Time (sec)");
                 m_dec = tree.Set(m_dec, m_dec, "Decelation", "Decelation Time (sec)");
             }
         }
-        List<Speed> m_aSpeed = new List<Speed>();
+        protected List<Speed> m_aSpeed = new List<Speed>();
         public List<string> m_asSpeed = new List<string>(); 
         public ObservableCollection<string> p_asSpeed { get; set; }
 
@@ -550,11 +552,11 @@ namespace RootTools.Control
                 m_bCmd = bCmd;
             }
 
-            public void RunTree(Tree tree)
+            public void RunTree(Tree tree, string sUnit)
             {
-                m_aPos[0] = tree.Set(m_aPos[0], m_aPos[0], "Start", "Start Position (pulse)");
-                m_aPos[1] = tree.Set(m_aPos[1], m_aPos[1], "End", "End Position (pulse)");
-                m_dPos = tree.Set(m_dPos, m_dPos, "Interval", "Trigger Interval (pulse)");
+                m_aPos[0] = tree.Set(m_aPos[0], m_aPos[0], "Start", "Start Position (" + sUnit + ")");
+                m_aPos[1] = tree.Set(m_aPos[1], m_aPos[1], "End", "End Position (" + sUnit + ")");
+                m_dPos = tree.Set(m_dPos, m_dPos, "Interval", "Trigger Interval (" + sUnit + ")");
                 m_bCmd = tree.Set(m_bCmd, m_bCmd, "Command Encoder", "use Command Encoder (false = Actual)");
             }
         }
