@@ -15,11 +15,13 @@ namespace RootTools.Control.ACS
 
         #region Property
         int m_nAxis = -1;
+        string m_sUnit = "mm"; 
         bool m_bAbsoluteEncoder = false;
         void RunTreeSettingProperty(Tree tree)
         {
             int nAxis = m_nAxis;
             m_nAxis = tree.Set(m_nAxis, m_nAxis, "Axis Number", "ACS Axis Number");
+            m_sUnit = tree.Set(m_sUnit, m_sUnit, "Unit", "AXS Axis Unit"); 
             m_bAbsoluteEncoder = tree.Set(m_bAbsoluteEncoder, m_bAbsoluteEncoder, "Absolute Encoder", "Absolute Encoder");
         }
         #endregion
@@ -320,8 +322,8 @@ namespace RootTools.Control.ACS
         public override void RunTree(Tree.eMode mode)
         {
             m_treeRoot.p_eMode = mode;
-            RunTreeSpeed(m_treeRoot.GetTree("Speed"));
-            RunTreePos(m_treeRoot.GetTree("Position"));
+            RunTreeSpeed(m_treeRoot.GetTree("Speed"), m_sUnit);
+            RunTreePos(m_treeRoot.GetTree("Position"), m_sUnit);
             m_trigger.RunTree(m_treeRoot.GetTree("Trigger"));
         }
 
