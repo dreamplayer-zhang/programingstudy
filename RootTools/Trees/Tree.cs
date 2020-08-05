@@ -26,7 +26,23 @@ namespace RootTools.Trees
 
         public string p_id { get; set; }
 
-        public string p_sDescription { get; set; }
+        public string p_sUnit { get; set; }
+
+        string _sDescription = ""; 
+        public string p_sDescription 
+        { 
+            get { return _sDescription; } 
+            set
+            {
+                if (_sDescription == value) return; 
+                _sDescription = value;
+                string[] asDescrition = _sDescription.Split('(');
+                if (asDescrition.Length < 2) return;
+                string sUnit = asDescrition[asDescrition.Length - 1];
+                if (sUnit[sUnit.Length - 1] != ')') return;
+                p_sUnit = sUnit.Substring(0, sUnit.Length - 1);
+            }
+        }
 
         public string p_sName { get; set; }
 
@@ -38,7 +54,8 @@ namespace RootTools.Trees
             get { return _bExpand; }
             set
             {
-                _bExpand = value; 
+                _bExpand = value;
+                OnPropertyChanged(); 
             } 
         }
 
