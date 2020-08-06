@@ -402,9 +402,16 @@ namespace RootTools.Control
             switch (p_eState)
             {
                 case eState.Ready:
+                    double dPos = 0; 
                     if (dInPos >= 0)
                     {
-                        double dPos = m_posDst - p_posActual;
+                        for (int n = 0; n < 10; n++)
+                        {
+                            dPos = m_posDst - p_posActual;
+                            if (Math.Abs(dPos) < dInPos) return "OK"; 
+                            p_sInfo = "WaitReady InPosition Error #" + n.ToString() + " : " + dPos.ToString();
+                            Thread.Sleep(100); 
+                        }
                         if (Math.Abs(dPos) > dInPos) return "WaitReady InPosition Error : " + dPos.ToString();
                     }
                     return "OK";
