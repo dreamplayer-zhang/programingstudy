@@ -8,22 +8,19 @@ namespace RootTools.Control.Ajin
     public class AjinAxis : Axis
     {
         #region Property
-        double _pulsepUnit = -1; 
+        double _pulsepUnit = 1; 
         double p_pulsepUnit
-        { 
+        {
             get { return _pulsepUnit; }
             set
             {
                 if (_pulsepUnit == value) return;
                 double fRatio = _pulsepUnit / value;
-                if (_pulsepUnit > 0)
-                {
-                    foreach (string sKey in p_asPos) m_aPos[sKey] *= fRatio;
-                    foreach (Speed speed in m_aSpeed) speed.m_v *= fRatio;
-                    m_trigger.m_aPos[0] *= fRatio;
-                    m_trigger.m_aPos[1] *= fRatio;
-                    m_trigger.m_dPos *= fRatio;
-                }
+                foreach (string sKey in p_asPos) m_aPos[sKey] *= fRatio;
+                foreach (Speed speed in m_aSpeed) speed.m_v *= fRatio;
+                m_trigger.m_aPos[0] *= fRatio;
+                m_trigger.m_aPos[1] *= fRatio;
+                m_trigger.m_dPos *= fRatio;
                 _pulsepUnit = value;
                 RunTree(Tree.eMode.Init);
                 RunTree(Tree.eMode.RegWrite);
@@ -38,7 +35,7 @@ namespace RootTools.Control.Ajin
             int nAxis = m_nAxis;
             m_nAxis = tree.Set(m_nAxis, m_nAxis, "Axis Number", "Ajin Axis Number");
             m_sUnit = tree.Set(m_sUnit, m_sUnit, "Unit", "Ajin Axis Unit");
-            p_pulsepUnit = tree.Set(p_pulsepUnit, p_pulsepUnit, "Pulse/Unit", "Pulse / Unit");
+            _pulsepUnit = tree.Set(p_pulsepUnit, p_pulsepUnit, "Pulse/Unit", "Pulse / Unit");
             m_bAbsoluteEncoder = tree.Set(m_bAbsoluteEncoder, m_bAbsoluteEncoder, "Absolute Encoder", "Absolute Encoder");
             if (nAxis != m_nAxis) m_listAxis.m_qSetAxis.Enqueue(this);
         }
