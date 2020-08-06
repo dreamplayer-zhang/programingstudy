@@ -35,7 +35,8 @@ namespace RootTools.Control.Ajin
             int nAxis = m_nAxis;
             m_nAxis = tree.Set(m_nAxis, m_nAxis, "Axis Number", "Ajin Axis Number");
             m_sUnit = tree.Set(m_sUnit, m_sUnit, "Unit", "Ajin Axis Unit");
-            _pulsepUnit = tree.Set(p_pulsepUnit, p_pulsepUnit, "Pulse/Unit", "Pulse / Unit");
+            double pulseUnit = tree.Set(p_pulsepUnit, p_pulsepUnit, "Pulse/Unit", "Pulse / Unit");
+            if (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead) p_pulsepUnit = pulseUnit; 
             m_bAbsoluteEncoder = tree.Set(m_bAbsoluteEncoder, m_bAbsoluteEncoder, "Absolute Encoder", "Absolute Encoder");
             if (nAxis != m_nAxis) m_listAxis.m_qSetAxis.Enqueue(this);
         }
