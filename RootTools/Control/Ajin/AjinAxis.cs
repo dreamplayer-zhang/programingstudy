@@ -8,7 +8,7 @@ namespace RootTools.Control.Ajin
     public class AjinAxis : Axis
     {
         #region Property
-        double _pulsepUnit = 1; 
+        double _pulsepUnit = -1; 
         double p_pulsepUnit
         { 
             get { return _pulsepUnit; }
@@ -16,12 +16,15 @@ namespace RootTools.Control.Ajin
             {
                 if (_pulsepUnit == value) return;
                 double fRatio = _pulsepUnit / value;
-                _pulsepUnit = value; 
-                foreach (string sKey in p_asPos) m_aPos[sKey] *= fRatio;
-                foreach (Speed speed in m_aSpeed) speed.m_v *= fRatio;
-                m_trigger.m_aPos[0] *= fRatio;
-                m_trigger.m_aPos[1] *= fRatio;
-                m_trigger.m_dPos *= fRatio;
+                if (_pulsepUnit > 0)
+                {
+                    foreach (string sKey in p_asPos) m_aPos[sKey] *= fRatio;
+                    foreach (Speed speed in m_aSpeed) speed.m_v *= fRatio;
+                    m_trigger.m_aPos[0] *= fRatio;
+                    m_trigger.m_aPos[1] *= fRatio;
+                    m_trigger.m_dPos *= fRatio;
+                }
+                _pulsepUnit = value;
                 RunTree(Tree.eMode.Init);
                 RunTree(Tree.eMode.RegWrite);
             }
