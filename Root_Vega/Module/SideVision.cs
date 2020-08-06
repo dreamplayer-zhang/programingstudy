@@ -369,7 +369,7 @@ namespace Root_Vega.Module
             //bool bRet = ReticleExistCheck(m_CamAlign2);
             //if (bRet == false) return "Reticle Not Exist";
 
-            if (m_diSideReticleExistSensor.p_bIn == true) return "Reticle Not Exist";
+            if (m_diSideReticleExistSensor.p_bIn == false) return "Reticle Not Exist";
 
             // 모든 축 Ready 위치로 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Safety))) return p_sInfo;
@@ -437,7 +437,7 @@ namespace Root_Vega.Module
             //bool bRet = ReticleExistCheck(m_CamAlign2);
             //if (bRet == false) return "Reticle Not Exist";
 
-            if (m_diSideReticleExistSensor.p_bIn == false) return "Reticle Exist";
+            if (m_diSideReticleExistSensor.p_bIn == true) return "Reticle Exist";
 
             // 모든 축 Ready 위치로 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Safety))) return p_sInfo;
@@ -582,7 +582,8 @@ namespace Root_Vega.Module
         {
             m_reg = new Registry(p_id + ".InfoReticle");
             m_sInfoReticle = m_reg.Read("sInfoReticle", m_sInfoReticle);
-            p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
+            if (m_diSideReticleExistSensor.p_bIn == false) p_infoReticle = null;
+            else p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
         }
         #endregion
 
