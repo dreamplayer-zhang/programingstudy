@@ -44,6 +44,7 @@ namespace RootTools.Trees
             }
         }
 
+        public string m_sGroup = ""; 
         public string p_sName { get; set; }
 
         public bool p_bEnable { get; set; }

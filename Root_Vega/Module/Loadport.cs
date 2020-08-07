@@ -218,12 +218,17 @@ namespace Root_Vega.Module
 
         public string BeforeGet()
         {
+            if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
+            if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
+            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             if (p_infoReticle == null) return p_id + " BeforeGet : InfoWafer = null";
             return IsRunOK();
         }
 
         public string BeforePut()
         {
+            if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Get Sequence";
+            if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
             if (p_infoReticle != null) return p_id + " BeforePut : InfoWafer != null";
             return IsRunOK();
         }
@@ -240,7 +245,7 @@ namespace Root_Vega.Module
 
         public bool IsReticleExist(bool bIgnoreExistSensor = false)
         {
-            if (m_infoPod.p_ePresentSensor != GemCarrierBase.ePresent.Exist) return false; 
+            //if (m_infoPod.p_ePresentSensor != GemCarrierBase.ePresent.Exist) return false; //ePresentSensor가 비어있는 상태
             return (m_infoPod.p_infoReticle != null); 
         }
 

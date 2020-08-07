@@ -254,6 +254,7 @@ namespace Root_Vega
         public void Test()
         {
             p_PatternVision.BeforeGet();
+            return;
         }
 
         public RelayCommand CommandTest
