@@ -486,7 +486,9 @@ namespace Root_Vega.Module
         {
             m_reg = new Registry(p_id + ".InfoReticle");
             m_sInfoReticle = m_reg.Read("sInfoReticle", m_sInfoReticle);
-            p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
+            //p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
+            if (m_diPatternReticleExistSensor.p_bIn == false) p_infoReticle = null;
+            else p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
         }
         #endregion
 
