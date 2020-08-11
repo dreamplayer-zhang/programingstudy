@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace RootTools.Module
 {
     /// <summary> ModuleRunList : ModuleRundml List 관리 (파일저장, 실행), Recipe 또는 Sequence에서 사용 할 수 있다 </summary>
-    public class ModuleRunList
+    public class ModuleRunList : ObservableObject
     {
         #region ModuleRun List
         public List<ModuleRunBase> m_aModuleRun = new List<ModuleRunBase>();
@@ -140,6 +140,11 @@ namespace RootTools.Module
         IEngineer m_engineer;
         ModuleList m_moduleList;
         public TreeRoot m_treeRoot;
+        public TreeRoot p_treeRoot
+        {
+            get { return m_treeRoot; }
+            set { SetProperty(ref m_treeRoot, value); }
+        }
         public ModuleRunList(string id, IEngineer engineer, string sLogGroup = "")
         {
             m_id = id;

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_Vega"
+             xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
              mc:Ignorable="d"
              d:DesignHeight="756" d:DesignWidth="1876">
     <Grid>
@@ -22,7 +23,53 @@
                         <ColumnDefinition Width="6*"/>
                     </Grid.ColumnDefinitions>
                     <Border Grid.Column="0">
-                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0"
+                                        Orientation="Vertical">
+                                <TextBlock Style="{StaticResource BasicTb}"
+                                           Text="Recipe"
+                                           FontSize="30"/>
+                                <Button Style="{StaticResource BasicBtn}"
+                                        Content="Open"
+                                        Margin="2"
+                                        Command="{Binding CommandRecipeOpen}"/>
+                                <Button Style="{StaticResource BasicBtn}"
+                                        Content="Save"
+                                        Margin="2"
+                                        Command="{Binding CommandRecipeSave}"/>
+                                <Button Style="{StaticResource BasicBtn}"
+                                        Content="Clear"
+                                        Margin="2"
+                                        Command="{Binding CommandRecipeClear}"/>
+                                <TextBlock Style="{StaticResource BasicTb}"
+                                           Text="Module"
+                                           FontSize="20"
+                                           Margin="2,12,2,2"/>
+                                <ComboBox Margin="2"
+                                          ItemsSource="{Binding p_recipe.p_asModule}"
+                                          SelectedValue="{Binding p_strSelectedModule}"/>
+                                <TextBlock Style="{StaticResource BasicTb}"
+                                           Text="Module Run"
+                                           FontSize="20"
+                                           Margin="2,12,2,2"/>
+                                <ComboBox Margin="2"
+                                          ItemsSource="{Binding p_aSelectedModuleRun}"
+                                          SelectedValue="{Binding p_strSelectedModuleRun}"/>
+                                <Button Style="{StaticResource BasicBtn}"
+                                        Content="Add"
+                                        Margin="2"
+                                        Visibility="{Binding p_vAddButtonVisibility}"
+                                        Command="{Binding CommandRecipeAdd}"/>
+                            </StackPanel>
+                            <Border Grid.Column="1">
+                                <tree:TreeUI DataContext="{Binding p_moduleRunList.p_treeRoot}"
+                                             Background="White"/>
+                            </Border>
+                        </Grid>
                     </Border>
                     <Border Grid.Column="1"
                         BorderBrush="{StaticResource BorderBrush}"

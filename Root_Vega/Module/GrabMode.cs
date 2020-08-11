@@ -163,7 +163,7 @@ namespace Root_Vega.Module
         }
         void RunTreeScanPos(Tree tree, bool bVisible, bool bReadOnly)
         {
-            m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
+            m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible, bReadOnly);
         }
 
         public string p_sName{get;set;}
