@@ -253,7 +253,7 @@ namespace Root_Vega
 
         public void Test()
         {
-            p_PatternVision.BeforeGet();
+            p_PatternVision.BeforePut();
             return;
         }
 

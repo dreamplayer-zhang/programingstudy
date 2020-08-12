@@ -182,6 +182,7 @@ namespace Root_Vega.Module
             Grab,
             Ready,
             Align,
+            ReticleCheck,
         }
 
         public enum eAxisPosX
@@ -190,6 +191,7 @@ namespace Root_Vega.Module
             Grab,
             Ready,
             Align,
+            ReticleCheck,
         }
 
         public enum eAxisPosY
@@ -198,6 +200,7 @@ namespace Root_Vega.Module
             Grab,
             Ready,
             Align,
+            ReticleCheck,
         }
 
         public enum eAxisPosClamp
@@ -263,7 +266,6 @@ namespace Root_Vega.Module
         public string BeforeGet()
         {
             // Clamp축 Home
-            //if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
             if (Run(m_axisClamp.StartHome())) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
             if (m_axisClamp.p_sensorHome == false)   // 인터락 추가
@@ -271,6 +273,16 @@ namespace Root_Vega.Module
                 p_sInfo = "Clamp Home이 완료되지 않았습니다.";
                 return p_sInfo;
             }
+
+            // 레티클 유무 체크 위치로 이동
+            if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.ReticleCheck))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
+            if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
             // 레티클 유무 체크
             string strLightName = "Align1_1";
@@ -294,16 +306,6 @@ namespace Root_Vega.Module
 
             if (m_diPatternReticleExistSensor.p_bIn == false) return "Reticle Not Exist";
 
-            // 모든 축 Ready 위치로 이동
-            if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
-
-            if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
-
-            if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
-            if (Run(m_axisZ.WaitReady())) return p_sInfo;
-
             // Clamp 축 열기
             if (Run(m_axisClamp.StartMove(eAxisPosClamp.Open))) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
@@ -315,7 +317,6 @@ namespace Root_Vega.Module
         public string BeforePut()
         {
             // Clamp축 Home
-            //if (Run(m_axisClamp.StartMove(eAxisPosClamp.Home))) return p_sInfo;
             if (Run(m_axisClamp.StartHome())) return p_sInfo;
             if (Run(m_axisClamp.WaitReady())) return p_sInfo;
             if (m_axisClamp.p_sensorHome == false)
@@ -323,6 +324,16 @@ namespace Root_Vega.Module
                 p_sInfo = "Clamp축 Home 완료되지 않았습니다.";
                 return p_sInfo;
             }
+
+            // 레티클 유무 체크 위치로 이동
+            if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.ReticleCheck))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
+            if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
             // 레티클 유무 체크
             string strLightName = "Align1_1";
@@ -345,16 +356,6 @@ namespace Root_Vega.Module
             //if (bRet == false) return "Reticle Not Exist";
 
             if (m_diPatternReticleExistSensor.p_bIn == true) return "Reticle Exist";
-
-            // 모든 축 Ready 위치로 이동
-            if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
-
-            if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
-            if (Run(m_axisXY.WaitReady())) return p_sInfo;
-
-            if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
-            if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
             // Clamp 축 열기
             if (Run(m_axisClamp.StartMove(eAxisPosClamp.Open))) return p_sInfo;
