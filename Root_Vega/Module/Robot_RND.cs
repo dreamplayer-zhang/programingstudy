@@ -228,7 +228,7 @@ namespace Root_Vega.Module
             if (m_eSendCmd != eCmd.None)
             {
                 if (EQ.IsStop()) return "EQ Stop";
-                Thread.Sleep(400);
+                Thread.Sleep(200);
                 if (m_eSendCmd != eCmd.None) return "RS232 Communication Error !!";
             }
             if (EQ.IsStop()) return "EQ Stop";
