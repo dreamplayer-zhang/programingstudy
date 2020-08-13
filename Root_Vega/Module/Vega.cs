@@ -36,7 +36,8 @@ namespace Root_Vega.Module
         DIO_I m_diProtectionBar;
         DIO_I m_diMCReset;
         DIO_I m_diIonizer;
-        DIO_I m_diCDALow; 
+        DIO_I m_diCDALow;
+
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
@@ -68,10 +69,9 @@ namespace Root_Vega.Module
             m_alidIonizer = m_gaf.GetALID(this, "Ionizer", "Ionizer Error");
             m_alidCDALow = m_gaf.GetALID(this, "CDA Low", "CDA Low Error");
 		}
-		#endregion
-
-		#region Thread
-		protected override void RunThread()
+        #endregion
+        #region Thread
+        protected override void RunThread()
         {
             base.RunThread();
             m_doLamp.Write(eLamp.Red, EQ.p_eState == EQ.eState.Error);
@@ -83,10 +83,11 @@ namespace Root_Vega.Module
 
 			m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
 			m_alidProtectionBar.Run(!m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
-			m_alidMCReset.Run(m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
-			m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer");
+            if (m_diMCReset.p_bIn) m_robot.m_bDisableHomeWhenArmOpen = true; 
+            m_alidMCReset.Run(m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
+            m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer");
 			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA");
-		}
+        }
 		#endregion
 
 		#region RFID
@@ -213,10 +214,12 @@ namespace Root_Vega.Module
         }
         #endregion
 
+        Robot_RND m_robot; 
         public Vega(string id, IEngineer engineer)
         {
             p_id = id;
             base.InitBase(id, engineer);
+            m_robot = ((Vega_Handler)engineer.ClassHandler()).m_robot; 
         }
 
         public override void ThreadStop()

@@ -4,6 +4,7 @@ using RootTools.Camera.CognexOCR;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
+using RootTools.GAFs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -29,11 +30,20 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_camOCR, this, "CamOCR");
             if (bInit)
             {
+                InitALID();//check
                 m_rs232.OnRecieve += M_rs232_OnRecieve;
                 m_rs232.p_bConnect = true;
             }
         }
         #endregion
+
+        #region GAF
+        ALID m_alidRTRWarningPos;
+
+        void InitALID()//check
+		{
+            m_alidRTRWarningPos = m_gaf.GetALID(this, "RTR WarningPos", "RTR WarningPos Error");
+		}
 
         #region DIO Function
         public string RunGrip(bool bGrip)
@@ -473,9 +483,15 @@ namespace Root_Vega.Module
 
         #region Home
         const int c_nReset = 3;
+        public bool m_bDisableHomeWhenArmOpen = false; 
         public override string StateHome()
         {
             if (EQ.p_bSimulate) return "OK";
+            if (m_bDisableHomeWhenArmOpen && !m_diArmClose.p_bIn)//check
+            {
+                m_alidRTRWarningPos.Run(!m_diArmClose.p_bIn, "Please Check State of RTR Arm. if Arm is opened, Operate it manually.");//check
+                return "RTR's Arm opened";//check
+            }
             int nReset = 0;
             while (IsFailResetCPU())
             {
@@ -484,18 +500,13 @@ namespace Root_Vega.Module
                 Thread.Sleep(100);
             }
             foreach (IRobotChild child in m_aChild) child.p_bLock = true;
-            if (m_bNeedHome)
-            {
-                if (Run(WriteCmd(eCmd.FindHome))) return p_sInfo;
-            }
-            else
-            {
-                if (Run(WriteCmd(eCmd.MoveHome))) return p_sInfo;
-            }
+            if (m_bNeedHome) if (Run(WriteCmd(eCmd.FindHome))) return p_sInfo;
+            else if(Run(WriteCmd(eCmd.MoveHome))) return p_sInfo;
             m_bNeedHome = false;
             if (Run(WaitReply(m_secHome))) return p_sInfo;
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             foreach (IRobotChild child in m_aChild) child.p_bLock = false;
+            m_bDisableHomeWhenArmOpen = false;
             return p_sInfo;
         }
         #endregion
