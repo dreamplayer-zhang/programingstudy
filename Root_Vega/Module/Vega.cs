@@ -80,10 +80,9 @@ namespace Root_Vega.Module
             m_eBuzzer = eBuzzer.BuzzerOff;
 			m_doBuzzer.Write(m_eBuzzer);
 			if (m_diEMS.p_bIn) EQ.p_eState = EQ.eState.Error;
-
-			m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
-			m_alidProtectionBar.Run(!m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
-            if (m_diMCReset.p_bIn) m_robot.m_bDisableHomeWhenArmOpen = true; 
+			m_alidEMS.Run(m_diEMS.p_bIn, "Please Check the EMS Buttons");
+			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
+            if (m_diMCReset.p_bIn) m_robot.m_bDisableHomeWhenArmOpen = true; //CHECK
             m_alidMCReset.Run(m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
             m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer");
 			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA");
