@@ -94,6 +94,7 @@ namespace Root_Vega.Module
         public void ReadInfoReticle_Registry()
         {
             m_reg = new Registry(p_id + ".InfoReticle");
+            p_bDisableHomeWhenArmOpen = m_reg.Read("p_bDisableHomeWhenArmOpen", false);
             m_sInfoReticle = m_reg.Read("sInfoReticle", m_sInfoReticle);
             p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
             foreach (IRobotChild child in m_aChild) child.ReadInfoReticle_Registry();
@@ -481,13 +482,23 @@ namespace Root_Vega.Module
         #endregion
 
         #region Home
+        bool _bDisableHomeWhenArmOpen = false;
+        public bool p_bDisableHomeWhenArmOpen
+		{
+            get { return _bDisableHomeWhenArmOpen; }
+			set
+			{
+                if (_bDisableHomeWhenArmOpen == value) return;
+                _bDisableHomeWhenArmOpen = value;
+                m_reg.Write("p_bDisableHomeWhenArmOpen", value); 
+			}
+		}
+
         const int c_nReset = 3;
-        public bool m_bDisableHomeWhenArmOpen = false; 
         public override string StateHome()//CHECK
         {
             if (EQ.p_bSimulate) return "OK";
-            //if (m_bDisableHomeWhenArmOpen && !m_diArmClose.p_bIn)
-            if (!m_diArmClose.p_bIn)
+            if (p_bDisableHomeWhenArmOpen && !m_diArmClose.p_bIn)
             {
                 m_alidRTRWarningPos.Run(!m_diArmClose.p_bIn, "Please Check State of RTR Arm. if Arm is opened, Operate it manually.");
                 return "RTR's Arm opened";
@@ -505,7 +516,7 @@ namespace Root_Vega.Module
             if (Run(WaitReply(m_secHome))) return p_sInfo;
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             foreach (IRobotChild child in m_aChild) child.p_bLock = false;
-            m_bDisableHomeWhenArmOpen = false;
+            p_bDisableHomeWhenArmOpen = false;
             return p_sInfo;
         }
         #endregion
