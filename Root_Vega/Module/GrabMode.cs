@@ -120,21 +120,7 @@ namespace Root_Vega.Module
         public MemoryGroup m_memoryGroup;
         public MemoryData m_memoryData;
         string m_sMemoryGroup = "";
-        public string p_sMemoryGroup
-        {
-            get
-            {
-                return m_sMemoryGroup;
-            }
-        }
         string m_sMemoryData = "Grab";
-        public string p_sMemoryData
-        {
-            get
-            {
-                return m_sMemoryData;
-            }
-        }
 
         void RunTreeMemory(Tree tree, bool bVisible, bool bReadOnly)
         {
@@ -175,6 +161,31 @@ namespace Root_Vega.Module
             m_lightSet = lightSet;
             m_memoryPool = memoryPool;
             m_RADSControl = radsControl;
+        }
+
+        public static GrabMode Copy(GrabMode src)
+        {
+            GrabMode dst = new GrabMode(src.p_id, src.m_cameraSet, src.m_lightSet, src.m_memoryPool, src.m_RADSControl);
+            dst.Grabed = src.Grabed;
+            dst.m_bUseBiDirectionScan = src.m_bUseBiDirectionScan;
+            dst.m_camera = src.m_camera;
+            dst.m_dTrigger = src.m_dTrigger;
+            dst.m_eGrabDirection = src.m_eGrabDirection;
+            dst.m_eScanPos = src.m_eScanPos;
+            dst.m_intervalAcc = src.m_intervalAcc;
+            dst.m_memoryData = src.m_memoryData;
+            dst.m_memoryGroup = src.m_memoryGroup;
+            dst.m_nReverseOffsetY = src.m_nReverseOffsetY;
+            dst.m_aLightPower = src.m_aLightPower;
+            dst.m_bUseRADS = src.m_bUseRADS;
+            dst.m_sCamera = src.m_sCamera;
+            dst.p_sName = src.p_sName;
+            dst.m_ScanLineNum = src.m_ScanLineNum;
+            dst.m_ScanStartLine = src.m_ScanStartLine;
+            dst.m_sMemoryData = src.m_sMemoryData;
+            dst.m_sMemoryGroup = src.m_sMemoryGroup;
+
+            return dst;
         }
 
         public void RunTreeName(Tree tree)

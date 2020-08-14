@@ -104,7 +104,7 @@ namespace RootTools.Control
         #endregion
 
         #region List Position
-        protected Dictionary<string, double> m_aPos = new Dictionary<string, double>();
+        public Dictionary<string, double> m_aPos = new Dictionary<string, double>();
         public List<string> m_asPos = new List<string>(); 
         public ObservableCollection<string> p_asPos { get; set; }
         public string p_strSelPos { get; set; }
