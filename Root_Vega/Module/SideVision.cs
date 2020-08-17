@@ -26,19 +26,12 @@ using System.Windows.Threading;
 
 namespace Root_Vega.Module
 {
-    //public enum eScanPos
-    //{
-    //    Bottom = 0,
-    //    Left,
-    //    Top,
-    //    Right,
-    //}
-
     public class SideVision : ModuleBase, IRobotChild
     {
         #region ToolBox
         public DIO_I m_diSideReticleExistSensor;
-        
+
+        public double m_dMaxScorePosX = 40000;
         AxisXY m_axisXY;
         public AxisXY p_axisXY
         {
@@ -870,7 +863,7 @@ namespace Root_Vega.Module
                 set
                 {
                     _sGrabMode = value;
-                    m_grabMode = m_module.GetGrabMode(value);
+                    //m_grabMode = m_module.GetGrabMode(value);
                 }
             }
 
@@ -896,9 +889,9 @@ namespace Root_Vega.Module
                 run.m_yLine = m_yLine;
                 run.m_xLine = m_xLine;
                 run.m_nMaxFrame = m_nMaxFrame;
-                if (m_grabMode != null)
-                    run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
                 run.m_nScanGap = m_nScanGap;
+                run.m_grabMode = m_module.GetGrabMode(p_sGrabMode);
+
                 return run;
             }
 
@@ -911,12 +904,15 @@ namespace Root_Vega.Module
                 m_nScanGap = tree.Set(m_nScanGap, m_nScanGap, "Scan Gab", "Scan 방향간의 Memory 상 Gab (Bottom, Left 간의 Memory 위치 차이)", bVisible);
                 m_yLine = tree.Set(m_yLine, m_yLine, "Reticle YSize", "# of Grab Lines", bVisible); // 120
                 m_xLine = tree.Set(m_xLine, m_xLine, "Reticle XSize", "# of Grab Lines", bVisible); // 120
-                //m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+
+                string strTemp = p_sGrabMode;
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null)
-                    m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
+                if (strTemp != p_sGrabMode)
+                {
+                    m_grabMode = m_module.GetGrabMode(p_sGrabMode);
+                }
             }
 
             public override string Run()
@@ -949,11 +945,12 @@ namespace Root_Vega.Module
                         /* Grab하기 위해 이동할 Y축의 시작 끝 점*/
                         double yPos1 = m_rpAxis.Y - yAxis / 2 - m_grabMode.m_intervalAcc;   //y 축 이동 시작 지점 
                         double yPos0 = m_rpAxis.Y + yAxis / 2 + m_grabMode.m_intervalAcc;  // Y 축 이동 끝 지점.
-                        double nPosX = m_rpAxis.X;   // X축 찍을 위치 
+                        //double nPosX = m_rpAxis.X;   // X축 찍을 위치 
+                        double nPosX = m_module.m_dMaxScorePosX;   // AF로 찾은 포커스 맞는 X위치
                         double nPosZ = m_nFocusPos + nLinesX * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
                         //double nPosZ = m_nFocusPos;
                         //double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
-                        double fPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4;
+                        double dPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
@@ -961,7 +958,7 @@ namespace Root_Vega.Module
                             return p_sInfo;
                         if (m_module.Run(axisXY.p_axisX.WaitReady()))
                             return p_sInfo;
-                        if (m_module.Run(axisTheta.StartMove(fPosTheta)))
+                        if (m_module.Run(axisTheta.StartMove(dPosTheta)))
                             return p_sInfo;
                         if (m_module.Run(axisTheta.WaitReady()))
                             return p_sInfo;
@@ -988,6 +985,7 @@ namespace Root_Vega.Module
                         string sMem = m_grabMode.m_eScanPos.ToString();
                         MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, "Side" + sMem);
 
+                        int nTest = m_grabMode.m_camera.GetRoiSize().Y;
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
                         /* 방향 바꾸는 코드 들어가야함*/
                         m_grabMode.StartGrab(mem, m_cpMemory, nLinesY);
@@ -1031,7 +1029,7 @@ namespace Root_Vega.Module
                 set
                 {
                     _sGrabMode = value;
-                    m_grabMode = m_module.GetGrabMode(value);
+                    //m_grabMode = m_module.GetGrabMode(value);
                 }
             }
 
@@ -1058,9 +1056,9 @@ namespace Root_Vega.Module
                 run.m_xLine = m_xLine;
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanRate = m_nScanRate;
-                if (m_grabMode != null)
-                    run.m_grabMode.m_eScanPos = m_grabMode.m_eScanPos;
                 run.m_nScanGap = m_nScanGap;
+                run.m_grabMode = m_module.GetGrabMode(p_sGrabMode);
+
                 return run;
             }
 
@@ -1073,12 +1071,15 @@ namespace Root_Vega.Module
                 m_nScanGap = tree.Set(m_nScanGap, m_nScanGap, "Scan Gab", "Scan 방향간의 Memory 상 Gab (Bottom, Left 간의 Memory 위치 차이)", bVisible);
                 m_yLine = tree.Set(m_yLine, m_yLine, "Reticle YSize", "# of Grab Lines", bVisible);
                 m_xLine = tree.Set(m_xLine, m_xLine, "Reticle XSize", "# of Grab Lines", bVisible);
-                //m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+                string strTemp = p_sGrabMode;
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null)
-                    m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
+                if (strTemp != p_sGrabMode)
+                {
+                    m_grabMode = m_module.GetGrabMode(p_sGrabMode);
+                }
+
             }
 
             public override string Run()
@@ -1112,11 +1113,12 @@ namespace Root_Vega.Module
                         /* Grab하기 위해 이동할 Y축의 시작 끝 점*/
                         double yPos1 = m_rpAxis.Y - yAxis / 2 - m_grabMode.m_intervalAcc;   //y 축 이동 시작 지점 
                         double yPos0 = m_rpAxis.Y + yAxis / 2 + m_grabMode.m_intervalAcc;  // Y 축 이동 끝 지점.
-                        double nPosX = m_rpAxis.X;   // X축 찍을 위치 
+                        //double nPosX = m_rpAxis.X;   // X축 찍을 위치 
+                        double nPosX = m_module.m_dMaxScorePosX;   // AF로 찾은 포커스 맞는 X위치
                         //double nPosZ = m_nFocusPos + nLinesX * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
                         double nPosZ = m_nFocusPos;
                         //double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
-                        double fPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4;
+                        double dPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
@@ -1124,7 +1126,7 @@ namespace Root_Vega.Module
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                        if (m_module.Run(axisTheta.StartMove(fPosTheta)))
+                        if (m_module.Run(axisTheta.StartMove(dPosTheta)))
                             return p_sInfo;
                         if (m_module.Run(axisTheta.WaitReady()))
                             return p_sInfo;
@@ -1176,7 +1178,7 @@ namespace Root_Vega.Module
         public class Run_AutoFocus : ModuleRunBase
         {
             public Dispatcher _dispatcher;
-            //public class CStepInfoList : ObservableCollection<CStepInfo> { }
+
             public class CStepInfo : ObservableObject
             {
                 string m_strInfo;
@@ -1250,6 +1252,8 @@ namespace Root_Vega.Module
             public int m_nStep = 0;
             public int m_nVarianceSize = 0;
             public bool m_bUsingSobel = true;
+            public eScanPos m_eScanPos = eScanPos.Bottom;
+            public bool m_bFindXPos = false;
 
             public Run_AutoFocus(SideVision module)
             {
@@ -1274,6 +1278,8 @@ namespace Root_Vega.Module
                 run.m_nStep = m_nStep;
                 run.m_nVarianceSize = m_nVarianceSize;
                 run.m_bUsingSobel = m_bUsingSobel;
+                run.m_eScanPos = m_eScanPos;
+                run.m_bFindXPos = m_bFindXPos;
 
                 run.p_lstLeftStepInfo = p_lstLeftStepInfo;
                 run.p_lstRightStepInfo = p_lstRightStepInfo;
@@ -1301,6 +1307,9 @@ namespace Root_Vega.Module
                 m_nVarianceSize = tree.Set(m_nVarianceSize, m_nVarianceSize, "Variance Size", "Variance Size", bVisible);
                 m_bUsingSobel = tree.Set(m_bUsingSobel, m_bUsingSobel, "Using Sovel Filter", "Using Sovel Filter", bVisible);
 
+                m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
+                m_bFindXPos = tree.Set(m_bFindXPos, m_bFindXPos, "Find X Position Again", "Find X Position Again", bVisible);
+
                 base.RunTree(tree, bVisible, bRecipe);
             }
 
@@ -1318,116 +1327,183 @@ namespace Root_Vega.Module
                 double dRightCurrentScore = 0.0;
                 double dRightMaxScore = -1.0;
                 double dRightMaxScorePosX = m_dRightStartPosX;
+                double dCenterCurrentScore = 0.0;
+                double dCenterMaxScore = -1.0;
+                double dCenterMaxScorePosX = m_dRightStartPosX;
                 p_afs.p_dTheta = 0.0;
                 p_afs.p_strStatus = "Ready";
 
-                _dispatcher.Invoke(new Action(delegate ()
+                if (_dispatcher != null)
                 {
-                    p_lstLeftStepInfo.Clear();
-                    p_lstRightStepInfo.Clear();
-                }));
-
-                //1.Reticle 좌측 위치로 이동 후 AF
-                int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
-                p_afs.p_strStatus = "Left Side AF...";
-                for (int i = 0; i < nStepCount; i++)
-                {
-                    // Axis Move
-                    if (m_module.Run(axisXY.StartMove(new RPoint(m_dLeftStartPosX + (m_nStep * i), m_dLeftPosY)))) return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                    if (m_module.Run(axisZ.StartMove(m_dLeftPosZ))) return p_sInfo;
-                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
-
-                    // Grab
-                    string strRet = cam.Grab();
-
-                    // Calculating Score
-                    System.Drawing.Bitmap bmp = null;
-                    if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
-                    else
-                    {
-                        dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
-                        bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                    }
-
                     _dispatcher.Invoke(new Action(delegate ()
                     {
-                        string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
-                        BitmapSource bmpSrc = GetBitmapSource(bmp);
-                        p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    }));
-
-                    if (dLeftCurrentScore > dLeftMaxScore)
-                    {
-                        dLeftMaxScore = dLeftCurrentScore;
-                        dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
-                    }
-                }
-
-                // 2. Reticle 우측 위치로 이동 후 AF
-                nStepCount = (int)Math.Abs(m_dRightEndPosX - m_dRightStartPosX) / m_nStep;
-                p_afs.p_strStatus = "Right Side AF...";
-                for (int i = 0; i < nStepCount; i++)
-                {
-                    // Axis Move
-                    if (m_module.Run(axisXY.StartMove(new RPoint(m_dRightStartPosX + (m_nStep * i), m_dRightPosY)))) return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                    if (m_module.Run(axisZ.StartMove(m_dRightPosZ))) return p_sInfo;
-                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
-
-                    // Grab
-                    string strRet = cam.Grab();
-
-                    // Calculating Score
-                    System.Drawing.Bitmap bmp = null;
-                    if (m_bUsingSobel) dRightCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
-                    else
-                    {
-                        dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
-                        bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                    }
-
-                    if (dRightCurrentScore > dRightMaxScore)
-                    {
-                        dRightMaxScore = dRightCurrentScore;
-                        dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
-                    }
-
-                    _dispatcher.Invoke(new Action(delegate ()
-                    {
-                        string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dRightStartPosX + (m_nStep * i)), dRightCurrentScore);
-                        BitmapSource bmpSrc = GetBitmapSource(bmp);
-                        p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                        p_lstLeftStepInfo.Clear();
+                        p_lstRightStepInfo.Clear();
                     }));
                 }
 
-                // 3. 좌우측 AF편차 구하기
-                bool bThetaClockwise = true;    // Theta+ = Anticlockwise
-                                                // Theta- = Clockwise
-                if (dLeftMaxScorePosX > dRightMaxScorePosX) bThetaClockwise = false;
-                af.p_dDifferenceOfFocusDistance = Math.Abs(dRightMaxScorePosX - dLeftMaxScorePosX);
-                if (m_dRightPosY >= m_dLeftPosY) return "AutoFocus - Right Y Position is bigger than Left Y Position";
-                af.p_dDistanceOfLeftPointToRightPoint = Math.Abs(m_dRightPosY - m_dLeftPosY);
+                try
+                {
+                    m_module.SetLightByName("SideVRS Side", 10);
 
-                // 4. 좌우측 위치 사이의 거리와 좌우측 AF편차를 이용하여 Theta 계산
-                double dThetaRadian = af.GetThetaRadian();
-                double dThetaDegree = af.GetThetaDegree(dThetaRadian);
-                if (bThetaClockwise) p_afs.m_dTheta = -dThetaDegree;
-                else p_afs.p_dTheta = dThetaDegree;
+                    // 0. 스캔 포지션으로 Theta 돌리기
+                    double dPosTheta = (int)m_eScanPos * 360000 / 4;
+                    if (m_module.Run(axisXY.p_axisX.StartMove(-50000)))
+                        return p_sInfo;
+                    if (m_module.Run(axisXY.p_axisX.WaitReady()))
+                        return p_sInfo;
+                    if (m_module.Run(axisTheta.StartMove(dPosTheta)))
+                        return p_sInfo;
+                    if (m_module.Run(axisTheta.WaitReady()))
+                        return p_sInfo;
 
-                // 5. Radian 값을 Theta 모터 포지션 값으로 Scaling
-                double dMinValue = 0.0;
-                double dMaxValue = 2 * Math.PI;
-                double dMinScaleValue = 0.0;
-                double dMaxScaleValue = 360000.0;
-                double dScaled = dMinScaleValue + (Math.Abs(dThetaRadian) - dMinValue) / (dMaxValue - dMinValue) * (dMaxScaleValue - dMinScaleValue);
+                    //1.Reticle 좌측 위치로 이동 후 AF
+                    int nStepCount = (int)Math.Abs(m_dLeftEndPosX - m_dLeftStartPosX) / m_nStep;
+                    p_afs.p_strStatus = "Left Side AF...";
+                    for (int i = 0; i < nStepCount; i++)
+                    {
+                        // Axis Move
+                        if (m_module.Run(axisXY.StartMove(new RPoint(m_dLeftStartPosX + (m_nStep * i), m_dLeftPosY)))) return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        if (m_module.Run(axisZ.StartMove(m_dLeftPosZ))) return p_sInfo;
+                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
 
-                // 6. Theta축 돌리기
-                double dActualPos = m_module.p_axisTheta.p_posActual;
-                if (bThetaClockwise) dScaled = -dScaled;
-                m_module.p_axisTheta.StartMove(dActualPos + dScaled);
+                        // Grab
+                        string strRet = cam.Grab();
 
-                p_afs.p_strStatus = "Success";
+                        // Calculating Score
+                        System.Drawing.Bitmap bmp = null;
+                        if (m_bUsingSobel) dLeftCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
+                        else
+                        {
+                            dLeftCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                            bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                        }
+
+                        if (_dispatcher != null)
+                        {
+                            _dispatcher.Invoke(new Action(delegate ()
+                            {
+                                string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dLeftStartPosX + (m_nStep * i)), dLeftCurrentScore);
+                                BitmapSource bmpSrc = GetBitmapSource(bmp);
+                                p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                            }));
+                        }
+
+                        if (dLeftCurrentScore > dLeftMaxScore)
+                        {
+                            dLeftMaxScore = dLeftCurrentScore;
+                            dLeftMaxScorePosX = m_dLeftStartPosX + (m_nStep * i);
+                        }
+                    }
+
+                    // 2. Reticle 우측 위치로 이동 후 AF
+                    nStepCount = (int)Math.Abs(m_dRightEndPosX - m_dRightStartPosX) / m_nStep;
+                    p_afs.p_strStatus = "Right Side AF...";
+                    for (int i = 0; i < nStepCount; i++)
+                    {
+                        // Axis Move
+                        if (m_module.Run(axisXY.StartMove(new RPoint(m_dRightStartPosX + (m_nStep * i), m_dRightPosY)))) return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        if (m_module.Run(axisZ.StartMove(m_dRightPosZ))) return p_sInfo;
+                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+
+                        // Grab
+                        string strRet = cam.Grab();
+
+                        // Calculating Score
+                        System.Drawing.Bitmap bmp = null;
+                        if (m_bUsingSobel) dRightCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
+                        else
+                        {
+                            dRightCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                            bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                        }
+
+                        if (dRightCurrentScore > dRightMaxScore)
+                        {
+                            dRightMaxScore = dRightCurrentScore;
+                            dRightMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
+                        }
+
+                        if (_dispatcher != null)
+                        {
+                            _dispatcher.Invoke(new Action(delegate ()
+                            {
+                                string strTemp = String.Format("Current Position={0} Current Score={1:N4}", (m_dRightStartPosX + (m_nStep * i)), dRightCurrentScore);
+                                BitmapSource bmpSrc = GetBitmapSource(bmp);
+                                p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                            }));
+                        }
+                    }
+
+                    // 3. 좌우측 AF편차 구하기
+                    bool bThetaClockwise = true;    // Theta+ = Anticlockwise
+                                                    // Theta- = Clockwise
+                    if (dLeftMaxScorePosX > dRightMaxScorePosX) bThetaClockwise = false;
+                    af.p_dDifferenceOfFocusDistance = Math.Abs(dRightMaxScorePosX - dLeftMaxScorePosX);
+                    if (m_dRightPosY >= m_dLeftPosY) return "AutoFocus - Right Y Position is bigger than Left Y Position";
+                    af.p_dDistanceOfLeftPointToRightPoint = Math.Abs(m_dRightPosY - m_dLeftPosY);
+
+                    // 4. 좌우측 위치 사이의 거리와 좌우측 AF편차를 이용하여 Theta 계산
+                    double dThetaRadian = af.GetThetaRadian();
+                    double dThetaDegree = af.GetThetaDegree(dThetaRadian);
+                    if (bThetaClockwise) p_afs.m_dTheta = -dThetaDegree;
+                    else p_afs.p_dTheta = dThetaDegree;
+
+                    // 5. Radian 값을 Theta 모터 포지션 값으로 Scaling
+                    double dMinValue = 0.0;
+                    double dMaxValue = 2 * Math.PI;
+                    double dMinScaleValue = 0.0;
+                    double dMaxScaleValue = 360000.0;
+                    double dScaled = dMinScaleValue + (Math.Abs(dThetaRadian) - dMinValue) / (dMaxValue - dMinValue) * (dMaxScaleValue - dMinScaleValue);
+
+                    // 6. Theta축 돌리기
+                    double dActualPos = m_module.p_axisTheta.p_posActual;
+                    if (bThetaClockwise) dScaled = -dScaled;
+                    m_module.p_axisTheta.StartMove(dActualPos + dScaled);
+                    m_module.p_axisTheta.m_aPos["Snap"] = (int)dScaled;
+
+                    // 7. Theta 돌린 후 X Position 다시 찾는 옵션이 켜져있으면
+                    if (m_bFindXPos == true)
+                    {
+                        // Reticle 중심 위치로 이동 후 AF
+                        p_afs.p_strStatus = "Find X Position...";
+                        double dCenterPosY = m_dLeftPosY - af.p_dDistanceOfLeftPointToRightPoint;
+                        for (int i = 0;  i<nStepCount; i++)
+                        {
+                            // Axis Move
+                            if (m_module.Run(axisXY.StartMove(new RPoint(m_dRightStartPosX + (m_nStep * i), dCenterPosY)))) return p_sInfo;
+                            if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                            if (m_module.Run(axisZ.StartMove(m_dRightPosZ))) return p_sInfo;
+                            if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+
+                            // Grab
+                            string strRet = cam.Grab();
+
+                            // Calculating Score
+                            System.Drawing.Bitmap bmp = null;
+                            if (m_bUsingSobel) dCenterCurrentScore = af.GetImageFocusScoreWithSobel(img, out bmp);
+                            else
+                            {
+                                dCenterCurrentScore = af.GetImageVarianceScore(img, m_nVarianceSize);
+                                bmp = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                            }
+
+                            if (dCenterCurrentScore > dCenterMaxScore)
+                            {
+                                dCenterMaxScore = dCenterCurrentScore;
+                                dCenterMaxScorePosX = m_dRightStartPosX + (m_nStep * i);
+                            }
+                        }
+                        m_module.m_dMaxScorePosX = dCenterMaxScorePosX;
+                    }
+                    p_afs.p_strStatus = "Success";
+                }
+                finally
+                {
+                    m_module.SetLightByName("SideVRS Side", 0);
+                }
 
                 return base.Run();
             }
@@ -1472,7 +1548,7 @@ namespace Root_Vega.Module
                 set
                 {
                     _sGrabMode = value;
-                    m_grabMode = m_module.GetGrabMode(value);
+                    //m_grabMode = m_module.GetGrabMode(value);
                 }
             }
 
@@ -1505,7 +1581,6 @@ namespace Root_Vega.Module
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                //tree.p_bVisible = bVisible;
                 m_rpAxis = tree.Set(m_rpAxis, m_rpAxis, "Center Axis Position", "Center Axis Position (mm ?)", bVisible);
                 m_fRes = tree.Set(m_fRes, m_fRes, "Cam Resolution", "Resolution  um", bVisible);
                 m_nFocusPos = tree.Set(m_nFocusPos, 0, "Focus Z Pos", "Focus Z Pos", bVisible);
@@ -1513,13 +1588,14 @@ namespace Root_Vega.Module
                 m_nScanGap = tree.Set(m_nScanGap, m_nScanGap, "Scan Gab", "Scan 방향간의 Memory 상 Gab (Bottom, Left 간의 Memory 위치 차이)", bVisible);
                 m_yLine = tree.Set(m_yLine, m_yLine, "Reticle YSize", "# of Grab Lines", bVisible);
                 m_xLine = tree.Set(m_xLine, m_xLine, "Reticle XSize", "# of Grab Lines", bVisible);
-                //m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+                string strTemp = p_sGrabMode;
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null)
-                    m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
-                //base.RunTree(tree, bVisible, bRecipe);
+                if (strTemp != p_sGrabMode)
+                {
+                    m_grabMode = m_module.GetGrabMode(p_sGrabMode);
+                }
             }
 
             public override string Run()
