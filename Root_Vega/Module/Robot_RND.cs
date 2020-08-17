@@ -4,6 +4,7 @@ using RootTools.Camera.CognexOCR;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
+using RootTools.GAFs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -29,11 +30,19 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_camOCR, this, "CamOCR");
             if (bInit)
             {
+                InitALID();
                 m_rs232.OnRecieve += M_rs232_OnRecieve;
                 m_rs232.p_bConnect = true;
             }
         }
         #endregion
+
+        ALID m_alidRTRWarningPos;
+
+        void InitALID()
+		{
+            m_alidRTRWarningPos = m_gaf.GetALID(this, "RTR WarningPos", "RTR WarningPos Error");
+		}
 
         #region DIO Function
         public string RunGrip(bool bGrip)
@@ -85,6 +94,7 @@ namespace Root_Vega.Module
         public void ReadInfoReticle_Registry()
         {
             m_reg = new Registry(p_id + ".InfoReticle");
+            p_bDisableHomeWhenArmOpen = m_reg.Read("p_bDisableHomeWhenArmOpen", false);
             m_sInfoReticle = m_reg.Read("sInfoReticle", m_sInfoReticle);
             p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
             foreach (IRobotChild child in m_aChild) child.ReadInfoReticle_Registry();
@@ -472,10 +482,27 @@ namespace Root_Vega.Module
         #endregion
 
         #region Home
+        bool _bDisableHomeWhenArmOpen = false;
+        public bool p_bDisableHomeWhenArmOpen
+		{
+            get { return _bDisableHomeWhenArmOpen; }
+			set
+			{
+                if (_bDisableHomeWhenArmOpen == value) return;
+                _bDisableHomeWhenArmOpen = value;
+                m_reg.Write("p_bDisableHomeWhenArmOpen", value); 
+			}
+		}
+
         const int c_nReset = 3;
-        public override string StateHome()
+        public override string StateHome()//CHECK
         {
             if (EQ.p_bSimulate) return "OK";
+            if (p_bDisableHomeWhenArmOpen && !m_diArmClose.p_bIn)
+            {
+                m_alidRTRWarningPos.Run(!m_diArmClose.p_bIn, "Please Check State of RTR Arm. if Arm is opened, Operate it manually.");
+                return "RTR's Arm opened";
+            }
             int nReset = 0;
             while (IsFailResetCPU())
             {
@@ -484,18 +511,12 @@ namespace Root_Vega.Module
                 Thread.Sleep(100);
             }
             foreach (IRobotChild child in m_aChild) child.p_bLock = true;
-            if (m_bNeedHome)
-            {
-                if (Run(WriteCmd(eCmd.FindHome))) return p_sInfo;
-            }
-            else
-            {
-                if (Run(WriteCmd(eCmd.MoveHome))) return p_sInfo;
-            }
+            if (m_bNeedHome ? Run(WriteCmd(eCmd.FindHome)) : Run(WriteCmd(eCmd.MoveHome))) return p_sInfo;
             m_bNeedHome = false;
             if (Run(WaitReply(m_secHome))) return p_sInfo;
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             foreach (IRobotChild child in m_aChild) child.p_bLock = false;
+            p_bDisableHomeWhenArmOpen = false;
             return p_sInfo;
         }
         #endregion
