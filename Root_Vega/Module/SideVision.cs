@@ -28,6 +28,11 @@ namespace Root_Vega.Module
 {
     public class SideVision : ModuleBase, IRobotChild
     {
+        #region ViewModel
+        public _2_6_SideViewModel m_sivm;
+        public _2_9_BevelViewModel m_bevm;
+        #endregion
+
         #region ToolBox
         public DIO_I m_diSideReticleExistSensor;
 
@@ -779,6 +784,7 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_BevelGrab(this), true, "Bevel Grab");
             AddModuleRunList(new Run_AutoFocus(this), true, "Auto Focus");
             AddModuleRunList(new Run_LADS(this), true, "LADS");
+            AddModuleRunList(new Run_Inspection(this), true, "Inspection");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -1674,6 +1680,65 @@ namespace Root_Vega.Module
                     m_grabMode.SetLight(false);
                 }
             }
+        }
+    }
+    #endregion
+
+    #region Run_Inspection
+    public class Run_Inspection : ModuleRunBase
+    {
+        SideVision m_module;
+        public _2_6_SideViewModel m_sivm;
+        //public _2_9_BevelViewModel m_bevm;
+
+        public Run_Inspection(SideVision module)
+        {
+            m_module = module;
+            m_sivm = m_module.m_sivm;
+            //m_bevm = m_module.m_bevm;
+            InitModuleRun(module);
+        }
+
+        public override ModuleRunBase Clone()
+        {
+            Run_Inspection run = new Run_Inspection(m_module);
+            return run;
+        }
+
+        public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+        {
+            treeRoot.p_eMode = mode;
+            RunTree(treeRoot, true);
+        }
+
+        public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+        {
+        }
+
+        public override string Run()
+        {
+            // 검사시작 전 확인사항 조건 추가해야함
+
+            // 검사시작
+            m_sivm._dispatcher.Invoke(new Action(delegate ()
+            {
+                m_sivm._startInsp();
+            }));
+
+            while (true)
+            {
+                DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+                if (connector.Open())
+                {
+                    string strQuery = "SELECT inspStatusNum FROM inspections.inspstatus where idx=0;";
+                    string strTemp = string.Empty;
+                    var result = connector.SendQuery(strQuery, ref strTemp);
+                    if (result == 0 && strTemp == "1") break;
+                }
+                Thread.Sleep(1000);
+            }
+
+            return "OK";
         }
     }
     #endregion
