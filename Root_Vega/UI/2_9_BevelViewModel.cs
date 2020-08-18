@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 namespace Root_Vega
 {
-    class _2_9_BevelViewModel : ObservableObject
+    public class _2_9_BevelViewModel : ObservableObject
     {
         /// <summary>
 		/// 외부 Thread에서 UI를 Update하기 위한 Dispatcher
