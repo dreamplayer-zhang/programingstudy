@@ -942,7 +942,8 @@ namespace Root_Vega.Module
                 EQ.p_eState = EQ.eState.Ready; 
                 BitmapImage image = m_module.m_camOCR.ReadImage();
                 ManualOCR memualOCR = new ManualOCR(m_module.p_infoReticle, image);
-                Application.Current.Dispatcher.Invoke(delegate { memualOCR.ShowOCR(); });
+                memualOCR.ShowOCR();
+                while (memualOCR.m_bShowDialog) Thread.Sleep(10); 
                 return "OK"; 
             }
         }
