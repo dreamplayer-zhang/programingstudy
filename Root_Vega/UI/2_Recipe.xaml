@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_Vega"
+             xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
              mc:Ignorable="d"
              d:DesignHeight="756" d:DesignWidth="1876">
     <Grid>
@@ -16,147 +17,186 @@
             <TabItem Header="Information" 
                      Style="{StaticResource RcptabItem}"
                      Margin="0,50,0,0">
-                <Border BorderBrush="{StaticResource BorderBrush}"
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4*"/>
+                        <ColumnDefinition Width="6*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <GroupBox Header="Recipe"
+					                          Grid.Row="1"
+                                              Margin="10,0,10,10"
+                                              Foreground="{StaticResource BtnForeGround}"
+                                              FontSize="20">
+                                    <StackPanel>
+                                        <Button Style="{StaticResource BasicBtn}"
+                                                    Content="Open"
+                                                    Margin="2"
+                                                    Command="{Binding CommandRecipeOpen}"/>
+                                        <Button Style="{StaticResource BasicBtn}"
+                                                    Content="Save"
+                                                    Margin="2"
+                                                    Command="{Binding CommandRecipeSave}"/>
+                                        <Button Style="{StaticResource BasicBtn}"
+                                                    Content="Clear"
+                                                    Margin="2"
+                                                    Command="{Binding CommandRecipeClear}"/>
+                                        <ComboBox Margin="2,20,2,2"
+                                                      ItemsSource="{Binding p_recipe.p_asModule}"
+                                                      SelectedValue="{Binding p_strSelectedModule}"/>
+                                        <ComboBox Margin="2"
+                                                      ItemsSource="{Binding p_aSelectedModuleRun}"
+                                                      SelectedValue="{Binding p_strSelectedModuleRun}"/>
+                                        <Button Style="{StaticResource BasicBtn}"
+                                                    Content="Add"
+                                                    Margin="2"
+                                                    Visibility="{Binding p_vAddButtonVisibility}"
+                                                    Command="{Binding CommandRecipeAdd}"/>
+                                    </StackPanel>
+                                </GroupBox>
+                            </Grid>
+                            <Border Grid.Column="1">
+                                <tree:TreeUI DataContext="{Binding p_moduleRunList.p_treeRoot}"
+                                             Background="White"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <Border Grid.Column="1"
+                        BorderBrush="{StaticResource BorderBrush}"
                         BorderThickness="3">
-                    <WrapPanel Orientation="Horizontal">
-                        <Grid Width="200"
+                        <WrapPanel Orientation="Horizontal">
+                            <Grid Width="200"
                               Height="300"
                               Margin="50">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="35"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Border Grid.Row="0"
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="35"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0"
                                     BorderBrush="{StaticResource BorderBrush}"
                                     BorderThickness="3"
                                     Background="Gray">
-                                <TextBlock Text="Item"
+                                    <TextBlock Text="Item"
                                            Style="{StaticResource BasicTb}"
                                            FontSize="20"/>
-                            </Border>
-                            <Border Grid.Row="1"
+                                </Border>
+                                <Border Grid.Row="1"
                                     BorderBrush="{StaticResource BorderBrush}"
                                     BorderThickness="3,0,3,3">
-                                <StackPanel>
-                                    <Grid Margin="15,15,15,0">
-                                        <TextBlock Text="EBR"
+                                    <StackPanel>
+                                        <Grid Margin="15,15,15,0">
+                                            <TextBlock Text="EBR"
                                                    Style="{StaticResource BasicTb}"
                                                    FontSize="15"
                                                    HorizontalAlignment="Left"/>
-                                        <CheckBox HorizontalAlignment="Right"
+                                            <CheckBox HorizontalAlignment="Right"
                                                   VerticalAlignment="Center"
                                                   Margin="0,0,10,0"/>
-                                    </Grid>
-                                    <Grid Margin="15,15,15,0">
-                                        <TextBlock Text="Surface"
+                                        </Grid>
+                                        <Grid Margin="15,15,15,0">
+                                            <TextBlock Text="Surface"
                                                    Style="{StaticResource BasicTb}"
                                                    FontSize="15"
                                                    HorizontalAlignment="Left"/>
-                                        <CheckBox HorizontalAlignment="Right"
+                                            <CheckBox HorizontalAlignment="Right"
                                                   VerticalAlignment="Center"
                                                   Margin="0,0,10,0"/>
-                                    </Grid>
+                                        </Grid>
 
-                                    <Grid Margin="15,15,15,0">
-                                        <TextBlock Text="Bump"
+                                        <Grid Margin="15,15,15,0">
+                                            <TextBlock Text="Bump"
                                                    Style="{StaticResource BasicTb}"
                                                    FontSize="15"
                                                    HorizontalAlignment="Left"/>
-                                        <CheckBox HorizontalAlignment="Right"
+                                            <CheckBox HorizontalAlignment="Right"
                                                   VerticalAlignment="Center"
                                                   Margin="0,0,10,0"/>
-                                    </Grid>
-                                    <Grid Margin="15,15,15,0">
-                                        <TextBlock Text="Kerf"
+                                        </Grid>
+                                        <Grid Margin="15,15,15,0">
+                                            <TextBlock Text="Kerf"
                                                    Style="{StaticResource BasicTb}"
                                                    FontSize="15"
                                                    HorizontalAlignment="Left"/>
-                                        <CheckBox HorizontalAlignment="Right"
+                                            <CheckBox HorizontalAlignment="Right"
                                                   VerticalAlignment="Center"
                                                   Margin="0,0,10,0"/>
-                                    </Grid>
+                                        </Grid>
 
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                        <Grid Width="200"
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <Grid Width="200"
                               Height="300"
                               Margin="0,50,50,50">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="35"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Border Grid.Row="0"
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="35"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0"
                                     BorderBrush="{StaticResource BorderBrush}"
                                     BorderThickness="3"
                                     Background="Gray">
-                                <TextBlock Text="Wafer Type"
+                                    <TextBlock Text="Wafer Type"
                                            Style="{StaticResource BasicTb}"
                                            FontSize="20"/>
-                            </Border>
-                            <Border Grid.Row="1"
+                                </Border>
+                                <Border Grid.Row="1"
                                     BorderBrush="{StaticResource BorderBrush}"
                                     BorderThickness="3,0,3,3">
-                                <StackPanel>
-                                    <Grid Margin="15,15,15,0">
-                                        <TextBlock Text="300mm"
+                                    <StackPanel>
+                                        <Grid Margin="15,15,15,0">
+                                            <TextBlock Text="300mm"
                                                    Style="{StaticResource BasicTb}"
                                                    FontSize="15"
                                                    HorizontalAlignment="Left"/>
-                                        <CheckBox HorizontalAlignment="Right"
+                                            <CheckBox HorizontalAlignment="Right"
                                                   VerticalAlignment="Center"
                                                   Margin="0,0,10,0"/>
-                                    </Grid>
-                                    <Grid Margin="15,15,15,0">
-                                        <TextBlock Text="400mm"
+                                        </Grid>
+                                        <Grid Margin="15,15,15,0">
+                                            <TextBlock Text="400mm"
                                                    Style="{StaticResource BasicTb}"
                                                    FontSize="15"
                                                    HorizontalAlignment="Left"/>
-                                        <CheckBox HorizontalAlignment="Right"
+                                            <CheckBox HorizontalAlignment="Right"
                                                   VerticalAlignment="Center"
                                                   Margin="0,0,10,0"/>
-                                    </Grid>
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                        <Grid Width="200"
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <Grid Width="200"
                               Height="300"
                               Margin="0,50,50,50">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="35"/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Border Grid.Row="0"
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="35"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Border Grid.Row="0"
                                     BorderBrush="{StaticResource BorderBrush}"
                                     BorderThickness="3"
                                     Background="Gray">
-                                <TextBlock Text="OCR"
+                                    <TextBlock Text="OCR"
                                            Style="{StaticResource BasicTb}"
                                            FontSize="20"/>
-                            </Border>
-                            <Border Grid.Row="1"
+                                </Border>
+                                <Border Grid.Row="1"
                                     BorderBrush="{StaticResource BorderBrush}"
                                     BorderThickness="3,0,3,3">
-                                <StackPanel>
+                                    <StackPanel>
 
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                    </WrapPanel>
-                </Border>
-            </TabItem>
-            <TabItem Header="Map"
-                     Style="{StaticResource RcptabItem}">
-                <Border BorderBrush="{StaticResource BorderBrush}"
-                        BorderThickness="3">
-                </Border>
-            </TabItem>
-            <TabItem Header="Origin"
-                     Style="{StaticResource RcptabItem}">
-                <Border BorderBrush="{StaticResource BorderBrush}"
-                        BorderThickness="3">
-                    <local:_2_3_Origin x:Name="_Origin"/>
-                </Border>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </WrapPanel>
+                    </Border>
+                </Grid>
             </TabItem>
             <TabItem Header="Position"
                      Style="{StaticResource RcptabItem}">
@@ -165,7 +205,7 @@
                     <local:_2_4_Position x:Name="_Position" />
                 </Border>
             </TabItem>
-            <TabItem Header="MainVision"
+            <TabItem Header="PatternVision"
                      Style="{StaticResource RcptabItem}">
                 <Border BorderBrush="Gray"
                         BorderThickness="3">
@@ -210,19 +250,19 @@
             <Button Content="Modify"
                     Style="{StaticResource BasicBtn}"
                     Margin="0,0,0,10"/>-->
-			<Button Content="Create Recipe"
+            <Button Content="Create Recipe"
                     Style="{StaticResource BasicBtn}"
 					Command="{Binding CommandRcpCreate}"
                     Margin="0,0,0,10"/>
-			<Button Content="Load Recipe"
+            <Button Content="Load Recipe"
                     Style="{StaticResource BasicBtn}"
 					Command="{Binding CommandRcpLoad}"
                     Margin="0,0,0,10"/>
-			<Button Content="Save Recipe"
+            <Button Content="Save Recipe"
                     Style="{StaticResource BasicBtn}"
 					Command="{Binding CommandRcpSave}"
                     Margin="0,0,0,10"/>
-			<Button Content="Save As Recipe"
+            <Button Content="Save As Recipe"
                     Style="{StaticResource BasicBtn}"
 					Command="{Binding CommandRcpSaveAs}"
                     Margin="0,0,0,10"/>

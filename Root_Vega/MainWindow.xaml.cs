@@ -107,8 +107,8 @@ namespace Root_Vega
 
             _Recipe.DataContext = new _2_RecipeViewModel(m_engineer);
 
-            _2_3_OriginViewModel ovm = new _2_3_OriginViewModel(m_engineer, dialogService);
-            _Recipe._Origin.DataContext = ovm;
+            //_2_3_OriginViewModel ovm = new _2_3_OriginViewModel(m_engineer, dialogService);
+            //_Recipe._Origin.DataContext = ovm;
             //_recipe._recipeOrigin.DataContext = rovm;
 
             _2_5_MainVisionViewModel suvm = new _2_5_MainVisionViewModel(m_engineer, dialogService);
@@ -116,9 +116,11 @@ namespace Root_Vega
 
             _2_6_SideViewModel sivm = new _2_6_SideViewModel(m_engineer, dialogService);
             _Recipe._Side.DataContext = sivm;
+            ((Vega_Handler)m_engineer.ClassHandler()).m_sideVision.m_sivm= sivm;
 
             _2_9_BevelViewModel bevm = new _2_9_BevelViewModel(m_engineer, dialogService);
             _Recipe._Bevel.DataContext = bevm;
+            ((Vega_Handler)m_engineer.ClassHandler()).m_sideVision.m_bevm = bevm;
 
             _2_7_EdgeBoxViewModel evm = new _2_7_EdgeBoxViewModel(m_engineer, dialogService);
             _Recipe._EdgeBox.DataContext = evm;

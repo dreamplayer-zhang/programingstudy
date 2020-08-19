@@ -43,7 +43,7 @@
             <Label Grid.Row="0" Content="{Binding p_sInfo}" Margin="2"/>
             <TabControl Grid.Row="1">
                 <TabItem Header="ModuleRun">
-                    <tree:TreeUI x:Name="treeRootUI" Margin="2"/>
+                    <tree:TreeUI x:Name="treeRootUI" Margin="10,0,-6,4"/>
                 </TabItem>
                 <TabItem Header="Info">
                     <local:Listp_sInfo_UI x:Name="infoListUI"/>

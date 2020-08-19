@@ -107,16 +107,19 @@ namespace Root_Vega
         {
             if (p_SelGrabMode == null)
                 return;
-            p_SelGrabMode.m_ScanLineNum = p_ScanNum;
-            p_SelGrabMode.m_ScanStartLine = p_StartLine;
-            if(p_SelGrabMode.p_sName.IndexOf("Side") >=0)
+
+            GrabMode grabModeTemp = GrabMode.Copy(p_SelGrabMode);
+            grabModeTemp.m_ScanLineNum = p_ScanNum;
+            grabModeTemp.m_ScanStartLine = p_StartLine;
+
+            if(grabModeTemp.p_sName.IndexOf("Side") >=0)
             {
-                m_RunSideGrab.m_grabMode = p_SelGrabMode;
+                m_RunSideGrab.m_grabMode = grabModeTemp;
                 m_RunBevelGrab.m_grabMode = null;
             }
-            else if( p_SelGrabMode.p_sName.IndexOf("Bevel")>=0)
+            else if(grabModeTemp.p_sName.IndexOf("Bevel")>=0)
             {
-                m_RunBevelGrab.m_grabMode = p_SelGrabMode;
+                m_RunBevelGrab.m_grabMode = grabModeTemp;
                 m_RunSideGrab.m_grabMode = null;
             }
             CloseRequested(this, new DialogCloseRequestedEventArgs(true));
