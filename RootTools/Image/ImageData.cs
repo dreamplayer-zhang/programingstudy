@@ -202,6 +202,49 @@ namespace RootTools
 			}
 			return bmp;
 		}
+
+		public Bitmap GetByteToBitmap(int width, int height, byte[] imageData)
+		{
+			var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+
+			bmp.Palette = mono;
+
+			using (var stream = new MemoryStream(imageData))
+			{
+
+				System.Drawing.Imaging.BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0,
+																bmp.Width,
+																bmp.Height),
+												  System.Drawing.Imaging.ImageLockMode.WriteOnly,
+												  bmp.PixelFormat);
+
+				IntPtr pNative = bmpData.Scan0;
+				Marshal.Copy(imageData, 0, pNative, imageData.Length);
+
+				bmp.UnlockBits(bmpData);
+			}
+			return bmp;
+		}
+
+		public byte[] GetRectByteArray(CRect rect)
+		{
+			int position = 0;
+
+			if (rect.Width % 4 != 0)
+			{
+				rect.Right += 4 - rect.Width % 4;
+			}
+
+			byte[] aBuf = new byte[rect.Width * p_nByte * rect.Height];
+			//나중에 거꾸로 나왔던것 확인해야 함. 일단 지금은 정순으로 바꿔둠
+			for (int i = 0; i < rect.Height; i++)
+			{
+				Marshal.Copy((IntPtr)((long)GetPtr() + rect.Left + ((long)i + (long)rect.Top) * p_Size.X), aBuf, position, rect.Width * p_nByte);
+				position += (rect.Width * p_nByte);
+			}
+			return aBuf;
+		}
+
 		public Bitmap GetRectImage(CRect rect)
 		{
 			#region TEMP

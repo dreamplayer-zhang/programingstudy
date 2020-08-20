@@ -10,7 +10,7 @@
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes" 
              mc:Ignorable="d" Cursor="{Binding RecipeCursor}"
-             d:DesignHeight="726" d:DesignWidth="1442">
+             d:DesignHeight="2000" d:DesignWidth="1442">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="75*"/>
@@ -21,22 +21,38 @@
                                Width="{PriorityBinding}"
                                Height="{PriorityBinding}"/>
         </Grid>
-        <Grid Grid.Column="1" Margin="0,15,15,15">
-            <Grid.RowDefinitions>
-				<RowDefinition Height="Auto"/>
-				<RowDefinition  Height="*"/>
-			</Grid.RowDefinitions>
-            <Grid Grid.Row="0">
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+					  Grid.Column="1" Margin="0,15,15,15"
+					  Background="{DynamicResource BtnMouseOver}" >
+            <Border Margin="3"
+					Padding="5">
                 <StackPanel>
                     <Button Content="Open Image"
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding p_ImageViewer.btnClickOpenImage}"
                             Margin="0,0,0,10" />
-                    <ListView ItemsSource="{Binding p_Recipe.RecipeData.RoiList}"
+                    <StackPanel DataContext="{Binding SelectedRecipe}">
+                        <UniformGrid Columns="2" Margin="0,10,0,10">
+                            <TextBlock  Text="Use Defect Merge"
+											Style="{StaticResource BasicTb}"/>
+                            <ToggleButton Content="{Binding VegaRecipeData.UseDefectMerge}"
+											  Style="{StaticResource BasicToggle}"
+											  IsChecked="{Binding VegaRecipeData.UseDefectMerge}"/>
+                        </UniformGrid>
+                        <UniformGrid Columns="2" Margin="0,0,0,10">
+                            <TextBlock Text="Defect Merge Distance(pxl)"
+										   Style="{StaticResource BasicTb}"/>
+                            <TextBox Text="{Binding VegaRecipeData.MergeDistance}"
+										 Style="{StaticResource BasicTbox}"/>
+                        </UniformGrid>
+                    </StackPanel>
+                    <TextBlock Foreground="White" Text="ROI List"/>
+                    <ListView ItemsSource="{Binding p_PatternRoiList}"
                               Height="100"
                               Margin="0,0,0,10"
                               Background="#FF1B1B1C"
-                              SelectedIndex="{Binding p_IndexMask}">
+                              SelectedItem="{Binding SelectedROI}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Name}"
@@ -46,158 +62,216 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <!--<ToggleButton Content="Draw" 
-                                  Margin="0,0,0,10"
-                                  Command="{Binding btnDraw}"
-                                  Style="{StaticResource MyToggle}"
-                                  IsChecked="{Binding Draw_IsChecked}"/>-->
-                    <Button Content="Save Mask"
+                    <Button Grid.Column="0"
+							Margin="0,0,0,20"
+							Style="{StaticResource BasicBtn}"
+						Command="{Binding AddROICommand}"
+							Content="Add Pattern Insp ROI"/>
+                    <Button Content="Clear Result"
                             Style="{StaticResource BasicBtn}"
-                            Margin="0,0,0,10"
-                            Command="{Binding CommandSaveMask}" />
-                    <Button Content="Clear"
-                            Style="{StaticResource BasicBtn}"
-                            Command="{Binding btnClear}"
+						Command="{Binding ClearResultCommand}"
                             Margin="0,0,0,10" />
-                    <Button Content="Insp Test"
+                    <Button Content="Clear Drawing"
                             Style="{StaticResource BasicBtn}"
-                            Command="{Binding btnInspTest}"
+						Command="{Binding ClearDrawingCommand}"
                             Margin="0,0,0,10" />
-					<Button Content="Inspection Done"
+                    <Button Content="Start Inspection"
                             Style="{StaticResource BasicBtn}"
-                            Command="{Binding btnInspDone}"
+                            Command="{Binding CommandStartInsp}"
                             Margin="0,0,0,10" />
-					<!--<Button Content="Start Insp Test"
-                            Style="{StaticResource BasicBtn}"
-                            Command="{Binding btnStartInsp}"
-                            Margin="0,0,0,10" />
-					<Button Content="Next Snap Test"
-                            Style="{StaticResource BasicBtn}"
-                            Command="{Binding btnNextSnap}"
-                            Margin="0,0,0,10" />
-					<Button Content="Recipe Save"
-                            Style="{StaticResource BasicBtn}"
-                            Command="{Binding btnRcpSave}"
-                            Margin="0,0,0,10" />
-					<Button Content="Recipe Save As"
-                            Style="{StaticResource BasicBtn}"
-                            Command="{Binding btnRcpSaveTest}"
-                            Margin="0,0,0,10" />
-					<Button Content="Recipe Load"
-                            Style="{StaticResource BasicBtn}"
-                            Command="{Binding btnRcpLoadTest}"
-                            Margin="0,0,0,10" />
-					<StackPanel>
-                        <WrapPanel Margin="3">
-                            <TextBlock Text="(X,Y) = " />
-                            <TextBlock Text="{Binding p_ImageViewer.p_MouseX}" />
-                            <TextBlock Text=", " />
-                            <TextBlock Text="{Binding p_ImageViewer.p_MouseY}" />
-                        </WrapPanel>
-                        <WrapPanel Margin="3">
-                            <TextBlock Text="(Mem X,Y) = " />
-                            <TextBlock Text="{Binding p_ImageViewer.p_MouseMemX}" />
-                            <TextBlock Text=", " />
-                            <TextBlock Text="{Binding p_ImageViewer.p_MouseMemY}" />
-                        </WrapPanel>
-                        <WrapPanel Margin="3">
-                            <TextBlock Text="GV = " />
-                            <TextBlock Text="{Binding p_ImageViewer.p_GV}" Margin="0,0,70,0" />
-                            <TextBlock Text="Zoom = " />
-                            <TextBlock Text="{Binding p_ImageViewer.p_Zoom, StringFormat=F3}" 
-                                           Margin="0,0,70,0"/>
-                        </WrapPanel>
-                        -->
-                    <!--<TextBlock Text="{Binding Test}"
-                                       Background="#FF43437A"
-                                           Margin="0,10,0,0"/>
-                        <TextBlock Text="{Binding Test2}"
-                                       Background="#FF43437A"
-                                           Margin="0,10,0,0"/>-->
-                    <!--
-                    </StackPanel>-->
-                </StackPanel>
-            </Grid>
-            <Grid Grid.Row="1" >
-				<ScrollViewer VerticalScrollBarVisibility="Auto"
-							  Background="{DynamicResource BtnMouseOver}" >
-					<StackPanel Margin="10,0,10,0">
-						<StackPanel DataContext="{Binding p_StripParamData}">
-							<UniformGrid Columns="2" Margin="0,10,0,10">
-								<TextBlock  Text="Intensity"
-                                        Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding Intensity}"
-                                     Style="{StaticResource BasicTbox}"/>
-							</UniformGrid>
-							<UniformGrid Columns="2" Margin="0,0,0,10">
-								<TextBlock  Text="Bandwidth"
-                                        Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding Bandwidth}"
-                                     Style="{StaticResource BasicTbox}"/>
-							</UniformGrid>
-							<UniformGrid Columns="2" Margin="0,0,0,10">
-								<TextBlock  Text="{Binding TargetLabelText}"
-                                        Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding TargetGV}"
-                                     Style="{StaticResource BasicTbox}"/>
-							</UniformGrid>
-							<UniformGrid Columns="2" Margin="0,0,0,10">
-								<TextBlock  Text="DefectSize"
-                                        Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding DefectSize}"
-                                     Style="{StaticResource BasicTbox}"/>
-							</UniformGrid>
-						</StackPanel>
-						<StackPanel DataContext="{Binding p_RecipeData}">
-							<UniformGrid Columns="2" Margin="0,10,0,10">
-								<TextBlock  Text="Use Defect Merge"
-											Style="{StaticResource BasicTb}"/>
-								<ToggleButton Content="{Binding UseDefectMerge}"
-											  Style="{StaticResource BasicToggle}"
-											  IsChecked="{Binding UseDefectMerge}"/>
-							</UniformGrid>
-							<UniformGrid Columns="2" Margin="0,0,0,10">
-								<TextBlock Text="Defect Merge Distance(pxl)"
+                    <Expander Header="Feature Parameters"
+							  Margin="0,0,0,10"
+							  Foreground="White">
+                        <StackPanel>
+                            <TextBlock Text="Feature Image List"
+									   Foreground="White"/>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ListView ItemsSource="{Binding p_PatternReferenceList}"
+										  Height="100"
+										  Background="#FF1B1B1C"
+										  SelectedItem="{Binding SelectedFeature}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}"
+													   Foreground="White"
+													   FontWeight="Bold"
+													   FontSize="13" />
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <Image Grid.Column="1"
+									   Width="100"
+									   Height="100"/>
+                            </Grid>
+                            <Button Content="Start Drawing Reference"
+									Style="{StaticResource BasicBtn}"
+									Command="{Binding ChangeToolForRef}"
+									Margin="0,0,0,10" />
+                            <Button Content="Save Feature"
+									Style="{StaticResource BasicBtn}"
+									Command="{Binding SaveFeatureCommand}"
+									Margin="0,0,0,10" />
+                            <Button Content="Delete Feature"
+									Style="{StaticResource BasicBtn}"
+									Margin="0,0,0,10" />
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Search Area Size"
 										   Style="{StaticResource BasicTb}"/>
-								<TextBox Text="{Binding MergeDistance}"
+                                <TextBox Text="{Binding SelectedFeature.FeatureFindArea}"
 										 Style="{StaticResource BasicTbox}"/>
-							</UniformGrid>
-						</StackPanel>
-					</StackPanel>
-                </ScrollViewer>
-            </Grid>
-            <!--<Canvas Grid.Row="1" obs:SizeObserver.Observe="true" Focusable="True"
-                    obs:SizeObserver.ObservedWidth="{Binding p_ImageViewer.p_ThumbWidth, Mode=OneWayToSource}"
-                    obs:SizeObserver.ObservedHeight="{Binding p_ImageViewer.p_ThumbHeight, Mode=OneWayToSource}"
-                    Background="Black">
-                <Image Source="{Binding Path= p_ImageViewer.p_ThumNailImgSource}" />
-                <Rectangle Margin="{Binding Path = p_ImageViewer.p_TumbnailImgMargin}"
-                        Width="{Binding p_ImageViewer.p_TumbnailImg_Rect.Width}"
-                        Height="{Binding p_ImageViewer.p_TumbnailImg_Rect.Height}" Stroke="Blue"
-                        StrokeThickness="4"/>
-                <i:Interaction.Behaviors>
-                    <mouse:MouseBehaviour MouseEvent="{Binding MouseEvent, Mode=OneWayToSource}"/>
-                    <mouse:MouseBehaviour
-                            MouseX="{Binding p_ImageViewer.p_TumbMouseX, Mode=OneWayToSource}"
-                            MouseY="{Binding p_ImageViewer.p_TumbMouseY, Mode=OneWayToSource}" />
-                </i:Interaction.Behaviors>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                        <i:InvokeCommandAction Command="{Binding p_ImageViewer.TumbNailMouseLeftDown}" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseMove">
-                        <i:InvokeCommandAction Command="{Binding p_ImageViewer.TumbNailMouseMove}" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseLeave">
-                        <i:InvokeCommandAction Command="{Binding p_ImageViewer.TumbNailMouseLeave}" />
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseLeftButtonUp">
-                        <i:InvokeCommandAction
-                                Command="{Binding p_ImageViewer.TumbNailMouseLeftUp}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Canvas>-->
-        </Grid>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Target Score"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedFeature.FeatureTargetScore}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Pattern Distance (X Pos)"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedFeature.PatternDistX}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Pattern Distance (Y Pos)"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedFeature.PatternDistY}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Expander>
+                    <Expander Header="Align Parameters"
+							  Margin="0,0,0,10"
+							  Visibility="Collapsed"
+							  Foreground="White">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ListView ItemsSource="{Binding p_PatternAlignList}"
+										  Height="100"
+										  Background="#FF1B1B1C"
+										  SelectedItem="{Binding SelectedAlign}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}"
+													   Foreground="White"
+													   FontWeight="Bold"
+													   FontSize="13" />
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <Image Grid.Column="1"
+									   Width="100"
+									   Height="100"/>
+                            </Grid>
+                            <Button Content="Start Align Reference"
+									Style="{StaticResource BasicBtn}"
+									Command="{Binding ChangeToolForAlign}"
+									Margin="0,0,0,10" />
+                            <Button Content="Save Align Feature"
+									Style="{StaticResource BasicBtn}"
+									Command="{Binding SaveAlignCommand}"
+									Margin="0,0,0,10" />
+                            <Button Content="Delete Align Feature"
+									Style="{StaticResource BasicBtn}"
+									Margin="0,0,0,10" />
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Snap Count"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedROI.Position.AlignSnapCount}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Align Scan Position"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedROI.Position.AlignPositionIndex}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Search Area Size"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedAlign.FeatureFindArea}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Target Score"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedAlign.FeatureTargetScore}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Expander>
+                    <Expander Header="Inspection Parameters"
+								  Margin="0,0,0,10"
+								  Foreground="White">
+                        <StackPanel>
+                            <TextBlock Text="Parameter List"
+							   Foreground="White"/>
+                            <ListView ItemsSource="{Binding StripParamList}"
+                              Height="100"
+                              Background="#FF1B1B1C"
+                              SelectedItem="{Binding SelectedParam}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           FontSize="13" />
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <Button Content="Add Parameter"
+										Style="{StaticResource BasicBtn}"
+										Command="{Binding CommandAddParam}"
+										Margin="0,10,0,10" />
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Inspection Area Width (pxl)"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedParam.InspAreaWidth}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Inspection Area Height (pxl)"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedParam.InspAreaHeight}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,10,0,10">
+                                <TextBlock  Text="Intensity"
+                                        Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedParam.Intensity}"
+                                     Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock  Text="Bandwidth"
+                                        Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedParam.Bandwidth}"
+                                     Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock  Text="{Binding TargetLabelText}"
+                                        Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedParam.TargetGV}"
+                                     Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock  Text="DefectSize"
+                                        Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedParam.DefectSize}"
+                                     Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Expander>
+                </StackPanel>
+            </Border>
+        </ScrollViewer>
 
     </Grid>
 </UserControl>

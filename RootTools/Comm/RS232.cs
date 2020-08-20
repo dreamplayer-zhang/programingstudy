@@ -264,6 +264,10 @@ namespace RootTools.Comm
             try
             {
                 string sSend = m_sStart + sMsg + m_sEnd;
+                if (p_eEndBit == eEndBit.LFCR_4CH)
+                {
+                    sSend = m_sStart + sMsg + "\r\n";
+                }
                 lock (m_csLock)
                 {
                     while (m_swWrite.ElapsedMilliseconds < 10) Thread.Sleep(1);
