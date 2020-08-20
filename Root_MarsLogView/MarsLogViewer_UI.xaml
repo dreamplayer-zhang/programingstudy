@@ -21,6 +21,9 @@
         <TabItem Header="LEH">
             <local:ListLEH_UI x:Name="listLEHUI"/>
         </TabItem>
+        <TabItem Header="CFG">
+            <local:ListCFG_UI x:Name="listCFGUI"/>
+        </TabItem>
         <TabItem Header="Option">
             <Grid>
                 <Grid.ColumnDefinitions>

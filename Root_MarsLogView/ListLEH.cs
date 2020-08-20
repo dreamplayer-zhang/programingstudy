@@ -21,7 +21,7 @@ namespace Root_MarsLogView
         public void Add(string sLog, string[] asLog)
         {
             m_asLog = asLog;
-            if (asLog.Length < 14) m_mars.AddError("LEH Length", sLog);
+            if (asLog.Length < 9) m_mars.AddError("LEH Length", sLog);
             Mars_LEH.eEvent eEvent = Mars_LEH.GetEvent(GetString(4));
             Mars_LEH leh = Get(asLog);
             if (eEvent == Mars_LEH.eEvent.CarrierLoad)

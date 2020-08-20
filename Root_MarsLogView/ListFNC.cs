@@ -21,7 +21,7 @@ namespace Root_MarsLogView
         public void Add(string sLog, string[] asLog)
         {
             m_asLog = asLog;
-            if (asLog.Length < 14) m_mars.AddError("PRC Length", sLog);
+            if (asLog.Length < 8) m_mars.AddError("FNC Length", sLog);
             string sStatus = GetString(5);
             Mars_FNC fnc = Get(asLog);
             if (sStatus == Mars_FNC.eStatus.Start.ToString())

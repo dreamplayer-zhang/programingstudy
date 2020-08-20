@@ -63,6 +63,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="ListCFG_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ListFNC_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -86,6 +90,10 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ListCFG.cs" />
+    <Compile Include="ListCFG_UI.xaml.cs">
+      <DependentUpon>ListCFG_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="ListFNC.cs" />
     <Compile Include="ListFNC_UI.xaml.cs">
@@ -117,6 +125,7 @@
     <Compile Include="MarsLogViewer_UI.xaml.cs">
       <DependentUpon>MarsLogViewer_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Mars_CFG.cs" />
     <Compile Include="Mars_FNC.cs" />
     <Compile Include="Mars_LEH.cs" />
     <Compile Include="Mars_PRC.cs" />
