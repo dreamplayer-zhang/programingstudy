@@ -8,39 +8,51 @@
              xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <TabControl>
-        <TabItem Header="PRC">
-            <local:ListPRC_UI x:Name="listPRCUI"/>
-        </TabItem>
-        <TabItem Header="XFR">
-            <local:ListXFR_UI x:Name="listXFRUI"/>
-        </TabItem>
-        <TabItem Header="FNC">
-            <local:ListFNC_UI x:Name="listFNCUI"/>
-        </TabItem>
-        <TabItem Header="LEH">
-            <local:ListLEH_UI x:Name="listLEHUI"/>
-        </TabItem>
-        <TabItem Header="CFG">
-            <local:ListCFG_UI x:Name="listCFGUI"/>
-        </TabItem>
-        <TabItem Header="Option">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <tree:TreeUI Grid.Column="0" x:Name="treeUI"/>
-                <TabControl Grid.Column="1" x:Name="tabOption">
-                    <TabItem Header="TCPIP EFEM">
-                        <tcp:TCPIPServer_UI x:Name="tcpServer0UI"/>
-                    </TabItem>
-                    <TabItem Header="TCPIP Vision">
-                        <tcp:TCPIPServer_UI x:Name="tcpServer1UI"/>
-                    </TabItem>
-                </TabControl>
-            </Grid>
-        </TabItem>
-
-    </TabControl>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <TabControl Grid.Column="0">
+            <TabItem Header="PRC">
+                <local:ListPRC_UI x:Name="listPRCUI"/>
+            </TabItem>
+            <TabItem Header="XFR">
+                <local:ListXFR_UI x:Name="listXFRUI"/>
+            </TabItem>
+            <TabItem Header="FNC">
+                <local:ListFNC_UI x:Name="listFNCUI"/>
+            </TabItem>
+            <TabItem Header="LEH">
+                <local:ListLEH_UI x:Name="listLEHUI"/>
+            </TabItem>
+            <TabItem Header="CFG">
+                <local:ListCFG_UI x:Name="listCFGUI"/>
+            </TabItem>
+        </TabControl>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+        <TabControl Grid.Column="2">
+            <TabItem Header="Error">
+                <local:ListError_UI x:Name="listErrorUI"/>
+            </TabItem>
+            <TabItem Header="Option">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TabControl Grid.Column="0" x:Name="tabOption">
+                        <TabItem Header="TCPIP EFEM">
+                            <tcp:TCPIPServer_UI x:Name="tcpServer0UI"/>
+                        </TabItem>
+                        <TabItem Header="TCPIP Vision">
+                            <tcp:TCPIPServer_UI x:Name="tcpServer1UI"/>
+                        </TabItem>
+                    </TabControl>
+                    <tree:TreeUI Grid.Column="1" x:Name="treeUI"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </UserControl>

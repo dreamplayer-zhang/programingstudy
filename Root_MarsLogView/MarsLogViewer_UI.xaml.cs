@@ -23,6 +23,7 @@ namespace Root_MarsLogView
             listFNCUI.Init(logViewer.m_listFNC);
             listLEHUI.Init(logViewer.m_listLEH);
             listCFGUI.Init(logViewer.m_listCFG);
+            listErrorUI.Init(logViewer.m_listError);
             tcpServer0UI.Init(logViewer.m_tcpServer[0]);
             tcpServer1UI.Init(logViewer.m_tcpServer[1]);
             treeUI.Init(logViewer.m_treeRoot);

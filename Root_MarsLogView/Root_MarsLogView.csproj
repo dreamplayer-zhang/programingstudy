@@ -67,6 +67,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ListError_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ListFNC_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -94,6 +98,10 @@
     <Compile Include="ListCFG.cs" />
     <Compile Include="ListCFG_UI.xaml.cs">
       <DependentUpon>ListCFG_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ListError.cs" />
+    <Compile Include="ListError_UI.xaml.cs">
+      <DependentUpon>ListError_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="ListFNC.cs" />
     <Compile Include="ListFNC_UI.xaml.cs">

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_MarsLogView"
         mc:Ignorable="d"
-        Title="MarsLogView" Height="900" Width="1000">
+        Title="MarsLogView" Height="900" Width="1800">
     <Grid>
         <local:MarsLogViewer_UI x:Name="logViewerUI"/>
     </Grid>

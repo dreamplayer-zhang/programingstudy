@@ -29,19 +29,9 @@ namespace Root_MarsLogView
         #endregion
 
         #region Error
-        class Error
-        {
-            public string m_sError;
-            public string m_sLog; 
-        }
-
-        Queue<Error> m_qError = new Queue<Error>(); 
         public void AddError(string sError, string sLog)
         {
-            Error error = new Error();
-            error.m_sError = sError;
-            error.m_sLog = sLog;
-            m_qError.Enqueue(error); 
+            m_listError.Add(sError, sLog); 
         }
         #endregion
 
@@ -81,7 +71,7 @@ namespace Root_MarsLogView
             sw.Close(); 
         }
 
-        string m_sFilePath = "c:";
+        public string m_sFilePath = "c:";
         string GetFileName(string sLog)
         {
             string sTime = sLog.Substring(0, 4) + sLog.Substring(5, 2) + sLog.Substring(8, 2) + sLog.Substring(11, 2); 
@@ -120,6 +110,7 @@ namespace Root_MarsLogView
             m_listFNC.RunTree(m_treeRoot.GetTree("FNC"));
             m_listLEH.RunTree(m_treeRoot.GetTree("LEH"));
             m_listCFG.RunTree(m_treeRoot.GetTree("CFG"));
+            m_listError.RunTree(m_treeRoot.GetTree("Error"));
         }
         #endregion
 
@@ -128,6 +119,7 @@ namespace Root_MarsLogView
         public ListFNC m_listFNC;
         public ListLEH m_listLEH;
         public ListCFG m_listCFG;
+        public ListError m_listError; 
         public MarsLogViewer()
         {
             m_listPRC = new ListPRC(this);
@@ -135,6 +127,7 @@ namespace Root_MarsLogView
             m_listFNC = new ListFNC(this);
             m_listLEH = new ListLEH(this);
             m_listCFG = new ListCFG(this);
+            m_listError = new ListError(this); 
             InitTCP(0);
             InitTCP(1);
             InitTreeRoot(); 
