@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Root_MarsLogView.ListPRC_UI"
+﻿<UserControl x:Class="Root_MarsLogView.ListFNC_UI"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -15,12 +15,6 @@
             <DataGridTextColumn Header="Status" Binding="{Binding p_sStatus}"/>
             <DataGridTextColumn Header="Material ID" Binding="{Binding p_sMaterial}"/>
             <DataGridTextColumn Header="Material Type" Binding="{Binding p_sMaterialType}"/>
-            <DataGridTextColumn Header="Slot No" Binding="{Binding p_sSlot}"/>
-            <DataGridTextColumn Header="Lot ID" Binding="{Binding p_sLot}"/>
-            <DataGridTextColumn Header="Recipe Name" Binding="{Binding p_sRecipe}"/>
-            <DataGridTextColumn Header="Step No" Binding="{Binding p_sStepNo}"/>
-            <DataGridTextColumn Header="Step Seq" Binding="{Binding p_sStepSeq}"/>
-            <DataGridTextColumn Header="Step Name" Binding="{Binding p_sStepName}"/>
             <DataGridTextColumn Header="Data" Binding="{Binding p_sData}"/>
         </DataGrid.Columns>
     </DataGrid>

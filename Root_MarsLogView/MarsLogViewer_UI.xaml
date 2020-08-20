@@ -12,6 +12,15 @@
         <TabItem Header="PRC">
             <local:ListPRC_UI x:Name="listPRCUI"/>
         </TabItem>
+        <TabItem Header="XFR">
+            <local:ListXFR_UI x:Name="listXFRUI"/>
+        </TabItem>
+        <TabItem Header="FNC">
+            <local:ListFNC_UI x:Name="listFNCUI"/>
+        </TabItem>
+        <TabItem Header="LEH">
+            <local:ListLEH_UI x:Name="listLEHUI"/>
+        </TabItem>
         <TabItem Header="Option">
             <Grid>
                 <Grid.ColumnDefinitions>

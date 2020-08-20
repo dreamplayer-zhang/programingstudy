@@ -2,9 +2,9 @@
 
 namespace Root_MarsLogView
 {
-    public class PRC : NotifyProperty
+    public class Mars_PRC : NotifyProperty
     {
-        #region State
+        #region Status
         public enum eStatus
         {
             Start,
@@ -53,29 +53,33 @@ namespace Root_MarsLogView
 
         public string p_sEvent { get; set; }
 
+        public string p_sMaterial { get; set; }
+
+        public string p_sMaterialType { get; set; }
+
+        public string p_sSlot { get; set; }
+
+        public string p_sLot { get; set; }
+
+        public string p_sRecipe { get; set; }
+
         public string p_sStepNo { get; set; }
 
         public string p_sStepSeq { get; set; }
 
         public string p_sStepName { get; set; }
 
-        public string p_sMaterial { get; set; }
-
-        public string p_sMaterialType { get; set; }
-
-        public string p_sRecipe { get; set; }
-
-        public string p_sLot { get; set; }
-
-        public string p_sSlot { get; set; }
+        public string p_sData { get; set; }
         #endregion
 
         #region Functions
+        string[] m_asLog;
         public bool IsSame(string[] asLog)
         {
             m_asLog = asLog; 
             if (GetString(2) != p_sModule) return false;
             if (GetString(4) != p_sEvent) return false;
+            if (GetString(9) != p_sLot) return false;
             if (GetString(11) != p_sStepNo) return false;
             return true;
         }
@@ -105,11 +109,8 @@ namespace Root_MarsLogView
         }
         #endregion
 
-        string m_sLog;
-        string[] m_asLog;
-        public PRC(string sLog, string[] asLog)
+        public Mars_PRC(string[] asLog)
         {
-            m_sLog = sLog; 
             m_asLog = asLog;
             m_sDate[0] = GetString(0);
             m_sTime[0] = GetString(1); 
@@ -123,6 +124,7 @@ namespace Root_MarsLogView
             p_sStepNo = GetString(11);
             p_sStepSeq = GetString(12);
             p_sStepName = GetString(13);
+            p_sData = GetString(14);
         }
     }
 }

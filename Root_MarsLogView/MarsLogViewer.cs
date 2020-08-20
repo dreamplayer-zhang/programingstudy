@@ -59,6 +59,9 @@ namespace Root_MarsLogView
                     switch (asLog[3])
                     {
                         case "PRC": m_listPRC.Add(sLog, asLog); break;
+                        case "XFR": m_listXFR.Add(sLog, asLog); break;
+                        case "FNC": m_listFNC.Add(sLog, asLog); break;
+                        case "LEH": m_listLEH.Add(sLog, asLog); break;
                     }
                 }
             }
@@ -112,19 +115,28 @@ namespace Root_MarsLogView
             m_treeRoot.p_eMode = mode;
             RunTreeFile(m_treeRoot.GetTree("File")); 
             m_listPRC.RunTree(m_treeRoot.GetTree("PRC"));
+            m_listXFR.RunTree(m_treeRoot.GetTree("XFR"));
+            m_listFNC.RunTree(m_treeRoot.GetTree("FNC"));
+            m_listLEH.RunTree(m_treeRoot.GetTree("LEH"));
         }
         #endregion
 
         public ListPRC m_listPRC;
+        public ListXFR m_listXFR;
+        public ListFNC m_listFNC;
+        public ListLEH m_listLEH;
         public MarsLogViewer()
         {
-            m_listPRC = new ListPRC(this); 
+            m_listPRC = new ListPRC(this);
+            m_listXFR = new ListXFR(this);
+            m_listFNC = new ListFNC(this);
+            m_listLEH = new ListLEH(this);
             InitTCP(0);
             InitTCP(1);
             InitTreeRoot(); 
 
             m_timer.Interval = TimeSpan.FromMilliseconds(20);
-            m_timer.Tick += M_timer_Tick; ;
+            m_timer.Tick += M_timer_Tick;
             m_timer.Start();
         }
 

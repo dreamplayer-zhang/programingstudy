@@ -63,7 +63,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="ListFNC_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ListLEH_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ListPRC_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ListXFR_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -75,9 +87,21 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ListFNC.cs" />
+    <Compile Include="ListFNC_UI.xaml.cs">
+      <DependentUpon>ListFNC_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ListLEH.cs" />
+    <Compile Include="ListLEH_UI.xaml.cs">
+      <DependentUpon>ListLEH_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ListPRC.cs" />
     <Compile Include="ListPRC_UI.xaml.cs">
       <DependentUpon>ListPRC_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ListXFR.cs" />
+    <Compile Include="ListXFR_UI.xaml.cs">
+      <DependentUpon>ListXFR_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -93,7 +117,10 @@
     <Compile Include="MarsLogViewer_UI.xaml.cs">
       <DependentUpon>MarsLogViewer_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PRC.cs" />
+    <Compile Include="Mars_FNC.cs" />
+    <Compile Include="Mars_LEH.cs" />
+    <Compile Include="Mars_PRC.cs" />
+    <Compile Include="Mars_XFR.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

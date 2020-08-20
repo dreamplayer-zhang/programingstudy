@@ -18,7 +18,10 @@ namespace Root_MarsLogView
         {
             m_logViewer = logViewer;
             DataContext = logViewer;
-            listPRCUI.Init(logViewer.m_listPRC); 
+            listPRCUI.Init(logViewer.m_listPRC);
+            listXFRUI.Init(logViewer.m_listXFR);
+            listFNCUI.Init(logViewer.m_listFNC);
+            listLEHUI.Init(logViewer.m_listLEH);
             tcpServer0UI.Init(logViewer.m_tcpServer[0]);
             tcpServer1UI.Init(logViewer.m_tcpServer[1]);
             treeUI.Init(logViewer.m_treeRoot);

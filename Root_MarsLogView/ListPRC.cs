@@ -6,11 +6,11 @@ namespace Root_MarsLogView
 {
     public class ListPRC : NotifyProperty
     {
-        public ObservableCollection<PRC> p_aPRC { get; set; }
-        public ObservableCollection<PRC> p_aPRCView { get; set; }
-        PRC Get(string[] asLog)
+        public ObservableCollection<Mars_PRC> p_aPRC { get; set; }
+        public ObservableCollection<Mars_PRC> p_aPRCView { get; set; }
+        Mars_PRC Get(string[] asLog)
         {
-            foreach (PRC prc in p_aPRC)
+            foreach (Mars_PRC prc in p_aPRC)
             {
                 if (prc.IsSame(asLog)) return prc; 
             }
@@ -23,8 +23,8 @@ namespace Root_MarsLogView
             m_asLog = asLog; 
             if (asLog.Length < 14) m_mars.AddError("PRC Length", sLog);
             string sStatus = GetString(5);
-            PRC prc = Get(asLog); 
-            if (sStatus == PRC.eStatus.Start.ToString())
+            Mars_PRC prc = Get(asLog); 
+            if (sStatus == Mars_PRC.eStatus.Start.ToString())
             {
                 if (prc != null)
                 {
@@ -33,12 +33,12 @@ namespace Root_MarsLogView
                     p_aPRC.Remove(prc);
                 }
                 m_mars.WriteEvent(sLog);
-                prc = new PRC(sLog, asLog);
+                prc = new Mars_PRC(asLog);
                 p_aPRC.Add(prc);
                 p_aPRCView.Add(prc);
                 if (p_aPRCView.Count > m_maxView) p_aPRCView.RemoveAt(0); 
             }
-            else if (sStatus == PRC.eStatus.End.ToString())
+            else if (sStatus == Mars_PRC.eStatus.End.ToString())
             {
                 if (prc != null)
                 {
@@ -66,8 +66,8 @@ namespace Root_MarsLogView
         public ListPRC(MarsLogViewer mars)
         {
             m_mars = mars; 
-            p_aPRC = new ObservableCollection<PRC>();
-            p_aPRCView = new ObservableCollection<PRC>();
+            p_aPRC = new ObservableCollection<Mars_PRC>();
+            p_aPRCView = new ObservableCollection<Mars_PRC>();
         }
     }
 }

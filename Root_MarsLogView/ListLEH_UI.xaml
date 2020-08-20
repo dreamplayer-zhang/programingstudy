@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Root_MarsLogView.ListPRC_UI"
+﻿<UserControl x:Class="Root_MarsLogView.ListLEH_UI"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -9,18 +9,14 @@
     <DataGrid x:Name="dataGrid" IsReadOnly="True" AutoGenerateColumns="False">
         <DataGrid.Columns>
             <DataGridTextColumn Header="Module ID" Binding="{Binding p_sModule}"/>
-            <DataGridTextColumn Header="Event" Binding="{Binding p_sEvent}"/>
-            <DataGridTextColumn Header="Start Time" Binding="{Binding p_sStart}"/>
-            <DataGridTextColumn Header="End Time" Binding="{Binding p_sEnd}"/>
-            <DataGridTextColumn Header="Status" Binding="{Binding p_sStatus}"/>
-            <DataGridTextColumn Header="Material ID" Binding="{Binding p_sMaterial}"/>
-            <DataGridTextColumn Header="Material Type" Binding="{Binding p_sMaterialType}"/>
-            <DataGridTextColumn Header="Slot No" Binding="{Binding p_sSlot}"/>
             <DataGridTextColumn Header="Lot ID" Binding="{Binding p_sLot}"/>
             <DataGridTextColumn Header="Recipe Name" Binding="{Binding p_sRecipe}"/>
-            <DataGridTextColumn Header="Step No" Binding="{Binding p_sStepNo}"/>
-            <DataGridTextColumn Header="Step Seq" Binding="{Binding p_sStepSeq}"/>
-            <DataGridTextColumn Header="Step Name" Binding="{Binding p_sStepName}"/>
+            <DataGridTextColumn Header="Flow Info" Binding="{Binding p_sFlowInfo}"/>
+            <DataGridTextColumn Header="Event" Binding="{Binding p_sEvent}"/>
+            <DataGridTextColumn Header="CarrierLoad" Binding="{Binding p_sTimeCarrierLoad}"/>
+            <DataGridTextColumn Header="ProcessJobStart" Binding="{Binding p_sTimeProcessJobStart}"/>
+            <DataGridTextColumn Header="ProcessJobEnd" Binding="{Binding p_sTimeProcessJobEnd}"/>
+            <DataGridTextColumn Header="CarrierUnload" Binding="{Binding p_sTimeCarrierUnload}"/>
             <DataGridTextColumn Header="Data" Binding="{Binding p_sData}"/>
         </DataGrid.Columns>
     </DataGrid>
