@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Trees;
 using System.Collections.ObjectModel;
 
 namespace Root_MarsLogView
@@ -28,20 +29,21 @@ namespace Root_MarsLogView
                 if (prc != null)
                 {
                     m_mars.AddError("PRC Not Ended", sLog);
-                    m_mars.WriteLog(prc.GetEndLog(asLog), asLog);
+                    m_mars.WriteEvent(prc.GetEndLog(asLog));
                     p_aPRC.Remove(prc);
                 }
-                m_mars.WriteLog(sLog, asLog);
+                m_mars.WriteEvent(sLog);
                 prc = new PRC(sLog, asLog);
                 p_aPRC.Add(prc);
                 p_aPRCView.Add(prc);
+                if (p_aPRCView.Count > m_maxView) p_aPRCView.RemoveAt(0); 
             }
             else if (sStatus == PRC.eStatus.End.ToString())
             {
                 if (prc != null)
                 {
                     prc.End(asLog);
-                    m_mars.WriteLog(sLog, asLog);
+                    m_mars.WriteEvent(sLog);
                     p_aPRC.Remove(prc);
                 }
                 else m_mars.AddError("PRC Not Started", sLog);
@@ -52,6 +54,12 @@ namespace Root_MarsLogView
         {
             if (m_asLog.Length <= nIndex) return "";
             return m_asLog[nIndex]; 
+        }
+
+        int m_maxView = 250; 
+        public void RunTree(Tree tree)
+        {
+            m_maxView = tree.Set(m_maxView, m_maxView, "Max List", "PRC Max List View Count"); 
         }
 
         MarsLogViewer m_mars; 

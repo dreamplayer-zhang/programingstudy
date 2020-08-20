@@ -1,6 +1,9 @@
-﻿using RootTools.Comm;
+﻿using NLog.Targets;
+using RootTools.Comm;
+using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Windows.Threading;
@@ -62,10 +65,53 @@ namespace Root_MarsLogView
         }
         #endregion
 
-        #region Write Log
-        public void WriteLog(string sLog, string[] asLog)
+        #region Write Event
+        public void WriteEvent(string sLog)
         {
-            //forget
+            if (sLog[sLog.Length - 1] == '$') sLog = sLog.Substring(0, sLog.Length - 1);
+            string sFile = GetFileName(sLog);
+            bool bFirst = File.Exists(sFile); 
+            StreamWriter sw = new StreamWriter(new FileStream(sFile, FileMode.Append));
+            if (bFirst) sw.WriteLine("Applied Samsung Standard Logging Spec Version: 2.0");
+            sw.WriteLine(sLog);
+            sw.Close(); 
+        }
+
+        string m_sFilePath = "c:";
+        string GetFileName(string sLog)
+        {
+            string sTime = sLog.Substring(0, 4) + sLog.Substring(5, 2) + sLog.Substring(8, 2) + sLog.Substring(11, 2); 
+            return m_sFilePath + "\\Logs\\EventLog\\EventLog" + sTime + ".txt"; 
+        }
+
+        void RunTreeFile(Tree tree)
+        {
+            m_sFilePath = tree.Set(m_sFilePath, m_sFilePath, "Path", "Mars Log Save File Path");
+            Directory.CreateDirectory(m_sFilePath + "\\Logs");
+            Directory.CreateDirectory(m_sFilePath + "\\Logs\\EventLog");
+        }
+        #endregion
+
+        #region Tree
+        public TreeRoot m_treeRoot; 
+        void InitTreeRoot()
+        {
+            m_treeRoot = new TreeRoot("MarsLog", null); 
+            RunTree(Tree.eMode.RegRead);
+            m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
+        }
+
+        private void M_treeRoot_UpdateTree()
+        {
+            RunTree(Tree.eMode.Update);
+            RunTree(Tree.eMode.RegWrite);
+        }
+
+        public void RunTree(Tree.eMode mode)
+        {
+            m_treeRoot.p_eMode = mode;
+            RunTreeFile(m_treeRoot.GetTree("File")); 
+            m_listPRC.RunTree(m_treeRoot.GetTree("PRC"));
         }
         #endregion
 
@@ -75,6 +121,7 @@ namespace Root_MarsLogView
             m_listPRC = new ListPRC(this); 
             InitTCP(0);
             InitTCP(1);
+            InitTreeRoot(); 
 
             m_timer.Interval = TimeSpan.FromMilliseconds(20);
             m_timer.Tick += M_timer_Tick; ;

@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using RootTools.Trees;
+using System.Windows.Controls;
 
 namespace Root_MarsLogView
 {
@@ -20,6 +21,8 @@ namespace Root_MarsLogView
             listPRCUI.Init(logViewer.m_listPRC); 
             tcpServer0UI.Init(logViewer.m_tcpServer[0]);
             tcpServer1UI.Init(logViewer.m_tcpServer[1]);
+            treeUI.Init(logViewer.m_treeRoot);
+            logViewer.RunTree(Tree.eMode.Init); 
         }
     }
 }
