@@ -882,6 +882,8 @@ namespace Root_Vega.Module
             public int m_xLine = 1000;  // X축 Reticle Size
             public int m_nMaxFrame = 100;  // Camera max Frame 스펙
             public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
+            public double m_dThetaOffset = 0.0;
+            public double m_dXOffset = 0.0;
 
             //public eScanPos m_eScanPos = eScanPos.Bottom;
             public override ModuleRunBase Clone()
@@ -896,6 +898,8 @@ namespace Root_Vega.Module
                 run.m_xLine = m_xLine;
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanGap = m_nScanGap;
+                run.m_dThetaOffset = m_dThetaOffset;
+                run.m_dXOffset = m_dXOffset;
                 run.m_grabMode = m_module.GetGrabMode(p_sGrabMode);
 
                 return run;
@@ -912,6 +916,8 @@ namespace Root_Vega.Module
                 m_xLine = tree.Set(m_xLine, m_xLine, "Reticle XSize", "# of Grab Lines", bVisible); // 120
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+                m_dThetaOffset = tree.Set(m_dThetaOffset, m_dThetaOffset, "Theta Offset", "Theta Offset", bVisible);
+                m_dXOffset = tree.Set(m_dXOffset, m_dXOffset, "X Offset", "X Offset", bVisible);
 
                 string strTemp = p_sGrabMode;
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
@@ -952,11 +958,11 @@ namespace Root_Vega.Module
                         double yPos1 = m_rpAxis.Y - yAxis / 2 - m_grabMode.m_intervalAcc;   //y 축 이동 시작 지점 
                         double yPos0 = m_rpAxis.Y + yAxis / 2 + m_grabMode.m_intervalAcc;  // Y 축 이동 끝 지점.
                         //double nPosX = m_rpAxis.X;   // X축 찍을 위치 
-                        double nPosX = m_module.m_dMaxScorePosX;   // AF로 찾은 포커스 맞는 X위치
+                        double nPosX = m_module.m_dMaxScorePosX + m_dXOffset;   // AF로 찾은 포커스 맞는 X위치
                         double nPosZ = m_nFocusPos + nLinesX * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
                         //double nPosZ = m_nFocusPos;
                         //double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
-                        double dPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4;
+                        double dPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4 + m_dThetaOffset;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
@@ -1048,6 +1054,8 @@ namespace Root_Vega.Module
             public int m_xLine = 1000;  // X축 Reticle Size
             public int m_nMaxFrame = 100;  // Camera max Frame 스펙
             public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
+            public double m_dThetaOffset = 0.0; // Theta Offset
+            public double m_dXOffset = 0.0; // X Offset
 
             public eScanPos m_eScanPos = eScanPos.Bottom;
             public override ModuleRunBase Clone()
@@ -1063,6 +1071,8 @@ namespace Root_Vega.Module
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanRate = m_nScanRate;
                 run.m_nScanGap = m_nScanGap;
+                run.m_dThetaOffset = m_dThetaOffset;
+                run.m_dXOffset = m_dXOffset;
                 run.m_grabMode = m_module.GetGrabMode(p_sGrabMode);
 
                 return run;
@@ -1079,6 +1089,8 @@ namespace Root_Vega.Module
                 m_xLine = tree.Set(m_xLine, m_xLine, "Reticle XSize", "# of Grab Lines", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+                m_dThetaOffset = tree.Set(m_dThetaOffset, m_dThetaOffset, "Theta Offset", "Theta Offset", bVisible);
+                m_dXOffset = tree.Set(m_dXOffset, m_dXOffset, "X Offset", "X Offset", bVisible);
                 string strTemp = p_sGrabMode;
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
                 if (strTemp != p_sGrabMode)
@@ -1120,11 +1132,11 @@ namespace Root_Vega.Module
                         double yPos1 = m_rpAxis.Y - yAxis / 2 - m_grabMode.m_intervalAcc;   //y 축 이동 시작 지점 
                         double yPos0 = m_rpAxis.Y + yAxis / 2 + m_grabMode.m_intervalAcc;  // Y 축 이동 끝 지점.
                         //double nPosX = m_rpAxis.X;   // X축 찍을 위치 
-                        double nPosX = m_module.m_dMaxScorePosX;   // AF로 찾은 포커스 맞는 X위치
+                        double nPosX = m_module.m_dMaxScorePosX + m_dXOffset;   // AF로 찾은 포커스 맞는 X위치
                         //double nPosZ = m_nFocusPos + nLinesX * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
                         double nPosZ = m_nFocusPos;
                         //double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
-                        double dPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4;
+                        double dPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4 + m_dThetaOffset;
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
@@ -1475,7 +1487,7 @@ namespace Root_Vega.Module
                     {
                         // Reticle 중심 위치로 이동 후 AF
                         p_afs.p_strStatus = "Find X Position...";
-                        double dCenterPosY = m_dLeftPosY - af.p_dDistanceOfLeftPointToRightPoint;
+                        double dCenterPosY = m_dLeftPosY - (af.p_dDistanceOfLeftPointToRightPoint / 2);
                         for (int i = 0;  i<nStepCount; i++)
                         {
                             // Axis Move
