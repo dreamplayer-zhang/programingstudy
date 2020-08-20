@@ -42,6 +42,11 @@ namespace RootTools.Inspects
 				oCnn.Close();
 			}
 		}
+		public void Close()
+		{
+			oCnn.Close();
+			oCnn.Dispose();
+		}
 		public bool Open()//TODO : try/catch문으로 error코드를 반환하도록 쉊ㅇ해야 함
 		{
 			try
