@@ -198,13 +198,6 @@
                     </Border>
                 </Grid>
             </TabItem>
-            <TabItem Header="Position"
-                     Style="{StaticResource RcptabItem}">
-                <Border BorderBrush="Gray"
-                        BorderThickness="3">
-                    <local:_2_4_Position x:Name="_Position" />
-                </Border>
-            </TabItem>
             <TabItem Header="PatternVision"
                      Style="{StaticResource RcptabItem}">
                 <Border BorderBrush="Gray"
@@ -231,13 +224,6 @@
                 <Border BorderBrush="Gray"
                         BorderThickness="3">
                     <local:_2_7_EdgeBox x:Name="_EdgeBox"/>
-                </Border>
-            </TabItem>
-            <TabItem Header="Manager"
-                     Style="{StaticResource RcptabItem}">
-                <Border BorderBrush="Gray"
-                        BorderThickness="3">
-                    <local:_2_8_Inspection_Manager x:Name="_InspectionManager" />
                 </Border>
             </TabItem>
         </TabControl>

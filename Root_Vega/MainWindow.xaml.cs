@@ -111,6 +111,9 @@ namespace Root_Vega
             //_Recipe._Origin.DataContext = ovm;
             //_recipe._recipeOrigin.DataContext = rovm;
 
+            //_2_4_PositionViewModel pvm = new _2_4_PositionViewModel(m_engineer, dialogService);
+            //_Recipe._Position.DataContext = pvm;
+
             _2_5_MainVisionViewModel suvm = new _2_5_MainVisionViewModel(m_engineer, dialogService);
             _Recipe._Strip.DataContext = suvm;
 
@@ -118,15 +121,12 @@ namespace Root_Vega
             _Recipe._Side.DataContext = sivm;
             ((Vega_Handler)m_engineer.ClassHandler()).m_sideVision.m_sivm= sivm;
 
-            _2_9_BevelViewModel bevm = new _2_9_BevelViewModel(m_engineer, dialogService);
-            _Recipe._Bevel.DataContext = bevm;
-            ((Vega_Handler)m_engineer.ClassHandler()).m_sideVision.m_bevm = bevm;
-
             _2_7_EdgeBoxViewModel evm = new _2_7_EdgeBoxViewModel(m_engineer, dialogService);
             _Recipe._EdgeBox.DataContext = evm;
 
-            _2_4_PositionViewModel pvm = new _2_4_PositionViewModel(m_engineer, dialogService);
-            _Recipe._Position.DataContext = pvm;
+            _2_9_BevelViewModel bevm = new _2_9_BevelViewModel(m_engineer, dialogService);
+            _Recipe._Bevel.DataContext = bevm;
+            ((Vega_Handler)m_engineer.ClassHandler()).m_sideVision.m_bevm = bevm;
 
             vvm = new _4_ViewerViweModel(m_engineer, dialogService);
             _Viewer.DataContext = vvm;
