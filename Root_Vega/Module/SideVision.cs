@@ -1131,8 +1131,8 @@ namespace Root_Vega.Module
                         /* Grab하기 위해 이동할 Y축의 시작 끝 점*/
                         double yPos1 = m_rpAxis.Y - yAxis / 2 - m_grabMode.m_intervalAcc;   //y 축 이동 시작 지점 
                         double yPos0 = m_rpAxis.Y + yAxis / 2 + m_grabMode.m_intervalAcc;  // Y 축 이동 끝 지점.
-                        //double nPosX = m_rpAxis.X;   // X축 찍을 위치 
-                        double nPosX = m_module.m_dMaxScorePosX + m_dXOffset;   // AF로 찾은 포커스 맞는 X위치
+                        double nPosX = m_rpAxis.X;   // X축 찍을 위치 
+                        //double nPosX = m_module.m_dMaxScorePosX + m_dXOffset;   // AF로 찾은 포커스 맞는 X위치
                         //double nPosZ = m_nFocusPos + nLinesX * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
                         double nPosZ = m_nFocusPos;
                         //double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
@@ -1140,9 +1140,9 @@ namespace Root_Vega.Module
 
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
 
-                        if (m_module.Run(axisXY.p_axisX.StartMove(-70000)))
+                        if (m_module.Run(axisXY.p_axisX.StartMove(-50000)))
                             return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
+                        if (m_module.Run(axisXY.p_axisX.WaitReady()))
                             return p_sInfo;
                         if (m_module.Run(axisTheta.StartMove(dPosTheta)))
                             return p_sInfo;
@@ -1174,7 +1174,7 @@ namespace Root_Vega.Module
                         m_grabMode.StartGrab(mem, m_cpMemory, nLinesY);
                         if (m_module.Run(axisXY.p_axisY.StartMove(yPos1, nScanSpeed)))
                             return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
+                        if (m_module.Run(axisXY.p_axisY.WaitReady()))
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
