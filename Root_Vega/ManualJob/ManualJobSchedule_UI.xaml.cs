@@ -84,6 +84,9 @@ namespace Root_Vega.ManualJob
             string strFileName = Path.GetFileNameWithoutExtension(sRecipe);
             string strVisionRecipeDirectoryPath = Path.GetDirectoryName(sRecipe) + "\\" + strFileName;
             string strVisionRecipeFullPath = strVisionRecipeDirectoryPath + "\\" + strFileName + ".VegaVision";
+
+            if (Directory.Exists(strVisionRecipeDirectoryPath) == false)
+                Directory.CreateDirectory(strVisionRecipeDirectoryPath);
             App.m_engineer.m_recipe.Load(strVisionRecipeFullPath);
         }
         #endregion
