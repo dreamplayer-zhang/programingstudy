@@ -333,6 +333,16 @@ namespace RootTools
 			}
 			return GetBitmapToArray(rect.Width, rect.Height, aBuf);
 		}
+
+		public Bitmap GetRectImagePattern(CRect rect)
+		{
+			if (rect.Width % 4 != 0)
+			{
+				rect.Right += 4 - rect.Width % 4;
+			}
+			return GetByteToBitmap(rect.Width, rect.Height, GetRectByteArray(rect));
+		}
+
 		public void SaveRectImage(CRect memRect)
 		{
 			SaveFileDialog ofd = new SaveFileDialog();

@@ -35,8 +35,10 @@ std::vector<DefectDataStruct> CInspectionReticle::StripInspection(int nBandwidth
 	//	nEndX = (int)(nEndX * nPatternInterpolationOffset);
 	//	nEndY = (int)(nEndY * nPatternInterpolationOffset);
 	//}
-	int nEndX = rtROI.right;
-	int nEndY = rtROI.bottom;
+	/*int nEndX = rtROI.right;
+	int nEndY = rtROI.bottom;*/
+	int nEndX = rtROI.right - rtROI.left;
+	int nEndY = rtROI.bottom - rtROI.top;
 
 
 	if (nGrayLevel > 0)//절대검사 먼저
