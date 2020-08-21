@@ -57,9 +57,6 @@ namespace Root_Vega
 				SetProperty(ref m_Recipe, value);
 			}
 		}
-		string sPool = "pool";
-		string sGroup = "group";
-		string sMem = "mem";
 
 		int tempImageWidth = 640;
 		int tempImageHeight = 480;
@@ -118,7 +115,8 @@ namespace Root_Vega
 
 			m_MemoryModule = engineer.ClassMemoryTool();
 
-			m_Image = new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem));
+			m_Image = new ImageData(m_MemoryModule.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem));
+			//p_ImageViewer = new ImageViewer_ViewModel(m_Image, dialogService);
 			p_ImageViewer = new ImageViewer_ViewModel(m_Image, dialogService);
 			m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
 			m_DrawHistoryWorker_List.Add(new DrawHistoryWorker());
@@ -146,7 +144,7 @@ namespace Root_Vega
 
 			m_Engineer.m_recipe.LoadComplete += () =>
 			{
-				p_Recipe = m_Engineer.m_recipe;
+				SelectedRecipe = m_Engineer.m_recipe;
 				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
 				StripParamList = new ObservableCollection<StripParamData>();
 
@@ -519,6 +517,8 @@ namespace Root_Vega
 			{
 				string dropQuery = "DROP TABLE Inspections.tempdata";
 				var result = connector.SendNonQuery(dropQuery);
+				string createQuery = "CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, memPOOL longtext DEFAULT NULL, memGROUP longtext DEFAULT NULL, memMEMORY longtext DEFAULT NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);";
+				connector.SendNonQuery(createQuery);
 				Debug.WriteLine(string.Format("tempdata Table Drop : {0}", result));
 				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '0') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='0';");
 				Debug.WriteLine(string.Format("Status Clear : {0}", result));
@@ -573,14 +573,14 @@ namespace Root_Vega
 						var bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
 						Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
 						var laplaceFeature = featureImage.Laplace(1);
-						//laplaceFeature.Save(@"D:\Test\feature.bmp");
+						laplaceFeature.Save(@"D:\Test\feature.bmp");
 
 						CRect targetRect = new CRect(
-							new Point(feature.RoiRect.Center().X - (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Center().Y - (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0),
-							new Point(feature.RoiRect.Center().X + (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Center().Y + (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0));
-						Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImage(targetRect));
+							new Point(feature.RoiRect.Left - (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Top - (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0),
+							new Point(feature.RoiRect.Right+ (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Bottom + (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0));
+						Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImagePattern(targetRect));
 						var laplaceSource = sourceImage.Laplace(1);
-						//laplaceSource.Save(@"D:\Test\source.bmp");
+						laplaceSource.Save(@"D:\Test\source.bmp");
 
 						var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
 
@@ -609,7 +609,7 @@ namespace Root_Vega
 							}
 						}
 						resultImage.Data = matches;
-						//resultImage.Save(@"D:\Test\result.bmp");
+						resultImage.Save(@"D:\Test\result.bmp");
 						if (foundFeature)
 						{
 							//2. feature 중심위치가 확보되면 해당 좌표를 저장
