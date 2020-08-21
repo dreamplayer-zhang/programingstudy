@@ -88,7 +88,10 @@ namespace Root_MarsLogView
         string GetString(int nIndex)
         {
             if (m_asLog.Length <= nIndex) return "";
-            return m_asLog[nIndex];
+            string sLog = m_asLog[nIndex];
+            if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
+            if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1);
+            return sLog;
         }
 
         public void End(string[] asLog)
@@ -97,6 +100,7 @@ namespace Root_MarsLogView
             m_sDate[1] = GetString(0);
             m_sTime[1] = GetString(1);
             p_eStatus = eStatus.End;
+            OnPropertyChanged("p_sEnd");
         }
 
         public string GetEndLog(string[] asLog)

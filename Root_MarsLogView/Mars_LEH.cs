@@ -100,17 +100,27 @@ namespace Root_MarsLogView
         string GetString(int nIndex)
         {
             if (m_asLog.Length <= nIndex) return "";
-            return m_asLog[nIndex];
+            string sLog = m_asLog[nIndex];
+            if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
+            if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1);
+            return sLog;
         }
 
         public string GetEndLog(eEvent eEvent, string[] asLog)
         {
             m_asLog[0] = asLog[0];
             m_asLog[1] = asLog[1];
-            m_asLog[4] = eEvent.ToString();
+            m_asLog[4] = '\'' + eEvent.ToString() + '\'';
             m_sDate[(int)eEvent] = asLog[0];
             m_sTime[(int)eEvent] = asLog[1];
             p_eEvent = eEvent; 
+            switch (eEvent)
+            {
+                case eEvent.CarrierLoad: OnPropertyChanged("p_sTimeCarrierLoad"); break;
+                case eEvent.ProcessJobStart: OnPropertyChanged("p_sTimeProcessJobStart"); break;
+                case eEvent.ProcessJobEnd: OnPropertyChanged("p_sTimeProcessJobEnd"); break;
+                case eEvent.CarrierUnload: OnPropertyChanged("p_sTimeCarrierUnload"); break;
+            }
             string sLog = "";
             for (int n = 0; n < m_asLog.Length - 1; n++) sLog += m_asLog[n] + '\t';
             return sLog + m_asLog[m_asLog.Length - 1];

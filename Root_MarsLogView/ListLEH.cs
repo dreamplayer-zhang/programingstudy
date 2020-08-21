@@ -52,15 +52,17 @@ namespace Root_MarsLogView
                 m_mars.AddError("LEH Invalid Event", sLog);
                 return; 
             }
-            if (dEvent > 1) SetEvent(leh, leh.p_eEvent + 1, sLog, asLog);
-            m_mars.WriteEvent(leh.GetEndLog(eEvent, asLog));
+            while (leh.p_eEvent < eEvent) m_mars.WriteEvent(leh.GetEndLog(leh.p_eEvent + 1, asLog));
             if (eEvent == Mars_LEH.eEvent.CarrierUnload) p_aLEH.Remove(leh); 
         }
 
         string GetString(int nIndex)
         {
             if (m_asLog.Length <= nIndex) return "";
-            return m_asLog[nIndex];
+            string sLog = m_asLog[nIndex];
+            if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
+            if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1);
+            return sLog;
         }
 
         int m_maxView = 250;

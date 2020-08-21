@@ -35,8 +35,12 @@ namespace Root_MarsLogView
         string GetString(int nIndex)
         {
             if (m_asLog.Length <= nIndex) return "";
-            return m_asLog[nIndex];
+            string sLog = m_asLog[nIndex];
+            if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
+            if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1);
+            return sLog;
         }
+
         #endregion
 
         public Mars_CFG(string[] asLog)

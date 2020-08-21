@@ -23,12 +23,13 @@ namespace Root_MarsLogView
             m_asLog = asLog; 
             if (asLog.Length < 14) m_mars.AddError("PRC Length", sLog);
             string sStatus = GetString(5);
-            Mars_PRC prc = Get(asLog); 
+            Mars_PRC prc = Get(asLog);
             if (sStatus == Mars_PRC.eStatus.Start.ToString())
             {
                 if (prc != null)
                 {
                     m_mars.AddError("PRC Not Ended", sLog);
+                    prc.End(asLog);
                     m_mars.WriteEvent(prc.GetEndLog(asLog));
                     p_aPRC.Remove(prc);
                 }
@@ -53,7 +54,10 @@ namespace Root_MarsLogView
         string GetString(int nIndex)
         {
             if (m_asLog.Length <= nIndex) return "";
-            return m_asLog[nIndex]; 
+            string sLog = m_asLog[nIndex]; 
+            if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
+            if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1); 
+            return sLog; 
         }
 
         int m_maxView = 250; 

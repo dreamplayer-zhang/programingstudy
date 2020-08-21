@@ -156,6 +156,7 @@ namespace RootTools.Comm
             {
                 if (m_tcpSocket != null) m_tcpSocket.ThreadStop(); 
                 m_socket = (Socket)ar.AsyncState;
+                Thread.Sleep(5); 
                 if (m_socket == null) return; 
                 Socket socket = m_socket.EndAccept(ar);
                 m_socket.BeginAccept(new AsyncCallback(CallBack_Accept), m_socket);
