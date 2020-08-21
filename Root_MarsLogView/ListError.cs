@@ -33,6 +33,7 @@ namespace Root_MarsLogView
         #region File
         void WriteError(Error error)
         {
+            if (error.p_sLog.Length < 11) return; 
             string sFile = GetFileName(error.p_sLog);
             StreamWriter sw = new StreamWriter(new FileStream(sFile, FileMode.Append));
             sw.WriteLine(error.p_sError + " :-> " + error.p_sLog);

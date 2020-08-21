@@ -79,6 +79,24 @@ namespace Root_Vega.ManualJob
             if (m_JobSchedule.m_loadport.m_infoPod.p_infoReticle == null) return; 
             m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.m_sManualRecipe = sRecipe;
             m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.RecipeOpen(sRecipe);
+
+            // Vision Recipe Open 코드 추가
+            string strFileName = Path.GetFileNameWithoutExtension(sRecipe);
+            string strVisionRecipeDirectoryPath = Path.GetDirectoryName(sRecipe) + "\\" + strFileName;
+            string strVisionRecipeFullPath = strVisionRecipeDirectoryPath + "\\" + "Parameter.VegaVision";
+
+            if (Directory.Exists(strVisionRecipeDirectoryPath) == false)
+                Directory.CreateDirectory(strVisionRecipeDirectoryPath);
+            if (File.Exists(strVisionRecipeFullPath) == false)
+            {
+                string strMessage = string.Format("\"Parameter.VegaVision\" Recipe is not Exist in the \"{0}\"", strVisionRecipeDirectoryPath);
+                MessageBox.Show(strMessage);
+                comboRecipeID.SelectedValue = null;
+            }
+            else
+            {
+                App.m_engineer.m_recipe.Load(strVisionRecipeFullPath);
+            }
         }
         #endregion
 

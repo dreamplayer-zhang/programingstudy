@@ -23,7 +23,7 @@ namespace Root_MarsLogView
         Queue<string> m_qLog = new Queue<string>();
         private void MarsLogViewer_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
-            socket.Send(aBuf);
+            socket.Send(aBuf, nSize, SocketFlags.None);
             m_qLog.Enqueue(Encoding.ASCII.GetString(aBuf, 0, nSize));
         }
         #endregion
@@ -48,11 +48,11 @@ namespace Root_MarsLogView
                 {
                     switch (asLog[3])
                     {
-                        case "PRC": m_listPRC.Add(sLog, asLog); break;
-                        case "XFR": m_listXFR.Add(sLog, asLog); break;
-                        case "FNC": m_listFNC.Add(sLog, asLog); break;
-                        case "LEH": m_listLEH.Add(sLog, asLog); break;
-                        case "CFG": m_listCFG.Add(sLog, asLog); break;
+                        case "'PRC'": m_listPRC.Add(sLog, asLog); break;
+                        case "'XFR'": m_listXFR.Add(sLog, asLog); break;
+                        case "'FNC'": m_listFNC.Add(sLog, asLog); break;
+                        case "'LEH'": m_listLEH.Add(sLog, asLog); break;
+                        case "'CFG'": m_listCFG.Add(sLog, asLog); break;
                     }
                 }
             }
@@ -64,9 +64,9 @@ namespace Root_MarsLogView
         {
             if (sLog[sLog.Length - 1] == '$') sLog = sLog.Substring(0, sLog.Length - 1);
             string sFile = GetFileName(sLog);
-            bool bFirst = File.Exists(sFile); 
+            bool bExist = File.Exists(sFile); 
             StreamWriter sw = new StreamWriter(new FileStream(sFile, FileMode.Append));
-            if (bFirst) sw.WriteLine("Applied Samsung Standard Logging Spec Version: 2.0");
+            if (bExist == false) sw.WriteLine("Applied Samsung Standard Logging Spec Version: 2.0");
             sw.WriteLine(sLog);
             sw.Close(); 
         }
@@ -139,6 +139,13 @@ namespace Root_MarsLogView
 
         public void ThreadStop()
         {
+            DateTime dt = DateTime.Now;
+            string sDate = dt.Year.ToString("0000/") + dt.Month.ToString("00/") + dt.Day.ToString("00");
+            string sTime = dt.Hour.ToString("00:") + dt.Minute.ToString("00:") + dt.Second.ToString("00") + "." + dt.Millisecond.ToString("000");
+            m_listPRC.ThreadStop(sDate, sTime);
+            m_listXFR.ThreadStop(sDate, sTime);
+            m_listFNC.ThreadStop(sDate, sTime);
+            m_listLEH.ThreadStop(sDate, sTime);
             m_tcpServer[0].ThreadStop();
             m_tcpServer[1].ThreadStop();
         }

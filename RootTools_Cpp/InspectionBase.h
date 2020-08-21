@@ -18,7 +18,7 @@ public :
 	static int defectIdx;
 protected:
 	int m_nInspOffset = 10;
-	byte inspbuffer[2000][2000];
+	byte inspbuffer[4000][4000];
 	byte inspbuffer2[16000000];
 	RECT inspbufferROI;
 	RECT GetInspbufferROI() const;

@@ -108,6 +108,7 @@
     <Compile Include="Module\ScareCrow.cs" />
     <Compile Include="Module\Siltron.cs" />
     <Compile Include="Module\Test.cs" />
+    <Compile Include="Module\TestMars.cs" />
     <Compile Include="Root_Handler.cs" />
     <Compile Include="Root_Handler_UI.xaml.cs">
       <DependentUpon>Root_Handler_UI.xaml</DependentUpon>

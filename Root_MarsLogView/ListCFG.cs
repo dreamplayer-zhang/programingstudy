@@ -14,7 +14,7 @@ namespace Root_MarsLogView
             m_asLog = asLog;
             if (asLog.Length < 9) m_mars.AddError("PRC Length", sLog);
             m_mars.WriteEvent(sLog);
-            Mars_CFG cfg = new Mars_CFG(asLog);
+            Mars_CFG cfg = new Mars_CFG(sLog, asLog);
             p_aCFGView.Add(cfg);
             if (p_aCFGView.Count > m_maxView) p_aCFGView.RemoveAt(0);
         }

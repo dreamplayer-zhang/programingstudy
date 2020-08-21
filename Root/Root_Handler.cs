@@ -16,7 +16,8 @@ namespace Root
         //public ScareCrow m_scarecrow;
         //public Siltron m_siltron;
         //public BayerConvert m_bayer;
-        public ACS m_acs; 
+        public ACS m_acs;
+        public TestMars m_testMars;
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
@@ -29,7 +30,9 @@ namespace Root
             //m_bayer = new BayerConvert("BayerConvert", m_enginner);
             //InitModule(m_bayer);
             m_acs = new ACS("ACS", m_enginner);
-            InitModule(m_acs); 
+            InitModule(m_acs);
+            m_testMars = new TestMars("TestMars", m_enginner);
+            InitModule(m_testMars); 
         }
 
         void InitModule(ModuleBase module)

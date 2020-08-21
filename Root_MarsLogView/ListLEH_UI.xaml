@@ -12,6 +12,7 @@
             <DataGridTextColumn Header="Lot ID" Binding="{Binding p_sLot}"/>
             <DataGridTextColumn Header="Recipe Name" Binding="{Binding p_sRecipe}"/>
             <DataGridTextColumn Header="Flow Info" Binding="{Binding p_sFlowInfo}"/>
+            <DataGridTextColumn Header="CarrierID" Binding="{Binding p_sCarrierID}"/>
             <DataGridTextColumn Header="Event" Binding="{Binding p_sEvent}"/>
             <DataGridTextColumn Header="CarrierLoad" Binding="{Binding p_sTimeCarrierLoad}"/>
             <DataGridTextColumn Header="ProcessJobStart" Binding="{Binding p_sTimeProcessJobStart}"/>

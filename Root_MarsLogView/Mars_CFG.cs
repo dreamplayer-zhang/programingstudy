@@ -31,16 +31,21 @@ namespace Root_MarsLogView
         #endregion
 
         #region Functions
-        string[] m_asLog;
+        public string[] m_asLog;
         string GetString(int nIndex)
         {
             if (m_asLog.Length <= nIndex) return "";
-            return m_asLog[nIndex];
+            string sLog = m_asLog[nIndex];
+            if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
+            if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1);
+            return sLog;
         }
-        #endregion
 
-        public Mars_CFG(string[] asLog)
+        #endregion
+        public string m_sLog; 
+        public Mars_CFG(string sLog, string[] asLog)
         {
+            m_sLog = sLog; 
             m_asLog = asLog;
             m_sDate = GetString(0);
             m_sTime = GetString(1);
