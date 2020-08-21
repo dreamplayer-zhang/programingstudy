@@ -112,7 +112,8 @@ namespace RootTools.Module
                             ModuleRunBase moduleRun = m_qModuleRun.Dequeue();
                             p_iRun = m_qModuleRun.Count;
                             moduleRun.StartRun();
-                            Thread.Sleep(100); 
+                            Thread.Sleep(100);
+                            while (moduleRun.m_moduleBase.m_qModuleRun.Count > 0) Thread.Sleep(10);
                             while (moduleRun.m_moduleBase.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
                             if (m_qModuleRun.Count == 0)
                             {
