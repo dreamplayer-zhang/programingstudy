@@ -34,7 +34,7 @@ namespace Root_MarsLogView
                     p_aFNC.Remove(fnc);
                 }
                 m_mars.WriteEvent(sLog);
-                fnc = new Mars_FNC(asLog);
+                fnc = new Mars_FNC(sLog, asLog);
                 p_aFNC.Add(fnc);
                 p_aFNCView.Add(fnc);
                 if (p_aFNCView.Count > m_maxView) p_aFNCView.RemoveAt(0);
@@ -72,6 +72,19 @@ namespace Root_MarsLogView
             m_mars = mars;
             p_aFNC = new ObservableCollection<Mars_FNC>();
             p_aFNCView = new ObservableCollection<Mars_FNC>();
+        }
+
+        public void ThreadStop(string sDate, string sTime)
+        {
+            foreach (Mars_FNC fnc in p_aFNC)
+            {
+                m_mars.AddError("FNC ThreadStop", fnc.m_sLog);
+                string[] asLog = fnc.m_asLog;
+                asLog[0] = sDate;
+                asLog[1] = sTime;
+                fnc.End(asLog);
+                m_mars.WriteEvent(fnc.GetEndLog(asLog));
+            }
         }
     }
 }

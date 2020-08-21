@@ -71,7 +71,7 @@ namespace Root_MarsLogView
         #endregion
 
         #region Functions
-        string[] m_asLog;
+        public string[] m_asLog;
         public bool IsSame(string[] asLog)
         {
             m_asLog = asLog;
@@ -113,9 +113,10 @@ namespace Root_MarsLogView
             return sLog + m_asLog[m_asLog.Length - 1];
         }
         #endregion
-
-        public Mars_XFR(string[] asLog)
+        public string m_sLog; 
+        public Mars_XFR(string sLog, string[] asLog)
         {
+            m_sLog = sLog; 
             m_asLog = asLog;
             m_sDate[0] = GetString(0);
             m_sTime[0] = GetString(1);

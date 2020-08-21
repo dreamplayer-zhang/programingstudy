@@ -139,6 +139,13 @@ namespace Root_MarsLogView
 
         public void ThreadStop()
         {
+            DateTime dt = DateTime.Now;
+            string sDate = dt.Year.ToString("0000/") + dt.Month.ToString("00/") + dt.Day.ToString("00");
+            string sTime = dt.Hour.ToString("00:") + dt.Minute.ToString("00:") + dt.Second.ToString("00") + "." + dt.Millisecond.ToString("000");
+            m_listPRC.ThreadStop(sDate, sTime);
+            m_listXFR.ThreadStop(sDate, sTime);
+            m_listFNC.ThreadStop(sDate, sTime);
+            m_listLEH.ThreadStop(sDate, sTime);
             m_tcpServer[0].ThreadStop();
             m_tcpServer[1].ThreadStop();
         }

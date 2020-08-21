@@ -31,7 +31,7 @@ namespace Root_MarsLogView
         #endregion
 
         #region Functions
-        string[] m_asLog;
+        public string[] m_asLog;
         string GetString(int nIndex)
         {
             if (m_asLog.Length <= nIndex) return "";
@@ -42,9 +42,10 @@ namespace Root_MarsLogView
         }
 
         #endregion
-
-        public Mars_CFG(string[] asLog)
+        public string m_sLog; 
+        public Mars_CFG(string sLog, string[] asLog)
         {
+            m_sLog = sLog; 
             m_asLog = asLog;
             m_sDate = GetString(0);
             m_sTime = GetString(1);

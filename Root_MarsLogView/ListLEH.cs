@@ -30,16 +30,21 @@ namespace Root_MarsLogView
                 {
                     m_mars.AddError("LEH Not CarrierUnloaded", sLog);
                     SetEvent(leh, Mars_LEH.eEvent.CarrierUnload, sLog, asLog);
+                    p_aLEH.Remove(leh);
                 }
                 m_mars.WriteEvent(sLog);
-                leh = new Mars_LEH(asLog);
+                leh = new Mars_LEH(sLog, asLog);
                 p_aLEH.Add(leh);
                 p_aLEHView.Add(leh);
                 if (p_aLEHView.Count > m_maxView) p_aLEHView.RemoveAt(0);
             }
             else
             {
-                if (leh != null) SetEvent(leh, eEvent, sLog, asLog); 
+                if (leh != null)
+                {
+                    SetEvent(leh, eEvent, sLog, asLog);
+                    if (eEvent == Mars_LEH.eEvent.CarrierUnload) p_aLEH.Remove(leh);
+                }
                 else m_mars.AddError("LEH Not CarrierLoaded", sLog);
             }
         }
@@ -53,7 +58,6 @@ namespace Root_MarsLogView
                 return; 
             }
             while (leh.p_eEvent < eEvent) m_mars.WriteEvent(leh.GetEndLog(leh.p_eEvent + 1, asLog));
-            if (eEvent == Mars_LEH.eEvent.CarrierUnload) p_aLEH.Remove(leh); 
         }
 
         string GetString(int nIndex)
@@ -77,6 +81,18 @@ namespace Root_MarsLogView
             m_mars = mars;
             p_aLEH = new ObservableCollection<Mars_LEH>();
             p_aLEHView = new ObservableCollection<Mars_LEH>();
+        }
+
+        public void ThreadStop(string sDate, string sTime)
+        {
+            foreach (Mars_LEH leh in p_aLEH)
+            {
+                m_mars.AddError("LEH ThreadStop", leh.m_sLog);
+                string[] asLog = leh.m_asLog;
+                asLog[0] = sDate;
+                asLog[1] = sTime;
+                SetEvent(leh, Mars_LEH.eEvent.CarrierUnload, leh.m_sLog, asLog);
+            }
         }
     }
 }

@@ -28,13 +28,13 @@ namespace Root_MarsLogView
             {
                 if (prc != null)
                 {
-                    m_mars.AddError("PRC Not Ended", sLog);
+                    m_mars.AddError("PRC Not Ended", prc.m_sLog);
                     prc.End(asLog);
                     m_mars.WriteEvent(prc.GetEndLog(asLog));
                     p_aPRC.Remove(prc);
                 }
                 m_mars.WriteEvent(sLog);
-                prc = new Mars_PRC(asLog);
+                prc = new Mars_PRC(sLog, asLog);
                 p_aPRC.Add(prc);
                 p_aPRCView.Add(prc);
                 if (p_aPRCView.Count > m_maxView) p_aPRCView.RemoveAt(0); 
@@ -72,6 +72,19 @@ namespace Root_MarsLogView
             m_mars = mars; 
             p_aPRC = new ObservableCollection<Mars_PRC>();
             p_aPRCView = new ObservableCollection<Mars_PRC>();
+        }
+
+        public void ThreadStop(string sDate, string sTime)
+        {
+            foreach (Mars_PRC prc in p_aPRC)
+            {
+                m_mars.AddError("PRC ThreadStop", prc.m_sLog);
+                string[] asLog = prc.m_asLog;
+                asLog[0] = sDate;
+                asLog[1] = sTime; 
+                prc.End(asLog);
+                m_mars.WriteEvent(prc.GetEndLog(asLog));
+            }
         }
     }
 }

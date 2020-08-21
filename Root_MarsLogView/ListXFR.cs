@@ -34,7 +34,7 @@ namespace Root_MarsLogView
                     p_aXFR.Remove(xfr);
                 }
                 m_mars.WriteEvent(sLog);
-                xfr = new Mars_XFR(asLog);
+                xfr = new Mars_XFR(sLog, asLog);
                 p_aXFR.Add(xfr);
                 p_aXFRView.Add(xfr);
                 if (p_aXFRView.Count > m_maxView) p_aXFRView.RemoveAt(0);
@@ -72,6 +72,19 @@ namespace Root_MarsLogView
             m_mars = mars;
             p_aXFR = new ObservableCollection<Mars_XFR>();
             p_aXFRView = new ObservableCollection<Mars_XFR>();
+        }
+
+        public void ThreadStop(string sDate, string sTime)
+        {
+            foreach (Mars_XFR xfr in p_aXFR)
+            {
+                m_mars.AddError("XFR ThreadStop", xfr.m_sLog);
+                string[] asLog = xfr.m_asLog;
+                asLog[0] = sDate;
+                asLog[1] = sTime;
+                xfr.End(asLog);
+                m_mars.WriteEvent(xfr.GetEndLog(asLog));
+            }
         }
     }
 }
