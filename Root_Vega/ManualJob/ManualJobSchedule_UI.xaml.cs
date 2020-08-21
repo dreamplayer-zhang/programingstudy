@@ -79,6 +79,12 @@ namespace Root_Vega.ManualJob
             if (m_JobSchedule.m_loadport.m_infoPod.p_infoReticle == null) return; 
             m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.m_sManualRecipe = sRecipe;
             m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.RecipeOpen(sRecipe);
+
+            // Vision Recipe Open 코드 추가
+            string strFileName = Path.GetFileNameWithoutExtension(sRecipe);
+            string strVisionRecipeDirectoryPath = Path.GetDirectoryName(sRecipe) + "\\" + strFileName;
+            string strVisionRecipeFullPath = strVisionRecipeDirectoryPath + "\\" + strFileName + ".VegaVision";
+            App.m_engineer.m_recipe.Load(strVisionRecipeFullPath);
         }
         #endregion
 
