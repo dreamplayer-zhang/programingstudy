@@ -355,7 +355,7 @@ namespace RootTools.Module
 
         #region Run
         /// <summary> m_qModuleRun : RunThread에서 실행 대기 중인 ModuleRunBase (EQ.IsStop() 인 경우만 정지) </summary>
-        Queue<ModuleRunBase> m_qModuleRun = new Queue<ModuleRunBase>();
+        public Queue<ModuleRunBase> m_qModuleRun = new Queue<ModuleRunBase>();
 
         protected string StartRun(string sRun)
         {
