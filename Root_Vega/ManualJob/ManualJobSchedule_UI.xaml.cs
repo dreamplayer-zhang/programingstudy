@@ -83,11 +83,20 @@ namespace Root_Vega.ManualJob
             // Vision Recipe Open 코드 추가
             string strFileName = Path.GetFileNameWithoutExtension(sRecipe);
             string strVisionRecipeDirectoryPath = Path.GetDirectoryName(sRecipe) + "\\" + strFileName;
-            string strVisionRecipeFullPath = strVisionRecipeDirectoryPath + "\\" + strFileName + ".VegaVision";
+            string strVisionRecipeFullPath = strVisionRecipeDirectoryPath + "\\" + "Parameter.VegaVision";
 
             if (Directory.Exists(strVisionRecipeDirectoryPath) == false)
                 Directory.CreateDirectory(strVisionRecipeDirectoryPath);
-            App.m_engineer.m_recipe.Load(strVisionRecipeFullPath);
+            if (File.Exists(strVisionRecipeFullPath) == false)
+            {
+                string strMessage = string.Format("\"Parameter.VegaVision\" Recipe is not Exist in the \"{0}\"", strVisionRecipeDirectoryPath);
+                MessageBox.Show(strMessage);
+                comboRecipeID.SelectedValue = null;
+            }
+            else
+            {
+                App.m_engineer.m_recipe.Load(strVisionRecipeFullPath);
+            }
         }
         #endregion
 
