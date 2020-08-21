@@ -126,9 +126,11 @@ namespace Root_MarsLogView
             return sLog + m_asLog[m_asLog.Length - 1];
         }
         #endregion
+        public int m_iTCP;
         public string m_sLog; 
-        public Mars_LEH(string sLog, string[] asLog)
+        public Mars_LEH(int iTCP, string sLog, string[] asLog)
         {
+            m_iTCP = iTCP; 
             m_sLog = sLog; 
             m_asLog = asLog;
             m_sDate[0] = GetString(0);

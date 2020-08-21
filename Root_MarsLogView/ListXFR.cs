@@ -18,7 +18,7 @@ namespace Root_MarsLogView
         }
 
         string[] m_asLog;
-        public void Add(string sLog, string[] asLog)
+        public void Add(int iTCP, string sLog, string[] asLog)
         {
             m_asLog = asLog;
             if (asLog.Length < 14) m_mars.AddError("XFR Length", sLog);
@@ -34,7 +34,7 @@ namespace Root_MarsLogView
                     p_aXFR.Remove(xfr);
                 }
                 m_mars.WriteEvent(sLog);
-                xfr = new Mars_XFR(sLog, asLog);
+                xfr = new Mars_XFR(iTCP, sLog, asLog);
                 p_aXFR.Add(xfr);
                 p_aXFRView.Add(xfr);
                 if (p_aXFRView.Count > m_maxView) p_aXFRView.RemoveAt(0);
@@ -58,6 +58,26 @@ namespace Root_MarsLogView
             if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
             if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1);
             return sLog;
+        }
+
+        public void Reset(int iTCP, string sDate, string sTime)
+        {
+            foreach (Mars_XFR xfr in p_aXFR)
+            {
+                if (xfr.m_iTCP == iTCP)
+                {
+                    m_mars.AddError("XFR Reset", xfr.m_sLog);
+                    string[] asLog = xfr.m_asLog;
+                    asLog[0] = sDate;
+                    asLog[1] = sTime;
+                    xfr.End(asLog);
+                    m_mars.WriteEvent(xfr.GetEndLog(asLog));
+                }
+            }
+            for (int n = p_aXFR.Count - 1; n >= 0; n--)
+            {
+                if (p_aXFR[n].m_iTCP == iTCP) p_aXFR.RemoveAt(n);
+            }
         }
 
         int m_maxView = 250;

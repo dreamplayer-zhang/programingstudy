@@ -18,7 +18,7 @@ namespace Root_MarsLogView
         }
 
         string[] m_asLog;
-        public void Add(string sLog, string[] asLog)
+        public void Add(int iTCP, string sLog, string[] asLog)
         {
             m_asLog = asLog;
             if (asLog.Length < 9) m_mars.AddError("LEH Length", sLog);
@@ -33,7 +33,7 @@ namespace Root_MarsLogView
                     p_aLEH.Remove(leh);
                 }
                 m_mars.WriteEvent(sLog);
-                leh = new Mars_LEH(sLog, asLog);
+                leh = new Mars_LEH(iTCP, sLog, asLog);
                 p_aLEH.Add(leh);
                 p_aLEHView.Add(leh);
                 if (p_aLEHView.Count > m_maxView) p_aLEHView.RemoveAt(0);
@@ -67,6 +67,25 @@ namespace Root_MarsLogView
             if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
             if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1);
             return sLog;
+        }
+
+        public void Reset(int iTCP, string sDate, string sTime)
+        {
+            foreach (Mars_LEH leh in p_aLEH)
+            {
+                if (leh.m_iTCP == iTCP)
+                {
+                    m_mars.AddError("LEH Reset", leh.m_sLog);
+                    string[] asLog = leh.m_asLog;
+                    asLog[0] = sDate;
+                    asLog[1] = sTime;
+                    SetEvent(leh, Mars_LEH.eEvent.CarrierUnload, leh.m_sLog, asLog);
+                }
+            }
+            for (int n = p_aLEH.Count - 1; n >= 0; n--)
+            {
+                if (p_aLEH[n].m_iTCP == iTCP) p_aLEH.RemoveAt(n);
+            }
         }
 
         int m_maxView = 250;

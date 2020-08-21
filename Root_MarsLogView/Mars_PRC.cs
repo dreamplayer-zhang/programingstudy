@@ -106,16 +106,17 @@ namespace Root_MarsLogView
         {
             m_asLog[0] = asLog[0];
             m_asLog[1] = asLog[1];
-            m_asLog[5] = "End";
+            m_asLog[5] = "'End'";
             string sLog = "";
             for (int n = 0; n < m_asLog.Length - 1; n++) sLog += m_asLog[n] + '\t';
             return sLog + m_asLog[m_asLog.Length - 1]; 
         }
         #endregion
-
+        public int m_iTCP; 
         public string m_sLog; 
-        public Mars_PRC(string sLog, string[] asLog)
+        public Mars_PRC(int iTCP, string sLog, string[] asLog)
         {
+            m_iTCP = iTCP; 
             m_sLog = sLog; 
             m_asLog = asLog;
             m_sDate[0] = GetString(0);

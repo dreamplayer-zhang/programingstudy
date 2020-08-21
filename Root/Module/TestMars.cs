@@ -74,7 +74,7 @@ namespace Root.Module
             AddModuleRunList(new Run_SendFNC(this), false, "Send FNC Commend");
             AddModuleRunList(new Run_SendLEH(this), false, "Send LEH Commend");
             AddModuleRunList(new Run_SendCFG(this), false, "Send CFG Commend");
-
+            AddModuleRunList(new Run_SendReset(this), false, "Send Reset Commend");
         }
 
         public class Run_SendPRC : ModuleRunBase
@@ -316,7 +316,33 @@ namespace Root.Module
                 return "OK";
             }
         }
-        #endregion
 
+        public class Run_SendReset : ModuleRunBase
+        {
+            TestMars m_module;
+            public Run_SendReset(TestMars module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_SendReset run = new Run_SendReset(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                string sLog = m_module.p_sDateTime;
+                m_module.m_client.Send(sLog + "\t0\tReset");
+                return "OK";
+            }
+        }
+        #endregion
     }
 }
