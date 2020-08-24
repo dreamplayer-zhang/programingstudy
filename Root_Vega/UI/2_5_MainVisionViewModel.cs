@@ -22,12 +22,12 @@ using MBrushes = System.Windows.Media.Brushes;
 
 namespace Root_Vega
 {
-	class _2_5_MainVisionViewModel : ObservableObject
+	public class _2_5_MainVisionViewModel : ObservableObject
 	{
 		/// <summary>
 		/// 외부 Thread에서 UI를 Update하기 위한 Dispatcher
 		/// </summary>
-		protected Dispatcher _dispatcher;
+		public Dispatcher _dispatcher;
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
 		ImageData m_Image;
@@ -542,7 +542,7 @@ namespace Root_Vega
 			p_InformationDrawer.Redrawing();
 		}
 
-		private void _startInsp()
+		public void _startInsp()
 		{
 			//TODO EdgeboxViewModel과 SideViewModel에 중복된 메소드가 존재하므로 통합이 가능한경우 정리하도록 합시다
 			if (!m_Engineer.m_recipe.Loaded)
