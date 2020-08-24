@@ -82,7 +82,8 @@ namespace Root_Vega
 
         private void ToggleButton_Click(object sender, RoutedEventArgs e)
         {
-            if (IsEnableLoad() == false) return; 
+            if (IsEnableLoad() == false) return;
+            if (m_manualjob.ShowPopup() == false) return;
             m_bgwLoad.RunWorkerAsync(); 
         }
 
@@ -99,7 +100,7 @@ namespace Root_Vega
             switch (m_loadport.p_eState)
             {
                 case ModuleBase.eState.Ready:
-                    if (m_manualjob.ShowPopup() == false) return;
+                    if (m_manualjob.SetInfoPod() != "OK") return; 
                     EQ.p_eState = EQ.eState.Run;
                     m_loadport.m_infoPod.StartProcess();
                     break; 
