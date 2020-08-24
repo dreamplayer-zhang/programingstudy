@@ -141,6 +141,7 @@ namespace RootTools.Comm
             CR,
             LF,
             CRLF,
+            LFCR_4CH,
             ETX
         }
         string m_sEnd = "";
@@ -158,6 +159,7 @@ namespace RootTools.Comm
                     case eEndBit.CR: m_sEnd = "\r"; break;
                     case eEndBit.LF: m_sEnd = "\n"; break;
                     case eEndBit.CRLF: m_sEnd = "\r\n"; break;
+                    case eEndBit.LFCR_4CH: m_sEnd = "\n\r$>"; break;
                     case eEndBit.ETX: m_sEnd = ((char)0x03).ToString(); break;
                     default: p_sInfo = "Unknown End Bit : " + value.ToString(); break; 
                 }
@@ -182,10 +184,10 @@ namespace RootTools.Comm
             SerialPort sp = (SerialPort)sender;
             string sRead = m_sRead + sp.ReadExisting();
             m_commLog.Add(CommLog.eType.Receive, sRead.Trim());
-            DataRecieve(sRead); 
+            DataRecieve(sRead, sender); 
         }
 
-        void DataRecieve(string sRead)
+        void DataRecieve(string sRead, object sender)
         {
             if ((m_sRead == "") && (p_eStartBit != eStartBit.None))
             {
@@ -198,12 +200,14 @@ namespace RootTools.Comm
                 nIndex += m_sStart.Length; 
                 sRead = sRead.Substring(nIndex, sRead.Length - nIndex); 
             }
-            m_sRead = DataRead(sRead);
-            if (m_sRead != "") DataRecieve(m_sRead); 
+            m_sRead = DataRead(sRead, sender);
+            if (m_sRead != "") 
+                DataRecieve(m_sRead, sender); 
         }
 
-        string DataRead(string sRead)
+        string DataRead(string sRead, object sender)
         {
+            int nIndex;
             try
             {
                 if (p_eEndBit == eEndBit.None)
@@ -211,7 +215,31 @@ namespace RootTools.Comm
                     OnRecieve(sRead);
                     return "";
                 }
-                int nIndex = sRead.IndexOf(m_sEnd);
+                else if (p_eEndBit == eEndBit.LFCR_4CH)
+                {
+                    nIndex = sRead.IndexOf(m_sEnd);
+                    if (nIndex < 0)
+                    {
+                        StopWatch sw = new StopWatch();
+                        sw.Start();
+                        while (nIndex < 0)
+                        {
+                            SerialPort sp = (SerialPort)sender;
+                            string strSpare = sp.ReadExisting();
+                            sRead = sRead + strSpare;
+                            nIndex = sRead.IndexOf(m_sEnd);
+                            if (sw.ElapsedMilliseconds > this.m_msReadTimeout && nIndex < 0)
+                            {
+                                sw.Stop();
+                                return "";
+                            }
+                        }
+                    }
+                    OnRecieve(sRead.Substring(0, nIndex));
+                    return "";
+                }
+
+                nIndex = sRead.IndexOf(m_sEnd);
                 if (nIndex < 0) return sRead;
                 OnRecieve(sRead.Substring(0, nIndex));
                 nIndex += m_sEnd.Length;
@@ -236,6 +264,10 @@ namespace RootTools.Comm
             try
             {
                 string sSend = m_sStart + sMsg + m_sEnd;
+                if (p_eEndBit == eEndBit.LFCR_4CH)
+                {
+                    sSend = m_sStart + sMsg + "\r\n";
+                }
                 lock (m_csLock)
                 {
                     while (m_swWrite.ElapsedMilliseconds < 10) Thread.Sleep(1);

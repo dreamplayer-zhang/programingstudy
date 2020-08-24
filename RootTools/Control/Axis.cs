@@ -104,7 +104,7 @@ namespace RootTools.Control
         #endregion
 
         #region List Position
-        Dictionary<string, double> m_aPos = new Dictionary<string, double>();
+        public Dictionary<string, double> m_aPos = new Dictionary<string, double>();
         public List<string> m_asPos = new List<string>(); 
         public ObservableCollection<string> p_asPos { get; set; }
         public string p_strSelPos { get; set; }
@@ -178,19 +178,20 @@ namespace RootTools.Control
             RunTree(Tree.eMode.RegRead);
         }
 
-        public void RunTreePos(Tree tree)
+        public void RunTreePos(Tree tree, string sUnit)
         {
             RunTreePosLimit(tree.GetTree("SW Limit", false));
-            RunTreePosition(tree.GetTree("Position"));
+            RunTreePosition(tree.GetTree("Position"), sUnit);
         }
 
-        void RunTreePosition(Tree tree)
+        void RunTreePosition(Tree tree, string sUnit)
         {
-            m_aPos[p_asPos[0]] = tree.Set(m_aPos[p_asPos[0]], 0.0, p_asPos[0], "Axis Position (unit)", m_bSWLimit[0]);
-            m_aPos[p_asPos[1]] = tree.Set(m_aPos[p_asPos[1]], 0.0, p_asPos[1], "Axis Position (unit)", m_bSWLimit[1]);
+            string sDesc = "Axis Position (" + sUnit + ")";
+            m_aPos[p_asPos[0]] = tree.Set(m_aPos[p_asPos[0]], 0.0, p_asPos[0], sDesc, m_bSWLimit[0]);
+            m_aPos[p_asPos[1]] = tree.Set(m_aPos[p_asPos[1]], 0.0, p_asPos[1], sDesc, m_bSWLimit[1]);
             for (int n = 2; n < p_asPos.Count; n++)
             {
-                m_aPos[p_asPos[n]] = tree.Set(m_aPos[p_asPos[n]], 0.0, p_asPos[n], "Axis Position (unit)");
+                m_aPos[p_asPos[n]] = tree.Set(m_aPos[p_asPos[n]], 0.0, p_asPos[n], sDesc);
             }
         }
         #endregion
@@ -260,14 +261,15 @@ namespace RootTools.Control
                 m_id = id;
             }
 
-            public void RunTree(Tree tree)
+            public void RunTree(Tree tree, string sUnit)
             {
-                m_v = tree.Set(m_v, m_v, "Velociry", "Axis Moving Velocity (unit / sec)");
+                m_v = tree.Set(m_v, -1, "Velocity", "Axis Moving Velocity (" + sUnit + " / sec)");
+                if (m_v < 0) m_v = tree.Set(m_v, m_v, "Velociry", "Axis Moving Velocity (" + sUnit + " / sec)");
                 m_acc = tree.Set(m_acc, m_acc, "Accelation", "Accelation Time (sec)");
                 m_dec = tree.Set(m_dec, m_dec, "Decelation", "Decelation Time (sec)");
             }
         }
-        List<Speed> m_aSpeed = new List<Speed>();
+        protected List<Speed> m_aSpeed = new List<Speed>();
         public List<string> m_asSpeed = new List<string>(); 
         public ObservableCollection<string> p_asSpeed { get; set; }
 
@@ -322,9 +324,9 @@ namespace RootTools.Control
             RunTree(Tree.eMode.RegRead);
         }
 
-        public void RunTreeSpeed(Tree tree)
+        public void RunTreeSpeed(Tree tree, string sUnit)
         {
-            foreach (Speed speed in m_aSpeed) speed.RunTree(tree.GetTree(speed.m_id, false));
+            foreach (Speed speed in m_aSpeed) speed.RunTree(tree.GetTree(speed.m_id, false), sUnit);
         }
         #endregion
 
@@ -400,9 +402,16 @@ namespace RootTools.Control
             switch (p_eState)
             {
                 case eState.Ready:
+                    double dPos = 0; 
                     if (dInPos >= 0)
                     {
-                        double dPos = m_posDst - p_posActual;
+                        for (int n = 0; n < 10; n++)
+                        {
+                            dPos = m_posDst - p_posActual;
+                            if (Math.Abs(dPos) < dInPos) return "OK"; 
+                            p_sInfo = "WaitReady InPosition Error #" + n.ToString() + " : " + dPos.ToString();
+                            Thread.Sleep(100); 
+                        }
                         if (Math.Abs(dPos) > dInPos) return "WaitReady InPosition Error : " + dPos.ToString();
                     }
                     return "OK";
@@ -549,11 +558,11 @@ namespace RootTools.Control
                 m_bCmd = bCmd;
             }
 
-            public void RunTree(Tree tree)
+            public void RunTree(Tree tree, string sUnit)
             {
-                m_aPos[0] = tree.Set(m_aPos[0], m_aPos[0], "Start", "Start Position (pulse)");
-                m_aPos[1] = tree.Set(m_aPos[1], m_aPos[1], "End", "End Position (pulse)");
-                m_dPos = tree.Set(m_dPos, m_dPos, "Interval", "Trigger Interval (pulse)");
+                m_aPos[0] = tree.Set(m_aPos[0], m_aPos[0], "Start", "Start Position (" + sUnit + ")");
+                m_aPos[1] = tree.Set(m_aPos[1], m_aPos[1], "End", "End Position (" + sUnit + ")");
+                m_dPos = tree.Set(m_dPos, m_dPos, "Interval", "Trigger Interval (" + sUnit + ")");
                 m_bCmd = tree.Set(m_bCmd, m_bCmd, "Command Encoder", "use Command Encoder (false = Actual)");
             }
         }
@@ -604,6 +613,23 @@ namespace RootTools.Control
         }
 
         public virtual void RunTreeSetting(Tree.eMode mode) { }
+
+        public TreeRoot m_treeRootInterlock = null;
+        void InitInterlock()
+        {
+            m_treeRootInterlock = new TreeRoot(p_id + ".Interlock", p_log);
+            m_treeRootInterlock.UpdateTree += M_treeRootInterlock_UpdateTree;
+            RunTreeInterlock(Tree.eMode.RegRead);
+        }
+
+        private void M_treeRootInterlock_UpdateTree()
+        {
+            RunTreeInterlock(Tree.eMode.Update);
+            RunTreeInterlock(Tree.eMode.RegWrite);
+            RunTreeInterlock(Tree.eMode.Init);
+        }
+
+        public virtual void RunTreeInterlock(Tree.eMode mode) { }
         #endregion
 
         #region RelayCommand
@@ -728,6 +754,7 @@ namespace RootTools.Control
             p_log = log;
             InitTree(); 
             InitSetting();
+            InitInterlock();
             EQ.m_EQ.OnDoorOpen += M_EQ_OnDoorOpen;
         }
     }

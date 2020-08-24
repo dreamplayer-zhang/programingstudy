@@ -393,6 +393,12 @@ namespace Root_Vega
             }
         }
 
+        public void Test()
+        {
+            p_SideVision.BeforeGet();
+            return;
+        }
+
         private void ViewModel_CloseRequested(object sender, DialogCloseRequestedEventArgs e)
         {
             throw new NotImplementedException();
@@ -410,7 +416,7 @@ namespace Root_Vega
         {
             get
             {
-                return new RelayCommand(LADS);
+                return new RelayCommand(Test);
             }
         }
         public RelayCommand CommandScan

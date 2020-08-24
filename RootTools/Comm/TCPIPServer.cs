@@ -8,11 +8,12 @@ using System.Text;
 using System.Threading;
 using System.Windows.Controls;
 
-namespace RootTools
+namespace RootTools.Comm
 {
     public class TCPIPServer : ITool, IComm
     {
         public delegate void OnReciveData(byte[] aBuf, int nSize, Socket socket);
+        public event OnReciveData EventReciveData;
 
         #region ITool
         public UserControl p_ui
@@ -121,7 +122,6 @@ namespace RootTools
                 }
             }
 
-
             public string p_id { get; set; }
             public TCPSocket(TCPIPServer server, Socket socket, int nBufRecieve = -1)
             {
@@ -156,17 +156,24 @@ namespace RootTools
             {
                 if (m_tcpSocket != null) m_tcpSocket.ThreadStop(); 
                 m_socket = (Socket)ar.AsyncState;
+                Thread.Sleep(5); 
                 if (m_socket == null) return; 
                 Socket socket = m_socket.EndAccept(ar);
                 m_socket.BeginAccept(new AsyncCallback(CallBack_Accept), m_socket);
                 TCPSocket tcpSocket = new TCPSocket(this, socket);
                 m_tcpSocket = tcpSocket;
+                m_tcpSocket.EventReciveData += M_tcpSocket_EventReciveData;
                 m_commLog.Add(CommLog.eType.Info, tcpSocket.p_id + " is Connect !!");
             }
             catch (SocketException eX)
             {
                 m_commLog.Add(CommLog.eType.Info, "CallBack_Accept : " + eX.Message);
             }
+        }
+
+        private void M_tcpSocket_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            if (EventReciveData != null) EventReciveData(aBuf, nSize, socket); 
         }
         #endregion
 
@@ -230,8 +237,8 @@ namespace RootTools
             }
             catch (Exception ex)
             {
-                m_log.Error(p_id + " Server Bind & Listen Fail !!");
-                m_log.Error(p_id + " Exception : " + ex.Message);
+                if (m_log != null) m_log.Error(p_id + " Server Bind & Listen Fail !!");
+                if (m_log != null) m_log.Error(p_id + " Exception : " + ex.Message);
                 return;
             }
         }

@@ -187,10 +187,6 @@
       <DependentUpon>2_3_Origin.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\2_3_OriginViewModel.cs" />
-    <Compile Include="UI\2_4_Position.xaml.cs">
-      <DependentUpon>2_4_Position.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\2_4_PositionViewModel.cs" />
     <Compile Include="UI\2_5_MainVision.xaml.cs">
       <DependentUpon>2_5_MainVision.xaml</DependentUpon>
     </Compile>
@@ -295,9 +291,6 @@
       <DependentUpon>InfoPod_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoReticle.cs" />
-    <Compile Include="UI\2_8_Inspection_Manager.xaml.cs">
-      <DependentUpon>2_8_Inspection_Manager.xaml</DependentUpon>
-    </Compile>
     <Compile Include="IRobotChild.cs" />
     <Compile Include="UI\1_MainViewModel.cs" />
     <Compile Include="Module\Loadport.cs" />
@@ -335,7 +328,6 @@
       <DependentUpon>Vega_Recipe_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\6_LogViewModel.cs" />
-    <Compile Include="UI\2_8_InspectionViewModel.cs" />
     <Page Include="Controls\FDC_Control.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -383,10 +375,6 @@
     <Page Include="UI\2_3_Origin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\2_4_Position.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\2_5_MainVision.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -481,10 +469,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="InfoPod_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\2_8_Inspection_Manager.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -47,7 +47,8 @@ namespace RootTools.Control.Ajin
                 tabItem.Height = 0;
                 tabControlAxis.Items.Add(tabItem);
                 axis.RunTree(Tree.eMode.Init);
-                axis.RunTreeSetting(Tree.eMode.Init); 
+                axis.RunTreeSetting(Tree.eMode.Init);
+                axis.RunTreeInterlock(Tree.eMode.Init);
             }
             comboAxis.ItemsSource = m_asAxis; 
         }

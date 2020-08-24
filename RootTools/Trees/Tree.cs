@@ -24,17 +24,27 @@ namespace RootTools.Trees
 
         public Tree p_treeParent { get; set; }
 
-        int _nIndex = 0; 
-        public int p_nIndex 
-        { 
-            get { return _nIndex; }
-            set { _nIndex = value; } 
-        }
-
         public string p_id { get; set; }
 
-        public string p_sDescription { get; set; }
+        public string p_sUnit { get; set; }
 
+        string _sDescription = ""; 
+        public string p_sDescription 
+        { 
+            get { return _sDescription; } 
+            set
+            {
+                if (_sDescription == value) return; 
+                _sDescription = value;
+                string[] asDescrition = _sDescription.Split('(');
+                if (asDescrition.Length < 2) return;
+                string sUnit = asDescrition[asDescrition.Length - 1];
+                if (sUnit[sUnit.Length - 1] != ')') return;
+                p_sUnit = sUnit.Substring(0, sUnit.Length - 1);
+            }
+        }
+
+        public string m_sGroup = ""; 
         public string p_sName { get; set; }
 
         public bool p_bEnable { get; set; }
@@ -45,7 +55,8 @@ namespace RootTools.Trees
             get { return _bExpand; }
             set
             {
-                _bExpand = value; 
+                _bExpand = value;
+                OnPropertyChanged(); 
             } 
         }
 
@@ -101,7 +112,7 @@ namespace RootTools.Trees
         {
             foreach (Tree tree in p_aChild)
             {
-                if ((tree.p_id == treeChild.p_id) && (tree.p_nIndex == treeChild.p_nIndex)) return true; 
+                if (tree.p_id == treeChild.p_id) return true; 
             }
             return false; 
         }
@@ -128,17 +139,22 @@ namespace RootTools.Trees
         #endregion
 
         #region Find Tree List<>
-        Tree FindTreeItem(string sName, int nIndex = 0)
+        Tree FindTreeItem(string sName)
         {
             foreach (Tree item in m_aChildRunInit)
             {
-                if ((item.p_sName == sName) && (item.p_nIndex == nIndex))
+                if (item.p_sName == sName)
                 {
                     item.m_bUse = true;
                     return item;
                 }
             }
             return null;
+        }
+
+        Tree FindTreeItem(string sName, int nIndex)
+        {
+            return FindTreeItem(nIndex.ToString("000") + "." + sName); 
         }
 
         void AddTreeItem(Tree treeItem)

@@ -5,7 +5,7 @@ using System;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
-namespace RootTools
+namespace RootTools.Comm
 {
     /// <summary>
     /// TCPIPServer_UI.xaml에 대한 상호 작용 논리

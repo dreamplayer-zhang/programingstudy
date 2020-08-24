@@ -156,6 +156,12 @@ namespace RootTools.Control.Ajin
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             m_dio.Init(id + ".DIO", nInput, nOutput);
             m_listAxis.Init(id + ".Axis", engineer, bAXL); 
+            
+            for (int i = 0; i<m_listAxis.m_aAxis.Count; i++)
+            {
+                m_listAxis.m_aAxis[i].RunTreeInterlock(Tree.eMode.RegRead);
+            }
+
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
         }

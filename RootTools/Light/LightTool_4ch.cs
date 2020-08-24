@@ -60,13 +60,22 @@ namespace RootTools.Light
                 m_rs232.Send(str);
             }
 
+            //private void M_rs232_OnRecieve(string sRead)
+            //{
+            //    if (sRead.Length < 11) return;
+            //    if (sRead.Substring(0, 6) != m_sGet) return;
+            //    string sPower = sRead.Substring(7, 3);
+            //    if (sPower == m_sSetPower) p_fGetPower = p_fSetPower;
+            //    else p_fGetPower = Convert.ToDouble(sPower) / p_fScalePower;
+            //}
+
             private void M_rs232_OnRecieve(string sRead)
             {
-                if (sRead.Length < 11) return;
-                if (sRead.Substring(0, 6) != m_sGet) return;
-                string sPower = sRead.Substring(7, 3);
+                if (sRead.Length < 9) return;
+                string sPower = sRead.Substring(6, 3);
                 if (sPower == m_sSetPower) p_fGetPower = p_fSetPower;
                 else p_fGetPower = Convert.ToDouble(sPower) / p_fScalePower;
+                p_rs232.m_commLog.Add(CommLog.eType.Receive, "4CH Receive = " + sRead.Trim());
             }
 
             int m_nCh = 0;

@@ -91,11 +91,13 @@ namespace RootTools
 
         public static bool operator ==(RPoint cp0, RPoint cp1)
         {
+            cp0 = cp0 ?? new RPoint(); 
             return cp0.Equals(cp1);
         }
 
         public static bool operator !=(RPoint cp0, RPoint cp1)
         {
+            cp0 = cp0 ?? new RPoint();
             return !cp0.Equals(cp1);
         }
 

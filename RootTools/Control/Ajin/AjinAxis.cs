@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Controls;
 using RootTools.Trees;
 
@@ -7,12 +8,35 @@ namespace RootTools.Control.Ajin
     public class AjinAxis : Axis
     {
         #region Property
-        int m_nAxis = -1;
+        double _pulsepUnit = 1; 
+        double p_pulsepUnit
+        {
+            get { return _pulsepUnit; }
+            set
+            {
+                if (_pulsepUnit == value) return;
+                double fRatio = _pulsepUnit / value;
+                foreach (string sKey in p_asPos) m_aPos[sKey] *= fRatio;
+                foreach (Speed speed in m_aSpeed) speed.m_v *= fRatio;
+                m_trigger.m_aPos[0] *= fRatio;
+                m_trigger.m_aPos[1] *= fRatio;
+                m_trigger.m_dPos *= fRatio;
+                _pulsepUnit = value;
+                RunTree(Tree.eMode.Init);
+                RunTree(Tree.eMode.RegWrite);
+            }
+        }
+
+        public int m_nAxis = -1;
+        string m_sUnit = "mm";
         bool m_bAbsoluteEncoder = false;
         void RunTreeSettingProperty(Tree tree)
         {
             int nAxis = m_nAxis;
             m_nAxis = tree.Set(m_nAxis, m_nAxis, "Axis Number", "Ajin Axis Number");
+            m_sUnit = tree.Set(m_sUnit, m_sUnit, "Unit", "Ajin Axis Unit");
+            double pulseUnit = tree.Set(p_pulsepUnit, p_pulsepUnit, "Pulse/Unit", "Pulse / Unit");
+            if (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead) p_pulsepUnit = pulseUnit; 
             m_bAbsoluteEncoder = tree.Set(m_bAbsoluteEncoder, m_bAbsoluteEncoder, "Absolute Encoder", "Absolute Encoder");
             if (nAxis != m_nAxis) m_listAxis.m_qSetAxis.Enqueue(this);
         }
@@ -21,38 +45,41 @@ namespace RootTools.Control.Ajin
         #region Position & Velocity
         public override void SetCommandPosition(double fPos)
         {
-            AXM("AxmStatusSetActPos", CAXM.AxmStatusSetActPos(m_nAxis, fPos));
+            AXM("AxmStatusSetActPos", CAXM.AxmStatusSetActPos(m_nAxis, fPos * p_pulsepUnit));
         }
 
         public override void SetActualPosition(double fPos)
         {
-            AXM("AxmStatusSetCmdPos", CAXM.AxmStatusSetCmdPos(m_nAxis, fPos));
+            AXM("AxmStatusSetCmdPos", CAXM.AxmStatusSetCmdPos(m_nAxis, fPos * p_pulsepUnit));
         }
 
         public override void OverrideVelocity(double v)
         {
-            AXM("AxmOverrideVel", CAXM.AxmOverrideVel(m_nAxis, v));
+            AXM("AxmOverrideVel", CAXM.AxmOverrideVel(m_nAxis, v * p_pulsepUnit));
         }
 
         void RunThreadCheck_Position()
         {
             double dRead = 0;
             AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetCmdPos(m_nAxis, ref dRead));
-            p_posCommand = dRead;
+            p_posCommand = dRead / p_pulsepUnit;
             AXM("AxmStatusGetCmdPos", CAXM.AxmStatusGetActPos(m_nAxis, ref dRead));
-            p_posActual = dRead;
+            p_posActual = dRead / p_pulsepUnit;
             AXM("AxmStatusReadVel", CAXM.AxmStatusReadVel(m_nAxis, ref dRead));
-            p_vNow = dRead;
+            p_vNow = dRead / p_pulsepUnit;
         }
         #endregion
 
         #region Jog
         public override string Jog(double fScale, string sSpeed = null)
         {
+            bool bRet = CheckInterlock();
+            if (bRet == false) return p_id + " - Check Interlock Please";
+
             p_sInfo = base.Jog(fScale, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
             if (m_nAxis < 0) return p_id + " Axis not Assigned";
-            if (AXM("AxmMoveVel", CAXM.AxmMoveVel(m_nAxis, fScale * m_speedNow.m_v, m_speedNow.m_acc, m_speedNow.m_dec)) != 0)
+            if (AXM("AxmMoveVel", CAXM.AxmMoveVel(m_nAxis, fScale * m_speedNow.m_v * p_pulsepUnit, m_speedNow.m_acc, m_speedNow.m_dec)) != 0)
             {
                 p_eState = eState.Init;
                 p_sInfo = p_id + " Axis Jog Start Error";
@@ -73,10 +100,13 @@ namespace RootTools.Control.Ajin
         #region Move
         public override string StartMove(double fPos, string sSpeed = null)
         {
+            bool bRet = CheckInterlock();
+            if (bRet == false) return p_id + " - Check Interlock Please";
+
             p_sInfo = base.StartMove(fPos, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
             if (m_nAxis < 0) return p_id + " Axis not Assigned";
-            if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos, m_speedNow.m_v, m_speedNow.m_acc, m_speedNow.m_dec)) != 0)
+            if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos * p_pulsepUnit, m_speedNow.m_v * p_pulsepUnit, m_speedNow.m_acc, m_speedNow.m_dec)) != 0)
             {
                 p_eState = eState.Init;
                 p_sInfo = p_id + " Axis MoveStartPos Error";
@@ -89,12 +119,15 @@ namespace RootTools.Control.Ajin
 
         public override string StartMove(double fPos, double v, double acc = -1, double dec = -1)
         {
+            bool bRet = CheckInterlock();
+            if (bRet == false) return p_id + " - Check Interlock Please";
+
             acc = (acc < 0) ? GetSpeedValue(eSpeed.Move).m_acc : acc;
             dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
             p_sInfo = base.StartMove(fPos, v, acc, dec);
             if (p_sInfo != "OK") return p_sInfo;
             if (m_nAxis < 0) return p_id + " Axis not Assigned";
-            if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos, v, acc, dec)) != 0)
+            if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos * p_pulsepUnit, v * p_pulsepUnit, acc, dec)) != 0)
             {
                 p_eState = eState.Init;
                 p_sInfo = p_id + " Axis MoveStartPos Error";
@@ -109,6 +142,9 @@ namespace RootTools.Control.Ajin
         #region Home
         public override string StartHome()
         {
+            bool bRet = CheckInterlock();
+            if (bRet == false) return p_id + " - Check Interlock Please";
+
             if (m_bAbsoluteEncoder)
             {
                 p_eState = eState.Ready;
@@ -117,9 +153,9 @@ namespace RootTools.Control.Ajin
             p_sInfo = base.StartHome();
             if (p_sInfo != "OK") return p_sInfo;
             if (AXM("AxmHomeSetMethod", CAXM.AxmHomeSetMethod(m_nAxis, (int)m_eHomeDir, (uint)m_eHomeSignal, (uint)m_eHomeZPhase, 1000, 0)) != 0) return p_sInfo;
-            Speed v0 = GetSpeedValue(eSpeed.Home_First); 
-            Speed v1 = GetSpeedValue(eSpeed.Home_Last);
-            if (AXM("AxmHomeSetVel", CAXM.AxmHomeSetVel(m_nAxis, v0.m_v, v0.m_v, v1.m_v, v1.m_v, v0.m_acc, v1.m_acc)) != 0) return p_sInfo;
+            Speed[] speed = new Speed[2] { GetSpeedValue(eSpeed.Home_First), GetSpeedValue(eSpeed.Home_Last) };
+            double[] v = new double[2] { speed[0].m_v * p_pulsepUnit, speed[1].m_v * p_pulsepUnit };
+            if (AXM("AxmHomeSetVel", CAXM.AxmHomeSetVel(m_nAxis, v[0], v[0], v[1], v[1], speed[0].m_acc, speed[1].m_acc)) != 0) return p_sInfo;
             if (AXM("AxmHomeSetStart", CAXM.AxmHomeSetStart(m_nAxis)) != 0) return p_sInfo;
             p_eState = eState.Home;
             Thread.Sleep(10);
@@ -336,13 +372,13 @@ namespace RootTools.Control.Ajin
             uint nLevel = (uint)(m_bLevel ? 1 : 0);
             uint nEncoder = (uint)(m_trigger.m_bCmd ? 1 : 0);
             AXM("AxmTriggerSetTimeLevel", CAXM.AxmTriggerSetTimeLevel(m_nAxis, m_dTrigTime, nLevel, nEncoder, 0));
-            AXM("AxmTriggerSetBlock", CAXM.AxmTriggerSetBlock(m_nAxis, m_trigger.m_aPos[0], m_trigger.m_aPos[1], m_trigger.m_dPos));
+            AXM("AxmTriggerSetBlock", CAXM.AxmTriggerSetBlock(m_nAxis, m_trigger.m_aPos[0] * p_pulsepUnit, m_trigger.m_aPos[1] * p_pulsepUnit, m_trigger.m_dPos * p_pulsepUnit));
         }
 
         public void RunTreeSettingTrigger(Tree tree)
         {
-            m_bLevel = tree.Set(m_bLevel, m_bLevel, "Level", "Trigger Level (true = Active High)");
-            m_dTrigTime = tree.Set(m_dTrigTime, m_dTrigTime, "Time", "Trigger Out Time (ms)");
+            m_bLevel = tree.Set(m_bLevel, m_bLevel, "Level", "Trigger Level, true = Active High");
+            m_dTrigTime = tree.Set(m_dTrigTime, m_dTrigTime, "Time", "Trigger Out Time (us)");
         }
         #endregion
 
@@ -395,7 +431,7 @@ namespace RootTools.Control.Ajin
         public string SetPosTypeBound(double fPositivePos, double fNegativePos)
         {
             if (m_nAxis < 0) return "Axis not Assigned";
-            if (AXM("AxmStatusSetPosType", CAXM.AxmStatusSetPosType(m_nAxis, 1, fPositivePos, fNegativePos)) != 0) return p_sInfo;
+            if (AXM("AxmStatusSetPosType", CAXM.AxmStatusSetPosType(m_nAxis, 1, fPositivePos * p_pulsepUnit, fNegativePos * p_pulsepUnit)) != 0) return p_sInfo;
             return "OK";
         }
 
@@ -532,13 +568,77 @@ namespace RootTools.Control.Ajin
         }
         #endregion
 
+        #region Interlock
+        public class CSensor
+        {
+            public bool m_bHome = false;
+            public bool m_bPlus = false;
+            public bool m_bMinus = false;
+            public string m_strAxisName = "";
+            public CSensor(string strAxisName)
+            {
+                m_strAxisName = strAxisName;
+            }
+        }
+
+        public List<CSensor> m_aSensors = new List<CSensor>();
+
+        public bool CheckInterlock()
+        {
+            // variable
+
+            // implement
+            for (int i = 0; i < m_aSensors.Count; i++)
+            {
+                if (m_aSensors[i].m_bHome == true)
+                {
+                    if (!m_listAxis.m_aAxis[i].p_sensorHome) return false;
+                }
+                if (m_aSensors[i].m_bPlus == true)
+                {
+                    if (!m_listAxis.m_aAxis[i].p_sensorPlusLimit) return false;
+                }
+                if (m_aSensors[i].m_bMinus == true)
+                {
+                    if (!m_listAxis.m_aAxis[i].p_sensorMinusLimit) return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override void RunTreeInterlock(Tree.eMode mode)
+        {
+            m_treeRootInterlock.p_eMode = mode;
+            RunTreeInterlockAxis(m_treeRootInterlock.GetTree("Axis"));
+        }
+
+        void RunTreeInterlockAxis(Tree tree)
+        {
+            for (int i = 0; i < m_listAxis.m_aAxis.Count; i++)
+            {
+                CSensor sensor = new CSensor(m_listAxis.m_aAxis[i].p_id);
+                int iIndex = m_aSensors.FindIndex(x => x.m_strAxisName == m_listAxis.m_aAxis[i].p_id);
+                if (iIndex < 0) m_aSensors.Add(sensor);
+                RunTreeSensor(m_treeRootInterlock.GetTree(m_aSensors[i].m_strAxisName), i);
+            }
+        }
+
+        void RunTreeSensor(Tree tree, int iIndex)
+        {
+            m_aSensors[iIndex].m_bHome = tree.Set(m_aSensors[iIndex].m_bHome, m_aSensors[iIndex].m_bHome, "Home", "Home Sensor");
+            m_aSensors[iIndex].m_bPlus = tree.Set(m_aSensors[iIndex].m_bPlus, m_aSensors[iIndex].m_bPlus, "Plus", "Plus Sensor");
+            m_aSensors[iIndex].m_bMinus = tree.Set(m_aSensors[iIndex].m_bMinus, m_aSensors[iIndex].m_bMinus, "Minus", "Minus Sensor");
+        }
+        #endregion
+
         #region Tree
         public override void RunTree(Tree.eMode mode)
         {
             m_treeRoot.p_eMode = mode;
-            RunTreeSpeed(m_treeRoot.GetTree("Speed"));
-            RunTreePos(m_treeRoot.GetTree("Position"));
-            m_trigger.RunTree(m_treeRoot.GetTree("Trigger"));
+            RunTreeSpeed(m_treeRoot.GetTree("Speed"), m_sUnit);
+            RunTreePos(m_treeRoot.GetTree("Position"), m_sUnit);
+            m_trigger.RunTree(m_treeRoot.GetTree("Trigger"), m_sUnit);
         }
 
         public override void RunTreeSetting(Tree.eMode mode)
@@ -553,7 +653,7 @@ namespace RootTools.Control.Ajin
         }
         #endregion
 
-        AjinListAxis m_listAxis; 
+        public AjinListAxis m_listAxis; 
         public void Init(AjinListAxis listAxis, string id, Log log)
         {
             m_listAxis = listAxis; 
@@ -563,6 +663,7 @@ namespace RootTools.Control.Ajin
 
         public void ThreadStop()
         {
+            RunTree(Tree.eMode.RegWrite); //forget Vericiry
             ServoOn(false); 
             if (m_bThread)
             {

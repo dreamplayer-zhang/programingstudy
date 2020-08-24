@@ -244,6 +244,12 @@ namespace RootTools.Module
             m_listDO.m_aDIO.Clear();
             m_listAxis.Clear();
             GetTools(mode == Tree.eMode.RegRead);
+
+            for (int i = 0; i<m_listAxis.Count; i++)
+            {
+                m_listAxis[i].RunTreeInterlock(Tree.eMode.RegRead);
+            }
+
             if (OnChangeTool != null) OnChangeTool();
         }
 
@@ -380,6 +386,7 @@ namespace RootTools.Module
             m_log.Info("ModuleRun : " + moduleRun.p_id + " Start");
             try { p_sInfo = moduleRun.Run(); }
             catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
+
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
             m_log.Info("ModuleRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec")); 
             if (p_sInfo != "OK")

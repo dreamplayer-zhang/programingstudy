@@ -798,6 +798,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                    Command="{Binding GrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -812,6 +813,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                    Command="{Binding ContinousGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -826,6 +828,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="{Binding p_CamInfo._IsCanGrab, Converter={StaticResource InverseBooleanConverters}}"
+                                    Command="{Binding StopGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -930,6 +933,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                    Command="{Binding GrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -944,6 +948,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                    Command="{Binding ContinousGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -958,6 +963,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="{Binding p_CamInfo._IsCanGrab, Converter={StaticResource InverseBooleanConverters}}"
+                                    Command="{Binding StopGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -988,7 +994,7 @@
                                             Maximum="100"
                                             Minimum="0"
                                             DataContext="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext}"
-                                            Value="{Binding p_LightAlign1}"
+                                            Value="{Binding p_LightAlign2}"
                                             x:Name="slider10"></Slider>
                                     <TextBlock Grid.Column="1"
                                                Style="{StaticResource BasicTb}"

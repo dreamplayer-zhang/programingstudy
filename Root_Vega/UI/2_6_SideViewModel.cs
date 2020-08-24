@@ -20,12 +20,12 @@ using System.Data;
 
 namespace Root_Vega
 {
-	class _2_6_SideViewModel : ObservableObject
+	public class _2_6_SideViewModel : ObservableObject
 	{
 		/// <summary>
 		/// 외부 Thread에서 UI를 Update하기 위한 Dispatcher
 		/// </summary>
-		protected Dispatcher _dispatcher;
+		public Dispatcher _dispatcher;
 		System.Threading.Timer resultTimer;
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
@@ -401,7 +401,7 @@ namespace Root_Vega
 			}
 		}
 
-		private void _startInsp()
+		public void _startInsp()
 		{
 			//TODO EdgeboxViewModel과 SideViewModel에 중복된 메소드가 존재하므로 통합이 가능한경우 정리하도록 합시다
 			if (!m_Engineer.m_recipe.Loaded)

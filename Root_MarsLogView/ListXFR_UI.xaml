@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="Root_MarsLogView.ListXFR_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_MarsLogView"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <DataGrid x:Name="dataGrid" IsReadOnly="True" AutoGenerateColumns="False">
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="Module ID" Binding="{Binding p_sModule}"/>
+            <DataGridTextColumn Header="Event" Binding="{Binding p_sEvent}"/>
+            <DataGridTextColumn Header="Start Time" Binding="{Binding p_sStart}"/>
+            <DataGridTextColumn Header="End Time" Binding="{Binding p_sEnd}"/>
+            <DataGridTextColumn Header="Status" Binding="{Binding p_sStatus}"/>
+            <DataGridTextColumn Header="Material ID" Binding="{Binding p_sMaterial}"/>
+            <DataGridTextColumn Header="Material Type" Binding="{Binding p_sMaterialType}"/>
+            <DataGridTextColumn Header="Lot ID" Binding="{Binding p_sLot}"/>
+            <DataGridTextColumn Header="From Device" Binding="{Binding p_sFrom}"/>
+            <DataGridTextColumn Header="From Slot" Binding="{Binding p_sFromSlot}"/>
+            <DataGridTextColumn Header="To Device" Binding="{Binding p_sTo}"/>
+            <DataGridTextColumn Header="To Slot" Binding="{Binding p_sToSlot}"/>
+            <DataGridTextColumn Header="Data" Binding="{Binding p_sData}"/>
+        </DataGrid.Columns>
+    </DataGrid>
+</UserControl>

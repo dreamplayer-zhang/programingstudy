@@ -21,7 +21,6 @@ namespace Root_Vega.ManualJob
         Brush UIBackBrushT;
         Color UIBackColorF = Color.FromArgb(255, 45, 45, 48);
         Brush UIBackBrushF;
-        bool bChangUI = false;
         public ManualJobSchedule_UI()
         {
             m_bShow = true;
@@ -30,16 +29,18 @@ namespace Root_Vega.ManualJob
             UIBackBrushT = new SolidColorBrush(UIBackColorT);
             UIBackBrushF = new SolidColorBrush(UIBackColorF);
 
-            m_UIBackTimer.Interval = TimeSpan.FromMilliseconds(1500);
+            m_UIBackTimer.Interval = TimeSpan.FromMilliseconds(150);
             m_UIBackTimer.Tick += m_UIBackTimer_Tick;
             m_UIBackTimer.Start();
         }
 
+        int m_iTimer = 0; 
         private void m_UIBackTimer_Tick(object sender, EventArgs e)
         {
-            if (bChangUI) gridMain.Background = UIBackBrushT;
+            buttonRun.Visibility = (comboRecipeID.SelectedValue == null) ? Visibility.Hidden : Visibility.Visible; 
+            if (m_iTimer >= 5) gridMain.Background = UIBackBrushT;
             else gridMain.Background = UIBackBrushF;
-            bChangUI = !bChangUI;
+            m_iTimer = (m_iTimer + 1) % 10; 
         }
 
         ManualJobSchedule m_JobSchedule;
@@ -75,8 +76,27 @@ namespace Root_Vega.ManualJob
         {
             string sRecipe = (string)comboRecipeID.SelectedValue;
             if (sRecipe == null) return;
+            if (m_JobSchedule.m_loadport.m_infoPod.p_infoReticle == null) return; 
             m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.m_sManualRecipe = sRecipe;
             m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.RecipeOpen(sRecipe);
+
+            // Vision Recipe Open 코드 추가
+            string strFileName = Path.GetFileNameWithoutExtension(sRecipe);
+            string strVisionRecipeDirectoryPath = Path.GetDirectoryName(sRecipe) + "\\" + strFileName;
+            string strVisionRecipeFullPath = strVisionRecipeDirectoryPath + "\\" + "Parameter.VegaVision";
+
+            if (Directory.Exists(strVisionRecipeDirectoryPath) == false)
+                Directory.CreateDirectory(strVisionRecipeDirectoryPath);
+            if (File.Exists(strVisionRecipeFullPath) == false)
+            {
+                string strMessage = string.Format("\"Parameter.VegaVision\" Recipe is not Exist in the \"{0}\"", strVisionRecipeDirectoryPath);
+                MessageBox.Show(strMessage);
+                comboRecipeID.SelectedValue = null;
+            }
+            else
+            {
+                App.m_engineer.m_recipe.Load(strVisionRecipeFullPath);
+            }
         }
         #endregion
 

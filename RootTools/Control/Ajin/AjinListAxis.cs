@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using RootTools.Trees;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 
 namespace RootTools.Control.Ajin
@@ -12,7 +13,7 @@ namespace RootTools.Control.Ajin
         public event dgOnChangeAxisList OnChangeAxisList; 
 
         public List<AjinAxis> m_aAxis = new List<AjinAxis>();
-
+        
         public Axis GetAxis(string id, Log log)
         {
             AjinAxis axis = new AjinAxis();
