@@ -200,9 +200,8 @@ namespace RootTools.Comm
                 nIndex += m_sStart.Length; 
                 sRead = sRead.Substring(nIndex, sRead.Length - nIndex); 
             }
-            m_sRead = DataRead(sRead, sender);
-            if (m_sRead != "") 
-                DataRecieve(m_sRead, sender); 
+            string sRecieve = DataRead(sRead, sender);
+            if ((sRecieve != "") && (m_sRead != sRecieve)) DataRecieve(sRecieve, sender); 
         }
 
         string DataRead(string sRead, object sender)
