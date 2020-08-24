@@ -144,6 +144,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     Command="{Binding DisConnectCommand}"
+                                    IsEnabled="{Binding p_CamInfo.p_eState,Converter={StaticResource CameraConnectStateConverters}}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -304,6 +305,7 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     Command="{Binding DisConnectCommand}"
+                                    IsEnabled="{Binding p_CamInfo.p_eState,Converter={StaticResource CameraConnectStateConverters}}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
