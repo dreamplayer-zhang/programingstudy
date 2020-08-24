@@ -673,9 +673,26 @@ namespace RootTools.Control.Ajin
             }
         }
 
+        List<string> m_aAXM = new List<string>(); 
         uint AXM(string sFunc, uint uResult)
         {
-            if (uResult == 0) return uResult;
+            if (uResult == 0)
+            {
+                for (int n = 0; n < m_aAXM.Count; n++)
+                {
+                    if (sFunc == m_aAXM[n])
+                    {
+                        m_aAXM.RemoveAt(n);
+                        return uResult; 
+                    }
+                }
+                return uResult;
+            }
+            foreach (string sAXM in m_aAXM)
+            {
+                if (sAXM == sFunc) return uResult; 
+            }
+            m_aAXM.Add(sFunc); 
             p_sInfo = sFunc + ", Error # = " + uResult.ToString();
             return uResult;
         }
