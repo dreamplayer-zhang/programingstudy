@@ -18,7 +18,7 @@ namespace Root_MarsLogView
         }
 
         string[] m_asLog;
-        public void Add(string sLog, string[] asLog)
+        public void Add(int iTCP, string sLog, string[] asLog)
         {
             m_asLog = asLog;
             if (asLog.Length < 8) m_mars.AddError("FNC Length", sLog);
@@ -29,11 +29,12 @@ namespace Root_MarsLogView
                 if (fnc != null)
                 {
                     m_mars.AddError("FNC Not Ended", sLog);
+                    fnc.End(asLog); 
                     m_mars.WriteEvent(fnc.GetEndLog(asLog));
                     p_aFNC.Remove(fnc);
                 }
                 m_mars.WriteEvent(sLog);
-                fnc = new Mars_FNC(asLog);
+                fnc = new Mars_FNC(iTCP, sLog, asLog);
                 p_aFNC.Add(fnc);
                 p_aFNCView.Add(fnc);
                 if (p_aFNCView.Count > m_maxView) p_aFNCView.RemoveAt(0);
@@ -53,7 +54,30 @@ namespace Root_MarsLogView
         string GetString(int nIndex)
         {
             if (m_asLog.Length <= nIndex) return "";
-            return m_asLog[nIndex];
+            string sLog = m_asLog[nIndex];
+            if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
+            if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1);
+            return sLog;
+        }
+
+        public void Reset(int iTCP, string sDate, string sTime)
+        {
+            foreach (Mars_FNC fnc in p_aFNC)
+            {
+                if (fnc.m_iTCP == iTCP)
+                {
+                    m_mars.AddError("FNC Reset", fnc.m_sLog);
+                    string[] asLog = fnc.m_asLog;
+                    asLog[0] = sDate;
+                    asLog[1] = sTime;
+                    fnc.End(asLog);
+                    m_mars.WriteEvent(fnc.GetEndLog(asLog));
+                }
+            }
+            for (int n = p_aFNC.Count - 1; n >= 0; n--)
+            {
+                if (p_aFNC[n].m_iTCP == iTCP) p_aFNC.RemoveAt(n);
+            }
         }
 
         int m_maxView = 250;
@@ -68,6 +92,19 @@ namespace Root_MarsLogView
             m_mars = mars;
             p_aFNC = new ObservableCollection<Mars_FNC>();
             p_aFNCView = new ObservableCollection<Mars_FNC>();
+        }
+
+        public void ThreadStop(string sDate, string sTime)
+        {
+            foreach (Mars_FNC fnc in p_aFNC)
+            {
+                m_mars.AddError("FNC ThreadStop", fnc.m_sLog);
+                string[] asLog = fnc.m_asLog;
+                asLog[0] = sDate;
+                asLog[1] = sTime;
+                fnc.End(asLog);
+                m_mars.WriteEvent(fnc.GetEndLog(asLog));
+            }
         }
     }
 }

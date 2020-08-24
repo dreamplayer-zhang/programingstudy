@@ -73,7 +73,7 @@ namespace Root_MarsLogView
         #endregion
 
         #region Functions
-        string[] m_asLog;
+        public string[] m_asLog;
         public bool IsSame(string[] asLog)
         {
             m_asLog = asLog; 
@@ -87,7 +87,10 @@ namespace Root_MarsLogView
         string GetString(int nIndex)
         {
             if (m_asLog.Length <= nIndex) return "";
-            return m_asLog[nIndex];
+            string sLog = m_asLog[nIndex];
+            if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
+            if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1);
+            return sLog;
         }
 
         public void End(string[] asLog)
@@ -95,22 +98,26 @@ namespace Root_MarsLogView
             m_asLog = asLog;
             m_sDate[1] = GetString(0);
             m_sTime[1] = GetString(1);
-            p_eStatus = eStatus.End; 
+            p_eStatus = eStatus.End;
+            OnPropertyChanged("p_sEnd");
         }
 
         public string GetEndLog(string[] asLog)
         {
             m_asLog[0] = asLog[0];
             m_asLog[1] = asLog[1];
-            m_asLog[5] = "End";
+            m_asLog[5] = "'End'";
             string sLog = "";
             for (int n = 0; n < m_asLog.Length - 1; n++) sLog += m_asLog[n] + '\t';
             return sLog + m_asLog[m_asLog.Length - 1]; 
         }
         #endregion
-
-        public Mars_PRC(string[] asLog)
+        public int m_iTCP; 
+        public string m_sLog; 
+        public Mars_PRC(int iTCP, string sLog, string[] asLog)
         {
+            m_iTCP = iTCP; 
+            m_sLog = sLog; 
             m_asLog = asLog;
             m_sDate[0] = GetString(0);
             m_sTime[0] = GetString(1); 

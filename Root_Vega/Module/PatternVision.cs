@@ -25,6 +25,10 @@ namespace Root_Vega.Module
 {
     public class PatternVision : ModuleBase, IRobotChild
     {
+        #region ViewModel
+        public _2_5_MainVisionViewModel m_mvvm;
+        #endregion
+
         #region ToolBox
         public DIO_I m_diPatternReticleExistSensor;
 
@@ -679,6 +683,7 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
             AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
             AddModuleRunList(new Run_Grab(this), true, "Run Grab");
+            AddModuleRunList(new Run_Inspection(this), true, "Run Inspection");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -913,6 +918,50 @@ namespace Root_Vega.Module
                     //    m_grabMode.m_RADSControl.StopRADS();
                     //}
                 }
+            }
+        }
+
+        public class Run_Inspection : ModuleRunBase
+        {
+            PatternVision m_module;
+            public _2_5_MainVisionViewModel m_mvvm;
+
+            public Run_Inspection(PatternVision module)
+            {
+                m_module = module;
+                m_mvvm = m_module.m_mvvm;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Inspection run = new Run_Inspection(m_module);
+                return run;
+            }
+
+            public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+            {
+                treeRoot.p_eMode = mode;
+                RunTree(treeRoot, true);
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                // 검사시작 전 확인사항 조건 추가해야함
+
+                // 검사시작
+                m_mvvm._dispatcher.Invoke(new Action(delegate ()
+                {
+                    m_mvvm._startInsp();
+                }));
+
+                // DB에 Write완료될때까지 기다리는 루틴 추가해야함
+
+                return "OK";
             }
         }
         #endregion

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Windows.Threading;
 
 namespace Root_MarsLogView
@@ -14,17 +15,37 @@ namespace Root_MarsLogView
     {
         #region TCPIP
         public TCPIPServer[] m_tcpServer = new TCPIPServer[2]; 
-        void InitTCP(int n)
+        void InitTCP()
         {
-            m_tcpServer[n] = new TCPIPServer("TCP" + n.ToString(), null);
-            m_tcpServer[n].EventReciveData += MarsLogViewer_EventReciveData;
+            m_tcpServer[0] = new TCPIPServer("TCPIP EFEM", null);
+            m_tcpServer[0].EventReciveData += MarsLogViewer0_EventReciveData;
+            m_tcpServer[1] = new TCPIPServer("TCPIP Vision", null);
+            m_tcpServer[1].EventReciveData += MarsLogViewer1_EventReciveData;
         }
 
-        Queue<string> m_qLog = new Queue<string>();
-        private void MarsLogViewer_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        public class Mars
         {
-            socket.Send(aBuf);
-            m_qLog.Enqueue(Encoding.ASCII.GetString(aBuf, 0, nSize));
+            public int m_iTCP;
+            public string m_sLog; 
+
+            public Mars(int iTCP, string sLog)
+            {
+                m_iTCP = iTCP;
+                m_sLog = sLog; 
+            }
+        }
+
+        Queue<Mars> m_qLog = new Queue<Mars>();
+        private void MarsLogViewer0_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            socket.Send(aBuf, nSize, SocketFlags.None);
+            m_qLog.Enqueue(new Mars(0, Encoding.ASCII.GetString(aBuf, 0, nSize)));
+        }
+
+        private void MarsLogViewer1_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            socket.Send(aBuf, nSize, SocketFlags.None);
+            m_qLog.Enqueue(new Mars(1, Encoding.ASCII.GetString(aBuf, 0, nSize)));
         }
         #endregion
 
@@ -41,21 +62,34 @@ namespace Root_MarsLogView
         {
             while (m_qLog.Count > 0)
             {
-                string sLog = m_qLog.Dequeue();
+                Mars mars = m_qLog.Dequeue();
+                string sLog = mars.m_sLog;
                 string[] asLog = sLog.Split('\t');
                 if (asLog.Length < 4) AddError("Log Length", sLog);  
                 else
                 {
                     switch (asLog[3])
                     {
-                        case "PRC": m_listPRC.Add(sLog, asLog); break;
-                        case "XFR": m_listXFR.Add(sLog, asLog); break;
-                        case "FNC": m_listFNC.Add(sLog, asLog); break;
-                        case "LEH": m_listLEH.Add(sLog, asLog); break;
-                        case "CFG": m_listCFG.Add(sLog, asLog); break;
+                        case "'PRC'": m_listPRC.Add(mars.m_iTCP, sLog, asLog); break;
+                        case "'XFR'": m_listXFR.Add(mars.m_iTCP, sLog, asLog); break;
+                        case "'FNC'": m_listFNC.Add(mars.m_iTCP, sLog, asLog); break;
+                        case "'LEH'": m_listLEH.Add(mars.m_iTCP, sLog, asLog); break;
+                        case "'CFG'": m_listCFG.Add(sLog, asLog); break;
+                        case "Reset": Reset(mars.m_iTCP); break; 
                     }
                 }
             }
+        }
+
+        void Reset(int iTCP)
+        {
+            DateTime dt = DateTime.Now;
+            string sDate = dt.Year.ToString("0000/") + dt.Month.ToString("00/") + dt.Day.ToString("00");
+            string sTime = dt.Hour.ToString("00:") + dt.Minute.ToString("00:") + dt.Second.ToString("00") + "." + dt.Millisecond.ToString("000");
+            m_listFNC.Reset(iTCP, sDate, sTime);
+            m_listPRC.Reset(iTCP, sDate, sTime);
+            m_listXFR.Reset(iTCP, sDate, sTime);
+            m_listLEH.Reset(iTCP, sDate, sTime);
         }
         #endregion
 
@@ -64,9 +98,9 @@ namespace Root_MarsLogView
         {
             if (sLog[sLog.Length - 1] == '$') sLog = sLog.Substring(0, sLog.Length - 1);
             string sFile = GetFileName(sLog);
-            bool bFirst = File.Exists(sFile); 
+            bool bExist = File.Exists(sFile); 
             StreamWriter sw = new StreamWriter(new FileStream(sFile, FileMode.Append));
-            if (bFirst) sw.WriteLine("Applied Samsung Standard Logging Spec Version: 2.0");
+            if (bExist == false) sw.WriteLine("Applied Samsung Standard Logging Spec Version: 2.0");
             sw.WriteLine(sLog);
             sw.Close(); 
         }
@@ -128,8 +162,7 @@ namespace Root_MarsLogView
             m_listLEH = new ListLEH(this);
             m_listCFG = new ListCFG(this);
             m_listError = new ListError(this); 
-            InitTCP(0);
-            InitTCP(1);
+            InitTCP();
             InitTreeRoot(); 
 
             m_timer.Interval = TimeSpan.FromMilliseconds(20);
@@ -139,6 +172,13 @@ namespace Root_MarsLogView
 
         public void ThreadStop()
         {
+            DateTime dt = DateTime.Now;
+            string sDate = dt.Year.ToString("0000/") + dt.Month.ToString("00/") + dt.Day.ToString("00");
+            string sTime = dt.Hour.ToString("00:") + dt.Minute.ToString("00:") + dt.Second.ToString("00") + "." + dt.Millisecond.ToString("000");
+            m_listPRC.ThreadStop(sDate, sTime);
+            m_listXFR.ThreadStop(sDate, sTime);
+            m_listFNC.ThreadStop(sDate, sTime);
+            m_listLEH.ThreadStop(sDate, sTime);
             m_tcpServer[0].ThreadStop();
             m_tcpServer[1].ThreadStop();
         }

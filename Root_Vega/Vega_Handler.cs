@@ -80,7 +80,13 @@ namespace Root_Vega
         #region StateHome
         public string StateHome()
         {
-            string sInfo = StateHome(m_moduleList.m_aModule);
+            string sInfo = StateHome(m_robot);
+            if (sInfo != "OK")
+            {
+                EQ.p_eState = EQ.eState.Init;
+                return sInfo; 
+            }
+            sInfo = StateHome(m_vega, m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision, m_FDC);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }

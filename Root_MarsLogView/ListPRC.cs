@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Trees;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace Root_MarsLogView
 {
@@ -18,22 +19,23 @@ namespace Root_MarsLogView
         }
 
         string[] m_asLog; 
-        public void Add(string sLog, string[] asLog)
+        public void Add(int iTCP, string sLog, string[] asLog)
         {
             m_asLog = asLog; 
             if (asLog.Length < 14) m_mars.AddError("PRC Length", sLog);
             string sStatus = GetString(5);
-            Mars_PRC prc = Get(asLog); 
+            Mars_PRC prc = Get(asLog);
             if (sStatus == Mars_PRC.eStatus.Start.ToString())
             {
                 if (prc != null)
                 {
-                    m_mars.AddError("PRC Not Ended", sLog);
+                    m_mars.AddError("PRC Not Ended", prc.m_sLog);
+                    prc.End(asLog);
                     m_mars.WriteEvent(prc.GetEndLog(asLog));
                     p_aPRC.Remove(prc);
                 }
                 m_mars.WriteEvent(sLog);
-                prc = new Mars_PRC(asLog);
+                prc = new Mars_PRC(iTCP, sLog, asLog);
                 p_aPRC.Add(prc);
                 p_aPRCView.Add(prc);
                 if (p_aPRCView.Count > m_maxView) p_aPRCView.RemoveAt(0); 
@@ -53,7 +55,30 @@ namespace Root_MarsLogView
         string GetString(int nIndex)
         {
             if (m_asLog.Length <= nIndex) return "";
-            return m_asLog[nIndex]; 
+            string sLog = m_asLog[nIndex]; 
+            if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
+            if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1); 
+            return sLog; 
+        }
+
+        public void Reset(int iTCP, string sDate, string sTime)
+        {
+            foreach (Mars_PRC prc in p_aPRC)
+            {
+                if (prc.m_iTCP == iTCP)
+                {
+                    m_mars.AddError("PRC Reset", prc.m_sLog);
+                    string[] asLog = prc.m_asLog;
+                    asLog[0] = sDate;
+                    asLog[1] = sTime;
+                    prc.End(asLog);
+                    m_mars.WriteEvent(prc.GetEndLog(asLog));
+                }
+            }
+            for (int n = p_aPRC.Count - 1; n >= 0; n--)
+            {
+                if (p_aPRC[n].m_iTCP == iTCP) p_aPRC.RemoveAt(n); 
+            }
         }
 
         int m_maxView = 250; 
@@ -68,6 +93,19 @@ namespace Root_MarsLogView
             m_mars = mars; 
             p_aPRC = new ObservableCollection<Mars_PRC>();
             p_aPRCView = new ObservableCollection<Mars_PRC>();
+        }
+
+        public void ThreadStop(string sDate, string sTime)
+        {
+            foreach (Mars_PRC prc in p_aPRC)
+            {
+                m_mars.AddError("PRC ThreadStop", prc.m_sLog);
+                string[] asLog = prc.m_asLog;
+                asLog[0] = sDate;
+                asLog[1] = sTime; 
+                prc.End(asLog);
+                m_mars.WriteEvent(prc.GetEndLog(asLog));
+            }
         }
     }
 }

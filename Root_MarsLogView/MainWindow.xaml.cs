@@ -11,7 +11,16 @@ namespace Root_MarsLogView
         public MainWindow()
         {
             InitializeComponent();
-            logViewerUI.Init(m_logViewer); 
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            logViewerUI.Init(m_logViewer);
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            m_logViewer.ThreadStop(); 
         }
     }
 }

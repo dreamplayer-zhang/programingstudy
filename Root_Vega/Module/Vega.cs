@@ -70,6 +70,7 @@ namespace Root_Vega.Module
             m_alidCDALow = m_gaf.GetALID(this, "CDA Low", "CDA Low Error");
 		}
         #endregion
+
         #region Thread
         protected override void RunThread()
         {
