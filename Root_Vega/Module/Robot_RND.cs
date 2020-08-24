@@ -943,7 +943,6 @@ namespace Root_Vega.Module
                 BitmapImage image = m_module.m_camOCR.ReadImage();
                 ManualOCR memualOCR = new ManualOCR(m_module.p_infoReticle, image);
                 memualOCR.ShowOCR();
-                while (memualOCR.m_bShowDialog) Thread.Sleep(10); 
                 return "OK"; 
             }
         }
