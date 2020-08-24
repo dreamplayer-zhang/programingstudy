@@ -205,7 +205,8 @@ namespace RootTools.Camera.Dalsa
 
         public void Connect()
         {
-            bgw_Connect.RunWorkerAsync();
+            if (!bgw_Connect.IsBusy && p_CamInfo.p_eState == eCamState.Init)
+                bgw_Connect.RunWorkerAsync();
         }
 
         void ConnectCammera()
@@ -486,7 +487,8 @@ namespace RootTools.Camera.Dalsa
             {
                 return new RelayCommand(delegate
                 {
-                    bgw_Connect.RunWorkerAsync();
+                    if (!bgw_Connect.IsBusy && p_CamInfo.p_eState == eCamState.Init)
+                        bgw_Connect.RunWorkerAsync();
                 });
             }
         }
