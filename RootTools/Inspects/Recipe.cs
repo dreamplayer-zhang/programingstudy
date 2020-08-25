@@ -164,7 +164,7 @@ namespace RootTools.Inspects
 		/// <summary>
 		/// 레시피가 로드된 상태를 표시한다
 		/// </summary>
-		[XmlIgnore] public bool Loaded { get; protected set; }
+		[XmlIgnore] public bool Loaded { get; set; }
 		virtual public void Init()
 		{
 			this.RecipeName = "";

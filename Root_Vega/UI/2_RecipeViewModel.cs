@@ -175,12 +175,8 @@ namespace Root_Vega
 		{
 			if (m_Engineer.m_recipe.Loaded)
 			{
-				var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
+				var target = System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName);
 				m_Engineer.m_recipe.Save(target);
-			}
-			else
-			{
-				_btnRcpSaveAs();
 			}
 		}
 
@@ -192,6 +188,9 @@ namespace Root_Vega
 			{
 				m_Engineer.m_recipe.LoadComplete();
 			}
+
+			_btnRcpSaveAs();
+			m_Engineer.m_recipe.Loaded = true;
 		}
 		public ICommand CommandRcpSave
 		{
