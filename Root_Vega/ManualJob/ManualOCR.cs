@@ -8,7 +8,16 @@ namespace Root_Vega.ManualJob
     public class ManualOCR : NotifyProperty
     {
         #region Property
-        public BitmapImage p_image { get; set; }
+        BitmapImage _image = null; 
+        public BitmapImage p_image 
+        { 
+            get { return _image; }
+            set
+            {
+                _image = value;
+                OnPropertyChanged(); 
+            }
+        }
 
         public string p_sOCR
         {
