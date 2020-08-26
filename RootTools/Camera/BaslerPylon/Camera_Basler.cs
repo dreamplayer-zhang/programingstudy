@@ -444,7 +444,7 @@ namespace RootTools.Camera.BaslerPylon
 
 
         // Starts the continuous grabbing of images and handles exceptions.
-        private void GrabContinuousShot()
+        public void GrabContinuousShot()
         {
             try
             {

@@ -573,14 +573,14 @@ namespace Root_Vega
 						var bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
 						Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
 						var laplaceFeature = featureImage.Laplace(1);
-						laplaceFeature.Save(@"D:\Test\feature.bmp");
+						//laplaceFeature.Save(@"D:\Test\feature.bmp");
 
 						CRect targetRect = new CRect(
 							new Point(feature.RoiRect.Left - (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Top - (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0),
 							new Point(feature.RoiRect.Right+ (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Bottom + (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0));
 						Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImagePattern(targetRect));
 						var laplaceSource = sourceImage.Laplace(1);
-						laplaceSource.Save(@"D:\Test\source.bmp");
+						//laplaceSource.Save(@"D:\Test\source.bmp");
 
 						var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
 
@@ -609,7 +609,7 @@ namespace Root_Vega
 							}
 						}
 						resultImage.Data = matches;
-						resultImage.Save(@"D:\Test\result.bmp");
+						//resultImage.Save(@"D:\Test\result.bmp");
 						if (foundFeature)
 						{
 							//2. feature 중심위치가 확보되면 해당 좌표를 저장

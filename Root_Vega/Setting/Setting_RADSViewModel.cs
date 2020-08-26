@@ -93,17 +93,7 @@ namespace Root_Vega.Setting
 
         void GetDeviceInfo()
         {
-            //p_timerControl.UpdateDeviceInfo();
-            bool bUseRADS = false;
-            foreach (GrabMode gm in m_PatternVision.m_aGrabMode)
-            {
-                if (gm.GetUseRADS())
-                {
-                    bUseRADS = true;
-                    break;
-                }
-            }
-            if (bUseRADS) p_timerControl.UpdateDeviceInfo();
+            p_timerControl.UpdateDeviceInfo();
         }
 
         public RelayCommand GetDeviceInfoCommand

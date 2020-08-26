@@ -306,8 +306,8 @@ namespace Root_Vega
 				string temp = string.Empty;
 				var result = connector.SendQuery(query, ref temp);
 #if DEBUG
-				Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
-				Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
+				//Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
+				//Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
 #endif
 				int count;
 				if (int.TryParse(temp, out count))

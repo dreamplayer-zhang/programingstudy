@@ -141,7 +141,7 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 			int ytarget = i + rt.top + (nOffset - 5) * 2;
 			int xtarget = j + rt.left + (nOffset - 5) * 2;
 
-			inspbuffer[i + nOffset][nOffset + j] = mem[(ytarget)*nW + (xtarget)];
+			inspbuffer[i + nOffset][nOffset + j] = mem[(ytarget)*nW + (xtarget)];	// <-- Index Overflow...?? -ESCHO
 			//inspbuffer2[(i+nOffset)* nWidth + (nOffset + j)] = mem[(ytarget)*nW + (xtarget)];
 		}
 	}

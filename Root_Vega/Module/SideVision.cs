@@ -215,6 +215,7 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_CamLADS, this, "LADS");
             p_sInfo = m_toolBox.Get(ref m_CamBevelVRS, this, "Bevel VRS");
             p_sInfo = m_toolBox.Get(ref m_CamSideVRS, this, "Side VRS");
+            if (m_CamSideVRS != null) m_CamSideVRS.Connect();
             p_sInfo = m_toolBox.Get(ref m_CamAlign1, this, "Side_Align1");
             p_sInfo = m_toolBox.Get(ref m_CamAlign2, this, "Side_Align2");
 
