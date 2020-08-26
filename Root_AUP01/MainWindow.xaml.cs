@@ -2,7 +2,7 @@
 using System.IO;
 using System.Windows;
 
-namespace Root_EFEM
+namespace Root_AUP01
 {
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
@@ -17,26 +17,27 @@ namespace Root_EFEM
         #region Window Event
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(@"C:\Recipe\EFEM")) Directory.CreateDirectory(@"C:\Recipe\EFEM");
-            Init(); 
+            if (!Directory.Exists(@"C:\Recipe\AUP01")) Directory.CreateDirectory(@"C:\Recipe\AUP01");
+            Init();
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            ThreadStop(); 
+            ThreadStop();
         }
         #endregion
 
-        EFEM_Engineer m_engineer = new EFEM_Engineer();
+        AUP01_Engineer m_engineer = new AUP01_Engineer();
         void Init()
         {
-            m_engineer.Init("EFEM");
-            engineerUI.Init(m_engineer); 
+            m_engineer.Init("AUP01");
+            engineerUI.Init(m_engineer);
         }
 
         void ThreadStop()
         {
             m_engineer.ThreadStop();
         }
+
     }
 }
