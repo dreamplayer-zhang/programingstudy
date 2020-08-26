@@ -3,11 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:convert="clr-namespace:ViewConverter"
              xmlns:obs="clr-namespace:nsSizeObserver"
              xmlns:behavior="clr-namespace:mousebehavior"
-             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes"
               Cursor="{Binding p_MouseCursor}"
              mc:Ignorable="d"
@@ -26,7 +25,7 @@
                 <i:InvokeCommandAction Command="{Binding KeyPressedUpCommand}" />
             </i:EventTrigger>
             <i:EventTrigger EventName="KeyDown">
-                <ei:CallMethodAction TargetObject="{Binding}" MethodName="KeyDown"/>
+                <i:CallMethodAction TargetObject="{Binding}" MethodName="KeyDown"/>
             </i:EventTrigger>
         </i:Interaction.Triggers>
         <Grid.InputBindings>
@@ -75,12 +74,12 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
-            <!--<i:Interaction.Behaviors>
-                <behavior:KeyBehaviour KeyEvent="{Binding KeyEvent, Mode=OneWayToSource}"/>
+            <i:Interaction.Behaviors>
+                <!--<behavior:KeyBehaviour KeyEvent="{Binding KeyEvent, Mode=OneWayToSource}"/>
                 <behavior:MouseBehaviour MouseEvent="{Binding MouseEvent, Mode=OneWayToSource}" />
                 <behavior:MouseBehaviour MouseX="{Binding p_MouseX, Mode=OneWayToSource}"
-                        MouseY="{Binding p_MouseY, Mode=OneWayToSource}" />
-            </i:Interaction.Behaviors>-->
+                        MouseY="{Binding p_MouseY, Mode=OneWayToSource}" />-->
+            </i:Interaction.Behaviors>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseLeftButtonUp">
                     <i:InvokeCommandAction Command="{Binding CanvasMouseLeftUp}" />
@@ -98,13 +97,13 @@
                     <i:InvokeCommandAction Command="{Binding CanvasMouseLeftDown}" />
                 </i:EventTrigger>
                 <i:EventTrigger EventName="PreviewMouseDown">
-                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseDown" />
+                    <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseDown" />
 				</i:EventTrigger>
 				<i:EventTrigger EventName="MouseEnter">
-					<ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseEnter" />
+					<i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseEnter" />
 				</i:EventTrigger>
 				<i:EventTrigger EventName="PreviewMouseWheel">
-                    <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseWheel" />
+                    <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseWheel" />
                 </i:EventTrigger>
                 <i:EventTrigger EventName="Loaded" >
                     <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
@@ -141,12 +140,12 @@
                            Margin="0,0,70,0"
                            Foreground="White" />
             </WrapPanel>
-            <!--<TextBlock Text="{Binding Test}"
+            <TextBlock Text="{Binding Test}"
                                        Background="#FF43437A"
                                            Margin="0,10,0,0"/>
                         <TextBlock Text="{Binding Test2}"
                                        Background="#FF43437A"
-                                           Margin="0,10,0,0"/>-->
+                                           Margin="0,10,0,0"/>
         </StackPanel>
         <ProgressBar Grid.Row="1" Value="{Binding p_nProgress}" Width="300" Height="35"
                 Visibility="{Binding Path=p_nProgress, Converter= {StaticResource ConverterVisibleProgresss}}" />

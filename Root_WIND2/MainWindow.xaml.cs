@@ -5,7 +5,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using System.Windows.Media;
-
+using RootTools.Memory;
+using RootTools;
 
 namespace Root_WIND2
 {
@@ -13,8 +14,7 @@ namespace Root_WIND2
     /// MainWindow.xaml에 대한 상호 작용 논리
     /// </summary>
     public partial class MainWindow : Window
-    {
-        
+    {       
         #region Window Event
         public MainWindow()
         {
@@ -100,7 +100,6 @@ namespace Root_WIND2
         }
         #endregion
 
-
         private void textLastError_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             
@@ -120,14 +119,35 @@ namespace Root_WIND2
 
         #endregion
 
-
+        WIND2_Engineer m_engineer = new WIND2_Engineer();
+        MemoryTool m_memoryTool;
+        ImageData m_Imgae;
+        string sPool = "pool";
+        string sGroup = "group";
+        string sMem = "mem";
+        public int MemWidth = 12400;
+        public int MemHeight = 12400;
+        Viewer viewer = new Viewer();
         void Init()
         {
-           
+            IDialogService dialogService = new DialogService(this);
+            dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+            m_engineer.Init("WIND2");
+            m_memoryTool = m_engineer.ClassMemoryTool();
+            m_memoryTool.GetPool(sPool, true).p_gbPool = 1;
+            m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
+            m_memoryTool.GetMemory(sPool, sGroup, sMem);
+            
+            m_Imgae = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
+            viewer.p_ImageViewer = new ImageToolViewer_VM(m_Imgae, dialogService);
+            panel.DataContext = viewer.p_ImageViewer;
+
             //_Maint.engineerUI.Init(m_engineer);
             //Panel.DataContext = new NavigationManger();
             InitUI();
             InitTimer();
+
+            var a = panel.DataContext;
         }
 
         void InitUI()
@@ -148,7 +168,7 @@ namespace Root_WIND2
             m_ModeUI = new SelectMode();
             m_ModeUI.Init(this);
 
-            Home();
+            //Home();
         }
         void Home()
         {
@@ -158,15 +178,23 @@ namespace Root_WIND2
 
         void ThreadStop()
         {
-            //m_engineer.ThreadStop();
+            m_engineer.ThreadStop();
         }
 
-        
-
-
-
-
-
-
+    }
+    public class Viewer : ObservableObject
+    {
+        private ImageToolViewer_VM m_ImageViewer;
+        public ImageToolViewer_VM p_ImageViewer
+        {
+            get
+            {
+                return m_ImageViewer;
+            }
+            set
+            {
+                SetProperty(ref m_ImageViewer, value);
+            }
+        }
     }
 }

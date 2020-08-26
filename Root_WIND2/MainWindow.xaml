@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_WIND2"
         xmlns:icons="clr-namespace:Root_WIND2.Icons"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         mc:Ignorable="d"
         WindowStyle="None"
-        AllowsTransparency="True"
+        AllowsTransparency="False"
         ResizeMode="CanResizeWithGrip"
         Height="1080"
         Width="1920"
@@ -86,7 +87,12 @@
         </Grid>
         <!--Title Bar End-->   
         <Grid Grid.Row="1" x:Name="MainPanel">
-            <local:SelectMode x:Name="ModueUI"/>
+            <DockPanel x:Name="panel">
+                <Button Content="Open" DockPanel.Dock="Top" Command="{Binding OpenImage}"/>
+                <Button Content="Clear" DockPanel.Dock="Top" Command="{Binding ClearImage}"/>
+                <tools:ImageToolViewer/>
+            </DockPanel>
+            <!--<local:SelectMode Height="0"/>-->
         </Grid>
 
         <!--Log Area Start-->

@@ -30,7 +30,7 @@ namespace Root_WIND2
         {
             get
             {
-                
+
                 return m_cInspMethod;
             }
             set
@@ -179,36 +179,85 @@ namespace Root_WIND2
             p_selectedMethod = e as InspectionMethod;
         }
 
-        public ICommand btnGeneralSummary => new RelayCommand(m_Navigation.SetFrontGeneral);
-        public ICommand btnGeneralMask => new RelayCommand(m_Navigation.SetFrontGeneralMask);
-        public ICommand btnGeneralSetup => new RelayCommand(m_Navigation.SetFrontGeneralSetup);
-        public ICommand btnAddInspMethod => new RelayCommand(() =>
+        public ICommand btnGeneralSummary
         {
-            InspectionMethod method = new InspectionMethod();
-            method.p_sName = "Defalut";
-            method.changeMode += Item_changeMode;
-            p_cInspMethod.Add(method);
-            p_selectedMethod = p_cInspMethod.Last();
-        });
-        public ICommand btnDeleteInspMethod => new RelayCommand(() =>
+            get
+            {
+                return new RelayCommand(m_Navigation.SetFrontGeneral);
+            }
+        }
+        public ICommand btnGeneralMask
         {
-            p_cInspMethod.Remove(p_selectedMethod);
-            p_selectedMethod = p_cInspMethod.Last();
-            //InspMethodRefresh();
-        });
-        public ICommand btnAddInspItem => new RelayCommand(() =>
+            get
+            {
+                return new RelayCommand(m_Navigation.SetFrontGeneralMask);
+            }
+        }
+        public ICommand btnGeneralSetup
         {
-            InspectionItem item = new InspectionItem();
-            item.p_cMask = p_cMask;
-            item.p_cInspMethod = p_cInspMethod;
-            p_cInspItem.Add(item);
-        });
-        public ICommand btnDeleteInspItem => new RelayCommand(() =>
+            get
+            {
+                return new RelayCommand(m_Navigation.SetFrontGeneralSetup);
+            }
+        }
+        public ICommand btnAddInspMethod
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    InspectionMethod method = new InspectionMethod();
+                    method.p_sName = "Defalut";
+                    method.changeMode += Item_changeMode;
+                    p_cInspMethod.Add(method);
+                    p_selectedMethod = p_cInspMethod.Last();
+                });
+            }
+        }
+        public ICommand btnDeleteInspMethod
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    p_cInspMethod.Remove(p_selectedMethod);
+                    p_selectedMethod = p_cInspMethod.Last();
+                    //InspMethodRefresh();
+                });
+            }
+        }
+        public ICommand btnAddInspItem
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    InspectionItem item = new InspectionItem();
+                    item.p_cMask = p_cMask;
+                    item.p_cInspMethod = p_cInspMethod;
+                    p_cInspItem.Add(item);
+                });
+            }
+        }
+        public ICommand btnDeleteInspItem
+        {
+            get
+            {
+                return new RelayCommand(() =>
         {
             p_cInspItem.Remove(p_selectedInspItem);
             //InspItemRefresh();
         });
-        public ICommand btnBack => new RelayCommand(m_Navigation.SetWizardFrontSide);
+            }
+        }
+        public ICommand btnBack
+        {
+            get
+            {
+
+                return new RelayCommand(m_Navigation.SetWizardFrontSide);
+            }
+        }
 
     }
 }

@@ -1,30 +1,19 @@
 ﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using System.Windows;
-using System.Diagnostics;
 using System.Threading;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 using System.Windows.Media;
-using RootTools.Inspects;
-using RootTools.Memory;
-using MySql.Data.MySqlClient.Authentication;
 
 namespace RootTools
 {
 
-	public delegate void LoadedDelegate();
+    public delegate void LoadedDelegate();
 	// public delegate void RedrawDelegate();
 	public class ImageViewer_ViewModel : ObservableObject
 	{
@@ -596,7 +585,6 @@ namespace RootTools
 			}
 			SetThumNailIamge();
 		}
-
 		public void SetRoiRect()
 		{
 			if (p_ImageData != null)
@@ -667,7 +655,6 @@ namespace RootTools
 			}
 
 		}
-
 		public unsafe void SetImageSource()
 		{
 			try
@@ -746,7 +733,6 @@ namespace RootTools
 
 			RedrawingElement();
 		}
-
 		void TumbNailMove()
 		{
 			if (MouseEvent.LeftButton == MouseButtonState.Pressed)
@@ -756,12 +742,10 @@ namespace RootTools
 				CanvasMovePoint(perX, perY);
 			}
 		}
-
 		void ThumNailMoveStart()
 		{
 			TumbNailMove();
 		}
-
 		void _btnOpenImage()
 		{
 			if (m_ImageData == null)
@@ -774,22 +758,21 @@ namespace RootTools
 			ofd.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
 			if (ofd.ShowDialog() == DialogResult.OK)
 			{
-				var viewModel = new Dialog_ImageOpenViewModel(this);
-				Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
-				if (result.HasValue)
-				{
-					if (result.Value)
-					{
-						m_ImageData.OpenFile(ofd.FileName, p_CopyOffset);
-					}
-					else
-					{
-						// Cancelled
-					}
-				}
+				//var viewModel = new Dialog_ImageOpenViewModel(this);
+				//Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+				//if (result.HasValue)
+				//{
+				//	if (result.Value)
+				//	{
+				//		m_ImageData.OpenFile(ofd.FileName, p_CopyOffset);
+				//	}
+				//	else
+				//	{
+				//		// Cancelled
+				//	}
+				//}
 			}
 		}
-
 		void _btnSaveImage()
 		{
 			if (m_ImageData == null)
@@ -813,7 +796,6 @@ namespace RootTools
 				m_ImageData.SaveRectImage(new CRect(left, top, right, bot));
 			//}
 		}
-
 		void ImageClear()
 		{
 			if (m_ImageData != null)
@@ -904,7 +886,6 @@ namespace RootTools
 			SetImageSource();
 
 		}
-
 		void SetViewRect(CPoint point)      //point image의 좌상단
 		{
 			bool bRatio_WH = (double)p_ImageData.p_Size.X / p_CanvasWidth < (double)p_ImageData.p_Size.Y / p_CanvasHeight;
