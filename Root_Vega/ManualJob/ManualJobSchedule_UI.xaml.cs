@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Threading;
 using System.Windows.Media;
 using System;
@@ -47,9 +46,7 @@ namespace Root_Vega.ManualJob
         public void Init(ManualJobSchedule jobschdule)
         {
             m_JobSchedule = jobschdule;
-            this.DataContext = jobschdule.m_loadport.m_infoPod;
-            textBoxLotID.DataContext = jobschdule.m_loadport.m_infoPod.m_aGemSlot[0];
-            textBoxSlotID.DataContext = jobschdule.m_loadport.m_infoPod.m_aGemSlot[0];
+            this.DataContext = jobschdule;
             InitRecipeList();
         }
 
@@ -72,31 +69,12 @@ namespace Root_Vega.ManualJob
             foreach (FileInfo fileInfo in files) asRecipeFile.Add(fileInfo.FullName);
             comboRecipeID.ItemsSource = asRecipeFile;
         }
+
         private void comboRecipeID_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string sRecipe = (string)comboRecipeID.SelectedValue;
             if (sRecipe == null) return;
-            if (m_JobSchedule.m_loadport.m_infoPod.p_infoReticle == null) return; 
-            m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.m_sManualRecipe = sRecipe;
-            m_JobSchedule.m_loadport.m_infoPod.p_infoReticle.RecipeOpen(sRecipe);
-
-            // Vision Recipe Open 코드 추가
-            string strFileName = Path.GetFileNameWithoutExtension(sRecipe);
-            string strVisionRecipeDirectoryPath = Path.GetDirectoryName(sRecipe) + "\\" + strFileName;
-            string strVisionRecipeFullPath = strVisionRecipeDirectoryPath + "\\" + "Parameter.VegaVision";
-
-            if (Directory.Exists(strVisionRecipeDirectoryPath) == false)
-                Directory.CreateDirectory(strVisionRecipeDirectoryPath);
-            if (File.Exists(strVisionRecipeFullPath) == false)
-            {
-                string strMessage = string.Format("\"Parameter.VegaVision\" Recipe is not Exist in the \"{0}\"", strVisionRecipeDirectoryPath);
-                MessageBox.Show(strMessage);
-                comboRecipeID.SelectedValue = null;
-            }
-            else
-            {
-                App.m_engineer.m_recipe.Load(strVisionRecipeFullPath);
-            }
+            m_JobSchedule.m_sRecipe = sRecipe; 
         }
         #endregion
 

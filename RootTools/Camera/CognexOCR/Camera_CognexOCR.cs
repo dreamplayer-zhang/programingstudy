@@ -150,10 +150,10 @@ namespace RootTools.Camera.CognexOCR
                 Thread.Sleep(100);
                 BitmapImage image = new BitmapImage(new Uri("ftp://" + m_tcpip.p_sIP + "/image.bmp"));
 
-//                Thread.Sleep(1000);
-//                ftp.DownloadFile("ftp://" + m_tcpip.p_sIP + "/image.bmp", "c:\\Log\\CognexOCR.bmp");
-//                Thread.Sleep(100);
-//                BitmapImage image = new BitmapImage(new Uri("c:\\Log\\CognexOCR.bmp")); 
+                //Thread.Sleep(1000);
+                //ftp.DownloadFile("ftp://" + m_tcpip.p_sIP + "/image.bmp", "c:\\Log\\CognexOCR.bmp");
+                //Thread.Sleep(100);
+                //BitmapImage image = new BitmapImage(new Uri("c:\\Log\\CognexOCR.bmp")); 
 
                 return image;
             }

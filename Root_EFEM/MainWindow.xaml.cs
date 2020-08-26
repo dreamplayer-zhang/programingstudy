@@ -17,7 +17,7 @@ namespace Root_EFEM
         #region Window Event
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(@"C:\EFEM\Recipe")) Directory.CreateDirectory(@"C:\EFEM\Recipe");
+            if (!Directory.Exists(@"C:\Recipe\EFEM")) Directory.CreateDirectory(@"C:\Recipe\EFEM");
             Init(); 
         }
 
@@ -38,7 +38,5 @@ namespace Root_EFEM
         {
             m_engineer.ThreadStop();
         }
-
-
     }
 }

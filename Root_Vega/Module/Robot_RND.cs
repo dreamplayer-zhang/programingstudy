@@ -941,10 +941,21 @@ namespace Root_Vega.Module
                 m_module.p_sInfo = "ReadOCR Score Error : " + fScoreMax.ToString() + "%, " + sOCRMax;
                 EQ.p_eState = EQ.eState.Ready; 
                 BitmapImage image = m_module.m_camOCR.ReadImage();
+                SaveBMP(image, "c:\\Vega\\OCR.bmp"); 
                 ManualOCR memualOCR = new ManualOCR(m_module.p_infoReticle, image);
                 memualOCR.ShowOCR();
-                while (memualOCR.m_bShowDialog) Thread.Sleep(10); 
                 return "OK"; 
+            }
+
+            void SaveBMP(BitmapImage image, string filePath)
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(image));
+
+                using (var fileStream = new System.IO.FileStream(filePath, System.IO.FileMode.Create))
+                {
+                    encoder.Save(fileStream);
+                }
             }
         }
         #endregion

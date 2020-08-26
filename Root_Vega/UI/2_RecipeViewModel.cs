@@ -5,6 +5,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -69,7 +70,6 @@ namespace Root_Vega
 			}
 		}
 
-		string m_sPath = "c:\\Recipe\\";
 		void btnRecipeOpenClicked()
 		{
 			string sModel = EQ.m_sModel;
@@ -78,6 +78,7 @@ namespace Root_Vega
 			dlg.DefaultExt = "." + sModel;
 			dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
 			if (dlg.ShowDialog() == true) m_moduleRunList.OpenJob(dlg.FileName);
+			
 			p_moduleRunList.RunTree(Tree.eMode.Init);
 		}
 
@@ -88,7 +89,10 @@ namespace Root_Vega
 			dlg.InitialDirectory = m_sPath;
 			dlg.DefaultExt = "." + sModel;
 			dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
-			if (dlg.ShowDialog() == true) m_moduleRunList.SaveJob(dlg.FileName);
+			if (dlg.ShowDialog() == true)
+			{
+				m_moduleRunList.SaveJob(dlg.FileName);	
+			}
 			p_moduleRunList.RunTree(Tree.eMode.Init);
 		}
 
@@ -145,53 +149,89 @@ namespace Root_Vega
 		void Init()
 		{
 			m_moduleList = m_Engineer.m_handler.m_moduleList;
-			m_moduleRunList = m_moduleList.m_moduleRunList;
-			m_recipe = m_Engineer.m_handler.m_recipe;
+			p_recipe = m_Engineer.m_handler.m_recipe;
+			p_moduleRunList = p_recipe.m_moduleRunList;
 		}
 
+		string m_sPath = "c:\\VEGA\\Recipe\\";
 		private void _btnRcpLoad()
 		{
+			string sModel = EQ.m_sModel;
 			OpenFileDialog dlg = new OpenFileDialog();
-			dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
-			dlg.InitialDirectory = @"C:\VEGA\Recipe";
+			dlg.InitialDirectory = m_sPath;
+			dlg.DefaultExt = "." + sModel;
+			dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
 			if (dlg.ShowDialog() == true)
 			{
-				m_Engineer.m_recipe.Load(dlg.FileName);
+				// Sequence Recipe
+				m_moduleRunList.OpenJob(dlg.FileName);
+
+				// Inspection Recipe
+				dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
+				dlg.InitialDirectory = @"C:\VEGA\Recipe";
+				var target = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(dlg.FileName), System.IO.Path.GetFileNameWithoutExtension(dlg.FileName), "Parameter.VegaVision");
+				m_Engineer.m_recipe.Load(target);
 			}
+			p_moduleRunList.RunTree(Tree.eMode.Init);
+
+			//OpenFileDialog dlg = new OpenFileDialog();
+			//dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
+			//dlg.InitialDirectory = @"C:\VEGA\Recipe";
+			//if (dlg.ShowDialog() == true)
+			//{
+			//	m_Engineer.m_recipe.Load(dlg.FileName);
+			//}
 		}
 		private void _btnRcpSaveAs()
 		{
-			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-			dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
-			dlg.InitialDirectory = @"C:\VEGA\Recipe";
+			string sModel = EQ.m_sModel;
+			SaveFileDialog dlg = new SaveFileDialog();
+			dlg.InitialDirectory = m_sPath;
+			dlg.DefaultExt = "." + sModel;
+			dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
 			if (dlg.ShowDialog() == true)
 			{
+				// Sequence Recipe
+				m_moduleRunList.SaveJob(dlg.FileName);
+				p_moduleRunList.RunTree(Tree.eMode.Init);
+
+				// Inspection Recipe
+				dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
+				dlg.InitialDirectory = @"C:\VEGA\Recipe";
 				var target = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(dlg.FileName), System.IO.Path.GetFileNameWithoutExtension(dlg.FileName));
 				m_Engineer.m_recipe.Save(target);
 			}
+			p_moduleRunList.RunTree(Tree.eMode.Init);
 		}
 
 		private void _currentRcpSave()
 		{
-			if (m_Engineer.m_recipe.Loaded)
-			{
-				var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
-				m_Engineer.m_recipe.Save(target);
-			}
-			else
-			{
-				_btnRcpSaveAs();
-			}
-		}
+            if (m_Engineer.m_recipe.Loaded)
+            {
+				// Sequence Recipe
+				var target = System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName + ".Vega");
+				m_moduleRunList.SaveJob(target);
+				p_moduleRunList.RunTree(Tree.eMode.Init);
+
+				// Inspection Recipe
+				target = System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName);
+                m_Engineer.m_recipe.Save(target);
+            }
+        }
 
 		private void _rcpCreate()
 		{
 			m_Engineer.m_recipe.Init();
+			m_moduleRunList.Clear();
+			p_moduleRunList.RunTree(Tree.eMode.Init);
 
 			if (m_Engineer.m_recipe.LoadComplete != null)
 			{
 				m_Engineer.m_recipe.LoadComplete();
 			}
+
+			_btnRcpSaveAs();
+			m_Engineer.m_recipe.Loaded = true;
 		}
 		public ICommand CommandRcpSave
 		{
