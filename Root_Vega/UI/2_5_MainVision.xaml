@@ -3,11 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:tools ="clr-namespace:RootTools;assembly=RootTools"
              xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
              xmlns:mouse="clr-namespace:mousebehavior;assembly=RootTools"
-             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes" 
              mc:Ignorable="d" Cursor="{Binding RecipeCursor}"
              d:DesignHeight="2000" d:DesignWidth="1442">

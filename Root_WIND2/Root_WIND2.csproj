@@ -1,0 +1,464 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E3C9836B-8D43-4E38-A667-7DDA8241E309}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Root_WIND2</RootNamespace>
+    <AssemblyName>Root_WIND2</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MaterialDesignColors, Version=1.2.6.1513, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignColors.1.2.6\lib\net45\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=3.1.3.1513, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.3.1.3\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.3\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Core.Presentation" />
+    <Reference Include="System.Activities.Presentation" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Controls\Icons\Calendar.xaml.cs">
+      <DependentUpon>Calendar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\UserControl\DateTimePicker.xaml.cs">
+      <DependentUpon>DateTimePicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="InfoWafer.cs" />
+    <Compile Include="IWTRChild.cs" />
+    <Compile Include="Module\Vision.cs" />
+    <Compile Include="MVVM\Helper.cs" />
+    <Compile Include="Recipe\Recipe.cs" />
+    <Compile Include="Tune.xaml.cs">
+      <DependentUpon>Tune.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\3. Run\Run_ViewModel.cs" />
+    <Compile Include="UI\3. Run\Run.xaml.cs">
+      <DependentUpon>Run.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\Review_ViewModel.cs" />
+    <Compile Include="UI\2. Review\Review.xaml.cs">
+      <DependentUpon>Review.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\3. BackSide\BackSide_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\4. EBR\EBR_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\5. Edge\Edge_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1. PreAlign\PreAlign_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1. PreAlign\PreAlignPanel.xaml.cs">
+      <DependentUpon>PreAlignPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\2. Inspection\Inspection_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\1. Home\Home_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\5. GEM\GEM_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\4. Maintenance\Maintenance_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\Alignment_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\RecipeWizard_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\FrontSide_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\3. BackSide\BackSidePanel.xaml.cs">
+      <DependentUpon>BackSidePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\4. EBR\EBRPanel.xaml.cs">
+      <DependentUpon>EBRPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\5. Edge\EdgePanel.xaml.cs">
+      <DependentUpon>EdgePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\FrontSummaryPage.xaml.cs">
+      <DependentUpon>FrontSummaryPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\FrontSidePanel.xaml.cs">
+      <DependentUpon>FrontSidePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MVVM\Converter.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\General_ViewModel.cs" />
+    <Compile Include="Recipe\InspectionItem.cs" />
+    <Compile Include="Recipe\Mask.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentMapPage.xaml.cs">
+      <DependentUpon>AlignmentMapPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Button\NaviBtn.xaml.cs">
+      <DependentUpon>NaviBtn.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Recipe\InspectionMethod.cs" />
+    <Compile Include="MVVM\ObservableObject.cs" />
+    <Compile Include="MVVM\PropertySupport.cs" />
+    <Compile Include="MVVM\RelayCommand.cs" />
+    <Compile Include="UI\SelectMode.xaml.cs">
+      <DependentUpon>SelectMode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Dummy.cs" />
+    <Compile Include="UI\1.Setup\Setup_ViewModel.cs" />
+    <Compile Include="Controls\Icons\AtiLogo.xaml.cs">
+      <DependentUpon>AtiLogo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentOriginPage.xaml.cs">
+      <DependentUpon>AlignmentOriginPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentPositionPage.xaml.cs">
+      <DependentUpon>AlignmentPositionPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\5. GEM\GEMPanel.xaml.cs">
+      <DependentUpon>GEMPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralMaskPage.xaml.cs">
+      <DependentUpon>GeneralMaskPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralSetupPage.xaml.cs">
+      <DependentUpon>GeneralSetupPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\1. Home\HomePanel.xaml.cs">
+      <DependentUpon>HomePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\1. Home\HomeSummaryPage.xaml.cs">
+      <DependentUpon>HomeSummaryPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentPanel.xaml.cs">
+      <DependentUpon>AlignmentPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentSetupPage.xaml.cs">
+      <DependentUpon>AlignmentSetupPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentSummaryPage.xaml.cs">
+      <DependentUpon>AlignmentSummaryPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralPanel.xaml.cs">
+      <DependentUpon>GeneralPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralSummaryPage.xaml.cs">
+      <DependentUpon>GeneralSummaryPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\2. Inspection\InspectionPanel.xaml.cs">
+      <DependentUpon>InspectionPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\4. Maintenance\MaintenancePanel.xaml.cs">
+      <DependentUpon>MaintenancePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\RecipeSummaryPage.xaml.cs">
+      <DependentUpon>RecipeSummaryPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\RecipeWizardPanel.xaml.cs">
+      <DependentUpon>RecipeWizardPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\Setup.xaml.cs">
+      <DependentUpon>Setup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PropertyGrid\WpfPropertyGrid.cs" />
+    <Compile Include="Controls\UserControl\View.xaml.cs">
+      <DependentUpon>View.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WIND2_Engineer.cs" />
+    <Compile Include="WIND2_Handler.cs" />
+    <Compile Include="WIND2_Process.cs" />
+    <Compile Include="WIND2_Recipe.cs" />
+    <Page Include="Controls\Icons\Calendar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\UserControl\DateTimePicker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tune.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\3. Run\Run.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\Review.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\1. PreAlign\PreAlignPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\3. BackSide\BackSidePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\4. EBR\EBRPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\5. Edge\EdgePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\FrontSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\FrontSidePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentMapPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Button\NaviBtn.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Icons\AtiLogo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="UI\SelectMode.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentOriginPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentPositionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\5. GEM\GEMPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralMaskPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralSetupPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\1. Home\HomePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\1. Home\HomeSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentSetupPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\2. Inspection\InspectionPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\4. Maintenance\MaintenancePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\RecipeSummaryPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\RecipeWizardPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\Setup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\UserControl\View.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\aa.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\reticlemap.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\WaferMap.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\wafer.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Origin.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UI\Tune\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ChartEBR.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RootTools\RootTools.csproj">
+      <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
+      <Name>RootTools</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
+copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
+IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
+copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\AXL.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\AXL.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\EzBasicAxl.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.pdb" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.pdb"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\mariadbclient.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\mariadbclient.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\auth_gssapi_client.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\auth_gssapi_client.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\caching_sha2_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\caching_sha2_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\client_ed25519.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\client_ed25519.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\dialog.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\dialog.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\mysql_clear_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\mysql_clear_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_npipe.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_npipe.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_shmem.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_shmem.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\sha256_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\sha256_password.dll"</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="..\packages\MaterialDesignThemes.3.1.3\build\MaterialDesignThemes.targets" Condition="Exists('..\packages\MaterialDesignThemes.3.1.3\build\MaterialDesignThemes.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MaterialDesignThemes.3.1.3\build\MaterialDesignThemes.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MaterialDesignThemes.3.1.3\build\MaterialDesignThemes.targets'))" />
+  </Target>
+</Project>

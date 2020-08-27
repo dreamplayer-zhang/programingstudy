@@ -1,0 +1,269 @@
+﻿<UserControl x:Class="Root_WIND.GeneralSetupPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_WIND"
+             xmlns:wpg="clr-namespace:System.Windows.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="838" d:DesignWidth="1683" Background="{StaticResource PanelBackGround}">
+    <UserControl.Resources>
+        <local:StringConverter x:Key="StringConverter"/>
+        <local:ColorConverter x:Key="ColorConverter"/>
+        <local:IndexConverter x:Key="IndexConverter"/>
+        <Style TargetType="{x:Type DataGridCell}">
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="Foreground" Value="Black" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <ScrollViewer>
+            <StackPanel>
+                <Grid Height="838">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.5*"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="1.5*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="0">
+                        <GroupBox Header="Mask"
+                              Background="{StaticResource GroupBoxBackground}">
+                            <Grid Background="Black">
+
+                                <Viewbox>
+                                    <Grid>
+                                        <Image Source="/Root_WIND;component/Resources/Origin.PNG" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                                        <Canvas Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                                        Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                                            <Rectangle Canvas.Left="10" Canvas.Top="10"
+                                               Width="350" Height="305"
+                                               Stroke="Blue" Fill="SkyBlue"
+                                               Opacity="0.4"
+                                               StrokeThickness="1"/>
+                                            <Rectangle Canvas.Left="365" Canvas.Top="15"
+                                               Width="50" Height="335"
+                                               Opacity="0.3"
+                                               Stroke="Red" Fill="Crimson"/>
+                                            <Rectangle Canvas.Left="20" Canvas.Top="320"
+                                               Width="360" Height="60"
+                                               Opacity="0.3"
+                                               Stroke="Green" Fill="SeaGreen"/>
+
+                                        </Canvas>
+                                    </Grid>
+                                </Viewbox>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                    <!--Mask&Insepection Method-->
+                    <Grid Grid.Column="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition Height="2.5*"/>
+                            </Grid.RowDefinitions>
+                            <GroupBox Header="Mask" Grid.Row="0"
+                                  Background="{StaticResource GroupBoxBackground}">
+                                <ScrollViewer>
+                                    <DataGrid ItemsSource="{Binding p_cMask}"
+                                          SelectionMode="Single"
+                                          IsReadOnly="True"
+                                          AutoGenerateColumns="False">
+                                        <DataGrid.Resources>
+                                            <CollectionViewSource Source="{Binding p_cMask}" x:Key="masks"/>
+                                            <Style TargetType="DataGridColumnHeader">
+                                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            </Style>
+                                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                                                             Color="Gainsboro"/>
+                                        </DataGrid.Resources>
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="No." Width="35" 
+                                                            Binding="{Binding Converter={StaticResource IndexConverter},    
+                                                            ConverterParameter={StaticResource ResourceKey=masks}}"/>
+                                            <DataGridTextColumn Header="Mask" Width="*" Binding="{Binding p_sName}"/>
+                                            <DataGridTemplateColumn Header="Color" Width="*">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Margin="1" Opacity="0.5"
+                                                          Background="{Binding p_Color, Converter={StaticResource ColorConverter}}"/>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                            
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </ScrollViewer>
+                            </GroupBox>
+                            <GroupBox Header="Inspection Method" Grid.Row="1"
+                                  Background="{StaticResource GroupBoxBackground}">
+                                <ScrollViewer>
+                                    <StackPanel>
+                                        <DataGrid ItemsSource="{Binding p_cInspMethod}"
+                                              SelectedItem="{Binding p_selectedMethod}"
+                                              SelectionMode="Single"
+                                              AutoGenerateColumns="False" 
+                                              IsReadOnly="True"
+                                              LoadingRow="DataGrid_LoadingRow">
+                                            <DataGrid.Resources>
+                                                <CollectionViewSource Source="{Binding p_cInspMethod}" x:Key="methods"/>
+                                                <Style TargetType="DataGridColumnHeader">
+                                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                                                             Color="Gainsboro"/>
+                                            </DataGrid.Resources>
+
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="No." Width="35" 
+                                            Binding="{Binding Converter={StaticResource IndexConverter},    
+                                                                           ConverterParameter={StaticResource ResourceKey=methods}}"/>
+                                                <DataGridTextColumn Header="Name" Width="*" Binding="{Binding p_sName}"/>
+                                                <DataGridTextColumn Header="Inspection Mode" Width="*" Binding="{Binding p_inspMode, Converter={StaticResource ResourceKey=StringConverter}}"/>
+                                                <DataGridTemplateColumn Width="60" Header="-">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Button Content="Delete" Command="{Binding Path=DataContext.btnDeleteInspMethod, RelativeSource= {RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}"/>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                            </DataGrid.Columns>
+
+
+
+                                        </DataGrid>
+                                        <Button Content="Add Item" Margin="1" Height="30"
+                                            Command="{Binding btnAddInspMethod}"/>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </GroupBox>
+                            <GroupBox Header="Parameter" Grid.Row="2"
+                                  Background="{StaticResource GroupBoxBackground}">
+                                <GroupBox.Resources>
+                                    <local:PropertyConverter x:Key="PropertyConverter"/>
+                                </GroupBox.Resources>
+                                <wpg:WpfPropertyGrid SelectedObject="{Binding p_selectedMethod, FallbackValue=null,
+                                                                  Converter={StaticResource ResourceKey=PropertyConverter}}"
+                                                 HorizontalAlignment="Stretch"
+                                                 VerticalAlignment="Stretch"
+                                                 HelpVisible="True"
+                                                 ToolbarVisible="True"
+                                                 PropertySort="Categorized"/>
+                            </GroupBox>
+
+                        </Grid>
+                    </Grid>
+                    <!--Insepection Item-->
+                    <Grid Grid.Column="2">
+                        <GroupBox Header="Inspection Item"
+                                      Background="{StaticResource GroupBoxBackground}">
+                            <ScrollViewer>
+                                <StackPanel>
+                                    <DataGrid ItemsSource="{Binding p_cInspItem}"
+                                              SelectedItem="{Binding p_selectedInspItem}"
+                                              SelectionMode="Single"
+                                              IsReadOnly="True"
+                                              AutoGenerateColumns="False">
+                                        <DataGrid.Resources>
+                                            <CollectionViewSource Source="{Binding p_cInspItem}" x:Key="items"/>
+                                            <Style TargetType="DataGridColumnHeader">
+                                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            </Style>
+                                            <Style x:Key="TextInCellCenter" TargetType="{x:Type TextBlock}" >
+                                                <Setter Property="TextAlignment" Value="Center"/>
+                                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                            </Style>
+                                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                                                             Color="Gainsboro"/>
+
+                                        </DataGrid.Resources>
+
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="No." Width="35"
+                                                                ElementStyle="{StaticResource TextInCellCenter}"
+                                                                Binding="{Binding Converter={StaticResource IndexConverter}, 
+                                                                ConverterParameter={StaticResource ResourceKey=items}}"/>
+
+                                            <DataGridTemplateColumn Header="Mask" Width="*">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <ComboBox ItemsSource="{Binding p_cMask}"
+                                                                      SelectedItem="{Binding p_Mask, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                      IsSynchronizedWithCurrentItem="False"
+                                                                      DisplayMemberPath="p_sName"
+                                                                      BorderThickness="1"
+                                                                      VerticalContentAlignment="Center"/>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+
+                                            <DataGridTemplateColumn Header="Color" Width="*">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Margin="2" Opacity="0.5" 
+                                                              Background="{Binding p_Mask.p_Color, 
+                                                              Converter={StaticResource ColorConverter}}"/>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+
+                                            <DataGridTemplateColumn Header="Inspection Item" Width="1.5*">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <ComboBox ItemsSource="{Binding p_cInspMethod}"
+                                                                      SelectedItem="{Binding p_InspMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                      IsSynchronizedWithCurrentItem="False"
+                                                                      DisplayMemberPath="p_sName"
+                                                                      BorderThickness="1"
+                                                                      VerticalContentAlignment="Center"/>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+
+                                            <DataGridTextColumn Header="Value" Width="*"
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding p_InspMethod.p_nValue, 
+                                                                    Converter={StaticResource StringConverter}}"/>
+                                            <DataGridTextColumn Header="Size(Pxl)" Width="*" 
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding p_InspMethod.p_nSize, 
+                                                                    Converter={StaticResource StringConverter}}"/>
+                                            <DataGridTextColumn Header="Mode" Width="*" 
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding p_InspMethod.p_inspMode, 
+                                                                    Converter={StaticResource StringConverter}}"/>
+                                            <DataGridTemplateColumn Width="60" Header="-">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Button Content="Delete" Margin="1" Height="25"
+                                                                    Command="{Binding DataContext.btnDeleteInspItem, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <Button Content="Add Inspection" Margin="1" Height="30"
+                                            Command="{Binding btnAddInspItem}"/>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </GroupBox>
+                    </Grid>
+                </Grid>
+                <Line Stroke="{StaticResource Splitter}"
+                  Stretch="Fill"
+                  Margin="-1,2,-1,2"
+                  HorizontalAlignment="Stretch"
+                  X2="1"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

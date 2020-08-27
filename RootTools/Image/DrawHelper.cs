@@ -235,7 +235,6 @@ namespace RootTools
 
         public void Redrawing()
         {
-
             Point TopLeft = GetCanvasPoint(p_ModifyData.StartPos);
             SetTopLeft(p_ModifyRect, TopLeft);
             Point BottomRight = GetCanvasPoint(p_ModifyData.EndPos.X, p_ModifyData.EndPos.Y);
