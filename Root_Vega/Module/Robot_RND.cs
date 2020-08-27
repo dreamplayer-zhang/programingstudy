@@ -919,36 +919,56 @@ namespace Root_Vega.Module
 
             string ReadOCR(int nRetry)
             {
-                if (m_module.p_infoReticle == null) return "InfoReticle = null";
-                string sOCRMax = ""; 
-                string sOCR = "";
-                double fScoreMax = 0; 
-                double fScore = 0;
-                for (int n = 0; n < nRetry; n++)
+                try
                 {
-                    m_module.m_camOCR.ReadOCR(ref sOCR, ref fScore);
-                    if (fScore >= m_fMinScore)
+                    if (m_module.p_infoReticle == null) return "InfoReticle = null";
+                    string sOCRMax = "";
+                    string sOCR = "";
+                    double fScoreMax = 0;
+                    double fScore = 0;
+                    for (int n = 0; n < nRetry; n++)
                     {
-                        m_module.p_infoReticle.p_sSlotID = sOCR;
-                        return "OK"; 
+                        m_module.m_camOCR.ReadOCR(ref sOCR, ref fScore);
+                        if (fScore >= m_fMinScore)
+                        {
+                            m_module.p_infoReticle.p_sSlotID = sOCR;
+                            return "OK";
+                        }
+                        if (fScoreMax < fScore)
+                        {
+                            fScoreMax = fScore;
+                            sOCRMax = sOCR;
+                        }
                     }
-                    if (fScoreMax < fScore)
+                    m_module.p_sInfo = "ReadOCR Score Error : " + fScoreMax.ToString() + "%, " + sOCRMax;
+                    EQ.p_eState = EQ.eState.Ready;
+                    BitmapImage image = m_module.m_camOCR.ReadImage();
+                    SaveBMP(image, "c:\\Vega\\OCR.bmp");
+                    image.Freeze();
+                    //Application.Current.Dispatcher.Invoke((Action)delegate //jws 200827 check
+                    //{
+                    //    ManualOCR memualOCR = new ManualOCR(m_module.p_infoReticle, image);
+                    //    memualOCR.ShowOCR();
+                    //    memualOCR.m_ui.ShowDialog();
+
+                    //});
+                    Application.Current.Dispatcher.Invoke((Action)delegate
                     {
-                        fScoreMax = fScore;
-                        sOCRMax = sOCR; 
-                    }
+                        ManualOCR m_manualOCR = new ManualOCR(m_module.p_infoReticle, image);
+                        //if (m_manualOCR.ShowPopup() == false) return "OK";
+                        if(m_manualOCR.ShowPopup() == false)
+                        {
+
+                        }
+                        //else return "OK";
+                    });
+                    
+                    return "OK";
                 }
-                m_module.p_sInfo = "ReadOCR Score Error : " + fScoreMax.ToString() + "%, " + sOCRMax;
-                EQ.p_eState = EQ.eState.Ready; 
-                BitmapImage image = m_module.m_camOCR.ReadImage();
-                SaveBMP(image, "c:\\Vega\\OCR.bmp"); 
-                //Application.Current.Dispatcher.Invoke((Action)delegate //jws 200827 check
-                //{
-                //    ManualOCR memualOCR = new ManualOCR(m_module.p_infoReticle, image);
-                //    memualOCR.ShowOCR();
-                //    memualOCR.m_ui.ShowDialog(); 
-                //});
-                return "OK"; 
+                catch(Exception e)
+                {
+                    return "OK";
+                }
             }
 
             void SaveBMP(BitmapImage image, string filePath)

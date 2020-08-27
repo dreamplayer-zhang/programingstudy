@@ -8,8 +8,10 @@ namespace Root_Vega.ManualJob
     /// </summary>
     public partial class ManualOCR_UI : Window
     {
+        static public bool m_bShow = false;
         public ManualOCR_UI()
         {
+            m_bShow = true;
             InitializeComponent();
         }
 
@@ -24,12 +26,19 @@ namespace Root_Vega.ManualJob
         {
             EQ.p_bStop = false; 
             EQ.p_eState = EQ.eState.Run;
+            this.DialogResult = true;
             Close(); 
         }
 
         private void buttonStop_Click(object sender, RoutedEventArgs e)
         {
+            this.DialogResult = true;
             Close();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            m_bShow = false;
         }
     }
 }

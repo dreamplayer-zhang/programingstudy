@@ -5,18 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_Vega.ManualJob"
         mc:Ignorable="d"
+        Closing="Window_Closing"
         Title="ManualOCR" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width = "5*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width = "259*"/>
+            <ColumnDefinition Width="401*"/>
+            <ColumnDefinition Width="132*"/>
         </Grid.ColumnDefinitions>
-        <Image Grid.Column="0" x:Name= "imageOCR" Source= "{Binding p_image}" Stretch= "Uniform"/>
-        <StackPanel Grid.Column= "1" Orientation= "Vertical">
+        <Image Grid.Column="0" x:Name= "imageOCR" Source= "{Binding p_image}" Stretch= "Uniform" Grid.ColumnSpan="2"/>
+        <StackPanel Grid.Column= "2" Orientation= "Vertical">
             <TextBlock Text= "OCR" Margin= "3"/>
             <TextBox x:Name= "textBoxOCR" Margin= "3" Text="{Binding p_sOCR}"/>
-            <Button x:Name= "buttonRun" Content= "Run" Margin= "3" Height= "30" Click="buttonRun_Click"/>
-            <Button x:Name= "buttonStop" Content= "Stop" Margin= "3" Click="buttonStop_Click"/>
+            <Button x:Name= "buttonRun" Content= "Run" Margin= "3" Height= "30" Click="buttonRun_Click" IsDefault="True"/>
+            <Button x:Name= "buttonStop" Content= "Stop" Margin= "3" Click="buttonStop_Click" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>
