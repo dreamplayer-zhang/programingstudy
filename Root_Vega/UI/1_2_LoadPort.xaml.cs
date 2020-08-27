@@ -92,7 +92,13 @@ namespace Root_Vega
             ModuleRunBase moduleRun = m_loadport.m_runReadPodID.Clone();
             m_loadport.StartRun(moduleRun);
             Thread.Sleep(100);
-            while (m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10); 
+            while (m_loadport.m_qModuleRun.Count > 0) Thread.Sleep(10); 
+            while (m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+            moduleRun = m_loadport.m_runLoad.Clone();
+            m_loadport.StartRun(moduleRun);
+            Thread.Sleep(100);
+            while (m_loadport.m_qModuleRun.Count > 0) Thread.Sleep(10);
+            while (m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
         }
         
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

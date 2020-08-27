@@ -967,7 +967,7 @@ namespace Root_Vega.Module
                 }
                 catch(Exception e)
                 {
-                    return "OK";
+                    return e.Message;
                 }
             }
 
