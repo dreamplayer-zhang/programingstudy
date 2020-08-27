@@ -32,7 +32,7 @@ public:
 	};
 	inline void SetGrayLevel(int nValue)
 	{
-		assert(0 < nValue && nValue < Constants::MaxGrayLevel);
+		assert(0 <= nValue && nValue < Constants::MaxGrayLevel);
 		nGrayLevel = nValue;
 	};
 	inline void SetDefectSize(int nValue)
