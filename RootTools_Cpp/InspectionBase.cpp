@@ -142,12 +142,12 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 			INT64 xtarget = j + rt.left + (nOffset - 5) * 2;
 
 			INT64 iIndex = (ytarget)*nW + (xtarget);
-			byte* ptr = mem + iIndex;
+			byte* ptr = &mem[iIndex];
 			inspbuffer[i + nOffset][nOffset + j] = *ptr;	// <-- Index Overflow...?? -ESCHO
 			//inspbuffer[i + nOffset][nOffset + j] = mem[iIndex];	// <-- Index Overflow...?? -ESCHO
 			//inspbuffer2[(i+nOffset)* nWidth + (nOffset + j)] = mem[(ytarget)*nW + (xtarget)];
 		}
-	}
+	} 
 	
 
 	//for (int i = 0; i < m_nInspOffset; i++) {//Jerry
@@ -172,7 +172,7 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	}
 
 }
-InspectionBase::InspectionBase(int nWidth, int nHeight)
+InspectionBase::InspectionBase(INT64 nWidth, INT64 nHeight)
 {
 	bResult = false;
 
@@ -187,8 +187,8 @@ InspectionBase::InspectionBase(int nWidth, int nHeight)
 	bAbsoulteGrayLevel = false;
 	bLengthInspection = false;
 	bDarkInspection = false;
-	int sizerSize = nHeight * nHeight;
-	int bufSize = nWidth * nHeight;
+	INT64 sizerSize = nWidth * nHeight;
+	INT64 bufSize = nWidth * nHeight;
 
 	pPitSizer = new PitSizer(sizerSize, 1);
 	pBuffer = new byte(bufSize);
