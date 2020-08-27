@@ -101,11 +101,15 @@ namespace RootTools.Trees
 
         public void RunTreeDone()
         {
-            foreach (Tree tree in m_aChildRunInit)
+            try
             {
-                if (IsAlreadyExistatChild(tree) == false) p_aChild.Add(tree);
-                tree.RunTreeDone(); 
+                foreach (Tree tree in m_aChildRunInit)
+                {
+                    if (IsAlreadyExistatChild(tree) == false) p_aChild.Add(tree);
+                    tree.RunTreeDone();
+                }
             }
+            catch (Exception) { }
         }
 
         bool IsAlreadyExistatChild(Tree treeChild)

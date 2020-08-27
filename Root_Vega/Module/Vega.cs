@@ -179,7 +179,7 @@ namespace Root_Vega.Module
                 m_aCmd[5] = nCh;
                 CalcSend();
                 m_rs232.m_sp.Write(m_aSend, 0, 15); 
-                while (m_swRead.ElapsedMilliseconds < 2000)
+                while (m_swRead.ElapsedMilliseconds < 4000)
                 {
                     if (m_bOnRead == false)
                     {
