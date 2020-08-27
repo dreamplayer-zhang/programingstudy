@@ -758,20 +758,20 @@ namespace RootTools
 			ofd.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
 			if (ofd.ShowDialog() == DialogResult.OK)
 			{
-				//var viewModel = new Dialog_ImageOpenViewModel(this);
-				//Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
-				//if (result.HasValue)
-				//{
-				//	if (result.Value)
-				//	{
-				//		m_ImageData.OpenFile(ofd.FileName, p_CopyOffset);
-				//	}
-				//	else
-				//	{
-				//		// Cancelled
-				//	}
-				//}
-			}
+                //var viewModel = new Dialog_ImageOpenViewModel(this);
+                //Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+                if (true)
+                {
+                    if (true)
+                    {
+                        m_ImageData.OpenFile(ofd.FileName, p_CopyOffset);
+                    }
+                    else
+                    {
+                        // Cancelled
+                    }
+                }
+            }
 		}
 		void _btnSaveImage()
 		{

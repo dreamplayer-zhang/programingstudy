@@ -35,7 +35,6 @@
         </Menu>
         <Grid DockPanel.Dock="Bottom" Background="{StaticResource ControlBackGround}">
             <Grid HorizontalAlignment="Left" Margin="5,0">
-                
                 <StackPanel Orientation="Horizontal" TextElement.Foreground="{StaticResource MainThema}">
                     <TextBlock Text="{Binding p_MouseX}"/>
                     <TextBlock Text=","/>
@@ -76,10 +75,11 @@
                             <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasMouseWheel"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
+
                 </Canvas>
             </Grid>
 
-            <Grid Panel.ZIndex="99" VerticalAlignment="Bottom" Margin="0,0,0,10">
+            <!--<Grid Panel.ZIndex="99" VerticalAlignment="Bottom" Margin="0,0,0,10">
                 <TextBlock Text="{Binding p_Zoom, StringFormat=F2}" Foreground="White" 
                            HorizontalAlignment="Center"
                            VerticalAlignment="Bottom"
@@ -119,14 +119,14 @@
                             <ColumnDefinition Width="30*"/>
                             <ColumnDefinition Width="90*"/>
                         </Grid.ColumnDefinitions>
-                        <!--<marterial:PackIcon Kind="Cancel" Margin="0" Grid.Column="0"
-                        VerticalAlignment="Center" HorizontalAlignment="Center" />-->
+                        --><!--<marterial:PackIcon Kind="Cancel" Margin="0" Grid.Column="0"
+                        VerticalAlignment="Center" HorizontalAlignment="Center" />--><!--
                         <TextBlock Text="Cancel" Margin="0" Grid.Column="1"
                            Foreground="black"
                         VerticalAlignment="Center" HorizontalAlignment="Center" />
                     </Grid>
                 </ToggleButton>
-            </Grid>
+            </Grid>-->
         </Grid>
     </DockPanel>
 </UserControl>

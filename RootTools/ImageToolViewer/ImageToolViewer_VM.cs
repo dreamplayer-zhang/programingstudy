@@ -395,7 +395,6 @@ namespace RootTools
 			//InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
 			//SetImageSource();
 		}
-
 		public unsafe void SetImageSource()
 		{
 			try
@@ -522,7 +521,6 @@ namespace RootTools
 				p_View_Rect = new System.Drawing.Rectangle(point.X, point.Y, Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom * p_CanvasWidth / p_CanvasHeight), Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom));
 			}
 		}
-
 		public unsafe void SetThumNailIamgeSource()
 		{
 			if (p_ImageData.p_nByte == 1)
@@ -571,6 +569,7 @@ namespace RootTools
 			}
 
 		}
+
 		void _openImage()
 		{
 			if (m_ImageData == null)
@@ -750,6 +749,7 @@ namespace RootTools
 			}
 			return c;
 		}
+
         #endregion
 
         #region Event
@@ -805,6 +805,10 @@ namespace RootTools
 			{
 				CanvasMovePoint_Ref(m_ptViewBuffer, m_ptMouseBuffer.X - p_MouseX, m_ptMouseBuffer.Y - p_MouseY);
 			}
+			//if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
+			//{
+			//	//start drawing rect
+			//}
 		}
 		public void CanvasMouseWheel(object sender, MouseWheelEventArgs e)
 		{
@@ -813,7 +817,7 @@ namespace RootTools
 			var viewer = sender as Canvas;
 			viewer.Focus();
 
-			if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown == true)
+			if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
 			{
 				try
 				{
