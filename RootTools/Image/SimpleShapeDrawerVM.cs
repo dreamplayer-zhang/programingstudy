@@ -87,6 +87,8 @@ namespace RootTools
 
 				if (tempHistory.p_Index != HistoryIndex)
 				{
+					//4 m_History.RemoveAt(m_History.Count - 1);
+					//5 tempHistory = m_History.Last();
 					m_History.Add(tempHistory);
 					break;
 				}
@@ -610,7 +612,7 @@ namespace RootTools
 
 		public override void Redrawing()
 		{
-			Shape tempShape;
+			Shape tempShape;			
 			Point TopLeft = new Point();
 			Point BottomRight = new Point();
 			for (int i = 0; i < m_ListShape.Count; i++)
@@ -721,8 +723,7 @@ namespace RootTools
 
 		public TextBlock DrawnTb = new TextBlock();
 
-		public UniquenessDrawerVM(ImageViewer_ViewModel _ImageViewer)
-			: base(_ImageViewer)
+		public UniquenessDrawerVM(ImageViewer_ViewModel _ImageViewer): base(_ImageViewer)
 		{
 
 		}

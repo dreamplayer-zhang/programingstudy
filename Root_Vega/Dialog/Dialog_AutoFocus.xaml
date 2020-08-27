@@ -7,7 +7,7 @@
         xmlns:Tree="clr-namespace:RootTools.Trees;assembly=RootTools"
         xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         Height="768"
         Width="1280"
         

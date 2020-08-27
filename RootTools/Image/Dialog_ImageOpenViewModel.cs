@@ -12,8 +12,8 @@ namespace RootTools
     {
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
 
-        ImageViewer_ViewModel m_ImageViewer;
-        public ImageViewer_ViewModel p_ImageViewer
+        ImageToolViewer_VM m_ImageViewer;
+        public ImageToolViewer_VM p_ImageViewer
         {
             get
             {
@@ -25,7 +25,7 @@ namespace RootTools
             }
         }
 
-        public Dialog_ImageOpenViewModel(ImageViewer_ViewModel imageviewer)
+        public Dialog_ImageOpenViewModel(ImageToolViewer_VM imageviewer)
         {
             p_ImageViewer = imageviewer;
         }
