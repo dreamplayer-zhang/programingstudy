@@ -87,12 +87,14 @@
         </Grid>
         <!--Title Bar End-->   
         <Grid Grid.Row="1" x:Name="MainPanel">
+
             <DockPanel x:Name="panel">
                 <Button Content="Open" DockPanel.Dock="Top" Command="{Binding OpenImage}"/>
                 <Button Content="Clear" DockPanel.Dock="Top" Command="{Binding ClearImage}"/>
                 <tools:ImageToolViewer/>
             </DockPanel>
-            <!--<local:SelectMode Height="0"/>-->
+
+            <!--<local:SelectMode/>-->
         </Grid>
 
         <!--Log Area Start-->

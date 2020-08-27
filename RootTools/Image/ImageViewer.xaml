@@ -53,7 +53,7 @@
                 obs:SizeObserver.ObservedWidth="{Binding p_CanvasWidth, Mode=OneWayToSource}"
                 obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}">
             <Image Source="{Binding Path=p_ImgSource}"/>
-            </Canvas>
+        </Canvas>
             <ItemsControl ItemsSource="{Binding p_Element}" 
                           Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                           Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}"

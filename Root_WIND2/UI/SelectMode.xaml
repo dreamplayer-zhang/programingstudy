@@ -248,7 +248,7 @@
                         </Grid>
                     </GroupBox>
                 </Grid>
-                <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Height="45" Margin="1640,45,0,0" VerticalAlignment="Top" Width="155" Click="button_Click"/>
+                <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Height="45" Margin="1640,45,0,0" VerticalAlignment="Top" Width="155" Click="button_Click" Visibility="Collapsed"/>
             </Grid>
         </StackPanel>
     </ScrollViewer>

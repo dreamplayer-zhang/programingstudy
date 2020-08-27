@@ -1,8 +1,10 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using System;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -32,8 +34,11 @@ namespace RootTools
 
 		private readonly IDialogService m_DialogService;
 
-		bool mouseIsDown = System.Windows.Input.Mouse.LeftButton == MouseButtonState.Pressed;
-		
+		StopWatch m_swMouse = new StopWatch();
+		CPoint m_ptViewBuffer = new CPoint();
+		CPoint m_ptMouseBuffer = new CPoint();
+		System.Windows.Input.KeyEventArgs m_KeyEvent;
+
 		#region Property
 
 		private ImageData m_ImageData;
@@ -136,7 +141,6 @@ namespace RootTools
 		#endregion
 
 		#region Thumbnail
-
 		private BitmapSource m_ThumNailImgSource;
 		public BitmapSource p_ThumNailImgSource
 		{
@@ -224,13 +228,13 @@ namespace RootTools
                             if (p_ImgSource.Format.BitsPerPixel == 24)
                             {
                                 System.Windows.Media.Color c_Pixel = GetPixelColor(p_ImgSource, p_MouseX, p_MouseY);
-								p_PixelData = "R = " + c_Pixel.R + "G = " + c_Pixel.G + "B = " + c_Pixel.B;
+								p_PixelData = "R " + c_Pixel.R + " G " + c_Pixel.G + " B " + c_Pixel.B;
                             }
                             else if (p_ImgSource.Format.BitsPerPixel == 8)
                             {
                                 byte[] pixel = new byte[1];
                                 p_ImgSource.CopyPixels(new Int32Rect(p_MouseX, p_MouseY, 1, 1), pixel, 1, 0);
-								p_PixelData = "GV = " + pixel[0];
+								p_PixelData = "GV " + pixel[0];
                             }
                             p_MouseMemY = p_View_Rect.Y + p_MouseY * p_View_Rect.Height / m_CanvasHeight;
                             p_MouseMemX = p_View_Rect.X + p_MouseX * p_View_Rect.Width / m_CanvasWidth;
@@ -327,6 +331,42 @@ namespace RootTools
 			}
 		}
 		#endregion
+
+		// Stack
+		// Object -> Mem Point / w,h
+
+		// 이동 -> 1개의 동작
+		// 그리기 시작/ 그리는 중/ 그리기 완료 -> 1개의 동작
+		// List<Object> 변경사항 -> 1개의 동작
+
+		// List<Object> Property Set(동작완료)들어왔을때  -> Stack에 저장 
+		//-> Canvas 좌표로 p_Zoom비례 변환하면서 Obs<UIElement>로 복사 (이게 Redraw?)
+
+		// 확대/축소 -> Redraw?
+		// 확대/축소 이 후 실행취소는?
+		// List<Object> = Stack<이전꺼> 하면됨?
+		// -> Set으로 들어오니까 다시 Redraw 자동으로되나?
+
+
+		// 그리기/선택/수정은 1개의 클래스?
+		// 그리기
+		// 선택 Mode에따라 List<Object>의 Object 생성(Rect,Ellipse, Line)
+		// Mouse Down => Object.StartPt = Mem Mouse Pt
+		// Mouse Move => Object.w/h = Now Mem Mouse Pt
+		// Mouse UP  => Object.w/h = Now Mem Mouse Pt
+		// List<Object>.Add(Object) 
+		// Set -> Undo(Stack) -> Redraw -> UI반영
+
+		// 선택 / 수정
+		// Redraw 할 때 각 UIElement객체의 Mouse Enter Event 생성?
+		// Mouse Enter & Mouse Down = 선택? // isMouseOver && Mouse Down = 선택?
+
+		// ModifyManger 
+
+
+		// 복사/붙여넣기
+		// 그리기/선택(복수)/수정(복수)
+
 
 		#endregion
 
@@ -710,10 +750,13 @@ namespace RootTools
 			}
 			return c;
 		}
-		#endregion
+        #endregion
 
-		#region Command
-		public ICommand OpenImage
+        #region Event
+
+        #region ICommand
+
+        public ICommand OpenImage
 		{
 			get
 			{
@@ -735,13 +778,78 @@ namespace RootTools
 			}
 		}
 
+		#endregion
+
+		#region MethodAction
+
+		public void CanvasKeyEvent(object sender, System.Windows.Input.KeyEventArgs e)
+		{
+			m_KeyEvent = e;
+		}
+		public void CanvasPreviewMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
+		{
+			m_ptViewBuffer = new CPoint(p_View_Rect.X, p_View_Rect.Y);
+			m_ptMouseBuffer = new CPoint(p_MouseX, p_MouseY);
+			m_swMouse.Restart();
+		}
 		public void CanvasMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
 		{
+			var viewer = sender as Canvas;
+			viewer.Focus();
+
 			var pt = e.GetPosition(sender as IInputElement);
 			p_MouseX = (int) pt.X;
 			p_MouseY = (int) pt.Y;
+
+			if (e.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > 0)
+			{
+				CanvasMovePoint_Ref(m_ptViewBuffer, m_ptMouseBuffer.X - p_MouseX, m_ptMouseBuffer.Y - p_MouseY);
+			}
 		}
-		
-		#endregion
-	}
+		public void CanvasMouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			if (m_KeyEvent == null)
+				return;
+			var viewer = sender as Canvas;
+			viewer.Focus();
+
+			if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown == true)
+			{
+				try
+				{
+				
+					int lines = e.Delta * SystemInformation.MouseWheelScrollLines / 120;
+					double zoom = m_Zoom;
+
+					if (lines < 0)
+					{
+						zoom *= 1.1F;
+					}
+					if (lines > 0)
+					{
+						zoom *= 0.9F;
+					}
+
+					if (zoom > 1)
+					{
+						zoom = 1;
+					}
+					else if (p_Zoom < 0.0001)
+					{
+						zoom = 0.0001;
+					}
+					p_Zoom = zoom;
+					//SetRoiRect();
+				}
+				catch (Exception ex)
+				{
+					System.Windows.Forms.MessageBox.Show(ex.ToString());
+				}
+			}
+		}
+
+        #endregion
+
+        #endregion
+    }
 }

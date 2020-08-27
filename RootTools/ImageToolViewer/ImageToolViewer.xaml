@@ -6,7 +6,6 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:convert="clr-namespace:ViewConverter"
              xmlns:obs="clr-namespace:nsSizeObserver"
-             xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="500">
@@ -14,28 +13,30 @@
         <convert:ConverterVisibleProgress x:Key="ConverterVisibleProgresss" />
         <convert:ZoomConverter x:Key="ZoomConverters" />
     </UserControl.Resources>
+
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="{StaticResource ControlBackGround}">
-            <MenuItem BorderBrush="{x:Null}">
+            <MenuItem BorderBrush="{x:Null}" IsCheckable="True" Width="40">
                 <MenuItem.Header>
-                    <Grid Height="30">
-                        <marterial:PackIcon Kind="SquareOutline" Height="20" Width="20" VerticalAlignment="Center"/>
-                    </Grid>
+                    <TextBlock Text="File"/>
                 </MenuItem.Header>
             </MenuItem>
-            <MenuItem BorderBrush="{x:Null}">
+            <MenuItem BorderBrush="{x:Null}" IsCheckable="True" Width="40">
                 <MenuItem.Header>
-                    <Grid Height="30">
-                        
-                    </Grid>
+                    <TextBlock Text="Edit"/>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem BorderBrush="{x:Null}" IsCheckable="True" Width="40">
+                <MenuItem.Header>
+                    <TextBlock Text="Tool"/>
                 </MenuItem.Header>
             </MenuItem>
 
         </Menu>
-        <Grid DockPanel.Dock="Bottom" Background="{StaticResource ControlBackGround}"
-              TextElement.FontSize="14">
+        <Grid DockPanel.Dock="Bottom" Background="{StaticResource ControlBackGround}">
             <Grid HorizontalAlignment="Left" Margin="5,0">
-                <StackPanel Orientation="Horizontal">
+                
+                <StackPanel Orientation="Horizontal" TextElement.Foreground="{StaticResource MainThema}">
                     <TextBlock Text="{Binding p_MouseX}"/>
                     <TextBlock Text=","/>
                     <TextBlock Text="{Binding p_MouseY}"/>
@@ -47,11 +48,8 @@
                 </StackPanel>
             </Grid>
             <Grid HorizontalAlignment="Right" Margin="5,0">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="GV "/>
-                    <TextBlock Text="["/>
+                <StackPanel Orientation="Horizontal" TextElement.Foreground="{StaticResource MainThema}">
                     <TextBlock Text="{Binding p_PixelData}"/>
-                    <TextBlock Text="]"/>
                 </StackPanel>
             </Grid>
         </Grid>
@@ -60,51 +58,75 @@
                 <Canvas Background="Black" obs:SizeObserver.Observe="true" Focusable="True"
                 obs:SizeObserver.ObservedWidth="{Binding p_CanvasWidth, Mode=OneWayToSource}"
                 obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}">
-                <Image Source="{Binding Path=p_ImgSource}"/>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseMove">
-                        <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasMouseMove"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </Canvas>
-        </Grid>
-        
-        <Slider Panel.ZIndex="5" VerticalAlignment="Bottom" Width="200"  Height="20" Margin="0,0,0,10" 
-                Value="{Binding p_Zoom, Converter={StaticResource ZoomConverters}, Mode=TwoWay}" Minimum="1" Maximum="1000"
-                SmallChange="10" LargeChange="100" Focusable="False">
-            <Slider.Style>
-                <Style>
-                    <Style.Triggers>
-                        <Trigger Property="Slider.IsMouseOver" Value="False">
-                            <Setter Property="Slider.Opacity" Value="0.4"></Setter>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </Slider.Style>
-        </Slider>
-        <Grid Visibility="{Binding Path=p_nProgress, Converter={StaticResource ConverterVisibleProgresss}}">
-            <ProgressBar Grid.Row="1" Value="{Binding p_nProgress}" Width="300" Height="35"/>
-            <TextBlock Foreground="Black"
+                    <Image Source="{Binding Path=p_ImgSource}"/>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="PreviewKeyDown">
+                            <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasKeyEvent"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="PreviewKeyUp">
+                            <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasKeyEvent"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="PreviewMouseDown">
+                            <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasPreviewMouseDown"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseMove">
+                            <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasMouseMove"/>
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseWheel">
+                            <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasMouseWheel"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Canvas>
+            </Grid>
+
+            <Grid Panel.ZIndex="99" VerticalAlignment="Bottom" Margin="0,0,0,10">
+                <TextBlock Text="{Binding p_Zoom, StringFormat=F2}" Foreground="White" 
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom"
+                           Opacity="0.5"/>
+                <Slider Panel.ZIndex="5" VerticalAlignment="Bottom" Width="200" Height="20"
+                        Margin="0,0,0,15"
+                        Value="{Binding p_Zoom, Converter={StaticResource ZoomConverters}, Mode=TwoWay}" 
+                        Minimum="1" Maximum="1000"
+                        SmallChange="10" LargeChange="100" Focusable="False">
+                <Slider.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <Trigger Property="Slider.IsMouseOver" Value="False">
+                                    <Setter Property="Slider.Opacity" Value="0.2"/>
+                                </Trigger>
+                                <Trigger Property="Slider.IsMouseOver" Value="True">
+                                    <Setter Property="Slider.Opacity" Value="0.6"/>
+                                </Trigger>
+                            </Style.Triggers>
+                    </Style>
+                </Slider.Style>
+            </Slider>
+                
+            </Grid>
+            <Grid Visibility="{Binding Path=p_nProgress, Converter={StaticResource ConverterVisibleProgresss}}">
+                <ProgressBar Grid.Row="1" Value="{Binding p_nProgress}" Width="300" Height="35"/>
+                <TextBlock Foreground="Black"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"
                            Text="{Binding Path = p_nProgress, StringFormat={}{0:0}%}"
                            TextAlignment="Center" FontSize="30"/>
-            <ToggleButton Grid.Row="1" Width="100" Height="30" Margin="0,120,0,0" 
+                <ToggleButton Grid.Row="1" Width="100" Height="30" Margin="0,120,0,0" 
                               Background="AliceBlue" 
                               Command="{Binding CancelCommand}">
-                <Grid Margin="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="30*"/>
-                        <ColumnDefinition Width="90*"/>
-                    </Grid.ColumnDefinitions>
-                    <marterial:PackIcon Kind="Cancel" Margin="0" Grid.Column="0"
-                        VerticalAlignment="Center" HorizontalAlignment="Center" />
-                    <TextBlock Text="Cancel" Margin="0" Grid.Column="1"
+                    <Grid Margin="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30*"/>
+                            <ColumnDefinition Width="90*"/>
+                        </Grid.ColumnDefinitions>
+                        <!--<marterial:PackIcon Kind="Cancel" Margin="0" Grid.Column="0"
+                        VerticalAlignment="Center" HorizontalAlignment="Center" />-->
+                        <TextBlock Text="Cancel" Margin="0" Grid.Column="1"
                            Foreground="black"
                         VerticalAlignment="Center" HorizontalAlignment="Center" />
-                </Grid>
-            </ToggleButton>
+                    </Grid>
+                </ToggleButton>
+            </Grid>
         </Grid>
-    </Grid>
     </DockPanel>
 </UserControl>
