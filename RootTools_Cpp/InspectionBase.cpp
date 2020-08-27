@@ -99,7 +99,7 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	//opencv 전의 test용으로 interpolation 내용 미구현
 
 	byte* mem = pBuffer;
-	int nW = nBufferW;//80000;
+	INT64 nW = nBufferW;//80000;
 	RECT rt = rtROI;
 	int nBackGround = 255;
 	if (!bDark)
@@ -138,8 +138,8 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	{
 		for (int j = nStart; j < nEndX; j++)
 		{
-			int ytarget = i + rt.top + (nOffset - 5) * 2;
-			int xtarget = j + rt.left + (nOffset - 5) * 2;
+			INT64 ytarget = i + rt.top + (nOffset - 5) * 2;
+			INT64 xtarget = j + rt.left + (nOffset - 5) * 2;
 
 			inspbuffer[i + nOffset][nOffset + j] = mem[(ytarget)*nW + (xtarget)];	// <-- Index Overflow...?? -ESCHO
 			//inspbuffer2[(i+nOffset)* nWidth + (nOffset + j)] = mem[(ytarget)*nW + (xtarget)];
