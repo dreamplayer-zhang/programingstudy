@@ -206,7 +206,7 @@ namespace RootTools.Module
                         p_eState = eState.Error;
                         m_qModuleRun.Clear();
                     }
-                    p_eState = eState.Ready;
+                    if (m_qModuleRun.Count == 0) p_eState = eState.Ready;
                     break;
                 case eState.Error:
                     p_bEnableHome = false;

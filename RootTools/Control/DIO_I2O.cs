@@ -25,7 +25,7 @@ namespace RootTools.Control
 
         ListDIO m_listDI;
         ListDIO m_listDO;
-        string m_id;
+        public string m_id;
         Log m_log;
         public DIO_I2O(IToolDIO tool, string id, Log log, bool bEnableRun, string sFalse, string sTrue)
         {
