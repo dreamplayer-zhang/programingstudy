@@ -50,7 +50,7 @@ std::vector<DefectDataStruct> CInspectionReticle::StripInspection(int nBandwidth
 		}
 	}
 
-	//int nPL = CalHPPatternGV(nBandwidth, nIntensity, nEndX, nEndY);
+	int nPL = CalHPPatternGV(nBandwidth, nIntensity, nEndX, nEndY);
 	//SetGrayLevel(nPL);//Pattern Target GV 계산 후 GV Level 재설정
 
 	//if (nPL > 0)

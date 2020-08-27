@@ -20,7 +20,7 @@ namespace RootTools.RADS
 			m_log = log;
 
 			p_connect = new RADSConnectControl(this, bUseRADS);
-			p_connect.SearchComplete += OnSearchComplete;
+			//p_connect.SearchComplete += OnSearchComplete;
 
 			//if (bUseRADS == true)
 			//{

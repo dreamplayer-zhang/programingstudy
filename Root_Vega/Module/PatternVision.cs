@@ -117,7 +117,7 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
 
             p_sInfo = m_toolBox.Get(ref m_diPatternReticleExistSensor, this, "Pattern Reticle Sensor");
-            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", true);
+            //p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", true);
             if (bInit) m_inspectTool.OnInspectDone += M_inspectTool_OnInspectDone;
         }
 
