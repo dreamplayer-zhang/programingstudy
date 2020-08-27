@@ -189,7 +189,7 @@ namespace Root_Vega.Module
                     Thread.Sleep(20); 
                 }
                 sRFID = ""; 
-                return "RFID Read Timeout"; 
+                return "RFID Read Fail : Timeout"; 
             }
             #endregion
 
