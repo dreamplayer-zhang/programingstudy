@@ -94,9 +94,9 @@ namespace Root_Vega
 
             InitTimer(); 
 
-            if(!System.IO.Directory.Exists(@"C:\VEGA\Recipe"))
+            if(!System.IO.Directory.Exists(@"C:\Recipe\VEGA"))
 			{
-                System.IO.Directory.CreateDirectory(@"C:\VEGA\Recipe");
+                System.IO.Directory.CreateDirectory(@"C:\Recipe\VEGA");
 			}
         }
 
