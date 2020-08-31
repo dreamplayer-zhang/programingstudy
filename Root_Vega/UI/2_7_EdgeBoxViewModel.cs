@@ -402,7 +402,7 @@ namespace Root_Vega
 			}
 
 			//TODO : 원하는 파라메터만 갱신해서 저장할 수 있는 기능이 있으면 좋을 것 같음!
-			var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName));
+			var target = System.IO.Path.Combine(System.IO.Path.Combine(@"C:\Recipe\VEGA", m_Engineer.m_recipe.RecipeName));
 			m_Engineer.m_recipe.Save(target);
 		}
 		public void _addRoi()

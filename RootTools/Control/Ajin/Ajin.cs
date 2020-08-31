@@ -23,22 +23,27 @@ namespace RootTools.Control.Ajin
 
         bool CopyDllFile(string sPath)
         {
+            string MainFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             DirectoryInfo dir = new DirectoryInfo(sPath);
             if (dir.Exists == false) return false;
             FileInfo[] file = dir.GetFiles();
             for (int i = 0; i < file.Length; i++)
             {
-                file[i].CopyTo(Directory.GetCurrentDirectory() + @"\" + file[i].Name, true);
+                file[i].CopyTo(Path.Combine(MainFolder ,file[i].Name), true);
             }
             return true;
         }
         void CopyDllFile()
         {
-            //string[] sFindDll = Directory.GetFiles(Directory.GetCurrentDirectory(), "AXL.dll");
-            //if (sFindDll.Length != 0)
-            //    return;
-            if (CopyDllFile(@"C:\Program Files (x86)\EzSoftware UC\AXL(Library)\Library\64Bit")) return;
-            if (CopyDllFile(@"C:\Program Files (x86)\EzSoftware RM\AXL(Library)\Library\64Bit")) return;
+            string MainFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            string[] sFindDll = Directory.GetFiles(MainFolder, "AXL.dll");
+            if (sFindDll.Length != 0) return;
+
+            string pathUC = @"C:\Program Files (x86)\EzSoftware UC\AXL(Library)\Library\64Bit";
+            string pathRM = @"C:\Program Files (x86)\EzSoftware RM\AXL(Library)\Library\64Bit";
+
+            if (CopyDllFile(pathUC)) return;
+            if (CopyDllFile(pathRM)) return;
         }
         #endregion
 

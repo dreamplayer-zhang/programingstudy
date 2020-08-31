@@ -153,7 +153,7 @@ namespace Root_Vega
 			p_moduleRunList = p_recipe.m_moduleRunList;
 		}
 
-		string m_sPath = "c:\\VEGA\\Recipe\\";
+		string m_sPath = "c:\\Recipe\\VEGA\\";
 		private void _btnRcpLoad()
 		{
 			string sModel = EQ.m_sModel;
@@ -168,7 +168,7 @@ namespace Root_Vega
 
 				// Inspection Recipe
 				dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
-				dlg.InitialDirectory = @"C:\VEGA\Recipe";
+				dlg.InitialDirectory = @"C:\Recipe\VEGA";
 				var target = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(dlg.FileName), System.IO.Path.GetFileNameWithoutExtension(dlg.FileName), "Parameter.VegaVision");
 				m_Engineer.m_recipe.Load(target);
 			}
@@ -197,7 +197,7 @@ namespace Root_Vega
 
 				// Inspection Recipe
 				dlg.Filter = "Vega Vision Recipe (*.VegaVision)|*.VegaVision";
-				dlg.InitialDirectory = @"C:\VEGA\Recipe";
+				dlg.InitialDirectory = @"C:\Recipe\VEGA";
 				var target = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(dlg.FileName), System.IO.Path.GetFileNameWithoutExtension(dlg.FileName));
 				m_Engineer.m_recipe.Save(target);
 			}
@@ -209,12 +209,12 @@ namespace Root_Vega
             if (m_Engineer.m_recipe.Loaded)
             {
 				// Sequence Recipe
-				var target = System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName + ".Vega");
+				var target = System.IO.Path.Combine(@"C:\Recipe\VEGA", m_Engineer.m_recipe.RecipeName + ".Vega");
 				m_moduleRunList.SaveJob(target);
 				p_moduleRunList.RunTree(Tree.eMode.Init);
 
 				// Inspection Recipe
-				target = System.IO.Path.Combine(@"C:\VEGA\Recipe", m_Engineer.m_recipe.RecipeName);
+				target = System.IO.Path.Combine(@"C:\Recipe\VEGA", m_Engineer.m_recipe.RecipeName);
                 m_Engineer.m_recipe.Save(target);
             }
         }

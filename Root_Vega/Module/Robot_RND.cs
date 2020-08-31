@@ -941,7 +941,7 @@ namespace Root_Vega.Module
                 m_module.p_sInfo = "ReadOCR Score Error : " + fScoreMax.ToString() + "%, " + sOCRMax;
                 EQ.p_eState = EQ.eState.Ready; 
                 BitmapImage image = m_module.m_camOCR.ReadImage();
-                SaveBMP(image, "c:\\Vega\\OCR.bmp"); 
+                SaveBMP(image, "c:\\Log\\VEGA\\OCR.bmp"); 
                 ManualOCR memualOCR = new ManualOCR(m_module.p_infoReticle, image);
                 memualOCR.ShowOCR();
                 return "OK"; 
