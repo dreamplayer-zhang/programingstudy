@@ -151,7 +151,7 @@ namespace RootTools.Module
             m_engineer = engineer;
             m_moduleList = engineer.ClassModuleList();
             m_log = LogView.GetLog(m_id, sLogGroup);
-            m_treeRoot = new TreeRoot("Recipe", m_log);
+            m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);
         }

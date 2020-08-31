@@ -117,7 +117,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Module\Packer.cs" />
+    <Compile Include="Module\TapePacker.cs" />
+    <Compile Include="Module\VacuumPacker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Root_AUP01.Module
 {
-    public class Packer : ModuleBase
+    public class TapePacker : ModuleBase
     {
         #region ToolBox
         DIO_I2O m_dioHead;
@@ -21,6 +21,7 @@ namespace Root_AUP01.Module
         DIO_I2O m_dioAlign;
         DIO_I m_diAlignCheck;
         DIO_I m_diCaseCheck;
+        DIO_I2O m_dioPress;
 
         DIO_I2O m_dioCartridge;
         DIO_I2O m_dioCutter;
@@ -39,6 +40,7 @@ namespace Root_AUP01.Module
             p_sInfo = m_toolBox.Get(ref m_dioAlign, this, "Align", "Backward", "Align");
             p_sInfo = m_toolBox.Get(ref m_diAlignCheck, this, "AlignCheck");
             p_sInfo = m_toolBox.Get(ref m_diCaseCheck, this, "CaseCheck");
+            p_sInfo = m_toolBox.Get(ref m_dioAlign, this, "Press", "Backward", "Press");
 
             p_sInfo = m_toolBox.Get(ref m_dioCartridge, this, "Cartrige", "Backward", "Forward");
             p_sInfo = m_toolBox.Get(ref m_dioCutter, this, "Cutter", "Backward", "Forward");
@@ -112,11 +114,12 @@ namespace Root_AUP01.Module
 
         public string RunCoverOpen()
         {
-            if (Run(RunHead(false))) return p_sInfo;
             m_dioPad.Write(false);
-            if (Run(RunLidGuide(false))) return p_sInfo; 
-            if (Run(RunPad(false))) return p_sInfo; 
+            if (Run(RunHead(false))) return p_sInfo;
+            if (Run(RunLidGuide(false))) return p_sInfo;
+            m_dioPad.Write(true);
             if (Run(RunHead(true))) return p_sInfo;
+            if (Run(RunPad(true))) return p_sInfo; 
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(RunHead(false))) return p_sInfo;
             if (Run(RunLidGuide(true))) return p_sInfo;
@@ -126,14 +129,16 @@ namespace Root_AUP01.Module
         public string RunCoverClose()
         {
             if (Run(RunLidGuide(false))) return p_sInfo;
+            m_dioPad.Write(true);
             if (Run(RunHead(true))) return p_sInfo;
-            if (Run(RunPad(true))) return p_sInfo;
+            if (Run(RunVacuum(false))) return p_sInfo;
+            if (Run(RunPad(false))) return p_sInfo;
             return "OK"; 
         }
 
         public string RunHeadUp()
         {
-            if (Run(RunVacuum(true))) return p_sInfo;
+            if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(RunPad(false))) return p_sInfo;
             if (Run(RunHead(false))) return p_sInfo;
             return "OK"; 
@@ -166,6 +171,11 @@ namespace Root_AUP01.Module
             m_axisRotate.StartMove(fDeg, v, acc, acc);
             return m_axisRotate.WaitReady(3);
         }
+
+        public string RunPress(bool bOn)
+        {
+            return RunSol(m_dioPress, bOn, m_sSolPress);
+        }
         #endregion
 
         #region Cartridge Function
@@ -188,7 +198,8 @@ namespace Root_AUP01.Module
         double m_sSolLidGuide = 5;
         double m_sVac = 2;
         double m_sBlow = 0.5;
-        double m_sSolAlign = 5; 
+        double m_sSolAlign = 5;
+        double m_sSolPress = 5;
         double m_sSolCartridge = 5;
         double m_sSolCutter = 5; 
         void RunTreeDIOWait(Tree tree)
@@ -199,6 +210,7 @@ namespace Root_AUP01.Module
             m_sVac = tree.Set(m_sVac, m_sVac, "Vac", "Vacuum Sensor Wait (sec)");
             m_sBlow = tree.Set(m_sBlow, m_sBlow, "Blow", "Blow Time (sec)");
             m_sSolAlign = tree.Set(m_sSolAlign, m_sSolAlign, "Align", "Sol Value Move Wait (sec)");
+            m_sSolPress = tree.Set(m_sSolPress, m_sSolPress, "Press", "Sol Value Move Wait (sec)");
 
             m_sSolCartridge = tree.Set(m_sSolCartridge, m_sSolCartridge, "Cartridge", "Sol Value Move Wait (sec)");
             m_sSolCutter = tree.Set(m_sSolCutter, m_sSolCutter, "Cutter", "Sol Value Move Wait (sec)");
@@ -237,7 +249,7 @@ namespace Root_AUP01.Module
         }
         #endregion
 
-        public Packer(string id, IEngineer engineer)
+        public TapePacker(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
         }
@@ -257,8 +269,8 @@ namespace Root_AUP01.Module
 
         public class Run_Delay : ModuleRunBase
         {
-            Packer m_module;
-            public Run_Delay(Packer module)
+            TapePacker m_module;
+            public Run_Delay(TapePacker module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -286,8 +298,8 @@ namespace Root_AUP01.Module
 
         public class Run_Cover : ModuleRunBase
         {
-            Packer m_module;
-            public Run_Cover(Packer module)
+            TapePacker m_module;
+            public Run_Cover(TapePacker module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -326,8 +338,8 @@ namespace Root_AUP01.Module
 
         public class Run_Taping : ModuleRunBase
         {
-            Packer m_module;
-            public Run_Taping(Packer module)
+            TapePacker m_module;
+            public Run_Taping(TapePacker module)
             {
                 m_module = module;
                 InitModuleRun(module);

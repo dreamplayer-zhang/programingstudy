@@ -30,14 +30,17 @@ namespace Root_AUP01
         public ModuleList m_moduleList;
         public AUP01_Recipe m_recipe;
         public AUP01_Process m_process;
-        public Packer m_packer; 
+        public TapePacker m_tapePacker;
+        public VacuumPacker m_vacuumPacker; 
         //        public Robot_RND m_robot;
 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
-            m_packer = new Packer("Packer", m_engineer);
-            InitModule(m_packer); 
+            m_tapePacker = new TapePacker("TapePacker", m_engineer);
+            InitModule(m_tapePacker);
+            m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
+            InitModule(m_vacuumPacker); 
             //((IWTR)m_wtr).ReadInfoReticle_Registry();
             m_recipe = new AUP01_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
