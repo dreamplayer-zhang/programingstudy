@@ -33,6 +33,11 @@ namespace RootTools
             }
         }
 
+
+        public void InitBasicShape()
+        {
+
+        }
         public bool StartDrawBasicTool(Shape shapeType, CPoint memStartPt, CPoint canvasStartPt)
         {
             try

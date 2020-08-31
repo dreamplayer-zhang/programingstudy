@@ -810,14 +810,12 @@ namespace RootTools
 			m_KeyEvent = e;
 		}
 		public virtual void CanvasPreviewMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
-		{
-			
+		{			
 			m_ptViewBuffer = new CPoint(p_View_Rect.X, p_View_Rect.Y);
 			m_ptMouseBuffer = new CPoint(p_MouseX, p_MouseY);
 			m_swMouse.Restart();
 			
-			p_BasicTool.StartDrawBasicTool(new Rectangle(),GetMemPoint(m_ptMouseBuffer), m_ptMouseBuffer);
-			
+			p_BasicTool.StartDrawBasicTool(new Rectangle(),GetMemPoint(m_ptMouseBuffer), m_ptMouseBuffer);			
 		}
 		public virtual void CanvasMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
 		{
