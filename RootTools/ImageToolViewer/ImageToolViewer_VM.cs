@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace RootTools
 {
@@ -16,6 +17,7 @@ namespace RootTools
     {
 		public ImageToolViewer_VM(ImageData image = null, IDialogService dialogService = null)
 		{
+			
 			if (image != null)
 			{
 				p_ImageData = image;
@@ -24,13 +26,14 @@ namespace RootTools
 				image.UpdateOpenProgress += image_UpdateOpenProgress;
 				InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
 				SetImageSource();
-
+				
 			}
 			if (dialogService != null)
 			{
 				m_DialogService = dialogService;
 			}
 		}
+		
 
 		private readonly IDialogService m_DialogService;
 
@@ -38,6 +41,23 @@ namespace RootTools
 		CPoint m_ptViewBuffer = new CPoint();
 		CPoint m_ptMouseBuffer = new CPoint();
 		System.Windows.Input.KeyEventArgs m_KeyEvent;
+
+		Key m_keyMove = Key.LeftCtrl;
+		Key m_keyZoom = Key.LeftCtrl;
+		Key m_keyDrawBasic = Key.LeftShift;
+
+		private BasicTool m_BasicTool = new BasicTool();
+		public BasicTool p_BasicTool
+		{
+			get
+			{
+				return m_BasicTool;
+			}
+			set
+			{
+				SetProperty(ref m_BasicTool, value);
+			}
+		}
 
 		#region Property
 
@@ -54,7 +74,9 @@ namespace RootTools
 			}
 		}
 
-		private CPoint m_CopyOffset = new CPoint(0, 0);
+
+
+        private CPoint m_CopyOffset = new CPoint(0, 0);
 		public CPoint p_CopyOffset
 		{
 			get
@@ -118,6 +140,8 @@ namespace RootTools
 			{
 				if (value == 0)
 					return;
+
+				
 				SetProperty(ref m_CanvasWidth, value);
 			}
 		}
@@ -735,7 +759,7 @@ namespace RootTools
 		}
 		public System.Windows.Media.Color GetPixelColor(BitmapSource source, int x, int y)
 		{
-			System.Windows.Media.Color c = Colors.White;
+			System.Windows.Media.Color c = System.Windows.Media.Colors.White;
 			if (source != null)
 			{
 				try
@@ -749,14 +773,13 @@ namespace RootTools
 			}
 			return c;
 		}
+		#endregion
 
-        #endregion
+		#region Event
 
-        #region Event
+		#region ICommand
 
-        #region ICommand
-
-        public ICommand OpenImage
+		public ICommand OpenImage
 		{
 			get
 			{
@@ -786,35 +809,62 @@ namespace RootTools
 		{
 			m_KeyEvent = e;
 		}
-		public void CanvasPreviewMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
+		public virtual void CanvasPreviewMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
 		{
+			
 			m_ptViewBuffer = new CPoint(p_View_Rect.X, p_View_Rect.Y);
 			m_ptMouseBuffer = new CPoint(p_MouseX, p_MouseY);
 			m_swMouse.Restart();
+			
+			p_BasicTool.StartDrawBasicTool(new Rectangle(),GetMemPoint(m_ptMouseBuffer), m_ptMouseBuffer);
+			
 		}
-		public void CanvasMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+		public virtual void CanvasMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
 		{
-			var viewer = sender as Canvas;
+			var viewer = sender as Grid;
 			viewer.Focus();
 
 			var pt = e.GetPosition(sender as IInputElement);
 			p_MouseX = (int) pt.X;
 			p_MouseY = (int) pt.Y;
+			CPoint nowPt = new CPoint(p_MouseX, p_MouseY);
 
-			if (e.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > 0)
+			p_BasicTool.DrawingCrossLine(nowPt, p_CanvasWidth, p_CanvasHeight);
+            p_BasicTool.Drawing_BasicTool(GetMemPoint(nowPt), nowPt);
+
+
+            if (m_KeyEvent == null)
+				return;
+
+			if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown) 
+				if(e.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > 0)
 			{
 				CanvasMovePoint_Ref(m_ptViewBuffer, m_ptMouseBuffer.X - p_MouseX, m_ptMouseBuffer.Y - p_MouseY);
 			}
-			//if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
-			//{
-			//	//start drawing rect
-			//}
+        }
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@Protected@@@@@@@@@@@@@@@@@@@@@@@@
+		protected CPoint GetMemPoint(CPoint canvasPt)
+		{
+			double nX = p_View_Rect.X + canvasPt.X * p_View_Rect.Width / p_CanvasWidth;
+			double nY = p_View_Rect.Y + canvasPt.Y * p_View_Rect.Height / p_CanvasHeight;
+			return new CPoint((int)nX, (int)nY);
 		}
+		protected Point GetCanvasPoint(Point memPt)
+		{
+			if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)
+			{
+				double nX = (double)(memPt.X - p_View_Rect.X) * p_CanvasWidth / p_View_Rect.Width;
+				double nY = (double)(memPt.Y - p_View_Rect.Y) * p_CanvasHeight / p_View_Rect.Height;
+				return new Point(nX, nY);
+			}
+			return new Point(0, 0);
+		}
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@Protected@@@@@@@@@@@@@@@@@@@@@@@@
 		public void CanvasMouseWheel(object sender, MouseWheelEventArgs e)
 		{
 			if (m_KeyEvent == null)
 				return;
-			var viewer = sender as Canvas;
+			var viewer = sender as Grid;
 			viewer.Focus();
 
 			if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
@@ -851,6 +901,7 @@ namespace RootTools
 				}
 			}
 		}
+
 
         #endregion
 

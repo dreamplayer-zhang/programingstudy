@@ -34,8 +34,9 @@ namespace RootTools.Control.Ajin
         }
         void CopyDllFile()
         {
-            string[] sFindDll = Directory.GetFiles(Directory.GetCurrentDirectory(), "AXL.dll");
-            if (sFindDll.Length != 0) return;
+            //string[] sFindDll = Directory.GetFiles(Directory.GetCurrentDirectory(), "AXL.dll");
+            //if (sFindDll.Length != 0)
+            //    return;
             if (CopyDllFile(@"C:\Program Files (x86)\EzSoftware UC\AXL(Library)\Library\64Bit")) return;
             if (CopyDllFile(@"C:\Program Files (x86)\EzSoftware RM\AXL(Library)\Library\64Bit")) return;
         }
