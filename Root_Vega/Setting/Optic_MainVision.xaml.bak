@@ -437,7 +437,7 @@
                                         </Button.Content>
                                     </Button>
                                     <Button Style="{StaticResource BasicBtn}"
-                                            IsEnabled="{Binding p_CamInfo._IsGrabbing}"
+                                            IsEnabled="{Binding p_CamInfo._IsCanGrab, Converter={StaticResource InverseBooleanConverters}}"
                                             Command="{Binding StopGrabCommand}"
                                             Margin="5">
                                         <Button.Content>
