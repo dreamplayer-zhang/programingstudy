@@ -54,29 +54,37 @@
         </Grid>
         <Grid>
             <Grid Focusable="True">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="PreviewKeyDown">
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasKeyEvent"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="PreviewKeyUp">
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasKeyEvent"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="PreviewMouseDown">
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasPreviewMouseDown"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseMove">
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasMouseMove"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseWheel">
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasMouseWheel"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
                 <Canvas Background="Black" obs:SizeObserver.Observe="true" Focusable="True"
                 obs:SizeObserver.ObservedWidth="{Binding p_CanvasWidth, Mode=OneWayToSource}"
                 obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}">
                     <Image Source="{Binding Path=p_ImgSource}"/>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="PreviewKeyDown">
-                            <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasKeyEvent"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="PreviewKeyUp">
-                            <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasKeyEvent"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="PreviewMouseDown">
-                            <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasPreviewMouseDown"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="MouseMove">
-                            <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasMouseMove"/>
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="MouseWheel">
-                            <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasMouseWheel"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-
                 </Canvas>
+                <ItemsControl ItemsSource="{Binding p_BasicTool.p_BasicElement}"
+                                  Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                                  Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas ClipToBounds="True" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
             </Grid>
 
             <Grid Panel.ZIndex="99" VerticalAlignment="Bottom" Margin="0,0,0,10">

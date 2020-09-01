@@ -56,10 +56,8 @@ namespace RootTools
 			}
 			set
 			{
-				if ((m_Size.X != value.X) && (m_Size.Y !=value.Y))
-				{
+				if (m_Size != value)
 					ReAllocate(value, p_nByte);
-				}
 				SetProperty(ref m_Size, value);
 			}
 		}
@@ -628,16 +626,15 @@ namespace RootTools
 			br.Close();
 		}
 
-		public bool ReAllocate(CPoint sz, int nByte)
+		bool ReAllocate(CPoint sz, int nByte)
 		{
-			if (nByte <= 0)
+			p_Size.X = (p_Size.X / 4) * 4;
+			if (p_nByte <= 0)
 				return false;
-			if ((sz.X < 1) || (sz.Y < 1))
+			if ((p_Size.X < 1) || (p_Size.Y < 1))
+				return false;
+			m_aBuf = new byte[(p_Size.X) * p_nByte * (p_Size.Y)];
 			return false;
-
-			Array.Resize(ref m_aBuf, sz.X * nByte* sz.Y);
-
-			return true;
 		}
 
 		public void ClearImage()
