@@ -132,7 +132,15 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	//	}
 	//}
 
-	
+
+	for (INT64 i = 0; i < 200000; i++)
+	{
+		for (INT64 j = 0; j < 6000; j++)
+		{
+			mem[i * nW + j] = 255;
+		}
+	}
+	return;
 	
 	for (int i = nStart; i < nEndY; i++)
 	{

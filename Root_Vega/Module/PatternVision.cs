@@ -105,14 +105,14 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_CamAlign1, this, "Align1");
             p_sInfo = m_toolBox.Get(ref m_CamAlign2, this, "Align2");
-            p_sInfo = m_toolBox.Get(ref m_CamRADS, this, "RADS");
+            //p_sInfo = m_toolBox.Get(ref m_CamRADS, this, "RADS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
 
             p_sInfo = m_toolBox.Get(ref m_diPatternReticleExistSensor, this, "Pattern Reticle Sensor");
-            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", true);
+            //p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", true);
             if (bInit) m_inspectTool.OnInspectDone += M_inspectTool_OnInspectDone;
         }
 

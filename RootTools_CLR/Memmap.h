@@ -527,8 +527,9 @@ protected:
     ATLASSERT(m_hMutex == nullptr);
 
     //Open the file mapping object
-    const DWORD dwDesiredAccess = bReadOnly ? FILE_MAP_READ : FILE_MAP_WRITE;
-    m_hMapping = OpenFileMapping(dwDesiredAccess, bInheritHandle, pszMappingName);
+    //const DWORD dwDesiredAccess = bReadOnly ? FILE_MAP_READ : FILE_MAP_WRITE;
+    const DWORD dwDesiredAccess = FILE_MAP_ALL_ACCESS;
+    m_hMapping = OpenFileMapping(FILE_MAP_ALL_ACCESS, bInheritHandle, pszMappingName);
     if (m_hMapping == nullptr)
     {
       const DWORD dwError = GetLastError();

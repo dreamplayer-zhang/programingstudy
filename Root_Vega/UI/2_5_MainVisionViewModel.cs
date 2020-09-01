@@ -720,10 +720,12 @@ namespace Root_Vega
 
 					m_Engineer.m_InspManager.SetStandardPos(nDefectCode, standardPos);
 
+					MemoryData memory = m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem);
+					IntPtr p = memory.GetPtr(0);
 					m_Engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
 							m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
 							m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
-							inspRect, 500, currentRoi.Strip.ParameterList[j], nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
+							inspRect, 500, currentRoi.Strip.ParameterList[j], nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, p);
 					//7. Strip검사를 시작한다
 				}
 			}
@@ -1017,13 +1019,15 @@ namespace Root_Vega
 			var memOffset = m_Engineer.GetMemory("pool", "group", "mem").GetMBOffset();
 			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 
+			MemoryData memory = m_Engineer.GetMemory("pool", "group", "mem");
+			IntPtr p = memory.GetPtr(0);
 			DrawRectList = m_Engineer.m_InspManager.CreateInspArea("pool", "group", "mem", memOffset,
 				m_Engineer.GetMemory("pool", "group", "mem").p_sz.X,
 				m_Engineer.GetMemory("pool", "group", "mem").p_sz.Y,
 				Mask_Rect, nblocksize,
 				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
 				nDefectCode,
-				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance);
+				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance, p);
 
 			System.Diagnostics.Debug.WriteLine("Start Insp");
 			m_Engineer.m_InspManager.StartInspection();

@@ -114,7 +114,9 @@ namespace RootTools.Inspects
 					{
 						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
 						{
-							clrInsp.StripInspection(
+							unsafe
+							{
+								clrInsp.StripInspection(
 								m_InspProp.MemoryPoolName,
 								m_InspProp.MemoryGroupName,
 								m_InspProp.MemoryName,
@@ -130,7 +132,9 @@ namespace RootTools.Inspects
 								m_InspProp.p_StripParam.TargetGV,
 								m_InspProp.p_StripParam.DefectSize,
 								m_InspProp.p_StripParam.Intensity,
-								m_InspProp.p_StripParam.Bandwidth);
+								m_InspProp.p_StripParam.Bandwidth,
+								(void *)m_InspProp.p_ptrMemory);
+							}
 							//foreach (var item in temp)
 							//{
 							//	arrDefects.Add(new DefectDataWrapper(item));

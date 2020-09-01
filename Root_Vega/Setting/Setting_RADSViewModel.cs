@@ -63,7 +63,7 @@ namespace Root_Vega.Setting
             m_Engineer = engineer;
             p_PatternVision = ((Vega_Handler)engineer.ClassHandler()).m_patternVision;
             p_timerControl = p_PatternVision.m_RADSControl;
-            p_timerControl.SearchComplete += SetEvent;
+            //p_timerControl.SearchComplete += SetEvent;
             p_CamRADS = p_PatternVision.m_CamRADS;
 
             //p_timerControl.UpdateDeviceInfo();
