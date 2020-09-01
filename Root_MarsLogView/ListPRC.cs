@@ -100,7 +100,7 @@ namespace Root_MarsLogView
             foreach (Mars_PRC prc in p_aPRC)
             {
                 m_mars.AddError("PRC ThreadStop", prc.m_sLog);
-                string[] asLog = prc.m_asLog;
+                string[] asLog = prc.m_sLog.Split('\t');
                 asLog[0] = sDate;
                 asLog[1] = sTime; 
                 prc.End(asLog);

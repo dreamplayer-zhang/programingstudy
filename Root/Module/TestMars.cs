@@ -379,8 +379,8 @@ namespace Root.Module
             {
                 switch (m_eSend)
                 {
-                    case eSend.Start: m_module.m_tcpVision.Send("ModuleID:Vision,LogType:PRC,EventID:Process,Status:Start,Time:2020-01-14 16:52:22.241,WaferID:logtest_2,RecipeName:MarLogTest,StepNo:0,SlotNo:2,LotID:lotID"); break;
-                    case eSend.End: m_module.m_tcpVision.Send("ModuleID:Vision,LogType:PRC,EventID:Process,Status:End,Time:2020-01-14 16:52:22.241,WaferID:logtest_2,RecipeName:MarLogTest,StepNo:0,SlotNo:2,LotID:lotID"); break;
+                    case eSend.Start: m_module.m_tcpVision.Send("ModuleID:Vision,LogType:PRC,EventID:Process,Status:Start,Time:" + m_module.p_sDateTime + ",WaferID:logtest_2,RecipeName:MarLogTest,StepNo:0,SlotNo:2,LotID:lotID"); break;
+                    case eSend.End: m_module.m_tcpVision.Send("ModuleID:Vision,LogType:PRC,EventID:Process,Status:End,Time:" + m_module.p_sDateTime + ",WaferID:logtest_2,RecipeName:MarLogTest,StepNo:0,SlotNo:2,LotID:lotID"); break;
                     case eSend.Reset: m_module.m_tcpVision.Send("ModuleID:Vision,LogType:Reset"); break;
                 }
                 return "OK";
