@@ -20,6 +20,7 @@ namespace Root_Siltron
             }
         }
         #endregion
+
         public ModuleRunList m_moduleRunList;
 
         public string m_id;

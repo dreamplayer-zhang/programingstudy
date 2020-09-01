@@ -73,6 +73,17 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
+        public string Get(ref DIO_I2O value, ModuleBase module, string id, string sFalse, string sTrue, bool bLog = true, bool bEnableRun = false)
+        {
+            if (value == null) value = new DIO_I2O(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sFalse, sTrue);
+            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
+            if (sInfo != "OK") return sInfo;
+            module.m_listDI.AddBit(value.m_aBitDI[0]);
+            module.m_listDI.AddBit(value.m_aBitDI[1]);
+            module.m_listDO.AddBit(value.m_bitDO);
+            return "OK";
+        }
+
         public string Get(ref DIO_I2O2 value, ModuleBase module, string id, string sFalse, string sTrue, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_I2O2(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sFalse, sTrue);

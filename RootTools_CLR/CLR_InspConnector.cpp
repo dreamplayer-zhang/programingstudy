@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "CLR_InspConnector.h"
+#include "Memmap.h"
 
 #include <intsafe.h>
 
@@ -37,9 +38,15 @@ namespace RootTools_CLR
 		t.assign(mmfName.begin(), mmfName.end());
 		HANDLE hMapping;
 		hMapping = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, t.c_str());
-
-		LPVOID buf = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0,0, ImgPool_Width * ImgPool_Height + offset);
-
+		/////////////////////////
+		CMemMapFile mmf;
+		bool bSuccess = mmf.MapExistingMemory(t.c_str(), nullptr, ImgPool_Width * ImgPool_Height + offset);
+		LPVOID buf;
+		if (bSuccess) buf = mmf.Open();
+		else buf = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0, 0, ImgPool_Width * ImgPool_Height + offset);
+		/////////////////////////
+		//LPVOID buf = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0,0, ImgPool_Width * ImgPool_Height + offset);
+		
 		if (buf == NULL)
 		{
 			errorCode = GetLastError();

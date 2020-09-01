@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace Root_EFEM
 {
-    public class EFEM_Handler : IHandler //forgetEFEM
+    public class EFEM_Handler : IHandler
     {
         #region UI Binding
         public Brush p_brushHandler

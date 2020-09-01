@@ -9,10 +9,12 @@ namespace Root.Module
     public class TestMars : ModuleBase
     {
         #region ToolBox
-        TCPIPClient m_client; 
+        TCPIPClient m_tcpEFEM;
+        TCPIPClient m_tcpVision;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_client, this, "TCPIP");
+            p_sInfo = m_toolBox.Get(ref m_tcpEFEM, this, "TCP EFEM");
+            p_sInfo = m_toolBox.Get(ref m_tcpVision, this, "TCP Vision");
         }
         #endregion
 
@@ -75,6 +77,7 @@ namespace Root.Module
             AddModuleRunList(new Run_SendLEH(this), false, "Send LEH Commend");
             AddModuleRunList(new Run_SendCFG(this), false, "Send CFG Commend");
             AddModuleRunList(new Run_SendReset(this), false, "Send Reset Commend");
+            AddModuleRunList(new Run_SendVision(this), false, "Send Vision Commend");
         }
 
         public class Run_SendPRC : ModuleRunBase
@@ -121,7 +124,7 @@ namespace Root.Module
             {
                 string sLog = m_module.p_sDateTime;
                 for (int n = 2; n < 15; n++) sLog += "\t" + m_asLog[n];
-                m_module.m_client.Send(sLog); 
+                m_module.m_tcpEFEM.Send(sLog); 
                 return "OK";
             }
         }
@@ -169,7 +172,7 @@ namespace Root.Module
             {
                 string sLog = m_module.p_sDateTime;
                 for (int n = 2; n < 14; n++) sLog += "\t" + m_asLog[n];
-                m_module.m_client.Send(sLog);
+                m_module.m_tcpEFEM.Send(sLog);
                 return "OK";
             }
         }
@@ -212,7 +215,7 @@ namespace Root.Module
             {
                 string sLog = m_module.p_sDateTime;
                 for (int n = 2; n < 9; n++) sLog += "\t" + m_asLog[n];
-                m_module.m_client.Send(sLog);
+                m_module.m_tcpEFEM.Send(sLog);
                 return "OK";
             }
         }
@@ -264,7 +267,7 @@ namespace Root.Module
             {
                 string sLog = m_module.p_sDateTime;
                 for (int n = 2; n < 10; n++) sLog += "\t" + m_asLog[n];
-                m_module.m_client.Send(sLog);
+                m_module.m_tcpEFEM.Send(sLog);
                 return "OK";
             }
         }
@@ -312,7 +315,7 @@ namespace Root.Module
             {
                 string sLog = m_module.p_sDateTime;
                 for (int n = 2; n < 10; n++) sLog += "\t" + m_asLog[n];
-                m_module.m_client.Send(sLog);
+                m_module.m_tcpEFEM.Send(sLog);
                 return "OK";
             }
         }
@@ -339,7 +342,47 @@ namespace Root.Module
             public override string Run()
             {
                 string sLog = m_module.p_sDateTime;
-                m_module.m_client.Send(sLog + "\t0\tReset");
+                m_module.m_tcpEFEM.Send(sLog + "\t0\tReset");
+                return "OK";
+            }
+        }
+
+        public class Run_SendVision : ModuleRunBase
+        {
+            TestMars m_module;
+            public Run_SendVision(TestMars module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            enum eSend
+            {
+                Start,
+                End,
+                Reset
+            }
+            eSend m_eSend = eSend.Start; 
+            public override ModuleRunBase Clone()
+            {
+                Run_SendVision run = new Run_SendVision(m_module);
+                run.m_eSend = m_eSend; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eSend = (eSend)tree.Set(m_eSend, m_eSend, "Send", "Send Cmd", bVisible);
+            }
+
+            public override string Run()
+            {
+                switch (m_eSend)
+                {
+                    case eSend.Start: m_module.m_tcpVision.Send("ModuleID:Vision,LogType:PRC,EventID:Process,Status:Start,Time:" + m_module.p_sDateTime + ",WaferID:logtest_2,RecipeName:MarLogTest,StepNo:0,SlotNo:2,LotID:lotID"); break;
+                    case eSend.End: m_module.m_tcpVision.Send("ModuleID:Vision,LogType:PRC,EventID:Process,Status:End,Time:" + m_module.p_sDateTime + ",WaferID:logtest_2,RecipeName:MarLogTest,StepNo:0,SlotNo:2,LotID:lotID"); break;
+                    case eSend.Reset: m_module.m_tcpVision.Send("ModuleID:Vision,LogType:Reset"); break;
+                }
                 return "OK";
             }
         }

@@ -81,16 +81,14 @@
     <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
     </Reference>
-    <Reference Include="Interop.SPIIPLUSCOM660Lib">
-      <HintPath>Control\ACS\DLL\Interop.SPIIPLUSCOM660Lib.dll</HintPath>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+    <Reference Include="MaterialDesignColors, Version=1.2.6.1513, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignColors.1.2.6\lib\net45\MaterialDesignColors.dll</HintPath>
     </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf">
-      <HintPath>..\Lib\MaterialDesignThemes.Wpf.dll</HintPath>
+    <Reference Include="MaterialDesignThemes.Wpf, Version=3.1.3.1513, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MaterialDesignThemes.3.1.3\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.3\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
     <Reference Include="MySql.Data, Version=8.0.20.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -117,10 +115,6 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -141,6 +135,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="crosstest.cs" />
+    <Compile Include="ImageToolViewer\BasicTool.cs" />
     <Compile Include="Camera\BaslerPylon\CameraBasler.cs" />
     <Compile Include="Camera\BaslerPylon\CameraBasler_UI.xaml.cs">
       <DependentUpon>CameraBasler_UI.xaml</DependentUpon>
@@ -173,6 +169,7 @@
     <Compile Include="Control\Ajin\AjinLib\AXHS.cs" />
     <Compile Include="Control\Ajin\AjinLib\AXL.cs" />
     <Compile Include="Control\Ajin\AjinLib\AXM.cs" />
+    <Compile Include="Control\DIO_I2O.cs" />
     <Compile Include="ImageProcess\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_Classes.cs" />
@@ -258,6 +255,10 @@
     </Compile>
     <Compile Include="IHandler.cs" />
     <Compile Include="ImageProcess\FocusStacking.cs" />
+    <Compile Include="ImageToolViewer\ImageToolViewer_VM.cs" />
+    <Compile Include="ImageToolViewer\ImageToolViewer.xaml.cs">
+      <DependentUpon>ImageToolViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Image\CRect.cs" />
     <Compile Include="Comm\CyUSBTool.cs" />
     <Compile Include="Comm\CyUSBTool_UI.xaml.cs">
@@ -645,6 +646,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Gem\XGem\XGem_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ImageToolViewer\ImageToolViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

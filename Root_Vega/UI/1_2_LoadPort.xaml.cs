@@ -100,6 +100,7 @@ namespace Root_Vega
             switch (m_loadport.p_eState)
             {
                 case ModuleBase.eState.Ready:
+                    m_loadport.m_infoPod.p_eState = InfoPod.eState.Load; 
                     if (m_manualjob.SetInfoPod() != "OK") return; 
                     EQ.p_eState = EQ.eState.Run;
                     m_loadport.m_infoPod.StartProcess();

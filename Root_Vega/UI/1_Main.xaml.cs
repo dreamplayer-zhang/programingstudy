@@ -1,5 +1,6 @@
 ﻿using Root_Vega.ManualJob;
 using RootTools;
+using RootTools.Module;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -82,6 +83,7 @@ namespace Root_Vega
         #region Button Initialization
         bool IsEnableInitialization()
         {
+            if (IsRunModule()) return false; 
             switch (EQ.p_eState)
             {
                 case EQ.eState.Run: return false;
@@ -89,6 +91,22 @@ namespace Root_Vega
             }
             return true; 
         }
+
+        bool IsRunModule()
+        {
+            if (IsRunModule(m_handler.m_aLoadport[0])) return true;
+            if (IsRunModule(m_handler.m_aLoadport[1])) return true;
+            if (IsRunModule(m_handler.m_robot)) return true;
+            if (IsRunModule(m_handler.m_sideVision)) return true;
+            if (IsRunModule(m_handler.m_patternVision)) return true;
+            return false; 
+        }
+
+        bool IsRunModule(ModuleBase module)
+        {
+            return (module.p_eState == ModuleBase.eState.Run) || (module.p_eState == ModuleBase.eState.Home); 
+        }
+
         private void buttonInitialization_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableInitialization() == false) return;
@@ -101,6 +119,7 @@ namespace Root_Vega
         #region Button Recovery
         bool IsEnableRecovery()
         {
+            if (IsRunModule()) return false;
             if (EQ.p_eState != EQ.eState.Ready) return false;
             return m_handler.IsEnableRecovery(); 
         }

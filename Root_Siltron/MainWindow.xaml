@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_Siltron"
         xmlns:icons="clr-namespace:Root_Siltron.Icons"
+        xmlns:tool="clr-namespace:RootTools;assembly=RootTools"
         mc:Ignorable="d"
         WindowStyle="None"
         ResizeMode="CanResizeWithGrip"
@@ -85,6 +86,7 @@
         <!--Title Bar End-->
         <Grid Grid.Row="1" x:Name="MainPanel">
             <local:SelectMode/>
+            <!--<tool:ImageViewerTool/>-->
         </Grid>
 
         

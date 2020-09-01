@@ -45,7 +45,43 @@ namespace Root_MarsLogView
         private void MarsLogViewer1_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
             socket.Send(aBuf, nSize, SocketFlags.None);
-            m_qLog.Enqueue(new Mars(1, Encoding.ASCII.GetString(aBuf, 0, nSize)));
+            m_qLog.Enqueue(new Mars(1, GetVisionString(Encoding.ASCII.GetString(aBuf, 0, nSize))));
+        }
+
+        string GetVisionString(string sVision)
+        {
+            string[] asMars = new string[14] { "", "", "", "'PRC'", "", "", "", "'Wafer'", "", "", "", "", "0", "$" };
+            string[] asVision = sVision.Split(',');
+            foreach (string sCmd in asVision)
+            {
+                string[] asCmd = sCmd.Split(':');
+                if (asCmd.Length >= 2)
+                {
+                    switch (asCmd[0])
+                    {
+                        case "Time":
+                            string[] asDate = sCmd.Split('\t');
+                            if (asDate.Length >= 2)
+                            {
+                                asMars[0] = asDate[0].Substring(5, asDate[0].Length - 5);
+                                asMars[1] = asDate[1]; 
+                            }
+                            break;
+                        case "ModuleID": asMars[2] = '\'' + asCmd[1] + '\''; break;
+                        case "LogType": asMars[3] = '\'' + asCmd[1] + '\''; break;
+                        case "EventID": asMars[4] = '\'' + asCmd[1] + '\''; break;
+                        case "Status": asMars[5] = '\'' + asCmd[1] + '\''; break;
+                        case "WaferID": asMars[6] = '\'' + asCmd[1] + '\''; break;
+                        case "SlotNo": asMars[8] = asCmd[1]; break;
+                        case "LotID": asMars[9] = '\'' + asCmd[1] + '\''; break;
+                        case "RecipeName": asMars[10] = '\'' + asCmd[1] + '\''; break;
+                        case "StepNo": asMars[11] = asCmd[1]; break;
+                    }
+                }
+            }
+            string sLog = asMars[0];
+            for (int n = 1; n < 14; n++) sLog += '\t' + asMars[n]; 
+            return sLog; 
         }
         #endregion
 
@@ -75,6 +111,7 @@ namespace Root_MarsLogView
                         case "'FNC'": m_listFNC.Add(mars.m_iTCP, sLog, asLog); break;
                         case "'LEH'": m_listLEH.Add(mars.m_iTCP, sLog, asLog); break;
                         case "'CFG'": m_listCFG.Add(sLog, asLog); break;
+                        case "'Reset'":
                         case "Reset": Reset(mars.m_iTCP); break; 
                     }
                 }

@@ -9,25 +9,18 @@ namespace RootTools.Control
         public List<BitDI> m_aBitDI = new List<BitDI>();
         public List<BitDO> m_aBitDO = new List<BitDO>();
 
-        public bool ReadDIO(ListDIO.eDIO dio, string sID)
+        public bool p_bIn
         {
-            int nIndex = GetIndex(sID); 
-            if (nIndex < 0) return false;
-            switch (dio)
+            get
             {
-                case ListDIO.eDIO.Input: return m_aBitDI[nIndex].p_bOn;
-                case ListDIO.eDIO.Output: return m_aBitDO[nIndex].p_bOn;
+                if (p_bOut) return (m_aBitDI[0].p_bOn == false) && m_aBitDI[1].p_bOn;
+                else return m_aBitDI[0].p_bOn && (m_aBitDI[1].p_bOn == false);
             }
-            return false;
         }
 
-        int GetIndex(string sID)
+        public bool p_bOut
         {
-            for (int n = 0; n < m_asID.Count; n++)
-            {
-                if (sID == m_asID[n]) return n;
-            }
-            return -1;
+            get { return m_aBitDO[1].p_bOn && (m_aBitDO[0].p_bOn == false); }
         }
 
         ListDIO m_listDI;
@@ -113,14 +106,6 @@ namespace RootTools.Control
             return (m_listDO.m_aDIO[nDO].p_sID != "Output");
         }
 
-        public void Write(string sID, bool bOn)
-        {
-            int nID = GetIndex(sID);
-            if (nID < 0) return;
-            m_aBitDO[nID].Write(bOn);
-            if (bOn) m_aBitDO[1 - nID].Write(false);
-        }
-
         public void Write(bool bOn)
         {
             m_aBitDO[0].Write(!bOn);
@@ -141,19 +126,19 @@ namespace RootTools.Control
         public void RunDIO()
         {
             if (m_eRun == eRun.Nothing) return;
-            m_bDO[1, 0] = ReadDIO(ListDIO.eDIO.Output, m_asID[0]);
-            m_bDO[1, 1] = ReadDIO(ListDIO.eDIO.Output, m_asID[1]);
+            m_bDO[1, 0] = m_aBitDO[0].p_bOn; 
+            m_bDO[1, 1] = m_aBitDO[1].p_bOn;
             switch (m_eRun)
             {
                 case eRun.OneOutput:
-                    if (m_bDO[1, 0] && (m_bDO[0, 0] == false)) Write(m_asID[1], false);
-                    if (m_bDO[1, 1] && (m_bDO[0, 1] == false)) Write(m_asID[0], false);
+                    if (m_bDO[1, 0] && (m_bDO[0, 0] == false)) m_aBitDO[1].Write(false);
+                    if (m_bDO[1, 1] && (m_bDO[0, 1] == false)) m_aBitDO[0].Write(false);
                     m_bDO[0, 0] = m_bDO[1, 0];
                     m_bDO[0, 1] = m_bDO[1, 1];
                     break;
                 case eRun.OffbyInput:
-                    if (m_bDO[1, 0] && ReadDIO(ListDIO.eDIO.Input, m_asID[0])) Write(m_asID[0], false);
-                    if (m_bDO[1, 1] && ReadDIO(ListDIO.eDIO.Input, m_asID[1])) Write(m_asID[1], false);
+                    if (m_bDO[1, 0] && m_aBitDI[0].p_bOn) m_aBitDO[0].Write(false);
+                    if (m_bDO[1, 1] && m_aBitDI[2].p_bOn) m_aBitDO[1].Write(false);
                     break;
                 case eRun.Repeat: Repeat(); break;
             }
@@ -165,16 +150,8 @@ namespace RootTools.Control
         {
             if (m_swRepeat.ElapsedMilliseconds < m_msRepeat) return;
             m_swRepeat.Restart();
-            if (ReadDIO(ListDIO.eDIO.Output, m_asID[0]))
-            {
-                Write(true); 
-                return; 
-            }
-            if (ReadDIO(ListDIO.eDIO.Output, m_asID[1]))
-            {
-                Write(false);
-                return; 
-            }
+            if (m_aBitDO[0].p_bOn) Write(true);
+            else if (m_aBitDO[1].p_bOn) Write(false);
         }
     }
 }
