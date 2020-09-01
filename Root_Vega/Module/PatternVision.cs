@@ -102,15 +102,10 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
             p_sInfo = m_toolBox.Get(ref m_axisClamp, this, "StageClamp");
             p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
-            if (m_CamMain != null) m_CamMain.Connect();
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_CamAlign1, this, "Align1");
             p_sInfo = m_toolBox.Get(ref m_CamAlign2, this, "Align2");
             p_sInfo = m_toolBox.Get(ref m_CamRADS, this, "RADS");
-            if (m_CamRADS != null)
-            {
-                m_CamRADS.Connect();
-            }
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
