@@ -121,7 +121,7 @@ namespace Root_WIND2
 
         WIND2_Engineer m_engineer = new WIND2_Engineer();
         MemoryTool m_memoryTool;
-        ImageData m_Imgae;
+        ImageData m_Image;
         string sPool = "pool";
         string sGroup = "group";
         string sMem = "mem";
@@ -138,8 +138,9 @@ namespace Root_WIND2
             m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
             m_memoryTool.GetMemory(sPool, sGroup, sMem);
             
-            m_Imgae = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
-            viewer.p_ImageViewer = new ImageToolViewer_VM(m_Imgae, dialogService);
+            m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
+            
+            viewer.p_ImageViewer = new ImageToolViewer_VM(m_Image, dialogService);
             panel.DataContext = viewer.p_ImageViewer;
 
             //_Maint.engineerUI.Init(m_engineer);
