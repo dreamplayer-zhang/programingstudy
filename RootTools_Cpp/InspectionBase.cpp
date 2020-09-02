@@ -99,7 +99,7 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	//opencv 전의 test용으로 interpolation 내용 미구현
 
 	byte* mem = pBuffer;
-	int nW = nBufferW;//80000;
+	INT64 nW = nBufferW;//80000;
 	RECT rt = rtROI;
 	int nBackGround = 255;
 	if (!bDark)
@@ -116,7 +116,7 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	inspbufferROI.right = nWidth;
 	inspbufferROI.bottom = nHeight;
 
-	int nOffset = m_nInspOffset;
+	INT64 nOffset = m_nInspOffset;
 	//	LPBYTE* ppBuffer = m_ppImageBuffer2;
 
 		// Copy Area
@@ -132,21 +132,19 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	//	}
 	//}
 
-	
-	
-	for (int i = nStart; i < nEndY; i++)
+	for (INT64 i = nStart; i < nEndY; i++)
 	{
-		for (int j = nStart; j < nEndX; j++)
+		for (INT64 j = nStart; j < nEndX; j++)
 		{
-			int ytarget = i + rt.top + (nOffset - 5) * 2;
-			int xtarget = j + rt.left + (nOffset - 5) * 2;
+			INT64 ytarget = i + rt.top + (nOffset - 5) * 2;
+			INT64 xtarget = j + rt.left + (nOffset - 5) * 2;
 
-			inspbuffer[i + nOffset][nOffset + j] = mem[(ytarget)*nW + (xtarget)];
+			INT64 iIndex = (ytarget)*nW + (xtarget);
+			inspbuffer[i + nOffset][nOffset + j] = mem[iIndex];
 			//inspbuffer2[(i+nOffset)* nWidth + (nOffset + j)] = mem[(ytarget)*nW + (xtarget)];
 		}
-	}
+	} 
 	
-
 	//for (int i = 0; i < m_nInspOffset; i++) {//Jerry
 	//	memset(&inspbuffer2[i], nBackGround, nWidth);
 	//	memset(&inspbuffer2[nHeight - 1 - i], nBackGround, nWidth);
@@ -169,7 +167,7 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	}
 
 }
-InspectionBase::InspectionBase(int nWidth, int nHeight)
+InspectionBase::InspectionBase(INT64 nWidth, INT64 nHeight)
 {
 	bResult = false;
 
@@ -184,8 +182,8 @@ InspectionBase::InspectionBase(int nWidth, int nHeight)
 	bAbsoulteGrayLevel = false;
 	bLengthInspection = false;
 	bDarkInspection = false;
-	int sizerSize = nHeight * nHeight;
-	int bufSize = nWidth * nHeight;
+	INT64 sizerSize = nWidth * nHeight;
+	INT64 bufSize = nWidth * nHeight;
 
 	pPitSizer = new PitSizer(sizerSize, 1);
 	pBuffer = new byte(bufSize);

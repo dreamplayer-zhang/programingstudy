@@ -338,7 +338,7 @@ namespace RootTools.Inspects
         /// <param name="bDefectMerge"></param>
         /// <param name="nMergeDistance"></param>
         /// <returns></returns>
-        public List<CRect> CreateInspArea(string poolName, string groupName, string memoryName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int dCode, bool bDefectMerge, int nMergeDistance)
+        public List<CRect> CreateInspArea(string poolName, string groupName, string memoryName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int dCode, bool bDefectMerge, int nMergeDistance, IntPtr ptrMemory)
         {
             List<CRect> inspblocklist = new List<CRect>();
 
@@ -399,6 +399,7 @@ namespace RootTools.Inspects
                         ip.MemoryOffset = memOffset;
                         ip.p_TargetMemWidth = memWidth;
                         ip.p_TargetMemHeight = memHeight;
+                        ip.p_ptrMemory = ptrMemory;
 
                         CRect inspblock = new CRect(sx, sy, ex, ey);
                         ip.p_Rect = inspblock;
@@ -953,6 +954,8 @@ namespace RootTools.Inspects
         public string MemoryGroupName { get; set; }
         public string MemoryName { get; set; }
         public ulong MemoryOffset { get; set; }
+
+        public IntPtr p_ptrMemory { get; set; }
     }
     public class MemInfo
     {

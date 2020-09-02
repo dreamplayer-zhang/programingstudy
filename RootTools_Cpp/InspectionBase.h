@@ -17,7 +17,7 @@ public :
 	void CheckConditions() const;
 	static int defectIdx;
 protected:
-	int m_nInspOffset = 10;
+	int m_nInspOffset = 5;
 	byte inspbuffer[4000][4000];
 	byte inspbuffer2[16000000];
 	RECT inspbufferROI;
@@ -27,12 +27,12 @@ public:
 	virtual void SetParams();
 	inline void SetDefectCode(int nValue)
 	{
-		assert(0 < nValue && nValue < Constants::MaxDefectCode);
+		assert(0 <= nValue && nValue < Constants::MaxDefectCode);
 		nDefectCode = nValue;
 	};
 	inline void SetGrayLevel(int nValue)
 	{
-		assert(0 < nValue && nValue < Constants::MaxGrayLevel);
+		assert(0 <= nValue && nValue < Constants::MaxGrayLevel);
 		nGrayLevel = nValue;
 	};
 	inline void SetDefectSize(int nValue)
@@ -106,6 +106,6 @@ private:
 	bool bDarkInspection;
 
 public:
-	InspectionBase(int nWidth, int nHeight);
+	InspectionBase(INT64 nWidth, INT64 nHeight);
 	virtual ~InspectionBase();
 };
