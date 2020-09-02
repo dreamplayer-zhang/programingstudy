@@ -428,9 +428,9 @@ namespace RootTools
 
 			bw.Write(Convert.ToUInt16(0x4d42));//ushort bfType = br.ReadUInt16();
 			if (p_nByte == 1)
-				bw.Write(Convert.ToUInt32(54 + 1024 + p_nByte * rect.Width * rect.Height));
+				bw.Write(Convert.ToUInt32(54 + 1024 + p_nByte * (Int64)rect.Width * (Int64)rect.Height));
 			else if (p_nByte == 3)
-				bw.Write(Convert.ToUInt32(54 + p_nByte * rect.Width * rect.Height));//uint bfSize = br.ReadUInt32();
+				bw.Write(Convert.ToUInt32(54 + p_nByte * (Int64)rect.Width * (Int64)rect.Height));//uint bfSize = br.ReadUInt32();
 
 			//image 크기 bw.Write();   bmfh.bfSize = sizeof(14byte) + nSizeHdr + rect.right * rect.bottom;
 			bw.Write(Convert.ToUInt16(0));   //reserved // br.ReadUInt16();
@@ -446,7 +446,7 @@ namespace RootTools
 			bw.Write(Convert.ToUInt16(1));// a = br.ReadUInt16();
 			bw.Write(Convert.ToUInt16(8 * p_nByte));     //byte       // nByte = br.ReadUInt16() / 8;                
 			bw.Write(Convert.ToUInt32(0));      //compress //b = br.ReadUInt32();
-			bw.Write(Convert.ToUInt32(rect.Width * rect.Height));// b = br.ReadUInt32();
+			bw.Write(Convert.ToUInt32((Int64)rect.Width * (Int64)rect.Height));// b = br.ReadUInt32();
 			bw.Write(Convert.ToInt32(0));//a = br.ReadInt32();
 			bw.Write(Convert.ToInt32(0));// a = br.ReadInt32();
 			bw.Write(Convert.ToUInt32(256));      //color //b = br.ReadUInt32();

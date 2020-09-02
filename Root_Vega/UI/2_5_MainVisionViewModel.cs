@@ -573,14 +573,14 @@ namespace Root_Vega
 						var bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
 						Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
 						var laplaceFeature = featureImage.Laplace(1);
-						laplaceFeature.Save(@"D:\Test\feature.bmp");
+						//laplaceFeature.Save(@"D:\Test\feature.bmp");
 
 						CRect targetRect = new CRect(
 							new Point(feature.RoiRect.Left - (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Top - (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0),
 							new Point(feature.RoiRect.Right+ (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Bottom + (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0));
 						Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImagePattern(targetRect));
 						var laplaceSource = sourceImage.Laplace(1);
-						laplaceSource.Save(@"D:\Test\source.bmp");
+						//laplaceSource.Save(@"D:\Test\source.bmp");
 
 						var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
 
@@ -609,7 +609,7 @@ namespace Root_Vega
 							}
 						}
 						resultImage.Data = matches;
-						resultImage.Save(@"D:\Test\result.bmp");
+						//resultImage.Save(@"D:\Test\result.bmp");
 						if (foundFeature)
 						{
 							//2. feature 중심위치가 확보되면 해당 좌표를 저장
@@ -720,10 +720,12 @@ namespace Root_Vega
 
 					m_Engineer.m_InspManager.SetStandardPos(nDefectCode, standardPos);
 
+					MemoryData memory = m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem);
+					IntPtr p = memory.GetPtr(0);
 					m_Engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
 							m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
 							m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
-							inspRect, 500, currentRoi.Strip.ParameterList[j], nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
+							inspRect, 500, currentRoi.Strip.ParameterList[j], nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, p);
 					//7. Strip검사를 시작한다
 				}
 			}
@@ -867,13 +869,6 @@ namespace Root_Vega
 				return new RelayCommand(_btnClear);
 			}
 		}
-		public ICommand btnInspTest
-		{
-			get
-			{
-				return new RelayCommand(_btnInspTest);
-			}
-		}
 		public ICommand btnInspDone
 		{
 			get
@@ -995,41 +990,7 @@ namespace Root_Vega
 		//	currentSnap++;//한줄 추가
 		//	m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
 		//}
-		List<CRect> DrawRectList;
-		private void _btnInspTest()
-		{
-			ClearUI();//재검사 전 UI 정리
-			bUsingInspection = true;
-			currentSnap = 0;
-			wLimit = 0;
-			System.Diagnostics.Debug.WriteLine(string.Format("Set wLimit : {0}", wLimit));
-
-			if (DrawRectList != null)
-				DrawRectList.Clear();//검사영역 draw용 Rect List 정리
-
-			m_Engineer.m_InspManager.ClearInspection();
-
-			currentDefectIdx = 0;
-
-			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
-			int nblocksize = 500;
-
-			var memOffset = m_Engineer.GetMemory("pool", "group", "mem").GetMBOffset();
-			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
-
-			DrawRectList = m_Engineer.m_InspManager.CreateInspArea("pool", "group", "mem", memOffset,
-				m_Engineer.GetMemory("pool", "group", "mem").p_sz.X,
-				m_Engineer.GetMemory("pool", "group", "mem").p_sz.Y,
-				Mask_Rect, nblocksize,
-				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
-				nDefectCode,
-				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance);
-
-			System.Diagnostics.Debug.WriteLine("Start Insp");
-			m_Engineer.m_InspManager.StartInspection();
-
-			return;
-		}
+		
 		#endregion
 
 

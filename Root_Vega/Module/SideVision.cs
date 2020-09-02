@@ -209,9 +209,7 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_CamBevel, this, "Bevel Main");
-            if (m_CamBevel != null) m_CamBevel.Connect();
             p_sInfo = m_toolBox.Get(ref m_CamSide, this, "Side Main");
-            if (m_CamSide != null) m_CamSide.Connect();
             p_sInfo = m_toolBox.Get(ref m_CamLADS, this, "LADS");
             p_sInfo = m_toolBox.Get(ref m_CamBevelVRS, this, "Bevel VRS");
             p_sInfo = m_toolBox.Get(ref m_CamSideVRS, this, "Side VRS");

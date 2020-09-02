@@ -178,10 +178,6 @@
     <Compile Include="UI\1_Main.xaml.cs">
       <DependentUpon>1_Main.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\2_3_Origin.xaml.cs">
-      <DependentUpon>2_3_Origin.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\2_3_OriginViewModel.cs" />
     <Compile Include="UI\2_5_MainVision.xaml.cs">
       <DependentUpon>2_5_MainVision.xaml</DependentUpon>
     </Compile>
@@ -364,10 +360,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1_Main.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\2_3_Origin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

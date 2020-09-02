@@ -306,8 +306,8 @@ namespace Root_Vega
 				string temp = string.Empty;
 				var result = connector.SendQuery(query, ref temp);
 #if DEBUG
-				Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
-				Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
+				//Debug.WriteLine(string.Format("tempdata Row Count CODE : {0}", result));
+				//Debug.WriteLine(string.Format("tempdata Row Result : {0}", temp));
 #endif
 				int count;
 				if (int.TryParse(temp, out count))
@@ -480,10 +480,12 @@ namespace Root_Vega
 							p_SimpleShapeDrawer_List[i].m_Element.Add(rect);
 							p_SimpleShapeDrawer_List[i].m_ListRect.Add(temp);
 
-						m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_sideMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).GetMBOffset(),
+							MemoryData memory = m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]);
+							IntPtr p = memory.GetPtr(0);
+							m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_sideMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).GetMBOffset(),
 								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.X,
 								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.Y,
-								adjustAreaList[n], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
+								adjustAreaList[n], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, p);
 						}
 						p_ImageViewer_List[i].SetRoiRect();
 					}

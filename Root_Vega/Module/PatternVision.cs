@@ -17,6 +17,7 @@ using RootTools.ZoomLens;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -101,25 +102,23 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
             p_sInfo = m_toolBox.Get(ref m_axisClamp, this, "StageClamp");
             p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
-            if (m_CamMain != null) m_CamMain.Connect();
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_CamAlign1, this, "Align1");
             p_sInfo = m_toolBox.Get(ref m_CamAlign2, this, "Align2");
-            p_sInfo = m_toolBox.Get(ref m_CamRADS, this, "RADS");
+            //p_sInfo = m_toolBox.Get(ref m_CamRADS, this, "RADS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
 
             p_sInfo = m_toolBox.Get(ref m_diPatternReticleExistSensor, this, "Pattern Reticle Sensor");
-
-            bool bUseRADS = false;
-            foreach (GrabMode gm in m_aGrabMode)
-            {
-                if (gm.GetUseRADS()) bUseRADS = true;
-            }
-            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
+            //p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", true);
             if (bInit) m_inspectTool.OnInspectDone += M_inspectTool_OnInspectDone;
+        }
+
+        void bgw_Connect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            
         }
 
         private void M_inspectTool_OnInspectDone(InspectTool.Data data)
@@ -812,11 +811,12 @@ namespace Root_Vega.Module
                 {
                     int nScanLine = 0;
                     m_grabMode.SetLight(true);
-                    //if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == false))
-                    //{
-                    //    m_grabMode.m_RADSControl.p_IsRun = true;
-                    //    m_grabMode.m_RADSControl.StartRADS();
-                    //}
+                    if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == false))
+                    {
+                        m_grabMode.m_RADSControl.p_IsRun = true;
+                        m_grabMode.m_RADSControl.StartRADS();
+                        m_module.m_CamRADS.GrabContinuousShot();
+                    }
                     AxisXY axisXY = m_module.p_axisXY;
                     Axis axisZ = m_module.p_axisZ;
                     m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
@@ -875,6 +875,9 @@ namespace Root_Vega.Module
 
                         nScanLine++;
                         m_cpMemory.X += m_grabMode.m_camera.GetRoiSize().X;
+
+                        // 1Strip Scan 후 검사
+
                     }
                     m_grabMode.m_camera.StopGrab();
                     #region Grab1차 Test후에 코드 부분
@@ -911,13 +914,13 @@ namespace Root_Vega.Module
                 }
                 finally
                 {
-                    //m_grabMode.ResetTrigger(m_module.m_axisXY.m_axisY);
                     m_grabMode.SetLight(false);
-                    //if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == true))
-                    //{
-                    //    m_grabMode.m_RADSControl.p_IsRun = false;
-                    //    m_grabMode.m_RADSControl.StopRADS();
-                    //}
+                    if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == true))
+                    {
+                        m_grabMode.m_RADSControl.p_IsRun = false;
+                        m_grabMode.m_RADSControl.StopRADS();
+                        m_module.m_CamRADS.StopGrab();
+                    }
                 }
             }
         }

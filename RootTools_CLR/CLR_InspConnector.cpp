@@ -35,17 +35,21 @@ namespace RootTools_CLR
 		DWORD errorCode;
 		std::string mmfName = memoryname;
 		std::wstring t;
+		/*std::string mutexName = "Mutex";
+		std::wstring mutexTemp;*/
 		t.assign(mmfName.begin(), mmfName.end());
+		/*mutexTemp.assign(mutexName.begin(), mutexName.end());*/
 		HANDLE hMapping;
 		hMapping = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, t.c_str());
 		/////////////////////////
-		CMemMapFile mmf;
-		bool bSuccess = mmf.MapExistingMemory(t.c_str(), nullptr, ImgPool_Width * ImgPool_Height + offset);
+		/*CMemMapFile mmf;
+		bool bSuccess = mmf.MapExistingMemory(t.c_str(), mutexTemp.c_str(), ImgPool_Width * ImgPool_Height, false, false, nullptr, offset, nullptr);
 		LPVOID buf;
 		if (bSuccess) buf = mmf.Open();
-		else buf = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0, 0, ImgPool_Width * ImgPool_Height + offset);
+		else return nullptr;*/
+		//else buf = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0, 0, ImgPool_Width * ImgPool_Height + offset);
 		/////////////////////////
-		//LPVOID buf = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0,0, ImgPool_Width * ImgPool_Height + offset);
+		LPVOID buf = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0,0, ImgPool_Width * ImgPool_Height + offset);
 		
 		if (buf == NULL)
 		{
