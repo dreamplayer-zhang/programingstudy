@@ -116,7 +116,7 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	inspbufferROI.right = nWidth;
 	inspbufferROI.bottom = nHeight;
 
-	int nOffset = m_nInspOffset;
+	INT64 nOffset = m_nInspOffset;
 	//	LPBYTE* ppBuffer = m_ppImageBuffer2;
 
 		// Copy Area
@@ -132,32 +132,19 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	//	}
 	//}
 
-
-	for (INT64 i = 0; i < 200000; i++)
+	for (INT64 i = nStart; i < nEndY; i++)
 	{
-		for (INT64 j = 0; j < 6000; j++)
-		{
-			mem[i * nW + j] = 255;
-		}
-	}
-	return;
-	
-	for (int i = nStart; i < nEndY; i++)
-	{
-		for (int j = nStart; j < nEndX; j++)
+		for (INT64 j = nStart; j < nEndX; j++)
 		{
 			INT64 ytarget = i + rt.top + (nOffset - 5) * 2;
 			INT64 xtarget = j + rt.left + (nOffset - 5) * 2;
 
 			INT64 iIndex = (ytarget)*nW + (xtarget);
-			byte* ptr = &mem[iIndex];
-			inspbuffer[i + nOffset][nOffset + j] = *ptr;	// <-- Index Overflow...?? -ESCHO
-			//inspbuffer[i + nOffset][nOffset + j] = mem[iIndex];	// <-- Index Overflow...?? -ESCHO
+			inspbuffer[i + nOffset][nOffset + j] = mem[iIndex];
 			//inspbuffer2[(i+nOffset)* nWidth + (nOffset + j)] = mem[(ytarget)*nW + (xtarget)];
 		}
 	} 
 	
-
 	//for (int i = 0; i < m_nInspOffset; i++) {//Jerry
 	//	memset(&inspbuffer2[i], nBackGround, nWidth);
 	//	memset(&inspbuffer2[nHeight - 1 - i], nBackGround, nWidth);

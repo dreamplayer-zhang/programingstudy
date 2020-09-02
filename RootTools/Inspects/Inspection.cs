@@ -87,7 +87,9 @@ namespace RootTools.Inspects
 					{
 						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
 						{
-							clrInsp.SurfaceInspection(
+							unsafe
+							{
+								clrInsp.SurfaceInspection(
 								m_InspProp.MemoryPoolName,
 								m_InspProp.MemoryGroupName,
 								m_InspProp.MemoryName,
@@ -103,7 +105,9 @@ namespace RootTools.Inspects
 								m_InspProp.p_surfaceParam.TargetGV,
 								m_InspProp.p_surfaceParam.DefectSize,
 								m_InspProp.p_surfaceParam.UseDarkInspection,
-								m_InspProp.p_surfaceParam.UseAbsoluteInspection);
+								m_InspProp.p_surfaceParam.UseAbsoluteInspection,
+								(void *)m_InspProp.p_ptrMemory);
+							}
 							//foreach (var item in temp)
 							//{
 							//	arrDefects.Add(new DefectDataWrapper(item));

@@ -869,13 +869,6 @@ namespace Root_Vega
 				return new RelayCommand(_btnClear);
 			}
 		}
-		public ICommand btnInspTest
-		{
-			get
-			{
-				return new RelayCommand(_btnInspTest);
-			}
-		}
 		public ICommand btnInspDone
 		{
 			get
@@ -997,43 +990,7 @@ namespace Root_Vega
 		//	currentSnap++;//한줄 추가
 		//	m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
 		//}
-		List<CRect> DrawRectList;
-		private void _btnInspTest()
-		{
-			ClearUI();//재검사 전 UI 정리
-			bUsingInspection = true;
-			currentSnap = 0;
-			wLimit = 0;
-			System.Diagnostics.Debug.WriteLine(string.Format("Set wLimit : {0}", wLimit));
-
-			if (DrawRectList != null)
-				DrawRectList.Clear();//검사영역 draw용 Rect List 정리
-
-			m_Engineer.m_InspManager.ClearInspection();
-
-			currentDefectIdx = 0;
-
-			CRect Mask_Rect = p_Recipe.RecipeData.RoiList[0].Strip.NonPatternList[0].Area;
-			int nblocksize = 500;
-
-			var memOffset = m_Engineer.GetMemory("pool", "group", "mem").GetMBOffset();
-			int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
-
-			MemoryData memory = m_Engineer.GetMemory("pool", "group", "mem");
-			IntPtr p = memory.GetPtr(0);
-			DrawRectList = m_Engineer.m_InspManager.CreateInspArea("pool", "group", "mem", memOffset,
-				m_Engineer.GetMemory("pool", "group", "mem").p_sz.X,
-				m_Engineer.GetMemory("pool", "group", "mem").p_sz.Y,
-				Mask_Rect, nblocksize,
-				p_Recipe.RecipeData.RoiList[0].Strip.ParameterList[0],
-				nDefectCode,
-				p_Recipe.RecipeData.UseDefectMerge, p_Recipe.RecipeData.MergeDistance, p);
-
-			System.Diagnostics.Debug.WriteLine("Start Insp");
-			m_Engineer.m_InspManager.StartInspection();
-
-			return;
-		}
+		
 		#endregion
 
 

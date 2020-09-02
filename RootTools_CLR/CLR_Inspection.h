@@ -38,7 +38,7 @@ namespace RootTools_CLR
 			delete pInspReticle;
 		}
 
-		void SurfaceInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
+		void SurfaceInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute, void* ptrMemory)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -51,7 +51,8 @@ namespace RootTools_CLR
 			msclr::interop::marshal_context context;
 			std::string standardString = context.marshal_as<std::string>(poolName);
 
-			byte* buffer = m_InspConn->GetImagePool(standardString, memOffset, memwidth, memHeight);
+			//byte* buffer = m_InspConn->GetImagePool(standardString, memOffset, memwidth, memHeight);
+			byte* buffer = (byte*)ptrMemory;
 			if (buffer != NULL)
 			{
 				int bufferwidth = memwidth;
@@ -158,7 +159,6 @@ namespace RootTools_CLR
 			pInspReticle->CheckConditions();
 
 			pInspReticle->CopyImageToBuffer(true);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
-			return;
 			vTempResult = pInspReticle->StripInspection(nBandwidth, nIntensity, nDefectCode);
 
 			bool bResultExist = vTempResult.size() > 0;

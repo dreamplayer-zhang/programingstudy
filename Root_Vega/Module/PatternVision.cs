@@ -875,6 +875,9 @@ namespace Root_Vega.Module
 
                         nScanLine++;
                         m_cpMemory.X += m_grabMode.m_camera.GetRoiSize().X;
+
+                        // 1Strip Scan 후 검사
+
                     }
                     m_grabMode.m_camera.StopGrab();
                     #region Grab1차 Test후에 코드 부분
