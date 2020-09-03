@@ -68,7 +68,7 @@ namespace RootTools
 			{
 				m_BasicTool = value;
 				//SetProperty(ref m_BasicTool, value);
-			}
+			}		
 		}
 
 		#region Property
@@ -153,6 +153,7 @@ namespace RootTools
 
 				
 				SetProperty(ref m_CanvasWidth, value);
+				m_BasicTool.CanvasSize
 			}
 		}
 		private int m_CanvasHeight = 100;
