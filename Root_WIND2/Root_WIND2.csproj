@@ -101,7 +101,16 @@
     <Compile Include="IWTRChild.cs" />
     <Compile Include="Module\Vision.cs" />
     <Compile Include="MVVM\Helper.cs" />
+    <Compile Include="Recipe\DrawRecipe.cs" />
+    <Compile Include="Recipe\RecipeData\IRecipeData.cs" />
     <Compile Include="Recipe\Recipe.cs" />
+    <Compile Include="Recipe\RecipeData\RecipeData_Origin.cs" />
+    <Compile Include="Recipe\RecipeData\RecipeData_Parameter.cs" />
+    <Compile Include="Recipe\RecipeData\RecipeData_Position.cs" />
+    <Compile Include="Recipe\RecipeData\RecipeData_ROI.cs" />
+    <Compile Include="Recipe\RecipeData\RecipeData_ROIData.cs" />
+    <Compile Include="Recipe\RecipeData\RecipeData_WaferMap.cs" />
+    <Compile Include="Recipe\RecipeManager.cs" />
     <Compile Include="Tune.xaml.cs">
       <DependentUpon>Tune.xaml</DependentUpon>
     </Compile>
