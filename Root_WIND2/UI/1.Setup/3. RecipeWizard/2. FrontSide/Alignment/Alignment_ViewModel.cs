@@ -19,7 +19,6 @@ namespace Root_WIND2
         public AlignmentPositionPage Position;
         public AlignmentMapPage Map;
 
-        
         public Alignment_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;

@@ -88,7 +88,6 @@ namespace Root_MarsLogView
         {
             if (m_asLog.Length <= nIndex) return "";
             string sLog = m_asLog[nIndex];
-            if (sLog == "") return ""; 
             if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
             if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1);
             return sLog;
