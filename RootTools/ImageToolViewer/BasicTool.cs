@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,6 +15,7 @@ namespace RootTools
 {
     public class BasicTool : ObservableObject
     {
+
         public BasicTool()
         {
             InitCrossLine();
@@ -48,7 +50,6 @@ namespace RootTools
             }
         }
 
-        public List<BasicShape> msadafdsf;
         private Cursor m_Cursor;
         public Cursor p_Cursor
         {
@@ -114,15 +115,6 @@ namespace RootTools
             return;
         }
 
-        //public virtual void Draw(CPoint mempt, CPoint canvasPt)
-        //{
-
-        //}
-
-        public void SelectShape(BasicShape shape)
-        {
-        }
-
         public virtual bool Draw(CPoint memPt, CPoint canvasPt, ToolState state = ToolState.None)
         {
             switch (eToolState)
@@ -175,25 +167,6 @@ namespace RootTools
         }
 
 
-        private void M_CanvasShape_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var aa = sender as Rectangle;
-            var asdf = VisualTreeHelper.GetParent(aa);
-
-            //var bb =(sender as UIElement).
-            Shape selected = sender as Shape;
-            
-            var pos = e.GetPosition(asdf as IInputElement);
-            selected.Stroke = Brushes.Red;
-        }
-
-        private void M_CanvasShape_MouseEnter(object sender, MouseEventArgs e)
-        {
-            
-            p_Cursor = Cursors.AppStarting;
-        }
-
-
         public bool StartDrawBasicTool(Shape shapeType, CPoint memStartPt, CPoint canvasStartPt)
         {
             if (basic == null)
@@ -236,7 +209,6 @@ namespace RootTools
         }
         public bool Drawing_Done(CPoint memEndPt, CPoint canvasEndPt)
         {
-
             return true;
         }
 
@@ -323,7 +295,7 @@ namespace RootTools
 
 
             return HitType.Body;
-        }
+        }        
         public Cursor SetMouseCursor(HitType m_MouseHitType)
         {
             // See what cursor we should display.
@@ -356,11 +328,14 @@ namespace RootTools
 
             return _cursor;
         }
-        public void AdjustShape(BasicShape shape, CPoint canvasNowPt)
+        public void test()
         {
-            //
+            
+            
         }
     }
+    
+
 
     public class BasicShape
     {
@@ -385,6 +360,7 @@ namespace RootTools
         {
             m_MemoryEndPt = memEndPt;
             m_CanvasEndPt = canvasEndPt;
+            
         }
 
         /// <summary>
@@ -416,6 +392,7 @@ namespace RootTools
                 m_CanvasShape.Height= Math.Abs(value.Y - m_CanvasStartPt.Y);
 
                 _canvasEndPt = value;
+
             }
         }
         /// <summary>
@@ -455,4 +432,154 @@ namespace RootTools
         None, Body, UL, UR, LR, LL, L, R, T, B
     };
 
+}
+namespace RootTools.ToolShapess
+{
+    public abstract class ToolShapes
+    {
+
+    }
+
+    public class PointLine : ToolShapes
+    {
+        public CPoint StartPt;
+        public int Width;
+    }
+    public class TPoint
+    {
+        public TPoint()
+        {
+            CanvasPoint = new CPoint();
+            MemoryPoint = new CPoint();
+        }
+        public TPoint(CPoint canvastPt, CPoint memPt)
+        {
+            CanvasPoint = canvastPt;
+            MemoryPoint = memPt;
+        }
+        public CPoint CanvasPoint;
+        public CPoint MemoryPoint;
+    }
+    public class TLine
+    {
+        public TLine(Brush brush, double thickness)
+        {
+            CanvasLine = new Line();
+            CanvasLine.Stroke = brush;
+            CanvasLine.StrokeThickness = thickness;
+            MemoryLine = new List<PointLine>();
+        }
+        public Line CanvasLine;
+        public CPoint CanvasStartPoint
+        {
+            get
+            {
+                return new CPoint((int)CanvasLine.X1, (int)CanvasLine.Y1);
+            }
+            set
+            {
+                CanvasLine.X1 = value.X;
+                CanvasLine.Y1 = value.Y;
+            }
+        }
+        public CPoint CanvasEndPoint
+        {
+            get
+            {
+                return new CPoint((int)CanvasLine.X2, (int)CanvasLine.Y2);
+            }
+            set
+            {
+                CanvasLine.X2 = value.X;
+                CanvasLine.Y2 = value.Y;
+            }
+
+        }
+
+        public List<PointLine> MemoryLine;
+    }
+    public class TRect
+    {
+        public TRect(Brush brush, double thickness)
+        {
+            CanvasRect = new Rectangle();
+            CanvasRect.Stroke = brush;
+            CanvasRect.StrokeThickness = thickness;
+        }
+        public void SetLeftTop(CPoint canvasPt, CPoint memPt)
+        {
+            CanvasLeft = canvasPt.X;
+            CanvasTop = canvasPt.Y;
+            MemoryRect.Left = memPt.X;
+            MemoryRect.Top = memPt.Y;
+        }
+        public void SetRightBottom(CPoint canvasPt, CPoint memPt)
+        {
+            CanvasRight = canvasPt.X;
+            CanvasBottom = canvasPt.Y;
+            MemoryRect.Right = memPt.X;
+            MemoryRect.Bottom = memPt.Y;
+        }
+        public Rectangle CanvasRect;
+        public int CanvasLeft;
+        public int CanvasTop;
+        public int CanvasRight;
+        public int CanvasBottom;
+        public int CanvasWidth
+        {
+            get
+            {
+                return CanvasRight - CanvasLeft;
+            }
+            set
+            {
+                CanvasRight = value + CanvasLeft;
+                CanvasRect.Width = CanvasRight - CanvasLeft;
+            }
+        }
+        public int CanvasHeight
+        {
+            get
+            {
+                return CanvasBottom - CanvasTop;
+            }
+            set
+            {
+                CanvasBottom = value + CanvasTop;
+                CanvasRect.Height = CanvasBottom - CanvasTop;
+            }
+        }
+
+        public CRect MemoryRect;
+
+    }
+    public class TEllipse
+    {
+        public TEllipse(Brush brush, double thickness)
+        {
+            CanvasEllipse = new Ellipse();
+            CanvasEllipse.Stroke = brush;
+            CanvasEllipse.StrokeThickness = thickness;
+
+            MemoryEllipse = new List<PointLine>();
+        }
+        public Ellipse CanvasEllipse;
+        public int CanvasLeft;
+        public int CanvasTop;
+        public List<PointLine> MemoryEllipse;
+    }
+    public class TPolygon
+    {
+        public TPolygon(Brush brush, double thickness)
+        {
+            CanvasPolygon.Points = new PointCollection();
+            CanvasPolygon = new Polygon();
+            CanvasPolygon.Stroke = brush;
+            CanvasPolygon.StrokeThickness = thickness;
+        }
+        public Polygon CanvasPolygon;
+        public Point[] CanvasPointArr;
+        public Image ImageROI;
+        public List<PointLine> MemoryPolygon;
+    }
 }

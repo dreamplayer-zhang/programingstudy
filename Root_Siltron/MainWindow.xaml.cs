@@ -101,38 +101,27 @@ namespace Root_Siltron
         }
         #endregion
 
-
-        private void textLastError_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            m_engineer.m_gaf.m_listALID.ShowPopup();
-        }
-
-        #region UI
-        public SetupHome m_SetupUI;
-        private SetupUIManger m_SetupViewModel;
-
-        public SelectMode m_ModeUI;
-
-
-        #endregion
-
         Siltron_Engineer m_engineer = new Siltron_Engineer();
 
         void Init()
         {
             m_engineer.Init("Siltron");
-            //_Maint.engineerUI.Init(m_engineer);
-            //Panel.DataContext = new NavigationManger();
-            InitTimer();
-            InitUI();
+            engineerUI.Init(m_engineer);
+
+            //InitTimer();
+            //InitUI();
         }
 
+        #region UI
+        public SetupHome m_SetupUI;
+        private SetupUIManger m_SetupViewModel;
+        public SelectMode m_ModeUI;
         void InitUI()
         {
             m_SetupUI = new SetupHome();
             ((SetupUIManger)m_SetupUI.DataContext).init(this);
             m_SetupViewModel = (SetupUIManger)m_SetupUI.DataContext;
-            
+
             m_ModeUI = new SelectMode();
             m_ModeUI.Init(this);
 
@@ -148,6 +137,7 @@ namespace Root_Siltron
             MainPanel.Children.Clear();
             MainPanel.Children.Add(m_SetupUI);
         }
+        #endregion
 
         void ThreadStop()
         {

@@ -8,6 +8,6 @@
              d:DesignHeight="756" d:DesignWidth="1876"
              Background="#FF2D2D30">
     <Grid>
-        <local:Siltron_Engineer_UI x:Name="engineerUI"/>
+        <local:Siltron_Engineer_UI/>
     </Grid>
 </UserControl>

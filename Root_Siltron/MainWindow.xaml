@@ -85,7 +85,16 @@
         </Grid>
         <!--Title Bar End-->
         <Grid Grid.Row="1" x:Name="MainPanel">
-            <local:SelectMode/>
+            <TabControl>
+                <TabItem Header="Engineer" Width="100" Height="30">
+                    <local:Siltron_Engineer_UI x:Name="engineerUI"/>
+                </TabItem>
+                <TabItem Header="Result" Width="100" Height="30">
+                    <local:Review/>
+                </TabItem>
+            </TabControl>
+            
+            <!--<local:SelectMode/>-->
             <!--<tool:ImageViewerTool/>-->
         </Grid>
 
