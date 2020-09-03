@@ -50,7 +50,7 @@ namespace Root_MarsLogView
 
         string GetVisionString(string sVision)
         {
-            string[] asMars = new string[14] { "", "", "", "'PRC'", "", "", "", "'Wafer'", "", "", "", "", "0", "$" };
+            string[] asMars = new string[14] { "", "", "", "'PRC'", "", "", "", "'Wafer'", "0", "", "", "0", "0", "$" };
             string[] asVision = sVision.Split(',');
             foreach (string sCmd in asVision)
             {
@@ -60,21 +60,21 @@ namespace Root_MarsLogView
                     switch (asCmd[0])
                     {
                         case "Time":
-                            string[] asDate = sCmd.Split('\t');
+                            string[] asDate = sCmd.Split(' ');
                             if (asDate.Length >= 2)
                             {
                                 asMars[0] = asDate[0].Substring(5, asDate[0].Length - 5);
                                 asMars[1] = asDate[1]; 
                             }
                             break;
-                        case "ModuleID": asMars[2] = '\'' + asCmd[1] + '\''; break;
-                        case "LogType": asMars[3] = '\'' + asCmd[1] + '\''; break;
-                        case "EventID": asMars[4] = '\'' + asCmd[1] + '\''; break;
-                        case "Status": asMars[5] = '\'' + asCmd[1] + '\''; break;
-                        case "WaferID": asMars[6] = '\'' + asCmd[1] + '\''; break;
+                        case "ModuleID": asMars[2] = GetData(asCmd[1]); break;
+                        case "LogType": asMars[3] = GetData(asCmd[1]); break;
+                        case "EventID": asMars[4] = GetData(asCmd[1]); break;
+                        case "Status": asMars[5] = GetData(asCmd[1]); break;
+                        case "WaferID": asMars[6] = GetData(asCmd[1]); break;
                         case "SlotNo": asMars[8] = asCmd[1]; break;
-                        case "LotID": asMars[9] = '\'' + asCmd[1] + '\''; break;
-                        case "RecipeName": asMars[10] = '\'' + asCmd[1] + '\''; break;
+                        case "LotID": asMars[9] = GetData(asCmd[1]); break;
+                        case "RecipeName": asMars[10] = GetData(asCmd[1]); break;
                         case "StepNo": asMars[11] = asCmd[1]; break;
                     }
                 }
@@ -82,6 +82,12 @@ namespace Root_MarsLogView
             string sLog = asMars[0];
             for (int n = 1; n < 14; n++) sLog += '\t' + asMars[n]; 
             return sLog; 
+        }
+
+        string GetData(string sData)
+        {
+            if (sData == "$") return sData;
+            return '\'' + sData + '\''; 
         }
         #endregion
 
@@ -135,11 +141,15 @@ namespace Root_MarsLogView
         {
             if (sLog[sLog.Length - 1] == '$') sLog = sLog.Substring(0, sLog.Length - 1);
             string sFile = GetFileName(sLog);
-            bool bExist = File.Exists(sFile); 
-            StreamWriter sw = new StreamWriter(new FileStream(sFile, FileMode.Append));
-            if (bExist == false) sw.WriteLine("Applied Samsung Standard Logging Spec Version: 2.0");
-            sw.WriteLine(sLog);
-            sw.Close(); 
+            bool bExist = File.Exists(sFile);
+            try
+            {
+                StreamWriter sw = new StreamWriter(new FileStream(sFile, FileMode.Append));
+                if (bExist == false) sw.WriteLine("Applied Samsung Standard Logging Spec Version: 2.0");
+                sw.WriteLine(sLog);
+                sw.Close();
+            }
+            catch (Exception) { }
         }
 
         public string m_sFilePath = "c:";

@@ -14,7 +14,7 @@ namespace Root_WIND2
     /// MainWindow.xaml에 대한 상호 작용 논리
     /// </summary>
     public partial class MainWindow : Window
-    {       
+    {
         #region Window Event
         public MainWindow()
         {
@@ -102,7 +102,7 @@ namespace Root_WIND2
 
         private void textLastError_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            
+
         }
 
         #region UI
@@ -137,9 +137,9 @@ namespace Root_WIND2
             m_memoryTool.GetPool(sPool, true).p_gbPool = 1;
             m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
             m_memoryTool.GetMemory(sPool, sGroup, sMem);
-            
+
             m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
-            
+
             viewer.p_ImageViewer = new ImageToolViewer_VM(m_Image, dialogService);
             panel.DataContext = viewer.p_ImageViewer;
 
@@ -162,7 +162,7 @@ namespace Root_WIND2
             m_ReviewViewModel = (Review_ViewModel)m_Review.DataContext;
 
             m_Run = new Run();
-            
+
             ((Run_ViewModel)m_Run.DataContext).init(this);
             m_RunViewModel = (Run_ViewModel)m_Run.DataContext;
 
