@@ -79,8 +79,6 @@ namespace Root_MarsLogView
             m_asLog = asLog; 
             if (GetString(2) != p_sModule) return false;
             if (GetString(4) != p_sEvent) return false;
-            if (GetString(9) != p_sLot) return false;
-            if (GetString(11) != p_sStepNo) return false;
             return true;
         }
 
@@ -113,6 +111,7 @@ namespace Root_MarsLogView
             return sLog + m_asLog[m_asLog.Length - 1]; 
         }
         #endregion
+
         public int m_iTCP; 
         public string m_sLog; 
         public Mars_PRC(int iTCP, string sLog, string[] asLog)
