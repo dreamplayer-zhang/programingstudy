@@ -226,6 +226,13 @@
                     <local:_2_7_EdgeBox x:Name="_EdgeBox"/>
                 </Border>
             </TabItem>
+            <TabItem Header="D2D_Insp"
+                     Style="{StaticResource RcptabItem}">
+                <Border BorderBrush="Gray"
+                        BorderThickness="3">
+                    <local:_2_8_D2D_Insp x:Name="_D2D_Insp"/>
+                </Border>
+            </TabItem>
         </TabControl>
         <StackPanel Grid.Column="1"
                     Margin="0,45,15,15">

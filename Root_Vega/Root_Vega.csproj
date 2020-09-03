@@ -139,6 +139,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI\2_8_D2D_Insp.xaml.cs">
+      <DependentUpon>2_8_D2D_Insp.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_8_D2D_InspViewModel.cs" />
     <Compile Include="Controls\FDC_ContorlViewModel.cs" />
     <Compile Include="Controls\FDC_Control.xaml.cs">
       <DependentUpon>FDC_Control.xaml</DependentUpon>
@@ -319,6 +323,10 @@
       <DependentUpon>Vega_Recipe_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\6_LogViewModel.cs" />
+    <Page Include="UI\2_8_D2D_Insp.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\FDC_Control.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
