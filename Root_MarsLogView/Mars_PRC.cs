@@ -79,6 +79,10 @@ namespace Root_MarsLogView
             m_asLog = asLog; 
             if (GetString(2) != p_sModule) return false;
             if (GetString(4) != p_sEvent) return false;
+            if (p_sEvent == "StepProcess")
+            {
+                if (GetString(11) != p_sStepNo) return false;
+            }
             return true;
         }
 
