@@ -140,7 +140,6 @@
     <ClInclude Include="CLR_Inspection.h" />
     <ClInclude Include="CLR_InspConnector.h" />
     <ClInclude Include="DefectData.h" />
-    <ClInclude Include="Memmap.h" />
     <ClInclude Include="MySQLDBConnector.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
