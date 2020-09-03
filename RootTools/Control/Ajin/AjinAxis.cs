@@ -45,12 +45,12 @@ namespace RootTools.Control.Ajin
         #region Position & Velocity
         public override void SetCommandPosition(double fPos)
         {
-            AXM("AxmStatusSetActPos", CAXM.AxmStatusSetActPos(m_nAxis, fPos * p_pulsepUnit));
+            AXM("AxmStatusSetCmdPos", CAXM.AxmStatusSetCmdPos(m_nAxis, fPos * p_pulsepUnit));
         }
 
         public override void SetActualPosition(double fPos)
         {
-            AXM("AxmStatusSetCmdPos", CAXM.AxmStatusSetCmdPos(m_nAxis, fPos * p_pulsepUnit));
+            AXM("AxmStatusSetActPos", CAXM.AxmStatusSetActPos(m_nAxis, fPos * p_pulsepUnit));
         }
 
         public override void OverrideVelocity(double v)
@@ -649,6 +649,7 @@ namespace RootTools.Control.Ajin
             RunTreeSettingMode(m_treeRootSetting.GetTree("Mode"));
             RunTreeSettingSensor(m_treeRootSetting.GetTree("Sensor"));
             RunTreeSettingTrigger(m_treeRootSetting.GetTree("Trigger"));
+            if (mode == Tree.eMode.RegRead) InitAxis(); 
             if (mode == Tree.eMode.Update) SetAxisStatus();
         }
         #endregion

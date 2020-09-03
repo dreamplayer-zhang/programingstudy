@@ -9,7 +9,7 @@ namespace RootTools.Control
         public List<BitDI> m_aBitDI = new List<BitDI>();
         public BitDO m_bitDO = new BitDO();
 
-        public bool p_bIn
+        public bool p_bDone
         {
             get
             {

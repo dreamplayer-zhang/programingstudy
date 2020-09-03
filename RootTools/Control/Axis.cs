@@ -341,7 +341,7 @@ namespace RootTools.Control
             m_swMove.Start();
             if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
-            if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
+            //if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
             return CheckSWLimit(fScale * m_speedNow.m_v);
         }
 

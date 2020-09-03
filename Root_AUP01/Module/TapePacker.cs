@@ -40,7 +40,7 @@ namespace Root_AUP01.Module
             p_sInfo = m_toolBox.Get(ref m_dioAlign, this, "Align", "Backward", "Align");
             p_sInfo = m_toolBox.Get(ref m_diAlignCheck, this, "AlignCheck");
             p_sInfo = m_toolBox.Get(ref m_diCaseCheck, this, "CaseCheck");
-            p_sInfo = m_toolBox.Get(ref m_dioAlign, this, "Press", "Backward", "Press");
+            p_sInfo = m_toolBox.Get(ref m_dioPress, this, "Press", "Backward", "Press");
 
             p_sInfo = m_toolBox.Get(ref m_dioCartridge, this, "Cartrige", "Backward", "Forward");
             p_sInfo = m_toolBox.Get(ref m_dioCutter, this, "Cutter", "Backward", "Forward");
@@ -65,8 +65,9 @@ namespace Root_AUP01.Module
         string RunSol(DIO_I2O dio, bool bOn, double sWait)
         {
             dio.Write(bOn);
+            Thread.Sleep(2000);
             int msWait = (int)(1000 * sWait);
-            while (dio.p_bIn != bOn)
+            while (dio.p_bDone != true)
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return p_id + " EQ Stop";
@@ -154,27 +155,37 @@ namespace Root_AUP01.Module
             return "OK"; 
         }
 
+        double m_fRotateReady = -10; 
         public string RotateReady()
         {
-            double fPos = m_axisRotate.p_posCommand;
-            while (fPos > 360) fPos -= 360;
-            m_axisRotate.SetCommandPosition(fPos);
-            fPos = m_axisRotate.p_posActual;
-            while (fPos > 360) fPos -= 360;
-            m_axisRotate.SetActualPosition(fPos);
-            m_axisRotate.StartMove(0); 
-            return m_axisRotate.WaitReady(3); 
+            double fPulse = m_axisRotate.p_posCommand;
+            while (fPulse > 2621440) fPulse -= 2621440;
+            m_axisRotate.SetCommandPosition(fPulse);
+            //fPulse = m_axisRotate.p_posActual;
+            //while (fPulse > 2621440) fPulse -= 2621440;
+            //m_axisRotate.SetActualPosition(fPulse);
+            m_axisRotate.StartMove(m_fRotateReady * 2621440.0 / 360.0); 
+            return m_axisRotate.WaitReady(); 
         }
 
         public string Rotate(double fDeg, double v, double acc)
         {
-            m_axisRotate.StartMove(fDeg, v, acc, acc);
-            return m_axisRotate.WaitReady(3);
+            double fPulse = fDeg * 2621440.0 / 360.0;
+            double vPulse = v * 2621440.0 / 360.0;
+            m_axisRotate.StartMove(fPulse, vPulse, acc, acc);
+            return m_axisRotate.WaitReady();
         }
 
         public string RunPress(bool bOn)
         {
-            return RunSol(m_dioPress, bOn, m_sSolPress);
+            m_dioPress.Write(bOn);
+            Thread.Sleep(1000); 
+            return "OK";
+        }
+
+        void RunTreeRotate(Tree tree)
+        {
+            m_fRotateReady = tree.Set(m_fRotateReady, m_fRotateReady, "Ready", "Rotate Ready Position (Deg)"); 
         }
         #endregion
 
@@ -187,6 +198,7 @@ namespace Root_AUP01.Module
         public string RunCutter()
         {
             if (Run(RunSol(m_dioCutter, true, m_sSolCutter))) return p_sInfo;
+            Thread.Sleep(1000); 
             if (Run(RunSol(m_dioCutter, false, m_sSolCutter))) return p_sInfo;
             return "OK"; 
         }
@@ -226,6 +238,7 @@ namespace Root_AUP01.Module
 
         void RunTreeSetup(Tree tree)
         {
+            RunTreeRotate(tree.GetTree("Rotate", false));
             RunTreeDIOWait(tree.GetTree("Timeout", false)); 
         }
 
@@ -243,8 +256,15 @@ namespace Root_AUP01.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            m_axisRotate.ServoOn(true);
+            Thread.Sleep(100);
+            m_axisRotate.Jog(0.3);
+            Thread.Sleep(1200);
+            m_axisRotate.StopAxis();
+            Thread.Sleep(100);
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            if (p_eState == eState.Ready) RotateReady(); 
             return p_sInfo;
         }
         #endregion
@@ -263,6 +283,7 @@ namespace Root_AUP01.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
+            AddModuleRunList(new Run_SolValve(this), true, "Run SolValve");
             AddModuleRunList(new Run_Cover(this), true, "Run Cover Open, Close, Head Up");
             AddModuleRunList(new Run_Taping(this), true, "Run Taping");
         }
@@ -292,6 +313,48 @@ namespace Root_AUP01.Module
             public override string Run()
             {
                 Thread.Sleep((int)(1000 * m_secDelay));
+                return "OK";
+            }
+        }
+        public class Run_SolValve : ModuleRunBase
+        {
+            TapePacker m_module;
+            public Run_SolValve(TapePacker module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            enum eSolValve
+            {
+                Cartridge,
+                Head,
+                PadUp,
+            }
+            eSolValve m_eSol = eSolValve.Cartridge;
+            bool m_bOn = false; 
+            public override ModuleRunBase Clone()
+            {
+                Run_SolValve run = new Run_SolValve(m_module);
+                run.m_eSol = m_eSol;
+                run.m_bOn = m_bOn;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eSol = (eSolValve)tree.Set(m_eSol, m_eSol, "SolValve", "Run SolValve", bVisible);
+                m_bOn = tree.Set(m_bOn, m_bOn, "On", "Run SolValue On/Off", bVisible); 
+            }
+
+            public override string Run()
+            {
+                switch (m_eSol)
+                {
+                    case eSolValve.Cartridge: return m_module.RunCartridge(m_bOn);
+                    case eSolValve.Head: return m_module.RunHead(m_bOn);
+                    case eSolValve.PadUp: return m_module.RunPad(m_bOn); 
+                }
                 return "OK";
             }
         }
@@ -352,6 +415,10 @@ namespace Root_AUP01.Module
             public override ModuleRunBase Clone()
             {
                 Run_Taping run = new Run_Taping(m_module);
+                run.m_sCartride = m_sCartride;
+                run.m_fDeg = m_fDeg;
+                run.m_v = m_v;
+                run.m_acc = m_acc; 
                 return run;
             }
 
@@ -363,21 +430,26 @@ namespace Root_AUP01.Module
 
             void RunTreeRotate(Tree tree, bool bVisible)
             {
-                m_fDeg = tree.Set(m_fDeg, m_fDeg, "Degree", "Rotate Degree (Degree)", bVisible);
+                m_fDeg = tree.Set(m_fDeg, m_fDeg, "Rotate", "Rotate Degree (Degree)", bVisible);
                 m_v = tree.Set(m_v, m_v, "Velocity", "Rotate Velocity (Degree/sec)", bVisible);
                 m_acc = tree.Set(m_acc, m_acc, "Acceleration", "Rotate Acceleration Time (sec)", bVisible);
             }
 
             public override string Run()
             {
+                if (m_module.Run(m_module.RunCoverClose())) return p_sInfo;
+                if (m_module.Run(m_module.RotateReady())) return p_sInfo;
                 if (m_module.Run(m_module.RunCartridge(true))) return p_sInfo;
                 Thread.Sleep((int)(1000 * m_sCartride));
                 if (m_module.Run(m_module.RunCartridge(false))) return p_sInfo;
+                if (m_module.Run(m_module.RunPress(true))) return p_sInfo;
+                Thread.Sleep((int)(1000 * m_sCartride));
                 if (m_module.Run(m_module.Rotate(m_fDeg, m_v, m_acc))) return p_sInfo;
                 if (m_module.Run(m_module.RunCutter())) return p_sInfo;
-                double fDeg = ((int)(m_fDeg / 360) + 2) * 360;
-                if (m_module.Run(m_module.Rotate(fDeg, m_v, m_acc))) return p_sInfo;
-                //if (m_module.Run(m_module.Rotate())) return p_sInfo;
+                if (m_module.Run(m_module.Rotate(m_fDeg + 360, m_v, m_acc))) return p_sInfo;
+                if (m_module.Run(m_module.RunPress(false))) return p_sInfo;
+                if (m_module.Run(m_module.RotateReady())) return p_sInfo;
+                if (m_module.Run(m_module.RunHeadUp())) return p_sInfo;
                 return "OK";
             }
         }

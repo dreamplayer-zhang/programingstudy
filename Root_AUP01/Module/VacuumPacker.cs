@@ -79,7 +79,7 @@ namespace Root_AUP01.Module
         {
             dio.Write(bOn);
             int msWait = (int)(1000 * sWait);
-            while (dio.p_bIn != bOn)
+            while (dio.p_bDone != true)
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return p_id + " EQ Stop";
@@ -139,7 +139,7 @@ namespace Root_AUP01.Module
             m_dioStep1[0].Write(bOn);
             m_dioStep1[1].Write(bOn);
             int msWait = (int)(1000 * m_sSolStep1);
-            while ((m_dioStep1[0].p_bIn != bOn) || (m_dioStep1[0].p_bIn != bOn))
+            while ((m_dioStep1[0].p_bDone != true) || (m_dioStep1[0].p_bDone != true))
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return p_id + " EQ Stop";

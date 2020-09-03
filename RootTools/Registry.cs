@@ -25,14 +25,18 @@ namespace RootTools
             dynamic value = m_reg.GetValue(sSub);
             if (value == null) return valueDefault; 
             Type type = valueDefault.GetType();
-            if (type == typeof(bool)) return (value.ToString() == true.ToString());
-            if (type == typeof(int)) return Convert.ToInt32(value.ToString());
-            if (type == typeof(long)) return Convert.ToInt64(value.ToString());
-            if (type == typeof(double)) return Convert.ToDouble(value.ToString());
-            if (type == typeof(string)) return value.ToString();
-            if (type == typeof(CPoint)) return new CPoint(value.ToString(), null);
-            if (type == typeof(RPoint)) return new RPoint(value.ToString(), null);
-            return valueDefault; 
+            try
+            {
+                if (type == typeof(bool)) return (value.ToString() == true.ToString());
+                if (type == typeof(int)) return Convert.ToInt32(value.ToString());
+                if (type == typeof(long)) return Convert.ToInt64(value.ToString());
+                if (type == typeof(double)) return Convert.ToDouble(value.ToString());
+                if (type == typeof(string)) return value.ToString();
+                if (type == typeof(CPoint)) return new CPoint(value.ToString(), null);
+                if (type == typeof(RPoint)) return new RPoint(value.ToString(), null);
+                return valueDefault;
+            }
+            catch (Exception) { return valueDefault; }
         }
     }
 
