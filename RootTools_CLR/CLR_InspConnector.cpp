@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "CLR_InspConnector.h"
-#include "Memmap.h"
 
 #include <intsafe.h>
 
@@ -41,14 +40,6 @@ namespace RootTools_CLR
 		/*mutexTemp.assign(mutexName.begin(), mutexName.end());*/
 		HANDLE hMapping;
 		hMapping = ::OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, t.c_str());
-		/////////////////////////
-		/*CMemMapFile mmf;
-		bool bSuccess = mmf.MapExistingMemory(t.c_str(), mutexTemp.c_str(), ImgPool_Width * ImgPool_Height, false, false, nullptr, offset, nullptr);
-		LPVOID buf;
-		if (bSuccess) buf = mmf.Open();
-		else return nullptr;*/
-		//else buf = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0, 0, ImgPool_Width * ImgPool_Height + offset);
-		/////////////////////////
 		LPVOID buf = ::MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0,0, ImgPool_Width * ImgPool_Height + offset);
 		
 		if (buf == NULL)
