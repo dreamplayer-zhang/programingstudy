@@ -153,7 +153,7 @@ namespace RootTools
 
 				
 				SetProperty(ref m_CanvasWidth, value);
-				m_BasicTool.CanvasSize
+				//m_BasicTool.CanvasSize
 			}
 		}
 		private int m_CanvasHeight = 100;

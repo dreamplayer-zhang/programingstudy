@@ -1,12 +1,190 @@
 ﻿<Window x:Class="RootTools_Vision.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RootTools_Vision"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools" 
+		xmlns:local="clr-namespace:RootTools_Vision"
+        Title="MainWindow" Height="800" Width="1400" Loaded="Window_Loaded">
+
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <!--
+        ***********************************************************************
         
+        Left Panel
+        
+        ***********************************************************************
+        -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+
+            <!--<Grid Grid.Row="0" Name="gridInspectionWap" Background="Black" 
+                  DataContext="{Binding p_Inspection_ViewModel}">
+                <tools:ImageViewer DataContext="{Binding p_ImageViewer}"
+                                           Width="{PriorityBinding}"
+                                             Height="{PriorityBinding}"/>
+            </Grid>-->
+            <Grid Grid.Row="0">
+                <tools:ImageViewer x:Name="view"
+                                           Width="{PriorityBinding}"
+                                             Height="{PriorityBinding}"/>
+            </Grid>
+            <local:MapViewer x:Name="mapViewer"  Grid.Row="1"></local:MapViewer>
+        </Grid>
+
+
+
+        <!--
+        ***********************************************************************
+        
+        Right Panel
+        
+        ***********************************************************************
+        -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10*"/>
+                <RowDefinition Height="45*"/>
+                <RowDefinition Height="45*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Start Panel -->
+            <Grid Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                        FontSize="40" FontWeight="Bold"
+                    Content="START" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="Auto" Height="Auto" Click="Button_Click"/>
+                    <Button Grid.Column="1"
+                        FontSize="40" FontWeight="Bold"
+                    Content="STOP" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="Auto" Height="Auto" Click="BtnStop_Click"/>
+                </Grid>
+
+
+                <StackPanel Grid.Column="1"
+                        Orientation="Vertical">
+                    <Label Content="Work Bundle Index" Padding="10, 0, 0, 0" VerticalContentAlignment="Center"/>
+                    <Label Content="Workplace Bundle Index" Padding="10, 0, 0, 0" VerticalContentAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2"
+                        Orientation="Vertical">
+                    <TextBox Name="tbWorkBundleIndex"  Text="0" TextAlignment="Center" VerticalContentAlignment="Center"/>
+                    <TextBox Name="tbWorkplaceBundleIndex" Text="0" TextAlignment="Center" VerticalContentAlignment="Center"/>
+                </StackPanel>
+
+
+            </Grid>
+
+            <Grid Grid.Column="0" Grid.Row="1" Grid.RowSpan="2"/>
+
+
+
+            <!-- List WorkBundle & List WorkplaceBundle -->
+            <Grid Grid.Column="0" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5*"/>
+                    <RowDefinition Height="95*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Grid.Row="0"
+                   FontSize="15" FontWeight="Bold"
+                   Background="LightGreen"
+                Content="List of WorkBundle" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="Auto" Height="Auto" Margin="0,0,0,294" Grid.RowSpan="2"/>
+                <Label Grid.Column="1" Grid.Row="0"
+                   FontSize="15" FontWeight="Bold"
+                   Background="LightBlue"
+                Content="List of WorkplaceBundle" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="Auto" Height="Auto" Margin="0,0,0,294" Grid.RowSpan="2"/>
+                <StackPanel Grid.Column="0" Grid.Row="1"
+                        Name="stackListWorkBundle"
+                        Background="Cornsilk" Margin="0,40,0,0"/>
+                <StackPanel Grid.Column="1" Grid.Row="1"
+                        Name="stackListWorkplaceBundle"
+                        Background="Beige" Margin="0,40,0,0"/>
+            </Grid>
+
+
+            <!-- WorkBundle Stack Panel -->
+            <Grid Grid.Column="1" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="9*"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Column="0" Grid.Row="0"
+                   FontSize="15" FontWeight="Bold"
+                   Background="Azure"
+                Content="WorkBundle" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="Auto" Height="Auto"/>
+                <StackPanel Name="stackWorkBundle"
+                        Grid.Column="0" Grid.Row="1"
+                        Background="WhiteSmoke">
+
+                </StackPanel>
+            </Grid>
+            <!-- WorkplaceBundle Panel -->
+            <Grid Grid.Column="1" Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="9*"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Column="0" Grid.Row="0"
+                   FontSize="15" FontWeight="Bold"
+                   Background="Azure"
+                Content="WorkBundle" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="Auto" Height="Auto"/>
+                <Grid Name="gridMap"
+                Grid.Column="0" Grid.Row="1"
+                  Background="WhiteSmoke">
+                </Grid>
+            </Grid>
+
+            <!-- StackPanel -->
+            <StackPanel Grid.Column="2" Grid.Row="1">
+                <Button Content="Register WorkBundle" Height="60" Click="BtnRegisterWorkBundle"></Button>
+                <Button Content="Add Position" Height="30" Click="BtnAddPosition"></Button>
+                <Button Content="Add PreInspection" Height="30" Click="BtnAddPreInspection"></Button>
+                <Button Content="Add Inspection(D2D)" Height="30" Click="BtnAddInspectionD2D"></Button>
+                <Button Content="Add Inspection(Surface)" Height="30" Click="BtnAddInspectionSurface"></Button>
+                <Button Content="Add Measuremnet" Height="30" Click="BtnAddMeasurement"></Button>
+
+                <Button Content="Open Image" Height="30" Click="Button_Click_1"/>
+                <Button Content="SELECT DATA" Height="30" Click="Button_Click_2"/>
+                <Button Content="CLEAR DATA" Height="30" Click="Button_Click_3"/>
+
+            </StackPanel>
+            <StackPanel Grid.Column="2" Grid.Row="2">
+                <Button Content="Register WorkplaceBundle" Height="60" Click="BtnRegisterWorkplaceBundle"></Button>
+                <TextBox Name="tbMapSizeX"
+                     FontSize="20" 
+                     Height="30" Width="Auto"
+                Text="0" TextAlignment="Center" VerticalContentAlignment="Center"/>
+                <TextBox Name="tbMapSizeY"
+                     FontSize="20" 
+                     Height="30" Width="Auto"
+                Text="0" TextAlignment="Center" VerticalContentAlignment="Center"/>
+                <Button Content="Create Map" Height="30" Click="BtnCreateMap"></Button>
+
+            </StackPanel>
+        </Grid>
+
     </Grid>
 </Window>

@@ -11,8 +11,6 @@ class IP
 public:
 	static void Threshold(BYTE* pSrc, int nW, int nH, int nThrehold, bool bDark, BYTE* pDst);
 	static void Labeling(BYTE* pSrc, BYTE* pBin, int nW, int nH, bool bDark, BYTE* pDst, std::vector<LabeledData>& vtLabeled);
-
-	//Vision
 	static void Threshold(BYTE* pSrc, BYTE* pDst, int nW, int nH, bool bDark, int threshold);
 	
 	static float Average(BYTE* pSrc, int nW, int nH);	
