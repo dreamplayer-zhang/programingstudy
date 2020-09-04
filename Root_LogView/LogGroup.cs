@@ -140,6 +140,7 @@ namespace Root_LogView
 
             bool IsVisible(string sFilter, string sData)
             {
+                if (sData == null) return false; 
                 if (sFilter == "") return true;
                 return sData.Contains(sFilter);
             }
