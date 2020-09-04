@@ -453,7 +453,6 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-
         public Aligner_ATI(string id, IEngineer engineer)
         {
             m_waferSize = new InfoWafer.WaferSize(id, false, false);

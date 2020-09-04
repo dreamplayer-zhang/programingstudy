@@ -90,9 +90,11 @@ namespace RootTools.Control
             return (m_listDO.m_aDIO[nDO].p_sID != "Output");
         }
 
+        public StopWatch m_swWrite = new StopWatch(); 
         public void Write(bool bOn)
         {
             m_bitDO.Write(bOn);
+            m_swWrite.Start(); 
         }
 
         public bool p_bEnableRun { get; set; }

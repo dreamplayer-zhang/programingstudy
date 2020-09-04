@@ -38,7 +38,7 @@ namespace RootTools_CLR
 			delete pInspReticle;
 		}
 
-		void SurfaceInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute)
+		void SurfaceInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute, void* ptrMemory)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -51,7 +51,8 @@ namespace RootTools_CLR
 			msclr::interop::marshal_context context;
 			std::string standardString = context.marshal_as<std::string>(poolName);
 
-			byte* buffer = m_InspConn->GetImagePool(standardString, memOffset, memwidth, memHeight);
+			//byte* buffer = m_InspConn->GetImagePool(standardString, memOffset, memwidth, memHeight);
+			byte* buffer = (byte*)ptrMemory;
 			if (buffer != NULL)
 			{
 				int bufferwidth = memwidth;
@@ -136,7 +137,7 @@ namespace RootTools_CLR
 				//return local;
 			}
 		}
-		void StripInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth)
+		void StripInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth, void *ptrMemory)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -149,7 +150,8 @@ namespace RootTools_CLR
 			msclr::interop::marshal_context context;
 			std::string standardString = context.marshal_as<std::string>(poolName);
 
-			byte* buffer = m_InspConn->GetImagePool(standardString, memOffset, memwidth, memHeight);//TODO 수정필요
+			//byte* buffer = m_InspConn->GetImagePool(standardString, memOffset, memwidth, memHeight);//TODO 수정필요
+			byte* buffer = (byte*)ptrMemory;
 			int bufferwidth = memwidth;
 			int bufferheight = memHeight;
 

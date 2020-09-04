@@ -56,8 +56,10 @@ namespace RootTools
 			}
 			set
 			{
-				if (m_Size != value)
+				if ((m_Size.X != value.X) && (m_Size.Y !=value.Y))
+				{
 					ReAllocate(value, p_nByte);
+				}
 				SetProperty(ref m_Size, value);
 			}
 		}
@@ -426,9 +428,9 @@ namespace RootTools
 
 			bw.Write(Convert.ToUInt16(0x4d42));//ushort bfType = br.ReadUInt16();
 			if (p_nByte == 1)
-				bw.Write(Convert.ToUInt32(54 + 1024 + p_nByte * rect.Width * rect.Height));
+				bw.Write(Convert.ToUInt32(54 + 1024 + p_nByte * (Int64)rect.Width * (Int64)rect.Height));
 			else if (p_nByte == 3)
-				bw.Write(Convert.ToUInt32(54 + p_nByte * rect.Width * rect.Height));//uint bfSize = br.ReadUInt32();
+				bw.Write(Convert.ToUInt32(54 + p_nByte * (Int64)rect.Width * (Int64)rect.Height));//uint bfSize = br.ReadUInt32();
 
 			//image 크기 bw.Write();   bmfh.bfSize = sizeof(14byte) + nSizeHdr + rect.right * rect.bottom;
 			bw.Write(Convert.ToUInt16(0));   //reserved // br.ReadUInt16();
@@ -444,7 +446,7 @@ namespace RootTools
 			bw.Write(Convert.ToUInt16(1));// a = br.ReadUInt16();
 			bw.Write(Convert.ToUInt16(8 * p_nByte));     //byte       // nByte = br.ReadUInt16() / 8;                
 			bw.Write(Convert.ToUInt32(0));      //compress //b = br.ReadUInt32();
-			bw.Write(Convert.ToUInt32(rect.Width * rect.Height));// b = br.ReadUInt32();
+			bw.Write(Convert.ToUInt32((Int64)rect.Width * (Int64)rect.Height));// b = br.ReadUInt32();
 			bw.Write(Convert.ToInt32(0));//a = br.ReadInt32();
 			bw.Write(Convert.ToInt32(0));// a = br.ReadInt32();
 			bw.Write(Convert.ToUInt32(256));      //color //b = br.ReadUInt32();
@@ -626,15 +628,16 @@ namespace RootTools
 			br.Close();
 		}
 
-		bool ReAllocate(CPoint sz, int nByte)
+		public bool ReAllocate(CPoint sz, int nByte)
 		{
-			p_Size.X = (p_Size.X / 4) * 4;
-			if (p_nByte <= 0)
+			if (nByte <= 0)
 				return false;
-			if ((p_Size.X < 1) || (p_Size.Y < 1))
-				return false;
-			m_aBuf = new byte[(p_Size.X) * p_nByte * (p_Size.Y)];
+			if ((sz.X < 1) || (sz.Y < 1))
 			return false;
+
+			Array.Resize(ref m_aBuf, sz.X * nByte* sz.Y);
+
+			return true;
 		}
 
 		public void ClearImage()

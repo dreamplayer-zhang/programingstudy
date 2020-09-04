@@ -9,7 +9,7 @@
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
              xmlns:Axis="clr-namespace:RootTools.Control.Ajin;assembly=RootTools"
              xmlns:Dalsa="clr-namespace:RootTools.Camera.Dalsa;assembly=RootTools"
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
              d:DesignHeight="726"
              d:DesignWidth="1602">
@@ -437,7 +437,7 @@
                                         </Button.Content>
                                     </Button>
                                     <Button Style="{StaticResource BasicBtn}"
-                                            IsEnabled="{Binding p_CamInfo._IsCanGrab, Converter={StaticResource InverseBooleanConverters}}"
+                                            IsEnabled="{Binding p_CamInfo._IsGrabbing}"
                                             Command="{Binding StopGrabCommand}"
                                             Margin="5">
                                         <Button.Content>

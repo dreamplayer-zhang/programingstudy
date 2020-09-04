@@ -16,6 +16,7 @@ namespace RootTools.Trees
         #endregion
 
         #region Property
+        readonly object m_csLock = new object();
         eMode _eMode = eMode.RegRead;
         public eMode p_eMode
         {
@@ -26,8 +27,11 @@ namespace RootTools.Trees
                 switch (_eMode)
                 {
                     case eMode.Init:
-                        RunTreeRemove(); 
-                        RunTreeInit();
+                        RunTreeRemove();
+                        lock (m_csLock)
+                        {
+                            RunTreeInit();
+                        }
                         m_timer.Start(); 
                         break;
                     case eMode.Update:
@@ -42,9 +46,12 @@ namespace RootTools.Trees
         DispatcherTimer m_timer = new DispatcherTimer();
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            RunTreeDone(); 
+            lock (m_csLock)
+            {
+                RunTreeDone();
+            }
             m_timer.Stop(); 
-        }
+        }  
         #endregion
 
         public TreeRoot(string id, Log log, bool bReadOnly = false, string sModel = "")

@@ -101,6 +101,7 @@ namespace Root_MarsLogView
         {
             if (m_asLog.Length <= nIndex) return "";
             string sLog = m_asLog[nIndex];
+            if (sLog == "") return "";
             if (sLog[sLog.Length - 1] == '\'') sLog = sLog.Substring(0, sLog.Length - 1);
             if (sLog[0] == '\'') sLog = sLog.Substring(1, sLog.Length - 1);
             return sLog;
@@ -126,6 +127,7 @@ namespace Root_MarsLogView
             return sLog + m_asLog[m_asLog.Length - 1];
         }
         #endregion
+
         public int m_iTCP;
         public string m_sLog; 
         public Mars_LEH(int iTCP, string sLog, string[] asLog)
