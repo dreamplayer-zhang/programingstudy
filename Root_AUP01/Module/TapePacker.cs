@@ -65,7 +65,7 @@ namespace Root_AUP01.Module
         string RunSol(DIO_I2O dio, bool bOn, double sWait)
         {
             dio.Write(bOn);
-            Thread.Sleep(2000);
+            Thread.Sleep(500);
             int msWait = (int)(1000 * sWait);
             while (dio.p_bDone != true)
             {
@@ -166,6 +166,18 @@ namespace Root_AUP01.Module
             //m_axisRotate.SetActualPosition(fPulse);
             m_axisRotate.StartMove(m_fRotateReady * 2621440.0 / 360.0); 
             return m_axisRotate.WaitReady(); 
+        }
+        public string RotateTapingReady()
+        {
+            double fPulse = m_axisRotate.p_posCommand;
+            while (fPulse > 2621440) fPulse -= 2621440;
+            m_axisRotate.SetCommandPosition(fPulse);
+            //fPulse = m_axisRotate.p_posActual;
+            //while (fPulse > 2621440) fPulse -= 2621440;
+            //m_axisRotate.SetActualPosition(fPulse);
+            double fMovepos = 90 * 2621440.0 / 360.0;
+            m_axisRotate.StartMove(fMovepos);
+            return m_axisRotate.WaitReady();
         }
 
         public string Rotate(double fDeg, double v, double acc)
@@ -437,19 +449,32 @@ namespace Root_AUP01.Module
 
             public override string Run()
             {
-                if (m_module.Run(m_module.RunCoverClose())) return p_sInfo;
-                if (m_module.Run(m_module.RotateReady())) return p_sInfo;
-                if (m_module.Run(m_module.RunCartridge(true))) return p_sInfo;
-                Thread.Sleep((int)(1000 * m_sCartride));
-                if (m_module.Run(m_module.RunCartridge(false))) return p_sInfo;
-                if (m_module.Run(m_module.RunPress(true))) return p_sInfo;
-                Thread.Sleep((int)(1000 * m_sCartride));
-                if (m_module.Run(m_module.Rotate(m_fDeg, m_v, m_acc))) return p_sInfo;
-                if (m_module.Run(m_module.RunCutter())) return p_sInfo;
-                if (m_module.Run(m_module.Rotate(m_fDeg + 360, m_v, m_acc))) return p_sInfo;
-                if (m_module.Run(m_module.RunPress(false))) return p_sInfo;
-                if (m_module.Run(m_module.RotateReady())) return p_sInfo;
-                if (m_module.Run(m_module.RunHeadUp())) return p_sInfo;
+                for (int i = 0; i < 1; i++)
+                {
+                    if (m_module.Run(m_module.RunCoverClose())) return p_sInfo;
+                    if (m_module.Run(m_module.RotateReady())) return p_sInfo;
+                    if (m_module.Run(m_module.RunPress(true))) return p_sInfo;
+                    if (m_module.Run(m_module.RunCartridge(true))) return p_sInfo;
+                    //Thread.Sleep((int)(1000 * m_sCartride));
+                    if (m_module.Run(m_module.Rotate(13.0, m_v, m_acc))) return p_sInfo;
+                    if (m_module.Run(m_module.RunCartridge(false))) return p_sInfo;
+                    if (m_module.Run(m_module.Rotate(m_fDeg, m_v, m_acc))) return p_sInfo;
+                    if (m_module.Run(m_module.RunCutter())) return p_sInfo;
+                    if (m_module.Run(m_module.Rotate(m_fDeg+180.0, m_v, m_acc))) return p_sInfo;
+                    if (m_module.Run(m_module.RotateReady())) return p_sInfo;
+                    //if (m_module.Run(m_module.RunCoverClose())) return p_sInfo;
+                    //if (m_module.Run(m_module.RotateReady())) return p_sInfo;
+                    //if (m_module.Run(m_module.RunPress(true))) return p_sInfo;
+                    //if (m_module.Run(m_module.RunCartridge(true))) return p_sInfo;
+                    //Thread.Sleep((int)(1000 * m_sCartride));
+                    //if (m_module.Run(m_module.RunCartridge(false))) return p_sInfo;
+                    //if (m_module.Run(m_module.Rotate(m_fDeg, m_v, m_acc))) return p_sInfo;
+                    //if (m_module.Run(m_module.RunCutter())) return p_sInfo;
+                    //if (m_module.Run(m_module.Rotate(m_fDeg + 360, m_v, m_acc))) return p_sInfo;
+                    //if (m_module.Run(m_module.RunPress(false))) return p_sInfo;
+                    //if (m_module.Run(m_module.RotateReady())) return p_sInfo;
+                    //if (m_module.Run(m_module.RunHeadUp())) return p_sInfo;
+                }
                 return "OK";
             }
         }
