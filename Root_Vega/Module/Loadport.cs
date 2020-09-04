@@ -52,7 +52,11 @@ namespace Root_Vega.Module
                 InitPosZ();
                 InitPosPod();
                 InitPosPodLifter();
-                InitPosReticleLifter(); 
+                InitPosReticleLifter();
+                m_axisZ.ServoOn(true);
+                m_axisTheta.ServoOn(true);
+                m_axisPodLifter.ServoOn(true);
+                m_axisReticleLifter.ServoOn(true);
             }
         }
         #endregion
@@ -144,9 +148,7 @@ namespace Root_Vega.Module
 
         public string ShiftReticleLifter(double dPosX, double dPosY)
         {
-            RPoint rpActual = new RPoint(m_axisReticleLifter.p_axisX.p_posActual, m_axisReticleLifter.p_axisY.p_posActual);
-            RPoint rpMove = new RPoint(rpActual.X - dPosX, rpActual.Y - dPosY);
-            string sMove = m_axisReticleLifter.StartMove(rpMove);
+            string sMove = m_axisReticleLifter.StartShift(new RPoint(-dPosX, -dPosY));
             if (sMove != "OK") return sMove;
             return m_axisReticleLifter.WaitReady(m_dInposReticle);
         }
@@ -330,15 +332,9 @@ namespace Root_Vega.Module
             m_axisTheta.ServoOn(true);
             m_axisPodLifter.ServoOn(true);
             m_axisReticleLifter.ServoOn(true);
-            Thread.Sleep(1000);
             m_axisZ.p_eState = Axis.eState.Ready;
             m_axisTheta.p_eState = Axis.eState.Ready;
-            m_axisPodLifter.p_axisX.p_eState = Axis.eState.Ready;
-            m_axisPodLifter.p_axisY.p_eState = Axis.eState.Ready;
-            m_axisReticleLifter.p_axisX.p_eState = Axis.eState.Ready;
-            m_axisReticleLifter.p_axisY.p_eState = Axis.eState.Ready;
             Thread.Sleep(1000);
-            //JWS 200616 ADD
             if (GetdZPos(ePosZ.InnerPod) < 0)
             {
                 p_sInfo = HomeToMinusLimit(m_axisPodLifter.p_axisX, m_axisPodLifter.p_axisY, m_axisReticleLifter.p_axisX, m_axisReticleLifter.p_axisY);
@@ -402,7 +398,7 @@ namespace Root_Vega.Module
 
         double GetdZPos(ePosZ pos)
         {
-            return m_axisZ.p_posActual - m_axisZ.GetPosValue(pos.ToString()) + m_dInposZ;
+            return m_axisZ.p_posCommand - m_axisZ.GetPosValue(pos.ToString()) + m_dInposZ;
         }
 
         public override string StateReady()

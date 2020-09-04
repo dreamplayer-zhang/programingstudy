@@ -407,7 +407,7 @@ namespace RootTools.Control
                     {
                         for (int n = 0; n < 10; n++)
                         {
-                            dPos = m_posDst - p_posActual;
+                            dPos = m_posDst - p_posCommand;
                             if (Math.Abs(dPos) < dInPos) return "OK"; 
                             p_sInfo = "WaitReady InPosition Error #" + n.ToString() + " : " + dPos.ToString();
                             Thread.Sleep(100); 
@@ -426,6 +426,34 @@ namespace RootTools.Control
             if (m_speedNow.m_id != eSpeed.Move.ToString()) return;
             m_speedNow = GetSpeedValue(eSpeed.Move_DoorOpen);
             OverrideVelocity(m_speedNow.m_v);
+        }
+        #endregion
+
+        #region Shift
+        public virtual string StartShift(double dfPos, string sSpeed = null)
+        {
+            double fPos = p_posCommand + dfPos;
+            m_posDst = fPos;
+            m_speedNow = (sSpeed != null) ? GetSpeedValue(sSpeed) : GetSpeedValue(EQ.p_bDoorOpen ? eSpeed.Move_DoorOpen : eSpeed.Move);
+            m_swMove.Start();
+            if (EQ.IsStop()) return p_id + " EQ Stop";
+            if (EQ.p_bSimulate) return "OK";
+            double dPos = fPos - p_posCommand;
+            m_msMoveTime = (int)(1000 * (dPos / m_speedNow.m_v + m_speedNow.m_acc + m_speedNow.m_dec + 1));
+            return CheckSWLimit(ref fPos);
+        }
+
+        public virtual string StartShift(double dfPos, double v, double acc = -1, double dec = -1)
+        {
+            double fPos = p_posCommand + dfPos; 
+            m_posDst = fPos;
+            m_speedNow = null;
+            m_swMove.Start();
+            if (EQ.IsStop()) return p_id + " EQ Stop";
+            if (EQ.p_bSimulate) return "OK";
+            double dPos = fPos - p_posCommand;
+            m_msMoveTime = (int)(1000 * (dPos / v + acc + dec + 1));
+            return CheckSWLimit(ref fPos);
         }
         #endregion
 
@@ -453,7 +481,8 @@ namespace RootTools.Control
             }
             m_swMove.Start();
             string sStartHome = ResetAlarm();
-            ServoOn(true); 
+            ServoOn(true);
+            Thread.Sleep(10); 
             if (p_bSeroOn == false) return p_id + " ServoOn Error";
             return "OK";
         }

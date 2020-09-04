@@ -93,6 +93,19 @@ namespace RootTools.Control
         }
         #endregion
 
+        #region Shift
+        public string StartShift(RPoint drpPos, string sSpeed = null)
+        {
+            RPoint rpPos = p_posCommand + drpPos; 
+            m_rpDst = rpPos;
+            string xInfo = p_axisX.StartMove(rpPos.X, sSpeed);
+            string yInfo = p_axisY.StartMove(rpPos.Y, sSpeed);
+            if (xInfo != "OK") return "AxisX StartMove X Error : " + xInfo;
+            if (yInfo != "OK") return "AxisY StartMove Y Error : " + yInfo;
+            return "OK";
+        }
+        #endregion
+
         #region Functions
         public void ServoOn(bool bOn)
         {

@@ -39,9 +39,7 @@ namespace RootTools.Control.Ajin
             foreach (AjinAxis axis in m_listAxis.m_aAxis)
             {
                 TabItem tabItem = new TabItem();
-                Binding bindingHeader = new Binding("p_sName");
-                bindingHeader.Source = axis;
-                tabItem.SetBinding(TabItem.HeaderProperty, bindingHeader); 
+                tabItem.Header = axis.p_id; 
                 tabItem.Content = axis.p_ui;
                 m_asAxis.Add(axis.p_id); 
                 tabItem.Height = 0;
