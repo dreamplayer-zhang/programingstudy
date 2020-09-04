@@ -69,7 +69,7 @@ namespace RootTools.Control
                 else
                 {
                     m_aBitDI[nIndex] = m_listDI.m_aDIO[nDI];
-                    m_aBitDI[nIndex].SetID(m_log, m_id);
+                    m_aBitDI[nIndex].SetID(m_log, m_id + "." + m_asID[nIndex]);
                 }
             }
             return "OK";
@@ -93,7 +93,7 @@ namespace RootTools.Control
                 else
                 {
                     m_aBitDO[nIndex] = (BitDO)m_listDO.m_aDIO[nDO];
-                    m_aBitDO[nIndex].SetID(m_log, m_id);
+                    m_aBitDO[nIndex].SetID(m_log, m_id + "." + m_asID[nIndex]);
                 }
             }
             return "OK";

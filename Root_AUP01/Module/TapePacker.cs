@@ -29,7 +29,7 @@ namespace Root_AUP01.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_dioHead, this, "Head", "Up", "Down");
-            p_sInfo = m_toolBox.Get(ref m_dioPad, this, "PadUp", "Up", "Down");
+            p_sInfo = m_toolBox.Get(ref m_dioPad, this, "Pad", "Up", "Down");
             p_sInfo = m_toolBox.Get(ref m_dioLidGuide, this, "LidGuide", "Release", "Hold");
             p_sInfo = m_toolBox.Get(ref m_diPressCheck, this, "PressCheck");
             p_sInfo = m_toolBox.Get(ref m_diTopCoverCheck, this, "TopCoverCheck");
@@ -283,8 +283,9 @@ namespace Root_AUP01.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
-            AddModuleRunList(new Run_SolValve(this), true, "Run SolValve");
-            AddModuleRunList(new Run_Cover(this), true, "Run Cover Open, Close, Head Up");
+            AddModuleRunList(new Run_SolValve(this), false, "Run SolValve");
+            AddModuleRunList(new Run_Rotate(this), false, "Run Rotate");
+            AddModuleRunList(new Run_Cover(this), false, "Run Cover Open, Close, Head Up");
             AddModuleRunList(new Run_Taping(this), true, "Run Taping");
         }
 
@@ -316,6 +317,7 @@ namespace Root_AUP01.Module
                 return "OK";
             }
         }
+
         public class Run_SolValve : ModuleRunBase
         {
             TapePacker m_module;
@@ -329,7 +331,7 @@ namespace Root_AUP01.Module
             {
                 Cartridge,
                 Head,
-                PadUp,
+                Pad,
             }
             eSolValve m_eSol = eSolValve.Cartridge;
             bool m_bOn = false; 
@@ -353,9 +355,43 @@ namespace Root_AUP01.Module
                 {
                     case eSolValve.Cartridge: return m_module.RunCartridge(m_bOn);
                     case eSolValve.Head: return m_module.RunHead(m_bOn);
-                    case eSolValve.PadUp: return m_module.RunPad(m_bOn); 
+                    case eSolValve.Pad: return m_module.RunPad(m_bOn); 
                 }
                 return "OK";
+            }
+        }
+
+        public class Run_Rotate : ModuleRunBase
+        {
+            TapePacker m_module;
+            public Run_Rotate(TapePacker module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            double m_fDeg = 0;
+            double m_v = 120;
+            double m_acc = 2;
+            public override ModuleRunBase Clone()
+            {
+                Run_Rotate run = new Run_Rotate(m_module);
+                run.m_fDeg = m_fDeg;
+                run.m_v = m_v;
+                run.m_acc = m_acc;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_fDeg = tree.Set(m_fDeg, m_fDeg, "Rotate", "Rotate Degree (Degree)", bVisible);
+                m_v = tree.Set(m_v, m_v, "Velocity", "Rotate Velocity (Degree/sec)", bVisible);
+                m_acc = tree.Set(m_acc, m_acc, "Acceleration", "Rotate Acceleration Time (sec)", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.Rotate(m_fDeg, m_v, m_acc); 
             }
         }
 
