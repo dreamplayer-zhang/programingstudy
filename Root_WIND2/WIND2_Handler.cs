@@ -218,6 +218,7 @@ namespace Root_WIND2
 
         public void Init(string id, IEngineer engineer)
         {
+            bool a = false;
             m_id = id;
             m_enginner = (WIND2_Engineer)engineer;
             m_gaf = engineer.ClassGAF();
