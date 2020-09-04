@@ -9,8 +9,7 @@
 		<ResourceDictionary Source="pack://application:,,,/Root_Vega;component/Styles/Controls.TabControl.xaml" />
 		<ResourceDictionary Source="pack://application:,,,/Root_Vega;component/Styles/Controls.GroupBox.xaml" />
 		<ResourceDictionary Source="pack://application:,,,/Root_Vega;component/Styles/Controls.TabLikeRadioButtonStyleKey.xaml" />
-		<ResourceDictionary Source="pack://application:,,,/Root_Vega;component/Styles/Controls.CallMathodButton.xaml" />
-		
+
 		<!--<ResourceDictionary Source="pack://application:,,,/Root_Vega;component/Styles/Icons.xaml" />-->
 
 		<ResourceDictionary Source="pack://application:,,,/Root_Vega;component/Styles/Dark.xaml" />

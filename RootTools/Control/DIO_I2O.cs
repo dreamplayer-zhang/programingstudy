@@ -13,7 +13,7 @@ namespace RootTools.Control
         {
             get
             {
-                if (m_bitDO.p_bOn ^ m_bReverse) return (m_aBitDI[0].p_bOn == false) && m_aBitDI[1].p_bOn; 
+                if (p_bOut) return (m_aBitDI[0].p_bOn == false) && m_aBitDI[1].p_bOn; 
                 else return m_aBitDI[0].p_bOn && (m_aBitDI[1].p_bOn == false);
             }
         }
@@ -66,7 +66,7 @@ namespace RootTools.Control
                 else
                 {
                     m_aBitDI[nIndex] = m_listDI.m_aDIO[nDI];
-                    m_aBitDI[nIndex].SetID(m_log, m_id);
+                    m_aBitDI[nIndex].SetID(m_log, m_id + "." + m_asID[nIndex]);
                 }
             }
             return "OK";
@@ -90,7 +90,7 @@ namespace RootTools.Control
                 else
                 {
                     m_bitDO = (BitDO)m_listDO.m_aDIO[nDO];
-                    m_bitDO.SetID(m_log, m_id);
+                    m_bitDO.SetID(m_log, m_id + "." + m_asID[1]);
                 }
             }
             return "OK";

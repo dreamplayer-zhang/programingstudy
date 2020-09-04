@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 xmlns:controls="clr-namespace:Root_Vega.Controls"
-			 xmlns:metro="clr-namespace:MetroTrilithon.UI.Controls"
 			 xmlns:dialogs="clr-namespace:Root_Vega.Dialog"
              mc:Ignorable="d" 
              d:DesignHeight="756" d:DesignWidth="1800"
@@ -30,6 +29,7 @@
 						   Foreground="{Binding RelativeSource={RelativeSource AncestorType={x:Type RadioButton}}, Path=Foreground}" />
 			</RadioButton>
 			<RadioButton x:Name="SearchInspData"
+						 IsChecked="False"
 						 Style="{StaticResource TabLikeRadioButtonStyleKey}">
 				<TextBlock Text="Search DB"
 						   FontSize="16"
@@ -150,26 +150,22 @@
 								<ColumnDefinition Width="Auto"/>
 								<ColumnDefinition Width="Auto"/>
 							</Grid.ColumnDefinitions>
-							<metro:CallMethodButton FontSize="22"
-											   VerticalAlignment="Stretch"
-											   MethodName="StartSearch">
-								<Label Foreground="White" Padding="30,0">_Search</Label>
-							</metro:CallMethodButton>
+							<Button VerticalAlignment="Stretch"
+									Content="Search"
+									Command="{Binding CommandStartSearch}"/>
 							<!--여기서부터는 설정 관련 경로가 확실히 정해지면 없애는것으로 합니다-->
 							<Grid Grid.Column="1">
 								<Grid.RowDefinitions>
 									<RowDefinition/>
 									<RowDefinition/>
 								</Grid.RowDefinitions>
-								<metro:CallMethodButton Margin="3,0,0,3"
-												   MethodName="ChangeDBFilePath">
-									<Label Foreground="White" Padding="15,0">Select _DB</Label>
-								</metro:CallMethodButton>
-								<metro:CallMethodButton Margin="3,0,0,0"
-												   Grid.Row="1"
-												   MethodName="RefreshList">
-									<Label Foreground="White" Padding="15,0">_Refresh</Label>
-								</metro:CallMethodButton>
+								<Button Command="{Binding CommandChangeDBFilePath}"
+										Margin="3,0,0,3"
+										Content="Select DB"/>
+								<Button Command="{Binding CommandRefreshList}"
+										Grid.Row="1"
+										Margin="3,0,0,0"
+										Content="Refresh"/>
 							</Grid>
 							<!--여기까지입니다-->
 						</Grid>

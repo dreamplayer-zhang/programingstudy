@@ -101,11 +101,15 @@ namespace RootTools.Trees
 
         public void RunTreeDone()
         {
-            foreach (Tree tree in m_aChildRunInit)
+            try
             {
-                if (IsAlreadyExistatChild(tree) == false) p_aChild.Add(tree);
-                tree.RunTreeDone(); 
+                foreach (Tree tree in m_aChildRunInit)
+                {
+                    if (IsAlreadyExistatChild(tree) == false) p_aChild.Add(tree);
+                    tree.RunTreeDone();
+                }
             }
+            catch (Exception) { }
         }
 
         bool IsAlreadyExistatChild(Tree treeChild)
@@ -375,7 +379,9 @@ namespace RootTools.Trees
                 case eMode.JobOpen:
                 case eMode.JobSave:
                     if (p_treeRoot.m_job == null) return valueDef;
-                    return p_treeRoot.m_job.Set(p_id, item.p_sName, value, valueDef);
+                    string[] asID = p_id.Split('.');
+                    string sID = "Recipe" + p_id.Substring(asID[0].Length, p_id.Length - asID[0].Length); 
+                    return p_treeRoot.m_job.Set(sID, item.p_sName, value, valueDef);
             }
             return value;
         }

@@ -4,7 +4,6 @@
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:viewmodels="clr-namespace:Root_Vega"
-			 xmlns:metro="clr-namespace:MetroTrilithon.UI.Controls"
 			 xmlns:icons="clr-namespace:Root_Vega.Controls.Icons"
 			 Background="#FF2D2D30"
 			 mc:Ignorable="d"
@@ -118,15 +117,15 @@
 							 Margin="10,0,0,0" 
 							 KeyDown="TextBox_KeyDown"/>
 				</StackPanel>
-				<Grid Grid.Column="1"
+				<Border Grid.Column="1"
+						Padding="10,0"
 					  Grid.RowSpan="2">
-					<metro:CallMethodButton FontSize="22"
-											   VerticalAlignment="Stretch"
-											   MethodName="OnStartSearchButton"
-											   IsEnabled="{Binding IsInitialized}">
-						<Label Foreground="White" Padding="30,0">_Search</Label>
-					</metro:CallMethodButton>
-				</Grid>
+					<Button VerticalAlignment="Stretch"
+							IsEnabled="{Binding IsInitialized}"
+							Style="{StaticResource BasicBtn}"
+							Content="Search"
+							Command="{Binding CommandOnStartSearchButton}"/>
+				</Border>
 			</Grid>
 		</GroupBox>
 		<!--Defect Search UI End-->

@@ -73,6 +73,7 @@ namespace RootTools.Control.Ajin
         #region Jog
         public override string Jog(double fScale, string sSpeed = null)
         {
+            p_log.Info(p_id + " Jog Start : " + fScale.ToString()); 
             bool bRet = CheckInterlock();
             if (bRet == false) return p_id + " - Check Interlock Please";
 
