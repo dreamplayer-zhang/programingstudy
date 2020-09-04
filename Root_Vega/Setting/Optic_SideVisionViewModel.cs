@@ -395,7 +395,10 @@ namespace Root_Vega
 
         public void Test()
         {
-            p_SideVision.BeforeGet();
+            SideVision.Run_LADS lads = new SideVision.Run_LADS(m_SideVision);
+            lads.m_grabMode = m_SideVision.GetGrabMode("LADS");
+            lads.Run();
+            //p_SideVision.BeforeGet();
             return;
         }
 

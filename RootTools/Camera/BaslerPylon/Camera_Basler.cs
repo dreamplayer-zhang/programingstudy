@@ -617,7 +617,11 @@ namespace RootTools.Camera.BaslerPylon
                     p_CamInfo._IsCanGrab = false;
                 }
             }
-            catch (Exception) { }
+            catch (Exception e) 
+            {
+                string strError = e.Message.ToString();
+                Console.WriteLine(strError);
+            }
         }
         public string StopGrab()
         {
