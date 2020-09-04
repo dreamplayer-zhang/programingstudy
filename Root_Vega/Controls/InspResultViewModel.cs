@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -632,7 +633,13 @@ namespace Root_Vega.Controls
 			catch { }
 			return null;
 		}
-
+		public ICommand CommandOnStartSearchButton
+		{
+			get
+			{
+				return new RelayCommand(OnStartSearchButton);
+			}
+		}
 		public void OnStartSearchButton()
 		{
 			//Defect 탐색

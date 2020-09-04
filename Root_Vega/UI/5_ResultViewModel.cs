@@ -502,5 +502,27 @@ namespace Root_Vega
 				Debug.WriteLine("OpenSelectedInspectionData() - NULL");
 			}
 		}
+
+		public ICommand CommandStartSearch
+		{
+			get
+			{
+				return new RelayCommand(StartSearch);
+			}
+		}
+		public ICommand CommandChangeDBFilePath
+		{
+			get
+			{
+				return new RelayCommand(ChangeDBFilePath);
+			}
+		}
+		public ICommand CommandRefreshList
+		{
+			get
+			{
+				return new RelayCommand(RefreshList);
+			}
+		}
 	}
 }
