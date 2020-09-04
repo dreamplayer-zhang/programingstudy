@@ -125,8 +125,7 @@ namespace RootTools.Control.Ajin
             try
             {
                 double dPos = Convert.ToInt32(textBoxShift.Text);
-                double fPos = m_axis.p_posCommand + nDir * dPos;
-                m_axis.StartMove(fPos, comboSpeedShift.Text); 
+                m_axis.StartShift(dPos, comboSpeedShift.Text); 
             }
             catch (Exception) { }
         }

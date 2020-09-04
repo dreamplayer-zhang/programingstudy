@@ -140,6 +140,50 @@ namespace RootTools.Control.Ajin
         }
         #endregion
 
+        #region Shift
+        public override string StartShift(double dfPos, string sSpeed = null)
+        {
+            double fPos = p_posCommand + dfPos;
+            bool bRet = CheckInterlock();
+            if (bRet == false) return p_id + " - Check Interlock Please";
+
+            p_sInfo = base.StartShift(dfPos, sSpeed);
+            if (p_sInfo != "OK") return p_sInfo;
+            if (m_nAxis < 0) return p_id + " Axis not Assigned";
+            if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos * p_pulsepUnit, m_speedNow.m_v * p_pulsepUnit, m_speedNow.m_acc, m_speedNow.m_dec)) != 0)
+            {
+                p_eState = eState.Init;
+                p_sInfo = p_id + " Axis MoveStartPos Error";
+                return p_sInfo;
+            }
+            p_eState = eState.Move;
+            Thread.Sleep(10);
+            return "OK";
+        }
+
+        public override string StartShift(double dfPos, double v, double acc = -1, double dec = -1)
+        {
+            double fPos = p_posCommand + dfPos;
+            bool bRet = CheckInterlock();
+            if (bRet == false) return p_id + " - Check Interlock Please";
+
+            acc = (acc < 0) ? GetSpeedValue(eSpeed.Move).m_acc : acc;
+            dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
+            p_sInfo = base.StartShift(dfPos, v, acc, dec);
+            if (p_sInfo != "OK") return p_sInfo;
+            if (m_nAxis < 0) return p_id + " Axis not Assigned";
+            if (AXM("AxmMoveStartPos", CAXM.AxmMoveStartPos(m_nAxis, fPos * p_pulsepUnit, v * p_pulsepUnit, acc, dec)) != 0)
+            {
+                p_eState = eState.Init;
+                p_sInfo = p_id + " Axis MoveStartPos Error";
+                return p_sInfo;
+            }
+            p_eState = eState.Move;
+            Thread.Sleep(10);
+            return "OK";
+        }
+        #endregion
+
         #region Home
         public override string StartHome()
         {

@@ -173,6 +173,62 @@ namespace RootTools.Control.ACS
         }
         #endregion
 
+        #region Shift
+        public override string StartShift(double dfPos, string sSpeed = null)
+        {
+            double fPos = p_posCommand + dfPos;
+            p_sInfo = base.StartShift(dfPos, sSpeed);
+            if (p_sInfo != "OK") return p_sInfo;
+            if (m_nAxis < 0) return p_id + " Axis not Assigned";
+            if (p_bConnect == false) return "ACS not Connected";
+            try
+            {
+                p_channel.SetAccelerationImm(m_nAxis, m_speedNow.m_v / m_speedNow.m_acc);
+                p_channel.SetDecelerationImm(m_nAxis, m_speedNow.m_v / m_speedNow.m_dec);
+                p_channel.SetVelocityImm(m_nAxis, m_speedNow.m_v);
+                p_channel.ToPoint(0, m_nAxis, fPos);
+                p_log.Info(p_id + " Move Start : " + fPos.ToString());
+            }
+            catch (Exception e)
+            {
+                p_sInfo = p_id + " Move Start Error : " + e.Message;
+                p_eState = eState.Init;
+                return p_sInfo;
+            }
+            p_eState = eState.Move;
+            Thread.Sleep(100);
+            return "OK";
+        }
+
+        public override string StartShift(double dfPos, double v, double acc = -1, double dec = -1)
+        {
+            double fPos = p_posCommand + dfPos;
+            acc = (acc < 0) ? GetSpeedValue(eSpeed.Move).m_acc : acc;
+            dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
+            p_sInfo = base.StartShift(dfPos, v, acc, dec);
+            if (p_sInfo != "OK") return p_sInfo;
+            if (m_nAxis < 0) return p_id + " Axis not Assigned";
+            if (p_bConnect == false) return "ACS not Connected";
+            try
+            {
+                p_channel.SetAccelerationImm(m_nAxis, v / acc);
+                p_channel.SetDecelerationImm(m_nAxis, v / dec);
+                p_channel.SetVelocityImm(m_nAxis, v);
+                p_channel.ToPoint(0, m_nAxis, fPos);
+                p_log.Info(p_id + " Move Start : " + fPos.ToString());
+            }
+            catch (Exception e)
+            {
+                p_sInfo = p_id + " Move Start Error : " + e.Message;
+                p_eState = eState.Init;
+                return p_sInfo;
+            }
+            p_eState = eState.Move;
+            Thread.Sleep(100);
+            return "OK";
+        }
+        #endregion
+
         #region Home
         public override string StartHome()
         {
