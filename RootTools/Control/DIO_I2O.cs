@@ -13,7 +13,7 @@ namespace RootTools.Control
         {
             get
             {
-                if (m_bitDO.p_bOn ^ m_bReverse) return (m_aBitDI[0].p_bOn == false) && m_aBitDI[1].p_bOn; 
+                if (p_bOut) return (m_aBitDI[0].p_bOn == false) && m_aBitDI[1].p_bOn; 
                 else return m_aBitDI[0].p_bOn && (m_aBitDI[1].p_bOn == false);
             }
         }
