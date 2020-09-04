@@ -337,6 +337,7 @@ namespace Root_Vega.Module
             m_axisPodLifter.p_axisY.p_eState = Axis.eState.Ready;
             m_axisReticleLifter.p_axisX.p_eState = Axis.eState.Ready;
             m_axisReticleLifter.p_axisY.p_eState = Axis.eState.Ready;
+            Thread.Sleep(1000);
             //JWS 200616 ADD
             if (GetdZPos(ePosZ.InnerPod) < 0)
             {
@@ -540,7 +541,7 @@ namespace Root_Vega.Module
                     sResult = m_module.m_RFID.ReadRFID((byte)m_nCh, out sCarrierID);
                     m_module.m_infoPod.p_sCarrierID = (sResult == "OK") ? sCarrierID : ""; 
                 }
-                m_module.m_infoPod.SendCarrierID(sCarrierID); 
+                if (sResult == "OK") m_module.m_infoPod.SendCarrierID(sCarrierID); 
                 return sResult; 
             }
         }

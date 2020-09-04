@@ -31,14 +31,19 @@ namespace Root_Vega.ManualJob
         #endregion
 
         #region UI
-        public void ShowOCR()
+        //public ManualOCR_UI m_ui;
+        //public void ShowOCR()
+        //{
+        //    m_ui = new ManualOCR_UI();
+        //    m_ui.Init(this); 
+        //}
+        public bool ShowPopup()
         {
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                ManualOCR_UI ui = new ManualOCR_UI();
-                ui.Init(this);
-                ui.ShowDialog();
-            }); 
+            if (ManualOCR_UI.m_bShow) return false;
+            ManualOCR_UI manualOCRPopup = new ManualOCR_UI();
+            manualOCRPopup.Init(this);
+            manualOCRPopup.ShowDialog();
+            return manualOCRPopup.DialogResult == true;
         }
         #endregion
 
