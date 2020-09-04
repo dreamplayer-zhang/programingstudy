@@ -166,7 +166,7 @@
                 <Button Content="Add Inspection(Surface)" Height="30" Click="BtnAddInspectionSurface"></Button>
                 <Button Content="Add Measuremnet" Height="30" Click="BtnAddMeasurement"></Button>
 
-                <Button Content="Open Image" Height="30" Click="Button_Click_1"/>
+                <Button Name="btnImageOpen" Content="Open Image" Height="30" Command="{Binding btnClickOpenImage}"/>
                 <Button Content="SELECT DATA" Height="30" Click="Button_Click_2"/>
                 <Button Content="CLEAR DATA" Height="30" Click="Button_Click_3"/>
 

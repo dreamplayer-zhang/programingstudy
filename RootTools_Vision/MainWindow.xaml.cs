@@ -61,13 +61,15 @@ namespace RootTools_Vision
 
         private void TimerCallback(Object o)
         {
-            if(m_ImageViewer != null)
-                view.DataContext = m_ImageViewer;
+
+              
         }
 
         public void SetUIContext()
         {
             this.mapViewer.DataContext = vmMapView;
+            this.view.DataContext = m_ImageViewer;
+
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -90,7 +92,7 @@ namespace RootTools_Vision
                 m_ImageViewer = new ImageViewer_ViewModel(m_Image, null);
 
                 view.DataContext = m_ImageViewer;
-
+                btnImageOpen.DataContext = m_ImageViewer;
                 //m_DataViewer = new DataViewer_ViewModel(DatabaseManager.Instance.m_DefectTable);
                 //dataViewer.DataContext = m_DataViewer;
             }
