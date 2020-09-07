@@ -436,8 +436,8 @@ namespace Root_Vega.Module
             imgSrc = matBinary.ToImage<Gray, Byte>();
             blobDetector.Detect(imgSrc, blobs);
 
-            matSrc.Save(@"D:\\SRC.BMP");
-            matBinary.Save(@"D:\\BINARY.BMP");
+            matSrc.Save($"D:\\SRC.BMP");
+            matBinary.Save($"D:\\BINARY.BMP");
 
             // Bounding Box
             foreach (CvBlob blob in blobs.Values)

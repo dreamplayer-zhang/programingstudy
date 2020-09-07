@@ -8,7 +8,6 @@
              xmlns:obs="clr-namespace:nsSizeObserver"
              xmlns:local="clr-namespace:RootTools"
              mc:Ignorable="d" 
-             Cursor="{Binding p_BasicTool.p_Cursor}"
              d:DesignHeight="500" d:DesignWidth="500">
     <UserControl.Resources>
         <convert:ConverterVisibleProgress x:Key="ConverterVisibleProgresss" />
@@ -17,22 +16,20 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="{StaticResource ControlBackGround}">
-            <MenuItem BorderBrush="{x:Null}" IsCheckable="True">
+            <MenuItem BorderBrush="{x:Null}" IsCheckable="True" Width="40">
                 <MenuItem.Header>
                     <TextBlock Text="File"/>
                 </MenuItem.Header>
             </MenuItem>
-            <MenuItem BorderBrush="{x:Null}" IsCheckable="True">
+            <MenuItem BorderBrush="{x:Null}" IsCheckable="True" Width="40">
                 <MenuItem.Header>
                     <TextBlock Text="Edit"/>
                 </MenuItem.Header>
             </MenuItem>
-            <MenuItem BorderBrush="{x:Null}">
+            <MenuItem BorderBrush="{x:Null}" IsCheckable="True" Width="40">
                 <MenuItem.Header>
                     <TextBlock Text="Tool"/>
                 </MenuItem.Header>
-                <MenuItem Header="Rect" IsCheckable="True"/>
-                <MenuItem Header="Line" IsCheckable="True" />
             </MenuItem>
 
         </Menu>
@@ -59,19 +56,19 @@
             <Grid Focusable="True">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="PreviewKeyDown">
-                        <i:CallMethodAction TargetObject="{Binding}" MethodName="KeyEvent"/>
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasKeyEvent"/>
                     </i:EventTrigger>
                     <i:EventTrigger EventName="PreviewKeyUp">
-                        <i:CallMethodAction TargetObject="{Binding}" MethodName="KeyEvent"/>
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasKeyEvent"/>
                     </i:EventTrigger>
                     <i:EventTrigger EventName="PreviewMouseDown">
-                        <i:CallMethodAction TargetObject="{Binding}" MethodName="PreviewMouseDown"/>
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasPreviewMouseDown"/>
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseMove">
-                        <i:CallMethodAction TargetObject="{Binding}" MethodName="MouseMove"/>
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasMouseMove"/>
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseWheel">
-                        <i:CallMethodAction TargetObject="{Binding}" MethodName="MouseWheel"/>
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="CanvasMouseWheel"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <Canvas Background="Black" obs:SizeObserver.Observe="true" Focusable="True"
