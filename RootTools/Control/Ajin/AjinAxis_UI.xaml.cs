@@ -124,7 +124,7 @@ namespace RootTools.Control.Ajin
             if (m_axis.p_eState > Axis.eState.Ready) return;
             try
             {
-                double dPos = Convert.ToInt32(textBoxShift.Text);
+                double dPos = nDir * Convert.ToInt32(textBoxShift.Text);
                 m_axis.StartShift(dPos, comboSpeedShift.Text); 
             }
             catch (Exception) { }

@@ -98,8 +98,8 @@ namespace RootTools.Control
         {
             RPoint rpPos = p_posCommand + drpPos; 
             m_rpDst = rpPos;
-            string xInfo = p_axisX.StartMove(rpPos.X, sSpeed);
-            string yInfo = p_axisY.StartMove(rpPos.Y, sSpeed);
+            string xInfo = p_axisX.StartShift(drpPos.X, sSpeed);
+            string yInfo = p_axisY.StartShift(drpPos.Y, sSpeed);
             if (xInfo != "OK") return "AxisX StartMove X Error : " + xInfo;
             if (yInfo != "OK") return "AxisY StartMove Y Error : " + yInfo;
             return "OK";
