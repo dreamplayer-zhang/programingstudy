@@ -242,8 +242,12 @@ namespace RootTools.Camera.Dalsa
                 p_sInfo = p_id + " Sapera Transfer Empty";
                 return;
             }
-            
-            if( m_sapDevice != null && !m_sapDevice.Create())
+
+            m_sapXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfFrame;
+            m_sapXfer.XferNotify += new SapXferNotifyHandler(xfer_XferNotify);
+            m_sapXfer.XferNotifyContext = this;
+
+            if ( m_sapDevice != null && !m_sapDevice.Create())
             {
                 p_sInfo = DestroysObjects(p_id + "Error during SapDevice creation");
                 return;
@@ -258,10 +262,6 @@ namespace RootTools.Camera.Dalsa
                 p_sInfo = DestroysObjects(p_id + "Error during SapTransfer creation");
                 return;
             }
-
-            m_sapXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfFrame;
-            m_sapXfer.XferNotify += new SapXferNotifyHandler(xfer_XferNotify);
-            m_sapXfer.XferNotifyContext = this;
 
             p_CamParam.SetCamHandle(m_sapDevice, m_sapAcq);
             p_CamInfo.p_eState = eCamState.Ready;
