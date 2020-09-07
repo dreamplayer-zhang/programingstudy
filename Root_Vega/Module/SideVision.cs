@@ -1648,7 +1648,7 @@ namespace Root_Vega.Module
 
                     double dTriggerEnd = 1000000.0;
                     double dTriggerStart = 2000000.0;
-                    m_module.p_axisXY.p_axisY.SetTrigger(dTriggerStart, dTriggerEnd, m_grabMode.m_dTrigger, true);
+                    m_module.p_axisXY.p_axisY.SetTrigger(dTriggerStart, dTriggerEnd, m_grabMode.m_dTrigger, 50, true);  // Uptime 추가 테스트
 
                     string sPool = m_grabMode.m_memoryPool.p_id;
                     string sGroup = m_grabMode.m_memoryGroup.p_id;

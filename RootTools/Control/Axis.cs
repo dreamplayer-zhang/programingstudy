@@ -574,7 +574,14 @@ namespace RootTools.Control
             RunTrigger(true);
         }
 
+        public void SetTrigger(double fPos0, double fPos1, double dPos, double dUptime, bool bCmd)
+        {
+            m_trigger.Set(fPos0, fPos1, dPos, bCmd);
+            RunTrigger(dUptime, true);
+        }
+
         public virtual void RunTrigger(bool bOn) { }
+        public virtual void RunTrigger(double dUptime, bool bOn) { }
         #endregion
 
         #region Tree
