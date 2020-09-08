@@ -13,11 +13,11 @@ using System.Windows.Shapes;
 
 namespace RootTools
 {
-    public class ImageToolViewer_VM : ObservableObject
-    {
+	public class ImageToolViewer_VM : ObservableObject
+	{
 		public ImageToolViewer_VM(ImageData image = null, IDialogService dialogService = null)
 		{
-			
+
 			if (image != null)
 			{
 				p_ImageData = image;
@@ -26,31 +26,31 @@ namespace RootTools
 				image.UpdateOpenProgress += image_UpdateOpenProgress;
 				InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
 				SetImageSource();
-				
+
 			}
 			if (dialogService != null)
 			{
 				m_DialogService = dialogService;
 			}
 		}
-		
+
 
 		private readonly IDialogService m_DialogService;
-        /// <summary>
-        /// DragMove StopWatch
-        /// </summary>
+		/// <summary>
+		/// DragMove StopWatch
+		/// </summary>
 		StopWatch m_swMouse = new StopWatch();
-        /// <summary>
-        /// ViewRect Before Drag
-        /// </summary>
+		/// <summary>
+		/// ViewRect Before Drag
+		/// </summary>
 		CPoint m_ptViewBuffer = new CPoint();
-        /// <summary>
-        /// Mouse Point Before Drag
-        /// </summary>
+		/// <summary>
+		/// Mouse Point Before Drag
+		/// </summary>
 		CPoint m_ptMouseBuffer = new CPoint();
-        /// <summary>
-        /// Keyboard Event
-        /// </summary>
+		/// <summary>
+		/// Keyboard Event
+		/// </summary>
 		System.Windows.Input.KeyEventArgs m_KeyEvent;
 
 		Key m_keyMove = Key.LeftCtrl;
@@ -68,7 +68,7 @@ namespace RootTools
 			{
 				m_BasicTool = value;
 				//SetProperty(ref m_BasicTool, value);
-			}		
+			}
 		}
 
 		#region Property
@@ -86,7 +86,7 @@ namespace RootTools
 			}
 		}
 
-        private CPoint m_CopyOffset = new CPoint(0, 0);
+		private CPoint m_CopyOffset = new CPoint(0, 0);
 		public CPoint p_CopyOffset
 		{
 			get
@@ -151,12 +151,8 @@ namespace RootTools
 				if (value == 0)
 					return;
 
-				
+
 				SetProperty(ref m_CanvasWidth, value);
-<<<<<<< Updated upstream
-				//m_BasicTool.CanvasSize
-=======
->>>>>>> Stashed changes
 			}
 		}
 		private int m_CanvasHeight = 100;
@@ -261,23 +257,23 @@ namespace RootTools
 				{
 					if (p_CanvasWidth != 0 && p_CanvasHeight != 0)
 					{
-                        if (p_MouseX < p_ImgSource.Width && p_MouseY < p_ImgSource.Height)
-                        {
-                            if (p_ImgSource.Format.BitsPerPixel == 24)
-                            {
-                                System.Windows.Media.Color c_Pixel = GetPixelColor(p_ImgSource, p_MouseX, p_MouseY);
+						if (p_MouseX < p_ImgSource.Width && p_MouseY < p_ImgSource.Height)
+						{
+							if (p_ImgSource.Format.BitsPerPixel == 24)
+							{
+								System.Windows.Media.Color c_Pixel = GetPixelColor(p_ImgSource, p_MouseX, p_MouseY);
 								p_PixelData = "R " + c_Pixel.R + " G " + c_Pixel.G + " B " + c_Pixel.B;
-                            }
-                            else if (p_ImgSource.Format.BitsPerPixel == 8)
-                            {
-                                byte[] pixel = new byte[1];
-                                p_ImgSource.CopyPixels(new Int32Rect(p_MouseX, p_MouseY, 1, 1), pixel, 1, 0);
+							}
+							else if (p_ImgSource.Format.BitsPerPixel == 8)
+							{
+								byte[] pixel = new byte[1];
+								p_ImgSource.CopyPixels(new Int32Rect(p_MouseX, p_MouseY, 1, 1), pixel, 1, 0);
 								p_PixelData = "GV " + pixel[0];
-                            }
-                            p_MouseMemY = p_View_Rect.Y + p_MouseY * p_View_Rect.Height / p_CanvasHeight;
-                            p_MouseMemX = p_View_Rect.X + p_MouseX * p_View_Rect.Width / p_CanvasWidth;
-                        }
-                    }
+							}
+							p_MouseMemY = p_View_Rect.Y + p_MouseY * p_View_Rect.Height / p_CanvasHeight;
+							p_MouseMemX = p_View_Rect.X + p_MouseX * p_View_Rect.Width / p_CanvasWidth;
+						}
+					}
 				}
 				SetProperty(ref m_MouseX, value);
 			}
@@ -644,20 +640,20 @@ namespace RootTools
 			ofd.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
 			if (ofd.ShowDialog() == DialogResult.OK)
 			{
-                var viewModel = new Dialog_ImageOpenViewModel(this);
-                Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
-                if (result.HasValue)
-                {
-                    if (result.Value)
-                    {
-                        p_ImageData.OpenFile(ofd.FileName, p_CopyOffset);
-                    }
-                    else
-                    {
-                        // Cancelled
-                    }
-                }
-            }
+				var viewModel = new Dialog_ImageOpenViewModel(this);
+				Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+				if (result.HasValue)
+				{
+					if (result.Value)
+					{
+						p_ImageData.OpenFile(ofd.FileName, p_CopyOffset);
+					}
+					else
+					{
+						// Cancelled
+					}
+				}
+			}
 		}
 		void _saveImage()
 		{
@@ -849,15 +845,15 @@ namespace RootTools
 
 		}
 		public void PreviewMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
-		{			
+		{
 			m_ptViewBuffer = new CPoint(p_View_Rect.X, p_View_Rect.Y);
 			m_ptMouseBuffer = new CPoint(p_MouseX, p_MouseY);
 			m_swMouse.Restart();
 			if (m_KeyEvent == null)
 				return;
-			if(!m_KeyEvent.IsDown)
+			if (!m_KeyEvent.IsDown)
 				p_BasicTool.DrawTool(m_ptMouseBuffer, GetMemPoint(m_ptMouseBuffer), e);
-		
+
 		}
 		public void MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
 		{
@@ -865,15 +861,15 @@ namespace RootTools
 			viewer.Focus();
 
 			var pt = e.GetPosition(sender as IInputElement);
-			p_MouseX = (int) pt.X;
-			p_MouseY = (int) pt.Y;
+			p_MouseX = (int)pt.X;
+			p_MouseY = (int)pt.Y;
 			CPoint nowPt = new CPoint(p_MouseX, p_MouseY);
 
 			p_BasicTool.DrawCrossLine(nowPt, p_CanvasWidth, p_CanvasHeight);
-            if (m_KeyEvent == null)
+			if (m_KeyEvent == null)
 				return;
-			if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown) 
-				if(e.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > 0)
+			if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
+				if (e.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > 0)
 				{
 					CanvasMovePoint_Ref(m_ptViewBuffer, m_ptMouseBuffer.X - p_MouseX, m_ptMouseBuffer.Y - p_MouseY);
 					return;
@@ -881,7 +877,7 @@ namespace RootTools
 			p_BasicTool.DrawTool(nowPt, GetMemPoint(nowPt));
 
 
-        }
+		}
 		public void MouseWheel(object sender, MouseWheelEventArgs e)
 		{
 			if (m_KeyEvent == null)
@@ -893,7 +889,7 @@ namespace RootTools
 			{
 				try
 				{
-				
+
 					int lines = e.Delta * SystemInformation.MouseWheelScrollLines / 120;
 					double zoom = p_Zoom;
 
