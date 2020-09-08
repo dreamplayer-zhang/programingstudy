@@ -1622,6 +1622,13 @@ namespace Root_Vega.Module
                 }
             }
 
+            static int nTestTriggerCount = 0;
+            void GrabedLADS(object sender, System.EventArgs e)
+            {
+                nTestTriggerCount++;
+                return;
+            }
+
             public override string Run()
             {
                 if (m_grabMode == null)
@@ -1631,6 +1638,7 @@ namespace Root_Vega.Module
                 AxisXY axisXY = m_module.p_axisXY;
                 Axis axisZ = m_module.p_axisZ;
                 Axis axisTheta = m_module.p_axisTheta;
+                //cam.Grabed += ProcessingLADS;
 
                 try
                 {
@@ -1668,7 +1676,7 @@ namespace Root_Vega.Module
                     string sGroup = m_grabMode.m_memoryGroup.p_id;
                     string sMem = "Grab";
                     MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, sMem);
-
+                    m_grabMode.Grabed += GrabedLADS;
                     m_grabMode.StartGrab(mem, m_cpMemory, m_nTrigCount);
 
                     if (m_module.Run(axisXY.p_axisY.StartMove(dScanEndPosY)))
@@ -1682,6 +1690,7 @@ namespace Root_Vega.Module
                 finally
                 {
                     m_grabMode.SetLight(false);
+                    m_grabMode.Grabed -= GrabedLADS;
                     m_grabMode.StopGrab();
                 }
             }
