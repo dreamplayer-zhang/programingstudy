@@ -328,6 +328,7 @@ namespace Root_Vega.Module
         public override string StateHome()
         {
             if (EQ.p_bSimulate) return "OK";
+            m_log.Info(p_id + " Start StateHome");
             m_axisZ.ServoOn(true);
             m_axisTheta.ServoOn(true);
             m_axisPodLifter.ServoOn(true);
