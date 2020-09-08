@@ -311,6 +311,28 @@ namespace RootTools.Trees
             return (string)Set(item, value, valueDef);
         }
 
+        public RelayCommand SetButton(RelayCommand value, string sBtnName, string id, string sDesc, bool bVisible = true, bool bReadOnly = false)
+        {
+            TreeItem_ICommand item = (TreeItem_ICommand)GetItemICommand(id, value, sBtnName, sDesc);
+            if (item == null) return value;
+            item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
+            item.p_bVisible = bVisible;
+            switch (p_treeRoot.p_eMode)
+            {
+                case eMode.Init:
+                    item.SetValue(value);
+                    break;
+                case eMode.Update:
+                case eMode.RegWrite:
+                case eMode.RegRead:
+                case eMode.JobOpen:
+                case eMode.JobSave:
+                    break;
+            }
+
+            return value;
+        }
+
         public string SetFile(string value, string valueDef, string sExt, string id, string sDesc, bool bVisible = true, bool bReadOnly = false)
         {
             Tree item = GetItemFile(id, value, sExt, sDesc);
@@ -334,30 +356,8 @@ namespace RootTools.Trees
                 case eMode.JobOpen:
                 case eMode.JobSave:
                     if (p_treeRoot.m_job == null) return valueDef;
-                    return p_treeRoot.m_job.Set(p_id, item.p_sName, value, valueDef);
+                    return p_treeRoot.m_job.Set(GetJobID(p_id), item.p_sName, value, valueDef);
             }
-            return value;
-        }
-
-        public RelayCommand SetButton(RelayCommand value, string sBtnName, string id, string sDesc, bool bVisible = true, bool bReadOnly = false)
-        {
-            TreeItem_ICommand item = (TreeItem_ICommand)GetItemICommand(id, value, sBtnName, sDesc);
-            if (item == null) return value;
-            item.p_bEnable = !bReadOnly && p_treeParent.p_bEnable;
-            item.p_bVisible = bVisible;
-            switch (p_treeRoot.p_eMode)
-            {
-                case eMode.Init:
-                    item.SetValue(value);
-                    break;
-                case eMode.Update:
-                case eMode.RegWrite:
-                case eMode.RegRead:
-                case eMode.JobOpen:
-                case eMode.JobSave:
-                    break;
-            }
-
             return value;
         }
 
@@ -379,11 +379,15 @@ namespace RootTools.Trees
                 case eMode.JobOpen:
                 case eMode.JobSave:
                     if (p_treeRoot.m_job == null) return valueDef;
-                    string[] asID = p_id.Split('.');
-                    string sID = "Recipe" + p_id.Substring(asID[0].Length, p_id.Length - asID[0].Length); 
-                    return p_treeRoot.m_job.Set(sID, item.p_sName, value, valueDef);
+                    return p_treeRoot.m_job.Set(GetJobID(p_id), item.p_sName, value, valueDef);
             }
             return value;
+        }
+
+        string GetJobID(string sJobID)
+        {
+            int nL = p_treeRoot.p_id.Length;
+            return "Recipe" + sJobID.Substring(nL, sJobID.Length - nL); 
         }
         #endregion
 
