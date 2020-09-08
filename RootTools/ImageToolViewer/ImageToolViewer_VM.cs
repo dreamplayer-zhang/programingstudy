@@ -153,6 +153,7 @@ namespace RootTools
 
 				
 				SetProperty(ref m_CanvasWidth, value);
+<<<<<<< Updated upstream
 				//m_BasicTool.CanvasSize
 =======
 >>>>>>> Stashed changes
