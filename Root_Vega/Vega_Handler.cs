@@ -203,7 +203,10 @@ namespace Root_Vega
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
-                        m_process.p_sInfo = m_process.RunNextSequence();
+                        if (m_moduleList.m_qModuleRun.Count == 0)
+                        {
+                            m_process.p_sInfo = m_process.RunNextSequence();
+                        }
                         break;
                 }
             }

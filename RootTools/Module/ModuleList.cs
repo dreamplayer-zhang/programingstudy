@@ -130,7 +130,7 @@ namespace RootTools.Module
 
         #region StateRun
         /// <summary> m_qModuleRun : if (EQ.p_eState == Ready) 일 때 RunThread()에서 순차적으로 실행 </summary>
-        Queue<ModuleRunBase> m_qModuleRun = new Queue<ModuleRunBase>();
+        public Queue<ModuleRunBase> m_qModuleRun = new Queue<ModuleRunBase>();
 
         public string ClickRun()
         {
