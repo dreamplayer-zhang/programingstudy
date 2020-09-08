@@ -27,14 +27,19 @@
                     <TextBlock Text="Edit"/>
                 </MenuItem.Header>
             </MenuItem>
-            <MenuItem BorderBrush="{x:Null}">
-                <MenuItem.Header>
-                    <TextBlock Text="Tool"/>
-                </MenuItem.Header>
-                <MenuItem Header="Rect" IsCheckable="True"/>
-                <MenuItem Header="Line" IsCheckable="True" />
-            </MenuItem>
-
+            <ListBox SelectedIndex="{Binding p_BasicTool.p_SelectedToolIndex, Mode=TwoWay}"
+                     SelectionMode="Single">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBoxItem Visibility="Collapsed"/>
+                <ListBoxItem Content="Rect"/>
+                <ListBoxItem Content="Line"/>
+                <ListBoxItem Content="Circle"/>
+                <ListBoxItem Content="Polygon"/>
+            </ListBox>
         </Menu>
         <Grid DockPanel.Dock="Bottom" Background="{StaticResource ControlBackGround}">
             <Grid HorizontalAlignment="Left" Margin="5,0">
@@ -76,12 +81,16 @@
                 </i:Interaction.Triggers>
                 <Canvas Background="Black" obs:SizeObserver.Observe="true" Focusable="True"
                 obs:SizeObserver.ObservedWidth="{Binding p_CanvasWidth, Mode=OneWayToSource}"
-                obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}">
+                obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}" Grid.ColumnSpan="2">
                     <Image Source="{Binding Path=p_ImgSource}"/>
                 </Canvas>
+                <ItemsControl ItemsSource="{Binding p_ViewElement}" Panel.ZIndex="99"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                </ItemsControl>
                 <ItemsControl ItemsSource="{Binding p_BasicTool.p_BasicElement}"
-                                  Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                                  Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas ClipToBounds="True" />
@@ -100,20 +109,20 @@
                         Value="{Binding p_Zoom, Converter={StaticResource ZoomConverters}, Mode=TwoWay}" 
                         Minimum="1" Maximum="1000"
                         SmallChange="10" LargeChange="100" Focusable="False">
-                <Slider.Style>
-                    <Style>
-                        <Style.Triggers>
-                            <Trigger Property="Slider.IsMouseOver" Value="False">
+                    <Slider.Style>
+                        <Style>
+                            <Style.Triggers>
+                                <Trigger Property="Slider.IsMouseOver" Value="False">
                                     <Setter Property="Slider.Opacity" Value="0.2"/>
                                 </Trigger>
                                 <Trigger Property="Slider.IsMouseOver" Value="True">
                                     <Setter Property="Slider.Opacity" Value="0.6"/>
                                 </Trigger>
                             </Style.Triggers>
-                    </Style>
-                </Slider.Style>
-            </Slider>
-                
+                        </Style>
+                    </Slider.Style>
+                </Slider>
+
             </Grid>
             <Grid Visibility="{Binding Path=p_nProgress, Converter={StaticResource ConverterVisibleProgresss}}">
                 <ProgressBar Grid.Row="1" Value="{Binding p_nProgress}" Width="300" Height="35"/>

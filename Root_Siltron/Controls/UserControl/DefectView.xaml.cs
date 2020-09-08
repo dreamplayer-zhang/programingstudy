@@ -23,12 +23,7 @@ namespace Root_Siltron
         public DefectView()
         {
             InitializeComponent();
-            AddDefect(gridFront, 0);
-            AddDefect(gridFront, 10);
-            AddDefect(gridFront, 20);
-            AddDefect(gridBack, 7);
-            AddDefect(gridBack, -11);
-            AddDefect(gridBack, -15);
+
 
 
         }
@@ -44,13 +39,19 @@ namespace Root_Siltron
         public void AddDefect(Grid gridArea, double theta)
         {
             Rectangle defect = new Rectangle();
-            defect.Width = 5;
-            defect.Height = 5;
-            defect.Fill = Brushes.Red;
+            defect.Width = 10;
+            defect.Height = 10;
+            if(gridArea == gridFront)
+                defect.Fill = Brushes.Red;
+            if (gridArea == gridBack)
+                defect.Fill = Brushes.Blue;
+            if (gridArea == gridEdge)
+                defect.Fill = Brushes.Green;
+
             defect.Stroke = Brushes.Black;
             defect.StrokeThickness = 0.5;
             defect.VerticalAlignment = VerticalAlignment.Bottom;
-            defect.RenderTransformOrigin = new Point(0.5, -50);
+            defect.RenderTransformOrigin = new Point(0.5, -49);
             RotateTransform rotate = new RotateTransform(theta);
             TransformGroup transformGroup = new TransformGroup();
             transformGroup.Children.Add(rotate);
@@ -91,6 +92,28 @@ namespace Root_Siltron
                 return Visibility.Visible;
             else
                 return Visibility.Collapsed;
+            
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            gridFront.Children.Clear();
+            gridBack.Children.Clear();
+            gridEdge.Children.Clear();
+            Random random = new Random(1);
+            Random random2 = new Random(3);
+            Random random3 = new Random(7);
+            for (int i = 0; i < 150; i++)
+            {
+
+                int r1 = random.Next(-360, 360);
+                int r2 = random2.Next(-360, 360);
+                int r3 = random3.Next(-360, 360);
+                AddDefect(gridFront, r1);
+                AddDefect(gridBack, r2);
+                AddDefect(gridEdge, r3);
+
+            }
         }
     }
 }

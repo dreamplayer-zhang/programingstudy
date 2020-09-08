@@ -91,6 +91,7 @@
             <DockPanel x:Name="panel">
                 <Button Content="Open" DockPanel.Dock="Top" Command="{Binding OpenImage}"/>
                 <Button Content="Clear" DockPanel.Dock="Top" Command="{Binding ClearImage}"/>
+                <Button Content="Rect Clear" DockPanel.Dock="Top" Command="{Binding p_BasicTool.Clear}"/>
                 <tools:ImageToolViewer/>
             </DockPanel>
 

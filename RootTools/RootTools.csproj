@@ -397,6 +397,7 @@
     <Compile Include="ToolBoxs\ToolSet_UI.xaml.cs">
       <DependentUpon>ToolSet_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ImageToolViewer\TShape.cs" />
     <Compile Include="Trees\ITreeItem.cs" />
     <Compile Include="Trees\TreeGroup.cs" />
     <Compile Include="Trees\TreeRoot.cs" />

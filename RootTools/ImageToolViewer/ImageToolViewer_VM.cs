@@ -154,6 +154,8 @@ namespace RootTools
 				
 				SetProperty(ref m_CanvasWidth, value);
 				//m_BasicTool.CanvasSize
+=======
+>>>>>>> Stashed changes
 			}
 		}
 		private int m_CanvasHeight = 100;
@@ -850,10 +852,11 @@ namespace RootTools
 			m_ptViewBuffer = new CPoint(p_View_Rect.X, p_View_Rect.Y);
 			m_ptMouseBuffer = new CPoint(p_MouseX, p_MouseY);
 			m_swMouse.Restart();
-
-			p_BasicTool.Draw(GetMemPoint(m_ptMouseBuffer), m_ptMouseBuffer, ToolState.Start);
-
-			//p_BasicTool.StartDrawBasicTool(new Rectangle(),GetMemPoint(m_ptMouseBuffer), m_ptMouseBuffer);			
+			if (m_KeyEvent == null)
+				return;
+			if(!m_KeyEvent.IsDown)
+				p_BasicTool.DrawTool(m_ptMouseBuffer, GetMemPoint(m_ptMouseBuffer), e);
+		
 		}
 		public void MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
 		{
@@ -866,40 +869,18 @@ namespace RootTools
 			CPoint nowPt = new CPoint(p_MouseX, p_MouseY);
 
 			p_BasicTool.DrawCrossLine(nowPt, p_CanvasWidth, p_CanvasHeight);
-
-			p_BasicTool.Draw(GetMemPoint(nowPt), nowPt);
-
-
-            //p_BasicTool.Drawing_BasicTool(GetMemPoint(nowPt), nowPt);
-
-
             if (m_KeyEvent == null)
 				return;
-
 			if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown) 
 				if(e.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > 0)
-			{
-				CanvasMovePoint_Ref(m_ptViewBuffer, m_ptMouseBuffer.X - p_MouseX, m_ptMouseBuffer.Y - p_MouseY);
-			}
+				{
+					CanvasMovePoint_Ref(m_ptViewBuffer, m_ptMouseBuffer.X - p_MouseX, m_ptMouseBuffer.Y - p_MouseY);
+					return;
+				}
+			p_BasicTool.DrawTool(nowPt, GetMemPoint(nowPt));
+
+
         }
-		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@Protected@@@@@@@@@@@@@@@@@@@@@@@@
-		protected CPoint GetMemPoint(CPoint canvasPt)
-		{
-			double nX = p_View_Rect.X + canvasPt.X * p_View_Rect.Width / p_CanvasWidth;
-			double nY = p_View_Rect.Y + canvasPt.Y * p_View_Rect.Height / p_CanvasHeight;
-			return new CPoint((int)nX, (int)nY);
-		}
-		protected Point GetCanvasPoint(Point memPt)
-		{
-			if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)
-			{
-				double nX = (double)(memPt.X - p_View_Rect.X) * p_CanvasWidth / p_View_Rect.Width;
-				double nY = (double)(memPt.Y - p_View_Rect.Y) * p_CanvasHeight / p_View_Rect.Height;
-				return new Point(nX, nY);
-			}
-			return new Point(0, 0);
-		}
-		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@Protected@@@@@@@@@@@@@@@@@@@@@@@@
 		public void MouseWheel(object sender, MouseWheelEventArgs e)
 		{
 			if (m_KeyEvent == null)
@@ -943,8 +924,28 @@ namespace RootTools
 		}
 
 
-        #endregion
+		#endregion
 
-        #endregion
-    }
+		#endregion
+
+
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@Protected@@@@@@@@@@@@@@@@@@@@@@@@ 어디넣지
+		protected CPoint GetMemPoint(CPoint canvasPt)
+		{
+			double nX = p_View_Rect.X + canvasPt.X * p_View_Rect.Width / p_CanvasWidth;
+			double nY = p_View_Rect.Y + canvasPt.Y * p_View_Rect.Height / p_CanvasHeight;
+			return new CPoint((int)nX, (int)nY);
+		}
+		protected Point GetCanvasPoint(Point memPt)
+		{
+			if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)
+			{
+				double nX = (double)(memPt.X - p_View_Rect.X) * p_CanvasWidth / p_View_Rect.Width;
+				double nY = (double)(memPt.Y - p_View_Rect.Y) * p_CanvasHeight / p_View_Rect.Height;
+				return new Point(nX, nY);
+			}
+			return new Point(0, 0);
+		}
+		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@Protected@@@@@@@@@@@@@@@@@@@@@@@@
+	}
 }

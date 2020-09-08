@@ -13,6 +13,7 @@
                 <RowDefinition Height="85*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
+                <Button Content=" " Click="Button_Click"/>
                 <StackPanel VerticalAlignment="Top" 
                             HorizontalAlignment="Left"
                             Margin="10,10">
@@ -94,9 +95,9 @@
                 <Viewbox VerticalAlignment="Stretch"
                                  HorizontalAlignment="Stretch">
                     <Grid Width="1000" Height="1000" x:Name="gridFront">
-                        <Rectangle Width="5" Height="5" 
+                        <!--<Rectangle Width="10" Height="10" 
                                    Fill="Red" Stroke="Black" StrokeThickness="0.5"
-                                   VerticalAlignment="Bottom" RenderTransformOrigin="0.5,-50">
+                                   VerticalAlignment="Bottom" RenderTransformOrigin="0.5,-49">
                             <Rectangle.RenderTransform>
                                 <TransformGroup>
                                     <ScaleTransform/>
@@ -105,14 +106,14 @@
                                     <TranslateTransform/>
                                 </TransformGroup>
                             </Rectangle.RenderTransform>
-                        </Rectangle>
+                        </Rectangle>-->
                     </Grid>
                 </Viewbox>
                 <Viewbox VerticalAlignment="Stretch"
                                  HorizontalAlignment="Stretch"
                                  Margin="5">
                     <Grid Width="1000" Height="1000" x:Name="gridBack">
-                        <Rectangle Width="5" Height="5" 
+                        <!--<Rectangle Width="5" Height="5" 
                                    Fill="Blue" Stroke="Black" StrokeThickness="0.5"
                                    VerticalAlignment="Bottom" RenderTransformOrigin="0.5,-50">
                             <Rectangle.RenderTransform>
@@ -123,14 +124,14 @@
                                     <TranslateTransform/>
                                 </TransformGroup>
                             </Rectangle.RenderTransform>
-                        </Rectangle>
+                        </Rectangle>-->
                     </Grid>
                 </Viewbox>
                 <Viewbox VerticalAlignment="Stretch"
                                  HorizontalAlignment="Stretch"
                                  Margin="10">
                     <Grid Width="1000" Height="1000" x:Name="gridEdge">
-                        <Rectangle Width="5" Height="5" 
+                        <!--<Rectangle Width="5" Height="5" 
                                    Fill="Green" Stroke="Black" StrokeThickness="0.5"
                                    VerticalAlignment="Bottom" RenderTransformOrigin="0.5,-50">
                             <Rectangle.RenderTransform>
@@ -141,14 +142,14 @@
                                     <TranslateTransform/>
                                 </TransformGroup>
                             </Rectangle.RenderTransform>
-                        </Rectangle>
+                        </Rectangle>-->
                     </Grid>
                 </Viewbox>
                 <Viewbox VerticalAlignment="Stretch"
                                  HorizontalAlignment="Stretch"
                                  Margin="15">
                     <Grid Width="1000" Height="1000" x:Name="gridEBR">
-                        <Rectangle Width="5" Height="5" 
+                        <!--<Rectangle Width="5" Height="5" 
                                    Fill="DimGray" Stroke="Black" StrokeThickness="0.5"
                                    VerticalAlignment="Bottom" RenderTransformOrigin="0.5,-50">
                             <Rectangle.RenderTransform>
@@ -159,7 +160,7 @@
                                     <TranslateTransform/>
                                 </TransformGroup>
                             </Rectangle.RenderTransform>
-                        </Rectangle>
+                        </Rectangle>-->
                     </Grid>
                 </Viewbox>
 

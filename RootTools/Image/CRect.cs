@@ -50,11 +50,11 @@ namespace RootTools
         {
             get
             {
-                return Right - Left;
+                return Math.Abs(Right - Left);
             }
             set
             {
-                Right = value + Left;
+                Right = Math.Abs(value + Left);
             }
         }
         [XmlIgnore]
