@@ -1581,6 +1581,7 @@ namespace Root_Vega.Module
             public override ModuleRunBase Clone()
             {
                 Run_LADS run = new Run_LADS(m_module);
+                run.p_sGrabMode = p_sGrabMode;
                 run.m_fRes = m_fRes;
                 run.m_nFocusPos = m_nFocusPos;
                 run.m_rpAxis = new RPoint(m_rpAxis);
@@ -1592,6 +1593,7 @@ namespace Root_Vega.Module
                 run.m_nScanGap = m_nScanGap;
                 run.m_nTrigCount = m_nTrigCount;
                 run.m_nUptime = m_nUptime;
+                run.m_grabMode = m_module.GetGrabMode(p_sGrabMode);
 
                 return run;
             }
@@ -1638,8 +1640,7 @@ namespace Root_Vega.Module
                 AxisXY axisXY = m_module.p_axisXY;
                 Axis axisZ = m_module.p_axisZ;
                 Axis axisTheta = m_module.p_axisTheta;
-                //cam.Grabed += ProcessingLADS;
-
+                
                 try
                 {
                     m_grabMode.SetLight(true);
@@ -1647,10 +1648,10 @@ namespace Root_Vega.Module
 
                     int nPulsePerMM = 10000;
                     int nReticleYPulse = m_yLine * nPulsePerMM;
-                    double dScanStartPosY = m_rpAxis.Y - nReticleYPulse / 2 - m_grabMode.m_intervalAcc;
-                    double dScanEndPosY = m_rpAxis.Y + nReticleYPulse / 2 + m_grabMode.m_intervalAcc;
-                    double dTrigStartPosY = m_rpAxis.Y - nReticleYPulse / 2;
-                    double dTrigEndPosY = m_rpAxis.Y + nReticleYPulse / 2;
+                    double dScanEndPosY = m_rpAxis.Y - nReticleYPulse / 2 - m_grabMode.m_intervalAcc;
+                    double dScanStartPosY = m_rpAxis.Y + nReticleYPulse / 2 + m_grabMode.m_intervalAcc;
+                    double dTrigEndPosY = m_rpAxis.Y - nReticleYPulse / 2;
+                    double dTrigStartPosY = m_rpAxis.Y + nReticleYPulse / 2;
 
                     if (m_module.Run(axisXY.p_axisX.StartMove(-50000))) // X축 충돌안전위치 이동
                         return p_sInfo;
@@ -1669,7 +1670,7 @@ namespace Root_Vega.Module
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
 
-                    m_grabMode.m_dTrigger = (int)(dTrigEndPosY - dTrigStartPosY) / m_nTrigCount;
+                    m_grabMode.m_dTrigger = (int)(dTrigStartPosY - dTrigEndPosY) / m_nTrigCount;
                     m_module.p_axisXY.p_axisY.SetTrigger(dTrigStartPosY, dTrigEndPosY, m_grabMode.m_dTrigger, m_nUptime, true);
                     
                     string sPool = m_grabMode.m_memoryPool.p_id;
