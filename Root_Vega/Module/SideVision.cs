@@ -23,6 +23,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using static RootTools.Control.Axis;
 
 namespace Root_Vega.Module
 {
@@ -1669,7 +1670,7 @@ namespace Root_Vega.Module
                         return p_sInfo;
 
                     m_grabMode.m_dTrigger = (int)(dTrigStartPosY - dTrigEndPosY) / m_nTrigCount;
-                    m_module.p_axisXY.p_axisY.SetTrigger(dTrigStartPosY, dTrigEndPosY, m_grabMode.m_dTrigger, m_nUptime, true);
+                    axisXY.p_axisY.SetTrigger(dTrigStartPosY, dTrigEndPosY, m_grabMode.m_dTrigger, m_nUptime, true);
 
                     string sPool = m_grabMode.m_memoryPool.p_id;
                     string sGroup = m_grabMode.m_memoryGroup.p_id;
@@ -1678,7 +1679,7 @@ namespace Root_Vega.Module
                     m_grabMode.Grabed += GrabedLADS;
                     m_grabMode.StartGrab(mem, m_cpMemory, m_nTrigCount);
 
-                    if (m_module.Run(axisXY.p_axisY.StartMove(dScanEndPosY)))
+                    if (m_module.Run(axisXY.p_axisY.StartMove(dScanEndPosY, eSpeed.Move.ToString())))
                         return p_sInfo;
                     if (m_module.Run(axisXY.p_axisY.WaitReady()))
                         return p_sInfo;
@@ -1694,8 +1695,12 @@ namespace Root_Vega.Module
                 }
             }
 
+            public static int nCount = 0;
             unsafe void GrabedLADS(object sender, System.EventArgs e)
             {
+                nCount++;
+                return;
+
                 // variable
                 GrabedArgs ga = (GrabedArgs)e;
                 MemoryData md = ga.mdMemoryData;

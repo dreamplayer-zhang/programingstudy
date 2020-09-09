@@ -395,6 +395,9 @@ namespace Root_Vega
 
         unsafe public void Test()
         {
+            int nTest = SideVision.Run_LADS.nCount;
+            return;
+
             // LADS 테스트용 프레임 생성
             MemoryData md = App.m_engineer.GetMemory("SideVision.Memory", "LADS", "Grab");
             byte* pSrc = (byte*)md.GetPtr().ToPointer();

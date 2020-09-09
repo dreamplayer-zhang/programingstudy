@@ -130,6 +130,7 @@ namespace Root_Vega
             if (sideVision.p_CamSideVRS != null && sideVision.p_CamSideVRS.p_CamInfo._OpenStatus == false) sideVision.p_CamSideVRS.Connect();
             if (sideVision.p_CamAlign1 != null && sideVision.p_CamAlign1.p_CamInfo._OpenStatus == false) sideVision.p_CamAlign1.Connect();
             if (sideVision.p_CamAlign2 != null && sideVision.p_CamAlign2.p_CamInfo._OpenStatus == false) sideVision.p_CamAlign2.Connect();
+            if (sideVision.p_CamLADS != null && sideVision.p_CamLADS.p_CamInfo._OpenStatus == false) sideVision.p_CamLADS.Connect();
         }
         #endregion
 
