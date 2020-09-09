@@ -146,9 +146,11 @@ namespace Root_Vega
         #endregion
 
         #region Calc Sequence
+        public int m_nRnR = 1; 
         public string AddSequence(dynamic infoSlot)
         {
-            m_process.AddInfoReticle(infoSlot);
+            m_process.AddInfoReticle(infoSlot, m_nRnR);
+            m_nRnR = 1; 
             return "OK";
         }
 

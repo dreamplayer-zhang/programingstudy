@@ -1,6 +1,7 @@
 ﻿using Root_Vega.Module;
 using RootTools;
 using System.IO;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Windows;
 
 namespace Root_Vega.ManualJob
@@ -87,12 +88,38 @@ namespace Root_Vega.ManualJob
         }
         #endregion
 
+        #region RnR Property
+        bool _bRnR = false; 
+        public bool p_bRnR
+        {
+            get { return _bRnR; }
+            set
+            {
+                _bRnR = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        int _nRnR = 1; 
+        public int p_nRnR
+        { 
+            get { return _nRnR; }
+            set
+            {
+                _nRnR = value;
+                OnPropertyChanged(); 
+            }
+        }
+        #endregion
+
         public string p_id { get; set; }
         Log m_log;
+        Vega_Handler m_handler; 
         public Loadport m_loadport; 
-        public ManualJobSchedule(Loadport loadport)
+        public ManualJobSchedule(Loadport loadport, Vega_Handler handler)
         {
-            m_loadport = loadport; 
+            m_loadport = loadport;
+            m_handler = handler; 
             p_id = loadport.p_id;
             m_log = loadport.m_log;
         }
@@ -102,8 +129,9 @@ namespace Root_Vega.ManualJob
             if (ManualJobSchedule_UI.m_bShow) return false;
             ManualJobSchedule_UI jobschedulePopup = new ManualJobSchedule_UI();
             jobschedulePopup.Init(this);
+            p_bRnR = false; 
             jobschedulePopup.ShowDialog();
-            //return jobschedulePopup.ShowDialog() == true;
+            m_handler.m_nRnR = p_bRnR ? p_nRnR : 1; 
             return jobschedulePopup.DialogResult == true;
         }
     }

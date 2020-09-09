@@ -29,8 +29,8 @@ namespace Root_Vega
             moduleVision.Init(m_handler.m_patternVision);
             moduleSideVision.Init(m_handler.m_sideVision);
             moduleRobot.Init(m_handler.m_robot);
-            loadportA.Init(m_handler.m_aLoadport[0]);
-            loadportB.Init(m_handler.m_aLoadport[1]);
+            loadportA.Init(m_handler.m_aLoadport[0], m_handler);
+            loadportB.Init(m_handler.m_aLoadport[1], m_handler);
 
             InitTimer();
         }

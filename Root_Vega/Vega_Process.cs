@@ -14,34 +14,52 @@ namespace Root_Vega
         #region List InfoReticle
         /// <summary> 작업 할 InfoReticle List </summary>
         List<InfoReticle> m_aInfoReticle = new List<InfoReticle>();
-        public string AddInfoReticle(InfoReticle infoReticle)
+        public string AddInfoReticle(InfoReticle infoReticle, int nRnR)
         {
             if (m_aInfoReticle.Count > 0) return "Already Exist InfoReticle";
             if (infoReticle.m_moduleRunList.m_aModuleRun.Count == 0) return "Empty Recipe";
-            CalcInfoReticleProcess(infoReticle);
+            CalcInfoReticleProcess(infoReticle, nRnR);
             RunTree(Tree.eMode.Init); 
             return "OK";
         }
 
-        void CalcInfoReticleProcess(InfoReticle infoReticle)
+        void CalcInfoReticleProcess(InfoReticle infoReticle, int nRnR)
         {
             Queue<ModuleRunBase> qProcess = infoReticle.m_qProcess;
             qProcess.Clear();
             string sLoadport = infoReticle.m_sLoadport;
-            qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sLoadport));
-            for (int n = 0; n < infoReticle.m_moduleRunList.m_aModuleRun.Count; n++)
+            Loadport loadport = GetLoadport(sLoadport); 
+            for (int iRnR = 0; iRnR < nRnR; iRnR++)
             {
-                ModuleRunBase moduleRun = infoReticle.m_moduleRunList.m_aModuleRun[n];
-                string sChild = moduleRun.m_moduleBase.p_id;
-                bool bGetPut = (sChild != m_robot.p_id);
-                bool bPut = !IsSameModule(infoReticle.m_moduleRunList, n - 1, n); 
-                if (bPut && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sChild));
-                qProcess.Enqueue(moduleRun);
-                bool bGet = !IsSameModule(infoReticle.m_moduleRunList, n, n + 1);
-                if (bGet && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sChild));
+                if ((iRnR > 0) && (loadport != null))
+                {
+                    qProcess.Enqueue(loadport.m_runUnLoad.Clone());
+                    qProcess.Enqueue(loadport.m_runLoad.Clone()); 
+                }
+                qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sLoadport));
+                for (int n = 0; n < infoReticle.m_moduleRunList.m_aModuleRun.Count; n++)
+                {
+                    ModuleRunBase moduleRun = infoReticle.m_moduleRunList.m_aModuleRun[n];
+                    string sChild = moduleRun.m_moduleBase.p_id;
+                    bool bGetPut = (sChild != m_robot.p_id);
+                    bool bPut = !IsSameModule(infoReticle.m_moduleRunList, n - 1, n);
+                    if (bPut && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sChild));
+                    qProcess.Enqueue(moduleRun);
+                    bool bGet = !IsSameModule(infoReticle.m_moduleRunList, n, n + 1);
+                    if (bGet && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sChild));
+                }
+                qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sLoadport));
             }
-            qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sLoadport));
             m_aInfoReticle.Add(infoReticle);
+        }
+
+        Loadport GetLoadport(string sLoadport)
+        {
+            foreach (Loadport lp in m_handler.m_aLoadport)
+            {
+                if (lp.p_id == sLoadport) return lp; 
+            }
+            return null;
         }
 
         bool IsSameModule(ModuleRunList moduleRunList, int i0, int i1)

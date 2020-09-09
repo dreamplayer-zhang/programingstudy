@@ -23,10 +23,13 @@ namespace Root_Vega
         {
             InitializeComponent();
         }
+
+        Vega_Handler m_handler;
         Loadport m_loadport; 
-        public void Init(Loadport loadport)
+        public void Init(Loadport loadport, Vega_Handler handler)
         {
             m_loadport = loadport;
+            m_handler = handler;
             this.DataContext = loadport;
             textBoxPodID.DataContext = loadport.m_infoPod;
             textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
@@ -36,7 +39,7 @@ namespace Root_Vega
             InitButtonLoad();
             InitTimer(); 
 
-            m_manualjob = new ManualJobSchedule(m_loadport);
+            m_manualjob = new ManualJobSchedule(m_loadport, m_handler);
         }
 
         #region Timer
