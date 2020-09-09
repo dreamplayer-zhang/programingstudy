@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    class RecipeData_Position
+    class RecipeInfo_MotionData
     {
-
     }
 }

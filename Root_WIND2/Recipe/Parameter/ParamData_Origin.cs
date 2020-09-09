@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    /// <summary>
-    /// Wafer MAP
-    /// </summary>
-    class RecipeData_WaferMap
+    class ParamData_Origin : IParamData
     {
     }
 }

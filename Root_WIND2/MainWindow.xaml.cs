@@ -128,6 +128,7 @@ namespace Root_WIND2
         public int MemWidth = 12400;
         public int MemHeight = 12400;
         Viewer viewer = new Viewer();
+        RecipeManager m_RecipeMGR;
         void Init()
         {
             IDialogService dialogService = new DialogService(this);
@@ -150,6 +151,8 @@ namespace Root_WIND2
             InitTimer();
 
             var a = panel.DataContext;
+            m_RecipeMGR = new RecipeManager();
+            RecipeEditor editor = m_RecipeMGR.m_Recipe.GetRecipeEditor();
         }
 
         void InitUI()

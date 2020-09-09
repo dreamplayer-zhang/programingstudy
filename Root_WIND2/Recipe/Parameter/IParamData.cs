@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    interface IRecipeData
+    interface IParamData
     {
-        void SetData();
+        // 파라미터 행동 정의
+        
     }
 }

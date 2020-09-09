@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    interface IRecipeData
+    class RecipeInfo_ProductMap
     {
-        void SetData();
+
+        int m_Row;
+        int m_Col;
+        string m_ASCMap;
     }
 }

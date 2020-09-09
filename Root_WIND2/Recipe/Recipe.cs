@@ -11,7 +11,7 @@ namespace Root_WIND2
     /// Recipe 각 항목의 묶음.
     /// Recipe에 대한 기능 자체는 Manager에서 다룸.
     /// </summary>
-    public class Recipe
+    class Recipe
     {
         // ORIGIN, Die Pitch
         // WAFER MAP
@@ -19,10 +19,10 @@ namespace Root_WIND2
         // ROI (SURFACE, D2D)
         // INSPECTION PARAMETER
 
-        RecipeData_Origin RecipeData_Origin;
-        RecipeData_Position RecipeData_Position;
-        RecipeData_Parameter RecipeData_Parameter;
-        RecipeData_ROI RecipeData_ROI;
+        RecipeInfo m_RecipeInfo; // 레시피 정보 데이터
+        RecipeEditor m_RecipeEditor; // 그리기 데이터
+        RecipeData m_ReicpeData; // ROI 정보 데이터
+        RecipeParameter m_RecipeParam; // 파라미터 데이터
 
         public Recipe()
         {
@@ -31,11 +31,14 @@ namespace Root_WIND2
 
         public void Init()
         {
-            RecipeData_Origin = new RecipeData_Origin();
-            RecipeData_Position = new RecipeData_Position();
-            RecipeData_Parameter = new RecipeData_Parameter();
-            RecipeData_ROI = new RecipeData_ROI();
+            m_ReicpeData = new RecipeData();
+            m_RecipeInfo = new RecipeInfo();
+            m_RecipeParam = new RecipeParameter();
+            m_RecipeEditor = new RecipeEditor(m_ReicpeData);
         }
+        
+        public ref RecipeEditor GetRecipeEditor() { return ref m_RecipeEditor; }
+
 
     }
 }

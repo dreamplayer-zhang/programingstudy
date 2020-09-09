@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    interface IRecipeData
+    class ParamData_Position : IParamData
     {
-        void SetData();
     }
 }

@@ -11,22 +11,22 @@ namespace Root_WIND2
     /// </summary>
     public class RecipeManager
     {
-
         // EXPORT
         // IMPORT
         // SAVE
         // LOAD
-        // UI용 BITMAP 저장 
-
-        static void OpenRecipe()
+        // Convert Recipe
+      
+        public Recipe m_Recipe;
+        public RecipeManager()
         {
-
+            m_Recipe = new Recipe();
         }
 
-        static void SaveRecipe()
-        {
-
-        }
+        public void ExportRecipe() { }
+        public void ImportRecipe() { }
+        static void OpenRecipe() { }
+        static void SaveRecipe() { }
 
     }
 }

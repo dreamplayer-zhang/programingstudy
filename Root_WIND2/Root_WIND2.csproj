@@ -101,15 +101,24 @@
     <Compile Include="IWTRChild.cs" />
     <Compile Include="Module\Vision.cs" />
     <Compile Include="MVVM\Helper.cs" />
-    <Compile Include="Recipe\DrawRecipe.cs" />
+    <Compile Include="Recipe\DrawData\DrawData_Plain.cs" />
+    <Compile Include="Recipe\DrawData\DrawData_PlainData.cs" />
+    <Compile Include="Recipe\DrawData\RecipeEditor.cs" />
+    <Compile Include="Recipe\Parameter\IParamData.cs" />
+    <Compile Include="Recipe\Parameter\ParamData_Origin.cs" />
+    <Compile Include="Recipe\Parameter\ParamData_Position.cs" />
+    <Compile Include="Recipe\Parameter\ParamData_ROI.cs" />
+    <Compile Include="Recipe\Parameter\RecipeParameter.cs" />
     <Compile Include="Recipe\RecipeData\IRecipeData.cs" />
     <Compile Include="Recipe\Recipe.cs" />
+    <Compile Include="Recipe\RecipeData\RecipeData.cs" />
     <Compile Include="Recipe\RecipeData\RecipeData_Origin.cs" />
-    <Compile Include="Recipe\RecipeData\RecipeData_Parameter.cs" />
-    <Compile Include="Recipe\RecipeData\RecipeData_Position.cs" />
-    <Compile Include="Recipe\RecipeData\RecipeData_ROI.cs" />
-    <Compile Include="Recipe\RecipeData\RecipeData_ROIData.cs" />
-    <Compile Include="Recipe\RecipeData\RecipeData_WaferMap.cs" />
+    <Compile Include="Recipe\RecipeInfo\InspectionItem.cs" />
+    <Compile Include="Recipe\RecipeInfo\InspectionMethod.cs" />
+    <Compile Include="Recipe\RecipeInfo\Mask.cs" />
+    <Compile Include="Recipe\RecipeInfo\RecipeInfo.cs" />
+    <Compile Include="Recipe\RecipeInfo\RecipeInfo_MotionData.cs" />
+    <Compile Include="Recipe\RecipeInfo\RecipeInfo_ProductMap.cs" />
     <Compile Include="Recipe\RecipeManager.cs" />
     <Compile Include="Tune.xaml.cs">
       <DependentUpon>Tune.xaml</DependentUpon>
@@ -153,15 +162,12 @@
     </Compile>
     <Compile Include="MVVM\Converter.cs" />
     <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\General_ViewModel.cs" />
-    <Compile Include="Recipe\InspectionItem.cs" />
-    <Compile Include="Recipe\Mask.cs" />
     <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentMapPage.xaml.cs">
       <DependentUpon>AlignmentMapPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Button\NaviBtn.xaml.cs">
       <DependentUpon>NaviBtn.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Recipe\InspectionMethod.cs" />
     <Compile Include="MVVM\ObservableObject.cs" />
     <Compile Include="MVVM\PropertySupport.cs" />
     <Compile Include="MVVM\RelayCommand.cs" />
