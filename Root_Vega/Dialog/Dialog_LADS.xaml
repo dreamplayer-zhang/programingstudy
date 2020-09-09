@@ -1,13 +1,267 @@
 ﻿<Window x:Class="Root_Vega.Dialog_LADS"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
+        xmlns:module="clr-namespace:Root_Vega.Module"
+        xmlns:Tree="clr-namespace:RootTools.Trees;assembly=RootTools"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Root_Vega.Dialog"
-        mc:Ignorable="d"
-        Title="Dialog_LADS" Height="450" Width="800">
+        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        Height="768" Width="1280"
+        WindowStartupLocation="CenterScreen"
+        Background="#FF2D2D30">
+    <Window.InputBindings></Window.InputBindings>
+    <Window.Resources>
+        <converter:ListViewContentsWidthConverter  x:Key="ListViewContentsWidthConverters" />
+        <converter:InverseVisibilityConverter x:Key="InverseVisibilityConverters" />
+        <Style TargetType="Button"
+               x:Key="MyBtn">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="0"
+                                Background="#FF1B1B1C"
+                                BorderBrush="Gray"
+                                BorderThickness="0"
+                                x:Name="Bdr"
+                                Margin="0,0,0,0">
+                            <TextBlock FontSize="15"
+                                       FontFamily="Arial"
+                                       Foreground="White"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="5" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+                                <Setter Property="Background"
+                                        Value="#FF3E3E40" />
+                                <Setter Property="Cursor"
+                                        Value="Hand" />
+                            </Trigger>
+                            <Trigger Property="Button.IsPressed"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="#FF43437A" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
-        <Button Content="Test"
-                Command="{Binding CommandTest}"></Button>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="8*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Column="0"
+                    Grid.Row="0">
+                <TextBlock Style="{StaticResource BasicTb}"
+                           Text="Left Side"
+                           FontSize="30"></TextBlock>
+            </Border>
+            <Border Grid.Column="1"
+                    Grid.Row="0">
+                <TextBlock Style="{StaticResource BasicTb}"
+                           Text="Right Side"
+                           FontSize="30"></TextBlock>
+            </Border>
+            <Grid Grid.Column="0"
+                  Grid.Row="1">
+                <tools:ImageViewer Height="{PriorityBinding}"
+                                   Width="{PriorityBinding}"
+                                   DataContext="{Binding p_ImageViewerLeft}" 
+                                   Margin="10,10,10,10"></tools:ImageViewer>
+            </Grid>
+            <Grid Grid.Column="1"
+                  Grid.Row="1">
+                <tools:ImageViewer Height="{PriorityBinding}"
+                                   Width="{PriorityBinding}"
+                                   DataContext="{Binding p_ImageViewerRight}" 
+                                   Margin="10,10,10,10"></tools:ImageViewer>
+            </Grid>
+            <Border Grid.Column="0"
+                    Grid.Row="2"
+                    Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="8*"/>
+                        <RowDefinition Height="50"/>
+                    </Grid.RowDefinitions>
+                    <Image Grid.Row="0"
+                           Stretch="Fill" 
+                           Visibility="{Binding p_eLeftViewerVisibility}" 
+                           Panel.ZIndex="999" 
+                           Source="{Binding p_bmpSrcLeftViewer}">
+                        <Image.InputBindings>
+                            <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding LeftSideDoubleClick}"/>
+                        </Image.InputBindings>
+                    </Image>
+                    <TextBlock Grid.Row="1"
+                               Height="50"
+                               Background="Black"
+                               Foreground="Lime"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="15"
+                               Text="{Binding p_strLeftSelectedInfo}"
+                               Visibility="{Binding p_eLeftViewerVisibility}">
+                    </TextBlock>
+                    <ListView Grid.RowSpan="2"
+                              Background="Transparent"
+                              Foreground="Lime"
+                              ItemsSource="{Binding p_lstLeftStepInfo}"
+                              x:Name="LeftListView"
+                              Visibility="{Binding p_eLeftViewerVisibility, Converter={StaticResource InverseVisibilityConverters}}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding LeftSideDoubleClick}" CommandParameter="{Binding ElementName=LeftListView, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="True">
+                                <GridViewColumn Header="Image" Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Height="50" Width="300" Source="{Binding p_img}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding p_strInfo}" Header="Info"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </Border>
+            <Border Grid.Column="1"
+                    Grid.Row="2"
+                    Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="8*"/>
+                        <RowDefinition Height="50"/>
+                    </Grid.RowDefinitions>
+                    <Image Grid.Row="0"
+                           Stretch="Fill" 
+                           Visibility="{Binding p_eRightViewerVisibility}" 
+                           Panel.ZIndex="999"
+                           Source="{Binding p_bmpSrcRightViewer}">
+                        <Image.InputBindings>
+                            <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding RightSideDoubleClick}"/>
+                        </Image.InputBindings>
+                    </Image>
+                    <TextBlock Grid.Row="1"
+                               Height="50"
+                               Background="Black"
+                               Foreground="Lime"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="15"
+                               Text="{Binding p_strRightSelectedInfo}"
+                               Visibility="{Binding p_eRightViewerVisibility}">
+                    </TextBlock>
+                    <ListView Grid.RowSpan="2"
+                              Background="Transparent"
+                              Foreground="Lime"
+                              ItemsSource="{Binding p_lstRightStepInfo}"
+                              x:Name="RightListView"
+                              Visibility="{Binding p_eRightViewerVisibility, Converter={StaticResource InverseVisibilityConverters}}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDoubleClick">
+                                <i:InvokeCommandAction Command="{Binding RightSideDoubleClick}" CommandParameter="{Binding ElementName=RightListView, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="True">
+                                <GridViewColumn Header="Image" Width="100">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Height="50" Width="300" Source="{Binding p_img}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding p_strInfo}" Header="Info"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </Border>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0"
+                            Orientation="Vertical">
+                    <Button Style="{StaticResource BasicBtn}"
+                                    Command="{Binding OkCommand}"
+                                    Margin="10">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <material:PackIcon Kind="ZoomInOutline" 
+                                               Foreground="White"
+                                               Width="30"
+                                               Height="30"></material:PackIcon>
+                                <TextBlock Text="Start LADS"
+                                       Style="{StaticResource BasicTb}"></TextBlock>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button Style="{StaticResource BasicBtn}"
+                                    Command="{Binding CancelCommand}"
+                                    Margin="10">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <material:PackIcon Kind="Cancel" 
+                                               Foreground="White"
+                                               Width="30"
+                                               Height="30"></material:PackIcon>
+                                <TextBlock Text="Cancel"
+                                       Style="{StaticResource BasicTb}"></TextBlock>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   TextAlignment="Center"
+                                   FontSize="30"
+                                   Foreground="Red"
+                                   Text="Theta = "></TextBlock>
+                        <TextBlock Grid.Column="1"
+                                   TextAlignment="Center"
+                                   FontSize="30"
+                                   Foreground="Red"
+                                   Text="{Binding p_afs.p_dTheta}"></TextBlock>
+                    </Grid>
+                    <TextBlock TextAlignment="Center"
+                               FontSize="30"
+                               Foreground="Lime"
+                               Text="{Binding p_afs.p_strStatus}"></TextBlock>
+                </StackPanel>
+                <Tree:TreeUI  Grid.Row="1"
+                                  Background="White"
+                                  DataContext="{Binding p_treeRoot}"></Tree:TreeUI>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

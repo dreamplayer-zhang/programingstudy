@@ -601,7 +601,7 @@ namespace Root_Vega.Module
         MemoryData m_memoryBevelRight;
         MemoryData m_memoryBevelBottom;
 
-        public ushort[] m_aHeight;
+        public static ushort[] m_aHeight;
         double m_fScaleH = 0;
         public override void InitMemorys()
         {
@@ -661,7 +661,7 @@ namespace Root_Vega.Module
                 for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
                 {
                     nSum += *pSrcY;
-                    nYSum = *pSrcY * y;
+                    nYSum += *pSrcY * y;
                 }
                 int nAdd = x + iInspect * m_szAlignROI.X;
                 m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
@@ -1544,8 +1544,11 @@ namespace Root_Vega.Module
         #region Run_LADS
         public class Run_LADS : ModuleRunBase
         {
+            public Dispatcher _dispatcher;
+
             SideVision m_module;
 
+            public ushort[] m_aHeight;
             public RPoint m_rpAxis = new RPoint();
             public double m_fRes = 1;       //단위 um
             public int m_nFocusPos = 0;
@@ -1624,37 +1627,7 @@ namespace Root_Vega.Module
                 }
             }
 
-            unsafe void GrabedLADS(object sender, System.EventArgs e)
-            {
-                // variable
-                GrabedArgs ga = (GrabedArgs)e;
-                MemoryData md = ga.mdMemoryData;
-                int nFrameCount = ga.nFrameCnt;
-                CRect rtROI = ga.rtRoi;
-
-                // implement
-                byte* pSrc = (byte*)md.GetPtr().ToPointer();
-                //byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
-                //byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
-                //byte* pBright = (byte*)m_memoryBright.GetPtr(0, 0, iInspect).ToPointer();
-                //for (int x = 0; x < m_szAlignROI.X; x++, pSrc++, pHeight++, pBright++)
-                //{
-                //    byte* pSrcY = pSrc;
-                //    int nSum = 0;
-                //    int nYSum = 0;
-                //    for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
-                //    {
-                //        nSum += *pSrcY;
-                //        nYSum = *pSrcY * y;
-                //    }
-                //    int nAdd = x + iInspect * m_szAlignROI.X;
-                //    m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
-                //    *pHeight = (byte)(m_aHeight[nAdd] >> 8);
-                //    int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
-                //    *pBright = pSrc[x + yAve * m_szAlignROI.X];
-                //}
-                return;
-            }
+            
 
             public override string Run()
             {
@@ -1665,7 +1638,7 @@ namespace Root_Vega.Module
                 AxisXY axisXY = m_module.p_axisXY;
                 Axis axisZ = m_module.p_axisZ;
                 Axis axisTheta = m_module.p_axisTheta;
-                
+
                 try
                 {
                     m_grabMode.SetLight(true);
@@ -1697,7 +1670,7 @@ namespace Root_Vega.Module
 
                     m_grabMode.m_dTrigger = (int)(dTrigStartPosY - dTrigEndPosY) / m_nTrigCount;
                     m_module.p_axisXY.p_axisY.SetTrigger(dTrigStartPosY, dTrigEndPosY, m_grabMode.m_dTrigger, m_nUptime, true);
-                    
+
                     string sPool = m_grabMode.m_memoryPool.p_id;
                     string sGroup = m_grabMode.m_memoryGroup.p_id;
                     string sMem = "Grab";
@@ -1719,6 +1692,33 @@ namespace Root_Vega.Module
                     m_grabMode.Grabed -= GrabedLADS;
                     m_grabMode.StopGrab();
                 }
+            }
+
+            unsafe void GrabedLADS(object sender, System.EventArgs e)
+            {
+                // variable
+                GrabedArgs ga = (GrabedArgs)e;
+                MemoryData md = ga.mdMemoryData;
+                int nFrameCount = ga.nFrameCnt;
+                CRect rtROI = ga.rtRoi;
+
+                // implement
+                byte* pSrc = (byte*)md.GetPtr(0, 0, nFrameCount * rtROI.Y).ToPointer();
+                for (int x = 0; x < rtROI.X; x++, pSrc++)
+                {
+                    byte* pSrcY = pSrc;
+                    int nSum = 0;
+                    int nYSum = 0;
+                    for (int y = 0; y < rtROI.Y; y++, pSrcY += rtROI.X)
+                    {
+                        nSum += *pSrcY;
+                        nYSum += *pSrcY * y;
+                    }
+                    int nAdd = x + nFrameCount * rtROI.X;
+                    SideVision.m_aHeight[nAdd] = (nSum != 0) ? (ushort)(nYSum / nSum) : (ushort)0;
+                }
+
+                return;
             }
         }
     }
