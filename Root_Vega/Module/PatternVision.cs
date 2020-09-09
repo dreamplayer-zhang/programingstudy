@@ -112,7 +112,12 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
 
             p_sInfo = m_toolBox.Get(ref m_diPatternReticleExistSensor, this, "Pattern Reticle Sensor");
-            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", true);
+
+            // 노트북에서 구동시 RADS 내부에서 DataSocket 생성 후 무한루프에 빠지는 문제로 인해 조건 추가
+            bool bUseRADS = false;
+            if (m_CamRADS.p_CamInfo._IPAddress != "") bUseRADS = true;
+            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
+
             if (bInit) m_inspectTool.OnInspectDone += M_inspectTool_OnInspectDone;
         }
 

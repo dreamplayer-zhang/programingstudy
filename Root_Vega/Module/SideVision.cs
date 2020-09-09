@@ -1624,10 +1624,35 @@ namespace Root_Vega.Module
                 }
             }
 
-            static int nTestTriggerCount = 0;
-            void GrabedLADS(object sender, System.EventArgs e)
+            unsafe void GrabedLADS(object sender, System.EventArgs e)
             {
-                nTestTriggerCount++;
+                // variable
+                GrabedArgs ga = (GrabedArgs)e;
+                MemoryData md = ga.mdMemoryData;
+                int nFrameCount = ga.nFrameCnt;
+                CRect rtROI = ga.rtRoi;
+
+                // implement
+                byte* pSrc = (byte*)md.GetPtr().ToPointer();
+                //byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
+                //byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
+                //byte* pBright = (byte*)m_memoryBright.GetPtr(0, 0, iInspect).ToPointer();
+                //for (int x = 0; x < m_szAlignROI.X; x++, pSrc++, pHeight++, pBright++)
+                //{
+                //    byte* pSrcY = pSrc;
+                //    int nSum = 0;
+                //    int nYSum = 0;
+                //    for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
+                //    {
+                //        nSum += *pSrcY;
+                //        nYSum = *pSrcY * y;
+                //    }
+                //    int nAdd = x + iInspect * m_szAlignROI.X;
+                //    m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
+                //    *pHeight = (byte)(m_aHeight[nAdd] >> 8);
+                //    int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
+                //    *pBright = pSrc[x + yAve * m_szAlignROI.X];
+                //}
                 return;
             }
 
