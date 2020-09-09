@@ -13,11 +13,14 @@ using System.Windows.Shapes;
 
 namespace RootTools
 {
-	public class ImageToolViewer_VM : ObservableObject
+	public class RootViewer_ViewModel : ObservableObject
 	{
-		public ImageToolViewer_VM(ImageData image = null, IDialogService dialogService = null)
+		public RootViewer_ViewModel()
 		{
+		}
 
+		public void init(ImageData image = null, IDialogService dialogService = null)
+		{
 			if (image != null)
 			{
 				p_ImageData = image;
@@ -30,27 +33,19 @@ namespace RootTools
 			}
 			if (dialogService != null)
 			{
-				m_DialogService = dialogService;
+                m_DialogService = dialogService;
 			}
+
+			InitCrossLine();
 		}
+		private IDialogService m_DialogService;
 
-
-		private readonly IDialogService m_DialogService;
-		/// <summary>
-		/// DragMove StopWatch
-		/// </summary>
 		StopWatch m_swMouse = new StopWatch();
-		/// <summary>
-		/// ViewRect Before Drag
-		/// </summary>
 		CPoint m_ptViewBuffer = new CPoint();
-		/// <summary>
-		/// Mouse Point Before Drag
-		/// </summary>
 		CPoint m_ptMouseBuffer = new CPoint();
-		/// <summary>
-		/// Keyboard Event
-		/// </summary>
+		Line Horizon, Vertical;
+
+
 		public System.Windows.Input.KeyEventArgs m_KeyEvent;
 
 		Key m_keyMove = Key.LeftCtrl;
@@ -72,6 +67,19 @@ namespace RootTools
 		}
 
 		#region Property
+
+		private ObservableCollection<UIElement> m_ViewElement = new ObservableCollection<UIElement>();
+		public ObservableCollection<UIElement> p_ViewElement
+		{
+			get
+			{
+				return m_ViewElement;
+			}
+			set
+			{
+				m_ViewElement = value;
+			}
+        }
 
 		private ImageData m_ImageData;
 		public ImageData p_ImageData
@@ -386,50 +394,50 @@ namespace RootTools
 				SetRoiRect();
 			}
 		}
-        #endregion
 
-        // Stack
-        // Object -> Mem Point / w,h
+		#endregion
 
-        // 이동 -> 1개의 동작
-        // 그리기 시작/ 그리는 중/ 그리기 완료 -> 1개의 동작
-        // List<Object> 변경사항 -> 1개의 동작
+		// Stack
+		// Object -> Mem Point / w,h
 
-        // List<Object> Property Set(동작완료)들어왔을때  -> Stack에 저장 
-        //-> Canvas 좌표로 p_Zoom비례 변환하면서 Obs<UIElement>로 복사 (이게 Redraw?)
+		// 이동 -> 1개의 동작
+		// 그리기 시작/ 그리는 중/ 그리기 완료 -> 1개의 동작
+		// List<Object> 변경사항 -> 1개의 동작
 
-        // 확대/축소 -> Redraw?
-        // 확대/축소 이 후 실행취소는?
-        // List<Object> = Stack<이전꺼> 하면됨?
-        // -> Set으로 들어오니까 다시 Redraw 자동으로되나?
+		// List<Object> Property Set(동작완료)들어왔을때  -> Stack에 저장 
+		//-> Canvas 좌표로 p_Zoom비례 변환하면서 Obs<UIElement>로 복사 (이게 Redraw?)
 
-
-        // 그리기/선택/수정은 1개의 클래스?
-        // 그리기
-        // 선택 Mode에따라 List<Object>의 Object 생성(Rect,Ellipse, Line)
-        // Mouse Down => Object.StartPt = Mem Mouse Pt
-        // Mouse Move => Object.w/h = Now Mem Mouse Pt
-        // Mouse UP  => Object.w/h = Now Mem Mouse Pt
-        // List<Object>.Add(Object) 
-        // Set -> Undo(Stack) -> Redraw -> UI반영
-
-        // 선택 / 수정
-        // Redraw 할 때 각 UIElement객체의 Mouse Enter Event 생성?
-        // Mouse Enter & Mouse Down = 선택? // isMouseOver && Mouse Down = 선택?
-
-        // ModifyManger 
+		// 확대/축소 -> Redraw?
+		// 확대/축소 이 후 실행취소는?
+		// List<Object> = Stack<이전꺼> 하면됨?
+		// -> Set으로 들어오니까 다시 Redraw 자동으로되나?
 
 
-        // 복사/붙여넣기
-        // 그리기/선택(복수)/수정(복수)
+		// 그리기/선택/수정은 1개의 클래스?
+		// 그리기
+		// 선택 Mode에따라 List<Object>의 Object 생성(Rect,Ellipse, Line)
+		// Mouse Down => Object.StartPt = Mem Mouse Pt
+		// Mouse Move => Object.w/h = Now Mem Mouse Pt
+		// Mouse UP  => Object.w/h = Now Mem Mouse Pt
+		// List<Object>.Add(Object) 
+		// Set -> Undo(Stack) -> Redraw -> UI반영
+
+		// 선택 / 수정
+		// Redraw 할 때 각 UIElement객체의 Mouse Enter Event 생성?
+		// Mouse Enter & Mouse Down = 선택? // isMouseOver && Mouse Down = 선택?
+
+		// ModifyManger 
 
 
-        #endregion
+		// 복사/붙여넣기
+		// 그리기/선택(복수)/수정(복수)
 
-        #region Method
+		#endregion
 
-        #region Image Method
-        public void SetImageData(ImageData image)
+		#region Method
+
+		#region Image Method
+		public void SetImageData(ImageData image)
 		{
 			p_ImageData = null;
 			p_ImageData = image;
@@ -629,35 +637,35 @@ namespace RootTools
 			}
 
 		}
-        #endregion
+		#endregion
 
-        #region Command Method
-        void _openImage()
+		#region Command Method
+		void _openImage()
 		{
-			//if (p_ImageData == null)
-			//{
-			//	System.Windows.Forms.MessageBox.Show("Image를 열어주세요");
-			//	return;
-			//}
-			//_CancelCopy();
-			//OpenFileDialog ofd = new OpenFileDialog();
-			//ofd.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
-			//if (ofd.ShowDialog() == DialogResult.OK)
-			//{
-			//	var viewModel = new Dialog_ImageOpenViewModel(this);
-			//	Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
-			//	if (result.HasValue)
-			//	{
-			//		if (result.Value)
-			//		{
-			//			p_ImageData.OpenFile(ofd.FileName, p_CopyOffset);
-			//		}
-			//		else
-			//		{
-			//			// Cancelled
-			//		}
-			//	}
-			//}
+			if (p_ImageData == null)
+			{
+				System.Windows.Forms.MessageBox.Show("Image를 열어주세요");
+				return;
+			}
+			_CancelCopy();
+			OpenFileDialog ofd = new OpenFileDialog();
+			ofd.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
+			if (ofd.ShowDialog() == DialogResult.OK)
+			{
+				var viewModel = new Dialog_ImageOpenViewModel(this);
+				Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+				if (result.HasValue)
+				{
+					if (result.Value)
+					{
+						p_ImageData.OpenFile(ofd.FileName, p_CopyOffset);
+					}
+					else
+					{
+						// Cancelled
+					}
+				}
+			}
 		}
 		void _saveImage()
 		{
@@ -698,10 +706,10 @@ namespace RootTools
 				p_ImageData.Worker_MemoryClear.CancelAsync();
 			}
 		}
-        #endregion
+		#endregion
 
-        #region Mouse Method
-        void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
+		#region Mouse Method
+		void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
 		{
 			//CPoint StartPt = GetCurrentPoint();
 			CPoint MovePoint = new CPoint();
@@ -748,7 +756,7 @@ namespace RootTools
 			SetImageSource();
 
 		}
-        CPoint GetStartPoint(int MouseX, int MouseY)
+		CPoint GetStartPoint(int MouseX, int MouseY)
 		{
 			int nX = p_View_Rect.X + p_View_Rect.Width * MouseX / p_CanvasWidth - p_View_Rect.Width / 2;
 			int nY = p_View_Rect.Y + p_View_Rect.Height * MouseY / p_CanvasHeight - p_View_Rect.Height / 2;
@@ -796,7 +804,53 @@ namespace RootTools
 				nY = nImgHeight - viewrectheight;
 			return new CPoint(nX, nY);
 		}
-        #endregion
+
+		public void InitCrossLine()
+		{
+			if (p_ViewElement.Contains(Vertical) && p_ViewElement.Contains(Horizon))
+			{
+				p_ViewElement.Remove(Vertical);
+				p_ViewElement.Remove(Horizon);
+			}
+
+			Vertical = new Line();
+			Horizon = new Line();
+
+			Brush LineBrush = Brushes.Silver;
+			double LineThick = 1;
+			DoubleCollection LineDash = new DoubleCollection { 3, 4 };
+
+			Vertical.Stroke = LineBrush;
+			Vertical.StrokeThickness = LineThick;
+			Vertical.StrokeDashArray = LineDash;
+			Horizon.Stroke = LineBrush;
+			Horizon.StrokeThickness = LineThick;
+			Horizon.StrokeDashArray = LineDash;
+
+			p_ViewElement.Add(Vertical);
+			p_ViewElement.Add(Horizon);
+		}
+		public void DrawCrossLine(CPoint canvasPt)
+		{
+			try
+			{
+				Vertical.X1 = canvasPt.X;
+				Vertical.X2 = canvasPt.X;
+
+				Horizon.Y1 = canvasPt.Y;
+				Horizon.Y2 = canvasPt.Y;
+
+
+				Vertical.Y2 = p_CanvasHeight;
+				Horizon.X2 = p_CanvasWidth;
+			}
+			catch (Exception e)
+			{
+				return;
+			}
+			return;
+		}
+		#endregion
 
 		public System.Windows.Media.Color GetPixelColor(BitmapSource source, int x, int y)
 		{
@@ -850,18 +904,19 @@ namespace RootTools
 		{
 			m_KeyEvent = e;
 		}
-		public void PreviewMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
+		public virtual void PreviewMouseDown(object sender, System.Windows.Input.MouseEventArgs e)
 		{
 			m_ptViewBuffer = new CPoint(p_View_Rect.X, p_View_Rect.Y);
 			m_ptMouseBuffer = new CPoint(p_MouseX, p_MouseY);
 			m_swMouse.Restart();
+			
+			//p_BasicTool.DrawTool(m_ptMouseBuffer, GetMemPoint(m_ptMouseBuffer), e);
+
 			if (m_KeyEvent == null)
 				return;
-			if (!m_KeyEvent.IsDown)
-				p_BasicTool.DrawTool(m_ptMouseBuffer, GetMemPoint(m_ptMouseBuffer), e);
 
 		}
-		public void MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+		public virtual void MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
 		{
 			var viewer = sender as Grid;
 			viewer.Focus();
@@ -871,7 +926,8 @@ namespace RootTools
 			p_MouseY = (int)pt.Y;
 			CPoint nowPt = new CPoint(p_MouseX, p_MouseY);
 
-			p_BasicTool.DrawCrossLine(nowPt, p_CanvasWidth, p_CanvasHeight);
+			DrawCrossLine(nowPt);
+			//p_BasicTool.DrawCrossLine(nowPt, p_CanvasWidth, p_CanvasHeight);
 			if (m_KeyEvent == null)
 				return;
 			if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
@@ -880,7 +936,7 @@ namespace RootTools
 					CanvasMovePoint_Ref(m_ptViewBuffer, m_ptMouseBuffer.X - p_MouseX, m_ptMouseBuffer.Y - p_MouseY);
 					return;
 				}
-			p_BasicTool.DrawTool(nowPt, GetMemPoint(nowPt));
+			//p_BasicTool.DrawTool(nowPt, GetMemPoint(nowPt));
 
 
 		}

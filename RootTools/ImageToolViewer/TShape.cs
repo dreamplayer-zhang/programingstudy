@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.ServiceModel.Syndication;
 using System.Windows;
@@ -12,13 +13,30 @@ namespace RootTools
 {
     public class TShape
     {
+        public UIElement UIElement;
+        public Grid ModifyTool;
+        private bool _isSelected = false;
         public bool isSelected
         {
-            get; set;
-        } = false;
+            get
+            {
+                return _isSelected;
+            }
+            set
+            {
+                Debug.WriteLine(ModifyTool.GetHashCode());
+                if (ModifyTool != null)
+                    if (value)
+                        ModifyTool.Visibility = Visibility.Visible;
+                    else
+                        ModifyTool.Visibility = Visibility.Hidden;
+
+                _isSelected = value;
+            }
+        }
     }
 
-    public class PointLine
+    public class PointLine : TShape
     {
         public CPoint StartPt;
         public int Width;
@@ -84,97 +102,33 @@ namespace RootTools
     }
     public class TRect : TShape
     {
-        public TRect()
+        public Rectangle _CanvasRect;
+        public Rectangle CanvasRect
         {
-            CanvasRect = new Rectangle();
-            CanvasRect.Tag = this;
-            MemoryRect = new CRect();
+            get
+            {
+                return _CanvasRect;
+            }
+            set
+            {
+                base.UIElement = value;
+                _CanvasRect = value;
+            }
         }
+
         public TRect(Brush brush, double thickness)
         {
             CanvasRect = new Rectangle();
-            CanvasRect.Fill = brush;
-            CanvasRect.Opacity = 0.1;
+            CanvasRect.Opacity = 0.5;
+            FillBrush = brush;
             CanvasRect.Stroke = brush;
             CanvasRect.StrokeThickness = thickness;
 
             MemoryRect = new CRect();
         }
-        public void SetLeft(int canvasLeft, int memoryLeft)
-        {
-            CanvasLeft = canvasLeft;
-            MemoryRect.Left = memoryLeft;
-            Canvas.SetLeft(CanvasRect, CanvasLeft);
-        }
-        public void SetTop(int canvasTop, int memoryTop)
-        {
-            CanvasTop = canvasTop;
-            MemoryRect.Top = memoryTop;
-            Canvas.SetTop(CanvasRect, CanvasTop);
-        }
-        public void SetRight(int canvasRight, int memoryRight)
-        {
-            CanvasRight = canvasRight;
-            MemoryRect.Right = memoryRight;
-            Canvas.SetRight(CanvasRect, CanvasRight);
-        }
-        public void SetBottom(int canvasBottom, int memoryBottom)
-        {
-            CanvasBottom = canvasBottom;
-            MemoryRect.Bottom = memoryBottom;
-            Canvas.SetBottom(CanvasRect, CanvasBottom);
-        }
 
-        public void SetLeftTop(CPoint canvasPt, CPoint memPt)
-        {
-            CanvasLeft = canvasPt.X;
-            CanvasTop = canvasPt.Y;
-            MemoryRect.Left = memPt.X;
-            MemoryRect.Top = memPt.Y;
-
-            Canvas.SetLeft(CanvasRect, CanvasLeft);
-            Canvas.SetTop(CanvasRect, CanvasTop);
-        }
-        public void SetRightBottom(CPoint canvasPt, CPoint memPt)
-        {
-            CanvasRight = canvasPt.X;
-            CanvasBottom = canvasPt.Y;
-            MemoryRect.Right = memPt.X;
-            MemoryRect.Bottom = memPt.Y;
-
-            Canvas.SetRight(CanvasRect, CanvasRight);
-            Canvas.SetBottom(CanvasRect, CanvasBottom);
-        }
-
-        public Rectangle CanvasRect;
-        public int CanvasLeft;
-        public int CanvasTop;
-        public int CanvasRight;
-        public int CanvasBottom;
-        public int CanvasWidth
-        {
-            get
-            {
-                return Math.Abs(CanvasRight - CanvasLeft);
-            }
-            set
-            {
-                CanvasRight = Math.Abs(CanvasLeft + value);
-                CanvasRect.Width = Math.Abs(CanvasRight - CanvasLeft);
-            }
-        }
-        public int CanvasHeight
-        {
-            get
-            {
-                return CanvasBottom - CanvasTop;
-            }
-            set
-            {
-                CanvasBottom = value + CanvasTop;
-                CanvasRect.Height = CanvasBottom - CanvasTop;
-            }
-        }
+        public CPoint StartPointBuffer;
+        public Brush FillBrush;
 
         public CRect MemoryRect;
 

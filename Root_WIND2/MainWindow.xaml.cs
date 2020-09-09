@@ -140,9 +140,10 @@ namespace Root_WIND2
 
             m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
 
-            viewer.p_ImageViewer = new ImageToolViewer_VM(m_Image, dialogService);
-            panel.DataContext = viewer.p_ImageViewer;
-
+           // viewer.p_RootViewer = new RootViewer_ViewModel(m_Image, dialogService);
+           // panel.DataContext = viewer.p_RootViewer;
+            viewer.p_ROI_VM = new ROI_ViewModel(m_Image, dialogService);
+            panel.DataContext = viewer.p_ROI_VM;
             //_Maint.engineerUI.Init(m_engineer);
             //Panel.DataContext = new NavigationManger();
             InitUI();
@@ -185,6 +186,32 @@ namespace Root_WIND2
     }
     public class Viewer : ObservableObject
     {
+        private ROI_ViewModel m_ROI_VM;
+        public ROI_ViewModel p_ROI_VM
+        {
+            get
+            {
+                return m_ROI_VM;
+            }
+            set
+            {
+                SetProperty(ref m_ROI_VM, value);
+            }
+        }
+
+        private RootViewer_ViewModel m_RootViewer;
+        public RootViewer_ViewModel p_RootViewer
+        {
+            get
+            {
+                return m_RootViewer;
+            }
+            set
+            {
+                SetProperty(ref m_RootViewer, value);
+            }
+        }
+
         private ImageToolViewer_VM m_ImageViewer;
         public ImageToolViewer_VM p_ImageViewer
         {

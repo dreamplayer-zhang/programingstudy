@@ -354,6 +354,8 @@
     <Compile Include="RADS\RADSControl_UI.xaml.cs">
       <DependentUpon>RADSControl_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ImageToolViewer\ROI_ViewModel.cs" />
+    <Compile Include="ImageToolViewer\RootViewer_ViewModel.cs" />
     <Compile Include="RTC5s\DataList.cs" />
     <Compile Include="RTC5s\DesignBase.cs" />
     <Compile Include="RTC5s\DesignOutline.cs" />
@@ -831,6 +833,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Control\ACS\DLL\" />
+    <Folder Include="RecipeTool\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

@@ -8,7 +8,7 @@
              xmlns:obs="clr-namespace:nsSizeObserver"
              xmlns:local="clr-namespace:RootTools"
              mc:Ignorable="d" 
-             Cursor="{Binding p_BasicTool.p_Cursor}"
+             Cursor="{Binding p_Cursor, Mode=TwoWay}"
              d:DesignHeight="500" d:DesignWidth="500">
     <UserControl.Resources>
         <convert:ConverterVisibleProgress x:Key="ConverterVisibleProgresss" />
@@ -16,6 +16,10 @@
     </UserControl.Resources>
 
     <DockPanel>
+        <Button Content="clear" Command="{Binding Clear}"/>
+        <Label Content="{Binding test}" DockPanel.Dock="Top" Background="White"
+               Foreground="Red"
+               FontSize="15"/>
         <Menu DockPanel.Dock="Top" Background="{StaticResource ControlBackGround}">
             <MenuItem BorderBrush="{x:Null}" IsCheckable="True">
                 <MenuItem.Header>
@@ -27,7 +31,7 @@
                     <TextBlock Text="Edit"/>
                 </MenuItem.Header>
             </MenuItem>
-            <ListBox SelectedIndex="{Binding p_BasicTool.p_SelectedToolIndex, Mode=TwoWay}"
+            <ListBox SelectedIndex="{Binding p_SelectedToolIndex, Mode=TwoWay}"
                      SelectionMode="Single">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -35,11 +39,13 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
                 <ListBoxItem Visibility="Collapsed"/>
-                <ListBoxItem Content="Rect"/>
+                <ListBoxItem Content="Point"/>
                 <ListBoxItem Content="Line"/>
+                <ListBoxItem Content="Rect"/>
                 <ListBoxItem Content="Circle"/>
                 <ListBoxItem Content="Polygon"/>
             </ListBox>
+            
         </Menu>
         <Grid DockPanel.Dock="Bottom" Background="{StaticResource ControlBackGround}">
             <Grid HorizontalAlignment="Left" Margin="5,0">
@@ -72,6 +78,9 @@
                     <i:EventTrigger EventName="PreviewMouseDown">
                         <i:CallMethodAction TargetObject="{Binding}" MethodName="PreviewMouseDown"/>
                     </i:EventTrigger>
+                    <i:EventTrigger EventName="PreviewMouseUp">
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="PreviewMouseUp"/>
+                    </i:EventTrigger>
                     <i:EventTrigger EventName="MouseMove">
                         <i:CallMethodAction TargetObject="{Binding}" MethodName="MouseMove"/>
                     </i:EventTrigger>
@@ -84,11 +93,16 @@
                 obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}" Grid.ColumnSpan="2">
                     <Image Source="{Binding Path=p_ImgSource}"/>
                 </Canvas>
-                <ItemsControl ItemsSource="{Binding p_ViewElement}" Panel.ZIndex="99"
+                <ItemsControl ItemsSource="{Binding p_ViewElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas ClipToBounds="True"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
                 </ItemsControl>
-                <ItemsControl ItemsSource="{Binding p_BasicTool.p_BasicElement}"
+                <ItemsControl ItemsSource="{Binding p_ROIElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
                     <ItemsControl.ItemsPanel>

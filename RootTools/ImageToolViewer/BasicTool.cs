@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -145,8 +146,10 @@ namespace RootTools
                 return;
             }
             return;
-        }
-       
+        }     
+
+
+
         public void DrawTool(CPoint canvasPt, CPoint memPt, MouseEventArgs e = null)
         {
             bool LeftDown = false;
@@ -161,22 +164,22 @@ namespace RootTools
                         case ToolType.None:
                             {
                                 //Clear Select
-                                if (LeftDown)
-                                {
-                                    bool binside = false;
-                                    foreach (TShape shape in Shapes)
-                                    {
-                                        TRect rect = shape as TRect;
-                                        if (canvasPt.X < rect.CanvasRight &&
-                                            canvasPt.X > rect.CanvasLeft &&
-                                            canvasPt.Y > rect.CanvasTop &&
-                                            canvasPt.Y < rect.CanvasBottom)
-                                            binside = true;
-                                    }
-                                    if (binside == false)
-                                        foreach (TShape shape in Shapes)
-                                            CancleSelect(shape);
-                                }
+                                //if (LeftDown)
+                                //{
+                                //    bool binside = false;
+                                //    foreach (TShape shape in Shapes)
+                                //    {
+                                //        TRect rect = shape as TRect;
+                                //        if (canvasPt.X < rect.CanvasRight &&
+                                //            canvasPt.X > rect.CanvasLeft &&
+                                //            canvasPt.Y > rect.CanvasTop &&
+                                //            canvasPt.Y < rect.CanvasBottom)
+                                //            binside = true;
+                                //    }
+                                //    if (binside == false)
+                                //        foreach (TShape shape in Shapes)
+                                //            CancleSelect(shape);
+                                //}
                                 //if (LeftDown && p_Cursor != Cursors.Arrow)
                                 //{
                                 //    m_ptMouseBuffer = canvasPt;
@@ -199,8 +202,7 @@ namespace RootTools
                             {
                                 tshape = new TRect(Brushes.Yellow, 1);
                                 TRect rect = tshape as TRect;
-
-                                rect.SetLeftTop(canvasPt, memPt);
+                                //rect.SetLeftTop(canvasPt, memPt);
                                 p_BasicElement.Add(rect.CanvasRect);
                                 SetState(ToolProgress.Drawing);
                                 break;
@@ -228,8 +230,8 @@ namespace RootTools
                         case ToolType.Rect:
                             {
                                 TRect rect = tshape as TRect;
-                                rect.SetRightBottom(canvasPt, memPt);
-                                //rect.CanvasRect.Fill = Brushes.Transparent;
+                                //rect.SetRightBottom(canvasPt, memPt);
+                                rect.CanvasRect.Fill = rect.FillBrush;
                                 rect.CanvasRect.Tag = rect;
                                 rect.CanvasRect.Cursor = Cursors.Hand;
                                 rect.CanvasRect.MouseLeftButtonDown += CanvasRect_MouseLeftButtonDown;
@@ -246,10 +248,10 @@ namespace RootTools
         {
             TRect rect = tshape as TRect;
             rect.isSelected = true;
-            double left = rect.CanvasLeft;
-            double top = rect.CanvasTop;
-            double right = rect.CanvasRight;
-            double bottom = rect.CanvasBottom;
+            double left = Canvas.GetLeft(rect.CanvasRect);
+            double top = Canvas.GetTop(rect.CanvasRect);
+            double right = Canvas.GetRight(rect.CanvasRect);
+            double bottom = Canvas.GetBottom(rect.CanvasRect);
 
             //Rectangle ModifiedRect = new Rectangle();
             //Canvas.SetLeft(ModifiedRect, left - 2);
@@ -324,7 +326,6 @@ namespace RootTools
             else
                 SelectTShape(rect);   
         }
-
         public void MakeTShape(TShape tshape, CPoint canvasNowPt, CPoint memNowPt)
         {
             switch (tshape)
@@ -339,17 +340,33 @@ namespace RootTools
                     }
                 case TRect tRect:
                     {
-                        if (tRect.CanvasLeft > canvasNowPt.X)
+                        double left = Canvas.GetLeft(tRect.CanvasRect);
+                        double top = Canvas.GetTop(tRect.CanvasRect);
+                        if (left > canvasNowPt.X)
                         {
                             Canvas.SetLeft(tRect.CanvasRect, canvasNowPt.X);
+                            Canvas.SetRight(tRect.CanvasRect, left);
                         }
-                        if (tRect.CanvasTop > canvasNowPt.Y)
+                        else
+                        {
+                            Canvas.SetLeft(tRect.CanvasRect, left);
+                            Canvas.SetRight(tRect.CanvasRect, canvasNowPt.X);
+                        }
+                        if (top > canvasNowPt.Y)
                         {
                             Canvas.SetTop(tRect.CanvasRect, canvasNowPt.Y);
+                            Canvas.SetBottom(tRect.CanvasRect, top);
                         }
+                        else
+                        {
+                            Canvas.SetTop(tRect.CanvasRect, top);
+                            Canvas.SetBottom(tRect.CanvasRect, canvasNowPt.Y);
+                        }
+                        double right = Canvas.GetRight(tRect.CanvasRect);
+                        double bottom = Canvas.GetBottom(tRect.CanvasRect);
 
-                        tRect.CanvasRect.Width = Math.Abs(canvasNowPt.X - tRect.CanvasLeft);
-                        tRect.CanvasRect.Height = Math.Abs(canvasNowPt.Y - tRect.CanvasTop);
+                        tRect.CanvasRect.Width = Math.Abs(right - left);
+                        tRect.CanvasRect.Height = Math.Abs(bottom - top);
 
                         break;
                     }
@@ -357,130 +374,14 @@ namespace RootTools
 
 
         }
-
         public ToolProgress SetState(ToolProgress state)
         {
             eToolProgress = state;
             return state;
         }
 
-        public void ModifyTShape(TShape tshape, CPoint canvasPt, CPoint memPt)
-        {
-            int offset_x = canvasPt.X - m_ptMouseBuffer.X;
-            int offset_y = canvasPt.Y - m_ptMouseBuffer.Y;
-            CPoint Offset = new CPoint(offset_x, offset_y);
-
-           
-            switch (tshape)
-            {
-                case TRect tRect:
-                    int new_x1 = tRect.CanvasLeft;
-                    int new_y1 = tRect.CanvasTop;
-                    int new_x2 = tRect.CanvasRight;
-                    int new_y2 = tRect.CanvasBottom;
-                    if (p_Cursor == Cursors.ScrollAll)
-                    {
-                        new_x1 += Offset.X;
-                        new_y1 += Offset.Y;
-                        new_x2 += Offset.X;
-                        new_y2 += Offset.Y;
-                    }
-                    CPoint LT = new CPoint(new_x1, new_y1);
-                    CPoint RB = new CPoint(new_x2, new_y2);
-                    tRect.SetLeftTop(LT, memPt);
-                    tRect.SetRightBottom(RB, memPt);
-                    break;
-            }
-
-
-
-
-        }
-
 
         //안쓰는중...
-        public HitType SetHitType(TShape shape, CPoint canvasNowPt)
-        {
-            switch (shape)
-            {
-                case TRect tRect:
-                    {
-                        double left = Canvas.GetLeft(tRect.CanvasRect);
-                        double top = Canvas.GetTop(tRect.CanvasRect);
-                        double right = left + tRect.CanvasRect.Width;
-                        double bottom = top + tRect.CanvasRect.Height;
-
-                        const double GAP = 10;
-                        if (canvasNowPt.X < left)
-                            return HitType.None;
-                        if (canvasNowPt.X > right)
-                            return HitType.None;
-                        if (canvasNowPt.Y < top)
-                            return HitType.None;
-                        if (canvasNowPt.Y > bottom)
-                            return HitType.None;
-                        if (-1 * GAP <= canvasNowPt.X - left && canvasNowPt.X - left <= GAP)
-                        {
-                            if (-1 * GAP <= canvasNowPt.Y - top && canvasNowPt.Y - top <= GAP)
-                                return HitType.UL;
-                            if (-1 * GAP <= bottom - canvasNowPt.Y && bottom - canvasNowPt.Y <= GAP)
-                                return HitType.LL;
-                            return HitType.L;
-                        }
-                        if (-1 * GAP < right - canvasNowPt.X && right - canvasNowPt.X <= GAP)
-                        {
-                            if (-1 * GAP <= canvasNowPt.Y - top && canvasNowPt.Y - top <= GAP)
-                                return HitType.UR;
-                            if (-1 * GAP <= bottom - canvasNowPt.Y && bottom - canvasNowPt.Y <= GAP)
-                                return HitType.LR;
-                            return HitType.R;
-                        }
-                        if (-1 * GAP <= canvasNowPt.Y - top && canvasNowPt.Y - top <= GAP)
-                            return HitType.T;
-                        if (-1 * GAP <= bottom - canvasNowPt.Y && bottom - canvasNowPt.Y <= GAP)
-                            return HitType.B;
-                        if (left == 0)
-                            return HitType.None;
-
-                        return HitType.Body;
-                        break;
-                    }
-
-            }
-            return HitType.None;
-        }        
-        public Cursor SetMouseCursor(HitType m_MouseHitType)
-        {
-            // See what cursor we should display.
-            Cursor _cursor = Cursors.Arrow;
-            switch (m_MouseHitType)
-            {
-                case HitType.None:
-                    _cursor = Cursors.Arrow;
-                    break;
-                case HitType.Body:
-                    _cursor = Cursors.ScrollAll;
-                    break;
-                case HitType.UL:
-                case HitType.LR:
-                    _cursor = Cursors.SizeNWSE;
-                    break;
-                case HitType.LL:
-                case HitType.UR:
-                    _cursor = Cursors.SizeNESW;
-                    break;
-                case HitType.T:
-                case HitType.B:
-                    _cursor = Cursors.SizeNS;
-                    break;
-                case HitType.L:
-                case HitType.R:
-                    _cursor = Cursors.SizeWE;
-                    break;
-            }
-
-            return _cursor;
-        }
         private FrameworkElement Clone(FrameworkElement e)
         {
             System.Xml.XmlDocument document = new System.Xml.XmlDocument();
@@ -591,21 +492,6 @@ namespace RootTools
         Drawing,
         Adjust,
         Done,
-    }
-    public enum HitType
-    {
-        None, Body, UL, UR, LR, LL, L, R, T, B
-    };
-    public class TList<T> : List<T>
-    {
-        public event EventHandler Change;
-
-        public new void Add(T item)
-        {
-            if (Change != null)
-                Change(this, null);
-            base.Add(item);
-        }
     }
 
 }
