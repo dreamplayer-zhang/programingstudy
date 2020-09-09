@@ -295,28 +295,7 @@ namespace RootTools
 			}
 			set
 			{
-				if (p_ImgSource != null)
-				{
-					if (p_CanvasWidth != 0 && p_CanvasHeight != 0)
-					{
-						if (p_MouseX < p_ImgSource.Width && p_MouseY < p_ImgSource.Height)
-						{
-							if (p_ImgSource.Format.BitsPerPixel == 24)
-							{
-								System.Windows.Media.Color c_Pixel = GetPixelColor(p_ImgSource, p_MouseX, p_MouseY);
-								p_PixelData = "R " + c_Pixel.R + " G " + c_Pixel.G + " B " + c_Pixel.B;
-							}
-							else if (p_ImgSource.Format.BitsPerPixel == 8)
-							{
-								byte[] pixel = new byte[1];
-								p_ImgSource.CopyPixels(new Int32Rect(p_MouseX, p_MouseY, 1, 1), pixel, 1, 0);
-								p_PixelData = "GV " + pixel[0];
-							}
-							p_MouseMemY = p_View_Rect.Y + p_MouseY * p_View_Rect.Height / p_CanvasHeight;
-							p_MouseMemX = p_View_Rect.X + p_MouseX * p_View_Rect.Width / p_CanvasWidth;
-						}
-					}
-				}
+				
 				SetProperty(ref m_MouseY, value);
 			}
 		}
@@ -995,15 +974,15 @@ namespace RootTools
 			double nY = p_View_Rect.Y + canvasPt.Y * p_View_Rect.Height / p_CanvasHeight;
 			return new CPoint((int)nX, (int)nY);
 		}
-		protected Point GetCanvasPoint(Point memPt)
+		protected CPoint GetCanvasPoint(CPoint memPt)
 		{
 			if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)
 			{
-				double nX = (double)(memPt.X - p_View_Rect.X) * p_CanvasWidth / p_View_Rect.Width;
-				double nY = (double)(memPt.Y - p_View_Rect.Y) * p_CanvasHeight / p_View_Rect.Height;
-				return new Point(nX, nY);
+				int nX = (memPt.X - p_View_Rect.X) * p_CanvasWidth / p_View_Rect.Width;
+				int nY = (memPt.Y - p_View_Rect.Y) * p_CanvasHeight / p_View_Rect.Height;
+				return new CPoint(nX, nY);
 			}
-			return new Point(0, 0);
+			return new CPoint(0, 0);
 		}
 		//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@Protected@@@@@@@@@@@@@@@@@@@@@@@@
 	}

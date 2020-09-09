@@ -24,7 +24,6 @@ namespace RootTools
             }
             set
             {
-                Debug.WriteLine(ModifyTool.GetHashCode());
                 if (ModifyTool != null)
                     if (value)
                         ModifyTool.Visibility = Visibility.Visible;
@@ -118,16 +117,22 @@ namespace RootTools
 
         public TRect(Brush brush, double thickness)
         {
+            MemoryRect = new CRect();
+
             CanvasRect = new Rectangle();
             CanvasRect.Opacity = 0.5;
             FillBrush = brush;
             CanvasRect.Stroke = brush;
             CanvasRect.StrokeThickness = thickness;
 
-            MemoryRect = new CRect();
         }
+        public Rectangle RectConvert(CRect memRect)
+        {
+            Rectangle CanvasRect = new Rectangle();
 
-        public CPoint StartPointBuffer;
+            return CanvasRect;
+        }
+        public CPoint MemPointBuffer;
         public Brush FillBrush;
 
         public CRect MemoryRect;

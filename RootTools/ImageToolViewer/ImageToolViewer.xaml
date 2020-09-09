@@ -56,7 +56,7 @@
                     <TextBlock Text=" ("/>
                     <TextBlock Text="{Binding p_MouseMemX}"/>
                     <TextBlock Text=","/>
-                    <TextBlock Text="{Binding p_MouseMemX}"/>
+                    <TextBlock Text="{Binding p_MouseMemY}"/>
                     <TextBlock Text=")"/>
                 </StackPanel>
             </Grid>
