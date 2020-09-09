@@ -1555,6 +1555,8 @@ namespace Root_Vega.Module
             public int m_xLine = 1000;  // X축 Reticle Size
             public int m_nMaxFrame = 100;  // Camera max Frame 스펙
             public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
+            public int m_nTrigCount = 10;   // 촬영범위 내에서 Trigger 내보낼 횟수
+            public int m_nUptime = 50;
             public GrabMode m_grabMode = null;
             string _sGrabMode = "LADS";
             string p_sGrabMode
@@ -1579,6 +1581,7 @@ namespace Root_Vega.Module
             public override ModuleRunBase Clone()
             {
                 Run_LADS run = new Run_LADS(m_module);
+                run.p_sGrabMode = p_sGrabMode;
                 run.m_fRes = m_fRes;
                 run.m_nFocusPos = m_nFocusPos;
                 run.m_rpAxis = new RPoint(m_rpAxis);
@@ -1588,6 +1591,9 @@ namespace Root_Vega.Module
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanRate = m_nScanRate;
                 run.m_nScanGap = m_nScanGap;
+                run.m_nTrigCount = m_nTrigCount;
+                run.m_nUptime = m_nUptime;
+                run.m_grabMode = m_module.GetGrabMode(p_sGrabMode);
 
                 return run;
             }
@@ -1608,6 +1614,8 @@ namespace Root_Vega.Module
                 m_xLine = tree.Set(m_xLine, m_xLine, "Reticle XSize", "# of Grab Lines", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+                m_nTrigCount = tree.Set(m_nTrigCount, m_nTrigCount, "Trigger Count", "유효범위 내에서 내보낼 Trigger 횟수", bVisible);
+                m_nUptime = tree.Set(m_nUptime, m_nUptime, "Trigger Uptime", "Trigger Uptime", bVisible);
                 string strTemp = p_sGrabMode;
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
                 if (strTemp != p_sGrabMode)
@@ -1616,20 +1624,36 @@ namespace Root_Vega.Module
                 }
             }
 
+            static int nTestTriggerCount = 0;
+            void GrabedLADS(object sender, System.EventArgs e)
+            {
+                nTestTriggerCount++;
+                return;
+            }
+
             public override string Run()
             {
-                Camera_Basler cam = m_module.p_CamLADS;
-                ImageData img = cam.p_ImageViewer.p_ImageData;
-                AxisXY axisXY = m_module.p_axisXY;
-                Axis axisZ = m_module.p_axisZ;
-                Axis axisTheta = m_module.p_axisTheta;
-
                 if (m_grabMode == null)
                     return "Grab Mode == null";
 
+                Camera_Basler cam = m_module.p_CamLADS;
+                AxisXY axisXY = m_module.p_axisXY;
+                Axis axisZ = m_module.p_axisZ;
+                Axis axisTheta = m_module.p_axisTheta;
+                
                 try
                 {
-                    if (m_module.Run(axisXY.p_axisX.StartMove(-50000)))
+                    m_grabMode.SetLight(true);
+                    if (EQ.IsStop()) return "OK";
+
+                    int nPulsePerMM = 10000;
+                    int nReticleYPulse = m_yLine * nPulsePerMM;
+                    double dScanEndPosY = m_rpAxis.Y - nReticleYPulse / 2 - m_grabMode.m_intervalAcc;
+                    double dScanStartPosY = m_rpAxis.Y + nReticleYPulse / 2 + m_grabMode.m_intervalAcc;
+                    double dTrigEndPosY = m_rpAxis.Y - nReticleYPulse / 2;
+                    double dTrigStartPosY = m_rpAxis.Y + nReticleYPulse / 2;
+
+                    if (m_module.Run(axisXY.p_axisX.StartMove(-50000))) // X축 충돌안전위치 이동
                         return p_sInfo;
                     if (m_module.Run(axisXY.p_axisX.WaitReady()))
                         return p_sInfo;
@@ -1637,94 +1661,37 @@ namespace Root_Vega.Module
                         return p_sInfo;
                     if (m_module.Run(axisTheta.WaitReady()))
                         return p_sInfo;
-                    if (m_module.Run(axisZ.StartMove(390000.0)))
+                    if (m_module.Run(axisZ.StartMove(m_nFocusPos)))
                         return p_sInfo;
                     if (m_module.Run(axisZ.WaitReady()))
                         return p_sInfo;
-                    if (m_module.Run(axisXY.StartMove(new RPoint(-50000.0, 2300000.0))))
+                    if (m_module.Run(axisXY.StartMove(new RPoint(m_rpAxis.X, dScanStartPosY))))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
 
-                    double dTriggerEnd = 1000000.0;
-                    double dTriggerStart = 2000000.0;
-                    m_module.p_axisXY.p_axisY.SetTrigger(dTriggerStart, dTriggerEnd, m_grabMode.m_dTrigger, 50, true);  // Uptime 추가 테스트
-
+                    m_grabMode.m_dTrigger = (int)(dTrigStartPosY - dTrigEndPosY) / m_nTrigCount;
+                    m_module.p_axisXY.p_axisY.SetTrigger(dTrigStartPosY, dTrigEndPosY, m_grabMode.m_dTrigger, m_nUptime, true);
+                    
                     string sPool = m_grabMode.m_memoryPool.p_id;
                     string sGroup = m_grabMode.m_memoryGroup.p_id;
                     string sMem = "Grab";
                     MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, sMem);
+                    m_grabMode.Grabed += GrabedLADS;
+                    m_grabMode.StartGrab(mem, m_cpMemory, m_nTrigCount);
 
-                    m_grabMode.StartGrab(mem, m_cpMemory, 1000);
-
-                    if (m_module.Run(axisXY.p_axisY.StartMove(500000.0)))
+                    if (m_module.Run(axisXY.p_axisY.StartMove(dScanEndPosY)))
                         return p_sInfo;
                     if (m_module.Run(axisXY.p_axisY.WaitReady()))
                         return p_sInfo;
                     axisXY.p_axisY.RunTrigger(false);
 
                     return "OK";
-                    //////////////////////////////////////////////////////
-                    //int nScanLine = 0;
-                    //m_grabMode.SetLight(true);
-                    //m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fRes);        // 축해상도 0.1um로 하드코딩. 트리거 발생 주기.
-                    //int nLinesY = Convert.ToInt32(m_yLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
-                    //int nLinesX = Convert.ToInt32(m_xLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
-                    //m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
-
-                    //if (EQ.IsStop())
-                    //    return "OK";
-
-                    //double dTotalYLineCount = m_grabMode.m_dTrigger * nLinesY;     // 총 획득할 Image Y  
-                    //double dScanPosX = m_rpAxis.X;
-                    //double dStartPosY = m_rpAxis.Y + (dTotalYLineCount / 2) + m_grabMode.m_intervalAcc;   //y 축 이동 시작 지점 
-                    //double dEndPosY = m_rpAxis.Y - (dTotalYLineCount / 2) - m_grabMode.m_intervalAcc;  // Y 축 이동 끝 지점.
-                    //double dScanPosZ = m_nFocusPos;
-                    //double dScanPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4;
-
-                    //m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
-
-                    //if (m_module.Run(axisXY.p_axisX.StartMove(-50000)))
-                    //    return p_sInfo;
-                    //if (m_module.Run(axisXY.p_axisX.WaitReady()))
-                    //    return p_sInfo;
-                    //if (m_module.Run(axisTheta.StartMove(dScanPosTheta)))
-                    //    return p_sInfo;
-                    //if (m_module.Run(axisTheta.WaitReady()))
-                    //    return p_sInfo;
-                    //if (m_module.Run(axisZ.StartMove(dScanPosZ)))
-                    //    return p_sInfo;
-                    //if (m_module.Run(axisZ.WaitReady()))
-                    //    return p_sInfo;
-                    //if (m_module.Run(axisXY.StartMove(new RPoint(dScanPosX, dStartPosY))))
-                    //    return p_sInfo;
-                    //if (m_module.Run(axisXY.WaitReady()))
-                    //    return p_sInfo;
-
-                    ///* Trigger Set*/
-                    //double dTriggerEnd = m_rpAxis.Y - dTotalYLineCount / 2;
-                    //double dTriggerStart = m_rpAxis.Y + dTotalYLineCount / 2;
-                    //m_module.p_axisXY.p_axisY.SetTrigger(dTriggerStart, dTriggerEnd, m_grabMode.m_dTrigger, true);
-
-                    //string sPool = m_grabMode.m_memoryPool.p_id;
-                    //string sGroup = m_grabMode.m_memoryGroup.p_id;
-                    //string sMem = "Grab";
-                    //MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, sMem);
-
-                    //int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
-                    ///* 방향 바꾸는 코드 들어가야함*/
-                    //m_grabMode.StartGrab(mem, m_cpMemory, nLinesY);
-                    //if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
-                    //    return p_sInfo;
-                    //if (m_module.Run(axisXY.p_axisY.WaitReady()))
-                    //    return p_sInfo;
-                    //axisXY.p_axisY.RunTrigger(false);
-
-                    //return "OK";
                 }
                 finally
                 {
                     m_grabMode.SetLight(false);
+                    m_grabMode.Grabed -= GrabedLADS;
                     m_grabMode.StopGrab();
                 }
             }
