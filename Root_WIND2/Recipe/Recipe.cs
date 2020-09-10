@@ -37,8 +37,11 @@ namespace Root_WIND2
             m_RecipeEditor = new RecipeEditor(m_ReicpeData);
         }
         
-        public ref RecipeEditor GetRecipeEditor() { return ref m_RecipeEditor; }
 
+        public ref RecipeData GetRecipeData() { return ref m_ReicpeData; }
+        public ref RecipeInfo GetRecipeInfo() { return ref m_RecipeInfo; }
+        public ref RecipeParameter GetRecipeParameter() { return ref m_RecipeParam; }
+        public ref RecipeEditor GetRecipeEditor() { return ref m_RecipeEditor; }
 
     }
 }

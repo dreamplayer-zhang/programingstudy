@@ -10,25 +10,54 @@ namespace Root_WIND2
 
     class RecipeEditor
     {
-        DrawData_Plain m_DrawData_Plain;
+
+        List<DrawData_Plain> m_DrawData_PlainList;
+        RecipeData m_RecipeData;
         public RecipeEditor(RecipeData _recipeData)
         {
-            SetPlain(_recipeData);
+            m_RecipeData = _recipeData;
         }
 
-        private void SetPlain(RecipeData _recipeData)
+        public void PushPlain(PLAIN_TYPE plaintype, int nRoiNumber, List<TShape> basicShapes)
         {
-            m_DrawData_Plain = new DrawData_Plain(_recipeData);
-        }
-
-        public void PushPlain(PLAIN_TYPE plaintype, int nRoiCount, List<BasicShape> basicShapes)
-        {
-            m_DrawData_Plain.PushPlain(plaintype, nRoiCount, basicShapes);
+            DrawData_Plain plainData = new DrawData_Plain(plaintype, nRoiNumber, basicShapes);
+            m_DrawData_PlainList.Add(plainData);
         }
 
         public void UpdateRecipe()
         {
-            m_DrawData_Plain.ApplyPlainData();
+            // ToRecipeData
+            for (int i = 0; i < m_DrawData_PlainList.Count; i++)
+            {
+                PLAIN_TYPE type = m_DrawData_PlainList[i].GetPlainType();
+                DrawData_Plain plainData = m_DrawData_PlainList[i];
+
+                switch (type)
+                {
+                    case PLAIN_TYPE.ORIGIN:
+                        // 그리기 Origin Data를 RecipeData_Origin에 필요한 데이터 맵핑.
+                        RecipeData_Origin pOrigin = m_RecipeData.GetRecipeOrigin();
+
+                        //pOrigin.SetOrigin();
+                        break;
+
+                    case PLAIN_TYPE.POSITION:
+                        break;
+
+                    case PLAIN_TYPE.ALIGN:
+                        break;
+
+                    case PLAIN_TYPE.ROI:
+                        break;
+
+                    case PLAIN_TYPE.D2D:
+                        break;
+
+                    default:
+                        break;
+
+                }
+            }
         }
     }
 }
