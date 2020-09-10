@@ -16,10 +16,6 @@
     </UserControl.Resources>
 
     <DockPanel>
-        <Button Content="clear" Command="{Binding Clear}"/>
-        <Label Content="{Binding test}" DockPanel.Dock="Top" Background="White"
-               Foreground="Red"
-               FontSize="15"/>
         <Menu DockPanel.Dock="Top" Background="{StaticResource ControlBackGround}">
             <MenuItem BorderBrush="{x:Null}" IsCheckable="True">
                 <MenuItem.Header>
@@ -39,11 +35,11 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
                 <ListBoxItem Visibility="Collapsed"/>
-                <ListBoxItem Content="Point"/>
-                <ListBoxItem Content="Line"/>
-                <ListBoxItem Content="Rect"/>
-                <ListBoxItem Content="Circle"/>
-                <ListBoxItem Content="Polygon"/>
+                <ListBoxItem Content="Point" IsEnabled="False" FontWeight="Bold"/>
+                <ListBoxItem Content="Line" IsEnabled="False" FontWeight="Bold"/>
+                <ListBoxItem Content="Rect" FontWeight="Bold"/>
+                <ListBoxItem Content="Circle" IsEnabled="False" FontWeight="Bold"/>
+                <ListBoxItem Content="Polygon" IsEnabled="False" FontWeight="Bold"/>
             </ListBox>
             
         </Menu>

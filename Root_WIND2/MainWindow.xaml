@@ -89,9 +89,12 @@
         <Grid Grid.Row="1" x:Name="MainPanel">
 
             <DockPanel x:Name="panel">
-                <Button Content="Open" DockPanel.Dock="Top" Command="{Binding OpenImage}"/>
-                <Button Content="Clear" DockPanel.Dock="Top" Command="{Binding ClearImage}"/>
-                <Button Content="Rect Clear" DockPanel.Dock="Top" Command="{Binding p_BasicTool.Clear}"/>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Height="50">
+                    <Button Content="Open" DockPanel.Dock="Top" Command="{Binding OpenImage}" Width="150"/>
+                    <Button Content="Image Clear" DockPanel.Dock="Top" Command="{Binding ClearImage}" Width="150"/>
+                    <Button Content="ROI Clear" DockPanel.Dock="Top" Command="{Binding Clear}" Width="150"/>
+                    <Button Content="Save(ROI->Recipe)" DockPanel.Dock="Top" Width="150" Click="Button_Click"/>
+                </StackPanel>
                 <tools:ImageToolViewer/>
             </DockPanel>
 

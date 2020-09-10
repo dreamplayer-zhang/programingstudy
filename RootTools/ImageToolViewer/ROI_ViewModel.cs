@@ -15,6 +15,8 @@ namespace RootTools
 {
     public class ROI_ViewModel : RootViewer_ViewModel
     {
+
+
         public ROI_ViewModel(ImageData image = null, IDialogService dialogService = null)
         {
             base.init(image, dialogService);
@@ -35,13 +37,6 @@ namespace RootTools
             History.Push(Work);
         }
 
-        private FrameworkElement Clone(FrameworkElement e)
-        {
-            System.Xml.XmlDocument document = new System.Xml.XmlDocument();
-            document.LoadXml(System.Windows.Markup.XamlWriter.Save(e));
-
-            return (FrameworkElement)System.Windows.Markup.XamlReader.Load(new System.Xml.XmlNodeReader(document));
-        }
         private TShape tshape;
         private CPoint PointBuffer;
         private ToolProcess eToolProcess;
@@ -371,24 +366,6 @@ namespace RootTools
                 rect.isSelected = true;
             Debug.WriteLine("Selected: " + rect.isSelected);
         }
-        private bool isOutsideAllShape(CPoint memPt)
-        {
-            foreach (TShape shape in Shapes)
-            {
-                TRect rect = shape as TRect;
-                double left, top, right, bottom;
-
-                left = rect.MemoryRect.Left -50;
-                top = rect.MemoryRect.Top -50;
-                right = rect.MemoryRect.Right +50;
-                bottom = rect.MemoryRect.Bottom +50;
-                if (left < memPt.X && memPt.X < right && top < memPt.Y && memPt.Y < bottom)
-                {
-                    return false;
-                }       
-            }
-            return true;
-        }
         
         private void MakeModifyTool(TShape shape)
         {
@@ -599,6 +576,28 @@ namespace RootTools
             }
         }
 
+        private bool isOutsideAllShape(CPoint memPt)
+        {
+            foreach (TShape shape in Shapes)
+            {
+                TRect rect = shape as TRect;
+                double left, top, right, bottom;
+
+                left = rect.MemoryRect.Left -50;
+                top = rect.MemoryRect.Top -50;
+                right = rect.MemoryRect.Right +50;
+                bottom = rect.MemoryRect.Bottom +50;
+                if (left < memPt.X && memPt.X < right && top < memPt.Y && memPt.Y < bottom)
+                {
+                    return false;
+                }       
+            }
+            return true;
+        }
+        public List<TShape> GetListTShape()
+        {
+            return Shapes.ToList();
+        }
         public ToolProcess SetState(ToolProcess state)
         {
             eToolProcess = state;

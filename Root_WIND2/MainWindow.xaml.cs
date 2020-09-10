@@ -141,18 +141,20 @@ namespace Root_WIND2
 
             m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
 
-           // viewer.p_RootViewer = new RootViewer_ViewModel(m_Image, dialogService);
-           // panel.DataContext = viewer.p_RootViewer;
             viewer.p_ROI_VM = new ROI_ViewModel(m_Image, dialogService);
             panel.DataContext = viewer.p_ROI_VM;
-            //_Maint.engineerUI.Init(m_engineer);
-            //Panel.DataContext = new NavigationManger();
-            InitUI();
-            InitTimer();
 
-            var a = panel.DataContext;
+            
+            //InitUI();
+            //InitTimer();
+
+            
             m_RecipeMGR = new RecipeManager();
             //RecipeEditor editor = m_RecipeMGR.m_Recipe.GetRecipeEditor();
+        }
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var TShapes = viewer.p_ROI_VM.GetListTShape();
         }
 
         void InitUI()
@@ -173,7 +175,7 @@ namespace Root_WIND2
             m_ModeUI = new SelectMode();
             m_ModeUI.Init(this);
 
-            //Home();
+            Home();
         }
         void Home()
         {
@@ -185,7 +187,6 @@ namespace Root_WIND2
         {
             m_engineer.ThreadStop();
         }
-
     }
     public class Viewer : ObservableObject
     {
