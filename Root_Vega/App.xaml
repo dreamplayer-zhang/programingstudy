@@ -1,4 +1,4 @@
-﻿<Application x:Class="Root_Vega.App"
+﻿<Application x:Class="Root_VegaApp"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Root_Vega"

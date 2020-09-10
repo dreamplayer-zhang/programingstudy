@@ -108,6 +108,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)\Lib\opencv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,7 +163,10 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CD2DTest.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="D2DChipStruc.h" />
+    <ClInclude Include="D2DPtrStruc.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Functions.h" />
     <ClInclude Include="InspectionBase.h" />
@@ -174,6 +178,7 @@
     <ClInclude Include="TypeDefines.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CD2DTest.cpp" />
     <ClCompile Include="InspectionBase.cpp" />
     <ClCompile Include="InspectionReticle.cpp" />
     <ClCompile Include="InspectionSurface.cpp" />

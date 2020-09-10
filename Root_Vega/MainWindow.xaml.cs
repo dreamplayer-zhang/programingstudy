@@ -124,6 +124,9 @@ namespace Root_Vega
             _2_7_EdgeBoxViewModel evm = new _2_7_EdgeBoxViewModel(App.m_engineer, dialogService);
             _Recipe._EdgeBox.DataContext = evm;
 
+            _2_8_D2D_InspViewModel divm = new _2_8_D2D_InspViewModel(App.m_engineer, dialogService);
+            _Recipe._D2D_Insp.DataContext = divm;
+
             _2_9_BevelViewModel bevm = new _2_9_BevelViewModel(App.m_engineer, dialogService);
             _Recipe._Bevel.DataContext = bevm;
             ((Vega_Handler)App.m_engineer.ClassHandler()).m_sideVision.m_bevm = bevm;

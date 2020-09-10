@@ -33,6 +33,12 @@
     <ClInclude Include="MySQLDBConnector.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="CCLRD2DModule.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="CCLRD2DStructure.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -51,6 +57,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="MySQLDBConnector.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CCLRD2DModule.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="CCLRD2DStructure.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

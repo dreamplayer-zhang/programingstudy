@@ -25,6 +25,13 @@ namespace Root_Vega
 		public const string sPatternGroup = "PatternVision";
 		public const string sPatternmem = "Main";
 
+		public const string sD2DPool = "sD2D.Memory";
+		public const string sD2DGroup = "sD2D";
+
+		//public static string[] sD2Dmem;
+		public const string sD2Dmem = "D2dMem";
+		public const string sD2DABSmem = "D2dABSMem";
+
 		public static string MainFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
 	}
 }
