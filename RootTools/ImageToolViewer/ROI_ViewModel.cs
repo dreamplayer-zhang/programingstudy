@@ -45,6 +45,7 @@ namespace RootTools
         private TShape tshape;
         private CPoint PointBuffer;
         private ToolProcess eToolProcess;
+        private ModifyType eModifyType;
         private ToolType eToolType;
         private Stack<TShape[]> History = new Stack<TShape[]>();
         public ObservableCollection<TShape> Shapes = new ObservableCollection<TShape>();
@@ -154,20 +155,23 @@ namespace RootTools
                     {
                         if (isOutsideAllShape(MemPt))
                         {
+                            Debug.WriteLine("isOutSide");
                             foreach (TShape shape in Shapes)
                             {
                                 shape.isSelected = false;
                             }
                         }
-                        string cursor = p_Cursor.ToString();
-                        switch (cursor)
+
+                        if (p_Cursor != Cursors.Arrow)
                         {
-                            case "ScrollAll":
-                                PointBuffer = MemPt;
-                                SetState(ToolProcess.Modify);
-                                break;
+                            PointBuffer = MemPt;
+                            string cursor = p_Cursor.ToString();
+                            SetState(ToolProcess.Modify);
+                            Debug.WriteLine("Preview Mouse Down");
+                            Debug.WriteLine("Set Modify: " + eModifyType);
+                            
+
                         }
-                        //커서를보고 뭐할건지결정
                     }
                     else
                     {
@@ -181,6 +185,7 @@ namespace RootTools
                     break;
                 case ToolProcess.Drawing:
                     tshape = DrawDone(tshape, eToolType, CanvasPt);
+                    SetState(ToolProcess.None);
                     //Done
                     break;
                 case ToolProcess.Done:
@@ -208,6 +213,7 @@ namespace RootTools
                             if (shape.isSelected)
                             {
                                 MakeModifyTool(shape);
+                                shape.ModifyTool.Visibility = Visibility.Visible;
                             }
                         }
 
@@ -217,7 +223,7 @@ namespace RootTools
             }
         }
         public override void MouseMove(object sender, MouseEventArgs e)
-        {           
+        {
             base.MouseMove(sender, e);
             CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
             CPoint MemPt = GetMemPoint(CanvasPt);
@@ -235,10 +241,7 @@ namespace RootTools
                 case ToolProcess.Modify:
                     {
                         if (e.LeftButton == MouseButtonState.Pressed)
-                        {
-                            p_Cursor = Cursors.ScrollAll;
-                            ModifyRect(MemPt);                           
-                        }
+                            ModifyRect(MemPt);
                     }
                     break;
             }
@@ -256,6 +259,8 @@ namespace RootTools
                     shape = new TRect(Brushes.Yellow, 1);
                     TRect rect = shape as TRect;
                     rect.MemPointBuffer = memPt;
+                    rect.MemoryRect.Left = memPt.X;
+                    rect.MemoryRect.Top = memPt.Y;
                     break;
                 case ToolType.Circle:
                     break;
@@ -275,9 +280,10 @@ namespace RootTools
                     break;
                 case ToolType.Rect:
                     TRect rect = shape as TRect;
+                    // memright가 0인상태로 canvas rect width가 정해져서 버그...
+                    // 0이면 min정해줘야되나
                     if (rect.MemPointBuffer.X> memPt.X)
                     {
-                        rect.MemoryRect.Right = rect.MemoryRect.Left;
                         rect.MemoryRect.Left = memPt.X;
                     }
                     else
@@ -287,7 +293,6 @@ namespace RootTools
                     }
                     if (rect.MemPointBuffer.Y > memPt.Y)
                     {
-                        rect.MemoryRect.Bottom = rect.MemoryRect.Top;
                         rect.MemoryRect.Top = memPt.Y;
                     }
                     else
@@ -295,11 +300,14 @@ namespace RootTools
                         rect.MemoryRect.Top = rect.MemPointBuffer.Y;
                         rect.MemoryRect.Bottom = memPt.Y;
                     }
+
+
+
                     CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
                     CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
-
                     CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
                     CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+
                     int width = Math.Abs(canvasRB.X - canvasLT.X);
                     int height = Math.Abs(canvasRB.Y - canvasLT.Y);
                     Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
@@ -340,7 +348,6 @@ namespace RootTools
                 case ToolType.Polygon:
                     break;
             }
-            SetState(ToolProcess.None);
             return shape;
         }
 
@@ -357,11 +364,12 @@ namespace RootTools
         private void CanvasRect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             TRect rect = (sender as Rectangle).Tag as TRect;
-            Debug.WriteLine("Rect Mouse Left Donw : " + rect.GetHashCode());
+            Debug.WriteLine("Rect Mouse Left Donw : " + rect.UIElement.GetHashCode());
             if (rect.isSelected)
                 rect.isSelected = false;
             else
                 rect.isSelected = true;
+            Debug.WriteLine("Selected: " + rect.isSelected);
         }
         private bool isOutsideAllShape(CPoint memPt)
         {
@@ -370,10 +378,10 @@ namespace RootTools
                 TRect rect = shape as TRect;
                 double left, top, right, bottom;
 
-                left = rect.MemoryRect.Left;
-                top = rect.MemoryRect.Top;
-                right = rect.MemoryRect.Right;
-                bottom = rect.MemoryRect.Bottom;
+                left = rect.MemoryRect.Left -50;
+                top = rect.MemoryRect.Top -50;
+                right = rect.MemoryRect.Right +50;
+                bottom = rect.MemoryRect.Bottom +50;
                 if (left < memPt.X && memPt.X < right && top < memPt.Y && memPt.Y < bottom)
                 {
                     return false;
@@ -433,7 +441,7 @@ namespace RootTools
 
                     modifyTool.Children.Add(modifyPoint);
                 }
-            tshape.ModifyTool = modifyTool;
+            rect.ModifyTool = modifyTool;
             p_ROIElement.Add(modifyTool);
         }
         private void ModifyPoint_MouseEnter(object sender, MouseEventArgs e)
@@ -443,29 +451,56 @@ namespace RootTools
             if (index.X == 0)
             {
                 if (index.Y == 0)
+                {
                     p_Cursor = Cursors.SizeNWSE;
+                    eModifyType = ModifyType.LeftTop;
+                }
                 if (index.Y == 1)
+                {
                     p_Cursor = Cursors.SizeWE;
+                    eModifyType = ModifyType.Left;
+                }
                 if (index.Y == 2)
+                {
                     p_Cursor = Cursors.SizeNESW;
+                    eModifyType = ModifyType.LeftBottom;
+                }
             }
             if (index.X == 1)
             {
                 if (index.Y == 0)
+                {
                     p_Cursor = Cursors.SizeNS;
+                    eModifyType = ModifyType.Top;
+                }
                 if (index.Y == 1)
+                {
                     p_Cursor = Cursors.ScrollAll;
+                    eModifyType = ModifyType.ScrollAll;
+                }
                 if (index.Y == 2)
+                {
                     p_Cursor = Cursors.SizeNS;
+                    eModifyType = ModifyType.Bottom;
+                }
             }
             if (index.X == 2)
             {
                 if (index.Y == 0)
+                {
                     p_Cursor = Cursors.SizeNESW;
+                    eModifyType = ModifyType.RightTop;
+                }
                 if (index.Y == 1)
+                {
                     p_Cursor = Cursors.SizeWE;
+                    eModifyType = ModifyType.Right;
+                }
                 if (index.Y == 2)
+                {
                     p_Cursor = Cursors.SizeNWSE;
+                    eModifyType = ModifyType.RightBottom;
+                }
             }
 
         }
@@ -479,46 +514,86 @@ namespace RootTools
             int offset_y = memPt.Y - PointBuffer.Y;
             CPoint ptOffset = new CPoint(offset_x, offset_y);
 
-            if (true)
+            foreach (TShape shape in Shapes)
             {
-                foreach (TShape shape in Shapes)
+                TRect rect = shape as TRect;
+                if (rect.isSelected)
                 {
-                    TRect rect = shape as TRect;
-                    if (rect.isSelected)
+                    rect.ModifyTool.Visibility = Visibility.Collapsed;
+                    int left, top, right, bottom;
+                    left = rect.MemoryRect.Left;
+                    top = rect.MemoryRect.Top;
+                    right = rect.MemoryRect.Right;
+                    bottom = rect.MemoryRect.Bottom;
+
+                    switch (eModifyType)
                     {
-                        rect.ModifyTool.Visibility = Visibility.Collapsed;
-                        int left, top, right, bottom;
-                        left = rect.MemoryRect.Left;
-                        top = rect.MemoryRect.Top;
-                        right = rect.MemoryRect.Right;
-                        bottom = rect.MemoryRect.Bottom;
-
-                        left += ptOffset.X;
-                        top += ptOffset.Y;
-                        right += ptOffset.X;
-                        bottom += ptOffset.Y;
-
-                        rect.MemoryRect.Left = left;
-                        rect.MemoryRect.Top = top;
-                        rect.MemoryRect.Right = right;
-                        rect.MemoryRect.Top = top;
-                        CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
-                        CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
-
-                        CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
-                        CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
-                        int width = Math.Abs(canvasRB.X - canvasLT.X);
-                        int height = Math.Abs(canvasRB.Y - canvasLT.Y);
-                        rect.CanvasRect.Width = width;
-                        rect.CanvasRect.Height = height;
-                        Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
-                        Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
-                        Canvas.SetRight(rect.CanvasRect, canvasRB.X);
-                        Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
-                        
-                        Debug.WriteLine("Modifying :" + shape.UIElement.GetHashCode());
-
+                        case ModifyType.ScrollAll:
+                            p_Cursor = Cursors.ScrollAll;
+                            left += ptOffset.X;
+                            top += ptOffset.Y;
+                            right += ptOffset.X;
+                            bottom += ptOffset.Y;
+                            break;
+                        case ModifyType.Left:
+                            left += ptOffset.X;
+                            p_Cursor = Cursors.SizeWE;
+                            break;
+                        case ModifyType.Right:
+                            right += ptOffset.X;
+                            p_Cursor = Cursors.SizeWE;
+                            break;
+                        case ModifyType.Top:
+                            top += ptOffset.Y;
+                            p_Cursor = Cursors.SizeNS;
+                            break;
+                        case ModifyType.Bottom:
+                            bottom += ptOffset.Y;
+                            p_Cursor = Cursors.SizeNS;
+                            break;
+                        case ModifyType.LeftTop:
+                            left += ptOffset.X;
+                            top += ptOffset.Y;
+                            p_Cursor = Cursors.SizeNWSE;
+                            break;
+                        case ModifyType.LeftBottom:
+                            left += ptOffset.X;
+                            bottom += ptOffset.Y;
+                            p_Cursor = Cursors.SizeNESW;
+                            break;
+                        case ModifyType.RightTop:
+                            right += ptOffset.X;
+                            top += ptOffset.Y;
+                            p_Cursor = Cursors.SizeNESW;
+                            break;
+                        case ModifyType.RightBottom:
+                            right += ptOffset.X;
+                            bottom += ptOffset.Y;
+                            p_Cursor = Cursors.SizeNWSE;
+                            break;
                     }
+
+                    rect.MemoryRect.Left = left;
+                    rect.MemoryRect.Top = top;
+                    rect.MemoryRect.Right = right;
+                    rect.MemoryRect.Bottom = bottom;
+
+                    CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
+                    CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
+
+                    CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+                    CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+                    int width = Math.Abs(canvasRB.X - canvasLT.X);
+                    int height = Math.Abs(canvasRB.Y - canvasLT.Y);
+                    rect.CanvasRect.Width = width;
+                    rect.CanvasRect.Height = height;
+                    Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
+                    Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
+                    Canvas.SetRight(rect.CanvasRect, canvasRB.X);
+                    Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
+
+                    Debug.WriteLine("Type :" + eModifyType);
+                    Debug.WriteLine("Modifying :" + shape.UIElement.GetHashCode());
                 }
                 PointBuffer = memPt;
             }
@@ -537,6 +612,19 @@ namespace RootTools
             Rect,
             Circle,
             Polygon,
+        }
+        public enum ModifyType
+        {
+            None,
+            ScrollAll,
+            Left,
+            Right,
+            Top,
+            Bottom,
+            LeftTop,
+            RightTop,
+            LeftBottom,
+            RightBottom,
         }
         public enum ToolProcess
         {

@@ -17,7 +17,7 @@ namespace Root_WIND2
         // LOAD
         // Convert Recipe
       
-        public Recipe m_Recipe;
+        Recipe m_Recipe;
         public RecipeManager()
         {
             m_Recipe = new Recipe();

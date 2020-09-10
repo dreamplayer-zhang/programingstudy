@@ -152,7 +152,7 @@ namespace Root_WIND2
 
             var a = panel.DataContext;
             m_RecipeMGR = new RecipeManager();
-            RecipeEditor editor = m_RecipeMGR.m_Recipe.GetRecipeEditor();
+            //RecipeEditor editor = m_RecipeMGR.m_Recipe.GetRecipeEditor();
         }
 
         void InitUI()
