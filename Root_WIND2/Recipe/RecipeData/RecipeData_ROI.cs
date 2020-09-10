@@ -6,17 +6,7 @@ using System.Threading.Tasks;
 
 namespace Root_WIND2
 {
-    public class RecipeParameter
+    class RecipeData_ROI
     {
-
-        public RecipeParameter()
-        {
-            Init();
-        }
-        public void Init()
-        {
-
-        }
-
     }
 }

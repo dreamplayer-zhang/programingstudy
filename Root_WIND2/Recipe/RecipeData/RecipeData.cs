@@ -17,7 +17,6 @@ namespace Root_WIND2
         public RecipeData()
         {
             m_ReicpeData_Origin = new RecipeData_Origin();
-
         }
 
 

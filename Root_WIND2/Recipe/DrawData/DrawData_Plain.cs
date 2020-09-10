@@ -20,59 +20,25 @@ namespace Root_WIND2
 
     class DrawData_Plain
     {
-        int nROICount;
-        List<DrawData_PlainData> m_EditData_PlainData;
-        RecipeData m_RecipeData;
-        public DrawData_Plain(RecipeData _recipeData)
+        int m_nRoiNumber;
+        PLAIN_TYPE m_PlainType;
+        List<TShape> m_Object; // ROI 단위
+
+        public DrawData_Plain(PLAIN_TYPE _plaintype, int _nRoiNumber, List<TShape> basicShapes)
         {
-            m_RecipeData = _recipeData;
+            m_nRoiNumber = _nRoiNumber;
+            m_PlainType = _plaintype;
+            m_Object = basicShapes;
         }
 
-        public void PushPlain(PLAIN_TYPE plaintype, int nRoiCount, List<BasicShape> basicShapes)
+        public PLAIN_TYPE GetPlainType()
         {
-            DrawData_PlainData plainData = new DrawData_PlainData(plaintype, nRoiCount, basicShapes);
-            m_EditData_PlainData.Add(plainData);
+            return m_PlainType;
         }
 
-        public void ClearPlain()
+        public int GetRoiCount()
         {
-            m_EditData_PlainData.Clear();
+            return m_nRoiNumber;
         }
-
-        public void ApplyPlainData()
-        {
-            // ToRecipeData
-            for(int i = 0; i < m_EditData_PlainData.Count; i ++)
-            {
-                PLAIN_TYPE type = m_EditData_PlainData[i].GetPlainType();
-                DrawData_PlainData plainData = m_EditData_PlainData[i];
-
-                switch (type)
-                {
-                    case PLAIN_TYPE.ORIGIN:
-                        // 그리기 Origin Data를 RecipeData_Origin에 필요한 데이터 맵핑.
-                        RecipeData_Origin pOrigin = m_RecipeData.GetRecipeOrigin();
-                        //pOrigin.SetOrigin();
-                        break;
-
-                    case PLAIN_TYPE.POSITION:
-                        break;
-
-                    case PLAIN_TYPE.ALIGN:
-                        break;
-
-                    case PLAIN_TYPE.ROI:
-                        break;
-
-                    case PLAIN_TYPE.D2D:
-                        break;
-
-                    default:
-                        break;
-
-                }
-            }
-        }
-
     }
 }
