@@ -1,9 +1,11 @@
 ﻿using ATI;
 using Emgu.CV.Structure;
 using Microsoft.Win32;
+using Root_Vega.Module;
 using RootTools;
 using RootTools.Inspects;
 using RootTools.Memory;
+using RootTools_CLR;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,258 +25,6 @@ using MBrushes = System.Windows.Media.Brushes;
 namespace Root_Vega
 {
 
-	public class D2D_PreconditionInfo
-	{
-		public D2D_PreconditionInfo()
-		{
-			m_AlignInfo = new AlignInfo();
-			m_MaskInfo = new MaskInfo();
-			m_DieInfo = new DieInfo();
-			m_PrebuiltData = new PrebuiltData();
-		}
-
-		public AlignInfo m_AlignInfo;
-		public MaskInfo m_MaskInfo;
-		public DieInfo m_DieInfo;
-		public PrebuiltData m_PrebuiltData;
-
-		public void PreBuild()
-		{
-			//임시.  m_PrebuiltData.nChipWidth 는 256의 배수여야 SSE의 계산이 정상적임을 보장받음.
-			m_PrebuiltData.nDieWidth = m_DieInfo.p_FirstDieRight - m_DieInfo.p_FirstDieLeft;
-			//임시.  m_PrebuiltData.nChipHeight 는 256의 배수여야 SSE의 계산이 정상적임을 보장받음.
-			m_PrebuiltData.nDieHeight = m_DieInfo.p_FirstDieUp - m_DieInfo.p_FirstDieBottom;
-
-			m_PrebuiltData.nScribeLaneWidth = m_DieInfo.p_SecondDieLeft - m_DieInfo.p_FirstDieRight;
-			m_PrebuiltData.nScribeLaneHeight = m_DieInfo.p_SecondDieBottom - m_DieInfo.p_FirstDieUp;
-
-			m_PrebuiltData.ShotWidht = m_DieInfo.p_LastDieRight - m_DieInfo.p_FirstDieLeft;
-			m_PrebuiltData.ShotHeight = m_DieInfo.p_LastDieUp - m_DieInfo.p_FirstDieBottom;
-
-			// set rowchipcount and columnchipcount
-			int nRowChipCount = 0;
-			int nRowLength = m_DieInfo.p_FirstDieRight;
-			int nRowMaxLength = Math.Min(m_DieInfo.p_LastDieRight + m_PrebuiltData.nScribeLaneWidth / 2, m_AlignInfo.p_RightBottom.X);
-			while (nRowLength < nRowMaxLength)
-			{
-				nRowChipCount++;
-				nRowLength = nRowLength + m_PrebuiltData.nDieWidth + m_PrebuiltData.nScribeLaneWidth;
-			}
-			m_PrebuiltData.nRowChipCount = nRowChipCount;
-
-			int nColumnChipCount = 0;
-			int nColumnLength = m_DieInfo.p_FirstDieUp;
-			int nColumnMaxLength = Math.Min(m_DieInfo.p_LastDieUp + m_PrebuiltData.nScribeLaneHeight / 2, m_AlignInfo.p_leftTop.Y);
-			while (nColumnLength < nColumnMaxLength)
-			{
-				nColumnChipCount++;
-				nColumnLength = nColumnLength + m_PrebuiltData.nDieHeight + m_PrebuiltData.nScribeLaneHeight;
-			}
-			m_PrebuiltData.nColumnChipCount = nColumnChipCount;
-
-			//set pos Data of each Chip, in PrebuiltData
-			m_PrebuiltData.MakeChipPos(m_DieInfo.p_FirstDieLeft, m_DieInfo.p_FirstDieBottom);
-
-			m_AlignInfo.bNeedReckon = false;
-			m_DieInfo.bNeedReckon = false;
-			m_PrebuiltData.bPrebuilt = true;
-		}
-	}
-	public class MaskInfo
-	{
-		String MaskSerialNumber;
-
-	}
-	public class AlignInfo
-	{
-		public bool bNeedReckon = true;
-		private CPoint m_LeftBottom;
-		public CPoint p_LeftBottom
-		{
-			get { return m_LeftBottom; }
-			set
-			{
-				bNeedReckon = true;
-				m_LeftBottom = value;
-			}
-		}
-
-		private CPoint m_leftTop;
-		public CPoint p_leftTop
-		{
-			get { return m_leftTop; }
-			set
-			{
-				bNeedReckon = true;
-				m_leftTop = value;
-			}
-		}
-
-		private CPoint m_RightBottom;
-		public CPoint p_RightBottom
-		{
-			get { return m_RightBottom; }
-			set
-			{
-				bNeedReckon = true;
-				m_RightBottom = value;
-			}
-		}
-
-		private CPoint m_RightTop;
-		public CPoint p_RightTop
-		{
-			get { return m_RightTop; }
-			set
-			{
-				bNeedReckon = true;
-				m_RightTop = value;
-			}
-		}
-
-
-		//prebuiltData
-	}
-	public class DieInfo
-	{
-		public bool bNeedReckon = true;
-		private int m_FirstDieLeft;
-		public int p_FirstDieLeft
-		{
-			get { return m_FirstDieLeft; }
-			set
-			{
-				bNeedReckon = true;
-				m_FirstDieLeft = value;
-			}
-		}
-
-		private int m_FirstDieRight;
-		public int p_FirstDieRight
-		{
-			get { return m_FirstDieRight; }
-			set
-			{
-				bNeedReckon = true;
-				m_FirstDieRight = value;
-			}
-		}
-
-		private int m_SecondDieLeft;
-		public int p_SecondDieLeft
-		{
-			get { return m_SecondDieLeft; }
-			set
-			{
-				bNeedReckon = true;
-				m_SecondDieLeft = value;
-			}
-		}
-
-		private int m_LastDieRight;
-		public int p_LastDieRight
-		{
-			get { return m_LastDieRight; }
-			set
-			{
-				bNeedReckon = true;
-				m_LastDieRight = value;
-			}
-		}
-
-		private int m_FirstDieBottom;
-		public int p_FirstDieBottom
-		{
-			get { return m_FirstDieBottom; }
-			set
-			{
-				bNeedReckon = true;
-				m_FirstDieBottom = value;
-			}
-		}
-
-		private int m_FirstDieUp;
-		public int p_FirstDieUp
-		{
-			get { return m_FirstDieUp; }
-			set
-			{
-				bNeedReckon = true;
-				m_FirstDieUp = value;
-			}
-		}
-		private int m_SecondDieBottom;
-		public int p_SecondDieBottom
-		{
-			get { return m_SecondDieBottom; }
-			set
-			{
-				bNeedReckon = true;
-				m_SecondDieBottom = value;
-			}
-		}
-		private int m_LastDieUp;
-		public int p_LastDieUp
-		{
-			get { return m_LastDieUp; }
-			set
-			{
-				bNeedReckon = true;
-				m_LastDieUp = value;
-			}
-		}
-
-
-		//prebuiltData
-	}
-	public class PrebuiltData
-	{
-		public bool bPrebuilt = false;
-		public int nDieWidth;
-		public int nDieHeight;
-		public int nScribeLaneWidth;
-		public int nScribeLaneHeight;
-		public int ShotWidht;
-		public int ShotHeight;
-
-
-		public int nRowChipCount;
-		public int nColumnChipCount;
-		public int[][] nChipPos_X;
-		public int[][] nChipPos_Y;
-
-		public void MakeChipPos(int nFirstDieLeft, int nFirstDieBottom)
-		{
-			nChipPos_Y = new int[nRowChipCount][];
-			nChipPos_X = new int[nRowChipCount][];
-			for (int i = 0; i < nRowChipCount; i++)
-			{
-				nChipPos_Y[i] = new int[nColumnChipCount];
-				nChipPos_X[i] = new int[nColumnChipCount];
-			}
-
-			int nRowPos = nFirstDieLeft;
-			for (int i = 0; i < nRowChipCount; i++)
-			{
-				for (int j = 0; j < nColumnChipCount; j++)
-				{
-					nChipPos_X[i][j] = nRowPos;
-				}
-				nRowPos = nRowPos + nDieWidth + nScribeLaneWidth;
-			}
-
-			int nColumnPos = nFirstDieBottom;
-			for (int j = 0; j < nColumnChipCount; j++)
-			{
-				for (int i = 0; i < nRowChipCount; i++)
-				{
-					nChipPos_Y[i][j] = nColumnPos;
-				}
-				nColumnPos = nColumnPos + nDieHeight + nScribeLaneHeight;
-			}
-		}
-
-	}
 
 	public class _2_8_D2D_InspViewModel : ObservableObject
 	{
@@ -299,15 +49,10 @@ namespace Root_Vega
 		private string inspDefaultDir;
 		private string inspFileName;
 		bool bUsingInspection;
+		D2DInspect m_D2DInspect = new D2DInspect();
+		ImageData DoubleSize;
 
-		D2D_PreconditionInfo m_PreconditionInfo = new D2D_PreconditionInfo();
-
-
-
-
-
-
-
+		
 		public Recipe p_Recipe
 		{
 			get
@@ -482,11 +227,24 @@ namespace Root_Vega
 			get
 			{
 
-				return m_PreconditionInfo.m_DieInfo;
+				return m_D2DInspect.m_D2DInfo.m_DieInfo;
 			}
 			set
 			{
-				SetProperty(ref m_PreconditionInfo.m_DieInfo, value);
+				SetProperty(ref m_D2DInspect.m_D2DInfo.m_DieInfo, value);
+			}
+		}
+
+		public AlignInfo p_AlignInfo
+		{
+			get
+			{
+
+				return m_D2DInspect.m_D2DInfo.m_AlignInfo;
+			}
+			set
+			{
+				SetProperty(ref m_D2DInspect.m_D2DInfo.m_AlignInfo, value);
 			}
 		}
 
@@ -820,193 +578,32 @@ namespace Root_Vega
 			p_InformationDrawer.Redrawing();
 		}
 
-		public void _startInsp()
+
+		public void D2DInsp()
 		{
-			//TODO EdgeboxViewModel과 SideViewModel에 중복된 메소드가 존재하므로 통합이 가능한경우 정리하도록 합시다
-			if (!m_Engineer.m_recipe.Loaded)
-				return;
+			//m_D2DInspect.set
 
-			//0. 개수 초기화 및 Table Drop
-			_clearInspReslut();
 
-			ClearDrawList();
 
-			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
-			for (int k = 0; k < p_PatternRoiList.Count; k++)
-			{
-				var currentRoi = p_PatternRoiList[k];
-				//ROI 개수만큼 회전하면서 검사영역을 생성한다
-				for (int j = 0; j < currentRoi.Strip.ParameterList.Count; j++)
-				{
-					//검사영역 생성 기준
-					//1. 등록된 feature를 탐색한다. 지정된 score에 부합하는 feature가 없을 경우 2차, 3차로 넘어갈 수도 있다. 
-					//1.1. 만약 등록된 Feature가 없는 경우 기준 위치는 0,0으로한다
-					CPoint standardPos = new CPoint(0, 0);
-					int refStartXOffset = 0;
-					int refStartYOffset = 0;
+			MemoryData sD2Dmemdata = ((Vega_Handler)(m_Engineer.ClassHandler())).m_patternVision.m_memoryPool2.GetGroup(App.sD2DGroup).GetMemory(App.sD2Dmem);
+			MemoryData sD2DABSmemdata = ((Vega_Handler)(m_Engineer.ClassHandler())).m_patternVision.m_memoryPool2.GetGroup(App.sD2DGroup).GetMemory(App.sD2DABSmem);
+			m_D2DInspect.StartInsp(m_Image, sD2Dmemdata, sD2DABSmemdata);
+			//메모리 defult 사이즈 어디서 지정해야하지?
 
-					foreach (var feature in currentRoi.Position.ReferenceList)
-					{
-						//TODO : Align과 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
-						var bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
-						Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
-						var laplaceFeature = featureImage.Laplace(1);
-						laplaceFeature.Save(@"D:\Test\feature.bmp");
+			//MemoryPool pool =  m_Engineer.ClassMemoryTool().GetPool(App.sD2DPool, true);
+			//pool.p_gbPool = 3;
 
-						CRect targetRect = new CRect(
-							new Point(feature.RoiRect.Left - (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Top - (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0),
-							new Point(feature.RoiRect.Right + (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Bottom + (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0));
-						Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImagePattern(targetRect));
-						var laplaceSource = sourceImage.Laplace(1);
-						laplaceSource.Save(@"D:\Test\source.bmp");
+			//memdata = m_Engineer.ClassMemoryTool().GetPool(App.sD2DPool,true).GetGroup(App.sD2DGroup).CreateMemory(App.sD2Dmem, 100, 1, 1000, 1000);
 
-						var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
-
-						int widthDiff = laplaceSource.Width - resultImage.Width;
-						int heightDiff = laplaceSource.Height - resultImage.Height;
-
-						float[,,] matches = resultImage.Data;
-
-						Point maxRelativePoint = new Point();//상대위치
-
-						bool foundFeature = false;
-						float maxScore = float.MinValue;
-
-						for (int x = 0; x < matches.GetLength(1); x++)
-						{
-							for (int y = 0; y < matches.GetLength(0); y++)
-							{
-								if (maxScore < matches[y, x, 0] && feature.FeatureTargetScore <= matches[y, x, 0])
-								{
-									maxScore = matches[y, x, 0];
-									maxRelativePoint.X = x;
-									maxRelativePoint.Y = y;
-									foundFeature = true;
-								}
-								//matches[y, x, 0] *= 256;
-							}
-						}
-						resultImage.Data = matches;
-						resultImage.Save(@"D:\Test\result.bmp");
-						if (foundFeature)
-						{
-							//2. feature 중심위치가 확보되면 해당 좌표를 저장
-							standardPos.X = targetRect.Left + (int)maxRelativePoint.X + widthDiff / 2;
-							standardPos.Y = targetRect.Top + (int)maxRelativePoint.Y + heightDiff / 2;
-							refStartXOffset = feature.PatternDistX;
-							refStartYOffset = feature.PatternDistY;
-							DrawCross(new DPoint(standardPos.X, standardPos.Y), MBrushes.Red);
-
-							break;//찾았으니 중단
-						}
-						else
-						{
-							continue;//못 찾았으면 다음 Feature값으로 이동
-						}
-					}
-
-					//3. 등록된 Align Key 2개를 탐색한다. feature의 위치 정보도 참조하여 회전 보정 시에 들어갈 값을 준비해둔다
-					List<CPoint> alignKeyList = new List<CPoint>();
-
-					if (currentRoi.Position.AlignList.Count == 2)
-					{
-						for (int n = 0; n < 2; n++)
-						{
-							//TODO : Reference와 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
-							var align = currentRoi.Position.AlignList[n];
-							var bmp = align.m_Feature.GetRectImage(new CRect(0, 0, align.m_Feature.p_Size.X, align.m_Feature.p_Size.Y));
-							Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
-							var laplaceFeature = featureImage.Laplace(1);
-
-							CRect targetRect = new CRect(
-								new Point(align.RoiRect.Center().X - align.FeatureFindArea / 2.0, align.RoiRect.Center().Y - align.FeatureFindArea / 2.0),
-								new Point(align.RoiRect.Center().X + align.FeatureFindArea / 2.0, align.RoiRect.Center().Y + align.FeatureFindArea / 2.0));
-							Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImage(targetRect));
-							var laplaceSource = sourceImage.Laplace(1);
-
-							var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
-
-							int widthDiff = laplaceSource.Width - resultImage.Width;
-							int heightDiff = laplaceSource.Height - resultImage.Height;
-
-							float[,,] matches = resultImage.Data;
-
-							Point maxRelativePoint = new Point();//상대위치
-
-							bool foundFeature = false;
-							float maxScore = float.MinValue;
-
-							for (int x = 0; x < matches.GetLength(1); x++)
-							{
-								for (int y = 0; y < matches.GetLength(0); y++)
-								{
-									if (maxScore < matches[y, x, 0] && align.FeatureTargetScore <= matches[y, x, 0])
-									{
-										maxScore = matches[y, x, 0];
-										maxRelativePoint.X = x;
-										maxRelativePoint.Y = y;
-										foundFeature = true;
-									}
-									//matches[y, x, 0] *= 256;
-								}
-							}
-							if (foundFeature)
-							{
-								//2. feature 중심위치가 확보되면 해당 좌표를 저장
-								CPoint tempPos = new CPoint();
-								tempPos.X = targetRect.Left + (int)maxRelativePoint.X + widthDiff / 2;
-								tempPos.Y = targetRect.Top + (int)maxRelativePoint.Y + heightDiff / 2;
-								DrawCross(new DPoint(tempPos.X, tempPos.Y), MBrushes.Crimson);
-								alignKeyList.Add(tempPos);
-							}
-						}
-					}
-					//TODO : 회전보정은 나중에하기
-					if (alignKeyList.Count != 2)
-					{
-						//align 실패. 에러를 띄우거나 회전 좌표 보정을 하지 않음
-					}
-					else
-					{
-						//align 탐색 성공. 좌표 보정 계산 시작
-					}
-
-					//4. 저장된 좌표를 기준으로 PatternDistX, PatternDistY만큼 더한다. 이 좌표가 Start Position이 된다
-					var startPos = new Point(standardPos.X + refStartXOffset, standardPos.Y + refStartYOffset);
-					//5. Start Position에 InspAreaWidth와 InspAreaHeight만큼 더해준다. 이 좌표가 End Position이 된다
-					var endPos = new Point(startPos.X + (int)currentRoi.Strip.ParameterList[j].InspAreaWidth, startPos.Y + (int)currentRoi.Strip.ParameterList[j].InspAreaHeight);
-					//6. Start Postiion과 End Position, Inspection Offset을 이용하여 검사 영역을 생성한다. 우선은 일괄 생성을 대상으로 한다
-					var inspRect = new CRect(startPos, endPos);
-
-					var temp = new UIElementInfo(new Point(inspRect.Left, inspRect.Top), new Point(inspRect.Right, inspRect.Bottom));
-
-					System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-					rect.Width = inspRect.Width;
-					rect.Height = inspRect.Height;
-					System.Windows.Controls.Canvas.SetLeft(rect, inspRect.Left);
-					System.Windows.Controls.Canvas.SetTop(rect, inspRect.Top);
-					rect.StrokeThickness = 3;
-					rect.Stroke = MBrushes.Orange;
-
-					p_RefFeatureDrawer.m_ListShape.Add(rect);
-					p_RefFeatureDrawer.m_Element.Add(rect);
-					p_RefFeatureDrawer.m_ListRect.Add(temp);
-
-					p_ImageViewer.SetRoiRect();
-
-					int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, k);
-
-					m_Engineer.m_InspManager.SetStandardPos(nDefectCode, standardPos);
-
-					//m_Engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
-					//		m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
-					//		m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
-					//		inspRect, 500, currentRoi.Strip.ParameterList[j], nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
-					//7. Strip검사를 시작한다
-				}
-			}
-			m_Engineer.m_InspManager.StartInspection();//검사 시작!
+			//m_D2DInspect.DoubleImage[0][0] = new ImageData(m_MemoryModule.GetMemory(App.sD2DPool, App.sD2DGroup, App.sD2Dmem[0]));
 		}
+
+
+
+
+
+
+
 
 		void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor)
 		{
@@ -1096,7 +693,7 @@ namespace Root_Vega
 		{
 			get
 			{
-				return new RelayCommand(_startInsp);
+				return new RelayCommand(D2DInsp);
 			}
 		}
 

@@ -131,9 +131,9 @@ namespace RootTools.Memory
         public MemoryViewer m_viewer; 
         public MemoryPool(string id, MemoryTool memoryTool)
         {
-            p_aGroup = new ObservableCollection<MemoryGroup>(); 
+            p_aGroup = new ObservableCollection<MemoryGroup>();
             p_id = id;
-            m_memoryTool = memoryTool; 
+            m_memoryTool = memoryTool;
             m_log = memoryTool.m_log;
             m_viewer = new MemoryViewer(id, this, m_log);
         }

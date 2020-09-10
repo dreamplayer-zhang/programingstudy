@@ -259,6 +259,30 @@
                                 <TextBox Text="{Binding p_DieInfo.p_LastDieUp}"
                                      Style="{StaticResource BasicTbox}"/>
                             </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock  Text="Left"
+                                        Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding p_AlignInfo.p_Left}"
+                                     Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock  Text="Right"
+                                        Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding p_AlignInfo.p_Right}"
+                                     Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock  Text="Top"
+                                        Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding p_AlignInfo.p_Top}"
+                                     Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock  Text="Bottom"
+                                        Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding p_AlignInfo.p_Bottom}"
+                                     Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
                         </StackPanel>
                     </Expander>
                 </StackPanel>

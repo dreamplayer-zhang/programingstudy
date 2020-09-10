@@ -139,6 +139,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Module\D2DInsp.cs" />
     <Compile Include="UI\2_8_D2D_Insp.xaml.cs">
       <DependentUpon>2_8_D2D_Insp.xaml</DependentUpon>
     </Compile>

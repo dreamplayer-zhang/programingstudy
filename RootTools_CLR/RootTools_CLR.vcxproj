@@ -106,6 +106,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)Lib\mariadb-connector-c\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>libmariadb.lib;mariadbclient.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -137,6 +138,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CCLRD2DModule.h" />
+    <ClInclude Include="CCLRD2DStructure.h" />
     <ClInclude Include="CLR_Inspection.h" />
     <ClInclude Include="CLR_InspConnector.h" />
     <ClInclude Include="DefectData.h" />
@@ -146,6 +149,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="CCLRD2DModule.cpp" />
+    <ClCompile Include="CCLRD2DStructure.cpp" />
     <ClCompile Include="CLR_Inspection.cpp" />
     <ClCompile Include="CLR_InspConnector.cpp" />
     <ClCompile Include="DefectData.cpp" />

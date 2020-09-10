@@ -76,7 +76,7 @@ namespace RootTools_CLR
 					MySQLDBConnector^ connector = gcnew MySQLDBConnector();
 					unsigned int errorCode = connector->OpenDatabase();
 
-					for (int i = 0; i < vTempResult.size(); i++)
+					for (int i = 0; i < vTempResult.size(); i++)             
 					{
 						if (errorCode == 0)
 						{

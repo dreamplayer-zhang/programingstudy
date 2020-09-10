@@ -51,6 +51,15 @@ namespace RootTools.Inspects
 		{
 			//clrInsp.Dispose();
 		}
+		
+		
+
+		public void D2DRectInsp(CCLRD2DStructure StrucRef)
+		{
+
+			CCLRD2DModule testModule = new CCLRD2DModule();
+			testModule.D2DInspProto();
+		}
 
 		public bool StartInspection(InspectionProperty prop, int threadIndex)
 		{
