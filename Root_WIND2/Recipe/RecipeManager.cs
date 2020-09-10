@@ -23,6 +23,11 @@ namespace Root_WIND2
             m_Recipe = new Recipe();
         }
 
+        public ref Recipe GetRecipe()
+        {
+            return ref m_Recipe;
+        }
+
         public void ExportRecipe() { }
         public void ImportRecipe() { }
         static void OpenRecipe() { }
