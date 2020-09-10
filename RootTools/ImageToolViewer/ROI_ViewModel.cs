@@ -44,11 +44,12 @@ namespace RootTools
         }
         private TShape tshape;
         private CPoint PointBuffer;
-        private ToolProcess eToolProgress;
+        private ToolProcess eToolProcess;
         private ToolType eToolType;
         private Stack<TShape[]> History = new Stack<TShape[]>();
-        //private List<TShape> SelectedShapes = new List<TShape>();
         public ObservableCollection<TShape> Shapes = new ObservableCollection<TShape>();
+
+
         public ICommand Clear
         {
             get
@@ -67,6 +68,7 @@ namespace RootTools
             }
             //SelectedShapes.Clear();
         }
+
         #region Property
         private ObservableCollection<UIElement> m_ROIElement = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> p_ROIElement
@@ -139,30 +141,29 @@ namespace RootTools
         }
         #endregion
 
-
         #region Command
         public override void PreviewMouseDown(object sender, MouseEventArgs e)
         {
             base.PreviewMouseDown(sender, e);
-            CPoint nowPt= new CPoint(p_MouseX, p_MouseY);
-
-            switch (eToolProgress)
+            CPoint CanvasPt= new CPoint(p_MouseX, p_MouseY);
+            CPoint MemPt = GetMemPoint(CanvasPt);
+            switch (eToolProcess)
             {
                 case ToolProcess.None:
                     if (eToolType == ToolType.None)
                     {
-                        if (isOutsideAllShape(nowPt))
+                        if (isOutsideAllShape(MemPt))
                         {
                             foreach (TShape shape in Shapes)
                             {
                                 shape.isSelected = false;
                             }
-                        }                     
+                        }
                         string cursor = p_Cursor.ToString();
                         switch (cursor)
                         {
                             case "ScrollAll":
-                                PointBuffer = nowPt;
+                                PointBuffer = MemPt;
                                 SetState(ToolProcess.Modify);
                                 break;
                         }
@@ -170,7 +171,7 @@ namespace RootTools
                     }
                     else
                     {
-                        tshape = StartDraw(tshape, eToolType, nowPt);
+                        tshape = StartDraw(tshape, eToolType, MemPt);
                         Shapes.Add(tshape);
                         SetState(ToolProcess.Drawing);
                     }
@@ -179,7 +180,7 @@ namespace RootTools
                 case ToolProcess.Start:
                     break;
                 case ToolProcess.Drawing:
-                    tshape = DrawDone(tshape, eToolType, nowPt);
+                    tshape = DrawDone(tshape, eToolType, CanvasPt);
                     //Done
                     break;
                 case ToolProcess.Done:
@@ -190,27 +191,44 @@ namespace RootTools
         }
         public void PreviewMouseUp(object sender, MouseEventArgs e)
         {
-            foreach (TShape shape in Shapes)
-            {
-                if (shape.isSelected)
-                {
-                    MakeModifyTool(shape);
-                    shape.isSelected = true;
-                }
-            }
-        }
-        public override void MouseMove(object sender, MouseEventArgs e)
-        {           
-            base.MouseMove(sender, e);
-            CPoint nowPt = new CPoint(p_MouseX, p_MouseY);
-            switch (eToolProgress)
+            switch (eToolProcess)
             {
                 case ToolProcess.None:
                     break;
                 case ToolProcess.Start:
                     break;
                 case ToolProcess.Drawing:
-                    tshape = Drawing(tshape, eToolType, nowPt);
+                    break;
+                case ToolProcess.Done:
+                    break;
+                case ToolProcess.Modify:
+                    {
+                        foreach (TShape shape in Shapes)
+                        {
+                            if (shape.isSelected)
+                            {
+                                MakeModifyTool(shape);
+                            }
+                        }
+
+                        SetState(ToolProcess.None);
+                    }
+                    break;
+            }
+        }
+        public override void MouseMove(object sender, MouseEventArgs e)
+        {           
+            base.MouseMove(sender, e);
+            CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
+            CPoint MemPt = GetMemPoint(CanvasPt);
+            switch (eToolProcess)
+            {
+                case ToolProcess.None:
+                    break;
+                case ToolProcess.Start:
+                    break;
+                case ToolProcess.Drawing:
+                    tshape = Drawing(tshape, eToolType, MemPt);
                     break;
                 case ToolProcess.Done:
                     break;
@@ -219,20 +237,14 @@ namespace RootTools
                         if (e.LeftButton == MouseButtonState.Pressed)
                         {
                             p_Cursor = Cursors.ScrollAll;
-                            
-                            Debug.WriteLine("MouseMove in Modify");
-                            ModifyRect(nowPt);                           
-                        }
-                        else
-                        {
-                            SetState(ToolProcess.None);
+                            ModifyRect(MemPt);                           
                         }
                     }
                     break;
             }
         }
 
-        private TShape StartDraw(TShape shape, ToolType toolType, CPoint nowPt)
+        private TShape StartDraw(TShape shape, ToolType toolType, CPoint memPt)
         {
             switch (toolType)
             {
@@ -243,7 +255,7 @@ namespace RootTools
                 case ToolType.Rect:
                     shape = new TRect(Brushes.Yellow, 1);
                     TRect rect = shape as TRect;
-                    rect.StartPointBuffer = nowPt;
+                    rect.MemPointBuffer = memPt;
                     break;
                 case ToolType.Circle:
                     break;
@@ -253,7 +265,7 @@ namespace RootTools
             return shape;
 
         }
-        private TShape Drawing(TShape shape, ToolType toolType, CPoint nowPt)
+        private TShape Drawing(TShape shape, ToolType toolType, CPoint memPt)
         {
             switch (toolType)
             {
@@ -262,37 +274,41 @@ namespace RootTools
                 case ToolType.Line:
                     break;
                 case ToolType.Rect:
-                    TRect rect = shape as TRect;                   
-                    double left, top, right, bottom;
-                    if (rect.StartPointBuffer.X > nowPt.X)
+                    TRect rect = shape as TRect;
+                    if (rect.MemPointBuffer.X> memPt.X)
                     {
-                        Canvas.SetLeft(rect.CanvasRect, nowPt.X);
-                        Canvas.SetRight(rect.CanvasRect, rect.StartPointBuffer.X);
+                        rect.MemoryRect.Right = rect.MemoryRect.Left;
+                        rect.MemoryRect.Left = memPt.X;
                     }
                     else
                     {
-                        Canvas.SetLeft(rect.CanvasRect, rect.StartPointBuffer.X);
-                        Canvas.SetRight(rect.CanvasRect, nowPt.X);
+                        rect.MemoryRect.Left = rect.MemPointBuffer.X;
+                        rect.MemoryRect.Right = memPt.X;
                     }
-
-                    if (rect.StartPointBuffer.Y > nowPt.Y)
+                    if (rect.MemPointBuffer.Y > memPt.Y)
                     {
-                        Canvas.SetTop(rect.CanvasRect, nowPt.Y);
-                        Canvas.SetBottom(rect.CanvasRect, rect.StartPointBuffer.Y);
+                        rect.MemoryRect.Bottom = rect.MemoryRect.Top;
+                        rect.MemoryRect.Top = memPt.Y;
                     }
                     else
                     {
-                        Canvas.SetTop(rect.CanvasRect, rect.StartPointBuffer.Y);
-                        Canvas.SetBottom(rect.CanvasRect, nowPt.Y);
+                        rect.MemoryRect.Top = rect.MemPointBuffer.Y;
+                        rect.MemoryRect.Bottom = memPt.Y;
                     }
+                    CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
+                    CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
 
-                     left = Canvas.GetLeft(rect.CanvasRect);
-                     top = Canvas.GetTop(rect.CanvasRect);
-                     right = Canvas.GetRight(rect.CanvasRect);
-                     bottom = Canvas.GetBottom(rect.CanvasRect);
+                    CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+                    CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+                    int width = Math.Abs(canvasRB.X - canvasLT.X);
+                    int height = Math.Abs(canvasRB.Y - canvasLT.Y);
+                    Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
+                    Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
+                    Canvas.SetRight(rect.CanvasRect, canvasRB.X);
+                    Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
+                    rect.CanvasRect.Width = width;
+                    rect.CanvasRect.Height = height;
 
-                    rect.CanvasRect.Width = Math.Abs(right - left);
-                    rect.CanvasRect.Height = Math.Abs(bottom - top);
                     break;
                 case ToolType.Circle:
                     break;
@@ -311,27 +327,11 @@ namespace RootTools
                     break;
                 case ToolType.Rect:
                     TRect rect = shape as TRect;
-
                     rect.CanvasRect.Fill = rect.FillBrush;
                     rect.CanvasRect.Tag = rect;
                     rect.CanvasRect.MouseEnter += CanvasRect_MouseEnter;
                     rect.CanvasRect.MouseLeave += CanvasRect_MouseLeave;
                     rect.CanvasRect.MouseLeftButtonDown += CanvasRect_MouseLeftButtonDown;
-
-                    double left, top, right, bottom;
-                    left = Canvas.GetLeft(rect.CanvasRect);
-                    top = Canvas.GetTop(rect.CanvasRect);
-                    right = Canvas.GetRight(rect.CanvasRect);
-                    bottom = Canvas.GetBottom(rect.CanvasRect);
-
-                    CPoint LeftTop = new CPoint((int)left, (int)top);
-                    CPoint RightBottom = new CPoint((int)right, (int)bottom);
-
-                    rect.MemoryRect.Left = GetMemPoint(LeftTop).X;
-                    rect.MemoryRect.Top = GetMemPoint(LeftTop).Y;
-                    rect.MemoryRect.Right = GetMemPoint(RightBottom).X;
-                    rect.MemoryRect.Bottom = GetMemPoint(RightBottom).Y;
-
                     MakeModifyTool(rect);
                     p_SelectedToolIndex = 0;
                     break;
@@ -345,6 +345,7 @@ namespace RootTools
         }
 
         #endregion
+
         private void CanvasRect_MouseEnter(object sender, MouseEventArgs e)
         {
             p_Cursor = Cursors.Hand;
@@ -356,44 +357,36 @@ namespace RootTools
         private void CanvasRect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             TRect rect = (sender as Rectangle).Tag as TRect;
+            Debug.WriteLine("Rect Mouse Left Donw : " + rect.GetHashCode());
             if (rect.isSelected)
-                CancleSelect(rect);
+                rect.isSelected = false;
             else
-                Select(rect);
+                rect.isSelected = true;
         }
-        private void Select(TShape tshape)
+        private bool isOutsideAllShape(CPoint memPt)
         {
-            TShape shape = Shapes.Where(s => s == tshape).FirstOrDefault();
-            Debug.WriteLine("Select :"+shape.GetHashCode());
-            shape.isSelected = true;
-        }
-        private void CancleSelect(TShape tshape)
-        {
-            TShape shape = Shapes.Where(s => s == tshape).FirstOrDefault();
-            Debug.WriteLine("Cancle :" + shape.GetHashCode());
-            shape.isSelected = false;
-        }
-
-        private bool isOutsideAllShape(CPoint pt)
-        {
-            bool isInside = true;
             foreach (TShape shape in Shapes)
             {
                 TRect rect = shape as TRect;
-                double left = Canvas.GetLeft(rect.CanvasRect);
-                double top = Canvas.GetTop(rect.CanvasRect);
-                double right = Canvas.GetRight(rect.CanvasRect);
-                double bottom = Canvas.GetBottom(rect.CanvasRect);
-                Debug.WriteLine("isOutSideAll :" + shape.UIElement.GetHashCode());
-                if (pt.X < right && pt.X > left &&
-                    pt.Y > top && pt.Y < bottom)
-                    isInside = false;
+                double left, top, right, bottom;
+
+                left = rect.MemoryRect.Left;
+                top = rect.MemoryRect.Top;
+                right = rect.MemoryRect.Right;
+                bottom = rect.MemoryRect.Bottom;
+                if (left < memPt.X && memPt.X < right && top < memPt.Y && memPt.Y < bottom)
+                {
+                    return false;
+                }       
             }
-            return isInside;
+            return true;
         }
         
         private void MakeModifyTool(TShape shape)
         {
+            if (p_ROIElement.Contains(shape.ModifyTool))
+                p_ROIElement.Remove(shape.ModifyTool);
+
             TRect rect = shape as TRect;
 
             double left, top;
@@ -443,7 +436,6 @@ namespace RootTools
             tshape.ModifyTool = modifyTool;
             p_ROIElement.Add(modifyTool);
         }
-
         private void ModifyPoint_MouseEnter(object sender, MouseEventArgs e)
         {
             CPoint index = (sender as Ellipse).Tag as CPoint;
@@ -481,40 +473,60 @@ namespace RootTools
         {
             p_Cursor = Cursors.Arrow;
         }
-
-        private void ModifyRect(CPoint nowPt)
+        private void ModifyRect(CPoint memPt)
         {
-            int offset_x = nowPt.X - PointBuffer.X;
-            int offset_y = nowPt.Y - PointBuffer.Y;
+            int offset_x = memPt.X - PointBuffer.X;
+            int offset_y = memPt.Y - PointBuffer.Y;
             CPoint ptOffset = new CPoint(offset_x, offset_y);
 
             if (true)
             {
                 foreach (TShape shape in Shapes)
                 {
-                    if (shape.isSelected)
+                    TRect rect = shape as TRect;
+                    if (rect.isSelected)
                     {
-                        
-                        shape.ModifyTool.Visibility = Visibility.Collapsed;
-                        double left = Canvas.GetLeft(shape.UIElement);
-                        double top = Canvas.GetTop(shape.UIElement);
-                        double newleft = int.Parse(left.ToString());
-                        double newtop = int.Parse(top.ToString());
-                        newleft += ptOffset.X;
-                        newtop += ptOffset.Y;
+                        rect.ModifyTool.Visibility = Visibility.Collapsed;
+                        int left, top, right, bottom;
+                        left = rect.MemoryRect.Left;
+                        top = rect.MemoryRect.Top;
+                        right = rect.MemoryRect.Right;
+                        bottom = rect.MemoryRect.Bottom;
+
+                        left += ptOffset.X;
+                        top += ptOffset.Y;
+                        right += ptOffset.X;
+                        bottom += ptOffset.Y;
+
+                        rect.MemoryRect.Left = left;
+                        rect.MemoryRect.Top = top;
+                        rect.MemoryRect.Right = right;
+                        rect.MemoryRect.Top = top;
+                        CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
+                        CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
+
+                        CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+                        CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+                        int width = Math.Abs(canvasRB.X - canvasLT.X);
+                        int height = Math.Abs(canvasRB.Y - canvasLT.Y);
+                        rect.CanvasRect.Width = width;
+                        rect.CanvasRect.Height = height;
+                        Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
+                        Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
+                        Canvas.SetRight(rect.CanvasRect, canvasRB.X);
+                        Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
                         
                         Debug.WriteLine("Modifying :" + shape.UIElement.GetHashCode());
-                        Canvas.SetLeft(shape.UIElement, newleft);
-                        Canvas.SetTop(shape.UIElement, newtop);
+
                     }
                 }
-                PointBuffer = nowPt;
+                PointBuffer = memPt;
             }
         }
 
         public ToolProcess SetState(ToolProcess state)
         {
-            eToolProgress = state;
+            eToolProcess = state;
             return state;
         }
         public enum ToolType
