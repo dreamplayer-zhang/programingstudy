@@ -66,20 +66,20 @@ namespace Root_Vega
             get { return m_eRightViewerVisibility; }
             set { SetProperty(ref m_eRightViewerVisibility, value); }
         }
-        SideVision.Run_AutoFocus.CAutoFocusStatus m_afs;
-        public SideVision.Run_AutoFocus.CAutoFocusStatus p_afs
+        SideVision.CAutoFocusStatus m_afs;
+        public SideVision.CAutoFocusStatus p_afs
         {
             get { return m_afs; }
             set { SetProperty(ref m_afs, value); }
         }
-        ObservableCollection<SideVision.Run_AutoFocus.CStepInfo> m_lstLeftStepInfo;
-        public ObservableCollection<SideVision.Run_AutoFocus.CStepInfo> p_lstLeftStepInfo
+        ObservableCollection<SideVision.CStepInfo> m_lstLeftStepInfo;
+        public ObservableCollection<SideVision.CStepInfo> p_lstLeftStepInfo
         {
             get { return m_lstLeftStepInfo; }
             set { SetProperty(ref m_lstLeftStepInfo, value); }
         }
-        ObservableCollection<SideVision.Run_AutoFocus.CStepInfo> m_lstRightStepInfo;
-        public ObservableCollection<SideVision.Run_AutoFocus.CStepInfo> p_lstRightStepInfo
+        ObservableCollection<SideVision.CStepInfo> m_lstRightStepInfo;
+        public ObservableCollection<SideVision.CStepInfo> p_lstRightStepInfo
         {
             get { return m_lstRightStepInfo; }
             set { SetProperty(ref m_lstRightStepInfo, value); }
@@ -133,7 +133,7 @@ namespace Root_Vega
         {
             if (obj != null)
             {
-                SideVision.Run_AutoFocus.CStepInfo si = (SideVision.Run_AutoFocus.CStepInfo)obj;
+                SideVision.CStepInfo si = (SideVision.CStepInfo)obj;
                 p_bmpSrcLeftViewer = si.p_img;
                 p_strLeftSelectedInfo = si.p_strInfo;
             }
@@ -148,7 +148,7 @@ namespace Root_Vega
         {
             if (obj != null)
             {
-                SideVision.Run_AutoFocus.CStepInfo si = (SideVision.Run_AutoFocus.CStepInfo)obj;
+                SideVision.CStepInfo si = (SideVision.CStepInfo)obj;
                 p_bmpSrcRightViewer = si.p_img;
                 p_strRightSelectedInfo = si.p_strInfo;
             }
