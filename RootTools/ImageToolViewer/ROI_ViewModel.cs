@@ -141,6 +141,8 @@ namespace RootTools
         public override void PreviewMouseDown(object sender, MouseEventArgs e)
         {
             base.PreviewMouseDown(sender, e);
+            if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
+                return;
             CPoint CanvasPt= new CPoint(p_MouseX, p_MouseY);
             CPoint MemPt = GetMemPoint(CanvasPt);
             switch (eToolProcess)
@@ -156,16 +158,13 @@ namespace RootTools
                                 shape.isSelected = false;
                             }
                         }
-
                         if (p_Cursor != Cursors.Arrow)
                         {
                             PointBuffer = MemPt;
                             string cursor = p_Cursor.ToString();
-                            SetState(ToolProcess.Modify);
+                            SetState(ToolProcess.Modifying);
                             Debug.WriteLine("Preview Mouse Down");
-                            Debug.WriteLine("Set Modify: " + eModifyType);
-                            
-
+                            Debug.WriteLine("Set Modify: " + eModifyType);            
                         }
                     }
                     else
@@ -173,47 +172,13 @@ namespace RootTools
                         tshape = StartDraw(tshape, eToolType, MemPt);
                         Shapes.Add(tshape);
                         SetState(ToolProcess.Drawing);
-                    }
-                    
-                    break;
-                case ToolProcess.Start:
+                    }                    
                     break;
                 case ToolProcess.Drawing:
                     tshape = DrawDone(tshape, eToolType, CanvasPt);
                     SetState(ToolProcess.None);
-                    //Done
                     break;
-                case ToolProcess.Done:
-                    break;
-                case ToolProcess.Modify:
-                    break;
-            }
-        }
-        public void PreviewMouseUp(object sender, MouseEventArgs e)
-        {
-            switch (eToolProcess)
-            {
-                case ToolProcess.None:
-                    break;
-                case ToolProcess.Start:
-                    break;
-                case ToolProcess.Drawing:
-                    break;
-                case ToolProcess.Done:
-                    break;
-                case ToolProcess.Modify:
-                    {
-                        foreach (TShape shape in Shapes)
-                        {
-                            if (shape.isSelected)
-                            {
-                                MakeModifyTool(shape);
-                                shape.ModifyTool.Visibility = Visibility.Visible;
-                            }
-                        }
-
-                        SetState(ToolProcess.None);
-                    }
+                case ToolProcess.Modifying:
                     break;
             }
         }
@@ -226,14 +191,10 @@ namespace RootTools
             {
                 case ToolProcess.None:
                     break;
-                case ToolProcess.Start:
-                    break;
                 case ToolProcess.Drawing:
                     tshape = Drawing(tshape, eToolType, MemPt);
                     break;
-                case ToolProcess.Done:
-                    break;
-                case ToolProcess.Modify:
+                case ToolProcess.Modifying:
                     {
                         if (e.LeftButton == MouseButtonState.Pressed)
                             ModifyRect(MemPt);
@@ -241,7 +202,67 @@ namespace RootTools
                     break;
             }
         }
+        public void PreviewMouseUp(object sender, MouseEventArgs e)
+        {
+            switch (eToolProcess)
+            {
+                case ToolProcess.None:
+                    break;
+                case ToolProcess.Drawing:
+                    break;
+                case ToolProcess.Modifying:
+                    {
+                        foreach (TShape shape in Shapes)
+                        {
+                            if (shape.isSelected)
+                            {
+                                MakeModifyTool(shape);
+                                shape.ModifyTool.Visibility = Visibility.Visible;
+                            }
+                        }
 
+                        SetState(ToolProcess.None);
+                        eModifyType = ModifyType.None;
+                    }
+                    break;
+            }
+        }
+        public override void SetRoiRect()
+        {
+            base.SetRoiRect();
+            RedrawShapes();
+        }
+        public override void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
+        {
+            base.CanvasMovePoint_Ref(point, nX, nY);
+            RedrawShapes();
+        }
+        #endregion
+
+        private void RedrawShapes()
+        {
+            foreach (TShape shape in Shapes)
+            {
+                TRect rect = shape as TRect;
+                CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
+                CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
+
+                CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+                CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+                int width = Math.Abs(canvasRB.X - canvasLT.X);
+                int height = Math.Abs(canvasRB.Y - canvasLT.Y);
+                rect.CanvasRect.Width = width;
+                rect.CanvasRect.Height = height;
+                Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
+                Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
+                Canvas.SetRight(rect.CanvasRect, canvasRB.X);
+                Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
+
+                MakeModifyTool(shape);
+                if (shape.isSelected)
+                    shape.ModifyTool.Visibility = Visibility.Visible;
+            }
+        }
         private TShape StartDraw(TShape shape, ToolType toolType, CPoint memPt)
         {
             switch (toolType)
@@ -345,9 +366,6 @@ namespace RootTools
             }
             return shape;
         }
-
-        #endregion
-
         private void CanvasRect_MouseEnter(object sender, MouseEventArgs e)
         {
             p_Cursor = Cursors.Hand;
@@ -358,6 +376,14 @@ namespace RootTools
         }
         private void CanvasRect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            //Ctrl키로 클릭해야 복수선택되게
+            //선택은 항상 한개만
+            //foreach(TShape shape in Shapes)
+            //{
+            //    int cnt = 0;
+            //    if (shape.isSelected)
+            //        cnt++;
+            //}
             TRect rect = (sender as Rectangle).Tag as TRect;
             Debug.WriteLine("Rect Mouse Left Donw : " + rect.UIElement.GetHashCode());
             if (rect.isSelected)
@@ -628,10 +654,8 @@ namespace RootTools
         public enum ToolProcess
         {
             None,
-            Start,
             Drawing,
-            Modify,
-            Done,
+            Modifying,
         }
     }
 

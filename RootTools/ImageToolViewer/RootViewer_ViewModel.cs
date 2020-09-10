@@ -535,7 +535,7 @@ namespace RootTools
 			}
 			SetThumNailIamgeSource();
 		}
-		public void SetRoiRect()
+		public virtual void SetRoiRect()
 		{
 			if (p_ImageData != null)
 			{
@@ -688,7 +688,7 @@ namespace RootTools
 		#endregion
 
 		#region Mouse Method
-		void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
+		public virtual void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
 		{
 			//CPoint StartPt = GetCurrentPoint();
 			CPoint MovePoint = new CPoint();
@@ -919,7 +919,7 @@ namespace RootTools
 
 
 		}
-		public void MouseWheel(object sender, MouseWheelEventArgs e)
+		public virtual void MouseWheel(object sender, MouseWheelEventArgs e)
 		{
 			if (m_KeyEvent == null)
 				return;
@@ -930,7 +930,6 @@ namespace RootTools
 			{
 				try
 				{
-
 					int lines = e.Delta * SystemInformation.MouseWheelScrollLines / 120;
 					double zoom = p_Zoom;
 
