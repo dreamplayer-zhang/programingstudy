@@ -70,7 +70,6 @@ namespace Root_WIND2
 
                         TRect rect = shape[0] as TRect;
                         CPoint ptOrigin = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
-                        //pOrigin.SetOrigin(ptOrigin, rect.MemoryRect.Right, rect.MemoryRect.Bottom);
                         pOrigin.SetOrigin(rect.MemoryRect);
 
                         break;

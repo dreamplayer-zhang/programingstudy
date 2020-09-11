@@ -135,6 +135,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\Table\DatabaseManager.cs" />
+    <Compile Include="Database\Table\Database_ConnectSession.cs" />
+    <Compile Include="Database\Table\DataViewer.cs" />
+    <Compile Include="Database\Table\Defect\Defect.cs" />
+    <Compile Include="Database\Table\Defect\DefectManager.cs" />
+    <Compile Include="Database\Table\Lotinfo.cs" />
+    <Compile Include="Database\Table\Measurement\Measurement.cs" />
+    <Compile Include="Database\Table\Measurement\MeasurementManager.cs" />
     <Compile Include="ImageToolViewer\BasicTool.cs" />
     <Compile Include="Camera\BaslerPylon\CameraBasler.cs" />
     <Compile Include="Camera\BaslerPylon\CameraBasler_UI.xaml.cs">
