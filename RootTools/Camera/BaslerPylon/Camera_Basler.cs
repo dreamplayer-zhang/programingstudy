@@ -626,8 +626,8 @@ namespace RootTools.Camera.BaslerPylon
         public string StopGrab()
         {
             GrabStop();
-            //m_cam.Parameters[PLCamera.TriggerMode].TrySetValue("Off");
-            m_cam.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.Off);
+            m_cam.Parameters[PLCamera.TriggerMode].TrySetValue("Off");
+            //m_cam.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.Off);
             return "OK"; 
         }
     }

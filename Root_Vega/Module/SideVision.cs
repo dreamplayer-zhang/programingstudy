@@ -1630,23 +1630,23 @@ namespace Root_Vega.Module
                 AxisXY axisXY = m_module.p_axisXY;
                 Axis axisZ = m_module.p_axisZ;
                 Axis axisTheta = m_module.p_axisTheta;
-                p_afs.p_dTheta = 0.0;
-                p_afs.p_strStatus = "Ready";
-                ushort usLeftHeight = 0;
-                ushort usRightHeight = 0;
+                //p_afs.p_dTheta = 0.0;
+                //p_afs.p_strStatus = "Ready";
+                int nLeftHeight = 0;
+                int nRightHeight = 0;
 
-                if (_dispatcher != null)
-                {
-                    _dispatcher.Invoke(new Action(delegate ()
-                    {
-                        p_lstLeftStepInfo.Clear();
-                        p_lstRightStepInfo.Clear();
-                    }));
-                }
+                //if (_dispatcher != null)
+                //{
+                //    _dispatcher.Invoke(new Action(delegate ()
+                //    {
+                //        p_lstLeftStepInfo.Clear();
+                //        p_lstRightStepInfo.Clear();
+                //    }));
+                //}
 
                 try
                 {
-                    m_module.SetLightByName("SIDE LADS", 30);
+                    m_module.SetLightByName("LADS", 50);
 
                     // 0. 스캔 포지션으로 Theta 돌리기
                     double dPosTheta = (int)m_eScanPos * 360000 / 4;
@@ -1660,47 +1660,54 @@ namespace Root_Vega.Module
                         return p_sInfo;
 
                     // 1.Reticle 좌측 위치로 이동
-                    p_afs.p_strStatus = "Left Side Snap...";
+                    //p_afs.p_strStatus = "Left Side Snap...";
                     if (m_module.Run(axisXY.StartMove(new RPoint(m_dLeftPosX, m_dLeftPosY)))) return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                     if (m_module.Run(axisZ.StartMove(m_dLeftPosZ))) return p_sInfo;
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
-                    cam.Grab();
-                    usLeftHeight = CalculatingHeight(img);
+                    //cam.Grab();
+                    cam.GrabOneShot();
+                    Thread.Sleep(1000);
+                    cam.StopGrab();
+                    nLeftHeight = CalculatingHeight(img);
 
                     // 2. Reticle 우측 위치로 이동
-                    p_afs.p_strStatus = "Right Side Snap...";
+                    //p_afs.p_strStatus = "Right Side Snap...";
                     if (m_module.Run(axisXY.StartMove(new RPoint(m_dRightPosX, m_dRightPosY)))) return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                     if (m_module.Run(axisZ.StartMove(m_dRightPosZ))) return p_sInfo;
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
-                    cam.Grab();
-                    usRightHeight = CalculatingHeight(img);
+                    //cam.Grab();
+                    cam.GrabOneShot();
+                    Thread.Sleep(1000);
+                    cam.StopGrab();
+                    nRightHeight = CalculatingHeight(img);
 
                     // 3. 좌우측 높이차 구하기
                     bool bThetaClockwise = true;    // Theta+ = Anticlockwise
                                                     // Theta- = Clockwise
-                    int nDiff = (int)usLeftHeight - (int)usRightHeight;
+                    int nDiff = (int)nLeftHeight - (int)nRightHeight;
                     if (nDiff < 0) bThetaClockwise = false;
 
                     // 4. Theta 돌리기
                 }
                 finally
                 {
-                    m_module.SetLightByName("SIDE LADS", 0);
+                    m_module.SetLightByName("LADS", 0);
                 }
 
                 return base.Run();
             }
 
-            unsafe ushort CalculatingHeight(ImageData img)
+            unsafe int CalculatingHeight(ImageData img)
             {
                 // variable
                 int nImgWidth = 640;
                 int nImgHeight = 102;
-                ushort usResult = 0;
-                ushort usMaxHeight = 0;
-                
+                int nResult = 0;
+                int nMaxHeight = 0;
+                double dScale = 65535.0 / nImgHeight;
+
                 // implement
                 byte* pSrc = (byte*)img.GetPtr().ToPointer();
                 for (int x = 0; x < nImgWidth; x++, pSrc++)
@@ -1713,11 +1720,12 @@ namespace Root_Vega.Module
                         nSum += *pSrcY;
                         nYSum += *pSrcY * y;
                     }
-                    usResult = (nSum != 0) ? (ushort)(nYSum / nSum) : (ushort)0;
-                    if (usResult > usMaxHeight) usMaxHeight = usResult;
+                    nResult = (nSum != 0) ? (int)(dScale * nYSum / nSum) : 0;
+                    nResult >>= 8;
+                    if (nResult > nMaxHeight) nMaxHeight = nResult;
                 }
 
-                return usMaxHeight;
+                return nMaxHeight;
             }
         }
 
