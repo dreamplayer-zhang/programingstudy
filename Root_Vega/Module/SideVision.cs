@@ -1648,6 +1648,9 @@ namespace Root_Vega.Module
                 //p_afs.p_strStatus = "Ready";
                 int nLeftHeight = 0;
                 int nRightHeight = 0;
+                int nCenterHeight = 0;
+                int nFocusHeight = 69;
+                int nVerticalPixelPerPulse = 375;
                 double dPulsePerMM = 10000;
                 double dLeftSnapPosY = m_rpCenterAxisPos.Y + (m_dReticleSizeX / 2 * dPulsePerMM) - (m_dInnerOffsetMM * dPulsePerMM);
                 double dRightSnapPosY = m_rpCenterAxisPos.Y - (m_dReticleSizeX / 2 * dPulsePerMM) + (m_dInnerOffsetMM * dPulsePerMM);
@@ -1705,6 +1708,13 @@ namespace Root_Vega.Module
                     double dScaled = nDiff * 21.125;
                     m_module.p_axisTheta.StartMove(dActualPos + dScaled);
                     m_module.p_axisTheta.m_aPos["Snap"] = (int)dScaled;
+
+                    // 5. Y축 Center 위치에서 Laser의 높이가 69(LineScan카메라 Focus가 맞는 위치)에 맞도록 X위치 찾기
+                    if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, m_rpCenterAxisPos.Y)))) return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    strRet = cam.Grab();
+                    nCenterHeight = CalculatingHeight(img);
+                    m_module.m_dMaxScorePosX = m_rpCenterAxisPos.X + (nCenterHeight - nFocusHeight) * nVerticalPixelPerPulse;
                 }
                 finally
                 {
