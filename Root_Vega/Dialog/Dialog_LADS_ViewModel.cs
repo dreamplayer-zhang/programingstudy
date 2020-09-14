@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace Root_Vega
 {
@@ -22,10 +23,24 @@ namespace Root_Vega
             set { SetProperty(ref m_treeRoot, value); }
         }
 
+        ImageViewer_ViewModel m_ImageViewerLeft = new ImageViewer_ViewModel();
+        public ImageViewer_ViewModel p_ImageViewerLeft
+        {
+            get { return m_ImageViewerLeft; }
+            set { SetProperty(ref m_ImageViewerLeft, value); }
+        }
+        ImageViewer_ViewModel m_ImageViewerRight = new ImageViewer_ViewModel();
+        public ImageViewer_ViewModel p_ImageViewerRight
+        {
+            get { return m_ImageViewerRight; }
+            set { SetProperty(ref m_ImageViewerRight, value); }
+        }
+
         public Dialog_LADS_ViewModel(SideVision vision, SideVision.Run_LADS lads)
         {
             m_Vision = vision;
             m_RunLADS = lads;
+            m_RunLADS._dispatcher = Dispatcher.CurrentDispatcher;
             p_treeRoot = new TreeRoot("LADS_ViewModel", vision.m_log);
             lads.RunTree(p_treeRoot, Tree.eMode.RegRead);
             lads.RunTree(p_treeRoot, Tree.eMode.Init);
@@ -39,18 +54,30 @@ namespace Root_Vega
             m_RunLADS.RunTree(p_treeRoot, Tree.eMode.RegWrite);
         }
 
-        void Test()
+        public void OnOkButton()
         {
-            m_Vision.p_eState = RootTools.Module.ModuleBase.eState.Run;
             m_Vision.StartRun(m_RunLADS);
             return;
         }
 
-        public RelayCommand CommandTest
+        public void OnCancelButton()
+        {
+            CloseRequested(this, new DialogCloseRequestedEventArgs(false));
+        }
+
+        public RelayCommand OkCommand
         {
             get
             {
-                return new RelayCommand(Test);
+                return new RelayCommand(OnOkButton);
+            }
+        }
+
+        public RelayCommand CancelCommand
+        {
+            get
+            {
+                return new RelayCommand(OnCancelButton);
             }
         }
     }
