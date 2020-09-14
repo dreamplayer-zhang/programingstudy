@@ -290,10 +290,6 @@
                     Style="{StaticResource BasicBtn}"
                     Margin="0,0,0,10"
                     Command="{Binding p_ImageViewer.CommandImageClear}" />
-            <Button Content="LADS Test"
-                    Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10"
-                    Command="{Binding p_ImageViewer.CommandLADSTest}"/>
         </StackPanel>
     </Grid>
 </UserControl>

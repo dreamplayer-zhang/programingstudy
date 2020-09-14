@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -567,49 +568,15 @@ namespace Root_Vega
 					int refStartXOffset = 0;
 					int refStartYOffset = 0;
 
-					foreach (var feature in currentRoi.Position.ReferenceList)
+                    #region Feature
+                    foreach (var feature in currentRoi.Position.ReferenceList)
 					{
-						//TODO : Align과 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
-						var bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
-						Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
-						var laplaceFeature = featureImage.Laplace(1);
-						//laplaceFeature.Save(@"D:\Test\feature.bmp");
-
-						CRect targetRect = new CRect(
-							new Point(feature.RoiRect.Left - (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Top - (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0),
-							new Point(feature.RoiRect.Right+ (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Bottom + (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0));
-						Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImagePattern(targetRect));
-						var laplaceSource = sourceImage.Laplace(1);
-						//laplaceSource.Save(@"D:\Test\source.bmp");
-
-						var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
-
-						int widthDiff = laplaceSource.Width - resultImage.Width;
-						int heightDiff = laplaceSource.Height - resultImage.Height;
-
-						float[,,] matches = resultImage.Data;
-
-						Point maxRelativePoint = new Point();//상대위치
-
 						bool foundFeature = false;
-						float maxScore = float.MinValue;
+						CRect targetRect;
+						Point maxRelativePoint;
+						int widthDiff, heightDiff;
+						foundFeature = FindFeature(feature, out targetRect, out maxRelativePoint, out widthDiff, out heightDiff);
 
-						for (int x = 0; x < matches.GetLength(1); x++)
-						{
-							for (int y = 0; y < matches.GetLength(0); y++)
-							{
-								if (maxScore < matches[y, x, 0] && feature.FeatureTargetScore <= matches[y, x, 0])
-								{
-									maxScore = matches[y, x, 0];
-									maxRelativePoint.X = x;
-									maxRelativePoint.Y = y;
-									foundFeature = true;
-								}
-								//matches[y, x, 0] *= 256;
-							}
-						}
-						resultImage.Data = matches;
-						//resultImage.Save(@"D:\Test\result.bmp");
 						if (foundFeature)
 						{
 							//2. feature 중심위치가 확보되면 해당 좌표를 저장
@@ -626,9 +593,11 @@ namespace Root_Vega
 							continue;//못 찾았으면 다음 Feature값으로 이동
 						}
 					}
+                    #endregion
 
-					//3. 등록된 Align Key 2개를 탐색한다. feature의 위치 정보도 참조하여 회전 보정 시에 들어갈 값을 준비해둔다
-					List<CPoint> alignKeyList = new List<CPoint>();
+                    #region Align Key
+                    //3. 등록된 Align Key 2개를 탐색한다. feature의 위치 정보도 참조하여 회전 보정 시에 들어갈 값을 준비해둔다
+                    List<CPoint> alignKeyList = new List<CPoint>();
 
 					if (currentRoi.Position.AlignList.Count == 2)
 					{
@@ -692,9 +661,10 @@ namespace Root_Vega
 					{
 						//align 탐색 성공. 좌표 보정 계산 시작
 					}
+                    #endregion
 
-					//4. 저장된 좌표를 기준으로 PatternDistX, PatternDistY만큼 더한다. 이 좌표가 Start Position이 된다
-					var startPos = new Point(standardPos.X + refStartXOffset, standardPos.Y + refStartYOffset);
+                    //4. 저장된 좌표를 기준으로 PatternDistX, PatternDistY만큼 더한다. 이 좌표가 Start Position이 된다
+                    var startPos = new Point(standardPos.X + refStartXOffset, standardPos.Y + refStartYOffset);
 					//5. Start Position에 InspAreaWidth와 InspAreaHeight만큼 더해준다. 이 좌표가 End Position이 된다
 					var endPos = new Point(startPos.X + (int)currentRoi.Strip.ParameterList[j].InspAreaWidth, startPos.Y + (int)currentRoi.Strip.ParameterList[j].InspAreaHeight);
 					//6. Start Postiion과 End Position, Inspection Offset을 이용하여 검사 영역을 생성한다. 우선은 일괄 생성을 대상으로 한다
@@ -730,6 +700,53 @@ namespace Root_Vega
 				}
 			}
 			m_Engineer.m_InspManager.StartInspection();//검사 시작!
+		}
+
+		bool FindFeature(Reference feature, out CRect targetRect, out Point maxRelativePoint, out int widthDiff, out int heightDiff)
+		{
+			//TODO : Align과 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
+			var bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
+			Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
+			var laplaceFeature = featureImage.Laplace(1);
+			//laplaceFeature.Save(@"D:\Test\feature.bmp");
+
+			targetRect = new CRect(
+				new Point(feature.RoiRect.Left - (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Top - (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0),
+				new Point(feature.RoiRect.Right + (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Bottom + (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0));
+			Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImagePattern(targetRect));
+			var laplaceSource = sourceImage.Laplace(1);
+			//laplaceSource.Save(@"D:\Test\source.bmp");
+
+			var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
+
+			widthDiff = laplaceSource.Width - resultImage.Width;
+			heightDiff = laplaceSource.Height - resultImage.Height;
+
+			float[,,] matches = resultImage.Data;
+
+			maxRelativePoint = new Point();//상대위치
+
+			bool foundFeature = false;
+			float maxScore = float.MinValue;
+
+			for (int x = 0; x < matches.GetLength(1); x++)
+			{
+				for (int y = 0; y < matches.GetLength(0); y++)
+				{
+					if (maxScore < matches[y, x, 0] && feature.FeatureTargetScore <= matches[y, x, 0])
+					{
+						maxScore = matches[y, x, 0];
+						maxRelativePoint.X = x;
+						maxRelativePoint.Y = y;
+						foundFeature = true;
+					}
+					//matches[y, x, 0] *= 256;
+				}
+			}
+			resultImage.Data = matches;
+			//resultImage.Save(@"D:\Test\result.bmp");
+
+			return foundFeature;
 		}
 
 		void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor)
@@ -884,7 +901,34 @@ namespace Root_Vega
 			}
 		}
 
+		public RelayCommand CommandSaveAutoIlluminationFeature
+		{
+			get
+			{
+				return new RelayCommand(SaveAutoIlluminationFeature);
+			}
+		}
 
+		private void SaveAutoIlluminationFeature()
+		{
+			string strFileName = "AutoIlluminationFeature.bmp";
+			string strSaveTargetPath = $"C:/Recipe/AutoIllumination/";
+			if (!Directory.Exists(strSaveTargetPath))
+			{
+				Directory.CreateDirectory(strSaveTargetPath);
+			}
+			string strFullPath = System.IO.Path.Combine(strSaveTargetPath, strFileName);
+
+			if (p_ImageViewer.m_BasicTool.m_TempRect == null) return;
+			UIElementInfo uieROI = p_ImageViewer.m_BasicTool.m_TempRect;
+			int nLeft = (int)uieROI.StartPos.X;
+			int nTop = (int)uieROI.StartPos.Y;
+			int nRight = (int)uieROI.EndPos.X;
+			int nBottom = (int)uieROI.EndPos.Y;
+
+			p_ImageViewer.p_ImageData.SaveRectImage(new CRect(nLeft, nTop, nRight, nBottom), strFullPath);
+			return;
+		}
 
 		private void ClearUI()
 		{

@@ -695,6 +695,7 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
             AddModuleRunList(new Run_Grab(this), true, "Run Grab");
             AddModuleRunList(new Run_Inspection(this), true, "Run Inspection");
+            AddModuleRunList(new Run_AutoIllumination(this), true, "Run AutoIllumination");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -977,6 +978,75 @@ namespace Root_Vega.Module
                 // DB에 Write완료될때까지 기다리는 루틴 추가해야함
 
                 return "OK";
+            }
+        }
+
+        public class Run_AutoIllumination : ModuleRunBase
+        {
+            PatternVision m_module;
+            public _2_5_MainVisionViewModel m_mvvm;
+
+            public int m_nThreshold = 0;
+
+            public Run_AutoIllumination(PatternVision module)
+            {
+                m_module = module;
+                m_mvvm = m_module.m_mvvm;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_AutoIllumination run = new Run_AutoIllumination(m_module);
+                run.m_nThreshold = m_nThreshold;
+                return run;
+            }
+
+            public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+            {
+                treeRoot.p_eMode = mode;
+                RunTree(treeRoot, true);
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_nThreshold = tree.Set(m_nThreshold, m_nThreshold, "Threshold", "Threshold", bVisible);
+            }
+
+            public override string Run()
+            {
+                // variable
+                AxisXY axisXY = m_module.p_axisXY;
+                Axis axisZ = m_module.p_axisZ;
+
+                // implement
+                // 1. Feature와 Light CAL.Key가 Scan되는 위치 Scan
+                // 2. Feature 탐색
+                // 3. 탐색된 Feature위치를 기준으로 Light Cal.Key 영역 이미지를 AutoIllumination
+                // 4. 1~3과정을 AutoIllumination으로 원하는 Threshold값이 나올때까지(조명값 변경하면서) 반복 
+
+                return "OK";
+            }
+
+            unsafe int AutoIllumination(MemoryData md, CRect rtROI)
+            {
+                // variable
+                int nSum = 0;
+                int nResult = 0;
+
+                // implement
+                byte* pSrc = (byte*)md.GetPtr(0, rtROI.Left, rtROI.Top).ToPointer();
+                for (int i = 0; i<rtROI.Height; i++)
+                {
+                    byte* pDst = pSrc + (i * md.p_sz.X);
+                    for (int j = 0; j < rtROI.Width; j++, pDst++)
+                    {
+                        nSum += *pDst;
+                    }
+                }
+                nResult = nSum / (rtROI.Width * rtROI.Height);
+
+                return nResult;
             }
         }
         #endregion
