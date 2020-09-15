@@ -18,6 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace RootTools_Vision
 {
@@ -55,7 +56,11 @@ namespace RootTools_Vision
             Timer t = new Timer(TimerCallback, null, 100, 100);
         }
 
-        private WorkManager workManager;
+        private WorkFactory vision;
+
+        private List<WorkBundle> workbundleList;
+        private List<WorkplaceBundle> workplacebundleList;
+
         private WorkBundle workbundle;
         private WorkplaceBundle workplacebundle;
 
@@ -101,31 +106,34 @@ namespace RootTools_Vision
                 MessageBox.Show(ex.Message);
             }
 
-           
+
 
             // Init WorkManager
-            this.workManager = new WorkManager(8);
-            
+            this.vision = new WorkFactory();
+
             this.workbundle = new WorkBundle();
             this.workplacebundle = new WorkplaceBundle();
-            this.workManager.ChangedWorkState += ChangedWorkState_Callback;
 
+
+            this.workbundleList = new List<WorkBundle>();
+            this.workplacebundleList = new List<WorkplaceBundle>();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (this.workManager.works.Count == 0 || this.workManager.workplaces.Count == 0)
+            if (this.workbundleList.Count == 0 || this.workbundleList.Count == 0)
                 return;
 
             int workbundleIndex = Convert.ToInt32(this.tbWorkBundleIndex.Text);
             int workplacebundleIndex = Convert.ToInt32(this.tbWorkplaceBundleIndex.Text);
-            this.workManager.SetWork(workbundleIndex, workplacebundleIndex);
-            this.workManager.SetWorkResource(m_Image.m_ptrImg, m_Image.p_Size.X, m_Image.p_Size.Y);
-
-            this.workManager.Start();
 
 
-            SetInspectionMap(this.workManager.workplaces[workplacebundleIndex].UnitSizeX, this.workManager.workplaces[workplacebundleIndex].UnitSizeY);
+            this.vision.SetBundles(this.workbundleList[workbundleIndex], this.workplacebundleList[workplacebundleIndex]);
+
+            this.vision.Start();
+
+
+            SetInspectionMap(this.workplacebundleList[workplacebundleIndex].MapSizeX, this.workplacebundleList[workplacebundleIndex].MapSizeY);
         }
 
         private void BtnRegisterWorkBundle(object sender, RoutedEventArgs e)
@@ -134,8 +142,9 @@ namespace RootTools_Vision
             {
                 return;
             }
-            this.workManager.AddWorkBundle(new WorkBundle(this.workbundle));
-
+            
+           
+            this.workbundleList.Add(workbundle.Clone());
             this.workbundle.Clear();
 
             RefeshWorkBundleStack();
@@ -144,42 +153,38 @@ namespace RootTools_Vision
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
-            this.workManager.Stop();
+            this.vision.Stop();
         }
 
         private void BtnAddPosition(object sender, RoutedEventArgs e)
         {
-            this.workbundle.Add(new Position());
+            this.workbundle.Add(new Alignment());
             RefeshWorkBundleStack();
         }
-        private void BtnAddPreInspection(object sender, RoutedEventArgs e)
-        {
-            this.workbundle.Add(new PreInspection());
-            RefeshWorkBundleStack();
-        }
+
         private void BtnAddInspectionSurface(object sender, RoutedEventArgs e)
         {
-            
             Surface surface = new Surface();
-            surface.SetData(m_Image.GetPtr(), new System.Windows.Size(m_Image.p_Size.X, m_Image.p_Size.Y), new System.Windows.Size(1000, 1000));
-            SurfaceParameter param = new SurfaceParameter();
-            param.IsDark = false;
-            param.MinSize = 5;
-            param.Threshold = 200;
-            surface.SetParameter(param);
+            //surface.SetData(m_Image.GetPtr(), new System.Windows.Size(m_Image.p_Size.X, m_Image.p_Size.Y), new System.Windows.Size(1000, 1000));
+            //SurfaceParameter param = new SurfaceParameter();
+            //param.IsDark = false;
+            //param.MinSize = 5;
+            //param.Threshold = 200;
+            //surface.SetParameter(param);
 
             this.workbundle.Add(surface);
 
             RefeshWorkBundleStack();
         }
-        private void BtnAddInspectionD2D(object sender, RoutedEventArgs e)
+        //private void BtnAddInspectionD2D(object sender, RoutedEventArgs e)
+        //{
+        //    this.workbundle.Add(new D2D());
+        //    RefeshWorkBundleStack();
+        //}
+
+        private void BtnAddProcessDefect(object sender, RoutedEventArgs e)
         {
-            this.workbundle.Add(new D2D());
-            RefeshWorkBundleStack();
-        }
-        private void BtnAddMeasurement(object sender, RoutedEventArgs e)
-        {
-            this.workbundle.Add(new Measurement());
+            this.workbundle.Add(new ProcessDefect());
             RefeshWorkBundleStack();
         }
 
@@ -214,11 +219,13 @@ namespace RootTools_Vision
 
 
             WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap, 500, 500);
-            
 
-            WorkplaceBundle workplacebundle = WorkplaceBundle.CreateWaferMap(mapInfo);
 
-            this.workManager.AddWorkplaceBundle(workplacebundle);
+            WorkplaceBundle workplacebundle = new WorkplaceBundle();
+            workplacebundle = workplacebundle.CreateWaferMap(mapInfo);
+            workplacebundle.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
+
+            this.workplacebundleList.Add(workplacebundle);
 
             this.workplacebundle.Clear();
             this.gridMap.Children.Clear();
@@ -234,39 +241,57 @@ namespace RootTools_Vision
             this.vmMapView.MapSize = new System.Windows.Point(sizeX, sizeY);
         }
 
+        SolidColorBrush brushSnap = System.Windows.Media.Brushes.LightSkyBlue;
         SolidColorBrush brushPosition = System.Windows.Media.Brushes.SkyBlue;
         SolidColorBrush brushPreInspection = System.Windows.Media.Brushes.Cornsilk;
         SolidColorBrush brushInspection = System.Windows.Media.Brushes.Gold;
         SolidColorBrush brushMeasurement = System.Windows.Media.Brushes.CornflowerBlue;
         SolidColorBrush brushComplete = System.Windows.Media.Brushes.YellowGreen;
 
-        private void ChangedWorkState_Callback(WORK_TYPE work_type, WORKER_STATE worker_state, WORKPLACE_STATE workplace_state, int indexWorkplace, System.Drawing.Point SubIndex)
+        object lockObj = new object();
+        private void ChangedWorkplaceState_Callback(object obj)
         {
-            Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            lock(lockObj)
             {
-                TextBox tb = (TextBox)this.vmMapView.CellItems[(int)(SubIndex.X + SubIndex.Y * this.vmMapView.MapSize.X)];
-                if(worker_state == WORKER_STATE.WORK_COMPLETED)
-                {
-                    tb.Background = brushComplete;
-                    return;
-                }
+                Workplace workplace = obj as Workplace;
 
-                switch (work_type)
+                //string str;
+
+                //str = string.Format("{0} {1} {2}", workplace.Index, workplace.MapPositionX, workplace.MapPositionY);
+                //MessageBox.Show(str);
+
+
+
+                Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
                 {
-                    case WORK_TYPE.Position:
-                        tb.Background = brushPosition;
-                        break;
-                    case WORK_TYPE.PreInspection:
-                        tb.Background = brushPreInspection;
-                        break;
-                    case WORK_TYPE.Inspection:
-                        tb.Background = brushInspection;
-                        break;
-                    case WORK_TYPE.Measurement:
-                        tb.Background = brushMeasurement;
-                        break;
-                }
-            }));
+
+                    int workbundleIndex = Convert.ToInt32(this.tbWorkBundleIndex.Text);
+                    int workplacebundleIndex = Convert.ToInt32(this.tbWorkplaceBundleIndex.Text);
+
+                    if (workplace.Index == 0) return;
+
+                    TextBox tb = (TextBox)this.vmMapView.CellItems[(int)(workplace.MapPositionX + workplace.MapPositionY * this.workplacebundleList[workplacebundleIndex].MapSizeX)];
+
+                    switch (workplace.STATE)
+                    {
+                        case WORKPLACE_STATE.NONE:
+                            //tb.Background = brushPosition;
+                            break;
+                        case WORKPLACE_STATE.SNAP:
+                            tb.Background = brushPreInspection;
+                            break;
+                        case WORKPLACE_STATE.READY:
+                            tb.Background = brushPosition;
+                            break;
+                        case WORKPLACE_STATE.INSPECTION:
+                            tb.Background = brushInspection;
+                            break;
+                        case WORKPLACE_STATE.DEFECTPROCESS:
+                            tb.Background = brushComplete;
+                            break;
+                    }
+                }));
+            }
         }
 
         private void BtnCreateMap(object sender, RoutedEventArgs e)
@@ -314,34 +339,13 @@ namespace RootTools_Vision
         {
             this.stackWorkBundle.Children.Clear();
 
-            foreach(IWork work in this.workbundle)
+            foreach (IWork work in this.workbundle)
             {
                 TextBox tb = new TextBox();
                 tb.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
                 tb.VerticalContentAlignment = System.Windows.VerticalAlignment.Center;
-                tb.Text = work.TYPE.ToString();
+                tb.Text = work.GetType().Name;
                 tb.Height = 20;
-                if (work.TYPE == WORK_TYPE.Position)
-                {
-                    tb.Background = System.Windows.Media.Brushes.GreenYellow;
-                    tb.Text = work.TYPE.ToString();
-                }
-                else if (work.TYPE == WORK_TYPE.PreInspection)
-                {
-                    tb.Background = System.Windows.Media.Brushes.Cornsilk;
-                    tb.Text = work.TYPE.ToString();
-                }
-                else if (work.TYPE == WORK_TYPE.Inspection)
-                {
-                    tb.Background = System.Windows.Media.Brushes.Gold;
-                    tb.Text = work.TYPE.ToString() + " : " +  ((IInspection)work).TYPE.ToString();
-                }
-                else if (work.TYPE == WORK_TYPE.Measurement)
-                {
-                    tb.Background = System.Windows.Media.Brushes.CornflowerBlue;
-                    tb.Text = work.TYPE.ToString();
-                }
-
                 this.stackWorkBundle.Children.Add(tb);
             }
         }
@@ -350,7 +354,7 @@ namespace RootTools_Vision
         {            
             this.stackListWorkBundle.Children.Clear();
 
-            for (int i = 0; i < this.workManager.works.Count; i++ )
+            for (int i = 0; i < this.workbundleList.Count; i++ )
             {
                 TextBox tb = new TextBox();
                 tb.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
@@ -368,7 +372,7 @@ namespace RootTools_Vision
         {
             this.stackListWorkplaceBundle.Children.Clear();
 
-            for (int i = 0; i < this.workManager.workplaces.Count; i++)
+            for (int i = 0; i < this.workplacebundleList.Count; i++)
             {
                 TextBox tb = new TextBox();
                 tb.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;

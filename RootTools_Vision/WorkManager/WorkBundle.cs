@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -10,15 +9,31 @@ namespace RootTools_Vision
 {
     public class WorkBundle : Collection<IWork>
     {
-        public WorkBundle()
-        {
+        private Workplace workplace;
 
+        public Workplace Workplace 
+        { 
+            get => workplace; 
+            set
+            { 
+                this.workplace = value;
+                foreach (IWork work in this)
+                {
+                    work.SetWorkplace(this.workplace);
+                }
+
+            } 
         }
 
-        public WorkBundle(WorkBundle _workbundle)
+        public WorkBundle Clone()
         {
-            foreach (IWork work in _workbundle)
-                this.Add(work);
+            WorkBundle bundle = new WorkBundle();
+            foreach(IWork work in this)
+            {
+                bundle.Add(work);
+            }
+
+            return bundle;
         }
     }
 }

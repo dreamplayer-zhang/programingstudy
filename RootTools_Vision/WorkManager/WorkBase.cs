@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    interface IMeasurement
+    public class WorkBase
     {
+        public WorkBase()
+        {
+
+        }
     }
 }

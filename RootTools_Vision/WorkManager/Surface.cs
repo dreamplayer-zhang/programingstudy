@@ -1,71 +1,48 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using RootTools_CLR;
-
+using RootTools_Vision.UserTypes;
 
 namespace RootTools_Vision
 {
-    public class Surface : Inspection, IInspection
+    public class Surface : IWork
     {
-        #region IInspection 멤버
+        int index;
+        int mapPositionX;
+        int mapPositionY;
 
-        public INSPECTION_TYPE TYPE
+        public WORK_TYPE Type => WORK_TYPE.MAINWORK;
+
+        public void DoWork()
         {
-            get { return INSPECTION_TYPE.Surface; }
+            DoInspection();
         }
 
-        #endregion
-
-        private SurfaceParameter parameter;
-
-        public Surface() { }
-
-        public Surface(SurfaceParameter parameter, out object result)
+        public void SetWorkplace(Workplace workplace)
         {
-            result = new object();
+            index = workplace.Index;
+            mapPositionX = workplace.MapPositionX;
+            mapPositionY = workplace.MapPositionY;
+
         }
 
-        public void SetParameter(IParameter _parameter)
+        public void DoInspection()
         {
-            this.parameter = (SurfaceParameter)_parameter;
-        }
-
-        public void DoInspection(Workplace workplace, out InspectionResultCollection inspectionResults) 
-        {
-            int nBufferWidth = (int)this.szInspectionBuffer.Width;
-            int nBufferHeight = (int)this.szInspectionBuffer.Height;
-
-            // Inspection Buffer는 검사 초기에 미리 할당해놓고 사용해야할수도 있음
-            byte[] InspectionBuffer = new byte[nBufferWidth * nBufferHeight];
-
-            for(int y = 0; y < nBufferHeight; y++)
+            int nCount = 8000;
+            double sum = 0;
+            for(int i = 0; i < nCount; i++)
             {
-                Marshal.Copy(
-                this.ptrImageBuffer + (int)workplace.ImagePosition.X + (y + (int)workplace.ImagePosition.Y) * (int)this.szImageBuffer.Width, // source
-                InspectionBuffer,
-                nBufferWidth * y,
-                nBufferWidth
-                );
+                for (int j = 0; j < nCount; j++)
+                {
+                    sum += Math.Log(i) * Math.Log(j);
+                }
             }
-
-            CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, nBufferWidth, nBufferHeight, this.parameter.IsDark, this.parameter.Threshold);
-
-            CLR_IP.Cpp_Morphology(InspectionBuffer, InspectionBuffer, nBufferWidth, nBufferHeight, 3, "Open", 3);
-
-            var outLabels = CLR_IP.Cpp_Labeling(InspectionBuffer, InspectionBuffer, nBufferWidth, nBufferHeight, this.parameter.IsDark);
-
-            inspectionResults = new InspectionResultCollection();
-
-            foreach (var label in outLabels)
-            {
-                //inspectionResults.Add(new InspectionResult());
-            }
-            
         }
     }
 }
