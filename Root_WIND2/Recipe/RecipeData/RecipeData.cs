@@ -10,7 +10,7 @@ namespace Root_WIND2
     /// Edit 클래스에서 파생된 데이터를 검사 데이터로 옮김.
     /// 이 클래스는 Recipe의 하부로 들어감
     /// </summary>
-    class RecipeData
+    public class RecipeData
     {
         RecipeData_Origin m_ReicpeData_Origin;
 

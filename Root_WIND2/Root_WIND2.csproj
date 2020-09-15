@@ -450,6 +450,10 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
+      <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
+      <Name>RootTools_CLR</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\EBR.PNG" />

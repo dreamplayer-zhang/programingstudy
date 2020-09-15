@@ -11,7 +11,7 @@ namespace Root_WIND2
     /// Recipe 각 항목의 묶음.
     /// Recipe에 대한 기능 자체는 Manager에서 다룸.
     /// </summary>
-    class Recipe
+    public class Recipe
     {
         // ORIGIN, Die Pitch
         // WAFER MAP

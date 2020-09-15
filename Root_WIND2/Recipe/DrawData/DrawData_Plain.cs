@@ -18,7 +18,7 @@ namespace Root_WIND2
         D2D,
     }
 
-    class DrawData_Plain
+    public class DrawData_Plain
     {
         int m_nRoiNumber;
         PLAIN_TYPE m_PlainType;
@@ -29,6 +29,11 @@ namespace Root_WIND2
             m_nRoiNumber = _nRoiNumber;
             m_PlainType = _plaintype;
             m_Object = basicShapes;
+        }
+
+        public List<TShape> GetObject()
+        {
+            return m_Object;
         }
 
         public PLAIN_TYPE GetPlainType()

@@ -94,7 +94,7 @@
                     <Button Content="Image Clear" DockPanel.Dock="Top" Command="{Binding ClearImage}" Width="150"/>
                     <Button Content="ROI Clear" DockPanel.Dock="Top" Command="{Binding Clear}" Width="150"/>
                     <Button Content="Save(ROI->Recipe)" DockPanel.Dock="Top" Width="150" Click="Button_Click"/>
-                    <Button Content="TEST" DockPanel.Dock="Top" Width="150"/>
+                    <Button Content="Inspection Test" Width="150" Click="Button_Click_1"/>
                 </StackPanel>
                 <tools:ImageToolViewer/>
             </DockPanel>
