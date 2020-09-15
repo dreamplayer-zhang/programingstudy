@@ -251,6 +251,7 @@ namespace Root_Vega.Module
             Grab,
             Ready,
             Align,
+            LADS,
         }
 
         public enum eAxisPosX
@@ -1565,6 +1566,12 @@ namespace Root_Vega.Module
                 get { return m_lstRightStepInfo; }
                 set { SetProperty(ref m_lstRightStepInfo, value); }
             }
+            ObservableCollection<CStepInfo> m_lstCenterStepInfo;
+            public ObservableCollection<CStepInfo> p_lstCenterStepInfo
+            {
+                get { return m_lstCenterStepInfo; }
+                set { SetProperty(ref m_lstCenterStepInfo, value); }
+            }
 
             BitmapSource m_bmpSrcLeftViewer;
             public BitmapSource p_bmpSrcLeftViewer
@@ -1580,6 +1587,13 @@ namespace Root_Vega.Module
                 set { SetProperty(ref m_bmpSrcRightViewer, value); }
             }
 
+            BitmapSource m_bmpSrcCenterViewer;
+            public BitmapSource p_bmpSrcCenterViewer
+            {
+                get { return m_bmpSrcCenterViewer; }
+                set { SetProperty(ref m_bmpSrcCenterViewer, value); }
+            }
+
             CAutoFocusStatus m_afs;
             public CAutoFocusStatus p_afs
             {
@@ -1593,11 +1607,7 @@ namespace Root_Vega.Module
             public double m_dReticleSizeX = 150;    // 단위 mm
             public double m_dInnerOffsetMM = 25;    // 단위 mm
 
-            public double m_dLeftPosX = 0.0;
-            public double m_dLeftPosY = 0.0;
             public double m_dLeftPosZ = 0.0;
-            public double m_dRightPosX = 0.0;
-            public double m_dRightPosY = 0.0;
             public double m_dRightPosZ = 0.0;
             public eScanPos m_eScanPos = eScanPos.Bottom;
             public bool m_bFindXPos = false;
@@ -1608,6 +1618,7 @@ namespace Root_Vega.Module
                 InitModuleRun(module);
                 p_lstLeftStepInfo = new ObservableCollection<CStepInfo>();
                 p_lstRightStepInfo = new ObservableCollection<CStepInfo>();
+                p_lstCenterStepInfo = new ObservableCollection<CStepInfo>();
                 p_afs = new CAutoFocusStatus(0.0, "Ready");
             }
 
@@ -1619,11 +1630,7 @@ namespace Root_Vega.Module
                 run.m_dReticleSizeX = m_dReticleSizeX;
                 run.m_dInnerOffsetMM = m_dInnerOffsetMM;
 
-                run.m_dLeftPosX = m_dLeftPosX;
-                run.m_dLeftPosY = m_dLeftPosY;
                 run.m_dLeftPosZ = m_dLeftPosZ;
-                run.m_dRightPosX = m_dRightPosX;
-                run.m_dRightPosY = m_dRightPosY;
                 run.m_dRightPosZ = m_dRightPosZ;
                 run.m_eScanPos = m_eScanPos;
                 run.m_bFindXPos = m_bFindXPos;
@@ -1642,11 +1649,7 @@ namespace Root_Vega.Module
                 m_dRes = tree.Set(m_dRes, m_dRes, "Cam Resolution", "Resolution  um", bVisible);
                 m_dReticleSizeX = tree.Set(m_dReticleSizeX, m_dReticleSizeX, "Reticle Size X", "Reticle Size X (mm)", bVisible);
                 m_dInnerOffsetMM = tree.Set(m_dInnerOffsetMM, m_dInnerOffsetMM, "Inner Offset X", "Inner Offset X (mm)", bVisible);
-                m_dLeftPosX = tree.Set(m_dLeftPosX, m_dLeftPosX, "Left X Position", "Left Start X Position", bVisible);
-                m_dLeftPosY = tree.Set(m_dLeftPosY, m_dLeftPosY, "Left Y Position", "Left Start Y Position", bVisible);
                 m_dLeftPosZ = tree.Set(m_dLeftPosZ, m_dLeftPosZ, "Left Z Position", "Left Start Z Position", bVisible);
-                m_dRightPosX = tree.Set(m_dRightPosX, m_dRightPosX, "Right X Position", "Right Start X Position", bVisible);
-                m_dRightPosY = tree.Set(m_dRightPosY, m_dRightPosY, "Right Y Position", "Right Start Y Position", bVisible);
                 m_dRightPosZ = tree.Set(m_dRightPosZ, m_dRightPosZ, "Right Z Position", "Right Start Z Position", bVisible);
                 m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
                 m_bFindXPos = tree.Set(m_bFindXPos, m_bFindXPos, "Find X Position Again", "Find X Position Again", bVisible);
@@ -1678,6 +1681,7 @@ namespace Root_Vega.Module
                     {
                         p_lstLeftStepInfo.Clear();
                         p_lstRightStepInfo.Clear();
+                        p_lstCenterStepInfo.Clear();
                     }));
                 }
 
@@ -1698,7 +1702,7 @@ namespace Root_Vega.Module
 
                     // 1.Reticle 좌측 위치로 이동
                     p_afs.p_strStatus = "Left Side Snap...";
-                    if (m_module.Run(axisXY.StartMove(new RPoint(m_dLeftPosX, dLeftSnapPosY)))) return p_sInfo;
+                    if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dLeftSnapPosY)))) return p_sInfo;
                     if (m_module.Run(axisZ.StartMove(m_dLeftPosZ))) return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
@@ -1710,7 +1714,7 @@ namespace Root_Vega.Module
                     {
                         _dispatcher.Invoke(new Action(delegate ()
                         {
-                            string strTemp = "Left Laser Image";
+                            string strTemp = String.Format("Left Laser Height = {0}", nLeftHeight);
                             BitmapSource bmpSrc = GetBitmapSource(bmpLeft);
                             p_bmpSrcLeftViewer = bmpSrc;
                             p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
@@ -1719,8 +1723,9 @@ namespace Root_Vega.Module
 
                     // 2. Reticle 우측 위치로 이동
                     p_afs.p_strStatus = "Right Side Snap...";
-                    if (m_module.Run(axisXY.StartMove(new RPoint(m_dRightPosX, dRightSnapPosY)))) return p_sInfo;
-                    if (m_module.Run(axisZ.StartMove(m_dRightPosZ))) return p_sInfo;
+                    if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dRightSnapPosY)))) return p_sInfo;
+                    double dPosZ = axisZ.GetPosValue(eAxisPosZ.LADS);
+                    if (m_module.Run(axisZ.StartMove(dPosZ))) return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
                     strRet = cam.Grab();
@@ -1731,14 +1736,14 @@ namespace Root_Vega.Module
                     {
                         _dispatcher.Invoke(new Action(delegate ()
                         {
-                            string strTemp = "Right Laser Image";
+                            string strTemp = String.Format("Right Laser Height = {0}", nRightHeight);
                             BitmapSource bmpSrc = GetBitmapSource(bmpRight);
                             p_bmpSrcRightViewer = bmpSrc;
                             p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
                         }));
                     }
 
-                    // 3. 좌우측 높이차 구하기
+                    // 3. 좌우측 높이차 구하기   - 정확한 Resolution 알아서 다시 구해야 함.
                     bool bThetaClockwise = true;    // Theta+ = Anticlockwise
                                                     // Theta- = Clockwise
                     int nDiff = (int)nLeftHeight - (int)nRightHeight;
@@ -1750,13 +1755,43 @@ namespace Root_Vega.Module
                     m_module.p_axisTheta.StartMove(dActualPos + dScaled);
                     m_module.p_axisTheta.m_aPos["Snap"] = (int)dScaled;
 
-                    // 5. Y축 Center 위치에서 Laser의 높이가 69(LineScan카메라 Focus가 맞는 위치)에 맞도록 X위치 찾기
+                    // 5. Y축 Center 위치에서 Laser의 높이가 67(LineScan카메라 Focus가 맞는 위치)에 맞도록 X위치 찾기
+                    p_afs.p_strStatus = "Center Snap...";
                     if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, m_rpCenterAxisPos.Y)))) return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                     strRet = cam.Grab();
-                    img.SaveImageSync($"D:/Test3.bmp");
                     nCenterHeight = CalculatingHeight(img);
+                    System.Drawing.Bitmap bmpCenter = null;
+                    bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    if (_dispatcher != null)
+                    {
+                        _dispatcher.Invoke(new Action(delegate ()
+                        {
+                            string strTemp = String.Format("Center Laser Height = {0}", nCenterHeight);
+                            BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
+                            p_bmpSrcCenterViewer = bmpSrc;
+                            p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                        }));
+                    }
                     m_module.m_dMaxScorePosX = m_rpCenterAxisPos.X + (nCenterHeight - nFocusHeight) * nVerticalPixelPerPulse;
+
+                    // 6. 찾은 위치로 이동해서 한번 더 촬영
+                    if (m_module.Run(axisXY.StartMove(new RPoint(m_module.m_dMaxScorePosX, m_rpCenterAxisPos.Y)))) return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    strRet = cam.Grab();
+                    nCenterHeight = CalculatingHeight(img);
+                    bmpCenter = null;
+                    bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    if (_dispatcher != null)
+                    {
+                        _dispatcher.Invoke(new Action(delegate ()
+                        {
+                            string strTemp = String.Format("Center Laser Height = {0}", nCenterHeight);
+                            BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
+                            p_bmpSrcCenterViewer = bmpSrc;
+                            p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                        }));
+                    }
                 }
                 finally
                 {

@@ -19,6 +19,11 @@ namespace Root_Vega
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
         SideVision m_Vision;
         SideVision.Run_LADS m_RunLADS;
+        public SideVision.Run_LADS p_RunLADS
+        {
+            get { return m_RunLADS; }
+            set { SetProperty(ref m_RunLADS, value); }
+        }
         TreeRoot m_treeRoot = null;
         public TreeRoot p_treeRoot
         {
@@ -37,6 +42,12 @@ namespace Root_Vega
             get { return m_strRightSelectedInfo; }
             set { SetProperty(ref m_strRightSelectedInfo, value); }
         }
+        string m_strCenterSelectedInfo;
+        public string p_strCenterSelectedInfo
+        {
+            get { return m_strCenterSelectedInfo; }
+            set { SetProperty(ref m_strCenterSelectedInfo, value); }
+        }
         BitmapSource m_bmpSrcLeftViewer;
         public BitmapSource p_bmpSrcLeftViewer
         {
@@ -48,6 +59,12 @@ namespace Root_Vega
         {
             get { return m_bmpSrcRightViewer; }
             set { SetProperty(ref m_bmpSrcRightViewer, value); }
+        }
+        BitmapSource m_bmpSrcCenterViewer;
+        public BitmapSource p_bmpSrcCenterViewer
+        {
+            get { return m_bmpSrcCenterViewer; }
+            set { SetProperty(ref m_bmpSrcCenterViewer, value); }
         }
 
         Visibility m_eLeftViewerVisibility = Visibility.Collapsed;
@@ -62,6 +79,12 @@ namespace Root_Vega
         {
             get { return m_eRightViewerVisibility; }
             set { SetProperty(ref m_eRightViewerVisibility, value); }
+        }
+        Visibility m_eCenterViewerVisibility = Visibility.Collapsed;
+        public Visibility p_eCenterViewerVisibility
+        {
+            get { return m_eCenterViewerVisibility; }
+            set { SetProperty(ref m_eCenterViewerVisibility, value); }
         }
         SideVision.CAutoFocusStatus m_afs;
         public SideVision.CAutoFocusStatus p_afs
@@ -81,29 +104,25 @@ namespace Root_Vega
             get { return m_lstRightStepInfo; }
             set { SetProperty(ref m_lstRightStepInfo, value); }
         }
-        ImageViewer_ViewModel m_ImageViewerLeft = new ImageViewer_ViewModel();
-        public ImageViewer_ViewModel p_ImageViewerLeft
+        ObservableCollection<SideVision.CStepInfo> m_lstCenterStepInfo;
+        public ObservableCollection<SideVision.CStepInfo> p_lstCenterStepInfo
         {
-            get { return m_ImageViewerLeft; }
-            set { SetProperty(ref m_ImageViewerLeft, value); }
+            get { return m_lstCenterStepInfo; }
+            set { SetProperty(ref m_lstCenterStepInfo, value); }
         }
-        ImageViewer_ViewModel m_ImageViewerRight = new ImageViewer_ViewModel();
-        public ImageViewer_ViewModel p_ImageViewerRight
-        {
-            get { return m_ImageViewerRight; }
-            set { SetProperty(ref m_ImageViewerRight, value); }
-        }
-
+        
         public Dialog_LADS_ViewModel(SideVision vision, SideVision.Run_LADS lads)
         {
             m_Vision = vision;
-            m_RunLADS = lads;
-            m_RunLADS._dispatcher = Dispatcher.CurrentDispatcher;
+            p_RunLADS = lads;
+            p_RunLADS._dispatcher = Dispatcher.CurrentDispatcher;
             p_lstLeftStepInfo = lads.p_lstLeftStepInfo;
             p_lstRightStepInfo = lads.p_lstRightStepInfo;
+            p_lstCenterStepInfo = lads.p_lstCenterStepInfo;
             p_afs = lads.p_afs;
             p_bmpSrcLeftViewer = lads.p_bmpSrcLeftViewer;
             p_bmpSrcRightViewer = lads.p_bmpSrcRightViewer;
+            p_bmpSrcCenterViewer = lads.p_bmpSrcCenterViewer;
             p_treeRoot = new TreeRoot("LADS_ViewModel", vision.m_log);
             lads.RunTree(p_treeRoot, Tree.eMode.RegRead);
             lads.RunTree(p_treeRoot, Tree.eMode.Init);
@@ -112,14 +131,14 @@ namespace Root_Vega
 
         private void M_treeRoot_UpdateTree()
         {
-            m_RunLADS.RunTree(p_treeRoot, Tree.eMode.Update);
-            m_RunLADS.RunTree(p_treeRoot, Tree.eMode.Init);
-            m_RunLADS.RunTree(p_treeRoot, Tree.eMode.RegWrite);
+            p_RunLADS.RunTree(p_treeRoot, Tree.eMode.Update);
+            p_RunLADS.RunTree(p_treeRoot, Tree.eMode.Init);
+            p_RunLADS.RunTree(p_treeRoot, Tree.eMode.RegWrite);
         }
 
         public void OnOkButton()
         {
-            m_Vision.StartRun(m_RunLADS);
+            m_Vision.StartRun(p_RunLADS);
             return;
         }
 
@@ -158,6 +177,21 @@ namespace Root_Vega
             return;
         }
 
+        public void OnCenterDoubleClick(object obj)
+        {
+            if (obj != null)
+            {
+                SideVision.CStepInfo si = (SideVision.CStepInfo)obj;
+                p_bmpSrcCenterViewer = si.p_img;
+                p_strCenterSelectedInfo = si.p_strInfo;
+            }
+
+            if (p_eCenterViewerVisibility == Visibility.Collapsed) p_eCenterViewerVisibility = Visibility.Visible;
+            else p_eCenterViewerVisibility = Visibility.Collapsed;
+
+            return;
+        }
+
         public RelayCommandWithParameter LeftSideDoubleClick
         {
             get
@@ -171,6 +205,14 @@ namespace Root_Vega
             get
             {
                 return new RelayCommandWithParameter(OnRightSideDoubleClick);
+            }
+        }
+
+        public RelayCommandWithParameter CenterDoubleClick
+        {
+            get
+            {
+                return new RelayCommandWithParameter(OnCenterDoubleClick);
             }
         }
 
