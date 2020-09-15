@@ -1566,6 +1566,20 @@ namespace Root_Vega.Module
                 set { SetProperty(ref m_lstRightStepInfo, value); }
             }
 
+            BitmapSource m_bmpSrcLeftViewer;
+            public BitmapSource p_bmpSrcLeftViewer
+            {
+                get { return m_bmpSrcLeftViewer; }
+                set { SetProperty(ref m_bmpSrcLeftViewer, value); }
+            }
+
+            BitmapSource m_bmpSrcRightViewer;
+            public BitmapSource p_bmpSrcRightViewer
+            {
+                get { return m_bmpSrcRightViewer; }
+                set { SetProperty(ref m_bmpSrcRightViewer, value); }
+            }
+
             CAutoFocusStatus m_afs;
             public CAutoFocusStatus p_afs
             {
@@ -1592,6 +1606,9 @@ namespace Root_Vega.Module
             {
                 m_module = module;
                 InitModuleRun(module);
+                p_lstLeftStepInfo = new ObservableCollection<CStepInfo>();
+                p_lstRightStepInfo = new ObservableCollection<CStepInfo>();
+                p_afs = new CAutoFocusStatus(0.0, "Ready");
             }
 
             public override ModuleRunBase Clone()
@@ -1644,25 +1661,25 @@ namespace Root_Vega.Module
                 AxisXY axisXY = m_module.p_axisXY;
                 Axis axisZ = m_module.p_axisZ;
                 Axis axisTheta = m_module.p_axisTheta;
-                //p_afs.p_dTheta = 0.0;
-                //p_afs.p_strStatus = "Ready";
+                p_afs.p_dTheta = 0.0;
+                p_afs.p_strStatus = "Ready";
                 int nLeftHeight = 0;
                 int nRightHeight = 0;
                 int nCenterHeight = 0;
-                int nFocusHeight = 69;
+                int nFocusHeight = 67;
                 int nVerticalPixelPerPulse = 375;
                 double dPulsePerMM = 10000;
                 double dLeftSnapPosY = m_rpCenterAxisPos.Y + (m_dReticleSizeX / 2 * dPulsePerMM) - (m_dInnerOffsetMM * dPulsePerMM);
                 double dRightSnapPosY = m_rpCenterAxisPos.Y - (m_dReticleSizeX / 2 * dPulsePerMM) + (m_dInnerOffsetMM * dPulsePerMM);
 
-                //if (_dispatcher != null)
-                //{
-                //    _dispatcher.Invoke(new Action(delegate ()
-                //    {
-                //        p_lstLeftStepInfo.Clear();
-                //        p_lstRightStepInfo.Clear();
-                //    }));
-                //}
+                if (_dispatcher != null)
+                {
+                    _dispatcher.Invoke(new Action(delegate ()
+                    {
+                        p_lstLeftStepInfo.Clear();
+                        p_lstRightStepInfo.Clear();
+                    }));
+                }
 
                 try
                 {
@@ -1680,22 +1697,46 @@ namespace Root_Vega.Module
                         return p_sInfo;
 
                     // 1.Reticle 좌측 위치로 이동
-                    //p_afs.p_strStatus = "Left Side Snap...";
+                    p_afs.p_strStatus = "Left Side Snap...";
                     if (m_module.Run(axisXY.StartMove(new RPoint(m_dLeftPosX, dLeftSnapPosY)))) return p_sInfo;
                     if (m_module.Run(axisZ.StartMove(m_dLeftPosZ))) return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
                     string strRet = cam.Grab();
                     nLeftHeight = CalculatingHeight(img);
+                    System.Drawing.Bitmap bmpLeft = null;
+                    bmpLeft = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    if (_dispatcher != null)
+                    {
+                        _dispatcher.Invoke(new Action(delegate ()
+                        {
+                            string strTemp = "Left Laser Image";
+                            BitmapSource bmpSrc = GetBitmapSource(bmpLeft);
+                            p_bmpSrcLeftViewer = bmpSrc;
+                            p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                        }));
+                    }
 
                     // 2. Reticle 우측 위치로 이동
-                    //p_afs.p_strStatus = "Right Side Snap...";
+                    p_afs.p_strStatus = "Right Side Snap...";
                     if (m_module.Run(axisXY.StartMove(new RPoint(m_dRightPosX, dRightSnapPosY)))) return p_sInfo;
                     if (m_module.Run(axisZ.StartMove(m_dRightPosZ))) return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
                     strRet = cam.Grab();
                     nRightHeight = CalculatingHeight(img);
+                    System.Drawing.Bitmap bmpRight = null;
+                    bmpRight = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    if (_dispatcher != null)
+                    {
+                        _dispatcher.Invoke(new Action(delegate ()
+                        {
+                            string strTemp = "Right Laser Image";
+                            BitmapSource bmpSrc = GetBitmapSource(bmpRight);
+                            p_bmpSrcRightViewer = bmpSrc;
+                            p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                        }));
+                    }
 
                     // 3. 좌우측 높이차 구하기
                     bool bThetaClockwise = true;    // Theta+ = Anticlockwise
@@ -1713,6 +1754,7 @@ namespace Root_Vega.Module
                     if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, m_rpCenterAxisPos.Y)))) return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                     strRet = cam.Grab();
+                    img.SaveImageSync($"D:/Test3.bmp");
                     nCenterHeight = CalculatingHeight(img);
                     m_module.m_dMaxScorePosX = m_rpCenterAxisPos.X + (nCenterHeight - nFocusHeight) * nVerticalPixelPerPulse;
                 }
@@ -1750,6 +1792,19 @@ namespace Root_Vega.Module
                 }
 
                 return nMaxHeight;
+            }
+
+            private BitmapSource GetBitmapSource(System.Drawing.Bitmap bitmap)
+            {
+                BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap
+                (
+                    bitmap.GetHbitmap(),
+                    IntPtr.Zero,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions()
+                );
+
+                return bitmapSource;
             }
         }
         #endregion

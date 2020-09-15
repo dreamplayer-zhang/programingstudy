@@ -82,17 +82,15 @@
             </Border>
             <Grid Grid.Column="0"
                   Grid.Row="1">
-                <tools:ImageViewer Height="{PriorityBinding}"
-                                   Width="{PriorityBinding}"
-                                   DataContext="{Binding p_ImageViewerLeft}" 
-                                   Margin="10,10,10,10"></tools:ImageViewer>
+                <Image Stretch="Fill" 
+                       Source="{Binding p_bmpSrcLeftViewer}">
+                </Image>
             </Grid>
             <Grid Grid.Column="1"
                   Grid.Row="1">
-                <tools:ImageViewer Height="{PriorityBinding}"
-                                   Width="{PriorityBinding}"
-                                   DataContext="{Binding p_ImageViewerRight}" 
-                                   Margin="10,10,10,10"></tools:ImageViewer>
+                <Image Stretch="Fill" 
+                       Source="{Binding p_bmpSrcRightViewer}">
+                </Image>
             </Grid>
             <Border Grid.Column="0"
                     Grid.Row="2"
