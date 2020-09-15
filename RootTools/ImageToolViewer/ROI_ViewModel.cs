@@ -141,6 +141,8 @@ namespace RootTools
         public override void PreviewMouseDown(object sender, MouseEventArgs e)
         {
             base.PreviewMouseDown(sender, e);
+            if (m_KeyEvent == null)
+                return;
             if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
                 return;
             CPoint CanvasPt= new CPoint(p_MouseX, p_MouseY);
@@ -377,13 +379,14 @@ namespace RootTools
         private void CanvasRect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             //Ctrl키로 클릭해야 복수선택되게
-            //선택은 항상 한개만
+            //선택은 항상 한개만?
             //foreach(TShape shape in Shapes)
             //{
             //    int cnt = 0;
             //    if (shape.isSelected)
             //        cnt++;
             //}
+
             TRect rect = (sender as Rectangle).Tag as TRect;
             Debug.WriteLine("Rect Mouse Left Donw : " + rect.UIElement.GetHashCode());
             if (rect.isSelected)

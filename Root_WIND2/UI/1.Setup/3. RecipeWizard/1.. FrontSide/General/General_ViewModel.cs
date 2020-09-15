@@ -221,6 +221,8 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     p_cInspMethod.Remove(p_selectedMethod);
+                    if (p_cInspMethod.Count == 0)
+                        return;
                     p_selectedMethod = p_cInspMethod.Last();
                     //InspMethodRefresh();
                 });

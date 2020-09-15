@@ -126,16 +126,21 @@
                 <StackPanel Orientation="Horizontal"
                             Margin="0,0,3,0"
                             HorizontalAlignment="Right">
-                    <Button Content="Snap"
-                            Width="170"
-                            Height="35"
-                            Margin="0"
-                            Style="{StaticResource SetupPanelBtn}"/>
-                    <Button Content="Set Origin"
+                    <Button Content="Load Image"
                             Width="170"
                             Height="35"
                             Margin="10,0,0,0"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
+                    <Button Content="Clear Image"
+                            Width="170"
+                            Height="35"
+                            Margin="10,0,0,0"
+                            Style="{StaticResource PanelBtn}"/>
+                    <Button Content="Snap"
+                            Width="170"
+                            Height="35"
+                            Margin="10,0,0,0"
+                            Style="{StaticResource PanelBtn}"/>
                 </StackPanel>        
                 <StackPanel Grid.Column="1"
                             Margin="0,0,1,0"
@@ -145,12 +150,12 @@
                             Width="170"
                             Height="35"
                             Margin="0,0,0,0"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Clear"
                             Width="170"
                             Height="35"
                             Margin="10,0,0,0"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                 </StackPanel>
 
             </Grid>

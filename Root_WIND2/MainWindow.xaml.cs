@@ -144,11 +144,11 @@ namespace Root_WIND2
             viewer.p_ROI_VM = new ROI_ViewModel(m_Image, dialogService);
             panel.DataContext = viewer.p_ROI_VM;
 
-            
-            //InitUI();
-            //InitTimer();
 
-            
+            InitUI();
+            InitTimer();
+
+
             m_RecipeMGR = new RecipeManager();
             //RecipeEditor editor = m_RecipeMGR.m_Recipe.GetRecipeEditor();
         }

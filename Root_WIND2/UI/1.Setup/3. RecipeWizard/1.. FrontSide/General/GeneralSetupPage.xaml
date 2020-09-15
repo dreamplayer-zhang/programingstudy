@@ -145,7 +145,7 @@
                                     </StackPanel>
                                 </ScrollViewer>
                             </GroupBox>
-                            <GroupBox Header="Parameter" Grid.Row="2"
+                            <GroupBox Header="Method Spec" Grid.Row="2"
                                   Background="{StaticResource GroupBoxBackground}">
                                 <GroupBox.Resources>
                                     <local:PropertyConverter x:Key="PropertyConverter"/>

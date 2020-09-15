@@ -241,7 +241,7 @@
                                                 </Grid>
                                                 <Button Content="Search" Margin="0,12,0,0"
                                                 Height="30"
-                                                Style="{StaticResource SetupPanelBtn}"/>
+                                                Style="{StaticResource PanelBtn}"/>
                                             </StackPanel>
                                         </StackPanel>
                                     </Grid>

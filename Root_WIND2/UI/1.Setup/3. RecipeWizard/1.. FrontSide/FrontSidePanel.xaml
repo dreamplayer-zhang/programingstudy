@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Root_WIND2.EdgePanel"
+﻿<UserControl x:Class="Root_WIND2.FrontSidePanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -14,24 +14,24 @@
         <Border BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
             <Grid>
                 <StackPanel Margin="0,10,0,0">
-                    <Button Content="Edge Summary"
-                            Style="{StaticResource SetupPanelBtn}"
-                            Command="{Binding btnEdgeSummary}"/>
-                    <Button Content="Illumination"
-                            Command="{Binding btnEdgeIllum}"
-                            Style="{StaticResource SetupPanelBtn}"/>
-                    <Button Content="Upload Image"
-                            Command="{Binding btnEdgeUpload}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                    <Button Content="FrontSide Summary"
+                            Command="{Binding btnFrontSummary}"
+                            Style="{StaticResource PanelBtn}"/>
+                    <Button Content="Alignment"
+                            Command="{Binding btnFrontAlignment}"
+                            Style="{StaticResource PanelBtn}"/>
+                    <Button Content="General"
+                            Command="{Binding btnFrontGeneral}"
+                            Style="{StaticResource PanelBtn}"/>
                 </StackPanel>
                 <Button Content="Back"
                         Command="{Binding btnBack}"
                         VerticalAlignment="Bottom"
-                        Style="{StaticResource SetupPanelBtn}"/>
+                        Style="{StaticResource PanelBtn}"/>
             </Grid>
         </Border>
         <Grid Grid.Column="1" x:Name="SubPanel">
-            <TextBlock Text="Edge Panel"/>
+
         </Grid>
 
 

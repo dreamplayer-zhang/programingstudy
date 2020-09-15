@@ -10,12 +10,12 @@
         <StackPanel>
             <Grid Height="883">
                 <material:MaterialDateDisplay Margin="20,20" FontFamily="Arial"/>
-                <TextBlock Text="," Margin="177,37"
+                <TextBlock Text="," Margin="190,37"
                        VerticalAlignment="Top"
                        HorizontalAlignment="Left"
                        FontSize="30"
                        FontWeight="Normal"/>
-                <TextBlock Text="00:00:00" Margin="189,37"
+                <TextBlock Text="00:00:00" Margin="203,37"
                        VerticalAlignment="Top"
                        HorizontalAlignment="Left"
                        FontSize="30"

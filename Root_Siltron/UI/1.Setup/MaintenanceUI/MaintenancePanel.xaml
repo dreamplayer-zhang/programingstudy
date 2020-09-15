@@ -17,16 +17,16 @@
 
                 <StackPanel>
                     <Button Content="Handler"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Axis"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Camera"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
 
                 </StackPanel>
                 <Button Content="Back"
                         Command="{Binding btnMaintBack}"
-                        Style="{StaticResource SetupPanelBtn}"
+                        Style="{StaticResource PanelBtn}"
                         VerticalAlignment="Bottom"/>
             </Grid>
         </Border>

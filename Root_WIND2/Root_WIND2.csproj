@@ -91,11 +91,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. BackSide\BackSideSetupPage.xaml.cs">
+      <DependentUpon>BackSideSetupPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Icons\Calendar.xaml.cs">
       <DependentUpon>Calendar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\UserControl\DateTimePicker.xaml.cs">
       <DependentUpon>DateTimePicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\3. Edge\EdgeSetupPage.xaml.cs">
+      <DependentUpon>EdgeSetupPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\4. EBR\EBRSetupPage.xaml.cs">
+      <DependentUpon>EBRSetupPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoWafer.cs" />
     <Compile Include="IWTRChild.cs" />
@@ -131,38 +140,34 @@
     <Compile Include="UI\2. Review\Review.xaml.cs">
       <DependentUpon>Review.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\3. BackSide\BackSide_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. BackSide\BackSide_ViewModel.cs" />
     <Compile Include="UI\1.Setup\3. RecipeWizard\4. EBR\EBR_ViewModel.cs" />
-    <Compile Include="UI\1.Setup\3. RecipeWizard\5. Edge\Edge_ViewModel.cs" />
-    <Compile Include="UI\1.Setup\3. RecipeWizard\1. PreAlign\PreAlign_ViewModel.cs" />
-    <Compile Include="UI\1.Setup\3. RecipeWizard\1. PreAlign\PreAlignPanel.xaml.cs">
-      <DependentUpon>PreAlignPanel.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UI\1.Setup\3. RecipeWizard\3. Edge\Edge_ViewModel.cs" />
     <Compile Include="UI\1.Setup\2. Inspection\Inspection_ViewModel.cs" />
     <Compile Include="UI\1.Setup\1. Home\Home_ViewModel.cs" />
     <Compile Include="UI\1.Setup\5. GEM\GEM_ViewModel.cs" />
     <Compile Include="UI\1.Setup\4. Maintenance\Maintenance_ViewModel.cs" />
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\Alignment_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\Alignment_ViewModel.cs" />
     <Compile Include="UI\1.Setup\3. RecipeWizard\RecipeWizard_ViewModel.cs" />
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\FrontSide_ViewModel.cs" />
-    <Compile Include="UI\1.Setup\3. RecipeWizard\3. BackSide\BackSidePanel.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\FrontSide_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\2. BackSide\BackSidePanel.xaml.cs">
       <DependentUpon>BackSidePanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1.Setup\3. RecipeWizard\4. EBR\EBRPanel.xaml.cs">
       <DependentUpon>EBRPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\5. Edge\EdgePanel.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\3. Edge\EdgePanel.xaml.cs">
       <DependentUpon>EdgePanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\FrontSummaryPage.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\FrontSummaryPage.xaml.cs">
       <DependentUpon>FrontSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\FrontSidePanel.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\FrontSidePanel.xaml.cs">
       <DependentUpon>FrontSidePanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="MVVM\Converter.cs" />
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\General_ViewModel.cs" />
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentMapPage.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\General\General_ViewModel.cs" />
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentMapPage.xaml.cs">
       <DependentUpon>AlignmentMapPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Button\NaviBtn.xaml.cs">
@@ -179,19 +184,19 @@
     <Compile Include="Controls\Icons\AtiLogo.xaml.cs">
       <DependentUpon>AtiLogo.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentOriginPage.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentOriginPage.xaml.cs">
       <DependentUpon>AlignmentOriginPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentPositionPage.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentPositionPage.xaml.cs">
       <DependentUpon>AlignmentPositionPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1.Setup\5. GEM\GEMPanel.xaml.cs">
       <DependentUpon>GEMPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralMaskPage.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\General\GeneralMaskPage.xaml.cs">
       <DependentUpon>GeneralMaskPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralSetupPage.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\General\GeneralSetupPage.xaml.cs">
       <DependentUpon>GeneralSetupPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1.Setup\1. Home\HomePanel.xaml.cs">
@@ -200,19 +205,19 @@
     <Compile Include="UI\1.Setup\1. Home\HomeSummaryPage.xaml.cs">
       <DependentUpon>HomeSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentPanel.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentPanel.xaml.cs">
       <DependentUpon>AlignmentPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentSetupPage.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentSetupPage.xaml.cs">
       <DependentUpon>AlignmentSetupPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentSummaryPage.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentSummaryPage.xaml.cs">
       <DependentUpon>AlignmentSummaryPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralPanel.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\General\GeneralPanel.xaml.cs">
       <DependentUpon>GeneralPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralSummaryPage.xaml.cs">
+    <Compile Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\General\GeneralSummaryPage.xaml.cs">
       <DependentUpon>GeneralSummaryPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1.Setup\2. Inspection\InspectionPanel.xaml.cs">
@@ -238,6 +243,10 @@
     <Compile Include="WIND2_Handler.cs" />
     <Compile Include="WIND2_Process.cs" />
     <Compile Include="WIND2_Recipe.cs" />
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. BackSide\BackSideSetupPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Icons\Calendar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -245,6 +254,14 @@
     <Page Include="Controls\UserControl\DateTimePicker.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\3. Edge\EdgeSetupPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1.Setup\3. RecipeWizard\4. EBR\EBRSetupPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tune.xaml">
       <SubType>Designer</SubType>
@@ -258,11 +275,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\1. PreAlign\PreAlignPanel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\3. BackSide\BackSidePanel.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\2. BackSide\BackSidePanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -270,19 +283,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\5. Edge\EdgePanel.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\3. Edge\EdgePanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\FrontSummaryPage.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\FrontSummaryPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\FrontSidePanel.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\FrontSidePanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentMapPage.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentMapPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -310,11 +323,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentOriginPage.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentOriginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentPositionPage.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentPositionPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -322,11 +335,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralMaskPage.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\General\GeneralMaskPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralSetupPage.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\General\GeneralSetupPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -338,23 +351,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentPanel.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentSetupPage.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentSetupPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentSummaryPage.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\Alignment\AlignmentSummaryPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralPanel.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\General\GeneralPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\General\GeneralSummaryPage.xaml">
+    <Page Include="UI\1.Setup\3. RecipeWizard\1.. FrontSide\General\GeneralSummaryPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -437,6 +450,21 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\EBR.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\backside.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\defect.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\edge.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\defect2.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

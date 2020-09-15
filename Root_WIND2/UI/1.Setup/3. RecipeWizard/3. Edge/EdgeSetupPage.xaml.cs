@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Root_WIND2
 {
     /// <summary>
-    /// PreAlignPanel.xaml에 대한 상호 작용 논리
+    /// EdgeSetupPage.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class PreAlignPanel : UserControl
+    public partial class EdgeSetupPage : UserControl
     {
-        public PreAlignPanel()
+        public EdgeSetupPage()
         {
             InitializeComponent();
         }

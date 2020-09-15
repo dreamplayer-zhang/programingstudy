@@ -44,7 +44,6 @@ namespace Root_WIND2
         Home_ViewModel m_Home;
         Inspection_ViewModel m_Inspection;
         RecipeWizard_ViewModel m_Wizard;
-        PreAlign_ViewModel m_PreAlign;
         FrontSide_ViewModel m_FrontSide;
         BackSide_ViewModel m_BackSide;
         EBR_ViewModel m_EBR;
@@ -74,7 +73,6 @@ namespace Root_WIND2
             m_Home = new Home_ViewModel(this);
             m_Inspection = new Inspection_ViewModel(this);
             m_Wizard = new RecipeWizard_ViewModel(this);
-            m_PreAlign = new PreAlign_ViewModel(this);
             m_FrontSide = new FrontSide_ViewModel(this);
             m_BackSide = new BackSide_ViewModel(this);
             m_EBR = new EBR_ViewModel(this);
@@ -97,9 +95,6 @@ namespace Root_WIND2
 
             m_btnNaviGEM = new NaviBtn("GEM");
             m_btnNaviGEM.Btn.Click += Navi_GEMClick;
-
-            m_btnNaviPreAlign = new NaviBtn("PreAlign");
-            m_btnNaviPreAlign.Btn.Click += Navi_PreAlignClick;
 
             m_btnNaviFrontSide = new NaviBtn("FrontSide");
             m_btnNaviFrontSide.Btn.Click += Navi_FrontSideClick;
@@ -148,7 +143,6 @@ namespace Root_WIND2
         public NaviBtn m_btnNaviGEM;
 
         // RecipeWizard Navi Buttons
-        public NaviBtn m_btnNaviPreAlign;
         public NaviBtn m_btnNaviFrontSide;
         public NaviBtn m_btnNaviBackSide;
         public NaviBtn m_btnNaviEBR;
@@ -192,10 +186,6 @@ namespace Root_WIND2
         #endregion
 
         #region Recipe Wizard
-        private void Navi_PreAlignClick(object sender, RoutedEventArgs e)
-        {
-            SetWizardPreAlign();
-        }
         private void Navi_FrontSideClick(object sender, RoutedEventArgs e)
         {
             SetWizardFrontSide();
@@ -325,20 +315,13 @@ namespace Root_WIND2
         #endregion
 
         #region Recipe Wizard
-        public void SetWizardPreAlign()
-        {
-            p_NaviButtons.Clear();
-            p_NaviButtons.Add(m_btnNaviRecipeWizard);
-            p_NaviButtons.Add(m_btnNaviPreAlign);
-
-            p_CurrentPanel = m_PreAlign.Main;
-            p_CurrentPanel.DataContext = m_PreAlign;
-        }
         public void SetWizardFrontSide()
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
             p_NaviButtons.Add(m_btnNaviFrontSide);
+
+            m_FrontSide.SetPage(m_FrontSide.Summary);
 
             p_CurrentPanel = m_FrontSide.Main;
             p_CurrentPanel.DataContext = m_FrontSide;

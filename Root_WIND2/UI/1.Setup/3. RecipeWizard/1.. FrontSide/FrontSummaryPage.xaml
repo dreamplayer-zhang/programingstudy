@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Root_WIND2.RecipeSummaryPage"
+﻿<UserControl x:Class="Root_WIND2.FrontSummaryPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -18,85 +18,16 @@
                            HorizontalAlignment="Right"
                            FontSize="20"
                            FontWeight="Bold"/>
-                <TextBlock Text="Recipe Summary" 
+                <TextBlock Text="FrontSide Summary" 
                            HorizontalAlignment="Left"
                            FontSize="30"
                            Margin="0,10,10,10"
                            FontWeight="Bold"/>
             </Grid>
 
-            <!--Information-->
-            <TextBlock Text="Information"
-                       HorizontalAlignment="Right"
-                       FontSize="25"
-                       Margin="0,10,10,0"
-                       FontWeight="Bold"/>
-            <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
-            <Grid Height="200">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <!--Recipe-->
-                <GroupBox Grid.Column="0"
-                          Background="{StaticResource GroupBoxBackground}"
-                          Header="Recipe">
-                    <Grid Margin="10,0,10,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Text="Recipe ID" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                        <TextBlock Text="Recipe Path" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                        <TextBlock Text="Last Write Time" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-
-                        <TextBlock Text="NN000001" Style="{StaticResource BasicTb}" Grid.Row="0" Grid.Column="1"/>
-                        <TextBlock Text="D:\WIND2\Recipe" Style="{StaticResource BasicTb}" Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="2020-07-28 13:43" Style="{StaticResource BasicTb}" Grid.Row="2" Grid.Column="1"/>
-                    </Grid>
-                </GroupBox>
-                <!--Option-->
-                <GroupBox Grid.Column="1"    
-                          Background="{StaticResource GroupBoxBackground}"
-                          Header="Option">
-                    <Grid Margin="10,0,10,0">
-                        <Grid Grid.Column="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="Result Save Path" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                            <TextBlock Text="Review After Insp" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                            <TextBlock Text="Comparison" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                            <TextBlock Text="Cycle Per Rcp" Style="{StaticResource BasicTb}" Grid.Row="3"/>
-
-                            <TextBlock Text="D:\WIND2\Result" Style="{StaticResource BasicTb}" Grid.Row="0" Grid.Column="1"/>
-                            <TextBlock Text="True" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Row="1" Grid.Column="1"/>
-                            <TextBlock Text="False" Foreground="Black" Style="{StaticResource BasicTb}" Grid.Row="2" Grid.Column="1"/>
-                            <TextBlock Text="1" Foreground="Black" Style="{StaticResource BasicTb}" Grid.Row="3" Grid.Column="1"/>
-                        </Grid>
-
-
-                    </Grid>
-                </GroupBox>
-            </Grid>
-
 
             <!--Alignment-->
-            <TextBlock Text="FrontSide"
+            <TextBlock Text="Alignment"
                        HorizontalAlignment="Right"
                        FontSize="25"
                        Margin="0,10,10,0"
@@ -117,7 +48,7 @@
                 </GroupBox>
                 <GroupBox Grid.Column="1"
                           Background="{StaticResource GroupBoxBackground}"
-                          Header="Origin Position">
+                          Header="Origin Position Image">
                     <Grid Background="Black">
                         <Viewbox>
                             <Grid>
@@ -148,7 +79,7 @@
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0"
                               Background="{StaticResource GroupBoxBackground}"
-                              Header="Origin Data">
+                              Header="Origin">
                         <Grid Margin="10,0,10,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
@@ -179,7 +110,7 @@
                     </GroupBox>
                     <GroupBox Grid.Row="1"
                           Background="{StaticResource GroupBoxBackground}"
-                          Header="Feature Data">
+                          Header="Feature">
                         <Grid Margin="0,0,0,0">
                             <DataGrid IsReadOnly="True">
                                 <DataGrid.Resources>
@@ -203,42 +134,21 @@
                     </GroupBox>
                 </Grid>
             </Grid>
-            <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
-            <Grid Height="500">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0"                                        
-                          Background="{StaticResource GroupBoxBackground}"
-                          Header="Mask">
-                    <Grid Background="Black">
-                        <Viewbox>
-                            <Grid>
-                                <Image Source="/Root_WIND2;component/Resources/Origin.PNG" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-                                <Canvas Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                                        Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
-                                    <Rectangle Canvas.Left="10" Canvas.Top="10"
-                                               Width="350" Height="305"
-                                               Stroke="Blue" Fill="SkyBlue"
-                                               Opacity="0.4"
-                                               StrokeThickness="1"/>
-                                    <Rectangle Canvas.Left="365" Canvas.Top="15"
-                                               Width="50" Height="335"
-                                               Opacity="0.3"
-                                               Stroke="Red" Fill="Crimson"/>
-                                    <Rectangle Canvas.Left="20" Canvas.Top="320"
-                                               Width="360" Height="60"
-                                               Opacity="0.3"
-                                               Stroke="Green" Fill="SeaGreen"/>
 
-                                </Canvas>
-                            </Grid>
-                        </Viewbox>
-                    </Grid>
-                </GroupBox>
-                <GroupBox Header="Inspection Items" Grid.Column="1">
-                    <DataGrid IsReadOnly="True" Grid.Row="1">
+            <!--General-->
+            <TextBlock Text="General"
+                       HorizontalAlignment="Right"
+                       FontSize="25"
+                       Margin="0,10,10,0"
+                       FontWeight="Bold"/>
+            <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="300"/>
+                    <RowDefinition Height="500"/>
+                </Grid.RowDefinitions>
+                <GroupBox Header="Inspection Items">
+                    <DataGrid>
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -246,38 +156,74 @@
                             </Style>
                         </DataGrid.Resources>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="No." Binding="{Binding Path=no}" Width="*"/>
-                            <DataGridTextColumn Header="Mask" Binding="{Binding Path=mode}" Width="*"/>
-                            <DataGridTextColumn Header="Color" Binding="{Binding Path=dc}" Width="*"/>
-                            <DataGridTextColumn Header="Inspection Method" Binding="{Binding Path=chip}" Width="*"/>
-                            <DataGridTextColumn Header="Value" Binding="{Binding Path=xy}" Width="*"/>
-                            <DataGridTextColumn Header="Size(Pxl)" Binding="{Binding Path=gv}" Width="*"/>
-                            <DataGridTextColumn Header="Mode" Binding="{Binding Path=size}" Width="*"/>
+                            <DataGridTextColumn Header="No." Width="35" Binding="{Binding Path=no}"/>
+                            <DataGridTextColumn Header="Mask" Width="*" Binding="{Binding Path=mask}"/>
+                            <DataGridTextColumn Header="Color" Width="*" Binding="{Binding Path=color}"/>
+                            <DataGridTextColumn Header="Inspection Item" Width="*" Binding="{Binding item}"/>
+                            <DataGridTextColumn Header="Mode" Width="*" Binding="{Binding Path=mode}"/>
                         </DataGrid.Columns>
-                        <local:DummyResult no="0" mode="Mask1" dc="Red" xy="55" gv="30" size="Surface" chip="Surface_1"/>
-                        <local:DummyResult no="1" mode="Mask2" dc="Blue" xy="100" gv="100" size="Surface" chip="SurfaceAbs_1"/>
-                        <local:DummyResult no="2" mode="Mask3" dc="Green" xy="60" gv="25" size="D2D"  chip="D2D_1"/>
-
+                        <local:DummyGeneral no="0"  color="Blue" item="NN001_70" mask="Mask1" mode="Surface"/>
+                        <local:DummyGeneral no="1"  color="Blue" item="NN001_D2D" mask="Mask1" mode="D2D"/>
+                        <local:DummyGeneral no="2" color="Red" item="NN001_40" mask="Mask2" mode="Surface"/>
+                        <local:DummyGeneral no="3" color="Greed" item="NN001_120" mask="Mask3" mode="Surface"/>
                     </DataGrid>
                 </GroupBox>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Column="0"                                        
+                          Background="{StaticResource GroupBoxBackground}"
+                          Header="Mask">
+                        <Grid Background="Black">
+                            <Viewbox>
+                                <Grid>
+                                    <Image Source="/Root_WIND2;component/Resources/Origin.PNG" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                                    <Canvas Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                                        Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                                        <Rectangle Canvas.Left="10" Canvas.Top="10"
+                                               Width="350" Height="305"
+                                               Stroke="Blue" Fill="SkyBlue"
+                                               Opacity="0.4"
+                                               StrokeThickness="1"/>
+                                        <Rectangle Canvas.Left="365" Canvas.Top="15"
+                                               Width="50" Height="335"
+                                               Opacity="0.3"
+                                               Stroke="Red" Fill="Crimson"/>
+                                        <Rectangle Canvas.Left="20" Canvas.Top="320"
+                                               Width="360" Height="60"
+                                               Opacity="0.3"
+                                               Stroke="Green" Fill="SeaGreen"/>
+
+                                    </Canvas>
+                                </Grid>
+                            </Viewbox>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Inspection Method" Grid.Column="1">
+                        <DataGrid IsReadOnly="True">
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="No." Width="35" Binding="{Binding Path=no}"/>
+                                <DataGridTextColumn Header="Mode" Width="*" Binding="{Binding Path=x}"/>
+                                <DataGridTextColumn Header="Intensity" Width="*" Binding="{Binding Path=y}"/>
+                                <DataGridTextColumn Header="Size(Px)" Width="*" Binding="{Binding Path=width}"/>
+                                <DataGridTextColumn Header="Use Abs GV" Width="*" Binding="{Binding Path=height}"/>
+                                <DataGridTextColumn Header="Abs GV" Width="*" Binding="{Binding Path=color}"/>
+                            </DataGrid.Columns>
+                            <local:DummyMask no="0" x="Surface" y="15" width="40" height="False" color="-"/>
+                            <local:DummyMask no="1" x="Surface" y="-" width="20" height="True" color="55"/>
+                            <local:DummyMask no="2" x="D2D" y="60" width="15" height="False" color="-"/>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
             </Grid>
-            <TextBlock Text="BackSide"
-                       HorizontalAlignment="Right"
-                       FontSize="25"
-                       Margin="0,10,10,0"
-                       FontWeight="Bold"/>
-            <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
-            <TextBlock Text="Edge"
-                       HorizontalAlignment="Right"
-                       FontSize="25"
-                       Margin="0,10,10,0"
-                       FontWeight="Bold"/>
-            <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
-            <TextBlock Text="EBR"
-                       HorizontalAlignment="Right"
-                       FontSize="25"
-                       Margin="0,10,10,0"
-                       FontWeight="Bold"/>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
