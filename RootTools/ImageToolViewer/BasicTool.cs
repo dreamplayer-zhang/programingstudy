@@ -300,7 +300,7 @@ namespace RootTools
             SelectedShapes.Add(tshape);
        
         }
-        private void CancleSelect(TShape tshape)
+        private void CancelSelect(TShape tshape)
         {
             TRect rect = tshape as TRect;
             rect.isSelected = false;
@@ -322,7 +322,7 @@ namespace RootTools
         {
             TRect rect = (sender as Rectangle).Tag as TRect;
             if (rect.isSelected)
-                CancleSelect(rect);
+                CancelSelect(rect);
             else
                 SelectTShape(rect);   
         }

@@ -15,13 +15,13 @@
             <Grid>
                 <StackPanel>
                     <Button Content="GEM Setup"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="PIO(OHT)"
-                            Style="{StaticResource SetupPanelBtn}"/>    
+                            Style="{StaticResource PanelBtn}"/>    
                 </StackPanel>
                 <Button Content="Back"
                         Command="{Binding btnGEMBack}"
-                        Style="{StaticResource SetupPanelBtn}"
+                        Style="{StaticResource PanelBtn}"
                         VerticalAlignment="Bottom"/>
             </Grid>
         </Border>

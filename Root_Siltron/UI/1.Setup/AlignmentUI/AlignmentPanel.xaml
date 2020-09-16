@@ -18,23 +18,23 @@
                 <StackPanel>
                     <Button Content="Alignment Summary"
                             Command="{Binding btnAlignSummary}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Alignment Setup"
                             Command="{Binding btnAlignSetup}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Origin"
                             Command="{Binding btnAlignOrigin}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Die Position"
                             Command="{Binding btnAlignOrigin}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Map"
                             Command="{Binding btnAlignOrigin}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                 </StackPanel>
                 <Button Content="Back"
                         Command="{Binding btnAlignBack}"
-                        Style="{StaticResource SetupPanelBtn}"
+                        Style="{StaticResource PanelBtn}"
                         VerticalAlignment="Bottom"/>
             </Grid>
         </Border>

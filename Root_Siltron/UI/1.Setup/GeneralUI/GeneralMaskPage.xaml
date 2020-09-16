@@ -261,7 +261,7 @@
                             Orientation="Horizontal"
                             HorizontalAlignment="Right">
                     <Button Content="Clear"
-                            Style="{StaticResource SetupPanelBtn}"
+                            Style="{StaticResource PanelBtn}"
                             Margin="0"
                             HorizontalAlignment="Right"
                             Width="170"
@@ -269,7 +269,7 @@
                             FontWeight="Bold"
                             Height="35"/>
                     <Button Content="AddMask"
-                            Style="{StaticResource SetupPanelBtn}"
+                            Style="{StaticResource PanelBtn}"
                             HorizontalAlignment="Right"
                             Width="170"
                             FontSize="15"

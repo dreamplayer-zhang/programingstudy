@@ -84,41 +84,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Temp\RecipeMaster.cs" />
     <Compile Include="UI\GridHelper.cs" />
     <Compile Include="UI\MapViewer.xaml.cs">
       <DependentUpon>MapViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MapViewer_ViewModel.cs" />
     <Compile Include="UI\NotifyProperty.cs" />
-    <Compile Include="Vision_Engineer.cs" />
-    <Compile Include="WorkManager\D2D.cs" />
-    <Compile Include="WorkManager\EdgePosition.cs" />
-    <Compile Include="WorkManager\FeaturePosition.cs" />
-    <Compile Include="WorkManager\IInspection.cs" />
-    <Compile Include="WorkManager\IMeasurement.cs" />
-    <Compile Include="WorkManager\Inspection.cs" />
-    <Compile Include="WorkManager\InspectionResult.cs" />
-    <Compile Include="WorkManager\IParameter.cs" />
-    <Compile Include="WorkManager\IPosition.cs" />
-    <Compile Include="WorkManager\IPreInspection.cs" />
-    <Compile Include="WorkManager\IWork.cs" />
-    <Compile Include="WorkManager\IWorkerable.cs" />
-    <Compile Include="WorkManager\Measurement.cs" />
-    <Compile Include="WorkManager\Parameter.cs" />
-    <Compile Include="WorkManager\Position.cs" />
-    <Compile Include="WorkManager\PreInspection.cs" />
+    <Compile Include="WorkManager\Inferfaces.cs" />
     <Compile Include="WorkManager\ProcessDefect.cs" />
-    <Compile Include="WorkManager\ROI.cs" />
+    <Compile Include="WorkManager\UserTypes.cs" />
+    <Compile Include="WorkManager\WorkFactory.cs" />
+    <Compile Include="Vision_Engineer.cs" />
+    <Compile Include="WorkManager\IWork.cs" />
+    <Compile Include="WorkManager\IWorkable.cs" />
+    <Compile Include="WorkManager\Alignment.cs" />
     <Compile Include="WorkManager\Surface.cs" />
-    <Compile Include="WorkManager\SurfaceParameter.cs" />
-    <Compile Include="WorkManager\WaferMap.cs" />
+    <Compile Include="WorkManager\WaferMapInfo.cs" />
+    <Compile Include="WorkManager\WorkBase.cs" />
     <Compile Include="WorkManager\WorkBundle.cs" />
     <Compile Include="WorkManager\Worker.cs" />
     <Compile Include="WorkManager\WorkerManager.cs" />
     <Compile Include="WorkManager\WorkManager.cs" />
     <Compile Include="WorkManager\Workplace.cs" />
     <Compile Include="WorkManager\WorkplaceBundle.cs" />
-    <Compile Include="WorkManager\WorkResource.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -173,6 +162,7 @@
       <Name>RootTools_CLR</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"

@@ -135,6 +135,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Viewer\BoxTool_ViewModel.cs" />
     <Compile Include="Database\Table\DatabaseManager.cs" />
     <Compile Include="Database\Table\Database_ConnectSession.cs" />
     <Compile Include="Database\Table\Defect\Defect.cs" />
@@ -354,6 +355,7 @@
     <Compile Include="OHT\SSEM\OHT_SSEM_UI.xaml.cs">
       <DependentUpon>OHT_SSEM_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Viewer\OriginTool_ViewModel.cs" />
     <Compile Include="RADS\RADS.cs" />
     <Compile Include="RADS\RADSConnectControl.cs" />
     <Compile Include="RADS\RADSControl.cs" />
@@ -361,8 +363,11 @@
     <Compile Include="RADS\RADSControl_UI.xaml.cs">
       <DependentUpon>RADSControl_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ImageToolViewer\ROI_ViewModel.cs" />
-    <Compile Include="ImageToolViewer\RootViewer_ViewModel.cs" />
+    <Compile Include="Viewer\MaskTool_ViewModel.cs" />
+    <Compile Include="Viewer\RootViewer_ViewModel.cs" />
+    <Compile Include="Viewer\RootViewer.xaml.cs">
+      <DependentUpon>RootViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RTC5s\DataList.cs" />
     <Compile Include="RTC5s\DesignBase.cs" />
     <Compile Include="RTC5s\DesignOutline.cs" />
@@ -406,7 +411,7 @@
     <Compile Include="ToolBoxs\ToolSet_UI.xaml.cs">
       <DependentUpon>ToolSet_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ImageToolViewer\TShape.cs" />
+    <Compile Include="Viewer\TShape.cs" />
     <Compile Include="Trees\ITreeItem.cs" />
     <Compile Include="Trees\TreeGroup.cs" />
     <Compile Include="Trees\TreeRoot.cs" />
@@ -783,6 +788,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RADS\RADSControl_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Viewer\RootViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

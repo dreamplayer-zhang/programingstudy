@@ -1,0 +1,189 @@
+﻿<UserControl x:Class="Root_WIND2.EBRSetupPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_WIND2"
+             mc:Ignorable="d" 
+             d:DesignHeight="838" d:DesignWidth="1683" 
+             Background="{StaticResource PanelBackGround}">
+    <ScrollViewer>
+        <StackPanel>
+            <Grid Height="838">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="4*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="6*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="65*"/>
+                        <ColumnDefinition Width="35*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Column="0"
+                          Header="Scan Image">
+                        <ScrollViewer>
+                            <Grid Background="Black">
+                                <Image Source="/Root_WIND2;component/Resources/edge.png"
+                                       Stretch="Fill" Margin="0,0,200,0"/>
+                            </Grid>
+                        </ScrollViewer>
+                    </GroupBox>
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Header="Thumbnail" Grid.Row="0">
+                            <Grid Background="Black">
+                                <Image Source="/Root_WIND2;component/Resources/edge.png" Stretch="None"
+                                       HorizontalAlignment="Left"/>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </Grid>
+                <GridSplitter Grid.Column="1" 
+                              HorizontalAlignment="Stretch" 
+                              VerticalAlignment="Stretch" 
+                              Background="{StaticResource Splitter}" 
+                              Width="3"
+                              ShowsPreview="True"/>
+                <Grid Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Grid.Row="0" Header="Option">
+                            <Grid Margin="10,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock FontSize="12" Text="Enable Backside Insp." Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                <TextBlock FontSize="12" Text="Upload Image Size" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                                <TextBlock FontSize="12" Text="Upload Image Res." Style="{StaticResource BasicTb}" Grid.Row="2"/>
+                                <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Center" Width="85"/>
+                                <ComboBox Grid.Row="1" Grid.Column="1" SelectedIndex="0" 
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Center">
+                                    <ComboBoxItem Content="1000x1000"/>
+                                    <ComboBoxItem Content="1000x1000"/>
+                                    <ComboBoxItem Content="1000x1000"/>
+                                </ComboBox>
+                                <ComboBox Grid.Row="2" Grid.Column="1" SelectedIndex="0" 
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Center">
+                                    <ComboBoxItem Content="1000x1000"/>
+                                    <ComboBoxItem Content="1000x1000"/>
+                                    <ComboBoxItem Content="1000x1000"/>
+                                </ComboBox>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Grid.Row="1" Header="Illumination">
+                            <Grid Margin="10,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="3*"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock FontSize="12" Text="R" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                <TextBlock FontSize="12" Text="G" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                                <TextBlock FontSize="12" Text="B" Style="{StaticResource BasicTb}" Grid.Row="2"/>
+                                <TextBlock FontSize="12" Text="White" Style="{StaticResource BasicTb}" Grid.Row="3"/>
+                                <Slider Grid.Column="1" Grid.Row="0" VerticalAlignment="Center"/>
+                                <Slider Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"/>
+                                <Slider Grid.Column="1" Grid.Row="2" VerticalAlignment="Center"/>
+                                <Slider Grid.Column="1" Grid.Row="3" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Margin="7,5"/>
+                                <TextBox Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Margin="7,5"/>
+                                <TextBox Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Margin="7,5"/>
+                                <TextBox Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Margin="7,5"/>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Grid.Row="2" Header="Spec">
+                            Intensity, USL/LSL, Step Degree(Count), Offset Bevel, Offset EBR, Others(X Ave/Y Ave)
+                        </GroupBox>
+                        <GroupBox Grid.Row="3" Header="Defect Code">
+
+                        </GroupBox>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Grid.Row="0" Grid.Column="1" Header="Graph"
+                                  Background="{StaticResource GroupBoxBackground}">
+                            <Image Source="/Root_WIND2;component/Resources/EBR.PNG"/>
+                        </GroupBox>
+                        <GroupBox Grid.Row="1" Grid.Column="1" Header="Insepction Info"
+                                  Background="{StaticResource GroupBoxBackground}">
+                            <DataGrid IsReadOnly="True">
+                                <DataGrid.Resources>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="No." Width="35" Binding="{Binding Path=no}"/>
+                                    <DataGridTextColumn Header="Angle" Width="*" Binding="{Binding Path=x}"/>
+                                    <DataGridTextColumn Header="EBR(um)" Width="*" Binding="{Binding Path=y}"/>
+                                    <DataGridTextColumn Header="Bevel(um)" Width="*" Binding="{Binding Path=width}"/>
+                                </DataGrid.Columns>
+                                <local:DummyMask no="0" x="0" y="459.4" width="268.2"/>
+                                <local:DummyMask no="1" x="15" y="468.8" width="231.8"/>
+                                <local:DummyMask no="2" x="30" y="463.2" width="294.5"/>
+                                <local:DummyMask no="3" x="45" y="459.4" width="268.2"/>
+                                <local:DummyMask no="4" x="60" y="468.8" width="231.8"/>
+                                <local:DummyMask no="5" x="75" y="463.2" width="294.5"/>
+                                <local:DummyMask no="6" x="90" y="459.4" width="268.2"/>
+                                <local:DummyMask no="7" x="105" y="468.8" width="231.8"/>
+                                <local:DummyMask no="8" x="120" y="463.2" width="294.5"/>
+                                <local:DummyMask no="9" x="135" y="459.4" width="268.2"/>
+                                <local:DummyMask no="10" x="150" y="468.8" width="231.8"/>
+                                <local:DummyMask no="11" x="165" y="463.2" width="294.5"/>
+                                <local:DummyMask no="12" x="180" y="459.4" width="268.2"/>
+                                <local:DummyMask no="13" x="195" y="468.8" width="231.8"/>
+                                <local:DummyMask no="14" x="210" y="463.2" width="294.5"/>
+                                <local:DummyMask no="15" x="225" y="459.4" width="268.2"/>
+                                <local:DummyMask no="16" x="240" y="468.8" width="231.8"/>
+                                <local:DummyMask no="17" x="255" y="463.2" width="294.5"/>
+                                <local:DummyMask no="18" x="270" y="463.2" width="294.5"/>
+                                <local:DummyMask no="19" x="285" y="463.2" width="294.5"/>
+                                <local:DummyMask no="20" x="300" y="463.2" width="294.5"/>
+                                <local:DummyMask no="21" x="315" y="463.2" width="294.5"/>
+                                <local:DummyMask no="22" x="330" y="463.2" width="294.5"/>
+                                <local:DummyMask no="23" x="345" y="463.2" width="294.5"/>
+                                <local:DummyMask no="24" x="360" y="463.2" width="294.5"/>
+                            </DataGrid>
+                        </GroupBox>
+                    </Grid>
+
+                </Grid>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

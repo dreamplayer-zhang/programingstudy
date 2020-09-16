@@ -37,7 +37,7 @@
                            Height="18"
                            VerticalAlignment="Center"
                            Margin="3" />
-            <TextBlock Text="WIND2"
+            <TextBlock Text="WIND2 [RecipeName.rcp]"
                        Foreground="White"
                        VerticalAlignment="Center"
                        FontSize="15"

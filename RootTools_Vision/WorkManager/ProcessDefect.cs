@@ -1,34 +1,30 @@
-﻿using RootTools;
+﻿using RootTools_Vision.UserTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    class ProcessDefect : IWork
+    public class ProcessDefect : IWork
     {
-        /// <summary>
-        /// Defect 정보 Temp Table Insert
-        /// </summary>
-        #region IWork 멤버
+        public WORK_TYPE Type => WORK_TYPE.FINISHINGWORK;
 
-        public WORK_TYPE TYPE
+        public void DoWork()
         {
-            get { return WORK_TYPE.PreInspection; }
+            DoProcessDefect();
         }
 
-        public void SetImageBuffer(byte[] _buffer, int _width, int _height)
+        public void SetWorkplace(Workplace workplace)
         {
-
+            
         }
 
-        #endregion
-
-        void AddDefect(int nThreadID)
+        public void DoProcessDefect()
         {
-            //DatabaseManager.Instance.InsertDefect(nThreadID);
+            Thread.Sleep(2000);
         }
     }
 }

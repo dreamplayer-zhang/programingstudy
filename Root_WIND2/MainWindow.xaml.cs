@@ -125,12 +125,13 @@ namespace Root_WIND2
 
         WIND2_Engineer m_engineer = new WIND2_Engineer();
         MemoryTool m_memoryTool;
-        ImageData m_Image;
+        public ImageData m_Image;
+        public IDialogService dialogService;
         string sPool = "pool";
-        string sGroup = "group";
-        string sMem = "mem";
-        public int MemWidth = 12400;
-        public int MemHeight = 12400;
+        string sGroup = "groupss";
+        string sMem = "memss";
+        public int MemWidth = 24800;
+        public int MemHeight = 24800;
         Viewer viewer = new Viewer();
 
 
@@ -141,22 +142,23 @@ namespace Root_WIND2
 
         void Init()
         {
-            IDialogService dialogService = new DialogService(this);
+            dialogService = new DialogService(this);
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+
             m_engineer.Init("WIND2");
             m_memoryTool = m_engineer.ClassMemoryTool();
-            m_memoryTool.GetPool(sPool, true).p_gbPool = 1;
+            m_memoryTool.GetPool(sPool, true).p_gbPool = 4;
             m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
             m_memoryTool.GetMemory(sPool, sGroup, sMem);
 
             m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
 
-            viewer.p_ROI_VM = new ROI_ViewModel(m_Image, dialogService);
-            panel.DataContext = viewer.p_ROI_VM;
+            //viewer.p_ROI_VM = new ROI_ViewModel(m_Image, dialogService);
+            //panel.DataContext = viewer.p_ROI_VM;
 
 
-            //InitUI();
-            //InitTimer();
+            InitUI();
+            InitTimer();
 
 
             m_RecipeMGR = new RecipeManager();
@@ -180,8 +182,10 @@ namespace Root_WIND2
         void InitUI()
         {
             m_Setup = new Setup();
-            ((Setup_ViewModel)m_Setup.DataContext).init(this);
-            m_SetupViewModel = (Setup_ViewModel)m_Setup.DataContext;
+            m_SetupViewModel = new Setup_ViewModel(this);
+            m_Setup.DataContext = m_SetupViewModel;
+            //((Setup_ViewModel)m_Setup.DataContext).init(this);
+            //m_SetupViewModel = (Setup_ViewModel)m_Setup.DataContext;
 
             m_Review = new Review();
             ((Review_ViewModel)m_Review.DataContext).init(this);
@@ -210,32 +214,30 @@ namespace Root_WIND2
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            //RecipeData_Origin pOrigin = m_Recipe.GetRecipeData().GetRecipeOrigin();
-            //CPoint ptOrigin = pOrigin.GetOriginPoint();
-            //CRect rtOrigin = pOrigin.GetOriginRect();
+            RecipeData_Origin pOrigin = m_Recipe.GetRecipeData().GetRecipeOrigin();
 
-            //int nStride = (int)m_Image.p_Stride;
-            //byte[] InspectionBuffer = new byte[rtOrigin.Width * rtOrigin.Height];
-            //for (int y = 0; y < rtOrigin.Height; y++)
-            //{
-            //    Marshal.Copy(
-            //    m_Image.GetPtr() + ptOrigin.X + (y + ptOrigin.Y) * nStride, // source
-            //    InspectionBuffer,
-            //    rtOrigin.Width * y,
-            //    rtOrigin.Width
-            //    );
-            //}
+            CPoint ptOrigin = pOrigin.GetOriginPoint();
+            CRect rtOrigin = pOrigin.GetOriginRect();
+            byte[] InspectionBuffer = new byte[rtOrigin.Width * rtOrigin.Height];
 
-            //CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, rtOrigin.Width, rtOrigin.Height, true, 200);
-            m_RecipeMGR.OpenRecipe();
-            //m_RecipeMGR.SaveRecipe();
+            for (int y = 0; y < rtOrigin.Height; y++)
+            {
+                Marshal.Copy(
+                m_Image.GetPtr() + ptOrigin.X + (y + ptOrigin.Y) * (int)rtOrigin.Width, // source
+                InspectionBuffer,
+                rtOrigin.Width * y,
+                rtOrigin.Height
+                );
+            }
+            CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, rtOrigin.Width, rtOrigin.Height,true, 200);
 
+            //CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, nBufferWidth, nBufferHeight, this.parameter.IsDark, this.parameter.Threshold);
         }
     }
     public class Viewer : ObservableObject
     {
-        private ROI_ViewModel m_ROI_VM;
-        public ROI_ViewModel p_ROI_VM
+        private MaskTool_ViewModel m_ROI_VM;
+        public MaskTool_ViewModel p_ROI_VM
         {
             get
             {
@@ -273,5 +275,4 @@ namespace Root_WIND2
             }
         }
     }
-
 }
