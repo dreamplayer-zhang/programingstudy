@@ -4,10 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RootTools_Vision
+namespace RootTools_Vision.UserInterfaces
 {
-    public interface IParameter
-    {
-        object CopyTo();
-    }
+    
 }

@@ -1,93 +1,133 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
-
 
 namespace RootTools_Vision
 {
+    public delegate void EventStateChanged(object obj);
+
+
     public class WorkplaceBundle : Collection<Workplace>
     {
-        private int nUnitSizeX;
+        public event EventStateChanged WorkplaceStateChanged;
 
-        public int UnitSizeX
-        {
-            get { return nUnitSizeX; }
-        }
 
-        private int nUnitSizeY;
-        public int UnitSizeY
-        {
-            get { return nUnitSizeY; }
-        }
+        #region [Variables]
+        private int mapSizeX;
+        private int mapSizeY;
 
-        private int currentWorkplaceIndex = 0;
+        //private int masterPositionX;
+        //private int masterPositionY;
+
+        //private bool isMasterDetected;
+        #endregion
+
+
+        #region [Getter Setter]
+        public int MapSizeX { get => mapSizeX; set => mapSizeX = value; }
+        public int MapSizeY { get => mapSizeY; set => mapSizeY = value; }
+
+        // 첫번째 Workplace를 마스터 workplace로
+        //public int MasterPositionX { get => masterPositionX; set => masterPositionX = value; }
+        //public int MasterPositionY { get => masterPositionY; set => masterPositionY = value; }
+        //public bool IsMasterDetected { get => isMasterDetected; private set => isMasterDetected = value; }
+        #endregion
 
         public WorkplaceBundle()
         {
-
-        }
-
-        /// <summary>
-        /// 작업을 해야하는 작업장을 리턴한다.
-        /// 모든 작업장이 완료되었거나 할당된 작업이 없으면 null을 리턴
-        /// 인덱스가 자동으로 증가하기 때문에 리턴이 되면 반드시 작업을 하도록 해야함
-        /// 아니면 인덱스를 원복시켜야함
-        /// </summary>
-        /// <returns></returns>
-        public Workplace GetNextWorkplace()
-        {
-            if (this.currentWorkplaceIndex > this.Count - 1)
-                return null;
-
-            return this[currentWorkplaceIndex++];
-        }
-
-        public void IsCompleted()
-        {
-
+            // Master를 무조건 0번째 workplace
+            this.Add(new Workplace(-1, -1, 0, 0, 0, 0, 0));
         }
 
         public void Reset()
         {
-            foreach (Workplace workplace in this)
+            foreach(Workplace workplace in this)
             {
-                workplace.State = WORKPLACE_STATE.NONE;
+                workplace.Reset();
             }
-
-            this.currentWorkplaceIndex = 0;
         }
 
-        static public WorkplaceBundle CreateWaferMap(int nSizeX, int nSizeY, byte[] wafermap)
+        public new void Add(Workplace workplace)
         {
-            WorkplaceBundle bundle = new WorkplaceBundle();
-            bundle.nUnitSizeX = nSizeX;
-            bundle.nUnitSizeY = nSizeY;
+            workplace.StateChanged += WorkplaceStateChanged_Callback;
+            workplace.PositionUpdated += WorkplacePositionUpdated_Callback;
+            workplace.PositionIntialized += WorkplacePositionInitialized_Callback;
+            workplace.Index = this.Count;
+            base.Add(workplace);
+        }
 
-            for (int y = 0; y < nSizeY; y++)
+        public Workplace GetWorkplaceByState(WORKPLACE_STATE state)
+        {
+            foreach(Workplace workplace in this)
             {
-                for (int x = 0; x < nSizeX; x++)
+                if(workplace.STATE == state)
                 {
-                    int index = y * nSizeX + x;
-                    if(wafermap[index] == 1)
+                    return workplace;
+                }
+            }
+
+            return null;
+        }
+
+        public void WorkplaceStateChanged_Callback(object obj)
+        {
+            if (WorkplaceStateChanged != null)
+                WorkplaceStateChanged(obj);
+        }
+
+        public void WorkplacePositionInitialized_Callback(object obj, int transX, int transY)
+        {
+            Workplace workplace = obj as Workplace;
+            foreach(Workplace wp in this)
+            {
+                if (wp.Index == workplace.Index) continue;
+
+                wp.SetImagePositionByTrans(transX, transY);
+            }
+        }
+
+
+        public object objLock = new object();
+        public void WorkplacePositionUpdated_Callback(object obj)
+        {
+            lock (objLock)
+            {
+                Workplace workplace = obj as Workplace;
+
+                int mapX = workplace.MapPositionX;
+                int mapY = workplace.MapPositionY;
+
+                int transX = workplace.TransX;
+                int transY = workplace.TransY;
+
+                foreach (Workplace wp in this)
+                {
+                    if (wp.MapPositionX > mapX + 1) continue;
+
+                    if (wp.MapPositionX == mapX && wp.MapPositionY == mapY + 1) // 같은 라인인 경우 Y축만 업데이트
                     {
-                        bundle.Add(new Workplace(index, new Point(x, y), new Point(0, 0), new Size(0, 0)));
+                        wp.MoveImagePosition(transX, transY);  // Trans를 누적하지 않는다.
+                    }
+
+                    // 위에서 아래로 Position을 하기 때문에 오른쪽 칩중에 현재 라인에 없는 칩만 포지셔닝 하면됨
+                    // 아래쪽에서 오른쪽에 현재 라인에 없는 칩은 해당 라인 포지셔닝 할때 위에 조건에서 알아서 튜닝됨
+                    if (wp.MapPositionX == mapX + 1 && wp.MapPositionY <= mapY) 
+                    {
+                        wp.MoveImagePosition(transX, transY);
                     }
                 }
             }
-            return bundle;
         }
 
-        static public WorkplaceBundle CreateWaferMap(WaferMapInfo mapInfo)
+
+        public WorkplaceBundle CreateWaferMap(WaferMapInfo mapInfo)
         {
             WorkplaceBundle bundle = new WorkplaceBundle();
 
-            
+
             byte[] wafermap = mapInfo.WaferMapData;
             int nSizeX = mapInfo.MapSizeX;
             int nSizeY = mapInfo.MapSizeY;
@@ -96,21 +136,20 @@ namespace RootTools_Vision
             int nDiePitchX = mapInfo.DieSizeX;
             int nDiePitchY = mapInfo.DieSizeY;
 
-            bundle.nUnitSizeX = nSizeX;
-            bundle.nUnitSizeY = nSizeY;
 
-            int index = 0;
+            bundle.mapSizeX = nSizeX;
+            bundle.mapSizeY = nSizeY;
 
             // Right
-            for(int x = nMasterX; x < nSizeX; x++)
+            for (int x = nMasterX; x < nSizeX; x++)
             {
                 // Top
-                for(int y = nMasterY; y >= 0; y--)
+                for (int y = nMasterY; y >= 0; y--)
                 {
-                    if(wafermap[ x + y * nSizeX] == 1)
+                    if (wafermap[x + y * nSizeX] == 1)
                     {
-                        bundle.Add(new Workplace(index, new Point(x, y), new Point(x * nDiePitchX, y * nDiePitchY), new Size(nDiePitchX, nDiePitchY)));
-                        index++;
+                        Workplace workplace = new Workplace(x, y, x * nDiePitchX, y * nDiePitchY, nDiePitchX, nDiePitchY);
+                        bundle.Add(workplace);
                     }
                 }
 
@@ -119,8 +158,8 @@ namespace RootTools_Vision
                 {
                     if (wafermap[x + y * nSizeX] == 1)
                     {
-                        bundle.Add(new Workplace(index, new Point(x, y), new Point(x * nDiePitchX, y * nDiePitchY), new Size(nDiePitchX, nDiePitchY)));
-                        index++;
+                        Workplace workplace = new Workplace(x, y, x * nDiePitchX, y * nDiePitchY, nDiePitchX, nDiePitchY);
+                        bundle.Add(workplace);
                     }
                 }
             }
@@ -134,8 +173,8 @@ namespace RootTools_Vision
                 {
                     if (wafermap[x + y * nSizeX] == 1)
                     {
-                        bundle.Add(new Workplace(index, new Point(x, y), new Point(x * nDiePitchX, y * nDiePitchY), new Size(nDiePitchX, nDiePitchY)));
-                        index++;
+                        Workplace workplace = new Workplace(x, y, x * nDiePitchX, y * nDiePitchY, nDiePitchX, nDiePitchY);
+                        bundle.Add(workplace);
                     }
                 }
 
@@ -144,26 +183,13 @@ namespace RootTools_Vision
                 {
                     if (wafermap[x + y * nSizeX] == 1)
                     {
-                        bundle.Add(new Workplace(index, new Point(x, y), new Point(x * nDiePitchX, y * nDiePitchY), new Size(nDiePitchX, nDiePitchY)));
-                        index++;
+                        Workplace workplace = new Workplace(x, y, x * nDiePitchX, y * nDiePitchY, nDiePitchX, nDiePitchY);
+                        bundle.Add(workplace);
                     }
                 }
             }
 
             return bundle;
         }
-
-
-
-        static public WorkplaceBundle CreateSingle(int index, Point subIndex, Point pos)
-        {
-            WorkplaceBundle bundle = new WorkplaceBundle();
-
-            bundle.Add(new Workplace(index, subIndex, pos, new Size(0, 0)));
-
-            return bundle;
-        }
     }
-
-
 }

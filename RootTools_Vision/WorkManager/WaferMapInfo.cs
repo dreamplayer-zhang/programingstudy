@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace RootTools_Vision
 {
@@ -65,9 +64,9 @@ namespace RootTools_Vision
             this.pWaferMap = (byte[])waferMap.Clone();
 
             bool bDone = false;
-            for(int x = 0; x < this.nMapSizeX; x++)
+            for (int x = 0; x < this.nMapSizeX; x++)
             {
-                for(int y = 0; y < this.nMapSizeY; y++)
+                for (int y = 0; y < this.nMapSizeY; y++)
                 {
                     if (this.pWaferMap[x + y * this.nMapSizeX] == 1) ;
                     {
@@ -86,6 +85,5 @@ namespace RootTools_Vision
             this.nMasterDieX = x;
             this.nMasterDieY = y;
         }
-
     }
 }

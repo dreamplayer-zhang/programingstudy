@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class ROI
+    public interface IWorkable
     {
-        List<byte[]> listROI;
-
-        public ROI()
-        {
-            listROI = new List<byte[]>();
-        }
+        void Start();
+        void Stop();
+        void Pause();
     }
 }
