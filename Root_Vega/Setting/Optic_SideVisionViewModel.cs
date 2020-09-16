@@ -393,45 +393,47 @@ namespace Root_Vega
             }
         }
 
+        public ushort[] m_aHeight = new ushort[640];
         unsafe public void Test()
         {
-            //int nTest = SideVision.Run_LADS.nCount;
-            //return;
-
             // LADS 테스트용 프레임 생성
             MemoryData md = App.m_engineer.GetMemory("SideVision.Memory", "LADS", "Grab");
+            int nWidth = md.p_sz.X;
+            int nheight = md.p_sz.Y;
+            Random random = new Random();
             byte* pSrc = (byte*)md.GetPtr().ToPointer();
-            for (int i = 0; i<10; i++, pSrc += (md.p_sz.X*102))
+
+            pSrc += (nWidth * (nheight / 2));
+            for (int y = 0; y<3; y++)
             {
-                byte* pDst = pSrc;
-                pDst += (md.p_sz.X * (51+(i*3)));
-                pDst += 200;
-                for (int j = 200; j < 440; j++, pDst++)
+                byte* pDst = pSrc + (y * nWidth);
+                int nStartIndex = y == 2 ? nWidth / 4 * 1 - 2 : nWidth / 4 * 1;
+                int nEndIndex = y == 2 ? nWidth / 4 * 3 + 2 : nWidth / 4 * 3;
+                pDst += nStartIndex;
+                for (int x = nStartIndex; x < nEndIndex; x++, pDst++)
                 {
-                    *pDst = 255;
+                    *pDst = (byte)random.Next(75,80);
                 }
             }
-
-            double dScale = 65535.0 / 102;
+            
+            double dScale = 65535.0 / nheight;
             // LADS 테스트
-            for (int i = 0; i<10; i++)
-            {
-                pSrc = (byte*)md.GetPtr(0, 0, i * 102).ToPointer();
-                for (int x = 0; x<md.p_sz.X; x++, pSrc++)
-                {
-                    byte* pSrcY = pSrc;
-                    int nSum = 0;
-                    int nYSum = 0;
-                    for (int y = 0; y < 102; y++, pSrcY += md.p_sz.X)
-                    {
-                        nSum += *pSrcY;
-                        nYSum += *pSrcY * y;
-                    }
-                    int nAdd = x + i * md.p_sz.X;
-                    SideVision.m_aHeight[nAdd] = (nSum != 0) ? (ushort)((ushort)(dScale * nYSum / nSum) >> 8) : (ushort)0;
-                }
-            }
 
+            pSrc = (byte*)md.GetPtr().ToPointer();
+            for (int x = 0; x < nWidth; x++, pSrc++)
+            {
+                byte* pSrcY = pSrc;
+                int nSum = 0;
+                int nYSum = 0;
+                for (int y = 0; y < nheight; y++, pSrcY += nWidth)
+                {
+                    nSum += *pSrcY;
+                    nYSum += *pSrcY * y;
+                }
+                int nAdd = x;
+                m_aHeight[nAdd] = (nSum != 0) ? (ushort)(((ushort)(dScale * nYSum / nSum)) >> 8) : (ushort)0;                
+            }
+        
             return;
         }
 
@@ -453,6 +455,13 @@ namespace Root_Vega
             get
             {
                 return new RelayCommand(LADS);
+            }
+        }
+        public RelayCommand CommandTest
+        {
+            get
+            {
+                return new RelayCommand(Test);
             }
         }
         public RelayCommand CommandScan

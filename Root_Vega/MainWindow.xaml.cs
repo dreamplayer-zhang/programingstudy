@@ -53,7 +53,8 @@ namespace Root_Vega
         {
             textBoxDateTime.Text = DateTime.Now.ToString();
             TimerLamp();
-            TimerUI(App.m_engineer.m_login.p_eLevel); 
+            //TimerUI(App.m_engineer.m_login.p_eLevel); 
+            TimerUI(Login.eLevel.Admin);
         }
 
         void TimerUI(Login.eLevel level)
