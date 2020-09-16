@@ -96,6 +96,7 @@
     <Compile Include="AxisMapping_Handler_UI.xaml.cs">
       <DependentUpon>AxisMapping_Handler_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="InfoStrip.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
