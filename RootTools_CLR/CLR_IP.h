@@ -18,7 +18,8 @@ namespace RootTools_CLR
 	public:
 		// Function(Src - Input Image, Dst - Output Image, **Out**** - Result Data, ...)
 		static void Cpp_Threshold(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemWidth, int  nMemHeight, bool bDark, int nThreshold);
-		
+		static void Cpp_Threshold(byte* pSrcImg, array<byte>^ pDstImg, int  nMemWidth, int  nMemHeight, int nROILeft, int nROITop, int nROIRight, int nROIBot, bool bDark, int nThreshold);
+
 		static float Cpp_Average(array<byte>^ pSrcImg, int  nMemWidth, int  nMemHeight);
 		static float Cpp_Average(byte* pSrcImg, int  nMemWidth, int  nMemHeight, int nROILeft, int nROITop, int nROIRight, int nROIBot);
 
