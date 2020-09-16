@@ -27,6 +27,7 @@ namespace RootTools
 				image.OnCreateNewImage += image_NewImage;
 				image.OnUpdateImage += image_OnUpdateImage;
 				image.UpdateOpenProgress += image_UpdateOpenProgress;
+				SetRoiRect();
 				InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
 				SetImageSource();
 
@@ -51,20 +52,6 @@ namespace RootTools
 		Key m_keyMove = Key.LeftCtrl;
 		Key m_keyZoom = Key.LeftCtrl;
 		Key m_keyDrawBasic = Key.LeftShift;
-
-		private BasicTool m_BasicTool = new BasicTool();
-		public BasicTool p_BasicTool
-		{
-			get
-			{
-				return m_BasicTool;
-			}
-			set
-			{
-				m_BasicTool = value;
-				//SetProperty(ref m_BasicTool, value);
-			}
-		}
 
 		#region Property
 
@@ -252,6 +239,18 @@ namespace RootTools
 		#endregion
 
 		#region Mouse
+		private System.Windows.Input.Cursor m_Cursor = System.Windows.Input.Cursors.Arrow;
+		public System.Windows.Input.Cursor p_Cursor
+		{
+			get
+			{
+				return m_Cursor;
+			}
+			set
+			{
+				SetProperty(ref m_Cursor, value);
+			}
+		}
 		private int m_MouseX = 0;
 		public int p_MouseX
 		{
@@ -376,6 +375,33 @@ namespace RootTools
 
 		#endregion
 
+		#region Visibility
+		private Visibility m_VisibleMenu = Visibility.Collapsed;
+		public Visibility p_VisibleMenu
+		{
+			get
+			{
+				return m_VisibleMenu;
+			}
+			set
+			{
+				SetProperty(ref m_VisibleMenu, value);
+			}
+		}
+
+		private Visibility m_VisibleTool = Visibility.Collapsed;
+		public Visibility p_VisibleTool
+		{
+			get
+			{
+				return m_VisibleTool;
+			}
+			set
+			{
+				SetProperty(ref m_VisibleTool, value);
+			}
+        }
+		#endregion
 		// Stack
 		// Object -> Mem Point / w,h
 
@@ -616,6 +642,22 @@ namespace RootTools
 			}
 
 		}
+		public System.Windows.Media.Color GetPixelColor(BitmapSource source, int x, int y)
+		{
+			System.Windows.Media.Color c = System.Windows.Media.Colors.White;
+			if (source != null)
+			{
+				try
+				{
+					CroppedBitmap cb = new CroppedBitmap(source, new Int32Rect(x, y, 1, 1));
+					var pixels = new byte[4];
+					cb.CopyPixels(pixels, 4, 0);
+					c = System.Windows.Media.Color.FromRgb(pixels[2], pixels[1], pixels[0]);
+				}
+				catch (Exception) { }
+			}
+			return c;
+		}
 		#endregion
 
 		#region Command Method
@@ -631,7 +673,7 @@ namespace RootTools
 			ofd.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
 			if (ofd.ShowDialog() == DialogResult.OK)
 			{
-				var viewModel = new Dialog_ImageOpenViewModel(this);
+				var viewModel = new Dialog_ImageOpenViewModel(this as RootViewer_ViewModel);
 				Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
 				if (result.HasValue)
 				{
@@ -831,22 +873,7 @@ namespace RootTools
 		}
 		#endregion
 
-		public System.Windows.Media.Color GetPixelColor(BitmapSource source, int x, int y)
-		{
-			System.Windows.Media.Color c = System.Windows.Media.Colors.White;
-			if (source != null)
-			{
-				try
-				{
-					CroppedBitmap cb = new CroppedBitmap(source, new Int32Rect(x, y, 1, 1));
-					var pixels = new byte[4];
-					cb.CopyPixels(pixels, 4, 0);
-					c = System.Windows.Media.Color.FromRgb(pixels[2], pixels[1], pixels[0]);
-				}
-				catch (Exception) { }
-			}
-			return c;
-		}
+		
 		#endregion
 
 		#region Event
@@ -893,7 +920,6 @@ namespace RootTools
 
 			if (m_KeyEvent == null)
 				return;
-
 		}
 		public virtual void MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
 		{
@@ -916,8 +942,9 @@ namespace RootTools
 					return;
 				}
 			//p_BasicTool.DrawTool(nowPt, GetMemPoint(nowPt));
-
-
+		}
+		public virtual void PreviewMouseUp(object sender, System.Windows.Input.MouseEventArgs e)
+		{
 		}
 		public virtual void MouseWheel(object sender, MouseWheelEventArgs e)
 		{

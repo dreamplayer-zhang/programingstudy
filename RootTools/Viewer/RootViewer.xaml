@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="RootTools.ImageToolViewer"
+﻿<UserControl x:Class="RootTools.RootViewer"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,7 +6,6 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:convert="clr-namespace:ViewConverter"
              xmlns:obs="clr-namespace:nsSizeObserver"
-             xmlns:local="clr-namespace:RootTools"
              mc:Ignorable="d" 
              Cursor="{Binding p_Cursor, Mode=TwoWay}"
              d:DesignHeight="500" d:DesignWidth="500">
@@ -16,23 +15,24 @@
     </UserControl.Resources>
 
     <DockPanel>
-        <Grid DockPanel.Dock="Top">
-            <Menu DockPanel.Dock="Top" Background="{StaticResource ControlBackGround}">
-                <MenuItem BorderBrush="{x:Null}" Header="File" FontFamily="Arial">
+        <Grid DockPanel.Dock="Top" Background="{StaticResource ControlBackGround}"
+              Visibility="{Binding p_VisibleMenu}">
+            <Menu Background="{StaticResource ControlBackGround}" VerticalAlignment="Center">
+                <MenuItem BorderBrush="{x:Null}" Header="File" FontFamily="Arial" Margin="2,0" Height="30">
                     <MenuItem Header="Load Image" Command="{Binding OpenImage}"/>
-                    <MenuItem Header="Save Image"/>
+                    <MenuItem Header="Save Image" IsEnabled="False"/>
                     <MenuItem Header="Clear Image" Command="{Binding ClearImage}"/>
                 </MenuItem>
-                <MenuItem BorderBrush="{x:Null}" Header="Edit" FontFamily="Arial">
+                <MenuItem BorderBrush="{x:Null}" Header="Edit" FontFamily="Arial" Margin="2,0" Height="30">
                     <MenuItem Header="Undo"   IsEnabled="False"/>
                     <MenuItem Header="Redo"   IsEnabled="False"/>
                     <MenuItem Header="Copy"   IsEnabled="False"/>
                     <MenuItem Header="Paste"  IsEnabled="False"/>
                     <MenuItem Header="Delete" IsEnabled="False"/>
                 </MenuItem>
-                <Grid Height="32"/>
             </Menu>
-            <StackPanel Orientation="Horizontal" Background="Gainsboro" HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Background="LightGray"
+                        Visibility="{Binding p_VisibleTool}">
                 <TextBlock Text="Tools" VerticalAlignment="Center" Margin="5,0,0,0"/>
                 <ListBox SelectedIndex="{Binding p_SelectedToolIndex, Mode=TwoWay}"
                          VerticalAlignment="Center" Margin="5,2"

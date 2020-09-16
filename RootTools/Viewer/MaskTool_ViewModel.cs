@@ -13,13 +13,13 @@ using System.Windows.Shapes;
 
 namespace RootTools
 {
-    public class ROI_ViewModel : RootViewer_ViewModel
+    public class MaskTool_ViewModel : RootViewer_ViewModel
     {
-
-
-        public ROI_ViewModel(ImageData image = null, IDialogService dialogService = null)
+        public MaskTool_ViewModel(ImageData image = null, IDialogService dialogService = null)
         {
             base.init(image, dialogService);
+            p_VisibleMenu = Visibility.Visible;
+            p_VisibleTool = Visibility.Visible;
             Shapes.CollectionChanged += Shapes_CollectionChanged;
         }
 
@@ -90,23 +90,7 @@ namespace RootTools
                 m_ModifyElement = value;
             }
         }
-        private Cursor m_Cursor = Cursors.Arrow;
-        public Cursor p_Cursor
-        {
-            get         
-            {
-                if (m_Cursor == null)
-                    test = "null";
-                else
-                    test = m_Cursor.ToString();
-                return m_Cursor;
-            }
-            set
-            {
-                test = value.ToString();
-                SetProperty(ref m_Cursor, value);
-            }
-        }
+
         private string _test;
         public string test
         {
@@ -177,7 +161,7 @@ namespace RootTools
                     }                    
                     break;
                 case ToolProcess.Drawing:
-                    tshape = DrawDone(tshape, eToolType, CanvasPt);
+                    tshape = DrawDone(tshape, eToolType);
                     SetState(ToolProcess.None);
                     break;
                 case ToolProcess.Modifying:
@@ -204,7 +188,7 @@ namespace RootTools
                     break;
             }
         }
-        public void PreviewMouseUp(object sender, MouseEventArgs e)
+        public override void PreviewMouseUp(object sender, MouseEventArgs e)
         {
             switch (eToolProcess)
             {
@@ -319,8 +303,6 @@ namespace RootTools
                         rect.MemoryRect.Bottom = memPt.Y;
                     }
 
-
-
                     CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
                     CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
                     CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
@@ -343,7 +325,7 @@ namespace RootTools
             }
             return shape;
         }
-        private TShape DrawDone(TShape shape, ToolType toolType, CPoint nowPt)
+        private TShape DrawDone(TShape shape, ToolType toolType)
         {
             switch (toolType)
             {

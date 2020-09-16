@@ -634,31 +634,31 @@ namespace RootTools
         #region Command Method
         void _openImage()
 		{
-			//if (p_ImageData == null)
-			//{
-			//	System.Windows.Forms.MessageBox.Show("Image를 열어주세요");
-			//	return;
-			//}
-			//_CancelCopy();
-			//OpenFileDialog ofd = new OpenFileDialog();
-			//ofd.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
-			//if (ofd.ShowDialog() == DialogResult.OK)
-			//{
-			//	var viewModel = new Dialog_ImageOpenViewModel(this);
-			//	Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
-			//	if (result.HasValue)
-			//	{
-			//		if (result.Value)
-			//		{
-			//			p_ImageData.OpenFile(ofd.FileName, p_CopyOffset);
-			//		}
-			//		else
-			//		{
-			//			// Cancelled
-			//		}
-			//	}
-			//}
-		}
+            //if (p_ImageData == null)
+            //{
+            //    System.Windows.Forms.MessageBox.Show("Image를 열어주세요");
+            //    return;
+            //}
+            //_CancelCopy();
+            //OpenFileDialog ofd = new OpenFileDialog();
+            //ofd.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
+            //if (ofd.ShowDialog() == DialogResult.OK)
+            //{
+            //    var viewModel = new Dialog_ImageOpenViewModel(this);
+            //    Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+            //    if (result.HasValue)
+            //    {
+            //        if (result.Value)
+            //        {
+            //            p_ImageData.OpenFile(ofd.FileName, p_CopyOffset);
+            //        }
+            //        else
+            //        {
+            //            // Cancelled
+            //        }
+            //    }
+            //}
+        }
 		void _saveImage()
 		{
 			if (p_ImageData == null)

@@ -7,9 +7,6 @@
              xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="888" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
-    <UserControl.DataContext>
-        <local:Setup_ViewModel/>
-    </UserControl.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -79,8 +76,8 @@
                 </Menu>
                 <Menu>
                     <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
-                                  BorderThickness="0,0,0,0">
+                              BorderBrush="#FF707070"
+                              BorderThickness="0,0,0,0">
                         <MenuItem.Header>
                             <Grid Width="80" Height="25">
                                 <TextBlock Text="Setup Map"
