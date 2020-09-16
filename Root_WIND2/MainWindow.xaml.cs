@@ -154,11 +154,11 @@ namespace Root_WIND2
             viewer.p_ROI_VM = new ROI_ViewModel(m_Image, dialogService);
             panel.DataContext = viewer.p_ROI_VM;
 
-            
+
             //InitUI();
             //InitTimer();
 
-            
+
             m_RecipeMGR = new RecipeManager();
             m_Recipe = m_RecipeMGR.GetRecipe();
             m_RecipeEditor = m_Recipe.GetRecipeEditor();
@@ -210,24 +210,26 @@ namespace Root_WIND2
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            RecipeData_Origin pOrigin = m_Recipe.GetRecipeData().GetRecipeOrigin();
+            //RecipeData_Origin pOrigin = m_Recipe.GetRecipeData().GetRecipeOrigin();
+            //CPoint ptOrigin = pOrigin.GetOriginPoint();
+            //CRect rtOrigin = pOrigin.GetOriginRect();
 
-            CPoint ptOrigin = pOrigin.GetOriginPoint();
-            CRect rtOrigin = pOrigin.GetOriginRect();
-            byte[] InspectionBuffer = new byte[rtOrigin.Width * rtOrigin.Height];
+            //int nStride = (int)m_Image.p_Stride;
+            //byte[] InspectionBuffer = new byte[rtOrigin.Width * rtOrigin.Height];
+            //for (int y = 0; y < rtOrigin.Height; y++)
+            //{
+            //    Marshal.Copy(
+            //    m_Image.GetPtr() + ptOrigin.X + (y + ptOrigin.Y) * nStride, // source
+            //    InspectionBuffer,
+            //    rtOrigin.Width * y,
+            //    rtOrigin.Width
+            //    );
+            //}
 
-            for (int y = 0; y < rtOrigin.Height; y++)
-            {
-                Marshal.Copy(
-                m_Image.GetPtr() + ptOrigin.X + (y + ptOrigin.Y) * (int)rtOrigin.Width, // source
-                InspectionBuffer,
-                rtOrigin.Width * y,
-                rtOrigin.Height
-                );
-            }
-            CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, rtOrigin.Width, rtOrigin.Height,true, 200);
+            //CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, rtOrigin.Width, rtOrigin.Height, true, 200);
+            m_RecipeMGR.OpenRecipe();
+            //m_RecipeMGR.SaveRecipe();
 
-            //CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, nBufferWidth, nBufferHeight, this.parameter.IsDark, this.parameter.Threshold);
         }
     }
     public class Viewer : ObservableObject
@@ -271,4 +273,5 @@ namespace Root_WIND2
             }
         }
     }
+
 }
