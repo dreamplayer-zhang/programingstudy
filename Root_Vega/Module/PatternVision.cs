@@ -831,7 +831,8 @@ namespace Root_Vega.Module
                     }
                     AxisXY axisXY = m_module.p_axisXY;
                     Axis axisZ = m_module.p_axisZ;
-                    m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
+                    CPoint cpMemory = new CPoint(m_cpMemory);
+                    cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fYRes);        // 축해상도 0.1um로 하드코딩.
                     double XScal = m_fXRes*10;
                     int nLines = Convert.ToInt32(m_yLine * 1000 / m_fYRes);
@@ -878,7 +879,7 @@ namespace Root_Vega.Module
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
 
                         /* 방향 바꾸는 코드 들어가야함*/
-                        m_grabMode.StartGrab(mem, m_cpMemory, nLines, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.StartGrab(mem, cpMemory, nLines, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
                         if (m_module.Run(axisXY.p_axisY.StartMove(yPos1, nScanSpeed)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
@@ -886,7 +887,7 @@ namespace Root_Vega.Module
                         axisXY.p_axisY.RunTrigger(false);
 
                         nScanLine++;
-                        m_cpMemory.X += m_grabMode.m_camera.GetRoiSize().X;
+                        cpMemory.X += m_grabMode.m_camera.GetRoiSize().X;
 
                         // 1Strip Scan 후 검사
 
@@ -927,6 +928,8 @@ namespace Root_Vega.Module
                 finally
                 {
                     m_grabMode.SetLight(false);
+
+                    //
                     if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == true))
                     {
                         m_grabMode.m_RADSControl.p_IsRun = false;

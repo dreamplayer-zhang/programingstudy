@@ -889,7 +889,7 @@ namespace Root_Vega.Module
                 InitModuleRun(module);
             }
 
-            int m_nRetry = 3;
+            int m_nRetry = 10;
             double m_fMinScore = 70; 
             public override ModuleRunBase Clone()
             {
