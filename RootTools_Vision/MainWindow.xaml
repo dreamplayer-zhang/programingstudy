@@ -161,10 +161,10 @@
             <StackPanel Grid.Column="2" Grid.Row="1">
                 <Button Content="Register WorkBundle" Height="60" Click="BtnRegisterWorkBundle"></Button>
                 <Button Content="Add Position" Height="30" Click="BtnAddPosition"></Button>
-                <Button Content="Add PreInspection" Height="30" Click="BtnAddPreInspection"></Button>
-                <Button Content="Add Inspection(D2D)" Height="30" Click="BtnAddInspectionD2D"></Button>
+                <!--<Button Content="Add PreInspection" Height="30" Click="BtnAddPreInspection"></Button>
+                <Button Content="Add Inspection(D2D)" Height="30" Click="BtnAddInspectionD2D"></Button>-->
                 <Button Content="Add Inspection(Surface)" Height="30" Click="BtnAddInspectionSurface"></Button>
-                <Button Content="Add Measuremnet" Height="30" Click="BtnAddMeasurement"></Button>
+                <Button Content="Add ProcessDefect" Height="30" Click="BtnAddProcessDefect"></Button>
 
                 <Button Name="btnImageOpen" Content="Open Image" Height="30" Command="{Binding btnClickOpenImage}"/>
                 <Button Content="SELECT DATA" Height="30" Click="Button_Click_2"/>

@@ -93,9 +93,10 @@
                     </Grid>
                 </GroupBox>
             </Grid>
-            
+
+
             <!--Alignment-->
-            <TextBlock Text="Alignment"
+            <TextBlock Text="FrontSide"
                        HorizontalAlignment="Right"
                        FontSize="25"
                        Margin="0,10,10,0"
@@ -116,7 +117,7 @@
                 </GroupBox>
                 <GroupBox Grid.Column="1"
                           Background="{StaticResource GroupBoxBackground}"
-                          Header="Origin＆Die Position">
+                          Header="Origin Position">
                     <Grid Background="Black">
                         <Viewbox>
                             <Grid>
@@ -202,13 +203,6 @@
                     </GroupBox>
                 </Grid>
             </Grid>
-            
-            <!--General-->
-            <TextBlock Text="General"
-                       HorizontalAlignment="Right"
-                       FontSize="25"
-                       Margin="0,10,10,0"
-                       FontWeight="Bold"/>
             <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
             <Grid Height="500">
                 <Grid.ColumnDefinitions>
@@ -243,10 +237,47 @@
                         </Viewbox>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="Inspection" Grid.Column="1">
-                    
+                <GroupBox Header="Inspection Items" Grid.Column="1">
+                    <DataGrid IsReadOnly="True" Grid.Row="1">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="No." Binding="{Binding Path=no}" Width="*"/>
+                            <DataGridTextColumn Header="Mask" Binding="{Binding Path=mode}" Width="*"/>
+                            <DataGridTextColumn Header="Color" Binding="{Binding Path=dc}" Width="*"/>
+                            <DataGridTextColumn Header="Inspection Method" Binding="{Binding Path=chip}" Width="*"/>
+                            <DataGridTextColumn Header="Value" Binding="{Binding Path=xy}" Width="*"/>
+                            <DataGridTextColumn Header="Size(Pxl)" Binding="{Binding Path=gv}" Width="*"/>
+                            <DataGridTextColumn Header="Mode" Binding="{Binding Path=size}" Width="*"/>
+                        </DataGrid.Columns>
+                        <local:DummyResult no="0" mode="Mask1" dc="Red" xy="55" gv="30" size="Surface" chip="Surface_1"/>
+                        <local:DummyResult no="1" mode="Mask2" dc="Blue" xy="100" gv="100" size="Surface" chip="SurfaceAbs_1"/>
+                        <local:DummyResult no="2" mode="Mask3" dc="Green" xy="60" gv="25" size="D2D"  chip="D2D_1"/>
+
+                    </DataGrid>
                 </GroupBox>
             </Grid>
+            <TextBlock Text="BackSide"
+                       HorizontalAlignment="Right"
+                       FontSize="25"
+                       Margin="0,10,10,0"
+                       FontWeight="Bold"/>
+            <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
+            <TextBlock Text="Edge"
+                       HorizontalAlignment="Right"
+                       FontSize="25"
+                       Margin="0,10,10,0"
+                       FontWeight="Bold"/>
+            <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
+            <TextBlock Text="EBR"
+                       HorizontalAlignment="Right"
+                       FontSize="25"
+                       Margin="0,10,10,0"
+                       FontWeight="Bold"/>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

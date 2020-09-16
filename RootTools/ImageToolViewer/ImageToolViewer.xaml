@@ -16,33 +16,43 @@
     </UserControl.Resources>
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top" Background="{StaticResource ControlBackGround}">
-            <MenuItem BorderBrush="{x:Null}" IsCheckable="True">
-                <MenuItem.Header>
-                    <TextBlock Text="File"/>
-                </MenuItem.Header>
-            </MenuItem>
-            <MenuItem BorderBrush="{x:Null}" IsCheckable="True">
-                <MenuItem.Header>
-                    <TextBlock Text="Edit"/>
-                </MenuItem.Header>
-            </MenuItem>
-            <ListBox SelectedIndex="{Binding p_SelectedToolIndex, Mode=TwoWay}"
+        <Grid DockPanel.Dock="Top">
+            <Menu DockPanel.Dock="Top" Background="{StaticResource ControlBackGround}">
+                <MenuItem BorderBrush="{x:Null}" Header="File" FontFamily="Arial">
+                    <MenuItem Header="Load Image" Command="{Binding OpenImage}"/>
+                    <MenuItem Header="Save Image"/>
+                    <MenuItem Header="Clear Image" Command="{Binding ClearImage}"/>
+                </MenuItem>
+                <MenuItem BorderBrush="{x:Null}" Header="Edit" FontFamily="Arial">
+                    <MenuItem Header="Undo"   IsEnabled="False"/>
+                    <MenuItem Header="Redo"   IsEnabled="False"/>
+                    <MenuItem Header="Copy"   IsEnabled="False"/>
+                    <MenuItem Header="Paste"  IsEnabled="False"/>
+                    <MenuItem Header="Delete" IsEnabled="False"/>
+                </MenuItem>
+                <Grid Height="32"/>
+            </Menu>
+            <StackPanel Orientation="Horizontal" Background="Gainsboro" HorizontalAlignment="Right">
+                <TextBlock Text="Tools" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                <ListBox SelectedIndex="{Binding p_SelectedToolIndex, Mode=TwoWay}"
+                         VerticalAlignment="Center" Margin="5,2"
                      SelectionMode="Single">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel/>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBoxItem Visibility="Collapsed"/>
-                <ListBoxItem Content="Point" IsEnabled="False" FontWeight="Bold"/>
-                <ListBoxItem Content="Line" IsEnabled="False" FontWeight="Bold"/>
-                <ListBoxItem Content="Rect" FontWeight="Bold"/>
-                <ListBoxItem Content="Circle" IsEnabled="False" FontWeight="Bold"/>
-                <ListBoxItem Content="Polygon" IsEnabled="False" FontWeight="Bold"/>
-            </ListBox>
-            
-        </Menu>
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBoxItem Visibility="Collapsed"/>
+                    <ListBoxItem Content="Point" IsEnabled="False" FontWeight="Bold"/>
+                    <ListBoxItem Content="Line" IsEnabled="False" FontWeight="Bold"/>
+                    <ListBoxItem Content="Rect" FontWeight="Bold"/>
+                    <ListBoxItem Content="Circle" IsEnabled="False" FontWeight="Bold"/>
+                    <ListBoxItem Content="Polygon" IsEnabled="False" FontWeight="Bold"/>
+                </ListBox>
+                <Button Content="Delete Alll" FontFamily="Arial" Padding="5,0" Margin="0,2,5,2"
+                        />
+            </StackPanel>
+        </Grid>
         <Grid DockPanel.Dock="Bottom" Background="{StaticResource ControlBackGround}">
             <Grid HorizontalAlignment="Left" Margin="5,0">
                 <StackPanel Orientation="Horizontal" TextElement.Foreground="{StaticResource MainThema}">

@@ -44,16 +44,6 @@ namespace Root_WIND2
                 });
             }
         }
-        public ICommand btnWizardPreAlign
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    m_Setup.SetWizardPreAlign();
-                });
-            }
-        }
         public ICommand btnWizardFrontSide
         {
             get
