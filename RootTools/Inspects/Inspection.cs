@@ -50,6 +50,12 @@ namespace RootTools.Inspects
 		public void Dispose()
 		{
 			//clrInsp.Dispose();
+			if(_thread.IsAlive)
+			{
+				//_thread.Interrupt();
+				_thread.Interrupt();
+				shouldStop = false;
+			}
 		}
 		
 		
@@ -172,7 +178,10 @@ namespace RootTools.Inspects
 					shouldStop = true;
 					bState = InspectionState.Done;
 					//여기서 완료이벤트?
-					_thread.Join();
+					if(_thread.ThreadState == ThreadState.WaitSleepJoin)
+					{
+						_thread.Interrupt();
+					}
 				}
 			}
 		}
