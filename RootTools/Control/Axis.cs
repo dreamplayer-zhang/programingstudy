@@ -573,7 +573,7 @@ namespace RootTools.Control
         #endregion
 
         #region Trigger
-        protected class Trigger
+        public class Trigger
         {
             public double[] m_aPos = new double[2] { 0, 0 };
             public double m_dPos = 10;
@@ -595,7 +595,8 @@ namespace RootTools.Control
                 m_bCmd = tree.Set(m_bCmd, m_bCmd, "Command Encoder", "use Command Encoder (false = Actual)");
             }
         }
-        protected Trigger m_trigger = new Trigger(); 
+        public Trigger m_trigger = new Trigger();
+        public string m_sUnit = "mm";
 
         public void SetTrigger(double fPos0, double fPos1, double dPos, bool bCmd)
         {

@@ -153,47 +153,50 @@ namespace Root_ASIS.Module
         #region RunLoad
         public string RunLoad(double secTimeout)
         {
-            StopWatch sw = new StopWatch();
-            int msTimeout = (int)(1000 * secTimeout);
-            p_bCheck = m_diCheck.p_bIn;
-            if (m_diBlowAlarm.p_bIn) return "Blow Alarm DI Detected"; 
-            try
+            lock (m_csLock)
             {
-                if (m_dioEV.m_aBitDI[1].p_bOn)
+                StopWatch sw = new StopWatch();
+                int msTimeout = (int)(1000 * secTimeout);
+                p_bCheck = m_diCheck.p_bIn;
+                if (m_diBlowAlarm.p_bIn) return "Blow Alarm DI Detected";
+                try
                 {
-                    p_eMove = eMove.Down;
-                    while (m_dioEV.m_aBitDI[1].p_bOn)
+                    if (m_dioEV.m_aBitDI[1].p_bOn)
                     {
-                        Thread.Sleep(10);
-                        if (sw.ElapsedMilliseconds > msTimeout) return "RunLoad Timeout : Up Sensor";
+                        p_eMove = eMove.Down;
+                        while (m_dioEV.m_aBitDI[1].p_bOn)
+                        {
+                            Thread.Sleep(10);
+                            if (sw.ElapsedMilliseconds > msTimeout) return "RunLoad Timeout : Up Sensor";
+                        }
+                        if (m_diTop.p_bIn == false) p_eMove = eMove.Stop;
                     }
-                    if (m_diTop.p_bIn == false) p_eMove = eMove.Stop;
-                }
-                if (m_diTop.p_bIn)
-                {
-                    p_eMove = eMove.Down;
-                    while (m_diTop.p_bIn)
+                    if (m_diTop.p_bIn)
                     {
-                        Thread.Sleep(10);
-                        if (sw.ElapsedMilliseconds > msTimeout) return "RunLoad Timeout : Top Sensor Down";
+                        p_eMove = eMove.Down;
+                        while (m_diTop.p_bIn)
+                        {
+                            Thread.Sleep(10);
+                            if (sw.ElapsedMilliseconds > msTimeout) return "RunLoad Timeout : Top Sensor Down";
+                        }
+                        p_eMove = eMove.Stop;
+                    }
+                    p_eMove = eMove.Up;
+                    while (m_diTop.p_bIn == false)
+                    {
+                        Thread.Sleep(1);
+                        if (sw.ElapsedMilliseconds > msTimeout) return "RunLoad Timeout : Top Sensor Up";
                     }
                     p_eMove = eMove.Stop;
+                    p_bPaper = m_diPaper.p_bIn;
+                    AddNewInfoStrip();
+                    p_bDone = p_bCheck;
+                    return "OK";
                 }
-                p_eMove = eMove.Up;
-                while (m_diTop.p_bIn == false)
+                finally
                 {
-                    Thread.Sleep(1);
-                    if (sw.ElapsedMilliseconds > msTimeout) return "RunLoad Timeout : Top Sensor Up";
+                    p_eMove = eMove.Stop;
                 }
-                p_eMove = eMove.Stop;
-                p_bPaper = m_diPaper.p_bIn;
-                AddNewInfoStrip();
-                p_bDone = p_bCheck; 
-                return "OK";
-            }
-            finally
-            {
-                p_eMove = eMove.Stop; 
             }
         }
 
@@ -210,19 +213,22 @@ namespace Root_ASIS.Module
         #region RunDown
         public string RunDown(double secDown)
         {
-            StopWatch sw = new StopWatch();
-            int msDown = (int)(1000 * secDown);
-            try
+            lock (m_csLock)
             {
-                p_eMove = eMove.Down; 
-                while ((sw.ElapsedMilliseconds < msDown) && (EQ.IsStop() == false)) Thread.Sleep(10);
+                StopWatch sw = new StopWatch();
+                int msDown = (int)(1000 * secDown);
+                try
+                {
+                    p_eMove = eMove.Down;
+                    while ((sw.ElapsedMilliseconds < msDown) && (EQ.IsStop() == false)) Thread.Sleep(10);
+                }
+                finally
+                {
+                    p_eMove = eMove.Stop;
+                    p_bDone = false;
+                }
+                return "OK";
             }
-            finally
-            {
-                p_eMove = eMove.Stop;
-                p_bDone = false;
-            }
-            return "OK"; 
         }
         #endregion
 
@@ -251,6 +257,7 @@ namespace Root_ASIS.Module
         }
         #endregion
 
+        readonly object m_csLock = new object();
         public LoadEV(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);

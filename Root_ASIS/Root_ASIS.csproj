@@ -125,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Module\ASIS.cs" />
+    <Compile Include="Module\Boat.cs" />
     <Compile Include="Module\Loader0.cs" />
     <Compile Include="Module\LoadEV.cs" />
     <Compile Include="Module\Picker.cs" />

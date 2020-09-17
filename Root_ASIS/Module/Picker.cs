@@ -2,6 +2,7 @@
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
+using System.CodeDom;
 using System.Threading;
 
 namespace Root_ASIS.Module
@@ -192,8 +193,16 @@ namespace Root_ASIS.Module
             set
             {
                 _infoStrip = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
+                m_reg.Write("iStrip", (value == null) ? -1 : value.p_iStrip); 
             }
+        }
+
+        void InitStrip()
+        {
+            int iStrip = m_reg.Read("iStrip", -1);
+            if (iStrip < 0) return;
+            p_infoStrip = new InfoStrip(iStrip); 
         }
         #endregion
 
@@ -218,11 +227,14 @@ namespace Root_ASIS.Module
         #endregion
 
         public string p_id { get; set; }
-        ModuleBase m_module; 
+        ModuleBase m_module;
+        Registry m_reg; 
         public Picker(string id, ModuleBase module)
         {
             p_id = id;
-            m_module = module; 
+            m_module = module;
+            m_reg = new Registry(p_id);
+            InitStrip(); 
             InitThread(); 
         }
 

@@ -15,7 +15,6 @@ namespace RootTools.Control.ACS
 
         #region Property
         int m_nAxis = -1;
-        string m_sUnit = "mm"; 
         bool m_bAbsoluteEncoder = false;
         void RunTreeSettingProperty(Tree tree)
         {

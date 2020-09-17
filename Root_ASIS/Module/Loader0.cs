@@ -23,15 +23,17 @@ namespace Root_ASIS.Module
 
         public override void GetTools(bool bInit)
         {
-/*            p_sInfo = m_toolBox.Get(ref m_dioEV, this, "Elevator", "Down", "Up");
-            p_sInfo = m_toolBox.Get(ref m_diTop, this, "Top");
-            p_sInfo = m_toolBox.Get(ref m_diCheck, this, "Check");
-            p_sInfo = m_toolBox.Get(ref m_diBlowAlarm, this, "BlowAlarm");
-            p_sInfo = m_toolBox.Get(ref m_diPaper, this, "Paper");
-            p_sInfo = m_toolBox.Get(ref m_diPaperCheck, this, "PaperCheck");
-            p_sInfo = m_toolBox.Get(ref m_diPaperFull, this, "PaperFull");
-            p_sInfo = m_toolBox.Get(ref m_doIonBlow, this, "IonBlow");
-            p_sInfo = m_toolBox.Get(ref m_doAlignBlow, this, "AlignBlow"); */
+            m_aPicker[ePicker.Strip].GetTools(this, bInit);
+            m_aPicker[ePicker.Paper].GetTools(this, bInit);
+            /*            p_sInfo = m_toolBox.Get(ref m_dioEV, this, "Elevator", "Down", "Up");
+                        p_sInfo = m_toolBox.Get(ref m_diTop, this, "Top");
+                        p_sInfo = m_toolBox.Get(ref m_diCheck, this, "Check");
+                        p_sInfo = m_toolBox.Get(ref m_diBlowAlarm, this, "BlowAlarm");
+                        p_sInfo = m_toolBox.Get(ref m_diPaper, this, "Paper");
+                        p_sInfo = m_toolBox.Get(ref m_diPaperCheck, this, "PaperCheck");
+                        p_sInfo = m_toolBox.Get(ref m_diPaperFull, this, "PaperFull");
+                        p_sInfo = m_toolBox.Get(ref m_doIonBlow, this, "IonBlow");
+                        p_sInfo = m_toolBox.Get(ref m_doAlignBlow, this, "AlignBlow"); */
             if (bInit) InitTools();
         }
 
@@ -40,8 +42,24 @@ namespace Root_ASIS.Module
         }
         #endregion
 
-        public Loader0(string id, IEngineer engineer)
+        #region Picker
+        enum ePicker
         {
+            Strip,
+            Paper
+        }
+        Dictionary<ePicker, Picker> m_aPicker = new Dictionary<ePicker, Picker>();
+
+        void InitPicker()
+        {
+            m_aPicker.Add(ePicker.Strip, new Picker(p_id + ".StripPicker", this));
+            m_aPicker.Add(ePicker.Paper, new Picker(p_id + ".PaperPicker", this));
+        }
+        #endregion
+
+        public Loader0(string id, IEngineer engineer, LoadEV loadEV)
+        {
+            InitPicker();
             base.InitBase(id, engineer);
         }
 
