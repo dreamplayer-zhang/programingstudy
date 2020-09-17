@@ -258,6 +258,7 @@ namespace RootTools.Inspects
 			_SideBottomUpperOffset = new Param<int>(10000, 0, int.MaxValue);
 			_SideBottomCenterOffset = new Param<int>(30000, 0, int.MaxValue);
 			_SideBottomUnderOffset = new Param<int>(10000, 0, int.MaxValue);
+
 		}
 
 		#region SideInspMargin
@@ -591,8 +592,6 @@ namespace RootTools.Inspects
 			_min = Min;
 			_max = Max;
 			_value = Value;
-
-
 		}
 	}
 	public class BaseParamData : ObservableObject

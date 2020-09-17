@@ -8,6 +8,7 @@ namespace Root_WIND2
 {
     public class RecipeParameter
     {
+        public ParamData_Origin m_ParamData_Origin;
 
         public RecipeParameter()
         {
@@ -15,8 +16,7 @@ namespace Root_WIND2
         }
         public void Init()
         {
-
+            m_ParamData_Origin = new ParamData_Origin();
         }
-
     }
 }
