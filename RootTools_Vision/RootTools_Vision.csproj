@@ -125,7 +125,7 @@
     <Compile Include="Vision_Engineer.cs" />
     <Compile Include="WorkManager\IWork.cs" />
     <Compile Include="WorkManager\IWorkable.cs" />
-    <Compile Include="WorkManager\Alignment.cs" />
+    <Compile Include="WorkManager\Position.cs" />
     <Compile Include="WorkManager\Surface.cs" />
     <Compile Include="WorkManager\WaferMapInfo.cs" />
     <Compile Include="WorkManager\WorkBase.cs" />

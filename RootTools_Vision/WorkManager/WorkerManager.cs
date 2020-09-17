@@ -24,7 +24,7 @@ namespace RootTools_Vision
         WORKPLACE_STATE excuteCondition = WORKPLACE_STATE.NONE;
 
 
-        public WorkerManager(List<Worker> _workers)
+        public WorkerManager(List<Worker> _workers, WORKPLACE_STATE _resultState, WORKPLACE_STATE _excuteCondition)
         {
             foreach(Worker worker in _workers)
             {
@@ -32,19 +32,19 @@ namespace RootTools_Vision
             }
             this.workers = _workers;
 
+            this.resultState = _resultState;
+            this.excuteCondition = _excuteCondition;
+
             cancellationTokenSource = new CancellationTokenSource();
             CancellationToken token = cancellationTokenSource.Token;
 
             this.task = Task.Factory.StartNew(() => { Run(); }, token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
 
-        public void SetBundles(WorkBundle _workbundle, WorkplaceBundle _workplacebundle, WORKPLACE_STATE _resultState, WORKPLACE_STATE _excuteCondition)
+        public void SetBundles(WorkBundle _workbundle, WorkplaceBundle _workplacebundle)
         {
             this.workBundle = _workbundle;
             this.workplaceBundle = _workplacebundle;
-
-            this.resultState = _resultState;
-            this.excuteCondition = _excuteCondition;
         }
 
         private void WorkplaceStateChanged_Callback(object obj)

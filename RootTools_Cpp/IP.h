@@ -21,22 +21,22 @@ public:
 		2. 원본 이미지와 ROI 정보를 입력으로 받아 연산 진행 (Unsafe 사용)
 	  - 
 	*/
-	static void Threshold(BYTE* pSrc, BYTE* pDst, int nW, int nH, bool bDark, int threshold);
-	static void Threshold(BYTE* pSrc, BYTE* pDst, int nMemW, int nMemH, Point ptLeftTop, Point ptRightBot, bool bDark, int threshold);
+	static void Threshold(BYTE* pSrc, BYTE* pDst, int nW, int nH, bool bDark, int thresh);
+	static void Threshold(BYTE* pSrc, BYTE* pDst, int nMemW, int nMemH, Point ptLT, Point ptRB, bool bDark, int thresh);
 
 	static float Average(BYTE* pSrc, int nW, int nH);	
-	static float Average(BYTE* pSrc, int nMemW, int nMemH, Point ptLeftTop, Point ptRightBot);
+	static float Average(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB);
 	
 	static void Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nW, int nH, bool bDark);
-	static void Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nMemW, int nMemH, Point ptLeftTop, Point ptRightBot, bool bDark);
+	static void Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nMemW, int nMemH, Point ptLT, Point ptRB, bool bDark);
 
 	// Method 참고 : https://docs.opencv.org/2.4/doc/tutorials/imgproc/histograms/template_matching/template_matching.html
-	static int TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nSrcW, int nSrcH, int nTempW, int nTempH, int method = 5);
+	static float TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nSrcW, int nSrcH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method = 5);
 
 	// Filtering
-	static void GaussianBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nSigma);
-	static void MedianBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nFilterSz);
-	static void Morphology(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nFilterSz, std::string strMethod, int nIter);
+	static void GaussianBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nSig);
+	static void MedianBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nFiltSz);
+	static void Morphology(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nFiltSz, std::string strMethod, int nIter);
 };
 
 
