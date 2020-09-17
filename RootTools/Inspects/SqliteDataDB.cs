@@ -474,7 +474,10 @@ namespace ATI
 			sqLiteAdapter = new SQLiteDataAdapter(string.Format("SELECT * FROM {0}", dataTable.TableName), sqliteDBconnect);
 			sqLiteAdapter.AcceptChangesDuringFill = false;
 			var builder = new SQLiteCommandBuilder(sqLiteAdapter);
+			BeginWrite();
 			sqLiteAdapter.Update(dataTable);
+			Commit();
+			
 			builder.Dispose();
 
 			return true;

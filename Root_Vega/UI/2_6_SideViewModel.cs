@@ -408,7 +408,7 @@ namespace Root_Vega
 				return;
 
 			//0. 개수 초기화 및 Table Drop
-			_clearInspReslut();
+			//_clearInspReslut();
 
 			ClearDrawList();
 
@@ -572,7 +572,7 @@ namespace Root_Vega
 
 		private void _endInsp()
 		{
-			//			m_Engineer.ClassToolBox().
+			m_Engineer.m_InspManager.InspectionDone();
 		}
 
 		public void _addRoi()
