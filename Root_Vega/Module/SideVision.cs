@@ -1607,8 +1607,6 @@ namespace Root_Vega.Module
             public double m_dReticleSizeX = 150;    // 단위 mm
             public double m_dInnerOffsetMM = 25;    // 단위 mm
 
-            public double m_dLeftPosZ = 0.0;
-            public double m_dRightPosZ = 0.0;
             public eScanPos m_eScanPos = eScanPos.Bottom;
             public bool m_bFindXPos = false;
 
@@ -1634,8 +1632,6 @@ namespace Root_Vega.Module
                 run.m_dReticleSizeX = m_dReticleSizeX;
                 run.m_dInnerOffsetMM = m_dInnerOffsetMM;
 
-                run.m_dLeftPosZ = m_dLeftPosZ;
-                run.m_dRightPosZ = m_dRightPosZ;
                 run.m_eScanPos = m_eScanPos;
                 run.m_bFindXPos = m_bFindXPos;
 
@@ -1657,8 +1653,6 @@ namespace Root_Vega.Module
                 m_dRes = tree.Set(m_dRes, m_dRes, "Cam Resolution", "Resolution  um", bVisible);
                 m_dReticleSizeX = tree.Set(m_dReticleSizeX, m_dReticleSizeX, "Reticle Size X", "Reticle Size X (mm)", bVisible);
                 m_dInnerOffsetMM = tree.Set(m_dInnerOffsetMM, m_dInnerOffsetMM, "Inner Offset X", "Inner Offset X (mm)", bVisible);
-                m_dLeftPosZ = tree.Set(m_dLeftPosZ, m_dLeftPosZ, "Left Z Position", "Left Start Z Position", bVisible);
-                m_dRightPosZ = tree.Set(m_dRightPosZ, m_dRightPosZ, "Right Z Position", "Right Start Z Position", bVisible);
                 m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
                 m_bFindXPos = tree.Set(m_bFindXPos, m_bFindXPos, "Find X Position Again", "Find X Position Again", bVisible);
 
@@ -1680,9 +1674,9 @@ namespace Root_Vega.Module
                 p_afs.p_strStatus = "Ready";
                 double dLeftHeight = 0;
                 double dRightHeight = 0;
-                double dCenterHeight = 0;
-                double dFocusHeight = 177;
-                int nVerticalPixelPerPulse = 105;
+                //double dCenterHeight = 0;
+                //double dFocusHeight = 177;
+                //int nVerticalPixelPerPulse = 105;
                 double dPulsePerMM = 10000;
                 double dLeftSnapPosY = m_rpCenterAxisPos.Y + (m_dReticleSizeX / 2 * dPulsePerMM) - (m_dInnerOffsetMM * dPulsePerMM);
                 double dRightSnapPosY = m_rpCenterAxisPos.Y - (m_dReticleSizeX / 2 * dPulsePerMM) + (m_dInnerOffsetMM * dPulsePerMM);
@@ -1715,7 +1709,7 @@ namespace Root_Vega.Module
                     // 1.Reticle 좌측 위치로 이동
                     p_afs.p_strStatus = "Left Side Snap...";
                     if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dLeftSnapPosY)))) return p_sInfo;
-                    if (m_module.Run(axisZ.StartMove(m_dLeftPosZ))) return p_sInfo;
+                    if (m_module.Run(axisZ.StartMove(axisZ.GetPosValue(eAxisPosZ.LADS)))) return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
                     string strRet = cam.Grab();
@@ -1737,8 +1731,7 @@ namespace Root_Vega.Module
                     // 2. Reticle 우측 위치로 이동
                     p_afs.p_strStatus = "Right Side Snap...";
                     if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dRightSnapPosY)))) return p_sInfo;
-                    double dPosZ = axisZ.GetPosValue(eAxisPosZ.LADS);
-                    if (m_module.Run(axisZ.StartMove(dPosZ))) return p_sInfo;
+                    if (m_module.Run(axisZ.StartMove(axisZ.GetPosValue(eAxisPosZ.LADS)))) return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
                     strRet = cam.Grab();
@@ -1759,51 +1752,53 @@ namespace Root_Vega.Module
 
                     // 3. 좌우측 높이차 구하기   - 정확한 Resolution 알아서 다시 구해야 함.
                     double dDiff = dLeftHeight - dRightHeight;
+                    double dConvertingDiffHeightToPulse = dDiff * m_dConstant;
+                    double dDistanceOfLeftToRight = Math.Abs(dLeftSnapPosY - dRightSnapPosY);
 
-                    // 4. Theta 돌리기
-                    double dActualPos = m_module.p_axisTheta.p_posActual;
-                    double dScaled = dDiff * m_dConstant;    // AutoFocus로 돌아간 Pulse값으로 역계산한 상수 8.1592
-                    m_module.p_axisTheta.StartMove(dActualPos + dScaled);
-                    m_module.p_axisTheta.m_aPos["Snap"] = dScaled;
+                    //// 4. Theta 돌리기
+                    //double dActualPos = m_module.p_axisTheta.p_posActual;
+                    //double dScaled = dDiff * m_dConstant;    // AutoFocus로 돌아간 Pulse값으로 역계산한 상수 8.1592
+                    //m_module.p_axisTheta.StartMove(dActualPos + dScaled);
+                    //m_module.p_axisTheta.m_aPos["Snap"] = dScaled;
 
-                    // 5. Y축 Center 위치에서 Laser의 높이가 69(LineScan카메라 Focus가 맞는 위치)에 맞도록 X위치 찾기
-                    p_afs.p_strStatus = "Center Snap...";
-                    if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, m_rpCenterAxisPos.Y)))) return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                    strRet = cam.Grab();
-                    dCenterHeight = CalculatingHeight(img);
-                    img.SaveImageSync($"D:/BottomCenter.bmp");
-                    System.Drawing.Bitmap bmpCenter = null;
-                    bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                    if (_dispatcher != null)
-                    {
-                        _dispatcher.Invoke(new Action(delegate ()
-                        {
-                            string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
-                            BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
-                            p_bmpSrcCenterViewer = bmpSrc;
-                            p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                        }));
-                    }
-                    m_module.m_dMaxScorePosX = m_rpCenterAxisPos.X + ((dCenterHeight - m_dFocusHeight) * m_nVerticalPixelPerPulse);
+                    //// 5. Y축 Center 위치에서 Laser의 높이가 69(LineScan카메라 Focus가 맞는 위치)에 맞도록 X위치 찾기
+                    //p_afs.p_strStatus = "Center Snap...";
+                    //if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, m_rpCenterAxisPos.Y)))) return p_sInfo;
+                    //if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    //strRet = cam.Grab();
+                    //dCenterHeight = CalculatingHeight(img);
+                    //img.SaveImageSync($"D:/BottomCenter.bmp");
+                    //System.Drawing.Bitmap bmpCenter = null;
+                    //bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    //if (_dispatcher != null)
+                    //{
+                    //    _dispatcher.Invoke(new Action(delegate ()
+                    //    {
+                    //        string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
+                    //        BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
+                    //        p_bmpSrcCenterViewer = bmpSrc;
+                    //        p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    //    }));
+                    //}
+                    //m_module.m_dMaxScorePosX = m_rpCenterAxisPos.X + ((dCenterHeight - m_dFocusHeight) * m_nVerticalPixelPerPulse);
 
-                    // 6. 찾은 위치로 이동해서 한번 더 촬영
-                    if (m_module.Run(axisXY.StartMove(new RPoint(m_module.m_dMaxScorePosX, m_rpCenterAxisPos.Y)))) return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                    strRet = cam.Grab();
-                    dCenterHeight = CalculatingHeight(img);
-                    bmpCenter = null;
-                    bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                    if (_dispatcher != null)
-                    {
-                        _dispatcher.Invoke(new Action(delegate ()
-                        {
-                            string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
-                            BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
-                            p_bmpSrcCenterViewer = bmpSrc;
-                            p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                        }));
-                    }
+                    //// 6. 찾은 위치로 이동해서 한번 더 촬영
+                    //if (m_module.Run(axisXY.StartMove(new RPoint(m_module.m_dMaxScorePosX, m_rpCenterAxisPos.Y)))) return p_sInfo;
+                    //if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    //strRet = cam.Grab();
+                    //dCenterHeight = CalculatingHeight(img);
+                    //bmpCenter = null;
+                    //bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    //if (_dispatcher != null)
+                    //{
+                    //    _dispatcher.Invoke(new Action(delegate ()
+                    //    {
+                    //        string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
+                    //        BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
+                    //        p_bmpSrcCenterViewer = bmpSrc;
+                    //        p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                    //    }));
+                    //}
                 }
                 finally
                 {
@@ -1835,7 +1830,7 @@ namespace Root_Vega.Module
                         nYSum += *pSrcY * y;
                     }
                     int iIndex = x;
-                    daHeight[iIndex] = (nSum != 0) ? (double)((ushort)(dScale * nYSum / nSum) >> 8) : (ushort)0;
+                    daHeight[iIndex] = (nSum != 0) ? (double)((dScale * nYSum / nSum)) : 0.0;
                 }
                 
                 return GetHeightAverage(daHeight);
@@ -1850,7 +1845,7 @@ namespace Root_Vega.Module
                 // implement
                 for (int i = 0; i<daHeight.Length; i++)
                 {
-                    if (daHeight[i] == 0) continue;
+                    if (daHeight[i] < double.Epsilon) continue;
                     nHitCount++;
                     dSum += daHeight[i];
                 }

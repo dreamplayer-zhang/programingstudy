@@ -395,7 +395,7 @@ namespace Root_Vega
 
         unsafe public void Test()
         {
-            double[] m_aHeight = new double[640];
+            double[] aHeight = new double[640];
             // LADS 테스트용 프레임 생성
             MemoryData md = App.m_engineer.GetMemory("SideVision.Memory", "LADS", "Grab");
             int nWidth = md.p_sz.X;
@@ -433,10 +433,28 @@ namespace Root_Vega
                 }
                 int nAdd = x;
                 //m_aHeight[nAdd] = (nSum != 0) ? (ushort)(((ushort)(dScale * nYSum / nSum)) >> 8) : (ushort)0;                
-                m_aHeight[nAdd] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
+                aHeight[nAdd] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
             }
+
+            double dResult = GetHeightAverage(aHeight);
         
             return;
+        }
+
+        double GetHeightAverage(double[] daHeight)
+        {
+            // variable
+            double dSum = 0.0;
+            int nHitCount = 0;
+
+            // implement
+            for (int i = 0; i < daHeight.Length; i++)
+            {
+                if (daHeight[i] == 0) continue;
+                nHitCount++;
+                dSum += daHeight[i];
+            }
+            return dSum / nHitCount;
         }
 
         private void ViewModel_CloseRequested(object sender, DialogCloseRequestedEventArgs e)
