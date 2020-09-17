@@ -393,9 +393,9 @@ namespace Root_Vega
             }
         }
 
-        public ushort[] m_aHeight = new ushort[640];
         unsafe public void Test()
         {
+            double[] m_aHeight = new double[640];
             // LADS 테스트용 프레임 생성
             MemoryData md = App.m_engineer.GetMemory("SideVision.Memory", "LADS", "Grab");
             int nWidth = md.p_sz.X;
@@ -403,18 +403,18 @@ namespace Root_Vega
             Random random = new Random();
             byte* pSrc = (byte*)md.GetPtr().ToPointer();
 
-            pSrc += (nWidth * (nheight / 2));
-            for (int y = 0; y<3; y++)
-            {
-                byte* pDst = pSrc + (y * nWidth);
-                int nStartIndex = y == 2 ? nWidth / 4 * 1 - 2 : nWidth / 4 * 1;
-                int nEndIndex = y == 2 ? nWidth / 4 * 3 + 2 : nWidth / 4 * 3;
-                pDst += nStartIndex;
-                for (int x = nStartIndex; x < nEndIndex; x++, pDst++)
-                {
-                    *pDst = (byte)random.Next(75,80);
-                }
-            }
+            //pSrc += (nWidth * (nheight / 2));
+            //for (int y = 0; y<3; y++)
+            //{
+            //    byte* pDst = pSrc + (y * nWidth);
+            //    int nStartIndex = y == 2 ? nWidth / 4 * 1 - 2 : nWidth / 4 * 1;
+            //    int nEndIndex = y == 2 ? nWidth / 4 * 3 + 2 : nWidth / 4 * 3;
+            //    pDst += nStartIndex;
+            //    for (int x = nStartIndex; x < nEndIndex; x++, pDst++)
+            //    {
+            //        *pDst = (byte)random.Next(75,80);
+            //    }
+            //}
             
             double dScale = 65535.0 / nheight;
             // LADS 테스트
@@ -427,11 +427,13 @@ namespace Root_Vega
                 int nYSum = 0;
                 for (int y = 0; y < nheight; y++, pSrcY += nWidth)
                 {
+                    if (*pSrcY < 70) continue;
                     nSum += *pSrcY;
                     nYSum += *pSrcY * y;
                 }
                 int nAdd = x;
-                m_aHeight[nAdd] = (nSum != 0) ? (ushort)(((ushort)(dScale * nYSum / nSum)) >> 8) : (ushort)0;                
+                //m_aHeight[nAdd] = (nSum != 0) ? (ushort)(((ushort)(dScale * nYSum / nSum)) >> 8) : (ushort)0;                
+                m_aHeight[nAdd] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
             }
         
             return;
