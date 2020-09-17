@@ -104,7 +104,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Module\ASIS.cs" />
+    <Compile Include="Module\Loader0.cs" />
     <Compile Include="Module\LoadEV.cs" />
+    <Compile Include="Module\Picker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

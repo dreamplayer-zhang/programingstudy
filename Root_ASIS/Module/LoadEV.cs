@@ -81,6 +81,18 @@ namespace Root_ASIS.Module
                 m_doIonBlow.Write(value); 
             }
         }
+
+        bool _bDone = false; 
+        public bool p_bDone
+        {
+            get { return _bDone; }
+            set
+            {
+                if (_bDone == value) return;
+                _bDone = value;
+                OnPropertyChanged(); 
+            }
+        }
         #endregion
 
         #region InfoStrip
@@ -175,7 +187,8 @@ namespace Root_ASIS.Module
                 }
                 p_eMove = eMove.Stop;
                 p_bPaper = m_diPaper.p_bIn;
-                AddNewInfoStrip(); 
+                AddNewInfoStrip();
+                p_bDone = p_bCheck; 
                 return "OK";
             }
             finally
@@ -206,7 +219,8 @@ namespace Root_ASIS.Module
             }
             finally
             {
-                p_eMove = eMove.Stop; 
+                p_eMove = eMove.Stop;
+                p_bDone = false;
             }
             return "OK"; 
         }
