@@ -8,9 +8,11 @@ namespace RootTools_Vision
 {
     public class WorkFactory
     {
-        WorkManager workAlignment;
-        WorkManager workInspection;
-        WorkManager workProcessDefect;   
+        //WorkManager workAlignment;
+        //WorkManager workInspection;
+        //WorkManager workProcessDefect;
+
+        private List<WorkManager> workManagers;
 
         public WorkFactory()
         {
@@ -19,39 +21,64 @@ namespace RootTools_Vision
 
         public void  Init()
         {
-            workAlignment = new WorkManager("Position", UserTypes.WORK_TYPE.PREPARISON);
+            workManagers = new List<WorkManager>();
 
-            workInspection = new WorkManager("Inspection", UserTypes.WORK_TYPE.MAINWORK, 8);
+            //workAlignment = new WorkManager("Position", UserTypes.WORK_TYPE.PREPARISON, WORKPLACE_STATE.READY, WORKPLACE_STATE.NONE);
 
-            workProcessDefect = new WorkManager("ProcessDefect", UserTypes.WORK_TYPE.FINISHINGWORK);
+            //workInspection = new WorkManager("Inspection", UserTypes.WORK_TYPE.MAINWORK, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, 8);
+
+            //workProcessDefect = new WorkManager("ProcessDefect", UserTypes.WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION);
+        }
+
+        public void Add(WorkManager manager)
+        {
+            workManagers.Add(manager);
         }
 
         public void SetBundles(WorkBundle workbundle, WorkplaceBundle workplacebundle)
         {
-            workAlignment.SetBundles(workbundle, workplacebundle, WORKPLACE_STATE.READY, WORKPLACE_STATE.NONE);
-            workInspection.SetBundles(workbundle, workplacebundle, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY);
-            workProcessDefect.SetBundles(workbundle, workplacebundle, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION);
+
+            foreach(WorkManager manager in this.workManagers)
+            {
+                manager.SetBundles(workbundle, workplacebundle);
+            }
+
+            //workAlignment.SetBundles(workbundle, workplacebundle);
+            //workInspection.SetBundles(workbundle, workplacebundle);
+            //workProcessDefect.SetBundles(workbundle, workplacebundle);
         }
 
         public void Start()
         {
-            workAlignment.Start();
-            workInspection.Start();
-            workProcessDefect.Start();
+            foreach (WorkManager manager in this.workManagers)
+            {
+                manager.Start();
+            }
+            //workAlignment.Start();
+            //workInspection.Start();
+            //workProcessDefect.Start();
         }
 
         public void Stop()
         {
-            workAlignment.Stop();
-            workInspection.Stop();
-            workProcessDefect.Stop();
+            foreach (WorkManager manager in this.workManagers)
+            {
+                manager.Stop();
+            }
+            //workAlignment.Stop();
+            //workInspection.Stop();
+            //workProcessDefect.Stop();
         }
 
         public void Pause()
         {
-            workAlignment.Pause();
-            workInspection.Pause();
-            workProcessDefect.Pause();
+            foreach (WorkManager manager in this.workManagers)
+            {
+                manager.Pause();
+            }
+            //workAlignment.Pause();
+            //workInspection.Pause();
+            //workProcessDefect.Pause();
         }
     }
 }

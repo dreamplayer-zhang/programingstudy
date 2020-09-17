@@ -23,7 +23,7 @@ namespace RootTools_Vision
         /// <summary>
         /// WorkManager에서 객체를 생성해서 연결해주는 방식을 취함
         /// </summary>
-        public WorkManager(string _id, WORK_TYPE _type,int workerNum = 1)
+        public WorkManager(string _id, WORK_TYPE _type, WORKPLACE_STATE _resultState, WORKPLACE_STATE _excuteCondition, int workerNum = 1)
         {
             this.id = _id;
             if (workerNum < 1) workerNum = 1;
@@ -37,10 +37,10 @@ namespace RootTools_Vision
                 workers.Add(worker);
             }
 
-            this.workerManager = new WorkerManager(workers);
+            this.workerManager = new WorkerManager(workers, _resultState, _excuteCondition);
         }
 
-        public void SetBundles(WorkBundle _workbundle, WorkplaceBundle _workplacebundle, WORKPLACE_STATE resultState, WORKPLACE_STATE excuteCondition)
+        public void SetBundles(WorkBundle _workbundle, WorkplaceBundle _workplacebundle)
         {
             if (_workbundle.Count == 0 || _workplacebundle.Count == 0)
             {
@@ -60,7 +60,7 @@ namespace RootTools_Vision
             this.workplacebundle = _workplacebundle;
             this.workplacebundle.Reset();
 
-            this.workerManager.SetBundles(this.workbundle, this.workplacebundle, resultState, excuteCondition);
+            this.workerManager.SetBundles(this.workbundle, this.workplacebundle);
         }
 
 

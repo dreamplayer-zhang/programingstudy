@@ -56,7 +56,7 @@ namespace RootTools_Vision
             Timer t = new Timer(TimerCallback, null, 100, 100);
         }
 
-        private WorkFactory vision;
+        private WorkFactory factory;
 
         private List<WorkBundle> workbundleList;
         private List<WorkplaceBundle> workplacebundleList;
@@ -109,7 +109,12 @@ namespace RootTools_Vision
 
 
             // Init WorkManager
-            this.vision = new WorkFactory();
+            this.factory = new WorkFactory();
+
+            this.factory.Add(new WorkManager("Position", UserTypes.WORK_TYPE.PREPARISON, WORKPLACE_STATE.READY, WORKPLACE_STATE.NONE));
+            this.factory.Add(new WorkManager("Inspection", UserTypes.WORK_TYPE.MAINWORK, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, 8));
+            this.factory.Add(new WorkManager("ProcessDefect", UserTypes.WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION));
+
 
             this.workbundle = new WorkBundle();
             this.workplacebundle = new WorkplaceBundle();
@@ -128,9 +133,9 @@ namespace RootTools_Vision
             int workplacebundleIndex = Convert.ToInt32(this.tbWorkplaceBundleIndex.Text);
 
 
-            this.vision.SetBundles(this.workbundleList[workbundleIndex], this.workplacebundleList[workplacebundleIndex]);
+            this.factory.SetBundles(this.workbundleList[workbundleIndex], this.workplacebundleList[workplacebundleIndex]);
 
-            this.vision.Start();
+            this.factory.Start();
 
 
             SetInspectionMap(this.workplacebundleList[workplacebundleIndex].MapSizeX, this.workplacebundleList[workplacebundleIndex].MapSizeY);
@@ -153,12 +158,12 @@ namespace RootTools_Vision
 
         private void BtnStop_Click(object sender, RoutedEventArgs e)
         {
-            this.vision.Stop();
+            this.factory.Stop();
         }
 
         private void BtnAddPosition(object sender, RoutedEventArgs e)
         {
-            this.workbundle.Add(new Alignment());
+            this.workbundle.Add(new Position());
             RefeshWorkBundleStack();
         }
 
