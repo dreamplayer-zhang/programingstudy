@@ -59,6 +59,13 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Emgu.CV.UI">
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
+    </Reference>
     <Reference Include="MaterialDesignColors, Version=1.2.6.1513, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignColors.1.2.6\lib\net45\MaterialDesignColors.dll</HintPath>
     </Reference>
@@ -67,6 +74,9 @@
     </Reference>
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.3\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
+    <Reference Include="RootTools_Vision">
+      <HintPath>..\RootTools_Vision\bin\x64\Debug\RootTools_Vision.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Activities" />
@@ -91,6 +101,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="InspectionItem.cs" />
+    <Compile Include="InspectionMethod.cs" />
+    <Compile Include="Mask.cs" />
     <Compile Include="UI\1.Setup\3. RecipeWizard\2. BackSide\BackSideSetupPage.xaml.cs">
       <DependentUpon>BackSideSetupPage.xaml</DependentUpon>
     </Compile>
@@ -110,25 +123,6 @@
     <Compile Include="IWTRChild.cs" />
     <Compile Include="Module\Vision.cs" />
     <Compile Include="MVVM\Helper.cs" />
-    <Compile Include="Recipe\DrawData\DrawData_Plain.cs" />
-    <Compile Include="Recipe\DrawData\RecipeEditor.cs" />
-    <Compile Include="Recipe\Parameter\IParamData.cs" />
-    <Compile Include="Recipe\Parameter\ParamData_Origin.cs" />
-    <Compile Include="Recipe\Parameter\ParamData_Position.cs" />
-    <Compile Include="Recipe\Parameter\ParamData_ROI.cs" />
-    <Compile Include="Recipe\Parameter\RecipeParameter.cs" />
-    <Compile Include="Recipe\RecipeData\IRecipeData.cs" />
-    <Compile Include="Recipe\Recipe.cs" />
-    <Compile Include="Recipe\RecipeData\RecipeData.cs" />
-    <Compile Include="Recipe\RecipeData\RecipeData_Origin.cs" />
-    <Compile Include="Recipe\RecipeData\RecipeData_ROI.cs" />
-    <Compile Include="Recipe\RecipeInfo\InspectionItem.cs" />
-    <Compile Include="Recipe\RecipeInfo\InspectionMethod.cs" />
-    <Compile Include="Recipe\RecipeInfo\Mask.cs" />
-    <Compile Include="Recipe\RecipeInfo\RecipeInfo.cs" />
-    <Compile Include="Recipe\RecipeInfo\RecipeInfo_MotionData.cs" />
-    <Compile Include="Recipe\RecipeInfo\RecipeInfo_ProductMap.cs" />
-    <Compile Include="Recipe\RecipeManager.cs" />
     <Compile Include="Tune.xaml.cs">
       <DependentUpon>Tune.xaml</DependentUpon>
     </Compile>

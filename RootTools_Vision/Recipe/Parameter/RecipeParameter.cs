@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Root_WIND2
+namespace RootTools_Vision
 {
     public class RecipeParameter
     {
+        public ParamData_Origin m_ParamData_Origin;
+        public ParamData_Position m_ParamData_Position;
 
         public RecipeParameter()
         {
@@ -15,8 +17,8 @@ namespace Root_WIND2
         }
         public void Init()
         {
-
+            m_ParamData_Origin = new ParamData_Origin();
+            m_ParamData_Position = new ParamData_Position();
         }
-
     }
 }

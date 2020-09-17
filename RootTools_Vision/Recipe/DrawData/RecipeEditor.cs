@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RootTools;
 
-namespace Root_WIND2
+namespace RootTools_Vision
 {
 
     public class RecipeEditor
@@ -13,12 +13,14 @@ namespace Root_WIND2
 
         List<DrawData_Plain> m_DrawData_PlainList;
         RecipeData m_RecipeData;
+
         public RecipeEditor(RecipeData _recipeData)
         {
             m_RecipeData = _recipeData;
             m_DrawData_PlainList = new List<DrawData_Plain>();
 
         }
+
         public void PushPlain(DrawData_Plain _plain)
         {
             m_DrawData_PlainList.Add(_plain);
@@ -68,10 +70,12 @@ namespace Root_WIND2
                         RecipeData_Origin pOrigin = m_RecipeData.GetRecipeOrigin();
                         shape = plainData.GetObject();
 
-                        TRect rect = shape[0] as TRect;
-                        CPoint ptOrigin = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
-                        pOrigin.SetOrigin(rect.MemoryRect);
-
+                        if(shape.Count > 0)
+                        {
+                            TRect rect = shape[0] as TRect;
+                            CPoint ptOrigin = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
+                            pOrigin.SetOrigin(rect.MemoryRect);
+                        }
                         break;
 
                     case PLAIN_TYPE.POSITION:

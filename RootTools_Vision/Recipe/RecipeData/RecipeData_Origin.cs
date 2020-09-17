@@ -5,11 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using RootTools;
 
-namespace Root_WIND2
+namespace RootTools_Vision
 {
     public class RecipeData_Origin
     {
-        CPoint m_ptOrigin;
+        CPoint m_ptABSOrigin; // 메모리 기준 Origin 절대좌표 
+        CPoint m_ptRELOrigin; // Origin 상대좌표 (0, 0)
         CRect m_rtOrigin;
         int m_nWidth;
         int m_nHeight;
@@ -21,7 +22,7 @@ namespace Root_WIND2
 
         public CPoint GetOriginPoint()
         {
-            return m_ptOrigin;
+            return m_ptABSOrigin;
         }
 
         public CRect GetOriginRect()
@@ -31,7 +32,7 @@ namespace Root_WIND2
 
         public void SetOrigin(CPoint Origin, int nWidth, int nHeight)
         {
-            m_ptOrigin = Origin;
+            m_ptABSOrigin = Origin;
             m_nWidth = nWidth;
             m_nHeight = nHeight;
             m_rtOrigin = new CRect(Origin, nWidth, nHeight);
@@ -39,7 +40,7 @@ namespace Root_WIND2
 
         public void SetOrigin(CRect rtOrigin)
         {
-            m_ptOrigin = new CPoint(rtOrigin.Left, rtOrigin.Top);
+            m_ptABSOrigin = new CPoint(rtOrigin.Left, rtOrigin.Top);
             m_rtOrigin = rtOrigin;
             m_nWidth = rtOrigin.Width;
             m_nHeight = rtOrigin.Height;

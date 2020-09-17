@@ -11,6 +11,8 @@ using RootTools_CLR;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using RootTools_Vision;
+
 
 namespace Root_WIND2
 {
@@ -130,8 +132,8 @@ namespace Root_WIND2
         string sPool = "pool";
         string sGroup = "groupss";
         string sMem = "memss";
-        public int MemWidth = 24800;
-        public int MemHeight = 24800;
+        public int MemWidth = 40000;
+        public int MemHeight = 40000;
         Viewer viewer = new Viewer();
 
 
@@ -147,24 +149,24 @@ namespace Root_WIND2
 
             m_engineer.Init("WIND2");
             m_memoryTool = m_engineer.ClassMemoryTool();
-            m_memoryTool.GetPool(sPool, true).p_gbPool = 4;
+            m_memoryTool.GetPool(sPool, true).p_gbPool = 5;
             m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
             m_memoryTool.GetMemory(sPool, sGroup, sMem);
 
             m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
 
-            //viewer.p_ROI_VM = new MaskTool_ViewModel(m_Image, dialogService);
-            //panel.DataContext = viewer.p_ROI_VM;
+
+            viewer.p_ROI_VM = new MaskTool_ViewModel(m_Image, dialogService);
+            panel.DataContext = viewer.p_ROI_VM;
 
 
             InitUI();
             InitTimer();
 
-
             m_RecipeMGR = new RecipeManager();
             m_Recipe = m_RecipeMGR.GetRecipe();
             m_RecipeEditor = m_Recipe.GetRecipeEditor();
-            //RecipeEditor editor = m_RecipeMGR.m_Recipe.GetRecipeEditor();
+            m_RecipeMGR.m_Recipe.m_RecipeParam.m_ParamData_Origin.m_nOriginWidth = 7000;
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -219,18 +221,19 @@ namespace Root_WIND2
             CPoint ptOrigin = pOrigin.GetOriginPoint();
             CRect rtOrigin = pOrigin.GetOriginRect();
             byte[] InspectionBuffer = new byte[rtOrigin.Width * rtOrigin.Height];
-
+            int nStride = (int)m_Image.p_Stride;
             for (int y = 0; y < rtOrigin.Height; y++)
             {
                 Marshal.Copy(
-                m_Image.GetPtr() + ptOrigin.X + (y + ptOrigin.Y) * (int)rtOrigin.Width, // source
+                m_Image.GetPtr() + ptOrigin.X + (y + ptOrigin.Y) * nStride, // source
                 InspectionBuffer,
                 rtOrigin.Width * y,
-                rtOrigin.Height
+                rtOrigin.Width
                 );
             }
-            CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, rtOrigin.Width, rtOrigin.Height,true, 200);
-
+            CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, rtOrigin.Width, rtOrigin.Height, true, 200);
+            //m_RecipeMGR.SaveRecipe();
+            //m_RecipeMGR.OpenRecipe();
             //CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, nBufferWidth, nBufferHeight, this.parameter.IsDark, this.parameter.Threshold);
         }
     }

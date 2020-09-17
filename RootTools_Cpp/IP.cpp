@@ -83,7 +83,6 @@ void IP::Labeling(BYTE* pSrc, BYTE* pBin, int nW, int nH, bool bDark, BYTE* pDst
 
     delete[] pValue;
 
-
     //Mat imgColors;
 
     //cvtColor(imgSrc, imgColors, COLOR_GRAY2BGR);
@@ -108,26 +107,48 @@ void IP::Labeling(BYTE* pSrc, BYTE* pBin, int nW, int nH, bool bDark, BYTE* pDst
     //imshow("Labeling window", imgColors);
 }
 
-void IP::Threshold(BYTE* pSrc, BYTE* pDst, int nW, int nH, bool bDark, int threshold)
+
+// Vision
+void IP::Threshold(BYTE* pSrc, BYTE* pDst, int nW, int nH, bool bDark, int thresh)
 {
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
 
     
     if (bDark)
-        cv::threshold(imgSrc, imgDst, threshold, 255, CV_THRESH_BINARY_INV);
+        cv::threshold(imgSrc, imgDst, thresh, 255, CV_THRESH_BINARY_INV);
     else
-        cv::threshold(imgSrc, imgDst, threshold, 255, CV_THRESH_BINARY);
+        cv::threshold(imgSrc, imgDst, thresh, 255, CV_THRESH_BINARY);
+}
+void IP::Threshold(BYTE* pSrc, BYTE* pDst, int nMemW, int nMemH, Point ptLT, Point ptRB, bool bDark, int thresh)
+{
+    Mat imgSrc = Mat(nMemW, nMemW, CV_8UC1, pSrc);
+    Mat ROI(imgSrc, Rect(ptLT, ptRB));
+
+    Mat imgDst = Mat((ptRB.y - ptLT.y), (ptRB.x - ptLT.x), CV_8UC1, pDst);
+
+    if (bDark)
+        cv::threshold(ROI, imgDst, thresh, 255, CV_THRESH_BINARY_INV);
+    else
+        cv::threshold(ROI, imgDst, thresh, 255, CV_THRESH_BINARY);
 }
 
 float IP::Average(BYTE* pSrc, int nW, int nH)
 {
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
 
-    return (cv::sum(cv::sum(imgSrc)))[0] / (nW * nH); // mean 함수의 return Type = Scalar
+    return (cv::sum(cv::sum(imgSrc)))[0] / ((uint64)nW * nH); // mean 함수의 return Type = Scalar
+}
+float IP::Average(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB)
+{
+    Mat imgSrc = Mat(nMemW, nMemH, CV_8UC1, pSrc);
+    Mat ROI(imgSrc, Rect(ptLT, ptRB));
+
+    return (cv::sum(cv::sum(ROI)))[0] / ((uint64)(ptRB.x - ptLT.x) * (ptRB.y - ptLT.y)); // mean 함수의 return Type = Scalar
+
 }
 
-void IP::Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtLabeled, int nW, int nH, bool bDark)
+void IP::Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nW, int nH, bool bDark)
 {
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
     Mat imgBin = Mat(nH, nW, CV_8UC1, pBin);
@@ -185,7 +206,7 @@ void IP::Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtLabeled, i
         data.area = area;
         data.value = pValue[j - 1];
 
-        vtLabeled.push_back(data);
+        vtOutLabeled.push_back(data);
     }
 
     //delete[] pValue;
@@ -213,6 +234,86 @@ void IP::Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtLabeled, i
     namedWindow("Labeling window", WINDOW_KEEPRATIO);
     imshow("Labeling window", imgColors);
     cv::waitKey(0)*/;
+}
+void IP::Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nMemW, int nMemH, Point ptLT, Point ptRB, bool bDark)
+{
+    Mat imgSrc = Mat(nMemH, nMemW, CV_8UC1, pSrc);
+    Mat ROI(imgSrc, Rect(ptLT, ptRB));
+    Mat imgBin = Mat((ptRB.y - ptLT.y), (ptRB.x - ptLT.x), CV_8UC1, pBin);
+    Mat imgCopy = ROI.clone(); // ROI가 원본 Image 이기 때문에 영상처리할 경우 원본 이미지 훼손됨
+    Mat imgDst, imgMul;
+
+    if (bDark)
+        cv::bitwise_not(ROI, imgCopy); // Defect의 GV가 0인 경우 connectedComponent에서 Labeling 되지 않음
+
+    cv::divide(255, imgBin, imgBin); // 1, 0의 값을 가지는 Mask 생성
+    cv::multiply(imgCopy, imgBin, imgMul, 1.0, CV_8UC1);
+
+    Mat img_labels, stats, centroids;
+
+    int numOfLables = connectedComponentsWithStats(imgMul, imgDst, stats, centroids, 8, CV_32S);
+
+    // Dark일 경우 min 값을 찾고, Bright 경우 Max 값을 찾음
+    BYTE* pValue = new BYTE[numOfLables - 1];
+    memset(pValue, bDark ? 255 : 0, sizeof(BYTE) * (numOfLables - 1));
+
+    for (int i = 0; i < (uint64)(ptRB.x - ptLT.x) * (ptRB.y - ptLT.y); i++)
+    {
+        int label = imgDst.at<int>(i);
+        if (label == 0) continue;
+
+        BYTE val = imgCopy.at<BYTE>(i);
+        if (bDark)
+        {
+            if (val < pValue[label])
+            {
+                pValue[label] = val;
+            }
+        }
+        else
+        {
+            if (val > pValue[label])
+            {
+                pValue[label] = val;
+            }
+        }
+    }
+    //첫번째 라벨은 Background Label 임
+    for (int j = 1; j < numOfLables; j++) {
+        int area = stats.at<int>(j, CC_STAT_AREA);
+        int left = stats.at<int>(j, CC_STAT_LEFT);
+        int top = stats.at<int>(j, CC_STAT_TOP);
+        int width = stats.at<int>(j, CC_STAT_WIDTH);
+        int height = stats.at<int>(j, CC_STAT_HEIGHT);
+        int right = left + width;
+        int bottom = top + height;
+
+        LabeledData data;
+        data.bound = { left, top, right, bottom };
+        data.center = { (left + right) / 2, (top + bottom) / 2 };
+        data.area = area;
+        data.value = pValue[j - 1];
+
+        vtOutLabeled.push_back(data);
+    }
+}
+
+float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method)
+{
+    Mat imgSrc = Mat(nMemH, nMemW, CV_8UC1, pSrc);
+    Mat ROI(imgSrc, Rect(ptLT, ptRB));
+    Mat imgTemp = Mat(nTempH, nTempW, CV_8UC1, pTemp);
+
+    Mat result;
+
+    double minVal, maxVal;
+    Point minLoc, maxLoc;
+
+    matchTemplate(ROI, imgTemp, result, method);
+
+    minMaxLoc(result, NULL, &maxVal, NULL, &outMatchPoint); // 완벽하게 매칭될 경우 1
+
+    return maxVal * 100; // Matching Score
 }
 
 void IP::GaussianBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nSigma)
@@ -254,3 +355,4 @@ void IP::Morphology(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nFilterSz, std::
         cv::morphologyEx(imgSrc, imgDst, cv::MORPH_CLOSE, dirElement, cv::Point(-1, -1), nIter);
     }
 }
+

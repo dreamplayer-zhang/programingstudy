@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using RootTools_CLR;
 
 namespace RootTools_Vision
 {
-    public class Alignment : IWork
+    public class Position : IWork
     {
         public WORK_TYPE Type => WORK_TYPE.PREPARISON;
 
@@ -26,7 +27,7 @@ namespace RootTools_Vision
             int tranY = 0;
 
             // Position
-
+            //CLR_IP.Cpp_TemplateMatching()
 
             if(this.workplace.Index == 0)  // Master
             {
