@@ -125,12 +125,13 @@ namespace Root_WIND2
 
         WIND2_Engineer m_engineer = new WIND2_Engineer();
         MemoryTool m_memoryTool;
-        ImageData m_Image;
+        public ImageData m_Image;
+        public IDialogService dialogService;
         string sPool = "pool";
-        string sGroup = "group";
-        string sMem = "mem";
-        public int MemWidth = 12400;
-        public int MemHeight = 12400;
+        string sGroup = "groupss";
+        string sMem = "memss";
+        public int MemWidth = 24800;
+        public int MemHeight = 24800;
         Viewer viewer = new Viewer();
 
 
@@ -141,11 +142,12 @@ namespace Root_WIND2
 
         void Init()
         {
-            IDialogService dialogService = new DialogService(this);
+            dialogService = new DialogService(this);
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+
             m_engineer.Init("WIND2");
             m_memoryTool = m_engineer.ClassMemoryTool();
-            m_memoryTool.GetPool(sPool, true).p_gbPool = 1;
+            m_memoryTool.GetPool(sPool, true).p_gbPool = 4;
             m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
             m_memoryTool.GetMemory(sPool, sGroup, sMem);
 
@@ -180,8 +182,10 @@ namespace Root_WIND2
         void InitUI()
         {
             m_Setup = new Setup();
-            ((Setup_ViewModel)m_Setup.DataContext).init(this);
-            m_SetupViewModel = (Setup_ViewModel)m_Setup.DataContext;
+            m_SetupViewModel = new Setup_ViewModel(this);
+            m_Setup.DataContext = m_SetupViewModel;
+            //((Setup_ViewModel)m_Setup.DataContext).init(this);
+            //m_SetupViewModel = (Setup_ViewModel)m_Setup.DataContext;
 
             m_Review = new Review();
             ((Review_ViewModel)m_Review.DataContext).init(this);
@@ -232,8 +236,8 @@ namespace Root_WIND2
     }
     public class Viewer : ObservableObject
     {
-        private ROI_ViewModel m_ROI_VM;
-        public ROI_ViewModel p_ROI_VM
+        private MaskTool_ViewModel m_ROI_VM;
+        public MaskTool_ViewModel p_ROI_VM
         {
             get
             {

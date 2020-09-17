@@ -26,7 +26,7 @@ namespace Root_WIND2
             }
         }
 
-        private ObservableCollection<UIElement> m_NaviButtons;
+        private ObservableCollection<UIElement> m_NaviButtons = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> p_NaviButtons
         {
             get
@@ -39,7 +39,7 @@ namespace Root_WIND2
             }
         }
 
-        MainWindow m_MainWindow;
+        public MainWindow m_MainWindow;
 
         Home_ViewModel m_Home;
         Inspection_ViewModel m_Inspection;
@@ -54,21 +54,21 @@ namespace Root_WIND2
         GEM_ViewModel m_Gem;
 
 
-        public Setup_ViewModel()
+        public Setup_ViewModel(MainWindow main)
         {
-            init();
+            init(main);
         }
 
         public void init(MainWindow main = null)
         {
-            p_NaviButtons = new ObservableCollection<UIElement>();
-            initPanel();
-            InitNaviBtn();
+            m_MainWindow = main;
+
+            InitAllPanel();
+            InitAllNaviBtn();
             SetHome();
 
-            m_MainWindow = main;
         }
-        private void initPanel()
+        private void InitAllPanel()
         {
             m_Home = new Home_ViewModel(this);
             m_Inspection = new Inspection_ViewModel(this);
@@ -82,7 +82,7 @@ namespace Root_WIND2
             m_Maint = new Maintenance_ViewModel(this);
             m_Gem = new GEM_ViewModel(this);
         }
-        private void InitNaviBtn()
+        private void InitAllNaviBtn()
         {
             m_btnNaviInspection = new NaviBtn("Inspection");
             m_btnNaviInspection.Btn.Click += Navi_InspectionClick;

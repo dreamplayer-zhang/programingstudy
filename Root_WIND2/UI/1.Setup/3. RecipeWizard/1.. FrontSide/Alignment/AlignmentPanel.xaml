@@ -14,19 +14,18 @@
         </Grid.ColumnDefinitions>
         <Border BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
             <Grid>
-
                 <StackPanel Margin="0,10,0,0">
                     <Button Content="Alignment Summary"
                             Command="{Binding btnAlignSummary}"
-                            Style="{StaticResource PanelBtn}"/>
-                    <Button Content="Alignment Setup"
-                            Command="{Binding btnAlignSetup}"
                             Style="{StaticResource PanelBtn}"/>
                     <Button Content="Map"
                             Command="{Binding btnAlignMap}"
                             Style="{StaticResource PanelBtn}"/>
                     <Button Content="Origin"
                             Command="{Binding btnAlignOrigin}"
+                            Style="{StaticResource PanelBtn}"/>
+                    <Button Content="Alignment"
+                            Command="{Binding btnAlignSetup}"
                             Style="{StaticResource PanelBtn}"/>
                     <Button Content="Position"
                             Command="{Binding btnAlignPosition}"

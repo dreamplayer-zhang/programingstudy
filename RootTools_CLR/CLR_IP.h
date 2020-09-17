@@ -16,11 +16,18 @@ namespace RootTools_CLR
 	protected:
 
 	public:
-
+		// Function(Src - Input Image, Dst - Output Image, **Out**** - Result Data, ...)
 		static void Cpp_Threshold(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemWidth, int  nMemHeight, bool bDark, int nThreshold);
-		static float Cpp_Average(array<byte>^ pSrcImg, int  nMemWidth, int  nMemHeight);
-		static array<Cpp_LabelParam^>^ Cpp_Labeling(array<byte>^ pSrcImg, array<byte>^ pBinImg, int  nMemWidth, int  nMemHeight, bool bDark);
+		static void Cpp_Threshold(byte* pSrcImg, array<byte>^ pDstImg, int  nMemWidth, int  nMemHeight, int nROILeft, int nROITop, int nROIRight, int nROIBot, bool bDark, int nThreshold);
 
+		static float Cpp_Average(array<byte>^ pSrcImg, int  nMemWidth, int  nMemHeight);
+		static float Cpp_Average(byte* pSrcImg, int  nMemWidth, int  nMemHeight, int nROILeft, int nROITop, int nROIRight, int nROIBot);
+
+		static array<Cpp_LabelParam^>^ Cpp_Labeling(array<byte>^ pSrcImg, array<byte>^ pBinImg, int  nMemWidth, int  nMemHeight, bool bDark);
+		static array<Cpp_LabelParam^>^ Cpp_Labeling(byte* pSrcImg, array<byte>^ pBinImg, int  nMemWidth, int  nMemHeight, int nROILeft, int nROITop, int nROIRight, int nROIBot, bool bDark);
+		
+		static float Cpp_TemplateMatching(byte* pSrcImg, array<byte>^ pBinImg, int& nPosX, int& nPosY, int  nMemWidth, int  nMemHeight, int nTempWidth, int nTempHeight, int nMethod);
+		static float Cpp_TemplateMatching(byte* pSrcImg, array<byte>^ pBinImg, int& nPosX, int& nPosY, int  nMemWidth, int  nMemHeight, int nTempWidth, int nTempHeight); // Managed Code에서는 Default Value 사용 불가
 		//static void Cpp_Labeling(array<byte>^ pSrcImg, array<byte>^ pBinImg, int  nMemWidth, int  nMemHeight, bool bDark, [Out] array<Cpp_LabelParam^>^ outLabel);
 		
 		// Filtering

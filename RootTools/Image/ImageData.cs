@@ -153,9 +153,8 @@ namespace RootTools
 		{
 			for (int i = rect.Height - 1; i >= 0; i--)
 			{
-				Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * stride), m_aBuf, 0, rect.Width);
+				Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * stride), m_aBuf , i * rect.Width , rect.Width);
 			}
-
 		}
 		public ImageData(MemoryData data)
 		{
@@ -493,6 +492,8 @@ namespace RootTools
 			}
 			else
 			{
+				ImageData data = new ImageData(123, 123);
+				
 				//MessageBox.Show("OpenFile() - 파일이 존재 하지 않거나 열기에 실패하였습니다. - " + sFileName);
 			}
 		}

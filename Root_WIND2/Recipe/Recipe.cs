@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using RootTools;
 
 namespace Root_WIND2
@@ -11,7 +12,7 @@ namespace Root_WIND2
     /// Recipe 각 항목의 묶음.
     /// Recipe에 대한 기능 자체는 Manager에서 다룸.
     /// </summary>
-    public class Recipe
+    public class Recipe 
     {
         // ORIGIN, Die Pitch
         // WAFER MAP
@@ -19,10 +20,12 @@ namespace Root_WIND2
         // ROI (SURFACE, D2D)
         // INSPECTION PARAMETER
 
-        RecipeInfo m_RecipeInfo; // 레시피 정보 데이터
-        RecipeEditor m_RecipeEditor; // 그리기 데이터
-        RecipeData m_ReicpeData; // ROI 정보 데이터
-        RecipeParameter m_RecipeParam; // 파라미터 데이터
+
+        [XmlIgnore] RecipeEditor m_RecipeEditor; // 그리기 데이터
+        [XmlIgnore] RecipeData m_ReicpeData; // ROI 정보 데이터
+
+        public RecipeInfo m_RecipeInfo; // 레시피 정보 데이터
+        public RecipeParameter m_RecipeParam; // 파라미터 데이터
 
         public Recipe()
         {
