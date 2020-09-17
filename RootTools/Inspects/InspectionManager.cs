@@ -14,6 +14,7 @@ using DPoint = System.Drawing.Point;
 using System.Diagnostics;
 using MySqlX.XDevAPI.Relational;
 using RootTools.ToolBoxs;
+using System.Drawing.Imaging;
 
 namespace RootTools.Inspects
 {
@@ -58,6 +59,12 @@ namespace RootTools.Inspects
         public bool IsInitialized { get; private set; }
         public void StartInspection()
         {
+            //이건 무조건 한번만 하도록 구성해야 함
+            if (m_bProgress)
+            {
+                //강제로 리턴
+                return;
+			}
             m_bProgress = false;
             nInspectionCount = 0;
             sw = new StopWatch();
@@ -117,13 +124,15 @@ namespace RootTools.Inspects
                         }
                     }
 
-                    while (p_qInspection.Count == 0 && nInspDoneNum == nInspectionCount)
-                    {
-                        InspectionDone();
-                        Monitor.Wait(lockObj);
-                        m_bProgress = false;
-                        break;
-                    }
+                    //TODO : 한번 시작하면 무한으로 돌도록 만듭시다.
+                    //단 결과는 나와야 하므로 일정 구간에서 완료 이벤트는 발생이 되어야 합니다
+                    //while (p_qInspection.Count == 0 && nInspDoneNum == nInspectionCount)//구문이 이해가 안감...
+                    //{
+                    //    InspectionDone();
+                    //    Monitor.Wait(lockObj);
+                    //    m_bProgress = false;
+                    //    break;
+                    //}
 
                     for (int i = 0; i < nThreadNum; i++)
                     {
@@ -197,14 +206,14 @@ namespace RootTools.Inspects
                     VSDataDT = VSDBManager.GetDataTable("Data");
                 }
 
-                int stride = ImageWidth / 8;
-                string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
+                //int stride = ImageWidth / 8;
+               // string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
 
-                System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
+                //System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
 
-                System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
-                System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
-                encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
+                //System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
+                //System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
+                //encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
 
                 //Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
 
@@ -247,19 +256,20 @@ namespace RootTools.Inspects
                         (int)fPosY - ImageHeight / 2,
                         (int)fPosX + ImageWidth / 2,
                         (int)fPosY + ImageHeight / 2);
-                    string pool = item["memPOOL"].ToString();
-                    string group = item["memGROUP"].ToString();
-                    string memory = item["memMEMORY"].ToString();
-                    var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
-                    var image = new ImageData(tempMem);
-                    encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(image.GetRectImage(ImageSizeBlock))));
+                    //string pool = item["memPOOL"].ToString();
+                    //string group = item["memGROUP"].ToString();
+                    //string memory = item["memMEMORY"].ToString();
+                    //var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
+                    //var image = new ImageData(tempMem);
+                    //image.GetRectImage(ImageSizeBlock).Save(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + "_"+Convert.ToInt32(item["idx"]).ToString("D8")+".png"),ImageFormat.Png);
+                    //encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(image.GetRectImage(ImageSizeBlock))));
                 }
 
-                if (VSDataDT.Rows.Count > 0)
-                {
-                    encoder.Save(stream);
-                }
-                stream.Dispose();
+                //if (VSDataDT.Rows.Count > 0)
+                //{
+                //    encoder.Save(stream);
+                //}
+                //stream.Dispose();
 
                 VSDBManager.SetDataTable(VSDataInfoDT);
                 VSDBManager.SetDataTable(VSDataDT);
@@ -269,12 +279,32 @@ namespace RootTools.Inspects
 
 
                 result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
-
             }
             nInspectionCount = 0;
             sw.Stop();
             Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
-            connector.Close();
+            connector.Close(); 
+
+            //Monitor.Wait(lockObj);
+            m_bProgress = false;
+
+			for (int i = 0; i < InsepctionThread.Length; i++)
+			{
+                if(InsepctionThread[i]!=null)
+				{
+                    InsepctionThread[i].Dispose();
+                }
+			}
+
+            if (inspThread != null)
+			{
+				if (inspThread.IsAlive)
+				{
+                    inspThread.Interrupt();
+                    inspThread.Join();
+				}
+            }
+           
         }
         public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
         {
