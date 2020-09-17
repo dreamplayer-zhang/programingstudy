@@ -4,9 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Root_WIND2
+namespace RootTools_Vision
 {
-    class ParamData_Position : IParamData
+    class RecipeInfo_ProductMap
     {
+
+        int m_Row;
+        int m_Col;
+        string m_ASCMap;
     }
 }

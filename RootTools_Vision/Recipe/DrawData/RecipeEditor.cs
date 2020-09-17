@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RootTools;
 
-namespace Root_WIND2
+namespace RootTools_Vision
 {
 
     public class RecipeEditor

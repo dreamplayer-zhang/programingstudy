@@ -2,6 +2,7 @@
 using RootTools.Module;
 using System.Collections.Generic;
 using System.Dynamic;
+using Emgu.CV;
 
 namespace Root_Vega
 {
@@ -29,7 +30,7 @@ namespace Root_Vega
         #endregion
 
         public ModuleRunList m_moduleRunList;
-
+        
         public string m_id;
         IEngineer m_engineer;
         Log m_log;

@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Root_WIND2
+
+namespace RootTools_Vision
 {
-    class RecipeData_ROI
+    interface IParamData
     {
+        // 파라미터 행동 정의
     }
 }

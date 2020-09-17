@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace Root_WIND2
+namespace RootTools_Vision
 {
     /// <summary>
     /// Recipe 클래스 기반 부가 기능 상세.
@@ -45,6 +45,7 @@ namespace Root_WIND2
                     // Call the Deserialize method to restore the object's state.
                     result = (Recipe)serializer.Deserialize(reader);
                 }
+                m_Recipe = result;
             }
             catch(Exception ex)
             {

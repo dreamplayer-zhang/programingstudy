@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RootTools;
 
-
-namespace Root_WIND2
+namespace RootTools_Vision
 {
-    interface IParamData
+    interface IRecipeData
     {
-        // 파라미터 행동 정의
+        void SetData();
     }
 }

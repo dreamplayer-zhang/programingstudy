@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using RootTools;
 
-namespace Root_WIND2
+namespace RootTools_Vision
 {
     /// <summary>
     /// Recipe 각 항목의 묶음.

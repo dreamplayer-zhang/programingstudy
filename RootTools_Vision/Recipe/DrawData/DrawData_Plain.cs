@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using RootTools;
 
 
-namespace Root_WIND2
+namespace RootTools_Vision
 {
     public enum PLAIN_TYPE
     {
