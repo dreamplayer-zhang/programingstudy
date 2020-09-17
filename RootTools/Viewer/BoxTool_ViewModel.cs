@@ -20,14 +20,15 @@ namespace RootTools
             base.init(image, dialogService);
             p_VisibleMenu = Visibility.Visible;
             p_VisibleTool = Visibility.Collapsed;
-            var w = p_CanvasWidth;
-            var h = p_CanvasHeight;
             
         }
         public event boxDone BoxDone;
         public delegate void boxDone(object e);
         TShape BOX;
         CPoint PointBuffer;
+        public Grid Origin_UI;
+        public Grid Pitch_UI;
+
         BoxProcess eBoxProcess;
         ModifyType eModifyType;
         public enum ModifyType
@@ -150,7 +151,7 @@ namespace RootTools
         }
         private TShape StartDraw(TShape shape, CPoint memPt)
         {
-            shape = new TRect(Brushes.Red, 1);
+            shape = new TRect(Brushes.Blue, 2, 0.4);
             TRect rect = shape as TRect;
             rect.MemPointBuffer = memPt;
             rect.MemoryRect.Left = memPt.X;
@@ -166,6 +167,7 @@ namespace RootTools
             if (rect.MemPointBuffer.X > memPt.X)
             {
                 rect.MemoryRect.Left = memPt.X;
+                rect.MemoryRect.Right = rect.MemPointBuffer.X;
             }
             else
             {
@@ -175,6 +177,7 @@ namespace RootTools
             if (rect.MemPointBuffer.Y > memPt.Y)
             {
                 rect.MemoryRect.Top = memPt.Y;
+                rect.MemoryRect.Bottom = rect.MemPointBuffer.Y;
             }
             else
             {
@@ -462,15 +465,89 @@ namespace RootTools
             MakeModifyTool(BOX);
             if (BOX.isSelected)
                 BOX.ModifyTool.Visibility = Visibility.Visible;
-        }
-        private ImageData CreateBoxImageData(TShape shape)
-        {
-            TRect rect = shape as TRect;
-            ImageData BoxImage = new ImageData(rect.MemoryRect.Width, rect.MemoryRect.Height);
-            BoxImage.m_eMode = ImageData.eMode.ImageBuffer;
-            BoxImage.SetData(p_ImageData.GetPtr(), rect.MemoryRect, (int)p_ImageData.p_Stride);
 
-            return BoxImage;
+            if (p_ViewElement.Contains(Origin_UI))
+            {
+                CPoint memPtOriginBOX = Origin_UI.Tag as CPoint;
+                AddOriginPoint(memPtOriginBOX, Brushes.Red);
+            }
+            if (p_ViewElement.Contains(Pitch_UI))
+            {
+                CPoint memPtPitchBOX = Pitch_UI.Tag as CPoint;
+                AddPitchPoint(memPtPitchBOX, Brushes.Green);
+            }
+        }
+        public void AddOriginPoint(CPoint originMemPt, Brush color)
+        {
+            if (p_ViewElement.Contains(Origin_UI))
+                p_ViewElement.Remove(Origin_UI);
+            if (originMemPt.X == 0 && originMemPt.Y == 0)
+                return;
+            CPoint canvasPt = GetCanvasPoint(originMemPt);
+
+            Origin_UI = new Grid();
+            
+            Origin_UI.Tag = originMemPt;
+            Origin_UI.Width = 20;
+            Origin_UI.Height = 20;
+            Canvas.SetLeft(Origin_UI, canvasPt.X - 10);
+            Canvas.SetTop(Origin_UI, canvasPt.Y - 10);
+            Canvas.SetZIndex(Origin_UI, 99);
+            Line line1 = new Line();
+            line1.X1 = 0;
+            line1.Y1 = 0;
+            line1.X2 = 1;
+            line1.Y2 = 1;
+            line1.Stroke = color;
+            line1.StrokeThickness = 2;
+            line1.Stretch = Stretch.Fill;
+            Line line2 = new Line();
+            line2.X1 = 0;
+            line2.Y1 = 1;
+            line2.X2 = 1;
+            line2.Y2 = 0;
+            line2.Stroke = color;
+            line2.StrokeThickness = 3;
+            line2.Stretch = Stretch.Fill;
+
+            Origin_UI.Children.Add(line1);
+            Origin_UI.Children.Add(line2);
+            p_ViewElement.Add(Origin_UI);
+        }
+        public void AddPitchPoint(CPoint originMemPt, Brush color)
+        {
+            if (p_ViewElement.Contains(Pitch_UI))
+                p_ViewElement.Remove(Pitch_UI);
+            if (originMemPt.X == 0 && originMemPt.Y == 0)
+                return;
+            CPoint canvasPt = GetCanvasPoint(originMemPt);
+            Pitch_UI = new Grid();
+            Pitch_UI.Tag = originMemPt;
+            Pitch_UI.Width = 20;
+            Pitch_UI.Height = 20;
+            Canvas.SetLeft(Pitch_UI, canvasPt.X - 10);
+            Canvas.SetTop(Pitch_UI, canvasPt.Y - 10);
+            Canvas.SetZIndex(Pitch_UI, 99);
+            Line line1 = new Line();
+            line1.X1 = 0;
+            line1.Y1 = 0;
+            line1.X2 = 1;
+            line1.Y2 = 1;
+            line1.Stroke = color;
+            line1.StrokeThickness = 2;
+            line1.Stretch = Stretch.Fill;
+            Line line2 = new Line();
+            line2.X1 = 0;
+            line2.Y1 = 1;
+            line2.X2 = 1;
+            line2.Y2 = 0;
+            line2.Stroke = color;
+            line2.StrokeThickness = 3;
+            line2.Stretch = Stretch.Fill;
+
+            Pitch_UI.Children.Add(line1);
+            Pitch_UI.Children.Add(line2);
+            p_ViewElement.Add(Pitch_UI);
         }
 
     }
