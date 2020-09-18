@@ -50,9 +50,9 @@
                             </Grid.RowDefinitions>
                             <StackPanel Orientation="Horizontal" Background="{StaticResource ControlBackGround}">
                                 <ToggleButton Content="Origin Point" Width="100" Margin="0" BorderBrush="{x:Null}"
-                                        Command="{Binding SetOriginPoint}" IsChecked="{Binding p_UseOrigin, Mode=TwoWay}"/>
+                                              IsChecked="{Binding p_UseOrigin, Mode=TwoWay}"/>
                                 <ToggleButton Content="Pitch Point" Width="100" Margin="0" BorderBrush="{x:Null}"
-                                        Command="{Binding SetPitchPoint}" IsChecked="{Binding p_UsePitch, Mode=TwoWay}"/>
+                                               IsChecked="{Binding p_UsePitch, Mode=TwoWay}"/>
                                 <Button Content="Clear" Width="100" Margin="0" BorderBrush="{x:Null}" Command="{Binding ClearOrigin}"/>
                             </StackPanel>
                             <tools:RootViewer Grid.Row="1"/>
@@ -97,9 +97,11 @@
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Column="2" Width="200" Height="25" Grid.Row="3"
                                      IsEnabled="{Binding ElementName=pitchY, Path=IsChecked}"/>
-                            <TextBox Style="{StaticResource BasicTbox}" 
+                            <TextBox Text="{Binding p_Offset.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TextBoxToInt}}"
+                                     Style="{StaticResource BasicTbox}" 
                                      Grid.Column="2" Width="200" Height="25" Grid.Row="4"/>
-                            <TextBox Style="{StaticResource BasicTbox}" 
+                            <TextBox Text="{Binding p_Offset.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TextBoxToInt}}"
+                                     Style="{StaticResource BasicTbox}" 
                                      Grid.Column="2" Width="200" Height="25" Grid.Row="5"/>
                             <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Name="originX" IsChecked="False"/>
                             <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Name="originY"/>
@@ -108,8 +110,6 @@
 
                         </Grid>
                     </GroupBox>
-                    <Button Style="{StaticResource PanelBtn}" Grid.Column="0" Grid.Row="2" Content="Apply"
-                            Margin="2"/>
                 </Grid>
                 <Grid Grid.Column="3" Opacity="0.5">
                     <Grid.RowDefinitions>

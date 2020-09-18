@@ -28,6 +28,7 @@ namespace RootTools
         CPoint PointBuffer;
         public Grid Origin_UI;
         public Grid Pitch_UI;
+        public TRect InspArea;
 
         BoxProcess eBoxProcess;
         ModifyType eModifyType;
@@ -143,6 +144,15 @@ namespace RootTools
         {
             base.SetRoiRect();
             RedrawShapes();
+            if (BOX != null)
+            {
+                BoxDone(BOX);
+            }
+        }
+        public override void _openImage()
+        {
+            base._openImage();
+           
         }
         public override void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
         {
@@ -466,6 +476,7 @@ namespace RootTools
             if (BOX.isSelected)
                 BOX.ModifyTool.Visibility = Visibility.Visible;
 
+
             if (p_ViewElement.Contains(Origin_UI))
             {
                 CPoint memPtOriginBOX = Origin_UI.Tag as CPoint;
@@ -475,6 +486,10 @@ namespace RootTools
             {
                 CPoint memPtPitchBOX = Pitch_UI.Tag as CPoint;
                 AddPitchPoint(memPtPitchBOX, Brushes.Green);
+            }
+            if (InspArea != null)
+            {
+                AddInspArea();
             }
         }
         public void AddOriginPoint(CPoint originMemPt, Brush color)
@@ -548,6 +563,48 @@ namespace RootTools
             Pitch_UI.Children.Add(line1);
             Pitch_UI.Children.Add(line2);
             p_ViewElement.Add(Pitch_UI);
+        }
+        public void AddInspArea(TRect rect = null)
+        {
+            if(InspArea != null)
+                if (p_ViewElement.Contains(InspArea.CanvasRect))
+                    p_ViewElement.Remove(InspArea.CanvasRect);
+            if (rect != null)
+            {
+                InspArea = new TRect(rect.FillBrush, rect.CanvasRect.StrokeThickness, rect.CanvasRect.Opacity);
+                InspArea.MemoryRect.Left = rect.MemoryRect.Left;
+                InspArea.MemoryRect.Top= rect.MemoryRect.Top;
+                InspArea.MemoryRect.Right = rect.MemoryRect.Right;
+                InspArea.MemoryRect.Bottom = rect.MemoryRect.Bottom;
+            }
+            else
+                rect = InspArea;
+            CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
+            CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
+            CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+            CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+
+            int width = Math.Abs(canvasRB.X - canvasLT.X);
+            int height = Math.Abs(canvasRB.Y - canvasLT.Y);
+
+            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X);
+            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y);
+            Canvas.SetRight(InspArea.CanvasRect, canvasRB.X);
+            Canvas.SetBottom(InspArea.CanvasRect, canvasRB.Y);
+            InspArea.CanvasRect.Width = width;
+            InspArea.CanvasRect.Height = height;
+
+            p_ViewElement.Add(InspArea.CanvasRect);
+        }
+        public void Clear()
+        {
+            if (p_ViewElement.Contains(Origin_UI))
+                p_ViewElement.Remove(Origin_UI);
+            if (p_ViewElement.Contains(Pitch_UI))
+                p_ViewElement.Remove(Pitch_UI);
+            if (p_ViewElement.Contains(InspArea.CanvasRect))
+                p_ViewElement.Remove(InspArea.CanvasRect);
+            BoxDone(BOX);
         }
 
     }

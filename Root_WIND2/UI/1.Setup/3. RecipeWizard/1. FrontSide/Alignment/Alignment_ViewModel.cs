@@ -69,10 +69,16 @@ namespace Root_WIND2
         private void ViewerInit()
         {
             p_BOX_VM = new BoxTool_ViewModel(m_Setup.m_MainWindow.m_Image, m_Setup.m_MainWindow.dialogService);
-            p_BOX_VM.BoxDone += P_BOX_VM_BoxDone;            
+            p_BOX_VM.BoxDone += P_BOX_VM_BoxDone;        
             p_OriginTool_VM = new OriginTool_ViewModel();
             p_OriginTool_VM.AddOrigin += P_OriginTool_VM_AddOrigin;
             p_OriginTool_VM.AddPitch += P_OriginTool_VM_AddPitch;
+            p_OriginTool_VM.AddArea += P_OriginTool_VM_AddInspArea;
+        }
+
+        private void P_OriginTool_VM_AddInspArea(object e)
+        {
+            p_BOX_VM.AddInspArea(e as TRect);
         }
 
         private void P_OriginTool_VM_AddPitch(object e)

@@ -14,18 +14,21 @@ namespace RootTools
 {
     public class OriginTool_ViewModel :RootViewer_ViewModel
     {
+        OriginProcess eOriginProcess;
+        Grid Origin_UI;
+        Grid Pitch_UI;
+        TRect InspArea;
 
         public event addOrigin AddOrigin;
         public delegate void addOrigin(object e);
         public event addPitch AddPitch;
         public delegate void addPitch(object e);
+        public event addArea AddArea;
+        public delegate void addArea(object e);
         public CPoint BoxOffset = new CPoint();
         CPoint viewMemPoint = new CPoint();
-        CPoint PitchPoint = new CPoint();
-
-        Grid Origin_UI;
-        Grid Pitch_UI;
-        OriginProcess eOriginProcess;
+        CPoint OriginPitchPoint = new CPoint();
+        
 
         #region Property
         private bool m_UseOrigin = false;
@@ -81,6 +84,7 @@ namespace RootTools
             {
                 AddOrigin(m_OriginPoint);
                 AddOriginPoint(m_OriginPoint, Brushes.Red);
+                AddInspArea(m_Offset);
                 return m_OriginPoint;
             }
             set
@@ -93,8 +97,12 @@ namespace RootTools
         {
             get
             {
-                AddPitch(PitchPoint);
-                AddPitchPoint(PitchPoint, Brushes.Green);
+                int newX = m_OriginPoint.X + m_PitchSize.X;
+                int newY = m_OriginPoint.Y - m_PitchSize.Y;
+                OriginPitchPoint = new CPoint(newX, newY);
+                AddPitch(OriginPitchPoint);
+                AddPitchPoint(OriginPitchPoint, Brushes.Green);
+                AddInspArea(m_Offset);
                 return m_PitchSize;
             }
             set
@@ -102,8 +110,22 @@ namespace RootTools
                 SetProperty(ref m_PitchSize, value);
             }
         }
+
+        private CPoint m_Offset = new CPoint();
+        public CPoint p_Offset
+        {
+            get
+            {
+                AddInspArea(m_Offset);
+                return m_Offset;
+            }
+            set
+            {
+                SetProperty(ref m_Offset, value);
+            }
+        }
         #endregion
-        
+
 
         public OriginTool_ViewModel(ImageData image = null, IDialogService dialogService = null)
         {
@@ -131,24 +153,33 @@ namespace RootTools
                     p_Cursor = Cursors.Arrow;
                     eOriginProcess = OriginProcess.None;
 
-                    if (PitchPoint.X != 0 && PitchPoint.Y != 0)
+                    if (OriginPitchPoint.X != 0 && OriginPitchPoint.Y != 0)
                     {
-                        newX = Math.Abs(PitchPoint.X - p_OriginPoint.X);
-                        newY = Math.Abs(PitchPoint.Y - p_OriginPoint.Y);
+                        newX = Math.Abs(OriginPitchPoint.X - m_OriginPoint.X);
+                        newY = Math.Abs(OriginPitchPoint.Y - m_OriginPoint.Y);
                         p_PitchSize = new CPoint(newX, newY);
                     }
                     break;
                 case OriginProcess.Pitch:
-                    AddPitchPoint(OriginMemPt, Brushes.Green);
-                    PitchPoint = OriginMemPt;
-                    newX = Math.Abs(PitchPoint.X - m_OriginPoint.X);
-                    newY = Math.Abs(PitchPoint.Y - m_OriginPoint.Y);
+                    if (p_OriginPoint.X == 0 && p_OriginPoint.Y == 0)
+                    {
+                        System.Windows.MessageBox.Show("Set Origin Point First");
+                        p_UsePitch = false;
+                        p_Cursor = Cursors.Arrow;
+                        eOriginProcess = OriginProcess.None;
+                        break;
+                    }
+
+                    OriginPitchPoint = OriginMemPt;
+                    newX = Math.Abs(OriginPitchPoint.X - m_OriginPoint.X);
+                    newY = Math.Abs(OriginPitchPoint.Y - m_OriginPoint.Y);
                     p_PitchSize = new CPoint(newX, newY);
 
                     p_UsePitch = false;
                     p_Cursor = Cursors.Arrow;
                     eOriginProcess = OriginProcess.None;
-                    AddPitch(PitchPoint);
+
+                    AddInspArea(p_Offset);
                     break;
             }
         }
@@ -172,23 +203,22 @@ namespace RootTools
             RedrawShape();
         }
 
-
-        private void AddOriginPoint(CPoint originMemPt, Brush color)
+        private void AddOriginPoint(CPoint memPt, Brush color)
         {
             if (p_ViewElement.Contains(Origin_UI))
                 p_ViewElement.Remove(Origin_UI);
 
-            if(originMemPt.X == 0 && originMemPt.Y == 0)
+            if(memPt.X == 0 && memPt.Y == 0)
                 return;
 
-            if (originMemPt.X < BoxOffset.X || originMemPt.Y < BoxOffset.Y)
+            if (memPt.X < BoxOffset.X || memPt.Y < BoxOffset.Y)
                 return;
 
-            CPoint viewPt = originMemPt - BoxOffset;
+            CPoint viewPt = memPt - BoxOffset;
             CPoint canvasPt = GetCanvasPoint(viewPt);
 
             Origin_UI = new Grid();
-            Origin_UI.Tag = originMemPt;
+            Origin_UI.Tag = memPt;
             Origin_UI.Width = 20;
             Origin_UI.Height = 20;
             Canvas.SetLeft(Origin_UI, canvasPt.X-10);
@@ -214,18 +244,21 @@ namespace RootTools
             Origin_UI.Children.Add(line2);
             p_ViewElement.Add(Origin_UI);
         }
-        private void AddPitchPoint(CPoint originMemPt, Brush color)
+        private void AddPitchPoint(CPoint memPt, Brush color)
         {
             if (p_ViewElement.Contains(Pitch_UI))
                 p_ViewElement.Remove(Pitch_UI);
 
-            if (originMemPt.X < BoxOffset.X || originMemPt.Y < BoxOffset.Y)
+            if (memPt.X == 0 && memPt.Y == 0)
                 return;
 
-            CPoint viewPt = originMemPt - BoxOffset;
+            if (memPt.X < BoxOffset.X || memPt.Y < BoxOffset.Y)
+                return;
+
+            CPoint viewPt = memPt - BoxOffset;
             CPoint canvasPt = GetCanvasPoint(viewPt);
             Pitch_UI = new Grid();
-            Pitch_UI.Tag = originMemPt;
+            Pitch_UI.Tag = memPt;
             Pitch_UI.Width = 20;
             Pitch_UI.Height = 20;
             Canvas.SetLeft(Pitch_UI, canvasPt.X - 10);
@@ -251,17 +284,62 @@ namespace RootTools
             Pitch_UI.Children.Add(line2);
             p_ViewElement.Add(Pitch_UI);
         }
+        private void AddInspArea(CPoint offset)
+        {
+            if(InspArea != null)
+                if (p_ViewElement.Contains(InspArea.CanvasRect))
+                    p_ViewElement.Remove(InspArea.CanvasRect);
+            if (OriginPitchPoint.X == 0 || OriginPitchPoint.Y == 0)
+                return;
+
+            InspArea = new TRect(Brushes.Yellow, 2, 0.5);
+            InspArea.MemoryRect.Left = m_OriginPoint.X - offset.X;
+            InspArea.MemoryRect.Top = OriginPitchPoint.Y - offset.Y;
+            InspArea.MemoryRect.Right = OriginPitchPoint.X + offset.X;
+            InspArea.MemoryRect.Bottom = m_OriginPoint.Y + offset.Y;
+
+            
+            CPoint viewOriginPt = m_OriginPoint - BoxOffset;
+            CPoint viewPitchPt = OriginPitchPoint - BoxOffset;
+
+
+            CPoint LT = new CPoint(viewOriginPt.X - offset.X, viewPitchPt.Y - offset.Y);
+            CPoint RB = new CPoint(viewPitchPt.X + offset.X, viewOriginPt.Y + offset.Y);
+            CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+            CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+
+            int width = Math.Abs(canvasRB.X - canvasLT.X);
+            int height = Math.Abs(canvasRB.Y - canvasLT.Y);
+
+            Canvas.SetLeft(InspArea.CanvasRect, canvasLT.X);
+            Canvas.SetTop(InspArea.CanvasRect, canvasLT.Y);
+            Canvas.SetRight(InspArea.CanvasRect, canvasRB.X);
+            Canvas.SetBottom(InspArea.CanvasRect, canvasRB.Y);
+
+            InspArea.CanvasRect.Width = width;
+            InspArea.CanvasRect.Height = height;
+
+            p_ViewElement.Add(InspArea.CanvasRect);
+            AddArea(InspArea);
+        }
+
         private void RedrawShape()
         {
-            if (p_ViewElement.Contains(Origin_UI))
+            if (Origin_UI != null)
             {
-                CPoint memPtPitchBOX = Origin_UI.Tag as CPoint;
-                AddOriginPoint(m_OriginPoint, Brushes.Red);
+                CPoint OriginPt = Origin_UI.Tag as CPoint;
+                if (OriginPt != null && OriginPt.X != 0 && OriginPt.Y != 0)
+                    AddOriginPoint(m_OriginPoint, Brushes.Red);
             }
-            if (p_ViewElement.Contains(Pitch_UI))
+            if (Pitch_UI != null)
             {
-                CPoint memPtPitchBOX = Pitch_UI.Tag as CPoint;
-                AddPitchPoint(memPtPitchBOX, Brushes.Green);
+                CPoint PitchPt = OriginPitchPoint;
+                if (PitchPt != null && PitchPt.X != 0 && PitchPt.Y != 0)
+                    AddPitchPoint(PitchPt, Brushes.Green);
+            }
+            if (InspArea != null)
+            {
+                AddInspArea(p_Offset);
             }
         }
 
@@ -277,11 +355,13 @@ namespace RootTools
         {
             p_OriginPoint = new CPoint();
             p_PitchSize = new CPoint();
-            PitchPoint = new CPoint();
+            OriginPitchPoint = new CPoint();
             if (p_ViewElement.Contains(Origin_UI))
                 p_ViewElement.Remove(Origin_UI);
             if (p_ViewElement.Contains(Pitch_UI))
                 p_ViewElement.Remove(Pitch_UI);
+            if (p_ViewElement.Contains(InspArea.CanvasRect))
+                p_ViewElement.Remove(InspArea.CanvasRect);
         }
         public ICommand SetOriginPoint
         {

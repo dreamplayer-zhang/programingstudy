@@ -134,7 +134,6 @@ namespace RootTools
         }
         public CPoint MemPointBuffer;
         public Brush FillBrush;
-
         public CRect MemoryRect;
 
     }

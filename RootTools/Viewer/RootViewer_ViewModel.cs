@@ -661,7 +661,7 @@ namespace RootTools
 		#endregion
 
 		#region Command Method
-		void _openImage()
+		public virtual void _openImage()
 		{
 			if (p_ImageData == null)
 			{
