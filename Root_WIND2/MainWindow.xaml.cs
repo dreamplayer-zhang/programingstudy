@@ -160,8 +160,8 @@ namespace Root_WIND2
             panel.DataContext = viewer.p_ROI_VM;
 
 
-            //InitUI();
-            //InitTimer();
+            InitUI();
+            InitTimer();
 
             m_RecipeMGR = new RecipeManager();
             m_Recipe = m_RecipeMGR.GetRecipe();

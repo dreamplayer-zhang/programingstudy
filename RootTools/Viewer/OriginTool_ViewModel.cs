@@ -91,8 +91,8 @@ namespace RootTools
             {
                 SetProperty(ref m_OriginPoint, value);
             }
-        }
-        private CPoint m_PitchSize = new CPoint();
+        } // Origin 포인트
+        private CPoint m_PitchSize = new CPoint(); 
         public CPoint p_PitchSize
         {
             get
@@ -109,7 +109,7 @@ namespace RootTools
             {
                 SetProperty(ref m_PitchSize, value);
             }
-        }
+        } // Origin Pitch Size
 
         private CPoint m_Offset = new CPoint();
         public CPoint p_Offset
