@@ -12,17 +12,21 @@ namespace RootTools_Vision
         Parameter<int> _nPositionTrigger;
         public int m_nPositionTrigger
         {
-            get { return _nPositionTrigger._value; }
-            set
-            {
-                if (_nPositionTrigger._value == value) return;
-                _nPositionTrigger._value = value;
-            }
+            get => _nPositionTrigger._value;
+            set => _nPositionTrigger._value = value;
+        }
+
+        Parameter<int> _nPositionScore;
+        public int m_nPositionScore
+        {
+            get => _nPositionScore._value;
+            set => _nPositionScore._value = value;
         }
 
         public ParamData_Position()
         {
-            _nPositionTrigger = new Parameter<int>(0, 0, 100);
+            _nPositionTrigger = new Parameter<int>(0, 0, 500);
+            _nPositionScore = new Parameter<int>(50, 0, 100);
         }
         
 

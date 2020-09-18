@@ -12,25 +12,16 @@ namespace RootTools_Vision
     /// </summary>
     public class RecipeData
     {
-        RecipeData_Origin m_ReicpeData_Origin;
-        RecipeData_Position m_RecipeData_Position;
+        public RecipeData_Origin m_ReicpeData_Origin;
+        public RecipeData_Position m_RecipeData_Position;
         
         public RecipeData()
         {
             m_ReicpeData_Origin = new RecipeData_Origin();
-            m_RecipeData_Position = new RecipeData_Position();
-        }
 
-        public void SaveGraphicsData()
-        {
-            // 도형데이터 저장.
+            int nCount = Enum.GetNames(typeof(Position_Type)).Length;
+            m_RecipeData_Position = new RecipeData_Position(nCount);
         }
-
-        public void LoadGraphicsData()
-        {
-            // 도형데이터 로드
-        }
-
 
         public ref RecipeData_Origin GetRecipeOrigin() { return ref m_ReicpeData_Origin; }
 
