@@ -3,6 +3,7 @@ using RootTools;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control.Ajin;
+using RootTools.Inspects;
 using RootTools.Light;
 using RootTools.Module;
 using System;
@@ -253,7 +254,8 @@ namespace Root_Vega
 
         public void Test()
         {
-            p_PatternVision.BeforePut();
+            PatternVision.Run_AutoIllumination ai = new PatternVision.Run_AutoIllumination(m_PatternVision);
+            ai.Run();
             return;
         }
 
