@@ -702,7 +702,7 @@ namespace Root_Vega
 			m_Engineer.m_InspManager.StartInspection();//검사 시작!
 		}
 
-		bool FindFeature(Reference feature, out CRect targetRect, out Point maxRelativePoint, out int widthDiff, out int heightDiff)
+		public bool FindFeature(Reference feature, out CRect targetRect, out Point maxRelativePoint, out int widthDiff, out int heightDiff)
 		{
 			//TODO : Align과 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
 			var bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
@@ -749,7 +749,7 @@ namespace Root_Vega
 			return foundFeature;
 		}
 
-		void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor)
+		public void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor)
 		{
 			DPoint ptLT = new DPoint(pt.X - 10, pt.Y - 10);
 			DPoint ptRB = new DPoint(pt.X + 10, pt.Y + 10);
