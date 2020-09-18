@@ -22,10 +22,8 @@ namespace RootTools_Vision
 
 
         [XmlIgnore] RecipeEditor m_RecipeEditor; // 그리기 데이터
-        [XmlIgnore] RecipeData m_ReicpeData; // ROI 정보 데이터
-
         public RecipeInfo m_RecipeInfo; // 레시피 정보 데이터
-        public RecipeParameter m_RecipeParam; // 파라미터 데이터
+        public RecipeData m_ReicpeData; // ROI 정보 데이터
 
         public Recipe()
         {
@@ -36,14 +34,11 @@ namespace RootTools_Vision
         {
             m_ReicpeData = new RecipeData();
             m_RecipeInfo = new RecipeInfo();
-            m_RecipeParam = new RecipeParameter();
             m_RecipeEditor = new RecipeEditor(m_ReicpeData);
         }
         
-
         public ref RecipeData GetRecipeData() { return ref m_ReicpeData; }
         public ref RecipeInfo GetRecipeInfo() { return ref m_RecipeInfo; }
-        public ref RecipeParameter GetRecipeParameter() { return ref m_RecipeParam; }
         public ref RecipeEditor GetRecipeEditor() { return ref m_RecipeEditor; }
 
     }

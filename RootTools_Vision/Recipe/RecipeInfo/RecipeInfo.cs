@@ -9,15 +9,17 @@ namespace RootTools_Vision
 {
     public class RecipeInfo : ObservableObject
     {
-
         public string m_sRecipeName; // 레시피명
-
-        RecipeInfo_ProductMap m_RecipeInfoMap;
-        RecipeInfo_MotionData m_RecipeInfoMotionData;
+        public string m_sEqpID; // 장비명
+        public RecipeParameter m_RecipeParam; // 파라미터 데이터
+        RecipeInfo_ProductMap m_RecipeInfoMap; // 제품맵
+        RecipeInfo_MotionData m_RecipeInfoMotionData; // 모션
 
         public RecipeInfo()
         {
-
+            m_sRecipeName = "Wind2_Recipe";
+            m_sEqpID = "Wind2";
+            m_RecipeParam = new RecipeParameter();
         }
     }
 }

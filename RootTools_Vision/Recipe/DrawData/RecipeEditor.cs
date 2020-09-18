@@ -38,21 +38,6 @@ namespace RootTools_Vision
             m_DrawData_PlainList.Add(plainData);
         }
 
-        public void SaveEditData()
-        {
-            // Recipe 도형정보 Save.
-            int nX = 0;
-            int nY = 0;
-            int length = 1;
-
-        }
-
-        public void LoadEditData()
-        {
-
-        }
-
-
 
         public void UpdateRecipe()
         {

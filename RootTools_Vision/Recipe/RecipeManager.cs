@@ -32,43 +32,93 @@ namespace RootTools_Vision
             return ref m_Recipe;
         }
 
-        public void OpenRecipe() 
+
+        #region [Recipe Info Load / Save]
+        public void LoadRecipe()
         {
             try
             {
                 string paramPath = @"C:\Wind2\wind2.xml";
-                XmlSerializer serializer = new XmlSerializer(typeof(Recipe));
-                Recipe result = new Recipe();
+                XmlSerializer serializer = new XmlSerializer(typeof(RecipeInfo));
+                RecipeInfo result = new RecipeInfo();
 
                 using (Stream reader = new FileStream(paramPath, FileMode.Open))
                 {
                     // Call the Deserialize method to restore the object's state.
-                    result = (Recipe)serializer.Deserialize(reader);
+                    result = (RecipeInfo)serializer.Deserialize(reader);
                 }
-                m_Recipe = result;
+                m_Recipe.m_RecipeInfo = result;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string sError = ex.Message;
             }
         }
-        public void SaveRecipe() 
+        public void SaveRecipe()
         {
             try
-            {   
+            {
                 string paramPath = @"C:\Wind2\wind2.xml";
                 using (StreamWriter wr = new StreamWriter(paramPath))
                 {
-                    
-                    XmlSerializer xs = new XmlSerializer(typeof(Recipe));
-                    xs.Serialize(wr, m_Recipe);
+
+                    XmlSerializer xs = new XmlSerializer(typeof(RecipeInfo));
+                    xs.Serialize(wr, m_Recipe.m_RecipeInfo);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string sError = ex.Message;
             }
         }
+        #endregion
+
+        #region [Recipe Graphics Load / Save]
+        public void LoadGraphicsRecipe()
+        {
+            try
+            {
+                string paramPath = @"C:\Wind2\wind2_Graphics.xml";
+                XmlSerializer serializer = new XmlSerializer(typeof(RecipeData));
+                RecipeData result = m_Recipe.GetRecipeData();
+
+                using (Stream reader = new FileStream(paramPath, FileMode.Open))
+                {
+                    // Call the Deserialize method to restore the object's state.
+                    result = (RecipeData)serializer.Deserialize(reader);
+                }
+                m_Recipe.m_ReicpeData = result;
+            }
+            catch (Exception ex)
+            {
+                string sError = ex.Message;
+                // log
+            }
+
+        }
+        public void SaveGraphicsFile()
+        {
+            // 그리기파일
+            try
+            {
+                RecipeData recipeData = m_Recipe.GetRecipeData();
+                string paramPath = @"C:\Wind2\wind2_Graphics.xml";
+                using (StreamWriter wr = new StreamWriter(paramPath))
+                {
+                    XmlSerializer xs = new XmlSerializer(typeof(RecipeData));
+                    xs.Serialize(wr, recipeData);
+                }
+            }
+            catch (Exception ex)
+            {
+                string sError = ex.Message;
+                // log
+            }
+        }
+        #endregion
+
+
+
 
         public void ExportRecipe() { }
         public void ImportRecipe() { }

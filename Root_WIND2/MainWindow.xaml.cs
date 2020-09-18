@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using RootTools_Vision;
-
+using System.Drawing;
 
 namespace Root_WIND2
 {
@@ -159,13 +159,12 @@ namespace Root_WIND2
             panel.DataContext = viewer.p_ROI_VM;
 
 
-            InitUI();
-            InitTimer();
+            //InitUI();
+            //InitTimer();
 
             m_RecipeMGR = new RecipeManager();
             m_Recipe = m_RecipeMGR.GetRecipe();
             m_RecipeEditor = m_Recipe.GetRecipeEditor();
-            m_RecipeMGR.m_Recipe.m_RecipeParam.m_ParamData_Origin.m_nOriginWidth = 7000;
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -215,22 +214,45 @@ namespace Root_WIND2
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            RecipeData_Origin pOrigin = m_Recipe.GetRecipeData().GetRecipeOrigin();
+            //RecipeData_Origin pOrigin = m_Recipe.GetRecipeData().GetRecipeOrigin();
 
-            CPoint ptOrigin = pOrigin.GetOriginPoint();
-            CRect rtOrigin = pOrigin.GetOriginRect();
-            byte[] InspectionBuffer = new byte[rtOrigin.Width * rtOrigin.Height];
-            int nStride = (int)m_Image.p_Stride;
-            for (int y = 0; y < rtOrigin.Height; y++)
-            {
-                Marshal.Copy(
-                m_Image.GetPtr() + ptOrigin.X + (y + ptOrigin.Y) * nStride, // source
-                InspectionBuffer,
-                rtOrigin.Width * y,
-                rtOrigin.Width
-                );
-            }
-            CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, rtOrigin.Width, rtOrigin.Height, true, 200);
+            //CPoint ptOrigin = pOrigin.GetOriginPoint();
+            //CRect rtOrigin = pOrigin.GetOriginRect();
+            //byte[] InspectionBuffer = new byte[rtOrigin.Width * rtOrigin.Height];
+            //int nStride = (int)m_Image.p_Stride;
+            //for (int y = 0; y < rtOrigin.Height; y++)
+            //{
+            //    Marshal.Copy(
+            //    m_Image.GetPtr() + ptOrigin.X + (y + ptOrigin.Y) * nStride, // source
+            //    InspectionBuffer,
+            //    rtOrigin.Width * y,
+            //    rtOrigin.Width
+            //    );
+            //}
+            //CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, rtOrigin.Width, rtOrigin.Height, true, 200);
+
+
+
+            //m_RecipeMGR.m_Recipe.m_ReicpeData.m_RecipeData_Position.AddImageToBundle();
+            m_RecipeMGR.m_Recipe.m_ReicpeData.m_RecipeData_Position.AddImageToBundle();
+
+            m_RecipeMGR.SaveRecipe();
+            m_RecipeMGR.SaveGraphicsFile();
+
+            //m_RecipeMGR.LoadRecipe();
+            //m_RecipeMGR.LoadGraphicsRecipe();
+
+            m_RecipeMGR.m_Recipe.m_ReicpeData.m_RecipeData_Position.SaveImageBundle();
+
+
+            //byte[] source = m_RecipeMGR.m_Recipe.m_ReicpeData.m_RecipeData_Position.btyePositionFeature;
+            //ImageConverter con = new ImageConverter();
+            //System.Drawing.Image img = (System.Drawing.Image)con.ConvertFrom(source);
+
+            //img.Save(@"C:\Wind2\Result.bmp");
+
+
+            //m_RecipeMGR.LoadGraphicsRecipe();
             //m_RecipeMGR.SaveRecipe();
             //m_RecipeMGR.OpenRecipe();
             //CLR_IP.Cpp_Threshold(InspectionBuffer, InspectionBuffer, nBufferWidth, nBufferHeight, this.parameter.IsDark, this.parameter.Threshold);
