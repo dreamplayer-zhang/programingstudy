@@ -291,7 +291,7 @@ namespace RootTools.Control
             m_asSpeed.Add(sSpeed);
         }
 
-        protected Speed GetSpeedValue(Enum speed)
+        public Speed GetSpeedValue(Enum speed)
         {
             return GetSpeedValue(speed.ToString());
         }
@@ -386,6 +386,19 @@ namespace RootTools.Control
             double dPos = fPos - p_posCommand;
             m_msMoveTime = (int)(1000 * (dPos / v + acc + dec + 1));
             return CheckSWLimit(ref fPos);
+        }
+
+        public virtual string StartMoveV(double vStart, double posAt, double vChange, double posTo, double acc = -1, double dec = -1)
+        {
+            m_posDst = posTo;
+            m_speedNow = null;
+            m_swMove.Start();
+            if (EQ.IsStop()) return p_id + " EQ Stop";
+            if (EQ.p_bSimulate) return "OK";
+            if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
+            double dPos = posTo - p_posCommand;
+            m_msMoveTime = (int)(1000 * (dPos / Math.Min(vStart, vChange) + acc + dec + 1));
+            return "OK"; 
         }
 
         public string WaitReady(double dInPos = -1)

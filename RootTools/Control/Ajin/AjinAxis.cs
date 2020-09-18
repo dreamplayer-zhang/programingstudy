@@ -72,9 +72,8 @@ namespace RootTools.Control.Ajin
         #region Jog
         public override string Jog(double fScale, string sSpeed = null)
         {
-            p_log.Info(p_id + " Jog Start : " + fScale.ToString()); 
-            bool bRet = CheckInterlock();
-            if (bRet == false) return p_id + " - Check Interlock Please";
+            p_log.Info(p_id + " Jog Start : " + fScale.ToString());
+            if (IsInterlock()) return p_id + m_sCheckInterlock;
 
             p_sInfo = base.Jog(fScale, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
@@ -100,9 +99,7 @@ namespace RootTools.Control.Ajin
         #region Move
         public override string StartMove(double fPos, string sSpeed = null)
         {
-            bool bRet = CheckInterlock();
-            if (bRet == false) return p_id + " - Check Interlock Please";
-
+            if (IsInterlock()) return p_id + m_sCheckInterlock;
             p_sInfo = base.StartMove(fPos, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
             if (m_nAxis < 0) return p_id + " Axis not Assigned";
@@ -119,9 +116,7 @@ namespace RootTools.Control.Ajin
 
         public override string StartMove(double fPos, double v, double acc = -1, double dec = -1)
         {
-            bool bRet = CheckInterlock();
-            if (bRet == false) return p_id + " - Check Interlock Please";
-
+            if (IsInterlock()) return p_id + m_sCheckInterlock;
             acc = (acc < 0) ? GetSpeedValue(eSpeed.Move).m_acc : acc;
             dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
             p_sInfo = base.StartMove(fPos, v, acc, dec);
@@ -137,14 +132,32 @@ namespace RootTools.Control.Ajin
             Thread.Sleep(10);
             return "OK";
         }
+
+        public override string StartMoveV(double vStart, double posAt, double vChange, double posTo, double acc = -1, double dec = -1)
+        {
+            if (IsInterlock()) return p_id + m_sCheckInterlock;
+            acc = (acc < 0) ? GetSpeedValue(eSpeed.Move).m_acc : acc;
+            dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
+            p_sInfo = base.StartMoveV(vStart, posAt, vChange, posTo, acc, dec);
+            if (p_sInfo != "OK") return p_sInfo;
+            if (m_nAxis < 0) return p_id + " Axis not Assigned";
+            if (AXM("AxmOverrideVelAtPos", CAXM.AxmOverrideVelAtPos(m_nAxis, posTo, vStart, acc, dec, posAt, vChange, 0)) != 0)
+            {
+                p_eState = eState.Init;
+                p_sInfo = p_id + " Axis AxmOverrideVelAtPos Error";
+                return p_sInfo;
+            }
+            p_eState = eState.Move;
+            Thread.Sleep(10);
+            return "OK";
+        }
         #endregion
 
         #region Shift
         public override string StartShift(double dfPos, string sSpeed = null)
         {
             double fPos = p_posCommand + dfPos;
-            bool bRet = CheckInterlock();
-            if (bRet == false) return p_id + " - Check Interlock Please";
+            if (IsInterlock()) return p_id + m_sCheckInterlock;
 
             p_sInfo = base.StartShift(dfPos, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
@@ -163,8 +176,7 @@ namespace RootTools.Control.Ajin
         public override string StartShift(double dfPos, double v, double acc = -1, double dec = -1)
         {
             double fPos = p_posCommand + dfPos;
-            bool bRet = CheckInterlock();
-            if (bRet == false) return p_id + " - Check Interlock Please";
+            if (IsInterlock()) return p_id + m_sCheckInterlock;
 
             acc = (acc < 0) ? GetSpeedValue(eSpeed.Move).m_acc : acc;
             dec = (dec < 0) ? GetSpeedValue(eSpeed.Move).m_dec : dec;
@@ -186,8 +198,7 @@ namespace RootTools.Control.Ajin
         #region Home
         public override string StartHome()
         {
-            bool bRet = CheckInterlock();
-            if (bRet == false) return p_id + " - Check Interlock Please";
+            if (IsInterlock()) return p_id + m_sCheckInterlock;
 
             if (m_bAbsoluteEncoder)
             {
@@ -629,28 +640,31 @@ namespace RootTools.Control.Ajin
 
         public List<CSensor> m_aSensors = new List<CSensor>();
 
-        public bool CheckInterlock()
+        string m_sCheckInterlock = ""; 
+        bool IsInterlock()
         {
-            // variable
+            m_sCheckInterlock = CheckInterlock();
+            return (m_sCheckInterlock != "OK"); 
+        }
 
-            // implement
+        string CheckInterlock()
+        {
             for (int i = 0; i < m_aSensors.Count; i++)
             {
                 if (m_aSensors[i].m_bHome == true)
                 {
-                    if (!m_listAxis.m_aAxis[i].p_sensorHome) return false;
+                    if (!m_listAxis.m_aAxis[i].p_sensorHome) return " : HomeSensor Interlock Error";
                 }
                 if (m_aSensors[i].m_bPlus == true)
                 {
-                    if (!m_listAxis.m_aAxis[i].p_sensorPlusLimit) return false;
+                    if (!m_listAxis.m_aAxis[i].p_sensorPlusLimit) return " : Plus Limit Interlock Error";
                 }
                 if (m_aSensors[i].m_bMinus == true)
                 {
-                    if (!m_listAxis.m_aAxis[i].p_sensorMinusLimit) return false;
+                    if (!m_listAxis.m_aAxis[i].p_sensorMinusLimit) return " : Minus Limit Interlock Error";
                 }
             }
-
-            return true;
+            return "OK";
         }
 
         public override void RunTreeInterlock(Tree.eMode mode)
