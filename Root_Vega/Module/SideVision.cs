@@ -1612,7 +1612,9 @@ namespace Root_Vega.Module
 
             public double m_dFocusHeight = 177.0;
             public double m_nVerticalPixelPerPulse = 100;
-            public double m_dConstant = 8.1;
+            public double m_dPixelPerPulse = 387.0967;
+
+            public int m_nTestCheck = 0;
 
             public Run_LADS(SideVision module)
             {
@@ -1637,7 +1639,9 @@ namespace Root_Vega.Module
 
                 run.m_dFocusHeight = m_dFocusHeight;
                 run.m_nVerticalPixelPerPulse = m_nVerticalPixelPerPulse;
-                run.m_dConstant = m_dConstant;
+                run.m_dPixelPerPulse = m_dPixelPerPulse;
+
+                run.m_nTestCheck = m_nTestCheck;
 
                 return run;
             }
@@ -1658,7 +1662,9 @@ namespace Root_Vega.Module
 
                 m_dFocusHeight = tree.Set(m_dFocusHeight, m_dFocusHeight, "TDI Camera Focus Hitting Height", "TDI Camera Focus Hitting Height", bVisible);
                 m_nVerticalPixelPerPulse = tree.Set(m_nVerticalPixelPerPulse, m_nVerticalPixelPerPulse, "Height(1) per Pulse", "Height(1) per Pulse", bVisible);
-                m_dConstant = tree.Set(m_dConstant, m_dConstant, "Constant", "Constant", bVisible);
+                m_dPixelPerPulse = tree.Set(m_dPixelPerPulse, m_dPixelPerPulse, "Constant", "Constant", bVisible);
+
+                m_nTestCheck = tree.Set(m_nTestCheck, m_nTestCheck, "Test", "Test", bVisible);
                 
                 base.RunTree(tree, bVisible, bRecipe);
             }
@@ -1693,67 +1699,98 @@ namespace Root_Vega.Module
 
                 try
                 {
+
                     m_module.SetLightByName("LADS", 50);
 
-                    // 0. 스캔 포지션으로 Theta 돌리기
-                    double dPosTheta = (int)m_eScanPos * 360000 / 4;
-                    if (m_module.Run(axisXY.p_axisX.StartMove(-50000)))
-                        return p_sInfo;
-                    if (m_module.Run(axisXY.p_axisX.WaitReady()))
-                        return p_sInfo;
-                    if (m_module.Run(axisTheta.StartMove(dPosTheta)))
-                        return p_sInfo;
-                    if (m_module.Run(axisTheta.WaitReady()))
-                        return p_sInfo;
-
-                    // 1.Reticle 좌측 위치로 이동
-                    p_afs.p_strStatus = "Left Side Snap...";
-                    if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dLeftSnapPosY)))) return p_sInfo;
-                    if (m_module.Run(axisZ.StartMove(axisZ.GetPosValue(eAxisPosZ.LADS)))) return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
-                    string strRet = cam.Grab();
-                    dLeftHeight = CalculatingHeight(img);
-                    img.SaveImageSync($"D:/BottomLeft.bmp");
-                    System.Drawing.Bitmap bmpLeft = null;
-                    bmpLeft = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                    if (_dispatcher != null)
+                    if (m_nTestCheck == 0)
                     {
-                        _dispatcher.Invoke(new Action(delegate ()
-                        {
-                            string strTemp = String.Format("Left Laser Height = {0}", dLeftHeight);
-                            BitmapSource bmpSrc = GetBitmapSource(bmpLeft);
-                            p_bmpSrcLeftViewer = bmpSrc;
-                            p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                        }));
-                    }
+                        // 0. 스캔 포지션으로 Theta 돌리기
+                        double dPosTheta = (int)m_eScanPos * 360000 / 4;
+                        if (m_module.Run(axisXY.p_axisX.StartMove(-50000)))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.p_axisX.WaitReady()))
+                            return p_sInfo;
+                        //if (m_module.Run(axisTheta.StartMove(dPosTheta)))
+                        //    return p_sInfo;
+                        //if (m_module.Run(axisTheta.WaitReady()))
+                        //    return p_sInfo;
 
-                    // 2. Reticle 우측 위치로 이동
-                    p_afs.p_strStatus = "Right Side Snap...";
-                    if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dRightSnapPosY)))) return p_sInfo;
-                    if (m_module.Run(axisZ.StartMove(axisZ.GetPosValue(eAxisPosZ.LADS)))) return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
-                    strRet = cam.Grab();
-                    dRightHeight = CalculatingHeight(img);
-                    img.SaveImageSync($"D:/BottomRight.bmp");
-                    System.Drawing.Bitmap bmpRight = null;
-                    bmpRight = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                    if (_dispatcher != null)
+                        // 1.Reticle 좌측 위치로 이동
+                        p_afs.p_strStatus = "Left Side Snap...";
+                        if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dLeftSnapPosY)))) return p_sInfo;
+                        if (m_module.Run(axisZ.StartMove(axisZ.GetPosValue(eAxisPosZ.LADS)))) return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+                        string strRet = cam.Grab();
+                        dLeftHeight = CalculatingHeight(img);
+                        img.SaveImageSync($"D:/BottomLeft.bmp");
+                        System.Drawing.Bitmap bmpLeft = null;
+                        bmpLeft = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                        if (_dispatcher != null)
+                        {
+                            _dispatcher.Invoke(new Action(delegate ()
+                            {
+                                string strTemp = String.Format("Left Laser Height = {0}", dLeftHeight);
+                                BitmapSource bmpSrc = GetBitmapSource(bmpLeft);
+                                p_bmpSrcLeftViewer = bmpSrc;
+                                p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                            }));
+                        }
+
+                        // 2. Reticle 우측 위치로 이동
+                        p_afs.p_strStatus = "Right Side Snap...";
+                        if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dRightSnapPosY)))) return p_sInfo;
+                        if (m_module.Run(axisZ.StartMove(axisZ.GetPosValue(eAxisPosZ.LADS)))) return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+                        strRet = cam.Grab();
+                        dRightHeight = CalculatingHeight(img);
+                        img.SaveImageSync($"D:/BottomRight.bmp");
+                        System.Drawing.Bitmap bmpRight = null;
+                        bmpRight = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                        if (_dispatcher != null)
+                        {
+                            _dispatcher.Invoke(new Action(delegate ()
+                            {
+                                string strTemp = String.Format("Right Laser Height = {0}", dRightHeight);
+                                BitmapSource bmpSrc = GetBitmapSource(bmpRight);
+                                p_bmpSrcRightViewer = bmpSrc;
+                                p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                            }));
+                        }
+
+                        // 3. 좌우측 높이차 구하기   
+                        double dDiff = dLeftHeight - dRightHeight;
+                        double dConvertingDiffHeightToPulse = dDiff * m_dPixelPerPulse;
+                        double dDistanceOfLeftToRight = Math.Abs(dLeftSnapPosY - dRightSnapPosY);
+                        double dThetaRadian = Math.Atan2(dConvertingDiffHeightToPulse, dDistanceOfLeftToRight);
+                        double dThetaDegree = dThetaRadian * (180 / Math.PI);
+
+                        bool bThetaClockwise = true;    // Theta+ = Anticlockwise
+                                                        // Theta- = Clockwise
+                        if (dLeftHeight > dRightHeight) bThetaClockwise = false;
+
+                        // 5. Radian 값을 Theta 모터 포지션 값으로 Scaling
+                        double dMinValue = 0.0;
+                        double dMaxValue = 2 * Math.PI;
+                        double dMinScaleValue = 0.0;
+                        double dMaxScaleValue = 360000.0;
+                        double dScaled = dMinScaleValue + (Math.Abs(dThetaRadian) - dMinValue) / (dMaxValue - dMinValue) * (dMaxScaleValue - dMinScaleValue);
+
+                        double dActualPos = m_module.p_axisTheta.p_posActual;
+                        if (bThetaClockwise) dScaled = -dScaled;
+                        m_module.p_axisTheta.StartMove(dActualPos + dScaled);
+                        m_module.p_axisTheta.m_aPos["Snap"] = (int)dScaled;
+                    }
+                    else
                     {
-                        _dispatcher.Invoke(new Action(delegate ()
-                        {
-                            string strTemp = String.Format("Right Laser Height = {0}", dRightHeight);
-                            BitmapSource bmpSrc = GetBitmapSource(bmpRight);
-                            p_bmpSrcRightViewer = bmpSrc;
-                            p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                        }));
+                        Thread.Sleep(1000);
+                        string strRet = cam.Grab();
+                        Thread.Sleep(1000);
+                        double dHeight = CalculatingHeight(img);
+                        MessageBox.Show(dHeight.ToString());
                     }
-
-                    // 3. 좌우측 높이차 구하기   - 정확한 Resolution 알아서 다시 구해야 함.
-                    double dDiff = dLeftHeight - dRightHeight;
-                    double dConvertingDiffHeightToPulse = dDiff * m_dConstant;
-                    double dDistanceOfLeftToRight = Math.Abs(dLeftSnapPosY - dRightSnapPosY);
+                    
 
                     //// 4. Theta 돌리기
                     //double dActualPos = m_module.p_axisTheta.p_posActual;
@@ -1830,7 +1867,7 @@ namespace Root_Vega.Module
                         nYSum += *pSrcY * y;
                     }
                     int iIndex = x;
-                    daHeight[iIndex] = (nSum != 0) ? (double)((dScale * nYSum / nSum)) : 0.0;
+                    daHeight[iIndex] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
                 }
                 
                 return GetHeightAverage(daHeight);
