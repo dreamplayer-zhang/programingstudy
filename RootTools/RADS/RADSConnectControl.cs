@@ -635,11 +635,11 @@ namespace RootTools.RADS
 			{
 				sender = new UdpClient(RADSControlInfo.ADSCP_PORT);
 			}
-
+			Thread.Sleep(100);
 			sender.Send(bytes, bytes.Length, new IPEndPoint(p_CurrentController.p_IP, RADSControlInfo.ADSCP_PORT));
 
 			IPEndPoint remoteEP = new IPEndPoint(0, 0);
-
+			Thread.Sleep(100);
 			var results = sender.Receive(ref remoteEP);
 
 			var ADSCP_Type = results[0].ToString("X2") + results[1].ToString("X2");
@@ -668,7 +668,7 @@ namespace RootTools.RADS
 
 			return result;
 		}
-
+		
 		byte[] ConvertToByteArr(string out_packet)
 		{
 			// sendPacket
