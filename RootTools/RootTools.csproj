@@ -135,7 +135,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Viewer\BoxTool_ViewModel.cs" />
     <Compile Include="Database\Table\DatabaseManager.cs" />
     <Compile Include="Database\Table\Database_ConnectSession.cs" />
     <Compile Include="Database\Table\Defect\Defect.cs" />
@@ -355,7 +354,6 @@
     <Compile Include="OHT\SSEM\OHT_SSEM_UI.xaml.cs">
       <DependentUpon>OHT_SSEM_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Viewer\OriginTool_ViewModel.cs" />
     <Compile Include="RADS\RADS.cs" />
     <Compile Include="RADS\RADSConnectControl.cs" />
     <Compile Include="RADS\RADSControl.cs" />

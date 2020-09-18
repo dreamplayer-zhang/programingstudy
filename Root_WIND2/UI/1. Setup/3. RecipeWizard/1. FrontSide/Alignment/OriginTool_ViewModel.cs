@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.ServiceModel.Channels;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RootTools;
+using System;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace RootTools
+namespace Root_WIND2
 {
     public class OriginTool_ViewModel :RootViewer_ViewModel
     {
