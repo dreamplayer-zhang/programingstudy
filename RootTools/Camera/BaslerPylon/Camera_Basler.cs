@@ -625,9 +625,11 @@ namespace RootTools.Camera.BaslerPylon
         }
         public string StopGrab()
         {
+            p_sInfo = "StopGrab() - In";
             GrabStop();
-            m_cam.Parameters[PLCamera.TriggerMode].TrySetValue("Off");
-            //m_cam.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.Off);
+            p_sInfo = "StopGrab() - Mid";
+            //m_cam.Parameters[PLCamera.TriggerMode].TrySetValue("Off"); // Control Channel not open 에러발생
+            p_sInfo = "StopGrab() - Out";
             return "OK"; 
         }
     }

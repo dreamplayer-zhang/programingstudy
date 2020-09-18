@@ -50,7 +50,8 @@ namespace RootTools.Light
             string m_sSend = "";
             public override void SetPower()
             {
-                double fPower = p_bOn ? p_fSetPower : 0;
+                //double fPower = p_bOn ? p_fSetPower : 0;
+                double fPower = p_fSetPower;
                 fPower *= p_fScalePower;
                 m_sSend = GetCommand(fPower);
                 p_rs232.Send(m_sSend); 

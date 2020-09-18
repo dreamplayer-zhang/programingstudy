@@ -53,7 +53,8 @@ namespace Root_Vega
         {
             textBoxDateTime.Text = DateTime.Now.ToString();
             TimerLamp();
-            TimerUI(App.m_engineer.m_login.p_eLevel); 
+            //TimerUI(App.m_engineer.m_login.p_eLevel); 
+            TimerUI(Login.eLevel.Admin);
         }
 
         void TimerUI(Login.eLevel level)
@@ -116,6 +117,7 @@ namespace Root_Vega
 
             _2_5_MainVisionViewModel suvm = new _2_5_MainVisionViewModel(App.m_engineer, dialogService);
             _Recipe._Strip.DataContext = suvm;
+            ((Vega_Handler)App.m_engineer.ClassHandler()).m_patternVision.m_mvvm= suvm;
 
             _2_6_SideViewModel sivm = new _2_6_SideViewModel(App.m_engineer, dialogService);
             _Recipe._Side.DataContext = sivm;
