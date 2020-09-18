@@ -2,7 +2,6 @@
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
-using System.CodeDom;
 using System.Threading;
 
 namespace Root_ASIS.Module

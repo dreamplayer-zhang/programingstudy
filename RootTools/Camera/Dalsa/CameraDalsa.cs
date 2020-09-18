@@ -1,12 +1,11 @@
-﻿using System;
+﻿using DALSA.SaperaLT.SapClassBasic;
+using RootTools.Memory;
+using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
-using System.Windows;
 using System.Windows.Controls;
-using DALSA.SaperaLT.SapClassBasic;
-using RootTools.Memory;
-using RootTools.Trees;
 
 namespace RootTools.Camera.Dalsa
 {
@@ -278,6 +277,8 @@ namespace RootTools.Camera.Dalsa
         #endregion
 
         #region Grab
+        public bool p_bOnGrab { get { return m_sapXfer.Grabbing; } }
+
         bool m_bLive = false; 
         public void GrabLineScan(MemoryData memory, CPoint cp0, int nLine, bool bInvY = false, int yInvOffset = 0)
         {

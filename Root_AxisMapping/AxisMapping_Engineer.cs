@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.Control.ACS;
 using RootTools.Control.Ajin;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -22,6 +23,7 @@ namespace Root_AxisMapping
             switch (m_eControl)
             {
                 case eControl.Ajin: return m_ajin;
+                case eControl.ACS: return m_acs;
             }
             return m_ajin;
         }
@@ -50,28 +52,50 @@ namespace Root_AxisMapping
         #region Control
         enum eControl
         {
-            Ajin
+            Ajin,
+            ACS
         };
         eControl m_eControl = eControl.Ajin;
+
+        Registry m_reg = new Registry("AxisMapping");
         void InitControl()
         {
+            m_eControl = (eControl)m_reg.Read("Control", (int)0); 
             switch (m_eControl)
             {
                 case eControl.Ajin: InitAjin(); break;
+                case eControl.ACS: InitACS(); break; 
             }
         }
 
         void RunTreeControl(Tree tree)
         {
             m_eControl = (eControl)tree.Set(m_eControl, m_eControl, "Control", "Select Control");
+            m_reg.Write("Control", (int)m_eControl); 
+        }
+        #endregion
+
+        #region ACS
+        ACS m_acs;
+        ACS_UI m_acsUI;
+        void InitACS()
+        {
+            m_acs = new ACS();
+            m_acsUI = new ACS_UI();
+            m_acs.Init("ACS", this);
+            m_acsUI.Init(m_acs);
+            m_toolBox.AddToolSet(m_acs, m_acsUI);
+            m_toolBox.m_toolDIO = m_acs.m_dio;
         }
         #endregion
 
         #region Ajin
-        public Ajin m_ajin = new Ajin();
-        Ajin_UI m_ajinUI = new Ajin_UI();
+        public Ajin m_ajin;
+        Ajin_UI m_ajinUI;
         void InitAjin()
         {
+            m_ajin = new Ajin();
+            m_ajinUI = new Ajin_UI();
             m_ajin.Init("Ajin", this);
             m_ajinUI.Init(m_ajin);
             m_toolBox.AddToolSet(m_ajin, m_ajinUI);
@@ -128,9 +152,9 @@ namespace Root_AxisMapping
             EQ.m_sModel = id;
             LogView.Init();
             InitTree();
+            InitControl();
             m_login.Init();
             m_toolBox.Init(id, this);
-            InitControl();
             InitXGem();
             m_handler.Init(id, this);
             m_gaf.Init(id, this);

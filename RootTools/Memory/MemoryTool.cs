@@ -128,7 +128,7 @@ namespace RootTools.Memory
             {
                 foreach (Process process in aProcess) process.Kill();
             }
-            catch(Exception e) { }
+            catch(Exception) { }
             KillInspectProcess();
             RunTreeRun(Tree.eMode.Init);
         }

@@ -2,10 +2,7 @@
 using RootTools.Gem;
 using RootTools.Module;
 using RootTools.Trees;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Windows;
 
 namespace Root_Vega
 {

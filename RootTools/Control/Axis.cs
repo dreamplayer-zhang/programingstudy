@@ -578,21 +578,34 @@ namespace RootTools.Control
             public double[] m_aPos = new double[2] { 0, 0 };
             public double m_dPos = 10;
             public bool m_bCmd = true;
+            public double m_dUpTime = -1;
 
-            public void Set(double fPos0, double fPos1, double dPos, bool bCmd)
+            public Trigger Clone()
+            {
+                Trigger trigger = new Trigger();
+                trigger.m_aPos[0] = m_aPos[0];
+                trigger.m_aPos[1] = m_aPos[1];
+                trigger.m_dPos = m_dPos;
+                trigger.m_dUpTime = m_dUpTime; 
+                trigger.m_bCmd = m_bCmd; 
+                return trigger; 
+            }
+
+            public void Set(double fPos0, double fPos1, double dPos, bool bCmd, double dUpTime)
             {
                 m_aPos[0] = fPos0;
                 m_aPos[1] = fPos1;
                 m_dPos = dPos;
                 m_bCmd = bCmd;
+                m_dUpTime = dUpTime; 
             }
 
-            public void RunTree(Tree tree, string sUnit)
+            public void RunTree(Tree tree, string sUnit, bool bVisible = true)
             {
-                m_aPos[0] = tree.Set(m_aPos[0], m_aPos[0], "Start", "Start Position (" + sUnit + ")");
-                m_aPos[1] = tree.Set(m_aPos[1], m_aPos[1], "End", "End Position (" + sUnit + ")");
-                m_dPos = tree.Set(m_dPos, m_dPos, "Interval", "Trigger Interval (" + sUnit + ")");
-                m_bCmd = tree.Set(m_bCmd, m_bCmd, "Command Encoder", "use Command Encoder (false = Actual)");
+                m_aPos[0] = tree.Set(m_aPos[0], m_aPos[0], "Start", "Start Position (" + sUnit + ")", bVisible);
+                m_aPos[1] = tree.Set(m_aPos[1], m_aPos[1], "End", "End Position (" + sUnit + ")", bVisible);
+                m_dPos = tree.Set(m_dPos, m_dPos, "Interval", "Trigger Interval (" + sUnit + ")", bVisible);
+                m_bCmd = tree.Set(m_bCmd, m_bCmd, "Command Encoder", "use Command Encoder (false = Actual)", bVisible);
             }
         }
         public Trigger m_trigger = new Trigger();
@@ -600,18 +613,17 @@ namespace RootTools.Control
 
         public void SetTrigger(double fPos0, double fPos1, double dPos, bool bCmd)
         {
-            m_trigger.Set(fPos0, fPos1, dPos, bCmd);
-            RunTrigger(true);
+            m_trigger.Set(fPos0, fPos1, dPos, bCmd, -1);
+            RunTrigger(true, m_trigger);
         }
 
         public void SetTrigger(double fPos0, double fPos1, double dPos, double dUptime, bool bCmd)
         {
-            m_trigger.Set(fPos0, fPos1, dPos, bCmd);
-            RunTrigger(dUptime, true);
+            m_trigger.Set(fPos0, fPos1, dPos, bCmd, dUptime);
+            RunTrigger(true, m_trigger);
         }
 
-        public virtual void RunTrigger(bool bOn) { }
-        public virtual void RunTrigger(double dUptime, bool bOn) { }
+        public virtual void RunTrigger(bool bOn, Trigger trigger = null) { }
         #endregion
 
         #region Tree

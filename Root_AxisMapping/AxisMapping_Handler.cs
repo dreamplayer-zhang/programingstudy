@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_AxisMapping.Module;
+using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
@@ -27,19 +28,15 @@ namespace Root_AxisMapping
 
         #region Module
         public ModuleList m_moduleList;
+        public AxisMapping m_axisMapping; 
         public AxisMapping_Recipe m_recipe;
 //        public TapePacker m_tapePacker;
-//        public VacuumPacker m_vacuumPacker;
-        //        public Robot_RND m_robot;
 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
-//            m_tapePacker = new TapePacker("TapePacker", m_engineer);
-//            InitModule(m_tapePacker);
-//            m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
-//            InitModule(m_vacuumPacker);
-            //((IWTR)m_wtr).ReadInfoReticle_Registry();
+            m_axisMapping = new AxisMapping("AxisMapping", m_engineer);
+            InitModule(m_axisMapping); 
             m_recipe = new AxisMapping_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
         }
@@ -54,8 +51,6 @@ namespace Root_AxisMapping
         public bool IsEnableRecovery()
         {
             //            if (m_robot.p_infoReticle != null) return true;
-            //            if (m_sideVision.p_infoReticle != null) return true;
-            //            if (m_patternVision.p_infoReticle != null) return true;
             return false;
         }
         #endregion

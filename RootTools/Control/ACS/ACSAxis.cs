@@ -265,13 +265,15 @@ namespace RootTools.Control.ACS
         bool m_bTriggerOn = false; 
         bool m_bLevel = true;
         double m_dTrigTime = 2;
-        public override void RunTrigger(bool bOn)
+        public override void RunTrigger(bool bOn, Trigger trigger = null)
         {
+            if (trigger == null) trigger = m_trigger;
+            double dUpTime = (trigger.m_dUpTime < 0) ? m_dTrigTime : trigger.m_dUpTime; 
             if (m_nAxis < 0) return;
             if (p_bConnect == false) return;
             try
             {
-                if (m_bTriggerOn == bOn) return; 
+                if (m_bTriggerOn == bOn) return;
                 if (bOn == false)
                 {
                     p_channel.StopPeg(m_nAxis);
@@ -279,17 +281,17 @@ namespace RootTools.Control.ACS
                 }
                 else
                 {
-                    p_channel.PegInc(p_channel.ACSC_AMF_SYNCHRONOUS, m_nAxis, m_dTrigTime / 1000.0, m_trigger.m_aPos[0], m_trigger.m_dPos, m_trigger.m_aPos[1], 0, 0);
-                    string sTrigger = m_trigger.m_aPos[0].ToString() + " ~ " + m_trigger.m_aPos[1].ToString() + ", " + m_trigger.m_dPos.ToString();
-                    p_log.Info("Trigger On : " + sTrigger + ", " + m_dTrigTime.ToString());
+                    p_channel.PegInc(p_channel.ACSC_AMF_SYNCHRONOUS, m_nAxis, dUpTime / 1000.0, trigger.m_aPos[0], trigger.m_dPos, trigger.m_aPos[1], 0, 0);
+                    string sTrigger = trigger.m_aPos[0].ToString() + " ~ " + trigger.m_aPos[1].ToString() + ", " + trigger.m_dPos.ToString();
+                    p_log.Info("Trigger On : " + sTrigger + ", " + dUpTime.ToString());
                 }
-                m_bTriggerOn = bOn; 
+                m_bTriggerOn = bOn;
             }
             catch (Exception e)
             {
                 p_sInfo = p_id + " Set Trigger Error : " + e.Message;
                 p_eState = eState.Init;
-                m_bTriggerOn = false; 
+                m_bTriggerOn = false;
             }
         }
 

@@ -72,6 +72,11 @@ namespace RootTools.Control
             return StartMove(rp, (speed == null) ? null : speed.ToString());
         }
 
+        public string StartMove(double x, double y, string sSpeed = null)
+        {
+            return StartMove(new RPoint(x, y), sSpeed); 
+        }
+
         RPoint m_rpDst = new RPoint();
         public string StartMove(RPoint rpPos, string sSpeed = null)
         {

@@ -99,17 +99,10 @@ namespace Root_ASIS.Module
             if (m_axis.p_posCommand < posStart)
             {
                 m_axis.StartMove(posStart);
-                if (Run(m_axis.WaitReady())) return m_sRun; 
+                if (Run(m_axis.WaitReady())) return p_sInfo; 
             }
             m_axis.RunTrigger(true); //forget
             return "OK"; 
-        }
-
-        string m_sRun = ""; 
-        bool Run(string sRun)
-        {
-            m_sRun = sRun;
-            return (sRun != "OK"); 
         }
 
         void RunTreeGrab(Tree tree)

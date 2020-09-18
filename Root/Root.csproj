@@ -99,7 +99,6 @@
     <Compile Include="Module\ACS.cs" />
     <Compile Include="Module\BayerConvert.cs" />
     <Compile Include="Module\ScareCrow.cs" />
-    <Compile Include="Module\Siltron.cs" />
     <Compile Include="Module\Test.cs" />
     <Compile Include="Module\TestMars.cs" />
     <Compile Include="Root_Handler.cs" />

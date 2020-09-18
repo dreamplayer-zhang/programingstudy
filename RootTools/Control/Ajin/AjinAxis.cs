@@ -408,26 +408,17 @@ namespace RootTools.Control.Ajin
         #region Trigger
         bool m_bLevel = true;
         double m_dTrigTime = 2;
-        public override void RunTrigger(bool bOn)
+        public override void RunTrigger(bool bOn, Trigger trigger = null)
         {
+            if (trigger == null) trigger = m_trigger;
+            double dUpTime = (trigger.m_dUpTime < 0) ? m_dTrigTime : trigger.m_dUpTime; 
             if (m_nAxis < 0) return;
             AXM("AxmTriggerSetReset", CAXM.AxmTriggerSetReset(m_nAxis));
             if (bOn == false) return;
             uint nLevel = (uint)(m_bLevel ? 1 : 0);
-            uint nEncoder = (uint)(m_trigger.m_bCmd ? 1 : 0);
-            AXM("AxmTriggerSetTimeLevel", CAXM.AxmTriggerSetTimeLevel(m_nAxis, m_dTrigTime, nLevel, nEncoder, 0));
-            AXM("AxmTriggerSetBlock", CAXM.AxmTriggerSetBlock(m_nAxis, m_trigger.m_aPos[0] * p_pulsepUnit, m_trigger.m_aPos[1] * p_pulsepUnit, m_trigger.m_dPos * p_pulsepUnit));
-        }
-
-        public override void RunTrigger(double dUptime, bool bOn)
-        {
-            if (m_nAxis < 0) return;
-            AXM("AxmTriggerSetReset", CAXM.AxmTriggerSetReset(m_nAxis));
-            if (bOn == false) return;
-            uint nLevel = (uint)(m_bLevel ? 1 : 0);
-            uint nEncoder = (uint)(m_trigger.m_bCmd ? 1 : 0);
-            AXM("AxmTriggerSetTimeLevel", CAXM.AxmTriggerSetTimeLevel(m_nAxis, dUptime, nLevel, nEncoder, 0));
-            AXM("AxmTriggerSetBlock", CAXM.AxmTriggerSetBlock(m_nAxis, m_trigger.m_aPos[0] * p_pulsepUnit, m_trigger.m_aPos[1] * p_pulsepUnit, m_trigger.m_dPos * p_pulsepUnit));
+            uint nEncoder = (uint)(trigger.m_bCmd ? 1 : 0);
+            AXM("AxmTriggerSetTimeLevel", CAXM.AxmTriggerSetTimeLevel(m_nAxis, dUpTime, nLevel, nEncoder, 0));
+            AXM("AxmTriggerSetBlock", CAXM.AxmTriggerSetBlock(m_nAxis, trigger.m_aPos[0] * p_pulsepUnit, trigger.m_aPos[1] * p_pulsepUnit, trigger.m_dPos * p_pulsepUnit));
         }
 
         public void RunTreeSettingTrigger(Tree tree)
