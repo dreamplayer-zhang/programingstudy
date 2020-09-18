@@ -155,6 +155,7 @@ namespace Root_WIND2
 
             m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
 
+
             viewer.p_ROI_VM = new MaskTool_ViewModel(m_Image, dialogService);
             panel.DataContext = viewer.p_ROI_VM;
 

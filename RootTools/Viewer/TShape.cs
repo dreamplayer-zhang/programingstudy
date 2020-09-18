@@ -115,12 +115,12 @@ namespace RootTools
             }
         }
 
-        public TRect(Brush brush, double thickness)
+        public TRect(Brush brush, double thickness, double opacity)
         {
             MemoryRect = new CRect();
 
             CanvasRect = new Rectangle();
-            CanvasRect.Opacity = 0.5;
+            CanvasRect.Opacity = opacity;
             FillBrush = brush;
             CanvasRect.Stroke = brush;
             CanvasRect.StrokeThickness = thickness;
@@ -134,7 +134,6 @@ namespace RootTools
         }
         public CPoint MemPointBuffer;
         public Brush FillBrush;
-
         public CRect MemoryRect;
 
     }

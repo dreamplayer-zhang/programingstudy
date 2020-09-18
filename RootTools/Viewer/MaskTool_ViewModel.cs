@@ -258,7 +258,7 @@ namespace RootTools
                 case ToolType.Line:
                     break;
                 case ToolType.Rect:
-                    shape = new TRect(Brushes.Yellow, 1);
+                    shape = new TRect(Brushes.Yellow, 1, 0.5);
                     TRect rect = shape as TRect;
                     rect.MemPointBuffer = memPt;
                     rect.MemoryRect.Left = memPt.X;

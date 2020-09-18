@@ -4,10 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
+             xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="838" d:DesignWidth="1683" 
              Background="{StaticResource PanelBackGround}">
+    <UserControl.Resources>
+        <converter:TextBoxToIntConverter x:Key="TextBoxToInt"/>
+    </UserControl.Resources>
     <ScrollViewer VerticalScrollBarVisibility="Visible">
         <StackPanel>
             <Grid Height="838">
@@ -17,12 +21,10 @@
                     <ColumnDefinition Width="1.2*"/>
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0"
-                      x:Name="col1">
+                <Grid Grid.Column="0">
                     <GroupBox Grid.Row="0" Header="Image View"
                               Background="{StaticResource GroupBoxBackground}">
                         <Grid>
-                            <!--<tools:RootViewer/>-->
                             <tools:RootViewer DataContext="{Binding p_BOX_VM}"/>
                         </Grid>
                     </GroupBox>
@@ -33,7 +35,7 @@
                               Background="{StaticResource Splitter}" 
                               Width="3"
                               ShowsPreview="True"/>
-                <Grid Grid.Column="2" x:Name="col2">
+                <Grid Grid.Column="2" DataContext="{Binding p_OriginTool_VM}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="2*"/>
                         <RowDefinition/>
@@ -47,12 +49,13 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <StackPanel Orientation="Horizontal" Background="{StaticResource ControlBackGround}">
-                                <Button Content="Origin Point" Width="100" Margin="0" BorderBrush="{x:Null}"
-                                        Command="{Binding SetOriginPoint}"/>
-                                <Button Content="Pitch Point" Width="100" Margin="0" BorderBrush="{x:Null}"
-                                        Command="{Binding SetPitchPoint}"/>
+                                <ToggleButton Content="Origin Point" Width="100" Margin="0" BorderBrush="{x:Null}"
+                                              IsChecked="{Binding p_UseOrigin, Mode=TwoWay}"/>
+                                <ToggleButton Content="Pitch Point" Width="100" Margin="0" BorderBrush="{x:Null}"
+                                               IsChecked="{Binding p_UsePitch, Mode=TwoWay}"/>
+                                <Button Content="Clear" Width="100" Margin="0" BorderBrush="{x:Null}" Command="{Binding ClearOrigin}"/>
                             </StackPanel>
-                            <tools:RootViewer Grid.Row="1" DataContext="{Binding p_OriginTool_VM}"/>
+                            <tools:RootViewer Grid.Row="1"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Origin Information" Grid.Row="1"
@@ -78,16 +81,28 @@
                             <TextBlock Text="Pitch Y" Style="{StaticResource BasicTb}" Grid.Row="3"/>
                             <TextBlock Text="Offset X" Style="{StaticResource BasicTb}" Grid.Row="4"/>
                             <TextBlock Text="Offset Y" Style="{StaticResource BasicTb}" Grid.Row="5"/>
-                            <TextBox Style="{StaticResource BasicTbox}" Grid.Column="2" Width="200" Height="25" Grid.Row="0"
+                            <TextBox Text="{Binding p_OriginPoint.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="0"
                                      IsEnabled="{Binding ElementName=originX, Path=IsChecked}"/>
-                            <TextBox Style="{StaticResource BasicTbox}" Grid.Column="2" Width="200" Height="25" Grid.Row="1"
+                            <TextBox Text="{Binding p_OriginPoint.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="1"
                                      IsEnabled="{Binding ElementName=originY, Path=IsChecked}"/>
-                            <TextBox Style="{StaticResource BasicTbox}" Grid.Column="2" Width="200" Height="25" Grid.Row="2"
+                            <TextBox Text="{Binding p_PitchSize.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}"
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="2"
                                      IsEnabled="{Binding ElementName=pitchX, Path=IsChecked}"/>
-                            <TextBox Style="{StaticResource BasicTbox}" Grid.Column="2" Width="200" Height="25" Grid.Row="3"
+                            <TextBox Text="{Binding p_PitchSize.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}"
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="3"
                                      IsEnabled="{Binding ElementName=pitchY, Path=IsChecked}"/>
-                            <TextBox Style="{StaticResource BasicTbox}" Grid.Column="2" Width="200" Height="25" Grid.Row="4"/>
-                            <TextBox Style="{StaticResource BasicTbox}" Grid.Column="2" Width="200" Height="25" Grid.Row="5"/>
+                            <TextBox Text="{Binding p_Offset.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TextBoxToInt}}"
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="4"/>
+                            <TextBox Text="{Binding p_Offset.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TextBoxToInt}}"
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="5"/>
                             <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Name="originX" IsChecked="False"/>
                             <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Name="originY"/>
                             <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Name="pitchX"/>
@@ -95,10 +110,8 @@
 
                         </Grid>
                     </GroupBox>
-                    <Button Style="{StaticResource PanelBtn}" Grid.Column="0" Grid.Row="2" Content="Apply"
-                            Margin="2"/>
                 </Grid>
-                <Grid Grid.Column="3" x:Name="col3">
+                <Grid Grid.Column="3" Opacity="0.5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="2*"/>
                         <RowDefinition/>
@@ -106,11 +119,8 @@
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0" Header="Map"
                               Background="{StaticResource GroupBoxBackground}">
-                        <Grid Background="Black">
-                            <Grid>
-                                <Image Source="/Root_WIND2;component/Resources/WaferMap.PNG"/>
-                            </Grid>
-
+                        <Grid>
+                            <Image Source="/Root_WIND2;component/Resources/WaferMap.PNG"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Map Information" Grid.Row="1"

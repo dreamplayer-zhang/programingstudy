@@ -661,7 +661,7 @@ namespace RootTools
 		#endregion
 
 		#region Command Method
-		void _openImage()
+		public virtual void _openImage()
 		{
 			if (p_ImageData == null)
 			{
@@ -932,7 +932,7 @@ namespace RootTools
 			CPoint nowPt = new CPoint(p_MouseX, p_MouseY);
 
 			DrawCrossLine(nowPt);
-			//p_BasicTool.DrawCrossLine(nowPt, p_CanvasWidth, p_CanvasHeight);
+
 			if (m_KeyEvent == null)
 				return;
 			if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
@@ -941,10 +941,11 @@ namespace RootTools
 					CanvasMovePoint_Ref(m_ptViewBuffer, m_ptMouseBuffer.X - p_MouseX, m_ptMouseBuffer.Y - p_MouseY);
 					return;
 				}
-			//p_BasicTool.DrawTool(nowPt, GetMemPoint(nowPt));
+
 		}
 		public virtual void PreviewMouseUp(object sender, System.Windows.Input.MouseEventArgs e)
 		{
+
 		}
 		public virtual void MouseWheel(object sender, MouseWheelEventArgs e)
 		{
