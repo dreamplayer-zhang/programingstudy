@@ -7,6 +7,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using RootTools;
+using RootTools_Vision;
+
 namespace Root_WIND2
 {
     class Alignment_ViewModel : ObservableObject
@@ -46,11 +48,14 @@ namespace Root_WIND2
         public AlignmentSetupPage Setup;
         public AlignmentPositionPage Position;
         public AlignmentMapPage Map;
-
-        
+        public Recipe m_Recipe;
+    
         public Alignment_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
+            m_Recipe = m_Setup.m_MainWindow.m_RecipeMGR.GetRecipe();
+
+
             init();
             ViewerInit();
         }
@@ -64,13 +69,14 @@ namespace Root_WIND2
             Position = new AlignmentPositionPage();
             Map = new AlignmentMapPage();
             SetPage(Summary);
+
         }
 
         private void ViewerInit()
         {
             p_BOX_VM = new BoxTool_ViewModel(m_Setup.m_MainWindow.m_Image, m_Setup.m_MainWindow.dialogService);
             p_BOX_VM.BoxDone += P_BOX_VM_BoxDone;        
-            p_OriginTool_VM = new OriginTool_ViewModel();
+            p_OriginTool_VM = new OriginTool_ViewModel(m_Recipe);
             p_OriginTool_VM.AddOrigin += P_OriginTool_VM_AddOrigin;
             p_OriginTool_VM.AddPitch += P_OriginTool_VM_AddPitch;
             p_OriginTool_VM.AddArea += P_OriginTool_VM_AddInspArea;

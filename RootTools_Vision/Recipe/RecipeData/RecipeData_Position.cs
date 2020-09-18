@@ -22,8 +22,6 @@ namespace RootTools_Vision
     {
         #region [Graphics XML Serialize 변수(레시피)]
         // 무조건 Public 선언되어야 함  
-        byte[] btyePositionFeature;
-        public const int m_nPositionTypeNum = 3;
         public List<Image_Bundle> m_PositionImageBundle; // 시리얼 라이즈가 왠지 안됨
         #endregion
 
@@ -47,7 +45,7 @@ namespace RootTools_Vision
             }
         }
 
-            public void AddImageToBundle(ImageData _ImageData, Position_Type _Type, CPoint _ptCenter, CRect _rtBoundry)
+        public void AddImageToBundle(ImageData _ImageData, Position_Type _Type, CPoint _ptCenter, CRect _rtBoundry)
         {
             // 신규 Position Feature 등록
 
@@ -109,7 +107,7 @@ namespace RootTools_Vision
             bundle.SaveImageBundle();
         }
 
-            public Image_Bundle GetImagebundle(Position_Type _Type)
+        public Image_Bundle GetImagebundle(Position_Type _Type)
         {
             int nIndex = Convert.ToInt32(_Type);
             return m_PositionImageBundle[nIndex];

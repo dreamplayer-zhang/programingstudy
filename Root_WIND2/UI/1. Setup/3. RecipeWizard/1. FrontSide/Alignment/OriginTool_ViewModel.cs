@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using RootTools_Vision;
 
 namespace Root_WIND2
 {
@@ -121,10 +122,15 @@ namespace Root_WIND2
         }
         #endregion
 
+        Recipe m_Recipe;
+        RecipeData_Origin m_RecipeData_Origin;
 
-        public OriginTool_ViewModel(ImageData image = null, IDialogService dialogService = null)
+        public OriginTool_ViewModel(Recipe _Recipe, ImageData image = null, IDialogService dialogService = null)
         {
             base.init(image, dialogService);
+
+            m_Recipe = _Recipe;
+            m_RecipeData_Origin = _Recipe.GetRecipeDataOrigin();
         }
 
         
@@ -316,6 +322,8 @@ namespace Root_WIND2
 
             p_ViewElement.Add(InspArea.CanvasRect);
             AddArea(InspArea);
+
+            m_RecipeData_Origin.SetOrigin(InspArea.MemoryRect);
         }
 
         private void RedrawShape()

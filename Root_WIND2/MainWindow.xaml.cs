@@ -137,10 +137,10 @@ namespace Root_WIND2
         Viewer viewer = new Viewer();
 
 
-        RecipeManager m_RecipeMGR;
+        public RecipeManager m_RecipeMGR;
         Recipe m_Recipe;
+        RecipeInfo m_RecipeInfo;
         RecipeEditor m_RecipeEditor;
-
 
         void Init()
         {
@@ -159,13 +159,14 @@ namespace Root_WIND2
             viewer.p_ROI_VM = new MaskTool_ViewModel(m_Image, dialogService);
             panel.DataContext = viewer.p_ROI_VM;
 
-
-            InitUI();
-            InitTimer();
-
             m_RecipeMGR = new RecipeManager();
             m_Recipe = m_RecipeMGR.GetRecipe();
             m_RecipeEditor = m_Recipe.GetRecipeEditor();
+            m_RecipeInfo = m_Recipe.GetRecipeInfo();
+
+
+            InitUI();
+            InitTimer();
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
