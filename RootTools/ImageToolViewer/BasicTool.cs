@@ -200,7 +200,7 @@ namespace RootTools
                     {
                         case ToolType.Rect:
                             {
-                                tshape = new TRect(Brushes.Yellow, 1);
+                                tshape = new TRect(Brushes.Yellow, 1, 1);
                                 TRect rect = tshape as TRect;
                                 //rect.SetLeftTop(canvasPt, memPt);
                                 p_BasicElement.Add(rect.CanvasRect);
