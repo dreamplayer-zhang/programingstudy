@@ -1,4 +1,5 @@
-﻿using RootTools.Memory;
+﻿using RootTools;
+using RootTools.Memory;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,7 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace RootTools
+namespace Root_WIND2
 {
     public class BoxTool_ViewModel :RootViewer_ViewModel
     {
