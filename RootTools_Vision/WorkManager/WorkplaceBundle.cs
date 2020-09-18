@@ -50,6 +50,14 @@ namespace RootTools_Vision
             }
         }
 
+        public void SetSharedBuffer(IntPtr sharedBuffer, int width, int height)
+        {
+            foreach (Workplace workplace in this)
+            {
+                workplace.SetSharedBuffer(sharedBuffer, width, height);
+            }
+        }
+
         public new void Add(Workplace workplace)
         {
             workplace.StateChanged += WorkplaceStateChanged_Callback;

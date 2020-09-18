@@ -132,6 +132,7 @@ namespace RootTools_Vision
             int workbundleIndex = Convert.ToInt32(this.tbWorkBundleIndex.Text);
             int workplacebundleIndex = Convert.ToInt32(this.tbWorkplaceBundleIndex.Text);
 
+            this.workplacebundleList[workplacebundleIndex].SetSharedBuffer(m_Image.GetPtr(), m_Image.p_Size.X, m_Image.p_Size.Y);
 
             this.factory.SetBundles(this.workbundleList[workbundleIndex], this.workplacebundleList[workplacebundleIndex]);
 
@@ -162,8 +163,9 @@ namespace RootTools_Vision
         }
 
         private void BtnAddPosition(object sender, RoutedEventArgs e)
-        {
+        {            
             this.workbundle.Add(new Position());
+
             RefeshWorkBundleStack();
         }
 

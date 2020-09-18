@@ -52,6 +52,10 @@ namespace RootTools_Vision
         private int transY;
         private int sizeX;
         private int sizeY;
+
+        private IntPtr sharedBuffer;
+        private int sharedBufferWidth;
+        private int sharedBufferHeight;
         #endregion
 
         #region [Getter Setter]
@@ -64,6 +68,10 @@ namespace RootTools_Vision
         public int TransY { get => transY; private  set => transY = value; }
         public int SizeX { get => sizeX; private set => sizeX = value; }
         public int SizeY { get => sizeY; private set => sizeY = value; }
+
+        public IntPtr SharedBuffer { get => sharedBuffer; private set => sharedBuffer = value; }
+        public int SharedBufferWidth { get => sharedBufferWidth; private set => sharedBufferWidth = value; }
+        public int SharedBufferHeight { get => sharedBufferHeight; private set => sharedBufferHeight = value; }
         #endregion
 
         public Workplace()
@@ -85,6 +93,13 @@ namespace RootTools_Vision
             this.sizeX = szX;
             this.sizeY = szY;
             this.index = idx;
+        }
+
+        public void SetSharedBuffer(IntPtr _sharedBuffer, int width, int height)
+        {
+            this.sharedBuffer = _sharedBuffer;
+            this.sharedBufferWidth = width;
+            this.sharedBufferHeight = height;
         }
 
         public void SetImagePosition(int posX, int posY)
