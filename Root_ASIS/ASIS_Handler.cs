@@ -31,7 +31,8 @@ namespace Root_ASIS
         public ASIS_Recipe m_recipe;
         public ASIS_Process m_process;
         public ASIS m_ASIS;
-        public LoadEV m_loadEV; 
+        public LoadEV m_loadEV;
+        public Boat[] m_aBoat = new Boat[2];  
         //        public Robot_RND m_robot;
 
         void InitModule()
@@ -40,8 +41,11 @@ namespace Root_ASIS
             m_ASIS = new ASIS("ASIS", m_engineer);
             InitModule(m_ASIS);
             m_loadEV = new LoadEV("LoadEV", m_engineer);
-            InitModule(m_loadEV); 
-            //((IWTR)m_wtr).ReadInfoReticle_Registry();
+            InitModule(m_loadEV);
+            m_aBoat[0] = new Boat("Boat0", m_engineer);
+            InitModule(m_aBoat[0]);
+            m_aBoat[1] = new Boat("Boat1", m_engineer);
+            InitModule(m_aBoat[1]);
             m_recipe = new ASIS_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
             m_process = new ASIS_Process("Process", m_engineer, this);
