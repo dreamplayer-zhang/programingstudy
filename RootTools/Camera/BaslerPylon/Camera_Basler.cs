@@ -112,7 +112,6 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
         BackgroundWorker bgw_Connect = new BackgroundWorker();
-        BackgroundWorker bgw_Grab = new BackgroundWorker();
 
         public Camera_Basler(string id, Log log)
         {

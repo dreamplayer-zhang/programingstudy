@@ -3,6 +3,7 @@ using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
+using System.Configuration;
 using System.Threading;
 
 namespace Root_ASIS.Module
@@ -38,8 +39,38 @@ namespace Root_ASIS.Module
         }
         #endregion
 
+        #region Run Mode
+        void RunTreeMode(Tree tree) //forget
+        {
+            Strip.p_bUseMGZ = tree.Set(Strip.p_bUseMGZ, Strip.p_bUseMGZ, "Use MGZ", "Use MGZ or LoadEV");
+            Strip.p_bUsePaper = tree.Set(Strip.p_bUsePaper, Strip.p_bUsePaper, "Use Paper", "Use Paper");
+            Strip.p_szStrip = tree.Set(Strip.p_szStrip, Strip.p_szStrip, "Strip Size", "Strip Size");
+            Strip.m_szStripTeach = tree.Set(Strip.m_szStripTeach, Strip.m_szStripTeach, "Teach Strip Size", "Teach Strip Size");
+        }
+        #endregion
+
+        #region Override
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            RunTreeSetup(tree.GetTree("Setup", false));
+        }
+
+        void RunTreeSetup(Tree tree)
+        {
+            RunTreeMode(tree.GetTree("Mode", false));
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+        }
+        #endregion
+
+        ASIS_Handler m_handler; 
         public ASIS(string id, IEngineer engineer)
         {
+            m_handler = (ASIS_Handler)engineer.ClassHandler(); 
             base.InitBase(id, engineer);
         }
 

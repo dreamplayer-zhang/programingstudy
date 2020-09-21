@@ -98,13 +98,12 @@ namespace Root_ASIS.Module
         #endregion
 
         #region Axis Function
-        enum ePos
+        public enum ePos
         {
             Ready,
             ReadyMGZ,
             Done,
         }
-        public bool m_bMGZ = false; 
         void InitPosition()
         {
             m_axis.AddPos(Enum.GetNames(typeof(ePos)));
@@ -265,6 +264,8 @@ namespace Root_ASIS.Module
                 _infoStrip = value;
                 OnPropertyChanged();
                 m_reg.Write("iStrip", (value == null) ? -1 : value.p_iStrip);
+                p_bReady = false;
+                p_bDone = false; 
             }
         }
 
@@ -276,7 +277,43 @@ namespace Root_ASIS.Module
         }
         #endregion
 
+        #region Property
+        public bool _bReady = false;
+        public bool p_bReady
+        {
+            get { return _bReady; }
+            set
+            {
+                if (_bReady == value) return;
+                _bReady = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool _bDone = false;
+        public bool p_bDone
+        {
+            get { return _bDone; }
+            set
+            {
+                if (_bDone == value) return;
+                _bDone = value;
+                OnPropertyChanged();
+            }
+        }
+        #endregion
+
         #region Override
+        public override string StateReady()
+        {
+            if (p_bReady) return "OK";
+            if (p_infoStrip != null) return "OK";
+            Run_Move run = (Run_Move)m_runMove.Clone();
+            run.m_ePos = Strip.p_bUseMGZ ? ePos.ReadyMGZ : ePos.Ready;
+            StartRun(run); 
+            return "OK";
+        }
+
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
@@ -306,6 +343,7 @@ namespace Root_ASIS.Module
         {
             m_nID = nID; 
             m_reg = new Registry(id);
+            InitStrip(); 
             base.InitBase(id, engineer);
         }
 
@@ -319,10 +357,11 @@ namespace Root_ASIS.Module
         }
 
         #region ModuleRun
+        ModuleRunBase m_runMove; 
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
-            AddModuleRunList(new Run_Move(this), false, "Move Boat");
+            m_runMove = AddModuleRunList(new Run_Move(this), false, "Move Boat");
             AddModuleRunList(new Run_Grab(this), false, "Grab LineScan");
         }
 
@@ -364,7 +403,7 @@ namespace Root_ASIS.Module
                 InitModuleRun(module);
             }
 
-            ePos m_ePos = ePos.Ready; 
+            public ePos m_ePos = ePos.Ready; 
             public override ModuleRunBase Clone()
             {
                 Run_Move run = new Run_Move(m_module);

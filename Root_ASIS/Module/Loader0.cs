@@ -1,9 +1,11 @@
 ﻿using RootTools;
+using RootTools.Control;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Root_ASIS.Module
@@ -11,29 +13,14 @@ namespace Root_ASIS.Module
     public class Loader0 : ModuleBase
     {
         #region ToolBox
-/*        DIO_I2O2 m_dioEV;
-        DIO_I m_diTop;
-        DIO_I m_diCheck;
-        DIO_I m_diBlowAlarm;
-        DIO_I m_diPaper;
-        DIO_I m_diPaperCheck;
-        DIO_I m_diPaperFull;
-        DIO_O m_doIonBlow;
-        DIO_O m_doAlignBlow; */
-
+        Axis m_axis;
+        DIO_I m_diPaperFull; 
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_axis, this, "Axis");
+            p_sInfo = m_toolBox.Get(ref m_diPaperFull, this, "Paper Full"); 
             m_aPicker[ePicker.Strip].GetTools(this, bInit);
             m_aPicker[ePicker.Paper].GetTools(this, bInit);
-            /*            p_sInfo = m_toolBox.Get(ref m_dioEV, this, "Elevator", "Down", "Up");
-                        p_sInfo = m_toolBox.Get(ref m_diTop, this, "Top");
-                        p_sInfo = m_toolBox.Get(ref m_diCheck, this, "Check");
-                        p_sInfo = m_toolBox.Get(ref m_diBlowAlarm, this, "BlowAlarm");
-                        p_sInfo = m_toolBox.Get(ref m_diPaper, this, "Paper");
-                        p_sInfo = m_toolBox.Get(ref m_diPaperCheck, this, "PaperCheck");
-                        p_sInfo = m_toolBox.Get(ref m_diPaperFull, this, "PaperFull");
-                        p_sInfo = m_toolBox.Get(ref m_doIonBlow, this, "IonBlow");
-                        p_sInfo = m_toolBox.Get(ref m_doAlignBlow, this, "AlignBlow"); */
             if (bInit) InitTools();
         }
 
@@ -57,15 +44,56 @@ namespace Root_ASIS.Module
         }
         #endregion
 
+        #region Check Thread
+        bool m_bThreadCheck = false;
+        Thread m_threadCheck;
+        void InitThreadCheck()
+        {
+            m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
+            m_threadCheck.Start();
+        }
+
+        void RunThreadCheck()
+        {
+            m_bThreadCheck = true;
+            Thread.Sleep(2000);
+            while (m_bThreadCheck)
+            {
+                Thread.Sleep(10);
+                switch (m_axis.p_eState)
+                {
+                    case Axis.eState.Home:
+                    case Axis.eState.Jog:
+                    case Axis.eState.Move:
+                        if (m_aPicker[ePicker.Paper].IsDown() || m_aPicker[ePicker.Strip].IsDown())
+                        {
+                            m_axis.StopAxis(false);
+                            m_axis.ServoOn(false);
+                            m_axis.p_eState = Axis.eState.Init;
+                            EQ.p_bStop = true;
+                            p_sInfo = "Picker Down when Axis Move"; 
+                        }
+                        break;
+                }
+            }
+        }
+
+        #endregion
+
         public Loader0(string id, IEngineer engineer, LoadEV loadEV)
         {
             InitPicker();
             base.InitBase(id, engineer);
+            InitThreadCheck();
         }
 
         public override void ThreadStop()
         {
-            base.ThreadStop();
+            if (m_bThreadCheck)
+            {
+                m_bThreadCheck = false;
+                m_threadCheck.Join();
+            }
         }
 
     }

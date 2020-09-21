@@ -2,6 +2,7 @@
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
+using System.ComponentModel;
 using System.Threading;
 
 namespace Root_ASIS.Module
@@ -21,6 +22,11 @@ namespace Root_ASIS.Module
         #endregion
 
         #region DIO Functions
+        public bool IsDown()
+        {
+            return m_dioDown.m_aBitDI[1].p_bOn || (m_dioDown.m_aBitDI[0].p_bOn == false);
+        }
+
         bool m_bFastUp = false;
         bool IsMoveDone(bool bDown)
         {
@@ -74,21 +80,58 @@ namespace Root_ASIS.Module
         }
         #endregion
 
+        #region BackgroundWorker
+        readonly object m_csLock = new object();
+
+        BackgroundWorker m_bgw = new BackgroundWorker();
+        void InitBackgroundWork()
+        {
+            m_bgw.DoWork += M_bgwLoad_DoWork;
+        }
+
+        public bool p_bBusy
+        {
+            get { return m_bgw.IsBusy; }
+        }
+
+        bool m_bLoadBGW = true; 
+        LoadEV m_loadEVBGW = null;
+        bool m_bShakeBGW = false;
+        private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (m_bLoadBGW) RunLoad(m_loadEVBGW, m_bShakeBGW);
+            else RunUnload(); 
+        }
+        #endregion
+
         #region RunLoad
+        public string StartLoad(LoadEV loadEV, bool bShake)
+        {
+            if (p_bBusy) return "Picker BackgroundWorker Busy";
+            m_bLoadBGW = true; 
+            m_loadEVBGW = loadEV;
+            m_bShakeBGW = bShake;
+            m_bgw.RunWorkerAsync(); 
+            return "OK"; 
+        }
+
         string m_sLoad = "";
         int m_nRetry = 3;
         public string RunLoad(LoadEV loadEV, bool bShake)
         {
-            for (int n = 0; n < m_nRetry; n++)
+            lock (m_csLock)
             {
-                m_sLoad = Load(loadEV, bShake);
-                if (m_sLoad == "OK") return "OK";
-                if (loadEV != null) loadEV.RunLoad(m_secLoadEVDown + 2);
+                for (int n = 0; n < m_nRetry; n++)
+                {
+                    m_sLoad = Load(loadEV, bShake);
+                    if (m_sLoad == "OK") return "OK";
+                    if (loadEV != null) loadEV.RunLoad(m_secLoadEVDown + 2);
+                }
+                RunDown(false);
+                RunVacuum(false);
+                if (loadEV != null) loadEV.p_bBlow = false;
+                return m_sLoad;
             }
-            RunDown(false);
-            RunVacuum(false);
-            if (loadEV != null) loadEV.p_bBlow = false;
-            return m_sLoad;
         }
 
         double m_secLoadEVDown = 0.5; 
@@ -137,12 +180,23 @@ namespace Root_ASIS.Module
         #endregion
 
         #region RunUnload
+        public string StartUnload()
+        {
+            if (p_bBusy) return "Picker BackgroundWorker Busy";
+            m_bLoadBGW = false;
+            m_bgw.RunWorkerAsync();
+            return "OK"; 
+        }
+
         public string RunUnload()
         {
-            if (Run(RunDown(true))) return m_sRun;
-            if (Run(RunVacuum(false))) return m_sRun;
-            if (Run(RunDown(false))) return m_sRun;
-            return "OK"; 
+            lock (m_csLock)
+            {
+                if (Run(RunDown(true))) return m_sRun;
+                if (Run(RunVacuum(false))) return m_sRun;
+                if (Run(RunDown(false))) return m_sRun;
+                return "OK";
+            }
         }
         #endregion
 
@@ -234,11 +288,17 @@ namespace Root_ASIS.Module
             m_module = module;
             m_reg = new Registry(p_id);
             InitStrip(); 
-            InitThread(); 
+            InitThread();
+            InitBackgroundWork(); 
         }
 
         public void ThreadStop()
         {
+            if (m_bThread)
+            {
+                m_bThread = false;
+                m_thread.Join(); 
+            }
         }
     }
 }
