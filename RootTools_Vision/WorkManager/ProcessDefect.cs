@@ -1,4 +1,5 @@
-﻿using RootTools_Vision.UserTypes;
+﻿using RootTools_Vision.Temp_Recipe;
+using RootTools_Vision.UserTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,16 @@ namespace RootTools_Vision
         public void DoProcessDefect()
         {
             Thread.Sleep(2000);
+        }
+
+        public void SetData(object _recipeData, object _parameterData)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetData(IRecipe _recipeData, IParameter _parameterData)
+        {
+            throw new NotImplementedException();
         }
     }
 }

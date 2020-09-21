@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using RootTools_CLR;
+using RootTools_Vision.Temp_Recipe;
 using RootTools_Vision.UserTypes;
 
 namespace RootTools_Vision
@@ -25,7 +26,7 @@ namespace RootTools_Vision
         }
 
 
-        public void SetData(object _recipeData, object _parameterData)
+        public void SetData(IRecipe _recipeData, IParameter _parameterData)
         {
            
         }

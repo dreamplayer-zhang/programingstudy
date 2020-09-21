@@ -149,7 +149,7 @@ namespace Root_WIND2
 
             m_engineer.Init("WIND2");
             m_memoryTool = m_engineer.ClassMemoryTool();
-            m_memoryTool.GetPool(sPool, true).p_gbPool = 5;
+            m_memoryTool.GetPool(sPool, true).p_gbPool = 3;
             m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
             m_memoryTool.GetMemory(sPool, sGroup, sMem);
 

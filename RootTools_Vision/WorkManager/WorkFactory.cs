@@ -17,6 +17,11 @@ namespace RootTools_Vision
         public WorkFactory()
         {
             Init();
+            InitWorkManager();
+        }
+
+        protected virtual void InitWorkManager()
+        {
         }
 
         public void  Init()
