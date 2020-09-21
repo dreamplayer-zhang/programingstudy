@@ -1,10 +1,12 @@
 ﻿using RootTools;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
+using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_ASIS.Module
@@ -17,6 +19,7 @@ namespace Root_ASIS.Module
         DIO_O m_doBlow;
         DIO_O m_doWingBlow;
         DIO_O m_doCleanBlow;
+        LightSet m_lightSet;
         MemoryPool m_memoryPool;
         CameraDalsa m_cam;
 
@@ -27,6 +30,7 @@ namespace Root_ASIS.Module
             p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Blow");
             p_sInfo = m_toolBox.Get(ref m_doWingBlow, this, "WingBlow");
             p_sInfo = m_toolBox.Get(ref m_doCleanBlow, this, "CleanBlow");
+            p_sInfo = m_toolBox.Get(ref m_lightSet, this); 
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_cam, this, "Camera");
             if (bInit) InitTools();
@@ -34,6 +38,7 @@ namespace Root_ASIS.Module
 
         void InitTools()
         {
+            InitPosition(); 
         }
         #endregion
 
@@ -93,6 +98,103 @@ namespace Root_ASIS.Module
         #endregion
 
         #region Axis Function
+        enum ePos
+        {
+            Ready,
+            ReadyMGZ,
+            Done,
+        }
+        public bool m_bMGZ = false; 
+        void InitPosition()
+        {
+            m_axis.AddPos(Enum.GetNames(typeof(ePos)));
+        }
+        #endregion
+
+        #region Light
+        public class LightMode
+        {
+            List<double> _aLightPower = new List<double>();
+            List<double> p_aLightPower
+            {
+                get
+                {
+                    while (_aLightPower.Count < m_boat.m_lightSet.m_aLight.Count) _aLightPower.Add(0);
+                    return _aLightPower;
+                }
+            }
+
+            public bool p_bLightOn
+            {
+                set
+                {
+                    for (int n = 0; n < p_aLightPower.Count; n++) m_boat.m_lightSet.m_aLight[n].p_bOn = value;
+                }
+            }
+
+            public void RunTree(Tree treeParent)
+            {
+                Tree tree = treeParent.GetTree(m_id, false); 
+                for (int n = 0; n < p_aLightPower.Count; n++)
+                {
+                    string id = m_boat.m_lightSet.m_aLight[n].m_sName;
+                    p_aLightPower[n] = tree.Set(p_aLightPower[n], p_aLightPower[n], id, "Light Power (0 ~ 100 %%)"); 
+                }
+            }
+
+            public string m_id;
+            Boat m_boat; 
+            public LightMode(string id, Boat boat)
+            {
+                m_id = id; 
+                m_boat = boat; 
+            }
+        }
+
+        public List<LightMode> m_aLightMode = new List<LightMode>(); 
+        public int p_lLightMode
+        {
+            get { return m_aLightMode.Count; }
+            set
+            {
+                while (m_aLightMode.Count < value)
+                {
+                    LightMode lightMode = new LightMode("LightMode " + m_aLightMode.Count.ToString("00"), this);
+                    m_aLightMode.Add(lightMode);
+                }
+            }
+        }
+
+        public List<string> p_asLightMode
+        {
+            get
+            {
+                List<string> asLightMode = new List<string>();
+                foreach (LightMode lightMode in m_aLightMode) asLightMode.Add(lightMode.m_id);
+                return asLightMode; 
+            }
+        }
+
+        public LightMode GetLightMode(string sLightMode)
+        {
+            List<string> asLightMode = p_asLightMode; 
+            for (int n = 0; n < asLightMode.Count; n++)
+            {
+                if (asLightMode[n] == sLightMode) return m_aLightMode[n]; 
+            }
+            return null; 
+        }
+
+        void RunTreeLight(Tree tree)
+        {
+            p_lLightMode = tree.Set(p_lLightMode, p_lLightMode, "Count", "Light Mode Count");
+            for (int n = 0; n < p_lLightMode; n++)
+            {
+                string sLightID = "Light ID " + n.ToString("00"); 
+                m_aLightMode[n].m_id = tree.Set(m_aLightMode[n].m_id, m_aLightMode[n].m_id, sLightID, "Light ID"); 
+            }
+            for (int n = 0; n < p_lLightMode; n++) m_aLightMode[n].RunTree(tree);
+        }
         #endregion
 
         #region Memory
@@ -111,14 +213,15 @@ namespace Root_ASIS.Module
             m_szGrab = tree.Set(m_szGrab, m_szGrab, "Grab Size", "Dalsa Grab Size (pixel)");
         }
         #endregion
-        
+
         #region Grab
         double m_vGrab = 10; 
         double m_dpAcc = 10;
-        double m_posDone = 100; 
-        public string RunGrab()
+        public string RunGrab(string sLightMode)
         {
             StopWatch sw = new StopWatch();
+            LightMode lightMode = GetLightMode(sLightMode);
+            if (lightMode != null) lightMode.p_bLightOn = true; 
             p_bVacuum = true;
             p_bCleanBlow = true;
             double posStart = m_axis.m_trigger.m_aPos[0] - m_dpAcc;
@@ -132,12 +235,14 @@ namespace Root_ASIS.Module
             int nLine = (int)Math.Round((trigger.m_aPos[1] - trigger.m_aPos[0]) / trigger.m_dPos);
             if (Run(m_cam.StartGrab(new CPoint(), nLine))) return p_sInfo; 
             double v = m_axis.GetSpeedValue(Axis.eSpeed.Move).m_v;
-            m_axis.StartMoveV(v, posStart, m_vGrab, m_posDone);
-            while (m_cam.p_bOnGrab && (m_axis.p_posCommand < m_posDone)) Thread.Sleep(10);
+            double posDone = m_axis.GetPosValue(ePos.Done); 
+            m_axis.StartMoveV(v, posStart, m_vGrab, posDone);
+            while (m_cam.p_bOnGrab && (m_axis.p_posCommand < posDone)) Thread.Sleep(10);
             m_axis.OverrideVelocity(v);
             if (Run(m_axis.WaitReady())) return p_sInfo;
             if (m_cam.p_bOnGrab) return "Camera Dalsa OnGrab Error";
             p_bCleanBlow = false;
+            if (lightMode != null) lightMode.p_bLightOn = false;
             m_log.Info("RunGrab Done : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00")); 
             return "OK"; 
         }
@@ -146,8 +251,28 @@ namespace Root_ASIS.Module
         {
             m_vGrab = tree.Set(m_vGrab, m_vGrab, "Grab V", "Grab Speed (" + m_axis.m_sUnit + " / sec)");
             m_dpAcc = tree.Set(m_dpAcc, m_dpAcc, "Acc", "Acceleration Width (sec)");
-            m_posDone = tree.Set(m_posDone, m_posDone, "Done Pos", "Destination Position (" + m_axis.m_sUnit + ")");
             m_axis.m_trigger.RunTree(tree.GetTree("Trigger"), m_axis.m_sUnit); 
+        }
+        #endregion
+
+        #region InfoStrip
+        InfoStrip _infoStrip = null;
+        public InfoStrip p_infoStrip
+        {
+            get { return _infoStrip; }
+            set
+            {
+                _infoStrip = value;
+                OnPropertyChanged();
+                m_reg.Write("iStrip", (value == null) ? -1 : value.p_iStrip);
+            }
+        }
+
+        void InitStrip()
+        {
+            int iStrip = m_reg.Read("iStrip", -1);
+            if (iStrip < 0) return;
+            p_infoStrip = new InfoStrip(iStrip);
         }
         #endregion
 
@@ -160,9 +285,9 @@ namespace Root_ASIS.Module
 
         void RunTreeSetup(Tree tree)
         {
+            RunTreeLight(tree.GetTree("Light", false)); 
             RunTreeMemory(tree.GetTree("Memory", false));
             RunTreeGrab(tree.GetTree("Grab", false));
-//            RunTreeDIOWait(tree.GetTree("Timeout", false));
         }
 
         public override void Reset()
@@ -170,12 +295,17 @@ namespace Root_ASIS.Module
             p_bBlow = false;
             p_bWingBlow = false;
             p_bCleanBlow = false;
+            //forget
             base.Reset();
         }
         #endregion
 
-        public Boat(string id, IEngineer engineer)
+        int m_nID = 0; 
+        Registry m_reg;
+        public Boat(string id, int nID, IEngineer engineer)
         {
+            m_nID = nID; 
+            m_reg = new Registry(id);
             base.InitBase(id, engineer);
         }
 
@@ -187,6 +317,101 @@ namespace Root_ASIS.Module
             p_bCleanBlow = false; 
             base.ThreadStop();
         }
+
+        #region ModuleRun
+        protected override void InitModuleRuns()
+        {
+            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
+            AddModuleRunList(new Run_Move(this), false, "Move Boat");
+            AddModuleRunList(new Run_Grab(this), false, "Grab LineScan");
+        }
+
+        public class Run_Delay : ModuleRunBase
+        {
+            Boat m_module;
+            public Run_Delay(Boat module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            double m_secDelay = 2;
+            public override ModuleRunBase Clone()
+            {
+                Run_Delay run = new Run_Delay(m_module);
+                run.m_secDelay = m_secDelay;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
+            }
+
+            public override string Run()
+            {
+                Thread.Sleep((int)(1000 * m_secDelay));
+                return "OK";
+            }
+        }
+
+        public class Run_Move : ModuleRunBase
+        {
+            Boat m_module;
+            public Run_Move(Boat module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            ePos m_ePos = ePos.Ready; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Move run = new Run_Move(m_module);
+                run.m_ePos = m_ePos;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_ePos = (ePos)tree.Set(m_ePos, m_ePos, "Position", "Boat Move Position", bVisible);
+            }
+
+            public override string Run()
+            {
+                if (m_module.Run(m_module.m_axis.StartMove(m_ePos))) return p_sInfo; 
+                return m_module.m_axis.WaitReady();
+            }
+        }
+
+        public class Run_Grab : ModuleRunBase
+        {
+            Boat m_module;
+            public Run_Grab(Boat module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            string m_sLightMode = ""; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Grab run = new Run_Grab(m_module);
+                run.m_sLightMode = m_sLightMode; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_sLightMode = tree.Set(m_sLightMode, m_sLightMode, m_module.p_asLightMode, "LightMode", "LightMode ID", bVisible); 
+            }
+
+            public override string Run()
+            {
+                return m_module.RunGrab(m_sLightMode); 
+            }
+        }
+        #endregion
 
     }
 }

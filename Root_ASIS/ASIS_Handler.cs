@@ -42,9 +42,9 @@ namespace Root_ASIS
             InitModule(m_ASIS);
             m_loadEV = new LoadEV("LoadEV", m_engineer);
             InitModule(m_loadEV);
-            m_aBoat[0] = new Boat("Boat0", m_engineer);
+            m_aBoat[0] = new Boat("Boat0", 0, m_engineer);
             InitModule(m_aBoat[0]);
-            m_aBoat[1] = new Boat("Boat1", m_engineer);
+            m_aBoat[1] = new Boat("Boat1", 1, m_engineer);
             InitModule(m_aBoat[1]);
             m_recipe = new ASIS_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
