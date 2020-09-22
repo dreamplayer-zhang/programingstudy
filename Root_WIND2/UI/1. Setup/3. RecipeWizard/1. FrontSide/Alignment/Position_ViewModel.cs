@@ -22,7 +22,7 @@ namespace Root_WIND2
         TShape BOX;
         ImageData BoxImage;
         CPoint PointBuffer;
-
+        Grid Origin_UI;
         BoxProcess eBoxProcess;
         ModifyType eModifyType;
 
@@ -75,6 +75,7 @@ namespace Root_WIND2
             }
             set
             {
+                AddOriginPoint(value, Brushes.Red);
                 SetProperty(ref m_Origin, value);
             }
         }
@@ -569,6 +570,11 @@ namespace Root_WIND2
             if (BOX.isSelected)
                 BOX.ModifyTool.Visibility = Visibility.Visible;
 
+            if (p_ViewElement.Contains(Origin_UI))
+            {
+                CPoint memPtOriginBOX = Origin_UI.Tag as CPoint;
+                AddOriginPoint(memPtOriginBOX, Brushes.Red);
+            }
         }
 
 
@@ -595,6 +601,8 @@ namespace Root_WIND2
         {
             if (p_WaferMark.Count < 1)
                 p_WaferMark.Add(TbEmpty());
+            else
+                p_WaferMark[0].Visibility = Visibility.Collapsed;
             if (p_ShotMark.Count < 1)
                 p_ShotMark.Add(TbEmpty());
             if (p_ChipMark.Count < 1)
@@ -612,6 +620,43 @@ namespace Root_WIND2
             return tb;
         }
 
+        public void AddOriginPoint(CPoint originMemPt, Brush color)
+        {
+            if (p_ViewElement.Contains(Origin_UI))
+                p_ViewElement.Remove(Origin_UI);
+            if (originMemPt.X == 0 && originMemPt.Y == 0)
+                return;
+            CPoint canvasPt = GetCanvasPoint(originMemPt);
+
+            Origin_UI = new Grid();
+
+            Origin_UI.Tag = originMemPt;
+            Origin_UI.Width = 20;
+            Origin_UI.Height = 20;
+            Canvas.SetLeft(Origin_UI, canvasPt.X - 10);
+            Canvas.SetTop(Origin_UI, canvasPt.Y - 10);
+            Canvas.SetZIndex(Origin_UI, 99);
+            Line line1 = new Line();
+            line1.X1 = 0;
+            line1.Y1 = 0;
+            line1.X2 = 1;
+            line1.Y2 = 1;
+            line1.Stroke = color;
+            line1.StrokeThickness = 2;
+            line1.Stretch = Stretch.Fill;
+            Line line2 = new Line();
+            line2.X1 = 0;
+            line2.Y1 = 1;
+            line2.X2 = 1;
+            line2.Y2 = 0;
+            line2.Stroke = color;
+            line2.StrokeThickness = 3;
+            line2.Stretch = Stretch.Fill;
+
+            Origin_UI.Children.Add(line1);
+            Origin_UI.Children.Add(line2);
+            p_ViewElement.Add(Origin_UI);
+        }
         private void _saveImage()
         {
         }
@@ -621,8 +666,9 @@ namespace Root_WIND2
             m_RecipeData_Position.AddMasterFeature(rtf);
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
-            fc.p_ImageSource = BoxImage.GetBitMapSource();
+            fc.p_ImageSource = p_BoxImgSource;
             p_WaferMark.Add(fc);
+            CheckEmpty();
         }
         private void _addShotMark()
         {

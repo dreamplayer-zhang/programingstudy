@@ -127,6 +127,7 @@ namespace Root_WIND2
         
         public OriginTool_ViewModel(Recipe _recipe)
         {
+            base.init();
             m_Recipe = _recipe;
             m_RecipeData_Origin = _recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
         }
