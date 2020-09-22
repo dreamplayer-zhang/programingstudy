@@ -53,6 +53,7 @@ namespace Root_ASIS.Module
         double m_secBlow = 0.5; 
         string RunVacuum(bool bOn)
         {
+            if (bOn == false) m_bLoad = false; 
             m_dioVacuum.Write(bOn);
             if (bOn == false)
             {
@@ -77,6 +78,7 @@ namespace Root_ASIS.Module
             m_bFastUp = tree.Set(m_bFastUp, m_bFastUp, "FastUp", "Do not Wait Up Sensor On"); 
             m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum Sensor Wait (sec)");
             m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
+            m_secBackground = tree.Set(m_secBackground, m_secBackground, "Background", "Background Run Timeout (sec)"); 
         }
         #endregion
 
@@ -94,48 +96,60 @@ namespace Root_ASIS.Module
             get { return m_bgw.IsBusy; }
         }
 
-        bool m_bLoadBGW = true; 
-        LoadEV m_loadEVBGW = null;
-        bool m_bShakeBGW = false;
+        double m_secBackground = 5; 
+        public string WaitReady()
+        {
+            long msBackground = (long)(1000 * m_secBackground); 
+            while (m_swBusy.ElapsedMilliseconds < msBackground)
+            {
+                Thread.Sleep(10);
+                if (p_bBusy == false) return "OK";
+            }
+            return "Background Run Timeout"; 
+        }
+
+        bool m_bLoadBGW = true;
+        StopWatch m_swBusy = new StopWatch(); 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (m_bLoadBGW) RunLoad(m_loadEVBGW, m_bShakeBGW);
+            m_swBusy.Start(); 
+            if (m_bLoadBGW) RunLoad(null);
             else RunUnload(); 
         }
         #endregion
 
         #region RunLoad
-        public string StartLoad(LoadEV loadEV, bool bShake)
+        public string StartLoad()
         {
             if (p_bBusy) return "Picker BackgroundWorker Busy";
             m_bLoadBGW = true; 
-            m_loadEVBGW = loadEV;
-            m_bShakeBGW = bShake;
             m_bgw.RunWorkerAsync(); 
             return "OK"; 
         }
 
+        public bool m_bLoad = false; 
         string m_sLoad = "";
         int m_nRetry = 3;
-        public string RunLoad(LoadEV loadEV, bool bShake)
+        public string RunLoad(LoadEV loadEV)
         {
             lock (m_csLock)
             {
                 for (int n = 0; n < m_nRetry; n++)
                 {
-                    m_sLoad = Load(loadEV, bShake);
+                    m_sLoad = Load(loadEV);
                     if (m_sLoad == "OK") return "OK";
                     if (loadEV != null) loadEV.RunLoad(m_secLoadEVDown + 2);
                 }
                 RunDown(false);
                 RunVacuum(false);
                 if (loadEV != null) loadEV.p_bBlow = false;
+                m_bLoad = (m_sLoad == "OK"); 
                 return m_sLoad;
             }
         }
 
         double m_secLoadEVDown = 0.5; 
-        string Load(LoadEV loadEV, bool bShake)
+        string Load(LoadEV loadEV)
         {
             if (Run(RunDown(true))) return m_sRun;
             if (Run(RunVacuum(true))) return m_sRun;
@@ -143,7 +157,7 @@ namespace Root_ASIS.Module
             {
                 if (Run(loadEV.RunDown(m_secLoadEVDown))) return m_sRun;
                 loadEV.p_bBlow = true; 
-                if (bShake) RunShake(); 
+                if (!loadEV.p_bPaper) RunShake(); 
             }
             if (Run(RunDown(false))) return m_sRun;
             if (Run(RunVacuum(true))) return m_sRun;

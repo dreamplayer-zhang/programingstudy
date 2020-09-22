@@ -622,7 +622,7 @@ namespace RootTools.Control
             }
         }
         public Trigger m_trigger = new Trigger();
-        public string m_sUnit = "mm";
+        public string m_sUnit = "unit";
 
         public void SetTrigger(double fPos0, double fPos1, double dPos, bool bCmd)
         {

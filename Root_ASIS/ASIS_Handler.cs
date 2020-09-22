@@ -32,8 +32,10 @@ namespace Root_ASIS
         public ASIS_Process m_process;
         public ASIS m_ASIS;
         public LoadEV m_loadEV;
-        public Boat[] m_aBoat = new Boat[2];  
-        //        public Robot_RND m_robot;
+        public Loader0 m_loader0; 
+        public Boat[] m_aBoat = new Boat[2];
+        public Loader1 m_loader1;
+        public Turnover m_turnover; 
 
         void InitModule()
         {
@@ -42,8 +44,14 @@ namespace Root_ASIS
             InitModule(m_ASIS);
             m_loadEV = new LoadEV("LoadEV", m_engineer);
             InitModule(m_loadEV);
+            m_loader0 = new Loader0("Loader0", m_engineer, m_loadEV, m_aBoat[0]);
+            InitModule(m_loader0);
             m_aBoat[0] = new Boat("Boat0", 0, m_engineer);
             InitModule(m_aBoat[0]);
+            m_loader1 = new Loader1("Loader1", m_engineer, m_aBoat[0], m_turnover);
+            InitModule(m_loader1);
+            m_turnover = new Turnover("Turnover", m_engineer);
+            InitModule(m_turnover);
             m_aBoat[1] = new Boat("Boat1", 1, m_engineer);
             InitModule(m_aBoat[1]);
             m_recipe = new ASIS_Recipe("Recipe", m_engineer);

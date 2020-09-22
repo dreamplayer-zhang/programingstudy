@@ -18,6 +18,16 @@ namespace RootTools.Control
             }
         }
 
+        public string WaitDone(double secWait)
+        {
+            int msWait = (int)(1000 * secWait); 
+            while (m_swWrite.ElapsedMilliseconds < msWait)
+            {
+                if (p_bDone) return "OK"; 
+            }
+            return "DIO Timeout : " + m_id; 
+        }
+
         public bool p_bOut
         {
             get { return m_bitDO.p_bOn ^ m_bReverse; }

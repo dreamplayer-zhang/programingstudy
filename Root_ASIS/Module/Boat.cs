@@ -332,7 +332,6 @@ namespace Root_ASIS.Module
             p_bBlow = false;
             p_bWingBlow = false;
             p_bCleanBlow = false;
-            //forget
             base.Reset();
         }
         #endregion
@@ -350,9 +349,7 @@ namespace Root_ASIS.Module
         public override void ThreadStop()
         {
             p_bVacuum = false;
-            p_bBlow = false;
-            p_bWingBlow = false;
-            p_bCleanBlow = false; 
+            Reset(); 
             base.ThreadStop();
         }
 
