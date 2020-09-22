@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -509,6 +510,78 @@ namespace Root_Vega
 
 		}
 
+		public void Test()
+		{
+			System.Drawing.PointF[] ptSrc = new System.Drawing.PointF[3];
+			ptSrc[0] = new System.Drawing.PointF(50, 50);
+			ptSrc[1] = new System.Drawing.PointF(200, 50);
+			ptSrc[2] = new System.Drawing.PointF(50, 200);
+
+			System.Drawing.PointF[] ptDst = new System.Drawing.PointF[3];
+			ptDst[0] = new System.Drawing.PointF(310, 100);
+			ptDst[1] = new System.Drawing.PointF(500, 50);
+			ptDst[2] = new System.Drawing.PointF(400, 250);
+
+			Emgu.CV.Mat matAffine = Emgu.CV.CvInvoke.GetAffineTransform(ptSrc, ptDst);
+			var data = matAffine.GetData();
+			float[] Coef = new float[matAffine.Width * matAffine.Height];
+			int k = 0;
+			for (int i = 0; i<matAffine.Height; i++)
+			{
+				for (int j = 0; j<matAffine.Width; j++)
+				{
+					double dTemp = (double)data.GetValue(i, j);
+					Coef[k] = (float)dTemp;
+					k++;
+				}
+			}
+			
+			DrawCross(new DPoint((int)ptSrc[0].X, (int)ptSrc[0].Y), MBrushes.Red);
+			DrawCross(new DPoint((int)ptSrc[1].X, (int)ptSrc[1].Y), MBrushes.Red);
+			DrawCross(new DPoint((int)ptSrc[2].X, (int)ptSrc[2].Y), MBrushes.Red);
+			DrawLine(new DPoint((int)ptSrc[0].X, (int)ptSrc[0].Y), new DPoint((int)ptSrc[1].X, (int)ptSrc[1].Y), MBrushes.White);
+			DrawLine(new DPoint((int)ptSrc[1].X, (int)ptSrc[1].Y), new DPoint((int)ptSrc[2].X, (int)ptSrc[2].Y), MBrushes.White);
+			DrawLine(new DPoint((int)ptSrc[2].X, (int)ptSrc[2].Y), new DPoint((int)ptSrc[0].X, (int)ptSrc[0].Y), MBrushes.White);
+
+			DrawCross(new DPoint((int)ptDst[0].X, (int)ptDst[0].Y), MBrushes.Red);
+			DrawCross(new DPoint((int)ptDst[1].X, (int)ptDst[1].Y), MBrushes.Red);
+			DrawCross(new DPoint((int)ptDst[2].X, (int)ptDst[2].Y), MBrushes.Red);
+			DrawLine(new DPoint((int)ptDst[0].X, (int)ptDst[0].Y), new DPoint((int)ptDst[1].X, (int)ptDst[1].Y), MBrushes.Yellow);
+			DrawLine(new DPoint((int)ptDst[1].X, (int)ptDst[1].Y), new DPoint((int)ptDst[2].X, (int)ptDst[2].Y), MBrushes.Yellow);
+			DrawLine(new DPoint((int)ptDst[2].X, (int)ptDst[2].Y), new DPoint((int)ptDst[0].X, (int)ptDst[0].Y), MBrushes.Yellow);
+
+			System.Drawing.PointF ptTest;
+			System.Drawing.PointF ptRst;
+			for(int n = 0; n<10; n++)
+			{
+				ptTest = new System.Drawing.PointF(100, 100 + n * 10);
+				ptRst = AffineTransform(ptTest, Coef);
+				DrawCross(new DPoint((int)ptTest.X, (int)ptTest.Y), MBrushes.Green);
+				DrawCross(new DPoint((int)ptRst.X, (int)ptRst.Y), MBrushes.Orange);
+			}
+			
+			return;
+		}
+
+		System.Drawing.PointF AffineTransform(System.Drawing.PointF ptSrc, float[] Coef)
+		{
+			System.Drawing.PointF ptRst = new System.Drawing.PointF();
+
+			ptRst.X = RoundingUp((float)(ptSrc.X * Coef[0] + ptSrc.Y * Coef[1] + Coef[2]));
+			ptRst.Y = RoundingUp((float)(ptSrc.X * Coef[3] + ptSrc.Y * Coef[4] + Coef[5]));
+			return ptRst;
+		}
+
+		int RoundingUp(double d)
+		{
+			// 소수점 올림
+			int n = (int)d;
+			if (d > n)
+				return n + 1;
+
+			return n;
+		}
+
 		void _clearInspReslut()
 		{
 			currentTotalIdx = 0;
@@ -905,7 +978,7 @@ namespace Root_Vega
 		{
 			get
 			{
-				return new RelayCommand(SaveAutoIlluminationFeature);
+				return new RelayCommand(Test);
 			}
 		}
 
