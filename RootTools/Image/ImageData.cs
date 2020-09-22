@@ -156,6 +156,18 @@ namespace RootTools
 				Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * stride), m_aBuf , i * rect.Width , rect.Width);
 			}
 		}
+		public byte[] GetByteArray()
+		{
+			byte[] aBuf = new byte[p_Size.X * p_nByte * p_Size.Y];
+			int position = 0;
+
+			for (int i = 0; i < p_Size.Y; i++)
+			{
+				Marshal.Copy((IntPtr)( (long)GetPtr() + (((long)i) * p_Size.X)), aBuf, position, p_Size.X * p_nByte);
+				position += (p_Size.X * p_nByte);
+			}
+			return aBuf;
+		}
 		public ImageData(MemoryData data)
 		{
 			if (data == null) return;
