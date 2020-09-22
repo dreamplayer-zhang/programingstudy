@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,28 +38,14 @@ namespace Root_WIND2
             }
         }
 
-        public void ViewerInit(Setup_ViewModel setup)
+        public void init(Setup_ViewModel setup, Recipe recipe)
         {
             p_BOX_VM = new BoxTool_ViewModel(setup.m_MainWindow.m_Image, setup.m_MainWindow.dialogService);
             p_BOX_VM.BoxDone += P_BOX_VM_BoxDone;
-            p_OriginTool_VM = new OriginTool_ViewModel(setup.Recipe);
+            p_OriginTool_VM = new OriginTool_ViewModel(recipe);
             p_OriginTool_VM.AddOrigin += P_OriginTool_VM_AddOrigin;
             p_OriginTool_VM.AddPitch += P_OriginTool_VM_AddPitch;
             p_OriginTool_VM.AddArea += P_OriginTool_VM_AddInspArea;
-        }
-
-        private void P_OriginTool_VM_AddInspArea(object e)
-        {
-            p_BOX_VM.AddInspArea(e as TRect);
-        }
-
-        private void P_OriginTool_VM_AddPitch(object e)
-        {
-            p_BOX_VM.AddPitchPoint(e as CPoint, Brushes.Green);
-        }
-        private void P_OriginTool_VM_AddOrigin(object e)
-        {
-            p_BOX_VM.AddOriginPoint(e as CPoint, Brushes.Red);
         }
 
         private void P_BOX_VM_BoxDone(object e)
@@ -74,5 +61,19 @@ namespace Root_WIND2
             p_OriginTool_VM.SetRoiRect();
 
         }
+        private void P_OriginTool_VM_AddInspArea(object e)
+        {
+            p_BOX_VM.AddInspArea(e as TRect);
+        }
+
+        private void P_OriginTool_VM_AddPitch(object e)
+        {
+            p_BOX_VM.AddPitchPoint(e as CPoint, Brushes.Green);
+        }
+        private void P_OriginTool_VM_AddOrigin(object e)
+        {
+            p_BOX_VM.AddOriginPoint(e as CPoint, Brushes.Red);
+        }
+
     }
 }
