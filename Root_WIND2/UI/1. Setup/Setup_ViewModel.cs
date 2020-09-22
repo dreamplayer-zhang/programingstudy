@@ -51,6 +51,7 @@ namespace Root_WIND2
         Edge_ViewModel m_Edge;
         Alignment_ViewModel m_AlignMent;
         General_ViewModel m_General;
+        InspTest_ViewModel m_InspTest;
         Maintenance_ViewModel m_Maint;
         GEM_ViewModel m_Gem;
 
@@ -81,6 +82,7 @@ namespace Root_WIND2
             m_Edge = new Edge_ViewModel(this);
             m_AlignMent = new Alignment_ViewModel(this);
             m_General = new General_ViewModel(this);
+            m_InspTest = new InspTest_ViewModel(this);
             m_Maint = new Maintenance_ViewModel(this);
             m_Gem = new GEM_ViewModel(this);
         }
@@ -128,6 +130,9 @@ namespace Root_WIND2
             m_btnNaviGeneral = new NaviBtn("General");
             m_btnNaviGeneral.Btn.Click += NaviGeneralBtn_Click;
 
+            m_btnNaviInspTest = new NaviBtn("Test");
+            m_btnNaviInspTest.Btn.Click += Navi_InspBtn_Click;
+
             m_btnNaviGeneralMask = new NaviBtn("Mask");
             m_btnNaviGeneralMask.Btn.Click += NaviGeneralMaksBtn_Click;
 
@@ -163,6 +168,8 @@ namespace Root_WIND2
         public NaviBtn m_btnNaviGeneralMask;
         public NaviBtn m_btnNaviGeneralSetup;
 
+        // FrontSide - InspTest Navi Buttons
+        public NaviBtn m_btnNaviInspTest;
         // 
         #endregion
 
@@ -242,6 +249,11 @@ namespace Root_WIND2
             SetFrontGeneralSetup();
         }
 
+        // FrontSide - InspTest
+        void Navi_InspBtn_Click(object sender, RoutedEventArgs e)
+        {
+            SetFrontInspTest();
+        }
         #endregion
 
 
@@ -480,6 +492,19 @@ namespace Root_WIND2
 
             p_CurrentPanel = m_General.Main;
             p_CurrentPanel.DataContext = m_General;
+        }
+        // FrontSide Inspection TEST
+        public void SetFrontInspTest()
+        {
+            p_NaviButtons.Clear();
+            p_NaviButtons.Add(m_btnNaviRecipeWizard);
+            p_NaviButtons.Add(m_btnNaviFrontSide);
+            p_NaviButtons.Add(m_btnNaviInspTest);
+
+            m_InspTest.SetPage(m_InspTest.InspTest);
+
+            p_CurrentPanel = m_InspTest.Main;
+            p_CurrentPanel.DataContext = m_InspTest;
         }
         #endregion
 

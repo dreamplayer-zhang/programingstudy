@@ -234,15 +234,6 @@ namespace Root_WIND2
         }
         private void CanvasRect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //Ctrl키로 클릭해야 복수선택되게
-            //선택은 항상 한개만?
-            //foreach(TShape shape in Shapes)
-            //{
-            //    int cnt = 0;
-            //    if (shape.isSelected)
-            //        cnt++;
-            //}
-
             TRect rect = (sender as Rectangle).Tag as TRect;
             if (rect.isSelected)
                 rect.isSelected = false;

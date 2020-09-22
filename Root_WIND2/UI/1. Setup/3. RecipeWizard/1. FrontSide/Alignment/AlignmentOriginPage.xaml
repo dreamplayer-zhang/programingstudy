@@ -25,10 +25,8 @@
                 <Grid Grid.Column="0">
                     <GroupBox Grid.Row="0" Header="Image View"
                               Background="{StaticResource GroupBoxBackground}">
-                        <Grid>
-                            <tools:RootViewer DataContext="{Binding p_BOX_VM}"/>
-                        </Grid>
-                    </GroupBox>
+                        <tools:RootViewer DataContext="{Binding p_Origin_VM.p_BOX_VM}"/>
+                   </GroupBox>
                 </Grid>
                 <GridSplitter Grid.Column="1" 
                               HorizontalAlignment="Stretch" 
@@ -36,7 +34,7 @@
                               Background="{StaticResource Splitter}" 
                               Width="3"
                               ShowsPreview="True"/>
-                <Grid Grid.Column="2" DataContext="{Binding p_OriginTool_VM}">
+                <Grid Grid.Column="2" DataContext="{Binding p_Origin_VM.p_OriginTool_VM}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="2*"/>
                         <RowDefinition/>
