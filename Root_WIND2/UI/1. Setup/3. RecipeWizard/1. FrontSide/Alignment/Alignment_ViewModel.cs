@@ -7,6 +7,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using RootTools;
+using RootTools_Vision;
+
 namespace Root_WIND2
 {
     class Alignment_ViewModel : ObservableObject
@@ -59,11 +61,14 @@ namespace Root_WIND2
         public AlignmentSetupPage Setup;
         public AlignmentPositionPage Position;
         public AlignmentMapPage Map;
-
-        
+        public Recipe m_Recipe;
+    
         public Alignment_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
+            m_Recipe = m_Setup.m_MainWindow.m_RecipeMGR.GetRecipe();
+
+
             init();
             p_Origin_VM = new Origin_ViewModel();
             p_Origin_VM.ViewerInit(setup);
@@ -78,6 +83,7 @@ namespace Root_WIND2
             Position = new AlignmentPositionPage();
             Map = new AlignmentMapPage();
             SetPage(Summary);
+
         }
 
         //private void ViewerInit()

@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using RootTools_Vision;
 
 namespace Root_WIND2
 {
@@ -86,8 +87,8 @@ namespace Root_WIND2
             {
                 SetProperty(ref m_OriginPoint, value);
             }
-        }
-        private CPoint m_PitchSize = new CPoint();
+        } // Origin 포인트
+        private CPoint m_PitchSize = new CPoint(); 
         public CPoint p_PitchSize
         {
             get
@@ -104,7 +105,7 @@ namespace Root_WIND2
             {
                 SetProperty(ref m_PitchSize, value);
             }
-        }
+        } // Origin Pitch Size
 
         private CPoint m_Offset = new CPoint();
         public CPoint p_Offset
@@ -121,10 +122,15 @@ namespace Root_WIND2
         }
         #endregion
 
+        Recipe m_Recipe;
+        RecipeData_Origin m_RecipeData_Origin;
 
-        public OriginTool_ViewModel(ImageData image = null, IDialogService dialogService = null)
+        public OriginTool_ViewModel(Recipe _Recipe, ImageData image = null, IDialogService dialogService = null)
         {
             base.init(image, dialogService);
+
+            m_Recipe = _Recipe;
+            m_RecipeData_Origin = _Recipe.GetRecipeDataOrigin();
         }
 
         
@@ -326,6 +332,8 @@ namespace Root_WIND2
 
             p_ViewElement.Add(InspArea.CanvasRect);
             AddArea(InspArea);
+
+            m_RecipeData_Origin.SetOrigin(InspArea.MemoryRect);
         }
 
         private void RedrawShape()

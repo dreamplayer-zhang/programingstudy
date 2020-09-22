@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using RootTools_CLR;
+using RootTools_Vision.Temp_Recipe;
 using RootTools_Vision.UserTypes;
 
 namespace RootTools_Vision
@@ -22,6 +23,12 @@ namespace RootTools_Vision
         public void DoWork()
         {
             DoInspection();
+        }
+
+
+        public void SetData(IRecipe _recipeData, IParameter _parameterData)
+        {
+           
         }
 
         public void SetWorkplace(Workplace workplace)
@@ -44,5 +51,6 @@ namespace RootTools_Vision
                 }
             }
         }
+
     }
 }

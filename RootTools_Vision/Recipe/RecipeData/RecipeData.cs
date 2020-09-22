@@ -25,5 +25,7 @@ namespace RootTools_Vision
 
         public ref RecipeData_Origin GetRecipeOrigin() { return ref m_ReicpeData_Origin; }
 
+        public ref RecipeData_Position GetRecipePosition() { return ref m_RecipeData_Position; }
+
     }
 }

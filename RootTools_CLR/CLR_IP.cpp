@@ -15,7 +15,7 @@ namespace RootTools_CLR
 		pSrc = nullptr;  // unpin
 		pDst = nullptr;
 	}
-	void CLR_IP::Cpp_Threshold(byte* pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, bool bDark, int nThresh)
+	void CLR_IP::Cpp_Threshold(byte* pSrcImg, array<byte>^ pDstImg, int nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, bool bDark, int nThresh)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0]; // pin : 주소값 고정
 		pin_ptr<byte> pDst = &pDstImg[0];

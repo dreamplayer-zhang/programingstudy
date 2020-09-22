@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using RootTools_Vision;
 
 namespace Root_WIND2
 {
@@ -53,6 +54,8 @@ namespace Root_WIND2
         Maintenance_ViewModel m_Maint;
         GEM_ViewModel m_Gem;
 
+        Recipe m_Recipe;
+
 
         public Setup_ViewModel(MainWindow main)
         {
@@ -66,8 +69,11 @@ namespace Root_WIND2
             InitAllPanel();
             InitAllNaviBtn();
             SetHome();
-
         }
+
+
+
+
         private void InitAllPanel()
         {
             m_Home = new Home_ViewModel(this);

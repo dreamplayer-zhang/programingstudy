@@ -19,6 +19,8 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace RootTools_Vision
 {
@@ -132,6 +134,7 @@ namespace RootTools_Vision
             int workbundleIndex = Convert.ToInt32(this.tbWorkBundleIndex.Text);
             int workplacebundleIndex = Convert.ToInt32(this.tbWorkplaceBundleIndex.Text);
 
+            this.workplacebundleList[workplacebundleIndex].SetSharedBuffer(m_Image.GetPtr(), m_Image.p_Size.X, m_Image.p_Size.Y);
 
             this.factory.SetBundles(this.workbundleList[workbundleIndex], this.workplacebundleList[workplacebundleIndex]);
 
@@ -163,7 +166,41 @@ namespace RootTools_Vision
 
         private void BtnAddPosition(object sender, RoutedEventArgs e)
         {
-            this.workbundle.Add(new Position());
+            Temp_Recipe.Recipe recipe = new Temp_Recipe.Recipe();
+
+            Temp_Recipe.Parameter parameter = new Temp_Recipe.Parameter();
+
+            //Recipe Data
+
+
+            Bitmap bitmap = new Bitmap(@"D:\test\template images\template3.bmp");
+
+            byte[] tplBuffer = new byte[bitmap.Width * bitmap.Height];
+
+            BitmapData bmpData =
+                bitmap.LockBits(
+                    new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), //bitmap 영역
+                    ImageLockMode.ReadOnly,  //읽기 모드
+                    System.Drawing.Imaging.PixelFormat.Format8bppIndexed); //bitmap 형식
+            IntPtr ptr = bmpData.Scan0;  //비트맵의 첫째 픽셀 데이터 주소를 가져오거나 설정합니다.
+            Marshal.Copy(ptr, tplBuffer, 0, bitmap.Width * bitmap.Height);
+            bitmap.UnlockBits(bmpData);
+
+
+            RecipePosition recipePosition = recipe.GetRecipe(typeof(RecipePosition)) as RecipePosition;
+
+            recipePosition.ListMasterFeature.Add(new RecipeType_FeatureData(49, 49, 40, 40, tplBuffer));
+
+            Temp_Recipe.ParameterPosition param = parameter.GetParameter(typeof(Temp_Recipe.ParameterPosition)) as Temp_Recipe.ParameterPosition;
+
+            param.MinScoreLimit = 60;
+            param.SearchRangeX = 100;
+            param.SearchRangeY = 100;
+
+            Position position = new Position();
+            position.SetData(recipe.GetRecipe(typeof(RecipePosition)), parameter.GetParameter(typeof(Temp_Recipe.ParameterPosition)));
+            this.workbundle.Add(position);
+
             RefeshWorkBundleStack();
         }
 
@@ -223,8 +260,7 @@ namespace RootTools_Vision
 
 
 
-            WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap, 500, 500);
-
+            WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap, 1430, 1090);
 
             WorkplaceBundle workplacebundle = new WorkplaceBundle();
             workplacebundle = workplacebundle.CreateWaferMap(mapInfo);

@@ -117,9 +117,6 @@ namespace RootTools_Vision
         }
         #endregion
 
-
-
-
         public void ExportRecipe() { }
         public void ImportRecipe() { }
 
