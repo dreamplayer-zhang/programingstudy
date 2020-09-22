@@ -56,10 +56,20 @@ namespace Root_WIND2
         GEM_ViewModel m_Gem;
 
         Recipe m_Recipe;
+        WIND2_InspectionManager m_InspectionManager;
 
         public Setup_ViewModel(MainWindow main)
         {
             init(main);
+        }
+
+        public Setup_ViewModel(MainWindow main, Recipe recipe = null , WIND2_InspectionManager _InspectionManager = null)
+        {
+            
+            m_Recipe = recipe;
+            m_InspectionManager = _InspectionManager;
+
+            init(main);            
         }
 
         public void init(MainWindow main = null)
@@ -294,8 +304,10 @@ namespace Root_WIND2
             MessageBox.Show(sMsg);
         }
 
-        internal RecipeWizard_ViewModel Wizard { get => m_Wizard; set => m_Wizard = value; }
+        internal RecipeWizard_ViewModel Wizard { get => m_Wizard; set => m_Wizard 
+                = value; }
         public Recipe Recipe { get => m_Recipe; set => m_Recipe = value; }
+        public WIND2_InspectionManager InspectionManager { get => m_InspectionManager; set => m_InspectionManager = value; }
 
         #endregion
 

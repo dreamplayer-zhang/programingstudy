@@ -11,7 +11,7 @@ namespace RootTools_Vision
     {
         public string m_sRecipeName; // 레시피명
         public string m_sEqpID; // 장비명
-        public RecipeParameter m_RecipeParam; // 파라미터 데이터
+        public Parameter m_RecipeParam; // 파라미터 데이터
         RecipeInfo_ProductMap m_RecipeInfoMap; // 제품맵
         RecipeInfo_MotionData m_RecipeInfoMotionData; // 모션
 
@@ -19,7 +19,7 @@ namespace RootTools_Vision
         {
             m_sRecipeName = "Wind2_Recipe";
             m_sEqpID = "Wind2";
-            m_RecipeParam = new RecipeParameter();
+            m_RecipeParam = new Parameter();
         }
     }
 }

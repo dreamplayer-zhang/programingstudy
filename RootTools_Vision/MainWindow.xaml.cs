@@ -260,10 +260,11 @@ namespace RootTools_Vision
 
 
 
-            WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap, 1430, 1090);
+            //WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap, 1430, 1090);
+            WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap);
 
             WorkplaceBundle workplacebundle = new WorkplaceBundle();
-            workplacebundle = workplacebundle.CreateWaferMap(mapInfo);
+            workplacebundle = WorkplaceBundle.CreateWaferMap(mapInfo);
             workplacebundle.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
 
             this.workplacebundleList.Add(workplacebundle);

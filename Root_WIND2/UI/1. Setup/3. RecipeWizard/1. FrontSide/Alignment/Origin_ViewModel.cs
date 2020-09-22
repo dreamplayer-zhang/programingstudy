@@ -41,7 +41,7 @@ namespace Root_WIND2
         {
             p_BOX_VM = new BoxTool_ViewModel(setup.m_MainWindow.m_Image, setup.m_MainWindow.dialogService);
             p_BOX_VM.BoxDone += P_BOX_VM_BoxDone;
-            p_OriginTool_VM = new OriginTool_ViewModel();
+            p_OriginTool_VM = new OriginTool_ViewModel(setup.Recipe);
             p_OriginTool_VM.AddOrigin += P_OriginTool_VM_AddOrigin;
             p_OriginTool_VM.AddPitch += P_OriginTool_VM_AddPitch;
             p_OriginTool_VM.AddArea += P_OriginTool_VM_AddInspArea;

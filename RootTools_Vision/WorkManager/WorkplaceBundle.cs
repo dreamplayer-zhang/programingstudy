@@ -131,7 +131,7 @@ namespace RootTools_Vision
         }
 
 
-        public WorkplaceBundle CreateWaferMap(WaferMapInfo mapInfo)
+        public static WorkplaceBundle CreateWaferMap(WaferMapInfo mapInfo)
         {
             WorkplaceBundle bundle = new WorkplaceBundle();
 
@@ -141,7 +141,7 @@ namespace RootTools_Vision
             int nSizeY = mapInfo.MapSizeY;
             int nMasterX = mapInfo.MasterDieX;
             int nMasterY = mapInfo.MasterDieY;
-            int nDiePitchX = mapInfo.DieSizeX;
+            int nDiePitchX = mapInfo.DieSizeX;    //DitPitch 필요없음 삭제 예정
             int nDiePitchY = mapInfo.DieSizeY;
 
 

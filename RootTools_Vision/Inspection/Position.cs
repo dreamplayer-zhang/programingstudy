@@ -20,18 +20,25 @@ namespace RootTools_Vision
 
         Workplace workplace;
 
-        RecipePosition recipeData;
-        ParameterPosition parameterData;
+        RecipeData_Origin recipeData_Origin;
+        RecipeData_Position recipeData_Position;
+
+        ParamData_Position parameterData_Position;
 
         public void DoWork()
         {
             DoPosition();
         }
 
-        public void SetData(IRecipeData _recipeData, IParameter _parameterData)
+        public void SetData(IRecipeData _recipeData, IParameterData _parameterData)
         {
-            this.recipeData = _recipeData as RecipePosition;
-            this.parameterData = _parameterData as ParameterPosition;
+            Recipe recipe = _recipeData as Recipe;
+            Parameter parameter = _parameterData as Parameter;
+
+            this.recipeData_Origin = recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
+            this.recipeData_Position = recipe.GetRecipeData(typeof(RecipeData_Position)) as RecipeData_Position;
+
+            this.parameterData_Position = parameter.GetParameter(typeof(ParamData_Position)) as ParamData_Position;
         }
 
         public void SetWorkplace(Workplace _workplace)
@@ -43,7 +50,7 @@ namespace RootTools_Vision
         {
             if(this.workplace.MapPositionX == -1 && this.workplace.MapPositionX == -1) // Master
             {
-                if (this.recipeData.IndexMaxScoreMasterFeature == -1) // Feature가 셋팅이 안되어 있는 경우 전체 Feature 사용
+                if (this.recipeData_Position.IndexMaxScoreMasterFeature == -1) // Feature가 셋팅이 안되어 있는 경우 전체 Feature 사용
                 {
                     int outX = 0, outY = 0;
                     int maxX = 0, maxY = 0;
@@ -52,12 +59,12 @@ namespace RootTools_Vision
                     int i = 0;
                     int maxIndex = 0;
 
-                    foreach(RecipeType_FeatureData feature in this.recipeData.ListMasterFeature)
+                    foreach(RecipeType_FeatureData feature in this.recipeData_Position.ListMasterFeature)
                     {
-                        int startX = (feature.PositionX - this.parameterData.SearchRangeX) < 0 ? 0 : (feature.PositionX - this.parameterData.SearchRangeX);
-                        int startY = (feature.PositionY - this.parameterData.SearchRangeY) < 0 ? 0 : (feature.PositionY - this.parameterData.SearchRangeY);
-                        int endX = (feature.PositionX + feature.FeatureWidth + this.parameterData.SearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (feature.PositionX + feature.FeatureWidth + this.parameterData.SearchRangeX);
-                        int endY = (feature.PositionY + feature.FeatureHeight + this.parameterData.SearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (feature.PositionY + feature.FeatureHeight + this.parameterData.SearchRangeY);
+                        int startX = (feature.PositionX - this.parameterData_Position.SearchRangeX) < 0 ? 0 : (feature.PositionX - this.parameterData_Position.SearchRangeX);
+                        int startY = (feature.PositionY - this.parameterData_Position.SearchRangeY) < 0 ? 0 : (feature.PositionY - this.parameterData_Position.SearchRangeY);
+                        int endX = (feature.PositionX + feature.FeatureWidth + this.parameterData_Position.SearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (feature.PositionX + feature.FeatureWidth + this.parameterData_Position.SearchRangeX);
+                        int endY = (feature.PositionY + feature.FeatureHeight + this.parameterData_Position.SearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (feature.PositionY + feature.FeatureHeight + this.parameterData_Position.SearchRangeY);
 
                         unsafe
                         {
@@ -80,19 +87,19 @@ namespace RootTools_Vision
                     }
 
 
-                    if (maxScore < this.parameterData.MinScoreLimit)
+                    if (maxScore < this.parameterData_Position.MinScoreLimit)
                     {
                         return false;
                     }
 
 
-                    int tplStartX = this.recipeData.ListMasterFeature[maxIndex].PositionX;
-                    int tplStartY = this.recipeData.ListMasterFeature[maxIndex].PositionY;
-                    int tplW = this.recipeData.ListMasterFeature[maxIndex].FeatureWidth;
-                    int tplH = this.recipeData.ListMasterFeature[maxIndex].FeatureHeight;
+                    int tplStartX = this.recipeData_Position.ListMasterFeature[maxIndex].PositionX;
+                    int tplStartY = this.recipeData_Position.ListMasterFeature[maxIndex].PositionY;
+                    int tplW = this.recipeData_Position.ListMasterFeature[maxIndex].FeatureWidth;
+                    int tplH = this.recipeData_Position.ListMasterFeature[maxIndex].FeatureHeight;
 
-                    float tplCenterX = (float)this.recipeData.ListMasterFeature[maxIndex].CenterPositionX;
-                    float tplCenterY = (float)this.recipeData.ListMasterFeature[maxIndex].CenterPositionY;
+                    float tplCenterX = (float)this.recipeData_Position.ListMasterFeature[maxIndex].CenterPositionX;
+                    float tplCenterY = (float)this.recipeData_Position.ListMasterFeature[maxIndex].CenterPositionY;
 
                     maxX -= tplStartX;
                     maxY -= tplStartY;
@@ -119,22 +126,6 @@ namespace RootTools_Vision
 
                 }
             }
-
-
-            //Image img = Bitmap.FromFile(@"D:\test\template images\template3.bmp");
-            //Bitmap bitmap = new Bitmap(@"D:\test\template images\template3.bmp");
-
-            //byte[] tplBuffer = new byte[bitmap.Width * bitmap.Height];
-
-            //BitmapData bmpData =
-            //    bitmap.LockBits(
-            //        new Rectangle(0, 0, bitmap.Width, bitmap.Height), //bitmap 영역
-            //        ImageLockMode.ReadOnly,  //읽기 모드
-            //        PixelFormat.Format8bppIndexed); //bitmap 형식
-            //IntPtr ptr = bmpData.Scan0;  //비트맵의 첫째 픽셀 데이터 주소를 가져오거나 설정합니다.
-            //Marshal.Copy(ptr, tplBuffer, 0, bitmap.Width * bitmap.Height);
-            //bitmap.UnlockBits(bmpData);
-
 
             return true;
         }

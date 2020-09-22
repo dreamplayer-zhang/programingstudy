@@ -102,27 +102,29 @@ namespace Root_WIND2
 
         private void _btnTest()
         {
+            m_Setup.InspectionManager.Start();
+
             // TestCode
-            ImageData Image = m_Setup.m_MainWindow.m_Image;
-            int T = 7213;
-            int L = 640;
-            int nImgWsz = 796; //int imgWsz = 2560;
-            int nImgHsz = 683; //int imgHsz = 2786;
-            byte[] arrCopyImg = new byte[nImgHsz * nImgWsz];
-            int nStride = (int)Image.p_Stride;
-            int idx = 0;
+            //ImageData Image = m_Setup.m_MainWindow.m_Image;
+            //int T = 7213;
+            //int L = 640;
+            //int nImgWsz = 796; //int imgWsz = 2560;
+            //int nImgHsz = 683; //int imgHsz = 2786;
+            //byte[] arrCopyImg = new byte[nImgHsz * nImgWsz];
+            //int nStride = (int)Image.p_Stride;
+            //int idx = 0;
 
-            for (int cnt = T+50; cnt < T+150; cnt++, idx++)
-                Marshal.Copy(Image.m_ptrImg + (L + 200 + cnt * nStride), arrCopyImg, 100 * idx, 100);
+            //for (int cnt = T+50; cnt < T+150; cnt++, idx++)
+            //    Marshal.Copy(Image.m_ptrImg + (L + 200 + cnt * nStride), arrCopyImg, 100 * idx, 100);
 
-            float score;
-            int nPosX;
-            int nPosY;
+            //float score;
+            //int nPosX;
+            //int nPosY;
 
-            unsafe
-            {
-                score = CLR_IP.Cpp_TemplateMatching((byte*)Image.m_ptrImg.ToPointer(), arrCopyImg, &nPosX, &nPosY, Image.p_Size.X, Image.p_Size.Y, 100, 100, L, T, L+nImgWsz, T+nImgHsz, 3);
-            }
+            //unsafe
+            //{
+            //    score = CLR_IP.Cpp_TemplateMatching((byte*)Image.m_ptrImg.ToPointer(), arrCopyImg, &nPosX, &nPosY, Image.p_Size.X, Image.p_Size.Y, 100, 100, L, T, L+nImgWsz, T+nImgHsz, 3);
+            //}
         }
     }
 }

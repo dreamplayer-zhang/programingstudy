@@ -46,7 +46,7 @@ namespace RootTools_Vision
             }
         }
 
-        public void SetData(IRecipeData _recipeData, IParameter _parameterData)
+        public void SetData(IRecipeData _recipeData, IParameterData _parameterData)
         {
             throw new NotImplementedException();
         }

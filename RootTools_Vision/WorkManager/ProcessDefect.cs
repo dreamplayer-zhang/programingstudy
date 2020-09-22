@@ -28,12 +28,7 @@ namespace RootTools_Vision
             Thread.Sleep(2000);
         }
 
-        public void SetData(object _recipeData, object _parameterData)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetData(IRecipeData _recipeData, IParameter _parameterData)
+        public void SetData(IRecipeData _recipeData, IParameterData _parameterData)
         {
             throw new NotImplementedException();
         }

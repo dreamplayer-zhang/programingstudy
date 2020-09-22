@@ -170,19 +170,19 @@ namespace Root_WIND2
 
 
             // Inspction Manager
-            m_InspectionManager = new WIND2_InspectionManager();
+            m_InspectionManager = new WIND2_InspectionManager(m_Image.GetPtr(), m_Image.p_Size.X, m_Image.p_Size.Y);
 
             m_engineer.InspectionManager = m_InspectionManager; 
 
             InitUI();
             InitTimer();
-            InitDataSetting();
+            //InitDataSetting();
         }
 
-        private void InitDataSetting()
-        {
-            m_SetupViewModel.Recipe = m_Recipe;
-        }
+        //private void InitDataSetting()
+        //{
+        //    m_SetupViewModel.Recipe = m_Recipe;
+        //}
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -200,7 +200,7 @@ namespace Root_WIND2
         void InitUI()
         {
             m_Setup = new Setup();
-            m_SetupViewModel = new Setup_ViewModel(this);
+            m_SetupViewModel = new Setup_ViewModel(this, m_Recipe);
             m_Setup.DataContext = m_SetupViewModel;
             //((Setup_ViewModel)m_Setup.DataContext).init(this);
             //m_SetupViewModel = (Setup_ViewModel)m_Setup.DataContext;

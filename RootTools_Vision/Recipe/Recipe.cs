@@ -12,7 +12,7 @@ namespace RootTools_Vision
     /// Recipe 각 항목의 묶음.
     /// Recipe에 대한 기능 자체는 Manager에서 다룸.
     /// </summary>
-    public class Recipe 
+    public class Recipe
     {
         // ORIGIN, Die Pitch
         // WAFER MAP
@@ -25,6 +25,8 @@ namespace RootTools_Vision
         public RecipeInfo m_RecipeInfo; // 레시피 정보 데이터
         public RecipeData m_ReicpeData; // ROI 정보 데이터
 
+        public Parameter m_Parameter;
+
         public Recipe()
         {
             Init();
@@ -35,11 +37,14 @@ namespace RootTools_Vision
             m_ReicpeData = new RecipeData();
             m_RecipeInfo = new RecipeInfo();
             m_RecipeEditor = new RecipeEditor(m_ReicpeData);
+            m_Parameter = new Parameter();
         }
         
         public ref RecipeData GetRecipeData() { return ref m_ReicpeData; }
         public ref RecipeInfo GetRecipeInfo() { return ref m_RecipeInfo; }
         public ref RecipeEditor GetRecipeEditor() { return ref m_RecipeEditor; }
+
+        public ref Parameter GetParameter() { return ref m_Parameter; }
 
         public IRecipeData GetRecipeData(Type type)
         {
