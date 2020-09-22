@@ -136,8 +136,8 @@ namespace Root_WIND2
             base.init(image, dialogService);
 
             m_Recipe = _Recipe;
-            m_RecipeData_Origin = _Recipe.GetRecipeData().m_ReicpeData_Origin;
-            m_RecipeData_Origin = _Recipe.GetRecipeData().GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
+            //m_RecipeData_Origin = _Recipe.GetRecipeData().m_ReicpeData_Origin;
+            m_RecipeData_Origin = _Recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
         }
 
         
@@ -347,8 +347,8 @@ namespace Root_WIND2
             AddArea(InspArea);
 
             
-            m_RecipeData_Origin.m_ptABSOrigin = m_OriginPoint;
-            m_RecipeData_Origin.SetOrigin(InspArea.MemoryRect);
+            //m_RecipeData_Origin.m_ptABSOrigin = m_OriginPoint;
+            //m_RecipeData_Origin.SetOrigin(InspArea.MemoryRect);
             m_RecipeData_Origin.InspectionBufferOffsetX = offset.X;
             m_RecipeData_Origin.InspectionBufferOffsetY = offset.Y;
             

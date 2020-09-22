@@ -35,6 +35,7 @@ namespace Root_WIND2
             }
             set
             {
+                image.Source = value;
                 m_ImageSource = value;
             }
         }

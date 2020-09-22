@@ -50,7 +50,7 @@
                         </StackPanel>
                         <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
                             <Button Content="Save Image" Style="{StaticResource PanelBtn}" Margin="2" Command="{Binding SaveImage}"/>
-                            <Button Content="Add Wafer Feature" Style="{StaticResource PanelBtn}" Margin="2"/>
+                            <Button Content="Add Wafer Feature" Style="{StaticResource PanelBtn}" Margin="2" Command="{Binding AddWaferMark}"/>
                             <Button Content="Add Shot Feature" Style="{StaticResource PanelBtn}" Margin="2"/>
                             <Button Content="Add Chip Feature" Style="{StaticResource PanelBtn}" Margin="2"/>
                         </StackPanel>

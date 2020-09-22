@@ -28,6 +28,7 @@ namespace Root_WIND2
 
         Recipe m_Recipe;
         RecipeData_Origin m_RecipeData_Origin;
+        RecipeData_Position m_RecipeData_Position;
         public void init(Setup_ViewModel setup, Recipe recipe)
         {
             base.init(setup.m_MainWindow.m_Image, setup.m_MainWindow.dialogService);
@@ -35,9 +36,9 @@ namespace Root_WIND2
             p_VisibleTool = System.Windows.Visibility.Collapsed;
 
             m_Recipe = recipe;
-            m_RecipeData_Origin = recipe.GetRecipeData().m_ReicpeData_Origin;
-            p_Origin = m_RecipeData_Origin.m_ptABSOrigin;
-
+            m_RecipeData_Origin = recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin; ;
+            m_RecipeData_Position = recipe.GetRecipeData(typeof(RecipeData_Position)) as RecipeData_Position;
+            p_Origin = new CPoint(m_RecipeData_Origin.OriginX, m_RecipeData_Origin.OriginY);
             CheckEmpty();
         }
 
@@ -616,7 +617,12 @@ namespace Root_WIND2
         }
         private void _addWaferMark()
         {
-
+            RecipeType_FeatureData rtf = new RecipeType_FeatureData(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.GetByteArray());
+            m_RecipeData_Position.AddMasterFeature(rtf);
+            FeatureControl fc = new FeatureControl();
+            fc.p_Offset = m_Offset;
+            fc.p_ImageSource = BoxImage.GetBitMapSource();
+            p_WaferMark.Add(fc);
         }
         private void _addShotMark()
         {

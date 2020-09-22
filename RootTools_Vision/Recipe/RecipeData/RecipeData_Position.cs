@@ -41,32 +41,32 @@ namespace RootTools_Vision
             indexMaxScoreChipFeature = -1;
         }
 
-        void AddMasterFeature(RecipeType_FeatureData featureData)
+        public void AddMasterFeature(RecipeType_FeatureData featureData)
         {
             listMasterFeature.Add(featureData);
         }
 
-        void AddMasterFeature(int positionX, int positionY, int featureWidth, int featureHeight, byte[] rawData)
+        public void AddMasterFeature(int positionX, int positionY, int featureWidth, int featureHeight, byte[] rawData)
         {
             listMasterFeature.Add(new RecipeType_FeatureData(positionX, positionY, featureWidth, featureHeight, rawData));
         }
 
-        void AddShotFeature(RecipeType_FeatureData featureData)
+        public void AddShotFeature(RecipeType_FeatureData featureData)
         {
             listShotFeature.Add(featureData);
         }
 
-        void AddShotFeature(int positionX, int positionY, int featureWidth, int featureHeight, byte[] rawData)
+        public void AddShotFeature(int positionX, int positionY, int featureWidth, int featureHeight, byte[] rawData)
         {
             listShotFeature.Add(new RecipeType_FeatureData(positionX, positionY, featureWidth, featureHeight, rawData));
         }
 
-        void AddChipFeature(RecipeType_FeatureData featureData)
+        public void AddChipFeature(RecipeType_FeatureData featureData)
         {
             listChipFeature.Add(featureData);
         }
 
-        void AddChipFeature(int positionX, int positionY, int featureWidth, int featureHeight, byte[] rawData)
+        public void AddChipFeature(int positionX, int positionY, int featureWidth, int featureHeight, byte[] rawData)
         {
             listChipFeature.Add(new RecipeType_FeatureData(positionX, positionY, featureWidth, featureHeight, rawData));
         }
