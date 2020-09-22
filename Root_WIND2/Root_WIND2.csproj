@@ -101,6 +101,7 @@
     <Compile Include="InspectionItem.cs" />
     <Compile Include="InspectionMethod.cs" />
     <Compile Include="Mask.cs" />
+    <Compile Include="Module\WIND2_InspectionManager.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\BoxTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\OriginTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\2. BackSide\BackSideSetupPage.xaml.cs">

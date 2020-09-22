@@ -142,6 +142,11 @@ namespace Root_WIND2
         RecipeInfo m_RecipeInfo;
         RecipeEditor m_RecipeEditor;
 
+
+        //
+        WIND2_InspectionManager m_InspectionManager;
+
+
         void Init()
         {
             dialogService = new DialogService(this);
@@ -164,6 +169,11 @@ namespace Root_WIND2
             m_RecipeEditor = m_Recipe.GetRecipeEditor();
             m_RecipeInfo = m_Recipe.GetRecipeInfo();
 
+
+            // Inspction Manager
+            m_InspectionManager = new WIND2_InspectionManager();
+
+            m_engineer.InspectionManager = m_InspectionManager; 
 
             InitUI();
             InitTimer();
