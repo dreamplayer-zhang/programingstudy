@@ -105,6 +105,9 @@
                         <MenuItem Header="GEM"/>
                     </MenuItem>
                 </Menu>
+                <Button Width="100" Content="Test"  Command="{Binding btnTest}">
+                    
+                </Button>
             </StackPanel>
         </Border>
         <!--End Menu-->

@@ -7,51 +7,22 @@ using RootTools;
 
 namespace RootTools_Vision
 {
-    public class RecipeData_Origin
+    public class RecipeData_Origin : IRecipeData
     {
+        int originX;
+        int originY;
 
-        #region [Graphics XML Serialize 변수(레시피)]
-        // 무조건 Public 선언되어야 함
-        public CRect m_rtOrigin;
-        public CPoint m_ptABSOrigin; // 메모리 기준 Origin 절대좌표 
-        public CPoint m_ptRELOrigin; // Origin 상대좌표 
-        public int m_nWidth; // Origin Width
-        public int m_nHeight; // Origin Height
-        #endregion
+        int diePitchX;
+        int diePitchY;
 
-        public RecipeData_Origin()
-        {
-            m_nWidth = 0;
-            m_nHeight = 0;
-            m_ptABSOrigin = new CPoint(0, 0);
-            m_ptRELOrigin = new CPoint(0, 0);
-            m_rtOrigin = new CRect(0, 0, 10, 20);
-        }
+        int inspectionBufferOffsetX;
+        int inspectionBufferOffsetY;
 
-        public CPoint GetOriginPoint()
-        {
-            return m_ptABSOrigin;
-        }
-
-        public CRect GetOriginRect()
-        {
-            return m_rtOrigin;
-        }
-
-        public void SetOrigin(CPoint Origin, int nWidth, int nHeight)
-        {
-            m_ptABSOrigin = Origin;
-            m_nWidth = nWidth;
-            m_nHeight = nHeight;
-            m_rtOrigin = new CRect(Origin, nWidth, nHeight);
-        }
-
-        public void SetOrigin(CRect rtOrigin)
-        {
-            m_ptABSOrigin = new CPoint(rtOrigin.Left, rtOrigin.Top);
-            m_rtOrigin = rtOrigin;
-            m_nWidth = rtOrigin.Width;
-            m_nHeight = rtOrigin.Height;
-        }
+        public int OriginX { get => originX; set => originX = value; }
+        public int OriginY { get => originY; set => originY = value; }
+        public int DiePitchX { get => diePitchX; set => diePitchX = value; }
+        public int DiePitchY { get => diePitchY; set => diePitchY = value; }
+        public int InspectionBufferOffsetX { get => inspectionBufferOffsetX; set => inspectionBufferOffsetX = value; }
+        public int InspectionBufferOffsetY { get => inspectionBufferOffsetY; set => inspectionBufferOffsetY = value; }
     }
 }

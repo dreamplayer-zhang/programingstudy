@@ -198,7 +198,7 @@ namespace RootTools_Vision
             param.SearchRangeY = 100;
 
             Position position = new Position();
-            position.SetData(recipe.GetRecipe(typeof(RecipePosition)), parameter.GetParameter(typeof(Temp_Recipe.ParameterPosition)));
+            //position.SetData(recipe.GetRecipeData(typeof(RecipePosition)), parameter.GetParameter(typeof(Temp_Recipe.ParameterPosition)));
             this.workbundle.Add(position);
 
             RefeshWorkBundleStack();

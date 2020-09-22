@@ -120,7 +120,7 @@
     <Compile Include="Recipe\RecipeData\RecipeData_Position.cs" />
     <Compile Include="Temp_Recipe\RecipeOrigin.cs" />
     <Compile Include="Temp_Recipe\RecipePosition.cs" />
-    <Compile Include="Temp_Recipe\RecipeType_FeatureData.cs" />
+    <Compile Include="Recipe\RecipeData\RecipeType_FeatureData.cs" />
     <Compile Include="Recipe\RecipeInfo\RecipeInfo.cs" />
     <Compile Include="Recipe\RecipeInfo\RecipeInfo_MotionData.cs" />
     <Compile Include="Recipe\RecipeInfo\RecipeInfo_ProductMap.cs" />

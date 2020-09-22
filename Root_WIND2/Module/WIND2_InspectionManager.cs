@@ -9,6 +9,11 @@ namespace Root_WIND2
 {
     public class WIND2_InspectionManager : WorkFactory
     {
+
+        private Recipe m_Recipe;
+
+        public Recipe Recipe { get => m_Recipe; set => m_Recipe = value; }
+
         protected override void InitWorkManager()
         {
             this.Add(new WorkManager("Position", RootTools_Vision.UserTypes.WORK_TYPE.PREPARISON, WORKPLACE_STATE.READY, WORKPLACE_STATE.NONE));

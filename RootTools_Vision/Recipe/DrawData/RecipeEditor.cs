@@ -52,14 +52,14 @@ namespace RootTools_Vision
                 {
                     case PLAIN_TYPE.ORIGIN:
                         // 그리기 Origin Data를 RecipeData_Origin에 필요한 데이터 맵핑.
-                        RecipeData_Origin pOrigin = m_RecipeData.GetRecipeOrigin();
+                        //RecipeData_Origin pOrigin = m_RecipeData.GetRecipeOrigin();
                         shape = plainData.GetObject();
 
                         if(shape.Count > 0)
                         {
                             TRect rect = shape[0] as TRect;
                             CPoint ptOrigin = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
-                            pOrigin.SetOrigin(rect.MemoryRect);
+                            //pOrigin.SetOrigin(rect.MemoryRect);
                         }
                         break;
 

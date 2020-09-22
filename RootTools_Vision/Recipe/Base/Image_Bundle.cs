@@ -16,7 +16,7 @@ namespace RootTools_Vision
         // 이미지 등록함수
         // 이미지 제거 함수
 
-        public Position_Type m_Type;
+        //public Position_Type m_Type;
         public List<byte[]> m_byteImageList;
         List<Image> m_ImageDataList;
         
@@ -24,16 +24,16 @@ namespace RootTools_Vision
         public Image_Bundle()
         {
         }
-        public Image_Bundle(Position_Type _Type)
-        {
-            m_ImageDataList = new List<Image>();
-            m_byteImageList = new List<byte[]>();
-            m_Type = _Type;
-        }
-        public Position_Type GetPositionType()
-        {
-            return m_Type;
-        }
+        //public Image_Bundle(Position_Type _Type)
+        //{
+        //    m_ImageDataList = new List<Image>();
+        //    m_byteImageList = new List<byte[]>();
+        //    m_Type = _Type;
+        //}
+        //public Position_Type GetPositionType()
+        //{
+        //    return m_Type;
+        //}
 
         public void AddImageToBundle(Image _image)
         {

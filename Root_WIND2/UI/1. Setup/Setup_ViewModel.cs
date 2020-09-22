@@ -56,7 +56,6 @@ namespace Root_WIND2
 
         Recipe m_Recipe;
 
-
         public Setup_ViewModel(MainWindow main)
         {
             init(main);
@@ -71,14 +70,11 @@ namespace Root_WIND2
             SetHome();
         }
 
-
-
-
         private void InitAllPanel()
         {
             m_Home = new Home_ViewModel(this);
             m_Inspection = new Inspection_ViewModel(this);
-            m_Wizard = new RecipeWizard_ViewModel(this);
+            Wizard = new RecipeWizard_ViewModel(this);
             m_FrontSide = new FrontSide_ViewModel(this);
             m_BackSide = new BackSide_ViewModel(this);
             m_EBR = new EBR_ViewModel(this);
@@ -271,6 +267,24 @@ namespace Root_WIND2
                 return new RelayCommand(SetHome);
             }
         }
+
+        public ICommand btnTest
+        {
+            get
+            {
+                return new RelayCommand(Test);
+            }
+        }
+
+        public void Test()
+        {
+            string sMsg = string.Format("{0}, {1}", ((RecipeData_Origin)Recipe.GetRecipeData().GetRecipeData(typeof(RecipeData_Origin))).OriginX, ((RecipeData_Origin)Recipe.GetRecipeData().GetRecipeData(typeof(RecipeData_Origin))).OriginY);
+            MessageBox.Show(sMsg);
+        }
+
+        internal RecipeWizard_ViewModel Wizard { get => m_Wizard; set => m_Wizard = value; }
+        public Recipe Recipe { get => m_Recipe; set => m_Recipe = value; }
+
         #endregion
 
         #region Panel Change Method
@@ -297,10 +311,10 @@ namespace Root_WIND2
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
 
-            m_Wizard.SetPage(m_Wizard.Summary);
+            Wizard.SetPage(Wizard.Summary);
 
-            p_CurrentPanel = m_Wizard.Main;
-            p_CurrentPanel.DataContext = m_Wizard;
+            p_CurrentPanel = Wizard.Main;
+            p_CurrentPanel.DataContext = Wizard;
         }
         public void SetMaintenance()
         {
