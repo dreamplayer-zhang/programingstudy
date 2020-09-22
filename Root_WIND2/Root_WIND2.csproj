@@ -108,6 +108,7 @@
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\BoxTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\OriginTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\Origin_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\DrawTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\InspTestPage.xaml.cs">
       <DependentUpon>InspTestPage.xaml</DependentUpon>
     </Compile>

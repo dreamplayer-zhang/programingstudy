@@ -125,7 +125,10 @@ namespace Root_WIND2
         Recipe m_Recipe;
         RecipeData_Origin m_RecipeData_Origin;
 
-        public OriginTool_ViewModel(Recipe _Recipe, ImageData image = null, IDialogService dialogService = null)
+        public OriginTool_ViewModel()
+        {
+        }
+            public OriginTool_ViewModel(Recipe _Recipe, ImageData image = null, IDialogService dialogService = null)
         {
             base.init(image, dialogService);
 
