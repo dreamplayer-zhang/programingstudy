@@ -25,10 +25,9 @@
                                           Background="{StaticResource GroupBoxBackground}"
                                           Header="Image View">
                                 <Grid Background="Black">
-                                    <tools:RootViewer DataContext="{Binding p_ROOT_VM}"/>
+                                    <tools:RootViewer DataContext="{Binding p_DrawTool_VM}"/>
                                 </Grid>
                             </GroupBox>
-
                         </Grid>
                         <Grid Grid.Column="1">
                             <Grid.RowDefinitions>

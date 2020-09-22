@@ -599,5 +599,23 @@ namespace Root_WIND2
             BoxDone(BOX);
         }
 
+        public void DrawRect(CPoint LT, CPoint RB)
+        {
+            BOX = new TRect(Brushes.Red, 3, 1);
+            TRect rect = BOX as TRect;
+            rect.MemPointBuffer = LT;
+            rect.MemoryRect.Left = LT.X;
+            rect.MemoryRect.Top = LT.Y;
+
+            p_ViewElement.Add(BOX.UIElement);
+
+            BOX = Drawing(BOX, RB);
+
+            rect = BOX as TRect;
+            rect.CanvasRect.Tag = rect;
+            //MakeModifyTool(rect);
+
+            //BoxDone(BOX);
+        }
     }
 }
