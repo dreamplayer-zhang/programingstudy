@@ -157,6 +157,11 @@ namespace Root_WIND2
             }
         }
 
+        public void DrawRect(Point ptStart, Point ptEnd)
+        {
+            
+        }
+
         private void _btnTest()
         {
             //m_MapViewer_VM.MapSize = new Point(10, 10);
