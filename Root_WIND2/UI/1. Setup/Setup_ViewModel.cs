@@ -56,11 +56,20 @@ namespace Root_WIND2
         GEM_ViewModel m_Gem;
 
         Recipe m_Recipe;
-
+        WIND2_InspectionManager m_InspectionManager;
 
         public Setup_ViewModel(MainWindow main)
         {
             init(main);
+        }
+
+        public Setup_ViewModel(MainWindow main, Recipe recipe = null , WIND2_InspectionManager _InspectionManager = null)
+        {
+            
+            m_Recipe = recipe;
+            m_InspectionManager = _InspectionManager;
+
+            init(main);            
         }
 
         public void init(MainWindow main = null)
@@ -72,14 +81,11 @@ namespace Root_WIND2
             SetHome();
         }
 
-
-
-
         private void InitAllPanel()
         {
             m_Home = new Home_ViewModel(this);
             m_Inspection = new Inspection_ViewModel(this);
-            m_Wizard = new RecipeWizard_ViewModel(this);
+            Wizard = new RecipeWizard_ViewModel(this);
             m_FrontSide = new FrontSide_ViewModel(this);
             m_BackSide = new BackSide_ViewModel(this);
             m_EBR = new EBR_ViewModel(this);
@@ -283,6 +289,26 @@ namespace Root_WIND2
                 return new RelayCommand(SetHome);
             }
         }
+
+        public ICommand btnTest
+        {
+            get
+            {
+                return new RelayCommand(Test);
+            }
+        }
+
+        public void Test()
+        {
+            string sMsg = string.Format("{0}, {1}", ((RecipeData_Origin)Recipe.GetRecipeData().GetRecipeData(typeof(RecipeData_Origin))).OriginX, ((RecipeData_Origin)Recipe.GetRecipeData().GetRecipeData(typeof(RecipeData_Origin))).OriginY);
+            MessageBox.Show(sMsg);
+        }
+
+        internal RecipeWizard_ViewModel Wizard { get => m_Wizard; set => m_Wizard 
+                = value; }
+        public Recipe Recipe { get => m_Recipe; set => m_Recipe = value; }
+        public WIND2_InspectionManager InspectionManager { get => m_InspectionManager; set => m_InspectionManager = value; }
+
         #endregion
 
         #region Panel Change Method
@@ -309,10 +335,10 @@ namespace Root_WIND2
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
 
-            m_Wizard.SetPage(m_Wizard.Summary);
+            Wizard.SetPage(Wizard.Summary);
 
-            p_CurrentPanel = m_Wizard.Main;
-            p_CurrentPanel.DataContext = m_Wizard;
+            p_CurrentPanel = Wizard.Main;
+            p_CurrentPanel.DataContext = Wizard;
         }
         public void SetMaintenance()
         {
@@ -409,9 +435,9 @@ namespace Root_WIND2
 
             //m_AlignMent.SetAlignOrigin();
             m_AlignMent.SetPage(m_AlignMent.Origin);
-
             p_CurrentPanel = m_AlignMent.Main;
             p_CurrentPanel.DataContext = m_AlignMent;
+
         }
         public void SetFrontAlignPosition()
         {
@@ -422,7 +448,7 @@ namespace Root_WIND2
             p_NaviButtons.Add(m_btnNaviAlignDiePosition);
 
             m_AlignMent.SetPage(m_AlignMent.Position);
-
+            m_AlignMent.p_Position_VM.init(this, m_AlignMent.m_Recipe);
             p_CurrentPanel = m_AlignMent.Main;
             p_CurrentPanel.DataContext = m_AlignMent;
         }

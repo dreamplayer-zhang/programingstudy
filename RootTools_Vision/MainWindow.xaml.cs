@@ -198,7 +198,7 @@ namespace RootTools_Vision
             param.SearchRangeY = 100;
 
             Position position = new Position();
-            position.SetData(recipe.GetRecipe(typeof(RecipePosition)), parameter.GetParameter(typeof(Temp_Recipe.ParameterPosition)));
+            //position.SetData(recipe.GetRecipeData(typeof(RecipePosition)), parameter.GetParameter(typeof(Temp_Recipe.ParameterPosition)));
             this.workbundle.Add(position);
 
             RefeshWorkBundleStack();
@@ -260,10 +260,11 @@ namespace RootTools_Vision
 
 
 
-            WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap, 1430, 1090);
+            //WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap, 1430, 1090);
+            WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap);
 
             WorkplaceBundle workplacebundle = new WorkplaceBundle();
-            workplacebundle = workplacebundle.CreateWaferMap(mapInfo);
+            workplacebundle = WorkplaceBundle.CreateWaferMap(mapInfo);
             workplacebundle.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
 
             this.workplacebundleList.Add(workplacebundle);

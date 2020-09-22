@@ -7,28 +7,15 @@ using RootTools;
 
 namespace RootTools_Vision
 {
-    public class ParamData_Position : ObservableObject, IParamData
+    public class ParamData_Position : ObservableObject, IParameterData
     {
-        Parameter<int> _nPositionTrigger;
-        public int m_nPositionTrigger
-        {
-            get => _nPositionTrigger._value;
-            set => _nPositionTrigger._value = value;
-        }
+        int searchRangeX;
+        int searchRangeY;
 
-        Parameter<int> _nPositionScore;
-        public int m_nPositionScore
-        {
-            get => _nPositionScore._value;
-            set => _nPositionScore._value = value;
-        }
+        int minScoreLimit;
 
-        public ParamData_Position()
-        {
-            _nPositionTrigger = new Parameter<int>(0, 0, 500);
-            _nPositionScore = new Parameter<int>(50, 0, 100);
-        }
-        
-
+        public int SearchRangeX { get => searchRangeX; set => searchRangeX = value; }
+        public int SearchRangeY { get => searchRangeY; set => searchRangeY = value; }
+        public int MinScoreLimit { get => minScoreLimit; set => minScoreLimit = value; }
     }
 }

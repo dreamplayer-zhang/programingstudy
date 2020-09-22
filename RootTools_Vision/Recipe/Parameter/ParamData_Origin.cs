@@ -8,7 +8,7 @@ using RootTools;
 
 namespace RootTools_Vision
 {
-    public class ParamData_Origin : ObservableObject, IParamData
+    public class ParamData_Origin : ObservableObject, IParameterData
     {
         Parameter<int> _nOriginWidth;
         public int m_nOriginWidth

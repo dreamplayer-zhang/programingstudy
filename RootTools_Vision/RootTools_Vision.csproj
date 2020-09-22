@@ -104,10 +104,10 @@
     <Compile Include="Recipe\DrawData\DrawData_Plain.cs" />
     <Compile Include="Recipe\DrawData\LineData.cs" />
     <Compile Include="Recipe\DrawData\RecipeEditor.cs" />
-    <Compile Include="Recipe\Parameter\IParamData.cs" />
+    <Compile Include="Recipe\Parameter\IParameterData.cs" />
     <Compile Include="Recipe\Parameter\ParamData_Origin.cs" />
     <Compile Include="Recipe\Parameter\ParamData_Position.cs" />
-    <Compile Include="Recipe\Parameter\RecipeParameter.cs" />
+    <Compile Include="Recipe\Parameter\Parameter.cs" />
     <Compile Include="Recipe\Recipe.cs" />
     <Compile Include="Temp_Recipe\IParameter.cs" />
     <Compile Include="Temp_Recipe\IRecipe.cs" />
@@ -120,7 +120,7 @@
     <Compile Include="Recipe\RecipeData\RecipeData_Position.cs" />
     <Compile Include="Temp_Recipe\RecipeOrigin.cs" />
     <Compile Include="Temp_Recipe\RecipePosition.cs" />
-    <Compile Include="Temp_Recipe\RecipeType_FeatureData.cs" />
+    <Compile Include="Recipe\RecipeData\RecipeType_FeatureData.cs" />
     <Compile Include="Recipe\RecipeInfo\RecipeInfo.cs" />
     <Compile Include="Recipe\RecipeInfo\RecipeInfo_MotionData.cs" />
     <Compile Include="Recipe\RecipeInfo\RecipeInfo_ProductMap.cs" />

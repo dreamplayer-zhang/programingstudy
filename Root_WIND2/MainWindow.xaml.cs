@@ -130,8 +130,8 @@ namespace Root_WIND2
         public ImageData m_Image;
         public IDialogService dialogService;
         string sPool = "pool";
-        string sGroup = "groupss";
-        string sMem = "memss";
+        string sGroup = "group";
+        string sMem = "mem";
         public int MemWidth = 40000;
         public int MemHeight = 40000;
         Viewer viewer = new Viewer();
@@ -141,6 +141,11 @@ namespace Root_WIND2
         Recipe m_Recipe;
         RecipeInfo m_RecipeInfo;
         RecipeEditor m_RecipeEditor;
+
+
+        //
+        WIND2_InspectionManager m_InspectionManager;
+
 
         void Init()
         {
@@ -155,9 +160,9 @@ namespace Root_WIND2
 
             m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
 
-
-            viewer.p_ROI_VM = new MaskTool_ViewModel(m_Image, dialogService);
-            panel.DataContext = viewer.p_ROI_VM;
+            //test용
+            //viewer.p_ROI_VM = new MaskTool_ViewModel(m_Image, dialogService);
+            //panel.DataContext = viewer.p_ROI_VM;
 
             m_RecipeMGR = new RecipeManager();
             m_Recipe = m_RecipeMGR.GetRecipe();
@@ -165,9 +170,21 @@ namespace Root_WIND2
             m_RecipeInfo = m_Recipe.GetRecipeInfo();
 
 
+            // Inspction Manager
+            m_InspectionManager = new WIND2_InspectionManager(m_Image.GetPtr(), m_Image.p_Size.X, m_Image.p_Size.Y);
+
+            m_engineer.InspectionManager = m_InspectionManager; 
+
             InitUI();
             InitTimer();
+            //InitDataSetting();
         }
+
+        //private void InitDataSetting()
+        //{
+        //    m_SetupViewModel.Recipe = m_Recipe;
+        //}
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             m_RecipeEditor.ClearPlain();
@@ -184,7 +201,7 @@ namespace Root_WIND2
         void InitUI()
         {
             m_Setup = new Setup();
-            m_SetupViewModel = new Setup_ViewModel(this);
+            m_SetupViewModel = new Setup_ViewModel(this, m_Recipe);
             m_Setup.DataContext = m_SetupViewModel;
             //((Setup_ViewModel)m_Setup.DataContext).init(this);
             //m_SetupViewModel = (Setup_ViewModel)m_Setup.DataContext;
@@ -216,6 +233,15 @@ namespace Root_WIND2
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+
+            //RecipeData_Origin rcpOrigin = m_Recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
+
+            //rcpOrigin.OriginX = m_SetupViewModel.Wizard.
+
+            //m_InspectionManager.SetBundles();
+
+
+
             //RecipeData_Origin pOrigin = m_Recipe.GetRecipeData().GetRecipeOrigin();
 
             //CPoint ptOrigin = pOrigin.GetOriginPoint();
@@ -236,15 +262,15 @@ namespace Root_WIND2
 
 
             //m_RecipeMGR.m_Recipe.m_ReicpeData.m_RecipeData_Position.AddImageToBundle();
-            m_RecipeMGR.m_Recipe.m_ReicpeData.m_RecipeData_Position.AddImageToBundle();
+            //m_RecipeMGR.m_Recipe.m_ReicpeData.m_RecipeData_Position.AddImageToBundle();
 
-            m_RecipeMGR.SaveRecipe();
-            m_RecipeMGR.SaveGraphicsFile();
+            //m_RecipeMGR.SaveRecipe();
+            //m_RecipeMGR.SaveGraphicsFile();
 
-            //m_RecipeMGR.LoadRecipe();
-            //m_RecipeMGR.LoadGraphicsRecipe();
+            ////m_RecipeMGR.LoadRecipe();
+            ////m_RecipeMGR.LoadGraphicsRecipe();
 
-            m_RecipeMGR.m_Recipe.m_ReicpeData.m_RecipeData_Position.SaveImageBundle();
+            //m_RecipeMGR.m_Recipe.m_ReicpeData.m_RecipeData_Position.SaveImageBundle();
 
 
             //byte[] source = m_RecipeMGR.m_Recipe.m_ReicpeData.m_RecipeData_Position.btyePositionFeature;

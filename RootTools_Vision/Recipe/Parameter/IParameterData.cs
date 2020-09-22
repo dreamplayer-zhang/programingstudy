@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    interface IParamData
+    public interface IParameterData
     {
         // 파라미터 행동 정의
     }

@@ -92,6 +92,10 @@ namespace Root_WIND2
         #endregion
 
         public WIND2_Handler m_handler = new WIND2_Handler();
+
+        private WIND2_InspectionManager m_InspectionManager;
+        public WIND2_InspectionManager InspectionManager { get => m_InspectionManager; set => m_InspectionManager = value; }
+
         public void Init(string id)
         {
             EQ.m_sModel = id;

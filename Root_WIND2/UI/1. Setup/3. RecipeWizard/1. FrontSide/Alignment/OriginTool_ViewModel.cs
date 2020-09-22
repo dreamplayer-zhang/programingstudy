@@ -73,7 +73,7 @@ namespace Root_WIND2
                 SetProperty(ref m_UsePitch, value);
             }
         }
-        private CPoint m_OriginPoint = new CPoint();
+        private CPoint m_OriginPoint = new CPoint(); // Memory 좌표
         public CPoint p_OriginPoint
         {
             get
@@ -88,7 +88,7 @@ namespace Root_WIND2
                 SetProperty(ref m_OriginPoint, value);
             }
         } // Origin 포인트
-        private CPoint m_PitchSize = new CPoint(); 
+        private CPoint m_PitchSize = new CPoint();  // Memory Size
         public CPoint p_PitchSize
         {
             get
@@ -124,6 +124,13 @@ namespace Root_WIND2
 
         Recipe m_Recipe;
         RecipeData_Origin m_RecipeData_Origin;
+        
+        public OriginTool_ViewModel(Recipe _recipe)
+        {
+            base.init();
+            m_Recipe = _recipe;
+            m_RecipeData_Origin = _recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
+        }
 
         public OriginTool_ViewModel()
         {
@@ -133,7 +140,8 @@ namespace Root_WIND2
             base.init(image, dialogService);
 
             m_Recipe = _Recipe;
-            m_RecipeData_Origin = _Recipe.GetRecipeDataOrigin();
+            //m_RecipeData_Origin = _Recipe.GetRecipeData().m_ReicpeData_Origin;
+            m_RecipeData_Origin = _Recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
         }
 
         
@@ -206,7 +214,6 @@ namespace Root_WIND2
             base.CanvasMovePoint_Ref(point, nX, nY);
             RedrawShape();
         }
-
         private void AddOriginPoint(CPoint memPt, Brush color)
         {
             if (p_ViewElement.Contains(Origin_UI))
@@ -247,6 +254,9 @@ namespace Root_WIND2
             Origin_UI.Children.Add(line1);
             Origin_UI.Children.Add(line2);
             p_ViewElement.Add(Origin_UI);
+
+            m_RecipeData_Origin.OriginX = memPt.X;
+            m_RecipeData_Origin.OriginY = memPt.Y;
         }
         private void AddPitchPoint(CPoint memPt, Brush color)
         {
@@ -287,6 +297,10 @@ namespace Root_WIND2
             Pitch_UI.Children.Add(line1);
             Pitch_UI.Children.Add(line2);
             p_ViewElement.Add(Pitch_UI);
+
+
+            m_RecipeData_Origin.DiePitchX = viewPt.X;
+            m_RecipeData_Origin.DiePitchY = viewPt.Y;
         }
         private void AddInspArea(CPoint offset)
         {
@@ -336,9 +350,14 @@ namespace Root_WIND2
             p_ViewElement.Add(InspArea.CanvasRect);
             AddArea(InspArea);
 
-            m_RecipeData_Origin.SetOrigin(InspArea.MemoryRect);
+            
+            //m_RecipeData_Origin.m_ptABSOrigin = m_OriginPoint;
+            //m_RecipeData_Origin.SetOrigin(InspArea.MemoryRect);
+            m_RecipeData_Origin.InspectionBufferOffsetX = offset.X;
+            m_RecipeData_Origin.InspectionBufferOffsetY = offset.Y;
+            
+            //m_RecipeData_Origin.SetOrigin(InspArea.MemoryRect);
         }
-
         private void RedrawShape()
         {
             if (Origin_UI != null)
@@ -358,7 +377,6 @@ namespace Root_WIND2
                 AddInspArea(p_Offset);
             }
         }
-
         public void _setOriginPoint()
         {
             eOriginProcess = OriginProcess.Origin;

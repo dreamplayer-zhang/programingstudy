@@ -14,6 +14,6 @@ namespace RootTools_Vision
 
         void SetWorkplace(Workplace workplace);
 
-        void SetData(IRecipe _recipeData, Temp_Recipe.IParameter _parameterData);
+        void SetData(IRecipeData _recipeData, IParameterData _parameterData);
     }
 }

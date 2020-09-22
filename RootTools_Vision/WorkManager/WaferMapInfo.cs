@@ -52,12 +52,10 @@ namespace RootTools_Vision
             get { return this.nMasterDieY; }
         }
 
-        public WaferMapInfo(int mapSizeX, int mapSizeY, byte[] waferMap, int dieSizeX, int dieSizeY)
+        public WaferMapInfo(int mapSizeX, int mapSizeY, byte[] waferMap)
         {
             this.nMapSizeX = mapSizeX;
             this.nMapSizeY = mapSizeY;
-            this.nDieSizeX = dieSizeX;
-            this.nDieSizeY = dieSizeY;
 
             this.pWaferMap = new byte[this.nMapSizeX * this.nMapSizeY];
 

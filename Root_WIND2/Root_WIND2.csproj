@@ -102,12 +102,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\UserControl\FeatureControl.xaml.cs">
+      <DependentUpon>FeatureControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="InspectionItem.cs" />
     <Compile Include="InspectionMethod.cs" />
     <Compile Include="Mask.cs" />
+    <Compile Include="Module\WIND2_InspectionManager.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\BoxTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\OriginTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\Origin_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\Position_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\DrawTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\InspTestPage.xaml.cs">
       <DependentUpon>InspTestPage.xaml</DependentUpon>
@@ -249,6 +254,10 @@
     <Compile Include="WIND2_Handler.cs" />
     <Compile Include="WIND2_Process.cs" />
     <Compile Include="WIND2_Recipe.cs" />
+    <Page Include="Controls\UserControl\FeatureControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\InspectionTest\InspTestPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

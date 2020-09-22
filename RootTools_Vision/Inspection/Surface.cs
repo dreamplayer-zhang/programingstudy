@@ -25,12 +25,6 @@ namespace RootTools_Vision
             DoInspection();
         }
 
-
-        public void SetData(IRecipe _recipeData, IParameter _parameterData)
-        {
-           
-        }
-
         public void SetWorkplace(Workplace workplace)
         {
             index = workplace.Index;
@@ -52,5 +46,9 @@ namespace RootTools_Vision
             }
         }
 
+        public void SetData(IRecipeData _recipeData, IParameterData _parameterData)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
