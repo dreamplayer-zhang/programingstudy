@@ -51,5 +51,10 @@ namespace RootTools_Vision
             return this.m_ReicpeData.GetRecipeData(type);
         }
 
+        public IParameterData GetParameter(Type type)
+        {
+            return this.m_Parameter.GetParameter(type);
+        }
+
     }
 }

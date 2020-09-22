@@ -3,19 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Threading;
 using RootTools_Vision;
 
 
 namespace Root_WIND2
 {
+
+    public delegate void EventMapStateChanged(int x, int y, WORKPLACE_STATE state);
+
     public class WIND2_InspectionManager : WorkFactory
     {
+        public event EventMapStateChanged MapStateChanged;
+
+        SolidColorBrush brushSnap = System.Windows.Media.Brushes.LightSkyBlue;
+        SolidColorBrush brushPosition = System.Windows.Media.Brushes.SkyBlue;
+        SolidColorBrush brushPreInspection = System.Windows.Media.Brushes.Cornsilk;
+        SolidColorBrush brushInspection = System.Windows.Media.Brushes.Gold;
+        SolidColorBrush brushMeasurement = System.Windows.Media.Brushes.CornflowerBlue;
+        SolidColorBrush brushComplete = System.Windows.Media.Brushes.YellowGreen;
+
 
         public WIND2_InspectionManager(IntPtr _sharedBuffer, int _width, int _height)
         {
             this.m_ptrSharedBuffer = _sharedBuffer;
             this.m_SharedBufferWidth = _width;
             this.m_SharedBufferHeight = _height;
+
+            InitWorkManager();
+        }
+
+        protected override void InitWorkManager()
+        {
+            this.Add(new WorkManager("Position", RootTools_Vision.UserTypes.WORK_TYPE.PREPARISON, WORKPLACE_STATE.READY, WORKPLACE_STATE.NONE));
+            this.Add(new WorkManager("Inspection", RootTools_Vision.UserTypes.WORK_TYPE.MAINWORK, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, 8));
+            this.Add(new WorkManager("ProcessDefect", RootTools_Vision.UserTypes.WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION));
         }
 
         private IntPtr m_ptrSharedBuffer;
@@ -52,6 +76,8 @@ namespace Root_WIND2
                 0,0,0,0,0,1,1,1,1,0,0,0,0,0,//14
             };
 
+
+
             WaferMapInfo mapInfo = new WaferMapInfo(nMapSize, nMapSize, waferMapInfo);
 
 
@@ -60,11 +86,16 @@ namespace Root_WIND2
 
             Position position = new Position();
 
+            ParamData_Position param = m_Recipe.GetParameter(typeof(ParamData_Position)) as ParamData_Position;
+            param.SearchRangeX = 100;
+            param.SearchRangeY = 100;
+
             position.SetData(m_Recipe.GetRecipeData(), m_Recipe.GetParameter());
 
             works.Add(position);
 
             WorkplaceBundle workplaces = WorkplaceBundle.CreateWaferMap(mapInfo);
+            workplaces.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
 
             workplaces.SetSharedBuffer(this.PtrSharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight);
 
@@ -73,12 +104,52 @@ namespace Root_WIND2
         }
 
 
-        protected override void InitWorkManager()
+        object lockObj = new object();
+        private void ChangedWorkplaceState_Callback(object obj)
         {
-            this.Add(new WorkManager("Position", RootTools_Vision.UserTypes.WORK_TYPE.PREPARISON, WORKPLACE_STATE.READY, WORKPLACE_STATE.NONE));
-            this.Add(new WorkManager("Inspection", RootTools_Vision.UserTypes.WORK_TYPE.MAINWORK, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, 8));
-            this.Add(new WorkManager("ProcessDefect", RootTools_Vision.UserTypes.WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION));
+            lock (lockObj)
+            {
+                Workplace workplace = obj as Workplace;
+
+                if (MapStateChanged != null && workplace.MapPositionX >= 0 && workplace.MapPositionY >= 0)
+                        MapStateChanged(workplace.MapPositionX, workplace.MapPositionY, workplace.STATE);
+                //string str;
+
+                //str = string.Format("{0} {1} {2}", workplace.Index, workplace.MapPositionX, workplace.MapPositionY);
+                //MessageBox.Show(str);
+
+
+
+                //Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+                //{
+                //    if (workplace.Index == 0) return;
+
+                //    TextBox tb = (TextBox)this.vmMapView.CellItems[(int)(workplace.MapPositionX + workplace.MapPositionY * this.workplacebundleList[workplacebundleIndex].MapSizeX)];
+
+                //    switch (workplace.STATE)
+                //    {
+                //        case WORKPLACE_STATE.NONE:
+                //            //tb.Background = brushPosition;
+                //            break;
+                //        case WORKPLACE_STATE.SNAP:
+                //            tb.Background = brushPreInspection;
+                //            break;
+                //        case WORKPLACE_STATE.READY:
+                //            tb.Background = brushPosition;
+                //            break;
+                //        case WORKPLACE_STATE.INSPECTION:
+                //            tb.Background = brushInspection;
+                //            break;
+                //        case WORKPLACE_STATE.DEFECTPROCESS:
+                //            tb.Background = brushComplete;
+                //            break;
+                //    }
+                //}));
+            }
         }
+
+
+
 
         public new void Start()
         {

@@ -11,6 +11,8 @@ using System.Windows.Media;
 using System.Runtime.InteropServices;
 using RootTools;
 using RootTools_CLR;
+using RootTools_Vision;
+using System.Windows.Threading;
 
 namespace Root_WIND2
 {
@@ -32,6 +34,14 @@ namespace Root_WIND2
             {
                 SetProperty(ref m_ROOT_VM, value);
             }
+        }
+
+        private MapViewer_ViewModel m_MapViewer_VM;
+
+        public MapViewer_ViewModel p_MapViewer_VM
+        {
+            get { return this.m_MapViewer_VM; }
+            set { SetProperty(ref m_MapViewer_VM, value); }
         }
 
         public InspTest_ViewModel(Setup_ViewModel setup)
@@ -69,6 +79,10 @@ namespace Root_WIND2
         {
             p_ROOT_VM = new RootViewer_ViewModel();
             p_ROOT_VM.init(m_Setup.m_MainWindow.m_Image, m_Setup.m_MainWindow.dialogService);
+
+            m_MapViewer_VM = new MapViewer_ViewModel();
+            //m_MapViewer_VM.MapSize = new Point(10, 10);
+
         }
    
         public ICommand btnInspTestStart
@@ -100,8 +114,78 @@ namespace Root_WIND2
             }
         }
 
+
+        SolidColorBrush brushSnap = System.Windows.Media.Brushes.LightSkyBlue;
+        SolidColorBrush brushPosition = System.Windows.Media.Brushes.SkyBlue;
+        SolidColorBrush brushPreInspection = System.Windows.Media.Brushes.Cornsilk;
+        SolidColorBrush brushInspection = System.Windows.Media.Brushes.Gold;
+        SolidColorBrush brushMeasurement = System.Windows.Media.Brushes.CornflowerBlue;
+        SolidColorBrush brushComplete = System.Windows.Media.Brushes.YellowGreen;
+
+        object lockObj = new object();
+        private void MapStateChanged_Callback(int mapPosX, int mapPosY, WORKPLACE_STATE state)
+        {
+            lock(lockObj)
+            {
+                
+                Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+                {
+                    int index = (int)(mapPosX + mapPosY * m_MapViewer_VM.MapSize.X);
+                    if (index > this.m_MapViewer_VM.CellItems.Count - 1) return;
+
+                    TextBox tb = (TextBox)this.m_MapViewer_VM.CellItems[index];
+
+                    switch (state)
+                    {
+                        case WORKPLACE_STATE.NONE:
+                            //tb.Background = brushPosition;
+                            break;
+                        case WORKPLACE_STATE.SNAP:
+                            tb.Background = brushPreInspection;
+                            break;
+                        case WORKPLACE_STATE.READY:
+                            tb.Background = brushPosition;
+                            break;
+                        case WORKPLACE_STATE.INSPECTION:
+                            tb.Background = brushInspection;
+                            break;
+                        case WORKPLACE_STATE.DEFECTPROCESS:
+                            tb.Background = brushComplete;
+                            break;
+                    }
+                }));
+            }
+        }
+
         private void _btnTest()
         {
+            //m_MapViewer_VM.MapSize = new Point(10, 10);
+
+            //m_MapViewer_VM.MapSize = new Point(14, 14);
+
+            ////m_MapViewer_VM.CellItems = new ObservableCollection<UIElement>();
+
+            //int nSizeX = 14;
+            //int nSizeY = 14;
+            //for(int y = 0; y < nSizeY; y++)
+            //{
+            //    for(int x= 0; x < nSizeX; x++)
+            //    {
+            //        TextBox tb = new TextBox();
+            //        tb.Background = Brushes.LightGray;
+            //        m_MapViewer_VM.CellItems.Add(tb);
+
+            //        Grid.SetRow(tb, y);
+            //        Grid.SetColumn(tb, x);
+            //    }
+            //}
+            
+            //((ObservableCollection<UIElement>)items.ItemsSource).Add(tb);
+
+           
+
+            m_Setup.InspectionManager.MapStateChanged += MapStateChanged_Callback;
+            m_Setup.InspectionManager.CreateInspecion();
             m_Setup.InspectionManager.Start();
 
             // TestCode
