@@ -276,6 +276,30 @@
 									Style="{StaticResource BasicBtn}"
 									Command="{Binding CommandSaveAutoIlluminationFeature}"
 									Margin="0,0,0,10" />
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Light Cal. Key Distance (X Pos)"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedFeature.LightCalDistX}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Light Cal. Key Distance (Y Pos)"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedFeature.LightCalDistY}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Light Cal. Key Width (px)"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedFeature.LightCalDistX}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
+                            <UniformGrid Columns="2" Margin="0,0,0,10">
+                                <TextBlock Text="Light Cal. Key Height (px)"
+										   Style="{StaticResource BasicTb}"/>
+                                <TextBox Text="{Binding SelectedFeature.LightCalDistY}"
+										 Style="{StaticResource BasicTbox}"/>
+                            </UniformGrid>
                         </StackPanel>
                     </Expander>
                 </StackPanel>

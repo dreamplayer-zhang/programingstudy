@@ -395,13 +395,18 @@ namespace Root_Vega
 
         unsafe public void Test()
         {
-            double[] aHeight = new double[640];
-            // LADS 테스트용 프레임 생성
-            MemoryData md = App.m_engineer.GetMemory("SideVision.Memory", "LADS", "Grab");
-            int nWidth = md.p_sz.X;
-            int nheight = md.p_sz.Y;
-            Random random = new Random();
-            byte* pSrc = (byte*)md.GetPtr().ToPointer();
+            string strResult = m_SideVision.p_CamLADS.Grab();
+            ImageData img = m_SideVision.p_CamLADS.p_ImageViewer.p_ImageData;
+            double dResult = CalculatingHeight(img);
+            return;
+
+            //double[] aHeight = new double[640];
+            //// LADS 테스트용 프레임 생성
+            //MemoryData md = App.m_engineer.GetMemory("SideVision.Memory", "LADS", "Grab");
+            //int nWidth = md.p_sz.X;
+            //int nheight = md.p_sz.Y;
+            //Random random = new Random();
+            //byte* pSrc = (byte*)md.GetPtr().ToPointer();
 
             //pSrc += (nWidth * (nheight / 2));
             //for (int y = 0; y<3; y++)
@@ -416,29 +421,57 @@ namespace Root_Vega
             //    }
             //}
             
-            double dScale = 65535.0 / nheight;
-            // LADS 테스트
+            //double dScale = 65535.0 / nheight;
+            //// LADS 테스트
 
-            pSrc = (byte*)md.GetPtr().ToPointer();
-            for (int x = 0; x < nWidth; x++, pSrc++)
+            //pSrc = (byte*)md.GetPtr().ToPointer();
+            //for (int x = 0; x < nWidth; x++, pSrc++)
+            //{
+            //    byte* pSrcY = pSrc;
+            //    int nSum = 0;
+            //    int nYSum = 0;
+            //    for (int y = 0; y < nheight; y++, pSrcY += nWidth)
+            //    {
+            //        if (*pSrcY < 70) continue;
+            //        nSum += *pSrcY;
+            //        nYSum += *pSrcY * y;
+            //    }
+            //    int nAdd = x;
+            //    //m_aHeight[nAdd] = (nSum != 0) ? (ushort)(((ushort)(dScale * nYSum / nSum)) >> 8) : (ushort)0;                
+            //    aHeight[nAdd] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
+            //}
+
+            //double dResult = GetHeightAverage(aHeight);
+        
+            //return;
+        }
+
+        unsafe double CalculatingHeight(ImageData img)
+        {
+            // variable
+            int nImgWidth = 640;
+            int nImgHeight = 102;
+            double dScale = 65535.0 / nImgHeight;
+            double[] daHeight = new double[nImgWidth];
+
+            // implement
+            byte* pSrc = (byte*)img.GetPtr().ToPointer();
+            for (int x = 0; x < nImgWidth; x++, pSrc++)
             {
                 byte* pSrcY = pSrc;
                 int nSum = 0;
                 int nYSum = 0;
-                for (int y = 0; y < nheight; y++, pSrcY += nWidth)
+                for (int y = 0; y < nImgHeight; y++, pSrcY += nImgWidth)
                 {
                     if (*pSrcY < 70) continue;
                     nSum += *pSrcY;
                     nYSum += *pSrcY * y;
                 }
-                int nAdd = x;
-                //m_aHeight[nAdd] = (nSum != 0) ? (ushort)(((ushort)(dScale * nYSum / nSum)) >> 8) : (ushort)0;                
-                aHeight[nAdd] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
+                int iIndex = x;
+                daHeight[iIndex] = (nSum != 0) ? ((double)nYSum / (double)nSum) : 0.0;
             }
 
-            double dResult = GetHeightAverage(aHeight);
-        
-            return;
+            return GetHeightAverage(daHeight);
         }
 
         double GetHeightAverage(double[] daHeight)

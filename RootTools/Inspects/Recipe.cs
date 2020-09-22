@@ -891,6 +891,12 @@ namespace RootTools.Inspects
 		{
 			_PatternDistX = new Param<int>(1000, 0, int.MaxValue);
 			_PatternDistY = new Param<int>(1000, 0, int.MaxValue);
+
+			_LightCalDistX = new Param<int>(1000, 0, int.MaxValue);
+			_LightCalDistY = new Param<int>(1000, 0, int.MaxValue);
+
+			_LightCalWidth = new Param<int>(1000, 0, int.MaxValue);
+			_LightCalHeight = new Param<int>(1000, 0, int.MaxValue);
 		}
 
 		#region PatternDistX
@@ -922,7 +928,66 @@ namespace RootTools.Inspects
 				RaisePropertyChanged();
 			}
 		}
+		#endregion
 
+		#region LightCalDistX
+		Param<int> _LightCalDistX;
+		public int LightCalDistX
+		{
+			get { return _LightCalDistX._value; }
+			set
+			{
+				if (_LightCalDistX._value == value)
+					return;
+				_LightCalDistX._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region LightCalDistY
+		Param<int> _LightCalDistY;
+		public int LightCalDistY
+		{
+			get { return _LightCalDistY._value; }
+			set
+			{
+				if (_LightCalDistY._value == value)
+					return;
+				_LightCalDistY._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region LightCalWidth
+		Param<int> _LightCalWidth;
+		public int LightCalWidth
+		{
+			get { return _LightCalWidth._value; }
+			set
+			{
+				if (_LightCalWidth._value == value)
+					return;
+				_LightCalWidth._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region LightCalHeight
+		Param<int> _LightCalHeight;
+		public int LightCalHeight
+		{
+			get { return _LightCalHeight._value; }
+			set
+			{
+				if (_LightCalHeight._value == value)
+					return;
+				_LightCalHeight._value = value;
+				RaisePropertyChanged();
+			}
+		}
 		#endregion
 	}
 	public class AlignData : Feature
