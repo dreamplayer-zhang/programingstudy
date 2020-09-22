@@ -156,7 +156,7 @@ namespace Root_WIND2
                     }
                     break;
                 case OriginProcess.Pitch:
-                    if (p_OriginPoint.X == 0 && p_OriginPoint.Y == 0)
+                    if (m_OriginPoint.X == 0 && m_OriginPoint.Y == 0)
                     {
                         System.Windows.MessageBox.Show("Set Origin Point First");
                         p_UsePitch = false;
@@ -174,7 +174,7 @@ namespace Root_WIND2
                     p_Cursor = Cursors.Arrow;
                     eOriginProcess = OriginProcess.None;
 
-                    AddInspArea(p_Offset);
+                    //AddInspArea(p_Offset);
                     break;
             }
         }
@@ -285,7 +285,17 @@ namespace Root_WIND2
                 if (p_ViewElement.Contains(InspArea.CanvasRect))
                     p_ViewElement.Remove(InspArea.CanvasRect);
             if (OriginPitchPoint.X == 0 || OriginPitchPoint.Y == 0)
+            {
+                InspArea = new TRect(Brushes.Yellow, 2, 0.5);
+                AddArea(InspArea);
                 return;
+            }
+            if (m_OriginPoint.X == 0 || m_OriginPoint.Y == 0)
+            {
+                InspArea = new TRect(Brushes.Yellow, 2, 0.5);
+                AddArea(InspArea);
+                return;
+            }
 
             InspArea = new TRect(Brushes.Yellow, 2, 0.5);
             InspArea.MemoryRect.Left = m_OriginPoint.X - offset.X;

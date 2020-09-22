@@ -146,8 +146,8 @@ namespace RootTools
 				if (value == 0)
 					return;
 
-
 				SetProperty(ref m_CanvasWidth, value);
+				SetRoiRect();
 			}
 		}
 		private int m_CanvasHeight = 100;
