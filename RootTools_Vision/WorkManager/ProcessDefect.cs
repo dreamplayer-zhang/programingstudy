@@ -33,7 +33,7 @@ namespace RootTools_Vision
             throw new NotImplementedException();
         }
 
-        public void SetData(IRecipe _recipeData, IParameter _parameterData)
+        public void SetData(IRecipeData _recipeData, IParameter _parameterData)
         {
             throw new NotImplementedException();
         }

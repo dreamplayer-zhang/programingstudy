@@ -23,7 +23,7 @@ namespace RootTools_Vision
             DoPosition();
         }
 
-        public void SetData(IRecipe _recipeData, IParameter _parameterData)
+        public void SetData(IRecipeData _recipeData, IParameter _parameterData)
         {
             this.recipeData = _recipeData as RecipePosition;
             this.parameterData = _parameterData as ParameterPosition;

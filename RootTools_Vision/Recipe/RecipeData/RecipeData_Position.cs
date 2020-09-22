@@ -11,106 +11,64 @@ using System.Drawing;
 
 namespace RootTools_Vision
 {
-    public enum Position_Type
+    public class RecipeData_Position : IRecipeData
     {
-        MasterMark = 0,
-        ShotMark = 1,
-        ChipMark = 2,
-    }
+        List<RecipeType_FeatureData> listMasterFeature;
+        List<RecipeType_FeatureData> listShotFeature;
+        List<RecipeType_FeatureData> listChipFeature;
 
-    public class RecipeData_Position
-    {
-        #region [Graphics XML Serialize 변수(레시피)]
-        // 무조건 Public 선언되어야 함  
-        public List<Image_Bundle> m_PositionImageBundle; // 시리얼 라이즈가 왠지 안됨
+        int indexMaxScoreMasterFeature;
+        int indexMaxScoreShotFeature;
+        int indexMaxScoreChipFeature;
+
+        #region [Getter Setter]
+        public List<RecipeType_FeatureData> ListMasterFeature { get => listMasterFeature; set => listMasterFeature = value; }
+        public List<RecipeType_FeatureData> ListShotFeature { get => listShotFeature; set => listShotFeature = value; }
+        public List<RecipeType_FeatureData> ListDieFeature { get => listChipFeature; set => listChipFeature = value; }
+        public int IndexMaxScoreMasterFeature { get => indexMaxScoreMasterFeature; set => indexMaxScoreMasterFeature = value; }
+        public int IndexMaxScoreShotFeature { get => indexMaxScoreShotFeature; set => indexMaxScoreShotFeature = value; }
+        public int IndexMaxScoreChipFeature { get => indexMaxScoreChipFeature; set => indexMaxScoreChipFeature = value; }
         #endregion
 
         public RecipeData_Position()
         {
-            //m_PositionImageBundle = new List<Image_Bundle>();
-            //foreach (Position_Type type in Enum.GetValues(typeof(Position_Type)))
-            //{
-            //    Image_Bundle image_Bundle = new Image_Bundle(type);
-            //    m_PositionImageBundle.Add(image_Bundle);
-            //}
+            listMasterFeature = new List<RecipeType_FeatureData>();
+            listShotFeature = new List<RecipeType_FeatureData>();
+            listChipFeature = new List<RecipeType_FeatureData>();
+
+            indexMaxScoreMasterFeature = -1;
+            indexMaxScoreShotFeature = -1;
+            indexMaxScoreChipFeature = -1;
         }
 
-        public RecipeData_Position(int nCount)
+        void AddMasterFeature(RecipeType_FeatureData featureData)
         {
-            m_PositionImageBundle = new List<Image_Bundle>();
-            for (int i = 0; i < nCount; i++)
-            {
-                Image_Bundle image_Bundle = new Image_Bundle((Position_Type)i);
-                m_PositionImageBundle.Add(image_Bundle);
-            }
+            listMasterFeature.Add(featureData);
         }
 
-        public void AddImageToBundle(ImageData _ImageData, Position_Type _Type, CPoint _ptCenter, CRect _rtBoundry)
+        void AddMasterFeature(int positionX, int positionY, int featureWidth, int featureHeight, byte[] rawData)
         {
-            // 신규 Position Feature 등록
-
-            byte[] byteFeatureBuffer = new byte[_rtBoundry.Width * _rtBoundry.Height];
-            int nStride = (int)_ImageData.p_Stride;
-            for (int y = 0; y < _rtBoundry.Height; y++)
-            {
-                Marshal.Copy(
-                _ImageData.GetPtr() + _ptCenter.X + (y + _ptCenter.Y) * nStride, // source
-                byteFeatureBuffer,
-                _rtBoundry.Width * y,
-                _rtBoundry.Width
-                );
-            }
-
-            ImageConverter converter = new ImageConverter();
-            Image image = (System.Drawing.Image)converter.ConvertFrom(byteFeatureBuffer);
-
-            Image_Bundle bundle = GetImagebundle(_Type);
-            bundle.AddImageToBundle(image);
-
-            //Image image = Image.FromFile(@"C:\Wind2\6.bmp");
-            //ImageConverter converter = new ImageConverter();
-            //btyePositionFeature = (byte[])converter.ConvertTo(image, typeof(byte[]));
+            listMasterFeature.Add(new RecipeType_FeatureData(positionX, positionY, featureWidth, featureHeight, rawData));
         }
 
-        public void AddImageToBundle()
+        void AddShotFeature(RecipeType_FeatureData featureData)
         {
-            Image image1 = Image.FromFile(@"C:\Wind2\1.bmp");
-            Image image2 = Image.FromFile(@"C:\Wind2\2.bmp");
-            Image image3 = Image.FromFile(@"C:\Wind2\3.bmp");
-            Image image4 = Image.FromFile(@"C:\Wind2\4.bmp");
-            Image image5 = Image.FromFile(@"C:\Wind2\5.bmp");
-            Image image6 = Image.FromFile(@"C:\Wind2\6.bmp");
-            Image image7 = Image.FromFile(@"C:\Wind2\7.bmp");
-
-            List<Image> images;
-            images = new List<Image>();
-            images.Add(image1);
-            images.Add(image2);
-            images.Add(image3);
-            images.Add(image4);
-            images.Add(image5);
-            images.Add(image6);
-            images.Add(image7);
-
-            Image_Bundle bundle = GetImagebundle(Position_Type.MasterMark);
-
-            foreach (Image item in images)
-            {
-                bundle.AddImageToBundle(item);
-            }
+            listShotFeature.Add(featureData);
         }
 
-
-        public void SaveImageBundle()
+        void AddShotFeature(int positionX, int positionY, int featureWidth, int featureHeight, byte[] rawData)
         {
-            Image_Bundle bundle = GetImagebundle(Position_Type.MasterMark);
-            bundle.SaveImageBundle();
+            listShotFeature.Add(new RecipeType_FeatureData(positionX, positionY, featureWidth, featureHeight, rawData));
         }
 
-        public Image_Bundle GetImagebundle(Position_Type _Type)
+        void AddChipFeature(RecipeType_FeatureData featureData)
         {
-            int nIndex = Convert.ToInt32(_Type);
-            return m_PositionImageBundle[nIndex];
+            listChipFeature.Add(featureData);
+        }
+
+        void AddChipFeature(int positionX, int positionY, int featureWidth, int featureHeight, byte[] rawData)
+        {
+            listChipFeature.Add(new RecipeType_FeatureData(positionX, positionY, featureWidth, featureHeight, rawData));
         }
     }
 }

@@ -41,8 +41,10 @@ namespace RootTools_Vision
         public ref RecipeInfo GetRecipeInfo() { return ref m_RecipeInfo; }
         public ref RecipeEditor GetRecipeEditor() { return ref m_RecipeEditor; }
 
-        public ref RecipeData_Origin GetRecipeDataOrigin() { return ref m_ReicpeData.GetRecipeOrigin(); }
-        public ref RecipeData_Position GetRecipeDataPosition() { return ref m_ReicpeData.GetRecipePosition(); }
+        public IRecipeData GetRecipeData(Type type)
+        {
+            return this.m_ReicpeData.GetRecipeData(type);
+        }
 
     }
 }

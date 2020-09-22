@@ -7,8 +7,7 @@ using RootTools;
 
 namespace RootTools_Vision
 {
-    interface IRecipeData
+    public interface IRecipeData
     {
-        void SetData();
     }
 }

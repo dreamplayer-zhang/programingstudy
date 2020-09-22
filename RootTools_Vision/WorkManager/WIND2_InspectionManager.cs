@@ -8,7 +8,7 @@ using RootTools_Vision;
 
 namespace RootTools_Vision.Test
 {
-    class WIND2_InspectionManager : WorkFactory
+    class WIND2_InspectionManager_ : WorkFactory
     {
         protected override void InitWorkManager()
         {

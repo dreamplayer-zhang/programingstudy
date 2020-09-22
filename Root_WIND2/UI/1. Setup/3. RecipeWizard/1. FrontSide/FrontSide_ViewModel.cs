@@ -61,6 +61,16 @@ namespace Root_WIND2
                 });
             }
         }
+        public ICommand btnFrontInspTest
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    m_Setup.SetFrontInspTest();
+                });
+            }
+        }
         public ICommand btnBack
         {
             get
