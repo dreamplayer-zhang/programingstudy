@@ -325,6 +325,10 @@ namespace RootTools
 			#endregion
 
 			int position = 0;
+			if (rect.Width % 4 != 0)
+			{
+				rect.Right += 4 - rect.Width % 4;
+			}
 			byte[] aBuf = new byte[rect.Width * rect.Height];
 			//나중에 거꾸로 나왔던것 확인해야 함. 일단 지금은 정순으로 바꿔둠
 			for (int i = 0; i < rect.Height; i++)
@@ -333,6 +337,19 @@ namespace RootTools
 				position += rect.Width;
 			}
 			return GetBitmapToArray(rect.Width, rect.Height, aBuf);
+		}
+		public unsafe BitmapSource GetBitMapSource()
+		{
+			Image<Gray, byte> image = new Image<Gray, byte>(p_Size.X, p_Size.Y);
+			IntPtr ptrMem = GetPtr();
+
+			for (int y = 0; y < p_Size.Y; y++)
+				for (int x = 0; x < p_Size.X; x++)
+				{
+					image.Data[y,x,0]= ((byte*)ptrMem)[(long)x + (long)y * p_Size.X];
+				}
+
+			return ImageHelper.ToBitmapSource(image);
 		}
 
 		public Bitmap GetRectImagePattern(CRect rect)

@@ -397,9 +397,9 @@ namespace Root_WIND2
 
             //m_AlignMent.SetAlignOrigin();
             m_AlignMent.SetPage(m_AlignMent.Origin);
-
             p_CurrentPanel = m_AlignMent.Main;
             p_CurrentPanel.DataContext = m_AlignMent;
+
         }
         public void SetFrontAlignPosition()
         {
@@ -410,7 +410,7 @@ namespace Root_WIND2
             p_NaviButtons.Add(m_btnNaviAlignDiePosition);
 
             m_AlignMent.SetPage(m_AlignMent.Position);
-
+            m_AlignMent.p_Position_VM.init(this, m_AlignMent.m_Recipe);
             p_CurrentPanel = m_AlignMent.Main;
             p_CurrentPanel.DataContext = m_AlignMent;
         }

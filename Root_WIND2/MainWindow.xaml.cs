@@ -130,8 +130,8 @@ namespace Root_WIND2
         public ImageData m_Image;
         public IDialogService dialogService;
         string sPool = "pool";
-        string sGroup = "groupss";
-        string sMem = "memss";
+        string sGroup = "group";
+        string sMem = "mem";
         public int MemWidth = 40000;
         public int MemHeight = 40000;
         Viewer viewer = new Viewer();
@@ -155,9 +155,9 @@ namespace Root_WIND2
 
             m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
 
-
-            viewer.p_ROI_VM = new MaskTool_ViewModel(m_Image, dialogService);
-            panel.DataContext = viewer.p_ROI_VM;
+            //test용
+            //viewer.p_ROI_VM = new MaskTool_ViewModel(m_Image, dialogService);
+            //panel.DataContext = viewer.p_ROI_VM;
 
             m_RecipeMGR = new RecipeManager();
             m_Recipe = m_RecipeMGR.GetRecipe();
