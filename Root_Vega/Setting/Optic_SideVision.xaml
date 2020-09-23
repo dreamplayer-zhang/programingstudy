@@ -159,7 +159,6 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="False"
-                                    Command="{Binding GrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -173,8 +172,8 @@
                                 </Button.Content>
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
-                                    IsEnabled="False"
-                                    Command="{Binding ContinousGrabCommand}"
+                                    IsEnabled="{Binding p_CamInfo.p_eState,Converter={StaticResource CameraCanGrabConverters}}"
+                                    Command="{Binding LiveGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -188,7 +187,8 @@
                                 </Button.Content>
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
-                                    IsEnabled="False"
+                                    IsEnabled="{Binding p_CamInfo.p_eState,Converter={StaticResource CameraCanNotGrabConverters}}"
+                                    Command="{Binding StopGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -333,7 +333,8 @@
                                 </Button.Content>
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
-                                    IsEnabled="False"
+                                    IsEnabled="{Binding p_CamInfo.p_eState,Converter={StaticResource CameraCanGrabConverters}}"
+                                    Command="{Binding LiveGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -347,7 +348,8 @@
                                 </Button.Content>
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
-                                    IsEnabled="False"
+                                    IsEnabled="{Binding p_CamInfo.p_eState,Converter={StaticResource CameraCanNotGrabConverters}}"
+                                    Command="{Binding StopGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">

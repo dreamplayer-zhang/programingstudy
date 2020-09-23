@@ -522,6 +522,21 @@ namespace RootTools.Camera.Dalsa
             }
         }
 
+        public RelayCommand StopGrabCommand
+        {
+            get
+            {
+                return new RelayCommand(delegate
+                {
+                    if (p_CamInfo.p_eState == eCamState.GrabLive)
+                    {
+                        m_sapXfer.Freeze();
+                        p_CamInfo.p_eState = eCamState.Ready;
+                    }
+                });
+            }
+        }
+
         public RelayCommand TestCommand
         {
             get
@@ -586,6 +601,51 @@ namespace RootTools.Camera.Dalsa
         #endregion
     }
 
+    public class CameraCanGrabConverter : IValueConverter
+    {
+        #region IValueConverter Members
+        public object Convert(object value, Type targetType, object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            eCamState state = (eCamState)value;
+            switch (state)
+            {
+                case eCamState.GrabLive:
+                    return false;
+                default:
+                    return true;
+            }
+        }
 
-    
+        public object ConvertBack(object value, Type targetType, object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+        #endregion
+    }
+
+    public class CameraCanNotGrabConverter : IValueConverter
+    {
+        #region IValueConverter Members
+        public object Convert(object value, Type targetType, object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            eCamState state = (eCamState)value;
+            switch (state)
+            {
+                case eCamState.GrabLive:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+        #endregion
+    }
 }

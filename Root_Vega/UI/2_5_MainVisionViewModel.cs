@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+//using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -566,7 +567,6 @@ namespace Root_Vega
 		System.Drawing.PointF AffineTransform(System.Drawing.PointF ptSrc, float[] Coef)
 		{
 			System.Drawing.PointF ptRst = new System.Drawing.PointF();
-
 			ptRst.X = RoundingUp((float)(ptSrc.X * Coef[0] + ptSrc.Y * Coef[1] + Coef[2]));
 			ptRst.Y = RoundingUp((float)(ptSrc.X * Coef[3] + ptSrc.Y * Coef[4] + Coef[5]));
 			return ptRst;
@@ -895,7 +895,7 @@ namespace Root_Vega
 					var featureArea = p_AlignFeatureDrawer.m_ListRect[i];
 					var featureRect = new CRect(featureArea.StartPos, featureArea.EndPos);
 					var featureImageArr = p_ImageViewer.p_ImageData.GetRectByteArray(featureRect);
-					var targetName = string.Format("{0}_Ref_{1}.bmp", SelectedROI.Name, i);
+					var targetName = string.Format("{0}_Align_{1}.bmp", SelectedROI.Name, i);
 					//TODO 이상하게 구현함. 나중에 수정 필요
 					Emgu.CV.Image<Gray, byte> temp = new Emgu.CV.Image<Gray, byte>(featureRect.Width, featureRect.Height);
 					temp.Bytes = featureImageArr;
@@ -924,14 +924,15 @@ namespace Root_Vega
 				Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
 				var laplaceFeature = featureImage.Laplace(1);
 
-				CRect targetRect = new CRect(
-					new Point(align.RoiRect.Center().X - align.FeatureFindArea / 2.0, align.RoiRect.Center().Y - align.FeatureFindArea / 2.0),
-					new Point(align.RoiRect.Center().X + align.FeatureFindArea / 2.0, align.RoiRect.Center().Y + align.FeatureFindArea / 2.0));
+				CPoint ptCenter = align.RoiRect.Center();
+				Point ptStart = new Point(align.RoiRect.Center().X - align.FeatureFindArea / 2.0, align.RoiRect.Center().Y - align.FeatureFindArea / 2.0);
+				Point ptEnd = new Point(align.RoiRect.Center().X + align.FeatureFindArea / 2.0, align.RoiRect.Center().Y + align.FeatureFindArea / 2.0);
+				CRect targetRect = new CRect(ptStart, ptEnd);
 				Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImage(targetRect));
 				var laplaceSource = sourceImage.Laplace(1);
 
 				var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
-
+				
 				int widthDiff = laplaceSource.Width - resultImage.Width;
 				int heightDiff = laplaceSource.Height - resultImage.Height;
 
@@ -941,87 +942,33 @@ namespace Root_Vega
 
 				bool foundFeature = false;
 				float maxScore = float.MinValue;
+
+				for (int x = 0; x < matches.GetLength(1); x++)
+				{
+					for (int y = 0; y < matches.GetLength(0); y++)
+					{
+						if (maxScore < matches[y, x, 0] && align.FeatureTargetScore <= matches[y, x, 0])
+						{
+							maxScore = matches[y, x, 0];
+							maxRelativePoint.X = x;
+							maxRelativePoint.Y = y;
+							foundFeature = true;
+						}
+						//matches[y, x, 0] *= 256;
+					}
+				}
+				if (foundFeature)
+				{
+					//2. feature 중심위치가 확보되면 해당 좌표를 저장
+					CPoint tempPos = new CPoint();
+					tempPos.X = targetRect.Left + (int)maxRelativePoint.X + widthDiff / 2;
+					tempPos.Y = targetRect.Top + (int)maxRelativePoint.Y + heightDiff / 2;
+					DrawCross(new DPoint(tempPos.X, tempPos.Y), MBrushes.Crimson);
+					alignKeyList.Add(tempPos);
+				}
 			}
 
-			//for (int k = 0; k < p_PatternRoiList.Count; k++)
-			//{
-			//	var currentRoi = p_PatternRoiList[k];
-			//	//ROI 개수만큼 회전하면서 검사영역을 생성한다
-			//	for (int j = 0; j < currentRoi.Strip.ParameterList.Count; j++)
-			//	{
-			//		//검사영역 생성 기준
-			//		//1. 등록된 feature를 탐색한다. 지정된 score에 부합하는 feature가 없을 경우 2차, 3차로 넘어갈 수도 있다. 
-			//		//1.1. 만약 등록된 Feature가 없는 경우 기준 위치는 0,0으로한다
-			//		CPoint standardPos = new CPoint(0, 0);
-			//		int refStartXOffset = 0;
-			//		int refStartYOffset = 0;
 
-			//		List<CPoint> alignKeyList = new List<CPoint>();
-
-			//		if (currentRoi.Position.AlignList.Count == 3)
-			//		{
-			//			for (int n = 0; n < 3; n++)
-			//			{
-			//				//TODO : Reference와 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
-			//				var align = currentRoi.Position.AlignList[n];
-			//				var bmp = align.m_Feature.GetRectImage(new CRect(0, 0, align.m_Feature.p_Size.X, align.m_Feature.p_Size.Y));
-			//				Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
-			//				var laplaceFeature = featureImage.Laplace(1);
-
-			//				CRect targetRect = new CRect(
-			//					new Point(align.RoiRect.Center().X - align.FeatureFindArea / 2.0, align.RoiRect.Center().Y - align.FeatureFindArea / 2.0),
-			//					new Point(align.RoiRect.Center().X + align.FeatureFindArea / 2.0, align.RoiRect.Center().Y + align.FeatureFindArea / 2.0));
-			//				Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImage(targetRect));
-			//				var laplaceSource = sourceImage.Laplace(1);
-
-			//				var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
-
-			//				int widthDiff = laplaceSource.Width - resultImage.Width;
-			//				int heightDiff = laplaceSource.Height - resultImage.Height;
-
-			//				float[,,] matches = resultImage.Data;
-
-			//				Point maxRelativePoint = new Point();//상대위치
-
-			//				bool foundFeature = false;
-			//				float maxScore = float.MinValue;
-
-			//				for (int x = 0; x < matches.GetLength(1); x++)
-			//				{
-			//					for (int y = 0; y < matches.GetLength(0); y++)
-			//					{
-			//						if (maxScore < matches[y, x, 0] && align.FeatureTargetScore <= matches[y, x, 0])
-			//						{
-			//							maxScore = matches[y, x, 0];
-			//							maxRelativePoint.X = x;
-			//							maxRelativePoint.Y = y;
-			//							foundFeature = true;
-			//						}
-			//						//matches[y, x, 0] *= 256;
-			//					}
-			//				}
-			//				if (foundFeature)
-			//				{
-			//					//2. feature 중심위치가 확보되면 해당 좌표를 저장
-			//					CPoint tempPos = new CPoint();
-			//					tempPos.X = targetRect.Left + (int)maxRelativePoint.X + widthDiff / 2;
-			//					tempPos.Y = targetRect.Top + (int)maxRelativePoint.Y + heightDiff / 2;
-			//					DrawCross(new DPoint(tempPos.X, tempPos.Y), MBrushes.Crimson);
-			//					alignKeyList.Add(tempPos);
-			//				}
-			//			}
-			//		}
-			//		//TODO : 회전보정은 나중에하기
-			//		if (alignKeyList.Count != 2)
-			//		{
-			//			//align 실패. 에러를 띄우거나 회전 좌표 보정을 하지 않음
-			//		}
-			//		else
-			//		{
-			//			//align 탐색 성공. 좌표 보정 계산 시작
-			//		}
-			//	}
-			//}
 		}
 
 		#region Command
