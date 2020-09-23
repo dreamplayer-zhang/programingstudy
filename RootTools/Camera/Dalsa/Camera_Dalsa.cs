@@ -517,7 +517,9 @@ namespace RootTools.Camera.Dalsa
                             p_CamInfo.p_eState = eCamState.Ready;
                         }
                         else
-                            GrabArea();
+                        {
+                            if (m_sapXfer != null) GrabArea();
+                        }
                     });
             }
         }
