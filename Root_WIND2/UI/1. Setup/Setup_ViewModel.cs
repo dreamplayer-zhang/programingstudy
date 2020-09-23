@@ -151,6 +151,13 @@ namespace Root_WIND2
 
         }
 
+        private void InitEvent()
+        {
+            m_InspectionManager.MapStateChanged +=
+            m_InspTest.
+        }
+
+
         #region Navi Buttons
 
         // SetupHome Navi Buttons

@@ -172,6 +172,7 @@ namespace Root_WIND2
 
             // Inspction Manager
             m_InspectionManager = new WIND2_InspectionManager(m_Image.GetPtr(), m_Image.p_Size.X, m_Image.p_Size.Y);
+            m_InspectionManager.Recipe = m_Recipe;
 
             m_engineer.InspectionManager = m_InspectionManager; 
 
@@ -201,7 +202,7 @@ namespace Root_WIND2
         void InitUI()
         {
             m_Setup = new Setup();
-            m_SetupViewModel = new Setup_ViewModel(this, m_Recipe);
+            m_SetupViewModel = new Setup_ViewModel(this, m_Recipe, m_InspectionManager);
             m_Setup.DataContext = m_SetupViewModel;
             //((Setup_ViewModel)m_Setup.DataContext).init(this);
             //m_SetupViewModel = (Setup_ViewModel)m_Setup.DataContext;

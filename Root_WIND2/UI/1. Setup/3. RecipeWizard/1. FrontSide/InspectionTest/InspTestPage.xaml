@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2" 
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision" 
              xmlns:RootVision ="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              mc:Ignorable="d" 
              d:DesignHeight="838" d:DesignWidth="1912"
@@ -24,10 +25,9 @@
                                           Background="{StaticResource GroupBoxBackground}"
                                           Header="Image View">
                                 <Grid Background="Black">
-                                    <tools:RootViewer DataContext="{Binding p_ROOT_VM}"/>
+                                    <tools:RootViewer DataContext="{Binding p_DrawTool_VM}"/>
                                 </Grid>
                             </GroupBox>
-
                         </Grid>
                         <Grid Grid.Column="1">
                             <Grid.RowDefinitions>
@@ -89,7 +89,8 @@
                                           BorderThickness="1"
                                           Header="Map">
                                 <!--RootVision:MapViewer x:Name="mapViewer"></-->
-                                <Image Source="/Root_WIND2;component/Resources/WaferMap.PNG"/>
+                                <!--<Image Source="/Root_WIND2;component/Resources/WaferMap.PNG"/>-->
+                                <vision:MapViewer DataContext="{Binding p_MapViewer_VM}"></vision:MapViewer>
                             </GroupBox>
                         </Grid>
 
