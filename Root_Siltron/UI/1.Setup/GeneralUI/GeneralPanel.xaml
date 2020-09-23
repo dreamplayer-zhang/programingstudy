@@ -16,22 +16,22 @@
             <Grid>
                 <StackPanel>
                     <Button Content="General Summary"
-                            Style="{StaticResource SetupPanelBtn}"
+                            Style="{StaticResource PanelBtn}"
                             Command="{Binding btnGeneralSummary}"/>
                     <Button Content="Align Recipe"
                             Command="{Binding btnGeneralAlginRecipe}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Mask"
                             Command="{Binding btnGeneralMask}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="General Setup"
                             Command="{Binding btnGeneralSetup}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                 </StackPanel>
                 <Button Content="Back"
                         Command="{Binding btnGeneralBack}"
                         VerticalAlignment="Bottom"
-                        Style="{StaticResource SetupPanelBtn}"/>
+                        Style="{StaticResource PanelBtn}"/>
             </Grid>
         </Border>
         <Grid Grid.Column="1" x:Name="SubPanel">

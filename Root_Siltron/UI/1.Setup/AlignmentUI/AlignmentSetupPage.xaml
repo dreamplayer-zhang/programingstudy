@@ -269,20 +269,20 @@
                             Width="170"
                             Height="35"
                             Margin="0"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Snap"
                             HorizontalAlignment="Right"
                             Width="170"
                             Height="35"
                             Margin="10,0,2,0"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                 </StackPanel>
                 <Grid Grid.Column="1">
                     <Button Content="Add Alignment Group"
                             HorizontalAlignment="Right"
                             Width="200"
                             Height="35"
-                            Style="{StaticResource SetupPanelBtn}"
+                            Style="{StaticResource PanelBtn}"
                             Margin="10,0,2,0"/>
                 </Grid>
             </Grid>
