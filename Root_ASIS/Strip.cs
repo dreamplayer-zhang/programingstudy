@@ -18,13 +18,18 @@ namespace Root_ASIS
             set { m_strip.p_bUsePaper = value; }
         }
 
+        public static bool p_bUseCleanBlow
+        {
+            get { return m_strip.p_bUseCleanBlow; }
+            set { m_strip.p_bUseCleanBlow = value; }
+        }
+
         public static RPoint m_szStripTeach = new RPoint();
         public static RPoint p_szStrip
         {
             get { return m_strip.p_szStrip; }
             set { m_strip.p_szStrip = value; }
         }
-
     }
 
     public class _Strip : NotifyProperty
@@ -50,6 +55,18 @@ namespace Root_ASIS
                 if (_bUsePaper == value) return;
                 _bUsePaper = value;
                 OnPropertyChanged();
+            }
+        }
+
+        bool _bUseCleanBlow = true;
+        public bool p_bUseCleanBlow
+        {
+            get { return _bUseCleanBlow; }
+            set
+            {
+                if (_bUseCleanBlow == value) return;
+                _bUseCleanBlow = value;
+                OnPropertyChanged(); 
             }
         }
 

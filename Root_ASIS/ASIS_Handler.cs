@@ -37,6 +37,7 @@ namespace Root_ASIS
         public Loader1 m_loader1;
         public Turnover m_turnover;
         public Loader2 m_loader2;
+        public Cleaner[] m_cleaner = new Cleaner[2]; 
 
         void InitModule()
         {
@@ -57,6 +58,10 @@ namespace Root_ASIS
             InitModule(m_loader2);
             m_aBoat[1] = new Boat("Boat1", 1, m_engineer);
             InitModule(m_aBoat[1]);
+            m_cleaner[0] = new Cleaner("Cleaner0", 0, m_engineer);
+            InitModule(m_cleaner[0]);
+            m_cleaner[1] = new Cleaner("Cleaner1", 1, m_engineer);
+            InitModule(m_cleaner[1]);
             m_recipe = new ASIS_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
             m_process = new ASIS_Process("Process", m_engineer, this);
