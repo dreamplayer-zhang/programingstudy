@@ -14,7 +14,7 @@ namespace Root_WIND2
 
         public FrontSidePanel Main;
         public FrontSummaryPage Summary;
-
+        public FrontSideMapPage Map;
         public FrontSide_ViewModel(Setup_ViewModel setup)
         {
             init();
@@ -32,6 +32,16 @@ namespace Root_WIND2
         }
 
         public ICommand btnFrontSummary
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(Summary);
+                });
+            }
+        }
+        public ICommand btnFrontMap
         {
             get
             {

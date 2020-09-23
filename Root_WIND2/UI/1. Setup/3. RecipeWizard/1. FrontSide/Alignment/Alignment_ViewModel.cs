@@ -49,7 +49,7 @@ namespace Root_WIND2
         public AlignmentOriginPage Origin;
         public AlignmentSetupPage Setup;
         public AlignmentPositionPage Position;
-        public AlignmentMapPage Map;
+        public FrontSideMapPage Map;
         #endregion
 
         public Recipe m_Recipe;
@@ -76,7 +76,7 @@ namespace Root_WIND2
             Origin = new AlignmentOriginPage();
             p_Origin_VM = new Origin_ViewModel();
             Position = new AlignmentPositionPage();
-            Map = new AlignmentMapPage();
+            Map = new FrontSideMapPage();
             SetPage(Summary);
 
         }

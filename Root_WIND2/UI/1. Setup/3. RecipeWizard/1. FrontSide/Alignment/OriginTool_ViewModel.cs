@@ -135,7 +135,6 @@ namespace Root_WIND2
         public OriginTool_ViewModel(Recipe _Recipe, ImageData image = null, IDialogService dialogService = null)
         {
             base.init(image, dialogService);
-
             m_Recipe = _Recipe;
             //m_RecipeData_Origin = _Recipe.GetRecipeData().m_ReicpeData_Origin;
             m_RecipeData_Origin = _Recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;

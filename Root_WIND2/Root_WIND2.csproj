@@ -177,8 +177,8 @@
     </Compile>
     <Compile Include="MVVM\Converter.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\General\General_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\AlignmentMapPage.xaml.cs">
-      <DependentUpon>AlignmentMapPage.xaml</DependentUpon>
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\FrontSideMapPage.xaml.cs">
+      <DependentUpon>FrontSideMapPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\Button\NaviBtn.xaml.cs">
       <DependentUpon>NaviBtn.xaml</DependentUpon>
@@ -317,7 +317,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\AlignmentMapPage.xaml">
+    <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Alignment\FrontSideMapPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

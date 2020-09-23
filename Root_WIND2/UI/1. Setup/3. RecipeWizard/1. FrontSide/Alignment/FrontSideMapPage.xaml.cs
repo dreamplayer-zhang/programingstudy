@@ -18,9 +18,9 @@ namespace Root_WIND2
     /// <summary>
     /// AlignmentMapPage.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class AlignmentMapPage : UserControl
+    public partial class FrontSideMapPage : UserControl
     {
-        public AlignmentMapPage()
+        public FrontSideMapPage()
         {
             InitializeComponent();
         }
