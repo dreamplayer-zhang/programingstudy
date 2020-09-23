@@ -282,7 +282,8 @@ namespace Root_ASIS.Module
 
         public void Reset()
         {
-            m_dioDown.Write(false); 
+            m_dioDown.Write(false);
+            if (m_dioVacuum.p_bIn == false) p_infoStrip = null; 
         }
 
         string m_sRun = "";

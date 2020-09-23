@@ -35,7 +35,8 @@ namespace Root_ASIS
         public Loader0 m_loader0; 
         public Boat[] m_aBoat = new Boat[2];
         public Loader1 m_loader1;
-        public Turnover m_turnover; 
+        public Turnover m_turnover;
+        public Loader2 m_loader2;
 
         void InitModule()
         {
@@ -52,6 +53,8 @@ namespace Root_ASIS
             InitModule(m_loader1);
             m_turnover = new Turnover("Turnover", m_engineer);
             InitModule(m_turnover);
+            m_loader2 = new Loader2("Loader2", m_engineer, m_loader1, m_turnover, m_aBoat[0]);
+            InitModule(m_loader2);
             m_aBoat[1] = new Boat("Boat1", 1, m_engineer);
             InitModule(m_aBoat[1]);
             m_recipe = new ASIS_Recipe("Recipe", m_engineer);

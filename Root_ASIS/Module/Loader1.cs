@@ -52,7 +52,7 @@ namespace Root_ASIS.Module
         #region Axis
         public enum ePos
         {
-            Boat,
+            Boat0,
             Turnover
         }
         void InitPosition()
@@ -71,12 +71,12 @@ namespace Root_ASIS.Module
         #region RunLoad
         public string RunLoad()
         {
-            if (m_boat.p_bDone == false) return "Boat0 not Done";
+            if (m_boat0.p_bDone == false) return "Boat0 not Done";
             if (m_picker.m_bLoad) return "Picker already Load"; 
-            if (Run(AxisMove(ePos.Boat))) return p_sInfo;
+            if (Run(AxisMove(ePos.Boat0))) return p_sInfo;
             if (Run(m_picker.RunLoad(null))) return p_sInfo;
-            m_picker.p_infoStrip = m_boat.p_infoStrip;
-            m_boat.p_infoStrip = null; 
+            m_picker.p_infoStrip = m_boat0.p_infoStrip;
+            m_boat0.p_infoStrip = null; 
             return "OK";
         }
         #endregion
@@ -84,14 +84,18 @@ namespace Root_ASIS.Module
         #region RunUnload
         public string RunUnload()
         {
-            if (m_turnover.p_infoStrip0 != null) return "Turnover is not Ready";
-            if (m_picker.m_bLoad == false) return "Picker has no Strip"; 
-            if (Run(AxisMove(ePos.Turnover))) return p_sInfo;
-            if (Run(m_picker.RunUnload())) return p_sInfo;
-            if (Run(AxisMove(ePos.Boat))) return p_sInfo;
-            m_turnover.p_infoStrip0 = m_picker.p_infoStrip;
-            m_picker.p_infoStrip = null;
-            return "OK";
+            try
+            {
+                if (m_turnover.p_infoStrip0 != null) return "Turnover is not Ready";
+                if (m_picker.m_bLoad == false) return "Picker has no Strip";
+                if (Run(AxisMove(ePos.Turnover))) return p_sInfo;
+                if (Run(m_picker.RunUnload())) return p_sInfo;
+                if (Run(AxisMove(ePos.Boat0))) return p_sInfo;
+                m_turnover.p_infoStrip0 = m_picker.p_infoStrip;
+                m_picker.p_infoStrip = null;
+                return "OK";
+            }
+            finally { AxisMove(ePos.Boat0); }
         }
         #endregion
 
@@ -143,7 +147,7 @@ namespace Root_ASIS.Module
             }
             else
             {
-                if (m_boat.p_bDone) StartRun(m_runLoad); 
+                if (m_boat0.p_bDone) StartRun(m_runLoad); 
             }
             return "OK";
         }
@@ -167,17 +171,17 @@ namespace Root_ASIS.Module
                 m_picker.RunUnload();
             }
             m_picker.Reset();
-            AxisMove(ePos.Boat);
+            AxisMove(ePos.Boat0);
             base.Reset();
         }
         #endregion
 
-        Boat m_boat;
+        Boat m_boat0;
         Turnover m_turnover;
-        public Loader1(string id, IEngineer engineer, Boat boat, Turnover turnover)
+        public Loader1(string id, IEngineer engineer, Boat boat0, Turnover turnover)
         {
             m_turnover = turnover;
-            m_boat = boat;
+            m_boat0 = boat0;
             InitPicker();
             base.InitBase(id, engineer);
             InitThreadCheck();
@@ -244,7 +248,7 @@ namespace Root_ASIS.Module
                 InitModuleRun(module);
             }
 
-            public ePos m_ePos = ePos.Boat;
+            public ePos m_ePos = ePos.Boat0;
             public override ModuleRunBase Clone()
             {
                 Run_Move run = new Run_Move(m_module);
@@ -307,8 +311,10 @@ namespace Root_ASIS.Module
                 return run;
             }
 
+            string m_sLoad = "Boat0";
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                tree.Set(m_sLoad, m_sLoad, "Position", "Load from", bVisible, true);
             }
 
             public override string Run()
@@ -332,8 +338,10 @@ namespace Root_ASIS.Module
                 return run;
             }
 
+            string m_sUnoad = "Turnover";
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                tree.Set(m_sUnoad, m_sUnoad, "Position", "Unload to", bVisible, true);
             }
 
             public override string Run()
