@@ -148,7 +148,7 @@ namespace Root_Vega
 			m_Engineer.m_recipe.LoadComplete += () =>
 			{
 				SelectedRecipe = m_Engineer.m_recipe;
-				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
 				StripParamList = new ObservableCollection<StripParamData>();
 
 				_SelectedROI = null;
@@ -968,7 +968,7 @@ namespace Root_Vega
 				}
 			}
 
-
+			p_ImageViewer.p_ImageData.UpdateImage();
 		}
 
 		#region Command
