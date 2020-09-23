@@ -180,6 +180,10 @@ namespace Root_Vega
 			set
 			{
 				SetProperty(ref _p_PatternRoiList, value);
+				if (p_PatternRoiList.Count > 0)
+				{
+					SelectedROI = p_PatternRoiList[0];
+				}
 			}
 		}
 		#endregion
@@ -567,19 +571,9 @@ namespace Root_Vega
 		System.Drawing.PointF AffineTransform(System.Drawing.PointF ptSrc, float[] Coef)
 		{
 			System.Drawing.PointF ptRst = new System.Drawing.PointF();
-			ptRst.X = RoundingUp((float)(ptSrc.X * Coef[0] + ptSrc.Y * Coef[1] + Coef[2]));
-			ptRst.Y = RoundingUp((float)(ptSrc.X * Coef[3] + ptSrc.Y * Coef[4] + Coef[5]));
+			ptRst.X = (int)Math.Ceiling(ptSrc.X * Coef[0] + ptSrc.Y * Coef[1] + Coef[2]);
+			ptRst.Y = (int)Math.Ceiling(ptSrc.X * Coef[3] + ptSrc.Y * Coef[4] + Coef[5]);
 			return ptRst;
-		}
-
-		int RoundingUp(double d)
-		{
-			// 소수점 올림
-			int n = (int)d;
-			if (d > n)
-				return n + 1;
-
-			return n;
 		}
 
 		void _clearInspReslut()
@@ -630,34 +624,34 @@ namespace Root_Vega
 			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
 			for (int k = 0; k < p_PatternRoiList.Count; k++)
 			{
-				var currentRoi = p_PatternRoiList[k];
+				var roiCurrent = p_PatternRoiList[k];
 				//ROI 개수만큼 회전하면서 검사영역을 생성한다
-				for (int j = 0; j < currentRoi.Strip.ParameterList.Count; j++)
+				for (int j = 0; j < roiCurrent.Strip.ParameterList.Count; j++)
 				{
 					//검사영역 생성 기준
 					//1. 등록된 feature를 탐색한다. 지정된 score에 부합하는 feature가 없을 경우 2차, 3차로 넘어갈 수도 있다. 
 					//1.1. 만약 등록된 Feature가 없는 경우 기준 위치는 0,0으로한다
-					CPoint standardPos = new CPoint(0, 0);
-					int refStartXOffset = 0;
-					int refStartYOffset = 0;
+					CPoint cptStandard = new CPoint(0, 0);
+					int nRefStartOffsetX = 0;
+					int nRefStartOffsetY = 0;
 
                     #region Feature
-                    foreach (var feature in currentRoi.Position.ReferenceList)
+                    foreach (var feature in roiCurrent.Position.ReferenceList)
 					{
-						bool foundFeature = false;
-						CRect targetRect;
-						Point maxRelativePoint;
-						int widthDiff, heightDiff;
-						foundFeature = FindFeature(feature, out targetRect, out maxRelativePoint, out widthDiff, out heightDiff);
+						bool bFoundFeature = false;
+						CRect crtSearchArea;
+						Point ptMaxRelative;
+						int nWidthDiff, nHeightDiff;
+						bFoundFeature = FindFeature(feature, out crtSearchArea, out ptMaxRelative, out nWidthDiff, out nHeightDiff);
 
-						if (foundFeature)
+						if (bFoundFeature)
 						{
 							//2. feature 중심위치가 확보되면 해당 좌표를 저장
-							standardPos.X = targetRect.Left + (int)maxRelativePoint.X + widthDiff / 2;
-							standardPos.Y = targetRect.Top + (int)maxRelativePoint.Y + heightDiff / 2;
-							refStartXOffset = feature.PatternDistX;
-							refStartYOffset = feature.PatternDistY;
-							DrawCross(new DPoint(standardPos.X, standardPos.Y), MBrushes.Red);
+							cptStandard.X = crtSearchArea.Left + (int)ptMaxRelative.X + nWidthDiff / 2;
+							cptStandard.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + nHeightDiff / 2;
+							nRefStartOffsetX = feature.PatternDistX;
+							nRefStartOffsetY = feature.PatternDistY;
+							DrawCross(new DPoint(cptStandard.X, cptStandard.Y), MBrushes.Red);
 
 							break;//찾았으니 중단
 						}
@@ -672,12 +666,12 @@ namespace Root_Vega
                     //3. 등록된 Align Key 3개를 탐색한다. feature의 위치 정보도 참조하여 회전 보정 시에 들어갈 값을 준비해둔다
                     List<CPoint> alignKeyList = new List<CPoint>();
 
-					if (currentRoi.Position.AlignList.Count == 3)
+					if (roiCurrent.Position.AlignList.Count == 3)
 					{
 						for (int n = 0; n < 3; n++)
 						{
 							//TODO : Reference와 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
-							var align = currentRoi.Position.AlignList[n];
+							var align = roiCurrent.Position.AlignList[n];
 							var bmp = align.m_Feature.GetRectImage(new CRect(0, 0, align.m_Feature.p_Size.X, align.m_Feature.p_Size.Y));
 							Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
 							var laplaceFeature = featureImage.Laplace(1);
@@ -737,9 +731,9 @@ namespace Root_Vega
                     #endregion
 
                     //4. 저장된 좌표를 기준으로 PatternDistX, PatternDistY만큼 더한다. 이 좌표가 Start Position이 된다
-                    var startPos = new Point(standardPos.X + refStartXOffset, standardPos.Y + refStartYOffset);
+                    var startPos = new Point(cptStandard.X + nRefStartOffsetX, cptStandard.Y + nRefStartOffsetY);
 					//5. Start Position에 InspAreaWidth와 InspAreaHeight만큼 더해준다. 이 좌표가 End Position이 된다
-					var endPos = new Point(startPos.X + (int)currentRoi.Strip.ParameterList[j].InspAreaWidth, startPos.Y + (int)currentRoi.Strip.ParameterList[j].InspAreaHeight);
+					var endPos = new Point(startPos.X + (int)roiCurrent.Strip.ParameterList[j].InspAreaWidth, startPos.Y + (int)roiCurrent.Strip.ParameterList[j].InspAreaHeight);
 					//6. Start Postiion과 End Position, Inspection Offset을 이용하여 검사 영역을 생성한다. 우선은 일괄 생성을 대상으로 한다
 					var inspRect = new CRect(startPos, endPos);
 
@@ -761,65 +755,62 @@ namespace Root_Vega
 
 					int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, k);
 
-					m_Engineer.m_InspManager.SetStandardPos(nDefectCode, standardPos);
+					m_Engineer.m_InspManager.SetStandardPos(nDefectCode, cptStandard);
 
 					MemoryData memory = m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem);
 					IntPtr p = memory.GetPtr(0);
 					m_Engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
 							m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
 							m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
-							inspRect, 500, currentRoi.Strip.ParameterList[j], nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, p);
+							inspRect, 500, roiCurrent.Strip.ParameterList[j], nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, p);
 					//7. Strip검사를 시작한다
 				}
 			}
 			m_Engineer.m_InspManager.StartInspection();//검사 시작!
 		}
 
-		public bool FindFeature(Feature feature, out CRect targetRect, out Point maxRelativePoint, out int widthDiff, out int heightDiff)
+		public bool FindFeature(Feature feature, out CRect crtSearchArea, out Point ptMaxRelative, out int nWidthDiff, out int nHeightDiff)
 		{
 			//TODO : Align과 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
-			var bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
-			Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
-			var laplaceFeature = featureImage.Laplace(1);
-			//laplaceFeature.Save(@"D:\Test\feature.bmp");
+			System.Drawing.Bitmap bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
+			Emgu.CV.Image<Gray, byte> imgFeature = new Emgu.CV.Image<Gray, byte>(bmp);
+			Emgu.CV.Image<Gray, float> imgLaplaceFeature = imgFeature.Laplace(1);
 
-			targetRect = new CRect(
-				new Point(feature.RoiRect.Left - (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Top - (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0),
-				new Point(feature.RoiRect.Right + (feature.FeatureFindArea + feature.RoiRect.Width) / 2.0, feature.RoiRect.Bottom + (feature.FeatureFindArea + feature.RoiRect.Height) / 2.0));
-			Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImagePattern(targetRect));
-			var laplaceSource = sourceImage.Laplace(1);
-			//laplaceSource.Save(@"D:\Test\source.bmp");
+			CPoint cptCenter = feature.RoiRect.Center();
+			Point ptStart = new Point(cptCenter.X - (feature.FeatureFindArea / 2.0), cptCenter.Y - (feature.FeatureFindArea / 2.0));
+			Point ptEnd = new Point(cptCenter.X + (feature.FeatureFindArea / 2.0), cptCenter.Y + (feature.FeatureFindArea / 2.0));
+			crtSearchArea = new CRect(ptStart, ptEnd);
+			Emgu.CV.Image<Gray, byte> imgSrc = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImagePattern(crtSearchArea));
+			Emgu.CV.Image<Gray, float> imgSrcLaplace = imgSrc.Laplace(1);
+			Emgu.CV.Image<Gray, float> imgResult = imgSrcLaplace.MatchTemplate(imgLaplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
 
-			var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
+			nWidthDiff = imgSrcLaplace.Width - imgResult.Width;
+			nHeightDiff = imgSrcLaplace.Height - imgResult.Height;
 
-			widthDiff = laplaceSource.Width - resultImage.Width;
-			heightDiff = laplaceSource.Height - resultImage.Height;
+			float[,,] matches = imgResult.Data;
 
-			float[,,] matches = resultImage.Data;
+			ptMaxRelative = new Point();//상대위치
 
-			maxRelativePoint = new Point();//상대위치
-
-			bool foundFeature = false;
-			float maxScore = float.MinValue;
+			bool bFoundFeature = false;
+			float fMaxScore = float.MinValue;
 
 			for (int x = 0; x < matches.GetLength(1); x++)
 			{
 				for (int y = 0; y < matches.GetLength(0); y++)
 				{
-					if (maxScore < matches[y, x, 0] && feature.FeatureTargetScore <= matches[y, x, 0])
+					if (fMaxScore < matches[y, x, 0] && feature.FeatureTargetScore <= matches[y, x, 0])
 					{
-						maxScore = matches[y, x, 0];
-						maxRelativePoint.X = x;
-						maxRelativePoint.Y = y;
-						foundFeature = true;
+						fMaxScore = matches[y, x, 0];
+						ptMaxRelative.X = x;
+						ptMaxRelative.Y = y;
+						bFoundFeature = true;
 					}
 					//matches[y, x, 0] *= 256;
 				}
 			}
-			resultImage.Data = matches;
-			//resultImage.Save(@"D:\Test\result.bmp");
+			imgResult.Data = matches;
 
-			return foundFeature;
+			return bFoundFeature;
 		}
 
 		public void DrawCross(System.Drawing.Point pt, System.Windows.Media.SolidColorBrush brsColor)
@@ -915,56 +906,29 @@ namespace Root_Vega
 
 		void _FindAlignFeature()
 		{
+			if ((App.m_engineer.m_recipe.Loaded) && (App.m_engineer.m_recipe.VegaRecipeData.RoiList.Count > 0))
+				SelectedROI = App.m_engineer.m_recipe.VegaRecipeData.RoiList[0];
+			else 
+				return;
+
 			Roi roi = SelectedROI;
-			List<CPoint> alignKeyList = new List<CPoint>();
+			List<CPoint> lstAlignKeyCPoint = new List<CPoint>();
 			for (int j = 0; j<roi.Position.AlignList.Count; j++)
 			{
-				var align = roi.Position.AlignList[j];
-				var bmp = align.m_Feature.GetRectImage(new CRect(0, 0, align.m_Feature.p_Size.X, align.m_Feature.p_Size.Y));
-				Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
-				var laplaceFeature = featureImage.Laplace(1);
-
-				CPoint ptCenter = align.RoiRect.Center();
-				Point ptStart = new Point(align.RoiRect.Center().X - align.FeatureFindArea / 2.0, align.RoiRect.Center().Y - align.FeatureFindArea / 2.0);
-				Point ptEnd = new Point(align.RoiRect.Center().X + align.FeatureFindArea / 2.0, align.RoiRect.Center().Y + align.FeatureFindArea / 2.0);
-				CRect targetRect = new CRect(ptStart, ptEnd);
-				Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImage(targetRect));
-				var laplaceSource = sourceImage.Laplace(1);
-
-				var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
-				
-				int widthDiff = laplaceSource.Width - resultImage.Width;
-				int heightDiff = laplaceSource.Height - resultImage.Height;
-
-				float[,,] matches = resultImage.Data;
-
-				Point maxRelativePoint = new Point();//상대위치
-
-				bool foundFeature = false;
-				float maxScore = float.MinValue;
-
-				for (int x = 0; x < matches.GetLength(1); x++)
-				{
-					for (int y = 0; y < matches.GetLength(0); y++)
-					{
-						if (maxScore < matches[y, x, 0] && align.FeatureTargetScore <= matches[y, x, 0])
-						{
-							maxScore = matches[y, x, 0];
-							maxRelativePoint.X = x;
-							maxRelativePoint.Y = y;
-							foundFeature = true;
-						}
-						//matches[y, x, 0] *= 256;
-					}
-				}
-				if (foundFeature)
+				AlignData alignData = roi.Position.AlignList[j];
+				bool bFoundFeature = false;
+				CRect crtSearchArea;
+				Point ptMaxRelative;
+				int nWidthDiff, nHeightDiff;
+				bFoundFeature = FindFeature(alignData, out crtSearchArea, out ptMaxRelative, out nWidthDiff, out nHeightDiff);
+				if (bFoundFeature)
 				{
 					//2. feature 중심위치가 확보되면 해당 좌표를 저장
-					CPoint tempPos = new CPoint();
-					tempPos.X = targetRect.Left + (int)maxRelativePoint.X + widthDiff / 2;
-					tempPos.Y = targetRect.Top + (int)maxRelativePoint.Y + heightDiff / 2;
-					DrawCross(new DPoint(tempPos.X, tempPos.Y), MBrushes.Crimson);
-					alignKeyList.Add(tempPos);
+					CPoint cptTemp = new CPoint();
+					cptTemp.X = crtSearchArea.Left + (int)ptMaxRelative.X + nWidthDiff / 2;
+					cptTemp.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + nHeightDiff / 2;
+					DrawCross(new DPoint(cptTemp.X, cptTemp.Y), MBrushes.Crimson);
+					lstAlignKeyCPoint.Add(cptTemp);
 				}
 			}
 

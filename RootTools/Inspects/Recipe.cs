@@ -886,7 +886,10 @@ namespace RootTools.Inspects
 
 		#endregion
 
-		public Position()
+		#region AlignKeyPointF
+        #endregion
+
+        public Position()
 		{
 			_AlignSnapCount = new Param<int>(4, 0, int.MaxValue);
 			_AlignPositionIndex = new Param<int>(0, 0, int.MaxValue);
