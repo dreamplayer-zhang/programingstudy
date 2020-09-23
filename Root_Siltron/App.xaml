@@ -57,7 +57,7 @@
         <SolidColorBrush x:Key="MainThema" Color="#FF2D2D50"/>
 
         
-        <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
+        <Style TargetType="{x:Type Button}" x:Key="PanelBtn">
             <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="FontWeight" Value="Bold"/>

@@ -91,11 +91,18 @@
     <Compile Include="Button\NaviBtn.xaml.cs">
       <DependentUpon>NaviBtn.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PropertyGrid.cs">
-      <SubType>UserControl</SubType>
+    <Compile Include="Controls\UserControl\DateTimePicker.xaml.cs">
+      <DependentUpon>DateTimePicker.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PropertyGrid.Designer.cs">
-      <DependentUpon>PropertyGrid.cs</DependentUpon>
+    <Compile Include="Controls\Icons\Calendar.xaml.cs">
+      <DependentUpon>Calendar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\UserControl\DefectView.xaml.cs">
+      <DependentUpon>DefectView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Result\Siltron_Result.cs" />
+    <Compile Include="UI\2. Review\Review.xaml.cs">
+      <DependentUpon>Review.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
@@ -105,11 +112,11 @@
     <Compile Include="Engineer\3_Maint.xaml.cs">
       <DependentUpon>3_Maint.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Icon\AtiLogo.xaml.cs">
+    <Compile Include="Controls\Icons\AtiLogo.xaml.cs">
       <DependentUpon>AtiLogo.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InfoWafer.cs" />
-    <Compile Include="IWTRChild.cs" />
+    <Compile Include="Engineer\InfoWafer.cs" />
+    <Compile Include="Engineer\IWTRChild.cs" />
     <Compile Include="Module\Vision.cs" />
     <Compile Include="UI\1.Setup\AlignmentUI\AlginmentOriginPage.xaml.cs">
       <DependentUpon>AlginmentOriginPage.xaml</DependentUpon>
@@ -165,24 +172,35 @@
     <Compile Include="UI\1.Setup\SetupHome.xaml.cs">
       <DependentUpon>SetupHome.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Siltron_Engineer.cs" />
-    <Compile Include="Siltron_Engineer_UI.xaml.cs">
+    <Compile Include="Engineer\Siltron_Engineer.cs" />
+    <Compile Include="Engineer\Siltron_Engineer_UI.xaml.cs">
       <DependentUpon>Siltron_Engineer_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Siltron_Handler.cs" />
-    <Compile Include="Siltron_Handler_UI.xaml.cs">
+    <Compile Include="Engineer\Siltron_Handler.cs" />
+    <Compile Include="Engineer\Siltron_Handler_UI.xaml.cs">
       <DependentUpon>Siltron_Handler_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Siltron_Process.cs" />
-    <Compile Include="Siltron_Process_UI.xaml.cs">
+    <Compile Include="Engineer\Siltron_Process.cs" />
+    <Compile Include="Engineer\Siltron_Process_UI.xaml.cs">
       <DependentUpon>Siltron_Process_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Siltron_Recipe.cs" />
-    <Compile Include="Siltron_Recipe_UI.xaml.cs">
+    <Compile Include="Engineer\Siltron_Recipe.cs" />
+    <Compile Include="Engineer\Siltron_Recipe_UI.xaml.cs">
       <DependentUpon>Siltron_Recipe_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WpfPropertyGrid.cs" />
+    <Compile Include="Controls\UserControl\ViewControl.xaml.cs">
+      <DependentUpon>ViewControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\WpfPropertyGrid.cs" />
     <Page Include="Button\NaviBtn.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\UserControl\DateTimePicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\UserControl\DefectView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -190,9 +208,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Icon\AtiLogo.xaml">
+    <Page Include="Controls\Icons\AtiLogo.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Icons\Calendar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -206,6 +228,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\2. Review\Review.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\SelectMode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -282,19 +308,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Siltron_Engineer_UI.xaml">
+    <Page Include="Engineer\Siltron_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Siltron_Handler_UI.xaml">
+    <Page Include="Engineer\Siltron_Handler_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Siltron_Process_UI.xaml">
+    <Page Include="Engineer\Siltron_Process_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Siltron_Recipe_UI.xaml">
+    <Page Include="Engineer\Siltron_Recipe_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\UserControl\ViewControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -317,9 +347,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="PropertyGrid.resx">
-      <DependentUpon>PropertyGrid.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -350,9 +377,6 @@
   <ItemGroup>
     <Resource Include="Resources\Origin.PNG" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UI\ReviewMode\" />
-    <Folder Include="UI\RunMode\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

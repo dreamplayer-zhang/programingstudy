@@ -18,16 +18,16 @@
                 <Grid>
                     <StackPanel>
                         <Button Content="Start"
-                                Style="{StaticResource SetupPanelBtn}"/>
+                                Style="{StaticResource PanelBtn}"/>
                         <Button Content="Load"
-                                Style="{StaticResource SetupPanelBtn}"/>
+                                Style="{StaticResource PanelBtn}"/>
                         <Button Content="Snap"
-                                Style="{StaticResource SetupPanelBtn}"/>
+                                Style="{StaticResource PanelBtn}"/>
 
                     </StackPanel>
                     <Button Content="Back"
                             Command="{Binding btnInspBack}"
-                            Style="{StaticResource SetupPanelBtn}"
+                            Style="{StaticResource PanelBtn}"
                             VerticalAlignment="Bottom"/>
                 </Grid>
             </Border>

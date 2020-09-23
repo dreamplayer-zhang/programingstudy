@@ -17,18 +17,18 @@
                 <StackPanel>
                     <Button Content="Recipe Summary"
                             Command="{Binding btnWizardSummary}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Alignment"
                             Command="{Binding btnWizardAlignnment}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="General"
                             Command="{Binding btnWizardGeneral}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
 
                 </StackPanel>
                 <Button Content="Back"
                         Command="{Binding btnWizardBack}"
-                        Style="{StaticResource SetupPanelBtn}"
+                        Style="{StaticResource PanelBtn}"
                         VerticalAlignment="Bottom"/>
             </Grid>
         </Border>

@@ -20,7 +20,7 @@
                     <GroupBox Grid.Row="0" Header="Image View"
                               Background="{StaticResource GroupBoxBackground}">
                         <Grid Background="Black">
-                            <Image Source="/Root_Siltron;component/Resources/wafer.PNG"
+                            <Image Source="/Ro ot_Siltron;component/Resources/wafer.PNG"
                                    Stretch="UniformToFill"/>
                             <Canvas>
                                 <Rectangle Canvas.Left="50" Canvas.Top="317"
@@ -95,12 +95,12 @@
                             Width="170"
                             Height="35"
                             Margin="0"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="Set Origin"
                             Width="170"
                             Height="35"
                             Margin="10,0,-1,0"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                 </StackPanel>        
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
@@ -109,13 +109,13 @@
                             Width="170"
                             Height="35"
                             Margin="0,0,0,0"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                     <Button Content="AddMask"
                             HorizontalAlignment="Right"
                             Width="170"
                             Height="35"
                             Margin="10,0,1,0"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource PanelBtn}"/>
                 </StackPanel>
 
             </Grid>
