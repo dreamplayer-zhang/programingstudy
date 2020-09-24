@@ -53,8 +53,6 @@ namespace RootTools.Control
 
         public bool p_bEnableRun { get; set; }
 
-        public void RunDIO()
-        {
-        }
+        public void RunDIO() { }
     }
 }

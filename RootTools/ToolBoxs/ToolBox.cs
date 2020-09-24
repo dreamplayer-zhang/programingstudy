@@ -54,6 +54,24 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
+        public string Get(ref DIO_Is value, ModuleBase module, string id, string[] asDI, bool bLog = true, bool bEnableRun = false)
+        {
+            if (value == null) value = new DIO_Is(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, asDI);
+            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
+            if (sInfo != "OK") return sInfo;
+            for (int n = 0; n < asDI.Length; n++) module.m_listDO.AddBit(value.m_aBitDI[n]);
+            return "OK";
+        }
+
+        public string Get(ref DIO_Is value, ModuleBase module, string id, string sDI, int nCount, bool bLog = true, bool bEnableRun = false)
+        {
+            if (value == null) value = new DIO_Is(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sDI, nCount);
+            string sInfo = value.RunTree(module.m_treeToolBox.GetTree(id));
+            if (sInfo != "OK") return sInfo;
+            for (int n = 0; n < nCount; n++) module.m_listDO.AddBit(value.m_aBitDI[n]);
+            return "OK";
+        }
+
         public string Get(ref DIO_Os value, ModuleBase module, string id, string[] asDO, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_Os(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, asDO);

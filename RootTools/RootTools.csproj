@@ -135,6 +135,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Control\DIO_Is.cs" />
     <Compile Include="crosstest.cs" />
     <Compile Include="ImageToolViewer\BasicTool.cs" />
     <Compile Include="Camera\BaslerPylon\CameraBasler.cs" />
