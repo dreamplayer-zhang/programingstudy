@@ -242,7 +242,8 @@ namespace RootTools
         }
         public CPoint Center()
         {
-            return new CPoint(X, Y);
+            return new CPoint(Left + Width / 2, Top + Height / 2);
+            //return new CPoint(X, Y);
         }
         public override int GetHashCode()
         {

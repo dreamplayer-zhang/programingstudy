@@ -117,6 +117,13 @@ namespace RootTools.Inspects
 					feature.m_Feature = new ImageData(feature.RoiRect.Width, feature.RoiRect.Height);
 					feature.m_Feature.LoadImageSync(imageTargetPath, new CPoint(0, 0));
 				}
+				foreach (var feature in roi.Position.AlignList)
+				{
+					string imageTargetPath = System.IO.Path.Combine(Path.GetDirectoryName(filePath), feature.Name);
+					//TODO : Image 정보를 별도로 넣는 것이 효율적일 것으로 보임
+					feature.m_Feature = new ImageData(feature.RoiRect.Width, feature.RoiRect.Height);
+					feature.m_Feature.LoadImageSync(imageTargetPath, new CPoint(0, 0));
+				}
 			}
 
 			//map data load
@@ -879,7 +886,10 @@ namespace RootTools.Inspects
 
 		#endregion
 
-		public Position()
+		#region AlignKeyPointF
+        #endregion
+
+        public Position()
 		{
 			_AlignSnapCount = new Param<int>(4, 0, int.MaxValue);
 			_AlignPositionIndex = new Param<int>(0, 0, int.MaxValue);
