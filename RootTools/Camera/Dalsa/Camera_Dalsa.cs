@@ -326,6 +326,9 @@ namespace RootTools.Camera.Dalsa
         public string StopGrab()
         {
             m_nGrabCount = 0;
+            p_CamParam.p_eTDIMode = DalsaParameterSet.eTDIMode.Tdi;
+            p_CamParam.p_eTriggerMode = DalsaParameterSet.eTriggerMode.External;
+            m_sapDevice.UpdateFeaturesToDevice();
             m_sapXfer.Freeze();
             return "OK";
         }
@@ -442,6 +445,9 @@ namespace RootTools.Camera.Dalsa
                 m_sapBuf.GetAddress(n, out m_pSapBuf[n]);
             p_CamInfo.p_eState = eCamState.GrabLive;
             m_nGrabTrigger = 0;
+            p_CamParam.p_eTDIMode = DalsaParameterSet.eTDIMode.TdiArea;
+            p_CamParam.p_eTriggerMode = DalsaParameterSet.eTriggerMode.Internal;
+            m_sapDevice.UpdateFeaturesToDevice();
             m_sapXfer.Grab();
             m_GrabThread = new Thread(new ThreadStart(RunGrabAreaScanThread));
             m_GrabThread.Start();
