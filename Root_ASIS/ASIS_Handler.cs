@@ -37,7 +37,8 @@ namespace Root_ASIS
         public Loader1 m_loader1;
         public Turnover m_turnover;
         public Loader2 m_loader2;
-        public Cleaner[] m_cleaner = new Cleaner[2]; 
+        public Loader3 m_loader3;
+        public Dictionary<Cleaner.eCleaner, Cleaner> m_aCleaner = new Dictionary<Cleaner.eCleaner, Cleaner>(); 
 
         void InitModule()
         {
@@ -54,14 +55,16 @@ namespace Root_ASIS
             InitModule(m_loader1);
             m_turnover = new Turnover("Turnover", m_engineer);
             InitModule(m_turnover);
-            m_loader2 = new Loader2("Loader2", m_engineer, m_loader1, m_turnover, m_aBoat[0]);
+            m_loader2 = new Loader2("Loader2", m_engineer, m_loader1, m_turnover, m_aBoat[1]);
             InitModule(m_loader2);
             m_aBoat[1] = new Boat("Boat1", 1, m_engineer);
             InitModule(m_aBoat[1]);
-            m_cleaner[0] = new Cleaner("Cleaner0", 0, m_engineer);
-            InitModule(m_cleaner[0]);
-            m_cleaner[1] = new Cleaner("Cleaner1", 1, m_engineer);
-            InitModule(m_cleaner[1]);
+            m_loader3 = new Loader3("Loader3", m_engineer, m_aBoat[1], m_aCleaner);
+            InitModule(m_loader3);
+            m_aCleaner.Add(Cleaner.eCleaner.Cleaner0, new Cleaner("Cleaner0", 0, m_engineer));
+            InitModule(m_aCleaner[Cleaner.eCleaner.Cleaner0]);
+            m_aCleaner.Add(Cleaner.eCleaner.Cleaner1, new Cleaner("Cleaner1", 1, m_engineer));
+            InitModule(m_aCleaner[Cleaner.eCleaner.Cleaner1]);
             m_recipe = new ASIS_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
             m_process = new ASIS_Process("Process", m_engineer, this);

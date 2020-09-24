@@ -80,6 +80,7 @@
     <Compile Include="Module\Cleaner.cs" />
     <Compile Include="Module\Loader1.cs" />
     <Compile Include="Module\Loader2.cs" />
+    <Compile Include="Module\Loader3.cs" />
     <Compile Include="Module\Turnover.cs" />
     <Compile Include="Strip.cs" />
     <Page Include="ASIS_Engineer_UI.xaml">

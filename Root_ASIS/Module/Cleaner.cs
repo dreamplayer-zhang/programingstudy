@@ -11,6 +11,14 @@ namespace Root_ASIS.Module
 {
     public  class Cleaner : ModuleBase
     {
+        #region eCleaner
+        public enum eCleaner
+        {
+            Cleaner0,
+            Cleaner1
+        }
+        #endregion 
+
         #region ToolBox
         Axis[] m_axis = new Axis[2];
         DIO_I[] m_diSensor = new DIO_I[2];

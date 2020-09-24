@@ -3,11 +3,12 @@ using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_ASIS.Module
 {
-    public class Loader2 : ModuleBase
+    public class Loader3 : ModuleBase
     {
         #region ToolBox
         Axis m_axis;
@@ -32,26 +33,12 @@ namespace Root_ASIS.Module
         }
         #endregion
 
-        #region DIO
-        bool _bEMG = false;
-        public bool p_bEMG
-        {
-            get { return _bEMG; }
-            set
-            {
-                if (_bEMG == value) return;
-                EMGStop("Emergency Sensor Checked");
-                _bEMG = value;
-                OnPropertyChanged();
-            }
-        }
-        #endregion
-
         #region Axis
         public enum ePos
         {
-            Turnover,
             Boat1,
+            Cleaner0,
+            Cleaner1
         }
         void InitPosition()
         {
@@ -61,7 +48,8 @@ namespace Root_ASIS.Module
         string AxisMove(ePos ePos)
         {
             if (m_picker.IsDown()) return "AxisMove Error : Picker Down";
-            if (Run(m_axis.StartMove(ePos))) return p_sInfo;
+            double fOffset = (ePos == ePos.Boat1) ? 0 : (Strip.p_szStrip.X - Strip.m_szStripTeach.X) / 2;
+            if (Run(m_axis.StartMove(ePos, fOffset))) return p_sInfo;
             return m_axis.WaitReady();
         }
         #endregion
@@ -69,31 +57,33 @@ namespace Root_ASIS.Module
         #region RunLoad
         public string RunLoad()
         {
-            try
-            {
-                if (m_turnover.p_infoStrip1 == null) return "Turncver not Done";
-                if (m_picker.m_bLoad) return "Picker already Load";
-                if (Run(AxisMove(ePos.Turnover))) return p_sInfo;
-                if (Run(m_picker.RunLoad(null))) return p_sInfo;
-                if (Run(AxisMove(ePos.Boat1))) return p_sInfo;
-                m_picker.p_infoStrip = m_turnover.p_infoStrip1;
-                m_turnover.p_infoStrip1 = null;
-                return "OK";
-            }
-            finally { AxisMove(ePos.Boat1); }
+            if (m_boat1.p_bDone == false) return "Boat1 not Done";
+            if (m_picker.m_bLoad) return "Picker already Load";
+            if (Run(AxisMove(ePos.Boat1))) return p_sInfo;
+            if (Run(m_picker.RunLoad(null))) return p_sInfo;
+            m_picker.p_infoStrip = m_boat1.p_infoStrip;
+            m_boat1.p_infoStrip = null;
+            return "OK";
         }
         #endregion
 
         #region RunUnload
-        public string RunUnload()
+        public string RunUnload(Cleaner.eCleaner eCleaner)
         {
-            if (m_boat1.p_bReady == false) return "Boat1 is not Ready";
-            if (m_picker.m_bLoad == false) return "Picker has no Strip";
-            if (Run(AxisMove(ePos.Boat1))) return p_sInfo;
-            if (Run(m_picker.RunUnload())) return p_sInfo;
-            m_boat1.p_infoStrip = m_picker.p_infoStrip;
-            m_picker.p_infoStrip = null;
-            return "OK";
+            try
+            {
+                Cleaner cleaner = m_aCleaner[eCleaner]; 
+                if (cleaner.p_infoStrip0 != null) return "Cleaner is not Ready";
+                if (m_picker.m_bLoad == false) return "Picker has no Strip";
+                ePos pos = (eCleaner == Cleaner.eCleaner.Cleaner0) ? ePos.Cleaner0 : ePos.Cleaner1; 
+                if (Run(AxisMove(pos))) return p_sInfo;
+                if (Run(m_picker.RunUnload())) return p_sInfo;
+                if (Run(AxisMove(ePos.Boat1))) return p_sInfo;
+                cleaner.p_infoStrip0 = m_picker.p_infoStrip;
+                m_picker.p_infoStrip = null;
+                return "OK";
+            }
+            finally { AxisMove(ePos.Boat1); }
         }
         #endregion
 
@@ -113,7 +103,6 @@ namespace Root_ASIS.Module
             while (m_bThreadCheck)
             {
                 Thread.Sleep(10);
-                p_bEMG = m_loader1.p_bEMG;
                 switch (m_axis.p_eState)
                 {
                     case Axis.eState.Home:
@@ -141,13 +130,23 @@ namespace Root_ASIS.Module
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (m_picker.m_bLoad)
             {
-                if (m_boat1.p_bReady) StartRun(m_runUnload);
+                if (StartRunUnload(Cleaner.eCleaner.Cleaner0)) return "OK";
+                if (StartRunUnload(Cleaner.eCleaner.Cleaner1)) return "OK";
             }
             else
             {
-                if (m_turnover.p_infoStrip1 != null) StartRun(m_runLoad);
+                if (m_boat1.p_bDone) StartRun(m_runLoad);
             }
             return "OK";
+        }
+
+        bool StartRunUnload(Cleaner.eCleaner eCleaner)
+        {
+            if (m_aCleaner[eCleaner].p_infoStrip0 != null) return false; 
+            Run_Unload run = (Run_Unload)m_runUnload.Clone();
+            run.m_eCleaner = eCleaner;
+            StartRun(run);
+            return true; 
         }
 
         public override void RunTree(Tree tree)
@@ -165,7 +164,7 @@ namespace Root_ASIS.Module
         {
             if (m_picker.m_bLoad)
             {
-                if (Run(AxisMove(ePos.Turnover))) return;
+                if (Run(AxisMove(ePos.Boat1))) return;
                 m_picker.RunUnload();
             }
             m_picker.Reset();
@@ -174,27 +173,19 @@ namespace Root_ASIS.Module
         }
         #endregion
 
-        Loader1 m_loader1; 
         Boat m_boat1;
-        Turnover m_turnover;
-        public Loader2(string id, IEngineer engineer, Loader1 loader1, Turnover turnover, Boat boat1)
+        Dictionary<Cleaner.eCleaner, Cleaner> m_aCleaner; 
+        public Loader3(string id, IEngineer engineer, Boat boat1, Dictionary<Cleaner.eCleaner, Cleaner> aCleaner)
         {
-            m_loader1 = loader1; 
-            m_turnover = turnover;
             m_boat1 = boat1;
+            m_aCleaner = aCleaner; 
             InitPicker();
             base.InitBase(id, engineer);
-            InitThreadCheck();
         }
 
         public override void ThreadStop()
         {
             m_picker.ThreadStop();
-            if (m_bThreadCheck)
-            {
-                m_bThreadCheck = false;
-                m_threadCheck.Join();
-            }
             base.ThreadStop();
         }
 
@@ -204,7 +195,7 @@ namespace Root_ASIS.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
-            AddModuleRunList(new Run_Move(this), false, "Move Loader2");
+            AddModuleRunList(new Run_Move(this), false, "Move Loader3");
             AddModuleRunList(new Run_Picker(this), false, "Run Picker");
             m_runLoad = AddModuleRunList(new Run_Load(this), false, "Run Load");
             m_runUnload = AddModuleRunList(new Run_Unload(this), false, "Run Unload");
@@ -212,8 +203,8 @@ namespace Root_ASIS.Module
 
         public class Run_Delay : ModuleRunBase
         {
-            Loader2 m_module;
-            public Run_Delay(Loader2 module)
+            Loader3 m_module;
+            public Run_Delay(Loader3 module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -241,8 +232,8 @@ namespace Root_ASIS.Module
 
         public class Run_Move : ModuleRunBase
         {
-            Loader2 m_module;
-            public Run_Move(Loader2 module)
+            Loader3 m_module;
+            public Run_Move(Loader3 module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -258,7 +249,7 @@ namespace Root_ASIS.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_ePos = (ePos)tree.Set(m_ePos, m_ePos, "Position", "Loader2 Move Position", bVisible);
+                m_ePos = (ePos)tree.Set(m_ePos, m_ePos, "Position", "Loader3 Move Position", bVisible);
             }
 
             public override string Run()
@@ -269,8 +260,8 @@ namespace Root_ASIS.Module
 
         public class Run_Picker : ModuleRunBase
         {
-            Loader2 m_module;
-            public Run_Picker(Loader2 module)
+            Loader3 m_module;
+            public Run_Picker(Loader3 module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -298,8 +289,8 @@ namespace Root_ASIS.Module
 
         public class Run_Load : ModuleRunBase
         {
-            Loader2 m_module;
-            public Run_Load(Loader2 module)
+            Loader3 m_module;
+            public Run_Load(Loader3 module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -311,10 +302,10 @@ namespace Root_ASIS.Module
                 return run;
             }
 
-            string m_sLoad = "Turnover"; 
+            string m_sLoad = "Boat1";
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                tree.Set(m_sLoad, m_sLoad, "Position", "Load from", bVisible, true); 
+                tree.Set(m_sLoad, m_sLoad, "Position", "Load from", bVisible, true);
             }
 
             public override string Run()
@@ -325,28 +316,29 @@ namespace Root_ASIS.Module
 
         public class Run_Unload : ModuleRunBase
         {
-            Loader2 m_module;
-            public Run_Unload(Loader2 module)
+            Loader3 m_module;
+            public Run_Unload(Loader3 module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
 
+            public Cleaner.eCleaner m_eCleaner = Cleaner.eCleaner.Cleaner0; 
             public override ModuleRunBase Clone()
             {
                 Run_Unload run = new Run_Unload(m_module);
+                run.m_eCleaner = m_eCleaner; 
                 return run;
             }
 
-            string m_sUnoad = "Boat1";
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                tree.Set(m_sUnoad, m_sUnoad, "Position", "Unload to", bVisible, true);
+                m_eCleaner = (Cleaner.eCleaner)tree.Set(m_eCleaner, m_eCleaner, "Position", "Unload to", bVisible, true);
             }
 
             public override string Run()
             {
-                return m_module.RunUnload();
+                return m_module.RunUnload(m_eCleaner);
             }
         }
         #endregion
