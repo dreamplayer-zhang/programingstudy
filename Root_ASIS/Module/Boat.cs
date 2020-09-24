@@ -13,6 +13,14 @@ namespace Root_ASIS.Module
 {
     public class Boat : ModuleBase
     {
+        #region eCleaner
+        public enum eBoat
+        {
+            Boat0,
+            Boat1
+        }
+        #endregion 
+
         #region ToolBox
         Axis m_axis;
         DIO_O m_doVacuum;

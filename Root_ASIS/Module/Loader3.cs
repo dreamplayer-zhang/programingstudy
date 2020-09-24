@@ -333,7 +333,7 @@ namespace Root_ASIS.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eCleaner = (Cleaner.eCleaner)tree.Set(m_eCleaner, m_eCleaner, "Position", "Unload to", bVisible, true);
+                m_eCleaner = (Cleaner.eCleaner)tree.Set(m_eCleaner, m_eCleaner, "Position", "Unload to", bVisible);
             }
 
             public override string Run()
