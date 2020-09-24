@@ -18,6 +18,8 @@
         <Converter:InverseBooleanConverter x:Key="InverseBooleanConverters" />
         <Dalsa:CameraConnectStateConverter x:Key="CameraConnectStateConverters" />
         <Dalsa:CameraNotConnectStateConverter x:Key="CameraNotConnectStateConverters" />
+        <Dalsa:CameraCanGrabConverter x:Key="CameraCanGrabConverters"/>
+        <Dalsa:CameraCanNotGrabConverter x:Key="CameraCanNotGrabConverters"/>
         <Converter:AjinAxisToIAxis x:Key="AjinAxisToIAxiss" />
         <Converter:DictionaryItemKeysConverter x:Key="DictionaryItemKeysConverters" />
         <!--Axis:DictionaryItemGetPosConverter x:Key="DictionaryItemGetPosConverters" /-->
@@ -159,7 +161,6 @@
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
                                     IsEnabled="False"
-                                    Command="{Binding GrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -173,8 +174,8 @@
                                 </Button.Content>
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
-                                    IsEnabled="False"
-                                    Command="{Binding ContinousGrabCommand}"
+                                    IsEnabled="{Binding p_CamInfo.p_eState,Converter={StaticResource CameraCanGrabConverters}}"
+                                    Command="{Binding LiveGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -188,7 +189,8 @@
                                 </Button.Content>
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
-                                    IsEnabled="False"
+                                    IsEnabled="{Binding p_CamInfo.p_eState,Converter={StaticResource CameraCanNotGrabConverters}}"
+                                    Command="{Binding StopGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -333,7 +335,8 @@
                                 </Button.Content>
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
-                                    IsEnabled="False"
+                                    IsEnabled="{Binding p_CamInfo.p_eState,Converter={StaticResource CameraCanGrabConverters}}"
+                                    Command="{Binding LiveGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
@@ -347,7 +350,8 @@
                                 </Button.Content>
                             </Button>
                             <Button Style="{StaticResource BasicBtn}"
-                                    IsEnabled="False"
+                                    IsEnabled="{Binding p_CamInfo.p_eState,Converter={StaticResource CameraCanNotGrabConverters}}"
+                                    Command="{Binding StopGrabCommand}"
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
