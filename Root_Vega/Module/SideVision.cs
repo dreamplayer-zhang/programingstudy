@@ -1610,7 +1610,7 @@ namespace Root_Vega.Module
             public eScanPos m_eScanPos = eScanPos.Bottom;
             public bool m_bFindXPos = false;
 
-            public double m_dFocusHeight = 177.0;
+            public double m_dFocusHeight = 71.3;
             public double m_nVerticalPixelPerPulse = 100;
             public double m_dPixelPerPulse = 387.0967;
 
@@ -1680,7 +1680,7 @@ namespace Root_Vega.Module
                 p_afs.p_strStatus = "Ready";
                 double dLeftHeight = 0;
                 double dRightHeight = 0;
-                //double dCenterHeight = 0;
+                double dCenterHeight = 0;
                 //double dFocusHeight = 177;
                 //int nVerticalPixelPerPulse = 105;
                 double dPulsePerMM = 10000;
@@ -1710,10 +1710,10 @@ namespace Root_Vega.Module
                             return p_sInfo;
                         if (m_module.Run(axisXY.p_axisX.WaitReady()))
                             return p_sInfo;
-                        //if (m_module.Run(axisTheta.StartMove(dPosTheta)))
-                        //    return p_sInfo;
-                        //if (m_module.Run(axisTheta.WaitReady()))
-                        //    return p_sInfo;
+                        if (m_module.Run(axisTheta.StartMove(dPosTheta)))
+                            return p_sInfo;
+                        if (m_module.Run(axisTheta.WaitReady()))
+                            return p_sInfo;
 
                         // 1.Reticle 좌측 위치로 이동
                         p_afs.p_strStatus = "Left Side Snap...";
@@ -1781,6 +1781,44 @@ namespace Root_Vega.Module
                         if (bThetaClockwise) dScaled = -dScaled;
                         m_module.p_axisTheta.StartMove(dActualPos + dScaled);
                         m_module.p_axisTheta.m_aPos["Snap"] = (int)dScaled;
+
+                        // 6. Y축 Center 위치에서 Laser의 높이가 71.3(LineScan카메라 Focus가 맞는 위치)에 맞도록 X위치 찾기
+                        p_afs.p_strStatus = "Center Snap...";
+                        if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, m_rpCenterAxisPos.Y)))) return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        strRet = cam.Grab();
+                        dCenterHeight = CalculatingHeight(img);
+                        System.Drawing.Bitmap bmpCenter = null;
+                        bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                        if (_dispatcher != null)
+                        {
+                            _dispatcher.Invoke(new Action(delegate ()
+                            {
+                                string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
+                                BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
+                                p_bmpSrcCenterViewer = bmpSrc;
+                                p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                            }));
+                        }
+                        m_module.m_dMaxScorePosX = m_rpCenterAxisPos.X + ((dCenterHeight - m_dFocusHeight) * m_dPixelPerPulse);
+
+                        // 6. 찾은 위치로 이동해서 한번 더 촬영
+                        if (m_module.Run(axisXY.StartMove(new RPoint(m_module.m_dMaxScorePosX, m_rpCenterAxisPos.Y)))) return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        strRet = cam.Grab();
+                        dCenterHeight = CalculatingHeight(img);
+                        bmpCenter = null;
+                        bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                        if (_dispatcher != null)
+                        {
+                            _dispatcher.Invoke(new Action(delegate ()
+                            {
+                                string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
+                                BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
+                                p_bmpSrcCenterViewer = bmpSrc;
+                                p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                            }));
+                        }
                     }
                     else
                     {
@@ -1790,52 +1828,6 @@ namespace Root_Vega.Module
                         double dHeight = CalculatingHeight(img);
                         MessageBox.Show(dHeight.ToString());
                     }
-                    
-
-                    //// 4. Theta 돌리기
-                    //double dActualPos = m_module.p_axisTheta.p_posActual;
-                    //double dScaled = dDiff * m_dConstant;    // AutoFocus로 돌아간 Pulse값으로 역계산한 상수 8.1592
-                    //m_module.p_axisTheta.StartMove(dActualPos + dScaled);
-                    //m_module.p_axisTheta.m_aPos["Snap"] = dScaled;
-
-                    //// 5. Y축 Center 위치에서 Laser의 높이가 69(LineScan카메라 Focus가 맞는 위치)에 맞도록 X위치 찾기
-                    //p_afs.p_strStatus = "Center Snap...";
-                    //if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, m_rpCenterAxisPos.Y)))) return p_sInfo;
-                    //if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                    //strRet = cam.Grab();
-                    //dCenterHeight = CalculatingHeight(img);
-                    //img.SaveImageSync($"D:/BottomCenter.bmp");
-                    //System.Drawing.Bitmap bmpCenter = null;
-                    //bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                    //if (_dispatcher != null)
-                    //{
-                    //    _dispatcher.Invoke(new Action(delegate ()
-                    //    {
-                    //        string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
-                    //        BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
-                    //        p_bmpSrcCenterViewer = bmpSrc;
-                    //        p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    //    }));
-                    //}
-                    //m_module.m_dMaxScorePosX = m_rpCenterAxisPos.X + ((dCenterHeight - m_dFocusHeight) * m_nVerticalPixelPerPulse);
-
-                    //// 6. 찾은 위치로 이동해서 한번 더 촬영
-                    //if (m_module.Run(axisXY.StartMove(new RPoint(m_module.m_dMaxScorePosX, m_rpCenterAxisPos.Y)))) return p_sInfo;
-                    //if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                    //strRet = cam.Grab();
-                    //dCenterHeight = CalculatingHeight(img);
-                    //bmpCenter = null;
-                    //bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                    //if (_dispatcher != null)
-                    //{
-                    //    _dispatcher.Invoke(new Action(delegate ()
-                    //    {
-                    //        string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
-                    //        BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
-                    //        p_bmpSrcCenterViewer = bmpSrc;
-                    //        p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                    //    }));
-                    //}
                 }
                 finally
                 {
