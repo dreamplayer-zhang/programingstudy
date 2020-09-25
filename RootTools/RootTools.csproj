@@ -225,6 +225,10 @@
       <DependentUpon>Ajin_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\IControl.cs" />
+    <Compile Include="Printer\SRP350.cs" />
+    <Compile Include="Printer\SRP350_UI.xaml.cs">
+      <DependentUpon>SRP350_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModelHelper\DrawData.cs" />
     <Compile Include="GAFs\ALID.cs" />
     <Compile Include="GAFs\ALIDList.cs" />
@@ -774,6 +778,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Printer\SRP350_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RADS\RADSControl_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -832,6 +840,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Control\ACS\DLL\" />
+    <Folder Include="Printer\DLL\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

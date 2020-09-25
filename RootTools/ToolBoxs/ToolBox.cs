@@ -11,6 +11,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.OHT.Semi;
 using RootTools.OHT.SSEM;
+using RootTools.Printer;
 using RootTools.RADS;
 using RootTools.RTC5s.LaserBright;
 using RootTools.SQLogs;
@@ -387,6 +388,21 @@ namespace RootTools.ToolBoxs
                 module.m_aTool.Add(value);
             }
             return value.GetTools(module);
+        }
+        #endregion
+
+        #region ITool Printer
+        ToolSet m_toolSetPrinter = null;
+        public string Get(ref SRP350 value, ModuleBase module, string id)
+        {
+            if (m_toolSetPrinter == null) m_toolSetPrinter = InitToolSet("Printer");
+            if (value == null)
+            {
+                value = new SRP350(module.p_id + "." + id, module.m_log);
+                m_toolSetPrinter.AddTool(value);
+                module.m_aTool.Add(value);
+            }
+            return "OK"; 
         }
         #endregion
 

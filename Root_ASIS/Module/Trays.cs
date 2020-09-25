@@ -2,6 +2,7 @@
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
+using RootTools.Printer;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace Root_ASIS.Module
         DIO_I m_diFull;
         DIO_I m_diOpen;
         DIO_Is m_diProduct;
+        SRP350 m_srp350; 
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_diFull, this, "Strip Full");
@@ -24,6 +26,7 @@ namespace Root_ASIS.Module
             p_sInfo = m_toolBox.Get(ref m_diProduct, this, "Product Check", "Product", p_lTray);
             m_aLED[0].GetTools(m_toolBox, bInit);
             m_aLED[1].GetTools(m_toolBox, bInit);
+            p_sInfo = m_toolBox.Get(ref m_srp350, this, "Printer"); 
             if (bInit) InitTools();
         }
 
@@ -123,8 +126,8 @@ namespace Root_ASIS.Module
         LED[] m_aLED = new LED[2]; 
         void InitLED()
         {
-            m_aLED[0] = new LED(p_id + ".LED0", this);
-            m_aLED[1] = new LED(p_id + ".LED1", this);
+            m_aLED[0] = new LED("LED0", this);
+            m_aLED[1] = new LED("LED1", this);
         }
 
         ushort[] c_aCRC = new ushort[256]
@@ -224,13 +227,13 @@ namespace Root_ASIS.Module
                 }
             }
 
-            string _sXOut = "Tray"; 
-            public string p_sXOut
+            string _sTray = "Tray"; 
+            public string p_sTray
             {
-                get { return _sXOut; }
+                get { return _sTray; }
                 set
                 {
-                    _sXOut = value;
+                    _sTray = value;
                     OnPropertyChanged(); 
                 }
             }
@@ -257,7 +260,7 @@ namespace Root_ASIS.Module
                 }
                 else
                 {
-                    p_sLED = bProduct ? "CHEK" : p_sXOut.Substring(0, 4); 
+                    p_sLED = bProduct ? "CHEK" : p_sTray.Substring(0, 4); 
                 }
             }
 
@@ -303,6 +306,100 @@ namespace Root_ASIS.Module
         }
         #endregion
 
+        #region Sorting
+        int m_lGood = 3;
+        int[] m_alXout = new int[10] { 0, 2, 2, 1, 1, 1, 1, 1, 1, 1 };
+        int m_lETC = 1;
+        int m_lRework = 1;
+        int m_lError = 1;
+
+        int _nMaxSorting = 50; 
+        public int p_nMaxSorting
+        {
+            get { return _nMaxSorting; }
+            set
+            {
+                if (_nMaxSorting == value) return;
+                _nMaxSorting = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        void RunTreeSorting(Tree tree)
+        {
+
+            RunTreeSortingTray(tree.GetTree("Tray", false));
+        }
+
+        void RunTreeSortingTray(Tree tree)
+        {
+            m_lGood = tree.Set(m_lGood, m_lGood, "Good", "Tray Count");
+            for (int n = 1; n < 10; n++) m_alXout[n] = tree.Set(m_alXout[n], m_alXout[n], "XOut " + n.ToString(), "Tray Count");
+            m_lETC = tree.Set(m_lETC, m_lETC, "ETC", "Tray Count");
+            m_lRework = tree.Set(m_lRework, m_lRework, "Rework", "Tray Count");
+            m_lError = tree.Set(m_lError, m_lError, "Error", "Tray Count");
+        }
+
+        void InitSorting()
+        {
+            int nTray = 0;
+            for (int n = 0; n < m_lGood; n++, nTray++) m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Good);
+            for (int n = 1; n < 10; n++)
+            {
+                for (int i = 0; i < m_alXout[n]; i++, nTray++) m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Xout, n);
+            }
+            int lXout = p_lTray - m_lError - m_lRework - m_lETC; 
+            for (int n = 10; n < lXout; n++, nTray++) m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Xout, n);
+            for (int n = 0; n < m_lETC; n++, nTray++) m_aTray[nTray].p_sTray = c_sEtc;
+            for (int n = 0; n < m_lRework; n++, nTray++) m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Rework);
+            for (int n = 0; n < m_lError; n++, nTray++) m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Error);
+        }
+
+        const string c_sEtc = "Etc "; 
+        string GetTrayName(InfoStrip.eResult eResult, int nXOut = 0)
+        {
+            switch (eResult)
+            {
+                case InfoStrip.eResult.Good: return "Good";
+                case InfoStrip.eResult.Xout: return "X" + nXOut.ToString("000");
+                case InfoStrip.eResult.Rework: return "Rewk";
+                case InfoStrip.eResult.Error: return "Errr"; 
+            }
+            return c_sEtc; 
+        }
+
+        public CPoint GetTrayPosition(InfoStrip infoStip)
+        {
+            CPoint cpTray = new CPoint(0, 0); 
+            string sTray = GetTrayName(infoStip.p_eResult, infoStip.m_nXout);
+            if (GetTrayPosition(sTray, ref cpTray) == "OK") return cpTray;
+            GetTrayPosition(c_sEtc, ref cpTray);
+            return cpTray;
+        }
+
+        string GetTrayPosition(string sTray, ref CPoint cpTray)
+        {
+            for (int n = 0; n < p_lTray; n++)
+            {
+                if (m_aTray[n].p_sTray == sTray)
+                {
+                    cpTray.X = n % p_szTray.X;
+                    cpTray.Y = n / p_szTray.Y; 
+                    if (m_aTray[n].p_nCount < p_nMaxSorting) return "OK"; 
+                }
+            }
+            return "Not found"; 
+        }
+
+        public void AddSort(CPoint cpTray, InfoStrip infoStrip)
+        {
+            int nTray = cpTray.X + cpTray.Y * p_szTray.X;
+            m_aTray[nTray].p_nCount++;
+            if (infoStrip == null) return; 
+            //forget
+        }
+        #endregion
+
         #region Override
         public override string StateReady()
         {
@@ -323,6 +420,7 @@ namespace Root_ASIS.Module
         {
             RunTreeTray(tree.GetTree("Tray", false));
             RunTreeLED(tree.GetTree("LED", false));
+            RunTreeSorting(tree.GetTree("Sorting", false));
         }
 
         public override void Reset()
@@ -332,14 +430,13 @@ namespace Root_ASIS.Module
         #endregion
 
         Registry m_reg;
-        int m_nID = 0;
-        public Trays(string id, int nID, IEngineer engineer)
+        public Trays(string id, IEngineer engineer)
         {
-            m_nID = nID;
             m_reg = new Registry(id);
             InitBoxCount();
             InitLED(); 
             base.InitBase(id, engineer);
+            InitSorting(); 
         }
 
         public override void ThreadStop()

@@ -38,7 +38,8 @@ namespace Root_ASIS
         public Turnover m_turnover;
         public Loader2 m_loader2;
         public Loader3 m_loader3;
-        public Dictionary<Cleaner.eCleaner, Cleaner> m_aCleaner = new Dictionary<Cleaner.eCleaner, Cleaner>(); 
+        public Dictionary<Cleaner.eCleaner, Cleaner> m_aCleaner = new Dictionary<Cleaner.eCleaner, Cleaner>();
+        public Trays m_trays; 
 
         void InitModule()
         {
@@ -57,6 +58,8 @@ namespace Root_ASIS
             InitModule(m_aCleaner[Cleaner.eCleaner.Cleaner0]);
             m_aCleaner.Add(Cleaner.eCleaner.Cleaner1, new Cleaner("Cleaner1", 1, m_engineer));
             InitModule(m_aCleaner[Cleaner.eCleaner.Cleaner1]);
+            m_trays = new Trays("Trays", m_engineer);
+            InitModule(m_trays); 
             m_loader0 = new Loader0("Loader0", m_engineer, m_loadEV, m_aBoat[Boat.eBoat.Boat0]);
             InitModule(m_loader0);
             m_loader1 = new Loader1("Loader1", m_engineer, m_aBoat[Boat.eBoat.Boat0], m_turnover);
