@@ -57,6 +57,13 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Emgu.CV.UI">
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
+    </Reference>
     <Reference Include="MaterialDesignThemes.Wpf, Version=2.5.1.1345, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\MaterialDesignThemes.Wpf.dll</HintPath>
@@ -100,6 +107,7 @@
     <Compile Include="Controls\UserControl\DefectView.xaml.cs">
       <DependentUpon>DefectView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Result\Siltron_Result.cs" />
     <Compile Include="UI\2. Review\Review.xaml.cs">
       <DependentUpon>Review.xaml</DependentUpon>
@@ -379,4 +387,8 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

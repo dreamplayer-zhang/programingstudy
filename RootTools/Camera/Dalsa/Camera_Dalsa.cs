@@ -474,6 +474,8 @@ namespace RootTools.Camera.Dalsa
             }
         }
 
+        public double GetFps() { return 0; }
+
         #region Camera Event
         static void xfer_XferNotify(object sender, SapXferNotifyEventArgs args)
         {
