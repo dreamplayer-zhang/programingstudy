@@ -6,9 +6,11 @@ using RootTools.Printer;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
 using System.Threading;
+using System.Windows.Threading;
 
 namespace Root_ASIS.Module
 {
@@ -211,9 +213,10 @@ namespace Root_ASIS.Module
                 {
                     if (_nCount == value) return; 
                     _nCount = value;
-                    OnPropertyChanged(); 
+                    OnPropertyChanged();
                 }
             }
+            public Count m_count;
 
             bool _bProduct = false; 
             public bool p_bProduct
@@ -237,6 +240,7 @@ namespace Root_ASIS.Module
                     OnPropertyChanged(); 
                 }
             }
+            public int m_nXout = -1; 
 
             string _sLED = "Tray";
             public string p_sLED
@@ -265,7 +269,7 @@ namespace Root_ASIS.Module
             }
 
             public int p_iTray { get; set; }
-            Trays m_trays; 
+            Trays m_trays;
             public Tray(int iTray, Trays trays)
             {
                 p_iTray = iTray; 
@@ -327,7 +331,6 @@ namespace Root_ASIS.Module
 
         void RunTreeSorting(Tree tree)
         {
-
             RunTreeSortingTray(tree.GetTree("Tray", false));
         }
 
@@ -338,18 +341,35 @@ namespace Root_ASIS.Module
             m_lETC = tree.Set(m_lETC, m_lETC, "ETC", "Tray Count");
             m_lRework = tree.Set(m_lRework, m_lRework, "Rework", "Tray Count");
             m_lError = tree.Set(m_lError, m_lError, "Error", "Tray Count");
+            if (tree.IsUpdated())
+            {
+                InitSorting();
+                InitCount();
+            }
         }
 
         void InitSorting()
         {
             int nTray = 0;
-            for (int n = 0; n < m_lGood; n++, nTray++) m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Good);
+            for (int n = 0; n < m_lGood; n++, nTray++)
+            {
+                m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Good);
+                m_aTray[nTray].m_nXout = 0; 
+            }
             for (int n = 1; n < 10; n++)
             {
-                for (int i = 0; i < m_alXout[n]; i++, nTray++) m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Xout, n);
+                for (int i = 0; i < m_alXout[n]; i++, nTray++)
+                {
+                    m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Xout, n);
+                    m_aTray[nTray].m_nXout = n;
+                }
             }
-            int lXout = p_lTray - m_lError - m_lRework - m_lETC; 
-            for (int n = 10; n < lXout; n++, nTray++) m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Xout, n);
+            int lXout = p_lTray - m_lError - m_lRework - m_lETC;
+            for (int n = 10; n < lXout; n++, nTray++)
+            {
+                m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Xout, n);
+                m_aTray[nTray].m_nXout = n;
+            }
             for (int n = 0; n < m_lETC; n++, nTray++) m_aTray[nTray].p_sTray = c_sEtc;
             for (int n = 0; n < m_lRework; n++, nTray++) m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Rework);
             for (int n = 0; n < m_lError; n++, nTray++) m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Error);
@@ -394,9 +414,61 @@ namespace Root_ASIS.Module
         public void AddSort(CPoint cpTray, InfoStrip infoStrip)
         {
             int nTray = cpTray.X + cpTray.Y * p_szTray.X;
+            if (infoStrip == null) return;
             m_aTray[nTray].p_nCount++;
-            if (infoStrip == null) return; 
-            //forget
+            m_aTray[nTray].m_count.p_nCount++; 
+        }
+        #endregion
+
+        #region Count
+        public class Count : NotifyProperty
+        {
+            string _sName = ""; 
+            public string p_sName
+            {
+                get { return _sName; }
+                set
+                {
+                    _sName = value;
+                    OnPropertyChanged(); 
+                }
+            }
+            public int m_nXout = 0; 
+
+            int _nCount = 0;
+            public int p_nCount
+            {
+                get { return _nCount; }
+                set
+                {
+                    _nCount = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            public Count(string sName, int nXout)
+            {
+                p_sName = sName;
+                m_nXout = nXout; 
+                p_nCount = 0; 
+            }
+        }
+        public ObservableCollection<Count> m_aCount = new ObservableCollection<Count>(); 
+        void InitCount()
+        {
+            m_aCount.Clear(); 
+            foreach (Tray tray in m_aTray) tray.m_count = GetCountList(tray);
+        }
+
+        Count GetCountList(Tray tray)
+        {
+            foreach (Count count in m_aCount)
+            {
+                if (count.p_sName == tray.p_sTray) return count; 
+            }
+            Count newCount = new Count(tray.p_sTray, tray.m_nXout); 
+            m_aCount.Add(newCount);
+            return newCount; 
         }
         #endregion
 
@@ -436,7 +508,8 @@ namespace Root_ASIS.Module
             InitBoxCount();
             InitLED(); 
             base.InitBase(id, engineer);
-            InitSorting(); 
+            InitSorting();
+            InitCount(); 
         }
 
         public override void ThreadStop()
