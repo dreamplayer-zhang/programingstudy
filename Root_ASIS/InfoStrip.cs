@@ -28,7 +28,7 @@ namespace Root_ASIS
             }
         }
 
-        public int m_nXout = 1; 
+        public int m_nXout = -1; 
         #endregion
 
         public InfoStrip(int iStrip)
