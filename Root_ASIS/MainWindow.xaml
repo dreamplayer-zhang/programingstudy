@@ -8,7 +8,21 @@
         Loaded="Window_Loaded"
         Closing="Window_Closing"
         Title="ASIS" Height="1000" Width="1800" WindowState="Maximized">
-    <Grid>
-        <local:ASIS_Engineer_UI x:Name="engineerUI"/>
-    </Grid>
+    <Window.Resources>
+        <DataTemplate x:Key="TabItemHeaderTemplate">
+            <ContentPresenter Content="{TemplateBinding Content}" RenderTransformOrigin="0.5,0.5">
+                <ContentPresenter.LayoutTransform>
+                    <RotateTransform Angle="-90"/>
+                </ContentPresenter.LayoutTransform>
+            </ContentPresenter>
+        </DataTemplate>
+    </Window.Resources>
+    <TabControl TabStripPlacement="Left">
+        <TabItem Header=" MainUI " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
+            <local:Main_UI x:Name="mainUI"/>
+        </TabItem>
+        <TabItem Header=" Engineer " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
+            <local:ASIS_Engineer_UI x:Name="engineerUI"/>
+        </TabItem>
+    </TabControl>
 </Window>

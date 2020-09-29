@@ -32,6 +32,7 @@ namespace Root_ASIS
         {
             m_engineer.Init("ASIS");
             engineerUI.Init(m_engineer);
+            mainUI.Init(m_engineer); 
         }
 
         void ThreadStop()

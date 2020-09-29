@@ -15,7 +15,7 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
-        <local:AxisMapping_Handler_UI Grid.Column="0" x:Name="handlerUI"/>
+        <local:ASIS_Handler_UI Grid.Column="0" x:Name="handlerUI"/>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <TabControl Grid.Column="2">
             <TabItem Header="ToolBox" Background="DarkSalmon">

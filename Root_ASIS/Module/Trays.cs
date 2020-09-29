@@ -285,7 +285,7 @@ namespace Root_ASIS.Module
 
         #region Tray Size
         CPoint _szTray = new CPoint(0, 0);
-        CPoint p_szTray
+        public CPoint p_szTray
         {
             get { return _szTray; }
             set
@@ -301,7 +301,7 @@ namespace Root_ASIS.Module
 
         void InitBoxCount()
         {
-            p_szTray = m_reg.Read("szTray", p_szTray);
+            p_szTray = m_reg.Read("szTray", new CPoint(10, 5));
         }
 
         void RunTreeTray(Tree tree)
@@ -364,8 +364,8 @@ namespace Root_ASIS.Module
                     m_aTray[nTray].m_nXout = n;
                 }
             }
-            int lXout = p_lTray - m_lError - m_lRework - m_lETC;
-            for (int n = 10; n < lXout; n++, nTray++)
+            int lXout = p_lTray - nTray - m_lError - m_lRework - m_lETC;
+            for (int n = 0; n < lXout; n++, nTray++)
             {
                 m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Xout, n);
                 m_aTray[nTray].m_nXout = n;

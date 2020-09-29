@@ -77,11 +77,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Main_UI.xaml.cs">
+      <DependentUpon>Main_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\Cleaner.cs" />
     <Compile Include="Module\Loader1.cs" />
     <Compile Include="Module\Loader2.cs" />
     <Compile Include="Module\Loader3.cs" />
     <Compile Include="Module\Trays.cs" />
+    <Compile Include="Module\Trays_Tray_UI.xaml.cs">
+      <DependentUpon>Trays_Tray_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\Trays_UI.xaml.cs">
+      <DependentUpon>Trays_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\Turnover.cs" />
     <Compile Include="Strip.cs" />
     <Page Include="ASIS_Engineer_UI.xaml">
@@ -96,7 +105,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AxisMapping_Handler_UI.xaml">
+    <Page Include="ASIS_Handler_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -121,14 +130,26 @@
     <Compile Include="ASIS_Recipe_UI.xaml.cs">
       <DependentUpon>ASIS_Recipe_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AxisMapping_Handler_UI.xaml.cs">
-      <DependentUpon>AxisMapping_Handler_UI.xaml</DependentUpon>
+    <Compile Include="ASIS_Handler_UI.xaml.cs">
+      <DependentUpon>ASIS_Handler_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoStrip.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Main_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\Trays_Tray_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\Trays_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Module\ASIS.cs" />

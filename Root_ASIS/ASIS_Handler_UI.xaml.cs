@@ -7,9 +7,9 @@ namespace Root_ASIS
     /// <summary>
     /// AxisMapping_Handler_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class AxisMapping_Handler_UI : UserControl
+    public partial class ASIS_Handler_UI : UserControl
     {
-        public AxisMapping_Handler_UI()
+        public ASIS_Handler_UI()
         {
             InitializeComponent();
         }

@@ -12,7 +12,7 @@ namespace Root
     {
         #region Module
         public ModuleList m_moduleList;
-        //public Test m_test;
+        public Test m_test;
         //public ScareCrow m_scarecrow;
         //public Siltron m_siltron;
         //public BayerConvert m_bayer;
@@ -21,8 +21,8 @@ namespace Root
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
-            //m_test = new Test("Test", m_enginner);
-            //InitModule(m_test);
+            m_test = new Test("Test", m_enginner);
+            InitModule(m_test);
             //m_scarecrow =new ScareCrow("ScareCrow", m_enginner);
             //InitModule(m_scarecrow);
             //m_siltron = new Siltron("Siltrion", m_enginner);

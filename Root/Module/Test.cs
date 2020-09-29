@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Microsoft.Win32;
+using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
@@ -6,6 +7,8 @@ using RootTools.Light;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 
 namespace Root.Module
@@ -114,13 +117,143 @@ namespace Root.Module
                 m_bTest = tree.Set(m_bTest, false, "Test", "Run Test or Not", bVisible);
             }
 
+            class Data
+            {
+                string m_sCode;
+                public string m_sStrip;
+                string m_sXout;
+                public string m_sResult = "";
+                public string m_sTray = "";
+
+                public void Write(StreamWriter sw)
+                {
+                    sw.WriteLine(m_sCode + "\t" + m_sXout + "\t" + m_sStrip + "\t" + m_sResult + "\t" + m_sTray);
+                }
+
+                public Data(string sCode, string sStrip, string sXout)
+                {
+                    m_sCode = sCode;
+                    m_sStrip = sStrip;
+                    m_sXout = sXout; 
+                }
+            }
+            List<Data> m_aData = new List<Data>(); 
+
             public override string Run()
             {
                 //m_module.RunTree(Tree.eMode.Init); 
-                m_log.Info(p_id + " : Test Start");
-                Thread.Sleep(2000);
-                m_log.Info(p_id + " : Test End");
+                /*                m_log.Info(p_id + " : Test Start");
+                                Thread.Sleep(2000);
+                                m_log.Info(p_id + " : Test End"); */
+                int s = "[21.15.08] <Teach0AOI> Strip : ".Length;
+                int l = "Q0554510002S 027I".Length; 
+                FileStream fs = null;
+                StreamReader sr = null;
+                try
+                {
+                    fs = new FileStream("c:\\ASISLog\\LOG\\2020-09-27_Edit.Log", FileMode.Open);
+                    sr = new StreamReader(fs);
+                    string sLine = ReadLine(sr); 
+                    while (sLine != null)
+                    {
+                        if (sLine.Contains("Strip : Q0554"))
+                        {
+                            string sCode = sLine.Substring(s, l);
+                            string sStrip = ReadStrip(sr);
+                            string sXout = ReadITS(sCode);
+                            m_aData.Add(new Data(sCode, sStrip, sXout)); 
+                        }
+                        sLine = ReadLine(sr);
+                    }
+                }
+                catch (Exception e)
+                {
+                    int i = 0;
+                }
+                finally
+                {
+                    sr.Close();
+                    fs.Close();
+                }
+                FileStream fw = null;
+                StreamWriter sw = null;
+                try
+                {
+                    fw = new FileStream("c:\\ASISLog\\LOG\\ASIS.txt", FileMode.Create);
+                    sw = new StreamWriter(fw);
+                    foreach (Data data in m_aData) data.Write(sw); 
+                }
+                finally
+                {
+                    sw.Close();
+                    fw.Close();
+                }
                 return "OK";
+            }
+
+            string ReadStrip(StreamReader sr)
+            {
+                string sLine = ReadLine(sr); 
+                if (sLine.Contains("<Teach0> S="))
+                {
+                    string[] asStrip0 = sLine.Split('=');
+                    string[] asStrip1 = asStrip0[1].Split(' ');
+                    return asStrip1[0];
+                }
+                return ReadStrip(sr); 
+            }
+
+            string ReadLine(StreamReader sr)
+            {
+                string sLine = sr.ReadLine();
+                if (sLine == null) return null; 
+                if (sLine.Contains("<Work> Strip :"))
+                {
+                    string[] asLine = sLine.Split(',');
+                    string[] asStrip = asLine[0].Split(' ');
+                    string sStrip = asStrip[asStrip.Length - 1]; 
+                    string[] asXout = asLine[1].Split(' ');
+                    string sXout = asXout[asXout.Length - 1]; 
+                    string[] asTray = asLine[2].Split(' ');
+                    string sTray = asTray[asTray.Length - 1];
+                    for (int n = m_aData.Count - 1; n >= 0; n--)
+                    {
+                        if (m_aData[n].m_sStrip == sStrip)
+                        {
+                            m_aData[n].m_sResult = sXout;
+                            m_aData[n].m_sTray = sTray;
+                            return sLine; 
+                        }
+                    }
+                    Data data = new Data("No ITS", sStrip, "");
+                    data.m_sResult = sXout;
+                    data.m_sTray = sTray;
+                    m_aData.Add(data); 
+                }
+                return sLine; 
+            }
+
+            string ReadITS(string sCode)
+            {
+                int nCount = 0; 
+                FileStream fs = null;
+                StreamReader sr = null;
+                try
+                {
+                    fs = new FileStream("c:\\ASISLog\\ITS-FILE(SERVER)\\Q0554\\Q0554510002S 0\\" + sCode + ".smk", FileMode.Open);
+                    sr = new StreamReader(fs);
+                    for (int n = 0; n < 5; n++)
+                    {
+                        string sLine = sr.ReadLine();
+                        foreach (char ch in sLine) if (ch == '1') nCount++; 
+                    }
+                    return nCount.ToString(); 
+                }
+                finally
+                {
+                    sr.Close();
+                    fs.Close();
+                }
             }
         }
 
