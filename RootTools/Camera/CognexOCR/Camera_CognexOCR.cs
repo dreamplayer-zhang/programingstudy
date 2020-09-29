@@ -245,7 +245,7 @@ namespace RootTools.Camera.CognexOCR
         {
             return null;
         }
-
+        public double GetFps() { return 0; }
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
         public string StopGrab()
         {

@@ -471,7 +471,9 @@ namespace RootTools.Camera.Dalsa
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            SapDispose(); 
+            SapDispose();
         }
+
+        public double GetFps() { return 0; }
     }
 }

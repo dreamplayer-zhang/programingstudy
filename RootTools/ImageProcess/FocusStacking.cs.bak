@@ -9,6 +9,7 @@ using Emgu.CV.CvEnum;
 
 namespace RootTools.ImageProcess
 {
+
 	public class DataInfo
 	{
 		private int m_nScale = 2;
@@ -97,7 +98,6 @@ namespace RootTools.ImageProcess
 		}
 		public Stopwatch sw;
 	}
-
 	public class FocusStacking
 	{
 		static int size = 10;

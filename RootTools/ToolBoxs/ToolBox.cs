@@ -244,9 +244,16 @@ namespace RootTools.ToolBoxs
         {
             if (value == null)
             {
-                InitCameraSet(module);
-                value = new Camera_Basler(module.p_id + "." + id, module.m_log);
-                module.m_cameraSet.Add(value);
+				try
+				{
+                    InitCameraSet(module);
+                    value = new Camera_Basler(module.p_id + "." + id, module.m_log);
+                    module.m_cameraSet.Add(value);
+				}
+                catch (Exception ee)
+				{
+                    MessageBox.Show(ee.ToString());
+                }
             }
             return "OK";
         }

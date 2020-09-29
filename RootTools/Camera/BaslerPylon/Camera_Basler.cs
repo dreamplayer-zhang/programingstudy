@@ -322,11 +322,19 @@ namespace RootTools.Camera.BaslerPylon
         }
 
         public CPoint GetRoiSize()
-
         {
             return new CPoint(Convert.ToInt32(m_CamParam._Width), Convert.ToInt32(m_CamParam._Height));
         }
 
+        public double GetFps()
+        {
+            if (m_cam != null && m_cam.IsOpen)
+            {
+                double d = m_cam.Parameters[PLCamera.ResultingFrameRateAbs].GetValue();
+                return d;
+            }
+            return 1;
+        }
 
         public CPoint p_sz
         {
