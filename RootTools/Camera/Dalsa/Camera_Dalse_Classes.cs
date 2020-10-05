@@ -76,6 +76,18 @@ namespace RootTools.Camera.Dalsa
             Forward,
             Reverse,
         }
+
+        public enum eTDIMode
+        {
+            Tdi,
+            TdiArea,
+        }
+
+        public enum eTriggerMode
+        {
+            Internal,
+            External,
+        }
         
         public Log m_log;
         SapAcqDevice m_sapCam;
@@ -139,6 +151,32 @@ namespace RootTools.Camera.Dalsa
             set
             {
                 SetFeatureValue(ref m_eDir, value, "SensorScanDirection", typeof(string));
+            }
+        }
+
+        eTDIMode m_eTDIMode = eTDIMode.Tdi;
+        public eTDIMode p_eTDIMode
+        {
+            get
+            {
+                return m_eTDIMode;
+            }
+            set
+            {
+                SetFeatureValue(ref m_eTDIMode, value, "sensorTDIModeSelection", typeof(string));
+            }
+        }
+
+        eTriggerMode m_eTriggerMode = eTriggerMode.External;
+        public eTriggerMode p_eTriggerMode
+        {
+            get
+            {
+                return m_eTriggerMode;
+            }
+            set
+            {
+                SetFeatureValue(ref m_eTriggerMode, value, "TriggerMode", typeof(string));
             }
         }
 

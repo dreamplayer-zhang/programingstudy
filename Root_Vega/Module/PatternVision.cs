@@ -1219,5 +1219,77 @@ namespace Root_Vega.Module
             }
         }
         #endregion
+
+        #region VRS Review Image Capture
+        public class Run_VRSReviewImagCapture : ModuleRunBase
+        {
+            PatternVision m_module;
+            public GrabMode m_grabMode = null;
+            string _sGrabMode = "";
+            string p_sGrabMode
+            {
+                get { return _sGrabMode; }
+                set
+                {
+                    _sGrabMode = value;
+                    m_grabMode = m_module.GetGrabMode(value);
+                }
+            }
+
+            public RPoint m_rpReticleCenterPos = new RPoint();  // Pulse
+            public RPoint m_rpDistanceOfTDIToVRS_pulse = new RPoint();      // Pulse
+            public double m_dResY_um = 1;                       // um
+            public double m_dResX_um = 1;                       // um
+            public double m_dReticleSize_mm = 150;              // mm
+
+            public Run_VRSReviewImagCapture(PatternVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_VRSReviewImagCapture run = new Run_VRSReviewImagCapture(m_module);
+                run.p_sGrabMode = p_sGrabMode;
+                run.m_rpReticleCenterPos = m_rpReticleCenterPos;
+                run.m_rpDistanceOfTDIToVRS_pulse = m_rpDistanceOfTDIToVRS_pulse;
+                run.m_dResY_um = m_dResY_um;
+                run.m_dResX_um = m_dResX_um;
+                run.m_dReticleSize_mm = m_dReticleSize_mm;
+                return run;
+            }
+
+            public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+            {
+                treeRoot.p_eMode = mode;
+                RunTree(treeRoot, true);
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_rpReticleCenterPos = tree.Set(m_rpReticleCenterPos, m_rpReticleCenterPos, "Center Axis Position", "Center Axis Position (Pulse)", bVisible);
+                m_rpDistanceOfTDIToVRS_pulse = tree.Set(m_rpDistanceOfTDIToVRS_pulse, m_rpDistanceOfTDIToVRS_pulse, "Distance of TDI Camera to VRS Camera", "Distance of TDI Camera to VRS Camera (Pulse)", bVisible);
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera X Resolution", "Camera X Resolution (um)", bVisible);
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera Y Resolution", "Camera Y Resolution (um)", bVisible);
+                m_dReticleSize_mm = tree.Set(m_dReticleSize_mm, m_dReticleSize_mm, "Reticle Size", "Reticle Size (mm)", bVisible);
+            }
+
+            public override string Run()
+            {
+                // variable
+                AxisXY axisXY = m_module.m_axisXY;
+                Axis axisZ = m_module.m_axisZ;
+                int nMMPerUM = 1000;
+                m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
+                int nLines = Convert.ToInt32(m_dReticleSize_mm * nMMPerUM / m_dResY_um);    // 한 줄 스캔에서 획득할 총 라인의 수
+                int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nLines);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
+
+                // implement
+
+                return "OK";
+            }
+        }
+        #endregion 
     }
 }
