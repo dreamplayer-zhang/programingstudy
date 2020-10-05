@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -1241,7 +1242,7 @@ namespace Root_Vega.Module
             public double m_dResY_um = 1;                       // um
             public double m_dResX_um = 1;                       // um
             public double m_dReticleSize_mm = 150;              // mm
-
+            
             public Run_VRSReviewImagCapture(PatternVision module)
             {
                 m_module = module;
@@ -1280,14 +1281,72 @@ namespace Root_Vega.Module
                 // variable
                 AxisXY axisXY = m_module.m_axisXY;
                 Axis axisZ = m_module.m_axisZ;
-                int nMMPerUM = 1000;
-                m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
-                int nLines = Convert.ToInt32(m_dReticleSize_mm * nMMPerUM / m_dResY_um);    // 한 줄 스캔에서 획득할 총 라인의 수
-                int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nLines);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
+                Camera_Basler cam = m_module.m_CamVRS;
+                ImageData img = cam.p_ImageViewer.p_ImageData;
+                string strVRSImageDirectoryPath = "D:\\VRSImage\\";
+                string strVRSImageFullPath = "";
 
                 // implement
+                List<CPoint> lstDefectPos = GetDefectPosList();
+                for (int i = 0; i<lstDefectPos.Count; i++)
+                {
+                    // Defect 위치로 이동
+                    RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectPos[i]);
+                    if (m_module.Run(axisXY.StartMove(rpDefectPos)))
+                        return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady()))
+                        return p_sInfo;
+
+                    // VRS 촬영 및 저장
+                    string strRet = cam.Grab();
+                    strVRSImageFullPath = string.Format(strVRSImageDirectoryPath + "VRSImage_{0}.bmp", i);
+                    img.SaveImageSync(strVRSImageFullPath);
+                }
 
                 return "OK";
+            }
+
+            List<CPoint> GetDefectPosList()
+            {
+                // variable
+                DBConnector dbConnector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+                List<CPoint> lstDefectPos = new List<CPoint>();
+
+                // implement
+                if (dbConnector.Open())
+                {
+                    DataSet dataSet = dbConnector.GetDataSet("tempdata");
+
+                    foreach (System.Data.DataRow item in dataSet.Tables["tempdata"].Rows)
+                    {
+                        int posX = Convert.ToInt32(item["PosX"]);
+                        int posY = Convert.ToInt32(item["PosY"]);
+                        lstDefectPos.Add(new CPoint(posX, posY));
+                    }
+                }
+
+                return lstDefectPos;
+            }
+
+            RPoint GetAxisPosFromMemoryPos(CPoint cpMemory)
+            {
+                // variable
+                int nMMPerUM = 1000;
+                m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
+                int nReticleYSize_px = Convert.ToInt32(m_dReticleSize_mm * nMMPerUM / m_dResY_um);    // 레티클 영역(150mm -> 150,000um)의 Y픽셀 갯수
+                int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleYSize_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
+                double dTriggerStartPosY = m_rpReticleCenterPos.Y + nTotalTriggerCount / 2;
+                int nScanLine = cpMemory.X / m_grabMode.m_camera.GetRoiSize().X;
+                double dXScale = m_dResX_um * 10;
+                double dTriggerStartPosX = m_rpReticleCenterPos.X + nTotalTriggerCount * (double)m_grabMode.m_dTrigger / 2 - nScanLine * m_grabMode.m_camera.GetRoiSize().X * dXScale;
+                int nSpareX = cpMemory.X % m_grabMode.m_camera.GetRoiSize().X;
+                RPoint rpAxis = new RPoint();
+
+                // implement
+                rpAxis.X = dTriggerStartPosX + (10 * m_dResX_um * nSpareX) + m_rpDistanceOfTDIToVRS_pulse.X;
+                rpAxis.Y = dTriggerStartPosY + (m_grabMode.m_dTrigger * cpMemory.Y) + m_rpDistanceOfTDIToVRS_pulse.Y;
+
+                return rpAxis;
             }
         }
         #endregion 
