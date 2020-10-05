@@ -18,8 +18,8 @@ namespace Root_ASIS
         {
             m_engineer = engineer;
             m_handler = (ASIS_Handler)engineer.ClassHandler();
-            traysUI.DataContext = m_handler.m_trays;
-            traysUI.Init(m_handler.m_trays); 
+            traysUI.Init(m_handler.m_trays);
+            traysCountUI.Init(m_handler.m_trays); 
         }
     }
 }

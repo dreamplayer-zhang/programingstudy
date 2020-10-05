@@ -10,6 +10,7 @@
         <GroupBox.Header>
             <TextBlock Text="{Binding p_sTray}" Foreground="Black" FontWeight="Bold" />
         </GroupBox.Header>
-        <Label Grid.Row="1" Content="{Binding p_nCount}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+        <Label Grid.Row="1" Content="{Binding p_nCount}" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+               PreviewMouseDown="Label_PreviewMouseDown"/>
     </GroupBox>
 </UserControl>

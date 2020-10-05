@@ -211,7 +211,8 @@ namespace Root_ASIS.Module
                 get { return _nCount; }
                 set
                 {
-                    if (_nCount == value) return; 
+                    if (_nCount == value) return;
+                    if ((m_count != null) && (value > _nCount)) m_count.p_nCount += (value - _nCount); 
                     _nCount = value;
                     OnPropertyChanged();
                 }
@@ -280,6 +281,11 @@ namespace Root_ASIS.Module
         void InitTray()
         {
             while (m_aTray.Count < p_lTray) m_aTray.Add(new Tray(m_aTray.Count, this));
+        }
+
+        public void ClearTray()
+        {
+            foreach (Tray tray in m_aTray) tray.p_nCount = 0; 
         }
         #endregion
 
@@ -416,7 +422,6 @@ namespace Root_ASIS.Module
             int nTray = cpTray.X + cpTray.Y * p_szTray.X;
             if (infoStrip == null) return;
             m_aTray[nTray].p_nCount++;
-            m_aTray[nTray].m_count.p_nCount++; 
         }
         #endregion
 
@@ -469,6 +474,11 @@ namespace Root_ASIS.Module
             Count newCount = new Count(tray.p_sTray, tray.m_nXout); 
             m_aCount.Add(newCount);
             return newCount; 
+        }
+
+        public void ClearCount()
+        {
+            foreach (Count count in m_aCount) count.p_nCount = 0; 
         }
         #endregion
 

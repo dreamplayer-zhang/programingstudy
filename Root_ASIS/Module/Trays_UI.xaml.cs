@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using System;
+using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -39,12 +40,13 @@ namespace Root_ASIS.Module
             buttonOpen.Foreground = m_bBlink && m_trays.p_bOpen ? Brushes.Red : Brushes.Green; 
             buttonFull.Foreground = m_bBlink && m_trays.p_bFull ? Brushes.Red : Brushes.Green;
             InitTraysUI();
+            TimerTray(); 
             m_bBlink = !m_bBlink;
         }
         #endregion
 
         #region Tray
-        CPoint m_szTray = new CPoint(0, 0); 
+        CPoint m_szTray = new CPoint(0, 0);
         void InitTraysUI()
         {
             if (m_szTray == m_trays.p_szTray) return;
@@ -66,6 +68,20 @@ namespace Root_ASIS.Module
                 }
             }
         }
+
+        void TimerTray()
+        {
+            foreach (Trays_Tray_UI ui in gridTray.Children)
+            {
+                if (ui.m_tray.p_bProduct) ui.Background = m_bBlink && (ui.m_tray.p_nCount == 0) ? Brushes.Red : Brushes.LightGreen;
+                else ui.Background = m_bBlink && (ui.m_tray.p_nCount > 0) ? Brushes.Purple : Brushes.AliceBlue; 
+            }
+        }
         #endregion
+
+        private void buttonClear_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            m_trays.ClearTray(); 
+        }
     }
 }

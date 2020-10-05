@@ -12,6 +12,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button x:Name="buttonClear" Content=" Clear Tray Count " Margin="3,3,30,3" Click="buttonClear_Click"/>
             <Button x:Name="buttonOpen" Content=" Tray Open " Margin="3"/>
             <Button x:Name="buttonFull" Content=" Tray Full " Margin="3"/>
         </StackPanel>

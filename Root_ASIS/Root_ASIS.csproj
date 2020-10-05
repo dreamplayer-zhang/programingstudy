@@ -85,6 +85,9 @@
     <Compile Include="Module\Loader2.cs" />
     <Compile Include="Module\Loader3.cs" />
     <Compile Include="Module\Trays.cs" />
+    <Compile Include="Module\Trays_Count_UI.xaml.cs">
+      <DependentUpon>Trays_Count_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\Trays_Tray_UI.xaml.cs">
       <DependentUpon>Trays_Tray_UI.xaml</DependentUpon>
     </Compile>
@@ -139,6 +142,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Main_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\Trays_Count_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

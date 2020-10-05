@@ -1,4 +1,4 @@
-﻿using System;
+﻿using RootTools;
 using System.Windows.Controls;
 
 namespace Root_ASIS.Module
@@ -13,11 +13,17 @@ namespace Root_ASIS.Module
             InitializeComponent();
         }
 
-        Trays.Tray m_tray; 
+        public Trays.Tray m_tray; 
         public void Init(Trays.Tray tray)
         {
             m_tray = tray;
             DataContext = tray; 
+        }
+
+        private void Label_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (EQ.p_bSimulate == false) return;
+            m_tray.p_nCount++; 
         }
     }
 }

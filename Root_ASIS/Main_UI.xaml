@@ -13,5 +13,6 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <module:Trays_UI Grid.Column="0" x:Name="traysUI"/>
+        <module:Trays_Count_UI Grid.Column="1" x:Name="traysCountUI"/>
     </Grid>
 </UserControl>
