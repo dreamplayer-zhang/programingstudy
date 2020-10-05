@@ -58,7 +58,7 @@ namespace Root_ASIS.Module
         public string RunLoad()
         {
             if (m_boat1.p_bDone == false) return "Boat1 not Done";
-            if (m_picker.m_bLoad) return "Picker already Load";
+            if (m_picker.p_infoStrip != null) return "Picker already Load";
             if (Run(AxisMove(ePos.Boat1))) return p_sInfo;
             if (Run(m_picker.RunLoad(null))) return p_sInfo;
             m_picker.p_infoStrip = m_boat1.p_infoStrip;
@@ -74,7 +74,7 @@ namespace Root_ASIS.Module
             {
                 Cleaner cleaner = m_aCleaner[eCleaner]; 
                 if (cleaner.p_infoStrip0 != null) return "Cleaner is not Ready";
-                if (m_picker.m_bLoad == false) return "Picker has no Strip";
+                if (m_picker.p_infoStrip == null) return "Picker has no Strip";
                 ePos pos = (eCleaner == Cleaner.eCleaner.Cleaner0) ? ePos.Cleaner0 : ePos.Cleaner1; 
                 if (Run(AxisMove(pos))) return p_sInfo;
                 if (Run(m_picker.RunUnload())) return p_sInfo;
@@ -128,7 +128,7 @@ namespace Root_ASIS.Module
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
-            if (m_picker.m_bLoad)
+            if (m_picker.p_infoStrip != null)
             {
                 if (StartRunUnload(Cleaner.eCleaner.Cleaner0)) return "OK";
                 if (StartRunUnload(Cleaner.eCleaner.Cleaner1)) return "OK";
@@ -162,7 +162,7 @@ namespace Root_ASIS.Module
 
         public override void Reset()
         {
-            if (m_picker.m_bLoad)
+            if (m_picker.p_infoStrip != null)
             {
                 if (Run(AxisMove(ePos.Boat1))) return;
                 m_picker.RunUnload();

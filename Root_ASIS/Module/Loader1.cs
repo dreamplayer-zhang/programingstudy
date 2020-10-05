@@ -72,7 +72,7 @@ namespace Root_ASIS.Module
         public string RunLoad()
         {
             if (m_boat0.p_bDone == false) return "Boat0 not Done";
-            if (m_picker.m_bLoad) return "Picker already Load"; 
+            if (m_picker.p_infoStrip != null) return "Picker already Load"; 
             if (Run(AxisMove(ePos.Boat0))) return p_sInfo;
             if (Run(m_picker.RunLoad(null))) return p_sInfo;
             m_picker.p_infoStrip = m_boat0.p_infoStrip;
@@ -87,7 +87,7 @@ namespace Root_ASIS.Module
             try
             {
                 if (m_turnover.p_infoStrip0 != null) return "Turnover is not Ready";
-                if (m_picker.m_bLoad == false) return "Picker has no Strip";
+                if (m_picker.p_infoStrip == null) return "Picker has no Strip";
                 if (Run(AxisMove(ePos.Turnover))) return p_sInfo;
                 if (Run(m_picker.RunUnload())) return p_sInfo;
                 if (Run(AxisMove(ePos.Boat0))) return p_sInfo;
@@ -141,7 +141,7 @@ namespace Root_ASIS.Module
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
-            if (m_picker.m_bLoad)
+            if (m_picker.p_infoStrip != null)
             {
                 if (m_turnover.p_infoStrip0 == null) StartRun(m_runUnload); 
             }
@@ -165,7 +165,7 @@ namespace Root_ASIS.Module
 
         public override void Reset()
         {
-            if (m_picker.m_bLoad)
+            if (m_picker.p_infoStrip != null)
             {
                 if (Run(AxisMove(ePos.Turnover))) return;
                 m_picker.RunUnload();

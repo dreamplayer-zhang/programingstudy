@@ -49,7 +49,6 @@ namespace Root_ASIS.Module
                 m_log.Info("p_bPaper = " + value.ToString()); 
                 _bPaper = value;
                 OnPropertyChanged();
-                if (value) p_infoStrip = null; 
             }
         }
 
@@ -63,7 +62,6 @@ namespace Root_ASIS.Module
                 m_log.Info("p_bCheck = " + value.ToString());
                 _bCheck = value;
                 OnPropertyChanged();
-                if (value == false) p_infoStrip = null; 
             }
         }
 
@@ -108,15 +106,11 @@ namespace Root_ASIS.Module
             }
         }
 
-        InfoStrip _infoStrip = null;
-        public InfoStrip p_infoStrip
+        public InfoStrip GetNewInfoStrip()
         {
-            get { return _infoStrip; }
-            set
-            {
-                _infoStrip = value;
-                OnPropertyChanged(); 
-            }
+            InfoStrip infoStrip = new InfoStrip(p_iStrip);
+            p_iStrip++;
+            return infoStrip; 
         }
         #endregion
 
@@ -189,7 +183,6 @@ namespace Root_ASIS.Module
                     }
                     p_eMove = eMove.Stop;
                     p_bPaper = m_diPaper.p_bIn;
-                    AddNewInfoStrip();
                     p_bDone = p_bCheck;
                     return "OK";
                 }
@@ -198,15 +191,6 @@ namespace Root_ASIS.Module
                     p_eMove = eMove.Stop;
                 }
             }
-        }
-
-        void AddNewInfoStrip()
-        {
-            if (p_infoStrip != null) return;
-            if (p_bCheck == false) return;
-            if (p_bPaper) return;
-            p_infoStrip = new InfoStrip(p_iStrip);
-            p_iStrip++; 
         }
         #endregion
 

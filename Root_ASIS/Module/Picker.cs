@@ -53,7 +53,6 @@ namespace Root_ASIS.Module
         double m_secBlow = 0.5; 
         string RunVacuum(bool bOn)
         {
-            if (bOn == false) m_bLoad = false; 
             m_dioVacuum.Write(bOn);
             if (bOn == false)
             {
@@ -127,7 +126,6 @@ namespace Root_ASIS.Module
             return "OK"; 
         }
 
-        public bool m_bLoad = false; 
         string m_sLoad = "";
         int m_nRetry = 3;
         public string RunLoad(LoadEV loadEV)
@@ -143,7 +141,6 @@ namespace Root_ASIS.Module
                 RunDown(false);
                 RunVacuum(false);
                 if (loadEV != null) loadEV.p_bBlow = false;
-                m_bLoad = (m_sLoad == "OK"); 
                 return m_sLoad;
             }
         }
@@ -230,7 +227,7 @@ namespace Root_ASIS.Module
             while (m_bThread)
             {
                 Thread.Sleep(10);
-                p_bVacuumError = (m_dioDown.m_aBitDI[0].p_bOn && m_dioVacuum.p_bOut && (m_dioVacuum.p_bIn == false)); 
+                p_bVacuumError = ((p_infoStrip != null) && m_dioVacuum.p_bOut && (m_dioVacuum.p_bIn == false)); 
             }
         }
 

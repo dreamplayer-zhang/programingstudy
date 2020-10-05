@@ -95,13 +95,17 @@ namespace Root_ASIS.Module
             if (Run(AxisMove(ePos.LoadEV, m_loadEV.p_bPaper ? ePicker.Paper : ePicker.Strip))) return p_sInfo;
             if (m_loadEV.p_bPaper == false)
             {
-                if (m_aPicker[ePicker.Paper].m_bLoad) m_aPicker[ePicker.Paper].StartUnload();
+                if (m_aPicker[ePicker.Paper].p_infoStrip != null) m_aPicker[ePicker.Paper].StartUnload();
                 if (Run(m_aPicker[ePicker.Strip].RunLoad(m_loadEV))) return p_sInfo;
+                m_aPicker[ePicker.Strip].p_infoStrip = m_loadEV.GetNewInfoStrip();
                 if (Run(m_aPicker[ePicker.Paper].WaitReady())) return p_sInfo;
-                m_aPicker[ePicker.Strip].p_infoStrip = m_loadEV.p_infoStrip;
-                m_loadEV.p_infoStrip = null; 
+                m_aPicker[ePicker.Paper].p_infoStrip = null; 
             }
-            else if (Run(m_aPicker[ePicker.Paper].RunLoad(m_loadEV))) return p_sInfo;
+            else
+            {
+                if (Run(m_aPicker[ePicker.Paper].RunLoad(m_loadEV))) return p_sInfo;
+                m_aPicker[ePicker.Paper].p_infoStrip = new InfoStrip(-1); 
+            }
             return "OK";
         }
 
@@ -170,7 +174,7 @@ namespace Root_ASIS.Module
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK"; 
-            if (m_aPicker[ePicker.Strip].m_bLoad)
+            if (m_aPicker[ePicker.Strip].p_infoStrip != null)
             {
                 if (m_boat.p_bReady) return StartRunUnload(ePicker.Strip);
                 AxisMove(ePos.Boat, ePicker.Strip);
@@ -187,7 +191,7 @@ namespace Root_ASIS.Module
                     if (m_loadEV.p_bDone) return StartRunLoad(ePos.LoadEV);
                 }
             }
-            if (m_aPicker[ePicker.Paper].m_bLoad) return StartRunUnload(ePicker.Paper); 
+            if (m_aPicker[ePicker.Paper].p_infoStrip != null) return StartRunUnload(ePicker.Paper); 
             return "OK";
         }
 
@@ -222,8 +226,8 @@ namespace Root_ASIS.Module
 
         public override void Reset()
         {
-            if (m_aPicker[ePicker.Paper].m_bLoad) RunUnload(ePicker.Paper); 
-            if (m_aPicker[ePicker.Strip].m_bLoad)
+            if (m_aPicker[ePicker.Paper].p_infoStrip != null) RunUnload(ePicker.Paper); 
+            if (m_aPicker[ePicker.Strip].p_infoStrip != null)
             {
                 if (Run(AxisMove(ePos.LoadEV, ePicker.Strip))) return;
                 m_aPicker[ePicker.Strip].RunUnload(); 
