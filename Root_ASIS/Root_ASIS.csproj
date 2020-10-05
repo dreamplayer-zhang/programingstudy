@@ -84,6 +84,8 @@
     <Compile Include="Module\Loader1.cs" />
     <Compile Include="Module\Loader2.cs" />
     <Compile Include="Module\Loader3.cs" />
+    <Compile Include="Module\PickerFix.cs" />
+    <Compile Include="Module\Sorter0.cs" />
     <Compile Include="Module\Trays.cs" />
     <Compile Include="Module\Trays_Count_UI.xaml.cs">
       <DependentUpon>Trays_Count_UI.xaml</DependentUpon>
