@@ -15,6 +15,16 @@ namespace Root_ASIS.Module
 {
     public class Trays : ModuleBase
     {
+        #region Tray Access
+        enum eAccess
+        {
+            Both,
+            Sorter0,
+            Sorter1
+        }
+        public 
+        #endregion
+
         #region ToolBox
         DIO_I m_diFull;
         DIO_I m_diOpen;

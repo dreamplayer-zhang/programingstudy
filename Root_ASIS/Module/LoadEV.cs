@@ -52,6 +52,19 @@ namespace Root_ASIS.Module
             }
         }
 
+        bool _bUsePaper = true; 
+        public bool p_bUsePaper
+        {
+            get { return _bUsePaper; }
+            set
+            {
+                if (_bUsePaper == value) return;
+                m_log.Info("p_bUsePaper = " + value.ToString());
+                _bUsePaper = value;
+                OnPropertyChanged(); 
+            }
+        }
+
         bool _bCheck = false; 
         public bool p_bCheck
         {
@@ -182,7 +195,7 @@ namespace Root_ASIS.Module
                         if (sw.ElapsedMilliseconds > msTimeout) return "RunLoad Timeout : Top Sensor Up";
                     }
                     p_eMove = eMove.Stop;
-                    p_bPaper = m_diPaper.p_bIn;
+                    p_bPaper = m_diPaper.p_bIn && p_bUsePaper;
                     p_bDone = p_bCheck;
                     return "OK";
                 }
@@ -220,6 +233,12 @@ namespace Root_ASIS.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
+            RunTreeSetup(tree.GetTree("Setup", false));
+        }
+
+        void RunTreeSetup(Tree tree)
+        {
+            p_bUsePaper = tree.Set(p_bUsePaper, p_bUsePaper, "Use Paper", "Use Paper"); 
         }
 
         public override void Reset()

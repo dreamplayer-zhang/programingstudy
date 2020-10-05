@@ -124,7 +124,7 @@ namespace Root_ASIS.Module
                     for (int n = 0; n < 3; n++)
                     {
                         bool bBlowOn = m_bUseDI ? m_dioBlow[n].p_bIn : m_abBlowOn[n];
-                        m_dioBlow[n].Write(bBlowOn && value && Strip.p_bUseCleanBlow);
+                        m_dioBlow[n].Write(bBlowOn && value && m_cleaner.p_bUseBlow);
                     }
                 }
             }
@@ -139,6 +139,19 @@ namespace Root_ASIS.Module
         }
         public DIO_Blow m_blowTop;
         public DIO_Blow m_blowBottom;
+
+        bool _bUseBlow = false;
+        public bool p_bUseBlow
+        {
+            get { return _bUseBlow; }
+            set
+            {
+                if (_bUseBlow == value) return;
+                m_log.Info("bUseBlow = " + value.ToString());
+                _bUseBlow = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool p_bBlowOn
         {

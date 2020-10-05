@@ -12,18 +12,6 @@ namespace Root_ASIS
             set { m_strip.p_bUseMGZ = value; }
         }
 
-        public static bool p_bUsePaper
-        {
-            get { return m_strip.p_bUsePaper; }
-            set { m_strip.p_bUsePaper = value; }
-        }
-
-        public static bool p_bUseCleanBlow
-        {
-            get { return m_strip.p_bUseCleanBlow; }
-            set { m_strip.p_bUseCleanBlow = value; }
-        }
-
         public static RPoint m_szStripTeach = new RPoint();
         public static RPoint p_szStrip
         {
@@ -42,30 +30,6 @@ namespace Root_ASIS
             {
                 if (_bUseMGZ == value) return;
                 _bUseMGZ = value;
-                OnPropertyChanged(); 
-            }
-        }
-
-        bool _bUsePaper = false;
-        public bool p_bUsePaper
-        {
-            get { return _bUsePaper; }
-            set
-            {
-                if (_bUsePaper == value) return;
-                _bUsePaper = value;
-                OnPropertyChanged();
-            }
-        }
-
-        bool _bUseCleanBlow = true;
-        public bool p_bUseCleanBlow
-        {
-            get { return _bUseCleanBlow; }
-            set
-            {
-                if (_bUseCleanBlow == value) return;
-                _bUseCleanBlow = value;
                 OnPropertyChanged(); 
             }
         }

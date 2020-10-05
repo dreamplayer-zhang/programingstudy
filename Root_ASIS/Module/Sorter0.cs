@@ -117,7 +117,7 @@ namespace Root_ASIS.Module
         string RunLoad(Cleaner.eCleaner eCleaner)
         {
             if (m_trays.p_bFull) return "Run Load Cancel : Tray Full";
-            if (m_picker.p_infoStrip != null) return "Run Load Cancel : Picker Already Load";
+            if (m_picker.p_infoStrip != null) return "Run Load Cancel : Picker Already has Strip";
             try
             {
                 for (int nTry = 0; nTry < m_nTry; nTry++)
@@ -148,6 +148,17 @@ namespace Root_ASIS.Module
             m_nTry = tree.Set(m_nTry, m_nTry, "Try", "Load Try Count");
             m_nShake = tree.Set(m_nShake, m_nShake, "Shake", "Shake Count");
             m_dzShake = tree.Set(m_dzShake, m_dzShake, "dShake", "Shake Width (unit)"); 
+        }
+        #endregion
+
+        #region RunUnload
+        string RunUnload(CPoint cpTray)
+        {
+            if (m_trays.p_bFull) return "Run Unload Cancel : Tray Full";
+            if (m_picker.p_infoStrip == null) return "Run Unload Cancel : Picker has no Strip";
+            if (Run(AxisMoveZ(ePosZ.TrayBottom, GetTrayOffsetZ(cpTray.Y)))) return p_sInfo;
+            //forget
+            return "OK"; 
         }
         #endregion
 

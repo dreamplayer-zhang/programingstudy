@@ -43,7 +43,6 @@ namespace Root_ASIS.Module
         void RunTreeMode(Tree tree) //forget
         {
             Strip.p_bUseMGZ = tree.Set(Strip.p_bUseMGZ, Strip.p_bUseMGZ, "Use MGZ", "Use MGZ or LoadEV");
-            Strip.p_bUsePaper = tree.Set(Strip.p_bUsePaper, Strip.p_bUsePaper, "Use Paper", "Use Paper");
             Strip.p_szStrip = tree.Set(Strip.p_szStrip, Strip.p_szStrip, "Strip Size", "Strip Size");
             Strip.m_szStripTeach = tree.Set(Strip.m_szStripTeach, Strip.m_szStripTeach, "Teach Strip Size", "Teach Strip Size");
         }
