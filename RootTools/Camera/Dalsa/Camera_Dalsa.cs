@@ -213,61 +213,107 @@ namespace RootTools.Camera.Dalsa
         {
             if (p_CamInfo.p_sServer == "")
             {
-                 p_sInfo = p_id + "Empty Server Name";
-                 return;
+                m_log.Info(p_id + "Empty Server Name"); // 201005 ESCHO Add Log 
+                p_sInfo = p_id + "Empty Server Name";
+                return;
             }
             if (p_CamInfo.p_sFile == "")
             {
+                m_log.Info(p_id + "Empty Config File Name"); // 201005 ESCHO Add Log 
                 p_sInfo = p_id + "Empty Config File Name";
                 return;
             }
+            
+            m_log.Info("Before new SapLocation");   // 201005 ESCHO Add Log 
             SapLocation loc = new SapLocation(p_CamInfo.p_sServer, 0);
-            if(SapManager.GetResourceCount(p_CamInfo.p_sServer, SapManager.ResourceType.AcqDevice) > 0 )
+            m_log.Info("After new SapLocation");    // 201005 ESCHO Add Log 
+
+            m_log.Info("Before new SapDevice"); // 201005 ESCHO Add Log 
+            if (SapManager.GetResourceCount(p_CamInfo.p_sServer, SapManager.ResourceType.AcqDevice) > 0 )
                 m_sapDevice = new SapAcqDevice(loc);
+            m_log.Info("After new SapDevice");  // 201005 ESCHO Add Log 
+
+
             if (SapManager.GetResourceCount(p_CamInfo.p_sServer, SapManager.ResourceType.Acq) > 0)          //"Acq" (frame-grabber) "AcqDevice" (camera)
             {
+                m_log.Info("Before new SapAcquisition");    // 201005 ESCHO Add Log 
                 m_sapAcq = new SapAcquisition(loc, p_CamInfo.p_sFile);
+                m_log.Info("After new SapAcquisition"); // 201005 ESCHO Add Log 
+
+                m_log.Info("Before Create m_sapAcq");   // 201005 ESCHO Add Log 
                 if (!m_sapAcq.Create())
                 {
+                    m_log.Info("Before loc.Dispose 1"); // 201005 ESCHO Add Log 
                     loc.Dispose();
+                    m_log.Info("After loc.Dispose 1");  // 201005 ESCHO Add Log 
                     p_sInfo = DestroysObjects(p_id + "Error during SapAcquisition creation");
                     return;
                 }
+                m_log.Info("After Create m_sapAcq");    // 201005 ESCHO Add Log 
+
+                m_log.Info("Before new SapBuffer"); // 201005 ESCHO Add Log 
                 m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq, SapBuffer.MemoryType.ScatterGather);
+                m_log.Info("After new SapBuffer");  // 201005 ESCHO Add Log 
+
+                m_log.Info("Before new SapAcqToBuf");   // 201005 ESCHO Add Log 
                 m_sapXfer = new SapAcqToBuf(m_sapAcq, m_sapBuf);
-            }
-            loc.Dispose();
-            if (m_sapXfer == null)
-            {
-                p_sInfo = p_id + " Sapera Transfer Empty";
-                return;
+                m_log.Info("After new SapAcqToBuf");    // 201005 ESCHO Add Log 
             }
 
+            m_log.Info("Before loc.Dispose 2"); // 201005 ESCHO Add Log 
+            loc.Dispose();
+            m_log.Info("After loc.Dispose 2");  // 201005 ESCHO Add Log 
+
+            m_log.Info("Before m_sapXfer null check");  // 201005 ESCHO Add Log 
+            if (m_sapXfer == null)
+            {
+                m_log.Info("Sapera Transfer Empty");    // 201005 ESCHO Add Log 
+                p_sInfo = p_id + " Sapera Transfer Empty";  // 201005 ESCHO Add Log 
+                return;
+            }
+            m_log.Info("After m_sapXfer null check");   // 201005 ESCHO Add Log 
+
+            m_log.Info("Before m_sapDevice null check & !m_sapDevice.Create()");    // 201005 ESCHO Add Log 
             if ( m_sapDevice != null && !m_sapDevice.Create())
             {
+                m_log.Info(p_id + "Error during SapDevice creation");   // 201005 ESCHO Add Log 
                 p_sInfo = DestroysObjects(p_id + "Error during SapDevice creation");
                 return;
             }
+            m_log.Info("After m_sapDevice null check & !m_sapDevice.Create()"); // 201005 ESCHO Add Log 
+
+            m_log.Info("Before !m_sapBuf.Create()");    // 201005 ESCHO Add Log 
             if (!m_sapBuf.Create())
             {
+                m_log.Info(p_id + "Error during SapBuffer creation");   // 201005 ESCHO Add Log 
                 p_sInfo = DestroysObjects(p_id + "Error during SapBuffer creation");
                 return;
             }
+            m_log.Info("After !m_sapBuf.Create()"); // 201005 ESCHO Add Log 
+
+            m_log.Info("Before !m_sapXfer.Create()");   // 201005 ESCHO Add Log 
             if (!m_sapXfer.Create())
             {
+                m_log.Info(p_id + "Error during SapTransfer creation"); // 201005 ESCHO Add Log 
                 p_sInfo = DestroysObjects(p_id + "Error during SapTransfer creation");
                 return;
             }
+            m_log.Info("After !m_sapXfer.Create()");    // 201005 ESCHO Add Log 
 
+            m_log.Info("Before new sapXferNotifyHandler");  // 201005 ESCHO Add Log 
             m_sapXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfFrame;
             m_sapXfer.XferNotify += new SapXferNotifyHandler(xfer_XferNotify);
             m_sapXfer.XferNotifyContext = this;
+            m_log.Info("After new sapXferNotifyHandler");   // 201005 ESCHO Add Log 
 
+            m_log.Info("Before SetCamHandle");  // 201005 ESCHO Add Log 
             p_CamParam.SetCamHandle(m_sapDevice, m_sapAcq);
+            m_log.Info("After SetCamHandle");   // 201005 ESCHO Add Log 
             p_CamInfo.p_eState = eCamState.Ready;
+            m_log.Info("Before ReadParameter"); // 201005 ESCHO Add Log 
             p_CamParam.ReadParamter();
+            m_log.Info("After ReadParameter");  // 201005 ESCHO Add Log 
             m_log.Info(p_id + "Connect Success");
-            
         }
 
         string DestroysObjects(string sLog)
