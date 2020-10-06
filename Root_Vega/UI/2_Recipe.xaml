@@ -35,18 +35,6 @@
                                               Foreground="{StaticResource BtnForeGround}"
                                               FontSize="20">
                                     <StackPanel>
-                                        <Button Style="{StaticResource BasicBtn}"
-                                                    Content="Open"
-                                                    Margin="2"
-                                                    Command="{Binding CommandRecipeOpen}"/>
-                                        <Button Style="{StaticResource BasicBtn}"
-                                                    Content="Save"
-                                                    Margin="2"
-                                                    Command="{Binding CommandRecipeSave}"/>
-                                        <Button Style="{StaticResource BasicBtn}"
-                                                    Content="Clear"
-                                                    Margin="2"
-                                                    Command="{Binding CommandRecipeClear}"/>
                                         <ComboBox Margin="2,20,2,2"
                                                       ItemsSource="{Binding p_recipe.p_asModule}"
                                                       SelectedValue="{Binding p_strSelectedModule}"/>
@@ -58,6 +46,10 @@
                                                     Margin="2"
                                                     Visibility="{Binding p_vAddButtonVisibility}"
                                                     Command="{Binding CommandRecipeAdd}"/>
+                                        <Button Style="{StaticResource BasicBtn}"
+                                                    Content="Clear"
+                                                    Margin="2"
+                                                    Command="{Binding CommandRecipeClear}"/>
                                     </StackPanel>
                                 </GroupBox>
                             </Grid>

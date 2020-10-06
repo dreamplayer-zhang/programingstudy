@@ -769,6 +769,11 @@ namespace Root_Vega
 			m_Engineer.m_InspManager.StartInspection();//검사 시작!
 		}
 
+		private void _endInsp()
+		{
+			m_Engineer.m_InspManager.InspectionDone();
+		}
+
 		public bool FindFeature(Feature feature, out CRect crtSearchArea, out Point ptMaxRelative, out int nWidthDiff, out int nHeightDiff)
 		{
 			//TODO : Align과 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
@@ -965,6 +970,14 @@ namespace Root_Vega
 			get
 			{
 				return new RelayCommand(_startInsp);
+			}
+		}
+
+		public ICommand CommandEndInsp
+		{
+			get
+			{
+				return new RelayCommand(_endInsp);
 			}
 		}
 
