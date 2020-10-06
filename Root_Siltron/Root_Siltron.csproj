@@ -107,6 +107,7 @@
     <Compile Include="Controls\UserControl\DefectView.xaml.cs">
       <DependentUpon>DefectView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\EdgeSideInsp.cs" />
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Result\Siltron_Result.cs" />
     <Compile Include="UI\2. Review\Review.xaml.cs">
