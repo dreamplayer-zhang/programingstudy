@@ -4,6 +4,8 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Threading;
 
 namespace Root_ASIS.Module
 {
@@ -28,6 +30,21 @@ namespace Root_ASIS.Module
         {
             m_axisX.AddPos(Enum.GetNames(typeof(ePosX)));
             m_axisZ.AddPos(Enum.GetNames(typeof(ePosZ)));
+        }
+        #endregion
+
+        #region DIO
+        bool _bEMG = false;
+        public bool p_bEMG
+        {
+            get { return _bEMG; }
+            set
+            {
+                if (_bEMG == value) return;
+                EMGStop("Emergency Sensor Checked");
+                _bEMG = value;
+                OnPropertyChanged();
+            }
         }
         #endregion
 
@@ -114,6 +131,7 @@ namespace Root_ASIS.Module
         int m_nTry = 1;
         int m_nShake = 0;
         double m_dzShake = 2;
+        Cleaner.eCleaner m_eCleanerLoad = Cleaner.eCleaner.Cleaner0; 
         string RunLoad(Cleaner.eCleaner eCleaner)
         {
             if (m_trays.p_bFull) return "Run Load Cancel : Tray Full";
@@ -135,6 +153,7 @@ namespace Root_ASIS.Module
                     {
                         m_picker.p_infoStrip = m_aCleaner[eCleaner].p_infoStrip1;
                         m_aCleaner[eCleaner].p_infoStrip1 = null;
+                        m_eCleanerLoad = eCleaner; 
                         return "OK"; 
                     }
                 }
@@ -156,9 +175,106 @@ namespace Root_ASIS.Module
         {
             if (m_trays.p_bFull) return "Run Unload Cancel : Tray Full";
             if (m_picker.p_infoStrip == null) return "Run Unload Cancel : Picker has no Strip";
-            if (Run(AxisMoveZ(ePosZ.TrayBottom, GetTrayOffsetZ(cpTray.Y)))) return p_sInfo;
-            //forget
-            return "OK"; 
+            Cleaner.eCleaner eCleanerNext = 1 - m_eCleanerLoad; 
+            try
+            {
+                if (Run(AxisMoveZ(ePosZ.TrayBottom, GetTrayOffsetZ(cpTray.Y)))) return p_sInfo;
+                while (m_trays.m_cpNeedPaper != null)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                if (Run(AxisMoveTray(cpTray))) return p_sInfo;
+                Unload();
+                m_trays.AddSort(cpTray);
+                m_picker.p_infoStrip = null;
+                m_cpTrayUnload = null; 
+                if ((m_aCleaner[eCleanerNext].p_infoStrip1 == null) && (m_aCleaner[1 - eCleanerNext].p_infoStrip1 != null)) eCleanerNext = 1 - eCleanerNext;
+                ePosX ePosX = (eCleanerNext == Cleaner.eCleaner.Cleaner0) ? ePosX.Cleaner0 : ePosX.Cleaner1;
+                if (Run(m_axisX.StartMove(ePosX))) return p_sInfo; 
+                m_bgwCalcTray.RunWorkerAsync(eCleanerNext); 
+                while (m_bgwCalcTray.IsBusy)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                return m_axisX.WaitReady(); 
+            }
+            finally { AxisMoveX((eCleanerNext == Cleaner.eCleaner.Cleaner0) ? ePosX.Cleaner0 : ePosX.Cleaner1); }
+        }
+
+        double m_dzUnload = 1;
+        string Unload()
+        {
+            double z = m_axisZ.p_posCommand;
+            try
+            {
+                if (Run(m_axisZ.StartMove(z + m_dzUnload))) return p_sInfo;
+                if (Run(m_axisZ.WaitReady())) return p_sInfo;
+                if (Run(m_picker.RunVacuum(false))) return p_sInfo;
+                if (Run(m_axisZ.StartMove(z))) return p_sInfo;
+                if (Run(m_axisZ.WaitReady())) return p_sInfo;
+                return m_diSafeZ.p_bIn ? "OK" : "Safe Z Sensor not Detected";
+            }
+            finally { m_axisZ.StartMove(z); }
+        }
+
+        void RunTreeUnload(Tree tree)
+        {
+            m_dzUnload = tree.Set(m_dzUnload, m_dzUnload, "dZ Unload", "Unload Down dZ (unit)");
+        }
+        #endregion
+
+        #region CalcTray
+        BackgroundWorker m_bgwCalcTray = new BackgroundWorker();
+        void InitBackgroundWork()
+        {
+            m_bgwCalcTray.DoWork += M_bgwCalcTray_DoWork;
+        }
+
+        CPoint m_cpTrayUnload = null;
+        private void M_bgwCalcTray_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Cleaner.eCleaner eCleaner = (Cleaner.eCleaner)sender; 
+            while (m_aCleaner[eCleaner].p_infoStrip1 == null)
+            {
+                Thread.Sleep(10);
+                eCleaner = 1 - eCleaner; 
+            }
+            InfoStrip infoStrip = m_aCleaner[eCleaner].p_infoStrip1;
+            m_eCleanerLoad = eCleaner; 
+            m_cpTrayUnload = m_trays.GetTrayPosition(infoStrip);
+            m_trays.m_cpNeedPaper = m_cpTrayUnload; 
+        }
+        #endregion
+
+        #region Check Thread
+        bool m_bThreadCheck = false;
+        Thread m_threadCheck;
+        void InitThreadCheck()
+        {
+            m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
+            m_threadCheck.Start();
+        }
+
+        void RunThreadCheck()
+        {
+            m_bThreadCheck = true;
+            Thread.Sleep(2000);
+            while (m_bThreadCheck)
+            {
+                Thread.Sleep(10);
+                p_bEMG = m_diEmg.p_bIn;
+            }
+        }
+
+        void EMGStop(string sMsg)
+        {
+            m_axisX.StopAxis(false);
+            m_axisX.ServoOn(false);
+            m_axisX.p_eState = Axis.eState.Init;
+            EQ.p_bStop = true;
+            p_sInfo = sMsg;
         }
         #endregion
 
@@ -166,15 +282,36 @@ namespace Root_ASIS.Module
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
-//            if (m_picker.m_bLoad)
-//            {
-//                if (m_boat1.p_bReady) StartRun(m_runUnload);
-//            }
-//            else
-//            {
-//                if (m_turnover.p_infoStrip1 != null) StartRun(m_runLoad);
-//            }
-            return "OK";
+            if (m_picker.p_infoStrip != null)
+            {
+                if (m_trays.m_cpNeedPaper != null) return "OK";
+                return StartRunUnload(m_cpTrayUnload); 
+            }
+            else
+            {
+                if (m_cpTrayUnload == null)
+                {
+                    if (m_bgwCalcTray.IsBusy) return "OK";
+                    m_bgwCalcTray.RunWorkerAsync();
+                    return "OK";
+                }
+                if (m_aCleaner[m_eCleanerLoad].p_infoStrip1 == null) return "OK";
+                return StartRunLoad(m_eCleanerLoad); 
+            }
+        }
+
+        string StartRunLoad(Cleaner.eCleaner eCleaner)
+        {
+            Run_Load run = (Run_Load)m_runLoad.Clone();
+            run.m_eCleaner = eCleaner;
+            return StartRun(run); 
+        }
+
+        string StartRunUnload(CPoint cpTray)
+        {
+            Run_Unload run = (Run_Unload)m_runUnload.Clone();
+            run.m_cpTray = cpTray;
+            return StartRun(run); 
         }
 
         public override void RunTree(Tree tree)
@@ -185,7 +322,8 @@ namespace Root_ASIS.Module
 
         void RunTreeSetup(Tree tree)
         {
-            RunTreeLoad(tree.GetTree("Load", false)); 
+            RunTreeLoad(tree.GetTree("Load", false));
+            RunTreeUnload(tree.GetTree("Unload", false));
             m_picker.RunTree(tree.GetTree("Picker", false));
         }
 
@@ -204,13 +342,173 @@ namespace Root_ASIS.Module
             m_trays = trays;
             InitPicker();
             base.InitBase(id, engineer);
+            InitBackgroundWork();
+            InitThreadCheck();
         }
 
         public override void ThreadStop()
         {
             m_picker.ThreadStop();
+            if (m_bThreadCheck)
+            {
+                m_bThreadCheck = false;
+                m_threadCheck.Join();
+            }
             base.ThreadStop();
         }
 
+        #region ModuleRun
+        ModuleRunBase m_runLoad;
+        ModuleRunBase m_runUnload;
+        protected override void InitModuleRuns()
+        {
+            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
+            AddModuleRunList(new Run_MoveReady(this), false, "Move Ready");
+            AddModuleRunList(new Run_MoveTray(this), false, "Move Tray");
+            m_runLoad = AddModuleRunList(new Run_Load(this), false, "Run Load");
+            m_runUnload = AddModuleRunList(new Run_Unload(this), false, "Run Unload");
+        }
+
+        public class Run_Delay : ModuleRunBase
+        {
+            Sorter0 m_module;
+            public Run_Delay(Sorter0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            double m_secDelay = 2;
+            public override ModuleRunBase Clone()
+            {
+                Run_Delay run = new Run_Delay(m_module);
+                run.m_secDelay = m_secDelay;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
+            }
+
+            public override string Run()
+            {
+                Thread.Sleep((int)(1000 * m_secDelay));
+                return "OK";
+            }
+        }
+
+        public class Run_MoveReady : ModuleRunBase
+        {
+            Sorter0 m_module;
+            public Run_MoveReady(Sorter0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public Cleaner.eCleaner m_eCleaner = Cleaner.eCleaner.Cleaner1; 
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveReady run = new Run_MoveReady(m_module);
+                run.m_eCleaner = m_eCleaner;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eCleaner = (Cleaner.eCleaner)tree.Set(m_eCleaner, m_eCleaner, "Position", "Sorter0 Move Position", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.AxisMoveReady(m_eCleaner);
+            }
+        }
+
+        public class Run_MoveTray : ModuleRunBase
+        {
+            Sorter0 m_module;
+            public Run_MoveTray(Sorter0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public CPoint m_cpTray = new CPoint(); 
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveTray run = new Run_MoveTray(m_module);
+                run.m_cpTray = new CPoint(m_cpTray);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_cpTray = tree.Set(m_cpTray, m_cpTray, "Tray", "Sorter0 Move Position", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.AxisMoveTray(m_cpTray);
+            }
+        }
+
+        public class Run_Load : ModuleRunBase
+        {
+            Sorter0 m_module;
+            public Run_Load(Sorter0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public Cleaner.eCleaner m_eCleaner = Cleaner.eCleaner.Cleaner1;
+            public override ModuleRunBase Clone()
+            {
+                Run_Load run = new Run_Load(m_module);
+                run.m_eCleaner = m_eCleaner;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eCleaner = (Cleaner.eCleaner)tree.Set(m_eCleaner, m_eCleaner, "Position", "Sorter0 Move Position", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunLoad(m_eCleaner);
+            }
+        }
+
+        public class Run_Unload : ModuleRunBase
+        {
+            Sorter0 m_module;
+            public Run_Unload(Sorter0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public CPoint m_cpTray = new CPoint();
+            public override ModuleRunBase Clone()
+            {
+                Run_Unload run = new Run_Unload(m_module);
+                run.m_cpTray = new CPoint(m_cpTray);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_cpTray = tree.Set(m_cpTray, m_cpTray, "Tray", "Sorter0 Move Position", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunUnload(m_cpTray);
+            }
+        }
+        #endregion
     }
 }

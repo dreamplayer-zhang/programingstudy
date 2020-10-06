@@ -15,16 +15,6 @@ namespace Root_ASIS.Module
 {
     public class Trays : ModuleBase
     {
-        #region Tray Access
-        enum eAccess
-        {
-            Both,
-            Sorter0,
-            Sorter1
-        }
-        public 
-        #endregion
-
         #region ToolBox
         DIO_I m_diFull;
         DIO_I m_diOpen;
@@ -426,10 +416,9 @@ namespace Root_ASIS.Module
             return "Not found"; 
         }
 
-        public void AddSort(CPoint cpTray, InfoStrip infoStrip)
+        public void AddSort(CPoint cpTray)
         {
             int nTray = cpTray.X + cpTray.Y * p_szTray.X;
-            if (infoStrip == null) return;
             m_aTray[nTray].p_nCount++;
         }
         #endregion
@@ -489,6 +478,10 @@ namespace Root_ASIS.Module
         {
             foreach (Count count in m_aCount) count.p_nCount = 0; 
         }
+        #endregion
+
+        #region Paper
+        public CPoint m_cpNeedPaper = null;
         #endregion
 
         #region Override

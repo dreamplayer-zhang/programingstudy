@@ -125,13 +125,14 @@ namespace Root_ASIS.Module
         #endregion
 
         #region Override
+        Cleaner.eCleaner m_eCleanerUnload = Cleaner.eCleaner.Cleaner0; 
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (m_picker.p_infoStrip != null)
             {
-                if (StartRunUnload(Cleaner.eCleaner.Cleaner0)) return "OK";
-                if (StartRunUnload(Cleaner.eCleaner.Cleaner1)) return "OK";
+                m_eCleanerUnload = 1 - m_eCleanerUnload;
+                if (StartRunUnload(m_eCleanerUnload)) return "OK";
             }
             else
             {

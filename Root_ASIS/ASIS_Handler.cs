@@ -32,14 +32,15 @@ namespace Root_ASIS
         public ASIS_Process m_process;
         public ASIS m_ASIS;
         public LoadEV m_loadEV;
-        public Loader0 m_loader0; 
-        public Dictionary<Boat.eBoat, Boat> m_aBoat = new Dictionary<Boat.eBoat, Boat>(); 
-        public Loader1 m_loader1;
+        public Dictionary<Boat.eBoat, Boat> m_aBoat = new Dictionary<Boat.eBoat, Boat>();
         public Turnover m_turnover;
+        public Dictionary<Cleaner.eCleaner, Cleaner> m_aCleaner = new Dictionary<Cleaner.eCleaner, Cleaner>();
+        public Trays m_trays;
+        public Loader0 m_loader0; 
+        public Loader1 m_loader1;
         public Loader2 m_loader2;
         public Loader3 m_loader3;
-        public Dictionary<Cleaner.eCleaner, Cleaner> m_aCleaner = new Dictionary<Cleaner.eCleaner, Cleaner>();
-        public Trays m_trays; 
+        public Sorter0 m_sorter0; 
 
         void InitModule()
         {
@@ -68,6 +69,8 @@ namespace Root_ASIS
             InitModule(m_loader2);
             m_loader3 = new Loader3("Loader3", m_engineer, m_aBoat[Boat.eBoat.Boat1], m_aCleaner);
             InitModule(m_loader3);
+            m_sorter0 = new Sorter0("Sorter0", m_engineer, m_aCleaner, m_trays);
+            InitModule(m_sorter0);
             m_recipe = new ASIS_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
             m_process = new ASIS_Process("Process", m_engineer, this);
