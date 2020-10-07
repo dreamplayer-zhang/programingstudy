@@ -95,13 +95,13 @@ namespace Root_Vega
             ModuleRunBase moduleRun = m_loadport.m_runReadPodID.Clone();
             m_loadport.StartRun(moduleRun);
             Thread.Sleep(100);
-            while (m_loadport.m_qModuleRun.Count > 0) Thread.Sleep(10); 
-            while (m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+            while ((EQ.IsStop() != true) && m_loadport.m_qModuleRun.Count > 0) Thread.Sleep(10); 
+            while ((EQ.IsStop() != true) && m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
             moduleRun = m_loadport.m_runLoad.Clone();
             m_loadport.StartRun(moduleRun);
             Thread.Sleep(100);
-            while (m_loadport.m_qModuleRun.Count > 0) Thread.Sleep(10);
-            while (m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
+            while ((EQ.IsStop() != true) && m_loadport.m_qModuleRun.Count > 0) Thread.Sleep(10);
+            while ((EQ.IsStop() != true) && m_loadport.p_eState == ModuleBase.eState.Run) Thread.Sleep(10);
         }
         
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -112,6 +112,7 @@ namespace Root_Vega
                     m_loadport.m_infoPod.p_eState = InfoPod.eState.Load; 
                     if (m_manualjob.SetInfoPod() != "OK") return; 
                     m_loadport.m_infoPod.StartProcess();
+                    Thread.Sleep(100); 
                     EQ.p_eState = EQ.eState.Run;
                     break; 
             }
