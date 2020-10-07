@@ -128,6 +128,9 @@ namespace Root_Siltron.Module
 				}
 			}
 			matColor.Save(@"D:\matColor.bmp");
+
+			//byte[] arrResult = new byte[memSize];
+			//CLR_IP.ContourFitEllipse(matThreshold.GetRawData(), arrResult, matThreshold.Width, matThreshold.Height);
 		}
 
 		void DrawCross(IInputOutputArray img, System.Drawing.Point point)
@@ -139,7 +142,6 @@ namespace Root_Siltron.Module
 
 		void CalcDefectSize()
 		{
-			
 
 		}
 		

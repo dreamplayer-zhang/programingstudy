@@ -1,7 +1,8 @@
 
 #include "pch.h"
-
 #include "IP.h"
+
+using namespace std;
 
 void IP::Threshold(BYTE* pSrc, int nW, int nH, int threshold, bool bDark, BYTE* pDst)
 {
@@ -107,21 +108,3 @@ void IP::Labeling(BYTE* pSrc, BYTE* pBin, int nW, int nH, bool bDark, BYTE* pDst
     //namedWindow("Labeling window", WINDOW_KEEPRATIO);
     //imshow("Labeling window", imgColors);
 }
-
-void IP::ContourFitEllipse(BYTE* pSrc, int nW, int nH, BYTE* pDst)
-{
-    Mat imgSrc = Mat(nW, nH, CV_8UC1, pSrc);
-    Mat imgDst;
-
-    cv::findContours(imgSrc, imgDst, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-    cv::RotatedRect rect = cv::fitEllipse(imgDst);
-
-    
-
-    pDst = imgDst.ptr<BYTE>();
-}
-
-//void IP::CountourMinAreaRect()
-//{
-//
-//}
