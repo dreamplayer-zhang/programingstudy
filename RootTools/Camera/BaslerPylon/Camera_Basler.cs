@@ -8,11 +8,14 @@ using System.Runtime.InteropServices;
 using RootTools.Memory;
 using RootTools.Trees;
 using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace RootTools.Camera.BaslerPylon
 {
     public class Camera_Basler : ObservableObject, RootTools.Camera.ICamera
     {
+        public Dispatcher _dispatcher;
+
         public event System.EventHandler Grabed;
 
         #region Property
@@ -125,7 +128,7 @@ namespace RootTools.Camera.BaslerPylon
             bgw_Connect.DoWork += bgw_Connect_DoWork;
             bgw_Connect.RunWorkerCompleted += bgw_Connect_RunWorkerCompleted;
             m_ImageGrab = new ImageData(640, 480);
-            p_ImageViewer = new ImageViewer_ViewModel(m_ImageGrab);
+            p_ImageViewer = new ImageViewer_ViewModel(m_ImageGrab, null, _dispatcher);
         }
 
 
@@ -446,7 +449,10 @@ namespace RootTools.Camera.BaslerPylon
                 m_cam.StreamGrabber.Start(1, GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
                 p_CamInfo._IsCanGrab = false;
             }
-            catch (Exception) { }
+            catch (Exception e) 
+            {
+                MessageBox.Show(e.Message.ToString());
+            }
         }
 
 
@@ -466,7 +472,10 @@ namespace RootTools.Camera.BaslerPylon
                     p_CamInfo._IsCanGrab = false;
                 }
             }
-            catch (Exception) { }
+            catch (Exception e) 
+            {
+                MessageBox.Show(e.Message.ToString());
+            }
         }
 
         private void GrabStop()
@@ -509,10 +518,17 @@ namespace RootTools.Camera.BaslerPylon
 
                             stopWatch.Reset();
 
-                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            if (_dispatcher != null)
                             {
-                                m_ImageGrab.UpdateImage();
-                            });
+                                _dispatcher.Invoke(new Action(delegate ()
+                                {
+                                    m_ImageGrab.UpdateImage();
+                                }));
+                            }
+                            //Application.Current.Dispatcher.Invoke((Action)delegate
+                            //{
+                            //    m_ImageGrab.UpdateImage();
+                            //});
                         }
                         else
                         {

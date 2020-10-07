@@ -254,8 +254,13 @@ namespace Root_Vega
 
         public void Test()
         {
-            PatternVision.Run_AutoIllumination ai = new PatternVision.Run_AutoIllumination(m_PatternVision);
-            ai.Run();
+            PatternVision.Run_VRSReviewImagCapture sequence = new PatternVision.Run_VRSReviewImagCapture(m_PatternVision);
+            sequence.m_grabMode = m_PatternVision.m_aGrabMode[0];
+            sequence.m_dResX_um = 0.4995;
+            sequence.m_dResY_um = 0.5;
+            sequence.m_dReticleSize_mm = 150;
+            sequence.m_rpReticleCenterPos = new RPoint(-811154.0, 2020000);
+            RPoint rpReturn = sequence.GetAxisPosFromMemoryPos(new CPoint());
             return;
         }
 
