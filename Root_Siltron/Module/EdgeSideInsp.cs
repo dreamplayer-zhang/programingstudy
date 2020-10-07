@@ -8,6 +8,8 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.Util;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+using RootTools_CLR;
 
 namespace Root_Siltron.Module
 {
@@ -128,11 +130,18 @@ namespace Root_Siltron.Module
 			matColor.Save(@"D:\matColor.bmp");
 		}
 
-		public void DrawCross(IInputOutputArray img, System.Drawing.Point point)
+		void DrawCross(IInputOutputArray img, System.Drawing.Point point)
 		{
 			MCvScalar color = new MCvScalar(0, 0, 255); // red
 			CvInvoke.Line(img, new System.Drawing.Point(point.X - 1, point.Y), new System.Drawing.Point(point.X + 1, point.Y), color);
 			CvInvoke.Line(img, new System.Drawing.Point(point.X, point.Y - 1), new System.Drawing.Point(point.X, point.Y + 1), color);
 		}
+
+		void CalcDefectSize()
+		{
+			
+
+		}
+		
 	}
 }
