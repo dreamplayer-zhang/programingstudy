@@ -201,7 +201,11 @@ namespace RootTools.Comm
                 sRead = sRead.Substring(nIndex, sRead.Length - nIndex); 
             }
             string sRecieve = DataRead(sRead, sender);
-            if ((sRecieve != "") && (m_sRead != sRecieve)) DataRecieve(sRecieve, sender); 
+            if ((sRecieve != "") && (sRead != sRecieve))
+            {
+                m_sRead = sRecieve; 
+                DataRecieve(sRecieve, sender);
+            }
         }
 
         string DataRead(string sRead, object sender)
@@ -237,7 +241,6 @@ namespace RootTools.Comm
                     OnRecieve(sRead.Substring(0, nIndex));
                     return "";
                 }
-
                 nIndex = sRead.IndexOf(m_sEnd);
                 if (nIndex < 0) return sRead;
                 OnRecieve(sRead.Substring(0, nIndex));

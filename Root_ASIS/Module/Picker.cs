@@ -112,7 +112,7 @@ namespace Root_ASIS.Module
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
             m_swBusy.Start(); 
-            if (m_bLoadBGW) RunLoad(null);
+            if (m_bLoadBGW) RunLoad();
             else RunUnload(); 
         }
         #endregion
@@ -126,39 +126,63 @@ namespace Root_ASIS.Module
             return "OK"; 
         }
 
-        string m_sLoad = "";
         int m_nRetry = 3;
-        public string RunLoad(LoadEV loadEV)
+        public string RunLoad()
         {
             lock (m_csLock)
             {
-                for (int n = 0; n < m_nRetry; n++)
+                try
                 {
-                    m_sLoad = Load(loadEV);
-                    if (m_sLoad == "OK") return "OK";
-                    if (loadEV != null) loadEV.RunLoad(m_secLoadEVDown + 2);
+                    for (int n = 0; n < m_nRetry; n++)
+                    {
+                        if (Run(RunDown(false))) return m_sRun;
+                        if (Run(RunDown(true))) return m_sRun;
+                        if (Run(RunVacuum(true))) return m_sRun;
+                        if (Run(RunDown(false))) return m_sRun;
+                        if (m_dioVacuum.p_bIn) return "OK";
+                    }
+                    return p_id + " Run Load Error"; 
                 }
-                RunDown(false);
-                RunVacuum(false);
-                if (loadEV != null) loadEV.p_bBlow = false;
-                return m_sLoad;
+                finally { RunDown(false); }
             }
         }
 
-        double m_secLoadEVDown = 0.5; 
-        string Load(LoadEV loadEV)
+        double m_secLoadEVDown = 0.5;
+        public string RunLoadEV(LoadEV loadEV)
         {
-            if (Run(RunDown(true))) return m_sRun;
-            if (Run(RunVacuum(true))) return m_sRun;
-            if (loadEV != null)
+            lock (m_csLock)
             {
-                if (Run(loadEV.RunDown(m_secLoadEVDown))) return m_sRun;
-                loadEV.p_bBlow = true; 
-                if (!loadEV.p_bPaper) RunShake(); 
+                try
+                {
+                    for (int n = 0; n < m_nRetry; n++)
+                    {
+                        if (Run(RunVacuum(false))) return m_sRun;
+                        while (loadEV.p_bDone == false)
+                        {
+                            Thread.Sleep(10);
+                            if (EQ.IsStop()) return "EQ Stop";
+                        }
+                        if (Run(RunDown(true))) return m_sRun;
+                        if (Run(RunVacuum(true))) return m_sRun;
+                        loadEV.p_bBlow = true;
+                        loadEV.StartDown(m_secLoadEVDown);
+                        RunShake();
+                        if (Run(RunDown(false))) return m_sRun;
+                        loadEV.p_bBlow = false;
+                        if (m_dioVacuum.p_bIn)
+                        {
+                            loadEV.StartLoad();
+                            return "OK";
+                        }
+                    }
+                    return p_id + " Run Load Error";
+                }
+                finally
+                {
+                    loadEV.p_bBlow = false;
+                    RunDown(false);
+                }
             }
-            if (Run(RunDown(false))) return m_sRun;
-            if (Run(RunVacuum(true))) return m_sRun;
-            return "OK";
         }
 
         void RunTreeLoad(Tree tree)

@@ -96,14 +96,14 @@ namespace Root_ASIS.Module
             if (m_loadEV.p_bPaper == false)
             {
                 if (m_aPicker[ePicker.Paper].p_infoStrip != null) m_aPicker[ePicker.Paper].StartUnload();
-                if (Run(m_aPicker[ePicker.Strip].RunLoad(m_loadEV))) return p_sInfo;
+                if (Run(m_aPicker[ePicker.Strip].RunLoadEV(m_loadEV))) return p_sInfo;
                 m_aPicker[ePicker.Strip].p_infoStrip = m_loadEV.GetNewInfoStrip();
                 if (Run(m_aPicker[ePicker.Paper].WaitReady())) return p_sInfo;
                 m_aPicker[ePicker.Paper].p_infoStrip = null; 
             }
             else
             {
-                if (Run(m_aPicker[ePicker.Paper].RunLoad(m_loadEV))) return p_sInfo;
+                if (Run(m_aPicker[ePicker.Paper].RunLoadEV(m_loadEV))) return p_sInfo;
                 m_aPicker[ePicker.Paper].p_infoStrip = new InfoStrip(-1); 
             }
             return "OK";
@@ -361,7 +361,7 @@ namespace Root_ASIS.Module
 
             public override string Run()
             {
-                if (m_bLoad) return m_module.m_aPicker[m_ePicker].RunLoad(m_module.m_loadEV);
+                if (m_bLoad) return m_module.m_aPicker[m_ePicker].RunLoadEV(m_module.m_loadEV);
                 else return m_module.m_aPicker[m_ePicker].RunUnload(); 
             }
         }

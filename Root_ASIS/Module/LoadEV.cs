@@ -254,9 +254,11 @@ namespace Root_ASIS.Module
             StartRun(m_runLoad);
         }
 
-        public void StartDown()
+        public void StartDown(double secDown)
         {
-            StartRun(m_runDown);
+            Run_Down run = (Run_Down)m_runDown.Clone();
+            run.m_secDown = secDown; 
+            StartRun(run);
         }
         #endregion
 
@@ -350,7 +352,7 @@ namespace Root_ASIS.Module
                 InitModuleRun(module);
             }
 
-            double m_secDown = 3;
+            public double m_secDown = 3;
             public override ModuleRunBase Clone()
             {
                 Run_Down run = new Run_Down(m_module);
