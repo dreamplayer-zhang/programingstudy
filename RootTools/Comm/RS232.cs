@@ -177,18 +177,21 @@ namespace RootTools.Comm
         public delegate void dgOnRecieve(string sRead);
         public event dgOnRecieve OnRecieve;
 
-        public string m_sRead = ""; 
+        public string m_sRead = "";
         private void M_sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             if (OnRecieve == null) return;
             SerialPort sp = (SerialPort)sender;
             string sRead = m_sRead + sp.ReadExisting();
             m_commLog.Add(CommLog.eType.Receive, sRead.Trim());
+            m_nDataRecieve = 0; 
             DataRecieve(sRead, sender); 
         }
 
+        int m_nDataRecieve = 0;
         void DataRecieve(string sRead, object sender)
         {
+            m_nDataRecieve++; 
             if ((m_sRead == "") && (p_eStartBit != eStartBit.None))
             {
                 int nIndex = sRead.IndexOf(m_sStart);
