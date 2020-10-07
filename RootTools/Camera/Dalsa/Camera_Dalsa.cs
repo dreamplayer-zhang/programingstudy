@@ -273,6 +273,12 @@ namespace RootTools.Camera.Dalsa
             }
             m_log.Info("After m_sapXfer null check");   // 201005 ESCHO Add Log 
 
+            m_log.Info("Before new sapXferNotifyHandler");  // 201005 ESCHO Add Log 
+            m_sapXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfFrame;
+            m_sapXfer.XferNotify += new SapXferNotifyHandler(xfer_XferNotify);
+            m_sapXfer.XferNotifyContext = this;
+            m_log.Info("After new sapXferNotifyHandler");   // 201005 ESCHO Add Log 
+
             m_log.Info("Before m_sapDevice null check & !m_sapDevice.Create()");    // 201005 ESCHO Add Log 
             if ( m_sapDevice != null && !m_sapDevice.Create())
             {
@@ -299,12 +305,6 @@ namespace RootTools.Camera.Dalsa
                 return;
             }
             m_log.Info("After !m_sapXfer.Create()");    // 201005 ESCHO Add Log 
-
-            m_log.Info("Before new sapXferNotifyHandler");  // 201005 ESCHO Add Log 
-            m_sapXfer.Pairs[0].EventType = SapXferPair.XferEventType.EndOfFrame;
-            m_sapXfer.XferNotify += new SapXferNotifyHandler(xfer_XferNotify);
-            m_sapXfer.XferNotifyContext = this;
-            m_log.Info("After new sapXferNotifyHandler");   // 201005 ESCHO Add Log 
 
             m_log.Info("Before SetCamHandle");  // 201005 ESCHO Add Log 
             p_CamParam.SetCamHandle(m_sapDevice, m_sapAcq);

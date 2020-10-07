@@ -70,32 +70,6 @@ namespace Root_Vega
 			}
 		}
 
-		void btnRecipeOpenClicked()
-		{
-			string sModel = EQ.m_sModel;
-			OpenFileDialog dlg = new OpenFileDialog();
-			dlg.InitialDirectory = m_sPath;
-			dlg.DefaultExt = "." + sModel;
-			dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
-			if (dlg.ShowDialog() == true) m_moduleRunList.OpenJob(dlg.FileName);
-			
-			p_moduleRunList.RunTree(Tree.eMode.Init);
-		}
-
-		void btnRecipeSaveClicked()
-		{
-			string sModel = EQ.m_sModel;
-			SaveFileDialog dlg = new SaveFileDialog();
-			dlg.InitialDirectory = m_sPath;
-			dlg.DefaultExt = "." + sModel;
-			dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
-			if (dlg.ShowDialog() == true)
-			{
-				m_moduleRunList.SaveJob(dlg.FileName);	
-			}
-			p_moduleRunList.RunTree(Tree.eMode.Init);
-		}
-
 		void btnRecipeClearClicked()
 		{
 			m_moduleRunList.Clear();
@@ -106,22 +80,6 @@ namespace Root_Vega
 		{
 			m_moduleRunList.Add(p_strSelectedModule, p_strSelectedModuleRun);
 			p_moduleRunList.RunTree(Tree.eMode.Init);
-		}
-
-		public ICommand CommandRecipeOpen
-		{
-			get
-			{
-				return new RelayCommand(btnRecipeOpenClicked);
-			}
-		}
-
-		public ICommand CommandRecipeSave
-		{
-			get
-			{
-				return new RelayCommand(btnRecipeSaveClicked);
-			}
 		}
 
 		public ICommand CommandRecipeClear

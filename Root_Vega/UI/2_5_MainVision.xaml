@@ -78,6 +78,10 @@
                             Style="{StaticResource BasicBtn}"
                             Command="{Binding CommandStartInsp}"
                             Margin="0,0,0,10" />
+                    <Button Content="Inspection Complete"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding CommandEndInsp}"
+                            Margin="0,0,0,10" />
                     <Expander Header="Feature Parameters"
 							  Margin="0,0,0,10"
 							  Foreground="White">

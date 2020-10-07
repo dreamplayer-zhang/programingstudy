@@ -36,11 +36,13 @@ namespace Root_ASIS
         public Turnover m_turnover;
         public Dictionary<Cleaner.eCleaner, Cleaner> m_aCleaner = new Dictionary<Cleaner.eCleaner, Cleaner>();
         public Trays m_trays;
+        public LoadEV m_paperEV;
         public Loader0 m_loader0; 
         public Loader1 m_loader1;
         public Loader2 m_loader2;
         public Loader3 m_loader3;
-        public Sorter0 m_sorter0; 
+        public Sorter0 m_sorter0;
+        public Sorter1 m_sorter1;
 
         void InitModule()
         {
@@ -60,7 +62,9 @@ namespace Root_ASIS
             m_aCleaner.Add(Cleaner.eCleaner.Cleaner1, new Cleaner("Cleaner1", 1, m_engineer));
             InitModule(m_aCleaner[Cleaner.eCleaner.Cleaner1]);
             m_trays = new Trays("Trays", m_engineer);
-            InitModule(m_trays); 
+            InitModule(m_trays);
+            m_paperEV = new LoadEV("PaperEV", m_engineer);
+            InitModule(m_paperEV);
             m_loader0 = new Loader0("Loader0", m_engineer, m_loadEV, m_aBoat[Boat.eBoat.Boat0]);
             InitModule(m_loader0);
             m_loader1 = new Loader1("Loader1", m_engineer, m_aBoat[Boat.eBoat.Boat0], m_turnover);
@@ -71,6 +75,8 @@ namespace Root_ASIS
             InitModule(m_loader3);
             m_sorter0 = new Sorter0("Sorter0", m_engineer, m_aCleaner, m_trays);
             InitModule(m_sorter0);
+            m_sorter1 = new Sorter1("Sorter1", m_engineer, m_sorter0, m_trays, m_paperEV);
+            InitModule(m_sorter1);
             m_recipe = new ASIS_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
             m_process = new ASIS_Process("Process", m_engineer, this);
