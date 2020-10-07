@@ -313,6 +313,7 @@
                                     </Button>
                                     <Button Style="{StaticResource BasicBtn}"
                                             IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                            Command="{Binding GrabCommand}"
                                             Margin="5">
                                         <Button.Content>
                                             <StackPanel Orientation="Horizontal">
@@ -327,6 +328,7 @@
                                     </Button>
                                     <Button Style="{StaticResource BasicBtn}"
                                             IsEnabled="{Binding p_CamInfo._IsCanGrab}"
+                                            Command="{Binding ContinousGrabCommand}"
                                             Margin="5">
                                         <Button.Content>
                                             <StackPanel Orientation="Horizontal">
@@ -341,6 +343,7 @@
                                     </Button>
                                     <Button Style="{StaticResource BasicBtn}"
                                             IsEnabled="{Binding p_CamInfo._IsCanGrab, Converter={StaticResource InverseBooleanConverters}}"
+                                            Command="{Binding StopGrabCommand}"
                                             Margin="5">
                                         <Button.Content>
                                             <StackPanel Orientation="Horizontal">
@@ -1145,7 +1148,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <ComboBox Margin="10"
                                                           Grid.Column="0"
-                                                          SelectedItem="{Binding p_axisXY.p_axisY.p_SelMovePos, Mode=TwoWay}"
+                                                          SelectedItem="{Binding p_strSelPos, Mode=TwoWay}"
                                                           ItemsSource="{Binding p_asPos}"></ComboBox>
                                                 <TextBlock  Grid.Column="1"
                                                             Style="{StaticResource BasicTb}"
@@ -1372,7 +1375,7 @@
                                                 <Border Grid.Column="1">
                                                     <TextBox VerticalAlignment="Center"
                                                              Background="{PriorityBinding}"
-                                                             Text="{Binding p_axisXY.p_axisY.p_dRelPos}"
+                                                             Text="{Binding p_dRelPos}"
                                                              Foreground="White"
                                                              HorizontalAlignment="Center"
                                                              FontSize="20" 

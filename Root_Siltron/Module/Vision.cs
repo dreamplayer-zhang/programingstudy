@@ -477,6 +477,9 @@ namespace Root_Siltron.Module
 
             public override string Run()
             {
+                Test();
+                return "OK";
+
                 string sRstCam = m_module.OpenCamera();
                 if (sRstCam != "OK")
                 {
@@ -768,6 +771,12 @@ namespace Root_Siltron.Module
                     gmBevelTop.SetLight(false);
                 }
             }
+
+            private void Test()
+			{
+                EdgeSideInsp edgeSideInsp = new EdgeSideInsp();
+                edgeSideInsp.Insp(m_module.m_memoryEdgeTop, 800);
+			}
 
             int k_bottom = 0;
             void gmBevelBottom_Grabed(object sender, EventArgs e)

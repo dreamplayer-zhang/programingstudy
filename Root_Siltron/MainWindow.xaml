@@ -35,7 +35,7 @@
             <icons:AtiLogo Width="40"
                            Height="25"
                            Margin="3" />
-            <TextBlock Text="WIND2"
+            <TextBlock Text="SK Siltron"
                        Foreground="White"
                        VerticalAlignment="Center"
                        FontSize="15"

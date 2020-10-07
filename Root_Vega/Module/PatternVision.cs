@@ -699,6 +699,7 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_Grab(this), true, "Run Grab");
             AddModuleRunList(new Run_Inspection(this), true, "Run Inspection");
             AddModuleRunList(new Run_AutoIllumination(this), true, "Run AutoIllumination");
+            AddModuleRunList(new Run_VRSReviewImagCapture(this), true, "Run VRSReviewImageCapture");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -1306,7 +1307,7 @@ namespace Root_Vega.Module
                 return "OK";
             }
 
-            List<CPoint> GetDefectPosList()
+            public List<CPoint> GetDefectPosList()
             {
                 // variable
                 DBConnector dbConnector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
@@ -1328,7 +1329,7 @@ namespace Root_Vega.Module
                 return lstDefectPos;
             }
 
-            RPoint GetAxisPosFromMemoryPos(CPoint cpMemory)
+            public RPoint GetAxisPosFromMemoryPos(CPoint cpMemory)
             {
                 // variable
                 int nMMPerUM = 1000;
@@ -1338,13 +1339,13 @@ namespace Root_Vega.Module
                 double dTriggerStartPosY = m_rpReticleCenterPos.Y + nTotalTriggerCount / 2;
                 int nScanLine = cpMemory.X / m_grabMode.m_camera.GetRoiSize().X;
                 double dXScale = m_dResX_um * 10;
-                double dTriggerStartPosX = m_rpReticleCenterPos.X + nTotalTriggerCount * (double)m_grabMode.m_dTrigger / 2 - nScanLine * m_grabMode.m_camera.GetRoiSize().X * dXScale;
+                double dTriggerStartPosX = m_rpReticleCenterPos.X + nReticleYSize_px * (double)m_grabMode.m_dTrigger / 2 - nScanLine * m_grabMode.m_camera.GetRoiSize().X * dXScale;
                 int nSpareX = cpMemory.X % m_grabMode.m_camera.GetRoiSize().X;
                 RPoint rpAxis = new RPoint();
 
                 // implement
                 rpAxis.X = dTriggerStartPosX + (10 * m_dResX_um * nSpareX) + m_rpDistanceOfTDIToVRS_pulse.X;
-                rpAxis.Y = dTriggerStartPosY + (m_grabMode.m_dTrigger * cpMemory.Y) + m_rpDistanceOfTDIToVRS_pulse.Y;
+                rpAxis.Y = dTriggerStartPosY - (m_grabMode.m_dTrigger * cpMemory.Y) - m_rpDistanceOfTDIToVRS_pulse.Y;
 
                 return rpAxis;
             }

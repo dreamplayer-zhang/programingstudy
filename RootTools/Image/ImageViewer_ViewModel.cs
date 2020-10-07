@@ -9,6 +9,7 @@ using System.Threading;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace RootTools
 {
@@ -476,8 +477,10 @@ namespace RootTools
 		#endregion
 		public UniquenessDrawerVM m_BasicTool;
 		private UniquenessDrawerVM m_InformationTool;
-		public ImageViewer_ViewModel(ImageData image = null, IDialogService dialogService = null)
+		public ImageViewer_ViewModel(ImageData image = null, IDialogService dialogService = null, Dispatcher dispatcher = null)
 		{
+			if (dispatcher != null) dispatcher = Dispatcher.CurrentDispatcher;
+
 			if (image != null)
 			{
 				p_ImageData = image;

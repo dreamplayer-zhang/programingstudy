@@ -74,7 +74,7 @@ namespace Root_ASIS.Module
             if (m_boat0.p_bDone == false) return "Boat0 not Done";
             if (m_picker.p_infoStrip != null) return "Picker already Load"; 
             if (Run(AxisMove(ePos.Boat0))) return p_sInfo;
-            if (Run(m_picker.RunLoad(null))) return p_sInfo;
+            if (Run(m_picker.RunLoad())) return p_sInfo;
             m_picker.p_infoStrip = m_boat0.p_infoStrip;
             m_boat0.p_infoStrip = null; 
             return "OK";
@@ -291,7 +291,7 @@ namespace Root_ASIS.Module
 
             public override string Run()
             {
-                if (m_bLoad) return m_module.m_picker.RunLoad(null);
+                if (m_bLoad) return m_module.m_picker.RunLoad();
                 else return m_module.m_picker.RunUnload();
             }
         }
