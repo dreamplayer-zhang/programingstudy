@@ -149,7 +149,7 @@ namespace Root_Vega
         public int m_nRnR = 1; 
         public string AddSequence(dynamic infoSlot)
         {
-            m_process.AddInfoReticle(infoSlot, m_nRnR);
+            m_process.p_sInfo = m_process.AddInfoReticle(infoSlot, m_nRnR);
             m_nRnR = 1; 
             return "OK";
         }
