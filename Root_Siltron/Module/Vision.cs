@@ -477,8 +477,8 @@ namespace Root_Siltron.Module
 
             public override string Run()
             {
-                Test();
-                return "OK";
+                //Test();
+                //return "OK";
 
                 string sRstCam = m_module.OpenCamera();
                 if (sRstCam != "OK")
@@ -775,7 +775,7 @@ namespace Root_Siltron.Module
             private void Test()
 			{
                 EdgeSideInsp edgeSideInsp = new EdgeSideInsp();
-                edgeSideInsp.Insp(m_module.m_memoryEdgeTop, 800);
+                edgeSideInsp.Insp(m_module.m_memoryEdgeTop, 200);
 			}
 
             int k_bottom = 0;
