@@ -1,20 +1,26 @@
-﻿using Microsoft.Win32;
-using RootTools;
+﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
-using RootTools.GAFs;
 using RootTools.Light;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 
 namespace Root.Module
 {
     public class Test : ModuleBase
     {
+        #region StringTable
+        static string[] m_asStringTable =
+        {
+            "Gray Value Range (0~255)",
+        };
+        StringTable.Group m_ST = StringTable.Get("Test", m_asStringTable);
+        #endregion
+
         #region ToolBox
         enum eBuzzer
         {
@@ -165,10 +171,6 @@ namespace Root.Module
                         }
                         sLine = ReadLine(sr);
                     }
-                }
-                catch (Exception e)
-                {
-                    int i = 0;
                 }
                 finally
                 {

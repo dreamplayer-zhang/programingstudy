@@ -4,6 +4,14 @@ namespace Root_ASIS
 {
     public static class Strip
     {
+        public enum eUnitOrder
+        {
+            X_Y,
+            Y_X,
+            InvX_Y,
+            InvY_X
+        };
+
         public static _Strip m_strip = new _Strip(); 
 
         public static bool p_bUseMGZ
@@ -17,6 +25,24 @@ namespace Root_ASIS
         {
             get { return m_strip.p_szStrip; }
             set { m_strip.p_szStrip = value; }
+        }
+
+        public static CPoint p_szBlock
+        {
+            get { return m_strip.p_szBlock; }
+            set { m_strip.p_szBlock = value; }
+        }
+
+        public static CPoint p_szUnit
+        {
+            get { return m_strip.p_szUnit; }
+            set { m_strip.p_szUnit = value; }
+        }
+
+        public static eUnitOrder p_eUnitOrder
+        { 
+            get { return m_strip.p_eUnitOrder; }
+            set { m_strip.p_eUnitOrder = value; }
         }
     }
 
@@ -45,5 +71,43 @@ namespace Root_ASIS
                 OnPropertyChanged(); 
             }
         }
+
+        CPoint _szBlock = new CPoint(1, 1); 
+        public CPoint p_szBlock
+        {
+            get { return _szBlock; }
+            set
+            {
+                if (_szBlock == value) return;
+                _szBlock = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        CPoint _szUnit = new CPoint(1, 1);
+        public CPoint p_szUnit
+        {
+            get { return _szUnit; }
+            set
+            {
+                if (_szUnit == value) return;
+                _szUnit = value;
+                OnPropertyChanged();
+            }
+        }
+
+        Strip.eUnitOrder _eUnitOrder = Strip.eUnitOrder.X_Y; 
+        public Strip.eUnitOrder p_eUnitOrder
+        {
+            get { return _eUnitOrder; }
+            set
+            {
+                if (_eUnitOrder == value) return;
+                _eUnitOrder = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+
     }
 }

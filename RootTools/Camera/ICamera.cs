@@ -1,6 +1,7 @@
-﻿using System.Windows.Controls;
-using RootTools.Memory;
+﻿using RootTools.Memory;
 using RootTools.Trees;
+using System;
+using System.Windows.Controls;
 
 namespace RootTools.Camera
 {
@@ -12,7 +13,8 @@ namespace RootTools.Camera
 
     public interface ICamera
     {
-        event System.EventHandler Grabed;
+        event EventHandler Grabed;
+
         string p_id { get; set; }
 
         int p_nGrabProgress { get; set; }

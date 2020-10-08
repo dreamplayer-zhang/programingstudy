@@ -77,6 +77,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AOI\AOIData.cs" />
+    <Compile Include="AOI\AOIStrip.cs" />
+    <Compile Include="AOI\Blob.cs" />
     <Compile Include="Main_UI.xaml.cs">
       <DependentUpon>Main_UI.xaml</DependentUpon>
     </Compile>
@@ -99,6 +102,8 @@
     </Compile>
     <Compile Include="Module\Turnover.cs" />
     <Compile Include="Strip.cs" />
+    <Compile Include="Teach\IAOI.cs" />
+    <Compile Include="Teach\Teach.cs" />
     <Page Include="ASIS_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -198,5 +203,6 @@
       <Name>RootTools</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

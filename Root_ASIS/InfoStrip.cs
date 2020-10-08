@@ -28,12 +28,22 @@ namespace Root_ASIS
             }
         }
 
-        public int m_nXout = -1; 
+        public int m_nXout = -1;
+        #endregion
+
+        #region AOI Position
+        RPoint m_rpShift = new RPoint();
+        double m_fAngle = 0; 
+        public void SetInfoPos(RPoint rpShift, double fAngle)
+        {
+            m_rpShift = rpShift;
+            m_fAngle = fAngle; 
+        }
         #endregion
 
         public InfoStrip(int iStrip)
         {
-            p_iStrip = iStrip; 
+            p_iStrip = iStrip;
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using RootTools.Trees;
+﻿using RootTools.RTC5s;
+using RootTools.Trees;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RootTools.ToolBoxs
 {
@@ -7,72 +9,65 @@ namespace RootTools.ToolBoxs
     {
         public static _StringTable _stringTable = new _StringTable();
 
-        public static String Get(string sKey, string sGroup = "StringTable")
+        public static Group Get(string sGroup, string[] aString)
         {
-            return _stringTable.Get(sKey, sGroup);
+            return _stringTable.Get(sGroup, aString);
         }
 
-        public class String : NotifyProperty
+        public class Group
         {
-            string _sKey = ""; 
-            public string p_sKey { get { return _sKey; } set { _sKey = value; } }
-            string _sGroup = ""; 
-            public string p_sGroup { get { return _sGroup; } set { _sGroup = value; } }
+            public string m_sGroup = "";
+            public Dictionary<string, string> m_aString = new Dictionary<string, string>();
 
-            string _sValue = "";
-            public string p_sValue
+            public string Get(string sKey)
             {
-                get { return _sValue; }
-                set
-                {
-                    if (_sValue == value) return;
-                    _sValue = value;
-                    m_stringTable.m_reg.Write(p_sGroup + "." + p_sKey, _sValue);
-                    OnPropertyChanged();
-                }
-            }
-
-            public override string ToString()
-            {
-                return "(" + p_sKey + ", " + p_sValue + ")";
+                if (m_aString.ContainsKey(sKey)) return m_aString[sKey];
+                return sKey;
             }
 
             public void RunTree(Tree tree)
             {
-                p_sValue = tree.Set(p_sValue, p_sValue, p_sKey, "Change String Table Value");
+                foreach (var kv in m_aString.ToList())
+                {
+                    string sValue = tree.Set(kv.Value, kv.Value, kv.Key, "String Table Value");
+                    if (kv.Value != sValue) m_reg.Write(m_sGroup + "." + kv.Key, sValue);
+                    m_aString[kv.Key] = sValue;
+                }
             }
 
-            _StringTable m_stringTable = null;
-            public String(string sKey, string sGroup, _StringTable stringTable)
+            Registry m_reg;
+            public Group(string sGroup, string[] aString, Registry reg)
             {
-                p_sKey = sKey;
-                p_sGroup = sGroup;
-                m_stringTable = stringTable;
-                if (stringTable.m_reg == null) _sValue = sKey;
-                else _sValue = stringTable.m_reg.Read(sGroup + "." + sKey, sKey);
-            }
-
-            public void Init()
-            {
-                _sValue = m_stringTable.m_reg.Read(p_sGroup + "." + p_sKey, p_sKey);
+                m_reg = reg;
+                m_sGroup = sGroup;
+                foreach (string sKey in aString)
+                {
+                    string sValue = m_reg.Read(sGroup + "." + sKey, sKey);
+                    m_aString.Add(sKey, sValue);
+                }
             }
         }
     }
 
     public class _StringTable : IToolSet
     {
-        #region String
-        public List<StringTable.String> m_aString = new List<StringTable.String>();
-        public StringTable.String Get(string sKey, string sGroup)
+        static readonly object m_csLock = new object();
+        List<StringTable.Group> m_aGroup = new List<StringTable.Group>();
+
+        #region Group
+        public StringTable.Group Get(string sGroup, string[] aString)
         {
-            foreach (StringTable.String str in m_aString)
+            lock (m_csLock)
             {
-                if (str.p_sKey == sKey) return str;
+                foreach (StringTable.Group group in m_aGroup)
+                {
+                    if (group.m_sGroup == sGroup) return group;
+                }
+                StringTable.Group newGroup = new StringTable.Group(sGroup, aString, m_reg);
+                m_aGroup.Add(newGroup);
+                RunTree(Tree.eMode.Init); 
+                return newGroup;
             }
-            StringTable.String newString = new StringTable.String(sKey, sGroup, this);
-            m_aString.Add(newString);
-            RunTree(Tree.eMode.Init); 
-            return newString;
         }
         #endregion
 
@@ -85,7 +80,10 @@ namespace RootTools.ToolBoxs
         public void RunTree(Tree.eMode mode)
         {
             m_treeRoot.p_eMode = mode;
-            foreach (StringTable.String str in m_aString) str.RunTree(m_treeRoot.GetTree(str.p_sGroup)); 
+            lock (m_csLock)
+            {
+                foreach (StringTable.Group group in m_aGroup) group.RunTree(m_treeRoot.GetTree(group.m_sGroup));
+            }
         }
         #endregion
 
@@ -125,7 +123,6 @@ namespace RootTools.ToolBoxs
         {
             p_id = "StringTable"; 
             m_reg = new Registry(p_id, sModel);
-            foreach (StringTable.String str in m_aString) str.Init();
             m_treeRoot = new TreeRoot(sModel + "." + p_id, null);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
         }
