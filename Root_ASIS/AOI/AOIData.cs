@@ -7,7 +7,9 @@ namespace Root_ASIS.AOI
     public class AOIData : NotifyProperty
     {
         #region Property
-        public string m_sInspect = "OK"; 
+        public string m_sDisplay = ""; 
+
+        public bool m_bEnable = true; 
         #endregion 
 
         #region ROI State

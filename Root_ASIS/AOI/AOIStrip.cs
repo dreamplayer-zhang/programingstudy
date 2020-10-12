@@ -24,6 +24,7 @@ namespace Root_ASIS.AOI
         {
             public CPoint m_sz = new CPoint(100, 50);
             public AOIData m_aoiData;
+            public string m_sInspect = ""; 
 
             public void RunTree(Tree tree)
             {
@@ -128,20 +129,31 @@ namespace Root_ASIS.AOI
         };
 
         InfoStrip m_infoStrip;
+        MemoryData m_memory; 
         int m_dDistanceError = 10; 
         public string Inspect(InfoStrip infoStrip, MemoryData memory, eMode eMode)
         {
-            m_infoStrip = infoStrip; 
-            Parallel.For(0, 1, n => { m_aUnit[n].m_aoiData.m_sInspect = InspectBlob(infoStrip, memory, eMode, n); } );
+            m_infoStrip = infoStrip;
+            m_memory = memory;
+            string sInspect = Inspect(eMode);
+            if (sInspect == "OK") return sInspect;
+            m_infoStrip.p_eResult = InfoStrip.eResult.Rework;
+            m_infoStrip.m_sError = sInspect;
+            return sInspect; 
+        }
+
+        string Inspect(eMode eMode)
+        {
+            Parallel.For(0, 1, n => { m_aUnit[n].m_sInspect = InspectBlob(eMode, n); });
             foreach (Unit data in m_aUnit)
             {
-                if (data.m_aoiData.m_sInspect != "OK") return data.m_aoiData.m_sInspect; 
+                if (data.m_sInspect != "OK") return data.m_sInspect;
             }
-            m_aResult[eMode].CalcStripPos(); 
+            m_aResult[eMode].CalcStripPos();
             if (eMode == eMode.Inspect)
             {
                 if (Get_dDistance() >= m_dDistanceError) return "Fiducial Distance Error";
-                SetInfoPos(); 
+                SetInfoPos();
             }
             return "OK";
         }
@@ -152,11 +164,11 @@ namespace Root_ASIS.AOI
         double m_dSizeError = 20;
         double m_dLendthError = 20;
         double m_dCenterError = 50; 
-        string InspectBlob(InfoStrip infoStrip, MemoryData memory, eMode eMode, int iAOI)
+        string InspectBlob(eMode eMode, int iAOI)
         {
             Unit data = m_aUnit[iAOI]; 
             Blob blob = m_aBlob[iAOI];
-            blob.RunBlob(memory, 0, data.m_aoiData.m_cp0, data.m_aoiData.m_sz, m_nGV[0], m_nGV[1], 3);
+            blob.RunBlob(m_memory, 0, data.m_aoiData.m_cp0, data.m_aoiData.m_sz, m_nGV[0], m_nGV[1], 3);
             blob.RunSort(m_eSort);
             if (blob.m_aSort.Count == 0) return "Find Fiducial Error"; 
             Blob.Island island = blob.m_aSort[0];
@@ -164,6 +176,7 @@ namespace Root_ASIS.AOI
             result.m_maxLength = island.m_nLength;
             result.m_maxSize = island.m_nSize;
             result.m_rpCenter = island.m_rpCenter;
+            data.m_aoiData.m_sDisplay = "Size = " + island.m_nSize + ", " + island.m_sz.ToString(); 
             if (eMode == eMode.Inspect)
             {
                 if (Get_dSize(iAOI) >= m_dSizeError) return "Fiducial Size Error";

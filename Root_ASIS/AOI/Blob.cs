@@ -3,6 +3,7 @@ using RootTools.Memory;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Windows.Data;
 
 namespace Root_ASIS.AOI
 {
@@ -111,6 +112,18 @@ namespace Root_ASIS.AOI
                 m_rpCenter /= m_nSize;
                 m_rpCenter.X += cp.X;
                 m_rpCenter.Y += cp.Y;
+            }
+
+            public int GetSize(eSort eSort)
+            {
+                switch (eSort)
+                {
+                    case eSort.Size: return m_nSize;
+                    case eSort.Length: return m_nLength;
+                    case eSort.X: return m_sz.X;
+                    case eSort.Y: return m_sz.Y;
+                }
+                return m_nSize; 
             }
 
             public Island(int x, int y)

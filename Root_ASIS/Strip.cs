@@ -39,6 +39,8 @@ namespace Root_ASIS
             set { m_strip.p_szUnit = value; }
         }
 
+        public static int p_lUnit { get { return p_szUnit.X * p_szUnit.Y * p_szBlock.X * p_szBlock.Y; } }
+
         public static eUnitOrder p_eUnitOrder
         { 
             get { return m_strip.p_eUnitOrder; }

@@ -358,7 +358,7 @@ namespace Root_ASIS.Module
             int nTray = 0;
             for (int n = 0; n < m_lGood; n++, nTray++)
             {
-                m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Good);
+                m_aTray[nTray].p_sTray = GetTrayName(InfoStrip.eResult.Xout, 0);
                 m_aTray[nTray].m_nXout = 0; 
             }
             for (int n = 1; n < 10; n++)
@@ -385,8 +385,9 @@ namespace Root_ASIS.Module
         {
             switch (eResult)
             {
-                case InfoStrip.eResult.Good: return "Good";
-                case InfoStrip.eResult.Xout: return "X" + nXOut.ToString("000");
+                case InfoStrip.eResult.Xout: 
+                    if (nXOut == 0) return "Good";
+                    else return "X" + nXOut.ToString("000");
                 case InfoStrip.eResult.Rework: return "Rewk";
                 case InfoStrip.eResult.Error: return "Errr"; 
             }
