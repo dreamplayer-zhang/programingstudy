@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Security.Policy;
 using DALSA.SaperaLT.SapClassBasic;
 
 namespace RootTools.Camera.Dalsa
@@ -83,6 +84,13 @@ namespace RootTools.Camera.Dalsa
             TdiArea,
         }
 
+        
+        public enum eDeviceScanType
+        {
+            Linescan,
+            Areascan,
+        }
+
         public enum eTriggerMode
         {
             Internal,
@@ -164,6 +172,19 @@ namespace RootTools.Camera.Dalsa
             set
             {
                 SetFeatureValue(ref m_eTDIMode, value, "sensorTDIModeSelection", typeof(string));
+            }
+        }
+
+        eDeviceScanType m_eDeviceScanType = eDeviceScanType.Linescan;
+        public eDeviceScanType p_eDeviceScanType
+        {
+            get 
+            {
+                return m_eDeviceScanType; 
+            }
+            set
+            {
+                SetFeatureValue(ref m_eDeviceScanType, value, "DeviceScanType", typeof(string));
             }
         }
 
