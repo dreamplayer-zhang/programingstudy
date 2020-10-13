@@ -8,9 +8,12 @@ namespace Root_ASIS.AOI
     {
         #region Property
         public string m_sDisplay = ""; 
-
-        public bool m_bEnable = true; 
-        #endregion 
+        public bool m_bEnable = true;
+        public bool m_bInspect = false; 
+        public CPoint m_cp0 = new CPoint();
+        public CPoint m_sz;
+        public RPoint m_rpCenter = new RPoint();
+        #endregion
 
         #region ROI State
         public enum eROI
@@ -59,11 +62,6 @@ namespace Root_ASIS.AOI
             Resize
         }
         public eMove m_eMove = eMove.None; 
-        #endregion
-
-        #region Position
-        public CPoint m_cp0 = new CPoint();
-        public CPoint m_sz;
         #endregion
 
         #region Tree

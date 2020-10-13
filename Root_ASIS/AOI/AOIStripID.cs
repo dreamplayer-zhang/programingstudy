@@ -1,10 +1,8 @@
 ﻿using Root_ASIS.Teach;
 using RootTools;
-using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Root_ASIS.AOI
 {
@@ -47,7 +45,7 @@ namespace Root_ASIS.AOI
             {
                 while (m_aUnitID.Count < value)
                 {
-                    UnitID unitID = new UnitID(m_id + "." + m_aUnitID.Count.ToString("00"), this); 
+                    UnitID unitID = new UnitID(p_id + "." + m_aUnitID.Count.ToString("00"), this); 
                     m_aUnitID.Add(unitID); 
                 }
                 while (m_aUnitID.Count > value) m_aUnitID.RemoveAt(m_aUnitID.Count - 1);
@@ -68,12 +66,17 @@ namespace Root_ASIS.AOI
         }
         #endregion
 
-        string m_id;
+        #region IAOI
+        public string p_id { get; set; }
+        public bool p_bEnable { get; set; }
+        #endregion
+
         Log m_log;
         public AOIStripID(string id, Log log)
         {
-            m_id = id;
+            p_id = id;
             m_log = log;
+            p_bEnable = true; 
 //            InitUnit();
 //            InitResult();
         }

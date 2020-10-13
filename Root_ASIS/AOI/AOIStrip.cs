@@ -188,13 +188,18 @@ namespace Root_ASIS.AOI
 
         void RunTreeInspect(Tree tree)
         {
+            RunTreeInspectGV(tree.GetTree("GV")); 
             m_eSort = (Blob.eSort)tree.Set(m_eSort, m_eSort, "Sort", "Select Fiducial by");
-            m_nGV[0] = tree.Set(m_nGV[0], m_nGV[0], "Min GV", m_ST.Get("Gray Value Range (0~255)"));
-            m_nGV[1] = tree.Set(m_nGV[1], m_nGV[1], "Max GV", m_ST.Get("Gray Value Range (0~255)"));
-            RunTreeError(tree.GetTree("Error", false)); 
+            RunTreeInspectError(tree.GetTree("Error", false)); 
         }
 
-        void RunTreeError(Tree tree)
+        void RunTreeInspectGV(Tree tree)
+        {
+            m_nGV[0] = tree.Set(m_nGV[0], m_nGV[0], "Min", m_ST.Get("Gray Value Range (0~255)"));
+            m_nGV[1] = tree.Set(m_nGV[1], m_nGV[1], "Max", m_ST.Get("Gray Value Range (0~255)"));
+        }
+
+        void RunTreeInspectError(Tree tree)
         {
             m_dSizeError = tree.Set(m_dSizeError, m_dSizeError, "Size", "Size Error (%)");
             m_dLendthError = tree.Set(m_dLendthError, m_dLendthError, "Length", "Length Error (%)");
@@ -211,12 +216,17 @@ namespace Root_ASIS.AOI
         }
         #endregion
 
-        string m_id;
-        Log m_log; 
+        #region IAOI
+        public string p_id { get; set; }
+        public bool p_bEnable { get; set; }
+        #endregion
+
+        Log m_log;
         public AOIStrip(string id, Log log)
         {
-            m_id = id;
+            p_id = id;
             m_log = log;
+            p_bEnable = true;
             InitUnit();
             InitResult(); 
         }
