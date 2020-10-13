@@ -1,5 +1,6 @@
 ﻿using Root_Vega.Module;
 using RootTools.Gem;
+using RootTools.OHT;
 using RootTools.OHT.Semi;
 using System;
 using System.Windows;
@@ -22,8 +23,8 @@ namespace Root_Vega.ManualJob
         #region AccessMode
         void TimerAccessMode()
         {
-            SetBrush(buttonAccessManual, m_loadport.m_infoPod.p_bAccessLP_Manual);
-            SetBrush(buttonAccessAuto, m_loadport.m_infoPod.p_bAccessLP_Auto);
+            SetBrush(buttonAccessManual, m_loadport.m_infoPod.p_bAccessLP_Manual && p_bBlink);
+            SetBrush(buttonAccessAuto, m_loadport.m_infoPod.p_bAccessLP_Auto && p_bBlink);
         }
 
         private void buttonAccessManual_Click(object sender, RoutedEventArgs e)
@@ -38,8 +39,6 @@ namespace Root_Vega.ManualJob
         #endregion
 
         #region OHT State
-        int _nBlink = 0; 
-        bool p_bBlink { get { return _nBlink < 5; } }
         void TimerLoadportState()
         {
             SetBrush(buttonStateLoading, m_OHT.m_doLoadReq.p_bOn && p_bBlink); 
@@ -49,31 +48,53 @@ namespace Root_Vega.ManualJob
             bool bPodIn = p_bBlink ? m_loadport.m_dioPlaced.p_bIn : m_loadport.m_dioPresent.p_bIn;
             imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
             imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;
-            _nBlink = (_nBlink + 1) % 10; 
         }
+
+        void SetBrush(Button button, bool bOn)
+        {
+            button.Foreground = bOn ? Brushes.Red : Brushes.Black;
+            button.Background = bOn ? Brushes.Yellow : Brushes.DimGray;
+        }
+
         #endregion
 
         #region OHT DI
         void TimerDI()
         {
-            SetBrush(buttonDIValid, m_OHT.m_diValid.p_bOn); 
-            SetBrush(buttonDICS0, m_OHT.m_diCS[0].p_bOn);
-            SetBrush(buttonDICS1, m_OHT.m_diCS[1].p_bOn);
-            SetBrush(buttonDITrReq, m_OHT.m_diTrReq.p_bOn);
-            SetBrush(buttonDIBusy, m_OHT.m_diBusy.p_bOn);
-            SetBrush(buttonDICompt, m_OHT.m_diComplete.p_bOn);
-            SetBrush(buttonDICont, m_OHT.m_diContinue.p_bOn);
+            SetBrushDI(buttonDIValid, m_OHT.m_diValid);
+            SetBrushDI(buttonDICS0, m_OHT.m_diCS[0]);
+            SetBrushDI(buttonDICS1, m_OHT.m_diCS[1]);
+            SetBrushDI(buttonDITrReq, m_OHT.m_diTrReq);
+            SetBrushDI(buttonDIBusy, m_OHT.m_diBusy);
+            SetBrushDI(buttonDICompt, m_OHT.m_diComplete);
+            SetBrushDI(buttonDICont, m_OHT.m_diContinue);
+        }
+
+        void SetBrushDI(Button button, OHTBase.DI di)
+        {
+            bool bOn = di.p_bOn; 
+            button.Foreground = bOn ? Brushes.Red : Brushes.Black;
+            if (di.p_bWait) bOn = p_bBlink ? bOn : !bOn; 
+            button.Background = bOn ? Brushes.Yellow : Brushes.DimGray;
         }
         #endregion
 
         #region OHT DO
         void TimerDO()
         {
-            SetBrush(buttonDOLReq, m_OHT.m_doLoadReq.p_bOn);
-            SetBrush(buttonDOUReq, m_OHT.m_doUnloadReq.p_bOn);
-            SetBrush(buttonDOReady, m_OHT.m_doReady.p_bOn);
-            SetBrush(buttonDOHoAvbl, m_OHT.m_doHoAvailable.p_bOn);
-            SetBrush(buttonDOES, m_OHT.m_doES.p_bOn);
+            SetBrushDO(buttonDOLReq, m_OHT.m_doLoadReq);
+            SetBrushDO(buttonDOUReq, m_OHT.m_doUnloadReq);
+            SetBrushDO(buttonDOReady, m_OHT.m_doReady);
+            SetBrushDO(buttonDOHoAvbl, m_OHT.m_doHoAvailable);
+            SetBrushDO(buttonDOES, m_OHT.m_doES);
+        }
+
+        void SetBrushDO(Button button, OHTBase.DO dio)
+        {
+            bool bOn = dio.p_bOn;
+            button.Foreground = bOn ? Brushes.Red : Brushes.Black;
+            if (dio.p_bWait) bOn = p_bBlink ? bOn : !bOn;
+            button.Background = bOn ? Brushes.Yellow : Brushes.DimGray;
         }
 
         private void buttonDOLReq_Click(object sender, RoutedEventArgs e)
@@ -112,22 +133,18 @@ namespace Root_Vega.ManualJob
         }
         #endregion
 
-        #region Brushes
-        void SetBrush(Button button, bool bOn)
-        {
-            button.Foreground = bOn ? Brushes.Black : Brushes.White; 
-            button.Background = bOn ? Brushes.Yellow : Brushes.DimGray; 
-        }
-        #endregion
-
         #region Timer
+        int _nBlink = 0;
+        bool p_bBlink { get { return _nBlink < 5; } }
+
         DispatcherTimer m_timer = new DispatcherTimer();
         private void M_timer_Tick(object sender, EventArgs e)
         {
             TimerAccessMode();
             TimerLoadportState();
             TimerDI();
-            TimerDO(); 
+            TimerDO();
+            _nBlink = (_nBlink + 1) % 10;
         }
         #endregion
 

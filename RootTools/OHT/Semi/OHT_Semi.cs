@@ -266,8 +266,9 @@ namespace RootTools.OHT.Semi
                 switch (p_eState)
                 {
                     case eState.All_Off:
-                        CheckPresent(false); 
-                        if ((m_diCS[0].p_bOn || m_diCS[1].p_bOn) && m_diValid.p_bOn)
+                        CheckPresent(false);
+                        bool bCS = IsCS(true);
+                        if (bCS && m_diValid.p_bOn)
                         {
                             p_doLU_Req.p_bOn = true;
                             p_eState = eState.LU_Req_On;
@@ -275,6 +276,9 @@ namespace RootTools.OHT.Semi
                         CheckDI(m_diTrReq, false);
                         CheckDI(m_diBusy, false);
                         CheckDI(m_diComplete, false);
+                        m_doLoadReq.p_bWait = false;
+                        m_doUnloadReq.p_bWait = false;
+                        m_doReady.p_bWait = false; 
                         break;
                     case eState.LU_Req_On:
                         CheckPresent(false);
@@ -287,6 +291,9 @@ namespace RootTools.OHT.Semi
                         }
                         CheckDI(m_diBusy, false);
                         CheckDI(m_diComplete, false);
+                        m_doLoadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
+                        m_doUnloadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
+                        m_doReady.p_bWait = false;
                         break;
                     case eState.Ready_On:
                         CheckPresent(false);
@@ -295,6 +302,9 @@ namespace RootTools.OHT.Semi
                         CheckDI(m_diTrReq, true);
                         if (m_diBusy.p_bOn) p_eState = eState.Busy_On;
                         CheckDI(m_diComplete, false);
+                        m_doLoadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
+                        m_doUnloadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
+                        m_doReady.p_bWait = true;
                         break;
                     case eState.Busy_On:
                         CheckCS(true);
@@ -307,6 +317,9 @@ namespace RootTools.OHT.Semi
                             p_eState = eState.LU_Req_Off; 
                         }
                         CheckDI(m_diComplete, false);
+                        m_doLoadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
+                        m_doUnloadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
+                        m_doReady.p_bWait = true;
                         break;
                     case eState.LU_Req_Off:
                         CheckPresent(true);
@@ -317,11 +330,13 @@ namespace RootTools.OHT.Semi
                             m_doReady.p_bOn = false;
                             p_eState = eState.Ready_Off;
                         }
+                        m_doLoadReq.p_bWait = false;
+                        m_doUnloadReq.p_bWait = false;
+                        m_doReady.p_bWait = true;
                         break;
                     case eState.Ready_Off:
                         CheckPresent(true);
-                        bool bCS = (m_diCS[0].p_bOn == false) && (m_diCS[1].p_bOn == false);
-                        if (bCS && (m_diValid.p_bOn == false) && (m_diComplete.p_bOn == false))
+                        if ((IsCS(false) == false) && (m_diValid.p_bOn == false) && (m_diComplete.p_bOn == false))
                         {
                             switch (m_carrier.p_eTransfer)
                             {
@@ -336,6 +351,9 @@ namespace RootTools.OHT.Semi
                         }
                         CheckDI(m_diTrReq, false);
                         CheckDI(m_diBusy, false);
+                        m_doLoadReq.p_bWait = false;
+                        m_doUnloadReq.p_bWait = false;
+                        m_doReady.p_bWait = false;
                         break; 
                 }
                 CheckChangeDIO();
@@ -411,9 +429,18 @@ namespace RootTools.OHT.Semi
             p_sInfo = p_id + " Illegal Prosent Sensor";
         }
 
+        bool IsCS(bool bOn)
+        {
+            for (int n = 0; n < 2; n++) m_diCS[n].p_bWait = bOn;
+            bool bCSOn = false;
+            for (int n = 0; n < 2; n++) bCSOn |= m_diCS[n].p_bOn;
+            return bCSOn; 
+        }
+
         void CheckCS(bool bOn)
         {
-            if ((m_diCS[0].p_bOn || m_diCS[1].p_bOn) == bOn) return;
+            bool bCSOn = IsCS(bOn);
+            if (bCSOn == bOn) return;
             CheckDI(m_diCS[0], bOn); 
         }
         

@@ -44,11 +44,17 @@ namespace RootTools.OHT
         #endregion
 
         #region OHT DIO
+        public enum eDIO
+        {
+            DI,
+            DO,
+        }
         public interface IDIO
         {
             string p_id { get; set; }
-            bool p_bInput { get; }
+            eDIO p_eDIO { get; }
             bool p_bOn { get; set; }
+            bool p_bWait { get; set; }
             void RunTree(Tree tree);
             void RunTreeToolBox(Tree tree, OHTBase oht);
         }
@@ -58,7 +64,7 @@ namespace RootTools.OHT
             public DIO_I m_di = null;
 
             public string p_id { get; set; }
-            public bool p_bInput { get { return true; } }
+            public eDIO p_eDIO { get { return eDIO.DI; } }
 
             StopWatch m_sw = new StopWatch(); 
             public int m_msChange = 100;
@@ -75,6 +81,8 @@ namespace RootTools.OHT
                 set { }
             }
 
+            public bool p_bWait { get; set; }
+
             public void RunTree(Tree tree)
             {
                 m_msChange = tree.Set(m_msChange, m_msChange, p_id, "DI Change Delay for Remove Noise (ms)"); 
@@ -90,6 +98,7 @@ namespace RootTools.OHT
             public DI(string id)
             {
                 p_id = id;
+                p_bWait = false;
             }
         }
 
@@ -98,13 +107,19 @@ namespace RootTools.OHT
             public DIO_O m_do = null;
 
             public string p_id { get; set; }
-            public bool p_bInput { get { return false; } }
+            public eDIO p_eDIO { get { return eDIO.DO; } }
 
             public bool p_bOn
             {
                 get { return (m_do == null) ? false : m_do.p_bOut; }
-                set { m_do.Write(value); }
+                set 
+                {
+                    p_bWait = value; 
+                    m_do.Write(value); 
+                }
             }
+
+            public bool p_bWait { get; set; }
 
             public void Toggle()
             {
@@ -123,6 +138,7 @@ namespace RootTools.OHT
             public DO(string id)
             {
                 p_id = id;
+                p_bWait = false; 
             }
         }
 
@@ -144,15 +160,15 @@ namespace RootTools.OHT
                 public string p_id { get; set; }
                 public bool p_bOn { get; set; }
                 public Brush p_brush { get; set; }
-                public bool p_bInput 
+                public eDIO p_eDIO
                 {
-                    set { p_brush = value ? Brushes.Blue : Brushes.Red; } 
+                    set { p_brush = (value == eDIO.DI) ? Brushes.Blue : Brushes.Red; } 
                 }
 
                 public Data(IDIO dio)
                 {
                     p_id = dio.p_id;
-                    p_bInput = dio.p_bInput;
+                    p_eDIO = dio.p_eDIO;
                     p_bOn = dio.p_bOn; 
                 }
             }
