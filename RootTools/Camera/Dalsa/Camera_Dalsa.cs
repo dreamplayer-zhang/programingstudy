@@ -184,6 +184,9 @@ namespace RootTools.Camera.Dalsa
             
             p_CamParam.p_Width = tree.Set(p_CamParam.p_Width, 100, "Image Width", "Buffer Image Width");
             p_CamParam.p_Height = tree.Set(p_CamParam.p_Height, 100, "Image Height", "Buffer Image Height");
+            p_CamParam.p_eDeviceScanType = (DalsaParameterSet.eDeviceScanType)tree.Set(p_CamParam.p_eDeviceScanType, p_CamParam.p_eDeviceScanType, "Device Scan Type", "Device Scan Type");
+            p_CamParam.p_eTriggerMode = (DalsaParameterSet.eTriggerMode)tree.Set(p_CamParam.p_eTriggerMode, p_CamParam.p_eTriggerMode, "Trigger Mode", "Trigger Mode");
+
         }
 
         #endregion 
@@ -372,7 +375,8 @@ namespace RootTools.Camera.Dalsa
         public string StopGrab()
         {
             m_nGrabCount = 0;
-            p_CamParam.p_eTDIMode = DalsaParameterSet.eTDIMode.Tdi;
+            //p_CamParam.p_eTDIMode = DalsaParameterSet.eTDIMode.Tdi;
+            p_CamParam.p_eDeviceScanType = DalsaParameterSet.eDeviceScanType.Linescan;
             p_CamParam.p_eTriggerMode = DalsaParameterSet.eTriggerMode.External;
             m_sapDevice.UpdateFeaturesToDevice();
             m_sapXfer.Freeze();
@@ -483,7 +487,7 @@ namespace RootTools.Camera.Dalsa
         }
         public void GrabArea()
         {
-           //p_CamParam.ReadParamter();
+            p_CamParam.ReadParamter();
             m_ImageLive = new ImageData(p_CamParam.p_Width, p_CamParam.p_Height, 1);
             p_ImageViewer.SetImageData(m_ImageLive);
             m_pSapBuf = new IntPtr[p_nBuf];
@@ -491,9 +495,6 @@ namespace RootTools.Camera.Dalsa
                 m_sapBuf.GetAddress(n, out m_pSapBuf[n]);
             p_CamInfo.p_eState = eCamState.GrabLive;
             m_nGrabTrigger = 0;
-            p_CamParam.p_eTDIMode = DalsaParameterSet.eTDIMode.TdiArea;
-            p_CamParam.p_eTriggerMode = DalsaParameterSet.eTriggerMode.Internal;
-            m_sapDevice.UpdateFeaturesToDevice();
             m_sapXfer.Grab();
             m_GrabThread = new Thread(new ThreadStart(RunGrabAreaScanThread));
             m_GrabThread.Start();
