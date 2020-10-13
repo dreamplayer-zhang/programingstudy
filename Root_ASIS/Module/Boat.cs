@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_ASIS.Teachs;
+using RootTools;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
 using RootTools.Light;
@@ -311,6 +312,14 @@ namespace Root_ASIS.Module
         }
         #endregion
 
+        #region Teach
+        public Teach m_teach; 
+        void InitTeach()
+        {
+            m_teach = new Teach(p_id, m_memoryPool); 
+        }
+        #endregion
+
         #region Override
         public override string StateReady()
         {
@@ -350,8 +359,9 @@ namespace Root_ASIS.Module
         {
             m_nID = nID; 
             m_reg = new Registry(id);
-            InitStrip(); 
+            InitStrip();
             base.InitBase(id, engineer);
+            InitTeach();
         }
 
         public override void ThreadStop()

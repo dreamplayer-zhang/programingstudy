@@ -104,8 +104,14 @@
     </Compile>
     <Compile Include="Module\Turnover.cs" />
     <Compile Include="Strip.cs" />
-    <Compile Include="Teach\IAOI.cs" />
-    <Compile Include="Teach\Teach.cs" />
+    <Compile Include="Teachs\IAOI.cs" />
+    <Compile Include="Teachs\Teach.cs" />
+    <Compile Include="Teachs\Teach_UI.xaml.cs">
+      <DependentUpon>Teach_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Teach_UI.xaml.cs">
+      <DependentUpon>Teach_UI.xaml</DependentUpon>
+    </Compile>
     <Page Include="ASIS_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -164,6 +170,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Module\Trays_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Teachs\Teach_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Teach_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

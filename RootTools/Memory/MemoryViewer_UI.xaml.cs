@@ -18,13 +18,26 @@ namespace RootTools.Memory
 
         MemoryViewer m_viewer;
         MemoryPool m_pool; 
-        public void Init(MemoryViewer memoryViewer)
+        public void Init(MemoryViewer memoryViewer, bool bShowCombo = true)
         {
             m_viewer = memoryViewer;
             m_pool = memoryViewer.m_memoryPool; 
             this.DataContext = memoryViewer;
             comboBoxGroup.ItemsSource = memoryViewer.m_memoryPool.m_asGroup;
             memoryViewer.OnInvalidDraw += MemoryViewer_OnInvalidDraw;
+            if (bShowCombo == false)
+            {
+                CollepseComboBox(comboBoxGroup);
+                CollepseComboBox(comboBoxMemory);
+                CollepseComboBox(comboBoxIndex); 
+            }
+        }
+
+        void CollepseComboBox(ComboBox comboBox)
+        {
+            comboBox.MinWidth = 0;
+            comboBox.Width = 0;
+            comboBox.Height = 0; 
         }
 
         private void MemoryViewer_OnInvalidDraw()

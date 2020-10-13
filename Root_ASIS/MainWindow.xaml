@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_ASIS"
+        xmlns:teach="clr-namespace:Root_ASIS.Teachs"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
@@ -18,8 +19,11 @@
         </DataTemplate>
     </Window.Resources>
     <TabControl TabStripPlacement="Left">
-        <TabItem Header=" MainUI " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
+        <TabItem Header=" Main " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
             <local:Main_UI x:Name="mainUI"/>
+        </TabItem>
+        <TabItem Header=" Teach " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
+            <local:Teach_UI x:Name="teachUI"/>
         </TabItem>
         <TabItem Header=" Engineer " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
             <local:ASIS_Engineer_UI x:Name="engineerUI"/>
