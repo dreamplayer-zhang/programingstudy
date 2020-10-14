@@ -322,14 +322,14 @@ namespace RootTools.Memory
             br.ReadInt32();
             br.ReadUInt32();
             br.ReadUInt32();
-            CPoint szMemory = new CPoint(p_sz);
-            szMemory.X = Math.Min(szMemory.X, szBMP.X) / 4 * 4;
-            szMemory.Y = Math.Min(szMemory.Y, szBMP.Y);
+            p_sz.X = Math.Max(p_sz.X, szBMP.X) / 4 * 4;
+            p_sz.Y = Math.Max(p_sz.Y, szBMP.Y);
+            p_sz = p_sz; 
             if (p_nByte == 1) br.ReadBytes(256 * 4); 
-            for (int y = 0; y < szMemory.Y; y++)
+            for (int y = 0; y < p_sz.Y; y++)
             {
-                byte[] pBuf = br.ReadBytes(p_nByte * szMemory.X);
-                Marshal.Copy(pBuf, 0, GetPtr(nIndex, 0, szMemory.Y - y - 1), p_nByte * szMemory.X); 
+                byte[] pBuf = br.ReadBytes(p_nByte * p_sz.X);
+                Marshal.Copy(pBuf, 0, GetPtr(nIndex, 0, p_sz.Y - y - 1), p_nByte * p_sz.X); 
             }
             br.Close();
             fs.Close();
@@ -393,17 +393,16 @@ namespace RootTools.Memory
             }
             if (nByte != p_nByte) return "Invalid Pixel Depth";
             CPoint szJPG = new CPoint(bitmap.Width, bitmap.Height);
-            CPoint szMemory = new CPoint(p_sz);
-            szMemory.X = Math.Min(szMemory.X, szJPG.X) / 4 * 4;
-            szMemory.Y = Math.Min(szMemory.Y, szJPG.Y);
+            p_sz.X = Math.Min(p_sz.X, szJPG.X) / 4 * 4;
+            p_sz.Y = Math.Min(p_sz.Y, szJPG.Y);
             BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
             byte[] aBuf = new byte[p_nByte * szJPG.X * szJPG.Y];
             Marshal.Copy(bitmapData.Scan0, aBuf, 0, p_nByte * szJPG.X * szJPG.Y);
             int wJpg = p_nByte * szJPG.X;
-            int wMemory = p_nByte * szMemory.X; 
-            for (int y = 0; y < szMemory.Y; y++)
+            int wMemory = p_nByte * p_sz.X; 
+            for (int y = 0; y < p_sz.Y; y++)
             {
-                Marshal.Copy(aBuf, y * wJpg, GetPtr(nIndex, 0, szMemory.Y - y - 1), wMemory); 
+                Marshal.Copy(aBuf, y * wJpg, GetPtr(nIndex, 0, p_sz.Y - y - 1), wMemory); 
             }
             bitmap.UnlockBits(bitmapData);
             return "OK";

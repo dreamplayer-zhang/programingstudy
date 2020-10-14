@@ -28,12 +28,14 @@ namespace Root_ASIS
         #endregion
 
         ASIS_Engineer m_engineer = new ASIS_Engineer();
+        MainTeach m_teach; 
         void Init()
         {
             m_engineer.Init("ASIS");
             engineerUI.Init(m_engineer);
+            m_teach = new MainTeach("Teach", m_engineer); 
+            teachUI.Init(m_teach, m_engineer);
             mainUI.Init(m_engineer);
-            teachUI.Init(m_engineer); 
         }
 
         void ThreadStop()

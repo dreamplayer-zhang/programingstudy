@@ -23,7 +23,7 @@
             <local:Main_UI x:Name="mainUI"/>
         </TabItem>
         <TabItem Header=" Teach " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
-            <local:Teach_UI x:Name="teachUI"/>
+            <local:MainTeach_UI x:Name="teachUI"/>
         </TabItem>
         <TabItem Header=" Engineer " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
             <local:ASIS_Engineer_UI x:Name="engineerUI"/>

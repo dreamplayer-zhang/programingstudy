@@ -6,10 +6,10 @@ namespace Root_ASIS
     {
         public enum eUnitOrder
         {
-            X_Y,
-            Y_X,
-            InvX_Y,
-            InvY_X
+            Right_Down,
+            Down_Right,
+            Left_Down,
+            Up_Right
         };
 
         public static _Strip m_strip = new _Strip(); 
@@ -98,7 +98,7 @@ namespace Root_ASIS
             }
         }
 
-        Strip.eUnitOrder _eUnitOrder = Strip.eUnitOrder.X_Y; 
+        Strip.eUnitOrder _eUnitOrder = Strip.eUnitOrder.Right_Down; 
         public Strip.eUnitOrder p_eUnitOrder
         {
             get { return _eUnitOrder; }
