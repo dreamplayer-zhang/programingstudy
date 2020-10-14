@@ -186,6 +186,16 @@ namespace RootTools.Memory
             {
                 if (_fZoom == value) return;
                 _fZoom = value;
+                double dfMin = 1e20; 
+                for (int n = 0; n < m_aZoom.Length; n++)
+                {
+                    double df = Math.Abs(m_aZoom[n] - value);
+                    if (dfMin > df)
+                    {
+                        dfMin = df;
+                        m_iZoom = n;
+                    }
+                }
                 OnPropertyChanged(); 
             }
         }

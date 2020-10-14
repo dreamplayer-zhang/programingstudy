@@ -213,7 +213,8 @@ namespace Root_ASIS.Module
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryGrab = m_memoryGroup.CreateMemory("Grab", 1, m_cam.p_nByte, m_szGrab);
-            m_memoryPool.m_viewer.p_memoryData = m_memoryGrab; 
+            m_memoryPool.m_viewer.p_memoryData = m_memoryGrab;
+            m_memoryPool.m_viewer.p_fZoom = 0.04;
             m_cam.SetMemoryData(m_memoryGrab);
         }
 

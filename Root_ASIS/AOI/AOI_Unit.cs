@@ -20,6 +20,11 @@ namespace Root_ASIS.AOI
 
         #region IAOI
         public bool p_bEnable { get; set; }
+
+        public IAOI NewAOI()
+        {
+            return new AOI_Unit(p_id, m_log); 
+        }
         #endregion
 
         #region Unit
@@ -124,42 +129,29 @@ namespace Root_ASIS.AOI
         }
 
         Blob.eSort m_eSort = Blob.eSort.Size;
-        public int[] m_nGV = new int[2] { 100, 0 };
-        public int m_minSize = 100;
-        public int m_maxSize = 0; 
+        public CPoint m_mmGV = new CPoint(100, 0);
+        public CPoint m_mmSize = new CPoint(100, 0); 
         string Inspect(Unit unit, Blob blob)
         {
             if (unit.m_aoiData.m_bEnable == false) return "OK";
             AOIData aoiData = m_infoStrip.GetInfoPos(unit.m_aoiData);
-            blob.RunBlob(m_memory, 0, aoiData.m_cp0, m_sz, m_nGV[0], m_nGV[1], 3);
+            blob.RunBlob(m_memory, 0, aoiData.m_cp0, m_sz, m_mmGV.X, m_mmGV.Y, 3);
             blob.RunSort(m_eSort);
             if (blob.m_aSort.Count == 0) return "Find Fiducial Error";
             Blob.Island island = blob.m_aSort[0];
             unit.p_nSize = island.GetSize(m_eSort);
             unit.m_aoiData.m_rpCenter = island.m_rpCenter;
-            unit.m_aoiData.m_bInspect = (unit.p_nSize >= m_minSize) && ((m_maxSize <= 0) || (unit.p_nSize <= m_maxSize));
+            unit.m_aoiData.m_bInspect = (unit.p_nSize >= m_mmSize.X) && ((m_mmSize.Y <= 0) || (unit.p_nSize <= m_mmSize.Y));
             unit.m_result.CalcResult(m_eLogic, unit.m_aoiData.m_bInspect); 
             return "OK"; 
         }
 
         void RunTreeInspect(Tree tree)
         {
-            RunTreeInspectGV(tree.GetTree("GV"));
+            m_mmGV = tree.Set(m_mmGV, m_mmGV, "GV", m_ST.Get("Gray Value Range (0~255)"));
             m_eSort = (Blob.eSort)tree.Set(m_eSort, m_eSort, "Sort", "Select Fiducial by");
-            RunTreeInspectSize(tree.GetTree("Size"));
+            m_mmSize = tree.Set(m_mmSize, m_mmSize, "Size", "Size (pixel)");
             m_eLogic = (InfoStrip.UnitResult.eLogic)tree.Set(m_eLogic, m_eLogic, "Logic", "AOI_Unit Inspect Logic"); 
-        }
-
-        void RunTreeInspectGV(Tree tree)
-        {
-            m_nGV[0] = tree.Set(m_nGV[0], m_nGV[0], "Min", m_ST.Get("Gray Value Range (0~255)"));
-            m_nGV[1] = tree.Set(m_nGV[1], m_nGV[1], "Max", m_ST.Get("Gray Value Range (0~255)"));
-        }
-
-        void RunTreeInspectSize(Tree tree)
-        {
-            m_minSize = tree.Set(m_minSize, m_minSize, "Min", "Min Size");
-            m_maxSize = tree.Set(m_maxSize, m_maxSize, "Max", "Max Size");
         }
         #endregion
 
@@ -167,11 +159,12 @@ namespace Root_ASIS.AOI
         public void RunTree(Tree tree)
         {
             RunTreeUnit(tree.GetTree("Unit", false, false));
-            RunTreeInspect(tree.GetTree("Inspect", false));
+            RunTreeInspect(tree);
         }
         #endregion
 
         public string p_id { get; set; }
+        public int p_nID { get; set; }
         Log m_log;
 
         public AOI_Unit(string id, Log log)

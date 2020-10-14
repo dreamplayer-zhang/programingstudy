@@ -6,7 +6,11 @@ namespace Root_ASIS.Teachs
     {
         string p_id { get; set; }
 
+        int p_nID { get; set; }
+
         bool p_bEnable { get; set; }
+
+        IAOI NewAOI(); 
 
         void RunTree(Tree tree);
     }

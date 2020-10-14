@@ -3,6 +3,7 @@ using RootTools;
 using RootTools.Memory;
 using RootTools.Trees;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Root_ASIS.Teachs
 {
@@ -11,18 +12,24 @@ namespace Root_ASIS.Teachs
         #region List AOI 
         AOIStrip m_aoiStrip;
         AOIStripID m_aoiStripID;
-        List<IAOI> _aAOIDefault = new List<IAOI>();
         List<IAOI> _aAOI = new List<IAOI>();
-        public List<string> m_asAOI = new List<string>(); 
         void InitListAOI()
         {
             m_aoiStrip = new AOIStrip("AOIStrip", m_log);
-            _aAOIDefault.Add(m_aoiStrip);
             m_aoiStripID = new AOIStripID("AOIStripID", m_log);
-            _aAOIDefault.Add(m_aoiStripID);
 
             _aAOI.Add(new AOI_Unit("AOI_Unit", m_log));
-            foreach (IAOI aoi in _aAOI) m_asAOI.Add(aoi.p_id); 
+            InvalidateListAOI(); 
+        }
+
+        public ObservableCollection<IAOI> m_aListAOI = new ObservableCollection<IAOI>();
+        void InvalidateListAOI()
+        {
+            m_aListAOI.Clear(); 
+            foreach (IAOI aoi in _aAOI)
+            {
+                if (aoi.p_bEnable) m_aListAOI.Add(aoi);
+            }
         }
 
         void RunTreeAOIEnable(Tree tree)
@@ -35,16 +42,21 @@ namespace Root_ASIS.Teachs
         #endregion
 
         #region AOI
-        List<IAOI> m_aAOI = new List<IAOI>(); 
+        public ObservableCollection<IAOI> m_aAOI = new ObservableCollection<IAOI>(); 
         void ClearAOI()
         {
             m_aAOI.Clear();
-            foreach (IAOI aoi in _aAOIDefault) m_aAOI.Add(aoi); 
         }
 
         void RunTreeAOI(Tree tree)
         {
-            for (int n = 0; n < m_aAOI.Count; n++) m_aAOI[n].RunTree(tree.GetTree(n, m_aAOI[n].p_id)); 
+            m_aoiStrip.RunTree(tree.GetTree("AOIStrip"));
+            m_aoiStripID.RunTree(tree.GetTree("AOIStripID"));
+            for (int n = 0; n < m_aAOI.Count; n++)
+            {
+                m_aAOI[n].p_nID = n; 
+                m_aAOI[n].RunTree(tree.GetTree(n, m_aAOI[n].p_id));
+            }
         }
         #endregion
 
@@ -64,7 +76,8 @@ namespace Root_ASIS.Teachs
         private void M_treeRootSetup_UpdateTree()
         {
             RunTreeSetup(Tree.eMode.Update);
-            RunTreeSetup(Tree.eMode.RegWrite); 
+            RunTreeSetup(Tree.eMode.RegWrite);
+            InvalidateListAOI(); 
         }
 
         public void RunTreeSetup(Tree.eMode eMode)
@@ -91,7 +104,7 @@ namespace Root_ASIS.Teachs
         public void RunTreeAOI(Tree.eMode eMode)
         {
             m_treeRootAOI.p_eMode = eMode;
-            RunTreeAOI(m_treeRootAOI.GetTree("AOI"));
+            RunTreeAOI(m_treeRootAOI);
         }
         #endregion
 

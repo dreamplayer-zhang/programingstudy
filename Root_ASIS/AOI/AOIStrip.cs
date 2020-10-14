@@ -160,7 +160,7 @@ namespace Root_ASIS.AOI
 
         Blob[] m_aBlob = new Blob[2] { new Blob(), new Blob() };
         Blob.eSort m_eSort = Blob.eSort.Size;
-        public int[] m_nGV = new int[2] { 100, 0 };
+        public CPoint m_mmGV = new CPoint(100, 0); 
         double m_dSizeError = 20;
         double m_dLendthError = 20;
         double m_dCenterError = 50; 
@@ -168,7 +168,7 @@ namespace Root_ASIS.AOI
         {
             Unit data = m_aUnit[iAOI]; 
             Blob blob = m_aBlob[iAOI];
-            blob.RunBlob(m_memory, 0, data.m_aoiData.m_cp0, data.m_aoiData.m_sz, m_nGV[0], m_nGV[1], 3);
+            blob.RunBlob(m_memory, 0, data.m_aoiData.m_cp0, data.m_aoiData.m_sz, m_mmGV.X, m_mmGV.Y, 3);
             blob.RunSort(m_eSort);
             if (blob.m_aSort.Count == 0) return "Find Fiducial Error"; 
             Blob.Island island = blob.m_aSort[0];
@@ -188,15 +188,13 @@ namespace Root_ASIS.AOI
 
         void RunTreeInspect(Tree tree)
         {
-            RunTreeInspectGV(tree.GetTree("GV")); 
             m_eSort = (Blob.eSort)tree.Set(m_eSort, m_eSort, "Sort", "Select Fiducial by");
+            m_mmGV = tree.Set(m_mmGV, m_mmGV, "GV", m_ST.Get("Gray Value Range (0~255)"));
             RunTreeInspectError(tree.GetTree("Error", false)); 
         }
 
         void RunTreeInspectGV(Tree tree)
         {
-            m_nGV[0] = tree.Set(m_nGV[0], m_nGV[0], "Min", m_ST.Get("Gray Value Range (0~255)"));
-            m_nGV[1] = tree.Set(m_nGV[1], m_nGV[1], "Max", m_ST.Get("Gray Value Range (0~255)"));
         }
 
         void RunTreeInspectError(Tree tree)
@@ -212,21 +210,20 @@ namespace Root_ASIS.AOI
         public void RunTree(Tree tree)
         {
             RunTreeUnit(tree.GetTree("Unit", false, false));
-            RunTreeInspect(tree.GetTree("Inspect", false));
+            RunTreeInspect(tree);
         }
         #endregion
 
-        #region IAOI
         public string p_id { get; set; }
+        public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
-        #endregion
+        public IAOI NewAOI() { return null; }
 
         Log m_log;
         public AOIStrip(string id, Log log)
         {
             p_id = id;
             m_log = log;
-            p_bEnable = true;
             InitUnit();
             InitResult(); 
         }

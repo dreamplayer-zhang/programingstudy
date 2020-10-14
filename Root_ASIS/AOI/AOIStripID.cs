@@ -66,17 +66,16 @@ namespace Root_ASIS.AOI
         }
         #endregion
 
-        #region IAOI
         public string p_id { get; set; }
+        public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
-        #endregion
+        public IAOI NewAOI() { return null; }
 
         Log m_log;
         public AOIStripID(string id, Log log)
         {
             p_id = id;
             m_log = log;
-            p_bEnable = true; 
 //            InitUnit();
 //            InitResult();
         }
