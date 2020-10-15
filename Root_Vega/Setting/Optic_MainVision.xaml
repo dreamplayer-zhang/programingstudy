@@ -31,6 +31,7 @@
                           Offset="1" />
         </LinearGradientBrush>
         <Converter:TabSizeConverter x:Key="tabSizeConverter" />
+        <Converter:PositionScalingConverter x:Key="PositionScalingConverters"/>
         <Style TargetType="{x:Type TabItem}"
                x:Key="SizeableTabItem">
             <Setter Property="Background"
@@ -708,7 +709,7 @@
                                 <ColumnDefinition Width="40" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <Canvas x:Name="Test">
+                            <Canvas x:Name="StageCanvas">
                                 <Canvas.Background>
                                     <VisualBrush TileMode="Tile"
                                                  Viewport="0 0 30 30"
@@ -724,31 +725,46 @@
                                         </VisualBrush.Visual>
                                     </VisualBrush>
                                 </Canvas.Background>
-                                <Rectangle Fill="YellowGreen"
-                                           Opacity="0.2"
-                                           Canvas.Left="0"
-                                           Canvas.Top="135"
-                                           Height="70"
-                                           Width="{Binding ElementName=Test, Path=ActualWidth}"></Rectangle>
-                                <Rectangle Fill="White"
-                                           Opacity="0.5"
-                                           Canvas.Left="164"
-                                           Canvas.Top="147"
-                                           Height="50"
-                                           Width="50"></Rectangle>
-                                <material:PackIcon Kind="Camera"
+                                <Grid>
+                                    <Canvas.Top>
+                                        <MultiBinding Converter="{StaticResource PositionScalingConverters}"
+                                                      ConverterParameter="AxisY">
+                                            <Binding Path="p_PatternVision.p_axisXY.p_axisY"></Binding>
+                                            <Binding Path="ActualHeight" ElementName="StageCanvas"></Binding>
+                                            <Binding Path="p_PatternVision.p_axisXY.p_axisY.p_posActual"></Binding>
+                                            <Binding Path="p_PatternVision.p_id"></Binding>
+                                        </MultiBinding>
+                                    </Canvas.Top>
+                                    <Rectangle Fill="YellowGreen"
+                                               Opacity="0.5"
+                                               Height="100"
+                                               Width="{Binding ElementName=StageCanvas, Path=ActualWidth}"></Rectangle>
+                                    <Rectangle Fill="White"
+                                               Opacity="0.5"
+                                               Height="100"
+                                               Width="100"></Rectangle>
+                                    <Rectangle Fill="Red"
+                                               Opacity="0.5"
+                                               Width="100"
+                                               Height="10"
+                                               Margin="0,90,0,0"></Rectangle>
+                                </Grid>
+                                <Grid Canvas.Top="150">
+                                    <Canvas.Left>
+                                        <MultiBinding Converter="{StaticResource PositionScalingConverters}"
+                                                      ConverterParameter="AxisX">
+                                            <Binding Path="p_PatternVision.p_axisXY.p_axisX"></Binding>
+                                            <Binding Path="ActualWidth" ElementName="StageCanvas"></Binding>
+                                            <Binding Path="p_PatternVision.p_axisXY.p_axisX.p_posActual"></Binding>
+                                            <Binding Path="p_PatternVision.p_id"></Binding>
+                                        </MultiBinding>
+                                    </Canvas.Left>
+                                    <material:PackIcon Kind="Camera"
                                                    Foreground="White"
                                                    Height="50"
                                                    Width="50"
-                                                   Opacity="0.7"
-                                                   Canvas.Left="143"
-                                                   Canvas.Top="31"></material:PackIcon>
-                                <!--<Ellipse Fill="Black"
-                                         Opacity="0.3"
-                                         Canvas.Left="170"
-                                         Canvas.Top="135"
-                                         Height="50"
-                                         Width="50"></Ellipse>-->
+                                                   Opacity="0.7"></material:PackIcon>
+                                </Grid>
                             </Canvas>
                             <Canvas Grid.Column="1"
                                     x:Name="CanvasZ">
@@ -757,11 +773,20 @@
                                            Fill="HotPink"></Rectangle>
                                 <material:PackIcon Kind="Camera"
                                                    Foreground="White"
-                                                   Canvas.Top="150"
                                                    HorizontalAlignment="Center"
                                                    Canvas.Left="5"
                                                    Height="30"
-                                                   Width="30"></material:PackIcon>
+                                                   Width="30">
+                                    <Canvas.Bottom>
+                                        <MultiBinding Converter="{StaticResource PositionScalingConverters}"
+                                                      ConverterParameter="AxisZ">
+                                            <Binding Path="p_PatternVision.p_axisZ"></Binding>
+                                            <Binding Path="ActualHeight" ElementName="CanvasZ"></Binding>
+                                            <Binding Path="p_PatternVision.p_axisZ.p_posActual"></Binding>
+                                            <Binding Path="p_PatternVision.p_id"></Binding>
+                                        </MultiBinding>
+                                    </Canvas.Bottom>
+                                </material:PackIcon>
                             </Canvas>
                             <Grid Grid.Column="2">
                                 <Grid.RowDefinitions>
