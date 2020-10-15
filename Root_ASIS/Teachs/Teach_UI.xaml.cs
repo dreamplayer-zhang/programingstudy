@@ -1,4 +1,6 @@
-﻿using RootTools.Trees;
+﻿using Root_ASIS.AOI;
+using RootTools.Trees;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -29,12 +31,12 @@ namespace Root_ASIS.Teachs
             treeSetupUI.Init(teach.m_treeRootSetup);
             teach.RunTreeSetup(Tree.eMode.Init);
             InitAOI();
+            InitROI();
             listViewROI.ItemsSource = teach.m_aROI; 
         }
 
         private void buttonInspect_Click(object sender, RoutedEventArgs e)
         {
-
         }
 
         #region AOI
@@ -102,7 +104,7 @@ namespace Root_ASIS.Teachs
                 m_teach.m_aAOI.Remove(aoi);
                 m_teach.RunTreeAOI(Tree.eMode.Init);
                 m_teach.RunTreeAOI(Tree.eMode.Init);
-                m_teach.InvalidROI(); 
+                InvalidROI(); 
             }
         }
 
@@ -131,7 +133,7 @@ namespace Root_ASIS.Teachs
             }
             m_teach.RunTreeAOI(Tree.eMode.Init);
             m_teach.RunTreeAOI(Tree.eMode.Init);
-            m_teach.InvalidROI();
+            InvalidROI();
         }
 
         private static TAncestor FindAncestor<TAncestor>(DependencyObject dependencyObject) where TAncestor : DependencyObject
@@ -147,7 +149,61 @@ namespace Root_ASIS.Teachs
         #endregion
 
         #region ROI
+        Dictionary<AOIData.eROI, int> m_nROI = new Dictionary<AOIData.eROI, int>();
+        void InitROI()
+        {
+            m_nROI.Add(AOIData.eROI.Ready, 0);
+            m_nROI.Add(AOIData.eROI.Active, 0);
+            m_nROI.Add(AOIData.eROI.Done, 0);
+            InvalidROI();
+        }
 
+        void ClearROICount()
+        {
+            m_nROI[AOIData.eROI.Ready] = 0;
+            m_nROI[AOIData.eROI.Active] = 0;
+            m_nROI[AOIData.eROI.Done] = 0;
+        }
+
+        AOIData m_roiActive = null;
+        public void InvalidROI()
+        {
+            m_teach.InvalidROI();
+            ClearROICount();
+            foreach (AOIData roi in m_teach.m_aROI) m_nROI[roi.p_eROI]++;
+            buttonInspect.IsEnabled = (m_nROI[AOIData.eROI.Ready] == 0) && (m_nROI[AOIData.eROI.Active] == 0);
+            if (m_nROI[AOIData.eROI.Ready] == 0) return;
+            if (m_nROI[AOIData.eROI.Active] == 1) return;
+            if (m_nROI[AOIData.eROI.Active] > 1) ClearActive(); 
+            foreach (AOIData roi in m_teach.m_aROI)
+            {
+                if (roi.p_eROI == AOIData.eROI.Ready)
+                {
+                    roi.p_eROI = AOIData.eROI.Active;
+                    m_roiActive = roi; 
+                    return; 
+                }
+            }
+        }
+
+        void ClearActive()
+        {
+            foreach (AOIData roi in m_teach.m_aROI)
+            {
+                if (roi.p_eROI == AOIData.eROI.Active) roi.p_eROI = AOIData.eROI.Ready;
+            }
+            m_roiActive = null; 
+        }
+
+        private void listViewROI_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            int nSelect = listViewROI.SelectedIndex;
+            if (nSelect < 0) return;
+            if (nSelect >= m_teach.m_aROI.Count) return;
+            ClearActive();
+            m_roiActive = m_teach.m_aROI[nSelect];
+            m_roiActive.p_eROI = AOIData.eROI.Active;
+        }
         #endregion
     }
 }

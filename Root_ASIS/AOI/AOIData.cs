@@ -33,14 +33,14 @@ namespace Root_ASIS.AOI
                 OnPropertyChanged(); 
                 switch (_eROI)
                 {
-                    case eROI.Ready: p_brushROI = Brushes.Purple; break;
+                    case eROI.Ready: p_brushROI = Brushes.DarkGreen; break;
                     case eROI.Active: p_brushROI = Brushes.Red; break;
-                    case eROI.Done: p_brushROI = Brushes.Green; break; 
+                    case eROI.Done: p_brushROI = Brushes.DarkBlue; break; 
                 }
             }
         }
 
-        Brush _brushROI = Brushes.Purple; 
+        Brush _brushROI = Brushes.DarkGreen; 
         public Brush p_brushROI
         {
             get { return _brushROI; }

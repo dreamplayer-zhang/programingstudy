@@ -68,9 +68,6 @@ namespace Root_ASIS.Teachs
             m_aoiStrip.AddROI(m_aROI);
             m_aoiStripID.AddROI(m_aROI);
             foreach (IAOI aoi in m_aAOI) aoi.AddROI(m_aROI);
-            int nActive = 0;
-            foreach (AOIData roi in m_aROI) nActive += (roi.p_eROI == AOIData.eROI.Active) ? 1 : 0; 
-            //forget
         }
         #endregion
 
@@ -133,7 +130,6 @@ namespace Root_ASIS.Teachs
             InitTreeSetup();
             ClearAOI();
             InitTreeAOI();
-            InvalidROI(); 
         }
     }
 }
