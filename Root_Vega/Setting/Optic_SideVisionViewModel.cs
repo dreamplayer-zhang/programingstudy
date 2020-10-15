@@ -174,58 +174,6 @@ namespace Root_Vega
             }
         }
 
-        double m_dStageCanvasWidth;
-        public double p_dStageCanvasWidth
-        {
-            get
-            {
-                return m_dStageCanvasWidth;
-            }
-            set
-            {
-                SetProperty(ref m_dStageCanvasWidth, value);
-            }
-        }
-
-        double m_dStageCanvasHeight;
-        public double p_dStageCanvasHeight
-        {
-            get
-            {
-                return m_dStageCanvasHeight;
-            }
-            set
-            {
-                SetProperty(ref m_dStageCanvasHeight, value);
-            }
-        }
-
-        double m_dZCanvasWidth;
-        public double p_dZCanvasWidth
-        {
-            get
-            {
-                return m_dZCanvasWidth;
-            }
-            set
-            {
-                SetProperty(ref m_dZCanvasWidth, value);
-            }
-        }
-
-        double m_dZCanvasHeight;
-        public double p_dZCanvasHeight
-        {
-            get
-            {
-                return m_dZCanvasHeight;
-            }
-            set
-            {
-                SetProperty(ref m_dZCanvasHeight, value);
-            }
-        }
-
         private readonly IDialogService m_DialogService;
 
         public Optic_SideVisionViewModel(Vega_Engineer engineer,  IDialogService dialogService)
@@ -395,10 +343,10 @@ namespace Root_Vega
 
         unsafe public void Test()
         {
-            string strResult = m_SideVision.p_CamLADS.Grab();
-            ImageData img = m_SideVision.p_CamLADS.p_ImageViewer.p_ImageData;
-            double dResult = CalculatingHeight(img);
-            return;
+            //string strResult = m_SideVision.p_CamLADS.Grab();
+            //ImageData img = m_SideVision.p_CamLADS.p_ImageViewer.p_ImageData;
+            //double dResult = CalculatingHeight(img);
+            //return;
 
             //double[] aHeight = new double[640];
             //// LADS 테스트용 프레임 생성
@@ -420,7 +368,7 @@ namespace Root_Vega
             //        *pDst = (byte)random.Next(75,80);
             //    }
             //}
-            
+
             //double dScale = 65535.0 / nheight;
             //// LADS 테스트
 
@@ -442,7 +390,7 @@ namespace Root_Vega
             //}
 
             //double dResult = GetHeightAverage(aHeight);
-        
+
             //return;
         }
 
