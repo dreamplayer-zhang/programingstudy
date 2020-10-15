@@ -5,6 +5,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace Root_ASIS.AOI
@@ -193,10 +194,6 @@ namespace Root_ASIS.AOI
             RunTreeInspectError(tree.GetTree("Error", false)); 
         }
 
-        void RunTreeInspectGV(Tree tree)
-        {
-        }
-
         void RunTreeInspectError(Tree tree)
         {
             m_dSizeError = tree.Set(m_dSizeError, m_dSizeError, "Size", "Size Error (%)");
@@ -214,10 +211,18 @@ namespace Root_ASIS.AOI
         }
         #endregion
 
+        #region IAOI
         public string p_id { get; set; }
         public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
         public IAOI NewAOI() { return null; }
+
+        public void AddROI(ObservableCollection<AOIData> aROI)
+        {
+            aROI.Add(m_aUnit[0].m_aoiData);
+            aROI.Add(m_aUnit[1].m_aoiData);
+        }
+        #endregion
 
         Log m_log;
         public AOIStrip(string id, Log log)

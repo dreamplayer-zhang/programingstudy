@@ -60,6 +60,20 @@ namespace Root_ASIS.Teachs
         }
         #endregion
 
+        #region ROI
+        public ObservableCollection<AOIData> m_aROI = new ObservableCollection<AOIData>();
+        public void InvalidROI()
+        {
+            m_aROI.Clear();
+            m_aoiStrip.AddROI(m_aROI);
+            m_aoiStripID.AddROI(m_aROI);
+            foreach (IAOI aoi in m_aAOI) aoi.AddROI(m_aROI);
+            int nActive = 0;
+            foreach (AOIData roi in m_aROI) nActive += (roi.p_eROI == AOIData.eROI.Active) ? 1 : 0; 
+            //forget
+        }
+        #endregion
+
         #region Memory
         public MemoryPool m_memoryPool; 
         #endregion
@@ -119,6 +133,7 @@ namespace Root_ASIS.Teachs
             InitTreeSetup();
             ClearAOI();
             InitTreeAOI();
+            InvalidROI(); 
         }
     }
 }

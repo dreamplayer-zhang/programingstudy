@@ -29,6 +29,7 @@ namespace Root_ASIS.Teachs
             treeSetupUI.Init(teach.m_treeRootSetup);
             teach.RunTreeSetup(Tree.eMode.Init);
             InitAOI();
+            listViewROI.ItemsSource = teach.m_aROI; 
         }
 
         private void buttonInspect_Click(object sender, RoutedEventArgs e)
@@ -36,7 +37,7 @@ namespace Root_ASIS.Teachs
 
         }
 
-        #region AOI Drag n Drop
+        #region AOI
         void InitAOI()
         {
             listViewListAOI.PreviewMouseLeftButtonDown += ListViewListAOI_PreviewMouseLeftButtonDown;
@@ -101,36 +102,36 @@ namespace Root_ASIS.Teachs
                 m_teach.m_aAOI.Remove(aoi);
                 m_teach.RunTreeAOI(Tree.eMode.Init);
                 m_teach.RunTreeAOI(Tree.eMode.Init);
+                m_teach.InvalidROI(); 
             }
         }
 
         private void ListViewAOI_Drop(object sender, DragEventArgs e)
         {
+            IAOI aoi = null; 
+            ListView listView = sender as ListView;
+            Point p = e.GetPosition(listView);
+            IInputElement input = listView.InputHitTest(p);
+            ListViewItem item = FindAncestor<ListViewItem>(input as DependencyObject);
+            int iInsert = (item == null) ? -1 : listView.Items.IndexOf(item.Content);
             if (e.Data.GetDataPresent(c_sAOI))
             {
-                IAOI aoi = (IAOI)e.Data.GetData(c_sAOI);
+                aoi = (IAOI)e.Data.GetData(c_sAOI);
                 m_teach.m_aAOI.Remove(aoi);
-                ListView listView = sender as ListView;
-                Point p = e.GetPosition(listView);
-                IInputElement input = listView.InputHitTest(p);
-                ListViewItem item = FindAncestor<ListViewItem>(input as DependencyObject);
                 int iRemove = aoi.p_nID; 
                 m_teach.m_aAOI.Remove(aoi);
-                if (item == null) m_teach.m_aAOI.Add(aoi);
-                else
-                {
-                    int iInsert = listView.Items.IndexOf(item.Content);
-                    m_teach.m_aAOI.Insert(iInsert, aoi); 
-                }
-                m_teach.RunTreeAOI(Tree.eMode.Init);
-                m_teach.RunTreeAOI(Tree.eMode.Init);
+                if (iInsert < 0) m_teach.m_aAOI.Add(aoi);
+                else m_teach.m_aAOI.Insert(iInsert, aoi);
             }
             if (e.Data.GetDataPresent(c_sListAOI))
             {
-                IAOI aoi = (IAOI)e.Data.GetData(c_sListAOI);
-                m_teach.m_aAOI.Add(aoi.NewAOI());
-                m_teach.RunTreeAOI(Tree.eMode.Init); 
+                aoi = (IAOI)e.Data.GetData(c_sListAOI);
+                if (iInsert < 0) m_teach.m_aAOI.Add(aoi.NewAOI());
+                else m_teach.m_aAOI.Insert(iInsert, aoi.NewAOI());
             }
+            m_teach.RunTreeAOI(Tree.eMode.Init);
+            m_teach.RunTreeAOI(Tree.eMode.Init);
+            m_teach.InvalidROI();
         }
 
         private static TAncestor FindAncestor<TAncestor>(DependencyObject dependencyObject) where TAncestor : DependencyObject
@@ -143,6 +144,10 @@ namespace Root_ASIS.Teachs
             while (dependencyObject != null);
             return null;
         }
+        #endregion
+
+        #region ROI
+
         #endregion
     }
 }

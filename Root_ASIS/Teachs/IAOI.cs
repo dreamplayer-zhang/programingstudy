@@ -1,4 +1,6 @@
-﻿using RootTools.Trees;
+﻿using Root_ASIS.AOI;
+using RootTools.Trees;
+using System.Collections.ObjectModel;
 
 namespace Root_ASIS.Teachs
 {
@@ -10,7 +12,9 @@ namespace Root_ASIS.Teachs
 
         bool p_bEnable { get; set; }
 
-        IAOI NewAOI(); 
+        IAOI NewAOI();
+
+        void AddROI(ObservableCollection<AOIData> aROI);
 
         void RunTree(Tree tree);
     }

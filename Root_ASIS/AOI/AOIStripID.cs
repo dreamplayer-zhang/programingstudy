@@ -3,6 +3,7 @@ using RootTools;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Root_ASIS.AOI
 {
@@ -66,10 +67,17 @@ namespace Root_ASIS.AOI
         }
         #endregion
 
+        #region IAOI
         public string p_id { get; set; }
         public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
         public IAOI NewAOI() { return null; }
+
+        public void AddROI(ObservableCollection<AOIData> aROI)
+        {
+            foreach (UnitID unit in m_aUnitID) aROI.Add(unit.m_aoiData); 
+        }
+        #endregion
 
         Log m_log;
         public AOIStripID(string id, Log log)

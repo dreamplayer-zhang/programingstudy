@@ -67,7 +67,7 @@ namespace Root_ASIS.AOI
         #region Tree
         public void RunTree(Tree treeParent, bool bVisible)
         {
-            Tree tree = treeParent.GetTree(m_id, false, bVisible);
+            Tree tree = treeParent.GetTree(p_id, false, bVisible);
             p_eROI = (eROI)tree.Set(p_eROI, p_eROI, "eROI", "eROI", bVisible);
             m_cp0 = tree.Set(m_cp0, m_cp0, "cp0", "cp0", bVisible);
         }
@@ -75,16 +75,16 @@ namespace Root_ASIS.AOI
 
         public AOIData Clone()
         {
-            AOIData aoi = new AOIData(m_id, m_sz);
+            AOIData aoi = new AOIData(p_id, m_sz);
             aoi.m_cp0 = new CPoint(m_cp0);
             aoi.p_eROI = p_eROI;
             return aoi; 
         }
 
-        public string m_id;
+        public string p_id { get; set; }
         public AOIData(string id, CPoint sz)
         {
-            m_id = id;
+            p_id = id;
             m_sz = sz; 
         }
     }

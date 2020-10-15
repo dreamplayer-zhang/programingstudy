@@ -4,6 +4,7 @@ using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace Root_ASIS.AOI
@@ -25,6 +26,11 @@ namespace Root_ASIS.AOI
         {
             return new AOI_Unit(p_id, m_log); 
         }
+
+        public void AddROI(ObservableCollection<AOIData> aROI)
+        {
+            aROI.Add(m_aUnit[0].m_aoiData); 
+        }
         #endregion
 
         #region Unit
@@ -44,7 +50,7 @@ namespace Root_ASIS.AOI
                 {
                     if (_id == value) return;
                     _id = value;
-                    m_aoiData.m_id = value; 
+                    m_aoiData.p_id = value; 
                 }
             }
 
@@ -84,8 +90,8 @@ namespace Root_ASIS.AOI
             while (m_aUnit.Count > Strip.p_lUnit) m_aUnit.RemoveAt(m_aUnit.Count - 1);
             for (int n = 0; n < m_aUnit.Count; n++)
             {
-                m_aUnit[n].p_id = p_id + "." + m_aUnit.Count.ToString("000");
-                m_aUnit[n].m_result = infoStrip.GetUnitResult(n); 
+                m_aUnit[n].p_id = p_id + "." + n.ToString("000");
+                m_aUnit[n].m_result = (infoStrip != null) ? infoStrip.GetUnitResult(n) : null; 
             }
         }
 
@@ -142,7 +148,7 @@ namespace Root_ASIS.AOI
             unit.p_nSize = island.GetSize(m_eSort);
             unit.m_aoiData.m_rpCenter = island.m_rpCenter;
             unit.m_aoiData.m_bInspect = (unit.p_nSize >= m_mmSize.X) && ((m_mmSize.Y <= 0) || (unit.p_nSize <= m_mmSize.Y));
-            unit.m_result.CalcResult(m_eLogic, unit.m_aoiData.m_bInspect); 
+            if (unit.m_result != null) unit.m_result.CalcResult(m_eLogic, unit.m_aoiData.m_bInspect); 
             return "OK"; 
         }
 
@@ -166,12 +172,12 @@ namespace Root_ASIS.AOI
         public string p_id { get; set; }
         public int p_nID { get; set; }
         Log m_log;
-
         public AOI_Unit(string id, Log log)
         {
             p_id = id;
             m_log = log;
-            p_bEnable = true; 
+            p_bEnable = true;
+            InitUnit(null); 
             InitInspect(); 
         }
     }
