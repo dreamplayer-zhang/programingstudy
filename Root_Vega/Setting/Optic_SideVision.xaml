@@ -8,7 +8,6 @@
              xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:Dalsa="clr-namespace:RootTools.Camera.Dalsa;assembly=RootTools"
              xmlns:Axis="clr-namespace:RootTools.Control.Ajin;assembly=RootTools"
-             xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
@@ -1184,10 +1183,7 @@
                                 <ColumnDefinition Width="40"></ColumnDefinition>
                                 <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Canvas x:Name="StageCanvas"
-                                    obs:SizeObserver.Observe="true"
-                                    obs:SizeObserver.ObservedWidth="{Binding p_dStageCanvasWidth, Mode=OneWayToSource}"
-                                    obs:SizeObserver.ObservedHeight="{Binding p_dStageCanvasHeight, Mode=OneWayToSource}">
+                            <Canvas x:Name="StageCanvas">
                                 <Canvas.Background>
                                     <VisualBrush TileMode="Tile"
                                                  Viewport="0 0 30 30"
@@ -1216,6 +1212,7 @@
                                             <Binding Path="p_SideVision.p_axisXY.p_axisX"></Binding>
                                             <Binding Path="ActualWidth" ElementName="StageCanvas"></Binding>
                                             <Binding Path="p_SideVision.p_axisXY.p_axisX.p_posActual"></Binding>
+                                            <Binding Path="p_SideVision.p_id"></Binding>
                                         </MultiBinding>
                                     </Canvas.Left>
                                     <Grid.RenderTransform>
@@ -1226,6 +1223,7 @@
                                                     <Binding Path="p_SideVision.p_axisTheta"></Binding>
                                                     <Binding Path="ActualWidth" ElementName="StageCanvas"></Binding>
                                                     <Binding Path="p_SideVision.p_axisTheta.p_posActual"></Binding>
+                                                    <Binding Path="p_SideVision.p_id"></Binding>
                                                 </MultiBinding>
                                             </RotateTransform.Angle>
                                         </RotateTransform>
@@ -1247,6 +1245,7 @@
                                             <Binding Path="p_SideVision.p_axisXY.p_axisY"></Binding>
                                             <Binding Path="ActualHeight" ElementName="StageCanvas"></Binding>
                                             <Binding Path="p_SideVision.p_axisXY.p_axisY.p_posActual"></Binding>
+                                            <Binding Path="p_SideVision.p_id"></Binding>
                                         </MultiBinding>
                                     </Canvas.Top>
                                     <Grid.RowDefinitions>
@@ -1273,10 +1272,7 @@
                                 </Grid>
                             </Canvas>
                             <Canvas Grid.Column="1"
-                                    x:Name="ZCanvas"
-                                    obs:SizeObserver.Observe="true"
-                                    obs:SizeObserver.ObservedWidth="{Binding p_dZCanvasWidth, Mode=OneWayToSource}"
-                                    obs:SizeObserver.ObservedHeight="{Binding p_dZCanvasHeight, Mode=OneWayToSource}">
+                                    x:Name="CanvasZ">
                                 <Rectangle Width="40"
                                            Height="20"
                                            Fill="HotPink"></Rectangle>
@@ -1290,8 +1286,9 @@
                                         <MultiBinding Converter="{StaticResource PositionScalingConverters}"
                                                       ConverterParameter="AxisZ">
                                             <Binding Path="p_SideVision.p_axisZ"></Binding>
-                                            <Binding Path="ActualHeight" ElementName="ZCanvas"></Binding>
+                                            <Binding Path="ActualHeight" ElementName="CanvasZ"></Binding>
                                             <Binding Path="p_SideVision.p_axisZ.p_posActual"></Binding>
+                                            <Binding Path="p_SideVision.p_id"></Binding>
                                         </MultiBinding>
                                     </Canvas.Bottom>
                                 </material:PackIcon>
