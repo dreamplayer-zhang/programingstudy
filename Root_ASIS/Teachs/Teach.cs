@@ -69,6 +69,51 @@ namespace Root_ASIS.Teachs
             m_aoiStrip.AddROI(m_aROI);
             m_aoiStripID.AddROI(m_aROI);
             foreach (IAOI aoi in m_aAOI) aoi.AddROI(m_aROI);
+            CalcROICount();
+            if (m_nROI[AOIData.eROI.Ready] == 0) return;
+            if (m_nROI[AOIData.eROI.Active] == 1) return;
+            if (m_nROI[AOIData.eROI.Active] > 1) ClearActive();
+            SelectActive();
+            Draw(AOIData.eDraw.ROI); //forget
+        }
+
+        public Dictionary<AOIData.eROI, int> m_nROI = new Dictionary<AOIData.eROI, int>();
+        void InitROI()
+        {
+            m_nROI.Add(AOIData.eROI.Ready, 0);
+            m_nROI.Add(AOIData.eROI.Active, 0);
+            m_nROI.Add(AOIData.eROI.Done, 0);
+            InvalidROI();
+        }
+
+        void CalcROICount()
+        {
+            m_nROI[AOIData.eROI.Ready] = 0;
+            m_nROI[AOIData.eROI.Active] = 0;
+            m_nROI[AOIData.eROI.Done] = 0;
+            foreach (AOIData roi in m_aROI) m_nROI[roi.p_eROI]++;
+        }
+
+        public void ClearActive()
+        {
+            foreach (AOIData roi in m_aROI)
+            {
+                if (roi.p_eROI == AOIData.eROI.Active) roi.p_eROI = AOIData.eROI.Ready;
+            }
+            m_roiActive = null;
+        }
+
+        public void SelectActive()
+        {
+            foreach (AOIData roi in m_aROI)
+            {
+                if (roi.p_eROI == AOIData.eROI.Ready)
+                {
+                    roi.p_eROI = AOIData.eROI.Active;
+                    m_roiActive = roi;
+                    return;
+                }
+            }
         }
         #endregion
 
@@ -79,7 +124,6 @@ namespace Root_ASIS.Teachs
             m_memoryPool.m_viewer.OnLBD += M_viewer_OnLBD;
             m_memoryPool.m_viewer.OnMouseMove += M_viewer_OnMouseMove;
         }
-
 
         private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
         {
@@ -161,7 +205,8 @@ namespace Root_ASIS.Teachs
             InitTreeSetup();
             ClearAOI();
             InitTreeAOI();
-            InitDraw(); 
+            InitDraw();
+            InitROI();
         }
     }
 }

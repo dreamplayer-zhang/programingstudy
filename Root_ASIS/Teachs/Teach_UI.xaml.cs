@@ -1,6 +1,5 @@
 ﻿using Root_ASIS.AOI;
 using RootTools.Trees;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -31,7 +30,6 @@ namespace Root_ASIS.Teachs
             treeSetupUI.Init(teach.m_treeRootSetup);
             teach.RunTreeSetup(Tree.eMode.Init);
             InitAOI();
-            InitROI();
             listViewROI.ItemsSource = teach.m_aROI; 
         }
 
@@ -149,49 +147,10 @@ namespace Root_ASIS.Teachs
         #endregion
 
         #region ROI
-        Dictionary<AOIData.eROI, int> m_nROI = new Dictionary<AOIData.eROI, int>();
-        void InitROI()
-        {
-            m_nROI.Add(AOIData.eROI.Ready, 0);
-            m_nROI.Add(AOIData.eROI.Active, 0);
-            m_nROI.Add(AOIData.eROI.Done, 0);
-            InvalidROI();
-        }
-
-        void ClearROICount()
-        {
-            m_nROI[AOIData.eROI.Ready] = 0;
-            m_nROI[AOIData.eROI.Active] = 0;
-            m_nROI[AOIData.eROI.Done] = 0;
-        }
-
         public void InvalidROI()
         {
             m_teach.InvalidROI();
-            ClearROICount();
-            foreach (AOIData roi in m_teach.m_aROI) m_nROI[roi.p_eROI]++;
-            buttonInspect.IsEnabled = (m_nROI[AOIData.eROI.Ready] == 0) && (m_nROI[AOIData.eROI.Active] == 0);
-            if (m_nROI[AOIData.eROI.Ready] == 0) return;
-            if (m_nROI[AOIData.eROI.Active] == 1) return;
-            if (m_nROI[AOIData.eROI.Active] > 1) ClearActive(); 
-            foreach (AOIData roi in m_teach.m_aROI)
-            {
-                if (roi.p_eROI == AOIData.eROI.Ready)
-                {
-                    roi.p_eROI = AOIData.eROI.Active;
-                    m_teach.m_roiActive = roi; 
-                    return; 
-                }
-            }
-        }
-
-        void ClearActive()
-        {
-            foreach (AOIData roi in m_teach.m_aROI)
-            {
-                if (roi.p_eROI == AOIData.eROI.Active) roi.p_eROI = AOIData.eROI.Ready;
-            }
-            m_teach.m_roiActive = null; 
+            buttonInspect.IsEnabled = (m_teach.m_nROI[AOIData.eROI.Ready] == 0) && (m_teach.m_nROI[AOIData.eROI.Active] == 0);
         }
 
         private void listViewROI_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -199,7 +158,7 @@ namespace Root_ASIS.Teachs
             int nSelect = listViewROI.SelectedIndex;
             if (nSelect < 0) return;
             if (nSelect >= m_teach.m_aROI.Count) return;
-            ClearActive();
+            m_teach.ClearActive();
             m_teach.m_roiActive = m_teach.m_aROI[nSelect];
             m_teach.m_roiActive.p_eROI = AOIData.eROI.Active;
         }

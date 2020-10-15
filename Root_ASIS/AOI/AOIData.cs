@@ -97,14 +97,39 @@ namespace Root_ASIS.AOI
         #endregion
 
         #region Position
+        public enum eShape
+        {
+            None,
+            Set,
+            Move,
+            Resize,
+        }
+        eShape m_eShape = eShape.None; 
+
         public void LBD(bool bDown, CPoint cpImg)
         {
-            m_cp0 = cpImg; 
+            if (bDown && (m_eShape == eShape.None))
+            {
+                m_cp0 = cpImg;
+                m_eShape = eShape.Set; 
+            }
+            else if (m_eShape != eShape.None)
+            {
+                m_eShape = eShape.None;
+                p_eROI = eROI.Done; 
+            }
         }
 
         public void MouseMove(CPoint cpImg)
         {
-
+            switch (m_eShape)
+            {
+                case eShape.Set:
+                    m_sz.X = cpImg.X - m_cp0.X;
+                    m_sz.Y = cpImg.Y - m_cp0.Y;
+                    break;
+                default: break; 
+            }
         }
         #endregion
 

@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
+        WindowState="Minimized"
         Title="MarsLogView" Height="900" Width="1800">
     <Grid>
         <local:MarsLogViewer_UI x:Name="logViewerUI"/>
