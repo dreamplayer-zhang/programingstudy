@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -11,10 +12,23 @@ namespace RootTools.Memory
         #region Invalidate
         public delegate void dgOnInvalidDraw();
         public event dgOnInvalidDraw OnInvalidDraw;
-
         public void InvalidDraw()
         {
             if (OnInvalidDraw != null) OnInvalidDraw(); 
+        }
+
+        public delegate void dgOnLBD(bool bDown, CPoint cpImg);
+        public event dgOnLBD OnLBD;
+        public void LBD(bool bDown, CPoint cpImg)
+        {
+            if (OnLBD != null) OnLBD(bDown, cpImg); 
+        }
+
+        public delegate void dgOnMouseMove(CPoint cpImg);
+        public event dgOnMouseMove OnMouseMove;
+        public void MouseMove(CPoint cpImg)
+        {
+            if (OnMouseMove != null) OnMouseMove(cpImg);
         }
 
         DispatcherTimer m_timer = new DispatcherTimer(); 
@@ -261,6 +275,7 @@ namespace RootTools.Memory
                         p_sGV = m_aBufDisplay[nAdd + 2].ToString() + ", " + m_aBufDisplay[nAdd + 1].ToString() + ", " + m_aBufDisplay[nAdd].ToString();
                         break;
                 }
+                if (p_bShiftKeyDown && p_bLBD) MouseMove(p_cpImage); 
             }
         }
 
@@ -290,8 +305,22 @@ namespace RootTools.Memory
             return new CPoint(x, y); 
         }
 
-        public bool m_bShiftKey = false;
-        public bool m_bLBD = false;
+        bool _bLBD = false; 
+        public bool p_bLBD
+        {
+            get { return _bLBD; }
+            set
+            {
+                _bLBD = value;
+                LBD(p_bShiftKeyDown && value, GetImagePos(p_cpLBD));
+            }
+        }
+
+        public bool p_bShiftKeyDown
+        {
+            get { return Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift); }
+        }
+
         CPoint _cpLBDOffset = new CPoint();
         CPoint _cpLBD = new CPoint();
         public CPoint p_cpLBD
@@ -306,8 +335,8 @@ namespace RootTools.Memory
 
         void Shift(CPoint cpWindow)
         {
-            if (m_bShiftKey) return;
-            if (m_bLBD == false) return;
+            if (p_bShiftKeyDown) return;
+            if (p_bLBD == false) return;
             CPoint dp = cpWindow - p_cpLBD;
             dp /= p_fZoom;
             m_cpOffset = _cpLBDOffset - dp;

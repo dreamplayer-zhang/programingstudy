@@ -1,4 +1,6 @@
-﻿using RootTools;
+﻿using Root_ASIS.Teachs;
+using RootTools;
+using RootTools.Memory;
 using RootTools.Trees;
 using System.Windows.Media;
 
@@ -61,7 +63,49 @@ namespace Root_ASIS.AOI
             Shift,
             Resize
         }
-        public eMove m_eMove = eMove.None; 
+        public eMove m_eMove = eMove.None;
+        #endregion
+
+        #region Draw
+        public enum eDraw
+        {
+            ROI,
+            Inspect,
+            All,
+        };
+
+        public void Draw(MemoryDraw draw, eDraw eDraw)
+        {
+            Brush brush = null; 
+            switch (eDraw)
+            {
+                case eDraw.ROI: 
+                    brush = p_brushROI; 
+                    break;
+                case eDraw.Inspect:
+                    if (m_bInspect == false) return;
+                    brush = Brushes.Red;
+                    break;
+                case eDraw.All:
+                    brush = Brushes.Green;
+                    break; 
+            }
+            draw.AddRectangle(brush, m_cp0, m_cp0 + m_sz);
+            draw.AddText(brush, m_cp0, p_id);
+            draw.AddText(brush, m_cp0, m_sDisplay); 
+        }
+        #endregion
+
+        #region Position
+        public void LBD(bool bDown, CPoint cpImg)
+        {
+            m_cp0 = cpImg; 
+        }
+
+        public void MouseMove(CPoint cpImg)
+        {
+
+        }
         #endregion
 
         #region Tree

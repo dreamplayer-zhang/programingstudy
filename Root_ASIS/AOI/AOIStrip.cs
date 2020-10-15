@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Root_ASIS.AOI
 {
@@ -221,6 +222,12 @@ namespace Root_ASIS.AOI
         {
             aROI.Add(m_aUnit[0].m_aoiData);
             aROI.Add(m_aUnit[1].m_aoiData);
+        }
+
+        public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
+        {
+            m_aUnit[0].m_aoiData.Draw(draw, eDraw);
+            m_aUnit[1].m_aoiData.Draw(draw, eDraw);
         }
         #endregion
 

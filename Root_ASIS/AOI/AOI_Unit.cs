@@ -167,6 +167,11 @@ namespace Root_ASIS.AOI
             RunTreeUnit(tree.GetTree("Unit", false, false));
             RunTreeInspect(tree);
         }
+
+        public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
+        {
+            //forget
+        }
         #endregion
 
         public string p_id { get; set; }

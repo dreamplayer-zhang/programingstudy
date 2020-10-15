@@ -1,5 +1,6 @@
 ﻿using Root_ASIS.Teachs;
 using RootTools;
+using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System.Collections.Generic;
@@ -76,6 +77,11 @@ namespace Root_ASIS.AOI
         public void AddROI(ObservableCollection<AOIData> aROI)
         {
             foreach (UnitID unit in m_aUnitID) aROI.Add(unit.m_aoiData); 
+        }
+
+        public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
+        {
+            //forget
         }
         #endregion
 

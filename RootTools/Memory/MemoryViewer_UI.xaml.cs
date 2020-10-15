@@ -73,7 +73,7 @@ namespace RootTools.Memory
         {
             Point p = e.GetPosition(imageBitmapSource);
             m_viewer.p_cpWindow = new CPoint((int)p.X, (int)p.Y);
-            if (m_viewer.m_bLBD) m_viewer.Draw(gridDrawing);
+            if (m_viewer.p_bLBD) m_viewer.Draw(gridDrawing);
         }
 
         private void gridBitmapSource_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -87,18 +87,18 @@ namespace RootTools.Memory
         private void gridBitmapSource_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Point p = e.GetPosition(imageBitmapSource);
-            m_viewer.m_bLBD = true;
             m_viewer.p_cpLBD = new CPoint((int)p.X, (int)p.Y);
+            m_viewer.p_bLBD = true;
         }
 
         private void gridBitmapSource_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            m_viewer.m_bLBD = false;
+            m_viewer.p_bLBD = false;
         }
 
         private void gridBitmapSource_MouseLeave(object sender, MouseEventArgs e)
         {
-            m_viewer.m_bLBD = false;
+            m_viewer.p_bLBD = false;
         }
         #endregion
 

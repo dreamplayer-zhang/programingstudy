@@ -165,7 +165,6 @@ namespace Root_ASIS.Teachs
             m_nROI[AOIData.eROI.Done] = 0;
         }
 
-        AOIData m_roiActive = null;
         public void InvalidROI()
         {
             m_teach.InvalidROI();
@@ -180,7 +179,7 @@ namespace Root_ASIS.Teachs
                 if (roi.p_eROI == AOIData.eROI.Ready)
                 {
                     roi.p_eROI = AOIData.eROI.Active;
-                    m_roiActive = roi; 
+                    m_teach.m_roiActive = roi; 
                     return; 
                 }
             }
@@ -192,7 +191,7 @@ namespace Root_ASIS.Teachs
             {
                 if (roi.p_eROI == AOIData.eROI.Active) roi.p_eROI = AOIData.eROI.Ready;
             }
-            m_roiActive = null; 
+            m_teach.m_roiActive = null; 
         }
 
         private void listViewROI_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -201,8 +200,8 @@ namespace Root_ASIS.Teachs
             if (nSelect < 0) return;
             if (nSelect >= m_teach.m_aROI.Count) return;
             ClearActive();
-            m_roiActive = m_teach.m_aROI[nSelect];
-            m_roiActive.p_eROI = AOIData.eROI.Active;
+            m_teach.m_roiActive = m_teach.m_aROI[nSelect];
+            m_teach.m_roiActive.p_eROI = AOIData.eROI.Active;
         }
         #endregion
     }

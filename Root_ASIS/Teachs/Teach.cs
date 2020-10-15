@@ -62,6 +62,7 @@ namespace Root_ASIS.Teachs
 
         #region ROI
         public ObservableCollection<AOIData> m_aROI = new ObservableCollection<AOIData>();
+        public AOIData m_roiActive = null;
         public void InvalidROI()
         {
             m_aROI.Clear();
@@ -71,8 +72,38 @@ namespace Root_ASIS.Teachs
         }
         #endregion
 
-        #region Memory
-        public MemoryPool m_memoryPool; 
+        #region Memory & Draw
+        public MemoryPool m_memoryPool;
+        void InitDraw()
+        {
+            m_memoryPool.m_viewer.OnLBD += M_viewer_OnLBD;
+            m_memoryPool.m_viewer.OnMouseMove += M_viewer_OnMouseMove;
+        }
+
+
+        private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
+        {
+            if (m_roiActive == null) return;
+            m_roiActive.LBD(bDown, cpImg);
+            InvalidROI(); 
+        }
+
+        private void M_viewer_OnMouseMove(CPoint cpImg)
+        {
+            if (m_roiActive == null) return;
+            m_roiActive.MouseMove(cpImg);
+            InvalidROI();
+        }
+
+        public void Draw(AOIData.eDraw eDraw)
+        {
+            MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
+            draw.Clear();
+            m_aoiStrip.Draw(draw, eDraw);
+            m_aoiStripID.Draw(draw, eDraw);
+            foreach (IAOI aoi in m_aAOI) aoi.Draw(draw, eDraw); 
+            draw.InvalidDraw(); 
+        }
         #endregion
 
         #region Tree Setup
@@ -130,6 +161,7 @@ namespace Root_ASIS.Teachs
             InitTreeSetup();
             ClearAOI();
             InitTreeAOI();
+            InitDraw(); 
         }
     }
 }

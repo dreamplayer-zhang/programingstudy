@@ -27,12 +27,12 @@
             <Label Content="{Binding p_sGV}" ToolTip="GV or RGB" VerticalAlignment="Center"/>
         </StackPanel>
         <Canvas Grid.Row="1" x:Name="gridBitmapSource" Background="Gray"
-              SizeChanged="gridBitmapSource_SizeChanged"
-              PreviewMouseMove="gridBitmapSource_PreviewMouseMove"
-              PreviewMouseWheel="gridBitmapSource_PreviewMouseWheel"
-              PreviewMouseLeftButtonDown="gridBitmapSource_PreviewMouseLeftButtonDown"
-              PreviewMouseLeftButtonUp="gridBitmapSource_PreviewMouseLeftButtonUp"
-              MouseLeave="gridBitmapSource_MouseLeave">
+                SizeChanged="gridBitmapSource_SizeChanged"
+                PreviewMouseMove="gridBitmapSource_PreviewMouseMove"
+                PreviewMouseWheel="gridBitmapSource_PreviewMouseWheel"
+                PreviewMouseLeftButtonDown="gridBitmapSource_PreviewMouseLeftButtonDown"
+                PreviewMouseLeftButtonUp="gridBitmapSource_PreviewMouseLeftButtonUp"
+                MouseLeave="gridBitmapSource_MouseLeave">
             <Image x:Name="imageBitmapSource" Source="{Binding p_bitmapSrc}"/>
             <Grid x:Name="gridDrawing"/>
         </Canvas>
