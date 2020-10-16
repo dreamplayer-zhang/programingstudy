@@ -134,7 +134,7 @@ namespace Root_Vega.Module
         #endregion
 
         #region Axis
-        public int m_dTrigger = 10;
+        public double m_dTrigger = 10;
         public int m_intervalAcc = 100000;        // 가속 구간 point,  단위 0.1um
         public int m_ScanLineNum = 1;
         public int m_ScanStartLine = 0;

@@ -837,7 +837,7 @@ namespace Root_Vega.Module
                     Axis axisZ = m_module.p_axisZ;
                     CPoint cpMemory = new CPoint(m_cpMemory);
                     cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
-                    m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fYRes);        // 축해상도 0.1um로 하드코딩.
+                    m_grabMode.m_dTrigger = 10 * m_fYRes;        // 축해상도 0.1um로 하드코딩.
                     double XScal = m_fXRes*10;
                     int nLines = Convert.ToInt32(m_yLine * 1000 / m_fYRes);
                     while (m_grabMode.m_ScanLineNum > nScanLine)
@@ -861,7 +861,7 @@ namespace Root_Vega.Module
 
                         /* 조명 Set하는거 Test해서 넣어야됨.*/
                         //m_grabMode.SetLight(true);
-                        double nPosX = m_rpAxis.X + nLines * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * XScal; //해상도추가필요
+                        double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * XScal; //해상도추가필요
 
                         if (m_module.Run(axisZ.StartMove(m_nFocusPos)))
                             return p_sInfo;
