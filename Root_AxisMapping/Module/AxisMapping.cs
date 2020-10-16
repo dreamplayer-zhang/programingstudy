@@ -15,7 +15,7 @@ namespace Root_AxisMapping.Module
         Axis m_axisRotate;
         AxisXY m_axisXY;
         DIO_O m_doVacuum;
-        MemoryPool m_memoryPool;
+        public MemoryPool m_memoryPool;
         CameraDalsa m_cam;
         public override void GetTools(bool bInit)
         {
@@ -35,12 +35,13 @@ namespace Root_AxisMapping.Module
         #region Memory
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryGrab;
-        CPoint m_szGrab = new CPoint(1024, 1024); 
+        CPoint m_szGrab = new CPoint(16000, 250000); 
         public override void InitMemorys()
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryGrab = m_memoryGroup.CreateMemory("Grab", 1, m_cam.p_nByte, m_szGrab);
-            m_cam.SetMemoryData(m_memoryGrab); 
+            m_cam.SetMemoryData(m_memoryGrab);
+            m_memoryPool.m_viewer.p_memoryData = m_memoryGrab;
         }
 
         void RunTreeMemory(Tree tree)

@@ -65,12 +65,14 @@ namespace RootTools.Memory
         #region Image View
         private void gridBitmapSource_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            if (m_viewer == null) return; 
             m_viewer.p_szWindow = new CPoint((int)gridBitmapSource.ActualWidth, (int)gridBitmapSource.ActualHeight);
             m_viewer.Draw(gridDrawing);
         }
 
         private void gridBitmapSource_PreviewMouseMove(object sender, MouseEventArgs e)
         {
+            if (m_viewer == null) return;
             Point p = e.GetPosition(imageBitmapSource);
             m_viewer.p_cpWindow = new CPoint((int)p.X, (int)p.Y);
             if (m_viewer.p_bLBD) m_viewer.Draw(gridDrawing);
@@ -98,6 +100,7 @@ namespace RootTools.Memory
 
         private void gridBitmapSource_MouseLeave(object sender, MouseEventArgs e)
         {
+            if (m_viewer == null) return;
             m_viewer.p_bLBD = false;
         }
         #endregion

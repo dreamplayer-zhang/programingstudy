@@ -3,14 +3,14 @@ using RootTools.Memory;
 using RootTools.Trees;
 using System.Windows.Media;
 
-namespace Root_ASIS.AOI
+namespace Root_AxisMapping
 {
     public class AOIData : NotifyProperty
     {
         #region Property
-        public string m_sDisplay = ""; 
+        public string m_sDisplay = "";
         public bool m_bEnable = true;
-        public bool m_bInspect = false; 
+        public bool m_bInspect = false;
         public CPoint m_cp0 = new CPoint();
         public CPoint m_sz;
         public RPoint m_rpCenter = new RPoint();
@@ -31,17 +31,17 @@ namespace Root_ASIS.AOI
             {
                 if (_eROI == value) return;
                 _eROI = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
                 switch (_eROI)
                 {
                     case eROI.Ready: p_brushROI = Brushes.Gray; break;
                     case eROI.Active: p_brushROI = Brushes.Red; break;
-                    case eROI.Done: p_brushROI = Brushes.Green; break; 
+                    case eROI.Done: p_brushROI = Brushes.Green; break;
                 }
             }
         }
 
-        Brush _brushROI = Brushes.Gray; 
+        Brush _brushROI = Brushes.Gray;
         public Brush p_brushROI
         {
             get { return _brushROI; }
@@ -49,7 +49,7 @@ namespace Root_ASIS.AOI
             {
                 if (_brushROI == value) return;
                 _brushROI = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -75,12 +75,12 @@ namespace Root_ASIS.AOI
 
         public void Draw(MemoryDraw draw, eDraw eDraw)
         {
-            Brush brush = null; 
+            Brush brush = null;
             switch (eDraw)
             {
                 case eDraw.ROI:
-                    if (p_eROI == eROI.Ready) return; 
-                    brush = p_brushROI; 
+                    if (p_eROI == eROI.Ready) return;
+                    brush = p_brushROI;
                     break;
                 case eDraw.Inspect:
                     if (m_bInspect == false) return;
@@ -88,11 +88,11 @@ namespace Root_ASIS.AOI
                     break;
                 case eDraw.All:
                     brush = Brushes.Green;
-                    break; 
+                    break;
             }
             draw.AddRectangle(brush, m_cp0, m_cp0 + m_sz);
             draw.AddText(brush, m_cp0, p_id);
-            draw.AddText(brush, m_cp0, m_sDisplay); 
+            draw.AddText(brush, m_cp0, m_sDisplay);
         }
         #endregion
 
@@ -104,19 +104,19 @@ namespace Root_ASIS.AOI
             Move,
             Resize,
         }
-        eShape m_eShape = eShape.None; 
+        eShape m_eShape = eShape.None;
 
         public void LBD(bool bDown, CPoint cpImg)
         {
             if (bDown && (m_eShape == eShape.None))
             {
                 m_cp0 = cpImg;
-                m_eShape = eShape.Set; 
+                m_eShape = eShape.Set;
             }
             else if (m_eShape != eShape.None)
             {
                 m_eShape = eShape.None;
-                p_eROI = eROI.Done; 
+                p_eROI = eROI.Done;
             }
         }
 
@@ -128,7 +128,7 @@ namespace Root_ASIS.AOI
                     m_sz.X = cpImg.X - m_cp0.X;
                     m_sz.Y = cpImg.Y - m_cp0.Y;
                     break;
-                default: break; 
+                default: break;
             }
         }
         #endregion
@@ -147,14 +147,14 @@ namespace Root_ASIS.AOI
             AOIData aoi = new AOIData(p_id, m_sz);
             aoi.m_cp0 = new CPoint(m_cp0);
             aoi.p_eROI = p_eROI;
-            return aoi; 
+            return aoi;
         }
 
         public string p_id { get; set; }
         public AOIData(string id, CPoint sz)
         {
             p_id = id;
-            m_sz = sz; 
+            m_sz = sz;
         }
     }
 }

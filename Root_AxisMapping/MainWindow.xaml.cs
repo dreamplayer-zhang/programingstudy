@@ -28,10 +28,13 @@ namespace Root_AxisMapping
         #endregion
 
         AxisMapping_Engineer m_engineer = new AxisMapping_Engineer();
+        Mapping m_mapping; 
         void Init()
         {
             m_engineer.Init("AxisMapping");
             engineerUI.Init(m_engineer);
+            m_mapping = new Mapping("Mapping", m_engineer);
+            mappingUI.Init(m_mapping, m_engineer); 
         }
 
         void ThreadStop()

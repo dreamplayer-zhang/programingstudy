@@ -93,10 +93,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="AOIData.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Mapping.cs" />
     <Compile Include="AxisMapping_Engineer.cs" />
     <Compile Include="AxisMapping_Engineer_UI.xaml.cs">
       <DependentUpon>AxisMapping_Engineer_UI.xaml</DependentUpon>
@@ -113,8 +115,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Mapping_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mapping_UI.xaml.cs">
+      <DependentUpon>Mapping_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\AxisMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
