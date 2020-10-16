@@ -757,7 +757,74 @@ namespace Root_Vega.Module
                 return "OK";
             }
         }
+        //------------------------------------------------------
+        public class Run_Grab_ESCHO : ModuleRunBase
+        {
+            //------------------------------------------------------
+            PatternVision m_module;
+            public RPoint m_rpReticleCenterPos_pulse = new RPoint();    // Reticle 중심의 XY Postiion [pulse]
+            public CPoint m_cpMemoryOffset_pixel = new CPoint();        // Memory Offset [pixel]
+            public bool m_bInvDir = false;                              // 역방향 스캔
+            public double m_dResX_um = 1;                               // Camera X Resolution [um]
+            public double m_dResY_um = 1;                               // Camera Y Resolution [um]
+            public double m_dReticleSize_mm = 1000;                     // Reticle Size [mm]
+            public double m_dFocusPosZ_pulse = 0;                       // Focus Z Position [pulse]
+            public int m_nMaxFrame = 100;                               // Camera max Frame 스펙
+            public int m_nScanRate = 100;                               // Camera Frame Spec 사용률 ? 1~100 %
+            
+            public GrabMode m_grabMode = null;
+            string m_sGrabMode = "";
+            string p_sGrabMode
+            {
+                get { return m_sGrabMode; }
+                set
+                {
+                    m_sGrabMode = value;
+                    m_grabMode = m_module.GetGrabMode(value);
+                }
+            }
+            //------------------------------------------------------
+            public Run_Grab_ESCHO(PatternVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+            //------------------------------------------------------
+            public override ModuleRunBase Clone()
+            {
+                Run_Grab_ESCHO run = new Run_Grab_ESCHO(m_module);
+                run.p_sGrabMode = p_sGrabMode;
+                run.m_rpReticleCenterPos_pulse = m_rpReticleCenterPos_pulse;
+                run.m_cpMemoryOffset_pixel = m_cpMemoryOffset_pixel;
+                run.m_bInvDir = m_bInvDir;
+                run.m_dResX_um = m_dResX_um;
+                run.m_dResY_um = m_dResY_um;
+                run.m_dReticleSize_mm = m_dReticleSize_mm;
+                run.m_dFocusPosZ_pulse = m_dFocusPosZ_pulse;
+                run.m_nMaxFrame = m_nMaxFrame;
+                run.m_nScanRate = m_nScanRate;
 
+                return run;
+            }
+            //------------------------------------------------------
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_rpReticleCenterPos_pulse = tree.Set(m_rpReticleCenterPos_pulse, m_rpReticleCenterPos_pulse, "Center Axis Position [pulse]", "Center Axis Position [pulse]", bVisible);
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution [um]", "Camera X Resolution [um]", bVisible);
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution [um]", "Camera Y Resolution [um]", bVisible);
+                //m_dFocusPosZ_pulse = tree.Set(m_dFocusPosZ_pulse, m_dFocusPosZ_pulse, ")
+                //m_nFocusPos = tree.Set(m_nFocusPos, 0, "Focus Z Pos", "Focus Z Pos", bVisible);
+                //m_cpMemory = tree.Set(m_cpMemory, m_cpMemory, "Memory Position", "Grab Start Memory Position (pixel)", bVisible);
+                //m_bInvDir = tree.Set(m_bInvDir, m_bInvDir, "Inverse Direction", "Grab Direction", bVisible);
+                //m_yLine = tree.Set(m_yLine, m_yLine, "WaferSize", "# of Grab Lines", bVisible);
+                //m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
+                //m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+                //p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+                //if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
+            }
+            //------------------------------------------------------
+        }
+        //------------------------------------------------------
         public class Run_Grab : ModuleRunBase
         {
             PatternVision m_module;
