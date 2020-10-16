@@ -149,7 +149,7 @@ namespace Root_ASIS.Teachs
         #region ROI
         public void InvalidROI()
         {
-            m_teach.InvalidROI();
+            m_teach.InvalidListROI();
             buttonInspect.IsEnabled = (m_teach.m_nROI[AOIData.eROI.Ready] == 0) && (m_teach.m_nROI[AOIData.eROI.Active] == 0);
         }
 
@@ -159,8 +159,7 @@ namespace Root_ASIS.Teachs
             if (nSelect < 0) return;
             if (nSelect >= m_teach.m_aROI.Count) return;
             m_teach.ClearActive();
-            m_teach.m_roiActive = m_teach.m_aROI[nSelect];
-            m_teach.m_roiActive.p_eROI = AOIData.eROI.Active;
+            m_teach.m_aROI[nSelect].p_eROI = AOIData.eROI.Active;
         }
         #endregion
     }
