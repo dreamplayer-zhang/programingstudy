@@ -17,75 +17,143 @@
         Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <!--Title Bar Start-->
         <Grid Grid.Row="0"
               Name="TitleBar"
-              Background="#FF3694D4"
+              Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
               MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Icon:AtiLogo Width="30"
-                          Height="18"
+            <Icon:AtiLogo Width="25"
+                          Height="15"
                           VerticalAlignment="Center"
-                          Margin="3" />
-            <TextBlock Text="CAMELLIA"
-                       Foreground="White"
+                          Margin="2"/>
+            <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
+                       FontSize="11"
+                       Foreground="Black"
                        VerticalAlignment="Center"
-                       FontSize="15"
-                       Margin="5,0,0,0"
+                       Margin="0,0,0,0"
                        Grid.Column="1" />
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
                         Orientation="Horizontal"
                         Grid.Column="2">
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="MinimizeButton"
-                        Width="34"
-                        Height="26"
-                        Margin="0,0,10,0"
-                        Foreground="White"
+                        Width="30"
+                        Height="20"
+                        Margin="2,0"
                         Click="MinimizeButton_Click">
                     <Path Style="{StaticResource MinimizeIconKey}" />
                 </Button>
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="MaximizeButton"
-                        Width="34"
-                        Height="26"
-                        Margin="0,0,10,0"
-                        Foreground="White"
+                        Width="30"
+                        Height="20"
+                        Margin="2,0"
                         Click="MaximizeButton_Click">
                     <Path Style="{StaticResource MaximizeIconKey}" />
                 </Button>
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="NormalizeButton"
-                        Width="34"
-                        Height="26"
-                        Margin="0,0,10,0"
-                        Foreground="White"
+                        Width="30"
+                        Height="20"
+                        Margin="2,0"
                         Click="NormalizeButton_Click">
                     <Path Style="{StaticResource NormalizeIconKey}" />
                 </Button>
-                <Button Style="{StaticResource SystemButton}"
+                <!--<Button Style="{StaticResource SystemButton}"
                         x:Name="CloseButton"
-                        Width="34"
-                        Height="26"
-                        Margin="0,0,10,2"
-                        Foreground="White"
+                        Width="30"
+                        Height="20"
+                        Margin="2,0,0,0"
                         Click="CloseButton_Click"
                         VerticalAlignment="Bottom">
                     <Path Style="{StaticResource CloseIconKey}" />
-                </Button>
+                </Button>-->
             </StackPanel>
         </Grid>
-        <Menu VerticalAlignment="Stretch" Grid.Row="1">
-            <MenuItem Header="File" VerticalAlignment="Center"/>
+        <Grid Grid.Row="1">
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="LightSteelBlue" Offset="0"/>
+                    <GradientStop Color="White" Offset="2"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal" >
+                <Button Content="Load" VerticalAlignment="Center"
+                        Height="40" Width="50" Margin="5"/>
+                <Button Content="Recipe" VerticalAlignment="Center"
+                        Height="40" Width="50" Margin="5"/>
+            </StackPanel>
+            <Border Grid.Column="2" 
+                    CornerRadius="0,0,50,50">
+                <Border.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="SteelBlue" Offset="0"/>
+                        <GradientStop Color="White" Offset="2"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <TextBlock Text="CAMELLIA Ⅱ" VerticalAlignment="Center" HorizontalAlignment="Center"
+                           FontSize="32" FontWeight="Bold"/>
+            </Border>
+            <StackPanel Grid.Column="4"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <Button Content="Setting" VerticalAlignment="Center"
+                        Height="40" Width="50" Margin="5"/>
+                <Button Content="Exit" VerticalAlignment="Center"
+                        Height="40" Width="50" Margin="5" Click="Button_Click"/>
+            </StackPanel>
+        </Grid>
+        <Menu Grid.Row="2" Background="{DynamicResource ControlBackGround}">
+            <MenuItem Header="File">
+                <MenuItem Header="Load Recipe"/>
+                <MenuItem Header="Recipe Manager"/>
+            </MenuItem>
+            <MenuItem Header="Edit">
+                <MenuItem Header="Setting"/>
+            </MenuItem>
+            <MenuItem Header="User">
+                <MenuItem Header="Login"/>
+                <MenuItem Header="Logout"/>
+                <MenuItem Header="Authorization" IsEnabled="False"/>
+            </MenuItem>
+            <MenuItem Header="Test">
+                <MenuItem Header="Send Test"/>
+                <MenuItem Header="Filmetrics Test"/>
+            </MenuItem>
+            <MenuItem Header="PM">
+
+            </MenuItem>
         </Menu>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="EFEM">
+
+            </GroupBox>
+            <GroupBox Header="Camellia" Grid.Column="1">
+
+            </GroupBox>
+        </Grid>
     </Grid>
     <!--Title Bar End-->
 </Window>

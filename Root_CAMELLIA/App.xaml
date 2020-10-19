@@ -15,7 +15,7 @@
         <SolidColorBrush x:Key="ControlBackGround" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
         <SolidColorBrush x:Key="GroupBoxBackground" Color="Transparent"/>
         <SolidColorBrush x:Key="Splitter" Color="DimGray"/>
-        <SolidColorBrush x:Key="MainThema" Color="#FF3694D4"/>
+        <SolidColorBrush x:Key="MainThema" Color="LightSteelBlue"/>
         <!--End Color-->
 
         <!--Control-->
@@ -94,10 +94,6 @@
         <!--Title-->
         <Style TargetType="{x:Type Button}" 
                x:Key="SystemButton">
-            <Setter Property="Width"
-                    Value="34" />
-            <Setter Property="Height"
-                    Value="26" />
             <Setter Property="Background"
                     Value="Transparent" />
             <Setter Property="HorizontalContentAlignment"
