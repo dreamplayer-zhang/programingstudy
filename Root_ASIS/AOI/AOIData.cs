@@ -36,7 +36,7 @@ namespace Root_ASIS.AOI
                 {
                     case eROI.Ready: p_brushROI = Brushes.Gray; break;
                     case eROI.Active: p_brushROI = Brushes.Red; break;
-                    case eROI.Done: p_brushROI = Brushes.Green; break; 
+                    case eROI.Done: p_brushROI = Brushes.YellowGreen; break; 
                 }
             }
         }

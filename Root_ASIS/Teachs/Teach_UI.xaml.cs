@@ -160,6 +160,7 @@ namespace Root_ASIS.Teachs
             if (nSelect >= m_teach.m_aROI.Count) return;
             m_teach.ClearActive();
             m_teach.m_aROI[nSelect].p_eROI = AOIData.eROI.Active;
+            m_teach.Draw(AOIData.eDraw.ROI); 
         }
         #endregion
     }

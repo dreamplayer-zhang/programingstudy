@@ -68,12 +68,6 @@ namespace Root_ASIS.Teachs
             m_aoiStrip.AddROI(m_aROI);
             m_aoiStripID.AddROI(m_aROI);
             foreach (IAOI aoi in m_aAOI) aoi.AddROI(m_aROI);
-//            CalcROICount();
-//            if (m_nROI[AOIData.eROI.Ready] == 0) return;
-//            if (m_nROI[AOIData.eROI.Active] == 1) return;
-//            if (m_nROI[AOIData.eROI.Active] > 1) ClearActive();
-//            SelectActive();
-//            Draw(AOIData.eDraw.ROI); //forget
         }
 
         public Dictionary<AOIData.eROI, int> m_nROI = new Dictionary<AOIData.eROI, int>();
@@ -87,27 +81,29 @@ namespace Root_ASIS.Teachs
 
         public AOIData p_roiActive
         {
-            get
+            get { return GetActineROI(); }
+        }
+
+        AOIData GetActineROI()
+        {
+            CalcROICount();
+            if (m_nROI[AOIData.eROI.Active] == 1)
             {
-                CalcROICount();
-                if (m_nROI[AOIData.eROI.Active] == 1)
-                {
-                    foreach (AOIData roi in m_aROI)
-                    {
-                        if (roi.p_eROI == AOIData.eROI.Active) return roi; 
-                    }
-                }
-                if (m_nROI[AOIData.eROI.Active] > 1) ClearActive();
                 foreach (AOIData roi in m_aROI)
                 {
-                    if (roi.p_eROI == AOIData.eROI.Ready)
-                    {
-                        roi.p_eROI = AOIData.eROI.Active; 
-                        return roi;
-                    }
+                    if (roi.p_eROI == AOIData.eROI.Active) return roi;
                 }
-                return null; 
             }
+            if (m_nROI[AOIData.eROI.Active] > 1) ClearActive();
+            foreach (AOIData roi in m_aROI)
+            {
+                if (roi.p_eROI == AOIData.eROI.Ready)
+                {
+                    roi.p_eROI = AOIData.eROI.Active;
+                    return roi;
+                }
+            }
+            return null;
         }
 
         void CalcROICount()
@@ -139,7 +135,8 @@ namespace Root_ASIS.Teachs
         {
             if (p_roiActive == null) return;
             p_roiActive.LBD(bDown, cpImg);
-            Draw(AOIData.eDraw.ROI); 
+            Draw(AOIData.eDraw.ROI);
+            GetActineROI(); 
         }
 
         private void M_viewer_OnMouseMove(CPoint cpImg)
@@ -217,6 +214,7 @@ namespace Root_ASIS.Teachs
             InitTreeAOI();
             InitDraw();
             InitROI();
+            GetActineROI(); 
         }
     }
 }

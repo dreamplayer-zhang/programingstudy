@@ -75,7 +75,9 @@ namespace Root_MarsLogView
                         case "SlotNo": asMars[8] = asCmd[1]; break;
                         case "LotID": asMars[9] = '\'' + asCmd[1] + '\''; break;
                         case "RecipeName": asMars[10] = '\'' + asCmd[1] + '\''; break;
-                        case "StepNo": asMars[11] = asCmd[1]; break;
+                        case "StepNumber": asMars[11] = asCmd[1]; break;
+                        case "StepSeq": asMars[12] = asCmd[1]; break;
+                        case "StepName": asMars[13] = asCmd[1]; break;
                     }
                 }
             }

@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using Root_ASIS.AOI;
+using System.Windows.Controls;
 
 namespace Root_AxisMapping
 {
@@ -22,11 +23,19 @@ namespace Root_AxisMapping
             m_mapping = mapping;
             memoryViewerAlignUI.Init(mapping.m_axisMapping.m_memoryPool.m_viewer, false);
             //memoryViewerAlignUI.Init()
+            listViewROI.ItemsSource = mapping.m_aROI; 
         }
 
+        #region ROI
         private void listViewROI_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-
+            int nSelect = listViewROI.SelectedIndex;
+            if (nSelect < 0) return;
+            if (nSelect >= m_mapping.m_aROI.Count) return;
+            m_mapping.ClearActive();
+            m_mapping.m_aROI[nSelect].p_eROI = AOIData.eROI.Active;
+            m_mapping.Draw(AOIData.eDraw.ROI);
         }
+        #endregion
     }
 }

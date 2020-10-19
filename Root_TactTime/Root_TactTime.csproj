@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1B0C7786-3D5D-4A7F-B3BE-256AAD77BADD}</ProjectGuid>
+    <ProjectGuid>{DCDC9C3E-E77D-45C3-A07A-CE8503CC6D44}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Root_AxisMapping</RootNamespace>
-    <AssemblyName>Root_AxisMapping</AssemblyName>
+    <RootNamespace>Root_TactTime</RootNamespace>
+    <AssemblyName>Root_TactTime</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -35,27 +35,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -77,18 +56,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="AxisMapping_Engineer_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="AxisMapping_Handler_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="AxisMapping_Recipe_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Compile Include="Module.cs" />
+    <Compile Include="Module_UI.xaml.cs">
+      <DependentUpon>Module_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TactTime.cs" />
+    <Compile Include="TactTime_UI.xaml.cs">
+      <DependentUpon>TactTime_UI.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -97,33 +72,20 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Mapping.cs" />
-    <Compile Include="AxisMapping_Engineer.cs" />
-    <Compile Include="AxisMapping_Engineer_UI.xaml.cs">
-      <DependentUpon>AxisMapping_Engineer_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="AxisMapping_Handler.cs" />
-    <Compile Include="AxisMapping_Handler_UI.xaml.cs">
-      <DependentUpon>AxisMapping_Handler_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="AxisMapping_Recipe.cs" />
-    <Compile Include="AxisMapping_Recipe_UI.xaml.cs">
-      <DependentUpon>AxisMapping_Recipe_UI.xaml</DependentUpon>
-    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Mapping_UI.xaml">
+    <Page Include="Module_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TactTime_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Mapping_UI.xaml.cs">
-      <DependentUpon>Mapping_UI.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Module\AxisMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -154,11 +116,6 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Root_ASIS\Root_ASIS.csproj">
-      <Project>{a1f831c0-f0f4-4ef1-b9b4-e7c424735f65}</Project>
-      <Name>Root_ASIS</Name>
-    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
