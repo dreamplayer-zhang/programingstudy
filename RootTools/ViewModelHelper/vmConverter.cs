@@ -484,11 +484,20 @@ namespace ViewConverter
                 {
                     case "PatternVision":
                         if (strAxis == "AxisX")
+                        {
                             dControlLength = 50.0;
+                            dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, dStageLength - dControlLength, 0.0);
+                        }
                         else if (strAxis == "AxisY")
+                        {
                             dControlLength = 100.0;
+                            dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, dStageLength - dControlLength, 0.0);
+                        }
                         else if (strAxis == "AxisZ")
+                        {
                             dControlLength = 30.0;
+                            dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, 0.0, dStageLength - dControlLength);
+                        }
                         break;
                     case "SideVision":
                         if (strAxis == "AxisX")
@@ -504,10 +513,9 @@ namespace ViewConverter
                             dStageLength = 360.0;
                             dControlLength = 0.0;
                         }
+                        dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, 0.0, dStageLength - dControlLength);
                         break;
                 }
-
-                dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, 0.0, dStageLength - dControlLength);
 
                 return dScaled;
             }
