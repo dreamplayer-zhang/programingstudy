@@ -1,11 +1,9 @@
 ﻿<Window x:Class="Root_Vega.Dialog_AutoFocus"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
         xmlns:module="clr-namespace:Root_Vega.Module"
         xmlns:Tree="clr-namespace:RootTools.Trees;assembly=RootTools"
-        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         Height="768"
@@ -216,10 +214,6 @@
                                     Margin="10">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="ZoomInOutline" 
-                                               Foreground="White"
-                                               Width="30"
-                                               Height="30"></material:PackIcon>
                                 <TextBlock Text="Start AutoFocus"
                                        Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>
@@ -230,10 +224,6 @@
                                     Margin="10">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="Cancel" 
-                                               Foreground="White"
-                                               Width="30"
-                                               Height="30"></material:PackIcon>
                                 <TextBlock Text="Cancel"
                                        Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>

@@ -3,13 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:vmConverter="clr-namespace:ViewConverter;assembly=RootTools"
              mc:Ignorable="d"
              d:DesignHeight="726"
              d:DesignWidth="1651">
     <UserControl.Resources>
-        <vmConverter:AjinModuleToPackIconConverter x:Key="AjinModuleToPackIconConverters" />
+        <!--<vmConverter:AjinModuleToPackIconConverter x:Key="AjinModuleToPackIconConverters" />-->
         <vmConverter:DataContextToVisibleConverter x:Key="DataContextToVisibleConverters" />
     </UserControl.Resources>
     <Grid >
@@ -31,11 +30,7 @@
                     <StackPanel VerticalAlignment="Center"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Center">
-                        <marterial:PackIcon Kind="Search"
-                                            VerticalAlignment="Center"
-                                            Width="{PriorityBinding}"
-                                            Height="{PriorityBinding}"
-                                            Foreground="White"></marterial:PackIcon>
+                        
                         <TextBlock TextAlignment="Center"
                                    Text="Search Modules"
                                    Foreground="White"
@@ -48,11 +43,7 @@
                     <StackPanel VerticalAlignment="Center"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Center">
-                        <marterial:PackIcon Kind="Place"
-                                            VerticalAlignment="Center"
-                                            Width="{PriorityBinding}"
-                                            Height="{PriorityBinding}"
-                                            Foreground="White"></marterial:PackIcon>
+                        
                         <TextBlock TextAlignment="Center"
                                    Text="Match"
                                    Foreground="White"
@@ -110,10 +101,7 @@
                                     <WrapPanel>
                                         <Image Source="../Resources/AJINModule.JPG"
                                                Width="120" />
-                                        <marterial:PackIcon Kind="{Binding p_sModuleName ,Converter={StaticResource AjinModuleToPackIconConverters}}"
-                                                            Foreground="White"
-                                                            Width="{PriorityBinding}"
-                                                            Height="{PriorityBinding}"></marterial:PackIcon>
+                                        
                                         <StackPanel Margin="10,0,0,0"
                                                     VerticalAlignment="Center">
                                             <TextBlock Foreground="{StaticResource TextForeGround}"
@@ -135,11 +123,7 @@
                         <StackPanel VerticalAlignment="Center"
                                     Orientation="Horizontal"
                                     HorizontalAlignment="Center">
-                            <marterial:PackIcon Kind="Settings"
-                                                VerticalAlignment="Center"
-                                                Width="{PriorityBinding}"
-                                                Height="{PriorityBinding}"
-                                                Foreground="White"></marterial:PackIcon>
+                            
                             <TextBlock TextAlignment="Center"
                                        Text="Setting"
                                        Foreground="White"

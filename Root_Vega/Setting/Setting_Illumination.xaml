@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
              xmlns:comm="clr-namespace:RootTools.Comm;assembly=RootTools"
@@ -38,11 +37,7 @@
                         CornerRadius="10">
                     <StackPanel>
                         <WrapPanel Margin="0,10,0,0">
-                            <material:PackIcon Kind="Lightbulb"
-                                               Foreground="White"
-                                               Width="50"
-                                               Panel.ZIndex="2"
-                                               Height="50"></material:PackIcon>
+                            
                             <TextBlock Text="4CH Controller"
                                        FontSize="30"
                                        Foreground="White"></TextBlock>
@@ -53,24 +48,18 @@
                                     Command="{Binding ControlRemoveCommand}"
                                     CommandParameter="{Binding p_lightToolSet.p_aLightTool12ch}"
                                     Margin="10,0,10,10">
-                                <material:PackIcon Kind="Minus"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
                             </Button>
                             <TextBlock Text="{Binding p_lightToolSet.p_aLightTool12ch.Count}"
                                        Foreground="White"
                                        Width="30"
                                        FontSize="30"
                                        Margin="10,0,10,10"></TextBlock>
-                            <Button Height="40"
+                                <Button Height="40"
                                     Width="40"
                                     Command="{Binding ControlAddCommand}"
                                     CommandParameter="{Binding p_lightToolSet.p_aLightTool12ch}"
                                     Margin="10,0,10,10">
-                                <material:PackIcon Kind="Plus"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
-                            </Button>
+                                </Button>
                         </WrapPanel>
                     </StackPanel>
                 </Border>
@@ -80,11 +69,7 @@
                         CornerRadius="10">
                     <StackPanel>
                         <WrapPanel Margin="0,10,0,0">
-                            <material:PackIcon Kind="Lightbulb"
-                                               Foreground="White"
-                                               Width="50"
-                                               Panel.ZIndex="2"
-                                               Height="50"></material:PackIcon>
+                            
                             <TextBlock Text="12CH Controller"
                                        FontSize="30"
                                        Foreground="White"></TextBlock>
@@ -95,9 +80,7 @@
                                     CommandParameter="{Binding p_lightToolSet.p_aLightTool4ch}"
                                     Width="40"
                                     Margin="10,0,10,10">
-                                <material:PackIcon Kind="Minus"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                             </Button>
                             <TextBlock Text="{Binding p_lightToolSet.p_aLightTool4ch.Count}"
                                        Width="30"
@@ -109,9 +92,7 @@
                                     Command="{Binding ControlAddCommand}"
                                     CommandParameter="{Binding p_lightToolSet.p_aLightTool4ch}"
                                     Margin="10,0,10,10">
-                                <material:PackIcon Kind="Plus"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                             </Button>
                         </WrapPanel>
                     </StackPanel>
@@ -122,11 +103,7 @@
                         CornerRadius="10">
                     <StackPanel>
                         <WrapPanel Margin="0,10,0,0">
-                            <material:PackIcon Kind="Lightbulb"
-                                               Foreground="White"
-                                               Width="50"
-                                               Panel.ZIndex="2"
-                                               Height="50"></material:PackIcon>
+                            
                             <TextBlock Text="Kangwoo"
                                        FontSize="30"
                                        Foreground="White"></TextBlock>
@@ -137,9 +114,7 @@
                                     Command="{Binding ControlRemoveCommand}"
                                     CommandParameter="{Binding p_lightToolSet.p_aLightToolKwangwoo}"
                                     Margin="10,0,10,10">
-                                <material:PackIcon Kind="Minus"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                             </Button>
                             <TextBlock Text="{Binding p_lightToolSet.p_aLightToolKwangwoo.Count}"
                                        Width="30"
@@ -151,9 +126,7 @@
                                     Command="{Binding ControlAddCommand}"
                                     CommandParameter="{Binding p_lightToolSet.p_aLightToolKwangwoo}"
                                     Margin="10,0,10,10">
-                                <material:PackIcon Kind="Plus"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                             </Button>
                         </WrapPanel>
                     </StackPanel>
@@ -164,11 +137,7 @@
                         CornerRadius="10">
                     <StackPanel>
                         <WrapPanel Margin="0,10,0,0">
-                            <material:PackIcon Kind="Lightbulb"
-                                               Foreground="White"
-                                               Width="50"
-                                               Panel.ZIndex="2"
-                                               Height="50"></material:PackIcon>
+                            
                             <TextBlock Text="LVS Laser"
                                        FontSize="30"
                                        Foreground="White"></TextBlock>
@@ -179,9 +148,7 @@
                                     Command="{Binding ControlRemoveCommand}"
                                     CommandParameter="{Binding p_lightToolSet.p_aLightToolLVS}"
                                     Margin="10,0,10,10">
-                                <material:PackIcon Kind="Minus"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                             </Button>
                             <TextBlock Text="{Binding p_lightToolSet.p_aLightToolLVS.Count}"
                                        Width="30"
@@ -193,9 +160,7 @@
                                     Command="{Binding ControlAddCommand}"
                                     CommandParameter="{Binding p_lightToolSet.p_aLightToolLVS}"
                                     Margin="10,0,10,10">
-                                <material:PackIcon Kind="Plus"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                             </Button>
                         </WrapPanel>
                     </StackPanel>

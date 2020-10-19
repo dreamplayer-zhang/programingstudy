@@ -3,13 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="883" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
     <ScrollViewer>
         <StackPanel>
             <Grid Height="883">
-                <material:MaterialDateDisplay Margin="20,20" FontFamily="Arial"/>
+                
                 <TextBlock Text="," Margin="167,37.3"
                        VerticalAlignment="Top"
                        HorizontalAlignment="Left"
@@ -52,13 +51,7 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid>
-                                <material:PackIcon Kind="Wrench"
-                                           Foreground="{StaticResource MainThema}"
-                                           Width=" 150" 
-                                           Height="150"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"
-                                           Panel.ZIndex="2"/>
+                                
                             </Grid>
                             <Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
@@ -142,12 +135,7 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <material:PackIcon Kind="ChartBar" 
-                                           Width=" 150" 
-                                           Height="150"
-                                           Foreground="{StaticResource MainThema}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"/>
+                            
                             <Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
@@ -230,12 +218,7 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <material:PackIcon Kind="MonitorDashboard" 
-                                           Width=" 150" 
-                                           Height="150"
-                                           Foreground="{StaticResource MainThema}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"/>
+                            
                             <Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
@@ -316,19 +299,7 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <material:PackIcon Kind="Play"
-                                           Width="100"
-                                           Height="70"
-                                           Foreground="{StaticResource MainThema}"
-                                           VerticalAlignment="Center"
-                                           Margin="0,0,4,50"
-                                           HorizontalAlignment="Center"/>
-                            <material:PackIcon Kind="ComputerClassic" 
-                                           Width=" 150" 
-                                           Height="150"
-                                           Foreground="{StaticResource MainThema}"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center"/>
+                            
                             <Grid Grid.Row="1">
                                 <TextBlock Text="Stop"
                                        Style="{StaticResource BasicTb}"

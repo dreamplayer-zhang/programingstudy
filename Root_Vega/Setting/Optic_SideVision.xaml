@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:Tree="clr-namespace:RootTools.Trees;assembly=RootTools"
-             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:Dalsa="clr-namespace:RootTools.Camera.Dalsa;assembly=RootTools"
              xmlns:Axis="clr-namespace:RootTools.Control.Ajin;assembly=RootTools"
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
@@ -134,10 +133,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanConnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Connect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -149,10 +145,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanDisconnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="DisConnect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -163,10 +156,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCard"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="One Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -178,10 +168,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCardMultiple"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Cont. Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -193,10 +180,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="StopCircleOutline"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Stop"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -295,10 +279,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanConnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Connect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -310,10 +291,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanDisconnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="DisConnect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -324,10 +302,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCard"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="One Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -339,10 +314,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCardMultiple"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Cont. Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -354,10 +326,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="StopCircleOutline"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Stop"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -456,10 +425,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanConnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Connect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -471,10 +437,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanDisconnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="DisConnect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -486,10 +449,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCard"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="One Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -501,10 +461,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCardMultiple"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Cont. Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -516,10 +473,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="StopCircleOutline"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Stop"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -618,10 +572,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanConnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Connect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -633,10 +584,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanDisconnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="DisConnect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -647,10 +595,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCard"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="One Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -661,10 +606,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCardMultiple"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Cont. Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -675,10 +617,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="StopCircleOutline"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Stop"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -777,10 +716,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanConnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Connect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -792,10 +728,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanDisconnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="DisConnect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -807,10 +740,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCard"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="One Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -822,10 +752,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCardMultiple"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Cont. Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -837,10 +764,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="StopCircleOutline"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Stop"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -912,10 +836,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanConnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Connect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -927,10 +848,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanDisconnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="DisConnect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -942,10 +860,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCard"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="One Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -957,10 +872,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCardMultiple"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Cont. Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -972,10 +884,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="StopCircleOutline"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Stop"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -1047,10 +956,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanConnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Connect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -1062,10 +968,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="LanDisconnect"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="DisConnect"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -1077,10 +980,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCard"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="One Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -1092,10 +992,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="CreditCardMultiple"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Cont. Shot"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -1107,10 +1004,7 @@
                                     Margin="5">
                                 <Button.Content>
                                     <StackPanel Orientation="Horizontal">
-                                        <material:PackIcon Kind="StopCircleOutline"
-                                                           Foreground="White"
-                                                           Width="30"
-                                                           Height="30"></material:PackIcon>
+                                        
                                         <TextBlock Text="Stop"
                                                    Style="{StaticResource BasicTb}"></TextBlock>
                                     </StackPanel>
@@ -1252,18 +1146,7 @@
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-                                    <material:PackIcon Grid.Row="0"
-                                                       Kind="Camera"
-                                                       Foreground="White"
-                                                       Height="50"
-                                                       Width="50"
-                                                       Opacity="0.7"/>
-                                    <material:PackIcon Grid.Row="1"
-                                                       Kind="Camera"
-                                                       Foreground="White"
-                                                       Height="50"
-                                                       Width="50"
-                                                       Opacity="0.7"/>
+                                    
                                     <Rectangle Grid.RowSpan="2"
                                                Fill="White"
                                                Opacity="0.5"
@@ -1276,22 +1159,17 @@
                                 <Rectangle Width="40"
                                            Height="20"
                                            Fill="HotPink"></Rectangle>
-                                <material:PackIcon Kind="Camera"
-                                                   Foreground="White"
-                                                   HorizontalAlignment="Center"
-                                                   Canvas.Left="5"
-                                                   Height="30"
-                                                   Width="30">
-                                    <Canvas.Bottom>
-                                        <MultiBinding Converter="{StaticResource PositionScalingConverters}"
+                                
+                                    <!--<Canvas.Bottom>-->
+                                        <!--<MultiBinding Converter="{StaticResource PositionScalingConverters}"
                                                       ConverterParameter="AxisZ">
                                             <Binding Path="p_SideVision.p_axisZ"></Binding>
                                             <Binding Path="ActualHeight" ElementName="CanvasZ"></Binding>
                                             <Binding Path="p_SideVision.p_axisZ.p_posActual"></Binding>
                                             <Binding Path="p_SideVision.p_id"></Binding>
                                         </MultiBinding>
-                                    </Canvas.Bottom>
-                                </material:PackIcon>
+                                    </Canvas.Bottom>-->
+                                
                             </Canvas>
                             <Grid Grid.Column="2">
                                 <Grid.RowDefinitions>
@@ -1313,11 +1191,7 @@
                                             Style="{StaticResource BasicBtn}">
                                         <Button.Content>
                                             <StackPanel Orientation="Vertical">
-                                                <material:PackIcon Kind="Home"
-                                                                   Width="25"
-                                                                   HorizontalAlignment="Center"
-                                                                   Height="25"
-                                                                   Foreground="White"></material:PackIcon>
+                                                
                                                 <TextBlock Style="{StaticResource BasicTb}"
                                                            
                                                            Text="AllHome"
@@ -1331,11 +1205,7 @@
                                             Style="{StaticResource BasicBtn}">
                                         <Button.Content>
                                             <StackPanel Orientation="Vertical">
-                                                <material:PackIcon Kind="StopCircleOutline"
-                                                                   Width="25"
-                                                                   HorizontalAlignment="Center"
-                                                                   Height="25"
-                                                                   Foreground="White"></material:PackIcon>
+                                                
                                                 <TextBlock Style="{StaticResource BasicTb}"
                                                            Text="Stop"
                                                            FontSize="15"></TextBlock>
@@ -1349,11 +1219,7 @@
                                             Style="{StaticResource BasicBtn}">
                                         <Button.Content>
                                             <StackPanel Orientation="Vertical">
-                                                <material:PackIcon Kind="Camera"
-                                                                   Width="25"
-                                                                   HorizontalAlignment="Center"
-                                                                   Height="25"
-                                                                   Foreground="White"></material:PackIcon>
+                                                
                                                 <TextBlock Style="{StaticResource BasicTb}"
                                                            Text="Scan"
                                                            FontSize="15"></TextBlock>
@@ -1373,11 +1239,7 @@
                                             Style="{StaticResource BasicBtn}">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ZoomInOutline"
-                                                                   Width="25"
-                                                                   HorizontalAlignment="Center"
-                                                                   Height="25"
-                                                                   Foreground="White"></material:PackIcon>
+                                                    
                                                     <TextBlock Style="{StaticResource BasicTb}"
                                                            Text="AutoFocus"
                                                            FontSize="15"></TextBlock>
@@ -1390,11 +1252,7 @@
                                             Style="{StaticResource BasicBtn}">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ZoomInOutline"
-                                                                   Width="25"
-                                                                   HorizontalAlignment="Center"
-                                                                   Height="25"
-                                                                   Foreground="White"></material:PackIcon>
+                                                    
                                                     <TextBlock Style="{StaticResource BasicTb}"
                                                            Text="LADS"
                                                            FontSize="15"></TextBlock>
@@ -1407,11 +1265,7 @@
                                                 Style="{StaticResource BasicBtn}">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ZoomInOutline"
-                                                                   Width="25"
-                                                                   HorizontalAlignment="Center"
-                                                                   Height="25"
-                                                                   Foreground="White"></material:PackIcon>
+                                                    
                                                     <TextBlock Style="{StaticResource BasicTb}"
                                                            Text="TEST"
                                                            FontSize="15"></TextBlock>
@@ -1506,12 +1360,6 @@
                                                     <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
-                                            <RepeatButton.Content>
-                                                <material:PackIcon Kind="ArrowUpBox"
-                                                                   Width="{PriorityBinding}"
-                                                                   Height="{PriorityBinding}"
-                                                                   Foreground="White"></material:PackIcon>
-                                            </RepeatButton.Content>
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="3"
                                                       DataContext="{Binding p_SideVision.p_axisZ}"
@@ -1524,12 +1372,8 @@
                                                     <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
-                                            <RepeatButton.Content>
-                                                <material:PackIcon Kind="ArrowUpBox"
-                                                                   Width="{PriorityBinding}"
-                                                                   Height="{PriorityBinding}"
-                                                                   Foreground="Green"></material:PackIcon>
-                                            </RepeatButton.Content>
+                                          
+                                          
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="4"
                                                       DataContext="{Binding p_SideVision.p_axisTheta}"
@@ -1542,12 +1386,6 @@
                                                     <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
-                                            <RepeatButton.Content>
-                                                <material:PackIcon Kind="RotateLeft"
-                                                                   Width="{PriorityBinding}"
-                                                                   Height="{PriorityBinding}"
-                                                                   Foreground="Azure"></material:PackIcon>
-                                            </RepeatButton.Content>
                                         </RepeatButton>
                                     </Grid>
                                     <Grid Grid.Row="3">
@@ -1569,12 +1407,7 @@
                                                     <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
-                                            <RepeatButton.Content>
-                                                <material:PackIcon Kind="ArrowLeftBox"
-                                                                   Width="{PriorityBinding}"
-                                                                   Height="{PriorityBinding}"
-                                                                   Foreground="White"></material:PackIcon>
-                                            </RepeatButton.Content>
+                                           
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="1"
                                                       DataContext="{Binding p_SideVision.p_axisXY.p_axisY}"
@@ -1587,12 +1420,7 @@
                                                     <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
-                                            <RepeatButton.Content>
-                                                <material:PackIcon Kind="ArrowDownBox"
-                                                                   Width="{PriorityBinding}"
-                                                                   Height="{PriorityBinding}"
-                                                                   Foreground="White"></material:PackIcon>
-                                            </RepeatButton.Content>
+                                            
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="2"
                                                       DataContext="{Binding p_SideVision.p_axisXY.p_axisX}"
@@ -1605,12 +1433,7 @@
                                                     <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
-                                            <RepeatButton.Content>
-                                                <material:PackIcon Kind="ArrowRightBox"
-                                                                   Width="{PriorityBinding}"
-                                                                   Height="{PriorityBinding}"
-                                                                   Foreground="White"></material:PackIcon>
-                                            </RepeatButton.Content>
+                                           
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="3"
                                                       DataContext="{Binding p_SideVision.p_axisZ}"
@@ -1623,12 +1446,7 @@
                                                     <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
-                                            <RepeatButton.Content>
-                                                <material:PackIcon Kind="ArrowDownBox"
-                                                                   Width="{PriorityBinding}"
-                                                                   Height="{PriorityBinding}"
-                                                                   Foreground="Green"></material:PackIcon>
-                                            </RepeatButton.Content>
+                                           
                                         </RepeatButton>
                                         <RepeatButton Grid.Column="4"
                                                       DataContext="{Binding p_SideVision.p_axisTheta}"
@@ -1641,12 +1459,7 @@
                                                     <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
-                                            <RepeatButton.Content>
-                                                <material:PackIcon Kind="RotateRight"
-                                                                   Width="{PriorityBinding}"
-                                                                   Height="{PriorityBinding}"
-                                                                   Foreground="Azure"></material:PackIcon>
-                                            </RepeatButton.Content>
+                                           
                                         </RepeatButton>
                                     </Grid>
                                 </Grid>
@@ -1707,11 +1520,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowRightBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="30"
-                                                                       Height="30"></material:PackIcon>
+                                                    
                                                     <TextBlock Text="Move"
                                                                Style="{StaticResource BasicTb}"></TextBlock>
                                                 </StackPanel>
@@ -1724,11 +1533,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="File"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="30"
-                                                                       Height="30"></material:PackIcon>
+                                                    
                                                     <TextBlock Text="Save"
                                                                Style="{StaticResource BasicTb}"></TextBlock>
                                                 </StackPanel>
@@ -1767,11 +1572,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowRightBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="30"
-                                                                       Height="30"></material:PackIcon>
+                                                    
                                                     <TextBlock Text="Move"
                                                                Style="{StaticResource BasicTb}"></TextBlock>
                                                 </StackPanel>
@@ -1783,11 +1584,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="File"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="30"
-                                                                       Height="30"></material:PackIcon>
+                                                    
                                                     <TextBlock Text="Save"
                                                                Style="{StaticResource BasicTb}"></TextBlock>
                                                 </StackPanel>
@@ -1826,11 +1623,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowRightBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="30"
-                                                                       Height="30"></material:PackIcon>
+                                                    
                                                     <TextBlock Text="Move"
                                                                Style="{StaticResource BasicTb}"></TextBlock>
                                                 </StackPanel>
@@ -1842,11 +1635,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="File"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="30"
-                                                                       Height="30"></material:PackIcon>
+                                                    
                                                     <TextBlock Text="Save"
                                                                Style="{StaticResource BasicTb}"></TextBlock>
                                                 </StackPanel>
@@ -1885,11 +1674,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowRightBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="30"
-                                                                       Height="30"></material:PackIcon>
+                                                    
                                                     <TextBlock Text="Move"
                                                                Style="{StaticResource BasicTb}"></TextBlock>
                                                 </StackPanel>
@@ -1901,11 +1686,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="File"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="30"
-                                                                       Height="30"></material:PackIcon>
+                                                    
                                                     <TextBlock Text="Save"
                                                                Style="{StaticResource BasicTb}"></TextBlock>
                                                 </StackPanel>
@@ -1941,11 +1722,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowLeftBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="50"
-                                                                       Height="50"></material:PackIcon>
+                                                    
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>
@@ -1964,11 +1741,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowRightBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="50"
-                                                                       Height="50"></material:PackIcon>
+                                                    
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>
@@ -1990,11 +1763,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowLeftBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="50"
-                                                                       Height="50"></material:PackIcon>
+                                                    
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>
@@ -2013,11 +1782,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowRightBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="50"
-                                                                       Height="50"></material:PackIcon>
+                                                    
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>
@@ -2039,11 +1804,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowLeftBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="50"
-                                                                       Height="50"></material:PackIcon>
+                                                    
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>
@@ -2062,11 +1823,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowRightBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="50"
-                                                                       Height="50"></material:PackIcon>
+                                                    
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>
@@ -2089,11 +1846,7 @@
                                                 Margin="5" Grid.ColumnSpan="2">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowLeftBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="50"
-                                                                       Height="50"></material:PackIcon>
+                                                    
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>
@@ -2112,11 +1865,7 @@
                                                 Margin="5">
                                             <Button.Content>
                                                 <StackPanel Orientation="Vertical">
-                                                    <material:PackIcon Kind="ArrowRightBox"
-                                                                       Foreground="White"
-                                                                       HorizontalAlignment="Center"
-                                                                       Width="50"
-                                                                       Height="50"></material:PackIcon>
+                                                    
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>

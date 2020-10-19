@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:RootTools.ZoomLens"
              xmlns:comm="clr-namespace:RootTools.Comm"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -40,9 +39,6 @@
                                 Command="{Binding HomeCommand}">
                             <Button.Content>
                                 <StackPanel Orientation="Vertical">
-                                    <material:PackIcon Kind="Home"
-                                                       Width="25"
-                                                       Foreground="White"></material:PackIcon>
                                     <TextBlock Style="{StaticResource BasicTb}"
                                                Text="Home"
                                                FontSize="15"></TextBlock>
@@ -55,9 +51,6 @@
                                 Command="{Binding StopCommand}">
                             <Button.Content>
                                 <StackPanel Orientation="Vertical">
-                                    <material:PackIcon Kind="Stop"
-                                                       Width="25"
-                                                       Foreground="White"></material:PackIcon>
                                     <TextBlock Style="{StaticResource BasicTb}"
                                                Text="Stop"
                                                FontSize="15"></TextBlock>
@@ -70,9 +63,6 @@
                                 Command="{Binding ResetCommand}">
                             <Button.Content>
                                 <StackPanel Orientation="Vertical">
-                                    <material:PackIcon Kind="Restart"
-                                                       Width="25"
-                                                       Foreground="White"></material:PackIcon>
                                     <TextBlock Style="{StaticResource BasicTb}"
                                                Text="Reset"
                                                FontSize="15"></TextBlock>
@@ -85,9 +75,6 @@
                                 Command="{Binding EmergencyStopCommand}">
                             <Button.Content>
                                 <StackPanel Orientation="Vertical">
-                                    <material:PackIcon Kind="EmergencyExit"
-                                                       Width="25"
-                                                       Foreground="White"></material:PackIcon>
                                     <TextBlock Style="{StaticResource BasicTb}"
                                                Text="EMS"
                                                FontSize="15"></TextBlock>
@@ -138,11 +125,6 @@
                                         Command="{Binding MoveCommand}">
                                     <Button.Content>
                                         <StackPanel Orientation="Vertical">
-                                            <material:PackIcon Kind="MoveToInbox"
-                                                               Foreground="White"
-                                                               HorizontalAlignment="Center"
-                                                               Width="50"
-                                                               Height="50"></material:PackIcon>
                                             <TextBlock Style="{StaticResource BasicTb}"
                                                        Text="Move"
                                                        FontSize="15"></TextBlock>
@@ -177,9 +159,6 @@
                                             Name="btnUp">
                                         <Button.Content>
                                             <StackPanel Orientation="Vertical">
-                                                <material:PackIcon Kind="ArrowCompressUp"
-                                                                   Width="25"
-                                                                   Foreground="White"></material:PackIcon>
                                                 <TextBlock Style="{StaticResource BasicTb}"
                                                            Text="Up"
                                                            FontSize="15"></TextBlock>
@@ -203,9 +182,7 @@
                                             Name="btnDown">
                                         <Button.Content>
                                             <StackPanel Orientation="Vertical">
-                                                <material:PackIcon Kind="ArrowCompressDown"
-                                                                   Width="25"
-                                                                   Foreground="White"></material:PackIcon>
+                                                
                                                 <TextBlock Style="{StaticResource BasicTb}"
                                                            Text="Down"
                                                            FontSize="15"></TextBlock>

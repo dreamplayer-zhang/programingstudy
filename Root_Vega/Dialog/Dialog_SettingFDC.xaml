@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         WindowStyle="None"
         xmlns:convert ="clr-namespace:Root_Vega"
-             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
         WindowStartupLocation="CenterScreen"
         Title="Dialog_SettingFDC" Height="570" Width="400" Background="{StaticResource BackGround}" MouseDown="Window_MouseDown" 
         >
@@ -303,7 +302,6 @@
                                 <TabControl    Style="{StaticResource SettingUnitTab}" 
                            SelectedIndex="{Binding p_InputUnit,Converter={StaticResource TK4S_UnitToIndex}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
                                     <TabItem  Grid.Column="0" Style="{StaticResource  SettingPageTabItem}" Header="None" >
-                                        <!--<material:PackIcon Kind="Trashcan" HorizontalAlignment="Center" VerticalAlignment="Center" Width="35" Height="35"  Foreground="Wheat" />-->
                                     </TabItem>
                                     <TabItem Grid.Column="1" Style="{StaticResource  SettingPageTabItem}"  Header="kPa" >
                                     </TabItem>
@@ -359,14 +357,14 @@
                         <Button Grid.Column="1" Background="{StaticResource BackGround}" Style="{StaticResource CheckBtn}" 
                             BorderThickness="0"  Height="Auto" Width="{Binding Height}"
                         Command="{Binding OkCommand}" >
-                            <material:PackIcon Kind="CheckCircleOutline"  HorizontalAlignment="Center" VerticalAlignment="Center" Width="{Binding ActualWidth}" Height="{Binding ActualHight}"   Foreground="White" />
+                            
 
                         </Button>
                         <!--<Button Grid.Column="1" Style="{StaticResource MyBtn}"-->
                         <Button Grid.Column="3" Background="{StaticResource BackGround}" Style="{StaticResource CheckBtn}" 
                             Height="Auto" Width="{Binding Height}" BorderThickness="0" 
                         Command="{Binding CancelCommand}" >
-                            <material:PackIcon Kind="CloseCircleOutline" HorizontalAlignment="Center" VerticalAlignment="Center" Width="{Binding ActualWidth}" Height="{Binding ActualHight}"  Foreground="White"
+                            
                                             />
                             <Button.Resources>
                                 <Style TargetType="Border">

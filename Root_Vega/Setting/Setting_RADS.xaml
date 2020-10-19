@@ -6,7 +6,6 @@
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"            
              xmlns:local="clr-namespace:Root_Vega.Setting"
              xmlns:Tree="clr-namespace:RootTools.Trees;assembly=RootTools"
-             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="726" d:DesignWidth="1602">
@@ -37,10 +36,7 @@
                             Command="{Binding GetDeviceInfoCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="Information"
-                                                   Foreground="White"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                                 <TextBlock Text="Device Info"
                                            Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>
@@ -51,10 +47,7 @@
                             Command="{Binding SetResetContollerPacketCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="Restart"
-                                                   Foreground="White"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                                 <TextBlock Text="Reset Controller"
                                            Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>
@@ -66,10 +59,7 @@
                             IsEnabled="{Binding p_timerControl.p_IsRun, Converter={StaticResource InverseBooleanConverters}}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="RayStartArrow"
-                                                   Foreground="White"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                                 <TextBlock Text="Start ADS"
                                            Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>        
@@ -81,10 +71,7 @@
                             IsEnabled="{Binding p_timerControl.p_IsRun}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="StopCircleOutline"
-                                                   Foreground="White"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                                 <TextBlock Text="Stop ADS"
                                            Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>
@@ -105,10 +92,7 @@
                             Command="{Binding ConnectCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="LanConnect"
-                                                   Foreground="White"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                                 <TextBlock Text="Connect"
                                            Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>
@@ -120,10 +104,7 @@
                             Command="{Binding ConnectCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="LanDisconnect"
-                                                   Foreground="White"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                                 <TextBlock Text="DisConnect"
                                            Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>
@@ -135,10 +116,7 @@
                             Command="{Binding GrabCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="CreditCard"
-                                                   Foreground="White"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                                 <TextBlock Text="One Shot"
                                            Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>
@@ -150,10 +128,7 @@
                             Command="{Binding ContinousGrabCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="CreditCardMultiple"
-                                                   Foreground="White"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                                 <TextBlock Text="Cont. Shot"
                                            Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>
@@ -164,10 +139,7 @@
                             Command="{Binding StopGrabCommand}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="StopCircleOutline"
-                                                   Foreground="White"
-                                                   Width="30"
-                                                   Height="30"></material:PackIcon>
+                                
                                 <TextBlock Text="Stop"
                                            Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>
