@@ -55,6 +55,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Dlg_RecipeManger.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Icon\AtiLogo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -70,6 +74,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Dlg_RecipeManger.xaml.cs">
+      <DependentUpon>Dlg_RecipeManger.xaml</DependentUpon>
     </Compile>
     <Compile Include="Icon\AtiLogo.xaml.cs">
       <DependentUpon>AtiLogo.xaml</DependentUpon>

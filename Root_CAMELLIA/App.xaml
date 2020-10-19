@@ -40,8 +40,7 @@
                             <Border Name="Header" Padding="3,0,3,0" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1">
                                 <ContentPresenter ContentSource="Header" RecognizesAccessKey="true" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                                   TextElement.FontFamily="Arial"
-                                                  TextElement.FontWeight="Bold"
-                                                  TextElement.FontSize="15"/>
+                                                  TextElement.FontSize="12"/>
 
                             </Border>
                             <ContentPresenter Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
@@ -63,8 +62,6 @@
             <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="10"/>
-            <Setter Property="Height" Value="40"/>
             <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
             <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
         </Style>

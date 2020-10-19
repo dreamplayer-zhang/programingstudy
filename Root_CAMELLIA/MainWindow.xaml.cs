@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using System.Windows.Media;
+using System;
 
 namespace Root_CAMELLIA
 {
@@ -23,8 +24,11 @@ namespace Root_CAMELLIA
             {
                 NormalizeButton.Visibility = Visibility.Collapsed;
             }
+
+            InitTimer();
         }
 
+        #region Window
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
         }
@@ -32,6 +36,8 @@ namespace Root_CAMELLIA
         private void Window_Closing(object sender, CancelEventArgs e)
         {
         }
+        #endregion
+
         #region Title Bar
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -77,9 +83,31 @@ namespace Root_CAMELLIA
         }
         #endregion
 
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+        #endregion
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Dlg_RecipeManger recipe = new Dlg_RecipeManger();
+
+            recipe.ShowDialog();
         }
     }
 }
