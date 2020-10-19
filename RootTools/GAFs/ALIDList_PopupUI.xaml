@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:RootTools.GAFs"
         mc:Ignorable="d"
         Title="Alarm" Height="900" Width="1200" 
@@ -63,10 +62,6 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
-                <material:PackIcon Kind="AlertOutline" Foreground="White" 
-                                   Height="20" Width="20"
-                                   Margin="10,0,0,0"
-                                   VerticalAlignment="Center"/>
                 <TextBlock Text="Alarm"
                            Foreground="White"
                            VerticalAlignment="Center"

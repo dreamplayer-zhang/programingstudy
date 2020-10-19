@@ -5,7 +5,6 @@
         xmlns:module="clr-namespace:Root_Vega.Module"
         xmlns:Tree="clr-namespace:RootTools.Trees;assembly=RootTools"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         Height="768" Width="1280"
@@ -278,10 +277,7 @@
                                     Margin="10">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="ZoomInOutline" 
-                                               Foreground="White"
-                                               Width="30"
-                                               Height="30"></material:PackIcon>
+                                
                                 <TextBlock Text="Start LADS"
                                        Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>
@@ -292,10 +288,7 @@
                                     Margin="10">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
-                                <material:PackIcon Kind="Cancel" 
-                                               Foreground="White"
-                                               Width="30"
-                                               Height="30"></material:PackIcon>
+                                
                                 <TextBlock Text="Cancel"
                                        Style="{StaticResource BasicTb}"></TextBlock>
                             </StackPanel>

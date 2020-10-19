@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:tools ="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="756" d:DesignWidth="1876"
@@ -52,10 +51,7 @@
                                            Style="{StaticResource BasicLabel}"
                                            Background="{StaticResource Green}"
                                            Height="40"/>
-                                    <material:PackIcon Kind="ChevronDown"
-                                                           Foreground="White"
-                                                           HorizontalAlignment="Center"
-                                                           Height="40" Width="40"/>
+                                    
                                     <Label Content="RFID Read"
                                            Style="{StaticResource BasicLabel}"
                                                Background="{StaticResource Green}"
@@ -100,17 +96,12 @@
                             </Border>
                             <Border Grid.Row="1"
                                     BorderBrush="{StaticResource BorderBrush}"
-                                    
                                     BorderThickness="3,0,3,3">
                                 <StackPanel Margin="10">
                                     <Label Content="Wait Start"
                                            Style="{StaticResource BasicLabel}"
                                            Background="{StaticResource Yellow}"
                                            Height="40"/>
-                                    <material:PackIcon Kind="ChevronDown"
-                                                           Foreground="White"
-                                                           HorizontalAlignment="Center"
-                                                           Height="40" Width="40"/>
                                     <Label Content="RFID Read"
                                            Style="{StaticResource BasicLabel}"
                                            Background="{StaticResource DarkGray}"

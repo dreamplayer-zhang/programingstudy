@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:tree="clr-namespace:RootTools.Trees" 
              xmlns:local="clr-namespace:RootTools.Control.Ajin" 
-             xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes" 
              mc:Ignorable="d" d:DesignHeight="649.328"
         d:DesignWidth="386.254">
     <UserControl.Resources>
@@ -236,7 +235,7 @@
                 <TabItem>
                     <TabItem.Header>
                         <WrapPanel>
-                            <marterial:PackIcon Kind="Car"></marterial:PackIcon>
+                            
                             <TextBlock Text="Motion"></TextBlock>
                         </WrapPanel>
                     </TabItem.Header>
@@ -245,7 +244,7 @@
                 <TabItem>
                     <TabItem.Header>
                         <WrapPanel>
-                            <marterial:PackIcon Kind="Settings" Foreground="Black"></marterial:PackIcon>
+                            
                             <TextBlock Text="Setting"></TextBlock>
                         </WrapPanel>
                     </TabItem.Header>
@@ -254,7 +253,7 @@
                 <TabItem>
                     <TabItem.Header>
                         <WrapPanel>
-                            <marterial:PackIcon Kind="Safe" Foreground="Black"></marterial:PackIcon>
+                            
                             <TextBlock Text="Interlock"></TextBlock>
                         </WrapPanel>
                     </TabItem.Header>

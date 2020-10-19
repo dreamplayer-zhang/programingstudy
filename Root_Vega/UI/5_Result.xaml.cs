@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace Root_Vega
 {
 	/// <summary>
-	/// _5_Result.xaml에 대한 상호 작용 논리
+	/// _5_Result.xaml에 대한 상호 작용 논e
 	/// </summary>
 	public partial class _5_Result : UserControl
 	{

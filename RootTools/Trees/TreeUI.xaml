@@ -5,7 +5,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="d"
         xmlns:local="clr-namespace:RootTools.Trees" 
         xmlns:obs="clr-namespace:nsSizeObserver"
-        xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes"
              SizeChanged="UserControl_SizeChanged"
         xmlns:convert="clr-namespace:ViewConverter" d:DesignHeight="500" 
               d:DesignWidth="500">
@@ -49,21 +48,18 @@
                                     <ContentControl x:Name="Up_Arrow" VerticalAlignment="Center"
                                             HorizontalAlignment="Center" Focusable="True"
                                             IsTabStop="False">
-                                        <marterial:PackIcon Kind="ArrowUpDropCircleOutline"
-                                                Foreground="Red" />
+                                        
                                         <!--<TextBlock Text="+" />-->
                                     </ContentControl>
                                     <ContentControl x:Name="Down_Arrow" VerticalAlignment="Center"
                                             HorizontalAlignment="Center" Visibility="Collapsed"
                                             IsTabStop="False" Focusable="True">
-                                        <marterial:PackIcon Kind="ArrowDownDropCircleOutline"
-                                                Foreground="Black" />
+                                        
                                     </ContentControl>
                                     <ContentControl x:Name="None_Arrow" VerticalAlignment="Center"
                                             HorizontalAlignment="Center" Visibility="Hidden"
                                             IsTabStop="False" Focusable="True">
-                                        <marterial:PackIcon Kind="MinusCircleOutline"
-                                                Foreground="Gray" />
+                                        
                                     </ContentControl>
                                 </Grid>
                                 <ContentPresenter Grid.Column="1" HorizontalAlignment="Stretch"
@@ -653,12 +649,7 @@
                                         <Button.Template>
                                             <ControlTemplate>
                                                 <Border BorderThickness="1" BorderBrush="Black">
-                                                    <marterial:PackIcon Kind="FileFind"
-                                                                Width="{PriorityBinding}"
-                                                                Height="{PriorityBinding}"
-                                                                VerticalAlignment="Center"
-                                                                HorizontalAlignment="Center"
-                                                                Foreground="Black" />
+                                                    
                                                 </Border>
                                             </ControlTemplate>
                                         </Button.Template>
