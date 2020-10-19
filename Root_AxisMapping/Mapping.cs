@@ -1,11 +1,17 @@
 ﻿using Root_AxisMapping.Module;
 using RootTools;
 using RootTools.Trees;
+using System.Collections.ObjectModel;
 
 namespace Root_AxisMapping
 {
     public class Mapping
     {
+        #region ROI
+        public ObservableCollection<AOIData> m_aROI = new ObservableCollection<AOIData>();
+
+        #endregion
+
         #region Tree
         public TreeRoot m_treeRoot;
         void InitTree()

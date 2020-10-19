@@ -15,6 +15,36 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0" BorderBrush="Black" BorderThickness="1">
+                        <GroupBox.Header>
+                            <TextBlock Text="ROI" Foreground="Black" FontWeight="Bold" />
+                        </GroupBox.Header>
+                        <ListView x:Name="listViewROI" Margin="3" Height="70" PreviewMouseLeftButtonUp="listViewROI_PreviewMouseLeftButtonUp">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="    ROI    ">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding p_id}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Header="    State    ">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding p_eROI}" Foreground="{Binding p_brushROI}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </GroupBox>
+                </Grid>
                 <memory:MemoryViewer_UI Grid.Column="1" x:Name="memoryViewerAlignUI"/>
             </Grid>
         </TabItem>

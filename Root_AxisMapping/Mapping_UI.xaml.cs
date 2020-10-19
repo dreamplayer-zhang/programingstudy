@@ -23,5 +23,10 @@ namespace Root_AxisMapping
             memoryViewerAlignUI.Init(mapping.m_axisMapping.m_memoryPool.m_viewer, false);
             //memoryViewerAlignUI.Init()
         }
+
+        private void listViewROI_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+
+        }
     }
 }
