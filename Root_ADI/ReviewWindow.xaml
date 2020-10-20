@@ -1,0 +1,279 @@
+﻿<Window x:Class="Root_ADI.ReviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:control="clr-namespace:Root_ADI.Control"
+        xmlns:local="clr-namespace:Root_ADI"
+        xmlns:icons="clr-namespace:Root_Siltron.Icons"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        Title="ReviewWindow" Height="700" Width="1300" Background="{StaticResource PanelBackGround}">
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"/>
+    </WindowChrome.WindowChrome>
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!--Title Bar Start-->
+        <Grid Name="TitleBar"
+              Background="#FF5482A1"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <icons:AtiLogo Width="35"
+                           Height="20"
+                           Margin="3" />
+            <TextBlock Text="Review - ADI"
+                       FontFamily="Arial"
+                       Foreground="White"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       FontSize="15"
+                       Margin="10,0,0,0"
+                       Grid.Column="1" />
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                        Orientation="Horizontal"
+                        Grid.Column="2">
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MinimizeButton"
+                        Width="34"
+                        Height="26"
+                        Margin="0,0,10,0"
+                        Foreground="White"
+                        Click="MinimizeButton_Click">
+                    <Path Style="{StaticResource MinimizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MaximizeButton"
+                        Width="34"
+                        Height="26"
+                        Margin="0,0,10,0"
+                        Foreground="White"
+                        Click="MaximizeButton_Click">
+                    <Path Style="{StaticResource MaximizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="NormalizeButton"
+                        Width="34"
+                        Height="26"
+                        Margin="0,0,10,0"
+                        Foreground="White"
+                        Click="NormalizeButton_Click">
+                    <Path Style="{StaticResource NormalizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="CloseButton"
+                        Width="34"
+                        Height="26"
+                        Margin="0,0,10,2"
+                        Foreground="White"
+                        Click="CloseButton_Click"
+                        VerticalAlignment="Bottom">
+                    <Path Style="{StaticResource CloseIconKey}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+        <!--Title Bar End-->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.5*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="4.5*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" Grid.Row="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="7*"/>
+                        <RowDefinition Height="3*"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Result List" Grid.Row="0">
+                        <DataGrid IsReadOnly="True" Margin="5,2">
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="-">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="No." Width="30" Binding="{Binding no}"/>
+                                <DataGridTextColumn Header="Mask ID" Width="*" Binding="{Binding x}"/>
+                                <DataGridTextColumn Header="Recipe Name" Width="*" Binding="{Binding type}"/>
+                                <DataGridTextColumn Header="Inspection Time" Width="1.5*" Binding="{Binding y}"/>
+                            </DataGrid.Columns>
+                            <local:Dummy no="0" type="test0.rcp" x="mask1" y="2020-08-12 09:12"/>
+                            <local:Dummy no="1" type="test1.rcp" x="mask2" y="2020-08-12 09:12"/>
+                            <local:Dummy no="2" type="test2.rcp" x="mask3" y="2020-08-12 09:12"/>
+                            <local:Dummy no="3" type="test3.rcp" x="mask4" y="2020-08-12 09:12"/>
+                            <local:Dummy no="4" type="test4.rcp" x="mask5" y="2020-08-12 09:12"/>
+                            <local:Dummy no="5" type="test5.rcp" x="mask6" y="2020-08-12 09:12"/>
+                            <local:Dummy no="6" type="test6.rcp" x="mask7" y="2020-08-12 09:12"/>
+                            <local:Dummy no="7" type="test7.rcp" x="mask8" y="2020-08-12 09:12"/>
+                            <local:Dummy no="8" type="test8.rcp" x="mask9" y="2020-08-12 09:12"/>
+                        </DataGrid>
+                    </GroupBox>
+                    <GroupBox Header="Search Option" Grid.Row="1">
+                        <Grid Margin="5,2">
+                            <StackPanel>
+                                <CheckBox Content="Start Date" VerticalAlignment="Center" Margin="0,5,0,0" FontSize="12" x:Name="cbStart"/>
+                                <control:DateTimePicker IsEnabled="{Binding ElementName=cbStart, Path=IsChecked}" DateFormat="yyyy-MM-dd"/>
+                                <CheckBox Content="End Date" VerticalAlignment="Center" Margin="0,5,0,0" FontSize="12" x:Name="cbEnd"/>
+                                <control:DateTimePicker IsEnabled="{Binding ElementName=cbEnd, Path=IsChecked}" DateFormat="yyyy-MM-dd"/>
+                                <Grid Margin="0,7,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="1.5*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox Content="Mask ID" VerticalAlignment="Center" x:Name="cbWafer"/>
+                                    <TextBox Grid.Column="1" IsEnabled="{Binding ElementName=cbWafer, Path=IsChecked}"/>
+                                </Grid>
+                                <Grid Margin="0,7,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="1.5*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox Content="Recipe Name" VerticalAlignment="Center" x:Name="cbRecipe"/>
+                                    <TextBox Grid.Column="1" IsEnabled="{Binding ElementName=cbRecipe, Path=IsChecked}"/>
+                                </Grid>
+                                <Button Content="Search" Margin="0,9,0,0" Height="30"/>
+                            </StackPanel>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </Grid>
+            <Grid Grid.Column="1">
+                <GroupBox Header="Map" Grid.Row="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="86*"/>
+                            <RowDefinition Height="7*"/>
+                            <RowDefinition Height="7*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Background="Black">
+                            <Image Margin="15,30" Stretch="Fill" Source="ReticlDefect.PNG"/>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5" Grid.Row="1">
+                            <CheckBox Content="＜1um" Margin="0,0,10,0"/>
+                            <CheckBox Content="＜2um" Margin="0,0,10,0"/>
+                            <CheckBox Content="＜3um" Margin="0,0,10,0"/>
+                            <CheckBox Content="＜5um" Margin="0,0,10,0"/>
+                            <CheckBox Content="＜10um" Margin="0,0,10,0"/>
+                        </StackPanel>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="8*"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="0" VerticalAlignment="Center" Grid.Column="0"/>
+                            <Image Source="histomap.PNG" Margin="0,10" Stretch="Fill" Grid.Column="1"/>
+                            <TextBlock Text="255" VerticalAlignment="Center" Grid.Column="2"/>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+
+            </Grid>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="7*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.5*"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Header="Defect List">
+                        <Grid Margin="5,2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Point Base" HorizontalAlignment="Left"/>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                    <CheckBox Content="Left-Top" Margin="5,0" IsChecked="True"/>
+                                    <CheckBox Content="Left-Bottom" Margin="5,0"/>
+                                    <CheckBox Content="Right-Top" Margin="5,0"/>
+                                    <CheckBox Content="Right-Bottom" Margin="5,0"/>
+                                    <CheckBox Content="Center" Margin="5,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <DataGrid IsReadOnly="True" Grid.Row="1">
+                                <DataGrid.Resources>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="No." Width="30" Binding="{Binding no}"/>
+                                    <DataGridTextColumn Header="Code" Width="*" Binding="{Binding type}"/>
+                                    <DataGridTextColumn Header="Die" Width="*" Binding="{Binding index}"/>
+                                    <DataGridTextColumn Header="Location" Width="1.5*" Binding="{Binding loac}"/>
+                                    <DataGridTextColumn Header="Size(Pxl)" Width="*" Binding="{Binding x}"/>
+                                    <DataGridTextColumn Header="GV" Width="1*" Binding="{Binding y}"/>
+                                </DataGrid.Columns>
+                                <local:Dummy no="0" type="xx00000" index="0,0" loac="1357, 2468" x="11" y="82"/>
+                                <local:Dummy no="1" type="xx00000" index="1,2" loac="1357, 2468" x="17" y="86"/>
+                                <local:Dummy no="2" type="xx00000" index="2,2" loac="1357, 2468" x="32" y="84"/>
+                                <local:Dummy no="3" type="xx00000" index="0,0" loac="1357, 2468" x="11" y="82"/>
+                                <local:Dummy no="4" type="yy00000" index="1,2" loac="1357, 2468" x="17" y="86"/>
+                                <local:Dummy no="5" type="yy00000" index="2,2" loac="1357, 2468" x="32" y="84"/>
+                                <local:Dummy no="6" type="yy00000" index="0,0" loac="1357, 2468" x="11" y="82"/>
+                                <local:Dummy no="7" type="yy00000" index="1,2" loac="1357, 2468" x="17" y="86"/>
+                                <local:Dummy no="8" type="yy00000" index="2,2" loac="1357, 2468" x="32" y="84"/>
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="1.5*"/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Header="Defect Image">
+                            <Grid Background="Black">
+                                <TextBlock Text="Defect Image" Foreground="White"/>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </Grid>
+                
+                <Grid Grid.Row="1">
+                    <GroupBox Header="Histogram">
+                        <TabControl>
+                            <TabItem Header="GV">
+                                <Image Source="Histogram.PNG" Stretch="Fill"/>
+                            </TabItem>
+                            <TabItem Header="Size">
+                                <Image Source="Histogram.PNG" Stretch="Fill"/>
+
+                            </TabItem>
+                        </TabControl>
+                    </GroupBox>
+                </Grid>
+            </Grid>
+
+
+        </Grid>
+    </Grid>
+</Window>
