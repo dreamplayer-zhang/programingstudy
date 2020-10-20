@@ -243,7 +243,7 @@
                     <Grid Grid.Row="1">
                         <GroupBox Header="Map">
                             <Grid Background="Black">
-                                <Image Source="ReticleMap2.PNG" Margin="20,10" Stretch="Fill"/>
+                                <Image Source="Resource/ReticleMap2.PNG" Margin="20,10" Stretch="Fill"/>
                             </Grid>
                         </GroupBox>
                     </Grid>
@@ -597,7 +597,7 @@
                                         <GroupBox Header="Inspection Area" Grid.Column="1" Grid.Row="2" Grid.RowSpan="3">
 
                                             <Grid Background="Black">
-                                                <Image Source="ReticleMap2.PNG" 
+                                                <Image Source="Resource/ReticleMap2.PNG" 
                                                        Stretch="Fill" Margin="10"/>
                                                 <Viewbox>
                                                     <Canvas Width="1000" Height="1000">
@@ -757,7 +757,7 @@
                                                 </GroupBox>
                                                 <GroupBox Header="Map" Grid.Column="0" Grid.Row="1">
                                                     <Grid Background="Black" Margin="5,2">
-                                                        <Image Source="ReticleMap2.PNG" Margin="20,10" Stretch="Fill"/>
+                                                        <Image Source="Resource/ReticleMap2.PNG" Margin="20,10" Stretch="Fill"/>
                                                     </Grid>
                                                 </GroupBox>
                                                 <GroupBox Header="Coordinate" Grid.Column="0" Grid.Row="2">
@@ -1073,7 +1073,7 @@
                                         </Grid>
                                         <Grid Grid.Column="1" Grid.Row="1">
                                             <GroupBox Header="Histogram">
-                                                <Image Margin="10" Stretch="Fill" Source="Histogram.PNG"/>
+                                                <Image Margin="10" Stretch="Fill" Source="Resource/Histogram.PNG"/>
                                             </GroupBox>
                                         </Grid>
                                         <Grid Grid.Column="0" Grid.Row="2">

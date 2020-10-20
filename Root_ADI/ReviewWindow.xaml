@@ -168,7 +168,7 @@
                             <RowDefinition Height="7*"/>
                         </Grid.RowDefinitions>
                         <Grid Background="Black">
-                            <Image Margin="15,30" Stretch="Fill" Source="ReticlDefect.PNG"/>
+                            <Image Margin="15,30" Stretch="Fill" Source="Resource/ReticlDefect.PNG"/>
                         </Grid>
 
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5" Grid.Row="1">
@@ -185,7 +185,7 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="0" VerticalAlignment="Center" Grid.Column="0"/>
-                            <Image Source="histomap.PNG" Margin="0,10" Stretch="Fill" Grid.Column="1"/>
+                            <Image Source="Resource/histomap.PNG" Margin="0,10" Stretch="Fill" Grid.Column="1"/>
                             <TextBlock Text="255" VerticalAlignment="Center" Grid.Column="2"/>
                         </Grid>
                     </Grid>
@@ -262,10 +262,10 @@
                     <GroupBox Header="Histogram">
                         <TabControl>
                             <TabItem Header="GV">
-                                <Image Source="Histogram.PNG" Stretch="Fill"/>
+                                <Image Source="Resource/Histogram.PNG" Stretch="Fill"/>
                             </TabItem>
                             <TabItem Header="Size">
-                                <Image Source="Histogram.PNG" Stretch="Fill"/>
+                                <Image Source="Resource/Histogram.PNG" Stretch="Fill"/>
 
                             </TabItem>
                         </TabControl>
