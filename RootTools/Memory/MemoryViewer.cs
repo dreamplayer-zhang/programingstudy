@@ -340,8 +340,13 @@ namespace RootTools.Memory
             }
         }
 
+        bool m_bOnShift = false; 
         void Shift(CPoint cpWindow)
         {
+            if (m_bOnShift == false)
+            {
+                if (p_bShiftKeyDown) return;
+            }
             if (p_bShiftKeyDown) return;
             if (p_bLBD == false) return;
             CPoint dp = cpWindow - p_cpLBD;

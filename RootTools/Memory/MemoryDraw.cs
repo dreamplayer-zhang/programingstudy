@@ -156,6 +156,12 @@ namespace RootTools.Memory
             Text text = new Text(brush, cp, sLabel);
             m_aDraw.Add(text); 
         }
+
+        public void AddText(Brush brush, int x, int y, string sLabel)
+        {
+            Text text = new Text(brush, new CPoint(x, y), sLabel);
+            m_aDraw.Add(text);
+        }
         #endregion
 
         MemoryData m_memory;

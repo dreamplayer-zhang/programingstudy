@@ -3,7 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        
+        <!--Color-->
+        <SolidColorBrush x:Key="PanelBackGround" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+        <SolidColorBrush x:Key="ControlBackGround" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>
+        <SolidColorBrush x:Key="GroupBoxBackground" Color="Transparent"/>
+        <SolidColorBrush x:Key="Splitter" Color="DimGray"/>
+        <SolidColorBrush x:Key="MainThema" Color="#FF2D2D50"/>
         <!--Title Bar-->
         <Style TargetType="{x:Type Button}"
                x:Key="SystemButton">
@@ -126,8 +131,7 @@
                             <Border CornerRadius="0" Grid.Row="1" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="4" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="Transparent" Background="{TemplateBinding Background}" />
                             <Border Name="Header" Padding="3,0,3,0" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1">
                                 <ContentPresenter ContentSource="Header" RecognizesAccessKey="true" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                                  TextElement.FontWeight="Bold"
-                                                  TextElement.FontSize="15"/>
+                                                  TextElement.FontSize="12" TextElement.FontWeight="Bold"/>
 
                             </Border>
                             <ContentPresenter Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
@@ -145,5 +149,69 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!--TabControl-->
+        <Style TargetType="{x:Type TabControl}" x:Key="WizardTabControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid UseLayoutRounding="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel IsItemsHost="True"
+                                        Panel.ZIndex="2"/>
+                            <Border Grid.Column="1"
+                                    BorderBrush="#FFACACAC"
+                                    BorderThickness="1"
+                                    Margin="0,0,0,0">
+                                <ContentPresenter ContentSource="SelectedContent"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--TabItem-->
+        <Style TargetType="{x:Type TabItem}"
+               x:Key="WizardTabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Panel"
+                                Width="120"
+                                Height="30"
+                                HorizontalAlignment="Right"
+                                SnapsToDevicePixels="True"
+                                BorderBrush="#FFACACAC"
+                                BorderThickness="1,1,0,1">
+                            <TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontFamily="Arial"
+                                       FontSize="12">
+                                <ContentPresenter VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header"/>
+                            </TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="Panel" Property="Background" Value="{StaticResource ResourceKey=ControlBackGround}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Panel" Property="Margin" Value="0,0,-1,0"/>
+                                <Setter TargetName="Panel" Property="Width" Value="125"/>
+                                <Setter TargetName="Panel" Property="Height" Value="35"/>
+                                <Setter TargetName="Panel" Property="Background" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Panel" Property="Background" Value="#EAF3FC" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
     </Application.Resources>
 </Application>
