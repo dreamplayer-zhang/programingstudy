@@ -137,14 +137,14 @@ namespace Root_AUP01.Module
         string RunStep1(bool bOn)
         {
             m_dioStep1[0].Write(bOn);
-            m_dioStep1[1].Write(bOn);
-            int msWait = (int)(1000 * m_sSolStep1);
-            while ((m_dioStep1[0].p_bDone != true) || (m_dioStep1[0].p_bDone != true))
-            {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return p_id + " EQ Stop";
-                if (m_dioStep1[0].m_swWrite.ElapsedMilliseconds > msWait) return m_dioStep1[0].m_id + " Sol Valve Move Timeout";
-            }
+            m_dioStep1[1].Write(!bOn);
+            //int msWait = (int)(1000 * m_sSolStep1);
+            //while ((m_dioStep1[0].p_bDone != true) || (m_dioStep1[0].p_bDone != true))
+            //{
+            //    Thread.Sleep(10);
+            //    if (EQ.IsStop()) return p_id + " EQ Stop";
+            //    if (m_dioStep1[0].m_swWrite.ElapsedMilliseconds > msWait) return m_dioStep1[0].m_id + " Sol Valve Move Timeout";
+            //}
             return "OK";
         }
 
@@ -268,6 +268,7 @@ namespace Root_AUP01.Module
             AddModuleRunList(new Run_Step2(this), true, "Run Step2");
             AddModuleRunList(new Run_VacuumPump(this), true, "Run VacuumPump");
             AddModuleRunList(new Run_Heating(this), true, "Run Heating");
+            AddModuleRunList(new Run_Packing(this), true, "Run Packing");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -492,6 +493,70 @@ namespace Root_AUP01.Module
             public override string Run()
             {
                 return m_module.RunHeater(m_sHeat);
+            }
+        }
+        
+
+        public class Run_Packing : ModuleRunBase
+        {
+            VacuumPacker m_module;
+
+            eLoad m_eLoad = eLoad.Ready;            
+            eGuide m_eGuide = eGuide.Ready;
+
+
+            double m_sCartride = 1;
+            double m_fDeg = 720;
+            double m_v = 120;
+            double m_acc = 2;
+            double m_sHeat = 0;
+
+            public Run_Packing(VacuumPacker module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+                
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Packing run = new Run_Packing(m_module);
+                run.m_sCartride = m_sCartride;
+                run.m_fDeg = m_fDeg;
+                run.m_v = m_v;
+                run.m_acc = m_acc;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                //m_eLoad = (eLoad)tree.Set(m_eLoad, m_eLoad, "Load", "Run Load", bVisible);
+                //m_eGuide = (eGuide)tree.Set(m_eGuide, m_eGuide, "Guide", "Run Guide", bVisible);
+                m_sHeat = tree.Set(m_sHeat, m_sHeat, "Heating Time", "Heating Time (sec)", bVisible);
+            }
+
+            public override string Run()
+            {
+                for (int i = 0; i < 1; i++)
+                {
+                    if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // Step1 위쪽, 아래쪽/ Step2 위쪽 작은실린더/ Load = Y축/ Guide = X축 , 
+                    if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo;
+                    if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo;                   
+                    if (m_module.Run(m_module.RunLoad(eLoad.VacuumPump))) return p_sInfo;
+                    if (m_module.Run(m_module.RunGuide(eGuide.Open))) return p_sInfo;
+                    if (m_module.Run(m_module.RunStep1(false))) return p_sInfo;
+                    //if (m_module.Run(m_module.RunVacuum(true))) return p_sInfo;                  
+                    if (m_module.Run(m_module.RunStep2(true))) return p_sInfo;
+                    //if (m_module.Run(m_module.RunHeater(m_sHeat))) return p_sInfo;
+                    if (m_module.Run(m_module.RunStep2(false))) return p_sInfo;
+                    if (m_module.Run(m_module.RunStep1(true))) return p_sInfo;
+                    if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo;
+                    if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo;
+                    //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
+                    //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
+                    //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
+                }
+                return "OK";
             }
         }
         #endregion
