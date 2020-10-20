@@ -9,12 +9,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="2*"/>
-        </Grid.ColumnDefinitions>
-        <TabControl Grid.Column="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="0">
             <TabItem Header="PRC">
                 <local:ListPRC_UI x:Name="listPRCUI"/>
             </TabItem>
@@ -31,8 +31,8 @@
                 <local:ListCFG_UI x:Name="listCFGUI"/>
             </TabItem>
         </TabControl>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <TabControl Grid.Column="2">
+        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
+        <TabControl Grid.Row="2">
             <TabItem Header="Error">
                 <local:ListError_UI x:Name="listErrorUI"/>
             </TabItem>
