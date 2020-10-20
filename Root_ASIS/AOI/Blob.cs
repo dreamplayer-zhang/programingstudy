@@ -236,29 +236,29 @@ namespace Root_ASIS.AOI
 
         int CompareSize(Island A, Island B)
         {
-            if (A.m_nSize > B.m_nSize) return 1;
-            if (A.m_nSize < B.m_nSize) return -1;
+            if (A.m_nSize > B.m_nSize) return -1;
+            if (A.m_nSize < B.m_nSize) return 1;
             return 0;
         }
 
         int CompareLength(Island A, Island B)
         {
-            if (A.m_nLength > B.m_nLength) return 1;
-            if (A.m_nLength < B.m_nLength) return -1;
+            if (A.m_nLength > B.m_nLength) return -1;
+            if (A.m_nLength < B.m_nLength) return 1;
             return 0;
         }
 
         int CompareX(Island A, Island B)
         {
-            if (A.m_sz.X > B.m_sz.X) return 1;
-            if (A.m_sz.X < B.m_sz.X) return -1;
+            if (A.m_sz.X > B.m_sz.X) return -1;
+            if (A.m_sz.X < B.m_sz.X) return 1;
             return 0;
         }
 
         int CompareY(Island A, Island B)
         {
-            if (A.m_sz.Y > B.m_sz.Y) return 1;
-            if (A.m_sz.Y < B.m_sz.Y) return -1;
+            if (A.m_sz.Y > B.m_sz.Y) return -1;
+            if (A.m_sz.Y < B.m_sz.Y) return 1;
             return 0;
         }
         #endregion
@@ -267,7 +267,7 @@ namespace Root_ASIS.AOI
         int m_iMemory; 
         public string RunBlob(MemoryData memory, int nIndex, CPoint cp, CPoint sz, int nGV0, int nGV1, int minSize)
         {
-            if (m_memory == null) return "MemoryData is null"; 
+            if (memory == null) return "MemoryData is null"; 
             m_memory = memory;
             m_iMemory = nIndex; 
             m_cp = cp;

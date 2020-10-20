@@ -12,8 +12,8 @@
         <TabItem Header=" Align ">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="3*"/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
@@ -24,7 +24,9 @@
                         <GroupBox.Header>
                             <TextBlock Text="ROI" Foreground="Black" FontWeight="Bold" />
                         </GroupBox.Header>
-                        <ListView x:Name="listViewROI" Margin="3" Height="70" PreviewMouseLeftButtonUp="listViewROI_PreviewMouseLeftButtonUp">
+                        <ListView x:Name="listViewROI" Margin="3" Height="70" 
+                                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                  PreviewMouseLeftButtonUp="listViewROI_PreviewMouseLeftButtonUp">
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Header="    ROI    ">
@@ -46,7 +48,17 @@
                         </ListView>
                     </GroupBox>
                     <GroupBox Grid.Row="1" BorderBrush="Black" BorderThickness="1">
-                        
+                        <GroupBox.Header>
+                            <TextBlock Text="Find Fiducial" Foreground="Black" FontWeight="Bold" />
+                        </GroupBox.Header>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Button Grid.Row="0" x:Name="buttonInspect" Content="Inspect" Margin="3" Click="buttonInspect_Click"/>
+                            <tree:TreeUI Grid.Row="1" x:Name="treeUI" Height="80" Margin="3"/>
+                        </Grid>
                     </GroupBox>
                 </Grid>
                 <memory:MemoryViewer_UI Grid.Column="1" x:Name="memoryViewerAlignUI"/>

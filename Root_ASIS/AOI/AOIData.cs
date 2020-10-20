@@ -92,7 +92,8 @@ namespace Root_ASIS.AOI
             }
             draw.AddRectangle(brush, m_cp0, m_cp0 + m_sz);
             draw.AddText(brush, m_cp0, p_id);
-            draw.AddText(brush, m_cp0, m_sDisplay); 
+            draw.AddText(brush, m_cp0.X, m_cp0.Y + m_sz.Y, m_sDisplay);
+            if (m_bInspect) draw.AddCross(brush, new CPoint(m_rpCenter), 16); 
         }
         #endregion
 

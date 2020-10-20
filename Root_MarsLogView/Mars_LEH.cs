@@ -91,9 +91,6 @@ namespace Root_MarsLogView
         {
             m_asLog = asLog;
             if (GetString(2) != p_sModule) return false;
-            if (GetString(5) != p_sLot) return false;
-            if (GetString(6) != p_sRecipe) return false;
-            if (GetString(8) != p_sCarrierID) return false;
             return true;
         }
 
