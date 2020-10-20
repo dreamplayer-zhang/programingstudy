@@ -9,6 +9,7 @@ namespace Root_AUP01.Module
 {
     public class VacuumPacker : ModuleBase
     {
+        int TestNum = 1;
         #region ToolBox
         DIO_IO[] m_dioVacuum = new DIO_IO[2] { null, null };
         DIO_O[] m_doBlow = new DIO_O[2];
@@ -16,45 +17,91 @@ namespace Root_AUP01.Module
 
         DIO_I2O[] m_dioStep1 = new DIO_I2O[2] { null, null };
         DIO_I2O m_dioStep2;
-        DIO_O[] m_doHeater = new DIO_O[2] { null, null };
+        //DIO_O[] m_doHeater = new DIO_O[2] { null, null };
 
         Axis m_axisGuide;
         DIO_IO m_dioVacuumPump;
         DIO_O m_doVacuumPumpBlow;
 
+        DIO_I2O m_dioTopClampUpDown; // LJM 201020 Add
+        DIO_I2O m_dioBtmClampUpDown; // LJM 201020 Add
+        DIO_I2O m_dioTopHeaterUpdown; // LJM 201020 Add
+        DIO_I2O m_dioBtmHeaterUpdown; // LJM 201020 Add
+        DIO_I2O m_dioTopTotalHeaterUpdown; // LJM 201020 Add
+        DIO_O m_doHeater; // LJM 201020 Add
+
+
+
+
+
+
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_dioVacuum[0], this, "Bottom Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow[0], this, "Bottom Blow");
-            p_sInfo = m_toolBox.Get(ref m_dioVacuum[1], this, "Top Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow[1], this, "Top Blow");
-            p_sInfo = m_toolBox.Get(ref m_axisLoad, this, "Load");
+            
+            if(TestNum == 0) // 기존
+            {
+                p_sInfo = m_toolBox.Get(ref m_dioVacuum[0], this, "Bottom Vacuum");
+                p_sInfo = m_toolBox.Get(ref m_doBlow[0], this, "Bottom Blow");
+                p_sInfo = m_toolBox.Get(ref m_dioVacuum[1], this, "Top Vacuum");
+                p_sInfo = m_toolBox.Get(ref m_doBlow[1], this, "Top Blow");
+                p_sInfo = m_toolBox.Get(ref m_axisLoad, this, "Load");
 
-            p_sInfo = m_toolBox.Get(ref m_dioStep1[0], this, "Step1Left", "Up", "Down");
-            p_sInfo = m_toolBox.Get(ref m_dioStep1[1], this, "Step1Right", "Up", "Down");
-            p_sInfo = m_toolBox.Get(ref m_dioStep2, this, "Step2", "Up", "Down");
-            p_sInfo = m_toolBox.Get(ref m_doHeater[0], this, "Bottom Heater");
-            p_sInfo = m_toolBox.Get(ref m_doHeater[1], this, "Top Heater");
+                p_sInfo = m_toolBox.Get(ref m_dioStep1[0], this, "Step1Left", "Up", "Down");
+                p_sInfo = m_toolBox.Get(ref m_dioStep1[1], this, "Step1Right", "Up", "Down");
+                p_sInfo = m_toolBox.Get(ref m_dioStep2, this, "Step2", "Up", "Down");
 
-            p_sInfo = m_toolBox.Get(ref m_axisGuide, this, "Guide");
-            p_sInfo = m_toolBox.Get(ref m_dioVacuumPump, this, "VacuumPump");
-            p_sInfo = m_toolBox.Get(ref m_doVacuumPumpBlow, this, "Blow");
+                //p_sInfo = m_toolBox.Get(ref m_doHeater[0], this, "Bottom Heater");
+                //p_sInfo = m_toolBox.Get(ref m_doHeater[1], this, "Top Heater");
+                p_sInfo = m_toolBox.Get(ref m_doHeater, this, "Heater Heating"); // 상면히터만사용하기로함.
+                p_sInfo = m_toolBox.Get(ref m_axisGuide, this, "Guide");
+                p_sInfo = m_toolBox.Get(ref m_dioVacuumPump, this, "VacuumPump");
+                p_sInfo = m_toolBox.Get(ref m_doVacuumPumpBlow, this, "Blow");
+            }
+            else if(TestNum == 1) // 1차 실링 테스트 // LJM 201020 Add
+            {
+                p_sInfo = m_toolBox.Get(ref m_axisLoad, this, "Load");
+                p_sInfo = m_toolBox.Get(ref m_axisGuide, this, "Guide");
+                p_sInfo = m_toolBox.Get(ref m_dioTopClampUpDown, this, "TopClamp", "Up", "Down");
+                p_sInfo = m_toolBox.Get(ref m_dioBtmClampUpDown, this, "BtmClamp", "Down", "Up");
+                p_sInfo = m_toolBox.Get(ref m_dioTopHeaterUpdown, this, "TopHeater", "Up", "Down");
+                p_sInfo = m_toolBox.Get(ref m_dioBtmHeaterUpdown, this, "BtmHeater", "Down", "Up");
+                p_sInfo = m_toolBox.Get(ref m_dioTopTotalHeaterUpdown, this, "TotalHeater", "Down", "Up");
 
+                p_sInfo = m_toolBox.Get(ref m_doHeater, this, "Heater Heating");
+            }
+
+            
             if (bInit) InitTools();
         }
 
         void InitTools()
         {
-            m_dioVacuum[0].Write(false);
-            m_dioVacuum[1].Write(false);
-            m_dioStep1[0].Write(false);
-            m_dioStep1[1].Write(false);
-            m_dioStep2.Write(false);
-            m_dioVacuumPump.Write(false);
-            m_doVacuumPumpBlow.Write(false);
+            if(TestNum == 0)
+            {
+                m_dioVacuum[0].Write(false);
+                m_dioVacuum[1].Write(false);
+                m_dioStep1[0].Write(false);
+                m_dioStep1[1].Write(false);
+                m_dioStep2.Write(false);
+                m_dioVacuumPump.Write(false);
+                m_doVacuumPumpBlow.Write(false);
+                InitAxisPosLoad();
+                InitAxisPosGuide();
+            }
+            else if(TestNum == 1) // LJM 201020 Add
+            {
+                m_dioTopClampUpDown.Write(false);
+                m_dioBtmClampUpDown.Write(false);
+                m_dioTopHeaterUpdown.Write(false);
+                m_dioBtmHeaterUpdown.Write(false);
+                m_dioTopTotalHeaterUpdown.Write(true);
+                m_doHeater.Write(false);
+                InitAxisPosLoad();
+                InitAxisPosGuide();
+            }
+            
 
-            InitAxisPosLoad(); 
-            InitAxisPosGuide(); 
+            
         }
         #endregion
 
@@ -119,7 +166,7 @@ namespace Root_AUP01.Module
         {
             Ready,
             VacuumPump,
-            Load
+            Heating,//Load
         }
         void InitAxisPosLoad()
         {
@@ -136,8 +183,18 @@ namespace Root_AUP01.Module
         #region Step Function
         string RunStep1(bool bOn)
         {
-            m_dioStep1[0].Write(bOn);
-            m_dioStep1[1].Write(!bOn);
+            RunSol(m_dioTopTotalHeaterUpdown, !bOn, m_sSolStep2);
+            RunSol(m_dioTopClampUpDown, bOn, m_sSolStep2);
+            RunSol(m_dioBtmClampUpDown, bOn, m_sSolStep2);
+
+            //m_dioTopTotalHeaterUpdown.Write(!bOn);
+            //m_dioTopClampUpDown.Write(bOn);
+            //m_dioBtmClampUpDown.Write(bOn);
+
+
+
+            //m_dioStep1[0].Write(bOn);
+            //m_dioStep1[1].Write(!bOn);
             //int msWait = (int)(1000 * m_sSolStep1);
             //while ((m_dioStep1[0].p_bDone != true) || (m_dioStep1[0].p_bDone != true))
             //{
@@ -150,8 +207,13 @@ namespace Root_AUP01.Module
 
         string RunStep2(bool bOn)
         {
-            return RunSol(m_dioStep2, bOn, m_sSolStep2);
+            RunSol(m_dioTopHeaterUpdown, bOn, m_sSolStep2);
+            RunSol(m_dioBtmHeaterUpdown, bOn, m_sSolStep2);
+            return "OK";
+            //return RunSol(m_dioStep2, bOn, m_sSolStep2);
         }
+        
+
         #endregion
 
         #region Heater
@@ -161,8 +223,7 @@ namespace Root_AUP01.Module
             StopWatch sw = new StopWatch();
             try
             {
-                m_doHeater[0].Write(true);
-                m_doHeater[1].Write(true);
+                m_doHeater.Write(true);
                 while (sw.ElapsedMilliseconds < msHeat)
                 {
                     Thread.Sleep(10);
@@ -172,8 +233,7 @@ namespace Root_AUP01.Module
             }
             finally
             {
-                m_doHeater[0].Write(false);
-                m_doHeater[1].Write(false);
+                m_doHeater.Write(false);
             }
         }
         #endregion
@@ -243,6 +303,7 @@ namespace Root_AUP01.Module
             }
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+
             return p_sInfo;
         }
         #endregion
@@ -477,22 +538,22 @@ namespace Root_AUP01.Module
                 InitModuleRun(module);
             }
 
-            double m_sHeat = 30; 
+            //double m_sHeat = 30; 
             public override ModuleRunBase Clone()
             {
                 Run_Heating run = new Run_Heating(m_module);
-                run.m_sHeat = m_sHeat; 
+                //run.m_sHeat = m_sHeat; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_sHeat = tree.Set(m_sHeat, m_sHeat, "Time", "Heating Time (sec)", bVisible);
+                //m_sHeat = tree.Set(m_sHeat, m_sHeat, "Time", "Heating Time (sec)", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunHeater(m_sHeat);
+                return "";// m_module.RunHeater(m_sHeat);
             }
         }
         
@@ -510,6 +571,7 @@ namespace Root_AUP01.Module
             double m_v = 120;
             double m_acc = 2;
             double m_sHeat = 0;
+            double m_sVacTime = 0;
 
             public Run_Packing(VacuumPacker module)
             {
@@ -525,6 +587,8 @@ namespace Root_AUP01.Module
                 run.m_fDeg = m_fDeg;
                 run.m_v = m_v;
                 run.m_acc = m_acc;
+                run.m_sVacTime = m_sVacTime;
+                run.m_sHeat = m_sHeat;
                 return run;
             }
 
@@ -533,28 +597,49 @@ namespace Root_AUP01.Module
                 //m_eLoad = (eLoad)tree.Set(m_eLoad, m_eLoad, "Load", "Run Load", bVisible);
                 //m_eGuide = (eGuide)tree.Set(m_eGuide, m_eGuide, "Guide", "Run Guide", bVisible);
                 m_sHeat = tree.Set(m_sHeat, m_sHeat, "Heating Time", "Heating Time (sec)", bVisible);
+                m_sVacTime = tree.Set(m_sVacTime, m_sVacTime, "Vaccume Time", "Vaccume Time (sec)", bVisible);
+
             }
 
             public override string Run()
             {
                 for (int i = 0; i < 1; i++)
                 {
-                    if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // Step1 위쪽, 아래쪽/ Step2 위쪽 작은실린더/ Load = Y축/ Guide = X축 , 
-                    if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo;
-                    if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo;                   
-                    if (m_module.Run(m_module.RunLoad(eLoad.VacuumPump))) return p_sInfo;
-                    if (m_module.Run(m_module.RunGuide(eGuide.Open))) return p_sInfo;
-                    if (m_module.Run(m_module.RunStep1(false))) return p_sInfo;
-                    //if (m_module.Run(m_module.RunVacuum(true))) return p_sInfo;                  
-                    if (m_module.Run(m_module.RunStep2(true))) return p_sInfo;
-                    //if (m_module.Run(m_module.RunHeater(m_sHeat))) return p_sInfo;
-                    if (m_module.Run(m_module.RunStep2(false))) return p_sInfo;
-                    if (m_module.Run(m_module.RunStep1(true))) return p_sInfo;
-                    if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo;
-                    if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo;
-                    //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
-                    //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
-                    //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
+                    if(m_module.TestNum == 1)
+                    {
+                        if (m_module.Run(m_module.RunSol(m_module.m_dioTopTotalHeaterUpdown, true, m_module.m_sSolStep2))) return p_sInfo; // Total 실린더 Up
+                        if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo; // side 축 레디위치로 이동.
+                        if (m_module.Run(m_module.RunLoad(eLoad.VacuumPump))) return p_sInfo; // Load 축 이동 하드웨어 리밋정도까지 최대한 이동한 작업점까지.
+                        if (m_module.Run(m_module.RunGuide(eGuide.Open))) return p_sInfo; // side 축 open위치로 이동.
+                        if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // 상단, 하단클램프 및 Total 실린더 다운.
+                        Thread.Sleep((int)m_sVacTime * 1000); // 진공상태 대기.
+                        if (m_module.Run(m_module.RunLoad(eLoad.Heating))) return p_sInfo; // Load 축 이동 히팅기랑 간섭없는 위치로 이동.
+                        if (m_module.Run(m_module.RunStep2(true))) return p_sInfo; // 상부 히팅 다운 하부 히팅 업.
+                        if (m_module.Run(m_module.RunHeater(m_sHeat))) return p_sInfo; // 히팅
+                        if (m_module.Run(m_module.RunStep2(false))) return p_sInfo; // 상부 히팅 업 하부 히팅 다운.
+                        if (m_module.Run(m_module.RunStep1(false))) return p_sInfo; // 상단, 하단클램프 및 Total 실린더 업.
+                        if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo; // side 축 레디위치로 이동.
+                        if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo;
+                    }
+                    else
+                    {
+                        if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // Step1 위쪽, 아래쪽/ Step2 위쪽 작은실린더/ Load = Y축/ Guide = X축 , 
+                        if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo;
+                        if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo;
+                        if (m_module.Run(m_module.RunLoad(eLoad.VacuumPump))) return p_sInfo;
+                        if (m_module.Run(m_module.RunGuide(eGuide.Open))) return p_sInfo;
+                        if (m_module.Run(m_module.RunStep1(false))) return p_sInfo;
+                        //if (m_module.Run(m_module.RunVacuum(true))) return p_sInfo;                  
+                        if (m_module.Run(m_module.RunStep2(true))) return p_sInfo;
+                        //if (m_module.Run(m_module.RunHeater(m_sHeat))) return p_sInfo;
+                        if (m_module.Run(m_module.RunStep2(false))) return p_sInfo;
+                        if (m_module.Run(m_module.RunStep1(true))) return p_sInfo;
+                        if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo;
+                        if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo;
+                        //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
+                        //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
+                        //if (m_module.Run(m_module.RunLoad(eLoad.Load))) return p_sInfo;
+                    }
                 }
                 return "OK";
             }
