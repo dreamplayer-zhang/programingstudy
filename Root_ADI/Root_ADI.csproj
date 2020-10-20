@@ -168,19 +168,19 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="reticlemap.PNG" />
+    <Resource Include="Resource\reticlemap.PNG" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="ReticleMap2.PNG" />
+    <Resource Include="Resource\ReticleMap2.PNG" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Histogram.PNG" />
+    <Resource Include="Resource\Histogram.PNG" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="ReticlDefect.PNG" />
+    <Resource Include="Resource\ReticlDefect.PNG" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="histomap.PNG" />
+    <Resource Include="Resource\histomap.PNG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
