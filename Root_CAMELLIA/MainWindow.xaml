@@ -32,8 +32,8 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Icon:AtiLogo Width="25"
-                          Height="15"
+            <Icon:AtiLogo Width="30"
+                          Height="21"
                           VerticalAlignment="Center"
                           Margin="2"/>
             <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
@@ -48,7 +48,7 @@
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="MinimizeButton"
                         Width="30"
-                        Height="20"
+                        Height="25"
                         Margin="2,0"
                         Click="MinimizeButton_Click">
                     <Path Style="{StaticResource MinimizeIconKey}" />
@@ -56,7 +56,7 @@
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="MaximizeButton"
                         Width="30"
-                        Height="20"
+                        Height="25"
                         Margin="2,0"
                         Click="MaximizeButton_Click">
                     <Path Style="{StaticResource MaximizeIconKey}" />
@@ -64,7 +64,7 @@
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="NormalizeButton"
                         Width="30"
-                        Height="20"
+                        Height="25"
                         Margin="2,0"
                         Click="NormalizeButton_Click">
                     <Path Style="{StaticResource NormalizeIconKey}" />
