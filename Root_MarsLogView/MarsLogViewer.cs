@@ -60,7 +60,7 @@ namespace Root_MarsLogView
                     switch (asCmd[0])
                     {
                         case "Time":
-                            string[] asDate = sCmd.Split('\t');
+                            string[] asDate = sCmd.Split(' ');
                             if (asDate.Length >= 2)
                             {
                                 asMars[0] = asDate[0].Substring(5, asDate[0].Length - 5);
