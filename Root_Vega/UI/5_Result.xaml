@@ -85,19 +85,19 @@
 								<CheckBox Content="Start Time"
 								  VerticalAlignment="Center"
 								  IsChecked="{Binding IsDateSearch}"/>
-								<controls:DateTimePicker SelectedDate="{Binding StartDate, Mode=TwoWay}"
+								<!--<controls:DateTimePicker SelectedDate="{Binding StartDate, Mode=TwoWay}"
 												 Width="150"
 												 Margin="10,0,0,0"
 												 IsEnabled="{Binding IsDateSearch}"
-												 VerticalAlignment="Center"/>
+												 VerticalAlignment="Center"/>-->
 								<TextBlock Text="End Time"
 								   Margin="10,0,0,0"
 								   VerticalAlignment="Center"/>
-								<controls:DateTimePicker SelectedDate="{Binding EndDate, Mode=TwoWay}"
+								<!--<controls:DateTimePicker SelectedDate="{Binding EndDate, Mode=TwoWay}"
 												 Width="150"
 												 Margin="10,0,0,0"
 												 IsEnabled="{Binding IsDateSearch}"
-												 VerticalAlignment="Center"/>
+												 VerticalAlignment="Center"/>-->
 							</StackPanel>
 						</Grid>
 						<StackPanel Grid.Row="1"

@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-                 xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes"
          xmlns:convert ="clr-namespace:Root_Vega"
              mc:Ignorable="d"
             Background="#FF2D2D30"
@@ -122,18 +121,12 @@
                                             CornerRadius="100"
                                             Width="60" Height="60"
                                                         Opacity="0.6">
-                                                <marterial:PackIcon Kind="Plus"
-                                                            x:Name="icon"
-                                                            VerticalAlignment="Stretch"
-                                                            HorizontalAlignment="Stretch"
-                                                            Width="60" Height="60"
-                                                            Margin="-5,-5,0,0"/>
+                                                
                                             </Border>
                                         </Grid>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="Button.IsMouseOver" Value="True">
                                                 <Setter TargetName="bdr" Property="BorderBrush" Value="SteelBlue"/>
-                                                <Setter TargetName="icon" Property="Foreground" Value="SteelBlue"/>
                                                 <Setter TargetName="rect" Property="Stroke" Value="SteelBlue"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>

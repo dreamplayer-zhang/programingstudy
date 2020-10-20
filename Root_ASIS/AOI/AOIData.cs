@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Memory;
 using RootTools.Trees;
 using System.Windows.Media;
 
@@ -33,14 +34,14 @@ namespace Root_ASIS.AOI
                 OnPropertyChanged(); 
                 switch (_eROI)
                 {
-                    case eROI.Ready: p_brushROI = Brushes.Purple; break;
+                    case eROI.Ready: p_brushROI = Brushes.Gray; break;
                     case eROI.Active: p_brushROI = Brushes.Red; break;
-                    case eROI.Done: p_brushROI = Brushes.Green; break; 
+                    case eROI.Done: p_brushROI = Brushes.YellowGreen; break; 
                 }
             }
         }
 
-        Brush _brushROI = Brushes.Purple; 
+        Brush _brushROI = Brushes.Gray; 
         public Brush p_brushROI
         {
             get { return _brushROI; }
@@ -61,7 +62,75 @@ namespace Root_ASIS.AOI
             Shift,
             Resize
         }
-        public eMove m_eMove = eMove.None; 
+        public eMove m_eMove = eMove.None;
+        #endregion
+
+        #region Draw
+        public enum eDraw
+        {
+            ROI,
+            Inspect,
+            All,
+        };
+
+        public void Draw(MemoryDraw draw, eDraw eDraw)
+        {
+            Brush brush = null; 
+            switch (eDraw)
+            {
+                case eDraw.ROI:
+                    if (p_eROI == eROI.Ready) return; 
+                    brush = p_brushROI; 
+                    break;
+                case eDraw.Inspect:
+                    if (m_bInspect == false) return;
+                    brush = Brushes.Red;
+                    break;
+                case eDraw.All:
+                    brush = Brushes.Green;
+                    break; 
+            }
+            draw.AddRectangle(brush, m_cp0, m_cp0 + m_sz);
+            draw.AddText(brush, m_cp0, p_id);
+            draw.AddText(brush, m_cp0, m_sDisplay); 
+        }
+        #endregion
+
+        #region Position
+        public enum eShape
+        {
+            None,
+            Set,
+            Move,
+            Resize,
+        }
+        eShape m_eShape = eShape.None; 
+
+        public void LBD(bool bDown, CPoint cpImg)
+        {
+            if (bDown && (m_eShape == eShape.None))
+            {
+                m_cp0 = cpImg;
+                m_eShape = eShape.Set; 
+            }
+            else if (m_eShape != eShape.None)
+            {
+                m_eShape = eShape.None;
+                p_eROI = eROI.Done; 
+            }
+        }
+
+        public void MouseMove(CPoint cpImg)
+        {
+            switch (m_eShape)
+            {
+                case eShape.Set:
+                    m_sz.X = cpImg.X - m_cp0.X;
+                    m_sz.Y = cpImg.Y - m_cp0.Y;
+                    break;
+                default: break; 
+            }
+        }
         #endregion
 
         #region Tree

@@ -2,7 +2,6 @@
 using RootTools;
 using System;
 using System.Collections.Generic;
-using System.Windows.Documents;
 
 namespace Root_ASIS
 {
@@ -40,9 +39,8 @@ namespace Root_ASIS
         {
             public enum eLogic
             {
-                Set,
-                And,
                 Or,
+                And,
                 Match,
                 Match_False,
                 Match_True,
@@ -55,9 +53,8 @@ namespace Root_ASIS
             {
                 switch (eLogic)
                 {
-                    case eLogic.Set: m_bInspect = bInspect; break;
-                    case eLogic.And: m_bInspect &= bInspect; break;
                     case eLogic.Or: m_bInspect |= bInspect; break;
+                    case eLogic.And: m_bInspect &= bInspect; break;
                     case eLogic.Match:
                         if (m_bInspect == bInspect) return "OK";
                         m_infoStrip.p_eResult = eResult.Error;

@@ -1,4 +1,5 @@
-﻿using RootTools.Trees;
+﻿using Root_ASIS.AOI;
+using RootTools.Trees;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -34,7 +35,6 @@ namespace Root_ASIS.Teachs
 
         private void buttonInspect_Click(object sender, RoutedEventArgs e)
         {
-
         }
 
         #region AOI
@@ -102,7 +102,7 @@ namespace Root_ASIS.Teachs
                 m_teach.m_aAOI.Remove(aoi);
                 m_teach.RunTreeAOI(Tree.eMode.Init);
                 m_teach.RunTreeAOI(Tree.eMode.Init);
-                m_teach.InvalidROI(); 
+                InvalidROI(); 
             }
         }
 
@@ -131,7 +131,7 @@ namespace Root_ASIS.Teachs
             }
             m_teach.RunTreeAOI(Tree.eMode.Init);
             m_teach.RunTreeAOI(Tree.eMode.Init);
-            m_teach.InvalidROI();
+            InvalidROI();
         }
 
         private static TAncestor FindAncestor<TAncestor>(DependencyObject dependencyObject) where TAncestor : DependencyObject
@@ -147,7 +147,21 @@ namespace Root_ASIS.Teachs
         #endregion
 
         #region ROI
+        public void InvalidROI()
+        {
+            m_teach.InvalidListROI();
+            buttonInspect.IsEnabled = (m_teach.m_nROI[AOIData.eROI.Ready] == 0) && (m_teach.m_nROI[AOIData.eROI.Active] == 0);
+        }
 
+        private void listViewROI_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            int nSelect = listViewROI.SelectedIndex;
+            if (nSelect < 0) return;
+            if (nSelect >= m_teach.m_aROI.Count) return;
+            m_teach.ClearActive();
+            m_teach.m_aROI[nSelect].p_eROI = AOIData.eROI.Active;
+            m_teach.Draw(AOIData.eDraw.ROI); 
+        }
         #endregion
     }
 }

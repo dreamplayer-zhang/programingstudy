@@ -7,7 +7,6 @@
              xmlns:convert="clr-namespace:ViewConverter"
              xmlns:obs="clr-namespace:nsSizeObserver"
              xmlns:behavior="clr-namespace:mousebehavior"
-             xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes"
               Cursor="{Binding p_MouseCursor}"
              mc:Ignorable="d"
              Height="338" Width="356"
@@ -164,8 +163,7 @@
                     <ColumnDefinition Width="30*"></ColumnDefinition>
                     <ColumnDefinition Width="90*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <marterial:PackIcon Kind="Cancel" Margin="0" Grid.Column="0"
-                        VerticalAlignment="Center" HorizontalAlignment="Center" />
+                
                 <TextBlock Text="Cancel" Margin="0" Grid.Column="1"
                            Foreground="black"
                         VerticalAlignment="Center" HorizontalAlignment="Center" />

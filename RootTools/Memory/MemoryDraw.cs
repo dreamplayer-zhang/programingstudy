@@ -111,6 +111,17 @@ namespace RootTools.Memory
             lines.m_aPoint.Add(cp1);
             m_aDraw.Add(lines);
         }
+
+        public void AddRectangle(Brush brush, CPoint cp0, CPoint cp1)
+        {
+            Lines lines = new Lines(brush);
+            lines.m_aPoint.Add(cp0);
+            lines.m_aPoint.Add(new CPoint(cp0.X, cp1.Y));
+            lines.m_aPoint.Add(cp1);
+            lines.m_aPoint.Add(new CPoint(cp1.X, cp0.Y));
+            lines.m_aPoint.Add(cp0);
+            m_aDraw.Add(lines);
+        }
         #endregion
 
         #region Text

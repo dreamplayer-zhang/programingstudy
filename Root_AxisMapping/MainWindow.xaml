@@ -8,7 +8,21 @@
         Loaded="Window_Loaded"
         Closing="Window_Closing"
         Title="AxisMapping" Height="1000" Width="1800" WindowState="Maximized">
-    <Grid>
-        <local:AxisMapping_Engineer_UI x:Name="engineerUI"/>
-    </Grid>
+    <Window.Resources>
+        <DataTemplate x:Key="TabItemHeaderTemplate">
+            <ContentPresenter Content="{TemplateBinding Content}" RenderTransformOrigin="0.5,0.5">
+                <ContentPresenter.LayoutTransform>
+                    <RotateTransform Angle="-90"/>
+                </ContentPresenter.LayoutTransform>
+            </ContentPresenter>
+        </DataTemplate>
+    </Window.Resources>
+    <TabControl TabStripPlacement="Left">
+        <TabItem Header=" AxisMapping " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
+            <local:Mapping_UI x:Name="mappingUI"/>
+        </TabItem>
+        <TabItem Header=" Engineer " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
+            <local:AxisMapping_Engineer_UI x:Name="engineerUI"/>
+        </TabItem>
+    </TabControl>
 </Window>

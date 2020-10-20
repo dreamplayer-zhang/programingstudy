@@ -7,7 +7,6 @@
              xmlns:tools ="clr-namespace:RootTools;assembly=RootTools"
              xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
              xmlns:mouse="clr-namespace:mousebehavior;assembly=RootTools"
-             xmlns:marterial="http://materialdesigninxaml.net/winfx/xaml/themes" 
              mc:Ignorable="d" Cursor="{Binding RecipeCursor}"
              d:DesignHeight="900" d:DesignWidth="1442">
     <UserControl.Resources>

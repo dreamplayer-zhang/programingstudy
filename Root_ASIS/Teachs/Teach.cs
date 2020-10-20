@@ -62,20 +62,99 @@ namespace Root_ASIS.Teachs
 
         #region ROI
         public ObservableCollection<AOIData> m_aROI = new ObservableCollection<AOIData>();
-        public void InvalidROI()
+        public void InvalidListROI()
         {
             m_aROI.Clear();
             m_aoiStrip.AddROI(m_aROI);
             m_aoiStripID.AddROI(m_aROI);
             foreach (IAOI aoi in m_aAOI) aoi.AddROI(m_aROI);
-            int nActive = 0;
-            foreach (AOIData roi in m_aROI) nActive += (roi.p_eROI == AOIData.eROI.Active) ? 1 : 0; 
-            //forget
+        }
+
+        public Dictionary<AOIData.eROI, int> m_nROI = new Dictionary<AOIData.eROI, int>();
+        void InitROI()
+        {
+            m_nROI.Add(AOIData.eROI.Ready, 0);
+            m_nROI.Add(AOIData.eROI.Active, 0);
+            m_nROI.Add(AOIData.eROI.Done, 0);
+            InvalidListROI();
+        }
+
+        public AOIData p_roiActive
+        {
+            get { return GetActineROI(); }
+        }
+
+        AOIData GetActineROI()
+        {
+            CalcROICount();
+            if (m_nROI[AOIData.eROI.Active] == 1)
+            {
+                foreach (AOIData roi in m_aROI)
+                {
+                    if (roi.p_eROI == AOIData.eROI.Active) return roi;
+                }
+            }
+            if (m_nROI[AOIData.eROI.Active] > 1) ClearActive();
+            foreach (AOIData roi in m_aROI)
+            {
+                if (roi.p_eROI == AOIData.eROI.Ready)
+                {
+                    roi.p_eROI = AOIData.eROI.Active;
+                    return roi;
+                }
+            }
+            return null;
+        }
+
+        void CalcROICount()
+        {
+            m_nROI[AOIData.eROI.Ready] = 0;
+            m_nROI[AOIData.eROI.Active] = 0;
+            m_nROI[AOIData.eROI.Done] = 0;
+            foreach (AOIData roi in m_aROI) m_nROI[roi.p_eROI]++;
+        }
+
+        public void ClearActive()
+        {
+            foreach (AOIData roi in m_aROI)
+            {
+                if (roi.p_eROI == AOIData.eROI.Active) roi.p_eROI = AOIData.eROI.Ready;
+            }
         }
         #endregion
 
-        #region Memory
-        public MemoryPool m_memoryPool; 
+        #region Memory & Draw
+        public MemoryPool m_memoryPool;
+        void InitDraw()
+        {
+            m_memoryPool.m_viewer.OnLBD += M_viewer_OnLBD;
+            m_memoryPool.m_viewer.OnMouseMove += M_viewer_OnMouseMove;
+        }
+
+        private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
+        {
+            if (p_roiActive == null) return;
+            p_roiActive.LBD(bDown, cpImg);
+            Draw(AOIData.eDraw.ROI);
+            GetActineROI(); 
+        }
+
+        private void M_viewer_OnMouseMove(CPoint cpImg)
+        {
+            if (p_roiActive == null) return;
+            p_roiActive.MouseMove(cpImg);
+            Draw(AOIData.eDraw.ROI);
+        }
+
+        public void Draw(AOIData.eDraw eDraw)
+        {
+            MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
+            draw.Clear();
+            m_aoiStrip.Draw(draw, eDraw);
+            m_aoiStripID.Draw(draw, eDraw);
+            foreach (IAOI aoi in m_aAOI) aoi.Draw(draw, eDraw); 
+            draw.InvalidDraw(); 
+        }
         #endregion
 
         #region Tree Setup
@@ -133,7 +212,9 @@ namespace Root_ASIS.Teachs
             InitTreeSetup();
             ClearAOI();
             InitTreeAOI();
-            InvalidROI(); 
+            InitDraw();
+            InitROI();
+            GetActineROI(); 
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Root_ASIS.AOI;
+using RootTools.Memory;
 using RootTools.Trees;
 using System.Collections.ObjectModel;
 
@@ -11,6 +12,8 @@ namespace Root_ASIS.Teachs
         int p_nID { get; set; }
 
         bool p_bEnable { get; set; }
+
+        void Draw(MemoryDraw draw, AOIData.eDraw eDraw); 
 
         IAOI NewAOI();
 

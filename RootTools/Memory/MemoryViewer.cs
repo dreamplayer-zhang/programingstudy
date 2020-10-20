@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -11,10 +12,23 @@ namespace RootTools.Memory
         #region Invalidate
         public delegate void dgOnInvalidDraw();
         public event dgOnInvalidDraw OnInvalidDraw;
-
         public void InvalidDraw()
         {
             if (OnInvalidDraw != null) OnInvalidDraw(); 
+        }
+
+        public delegate void dgOnLBD(bool bDown, CPoint cpImg);
+        public event dgOnLBD OnLBD;
+        public void LBD(bool bDown, CPoint cpImg)
+        {
+            if (OnLBD != null) OnLBD(bDown, cpImg); 
+        }
+
+        public delegate void dgOnMouseMove(CPoint cpImg);
+        public event dgOnMouseMove OnMouseMove;
+        public void MouseMove(CPoint cpImg)
+        {
+            if (OnMouseMove != null) OnMouseMove(cpImg);
         }
 
         DispatcherTimer m_timer = new DispatcherTimer(); 
@@ -176,7 +190,7 @@ namespace RootTools.Memory
         }
 
         CPoint m_cpOffset = new CPoint();
-        double[] m_aZoom = { 8, 6, 5, 4, 3, 2.5, 2, 1.5, 1.25, 1, 0.8, 0.64, 0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.13, 0.1, 0.08, 0.064, 0.05, 0.04, 0.03, 0.025, 0.02, 0.015, 0.01 };
+        double[] m_aZoom = { 8, 6, 5, 4, 3, 2.5, 2, 1.5, 1.25, 1, 0.8, 0.64, 0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.13, 0.1, 0.08, 0.064, 0.05, 0.04, 0.03, 0.025, 0.02, 0.015, 0.01, 0.008, 0.0064, 0.005, 0.004, 0.003, 0.0025 };
         int m_iZoom = 9;
         double _fZoom = 1; 
         public double p_fZoom
@@ -196,8 +210,15 @@ namespace RootTools.Memory
                         m_iZoom = n;
                     }
                 }
-                OnPropertyChanged(); 
+                OnPropertyChanged();
+                OnPropertyChanged("p_sZoom");
             }
+        }
+
+        public string p_sZoom
+        {
+            get { return p_fZoom.ToString("0.0000"); }
+            set { }
         }
 
         public void ZoomIn(CPoint cpWindow)
@@ -215,12 +236,12 @@ namespace RootTools.Memory
         {
             if (p_memoryData == null) return; 
             if (m_iZoom >= (m_aZoom.Length - 1)) return;
-            double sx = p_memoryData.p_sz.X * p_fZoom / p_szWindow.X;
-            double sy = p_memoryData.p_sz.Y * p_fZoom / p_szWindow.Y;
-            if (Math.Max(sx, sy) < 1) return;
             CPoint cpImage = GetImagePos(cpWindow);
             m_iZoom++;
             p_fZoom = m_aZoom[m_iZoom];
+            double sx = p_memoryData.p_sz.X * p_fZoom / p_szWindow.X;
+            double sy = p_memoryData.p_sz.Y * p_fZoom / p_szWindow.Y;
+            if (Math.Max(sx, sy) < 1) p_fZoom = Math.Min(1.0 * p_szWindow.X / p_memoryData.p_sz.X, 1.0 * p_szWindow.Y / p_memoryData.p_sz.Y);
             m_cpOffset.X = cpImage.X - (int)Math.Round(cpWindow.X / p_fZoom);
             m_cpOffset.Y = cpImage.Y - (int)Math.Round(cpWindow.Y / p_fZoom);
             UpdateBitmapSource();
@@ -261,6 +282,7 @@ namespace RootTools.Memory
                         p_sGV = m_aBufDisplay[nAdd + 2].ToString() + ", " + m_aBufDisplay[nAdd + 1].ToString() + ", " + m_aBufDisplay[nAdd].ToString();
                         break;
                 }
+                if (p_bShiftKeyDown && p_bLBD) MouseMove(p_cpImage); 
             }
         }
 
@@ -290,8 +312,22 @@ namespace RootTools.Memory
             return new CPoint(x, y); 
         }
 
-        public bool m_bShiftKey = false;
-        public bool m_bLBD = false;
+        bool _bLBD = false; 
+        public bool p_bLBD
+        {
+            get { return _bLBD; }
+            set
+            {
+                _bLBD = value;
+                LBD(p_bShiftKeyDown && value, GetImagePos(p_cpLBD));
+            }
+        }
+
+        public bool p_bShiftKeyDown
+        {
+            get { return Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift); }
+        }
+
         CPoint _cpLBDOffset = new CPoint();
         CPoint _cpLBD = new CPoint();
         public CPoint p_cpLBD
@@ -306,8 +342,8 @@ namespace RootTools.Memory
 
         void Shift(CPoint cpWindow)
         {
-            if (m_bShiftKey) return;
-            if (m_bLBD == false) return;
+            if (p_bShiftKeyDown) return;
+            if (p_bLBD == false) return;
             CPoint dp = cpWindow - p_cpLBD;
             dp /= p_fZoom;
             m_cpOffset = _cpLBDOffset - dp;

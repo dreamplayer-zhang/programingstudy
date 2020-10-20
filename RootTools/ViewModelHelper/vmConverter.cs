@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using RootTools;
-using MaterialDesignThemes.Wpf;
 using System.Globalization;
 using RootTools.Control.Ajin;
 using RootTools.Control;
@@ -477,23 +476,45 @@ namespace ViewConverter
                 double dScaled = 0.0;
                 double dControlLength = 0.0;    // Control별 사이즈, 스테이지 영역을 넘어가지 않게 하기 위해 빼주는 값
                 string strAxis = (string)parameter;
+                string strCaller = (string)values[3];
 
                 // implement
-                if (strAxis == "AxisX")
-                    dControlLength = 150.0;
-                else if (strAxis == "AxisY")
-                    dControlLength = 100.0;
-                else if (strAxis == "AxisZ")
-                    dControlLength = 30.0;
-                else if (strAxis == "AxisTheta")
+                switch(strCaller)
                 {
-                    dMinusLimit = -180000.0;
-                    dPlusLimit = 180000.0;
-                    dStageLength = 360.0;
-                    dControlLength = 0.0;
+                    case "PatternVision":
+                        if (strAxis == "AxisX")
+                        {
+                            dControlLength = 50.0;
+                            dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, dStageLength - dControlLength, 0.0);
+                        }
+                        else if (strAxis == "AxisY")
+                        {
+                            dControlLength = 100.0;
+                            dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, dStageLength - dControlLength, 0.0);
+                        }
+                        else if (strAxis == "AxisZ")
+                        {
+                            dControlLength = 30.0;
+                            dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, 0.0, dStageLength - dControlLength);
+                        }
+                        break;
+                    case "SideVision":
+                        if (strAxis == "AxisX")
+                            dControlLength = 150.0;
+                        else if (strAxis == "AxisY")
+                            dControlLength = 100.0;
+                        else if (strAxis == "AxisZ")
+                            dControlLength = 30.0;
+                        else if (strAxis == "AxisTheta")
+                        {
+                            dMinusLimit = -180000.0;
+                            dPlusLimit = 180000.0;
+                            dStageLength = 360.0;
+                            dControlLength = 0.0;
+                        }
+                        dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, 0.0, dStageLength - dControlLength);
+                        break;
                 }
-
-                dScaled = PositionScaling(dActualPos, dMinusLimit, dPlusLimit, 0.0, dStageLength - dControlLength);
 
                 return dScaled;
             }
@@ -515,42 +536,42 @@ namespace ViewConverter
         }
     }
 
-    public class AjinModuleToPackIconConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            PackIconKind result = PackIconKind.AlphaXBox;
-            string str = value.ToString();
-            AXT_MODULE type = AXT_MODULE.AXT_SIO_DI32;
-            if (Enum.TryParse(value.ToString(), out type))
-            {
-                switch (type)
-                {
-                    case AXT_MODULE.AXT_SIO_DI32:
-                    case AXT_MODULE.AXT_SIO_RDI32MLIII:
-                    case AXT_MODULE.AXT_SIO_RDI32PMLIII:
-                        result = PackIconKind.AlphaIBox;
-                        break;
-                    case AXT_MODULE.AXT_SIO_DO32P:
-                    case AXT_MODULE.AXT_SIO_RDO32MLIII:
-                    case AXT_MODULE.AXT_SIO_RDO32PMLIII:
-                        result = PackIconKind.AlphaOBox;
-                        break;
-                    case AXT_MODULE.AXT_SIO_DB32P:
-                    case AXT_MODULE.AXT_SIO_RDB32MLIII:
-                    case AXT_MODULE.AXT_SIO_RDB32PMLIII:
-                        result = PackIconKind.AlphaBBox;
-                        break;
-                }
-            }
-            return result;
-        }
+    //public class AjinModuleToPackIconConverter : IValueConverter
+    //{
+    //    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    //    {
+    //        PackIconKind result = PackIconKind.AlphaXBox;
+    //        string str = value.ToString();
+    //        AXT_MODULE type = AXT_MODULE.AXT_SIO_DI32;
+    //        if (Enum.TryParse(value.ToString(), out type))
+    //        {
+    //            switch (type)
+    //            {
+    //                case AXT_MODULE.AXT_SIO_DI32:
+    //                case AXT_MODULE.AXT_SIO_RDI32MLIII:
+    //                case AXT_MODULE.AXT_SIO_RDI32PMLIII:
+    //                    result = PackIconKind.AlphaIBox;
+    //                    break;
+    //                case AXT_MODULE.AXT_SIO_DO32P:
+    //                case AXT_MODULE.AXT_SIO_RDO32MLIII:
+    //                case AXT_MODULE.AXT_SIO_RDO32PMLIII:
+    //                    result = PackIconKind.AlphaOBox;
+    //                    break;
+    //                case AXT_MODULE.AXT_SIO_DB32P:
+    //                case AXT_MODULE.AXT_SIO_RDB32MLIII:
+    //                case AXT_MODULE.AXT_SIO_RDB32PMLIII:
+    //                    result = PackIconKind.AlphaBBox;
+    //                    break;
+    //            }
+    //        }
+    //        return result;
+    //    }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    //    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
 
     public class DataContextToVisibleConverter : IValueConverter
     {
