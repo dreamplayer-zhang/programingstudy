@@ -4,11 +4,112 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_AOP01"
+        xmlns:icon="clr-namespace:Root_AOP01.Icon"
         mc:Ignorable="d"
+        WindowStyle="None"
+        WindowState="Maximized"
+        AllowsTransparency="False"
+        ResizeMode="CanResizeWithGrip"
+        Height="1080" Width="1920" 
+        Title="Root AOP01"
         Loaded="Window_Loaded"
-        Closing="Window_Closing"
-        Title="Root AOP01" Height="1000" Width="1900" WindowState="Maximized">
+        Closing="Window_Closing">
     <Grid>
-        <local:AOP01_Engineer_UI x:Name="engineerUI"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="85*"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="15*"/>
+        </Grid.RowDefinitions>
+        <!--Title Bar Start-->
+        <Grid Grid.Row="0"
+              Name="TitleBar"
+              Background="{StaticResource MainThema}"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <StackPanel Orientation="Horizontal">
+                <icon:AtiLogo Width="30"
+                           Height="18"
+                           VerticalAlignment="Center"
+                           Margin="3" />
+                <TextBlock Text="AOP01"
+                       Foreground="White"
+                       VerticalAlignment="Center"
+                       FontSize="15"
+                       Margin="5,0,0,0"
+                       Grid.Column="1" />
+            </StackPanel>
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Grid.Column="2">
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MinimizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="MinimizeButton_Click">
+                    <Path Style="{StaticResource MinimizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MaximizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="MaximizeButton_Click">
+                    <Path Style="{StaticResource MaximizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="NormalizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="NormalizeButton_Click">
+                    <Path Style="{StaticResource NormalizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="CloseButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="CloseButton_Click"
+                        VerticalAlignment="Bottom">
+                    <Path Style="{StaticResource CloseIconKey}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+        <!--Title Bar End-->
+
+        <Grid Grid.Row="1" x:Name="MainPanel">
+            <local:AOP01_Engineer_UI x:Name="engineerUI"/>
+            <local:SelectMode/>
+        </Grid>
+
+        <!--Log Area Start-->
+        <GridSplitter Grid.Row="2" 
+                      Height="3"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Background="{StaticResource Splitter}"
+                      ShowsPreview="True" Grid.ColumnSpan="2"/>
+        <Border Grid.Row="3" Grid.ColumnSpan="2" Panel.ZIndex="99">
+            <TabControl>
+                <TabItem Header="ALL" FontSize="10">
+                    <TextBlock Text="Log Area" Margin="5"/>
+                </TabItem>
+                <TabItem Header="System" FontSize="10"/>
+                <TabItem Header="Inspection" FontSize="10"/>
+                <TabItem Header="I/O" FontSize="10"/>
+                <TabItem Header="Network" FontSize="10"/>
+                <TabItem Header="Result" FontSize="10"/>
+            </TabControl>
+
+        </Border>
+        <!--Log End-->
+
+
     </Grid>
 </Window>

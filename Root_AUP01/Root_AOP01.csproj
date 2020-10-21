@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{06C96C2E-1A92-4DE8-BA8C-DC89538E9943}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Root_AUP01</RootNamespace>
-    <AssemblyName>Root_AUP01</AssemblyName>
+    <RootNamespace>Root_AOP01</RootNamespace>
+    <AssemblyName>Root_AOP01</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -71,19 +71,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="AOP01_Engineer_UI.xaml">
+    <Compile Include="SelectMode.xaml.cs">
+      <DependentUpon>SelectMode.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Engineer\AOP01_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AOP01_Handler_UI.xaml">
+    <Page Include="Engineer\AOP01_Handler_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AOP01_Process_UI.xaml">
+    <Page Include="Engineer\AOP01_Process_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AOP01_Recipe_UI.xaml">
+    <Page Include="Engineer\AOP01_Recipe_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Icon\AtiLogo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Icon\Calendar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -95,26 +106,36 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AOP01_Engineer.cs" />
-    <Compile Include="AOP01_Engineer_UI.xaml.cs">
+    <Compile Include="Engineer\AOP01_Engineer.cs" />
+    <Compile Include="Engineer\AOP01_Engineer_UI.xaml.cs">
       <DependentUpon>AOP01_Engineer_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AOP01_Handler.cs" />
-    <Compile Include="AOP01_Handler_UI.xaml.cs">
+    <Compile Include="Engineer\AOP01_Handler.cs" />
+    <Compile Include="Engineer\AOP01_Handler_UI.xaml.cs">
       <DependentUpon>AOP01_Handler_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AOP01_Process.cs" />
-    <Compile Include="AOP01_Process_UI.xaml.cs">
+    <Compile Include="Engineer\AOP01_Process.cs" />
+    <Compile Include="Engineer\AOP01_Process_UI.xaml.cs">
       <DependentUpon>AOP01_Process_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AOP01_Recipe.cs" />
-    <Compile Include="AOP01_Recipe_UI.xaml.cs">
+    <Compile Include="Engineer\AOP01_Recipe.cs" />
+    <Compile Include="Engineer\AOP01_Recipe_UI.xaml.cs">
       <DependentUpon>AOP01_Recipe_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Icon\AtiLogo.xaml.cs">
+      <DependentUpon>AtiLogo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Icon\Calendar.xaml.cs">
+      <DependentUpon>Calendar.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SelectMode.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Module\TapePacker.cs" />
@@ -150,7 +171,9 @@
       <Name>RootTools</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Control\UserControl\" />
+  </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
       <Visible>False</Visible>
@@ -162,6 +185,10 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\file_settings_127px.png" />
+    <Resource Include="Resource\system_task_127px.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

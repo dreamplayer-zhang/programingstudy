@@ -86,6 +86,7 @@
             </StackPanel>
         </Grid>
         <!--Title Bar End-->   
+        
         <Grid Grid.Row="1" x:Name="MainPanel">
 
             <DockPanel x:Name="panel">

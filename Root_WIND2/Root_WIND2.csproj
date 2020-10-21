@@ -85,7 +85,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Controls\Icons\Calendar.xaml.cs">
+    <Compile Include="Controls\Icon\Calendar.xaml.cs">
       <DependentUpon>Calendar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\UserControl\DateTimePicker.xaml.cs">
@@ -155,7 +155,7 @@
     </Compile>
     <Compile Include="UI\Dummy.cs" />
     <Compile Include="UI\1.Setup\Setup_ViewModel.cs" />
-    <Compile Include="Controls\Icons\AtiLogo.xaml.cs">
+    <Compile Include="Controls\Icon\AtiLogo.xaml.cs">
       <DependentUpon>AtiLogo.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1.Setup\3. RecipeWizard\2. FrontSide\Alignment\AlignmentOriginPage.xaml.cs">
@@ -217,7 +217,7 @@
     <Compile Include="WIND2_Handler.cs" />
     <Compile Include="WIND2_Process.cs" />
     <Compile Include="WIND2_Recipe.cs" />
-    <Page Include="Controls\Icons\Calendar.xaml">
+    <Page Include="Controls\Icon\Calendar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -269,7 +269,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\Icons\AtiLogo.xaml">
+    <Page Include="Controls\Icon\AtiLogo.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
