@@ -12,15 +12,30 @@
         <TabItem Header=" Align ">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="250"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0" BorderBrush="Black" BorderThickness="1">
+                        <GroupBox.Header>
+                            <TextBlock Text="Grab" Foreground="Black" FontWeight="Bold" />
+                        </GroupBox.Header>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Button Grid.Row="0" x:Name="buttonGrab" Content="Grab" Margin="3" Click="buttonGrab_Click"/>
+                            <tree:TreeUI Grid.Row="1" x:Name="treeGrabUI" Height="200" Margin="3"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Row="1" BorderBrush="Black" BorderThickness="1">
                         <GroupBox.Header>
                             <TextBlock Text="ROI" Foreground="Black" FontWeight="Bold" />
                         </GroupBox.Header>
@@ -47,7 +62,7 @@
                             </ListView.View>
                         </ListView>
                     </GroupBox>
-                    <GroupBox Grid.Row="1" BorderBrush="Black" BorderThickness="1">
+                    <GroupBox Grid.Row="2" BorderBrush="Black" BorderThickness="1">
                         <GroupBox.Header>
                             <TextBlock Text="Find Fiducial" Foreground="Black" FontWeight="Bold" />
                         </GroupBox.Header>
@@ -56,8 +71,21 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <Button Grid.Row="0" x:Name="buttonInspect" Content="Inspect" Margin="3" Click="buttonInspect_Click"/>
-                            <tree:TreeUI Grid.Row="1" x:Name="treeUI" Height="80" Margin="3"/>
+                            <Button Grid.Row="0" x:Name="buttonInspect" Content="Inspect" Margin="3" IsEnabled="False" Click="buttonInspect_Click"/>
+                            <tree:TreeUI Grid.Row="1" x:Name="treeInspectUI" Height="80" Margin="3"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Row="3" BorderBrush="Black" BorderThickness="1">
+                        <GroupBox.Header>
+                            <TextBlock Text="Rotate" Foreground="Black" FontWeight="Bold" />
+                        </GroupBox.Header>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Button Grid.Row="0" x:Name="buttonRotate" Content="Rotate" Margin="3" IsEnabled="False" Click="buttonRotate_Click"/>
+                            <tree:TreeUI Grid.Row="1" x:Name="treeRotateUI" Height="100" Margin="3"/>
                         </Grid>
                     </GroupBox>
                 </Grid>

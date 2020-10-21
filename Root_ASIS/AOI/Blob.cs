@@ -192,9 +192,7 @@ namespace Root_ASIS.AOI
             int y1 = y + dy; 
             m_aDst[y1, x1] = 100;
             m_aVisit[y1, x1].Set(true, x, y);
-            island.m_nSize++;
-            island.m_rpCenter.X += x1;
-            island.m_rpCenter.Y += y1; 
+            island.Add(x1, y1); 
         }
         #endregion
 

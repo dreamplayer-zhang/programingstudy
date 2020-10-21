@@ -93,10 +93,11 @@ namespace Root_AxisMapping.Module
         }
 
         #region ModuleRun
+        public ModuleRunBase m_runGrab; 
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
-            AddModuleRunList(new Run_Grab(this), false, "Grab LineScan");
+            m_runGrab = AddModuleRunList(new Run_Grab(this), false, "Grab LineScan");
         }
 
         public class Run_Delay : ModuleRunBase

@@ -1,9 +1,9 @@
 ﻿using Root_ASIS.AOI;
-using Root_ASIS.Teachs;
 using Root_AxisMapping.Module;
 using RootTools;
 using RootTools.Memory;
 using RootTools.Trees;
+using System;
 using System.Collections.ObjectModel;
 
 namespace Root_AxisMapping
@@ -45,6 +45,24 @@ namespace Root_AxisMapping
         }
         #endregion
 
+        #region Grab
+        AxisMapping.Run_Grab m_runGrab; 
+        void InitRunGrab()
+        {
+            m_runGrab = (AxisMapping.Run_Grab)m_axisMapping.m_runGrab;
+        }
+
+        public string RunGrab()
+        {
+            m_axisMapping.StartRun(m_runGrab); 
+            return "OK"; 
+        }
+        void RunTreeGrab(Tree tree)
+        {
+            m_runGrab.RunTree(tree, true); 
+        }
+        #endregion
+
         #region ROI
         CPoint m_szROI = new CPoint(100, 100); 
         public ObservableCollection<AOIData> m_aROI = new ObservableCollection<AOIData>();
@@ -77,6 +95,12 @@ namespace Root_AxisMapping
             return null; 
         }
 
+        public void InvalidROI()
+        {
+            m_aROI[0].p_eROI = AOIData.eROI.Active;
+            m_aROI[1].p_eROI = AOIData.eROI.Ready;
+        }
+
         public void ClearActive()
         {
             foreach (AOIData roi in m_aROI)
@@ -90,12 +114,15 @@ namespace Root_AxisMapping
         MemoryData m_memory;
         public string Inspect()
         {
+            m_fRotateAngle = 0; 
             m_memory = m_memoryPool.m_viewer.p_memoryData;
             for (int n = 0; n < 2; n++)
             {
                 m_aUnit[n].m_sInspect = InspectBlob(n);
                 if (m_aUnit[n].m_sInspect != "OK") return m_aUnit[n].m_sInspect; 
             }
+            m_rpDelta = m_aUnit[1].m_aoiData.m_rpCenter - m_aUnit[0].m_aoiData.m_rpCenter;
+            m_fRotateAngle = Math.Atan2(m_rpDelta.X, m_rpDelta.Y); 
             return "OK";
         }
 
@@ -118,6 +145,23 @@ namespace Root_AxisMapping
         void RunTreeInspect(Tree tree)
         {
             m_mmGV = tree.Set(m_mmGV, m_mmGV, "GV", "Gray Value Range (0~255)");
+        }
+        #endregion
+
+        #region Rotate
+        public RPoint m_rpDelta = new RPoint(); 
+        public double m_fRotateAngle = 0; 
+        void RunTreeRotate(Tree tree)
+        {
+            double fDeg = 180 * m_fRotateAngle / Math.PI; 
+            tree.Set(fDeg, fDeg, "Angle", "Rotate Angle (deg)", true, true);
+            tree.Set(m_rpDelta, m_rpDelta, "Delta", "Distance (pixel)", true, true); 
+        }
+
+        public void RunRotate()
+        {
+
+            m_fRotateAngle = 0; 
         }
         #endregion
 
@@ -154,26 +198,70 @@ namespace Root_AxisMapping
         }
         #endregion
 
-        #region Tree
-        public TreeRoot m_treeRoot;
-        void InitTree()
+        #region Tree Grab
+        public TreeRoot m_treeRootGrab;
+        void InitTreeGrab()
         {
-            m_treeRoot = new TreeRoot(m_id, m_log);
-            RunTree(Tree.eMode.RegRead);
-            m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
+            m_treeRootGrab = new TreeRoot(m_id, m_log);
+            RunTreeGrab(Tree.eMode.RegRead);
+            m_treeRootGrab.UpdateTree += M_treeRootGrab_UpdateTree;
+        }
+
+        private void M_treeRootGrab_UpdateTree()
+        {
+            RunTreeGrab(Tree.eMode.Update);
+            RunTreeGrab(Tree.eMode.RegWrite);
+        }
+
+        public void RunTreeGrab(Tree.eMode eMode)
+        {
+            m_treeRootGrab.p_eMode = eMode;
+            RunTreeGrab(m_treeRootGrab.GetTree("Grab"));
+        }
+        #endregion
+
+        #region Tree Inspect
+        public TreeRoot m_treeRootInspect;
+        void InitTreeInspect()
+        {
+            m_treeRootInspect = new TreeRoot(m_id, m_log);
+            RunTreeInspect(Tree.eMode.RegRead);
+            m_treeRootInspect.UpdateTree += M_treeRootInspect_UpdateTree;
+        }
+
+        private void M_treeRootInspect_UpdateTree()
+        {
+            RunTreeInspect(Tree.eMode.Update);
+            RunTreeInspect(Tree.eMode.RegWrite);
+        }
+
+        public void RunTreeInspect(Tree.eMode eMode)
+        {
+            m_treeRootInspect.p_eMode = eMode;
+            RunTreeUnit(m_treeRootInspect.GetTree("Unit", false, false));
+            RunTreeInspect(m_treeRootInspect.GetTree("Inspect"));
+        }
+        #endregion
+
+        #region Tree Rotate
+        public TreeRoot m_treeRootRotate;
+        void InitTreeRotate()
+        {
+            m_treeRootRotate = new TreeRoot(m_id, m_log);
+            RunTreeRotate(Tree.eMode.RegRead);
+            m_treeRootRotate.UpdateTree += M_treeRoot_UpdateTree;
         }
 
         private void M_treeRoot_UpdateTree()
         {
-            RunTree(Tree.eMode.Update);
-            RunTree(Tree.eMode.RegWrite);
+            RunTreeRotate(Tree.eMode.Update);
+            RunTreeRotate(Tree.eMode.RegWrite);
         }
 
-        public void RunTree(Tree.eMode eMode)
+        public void RunTreeRotate(Tree.eMode eMode)
         {
-            m_treeRoot.p_eMode = eMode;
-            RunTreeUnit(m_treeRoot.GetTree("Unit", false, false));
-            RunTreeInspect(m_treeRoot);
+            m_treeRootRotate.p_eMode = eMode;
+            RunTreeRotate(m_treeRootRotate.GetTree("Rotate"));
         }
         #endregion
 
@@ -188,8 +276,11 @@ namespace Root_AxisMapping
             m_axisMapping = ((AxisMapping_Handler)engineer.ClassHandler()).m_axisMapping;
             m_memoryPool = m_axisMapping.m_memoryPool; 
             m_log = LogView.GetLog(id);
-            InitUnit(); 
-            InitTree();
+            InitUnit();
+            InitRunGrab();
+            InitTreeGrab(); 
+            InitTreeInspect();
+            InitTreeRotate();
             InitDraw();
             InitROI();
             GetActineROI();
