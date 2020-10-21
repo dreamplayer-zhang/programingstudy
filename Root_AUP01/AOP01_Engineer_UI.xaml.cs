@@ -2,20 +2,20 @@
 using RootTools.Trees;
 using System.Windows.Controls;
 
-namespace Root_AUP01
+namespace Root_AOP01
 {
     /// <summary>
     /// AUP01_Engineer_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class AUP01_Engineer_UI : UserControl
+    public partial class AOP01_Engineer_UI : UserControl
     {
-        public AUP01_Engineer_UI()
+        public AOP01_Engineer_UI()
         {
             InitializeComponent();
         }
 
-        AUP01_Engineer m_engineer = null;
-        public void Init(AUP01_Engineer engineer)
+        AOP01_Engineer m_engineer = null;
+        public void Init(AOP01_Engineer engineer)
         {
             m_engineer = engineer;
             logViewUI.Init(LogView.m_logView);

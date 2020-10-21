@@ -5,21 +5,21 @@ using RootTools.Trees;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Root_AUP01
+namespace Root_AOP01
 {
     /// <summary>
     /// AUP01_Recipe_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class AUP01_Recipe_UI : UserControl
+    public partial class AOP01_Recipe_UI : UserControl
     {
-        public AUP01_Recipe_UI()
+        public AOP01_Recipe_UI()
         {
             InitializeComponent();
         }
 
-        AUP01_Recipe m_recipe;
+        AOP01_Recipe m_recipe;
         ModuleRunList m_moduleRunList;
-        public void Init(AUP01_Recipe recipe)
+        public void Init(AOP01_Recipe recipe)
         {
             m_recipe = recipe;
             m_moduleRunList = recipe.m_moduleRunList;

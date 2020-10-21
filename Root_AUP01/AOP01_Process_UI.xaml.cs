@@ -2,20 +2,20 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Root_AUP01
+namespace Root_AOP01
 {
     /// <summary>
     /// AUP01_Process_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class AUP01_Process_UI : UserControl
+    public partial class AOP01_Process_UI : UserControl
     {
-        public AUP01_Process_UI()
+        public AOP01_Process_UI()
         {
             InitializeComponent();
         }
 
-        AUP01_Process m_process;
-        public void Init(AUP01_Process process)
+        AOP01_Process m_process;
+        public void Init(AOP01_Process process)
         {
             m_process = process;
             this.DataContext = process;

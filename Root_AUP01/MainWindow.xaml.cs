@@ -2,7 +2,7 @@
 using System.IO;
 using System.Windows;
 
-namespace Root_AUP01
+namespace Root_AOP01
 {
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
@@ -17,7 +17,7 @@ namespace Root_AUP01
         #region Window Event
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(@"C:\Recipe\AUP01")) Directory.CreateDirectory(@"C:\Recipe\AUP01");
+            if (!Directory.Exists(@"C:\Recipe\AOP01")) Directory.CreateDirectory(@"C:\Recipe\AOP01");
             Init();
         }
 
@@ -27,10 +27,10 @@ namespace Root_AUP01
         }
         #endregion
 
-        AUP01_Engineer m_engineer = new AUP01_Engineer();
+        AOP01_Engineer m_engineer = new AOP01_Engineer();
         void Init()
         {
-            m_engineer.Init("AUP01");
+            m_engineer.Init("AOP01");
             engineerUI.Init(m_engineer);
         }
 

@@ -2,9 +2,9 @@
 using RootTools.Module;
 using System.Collections.Generic;
 
-namespace Root_AUP01
+namespace Root_AOP01
 {
-    public class AUP01_Recipe
+    public class AOP01_Recipe
     {
         #region ModuleBase
         /// <summary> Recipe 편집에 필요한 Module 이름 List </summary>
@@ -26,7 +26,7 @@ namespace Root_AUP01
         public string m_id;
         IEngineer m_engineer;
         Log m_log;
-        public AUP01_Recipe(string id, IEngineer engineer)
+        public AOP01_Recipe(string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer;

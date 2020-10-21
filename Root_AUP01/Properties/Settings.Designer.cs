@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Root_AUP01.Properties
+namespace Root_AOP01.Properties
 {
 
 

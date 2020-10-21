@@ -71,19 +71,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="AUP01_Engineer_UI.xaml">
+    <Page Include="AOP01_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AUP01_Handler_UI.xaml">
+    <Page Include="AOP01_Handler_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AUP01_Process_UI.xaml">
+    <Page Include="AOP01_Process_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="AUP01_Recipe_UI.xaml">
+    <Page Include="AOP01_Recipe_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -95,21 +95,21 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AUP01_Engineer.cs" />
-    <Compile Include="AUP01_Engineer_UI.xaml.cs">
-      <DependentUpon>AUP01_Engineer_UI.xaml</DependentUpon>
+    <Compile Include="AOP01_Engineer.cs" />
+    <Compile Include="AOP01_Engineer_UI.xaml.cs">
+      <DependentUpon>AOP01_Engineer_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AUP01_Handler.cs" />
-    <Compile Include="AUP01_Handler_UI.xaml.cs">
-      <DependentUpon>AUP01_Handler_UI.xaml</DependentUpon>
+    <Compile Include="AOP01_Handler.cs" />
+    <Compile Include="AOP01_Handler_UI.xaml.cs">
+      <DependentUpon>AOP01_Handler_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AUP01_Process.cs" />
-    <Compile Include="AUP01_Process_UI.xaml.cs">
-      <DependentUpon>AUP01_Process_UI.xaml</DependentUpon>
+    <Compile Include="AOP01_Process.cs" />
+    <Compile Include="AOP01_Process_UI.xaml.cs">
+      <DependentUpon>AOP01_Process_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AUP01_Recipe.cs" />
-    <Compile Include="AUP01_Recipe_UI.xaml.cs">
-      <DependentUpon>AUP01_Recipe_UI.xaml</DependentUpon>
+    <Compile Include="AOP01_Recipe.cs" />
+    <Compile Include="AOP01_Recipe_UI.xaml.cs">
+      <DependentUpon>AOP01_Recipe_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Windows.Controls;
 
-namespace Root_AUP01
+namespace Root_AOP01
 {
     /// <summary>
     /// AUP01_Handler_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class AUP01_Handler_UI : UserControl
+    public partial class AOP01_Handler_UI : UserControl
     {
-        public AUP01_Handler_UI()
+        public AOP01_Handler_UI()
         {
             InitializeComponent();
         }
 
-        AUP01_Handler m_handler;
-        public void Init(AUP01_Handler handler)
+        AOP01_Handler m_handler;
+        public void Init(AOP01_Handler handler)
         {
             m_handler = handler;
             DataContext = handler;
