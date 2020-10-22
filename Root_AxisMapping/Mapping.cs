@@ -114,7 +114,7 @@ namespace Root_AxisMapping
         MemoryData m_memory;
         public string Inspect()
         {
-            m_fRotateAngle = 0; 
+            m_degRotate = 0; 
             m_memory = m_memoryPool.m_viewer.p_memoryData;
             for (int n = 0; n < 2; n++)
             {
@@ -122,7 +122,7 @@ namespace Root_AxisMapping
                 if (m_aUnit[n].m_sInspect != "OK") return m_aUnit[n].m_sInspect; 
             }
             m_rpDelta = m_aUnit[1].m_aoiData.m_rpCenter - m_aUnit[0].m_aoiData.m_rpCenter;
-            m_fRotateAngle = Math.Atan2(m_rpDelta.X, m_rpDelta.Y); 
+            m_degRotate = 180 * Math.Atan2(m_rpDelta.X, m_rpDelta.Y) / Math.PI; 
             return "OK";
         }
 
@@ -150,18 +150,19 @@ namespace Root_AxisMapping
 
         #region Rotate
         public RPoint m_rpDelta = new RPoint(); 
-        public double m_fRotateAngle = 0; 
+        public double m_degRotate = 0; 
         void RunTreeRotate(Tree tree)
         {
-            double fDeg = 180 * m_fRotateAngle / Math.PI; 
-            tree.Set(fDeg, fDeg, "Angle", "Rotate Angle (deg)", true, true);
+            tree.Set(m_degRotate, m_degRotate, "Angle", "Rotate Angle (deg)", true, true);
             tree.Set(m_rpDelta, m_rpDelta, "Delta", "Distance (pixel)", true, true); 
         }
 
         public void RunRotate()
         {
-
-            m_fRotateAngle = 0; 
+            AxisMapping.Run_Rotate runRotate = (AxisMapping.Run_Rotate)m_axisMapping.m_runRotate.Clone();
+            runRotate.m_degRotate = m_degRotate; 
+            m_axisMapping.StartRun(runRotate);
+            m_degRotate = 0; 
         }
         #endregion
 

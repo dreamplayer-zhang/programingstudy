@@ -76,6 +76,7 @@ namespace RootTools.Memory
             Point p = e.GetPosition(imageBitmapSource);
             m_viewer.p_cpWindow = new CPoint((int)p.X, (int)p.Y);
             if (m_viewer.p_bLBD) m_viewer.Draw(gridDrawing);
+            if (m_viewer.p_bLBD && e.LeftButton == MouseButtonState.Released) m_viewer.p_bLBD = false;
         }
 
         private void gridBitmapSource_PreviewMouseWheel(object sender, MouseWheelEventArgs e)

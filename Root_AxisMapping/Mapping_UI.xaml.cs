@@ -52,7 +52,7 @@ namespace Root_AxisMapping
         {
             IsEnabled = (m_mapping.m_axisMapping.p_eState != ModuleBase.eState.Run); 
             buttonInspect.IsEnabled = (m_mapping.m_aROI[0].p_eROI == AOIData.eROI.Done) && (m_mapping.m_aROI[1].p_eROI == AOIData.eROI.Done);
-            buttonRotate.IsEnabled = (m_mapping.m_fRotateAngle != 0);
+            buttonRotate.IsEnabled = (m_mapping.m_degRotate != 0);
         }
         #endregion
 
@@ -87,6 +87,7 @@ namespace Root_AxisMapping
 
         private void buttonRotate_Click(object sender, RoutedEventArgs e)
         {
+            m_mapping.RunRotate(); 
             m_mapping.InvalidROI();
         }
 

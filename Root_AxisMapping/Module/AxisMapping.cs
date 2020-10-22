@@ -29,6 +29,7 @@ namespace Root_AxisMapping.Module
 
         void InitTools()
         {
+            if (m_memoryPool.p_gbPool < 4) m_memoryPool.p_gbPool = 4; 
         }
         #endregion
 
@@ -39,7 +40,7 @@ namespace Root_AxisMapping.Module
         public override void InitMemorys()
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
-            m_memoryGrab = m_memoryGroup.CreateMemory("Grab", 1, m_cam.p_nByte, m_szGrab);
+            m_memoryGrab = m_memoryGroup.CreateMemory("AlignGrab", 1, m_cam.p_nByte, m_szGrab);
             m_cam.SetMemoryData(m_memoryGrab);
             m_memoryPool.m_viewer.p_memoryData = m_memoryGrab;
         }
@@ -93,11 +94,13 @@ namespace Root_AxisMapping.Module
         }
 
         #region ModuleRun
-        public ModuleRunBase m_runGrab; 
+        public ModuleRunBase m_runGrab;
+        public ModuleRunBase m_runRotate;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
             m_runGrab = AddModuleRunList(new Run_Grab(this), false, "Grab LineScan");
+            m_runRotate = AddModuleRunList(new Run_Rotate(this), false, "Rotate");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -184,6 +187,39 @@ namespace Root_AxisMapping.Module
                 p_axisY.RunTrigger(false); 
                 if (p_cam.p_bOnGrab) return "Dalsa Camera Grab not Finished"; 
                 return "OK";
+            }
+        }
+
+        public class Run_Rotate : ModuleRunBase
+        {
+            AxisMapping m_module;
+            public Run_Rotate(AxisMapping module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            Axis p_axis { get { return m_module.m_axisRotate; } }
+            public double m_degRotate = 0;
+            int m_nPpR = 10000; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Rotate run = new Run_Rotate(m_module);
+                run.m_degRotate = m_degRotate;
+                run.m_nPpR = m_nPpR; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_degRotate = tree.Set(m_degRotate, m_degRotate, "Degree", "Axis Rotate (degree)", bVisible);
+            }
+
+            public override string Run()
+            {
+                double pulseRotate = m_nPpR * m_degRotate / 360;
+                p_axis.StartMove(pulseRotate);
+                return p_axis.WaitReady(); 
             }
         }
         #endregion
