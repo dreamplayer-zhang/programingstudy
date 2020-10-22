@@ -84,8 +84,9 @@
         <!--Title Bar End-->
 
         <Grid Grid.Row="1" x:Name="MainPanel">
-            <local:AOP01_Engineer_UI x:Name="engineerUI"/>
-            <local:SelectMode/>
+            <local:SelectMode2/>
+            <local:AOP01_Engineer_UI x:Name="engineerUI" Opacity="0"/>
+            <local:SelectMode Opacity="0"/>
         </Grid>
 
         <!--Log Area Start-->

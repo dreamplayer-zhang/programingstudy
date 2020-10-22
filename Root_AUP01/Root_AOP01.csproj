@@ -71,8 +71,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="SelectMode.xaml.cs">
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipeWizard_Panel.xaml.cs">
+      <DependentUpon>RecipeWizard_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. SETUP\1. Home\HomeSummary_Page.xaml.cs">
+      <DependentUpon>HomeSummary_Page.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. SETUP\1. Home\Home_Panel.xaml.cs">
+      <DependentUpon>Home_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SelectMode2.xaml.cs">
+      <DependentUpon>SelectMode2.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. SETUP\Setup_Panel.xaml.cs">
+      <DependentUpon>Setup_Panel.xaml</DependentUpon>
     </Compile>
     <Page Include="Engineer\AOP01_Engineer_UI.xaml">
       <SubType>Designer</SubType>
@@ -95,6 +110,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\Icon\Calendar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. SETUP\2. RecipeWizard\RecipeWizard_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. SETUP\1. Home\HomeSummary_Page.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. SETUP\1. Home\Home_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -132,7 +159,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="SelectMode.xaml">
+    <Page Include="UI\SelectMode.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SelectMode2.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. SETUP\Setup_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -173,6 +208,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Control\UserControl\" />
+    <Folder Include="UI\1. SETUP\3. Maintenance\" />
+    <Folder Include="UI\1. SETUP\4. GEM\" />
+    <Folder Include="UI\2. REVIEW\" />
+    <Folder Include="UI\3. RUN\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
@@ -187,8 +226,18 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resource\file_settings_127px.png" />
-    <Resource Include="Resource\system_task_127px.png" />
+    <Resource Include="Control\Icon\Resource\file_settings_127px.png" />
+    <Resource Include="Control\Icon\Resource\system_task_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Control\Icon\Resource\monitor_127px.png" />
+    <Resource Include="Control\Icon\Resource\play_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Control\Icon\Resource\arrow_pointing_left_127px.png" />
+    <Resource Include="Control\Icon\Resource\folder_127px.png" />
+    <Resource Include="Control\Icon\Resource\home_127px.png" />
+    <Resource Include="Control\Icon\Resource\save_127px.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
