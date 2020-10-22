@@ -5,93 +5,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_AOP01"
              mc:Ignorable="d" 
-             d:DesignHeight="887" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
+             d:DesignHeight="866" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
     <ScrollViewer>
         <StackPanel>
-            <Grid Height="887">
+            <Grid Height="866">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="25"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <!--Menu-->
-                <Border Grid.Row="0"
-                        Background="{StaticResource ControlBackGround}"
-                        BorderBrush="DimGray"
-                        BorderThickness="0,0,0,0">
-                    <StackPanel Orientation="Horizontal">
-                        <Menu>
-                            <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
-                                  BorderThickness="0,0,0,0">
-                                <MenuItem.Header>
-                                    <Grid Width="70" Height="25">
-                                        <TextBlock Text="File"
-                                               FontSize="13"
-                                               FontWeight="Bold"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
-                                    </Grid>
-                                </MenuItem.Header>
-                                <MenuItem Header="New">
-
-                                </MenuItem>
-                                <MenuItem Header="Load">
-
-                                </MenuItem>
-                                <MenuItem Header="Import">
-
-                                </MenuItem>
-                                <MenuItem Header="Save">
-
-                                </MenuItem>
-                                <MenuItem Header="Save As">
-
-                                </MenuItem>
-                            </MenuItem>
-                            <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
-                                  BorderThickness="0,0,0,0">
-                                <MenuItem.Header>
-                                    <Grid Width="80" Height="25">
-                                        <TextBlock Text="Navigation"
-                                               FontSize="13"
-                                               FontWeight="Bold"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
-                                    </Grid>
-                                </MenuItem.Header>
-                                <MenuItem Header="Setup">
-                                    <MenuItem Header="Recipe Wizard">
-                                        <MenuItem Header="Recipe Summary"/>
-                                        <MenuItem Header="Recipe Option"/>
-                                        <MenuItem Header="Edge"/>
-                                        <MenuItem Header="Pellicle"/>
-                                        <MenuItem Header="Pattern"/>
-                                    </MenuItem>
-                                    <MenuItem Header="Matienance"/>
-                                    <MenuItem Header="GEM"/>
-                                </MenuItem>
-                            </MenuItem>
-                            <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
-                                  Command="{Binding btnMode}"
-                                  BorderThickness="0,0,0,0">
-                                <MenuItem.Header>
-                                    <Grid Width="70" Height="25">
-                                        <TextBlock Text="Exit"
-                                               FontSize="13"
-                                               FontWeight="Bold"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
-                                    </Grid>
-                                </MenuItem.Header>
-                            </MenuItem>
-                        </Menu>
-                    </StackPanel>
-                </Border>
                 <!--Toolbar-->
-                <Border Grid.Row="1"
+                <Border Grid.Row="0"
                 Background="{StaticResource ControlBackGround}"
                 BorderBrush="DimGray"
                 BorderThickness="0,0,0,0">
@@ -179,7 +103,7 @@
                     </Grid>
                 </Border>
                 <!--Panel-->
-                <Grid Grid.Row="2"/>
+                <Grid Grid.Row="1"/>
 
             </Grid>
 

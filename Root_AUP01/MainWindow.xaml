@@ -17,6 +17,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
             <RowDefinition Height="85*"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="15*"/>
@@ -82,21 +83,95 @@
             </StackPanel>
         </Grid>
         <!--Title Bar End-->
+        <Border Grid.Row="1"
+                        Background="{StaticResource ControlBackGround}"
+                        BorderBrush="DimGray"
+                        BorderThickness="0,0,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Menu>
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  BorderThickness="0,0,0,0">
+                        <MenuItem.Header>
+                            <Grid Width="70" Height="25">
+                                <TextBlock Text="File"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="New">
 
-        <Grid Grid.Row="1" x:Name="MainPanel">
+                        </MenuItem>
+                        <MenuItem Header="Load">
+
+                        </MenuItem>
+                        <MenuItem Header="Import">
+
+                        </MenuItem>
+                        <MenuItem Header="Save">
+
+                        </MenuItem>
+                        <MenuItem Header="Save As">
+
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  BorderThickness="0,0,0,0">
+                        <MenuItem.Header>
+                            <Grid Width="80" Height="25">
+                                <TextBlock Text="Navigation"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="Setup">
+                            <MenuItem Header="Recipe Wizard">
+                                <MenuItem Header="Recipe Summary"/>
+                                <MenuItem Header="Recipe Option"/>
+                                <MenuItem Header="Edge"/>
+                                <MenuItem Header="Pellicle"/>
+                                <MenuItem Header="Pattern"/>
+                            </MenuItem>
+                            <MenuItem Header="Matienance"/>
+                            <MenuItem Header="GEM"/>
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Command="{Binding btnMode}"
+                                  BorderThickness="0,0,0,0">
+                        <MenuItem.Header>
+                            <Grid Width="70" Height="25">
+                                <TextBlock Text="Exit"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+                </Menu>
+            </StackPanel>
+        </Border>
+        <Grid Grid.Row="2" x:Name="MainPanel">
             <local:SelectMode2/>
             <local:AOP01_Engineer_UI x:Name="engineerUI" Opacity="0"/>
             <local:SelectMode Opacity="0"/>
         </Grid>
 
         <!--Log Area Start-->
-        <GridSplitter Grid.Row="2" 
+        <GridSplitter Grid.Row="3" 
                       Height="3"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       Background="{StaticResource Splitter}"
                       ShowsPreview="True" Grid.ColumnSpan="2"/>
-        <Border Grid.Row="3" Grid.ColumnSpan="2" Panel.ZIndex="99">
+        <Border Grid.Row="4" Grid.ColumnSpan="2" Panel.ZIndex="99">
             <TabControl>
                 <TabItem Header="ALL" FontSize="10">
                     <TextBlock Text="Log Area" Margin="5"/>

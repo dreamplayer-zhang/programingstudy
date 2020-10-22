@@ -71,6 +71,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI\3. RUN\Run_Panel.xaml.cs">
+      <DependentUpon>Run_Panel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\1. SETUP\4. GEM\GEM_Panel.xaml.cs">
       <DependentUpon>GEM_Panel.xaml</DependentUpon>
     </Compile>
@@ -131,6 +134,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\Icon\Calendar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\3. RUN\Run_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -258,7 +265,6 @@
   <ItemGroup>
     <Folder Include="Control\UserControl\" />
     <Folder Include="UI\2. REVIEW\" />
-    <Folder Include="UI\3. RUN\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
