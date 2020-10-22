@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Root_TactTime
 {
@@ -28,6 +29,7 @@ namespace Root_TactTime
         private void Label_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (m_module.p_sStrip == "") return;
+            if (m_module.m_tact.m_qSequence.Count > 0) return; 
             m_bDrag = true; 
         }
 
@@ -35,16 +37,16 @@ namespace Root_TactTime
         {
             if (m_bDrag == false) return;
             m_bDrag = false;
-            DataObject obj = new DataObject("DragDrop", m_module);
+            DataObject obj = new DataObject("Module", m_module);
             System.Windows.DragDrop.DoDragDrop(e.OriginalSource as DependencyObject, obj, DragDropEffects.Move); 
         }
 
         private void Label_Drop(object sender, DragEventArgs e)
         {
             if (m_module.p_sStrip != "") return; 
-            if (e.Data.GetDataPresent("DragDrop") == false) return;
-            Module moduleFrom = (Module)e.Data.GetData("DragDrop");
-            m_module.MoveFrom(moduleFrom); 
+            if (e.Data.GetDataPresent("Picker") == false) return;
+            Picker picker = (Picker)e.Data.GetData("Picker");
+            m_module.MoveFrom(picker, true);
         }
         #endregion
     }

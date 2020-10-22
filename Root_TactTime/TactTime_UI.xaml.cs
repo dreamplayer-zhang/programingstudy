@@ -18,6 +18,7 @@ namespace Root_TactTime
         {
             m_tactTime = tactTime;
             DataContext = tactTime;
+            listView.ItemsSource = tactTime.m_aEvent; 
             InitModuleUI();
             treeUI.Init(tactTime.m_treeRoot);
             tactTime.RunTree(Tree.eMode.Init); 
@@ -26,18 +27,30 @@ namespace Root_TactTime
         #region Module UI
         void InitModuleUI()
         {
-            foreach (Module module in m_tactTime.m_aModule)
-            {
-                Module_UI ui = new Module_UI();
-                ui.Init(module);
-                canvasTact.Children.Add(ui); 
-            }
+            foreach (Module module in m_tactTime.m_aModule) canvasTact.Children.Add(module.p_ui);
+            foreach (Picker picker in m_tactTime.m_aPicker) canvasTact.Children.Add(picker.p_ui);
         }
         #endregion
 
         private void buttonClear_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            m_tactTime.ClearSequence(); 
+            m_tactTime.ClearSequence(true); 
+        }
+
+        private void buttonSave_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            m_tactTime.SaveSequence(); 
+        }
+
+        private void buttonOpen_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            m_tactTime.OpenSequence();
+            m_tactTime.StartSimulation();
+        }
+
+        private void buttonRun_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            m_tactTime.StartSimulation(); 
         }
     }
 }

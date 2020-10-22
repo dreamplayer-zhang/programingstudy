@@ -1,24 +1,38 @@
 ﻿using RootTools;
+using RootTools.Trees;
 using System;
 
 namespace Root_TactTime
 {
     public class Module : NotifyProperty
     {
-        #region Type
-        public enum eType
+        #region UI
+        Module_UI _ui = null;
+        public Module_UI p_ui
         {
-            Module,
-            Picker
+            get
+            {
+                if (_ui == null)
+                {
+                    _ui = new Module_UI();
+                    _ui.Init(this);
+                }
+                return _ui; 
+            }
         }
-        public eType m_eType = eType.Module;
-        #endregion
 
-        #region Picker
-        public static double m_secPickerGet = 1;
-        public static double m_secPickerPut = 0.7; 
+        TactTime.eColor _eColor = TactTime.eColor.None;
+        public TactTime.eColor p_eColor
+        {
+            get { return _eColor; }
+            set
+            {
+                if (_eColor == value) return;
+                _eColor = value;
+                p_ui.Background = m_tact.m_aColor[value];
+            }
+        }
         #endregion
-
         public string p_id { get; set; }
 
         string _sStrip = "Init"; 
@@ -28,12 +42,22 @@ namespace Root_TactTime
             set
             {
                 if (_sStrip == value) return;
-                if (m_bAutoLoad && (value == ""))
+                if (value == "") m_secRun[0] = 0; 
+                switch (m_eType)
                 {
-                    _sStrip = "Strip " + m_tact.m_iStrip.ToString("00");
-                    m_tact.m_iStrip++; 
+                    case eType.Load:
+                        if (value == "")
+                        {
+                            _sStrip = "Strip " + m_tact.m_iStrip.ToString("00");
+                            m_tact.m_iStrip++;
+                        }
+                        break;
+                    case eType.Unload:
+                        if (value != "") m_tact.p_nUnload++; 
+                        _sStrip = ""; 
+                        break;
+                    default: _sStrip = value; break; 
                 }
-                else _sStrip = value; 
                 m_secRun[0] = m_tact.p_secRun;
                 OnPropertyChanged();
                 OnPropertyChanged("p_fProgress");
@@ -51,35 +75,42 @@ namespace Root_TactTime
             set { }
         }
 
-        public void MoveFrom(Module moduleFrom)
+        public void MoveFrom(Picker picker, bool bDrag)
         {
-            if (p_sStrip != "")
-            {
-                double sec = GetSec();
-                if (sec > 0) m_tact.p_secRun += sec;
-            }
-            double secFrom = moduleFrom.GetSec();
-            if (secFrom > 0) m_tact.p_secRun += secFrom; 
-            p_sStrip = moduleFrom.p_sStrip; 
-            moduleFrom.p_sStrip = ""; 
+            m_tact.ClearColor(); 
+            picker.p_eColor = TactTime.eColor.From;
+            p_eColor = TactTime.eColor.To;
+            if (bDrag) m_tact.AddSequence(picker.p_id, p_id);
+            picker.m_loader.Move(m_rpLoc - picker.m_rpLoc); 
+            m_tact.AddEvent(Picker.m_secPickerPut, "Picker Put"); 
+            p_sStrip = picker.p_sStrip; 
+            picker.p_sStrip = ""; 
         }
 
-        double GetSec()
+        public void WaitDone()
         {
-            return m_secRun[1] - (m_tact.p_secRun - m_secRun[0]);
+            double secDone = m_secRun[1] - (m_tact.p_secRun - m_secRun[0]);
+            if (secDone > 0) m_tact.AddEvent(secDone, p_id + " Wait Done"); 
         }
 
-        public bool m_bAutoLoad = false; 
+        public enum eType
+        {
+            Load, 
+            Run,
+            Unload
+        }
+        eType m_eType = eType.Run; 
         public CPoint m_cpLoc;
-        TactTime m_tact; 
-        public Module(TactTime tact, string id, eType eType, double secRun, CPoint cpLoc, bool bAutoLoad = false)
+        public RPoint m_rpLoc; 
+        public TactTime m_tact; 
+        public Module(TactTime tact, string id, double secRun, CPoint cpLoc, RPoint rpLoc, eType eType = eType.Run)
         {
             m_tact = tact; 
             p_id = id;
-            m_eType = eType; 
             m_secRun[1] = secRun;
             m_cpLoc = cpLoc;
-            m_bAutoLoad = bAutoLoad;
+            m_rpLoc = rpLoc; 
+            m_eType = eType;
             p_sStrip = ""; 
         }
     }

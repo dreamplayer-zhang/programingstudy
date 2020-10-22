@@ -77,9 +77,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Loader.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Module_UI.xaml.cs">
       <DependentUpon>Module_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Picker.cs" />
+    <Compile Include="Picker_UI.xaml.cs">
+      <DependentUpon>Picker_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="TactTime.cs" />
     <Compile Include="TactTime_UI.xaml.cs">
@@ -98,6 +103,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Module_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Picker_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
