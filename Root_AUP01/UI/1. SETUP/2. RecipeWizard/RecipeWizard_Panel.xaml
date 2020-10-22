@@ -24,8 +24,6 @@
                             Style="{StaticResource SetupPanelBtn}"/>
                     <Button Content="Pattern"
                             Style="{StaticResource SetupPanelBtn}"/>
-                   
-
                 </StackPanel>
                 <Button Content="Back"
                         Command="{Binding btnBack}"

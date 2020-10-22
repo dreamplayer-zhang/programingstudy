@@ -54,29 +54,24 @@
                                   BorderThickness="0,0,0,0">
                                 <MenuItem.Header>
                                     <Grid Width="80" Height="25">
-                                        <TextBlock Text="Setup Map"
+                                        <TextBlock Text="Navigation"
                                                FontSize="13"
                                                FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
                                     </Grid>
                                 </MenuItem.Header>
-                                <MenuItem Header="Setup Home"/>
-                                <MenuItem Header="Inspction"/>
-                                <MenuItem Header="Recipe Wizard">
-                                    <MenuItem Header="Recipe Summary"/>
-                                    <MenuItem Header="PreAlign"/>
-                                    <MenuItem Header="FrontSide">
-                                        <MenuItem Header="Front Summary"/>
-                                        <MenuItem Header="Alignment"/>
-                                        <MenuItem Header="General"/>
+                                <MenuItem Header="Setup">
+                                    <MenuItem Header="Recipe Wizard">
+                                        <MenuItem Header="Recipe Summary"/>
+                                        <MenuItem Header="Recipe Option"/>
+                                        <MenuItem Header="Edge"/>
+                                        <MenuItem Header="Pellicle"/>
+                                        <MenuItem Header="Pattern"/>
                                     </MenuItem>
-                                    <MenuItem Header="BackSide"/>
-                                    <MenuItem Header="EBR"/>
-                                    <MenuItem Header="Edge"/>
+                                    <MenuItem Header="Matienance"/>
+                                    <MenuItem Header="GEM"/>
                                 </MenuItem>
-                                <MenuItem Header="Matienance"/>
-                                <MenuItem Header="GEM"/>
                             </MenuItem>
                             <MenuItem Background="{StaticResource ControlBackGround}"
                                   BorderBrush="#FF707070"
@@ -120,7 +115,7 @@
                                     Command="{Binding p_CurrentPanel.DataContext.btnBack}"
                                     Background="{StaticResource ControlBackGround}">
                                     <StackPanel Orientation="Horizontal">
-                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/arrow_pointing_left_127px.png"/>
+                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/arrow_pointing_left_127px.png" Margin="3"/>
                                     </StackPanel>
                                 </Button>
                             </Grid>
@@ -131,7 +126,7 @@
                                     Command="{Binding btnNaviSetupHome}"
                                     Background="{StaticResource ControlBackGround}">
                                     <StackPanel Orientation="Horizontal">
-                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/home_127px.png"/>
+                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/home_127px.png" Margin="3"/>
                                     </StackPanel>
                                 </Button>
                             </Grid>
@@ -141,7 +136,7 @@
                                     ToolTip="Load Recipe"
                                     Background="{StaticResource ControlBackGround}">
                                     <StackPanel Orientation="Horizontal">
-                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/folder_127px.png"/>
+                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/folder_127px.png" Margin="3"/>
                                         <!--<TextBlock Text="Load"/>-->
                                     </StackPanel>
                                 </Button>
@@ -153,7 +148,7 @@
                                     Background="{StaticResource ControlBackGround}">
                                     <Button.Content>
                                         <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/save_127px.png"/>
+                                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/save_127px.png" Margin="3"/>
                                             <!--<TextBlock Text="Save"/>-->
                                         </StackPanel>
                                     </Button.Content>
