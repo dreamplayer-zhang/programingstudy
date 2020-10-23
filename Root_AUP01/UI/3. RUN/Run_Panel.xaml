@@ -223,9 +223,10 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                                 <RowDefinition/>
-                                <RowDefinition Height="4*"/>
+                                <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <GroupBox Header="Pellicle Haze">
+                            <GroupBox Header="Pellicle Expansion">
                                 <!--<DataGrid IsReadOnly="True" Margin="5">
                                 <DataGrid.Resources>
                                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
@@ -244,11 +245,26 @@
                                 </DataGrid.Columns>
                             </DataGrid>-->
                             </GroupBox>
-                            <GroupBox Header="test" Grid.Row="1">
+                            <GroupBox Header="Pellicle Haze" Grid.Row="1">
                                 
                             </GroupBox>
-                            <GroupBox Header="Pattern" Grid.Column="1">
+                            <GroupBox Header="Pellicle Defect" Grid.Row="2">
+
+                            </GroupBox>
+                            <GroupBox Header="Pellicle Shift" Grid.Row="3">
+
+                            </GroupBox>
+                            <GroupBox Header="Barcode Scratch" Grid.Column="1">
                                 
+                            </GroupBox>
+                            <GroupBox Header="Align Key" Grid.Column="1" Grid.Row="1">
+
+                            </GroupBox>
+                            <GroupBox Header="Pattern Discolor" Grid.Column="1" Grid.Row="2">
+
+                            </GroupBox>
+                            <GroupBox Header="Pattern Shift" Grid.Column="1" Grid.Row="3">
+
                             </GroupBox>
                         </Grid>
                     </GroupBox>
