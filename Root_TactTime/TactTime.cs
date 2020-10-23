@@ -246,10 +246,10 @@ namespace Root_TactTime
             m_aModule.Add(new Module(this, "MGZ Load", 2, new CPoint(50, 100), new RPoint(0, 0), Module.eType.Load));
             m_aModule.Add(new Module(this, "MGZ Unoad", 2, new CPoint(50, 200), new RPoint(0, 0.4), Module.eType.Unload));
             m_aModule.Add(new Module(this, "Turnover", 4, new CPoint(50, 350), new RPoint(0, 1)));
-            m_aModule.Add(new Module(this, "Boat0", 12, new CPoint(450, 100), new RPoint(1, 0)));
-            m_aModule.Add(new Module(this, "Boat1", 12, new CPoint(450, 200), new RPoint(1, 0.4)));
-            m_aModule.Add(new Module(this, "Boat2", 12, new CPoint(450, 300), new RPoint(1, 0.8)));
-            m_aModule.Add(new Module(this, "Boat3", 12, new CPoint(450, 400), new RPoint(1, 1.2)));
+            m_aModule.Add(new Module(this, "Boat0", 12, new CPoint(450, 100), new RPoint(0.6, 0)));
+            m_aModule.Add(new Module(this, "Boat1", 12, new CPoint(450, 200), new RPoint(0.6, 0.4)));
+            m_aModule.Add(new Module(this, "Boat2", 12, new CPoint(450, 300), new RPoint(0.6, 0.8)));
+            m_aModule.Add(new Module(this, "Boat3", 12, new CPoint(450, 400), new RPoint(0.6, 1.2)));
 
             m_loader = new Loader(this, "Loader");
             m_loader.Add(new Picker(m_loader, "Picker0", new CPoint(250, 200), new RPoint(0, -0.2)));

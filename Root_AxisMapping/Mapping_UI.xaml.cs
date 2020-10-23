@@ -1,4 +1,5 @@
 ﻿using Root_ASIS.AOI;
+using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -50,7 +51,7 @@ namespace Root_AxisMapping
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            IsEnabled = (m_mapping.m_axisMapping.p_eState != ModuleBase.eState.Run); 
+            IsEnabled = (m_mapping.m_axisMapping.p_eState != ModuleBase.eState.Run) || EQ.p_bSimulate; 
             buttonInspect.IsEnabled = (m_mapping.m_aROI[0].p_eROI == AOIData.eROI.Done) && (m_mapping.m_aROI[1].p_eROI == AOIData.eROI.Done);
             buttonRotate.IsEnabled = (m_mapping.m_degRotate != 0);
         }

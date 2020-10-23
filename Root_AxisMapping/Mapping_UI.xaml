@@ -71,7 +71,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <Button Grid.Row="0" x:Name="buttonInspect" Content="Inspect" Margin="3" IsEnabled="False" Click="buttonInspect_Click"/>
+                            <Button Grid.Row="0" x:Name="buttonInspect" Content="Inspect" Margin="3" Click="buttonInspect_Click"/>
                             <tree:TreeUI Grid.Row="1" x:Name="treeInspectUI" Height="80" Margin="3"/>
                         </Grid>
                     </GroupBox>
@@ -84,7 +84,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <Button Grid.Row="0" x:Name="buttonRotate" Content="Rotate" Margin="3" IsEnabled="False" Click="buttonRotate_Click"/>
+                            <Button Grid.Row="0" x:Name="buttonRotate" Content="Rotate" Margin="3" Click="buttonRotate_Click"/>
                             <tree:TreeUI Grid.Row="1" x:Name="treeRotateUI" Height="100" Margin="3"/>
                         </Grid>
                     </GroupBox>
