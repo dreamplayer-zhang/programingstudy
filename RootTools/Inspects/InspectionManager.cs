@@ -206,18 +206,18 @@ namespace RootTools.Inspects
                     VSDataDT = VSDBManager.GetDataTable("Data");
                 }
 
-                //int stride = ImageWidth / 8;
-               // string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
+				int stride = ImageWidth / 8;
+				string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
 
-                //System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
+				System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
 
-                //System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
-                //System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
-                //encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
+				System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
+				System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
+				encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
 
-                //Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
+				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
 
-                foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
+				foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
                 {
                     System.Data.DataRow dataRow = VSDataDT.NewRow();
 
@@ -256,22 +256,21 @@ namespace RootTools.Inspects
                         (int)fPosY - ImageHeight / 2,
                         (int)fPosX + ImageWidth / 2,
                         (int)fPosY + ImageHeight / 2);
-                    //string pool = item["memPOOL"].ToString();
-                    //string group = item["memGROUP"].ToString();
-                    //string memory = item["memMEMORY"].ToString();
-                    //var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
-                    //var image = new ImageData(tempMem);
-                    //image.GetRectImage(ImageSizeBlock).Save(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + "_"+Convert.ToInt32(item["idx"]).ToString("D8")+".png"),ImageFormat.Png);
-                    //encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(image.GetRectImage(ImageSizeBlock))));
-                }
+					string pool = item["memPOOL"].ToString();
+					string group = item["memGROUP"].ToString();
+					string memory = item["memMEMORY"].ToString();
+					var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
+					var image = new ImageData(tempMem);
+					encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(image.GetRectImage(ImageSizeBlock))));
+				}
 
-                //if (VSDataDT.Rows.Count > 0)
-                //{
-                //    encoder.Save(stream);
-                //}
-                //stream.Dispose();
+				if (VSDataDT.Rows.Count > 0)
+				{
+					encoder.Save(stream);
+				}
+				stream.Dispose();
 
-                VSDBManager.SetDataTable(VSDataInfoDT);
+				VSDBManager.SetDataTable(VSDataInfoDT);
                 VSDBManager.SetDataTable(VSDataDT);
                 VSDBManager.Disconnect();
                 VSDataDT.Clear();

@@ -141,6 +141,7 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 
 			INT64 iIndex = (ytarget)*nW + (xtarget);
 			inspbuffer[i + nOffset][nOffset + j] = mem[iIndex];
+			mem[iIndex] = 255;
 			//inspbuffer2[(i+nOffset)* nWidth + (nOffset + j)] = mem[(ytarget)*nW + (xtarget)];
 		}
 	} 

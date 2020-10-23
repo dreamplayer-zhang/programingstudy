@@ -51,8 +51,8 @@ namespace RootTools.Inspects
 		{
 			try
 			{
-				//oCnn.Open();
-			//	Connected = true;
+				oCnn.Open();
+				Connected = true;
 				return true;
 			}
 			catch
