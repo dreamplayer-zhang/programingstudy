@@ -1,4 +1,5 @@
 ﻿using RootTools.Trees;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Root_TactTime
@@ -43,28 +44,28 @@ namespace Root_TactTime
         }
         #endregion
 
-        private void buttonClear_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonClear_Click(object sender, RoutedEventArgs e)
         {
             m_tactTime.ClearSequence(true); 
         }
 
-        private void buttonSave_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonSave_Click(object sender, RoutedEventArgs e)
         {
             m_tactTime.SaveSequence(); 
         }
 
-        private void buttonOpen_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonOpen_Click(object sender, RoutedEventArgs e)
         {
             m_tactTime.OpenSequence();
             m_tactTime.StartSimulation();
         }
 
-        private void buttonRun_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonRun_Click(object sender, RoutedEventArgs e)
         {
             m_tactTime.StartSimulation(); 
         }
 
-        private void buttonUndo_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonUndo_Click(object sender, RoutedEventArgs e)
         {
             m_tactTime.Undo(); 
         }
