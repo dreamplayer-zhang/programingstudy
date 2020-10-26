@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Trees;
+using System;
 
 namespace Root_TactTime
 {
@@ -34,9 +35,9 @@ namespace Root_TactTime
         #endregion
 
         #region Tree
-        public static double m_secPickerGet = 1;
-        public static double m_secPickerPut = 0.7;
-        public static void RunTreePicker(Tree tree)
+        public double m_secPickerGet = 1;
+        public double m_secPickerPut = 0.7;
+        public void RunTree(Tree tree)
         {
             m_secPickerGet = tree.Set(m_secPickerGet, m_secPickerGet, "Get", "Picker Get Time (sec)");
             m_secPickerPut = tree.Set(m_secPickerPut, m_secPickerPut, "Put", "Picker Put Time (sec)");
@@ -63,11 +64,29 @@ namespace Root_TactTime
             module.p_eColor = TactTime.eColor.From;
             p_eColor = TactTime.eColor.To;
             if (bDrag) m_tact.AddSequence(module.p_id, p_id);
-            m_loader.Move(module.m_rpLoc - m_rpLoc); 
-            module.WaitDone();
-            m_tact.AddEvent(m_secPickerGet, "Picker Get"); 
+            double secNow = Math.Max(m_loader.m_secReady, module.m_secReady);
+            m_loader.Move(ref secNow, module.m_rpLoc - m_rpLoc); 
+            module.WaitDone(ref secNow, m_loader);
+            m_loader.AddEvent(ref secNow, m_secPickerGet, "Picker Get"); 
             p_sStrip = module.p_sStrip;
             module.p_sStrip = "";
+            m_loader.m_secReady = secNow; 
+            module.m_secReady = secNow; 
+        }
+
+        public void MoveFrom(Picker picker, bool bDrag)
+        {
+            m_tact.ClearColor();
+            picker.p_eColor = TactTime.eColor.From;
+            p_eColor = TactTime.eColor.To;
+            if (bDrag) m_tact.AddSequence(picker.p_id, p_id);
+            double secNow = Math.Max(m_loader.m_secReady, picker.m_loader.m_secReady);
+            m_loader.Move(ref secNow, picker.m_loader.m_rp - m_rpLoc);
+            m_loader.AddEvent(ref secNow, picker.m_secPickerPut, "Picker Put");
+            p_sStrip = picker.p_sStrip;
+            picker.p_sStrip = "";
+            m_loader.m_secReady = secNow; 
+            picker.m_loader.m_secReady = secNow; 
         }
 
         public Loader m_loader; 

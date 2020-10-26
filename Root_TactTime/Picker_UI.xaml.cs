@@ -43,9 +43,18 @@ namespace Root_TactTime
         private void Label_Drop(object sender, DragEventArgs e)
         {
             if (m_picker.p_sStrip != "") return;
-            if (e.Data.GetDataPresent("Module") == false) return;
             Module module = (Module)e.Data.GetData("Module");
-            m_picker.MoveFrom(module, true);
+            if (module != null)
+            {
+                m_picker.MoveFrom(module, true);
+                return;
+            }
+            Picker picker = (Picker)e.Data.GetData("Picker");
+            if (picker != null)
+            {
+                m_picker.MoveFrom(picker, true);
+                return;
+            }
         }
         #endregion
     }

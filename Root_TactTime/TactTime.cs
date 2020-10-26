@@ -1,11 +1,10 @@
 ﻿using Microsoft.Win32;
+using Root_TactTime.Pine2;
 using RootTools;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -13,7 +12,7 @@ namespace Root_TactTime
 {
     public class TactTime : NotifyProperty
     {
-        #region Time Event
+        #region Time
         double _secRun = 0;
         public double p_secRun
         {
@@ -24,26 +23,6 @@ namespace Root_TactTime
                 OnPropertyChanged();
                 foreach (Module module in m_aModule) module.OnPropertyChanged("p_fProgress"); 
             }
-        }
-
-        public class Event
-        { 
-            public double p_secNow { get; set; }
-            public double p_secAdd { get; set; }
-            public string p_sEvent { get; set; }
-
-            public Event(double secNow, double secAdd, string sEvent)
-            {
-                p_secNow = Math.Round(100 * secNow) / 100;
-                p_secAdd = Math.Round(100 * secAdd) / 100;
-                p_sEvent = sEvent; 
-            }
-        }
-        public ObservableCollection<Event> m_aEvent = new ObservableCollection<Event>(); 
-        public void AddEvent(double sec, string sEvent)
-        {
-            m_aEvent.Add(new Event(p_secRun, sec, sEvent));
-            p_secRun += sec; 
         }
         #endregion
 
@@ -56,13 +35,13 @@ namespace Root_TactTime
             {
                 if (_nUnload == value) return;
                 _nUnload = value;
-                if (_nUnload == 1) m_secUnload0 = p_secRun;
+                if (_nUnload == 1) m_secUnload0 = p_secRun; 
                 OnPropertyChanged();
                 OnPropertyChanged("p_secTact");
             }
         }
 
-        double m_secUnload0 = 0; 
+        double m_secUnload0 = 0; //forget p_secRun -> 시간
         public double p_secTact
         {
             get
@@ -95,9 +74,8 @@ namespace Root_TactTime
         {
             p_secRun = 0;
             m_iStrip = 0;
-            foreach (Module module in m_aModule) module.p_sStrip = "";
-            foreach (Picker picker in m_aPicker) picker.p_sStrip = "";
-            m_aEvent.Clear();
+            foreach (Module module in m_aModule) module.Clear();
+            foreach (Loader loader in m_aLoader) loader.Clear();
             p_nUnload = 0; 
             if (bClearSequence) m_aSequence.Clear();
         }
@@ -151,6 +129,14 @@ namespace Root_TactTime
                 fs.Close();
             }
         }
+
+        public void Undo()
+        {
+            m_aSequence.RemoveAt(m_aSequence.Count - 1);
+            m_timer.Interval = TimeSpan.FromSeconds(0.001);
+            StartSimulation(); 
+            m_timer.Interval = TimeSpan.FromSeconds(m_secSimul);
+        }
         #endregion
 
         #region Run Simulation
@@ -183,14 +169,21 @@ namespace Root_TactTime
             else
             {
                 Picker picker = GetPicker(sequence.m_sTo);
-                picker.MoveFrom(GetModule(sequence.m_sFrom), false); 
+                module = GetModule(sequence.m_sFrom);
+                if (module != null)
+                {
+                    picker.MoveFrom(module, false);
+                    return; 
+                }
+                Picker pickerFrom = GetPicker(sequence.m_sFrom);
+                if (pickerFrom != null) picker.MoveFrom(pickerFrom, false); 
             }
         }
 
         double m_secSimul = 1; 
         void RunTreeSimul(Tree tree)
         {
-            m_secSimul = tree.Set(m_secSimul, m_secSimul, "interval", "Simul Intervaql (sec)");
+            m_secSimul = tree.Set(m_secSimul, m_secSimul, "Interval", "Simul Interval (sec)");
             m_timer.Interval = TimeSpan.FromSeconds(m_secSimul); 
         }
         #endregion
@@ -217,7 +210,7 @@ namespace Root_TactTime
         }
         #endregion
 
-        #region Module & Picker
+        #region Module, Loader, Picker
         public List<Module> m_aModule = new List<Module>();
         Module GetModule(string id)
         {
@@ -228,6 +221,8 @@ namespace Root_TactTime
             return null; 
         }
 
+        public List<Loader> m_aLoader = new List<Loader>(); 
+
         public List<Picker> m_aPicker = new List<Picker>();
         Picker GetPicker(string id)
         {
@@ -236,24 +231,6 @@ namespace Root_TactTime
                 if (picker.p_id == id) return picker;
             }
             return null;
-        }
-        #endregion
-
-        #region Pine2
-        Loader m_loader; 
-        void InitPine2()
-        {
-            m_aModule.Add(new Module(this, "MGZ Load", 2, new CPoint(50, 100), new RPoint(0, 0), Module.eType.Load));
-            m_aModule.Add(new Module(this, "MGZ Unoad", 2, new CPoint(50, 200), new RPoint(0, 0.4), Module.eType.Unload));
-            m_aModule.Add(new Module(this, "Turnover", 4, new CPoint(50, 350), new RPoint(0, 1)));
-            m_aModule.Add(new Module(this, "Boat0", 12, new CPoint(450, 100), new RPoint(0.6, 0)));
-            m_aModule.Add(new Module(this, "Boat1", 12, new CPoint(450, 200), new RPoint(0.6, 0.4)));
-            m_aModule.Add(new Module(this, "Boat2", 12, new CPoint(450, 300), new RPoint(0.6, 0.8)));
-            m_aModule.Add(new Module(this, "Boat3", 12, new CPoint(450, 400), new RPoint(0.6, 1.2)));
-
-            m_loader = new Loader(this, "Loader");
-            m_loader.Add(new Picker(m_loader, "Picker0", new CPoint(250, 200), new RPoint(0, -0.2)));
-            m_loader.Add(new Picker(m_loader, "Picker1", new CPoint(250, 300), new RPoint(0, 0.2)));
         }
         #endregion
 
@@ -277,8 +254,7 @@ namespace Root_TactTime
         {
             m_treeRoot.p_eMode = eMode;
             RunTreeSimul(m_treeRoot.GetTree("Simulation"));
-            Picker.RunTreePicker(m_treeRoot.GetTree("Picker"));
-            Loader.RunTreeLoader(m_treeRoot.GetTree("Loader"));
+            foreach (Loader loader in m_aLoader) loader.RunTree(m_treeRoot.GetTree(loader.p_id));
             RunTreeRunTime(m_treeRoot.GetTree("ModuleRun")); 
         }
 
@@ -291,11 +267,12 @@ namespace Root_TactTime
         }
         #endregion
 
+        dynamic m_model = null; 
         public int m_iStrip = 0; 
         public TactTime()
         {
-            p_secRun = 0; 
-            InitPine2();
+            p_secRun = 0;
+            m_model = new Pine2_Buffer(this); 
 
             InitColor(); 
             InitTree();

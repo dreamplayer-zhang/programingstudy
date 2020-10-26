@@ -20,38 +20,13 @@
                 <Button x:Name="buttonSave" Content=" Save " Margin="3" Click="buttonSave_Click"/>
                 <Button x:Name="buttonOpen" Content=" Open " Margin="3" Click="buttonOpen_Click"/>
                 <Button x:Name="buttonRun" Content=" Simulation " Margin="3" Click="buttonRun_Click"/>
+                <Button x:Name="buttonUndo" Content=" Undo " Margin="3" Click="buttonUndo_Click"/>
                 <Label Content="Time = " FontSize="20" Margin="3"/>
                 <TextBox Text="{Binding p_secRun}" FontSize="20" Margin="3" MinWidth="70"/>
                 <Label Content=" Tact = " FontSize="20" Margin="3"/>
                 <TextBox Text="{Binding p_secTact}" FontSize="20" Margin="3" MinWidth="70"/>
             </StackPanel>
         </Canvas>
-        <ListView Grid.Column="2" x:Name="listView" Margin="3">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="    Time    ">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding p_secNow}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="    Delay    ">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding p_secAdd}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="    Event    ">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding p_sEvent}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <TabControl Grid.Column="2" x:Name="tabControl" Margin="3"/>
     </Grid>
 </UserControl>

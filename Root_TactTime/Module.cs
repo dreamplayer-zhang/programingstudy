@@ -58,10 +58,16 @@ namespace Root_TactTime
                         break;
                     default: _sStrip = value; break; 
                 }
-                m_secRun[0] = m_tact.p_secRun;
+                m_secRun[0] = m_tact.p_secRun; //forget Delete
                 OnPropertyChanged();
                 OnPropertyChanged("p_fProgress");
             }
+        }
+
+        public void Clear()
+        {
+            p_sStrip = "";
+            m_secReady = 0;
         }
 
         public double[] m_secRun = new double[2] { 0, 1 }; 
@@ -81,16 +87,20 @@ namespace Root_TactTime
             picker.p_eColor = TactTime.eColor.From;
             p_eColor = TactTime.eColor.To;
             if (bDrag) m_tact.AddSequence(picker.p_id, p_id);
-            picker.m_loader.Move(m_rpLoc - picker.m_rpLoc); 
-            m_tact.AddEvent(Picker.m_secPickerPut, "Picker Put"); 
+            double secNow = Math.Max(picker.m_loader.m_secReady, m_secReady); 
+            picker.m_loader.Move(ref secNow, m_rpLoc - picker.m_rpLoc); 
+            picker.m_loader.AddEvent(ref secNow, picker.m_secPickerPut, "Picker Put"); 
             p_sStrip = picker.p_sStrip; 
-            picker.p_sStrip = ""; 
+            picker.p_sStrip = "";
+            picker.m_loader.m_secReady = secNow; 
         }
 
-        public void WaitDone()
+        public double m_secReady = 0; 
+        public void WaitDone(ref double secNow, Loader loader)
         {
-            double secDone = m_secRun[1] - (m_tact.p_secRun - m_secRun[0]);
-            if (secDone > 0) m_tact.AddEvent(secDone, p_id + " Wait Done"); 
+            double secDone = m_secRun[1] - (secNow - m_secRun[0]);
+            if (secDone > 0) loader.AddEvent(ref secNow, secDone, p_id + " Wait Done");
+            m_secReady = secNow; 
         }
 
         public enum eType
