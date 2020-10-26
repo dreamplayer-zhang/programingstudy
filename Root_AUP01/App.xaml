@@ -41,11 +41,11 @@
                                 <ContentPresenter ContentSource="Header" RecognizesAccessKey="true" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                                   TextElement.FontFamily="Arial"
                                                   TextElement.FontWeight="Bold"
-                                                  TextElement.FontSize="12"/>
+                                                  TextElement.FontSize="{TemplateBinding FontSize}"/>
 
                             </Border>
                             <ContentPresenter Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                            <Border Grid.Row="1" Grid.RowSpan="3" Grid.ColumnSpan="4"  BorderThickness="1" BorderBrush="Black" CornerRadius="0">
+                            <Border Grid.Row="1" Grid.RowSpan="3" Grid.ColumnSpan="4"  BorderThickness="1" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="0">
                                 <Border.OpacityMask>
                                     <MultiBinding Converter="{StaticResource BorderGapMaskConverter}" ConverterParameter="7">
                                         <Binding ElementName="Header" Path="ActualWidth" />

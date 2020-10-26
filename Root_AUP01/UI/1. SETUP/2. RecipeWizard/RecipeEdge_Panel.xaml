@@ -16,6 +16,8 @@
                 <StackPanel Margin="0,10,0,0">
                     <Button Content="Spec"
                             Style="{StaticResource SetupPanelBtn}"/>
+                    <Button Content="Snap"
+                            Style="{StaticResource SetupPanelBtn}"/>
                     <Button Content="Inspection"
                             Style="{StaticResource SetupPanelBtn}"/>
                 </StackPanel>
@@ -25,10 +27,10 @@
                         VerticalAlignment="Bottom"/>
             </Grid>
         </Border>
-        <Grid Grid.Column="1" x:Name="SubPanel">
+        <Grid Grid.Column="1">
             <ScrollViewer>
                 <StackPanel>
-                    <Grid Height="838">
+                    <Grid Height="832">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="4*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -37,27 +39,31 @@
 
                         <Grid Grid.Column="0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="75*"/>
-                                <ColumnDefinition Width="25*"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <GroupBox Grid.Column="0"
-                          Header="Scan Image">
+                            <GroupBox Grid.Column="0" Header="Left">
                                 <ScrollViewer>
-                                    <Grid Background="Black">
-                                    </Grid>
+                                    <Grid Background="Black"/>
                                 </ScrollViewer>
                             </GroupBox>
-                            <Grid Grid.Column="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="2*"/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <GroupBox Header="Thumbnail" Grid.Row="0">
-                                    <Grid Background="Black">
-
-                                    </Grid>
-                                </GroupBox>
-                            </Grid>
+                            <GroupBox Grid.Column="1" Header="Top">
+                                <ScrollViewer>
+                                    <Grid Background="Black"/>
+                                </ScrollViewer>
+                            </GroupBox>
+                            <GroupBox Grid.Column="2" Header="Right">
+                                <ScrollViewer>
+                                    <Grid Background="Black"/>
+                                </ScrollViewer>
+                            </GroupBox>
+                            <GroupBox Grid.Column="3" Header="Bottom">
+                                <ScrollViewer>
+                                    <Grid Background="Black"/>
+                                </ScrollViewer>
+                            </GroupBox>
                         </Grid>
                         <GridSplitter Grid.Column="1" 
                               HorizontalAlignment="Stretch" 
@@ -72,10 +78,10 @@
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="1*"/>
                                     <RowDefinition Height="2*"/>
-                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="3*"/>
+                                    <RowDefinition Height="3*"/>
                                 </Grid.RowDefinitions>
                                 <GroupBox Grid.Row="0" Header="Option">
                                     <Grid Margin="10,5">
@@ -89,7 +95,7 @@
                                             <RowDefinition/>
                                         </Grid.RowDefinitions>
 
-                                        <TextBlock FontSize="12" Text="Enable Backside Insp." Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                        <TextBlock FontSize="12" Text="Enable Edge Insp." Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontSize="12" Text="Upload Image Size" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <TextBlock FontSize="12" Text="Upload Image Res." Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                         <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
@@ -114,28 +120,14 @@
                                 <GroupBox Grid.Row="1" Header="Illumination">
                                     <Grid Margin="10,5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition/>
-                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="1.3*"/>
+                                            <ColumnDefinition Width="1.7*"/>
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition/>
-                                            <RowDefinition/>
-                                            <RowDefinition/>
-                                            <RowDefinition/>
-                                        </Grid.RowDefinitions>
-                                        <TextBlock FontSize="12" Text="R" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                        <TextBlock FontSize="12" Text="G" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                        <TextBlock FontSize="12" Text="B" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                        <TextBlock FontSize="12" Text="White" Style="{StaticResource BasicTb}" Grid.Row="3"/>
-                                        <Slider Grid.Column="1" Grid.Row="0" VerticalAlignment="Center"/>
-                                        <Slider Grid.Column="1" Grid.Row="1" VerticalAlignment="Center"/>
-                                        <Slider Grid.Column="1" Grid.Row="2" VerticalAlignment="Center"/>
-                                        <Slider Grid.Column="1" Grid.Row="3" VerticalAlignment="Center"/>
-                                        <TextBox Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                        <TextBox Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                        <TextBox Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                        <TextBox Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+
+                                        <TextBlock FontSize="12" Text="Edge White LED" Style="{StaticResource BasicTb}"/>
+                                        <Slider Grid.Column="1" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Column="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="2" Header="Spec">
@@ -278,7 +270,5 @@
                 </StackPanel>
             </ScrollViewer>
         </Grid>
-
-
     </Grid>
 </UserControl>

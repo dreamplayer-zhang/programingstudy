@@ -71,6 +71,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\Recipe45D_Panel.xaml.cs">
+      <DependentUpon>Recipe45D_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipeBackside_Panel.xaml.cs">
+      <DependentUpon>RecipeBackside_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipeLADS_Panel.xaml.cs">
+      <DependentUpon>RecipeLADS_Panel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\3. RUN\Run_Panel.xaml.cs">
       <DependentUpon>Run_Panel.xaml</DependentUpon>
     </Compile>
@@ -88,12 +97,6 @@
     </Compile>
     <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipeOption_Panel.xaml.cs">
       <DependentUpon>RecipeOption_Panel.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipePattern_Panel.xaml.cs">
-      <DependentUpon>RecipePattern_Panel.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipePellicle_Panel.xaml.cs">
-      <DependentUpon>RecipePellicle_Panel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipeWizard_Panel.xaml.cs">
       <DependentUpon>RecipeWizard_Panel.xaml</DependentUpon>
@@ -137,6 +140,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\1. SETUP\2. RecipeWizard\Recipe45D_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. SETUP\2. RecipeWizard\RecipeBackside_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. SETUP\2. RecipeWizard\RecipeLADS_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\3. RUN\Run_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -158,14 +173,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. SETUP\2. RecipeWizard\RecipeOption_Panel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\1. SETUP\2. RecipeWizard\RecipePattern_Panel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\1. SETUP\2. RecipeWizard\RecipePellicle_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -230,7 +230,7 @@
                                 <RowDefinition Height="0.5*"/>
                                 <RowDefinition Height="0.5*"/>
                             </Grid.RowDefinitions>
-                            <GroupBox Header="Pellicle Expansion">
+                            <GroupBox Header="Pellicle Expanding">
                                 <UniformGrid Margin="10" Rows="3" Columns="2">
                                     <TextBlock Text="Result" VerticalAlignment="Center"/>
                                     <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
