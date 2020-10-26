@@ -209,65 +209,127 @@
 
                             </Grid>
                             <Grid Grid.Column="1" Grid.Row="1" Background="Black" Margin="5">
-                                
+
                             </Grid>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="Result" Grid.Column="1">
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
                         <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
+                                <RowDefinition Height="0.5*"/>
+                                <RowDefinition Height="0.5*"/>
+                                <RowDefinition Height="0.5*"/>
                                 <RowDefinition/>
                                 <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
+                                <RowDefinition Height="0.5*"/>
+                                <RowDefinition Height="0.5*"/>
+                                <RowDefinition Height="0.5*"/>
                             </Grid.RowDefinitions>
                             <GroupBox Header="Pellicle Expansion">
-                                <!--<DataGrid IsReadOnly="True" Margin="5">
-                                <DataGrid.Resources>
-                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
-                                                             Color="Gainsboro"/>
-                                </DataGrid.Resources>
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Haze" Width="0.6*"/>
-                                    <DataGridTextColumn Header="Expand" Width="0.6*"/>
-                                    <DataGridTextColumn Header="Pellicle Defect" Width="1.1*"/>
-                                    <DataGridTextColumn Header="Pellicle Shift" Width="1*"/>
-                                    <DataGridTextColumn Header="Barcode" Width="0.8*"/>
-                                    <DataGridTextColumn Header="Align Key" Width="*"/>
-                                    <DataGridTextColumn Header="Pattern Discolor" Width="1.2*"/>
-                                    <DataGridTextColumn Header="Pattern Shift" Width="1.1*"/>
-                                    <DataGridTextColumn Header="Edge Broken" Width="1.1*"/>
-                                </DataGrid.Columns>
-                            </DataGrid>-->
+                                <UniformGrid Margin="10" Rows="3" Columns="2">
+                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Min" VerticalAlignment="Center"/>
+                                    <TextBlock Text="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Max" VerticalAlignment="Center"/>
+                                    <TextBlock Text="0" VerticalAlignment="Center"/>
+                                </UniformGrid>
                             </GroupBox>
                             <GroupBox Header="Pellicle Haze" Grid.Row="1">
-                                
+                                <UniformGrid Margin="10" Rows="1" Columns="2">
+                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
+                                </UniformGrid>
                             </GroupBox>
-                            <GroupBox Header="Pellicle Defect" Grid.Row="2">
-
+                            <GroupBox Header="Pattern Discolor" Grid.Row="2">
+                                <UniformGrid Margin="10" Rows="1" Columns="2">
+                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
+                                </UniformGrid>
                             </GroupBox>
-                            <GroupBox Header="Pellicle Shift" Grid.Row="3">
-
+                            <GroupBox Header="Align Key Exist" Grid.Row="3">
+                                <UniformGrid Margin="10" Rows="1" Columns="2">
+                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
+                                </UniformGrid>
                             </GroupBox>
-                            <GroupBox Header="Barcode Scratch" Grid.Column="1">
-                                
+                            <GroupBox Header="Pattern Shift" Grid.Row="4">
+                                <UniformGrid Margin="10" Rows="3" Columns="2">
+                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Text="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Angle" VerticalAlignment="Center"/>
+                                    <TextBlock Text="0" VerticalAlignment="Center"/>
+                                </UniformGrid>
                             </GroupBox>
-                            <GroupBox Header="Align Key" Grid.Column="1" Grid.Row="1">
-
+                            <GroupBox Header="Pellicle Shift" Grid.Row="5">
+                                <UniformGrid Margin="10" Rows="3" Columns="2">
+                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Center" VerticalAlignment="Center"/>
+                                    <TextBlock Text="0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Angle" VerticalAlignment="Center"/>
+                                    <TextBlock Text="0" VerticalAlignment="Center"/>
+                                </UniformGrid>
                             </GroupBox>
-                            <GroupBox Header="Pattern Discolor" Grid.Column="1" Grid.Row="2">
-
+                            <GroupBox Header="Pellicle FrontSide" Grid.Row="6">
+                                <UniformGrid Margin="10" Rows="1" Columns="2">
+                                    <TextBlock Text="Pellicle FrontSide" VerticalAlignment="Center"/>
+                                    <TextBlock Text="0" VerticalAlignment="Center"/>
+                                </UniformGrid>
                             </GroupBox>
-                            <GroupBox Header="Pattern Shift" Grid.Column="1" Grid.Row="3">
-
+                            <GroupBox Header="Barcode Scratch" Grid.Row="7">
+                                <UniformGrid Margin="10" Rows="1" Columns="2">
+                                    <TextBlock Text="Defect Count" VerticalAlignment="Center"/>
+                                    <TextBlock Text="0" VerticalAlignment="Center"/>
+                                </UniformGrid>
+                            </GroupBox>
+                            <GroupBox Header="Edge Broken" Grid.Row="8">
+                                <UniformGrid Margin="10" Rows="1" Columns="2">
+                                    <TextBlock Text="Defect Count" VerticalAlignment="Center"/>
+                                    <TextBlock Text="0" VerticalAlignment="Center"/>
+                                </UniformGrid>
                             </GroupBox>
                         </Grid>
-                    </GroupBox>
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="2*"/>
+                            </Grid.RowDefinitions>
+                            <GroupBox Header="Defect Image" Grid.Row="0">
+                                <Grid Background="Black"/>
+                            </GroupBox>
+                            <GroupBox Header="Defect List" Grid.Row="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <WrapPanel>
+                                        <CheckBox Content="All" Margin="3"/>
+                                        <CheckBox Content="Pellicle" Margin="3"/>
+                                        <CheckBox Content="Barcode" Margin="3"/>
+                                        <CheckBox Content="Edge" Margin="3"/>
+                                    </WrapPanel>
+                                    <DataGrid Background="White" Grid.Row="1">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Index" Width="50"/>
+                                            <DataGridTextColumn Header="Location" Width="*"/>
+                                            <DataGridTextColumn Header="Size" Width="*"/>
+                                            <DataGridTextColumn Header="GV" Width="50"/>
+                                            <DataGridTextColumn Header="Defect Code" Width="*"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
         </StackPanel>

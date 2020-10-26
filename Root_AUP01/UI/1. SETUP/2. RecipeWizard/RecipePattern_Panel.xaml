@@ -25,7 +25,9 @@
                         VerticalAlignment="Bottom"/>
             </Grid>
         </Border>
-        <Grid Grid.Column="1" x:Name="SubPanel"/>
+        <Grid Grid.Column="1" x:Name="SubPanel">
+            
+        </Grid>
 
 
     </Grid>
