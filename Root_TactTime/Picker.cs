@@ -74,21 +74,6 @@ namespace Root_TactTime
             module.m_secReady = secNow; 
         }
 
-        public void MoveFrom(Picker picker, bool bDrag)
-        {
-            m_tact.ClearColor();
-            picker.p_eColor = TactTime.eColor.From;
-            p_eColor = TactTime.eColor.To;
-            if (bDrag) m_tact.AddSequence(picker.p_id, p_id);
-            double secNow = Math.Max(m_loader.m_secReady, picker.m_loader.m_secReady);
-            m_loader.Move(ref secNow, picker.m_loader.m_rp - m_rpLoc);
-            m_loader.AddEvent(ref secNow, picker.m_secPickerPut, "Picker Put");
-            p_sStrip = picker.p_sStrip;
-            picker.p_sStrip = "";
-            m_loader.m_secReady = secNow; 
-            picker.m_loader.m_secReady = secNow; 
-        }
-
         public Loader m_loader; 
         public CPoint m_cpLoc;
         public RPoint m_rpLoc;

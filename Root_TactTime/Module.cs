@@ -53,12 +53,10 @@ namespace Root_TactTime
                         }
                         break;
                     case eType.Unload:
-                        if (value != "") m_tact.p_nUnload++; 
                         _sStrip = ""; 
                         break;
                     default: _sStrip = value; break; 
                 }
-                m_secRun[0] = m_tact.p_secRun; //forget Delete
                 OnPropertyChanged();
                 OnPropertyChanged("p_fProgress");
             }
@@ -67,6 +65,7 @@ namespace Root_TactTime
         public void Clear()
         {
             p_sStrip = "";
+            m_secRun[0] = 0; 
             m_secReady = 0;
         }
 
@@ -89,8 +88,10 @@ namespace Root_TactTime
             if (bDrag) m_tact.AddSequence(picker.p_id, p_id);
             double secNow = Math.Max(picker.m_loader.m_secReady, m_secReady); 
             picker.m_loader.Move(ref secNow, m_rpLoc - picker.m_rpLoc); 
-            picker.m_loader.AddEvent(ref secNow, picker.m_secPickerPut, "Picker Put"); 
-            p_sStrip = picker.p_sStrip; 
+            picker.m_loader.AddEvent(ref secNow, picker.m_secPickerPut, "Picker Put");
+            m_secRun[0] = secNow;
+            p_sStrip = picker.p_sStrip;
+            if (m_eType == eType.Unload) m_tact.Unload(secNow);
             picker.p_sStrip = "";
             picker.m_loader.m_secReady = secNow; 
         }
@@ -117,6 +118,7 @@ namespace Root_TactTime
         {
             m_tact = tact; 
             p_id = id;
+            m_secRun[0] = 0;
             m_secRun[1] = secRun;
             m_cpLoc = cpLoc;
             m_rpLoc = rpLoc; 

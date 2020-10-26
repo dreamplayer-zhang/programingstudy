@@ -27,29 +27,28 @@ namespace Root_TactTime
         #endregion
 
         #region Unload & TactTime
-        int _nUnload = 0; 
-        public int p_nUnload
+        int m_nUnload = 0; 
+        double m_secUnload0 = 0;
+        public void Unload(double secUnload)
         {
-            get { return _nUnload; }
-            set
+            if (m_nUnload > 0) p_secTact = (secUnload - m_secUnload0) / m_nUnload;
+            else
             {
-                if (_nUnload == value) return;
-                _nUnload = value;
-                if (_nUnload == 1) m_secUnload0 = p_secRun; 
-                OnPropertyChanged();
-                OnPropertyChanged("p_secTact");
+                m_secUnload0 = secUnload;
+                p_secTact = 0; 
             }
+            m_nUnload++;
         }
 
-        double m_secUnload0 = 0; //forget p_secRun -> 시간
+        double _secTact = 0; 
         public double p_secTact
         {
-            get
+            get { return _secTact; }
+            set
             {
-                if (p_nUnload <= 1) return 0;
-                return Math.Round(100 * (p_secRun - m_secUnload0) / (p_nUnload - 1)) / 100; 
+                _secTact = Math.Round(100 * value) / 100;
+                OnPropertyChanged(); 
             }
-            set { }
         }
         #endregion
 
@@ -76,7 +75,8 @@ namespace Root_TactTime
             m_iStrip = 0;
             foreach (Module module in m_aModule) module.Clear();
             foreach (Loader loader in m_aLoader) loader.Clear();
-            p_nUnload = 0; 
+            m_nUnload = 0;
+            p_secTact = 0; 
             if (bClearSequence) m_aSequence.Clear();
         }
 
@@ -170,13 +170,7 @@ namespace Root_TactTime
             {
                 Picker picker = GetPicker(sequence.m_sTo);
                 module = GetModule(sequence.m_sFrom);
-                if (module != null)
-                {
-                    picker.MoveFrom(module, false);
-                    return; 
-                }
-                Picker pickerFrom = GetPicker(sequence.m_sFrom);
-                if (pickerFrom != null) picker.MoveFrom(pickerFrom, false); 
+                if (module != null) picker.MoveFrom(module, false);
             }
         }
 

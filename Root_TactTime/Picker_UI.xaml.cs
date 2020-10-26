@@ -44,17 +44,7 @@ namespace Root_TactTime
         {
             if (m_picker.p_sStrip != "") return;
             Module module = (Module)e.Data.GetData("Module");
-            if (module != null)
-            {
-                m_picker.MoveFrom(module, true);
-                return;
-            }
-            Picker picker = (Picker)e.Data.GetData("Picker");
-            if (picker != null)
-            {
-                m_picker.MoveFrom(picker, true);
-                return;
-            }
+            if (module != null) m_picker.MoveFrom(module, true);
         }
         #endregion
     }

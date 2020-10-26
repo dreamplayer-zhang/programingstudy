@@ -15,8 +15,9 @@ namespace Root_TactTime.Pine2
             aModule.Add(new Module(tact, "MGZ Unoad", 2, new CPoint(50, 200), new RPoint(0, 0.4), Module.eType.Unload));
             aModule.Add(new Module(tact, "Boat0", 12, new CPoint(450, 100), new RPoint(0.6, 0)));
             aModule.Add(new Module(tact, "Boat1", 12, new CPoint(450, 200), new RPoint(0.6, 0.4)));
-            aModule.Add(new Module(tact, "Boat2", 12.5, new CPoint(450, 300), new RPoint(0.6, 0.8)));
-            aModule.Add(new Module(tact, "Boat3", 12.5, new CPoint(450, 400), new RPoint(0.6, 1.2)));
+            aModule.Add(new Module(tact, "Buffer Pad", 0, new CPoint(450, 300), new RPoint(0.6, 0.8)));
+            aModule.Add(new Module(tact, "Boat2", 12.5, new CPoint(450, 400), new RPoint(0.6, 0.8)));
+            aModule.Add(new Module(tact, "Boat3", 12.5, new CPoint(450, 500), new RPoint(0.6, 1.2)));
 
             m_loader = new Loader(tact, "Loader");
             tact.m_aLoader.Add(m_loader);
