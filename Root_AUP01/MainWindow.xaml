@@ -16,7 +16,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="85*"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="15*"/>
@@ -24,18 +24,18 @@
         <!--Title Bar Start-->
         <Grid Grid.Row="0"
               Name="TitleBar"
-              Background="{StaticResource MainThema}"
+              Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
               MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <StackPanel Orientation="Horizontal">
-                <icon:AtiLogo Width="30"
-                           Height="18"
+                <icon:AtiLogo Width="25"
+                           Height="15"
                            VerticalAlignment="Center"
-                           Margin="3" />
+                           Margin="5"/>
                 <TextBlock Text="AOP01"
                        Foreground="White"
                        VerticalAlignment="Center"
                        FontSize="15"
-                       Margin="5,0,0,0"
+                       Margin="0,0,0,0"
                        Grid.Column="1" />
             </StackPanel>
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
@@ -83,16 +83,16 @@
         </Grid>
         <!--Title Bar End-->
         <Border Grid.Row="1"
-                        Background="{StaticResource ControlBackGround}"
-                        BorderBrush="DimGray"
-                        BorderThickness="0,0,0,0">
+                Background="{StaticResource ControlBackGround}"
+                BorderBrush="DimGray"
+                BorderThickness="0,0,0,0">
             <StackPanel Orientation="Horizontal">
                 <Menu>
                     <MenuItem Background="{StaticResource ControlBackGround}"
                                   BorderBrush="#FF707070"
                                   BorderThickness="0,0,0,0">
                         <MenuItem.Header>
-                            <Grid Width="70" Height="25">
+                            <Grid Width="70" Height="30">
                                 <TextBlock Text="File"
                                                FontSize="13"
                                                FontWeight="Bold"

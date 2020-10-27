@@ -1,12 +1,15 @@
-﻿using System.Windows.Input;
+﻿using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Root_AOP01
 {
     class RecipeWizard_ViewModel : ObservableObject
     {
-
         public RecipeWizard_Panel RecipeWizard = new RecipeWizard_Panel();
-        public RecipeOption_Panel RecipeOption = new RecipeOption_Panel();
+
+        public RecipeSummary_Page RecipeSummary = new RecipeSummary_Page();
+        public RecipeOption_Page RecipeOption = new RecipeOption_Page();
+
         public Recipe45D_Panel Recipe45D = new Recipe45D_Panel();
         public RecipeBackside_Panel RecipeBackside = new RecipeBackside_Panel();
         public RecipeEdge_Panel RecipeEdge = new RecipeEdge_Panel();
@@ -17,13 +20,37 @@ namespace Root_AOP01
         {
             m_Setup = setup;        
         }
+
+
+        public ICommand btnSummary
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    bool check = (bool)RecipeWizard.SummaryBtn.IsChecked;
+                    if (check)
+                    {
+                        RecipeWizard.OptionBtn.IsChecked = false;
+                        RecipeWizard.SummaryBtn.IsChecked = true;
+                        m_Setup.Set_RecipeSummary();
+                    }
+                });
+            }
+        }
         public ICommand btnRecipeOption
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    m_Setup.Set_RecipeOptionPanel();
+                    bool check = (bool)RecipeWizard.OptionBtn.IsChecked;
+                    if (check)
+                    {
+                        RecipeWizard.SummaryBtn.IsChecked = false;
+                        RecipeWizard.OptionBtn.IsChecked = true;
+                        m_Setup.Set_RecipeOption();
+                    }
                 });
             }
         }

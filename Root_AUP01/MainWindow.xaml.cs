@@ -10,12 +10,7 @@ namespace Root_AOP01
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
         #region Title Bar
-
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
@@ -64,7 +59,17 @@ namespace Root_AOP01
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if (!Directory.Exists(@"C:\Recipe\AOP01")) Directory.CreateDirectory(@"C:\Recipe\AOP01");
+
             Init();
+
+            if (this.WindowState == WindowState.Maximized)
+            {
+                MaximizeButton.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                NormalizeButton.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -72,6 +77,12 @@ namespace Root_AOP01
             ThreadStop();
         }
         #endregion
+
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
 
         #region Mode UI
         public SelectMode ModeSelect;
@@ -84,16 +95,16 @@ namespace Root_AOP01
         private Run_ViewModel m_Run;
         #endregion
 
-
         AOP01_Engineer m_engineer = new AOP01_Engineer();
 
         void Init()
         {
+            m_engineer.Init("AOP01");
+            //engineerUI.Init(m_engineer);
+
             Init_ViewModel();
             Init_UI();
 
-            //m_engineer.Init("AOP01");
-            //engineerUI.Init(m_engineer);
         }
         void Init_ViewModel()
         {
@@ -115,7 +126,7 @@ namespace Root_AOP01
         }
         void ThreadStop()
         {
-            //m_engineer.ThreadStop();
+            m_engineer.ThreadStop();
         }
 
     }

@@ -14,9 +14,19 @@ namespace Root_AOP01
         Setup_ViewModel m_Setup;
         public Home_ViewModel(Setup_ViewModel setup)
         {
-            m_Setup = setup;      
+            m_Setup = setup;
         }
 
+        public ICommand btnSummary
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    Home.SummaryBtn.IsChecked = true;
+                });
+            }
+        }
         public ICommand btnRecipeWizard
         {
             get

@@ -17,6 +17,7 @@
                 </Grid.ColumnDefinitions>
 
                 <GroupBox Grid.Column="0"
+                          BorderBrush="Black"
                               Margin="40,120"
                               Background="{StaticResource ControlBackGround}"
                               MouseEnter="GroupBox_MouseEnter"
@@ -36,7 +37,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid>
-                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/file_settings_127px.png" Margin="50"/>
+                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/file_settings_127px.png" Margin="70"/>
                         </Grid>
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
@@ -103,6 +104,7 @@
                       HorizontalAlignment="Center"
                       Y2="1"/>
                 <GroupBox Grid.Column="2"
+                          BorderBrush="Black"
                               Margin="40,120"
                               Background="{StaticResource ControlBackGround}"
                               MouseEnter="GroupBox_MouseEnter"
@@ -121,7 +123,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/system_task_127px.png" Margin="50"/>
+                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/system_task_127px.png" Margin="70"/>
                         </Grid>
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
@@ -187,6 +189,7 @@
                       HorizontalAlignment="Center"
                       Y2="1"/>
                 <GroupBox Grid.Column="4"
+                          BorderBrush="Black"
                               Margin="40,120"
                               Background="{StaticResource ControlBackGround}"
                               MouseEnter="GroupBox_MouseEnter"
@@ -205,8 +208,8 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/monitor_127px.png" Margin="50"/>
-                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/play_127px.png" Margin="60,60,60,90"/>
+                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/monitor_127px.png" Margin="70"/>
+                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/play_127px.png" Margin="70,80,70,110"/>
                         </Grid>
                         <Grid Grid.Row="1">
                             <TextBlock Text="Start"

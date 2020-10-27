@@ -20,7 +20,7 @@ namespace Root_AOP01
             {
                 return new RelayCommand(() =>
                 {
-                    m_Setup.Set_RecipeWizardPanel();
+                    m_Setup.Set_HomePanel();
                 });
             }
         }

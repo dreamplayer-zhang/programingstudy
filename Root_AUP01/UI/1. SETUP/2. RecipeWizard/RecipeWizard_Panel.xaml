@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_AOP01"
              mc:Ignorable="d" 
-             d:DesignHeight="832" d:DesignWidth="1892" Background="{StaticResource PanelBackGround}">
+             d:DesignHeight="866" d:DesignWidth="1912"
+             Background="{StaticResource PanelBackGround}">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="12*"/>
@@ -14,11 +15,13 @@
         <Border BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
             <Grid>
                 <StackPanel Margin="0,10,0,0">
-                    <Button Content="Recipe Summary" Background="AliceBlue"
-                            Style="{StaticResource SetupPanelBtn}"/>
-                    <Button Content="Recipe Option"
+                    <ToggleButton Content="Recipe Summary" x:Name="SummaryBtn"
+                                  Command="{Binding btnSummary}"
+                            Style="{StaticResource SetupPanelToggleBtn}"/>
+                    <ToggleButton Content="Recipe Option" x:Name="OptionBtn"
+                                  IsChecked="True"
                             Command="{Binding btnRecipeOption}"
-                            Style="{StaticResource SetupPanelBtn}"/>
+                            Style="{StaticResource SetupPanelToggleBtn}"/>
                     <Button Content="45D"
                             Command="{Binding btn45D}"
                             Style="{StaticResource SetupPanelBtn}"/>
@@ -38,7 +41,9 @@
                         VerticalAlignment="Bottom"/>
             </Grid>
         </Border>
-        <Grid Grid.Column="1" x:Name="SubPanel"/>
+        <Grid Grid.Column="1" x:Name="SubPanel">
+            
+        </Grid>
 
 
     </Grid>

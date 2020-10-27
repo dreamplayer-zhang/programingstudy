@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Root_AOP01
 {
@@ -46,7 +47,6 @@ namespace Root_AOP01
         RecipeEdge_ViewModel m_RecipeEdge;
         RecipeLADS_ViewModel m_RecipeLADS;
 
-
         public Setup_ViewModel(MainWindow mainwindow)
         {
             m_MainWindow = mainwindow;
@@ -72,8 +72,12 @@ namespace Root_AOP01
         }
         void Init_NaviBtn()
         {
-            Navi_Home = new NaviBtn("Home");
-            Navi_Home.Btn.Click += NaviHomeBtn_Click;
+            Navi_Setup = new NaviBtn("Setup");
+            Navi_Setup.Arrow.Visibility = Visibility.Collapsed;
+            Navi_Setup.Btn.Click += NaviHomeBtn_Click;
+
+            Navi_SetupSummary = new NaviBtn("Summary");
+            Navi_SetupSummary.Btn.Click += NaviSetupSummaryBtn_Click;
 
             Navi_Maintenance = new NaviBtn("Maintenance");
             Navi_Maintenance.Btn.Click += NaviMaintBtn_Click;
@@ -86,6 +90,8 @@ namespace Root_AOP01
 
             Navi_RecipeOption = new NaviBtn("Recipe Option");
             Navi_RecipeOption.Btn.Click += NaviRecipeOptionBtn_Click;
+            Navi_RecipeSummary = new NaviBtn("Recipe Summary");
+            Navi_RecipeSummary.Btn.Click += NaviRecipeSummaryBtn_Click;
             Navi_45D = new NaviBtn("45D");
             Navi_45D.Btn.Click += Navi45DBtn_Click;
             Navi_Backside = new NaviBtn("Backside");
@@ -97,90 +103,109 @@ namespace Root_AOP01
 
         }
 
+        private void NaviSetupSummaryBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Set_HomePanel();
+        }
+
         #region Navigation
 
         #region Navi Btns
 
-        NaviBtn Navi_Home;
-        NaviBtn Navi_Maintenance;
-        NaviBtn Navi_GEM;
-
-        NaviBtn Navi_RecipeWizard;
-        NaviBtn Navi_RecipeOption;
-        NaviBtn Navi_45D;
-        NaviBtn Navi_Backside;
-        NaviBtn Navi_Edge;
-        NaviBtn Navi_LADS;
+        public NaviBtn Navi_Setup;
+        public NaviBtn Navi_SetupSummary;
+        public NaviBtn Navi_Maintenance;
+        public NaviBtn Navi_GEM;
+        public NaviBtn Navi_RecipeWizard;
+        public NaviBtn Navi_RecipeSummary;
+        public NaviBtn Navi_RecipeOption;
+        public NaviBtn Navi_45D;
+        public NaviBtn Navi_Backside;
+        public NaviBtn Navi_Edge;
+        public NaviBtn Navi_LADS;
 
         #endregion
 
         #region NaviBtn Event
+        public ICommand btnNaviSetupHome
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    Set_HomePanel();
+                });
+            }
+        }
         private void NaviLADSBtn_Click(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            Set_RecipeLADSPanel();
         }
-
         private void NaviEdgeBtn_Click(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            Set_RecipeEdgePanel();
         }
-
         private void NaviBacksideBtn_Click(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            Set_RecipeBacksidePanel();
         }
-
         private void Navi45DBtn_Click(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            Set_Recipe45DPanel();
         }
-
+        private void NaviRecipeSummaryBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Set_RecipeSummary();
+        }
         private void NaviRecipeOptionBtn_Click(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            Set_RecipeOption();
         }
-
         private void NaviRecipeWizardBtn_Click(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            Set_RecipeWizardPanel();
         }
-
         private void NaviGEMBtn_Click(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            Set_GEMPanel();
         }
-
         private void NaviMaintBtn_Click(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            Set_MaintenancePanel();
         }
-
         private void NaviHomeBtn_Click(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            Set_HomePanel();
         }
 
         #endregion
 
-        #region Panel Change Method
+        #region Panel change Method
         public void Set_HomePanel()
         {
             NaviButtons.Clear();
-
+            NaviButtons.Add(Navi_Setup);
+            NaviButtons.Add(Navi_SetupSummary);
             CurrentPanel = m_Home.Home;
             CurrentPanel.DataContext = m_Home;
         }
         public void Set_RecipeWizardPanel()
         {
             NaviButtons.Clear();
-            NaviButtons.Add(Navi_RecipeWizard);
-
-            CurrentPanel = m_RecipeWizard.RecipeWizard;
-            CurrentPanel.DataContext = m_RecipeWizard;
+            if (m_RecipeWizard.RecipeWizard.SubPanel.Children.Count > 0)
+            {
+                if (m_RecipeWizard.RecipeWizard.SubPanel.Children[0] == m_RecipeWizard.RecipeSummary)
+                    Set_RecipeSummary();
+                if (m_RecipeWizard.RecipeWizard.SubPanel.Children[0] == m_RecipeWizard.RecipeOption)
+                    Set_RecipeOption();
+            }
+            else
+                Set_RecipeSummary();          
         }
         public void Set_MaintenancePanel()
         {
             NaviButtons.Clear();
+            NaviButtons.Add(Navi_Setup);
             NaviButtons.Add(Navi_Maintenance);
 
             CurrentPanel = m_Maintenance.Maintenance;
@@ -189,6 +214,7 @@ namespace Root_AOP01
         public void Set_GEMPanel()
         {
             NaviButtons.Clear();
+            NaviButtons.Add(Navi_Setup);
             NaviButtons.Add(Navi_GEM);
 
             CurrentPanel = m_GEM.GEM;
@@ -197,6 +223,7 @@ namespace Root_AOP01
         public void Set_Recipe45DPanel()
         {
             NaviButtons.Clear();
+            NaviButtons.Add(Navi_Setup);
             NaviButtons.Add(Navi_RecipeWizard);
             NaviButtons.Add(Navi_45D);
 
@@ -206,6 +233,7 @@ namespace Root_AOP01
         public void Set_RecipeBacksidePanel()
         {
             NaviButtons.Clear();
+            NaviButtons.Add(Navi_Setup);
             NaviButtons.Add(Navi_RecipeWizard);
             NaviButtons.Add(Navi_Backside);
 
@@ -215,6 +243,7 @@ namespace Root_AOP01
         public void Set_RecipeEdgePanel()
         {
             NaviButtons.Clear();
+            NaviButtons.Add(Navi_Setup);
             NaviButtons.Add(Navi_RecipeWizard);
             NaviButtons.Add(Navi_Edge);
 
@@ -224,6 +253,7 @@ namespace Root_AOP01
         public void Set_RecipeLADSPanel()
         {
             NaviButtons.Clear();
+            NaviButtons.Add(Navi_Setup);
             NaviButtons.Add(Navi_RecipeWizard);
             NaviButtons.Add(Navi_LADS);
 
@@ -233,11 +263,45 @@ namespace Root_AOP01
         public void Set_RecipeOptionPanel()
         {
             NaviButtons.Clear();
+            NaviButtons.Add(Navi_Setup);
             NaviButtons.Add(Navi_RecipeWizard);
             NaviButtons.Add(Navi_RecipeOption);
 
             CurrentPanel = m_RecipeWizard.RecipeOption;
             CurrentPanel.DataContext = m_RecipeOption;
+        }
+        #endregion
+
+        #region Page Change Method
+        public void Set_RecipeSummary()
+        {
+            NaviButtons.Clear();
+            NaviButtons.Add(Navi_Setup);
+            NaviButtons.Add(Navi_RecipeWizard);
+            NaviButtons.Add(Navi_RecipeSummary);
+
+            m_RecipeWizard.RecipeWizard.SubPanel.Children.Clear();
+            m_RecipeWizard.RecipeWizard.SubPanel.Children.Add(m_RecipeWizard.RecipeSummary);
+            m_RecipeWizard.RecipeWizard.SummaryBtn.IsChecked = true;
+            m_RecipeWizard.RecipeWizard.OptionBtn.IsChecked = false;
+
+            CurrentPanel = m_RecipeWizard.RecipeWizard;
+            CurrentPanel.DataContext = m_RecipeWizard;
+        }
+        public void Set_RecipeOption()
+        {
+            NaviButtons.Clear();
+            NaviButtons.Add(Navi_Setup);
+            NaviButtons.Add(Navi_RecipeWizard);
+            NaviButtons.Add(Navi_RecipeOption);
+
+            m_RecipeWizard.RecipeWizard.SubPanel.Children.Clear();
+            m_RecipeWizard.RecipeWizard.SubPanel.Children.Add(m_RecipeWizard.RecipeOption);
+            m_RecipeWizard.RecipeWizard.SummaryBtn.IsChecked = false;
+            m_RecipeWizard.RecipeWizard.OptionBtn.IsChecked = true;
+
+            CurrentPanel = m_RecipeWizard.RecipeWizard;
+            CurrentPanel.DataContext = m_RecipeWizard;
         }
         #endregion
 

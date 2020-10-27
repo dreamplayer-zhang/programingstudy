@@ -4,12 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="20"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
+    <StackPanel Orientation="Horizontal">
+        
         <Border Margin="1"
+                x:Name="Arrow"
+                Width="20"
                 Background="LightBlue">
             <TextBlock Text=">"
                        VerticalAlignment="Center"
@@ -23,5 +22,5 @@
                 Background="LightBlue"
                 BorderBrush="{x:Null}"/>
 
-    </Grid>
+    </StackPanel>
 </UserControl>
