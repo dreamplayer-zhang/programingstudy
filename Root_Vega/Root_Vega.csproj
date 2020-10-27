@@ -133,6 +133,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Module\D2DInsp.cs" />
+    <Compile Include="UI\2_10_BevelEdgeBoxViewModel.cs" />
     <Compile Include="UI\2_8_D2D_Insp.xaml.cs">
       <DependentUpon>2_8_D2D_Insp.xaml</DependentUpon>
     </Compile>
@@ -299,6 +300,9 @@
     </Compile>
     <Compile Include="Setting\Setting_RADSViewModel.cs" />
     <Compile Include="UI\2_RecipeViewModel.cs" />
+    <Compile Include="UI\2_10_BevelEdgeBox.xaml.cs">
+      <DependentUpon>2_10_BevelEdgeBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Vega_Engineer.cs" />
     <Compile Include="Vega_Engineer_UI.xaml.cs">
       <DependentUpon>Vega_Engineer_UI.xaml</DependentUpon>
@@ -525,6 +529,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Styles\Purple.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2_10_BevelEdgeBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
