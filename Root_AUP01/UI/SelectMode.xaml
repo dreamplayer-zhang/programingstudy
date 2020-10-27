@@ -36,7 +36,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid>
-                            <Image Source="Resource/file_settings_127px.png" Margin="70"/>
+                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/file_settings_127px.png" Margin="50"/>
                         </Grid>
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
@@ -121,7 +121,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <Image Source="Resource/system_task_127px.png" Margin="70"/>
+                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/system_task_127px.png" Margin="50"/>
                         </Grid>
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
@@ -204,7 +204,10 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-
+                        <Grid Grid.Row="0">
+                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/monitor_127px.png" Margin="50"/>
+                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/play_127px.png" Margin="60,60,60,90"/>
+                        </Grid>
                         <Grid Grid.Row="1">
                             <TextBlock Text="Start"
                                        Style="{StaticResource BasicTb}"

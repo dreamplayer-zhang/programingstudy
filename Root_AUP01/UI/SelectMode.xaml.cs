@@ -20,9 +20,14 @@ namespace Root_AOP01
     /// </summary>
     public partial class SelectMode : UserControl
     {
+        MainWindow m_MainWindow;
         public SelectMode()
         {
             InitializeComponent();
+        }
+        public void Init(MainWindow main)
+        {
+            m_MainWindow = main;
         }
         private void GroupBox_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -34,17 +39,20 @@ namespace Root_AOP01
         }
         private void Setup_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-
+            m_MainWindow.MainPanel.Children.Clear();
+            m_MainWindow.MainPanel.Children.Add(m_MainWindow.Setup);
         }
 
         private void Review_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-
+            m_MainWindow.MainPanel.Children.Clear();
+            m_MainWindow.MainPanel.Children.Add(m_MainWindow.Setup);
         }
 
         private void Run_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-
+            m_MainWindow.MainPanel.Children.Clear();
+            m_MainWindow.MainPanel.Children.Add(m_MainWindow.Run);
         }
     }
 }

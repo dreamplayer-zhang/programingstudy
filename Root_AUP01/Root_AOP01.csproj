@@ -71,6 +71,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UI\3. RUN\Run_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\4. GEM\GEM_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\3. Maintenance\Maintenance_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\1. Home\Home_ViewModel.cs" />
+    <Compile Include="MVVM\ObservableObject.cs" />
+    <Compile Include="MVVM\PropertySupport.cs" />
+    <Compile Include="MVVM\RelayCommand.cs" />
+    <Compile Include="Control\Button\NaviBtn.xaml.cs">
+      <DependentUpon>NaviBtn.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeOption_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\Recipe45D_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeBackside_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeEdge_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeLADS_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipeWizard_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\Setup_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\Recipe45D_Panel.xaml.cs">
       <DependentUpon>Recipe45D_Panel.xaml</DependentUpon>
     </Compile>
@@ -86,9 +103,6 @@
     <Compile Include="UI\1. SETUP\4. GEM\GEM_Panel.xaml.cs">
       <DependentUpon>GEM_Panel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipeSummary_Page.xaml.cs">
-      <DependentUpon>RecipeSummary_Page.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\1. SETUP\3. Maintenance\Maintenance_Panel.xaml.cs">
       <DependentUpon>Maintenance_Panel.xaml</DependentUpon>
     </Compile>
@@ -101,17 +115,11 @@
     <Compile Include="UI\1. SETUP\2. RecipeWizard\RecipeWizard_Panel.xaml.cs">
       <DependentUpon>RecipeWizard_Panel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1. SETUP\1. Home\HomeSummary_Page.xaml.cs">
-      <DependentUpon>HomeSummary_Page.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\1. SETUP\1. Home\Home_Panel.xaml.cs">
       <DependentUpon>Home_Panel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\SelectMode2.xaml.cs">
-      <DependentUpon>SelectMode2.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. SETUP\Setup_Panel.xaml.cs">
       <DependentUpon>Setup_Panel.xaml</DependentUpon>
@@ -140,6 +148,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\Button\NaviBtn.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1. SETUP\2. RecipeWizard\Recipe45D_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -160,10 +172,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1. SETUP\2. RecipeWizard\RecipeSummary_Page.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\1. SETUP\3. Maintenance\Maintenance_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -177,10 +185,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. SETUP\2. RecipeWizard\RecipeWizard_Panel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\1. SETUP\1. Home\HomeSummary_Page.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -223,10 +227,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UI\SelectMode.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\SelectMode2.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

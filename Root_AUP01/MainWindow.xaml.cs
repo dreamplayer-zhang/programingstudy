@@ -73,16 +73,49 @@ namespace Root_AOP01
         }
         #endregion
 
+        #region Mode UI
+        public SelectMode ModeSelect;
+        public Setup_Panel Setup;
+        public Run_Panel Run;
+        #endregion
+
+        #region ViewModel
+        private Setup_ViewModel m_Setup;
+        private Run_ViewModel m_Run;
+        #endregion
+
+
         AOP01_Engineer m_engineer = new AOP01_Engineer();
+
         void Init()
         {
-            m_engineer.Init("AOP01");
-            engineerUI.Init(m_engineer);
-        }
+            Init_ViewModel();
+            Init_UI();
 
+            //m_engineer.Init("AOP01");
+            //engineerUI.Init(m_engineer);
+        }
+        void Init_ViewModel()
+        {
+            m_Setup = new Setup_ViewModel(this);
+            m_Run = new Run_ViewModel(this);
+        }
+        void Init_UI()
+        {
+            ModeSelect = new SelectMode();
+            ModeSelect.Init(this);
+
+            Setup = new Setup_Panel();
+            Setup.DataContext = m_Setup;
+
+            Run = new Run_Panel();
+
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(ModeSelect);
+        }
         void ThreadStop()
         {
-            m_engineer.ThreadStop();
+            //m_engineer.ThreadStop();
         }
 
     }

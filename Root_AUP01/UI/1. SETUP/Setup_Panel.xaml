@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Root_AOP01"
              mc:Ignorable="d" 
              d:DesignHeight="866" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
+
     <ScrollViewer>
         <StackPanel>
             <Grid Height="866">
@@ -39,7 +40,7 @@
                                     Command="{Binding p_CurrentPanel.DataContext.btnBack}"
                                     Background="{StaticResource ControlBackGround}">
                                     <StackPanel Orientation="Horizontal">
-                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/arrow_pointing_left_127px.png" Margin="3"/>
+                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/arrow_pointing_left_127px.png" Margin="5"/>
                                     </StackPanel>
                                 </Button>
                             </Grid>
@@ -50,7 +51,7 @@
                                     Command="{Binding btnNaviSetupHome}"
                                     Background="{StaticResource ControlBackGround}">
                                     <StackPanel Orientation="Horizontal">
-                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/home_127px.png" Margin="3"/>
+                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/home_127px.png" Margin="5"/>
                                     </StackPanel>
                                 </Button>
                             </Grid>
@@ -60,7 +61,7 @@
                                     ToolTip="Load Recipe"
                                     Background="{StaticResource ControlBackGround}">
                                     <StackPanel Orientation="Horizontal">
-                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/folder_127px.png" Margin="3"/>
+                                        <Image Source="/Root_AOP01;component/Control/Icon/Resource/folder_127px.png" Margin="5"/>
                                         <!--<TextBlock Text="Load"/>-->
                                     </StackPanel>
                                 </Button>
@@ -72,7 +73,7 @@
                                     Background="{StaticResource ControlBackGround}">
                                     <Button.Content>
                                         <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/save_127px.png" Margin="3"/>
+                                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/save_127px.png" Margin="5"/>
                                             <!--<TextBlock Text="Save"/>-->
                                         </StackPanel>
                                     </Button.Content>
@@ -90,7 +91,7 @@
                                 Background="LightBlue"
                                 BorderBrush="{x:Null}"
                                 Content="Setup"/>
-                                <ItemsControl ItemsSource="{Binding p_NaviButtons}">
+                                <ItemsControl ItemsSource="{Binding NaviButtons}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal"/>
@@ -103,10 +104,9 @@
                     </Grid>
                 </Border>
                 <!--Panel-->
-                <Grid Grid.Row="1"/>
+                <ContentControl Content="{Binding CurrentPanel}" Grid.Row="1"/>
 
             </Grid>
-
         </StackPanel>
     </ScrollViewer>
 </UserControl>

@@ -16,13 +16,14 @@ using System.Windows.Shapes;
 namespace Root_AOP01
 {
     /// <summary>
-    /// SelectMode2.xaml에 대한 상호 작용 논리
+    /// NaviBtn.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class SelectMode2 : UserControl
+    public partial class NaviBtn : UserControl
     {
-        public SelectMode2()
+        public NaviBtn(string name)
         {
             InitializeComponent();
+            Btn.Content = name;
         }
     }
 }

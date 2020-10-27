@@ -7,7 +7,6 @@
         xmlns:icon="clr-namespace:Root_AOP01.Icon"
         mc:Ignorable="d"
         WindowStyle="None"
-        WindowState="Maximized"
         AllowsTransparency="False"
         ResizeMode="CanResizeWithGrip"
         Height="1080" Width="1920" 
@@ -158,11 +157,9 @@
                 </Menu>
             </StackPanel>
         </Border>
-        <Grid Grid.Row="2" x:Name="MainPanel">
-            <local:SelectMode2/>
-            <local:AOP01_Engineer_UI x:Name="engineerUI" Opacity="0"/>
-            <local:SelectMode Opacity="0"/>
-        </Grid>
+        <Grid Grid.Row="2" x:Name="MainPanel"/>
+
+
 
         <!--Log Area Start-->
         <GridSplitter Grid.Row="3" 

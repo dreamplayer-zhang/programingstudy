@@ -117,7 +117,15 @@
 
                                     </Grid>
                                 </GroupBox>
-                                <GroupBox Header="Pellicle Expanding" Grid.Row="4">
+
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="3*"/>
+                                    <RowDefinition Height="5*"/>
+                                </Grid.RowDefinitions>
+                                <GroupBox Header="Pellicle Expanding" Grid.Row="0">
                                     <Grid Margin="10,5">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="3*"/>
@@ -136,9 +144,9 @@
                                         <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
                                     </Grid>
                                 </GroupBox>
-                                <GroupBox Grid.Row="5"  Header="Insepction Info"
+                                <GroupBox Grid.Row="1"  Header="Insepction Info"
                                   Background="{StaticResource GroupBoxBackground}">
-                                    <DataGrid IsReadOnly="True" Grid.Row="1">
+                                    <DataGrid IsReadOnly="True">
                                         <DataGrid.Resources>
                                             <Style TargetType="DataGridColumnHeader">
                                                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -152,10 +160,6 @@
                                         </DataGrid.Columns>
                                     </DataGrid>
                                 </GroupBox>
-
-                            </Grid>
-                            <Grid Grid.Column="1">
-
                             </Grid>
 
                         </Grid>

@@ -14,15 +14,22 @@
         <Border BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
             <Grid>
                 <StackPanel Margin="0,10,0,0">
-                    <Button Content="Recipe Summary"
+                    <Button Content="Recipe Summary" Background="AliceBlue"
                             Style="{StaticResource SetupPanelBtn}"/>
                     <Button Content="Recipe Option"
+                            Command="{Binding btnRecipeOption}"
+                            Style="{StaticResource SetupPanelBtn}"/>
+                    <Button Content="45D"
+                            Command="{Binding btn45D}"
+                            Style="{StaticResource SetupPanelBtn}"/>
+                    <Button Content="Backside"
+                            Command="{Binding btnBackside}"
                             Style="{StaticResource SetupPanelBtn}"/>
                     <Button Content="Edge"
+                            Command="{Binding btnEdge}"
                             Style="{StaticResource SetupPanelBtn}"/>
-                    <Button Content="Pellicle"
-                            Style="{StaticResource SetupPanelBtn}"/>
-                    <Button Content="Pattern"
+                    <Button Content="LADS"
+                            Command="{Binding btnLADS}"
                             Style="{StaticResource SetupPanelBtn}"/>
                 </StackPanel>
                 <Button Content="Back"
