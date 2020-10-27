@@ -207,67 +207,79 @@ namespace RootTools.Inspects
 					VSDataDT = VSDBManager.GetDataTable("Data");
 				}
 
-				int stride = ImageWidth / 8;
-				string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
+				//int stride = ImageWidth / 8;
+				//string target_path = System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".tif");
 
-				System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
+				//System.Windows.Media.Imaging.BitmapPalette myPalette = System.Windows.Media.Imaging.BitmapPalettes.WebPalette;
 
-				System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
-				System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
-				encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
+				//System.IO.FileStream stream = new System.IO.FileStream(target_path, System.IO.FileMode.Create);
+				//System.Windows.Media.Imaging.TiffBitmapEncoder encoder = new System.Windows.Media.Imaging.TiffBitmapEncoder();
+				//encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
 
 				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-
-				foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
+				using (FileStream fs = new FileStream(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".vega_image"), FileMode.Create))
 				{
-					System.Data.DataRow dataRow = VSDataDT.NewRow();
-
-					dataRow["No"] = item["idx"];
-					dataRow["DCode"] = item["ClassifyCode"];
-					dataRow["AreaSize"] = item["AreaSize"];
-					dataRow["Length"] = item["Length"];
-					dataRow["Width"] = item["Width"];
-					dataRow["Height"] = item["Height"];
-					dataRow["FOV"] = item["FOV"];
-					int posX = Convert.ToInt32(item["PosX"]);
-					int posY = Convert.ToInt32(item["PosY"]);
-
-					if (refPosDictionary != null)
+					foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
 					{
-						if (refPosDictionary.ContainsKey(Convert.ToInt32(item["ClassifyCode"])))
+						System.Data.DataRow dataRow = VSDataDT.NewRow();
+
+						dataRow["No"] = item["idx"];
+						dataRow["DCode"] = item["ClassifyCode"];
+						dataRow["AreaSize"] = item["AreaSize"];
+						dataRow["Length"] = item["Length"];
+						dataRow["Width"] = item["Width"];
+						dataRow["Height"] = item["Height"];
+						dataRow["FOV"] = item["FOV"];
+						int posX = Convert.ToInt32(item["PosX"]);
+						int posY = Convert.ToInt32(item["PosY"]);
+
+						if (refPosDictionary != null)
 						{
-							//보정 기본 좌표가 있는 경우 보정 기준 좌표를 적용한다
-							posX -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].X;
-							posY -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].Y;
+							if (refPosDictionary.ContainsKey(Convert.ToInt32(item["ClassifyCode"])))
+							{
+								//보정 기본 좌표가 있는 경우 보정 기준 좌표를 적용한다
+								posX -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].X;
+								posY -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].Y;
+							}
 						}
+						dataRow["PosX"] = posX;
+						dataRow["PosY"] = posY;
+
+						dataRow["TdiImageExist"] = 1;
+						dataRow["VrsImageExist"] = 0;
+
+						VSDataDT.Rows.Add(dataRow);
+
+
+						//TODO 
+						//  int,int,bytes 무한반복
+
+
+						double fPosX = Convert.ToDouble(item["PosX"]);
+						double fPosY = Convert.ToDouble(item["PosY"]);
+						CRect ImageSizeBlock = new CRect(
+								 (int)fPosX - ImageWidth / 2,
+								 (int)fPosY - ImageHeight / 2,
+								 (int)fPosX + ImageWidth / 2,
+								 (int)fPosY + ImageHeight / 2);
+						string pool = item["memPOOL"].ToString();
+						string group = item["memGROUP"].ToString();
+						string memory = item["memMEMORY"].ToString();
+						var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
+						var imageBytes = new ImageData(tempMem).GetRectByteArray(ImageSizeBlock);
+
+						fs.Write(BitConverter.GetBytes(ImageWidth), 0, sizeof(int));
+						fs.Write(BitConverter.GetBytes(ImageHeight), 0, sizeof(int));
+						fs.Write(imageBytes, 0, imageBytes.Length);
+						//encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(image.GetRectImage(ImageSizeBlock))));
 					}
-					dataRow["PosX"] = posX;
-					dataRow["PosY"] = posY;
-
-					dataRow["TdiImageExist"] = 1;
-					dataRow["VrsImageExist"] = 0;
-
-					VSDataDT.Rows.Add(dataRow);
-
-					double fPosX = Convert.ToDouble(item["PosX"]);
-					double fPosY = Convert.ToDouble(item["PosY"]); CRect ImageSizeBlock = new CRect(
-							 (int)fPosX - ImageWidth / 2,
-							 (int)fPosY - ImageHeight / 2,
-							 (int)fPosX + ImageWidth / 2,
-							 (int)fPosY + ImageHeight / 2);
-					string pool = item["memPOOL"].ToString();
-					string group = item["memGROUP"].ToString();
-					string memory = item["memMEMORY"].ToString();
-					var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
-					var image = new ImageData(tempMem);
-					encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(image.GetRectImage(ImageSizeBlock))));
 				}
 
-				if (VSDataDT.Rows.Count > 0)
-				{
-					encoder.Save(stream);
-				}
-				stream.Dispose();
+				//if (VSDataDT.Rows.Count > 0)
+				//{
+				//	encoder.Save(stream);
+				//}
+				//stream.Dispose();
 
 				VSDBManager.SetDataTable(VSDataInfoDT);
 				VSDBManager.SetDataTable(VSDataDT);
