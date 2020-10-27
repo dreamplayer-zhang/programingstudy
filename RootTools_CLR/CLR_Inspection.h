@@ -58,7 +58,7 @@ namespace RootTools_CLR
 				int bufferwidth = memwidth;
 				int bufferheight = memHeight;
 
-				pInspSurface->SetParams(buffer, RoiRight - RoiLeft, RoiBottom - RoiTop, targetRect, 1, GV, DefectSize, bDark, threadindex);
+				pInspSurface->SetParams(buffer, bufferwidth, bufferheight, targetRect, 1, GV, DefectSize, bDark, threadindex);
 
 				//TODO 여기서 이벤트를 올리는 방식으로 변경한다
 				//여기 들어올때 이미 한 블럭에 대한 정보가 통째로 넘어오는 것이므로 구조 자체를 변경하여 AddDefect이 발생하는 순간을 여기서 포착하도록 수정한다

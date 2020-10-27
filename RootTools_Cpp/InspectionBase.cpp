@@ -120,7 +120,9 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	//	LPBYTE* ppBuffer = m_ppImageBuffer2;
 
 		// Copy Area
-	int nStart = 0, nEndX = Functions::GetWidth(rt), nEndY = Functions::GetHeight(rt);
+	int nStart = 0;
+	int nEndX = Functions::GetWidth(rt);
+	int nEndY = Functions::GetHeight(rt);
 
 	//inspbuffer2 = new byte[nEndX * nEndY*6];
 
@@ -131,7 +133,8 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	//		inspbuffer2[i * nW + j] = nBackGround;
 	//	}
 	//}
-
+	
+	//버퍼 복사를 이상하게 하고있음. 문제 확인 후 조치 필요함
 	for (INT64 i = nStart; i < nEndY; i++)
 	{
 		for (INT64 j = nStart; j < nEndX; j++)
@@ -141,7 +144,7 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 
 			INT64 iIndex = (ytarget)*nW + (xtarget);
 			inspbuffer[i + nOffset][nOffset + j] = mem[iIndex];
-			mem[iIndex] = 255;
+			//mem[iIndex] = 255;//테스트용 코드
 			//inspbuffer2[(i+nOffset)* nWidth + (nOffset + j)] = mem[(ytarget)*nW + (xtarget)];
 		}
 	} 

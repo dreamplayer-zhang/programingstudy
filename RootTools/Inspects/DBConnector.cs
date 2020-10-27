@@ -35,13 +35,6 @@ namespace RootTools.Inspects
 			IsInitialize = true;
 			Connected = false;
 		}
-		~DBConnector()
-		{
-			if (Connected)
-			{
-				oCnn.Close();
-			}
-		}
 		public void Close()
 		{
 			oCnn.Close();

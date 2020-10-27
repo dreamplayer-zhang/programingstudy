@@ -85,8 +85,8 @@ namespace RootTools
             Right = (int)endPoint.X;
             Bottom = (int)endPoint.Y;
 
-            X = ((Right - Left) / 2);
-            Y = ((Bottom - Top) / 2);
+            X = Left + Width / 2;
+            Y = Right + Height / 2;
         }
 
         public CRect(int cenx, int ceny, int size)
@@ -135,8 +135,8 @@ namespace RootTools
 				Bottom = t;
 				Top = b;
 			}
-			X = ((Right - Left) / 2);
-			Y = ((Bottom - Top) / 2);
+            X = Left + Width/2;
+            Y = Top + Height/2;
 		}
         /// <summary>
         /// Top,Left,Bottom,Right를 위치에 맞게 재정렬한다
@@ -162,8 +162,8 @@ namespace RootTools
                 result.Bottom = rect.Top;
                 result.Top = rect.Bottom;
             }
-            result.X = ((result.Right - result.Left) / 2);
-            result.Y = ((result.Bottom - result.Top) / 2);
+            result.X = result.Left + result.Width/2;
+            result.Y = result.Top + result.Height / 2;
 
             return result;
         }
