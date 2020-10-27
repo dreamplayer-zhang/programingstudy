@@ -28,7 +28,7 @@
                 <Button Content="Connect" Command="{Binding ConnectCommand}"/>
                 <Button Grid.Column="1" Content="DisConnect" Command="{Binding DisConnectCommand}"/>
                 <Button Grid.Column="2" Content="Live" Command="{Binding LiveGrabCommand}"/>
-                <Button Grid.Column="3" Content="Test" Command="{Binding TestCommand}"/>
+                <Button Grid.Column="3" Content="Stop" Command="{Binding StopGrabCommand}"/>
             </Grid>
             <tree:TreeUI x:Name="treeRootUI" Grid.Column="1"/>
         </Grid>
