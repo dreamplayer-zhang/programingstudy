@@ -86,7 +86,7 @@ namespace RootTools
 		}
 
 		public IntPtr m_ptrImg;
-		byte[] m_aBuf;
+		public byte[] m_aBuf;
 		byte[] m_aBufFileOpen;
 
 		ObservableCollection<object> m_element = new ObservableCollection<object>();
