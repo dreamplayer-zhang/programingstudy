@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -15,6 +16,7 @@ namespace RootTools.Camera.Matrox
 {
     public class Camera_Matrox : ObservableObject, ICamera
     {
+        Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
         public event EventHandler Grabed;
         BackgroundWorker bgw_Connect = new BackgroundWorker();
         ImageData m_ImageLive;
@@ -206,8 +208,8 @@ namespace RootTools.Camera.Matrox
             p_treeRoot = new TreeRoot(id, m_log);
             bgw_Connect.DoWork += bgw_Connect_Dowork;
             bgw_Connect.RunWorkerCompleted += bgw_Connect_RunWorkerCompleted;
-            m_ImageLive = new ImageData(640, 480);
-            p_ImageViewer = new ImageViewer_ViewModel(m_ImageLive);
+            m_ImageLive = new ImageData(1920, 1080, 1);
+            p_ImageViewer = new ImageViewer_ViewModel(m_ImageLive, null, _dispatcher);
             p_CamInfo = new MatroxCamInfo(m_log);
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
@@ -246,7 +248,7 @@ namespace RootTools.Camera.Matrox
                     // Digitizer
                     if (m_MilDigitizer == MIL.M_NULL)
                     {
-                        MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_DEFAULT, ref m_MilDigitizer);
+                        MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, /*p_CamInfo.p_sFile*/"M_DEFAULT", MIL.M_DEFAULT, ref m_MilDigitizer);
 
                         // Inquire the digitizer to determine the image buffer size
                         p_nImgBand = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_BAND, MIL.M_NULL);
@@ -261,7 +263,7 @@ namespace RootTools.Camera.Matrox
             // Buffer
             for (int i = 0; i<p_nBuf; i++)
             {
-                MIL.MbufAllocColor(m_MilSystem, (MIL_INT)p_nImgBand, (MIL_INT)p_nWidth, (MIL_INT)p_nHeight, 8 + MIL.M_UNSIGNED, lImgAttributes, ref m_MilBuffers[i]);
+                MIL.MbufAlloc2d(m_MilSystem, (MIL_INT)p_nWidth, (MIL_INT)p_nHeight, 8 + MIL.M_UNSIGNED, lImgAttributes, ref m_MilBuffers[i]);
             }
 
             return;
@@ -308,7 +310,7 @@ namespace RootTools.Camera.Matrox
             if (m_MilSystem == MIL.M_NULL) return;
             if (m_MilDisplay == MIL.M_NULL) return;
             if (m_MilDigitizer == MIL.M_NULL) return;
-            for (int i = 0; i<p_nBuf; i++)
+            for (int i = 0; i < p_nBuf; i++)
             {
                 if (m_MilBuffers[i] == MIL.M_NULL) return;
             }
@@ -317,18 +319,19 @@ namespace RootTools.Camera.Matrox
             GCHandle userObjectHandle = GCHandle.Alloc(userObject);
 
             MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(HookFunction);
-            MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_START, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_END, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
 
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
 
             int iBlock = 0;
-            while(iBlock < 10000)
+            while (iBlock < 10000)
             {
+                Thread.Sleep(100);
                 MIL.MdigGrab(m_MilDigitizer, m_MilBuffers[(iBlock) % p_nBuf]);
                 iBlock++;
             }
 
-            MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_START + MIL.M_UNHOOK, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_END + MIL.M_UNHOOK, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
 
             userObjectHandle.Free();
         }
@@ -339,6 +342,23 @@ namespace RootTools.Camera.Matrox
 
             // implement
             // 1-Frame 채워지면 들어오는 Callback함수 -> Frame Buffer에서 User Buffer로 복사하는 코드 넣어야 함
+            if (UserDataPtr != IntPtr.Zero)
+            {
+                GCHandle userObjectHandle = GCHandle.FromIntPtr(UserDataPtr);
+                UserDataObject userData = userObjectHandle.Target as UserDataObject;
+                if (userData != null)
+                {
+                    MIL.MbufGet2d(m_MilBuffers[(userData.NbGrabStart) % p_nBuf], 0, 0, p_nWidth, p_nHeight, m_ImageLive.m_aBuf);
+                    if (_dispatcher != null)
+                    {
+                        _dispatcher.Invoke(new Action(delegate ()
+                        {
+                            m_ImageLive.UpdateImage();
+                        }));
+                    }
+                    userData.NbGrabStart++;
+                }
+            }
             return 0;
         }
 
@@ -400,7 +420,8 @@ namespace RootTools.Camera.Matrox
             {
                 return new RelayCommand(delegate
                 {
-                    LiveGrab();
+                    Thread th = new Thread(new ThreadStart(LiveGrab));
+                    th.Start();
                 });
             }
         }
