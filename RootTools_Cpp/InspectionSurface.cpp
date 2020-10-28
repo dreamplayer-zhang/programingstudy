@@ -79,7 +79,15 @@ std::vector<DefectDataStruct> CInspectionSurface::SurfaceInspection(bool bAbsolu
 			{
 				//ret = GetPitsizer()->GetPitSize(pPos, x, y, 10000, nGrayLevel, nGrayLevel, 1, false);
 				int col = sizeof(inspbuffer[0]) / sizeof(byte);
-				ret = GetPitsizer()->GetPitSize(*inspbuffer, x, y, col, nGrayLevel, nGrayLevel, 1, false);
+				//bright검사는 -1, dark 검사는 1
+				if (GetDarkInspection())
+				{
+					ret = GetPitsizer()->GetPitSize(*inspbuffer, x, y, col, nGrayLevel, nGrayLevel, 1, false);
+				}
+				else 
+				{
+					ret = GetPitsizer()->GetPitSize(*inspbuffer, x, y, col, nGrayLevel, nGrayLevel, -1, false);
+				}
 				
 				if (GetLengthInspection())
 				{
