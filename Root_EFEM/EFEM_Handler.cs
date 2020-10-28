@@ -131,7 +131,8 @@ namespace Root_EFEM
         enum eAligner
         { 
             None,
-            ATI
+            ATI,
+            RND
         }
         eAligner m_eAligner = eAligner.ATI;
         void InitAligner()
@@ -139,7 +140,8 @@ namespace Root_EFEM
             ModuleBase module = null; 
             switch (m_eAligner)
             {
-                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break; 
+                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break;
+                case eAligner.RND: module = new Aligner_RND("Aligner", m_engineer); break; 
             }
             if (module != null)
             {

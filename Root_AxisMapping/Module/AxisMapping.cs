@@ -201,24 +201,29 @@ namespace Root_AxisMapping.Module
 
             Axis p_axis { get { return m_module.m_axisRotate; } }
             public double m_degRotate = 0;
-            int m_nPpR = 10000; 
+            int m_nPpR = 10000;
+            bool m_bInverse = false; 
             public override ModuleRunBase Clone()
             {
                 Run_Rotate run = new Run_Rotate(m_module);
                 run.m_degRotate = m_degRotate;
-                run.m_nPpR = m_nPpR; 
+                run.m_nPpR = m_nPpR;
+                run.m_bInverse = m_bInverse; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_degRotate = tree.Set(m_degRotate, m_degRotate, "Degree", "Axis Rotate (degree)", bVisible);
+                m_nPpR = tree.Set(m_nPpR, m_nPpR, "PnR", "Pulse / Round");
+                m_bInverse = tree.Set(m_bInverse, m_bInverse, "Inverse", "Rotate Direction"); 
             }
 
             public override string Run()
             {
                 double pulseRotate = m_nPpR * m_degRotate / 360;
-                p_axis.StartMove(pulseRotate);
+                if (m_bInverse) pulseRotate = -pulseRotate; 
+                p_axis.StartShift(pulseRotate);
                 return p_axis.WaitReady(); 
             }
         }

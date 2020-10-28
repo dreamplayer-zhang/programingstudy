@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Memory;
 using RootTools.Trees;
+using System;
 using System.Windows.Media;
 
 namespace Root_ASIS.AOI
@@ -105,14 +106,21 @@ namespace Root_ASIS.AOI
             Move,
             Resize,
         }
-        eShape m_eShape = eShape.None; 
+        eShape m_eShape = eShape.None;
 
+        CPoint m_dpMove = new CPoint();
+        CPoint m_dpResize = new CPoint(); 
         public void LBD(bool bDown, CPoint cpImg)
         {
             if (bDown && (m_eShape == eShape.None))
             {
-                m_cp0 = cpImg;
-                m_eShape = eShape.Set; 
+                m_eShape = CheckLBD(cpImg); 
+                switch (m_eShape)
+                {
+                    case eShape.Set: m_cp0 = cpImg; break;
+                    case eShape.Move: m_dpMove = cpImg - m_cp0; break;
+                    case eShape.Resize: m_dpResize = cpImg - m_sz; break; 
+                }
             }
             else if (m_eShape != eShape.None)
             {
@@ -125,12 +133,30 @@ namespace Root_ASIS.AOI
         {
             switch (m_eShape)
             {
-                case eShape.Set:
-                    m_sz.X = cpImg.X - m_cp0.X;
-                    m_sz.Y = cpImg.Y - m_cp0.Y;
-                    break;
+                case eShape.Set: m_sz = cpImg - m_cp0; break; 
+                case eShape.Move: m_cp0 = cpImg - m_dpMove; break;
+                case eShape.Resize: m_sz = cpImg - m_dpResize; break; 
                 default: break; 
             }
+        }
+
+        eShape CheckLBD(CPoint cpImg)
+        {
+            if (IsInside(cpImg) == false) return eShape.Set;
+            int dL = Math.Min(m_sz.X, m_sz.Y) / 3; 
+            CPoint dp = cpImg - m_cp0;
+            if ((dp.X < dL) && (dp.Y < dL)) return eShape.Move;
+            dp = m_sz - cpImg;
+            if ((dp.X < dL) && (dp.Y < dL)) return eShape.Resize;
+            return eShape.Set;
+        }
+
+        bool IsInside(CPoint cpImg)
+        {
+            CPoint dp = cpImg - m_cp0;
+            if ((dp.X < 0) || (dp.X > m_sz.X)) return false;
+            if ((dp.Y < 0) || (dp.Y > m_sz.Y)) return false;
+            return true; 
         }
         #endregion
 

@@ -5,7 +5,6 @@ using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
 using RootTools.Trees;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 
