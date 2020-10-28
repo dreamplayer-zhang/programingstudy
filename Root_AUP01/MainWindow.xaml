@@ -7,12 +7,16 @@
         xmlns:icon="clr-namespace:Root_AOP01.Icon"
         mc:Ignorable="d"
         WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
         AllowsTransparency="False"
         ResizeMode="CanResizeWithGrip"
         Height="1080" Width="1920" 
         Title="Root AOP01"
         Loaded="Window_Loaded"
         Closing="Window_Closing">
+    <Window.Resources>
+        <local:BooleanToVisiblityConverter x:Key="BooleanToVisiblity"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -136,9 +140,9 @@
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
-                            <MenuItem Header="Log" IsCheckable="True" x:Name="viewLog"/>
+                            <MenuItem Header="Log" IsCheckable="True" x:Name="viewLog" />
+                            <MenuItem Header="Alarm" IsCheckable="True" x:Name="viewAlarm" />
                             <MenuItem Header="FDC" IsCheckable="True" x:Name="viewFDC"/>
-                            <MenuItem Header="Alarm" IsCheckable="True" x:Name="viewAlarm"/>
 
 
                         </MenuItem>
@@ -167,7 +171,7 @@
                             <MenuItem Header="LoadPort">
 
                             </MenuItem>
-                            <MenuItem Header="Option">
+                            <MenuItem Header="Setting">
                                 
                             </MenuItem>
                         </MenuItem>
@@ -187,7 +191,7 @@
                             <MenuItem Header="Setup">
                                 <MenuItem Header="Recipe Wizard">
                                     <MenuItem Header="Recipe Summary" Click="NaviRecipeSummary_Click"/>
-                                    <MenuItem Header="Recipe Option" Click="NaviRecipeOption_Click"/>
+                                    <MenuItem Header="Recipe Spec" Click="NaviRecipeSpec_Click"/>
                                     <MenuItem Header="45D" Click="NaviRecipe45D_Click"/>
                                     <MenuItem Header="Backside" Click="NaviRecipeBackside_Click"/>
                                     <MenuItem Header="Edge" Click="NaviRecipeEdge_Click"/>
@@ -253,34 +257,36 @@
         <!--Log-->
         <Border Grid.Row="4" Grid.ColumnSpan="2" Panel.ZIndex="99">
             <TabControl>
-                <TabItem Width="50">
+                <TabItem Width="50" Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                     <TabItem.Header>
                         <TextBlock Text="Log" FontWeight="Bold"/>
                     </TabItem.Header>
-                    <Grid Height="200">
-                        <TabControl>
-                            <TabItem Header="ALL" FontSize="10">
-                                <TextBlock Text="Log Area" Margin="5"/>
-                            </TabItem>
-                            <TabItem Header="System" FontSize="10"/>
-                            <TabItem Header="Inspection" FontSize="10"/>
-                            <TabItem Header="I/O" FontSize="10"/>
-                            <TabItem Header="Network" FontSize="10"/>
-                            <TabItem Header="Result" FontSize="10"/>
-                        </TabControl>
-                    </Grid>
+                    <TabControl Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                        <TabItem Header="ALL" FontSize="10">
+                            <TextBlock Text="Log Area" Margin="5"/>
+                        </TabItem>
+                        <TabItem Header="System" FontSize="10"/>
+                        <TabItem Header="Inspection" FontSize="10"/>
+                        <TabItem Header="I/O" FontSize="10"/>
+                        <TabItem Header="Network" FontSize="10"/>
+                        <TabItem Header="Result" FontSize="10"/>
+                    </TabControl>
                 </TabItem>
-                <TabItem Width="50">
+                <TabItem Width="50" Visibility="{Binding ElementName=viewAlarm, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                     <TabItem.Header>
                         <TextBlock Text="Alarm" FontWeight="Bold"/>
                     </TabItem.Header>
-                    <Grid Height="200"/>
+                    <Grid Background="LightBlue" Visibility="{Binding ElementName=viewAlarm, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                        <TextBlock Text="Alarm"/>
+                    </Grid>
                 </TabItem>
-                <TabItem Width="50">
+                <TabItem Width="50" Visibility="{Binding ElementName=viewFDC, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                     <TabItem.Header>
                         <TextBlock Text="FDC" FontWeight="Bold"/>
                     </TabItem.Header>
-                    <Grid Height="200"/>
+                    <Grid Background="LightCoral" Visibility="{Binding ElementName=viewFDC, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                        <TextBlock Text="FDC"/>
+                    </Grid>
                 </TabItem>
             </TabControl>
         </Border>

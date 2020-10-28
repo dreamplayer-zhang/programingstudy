@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_AOP01
@@ -144,11 +145,11 @@ namespace Root_AOP01
             m_Setup.Set_RecipeSummary();
         }
 
-        private void NaviRecipeOption_Click(object sender, RoutedEventArgs e)
+        private void NaviRecipeSpec_Click(object sender, RoutedEventArgs e)
         {
             MainPanel.Children.Clear();
             MainPanel.Children.Add(Setup);
-            m_Setup.Set_RecipeOption();
+            m_Setup.Set_RecipeSpec();
         }
 
         private void NaviRecipe45D_Click(object sender, RoutedEventArgs e)
@@ -203,5 +204,6 @@ namespace Root_AOP01
             MainPanel.Children.Clear();
             MainPanel.Children.Add(Run);
         }
+
     }
 }

@@ -8,7 +8,7 @@ namespace Root_AOP01
         public RecipeWizard_Panel RecipeWizard = new RecipeWizard_Panel();
 
         public RecipeSummary_Page RecipeSummary = new RecipeSummary_Page();
-        public RecipeOption_Page RecipeOption = new RecipeOption_Page();
+        public RecipeSpec_Page RecipeSpec = new RecipeSpec_Page();
 
         public Recipe45D_Panel Recipe45D = new Recipe45D_Panel();
         public RecipeBackside_Panel RecipeBackside = new RecipeBackside_Panel();
@@ -28,11 +28,11 @@ namespace Root_AOP01
             {
                 return new RelayCommand(() =>
                 {
-                    bool check = (bool)RecipeWizard.SummaryBtn.IsChecked;
+                    bool check = (bool)RecipeWizard.btnSummary.IsChecked;
                     if (check)
                     {
-                        RecipeWizard.OptionBtn.IsChecked = false;
-                        RecipeWizard.SummaryBtn.IsChecked = true;
+                        RecipeWizard.btnSpec.IsChecked = false;
+                        RecipeWizard.btnSummary.IsChecked = true;
                         m_Setup.Set_RecipeSummary();
                     }
                 });
@@ -44,12 +44,12 @@ namespace Root_AOP01
             {
                 return new RelayCommand(() =>
                 {
-                    bool check = (bool)RecipeWizard.OptionBtn.IsChecked;
+                    bool check = (bool)RecipeWizard.btnSpec.IsChecked;
                     if (check)
                     {
-                        RecipeWizard.SummaryBtn.IsChecked = false;
-                        RecipeWizard.OptionBtn.IsChecked = true;
-                        m_Setup.Set_RecipeOption();
+                        RecipeWizard.btnSummary.IsChecked = false;
+                        RecipeWizard.btnSpec.IsChecked = true;
+                        m_Setup.Set_RecipeSpec();
                     }
                 });
             }

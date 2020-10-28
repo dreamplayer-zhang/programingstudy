@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_AOP01"
              mc:Ignorable="d" 
-             d:DesignHeight="832" d:DesignWidth="1892" Background="{StaticResource PanelBackGround}">
+             d:DesignHeight="836" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="12*"/>
@@ -30,7 +30,7 @@
         <Grid Grid.Column="1" x:Name="SubPanel">
             <ScrollViewer>
                 <StackPanel>
-                    <Grid Height="832">
+                    <Grid Height="836">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="4*"/>
                             <ColumnDefinition Width="Auto"/>
@@ -64,9 +64,9 @@
                                     <RowDefinition Height="6.5*"/>
                                 </Grid.RowDefinitions>
                                 <GroupBox Grid.Row="0" Header="Option">
-                                    <Grid Margin="10,5">
+                                    <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="2*"/>
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
@@ -101,32 +101,34 @@
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="1" Header="Illumination">
-                                    <Grid Margin="10,5">
+                                    <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="0.7*"/>
                                             <ColumnDefinition Width="1.3*"/>
-                                            <ColumnDefinition Width="1.7*"/>
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock FontSize="12" Text="Backside White LED" Style="{StaticResource BasicTb}"/>
+                                        <TextBlock FontSize="12" Text="White LED" Style="{StaticResource BasicTb}"/>
                                         <Slider Grid.Column="1" VerticalAlignment="Center"/>
-                                        <TextBox Grid.Column="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                        <TextBox Grid.Column="2" Style="{StaticResource BasicTbox}" Text="0" Width="80" Height="20"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="2" Header="Parttern DisColor">
-                                    <Grid Margin="10,5">
+                                    <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="2*"/>
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock FontSize="12" Text="Discolor Spec" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                        <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="0"/>
+                                        <TextBlock FontSize="12" Text="Discolor Spe(mm)" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                        <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="1" Width="80" Height="20" Grid.Column="1" Grid.Row="0"/>
+                                        <TextBlock Style="{StaticResource BasicTb}" Text="mm" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="3" Header="Align Key">
-                                    <Grid Margin="10,5">
+                                    <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="2*"/>
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
@@ -134,15 +136,18 @@
                                             <RowDefinition/>
                                         </Grid.RowDefinitions>
                                         <TextBlock FontSize="12" Text="Score" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="80" Width="80" Height="20" Grid.Column="1" Grid.Row="0"/>
+
                                         <TextBlock FontSize="12" Text="Spec" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                        <TextBox Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                        <TextBox Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                        <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0" Grid.Row="1"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="30" Width="80" Height="20" Grid.Column="1" Grid.Row="1"/>
+                                        <TextBlock Style="{StaticResource BasicTb}" Text="um" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0" Grid.Row="1"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="4" Header="Parttern Shift">
-                                    <Grid Margin="10,5">
+                                    <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="2*"/>
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
@@ -151,14 +156,16 @@
                                         </Grid.RowDefinitions>
                                         <TextBlock FontSize="12" Text="Score" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontSize="12" Text="Shift Spec" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                        <TextBox Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                        <TextBox Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                        <TextBox Grid.Column="2" Grid.Row="0" Text="80" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                        <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0" Grid.Row="1"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="0.5" Width="80" Height="20" Grid.Column="1" Grid.Row="1"/>
+                                        <TextBlock Style="{StaticResource BasicTb}" Text="mm" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0" Grid.Row="1"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="5" Header="Pellicle Shift">
-                                    <Grid Margin="10,5">
+                                    <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="2*"/>
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
@@ -167,8 +174,10 @@
                                         </Grid.RowDefinitions>
                                         <TextBlock FontSize="12" Text="Score" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontSize="12" Text="Shift Spec" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                                        <TextBox Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                        <TextBox Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                        <TextBox Grid.Column="2" Grid.Row="0" Text="80" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                        <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0" Grid.Row="1"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="0.3" Width="80" Height="20" Grid.Column="1" Grid.Row="1"/>
+                                        <TextBlock Style="{StaticResource BasicTb}" Text="mm" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0" Grid.Row="1"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="6" Header="Barcode Scratch">
@@ -178,9 +187,9 @@
                                             <RowDefinition Height="5*"/>
                                         </Grid.RowDefinitions>
                                         <GroupBox Header="Spec">
-                                            <Grid Margin="10,5">
+                                            <Grid Margin="5">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="3*"/>
+                                                    <ColumnDefinition Width="2*"/>
                                                     <ColumnDefinition Width="1*"/>
                                                 </Grid.ColumnDefinitions>
                                                 <Grid.RowDefinitions>
@@ -196,15 +205,15 @@
                                                 <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center" Width="85"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="1"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="2"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3"/>
+                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="1" Text="0"/>
+                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="2" Text="0"/>
+                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="3" Text="0"/>
                                             </Grid>
                                         </GroupBox>
                                         <GroupBox Header="Defect Code" Grid.Row="1">
-                                            <Grid Margin="10,5">
+                                            <Grid Margin="5">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="3*"/>
+                                                    <ColumnDefinition Width="2*"/>
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
                                                 <Grid.RowDefinitions>
@@ -284,9 +293,9 @@
                                     <RowDefinition Height="6*"/>
                                 </Grid.RowDefinitions>
                                 <GroupBox Header="Pattern Discolor" Grid.Row="0">
-                                    <Grid Margin="10,5">
+                                    <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="2*"/>
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
@@ -294,9 +303,9 @@
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Header="Align Key" Grid.Row="1">
-                                    <Grid Margin="10,5">
+                                    <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="2*"/>
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
@@ -304,9 +313,9 @@
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Header="Pattern Shift" Grid.Row="2">
-                                    <Grid Margin="10,5">
+                                    <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="2*"/>
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
@@ -323,9 +332,9 @@
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Header="Pellicle Shift" Grid.Row="3">
-                                    <Grid Margin="10,5">
+                                    <Grid Margin="5">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="2*"/>
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>

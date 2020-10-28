@@ -41,7 +41,7 @@ namespace Root_AOP01
         public GEM_ViewModel m_GEM;
 
         public RecipeWizard_ViewModel m_RecipeWizard;
-        public RecipeOption_ViewModel m_RecipeOption;
+        public RecipeSpec_ViewModel m_RecipeSpec;
         public Recipe45D_ViewModel m_Recipe45D;
         public RecipeBackside_ViewModel m_RecipeBackSide;
         public RecipeEdge_ViewModel m_RecipeEdge;
@@ -68,7 +68,7 @@ namespace Root_AOP01
             m_RecipeBackSide = new RecipeBackside_ViewModel(this);
             m_RecipeEdge = new RecipeEdge_ViewModel(this);
             m_RecipeLADS = new RecipeLADS_ViewModel(this);
-            m_RecipeOption = new RecipeOption_ViewModel(this);
+            m_RecipeSpec = new RecipeSpec_ViewModel(this);
         }
         void Init_NaviBtn()
         {
@@ -88,8 +88,8 @@ namespace Root_AOP01
             Navi_RecipeWizard = new NaviBtn("Recipe Wizard");
             Navi_RecipeWizard.Btn.Click += NaviRecipeWizardBtn_Click;
 
-            Navi_RecipeOption = new NaviBtn("Recipe Option");
-            Navi_RecipeOption.Btn.Click += NaviRecipeOptionBtn_Click;
+            Navi_RecipeSpec = new NaviBtn("Spec");
+            Navi_RecipeSpec.Btn.Click += NaviRecipeSpecBtn_Click;
             Navi_RecipeSummary = new NaviBtn("Recipe Summary");
             Navi_RecipeSummary.Btn.Click += NaviRecipeSummaryBtn_Click;
             Navi_45D = new NaviBtn("45D");
@@ -118,7 +118,7 @@ namespace Root_AOP01
         public NaviBtn Navi_GEM;
         public NaviBtn Navi_RecipeWizard;
         public NaviBtn Navi_RecipeSummary;
-        public NaviBtn Navi_RecipeOption;
+        public NaviBtn Navi_RecipeSpec;
         public NaviBtn Navi_45D;
         public NaviBtn Navi_Backside;
         public NaviBtn Navi_Edge;
@@ -157,9 +157,9 @@ namespace Root_AOP01
         {
             Set_RecipeSummary();
         }
-        private void NaviRecipeOptionBtn_Click(object sender, RoutedEventArgs e)
+        private void NaviRecipeSpecBtn_Click(object sender, RoutedEventArgs e)
         {
-            Set_RecipeOption();
+            Set_RecipeSpec();
         }
         private void NaviRecipeWizardBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -196,8 +196,8 @@ namespace Root_AOP01
             {
                 if (m_RecipeWizard.RecipeWizard.SubPanel.Children[0] == m_RecipeWizard.RecipeSummary)
                     Set_RecipeSummary();
-                if (m_RecipeWizard.RecipeWizard.SubPanel.Children[0] == m_RecipeWizard.RecipeOption)
-                    Set_RecipeOption();
+                if (m_RecipeWizard.RecipeWizard.SubPanel.Children[0] == m_RecipeWizard.RecipeSpec)
+                    Set_RecipeSpec();
             }
             else
                 Set_RecipeSummary();          
@@ -265,10 +265,10 @@ namespace Root_AOP01
             NaviButtons.Clear();
             NaviButtons.Add(Navi_Setup);
             NaviButtons.Add(Navi_RecipeWizard);
-            NaviButtons.Add(Navi_RecipeOption);
+            NaviButtons.Add(Navi_RecipeSpec);
 
-            CurrentPanel = m_RecipeWizard.RecipeOption;
-            CurrentPanel.DataContext = m_RecipeOption;
+            CurrentPanel = m_RecipeWizard.RecipeSpec;
+            CurrentPanel.DataContext = m_RecipeSpec;
         }
         #endregion
 
@@ -282,23 +282,23 @@ namespace Root_AOP01
 
             m_RecipeWizard.RecipeWizard.SubPanel.Children.Clear();
             m_RecipeWizard.RecipeWizard.SubPanel.Children.Add(m_RecipeWizard.RecipeSummary);
-            m_RecipeWizard.RecipeWizard.SummaryBtn.IsChecked = true;
-            m_RecipeWizard.RecipeWizard.OptionBtn.IsChecked = false;
+            m_RecipeWizard.RecipeWizard.btnSummary.IsChecked = true;
+            m_RecipeWizard.RecipeWizard.btnSpec.IsChecked = false;
 
             CurrentPanel = m_RecipeWizard.RecipeWizard;
             CurrentPanel.DataContext = m_RecipeWizard;
         }
-        public void Set_RecipeOption()
+        public void Set_RecipeSpec()
         {
             NaviButtons.Clear();
             NaviButtons.Add(Navi_Setup);
             NaviButtons.Add(Navi_RecipeWizard);
-            NaviButtons.Add(Navi_RecipeOption);
+            NaviButtons.Add(Navi_RecipeSpec);
 
             m_RecipeWizard.RecipeWizard.SubPanel.Children.Clear();
-            m_RecipeWizard.RecipeWizard.SubPanel.Children.Add(m_RecipeWizard.RecipeOption);
-            m_RecipeWizard.RecipeWizard.SummaryBtn.IsChecked = false;
-            m_RecipeWizard.RecipeWizard.OptionBtn.IsChecked = true;
+            m_RecipeWizard.RecipeWizard.SubPanel.Children.Add(m_RecipeWizard.RecipeSpec);
+            m_RecipeWizard.RecipeWizard.btnSummary.IsChecked = false;
+            m_RecipeWizard.RecipeWizard.btnSpec.IsChecked = true;
 
             CurrentPanel = m_RecipeWizard.RecipeWizard;
             CurrentPanel.DataContext = m_RecipeWizard;
