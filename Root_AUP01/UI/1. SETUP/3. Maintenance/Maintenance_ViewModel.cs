@@ -11,7 +11,16 @@ namespace Root_AOP01
         {
             m_Setup = setup;
         }
-
+        public ICommand btnSummary
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    Maintenance.EngineerBtn.IsChecked = true;
+                });
+            }
+        }
         public ICommand btnBack
         {
             get

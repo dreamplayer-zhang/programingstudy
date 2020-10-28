@@ -18,26 +18,29 @@
             <RowDefinition Height="25"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="85*"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="15*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <!--Title Bar Start-->
+        <!--Title Bar-->
         <Grid Grid.Row="0"
               Name="TitleBar"
-              Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+              Background="{DynamicResource MainThema}"
               MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <StackPanel Orientation="Horizontal">
-                <icon:AtiLogo Width="25"
-                           Height="15"
+                <Viewbox Margin="3" VerticalAlignment="Center">
+                    <icon:AtiLogo/>
+                </Viewbox>
+                <TextBlock Text="AOP01  -  Ver. 0.0.1"
+                           Foreground="White"
                            VerticalAlignment="Center"
-                           Margin="5"/>
-                <TextBlock Text="AOP01"
+                           FontSize="12"
+                           Margin="5,0,0,0"
+                           Grid.Column="1" />
+            </StackPanel>
+            <TextBlock Text="Recipe Name"
                        Foreground="White"
                        VerticalAlignment="Center"
-                       FontSize="15"
-                       Margin="0,0,0,0"
-                       Grid.Column="1" />
-            </StackPanel>
+                       HorizontalAlignment="Center"/>
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
                         HorizontalAlignment="Right"
                         Orientation="Horizontal"
@@ -69,7 +72,7 @@
                         Click="NormalizeButton_Click">
                     <Path Style="{StaticResource NormalizeIconKey}" />
                 </Button>
-                <Button Style="{StaticResource SystemButton}"
+                <!--<Button Style="{StaticResource SystemButton}"
                         x:Name="CloseButton"
                         Width="30"
                         Height="25"
@@ -78,111 +81,208 @@
                         Click="CloseButton_Click"
                         VerticalAlignment="Bottom">
                     <Path Style="{StaticResource CloseIconKey}" />
-                </Button>
+                </Button>-->
             </StackPanel>
         </Grid>
-        <!--Title Bar End-->
+
+        <!--Menu-->
         <Border Grid.Row="1"
                 Background="{StaticResource ControlBackGround}"
                 BorderBrush="DimGray"
                 BorderThickness="0,0,0,0">
-            <StackPanel Orientation="Horizontal">
-                <Menu>
-                    <MenuItem Background="{StaticResource ControlBackGround}"
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Menu Background="{StaticResource ControlBackGround}">
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  Width="70" Height="30"
+                                  Padding="0"
                                   BorderBrush="#FF707070"
                                   BorderThickness="0,0,0,0">
-                        <MenuItem.Header>
-                            <Grid Width="70" Height="30">
-                                <TextBlock Text="File"
+                            <MenuItem.Header>
+                                <Grid Width="70">
+                                    <TextBlock Text="File"
                                                FontSize="13"
                                                FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="New">
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="New">
 
-                        </MenuItem>
-                        <MenuItem Header="Load">
-
-                        </MenuItem>
-                        <MenuItem Header="Import">
-
-                        </MenuItem>
-                        <MenuItem Header="Save">
-
-                        </MenuItem>
-                        <MenuItem Header="Save As">
-
-                        </MenuItem>
-                    </MenuItem>
-                    <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
-                                  BorderThickness="0,0,0,0">
-                        <MenuItem.Header>
-                            <Grid Width="80" Height="25">
-                                <TextBlock Text="Navigation"
-                                               FontSize="13"
-                                               FontWeight="Bold"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="Setup">
-                            <MenuItem Header="Recipe Wizard">
-                                <MenuItem Header="Recipe Summary"/>
-                                <MenuItem Header="Recipe Option"/>
-                                <MenuItem Header="Edge"/>
-                                <MenuItem Header="Pellicle"/>
-                                <MenuItem Header="Pattern"/>
                             </MenuItem>
-                            <MenuItem Header="Matienance"/>
-                            <MenuItem Header="GEM"/>
+                            <MenuItem Header="Load">
+
+                            </MenuItem>
+                            <MenuItem Header="Import">
+
+                            </MenuItem>
+                            <MenuItem Header="Save">
+
+                            </MenuItem>
+                            <MenuItem Header="Save As">
+
+                            </MenuItem>
                         </MenuItem>
-                    </MenuItem>
-                    <MenuItem Background="{StaticResource ControlBackGround}"
+                        <MenuItem Background="{StaticResource ControlBackGround}"
                                   BorderBrush="#FF707070"
-                                  Command="{Binding btnMode}"
-                                  BorderThickness="0,0,0,0">
-                        <MenuItem.Header>
-                            <Grid Width="70" Height="25">
-                                <TextBlock Text="Exit"
+                                  Width="70"
+                                  BorderThickness="0,0,0,0" Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="70">
+                                    <TextBlock Text="View"
                                                FontSize="13"
                                                FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Log" IsCheckable="True" x:Name="viewLog"/>
+                            <MenuItem Header="FDC" IsCheckable="True" x:Name="viewFDC"/>
+                            <MenuItem Header="Alarm" IsCheckable="True" x:Name="viewAlarm"/>
+
+
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="70"
+                                  BorderThickness="0,0,0,0" Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="70">
+                                    <TextBlock Text="Tool"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Login">
+                                
+                            </MenuItem>
+                            <MenuItem Header="Alarm">
+
+                            </MenuItem>
+                            <MenuItem Header="RTR">
+
+                            </MenuItem>
+                            <MenuItem Header="LoadPort">
+
+                            </MenuItem>
+                            <MenuItem Header="Option">
+                                
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="100"
+                                  BorderThickness="0,0,0,0" Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="100">
+                                    <TextBlock Text="Navigation"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Setup">
+                                <MenuItem Header="Recipe Wizard">
+                                    <MenuItem Header="Recipe Summary" Click="NaviRecipeSummary_Click"/>
+                                    <MenuItem Header="Recipe Option" Click="NaviRecipeOption_Click"/>
+                                    <MenuItem Header="45D" Click="NaviRecipe45D_Click"/>
+                                    <MenuItem Header="Backside" Click="NaviRecipeBackside_Click"/>
+                                    <MenuItem Header="Edge" Click="NaviRecipeEdge_Click"/>
+                                    <MenuItem Header="LADS" Click="NaviRecipeLADS_Click"/>
+                                </MenuItem>
+                                <MenuItem Header="Matienance" Click="NaviMaintenance_Click"/>
+                                <MenuItem Header="GEM" Click="NaviGEM_Click"/>
+                            </MenuItem>
+                            <MenuItem Header="Review" Click="NaviReview_Click">
+                            </MenuItem>
+                            <MenuItem Header="Run" Click="NaviRun_click">
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="110"
+                                  BorderThickness="0,0,0,0" Padding="0"
+                                  Click="ModeSelect_Click">
+                            <MenuItem.Header>
+                                <Grid Width="110">
+                                    <TextBlock Text="Mode Select"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </Menu>
+                </StackPanel>
+                <Menu Background="{StaticResource ControlBackGround}" HorizontalAlignment="Right">
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                              Width="100" Height="30"
+                              Padding="0"
+                              HorizontalAlignment="Right"
+                              BorderBrush="#FF707070"
+                              BorderThickness="0,0,0,0" Click="CloseButton_Click">
+                        <MenuItem.Header>
+                            <Grid Width="100">
+                                <TextBlock Text="Exit"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>
                             </Grid>
                         </MenuItem.Header>
                     </MenuItem>
                 </Menu>
-            </StackPanel>
+            </Grid>
         </Border>
+
+        <!--Main Panel-->
         <Grid Grid.Row="2" x:Name="MainPanel"/>
 
-
-
-        <!--Log Area Start-->
+        <!--Splitter-->
         <GridSplitter Grid.Row="3" 
                       Height="3"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       Background="{StaticResource Splitter}"
                       ShowsPreview="True" Grid.ColumnSpan="2"/>
+        
+        <!--Log-->
         <Border Grid.Row="4" Grid.ColumnSpan="2" Panel.ZIndex="99">
             <TabControl>
-                <TabItem Header="ALL" FontSize="10">
-                    <TextBlock Text="Log Area" Margin="5"/>
+                <TabItem Width="50">
+                    <TabItem.Header>
+                        <TextBlock Text="Log" FontWeight="Bold"/>
+                    </TabItem.Header>
+                    <Grid Height="200">
+                        <TabControl>
+                            <TabItem Header="ALL" FontSize="10">
+                                <TextBlock Text="Log Area" Margin="5"/>
+                            </TabItem>
+                            <TabItem Header="System" FontSize="10"/>
+                            <TabItem Header="Inspection" FontSize="10"/>
+                            <TabItem Header="I/O" FontSize="10"/>
+                            <TabItem Header="Network" FontSize="10"/>
+                            <TabItem Header="Result" FontSize="10"/>
+                        </TabControl>
+                    </Grid>
                 </TabItem>
-                <TabItem Header="System" FontSize="10"/>
-                <TabItem Header="Inspection" FontSize="10"/>
-                <TabItem Header="I/O" FontSize="10"/>
-                <TabItem Header="Network" FontSize="10"/>
-                <TabItem Header="Result" FontSize="10"/>
+                <TabItem Width="50">
+                    <TabItem.Header>
+                        <TextBlock Text="Alarm" FontWeight="Bold"/>
+                    </TabItem.Header>
+                    <Grid Height="200"/>
+                </TabItem>
+                <TabItem Width="50">
+                    <TabItem.Header>
+                        <TextBlock Text="FDC" FontWeight="Bold"/>
+                    </TabItem.Header>
+                    <Grid Height="200"/>
+                </TabItem>
             </TabControl>
-
         </Border>
-        <!--Log End-->
-
-
     </Grid>
 </Window>

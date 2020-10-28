@@ -37,15 +37,15 @@ namespace Root_AOP01
         MainWindow m_MainWindow;
 
         Home_ViewModel m_Home;
-        Maintenance_ViewModel m_Maintenance;
-        GEM_ViewModel m_GEM;
+        public Maintenance_ViewModel m_Maintenance;
+        public GEM_ViewModel m_GEM;
 
-        RecipeWizard_ViewModel m_RecipeWizard;
-        RecipeOption_ViewModel m_RecipeOption;
-        Recipe45D_ViewModel m_Recipe45D;
-        RecipeBackside_ViewModel m_RecipeBackSide;
-        RecipeEdge_ViewModel m_RecipeEdge;
-        RecipeLADS_ViewModel m_RecipeLADS;
+        public RecipeWizard_ViewModel m_RecipeWizard;
+        public RecipeOption_ViewModel m_RecipeOption;
+        public Recipe45D_ViewModel m_Recipe45D;
+        public RecipeBackside_ViewModel m_RecipeBackSide;
+        public RecipeEdge_ViewModel m_RecipeEdge;
+        public RecipeLADS_ViewModel m_RecipeLADS;
 
         public Setup_ViewModel(MainWindow mainwindow)
         {

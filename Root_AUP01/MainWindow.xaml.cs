@@ -78,11 +78,13 @@ namespace Root_AOP01
         }
         #endregion
 
-        public MainWindow()
+        #region Other Event
+        private void ModeSelect_Click(object sender, RoutedEventArgs e)
         {
-            InitializeComponent();
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(ModeSelect);
         }
-
+        #endregion
 
         #region Mode UI
         public SelectMode ModeSelect;
@@ -97,14 +99,18 @@ namespace Root_AOP01
 
         AOP01_Engineer m_engineer = new AOP01_Engineer();
 
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
         void Init()
         {
-            m_engineer.Init("AOP01");
-            //engineerUI.Init(m_engineer);
-
             Init_ViewModel();
             Init_UI();
 
+            m_engineer.Init("AOP01");
+            m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
         }
         void Init_ViewModel()
         {
@@ -120,6 +126,8 @@ namespace Root_AOP01
             Setup.DataContext = m_Setup;
 
             Run = new Run_Panel();
+            Run.DataContext = this;
+
 
             MainPanel.Children.Clear();
             MainPanel.Children.Add(ModeSelect);
@@ -129,5 +137,71 @@ namespace Root_AOP01
             m_engineer.ThreadStop();
         }
 
+        private void NaviRecipeSummary_Click(object sender, RoutedEventArgs e)
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(Setup);
+            m_Setup.Set_RecipeSummary();
+        }
+
+        private void NaviRecipeOption_Click(object sender, RoutedEventArgs e)
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(Setup);
+            m_Setup.Set_RecipeOption();
+        }
+
+        private void NaviRecipe45D_Click(object sender, RoutedEventArgs e)
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(Setup);
+            m_Setup.Set_Recipe45DPanel();
+        }
+
+        private void NaviRecipeBackside_Click(object sender, RoutedEventArgs e)
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(Setup);
+            m_Setup.Set_RecipeBacksidePanel();
+        }
+
+        private void NaviRecipeEdge_Click(object sender, RoutedEventArgs e)
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(Setup);
+            m_Setup.Set_RecipeEdgePanel();
+        }
+
+        private void NaviRecipeLADS_Click(object sender, RoutedEventArgs e)
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(Setup);
+            m_Setup.Set_RecipeLADSPanel();
+        }
+
+        private void NaviMaintenance_Click(object sender, RoutedEventArgs e)
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(Setup);
+            m_Setup.Set_MaintenancePanel();
+        }
+
+        private void NaviGEM_Click(object sender, RoutedEventArgs e)
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(Setup);
+            m_Setup.Set_GEMPanel();
+        }
+
+        private void NaviReview_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void NaviRun_click(object sender, RoutedEventArgs e)
+        {
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(Run);
+        }
     }
 }
