@@ -133,6 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera\Matrox\Camera_Matrox.cs" />
+    <Compile Include="Camera\Matrox\Camera_Matrox_Classes.cs" />
     <Compile Include="Camera\Matrox\Camera_Matrox_UI.xaml.cs">
       <DependentUpon>Camera_Matrox_UI.xaml</DependentUpon>
     </Compile>

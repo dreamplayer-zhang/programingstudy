@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -14,16 +15,17 @@ namespace RootTools.Camera.Matrox
 {
     public class Camera_Matrox : ObservableObject, ICamera
     {
-        Dispatcher _dispatcher = null;
         public event EventHandler Grabed;
         BackgroundWorker bgw_Connect = new BackgroundWorker();
+        ImageData m_ImageLive;
 
-        public MIL_ID m_MilApplication; // Application -> 프로그램당 하나
-        public MIL_ID m_MilSystem;      // 프레임그래버
-        public MIL_ID m_MilDigitizer;   // 카메라
-        public MIL_ID m_MilDisplay;     // 디스플레이
-        public MIL_ID m_MilImage;      // 버퍼
 
+        public MIL_ID m_MilApplication;                     // Application -> 프로그램당 하나
+        public MIL_ID m_MilSystem;                          // 프레임그래버
+        public MIL_ID m_MilDigitizer;                       // 카메라
+        public MIL_ID m_MilDisplay;                         // 디스플레이
+        public MIL_ID[] m_MilBuffers = new MIL_ID[c_nBuf];  // 버퍼
+        
         int m_nWidth = 0;
         public int p_nWidth
         {
@@ -104,6 +106,34 @@ namespace RootTools.Camera.Matrox
             }
         }
 
+        MatroxCamInfo m_CamInfo;
+        public MatroxCamInfo p_CamInfo
+        {
+            get
+            {
+                return m_CamInfo;
+            }
+            set
+            {
+                SetProperty(ref m_CamInfo, value);
+            }
+        }
+        const int c_nBuf = 100;
+        int _nBuf = 100;
+        public int p_nBuf
+        {
+            get
+            {
+                return _nBuf;
+            }
+            set
+            {
+                SetProperty(ref _nBuf, value);
+                _nBuf = (value > c_nBuf) ? c_nBuf : value;
+            }
+        }
+        int m_nGrabTrigger = 0;
+
         public CPoint p_sz
         {
             get { return new CPoint(); }
@@ -150,8 +180,14 @@ namespace RootTools.Camera.Matrox
         }
         void RunTree(Tree treeRoot)
         {
+            RunSetTree(treeRoot.GetTree("Connect Set"));
             RunImageRoiTree(treeRoot.GetTree("Buffer Image ROI"));
             return;
+        }
+
+        void RunSetTree(Tree tree)
+        {
+            p_CamInfo.p_sFile = tree.SetFile(p_CamInfo.p_sFile, p_CamInfo.p_sFile, "dcf", "CamFile", "Cam File");
         }
 
         void RunImageRoiTree(Tree tree)
@@ -170,7 +206,9 @@ namespace RootTools.Camera.Matrox
             p_treeRoot = new TreeRoot(id, m_log);
             bgw_Connect.DoWork += bgw_Connect_Dowork;
             bgw_Connect.RunWorkerCompleted += bgw_Connect_RunWorkerCompleted;
-
+            m_ImageLive = new ImageData(640, 480);
+            p_ImageViewer = new ImageViewer_ViewModel(m_ImageLive);
+            p_CamInfo = new MatroxCamInfo(m_log);
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
             p_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
@@ -188,53 +226,45 @@ namespace RootTools.Camera.Matrox
 
         void ConnectCamera()
         {
-            // variable
-
-            // implement
-            _dispatcher = Dispatcher.CurrentDispatcher;
             // Application
-            MIL.MappAlloc(MIL.M_NULL, MIL.M_DEFAULT, ref m_MilApplication);
-
+            if (m_MilApplication == MIL.M_NULL)
+                MIL.MappAlloc(MIL.M_NULL, MIL.M_DEFAULT, ref m_MilApplication);
             // System
-            MIL.MsysAlloc(MIL.M_DEFAULT, "M_DEFAULT", MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);
-
+            if (m_MilSystem == MIL.M_NULL)
+                MIL.MsysAlloc(MIL.M_DEFAULT, "M_DEFAULT", MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);
             // Display
-            MIL.MdispAlloc(m_MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref m_MilDisplay);
-
+            if (m_MilDisplay == MIL.M_NULL)
+                MIL.MdispAlloc(m_MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref m_MilDisplay);
             // Set dafault values for the image buffer in case no digitizer can be allocated
             long lImgAttributes = MIL.M_IMAGE | MIL.M_DISP | MIL.M_PROC;
-
             // Inquire the number of digitizers for the system
-            MIL_INT nNumberOfDigitizers = MIL.MsysInquire(m_MilSystem, MIL.M_DIGITIZER_NUM, MIL.M_NULL);
-            if (nNumberOfDigitizers > 0)
+            if (m_MilSystem != MIL.M_NULL)
             {
-                // Digitizer
-                MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_DEFAULT, ref m_MilDigitizer);
+                MIL_INT nNumberOfDigitizers = MIL.MsysInquire(m_MilSystem, MIL.M_DIGITIZER_NUM, MIL.M_NULL);
+                if (nNumberOfDigitizers > 0)
+                {
+                    // Digitizer
+                    if (m_MilDigitizer == MIL.M_NULL)
+                    {
+                        MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_DEFAULT, ref m_MilDigitizer);
 
-                // Inquire the digitizer to determine the image buffer size
-                p_nImgBand = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_BAND, MIL.M_NULL);
-                p_nWidth = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_X, MIL.M_NULL);
-                p_nHeight = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_Y, MIL.M_NULL);
+                        // Inquire the digitizer to determine the image buffer size
+                        p_nImgBand = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_BAND, MIL.M_NULL);
+                        p_nWidth = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_X, MIL.M_NULL);
+                        p_nHeight = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_Y, MIL.M_NULL);
 
-                // Add the M_GRAB attribute to the image buffer
-                lImgAttributes |= MIL.M_GRAB;
+                        // Add the M_GRAB attribute to the image buffer
+                        lImgAttributes |= MIL.M_GRAB;
+                    }
+                }
+            }
+            // Buffer
+            for (int i = 0; i<p_nBuf; i++)
+            {
+                MIL.MbufAllocColor(m_MilSystem, (MIL_INT)p_nImgBand, (MIL_INT)p_nWidth, (MIL_INT)p_nHeight, 8 + MIL.M_UNSIGNED, lImgAttributes, ref m_MilBuffers[i]);
             }
 
-            // Buffer
-            MIL.MbufAllocColor(m_MilSystem, (MIL_INT)p_nImgBand, (MIL_INT)p_nWidth, (MIL_INT)p_nHeight, 8 + MIL.M_UNSIGNED, lImgAttributes, ref m_MilImage);
-
-            
-
             return;
-        }
-
-        MIL_INT HookHandler(MIL_INT HookType, MIL_ID EventId, IntPtr UserDataPtr)
-        {
-            // variable
-
-            // implement
-            // 1-Frame 채워지면 들어오는 Callback함수 -> Frame Buffer에서 User Buffer로 복사하는 코드 넣어야 함
-            return 0;
         }
 
         void DisconnectCamera()
@@ -242,50 +272,74 @@ namespace RootTools.Camera.Matrox
             // variable
 
             // implement
-            if (m_MilImage != MIL.M_NULL)
+            for (int i = 0; i<p_nBuf; i++)
             {
-                MIL.MbufFree(m_MilImage);
-                m_MilImage = MIL.M_NULL;
+                if (m_MilBuffers[i] != MIL.M_NULL)
+                {
+                    MIL.MbufFree(m_MilBuffers[i]);
+                    m_MilBuffers[i] = MIL.M_NULL;
+                }
             }
-
             if (m_MilDisplay != MIL.M_NULL)
             {
                 MIL.MdispFree(m_MilDisplay);
                 m_MilDisplay = MIL.M_NULL;
             }
-
             if (m_MilDigitizer != MIL.M_NULL)
             {
                 MIL.MdigFree(m_MilDigitizer);
                 m_MilDigitizer = MIL.M_NULL;
             }
-
             if (m_MilSystem != MIL.M_NULL)
             {
                 MIL.MsysFree(m_MilSystem);
                 m_MilSystem = MIL.M_NULL;
             }
-
-            if (m_MilApplication != MIL.M_NULL)
-            {
-                if (_dispatcher != null)
-                {
-                    _dispatcher.Invoke(new Action(delegate ()
-                    {
-                        MIL.MappFree(m_MilApplication);
-                        m_MilApplication = MIL.M_NULL;
-                    }));
-                }
-            }
-
             GC.SuppressFinalize(this);
         }
 
         void LiveGrab()
         {
-            if (m_MilDigitizer == MIL.M_NULL || m_MilImage == MIL.M_NULL) 
-                return;
-            MIL.MdigGrabContinuous(m_MilDigitizer, m_MilImage);
+            // variable
+            UserDataObject userObject = new UserDataObject();
+
+            // implement
+            if (m_MilApplication == MIL.M_NULL) return;
+            if (m_MilSystem == MIL.M_NULL) return;
+            if (m_MilDisplay == MIL.M_NULL) return;
+            if (m_MilDigitizer == MIL.M_NULL) return;
+            for (int i = 0; i<p_nBuf; i++)
+            {
+                if (m_MilBuffers[i] == MIL.M_NULL) return;
+            }
+
+            userObject.NbGrabStart = 0;
+            GCHandle userObjectHandle = GCHandle.Alloc(userObject);
+
+            MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(HookFunction);
+            MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_START, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
+
+            int iBlock = 0;
+            while(iBlock < 10000)
+            {
+                MIL.MdigGrab(m_MilDigitizer, m_MilBuffers[(iBlock) % p_nBuf]);
+                iBlock++;
+            }
+
+            MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_START + MIL.M_UNHOOK, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+
+            userObjectHandle.Free();
+        }
+
+        MIL_INT HookFunction(MIL_INT HookType, MIL_ID EventId, IntPtr UserDataPtr)
+        {
+            // variable
+
+            // implement
+            // 1-Frame 채워지면 들어오는 Callback함수 -> Frame Buffer에서 User Buffer로 복사하는 코드 넣어야 함
+            return 0;
         }
 
         public double GetFps()
