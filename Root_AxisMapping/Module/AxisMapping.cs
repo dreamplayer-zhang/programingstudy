@@ -14,6 +14,7 @@ namespace Root_AxisMapping.Module
         #region ToolBox
         Axis m_axisRotate;
         AxisXY m_axisXY;
+        Axis m_axisZ;
         DIO_O m_doVacuum;
         public MemoryPool m_memoryPool;
         CameraDalsa m_cam;
@@ -21,6 +22,7 @@ namespace Root_AxisMapping.Module
         {
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Stage");
+            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Camera Z"); 
             p_sInfo = m_toolBox.Get(ref m_doVacuum, this, "Vacuum");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
             p_sInfo = m_toolBox.Get(ref m_cam, this, "Camera");
@@ -143,7 +145,6 @@ namespace Root_AxisMapping.Module
 
             CameraDalsa p_cam { get { return m_module.m_cam; } }
             AxisXY p_axisXY { get { return m_module.m_axisXY; } }
-            Axis p_axisX { get { return m_module.m_axisXY.p_axisX; } }
             Axis p_axisY { get { return m_module.m_axisXY.p_axisY; } }
 
             Axis.Trigger _trigger = null;
@@ -163,6 +164,7 @@ namespace Root_AxisMapping.Module
                 Run_Grab run = new Run_Grab(m_module);
                 run.p_trigger = p_trigger.Clone();
                 run.m_xStart = m_xStart;
+                run.m_dyAcc = m_dyAcc; 
                 return run;
             }
 
