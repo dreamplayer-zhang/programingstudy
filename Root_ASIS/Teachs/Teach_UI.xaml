@@ -63,7 +63,13 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header=" ROI ">
-                    <TreeView x:Name="treeViewROI" Margin="3" PreviewMouseUp="treeViewROI_PreviewMouseUp">
+                    <TreeView x:Name="treeViewROI" Margin="3"
+                              SelectedItemChanged="treeViewROI_SelectedItemChanged">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Setter Property="IsExpanded" Value="True"/>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
                         <TreeView.ItemTemplate>
                             <HierarchicalDataTemplate ItemsSource="{Binding p_aROI}">
                                 <TextBlock Text="{Binding p_id}" Foreground="{Binding p_brushROI}" Height="{Binding p_nHeight}"/>

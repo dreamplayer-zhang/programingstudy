@@ -25,8 +25,7 @@ namespace Root_ASIS.Teachs
             memoryViewerUI.Init(teach.m_memoryPool.m_viewer, false);
             listViewAOI.ItemsSource = teach.p_aAOI;
             listViewListAOI.ItemsSource = teach.m_aEnableAOI;
-            //treeROIUI.Init(teach.m_treeRootROI); //forget1029
-            teach.RunTreeROI(Tree.eMode.Init);
+            treeViewROI.ItemsSource = teach.p_aROI; 
             treeAOIUI.Init(teach.m_treeRootAOI);
             teach.RunTreeAOI(Tree.eMode.Init);
             treeSetupUI.Init(teach.m_treeRootSetup);
@@ -151,11 +150,15 @@ namespace Root_ASIS.Teachs
         public void InvalidROI()
         {
             buttonInspect.IsEnabled = (m_teach.m_nROIReady == 0) && (m_teach.m_nROIActive == 0);
+            m_teach.InvalidROI(); 
         }
 
-        private void treeViewROI_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        private void treeViewROI_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-
+            AOIData aoiActive = m_teach.p_roiActive;
+            ((AOIData)e.NewValue).p_eROI = AOIData.eROI.Active;
+            m_teach.CalcROICount();
+            if (m_teach.m_nROIActive > 1) aoiActive.p_eROI = AOIData.eROI.Ready;
         }
         #endregion
     }

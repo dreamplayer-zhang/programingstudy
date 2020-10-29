@@ -51,9 +51,15 @@ namespace Root_ASIS.Teachs
         void ClearAOI()
         {
             p_aAOI.Clear();
+            InvalidROI(); 
+        }
+
+        public void InvalidROI()
+        {
             p_aROI.Clear();
             p_aROI.Add(m_aoiStrip);
-            p_aROI.Add(m_aoiArray); 
+            p_aROI.Add(m_aoiArray);
+            foreach (IAOI aoi in p_aAOI) p_aROI.Add(aoi); 
         }
 
         void RunTreeAOI(Tree tree)
@@ -95,14 +101,13 @@ namespace Root_ASIS.Teachs
                 if (active != null)
                 {
                     active.p_eROI = AOIData.eROI.Active;
-                    RunTreeROI(Tree.eMode.Init); 
                     return active;
                 }
             }
             return null;
         }
 
-        void CalcROICount()
+        public void CalcROICount()
         {
             m_nROIReady = 0;
             m_nROIActive = 0;
@@ -112,17 +117,6 @@ namespace Root_ASIS.Teachs
         public void ClearActive()
         {
             foreach (IAOI aoi in p_aROI) aoi.ClearActive(); 
-        }
-
-        void RunTreeROI(Tree tree) //forget1029
-        {
-//            m_aoiStrip.RunTreeROI(tree.GetTree("AOIStrip"));
-//            m_aoiArray.RunTreeROI(tree.GetTree("AOIArray"));
-//            for (int n = 0; n < p_aAOI.Count; n++)
-//            {
-//                p_aAOI[n].p_nID = n;
-//                p_aAOI[n].RunTreeROI(tree.GetTree(n, p_aAOI[n].p_id));
-//            }
         }
         #endregion
 
@@ -202,31 +196,6 @@ namespace Root_ASIS.Teachs
         }
         #endregion
 
-        #region Tree ROI
-        public TreeRoot m_treeRootROI;
-        void InitTreeROI()
-        {
-            m_treeRootROI = new TreeRoot(m_id + ".ROI", m_log);
-            m_treeRootROI.UpdateTree += M_treeRootROI_UpdateTree;
-        }
-
-        private void M_treeRootROI_UpdateTree()
-        {
-            AOIData aoiActive = p_roiActive;
-            RunTreeROI(Tree.eMode.Update);
-            CalcROICount();
-            if (m_nROIActive > 1) aoiActive.p_eROI = AOIData.eROI.Ready;
-            RunTreeROI(Tree.eMode.RegWrite);
-            RunTreeROI(Tree.eMode.Init);
-        }
-
-        public void RunTreeROI(Tree.eMode eMode)
-        {
-            m_treeRootROI.p_eMode = eMode;
-            RunTreeROI(m_treeRootROI);
-        }
-        #endregion
-
         public string m_id;
         Log m_log; 
         public Teach(string id, MemoryPool memoryPool)
@@ -240,7 +209,6 @@ namespace Root_ASIS.Teachs
             InitTreeSetup();
             ClearAOI();
             InitTreeAOI();
-            InitTreeROI();
             InitDraw();
             GetActineROI(); 
         }

@@ -40,20 +40,23 @@ namespace Root_ASIS.AOI
                 m_aoiData = new AOIData(id, m_sz);
             }
         }
-        List<Unit> m_aUnitROI = new List<Unit>(); 
+        List<Unit> m_aUnit = new List<Unit>(); 
 
         void InitUnit()
         {
-            m_aUnitROI.Add(new Unit("Unit Origin", this));
-            m_aUnitROI.Add(new Unit("Unit Right", this));
-            m_aUnitROI.Add(new Unit("Unit Bottom", this));
-            m_aUnitROI.Add(new Unit("Block Right", this));
-            m_aUnitROI.Add(new Unit("Block Bottom", this));
+            m_aUnit.Add(new Unit("Unit Origin", this));
+            m_aUnit.Add(new Unit("Unit Right", this));
+            m_aUnit.Add(new Unit("Unit Bottom", this));
+            m_aUnit.Add(new Unit("Block Right", this));
+            m_aUnit.Add(new Unit("Block Bottom", this));
+            p_aROI.Clear();
+            foreach (Unit unit in m_aUnit) p_aROI.Add(unit.m_aoiData);
+
         }
 
         void RunTreeUnit(Tree tree)
         {
-            foreach (Unit unit in m_aUnitROI) unit.RunTree(tree.GetTree(unit.m_id)); 
+            foreach (Unit unit in m_aUnit) unit.RunTree(tree.GetTree(unit.m_id)); 
         }
         #endregion
 
@@ -66,24 +69,24 @@ namespace Root_ASIS.AOI
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {
-            foreach (Unit unit in m_aUnitROI) unit.m_aoiData.Draw(draw, eDraw); 
+            foreach (Unit unit in m_aUnit) unit.m_aoiData.Draw(draw, eDraw); 
         }
 
         public ObservableCollection<AOIData> p_aROI { get; set; }
 
         public void ClearActive()
         {
-            foreach (Unit unit in m_aUnitROI)
+            foreach (AOIData aoiData in p_aROI)
             {
-                if (unit.m_aoiData.p_eROI == AOIData.eROI.Active) unit.m_aoiData.p_eROI = AOIData.eROI.Ready;
+                if (aoiData.p_eROI == AOIData.eROI.Active) aoiData.p_eROI = AOIData.eROI.Ready;
             }
         }
 
         public void CalcROICount(ref int nReady, ref int nActive)
         {
-            foreach (Unit unit in m_aUnitROI)
+            foreach (AOIData aoiData in p_aROI)
             {
-                switch (unit.m_aoiData.p_eROI)
+                switch (aoiData.p_eROI)
                 {
                     case AOIData.eROI.Ready: nReady++; break;
                     case AOIData.eROI.Active: nActive++; break;
@@ -93,9 +96,9 @@ namespace Root_ASIS.AOI
 
         public AOIData GetAOIData(AOIData.eROI eROI)
         {
-            foreach (Unit unit in m_aUnitROI)
+            foreach (AOIData aoiData in p_aROI)
             {
-                if (unit.m_aoiData.p_eROI == eROI) return unit.m_aoiData;
+                if (aoiData.p_eROI == eROI) return aoiData;
             }
             return null;
         }
