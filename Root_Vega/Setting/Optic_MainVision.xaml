@@ -1179,7 +1179,7 @@
                                                 </Grid.ColumnDefinitions>
                                                 <Button Grid.Column="0"
                                                         Style="{StaticResource BasicBtn}"
-                                                        Command="{Binding MRelativeMoveCommand}"
+                                                        Command="{Binding PRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">
@@ -1198,7 +1198,7 @@
                                                 </Border>
                                                 <Button Grid.Column="2"
                                                         Style="{StaticResource BasicBtn}"
-                                                        Command="{Binding PRelativeMoveCommand}"
+                                                        Command="{Binding MRelativeMoveCommand}"
                                                         Margin="5">
                                                     <Button.Content>
                                                         <StackPanel Orientation="Vertical">

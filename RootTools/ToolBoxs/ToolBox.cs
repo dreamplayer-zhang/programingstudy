@@ -2,6 +2,7 @@
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.CognexOCR;
 using RootTools.Camera.Dalsa;
+using RootTools.Camera.Matrox;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Gem;
@@ -266,6 +267,24 @@ namespace RootTools.ToolBoxs
                 {
                     InitCameraSet(module);
                     value = new Camera_Dalsa(module.p_id + "." + id, module.m_log);
+                    module.m_cameraSet.Add(value);
+                }
+                catch (Exception ee)
+                {
+                    MessageBox.Show(ee.ToString());
+                }
+            }
+            return "OK";
+        }
+
+        public string Get(ref Camera_Matrox value, ModuleBase module, string id)
+        {
+            if (value == null)
+            {
+                try
+                {
+                    InitCameraSet(module);
+                    value = new Camera_Matrox(module.p_id + "." + id, module.m_log);
                     module.m_cameraSet.Add(value);
                 }
                 catch (Exception ee)

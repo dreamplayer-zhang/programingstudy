@@ -645,7 +645,7 @@
                                             Maximum="100"
                                             Minimum="0"
                                             DataContext="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext}"
-                                            Value="{Binding p_LightSideVRSCoax}"
+                                            Value="{Binding p_LightBevelVRSCoax}"
                                             x:Name="slider7"></Slider>
                                     <TextBlock Grid.Column="1"
                                                Style="{StaticResource BasicTb}"
@@ -668,7 +668,7 @@
                                             Maximum="100"
                                             Minimum="0"
                                             DataContext="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext}"
-                                            Value="{Binding p_LightSideVRSSide}"
+                                            Value="{Binding p_LightBevelVRSSide}"
                                             x:Name="slider8"></Slider>
                                     <TextBlock Grid.Column="1"
                                                Style="{StaticResource BasicTb}"
