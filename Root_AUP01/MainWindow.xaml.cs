@@ -129,7 +129,6 @@ namespace Root_AOP01
             Run = new Run_Panel();
             Run.DataContext = this;
 
-
             MainPanel.Children.Clear();
             MainPanel.Children.Add(ModeSelect);
         }
@@ -137,6 +136,7 @@ namespace Root_AOP01
         {
             m_engineer.ThreadStop();
         }
+
 
         private void NaviRecipeSummary_Click(object sender, RoutedEventArgs e)
         {
@@ -205,5 +205,31 @@ namespace Root_AOP01
             MainPanel.Children.Add(Run);
         }
 
+        private void ViewMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            bool check = false;
+
+            for (int i = 0; i < ViewMenu.Items.Count; i++)
+            {
+                check = ((MenuItem)ViewMenu.Items[i]).IsChecked || check;
+                if ((sender as MenuItem) == (MenuItem)ViewMenu.Items[i])
+                {
+                    if ((sender as MenuItem).IsChecked)
+                        viewTab.SelectedIndex = i;
+                }
+
+            }
+            if (check == false)
+            {
+                splitter.IsEnabled = false;
+                ViewArea.Height = new GridLength(0);
+            }
+            else
+            {
+                splitter.IsEnabled = true;
+                ViewArea.Height = new GridLength(200);
+            }
+
+        }
     }
 }

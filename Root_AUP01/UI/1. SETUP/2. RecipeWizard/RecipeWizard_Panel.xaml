@@ -17,11 +17,10 @@
                 <StackPanel Margin="0,10,0,0">
                     <ToggleButton Content="Recipe Summary" x:Name="btnSummary"
                                   Command="{Binding btnSummary}"
-                            Style="{StaticResource SetupPanelToggleBtn}"/>
+                                  Style="{StaticResource SetupPanelToggleBtn}"/>
                     <ToggleButton Content="Spec" x:Name="btnSpec"
-                                  IsChecked="True"
-                            Command="{Binding btnRecipeOption}"
-                            Style="{StaticResource SetupPanelToggleBtn}"/>
+                                  Command="{Binding btnRecipeOption}"
+                                  Style="{StaticResource SetupPanelToggleBtn}"/>
                     <Button Content="45D"
                             Command="{Binding btn45D}"
                             Style="{StaticResource SetupPanelBtn}"/>

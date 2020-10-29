@@ -23,7 +23,7 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="85*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" x:Name="ViewArea"/>
         </Grid.RowDefinitions>
         <!--Title Bar-->
         <Grid Grid.Row="0"
@@ -127,9 +127,10 @@
 
                             </MenuItem>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource ControlBackGround}"
+                        <MenuItem Background="{StaticResource ControlBackGround}"                                
                                   BorderBrush="#FF707070"
-                                  Width="70"
+                                  Width="70" 
+                                  x:Name="ViewMenu"
                                   BorderThickness="0,0,0,0" Padding="0">
                             <MenuItem.Header>
                                 <Grid Width="70">
@@ -140,9 +141,9 @@
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
-                            <MenuItem Header="Log" IsCheckable="True" x:Name="viewLog" />
-                            <MenuItem Header="Alarm" IsCheckable="True" x:Name="viewAlarm" />
-                            <MenuItem Header="FDC" IsCheckable="True" x:Name="viewFDC"/>
+                            <MenuItem Header="Log" IsCheckable="True" x:Name="viewLog" Click="ViewMenuItem_Click"/>
+                            <MenuItem Header="Alarm" IsCheckable="True" x:Name="viewAlarm" Click="ViewMenuItem_Click"/>
+                            <MenuItem Header="FDC" IsCheckable="True" x:Name="viewFDC" Click="ViewMenuItem_Click"/>
 
 
                         </MenuItem>
@@ -251,17 +252,19 @@
                       Height="3"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
+                      x:Name="splitter"
                       Background="{StaticResource Splitter}"
                       ShowsPreview="True" Grid.ColumnSpan="2"/>
         
         <!--Log-->
         <Border Grid.Row="4" Grid.ColumnSpan="2" Panel.ZIndex="99">
-            <TabControl>
+            <TabControl x:Name="viewTab">
                 <TabItem Width="50" Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                     <TabItem.Header>
                         <TextBlock Text="Log" FontWeight="Bold"/>
                     </TabItem.Header>
-                    <TabControl Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                    <TabControl Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}"
+                                Background="Gray">
                         <TabItem Header="ALL" FontSize="10">
                             <TextBlock Text="Log Area" Margin="5"/>
                         </TabItem>
