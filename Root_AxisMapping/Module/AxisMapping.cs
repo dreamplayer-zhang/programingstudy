@@ -146,6 +146,7 @@ namespace Root_AxisMapping.Module
             CameraDalsa p_cam { get { return m_module.m_cam; } }
             AxisXY p_axisXY { get { return m_module.m_axisXY; } }
             Axis p_axisY { get { return m_module.m_axisXY.p_axisY; } }
+            Axis p_axisZ { get { return m_module.m_axisZ; } }
 
             Axis.Trigger _trigger = null;
             Axis.Trigger p_trigger
@@ -158,25 +159,30 @@ namespace Root_AxisMapping.Module
                 set { _trigger = value; }
             }
             double m_xStart = 0;
+            double m_zStart = 0;
             double m_dyAcc = 3; 
             public override ModuleRunBase Clone()
             {
                 Run_Grab run = new Run_Grab(m_module);
                 run.p_trigger = p_trigger.Clone();
                 run.m_xStart = m_xStart;
+                run.m_zStart = m_zStart;
                 run.m_dyAcc = m_dyAcc; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_xStart = tree.Set(m_xStart, m_xStart, "X0", "Axis X Position (Unit)", bVisible);
-                m_dyAcc = tree.Set(m_dyAcc, m_dyAcc, "dY Acc", "Axis Y Acc Length (Unit)"); 
+                m_xStart = tree.Set(m_xStart, m_xStart, "X", "Axis X Position (Unit)", bVisible);
+                m_zStart = tree.Set(m_zStart, m_zStart, "Z", "Axis X Position (Unit)", bVisible);
+                m_dyAcc = tree.Set(m_dyAcc, m_dyAcc, "dY Acc", "Axis Y Acc Length (Unit)", bVisible); 
                 p_trigger.RunTree(tree.GetTree("Trigger", true, bVisible), p_axisY.m_sUnit, bVisible);
             }
 
             public override string Run()
             {
+                if (m_module.Run(p_axisZ.StartMove(m_zStart))) return p_sInfo;
+                if (m_module.Run(p_axisZ.WaitReady())) return p_sInfo;
                 double y0 = p_trigger.m_aPos[0] - m_dyAcc;
                 if (m_module.Run(p_axisXY.StartMove(m_xStart, y0))) return p_sInfo;
                 if (m_module.Run(p_axisXY.WaitReady())) return p_sInfo;
@@ -217,8 +223,8 @@ namespace Root_AxisMapping.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_degRotate = tree.Set(m_degRotate, m_degRotate, "Degree", "Axis Rotate (degree)", bVisible);
-                m_nPpR = tree.Set(m_nPpR, m_nPpR, "PnR", "Pulse / Round");
-                m_bInverse = tree.Set(m_bInverse, m_bInverse, "Inverse", "Rotate Direction"); 
+                m_nPpR = tree.Set(m_nPpR, m_nPpR, "PnR", "Pulse / Round", bVisible);
+                m_bInverse = tree.Set(m_bInverse, m_bInverse, "Inverse", "Rotate Direction", bVisible); 
             }
 
             public override string Run()
