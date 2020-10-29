@@ -77,9 +77,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AOI\AOIArray.cs" />
     <Compile Include="AOI\AOIData.cs" />
     <Compile Include="AOI\AOIStrip.cs" />
-    <Compile Include="AOI\AOIStripID.cs" />
+    <Compile Include="AOI\AOI_StripID.cs" />
     <Compile Include="AOI\AOI_Unit.cs" />
     <Compile Include="AOI\Blob.cs" />
     <Compile Include="Main_UI.xaml.cs">

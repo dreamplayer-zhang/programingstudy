@@ -109,7 +109,5 @@ namespace Root_ASIS
                 OnPropertyChanged(); 
             }
         }
-
-
     }
 }

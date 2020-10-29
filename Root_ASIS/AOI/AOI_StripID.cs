@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 
 namespace Root_ASIS.AOI
 {
-    public class AOIStripID : IAOI
+    public class AOI_StripID : IAOI
     {
         #region StringTable
         static string[] m_asStringTable =
@@ -31,8 +31,8 @@ namespace Root_ASIS.AOI
             }
 
             public string m_id;
-            AOIStripID m_aoi;
-            public UnitID(string id, AOIStripID aoi)
+            AOI_StripID m_aoi;
+            public UnitID(string id, AOI_StripID aoi)
             {
                 m_id = id;
                 m_aoi = aoi;
@@ -60,33 +60,48 @@ namespace Root_ASIS.AOI
         }
         #endregion
 
-        #region Tree
-        public void RunTree(Tree tree)
-        {
-            RunTreeUnit(tree.GetTree("UnitID", false, false));
-            //RunTreeInspect(tree.GetTree("Inspect", false));
-        }
-        #endregion
-
         #region IAOI
         public string p_id { get; set; }
         public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
         public IAOI NewAOI() { return null; }
 
-        public void AddROI(ObservableCollection<AOIData> aROI)
-        {
-            foreach (UnitID unit in m_aUnitID) aROI.Add(unit.m_aoiData); 
-        }
-
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {
             //forget
         }
+
+        public void ClearActive()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void CalcROICount(ref int nReady, ref int nActive)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public AOIData GetAOIData(AOIData.eROI eROI)
+        {
+            throw new System.NotImplementedException();
+        }
+        #endregion
+
+        #region Tree
+        public void RunTreeAOI(Tree tree)
+        {
+            RunTreeUnit(tree.GetTree("UnitID", false, false));
+            //RunTreeInspect(tree.GetTree("Inspect", false));
+        }
+
+        public void RunTreeROI(Tree tree)
+        {
+            //foreach (Unit unit in m_aUnitROI) unit.m_aoiData.RunTreeROI(tree);
+        }
         #endregion
 
         Log m_log;
-        public AOIStripID(string id, Log log)
+        public AOI_StripID(string id, Log log)
         {
             p_id = id;
             m_log = log;

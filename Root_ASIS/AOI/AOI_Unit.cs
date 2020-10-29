@@ -27,9 +27,38 @@ namespace Root_ASIS.AOI
             return new AOI_Unit(p_id, m_log); 
         }
 
-        public void AddROI(ObservableCollection<AOIData> aROI)
+        public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {
-            aROI.Add(m_aUnit[0].m_aoiData); 
+            //forget
+        }
+
+        public void ClearActive()
+        {
+            foreach (Unit unit in m_aUnitROI)
+            {
+                if (unit.m_aoiData.p_eROI == AOIData.eROI.Active) unit.m_aoiData.p_eROI = AOIData.eROI.Ready;
+            }
+        }
+
+        public void CalcROICount(ref int nReady, ref int nActive)
+        {
+            foreach (Unit unit in m_aUnitROI)
+            {
+                switch (unit.m_aoiData.p_eROI)
+                {
+                    case AOIData.eROI.Ready: nReady++; break;
+                    case AOIData.eROI.Active: nActive++; break;
+                }
+            }
+        }
+
+        public AOIData GetAOIData(AOIData.eROI eROI)
+        {
+            foreach (Unit unit in m_aUnitROI)
+            {
+                if (unit.m_aoiData.p_eROI == eROI) return unit.m_aoiData;
+            }
+            return null;
         }
         #endregion
 
@@ -78,7 +107,8 @@ namespace Root_ASIS.AOI
                 m_aoi = aoi;
             }
         }
-        List<Unit> m_aUnit = new List<Unit>(); 
+        List<Unit> m_aUnit = new List<Unit>();
+        List<Unit> m_aUnitROI = new List<Unit>(); 
 
         void InitUnit(InfoStrip infoStrip)
         {
@@ -93,6 +123,8 @@ namespace Root_ASIS.AOI
                 m_aUnit[n].p_id = p_id + "." + n.ToString("000");
                 m_aUnit[n].m_result = (infoStrip != null) ? infoStrip.GetUnitResult(n) : null; 
             }
+            m_aUnitROI.Clear();
+            m_aUnitROI.Add(m_aUnit[0]); 
         }
 
         void RunTreeUnit(Tree tree)
@@ -162,15 +194,15 @@ namespace Root_ASIS.AOI
         #endregion
 
         #region Tree
-        public void RunTree(Tree tree)
+        public void RunTreeAOI(Tree tree)
         {
             RunTreeUnit(tree.GetTree("Unit", false, false));
             RunTreeInspect(tree);
         }
 
-        public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
+        public void RunTreeROI(Tree tree)
         {
-            //forget
+            foreach (Unit unit in m_aUnitROI) unit.m_aoiData.RunTreeROI(tree);
         }
         #endregion
 

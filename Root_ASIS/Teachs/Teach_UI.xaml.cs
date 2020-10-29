@@ -23,14 +23,15 @@ namespace Root_ASIS.Teachs
             m_teach = teach;
             DataContext = teach;
             memoryViewerUI.Init(teach.m_memoryPool.m_viewer, false);
-            listViewAOI.ItemsSource = teach.m_aAOI;
-            listViewListAOI.ItemsSource = teach.m_aListAOI; 
+            listViewAOI.ItemsSource = teach.p_aAOI;
+            listViewListAOI.ItemsSource = teach.m_aEnableAOI;
+            treeROIUI.Init(teach.m_treeRootROI);
+            teach.RunTreeROI(Tree.eMode.Init);
             treeAOIUI.Init(teach.m_treeRootAOI);
-            teach.RunTreeAOI(Tree.eMode.Init); 
+            teach.RunTreeAOI(Tree.eMode.Init);
             treeSetupUI.Init(teach.m_treeRootSetup);
             teach.RunTreeSetup(Tree.eMode.Init);
             InitAOI();
-            listViewROI.ItemsSource = teach.m_aROI; 
         }
 
         private void buttonInspect_Click(object sender, RoutedEventArgs e)
@@ -99,7 +100,7 @@ namespace Root_ASIS.Teachs
             if (e.Data.GetDataPresent(c_sAOI))
             {
                 IAOI aoi = (IAOI)e.Data.GetData(c_sAOI);
-                m_teach.m_aAOI.Remove(aoi);
+                m_teach.p_aAOI.Remove(aoi);
                 m_teach.RunTreeAOI(Tree.eMode.Init);
                 m_teach.RunTreeAOI(Tree.eMode.Init);
                 InvalidROI(); 
@@ -117,17 +118,17 @@ namespace Root_ASIS.Teachs
             if (e.Data.GetDataPresent(c_sAOI))
             {
                 aoi = (IAOI)e.Data.GetData(c_sAOI);
-                m_teach.m_aAOI.Remove(aoi);
+                m_teach.p_aAOI.Remove(aoi);
                 int iRemove = aoi.p_nID; 
-                m_teach.m_aAOI.Remove(aoi);
-                if (iInsert < 0) m_teach.m_aAOI.Add(aoi);
-                else m_teach.m_aAOI.Insert(iInsert, aoi);
+                m_teach.p_aAOI.Remove(aoi);
+                if (iInsert < 0) m_teach.p_aAOI.Add(aoi);
+                else m_teach.p_aAOI.Insert(iInsert, aoi);
             }
             if (e.Data.GetDataPresent(c_sListAOI))
             {
                 aoi = (IAOI)e.Data.GetData(c_sListAOI);
-                if (iInsert < 0) m_teach.m_aAOI.Add(aoi.NewAOI());
-                else m_teach.m_aAOI.Insert(iInsert, aoi.NewAOI());
+                if (iInsert < 0) m_teach.p_aAOI.Add(aoi.NewAOI());
+                else m_teach.p_aAOI.Insert(iInsert, aoi.NewAOI());
             }
             m_teach.RunTreeAOI(Tree.eMode.Init);
             m_teach.RunTreeAOI(Tree.eMode.Init);
@@ -149,18 +150,7 @@ namespace Root_ASIS.Teachs
         #region ROI
         public void InvalidROI()
         {
-            m_teach.InvalidListROI();
-            buttonInspect.IsEnabled = (m_teach.m_nROI[AOIData.eROI.Ready] == 0) && (m_teach.m_nROI[AOIData.eROI.Active] == 0);
-        }
-
-        private void listViewROI_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            int nSelect = listViewROI.SelectedIndex;
-            if (nSelect < 0) return;
-            if (nSelect >= m_teach.m_aROI.Count) return;
-            m_teach.ClearActive();
-            m_teach.m_aROI[nSelect].p_eROI = AOIData.eROI.Active;
-            m_teach.Draw(AOIData.eDraw.ROI); 
+            buttonInspect.IsEnabled = (m_teach.m_nROIReady == 0) && (m_teach.m_nROIActive == 0);
         }
         #endregion
     }

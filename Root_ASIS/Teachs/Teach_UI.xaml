@@ -63,26 +63,7 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header=" ROI ">
-                    <ListView x:Name="listViewROI" Margin="3" PreviewMouseLeftButtonUp="listViewROI_PreviewMouseLeftButtonUp">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="    ROI    ">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding p_id}"/>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="    State    ">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding p_eROI}" Foreground="{Binding p_brushROI}"/>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
+                    <tree:TreeUI x:Name="treeROIUI" Margin="3"/>
                 </TabItem>
                 <TabItem Header=" Parameter ">
                     <tree:TreeUI x:Name="treeAOIUI" Margin="3"/>

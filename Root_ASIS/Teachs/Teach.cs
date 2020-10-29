@@ -11,24 +11,26 @@ namespace Root_ASIS.Teachs
     {
         #region List AOI 
         AOIStrip m_aoiStrip;
-        AOIStripID m_aoiStripID;
+        AOIArray m_aoiArray;
+        /// <summary> 사용가능한 AOI List </summary>
         List<IAOI> _aAOI = new List<IAOI>();
         void InitListAOI()
         {
             m_aoiStrip = new AOIStrip("AOIStrip", m_log);
-            m_aoiStripID = new AOIStripID("AOIStripID", m_log);
+            m_aoiArray = new AOIArray("AOIArray", m_log); 
 
             _aAOI.Add(new AOI_Unit("AOI_Unit", m_log));
             InvalidateListAOI(); 
         }
 
-        public ObservableCollection<IAOI> m_aListAOI = new ObservableCollection<IAOI>();
+        /// <summary> 활성화된 AOI List </summary>
+        public ObservableCollection<IAOI> m_aEnableAOI = new ObservableCollection<IAOI>();
         void InvalidateListAOI()
         {
-            m_aListAOI.Clear(); 
+            m_aEnableAOI.Clear();
             foreach (IAOI aoi in _aAOI)
             {
-                if (aoi.p_bEnable) m_aListAOI.Add(aoi);
+                if (aoi.p_bEnable) m_aEnableAOI.Add(aoi);
             }
         }
 
@@ -42,42 +44,34 @@ namespace Root_ASIS.Teachs
         #endregion
 
         #region AOI
-        public ObservableCollection<IAOI> m_aAOI = new ObservableCollection<IAOI>(); 
+        /// <summary> Inspect를 위한 AOI List, AOI_Strip 제외 </summary>
+        public ObservableCollection<IAOI> p_aAOI { get; set; }
+        /// <summary> Inspect를 위한 AOI List, AOI_Strip 포함 </summary>
+        public List<IAOI> m_aAOI = new List<IAOI>(); 
         void ClearAOI()
         {
+            p_aAOI.Clear();
             m_aAOI.Clear();
+            m_aAOI.Add(m_aoiStrip);
+            m_aAOI.Add(m_aoiArray); 
         }
 
         void RunTreeAOI(Tree tree)
         {
-            m_aoiStrip.RunTree(tree.GetTree("AOIStrip"));
-            m_aoiStripID.RunTree(tree.GetTree("AOIStripID"));
-            for (int n = 0; n < m_aAOI.Count; n++)
+            m_aoiStrip.RunTreeAOI(tree.GetTree("AOIStrip"));
+            m_aoiArray.RunTreeAOI(tree.GetTree("AOIArray", true, false)); 
+            for (int n = 0; n < p_aAOI.Count; n++)
             {
-                m_aAOI[n].p_nID = n; 
-                m_aAOI[n].RunTree(tree.GetTree(n, m_aAOI[n].p_id));
+                p_aAOI[n].p_nID = n; 
+                p_aAOI[n].RunTreeAOI(tree.GetTree(n, p_aAOI[n].p_id));
             }
         }
         #endregion
 
         #region ROI
-        public ObservableCollection<AOIData> m_aROI = new ObservableCollection<AOIData>();
-        public void InvalidListROI()
-        {
-            m_aROI.Clear();
-            m_aoiStrip.AddROI(m_aROI);
-            m_aoiStripID.AddROI(m_aROI);
-            foreach (IAOI aoi in m_aAOI) aoi.AddROI(m_aROI);
-        }
-
         public Dictionary<AOIData.eROI, int> m_nROI = new Dictionary<AOIData.eROI, int>();
-        void InitROI()
-        {
-            m_nROI.Add(AOIData.eROI.Ready, 0);
-            m_nROI.Add(AOIData.eROI.Active, 0);
-            m_nROI.Add(AOIData.eROI.Done, 0);
-            InvalidListROI();
-        }
+        public int m_nROIReady = 0;
+        public int m_nROIActive = 0; 
 
         public AOIData p_roiActive
         {
@@ -87,20 +81,23 @@ namespace Root_ASIS.Teachs
         AOIData GetActineROI()
         {
             CalcROICount();
-            if (m_nROI[AOIData.eROI.Active] == 1)
+            if (m_nROIActive == 1)
             {
-                foreach (AOIData roi in m_aROI)
+                foreach (IAOI aoi in m_aAOI)
                 {
-                    if (roi.p_eROI == AOIData.eROI.Active) return roi;
+                    AOIData active = aoi.GetAOIData(AOIData.eROI.Active);
+                    if (active != null) return active; 
                 }
             }
-            if (m_nROI[AOIData.eROI.Active] > 1) ClearActive();
-            foreach (AOIData roi in m_aROI)
+            if (m_nROIActive > 1) ClearActive();
+            foreach (IAOI aoi in m_aAOI)
             {
-                if (roi.p_eROI == AOIData.eROI.Ready)
+                AOIData active = aoi.GetAOIData(AOIData.eROI.Ready);
+                if (active != null)
                 {
-                    roi.p_eROI = AOIData.eROI.Active;
-                    return roi;
+                    active.p_eROI = AOIData.eROI.Active;
+                    RunTreeROI(Tree.eMode.Init); 
+                    return active;
                 }
             }
             return null;
@@ -108,17 +105,24 @@ namespace Root_ASIS.Teachs
 
         void CalcROICount()
         {
-            m_nROI[AOIData.eROI.Ready] = 0;
-            m_nROI[AOIData.eROI.Active] = 0;
-            m_nROI[AOIData.eROI.Done] = 0;
-            foreach (AOIData roi in m_aROI) m_nROI[roi.p_eROI]++;
+            m_nROIReady = 0;
+            m_nROIActive = 0;
+            foreach (IAOI aoi in m_aAOI) aoi.CalcROICount(ref m_nROIReady, ref m_nROIActive);
         }
 
         public void ClearActive()
         {
-            foreach (AOIData roi in m_aROI)
+            foreach (IAOI aoi in m_aAOI) aoi.ClearActive(); 
+        }
+
+        void RunTreeROI(Tree tree)
+        {
+            m_aoiStrip.RunTreeROI(tree.GetTree("AOIStrip"));
+            m_aoiArray.RunTreeROI(tree.GetTree("AOIArray"));
+            for (int n = 0; n < p_aAOI.Count; n++)
             {
-                if (roi.p_eROI == AOIData.eROI.Active) roi.p_eROI = AOIData.eROI.Ready;
+                p_aAOI[n].p_nID = n;
+                p_aAOI[n].RunTreeROI(tree.GetTree(n, p_aAOI[n].p_id));
             }
         }
         #endregion
@@ -150,8 +154,6 @@ namespace Root_ASIS.Teachs
         {
             MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
             draw.Clear();
-            m_aoiStrip.Draw(draw, eDraw);
-            m_aoiStripID.Draw(draw, eDraw);
             foreach (IAOI aoi in m_aAOI) aoi.Draw(draw, eDraw); 
             draw.InvalidDraw(); 
         }
@@ -201,10 +203,36 @@ namespace Root_ASIS.Teachs
         }
         #endregion
 
+        #region Tree ROI
+        public TreeRoot m_treeRootROI;
+        void InitTreeROI()
+        {
+            m_treeRootROI = new TreeRoot(m_id + ".ROI", m_log);
+            m_treeRootROI.UpdateTree += M_treeRootROI_UpdateTree;
+        }
+
+        private void M_treeRootROI_UpdateTree()
+        {
+            AOIData aoiActive = p_roiActive;
+            RunTreeROI(Tree.eMode.Update);
+            CalcROICount();
+            if (m_nROIActive > 1) aoiActive.p_eROI = AOIData.eROI.Ready;
+            RunTreeROI(Tree.eMode.RegWrite);
+            RunTreeROI(Tree.eMode.Init);
+        }
+
+        public void RunTreeROI(Tree.eMode eMode)
+        {
+            m_treeRootROI.p_eMode = eMode;
+            RunTreeROI(m_treeRootROI);
+        }
+        #endregion
+
         public string m_id;
         Log m_log; 
         public Teach(string id, MemoryPool memoryPool)
         {
+            p_aAOI = new ObservableCollection<IAOI>();
             m_id = id;
             m_memoryPool = memoryPool; 
             m_log = LogView.GetLog(id);
@@ -212,8 +240,8 @@ namespace Root_ASIS.Teachs
             InitTreeSetup();
             ClearAOI();
             InitTreeAOI();
+            InitTreeROI();
             InitDraw();
-            InitROI();
             GetActineROI(); 
         }
     }

@@ -22,7 +22,7 @@ namespace Root_ASIS.AOI
         {
             Ready,
             Active,
-            Done
+            Done,
         }
         eROI _eROI = eROI.Ready;
         public eROI p_eROI
@@ -164,8 +164,12 @@ namespace Root_ASIS.AOI
         public void RunTree(Tree treeParent, bool bVisible)
         {
             Tree tree = treeParent.GetTree(p_id, false, bVisible);
-            p_eROI = (eROI)tree.Set(p_eROI, p_eROI, "eROI", "eROI", bVisible);
             m_cp0 = tree.Set(m_cp0, m_cp0, "cp0", "cp0", bVisible);
+        }
+
+        public void RunTreeROI(Tree tree)
+        {
+            p_eROI = (eROI)tree.Set(p_eROI, p_eROI, p_id, "eROI State");
         }
         #endregion
 
