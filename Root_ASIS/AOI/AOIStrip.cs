@@ -5,6 +5,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace Root_ASIS.AOI
@@ -42,14 +43,13 @@ namespace Root_ASIS.AOI
             }
         }
         List<Unit> m_aUnit = new List<Unit>();
-        List<Unit> m_aUnitROI = new List<Unit>();
 
         void InitUnit()
         {
             m_aUnit.Add(new Unit("Strip Origin 0", this));
             m_aUnit.Add(new Unit("Strip Origin 1", this));
-            m_aUnitROI.Clear();
-            foreach (Unit unit in m_aUnit) m_aUnitROI.Add(unit); 
+            p_aROI.Clear();
+            foreach (Unit unit in m_aUnit) p_aROI.Add(unit.m_aoiData); 
         }
 
         void RunTreeUnit(Tree tree)
@@ -209,6 +209,7 @@ namespace Root_ASIS.AOI
         public string p_id { get; set; }
         public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
+
         public IAOI NewAOI() { return null; }
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
@@ -217,19 +218,21 @@ namespace Root_ASIS.AOI
             m_aUnit[1].m_aoiData.Draw(draw, eDraw);
         }
 
+        public ObservableCollection<AOIData> p_aROI { get; set; }
+
         public void ClearActive()
         {
-            foreach (Unit unit in m_aUnitROI)
+            foreach (AOIData aoiData in p_aROI)
             {
-                if (unit.m_aoiData.p_eROI == AOIData.eROI.Active) unit.m_aoiData.p_eROI = AOIData.eROI.Ready;
+                if (aoiData.p_eROI == AOIData.eROI.Active) aoiData.p_eROI = AOIData.eROI.Ready;
             }
         }
 
         public void CalcROICount(ref int nReady, ref int nActive)
         {
-            foreach (Unit unit in m_aUnitROI)
+            foreach (AOIData aoiData in p_aROI)
             {
-                switch (unit.m_aoiData.p_eROI)
+                switch (aoiData.p_eROI)
                 {
                     case AOIData.eROI.Ready: nReady++; break;
                     case AOIData.eROI.Active: nActive++; break; 
@@ -239,9 +242,9 @@ namespace Root_ASIS.AOI
 
         public AOIData GetAOIData(AOIData.eROI eROI)
         {
-            foreach (Unit unit in m_aUnitROI)
+            foreach (AOIData aoiData in p_aROI)
             {
-                if (unit.m_aoiData.p_eROI == eROI) return unit.m_aoiData; 
+                if (aoiData.p_eROI == eROI) return aoiData; 
             }
             return null; 
         }
@@ -253,16 +256,12 @@ namespace Root_ASIS.AOI
             RunTreeUnit(tree.GetTree("Unit", false, false));
             RunTreeInspect(tree);
         }
-
-        public void RunTreeROI(Tree tree)
-        {
-            foreach (Unit unit in m_aUnitROI) unit.m_aoiData.RunTreeROI(tree);
-        }
         #endregion
 
         Log m_log;
         public AOIStrip(string id, Log log)
         {
+            p_aROI = new ObservableCollection<AOIData>(); 
             p_id = id;
             m_log = log;
             InitUnit();

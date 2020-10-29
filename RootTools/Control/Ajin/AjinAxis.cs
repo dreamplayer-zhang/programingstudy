@@ -370,7 +370,7 @@ namespace RootTools.Control.Ajin
             m_eProfile = (eProfile)tree.Set(m_eProfile, m_eProfile, "Profile", "Axis Velocity Profile", bVisible, bReadOnly);
             m_nBrakeSignalBit = tree.Set(m_nBrakeSignalBit, m_nBrakeSignalBit, "BrakeBit", "UNUSED(-1) USED(0~4)", bVisible, bReadOnly);
             m_nServoOnLevel = tree.Set(m_nServoOnLevel, m_nServoOnLevel, "ServoOnLevel", "LOW(0) HIGH(1)", bVisible, bReadOnly);
-            m_maxV = tree.Set(m_maxV, m_maxV, "Max Velocity", "Max Velociry (pulse/sec)", bVisible, bReadOnly);
+            m_maxV = tree.Set(m_maxV, m_maxV, "Max Velocity", "Max Velocity (pulse/sec)", bVisible, bReadOnly);
         }
         #endregion
 
@@ -724,7 +724,6 @@ namespace RootTools.Control.Ajin
 
         public void ThreadStop()
         {
-            RunTree(Tree.eMode.RegWrite); //forget Vericiry
             ServoOn(false); 
             if (m_bThread)
             {

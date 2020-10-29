@@ -61,12 +61,15 @@ namespace Root_ASIS.AOI
         public string p_id { get; set; }
         public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
+
         public IAOI NewAOI() { return null; }
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {
             foreach (Unit unit in m_aUnitROI) unit.m_aoiData.Draw(draw, eDraw); 
         }
+
+        public ObservableCollection<AOIData> p_aROI { get; set; }
 
         public void ClearActive()
         {
@@ -103,16 +106,12 @@ namespace Root_ASIS.AOI
         {
             RunTreeUnit(tree.GetTree("Unit", false, false));
         }
-
-        public void RunTreeROI(Tree tree)
-        {
-            foreach (Unit unit in m_aUnitROI) unit.m_aoiData.RunTreeROI(tree);
-        }
         #endregion
 
         Log m_log;
         public AOIArray(string id, Log log)
         {
+            p_aROI = new ObservableCollection<AOIData>(); 
             p_id = id;
             m_log = log;
             InitUnit();

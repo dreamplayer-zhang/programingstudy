@@ -63,7 +63,13 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header=" ROI ">
-                    <tree:TreeUI x:Name="treeROIUI" Margin="3"/>
+                    <TreeView x:Name="treeViewROI" Margin="3" PreviewMouseUp="treeViewROI_PreviewMouseUp">
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding p_aROI}">
+                                <TextBlock Text="{Binding p_id}" Foreground="{Binding p_brushROI}" Height="{Binding p_nHeight}"/>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
                 </TabItem>
                 <TabItem Header=" Parameter ">
                     <tree:TreeUI x:Name="treeAOIUI" Margin="3"/>

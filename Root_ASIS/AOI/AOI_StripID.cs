@@ -64,12 +64,15 @@ namespace Root_ASIS.AOI
         public string p_id { get; set; }
         public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
+
         public IAOI NewAOI() { return null; }
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {
             //forget
         }
+
+        public ObservableCollection<AOIData> p_aROI { get; set; }
 
         public void ClearActive()
         {
@@ -93,16 +96,12 @@ namespace Root_ASIS.AOI
             RunTreeUnit(tree.GetTree("UnitID", false, false));
             //RunTreeInspect(tree.GetTree("Inspect", false));
         }
-
-        public void RunTreeROI(Tree tree)
-        {
-            //foreach (Unit unit in m_aUnitROI) unit.m_aoiData.RunTreeROI(tree);
-        }
         #endregion
 
         Log m_log;
         public AOI_StripID(string id, Log log)
         {
+            p_aROI = new ObservableCollection<AOIData>(); 
             p_id = id;
             m_log = log;
 //            InitUnit();

@@ -1,6 +1,7 @@
 ﻿using Root_ASIS.AOI;
 using RootTools.Memory;
 using RootTools.Trees;
+using System.Collections.ObjectModel;
 
 namespace Root_ASIS.Teachs
 {
@@ -16,6 +17,8 @@ namespace Root_ASIS.Teachs
 
         IAOI NewAOI();
 
+        ObservableCollection<AOIData> p_aROI { get; set; }
+
         void ClearActive();
 
         void CalcROICount(ref int nReady, ref int nActive);
@@ -23,7 +26,5 @@ namespace Root_ASIS.Teachs
         AOIData GetAOIData(AOIData.eROI eROI); 
 
         void RunTreeAOI(Tree tree);
-
-        void RunTreeROI(Tree tree);
     }
 }

@@ -199,15 +199,12 @@ namespace Root_ASIS.AOI
             RunTreeUnit(tree.GetTree("Unit", false, false));
             RunTreeInspect(tree);
         }
-
-        public void RunTreeROI(Tree tree)
-        {
-            foreach (Unit unit in m_aUnitROI) unit.m_aoiData.RunTreeROI(tree);
-        }
         #endregion
 
         public string p_id { get; set; }
         public int p_nID { get; set; }
+        public ObservableCollection<AOIData> p_aROI { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        //forget1029
         Log m_log;
         public AOI_Unit(string id, Log log)
         {
