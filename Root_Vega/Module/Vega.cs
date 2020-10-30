@@ -19,7 +19,7 @@ namespace Root_Vega.Module
             Yellow,
             Green
         }
-        enum eBuzzer
+        public enum eBuzzer
         { 
             Buzzer1,
             Buzzer2,
@@ -75,12 +75,22 @@ namespace Root_Vega.Module
         protected override void RunThread()
         {
             base.RunThread();
-            m_doLamp.Write(eLamp.Red, EQ.p_eState == EQ.eState.Error);
-            m_doLamp.Write(eLamp.Yellow, EQ.p_eState == EQ.eState.Run);
-            m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Ready);
-            m_eBuzzer = eBuzzer.BuzzerOff;
-			m_doBuzzer.Write(m_eBuzzer);
-			if (!m_diEMS.p_bIn) EQ.p_eState = EQ.eState.Error;
+            m_doLamp.Write(eLamp.Red, EQ.p_eState == EQ.eState.Error); //DIO의 Write함수가 되는지 확인해봐야 함, 안되면 추가해야함
+            m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Run);
+            m_doLamp.Write(eLamp.Yellow, EQ.p_eState == EQ.eState.Ready);
+            
+            switch(EQ.p_eState)
+			{
+                case EQ.eState.Error: BuzzerSet(eBuzzer.Buzzer1); // 부저 계속 켜지는 것 수정해야 함
+                    break;
+                case EQ.eState.Run: BuzzerSet(eBuzzer.Buzzer2);
+                    break;
+                case EQ.eState.Ready:
+                case EQ.eState.Init:
+                    break;
+            }
+
+            if (!m_diEMS.p_bIn) EQ.p_eState = EQ.eState.Error;
 			m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
 			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
             if (m_robot != null)
@@ -277,6 +287,15 @@ namespace Root_Vega.Module
                 return sResult;
             }
         }
-        #endregion
-    }
+		#endregion
+
+		#region Buzzer
+        public void BuzzerSet(eBuzzer Buzzer)
+		{
+            m_eBuzzer = Buzzer;
+            m_doBuzzer.Write(m_eBuzzer);
+        }
+		#endregion
+
+	}
 }
