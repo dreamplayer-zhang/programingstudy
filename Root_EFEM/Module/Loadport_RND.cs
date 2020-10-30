@@ -43,7 +43,7 @@ namespace Root_EFEM.Module
             GemCarrierBase.ePresent present;
             if (m_diPlaced.p_bIn != m_diPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
             else present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            if (m_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + m_infoCarrier.p_eState);
+            if (m_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + m_infoCarrier.p_eState, true);
             switch (m_infoCarrier.p_ePresentSensor)
             {
                 case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;
