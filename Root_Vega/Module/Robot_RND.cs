@@ -95,6 +95,7 @@ namespace Root_Vega.Module
         {
             m_reg = new Registry(p_id + ".InfoReticle");
             p_bDisableHomeWhenArmOpen = m_reg.Read("p_bDisableHomeWhenArmOpen", false);
+            if (!m_diCheckVac.p_bIn) p_infoReticle = null;
             m_sInfoReticle = m_reg.Read("sInfoReticle", m_sInfoReticle);
             p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
             foreach (IRobotChild child in m_aChild) child.ReadInfoReticle_Registry();
