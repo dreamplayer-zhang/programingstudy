@@ -245,7 +245,15 @@ namespace RootTools.Control.Ajin
                 if (AXM("AxmSignalWriteOutputBit", CAXM.AxmSignalWriteOutputBit(m_nAxis, m_nBrakeSignalBit, uOn)) != 0) return;
             }
             if (bOn == false) p_eState = eState.Init;
-            Thread.Sleep(100);
+            for (int n = 0; n < 200; n++)
+            {
+                Thread.Sleep(10); 
+                if (bOn == p_bSeroOn)
+                {
+                    Thread.Sleep(10);
+                    return;
+                }
+            }
         }
 
         int _progressHome = 0; 
