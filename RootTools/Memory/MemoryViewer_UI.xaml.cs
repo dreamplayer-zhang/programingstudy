@@ -35,8 +35,8 @@ namespace RootTools.Memory
 
         void CollepseComboBox(ComboBox comboBox)
         {
-            comboBox.MinWidth = 0;
-            comboBox.Width = 0;
+            comboBox.MinWidth = 0; 
+            comboBox.Width = 0; 
             comboBox.Height = 0; 
         }
 
