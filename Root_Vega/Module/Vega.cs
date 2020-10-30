@@ -19,7 +19,7 @@ namespace Root_Vega.Module
             Yellow,
             Green
         }
-        public enum eBuzzer
+        enum eBuzzer
         { 
             Buzzer1,
             Buzzer2,
@@ -75,31 +75,26 @@ namespace Root_Vega.Module
         protected override void RunThread()
         {
             base.RunThread();
-            m_doLamp.Write(eLamp.Red, EQ.p_eState == EQ.eState.Error); //DIO의 Write함수가 되는지 확인해봐야 함, 안되면 추가해야함
-            m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Run);
-            m_doLamp.Write(eLamp.Yellow, EQ.p_eState == EQ.eState.Ready);
-            
-            switch(EQ.p_eState)
-			{
-                case EQ.eState.Error: BuzzerSet(eBuzzer.Buzzer1); // 부저 계속 켜지는 것 수정해야 함
-                    break;
-                case EQ.eState.Run: BuzzerSet(eBuzzer.Buzzer2);
-                    break;
-                case EQ.eState.Ready:
-                case EQ.eState.Init:
-                    break;
-            }
-
-            if (!m_diEMS.p_bIn) EQ.p_eState = EQ.eState.Error;
-			m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
-			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
+            m_doLamp.Write(eLamp.Red, EQ.p_eState == EQ.eState.Error);
+            m_doLamp.Write(eLamp.Yellow, EQ.p_eState == EQ.eState.Run);
+            m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Ready);
+			//switch(EQ.p_eState)
+   //         {
+   //             case EQ.eState.Error : m_doBuzzer.Write(eBuzzer.Buzzer2); break;
+   //             case EQ.eState.Run: m_doBuzzer.Write(eBuzzer.Buzzer1); break;
+   //             case EQ.eState.Home: m_doBuzzer.Write(eBuzzer.Buzzer1); break;
+   //             case EQ.eState.Ready: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
+   //             case EQ.eState.Init: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
+   //         }
+			m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons", true);
+			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.", true);
             if (m_robot != null)
             {
                 if (!m_diMCReset.p_bIn) m_robot.p_bDisableHomeWhenArmOpen = true; //CHECK
             }
-            m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
-            m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer");
-			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA");
+            m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.", true);
+            m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer", true);
+			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA", true);
         }
 		#endregion
 
@@ -287,15 +282,6 @@ namespace Root_Vega.Module
                 return sResult;
             }
         }
-		#endregion
-
-		#region Buzzer
-        public void BuzzerSet(eBuzzer Buzzer)
-		{
-            m_eBuzzer = Buzzer;
-            m_doBuzzer.Write(m_eBuzzer);
-        }
-		#endregion
-
-	}
+        #endregion
+    }
 }

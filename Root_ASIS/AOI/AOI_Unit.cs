@@ -32,19 +32,21 @@ namespace Root_ASIS.AOI
             //forget
         }
 
+        public ObservableCollection<AOIData> p_aROI { get; set; }
+
         public void ClearActive()
         {
-            foreach (Unit unit in m_aUnitROI)
+            foreach (AOIData aoiData in p_aROI)
             {
-                if (unit.m_aoiData.p_eROI == AOIData.eROI.Active) unit.m_aoiData.p_eROI = AOIData.eROI.Ready;
+                if (aoiData.p_eROI == AOIData.eROI.Active) aoiData.p_eROI = AOIData.eROI.Ready;
             }
         }
 
         public void CalcROICount(ref int nReady, ref int nActive)
         {
-            foreach (Unit unit in m_aUnitROI)
+            foreach (AOIData aoiData in p_aROI)
             {
-                switch (unit.m_aoiData.p_eROI)
+                switch (aoiData.p_eROI)
                 {
                     case AOIData.eROI.Ready: nReady++; break;
                     case AOIData.eROI.Active: nActive++; break;
@@ -54,9 +56,9 @@ namespace Root_ASIS.AOI
 
         public AOIData GetAOIData(AOIData.eROI eROI)
         {
-            foreach (Unit unit in m_aUnitROI)
+            foreach (AOIData aoiData in p_aROI)
             {
-                if (unit.m_aoiData.p_eROI == eROI) return unit.m_aoiData;
+                if (aoiData.p_eROI == eROI) return aoiData;
             }
             return null;
         }
@@ -108,7 +110,6 @@ namespace Root_ASIS.AOI
             }
         }
         List<Unit> m_aUnit = new List<Unit>();
-        List<Unit> m_aUnitROI = new List<Unit>(); 
 
         void InitUnit(InfoStrip infoStrip)
         {
@@ -123,8 +124,8 @@ namespace Root_ASIS.AOI
                 m_aUnit[n].p_id = p_id + "." + n.ToString("000");
                 m_aUnit[n].m_result = (infoStrip != null) ? infoStrip.GetUnitResult(n) : null; 
             }
-            m_aUnitROI.Clear();
-            m_aUnitROI.Add(m_aUnit[0]); 
+            p_aROI.Clear();
+            p_aROI.Add(m_aUnit[0].m_aoiData); 
         }
 
         void RunTreeUnit(Tree tree)
@@ -203,16 +204,16 @@ namespace Root_ASIS.AOI
 
         public string p_id { get; set; }
         public int p_nID { get; set; }
-        public ObservableCollection<AOIData> p_aROI { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        //forget1029
+
         Log m_log;
         public AOI_Unit(string id, Log log)
         {
+            p_aROI = new ObservableCollection<AOIData>();
             p_id = id;
             m_log = log;
             p_bEnable = true;
-            InitUnit(null); 
-            InitInspect(); 
+            InitUnit(null);
+            InitInspect();
         }
     }
 }
