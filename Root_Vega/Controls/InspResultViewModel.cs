@@ -330,9 +330,9 @@ namespace Root_Vega.Controls
 		#endregion
 
 		string DBDataPath { get; set; }
-		string TiffDataPath
+		string VegaImagePath
 		{
-			get { return this.DBDataPath.Replace(".vega_result", ".tif"); }
+			get { return this.DBDataPath.Replace(".vega_result", ".vega_image"); }
 		}
 
 		public string[] SignArray = new string[] { ">=", "<=", "=" };
@@ -395,7 +395,7 @@ namespace Root_Vega.Controls
 				MakeDictionary(tempTable);
 				tempTable.Dispose();
 				//Data,*No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER),TdiImageExist(INTEGER),VrsImageExist(INTEGER)
-				_OriginResultDataTable = DataIndexDB.GetDataTable("Data", "No", "DCode", "Size", "Length", "Width", "Height", "InspMode", "PosX", "PosY");
+				_OriginResultDataTable = DataIndexDB.GetDataTable("Data", "No", "DCode", "AreaSize", "Length", "Width", "Height", "InspMode", "FOV", "PosX", "PosY");
 				ResultDataTable = _OriginResultDataTable.Copy();
 
 				//Datainfo,*LotIndexID(INTEGER),InspStartTime(TEXT),BCRID(TEXT)
@@ -459,28 +459,26 @@ namespace Root_Vega.Controls
 				DataIndexDB.Disconnect();
 			}
 		}
-		public async Task LoadTiffImage(CancellationToken ct)
+		public async Task LoadVegaImage(CancellationToken ct)
 		{
 			this.ImageLoaded = false;
 			this.TDIImageDictionary = new Dictionary<int, Bitmap>();
 			this.VRSImageDictionary = new Dictionary<int, Bitmap>();
-			if (File.Exists(TiffDataPath))
+			if (File.Exists(VegaImagePath))
 			{
-				await Task.Factory.StartNew(() => ParseTiff(ct));
+				await Task.Factory.StartNew(() => ParseVegaImage(ct));
 			}
 		}
-		public bool ParseTiff(CancellationToken token)
+		public bool ParseVegaImage(CancellationToken token)
 		{
-			using (Image imageFile = Image.FromFile(TiffDataPath))
+			using (FileStream fs = new FileStream(System.IO.Path.Combine(VegaImagePath), FileMode.Open))
 			{
 				LoadStatusVisible = Visibility.Visible;
 				try
 				{
-					FrameDimension frameDimensions = new FrameDimension(
-					   imageFile.FrameDimensionsList[0]);
-
-					// Gets the number of pages from the tiff image (if multipage) 
-					int frameNum = imageFile.GetFrameCount(frameDimensions);
+					byte[] buffer = new byte[4];
+					fs.Read(buffer, 0, sizeof(int));
+					var frameNum = BitConverter.ToInt32(buffer, 0);
 
 					for (int frame = 0; frame < frameNum; frame++)
 					{
@@ -493,9 +491,29 @@ namespace Root_Vega.Controls
 							return false;
 						}
 
-						imageFile.SelectActiveFrame(frameDimensions, frame);
-						using (Bitmap bmp = new Bitmap(imageFile))
+						fs.Read(buffer, 0, sizeof(int));
+						int idx = BitConverter.ToInt32(buffer, 0);
+
+						fs.Read(buffer, 0, sizeof(int));
+						int imageWidth = BitConverter.ToInt32(buffer, 0);
+
+						fs.Read(buffer, 0, sizeof(int));
+						int imageHeight = BitConverter.ToInt32(buffer, 0);
+
+						fs.Read(buffer, 0, sizeof(int));
+						int length = BitConverter.ToInt32(buffer, 0);
+
+						buffer = new byte[length];
+						fs.Read(buffer, 0, length);
+
+
+						//imageFile.SelectActiveFrame(frameDimensions, frame);
+						using (Bitmap bmp = new Bitmap(imageWidth,imageHeight,System.Drawing.Imaging.PixelFormat.Format8bppIndexed))
 						{
+							BitmapData data = bmp.LockBits(new Rectangle(0, 0, imageWidth, imageHeight), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+							System.Runtime.InteropServices.Marshal.Copy(buffer, 0, data.Scan0, buffer.Length);
+							bmp.UnlockBits(data);
+
 							switch (ImageInfoDictionary[frame].Type)
 							{
 								case ImageType.TDI:
@@ -507,6 +525,7 @@ namespace Root_Vega.Controls
 								case ImageType.Mask:
 									break;
 							}
+							bmp.Dispose();
 						}
 					}
 					this.ImageLoaded = true;

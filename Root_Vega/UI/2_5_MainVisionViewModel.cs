@@ -771,7 +771,7 @@ namespace Root_Vega
 
 		private void _endInsp()
 		{
-			m_Engineer.m_InspManager.InspectionDone();
+			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath);
 		}
 
 		public bool FindFeature(Feature feature, out CRect crtSearchArea, out Point ptMaxRelative, out int nWidthDiff, out int nHeightDiff)

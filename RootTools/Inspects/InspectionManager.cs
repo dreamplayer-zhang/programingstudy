@@ -50,8 +50,10 @@ namespace RootTools.Inspects
 		private string inspDefaultDir;
 		private string inspFileName;
 		SqliteDataDB VSDBManager;
+		SqliteDataDB IndexDBManager;
 		System.Data.DataTable VSDataInfoDT;
 		System.Data.DataTable VSDataDT;
+		System.Data.DataTable SearchDataDT;
 		Dictionary<int, CPoint> refPosDictionary;
 
 		bool m_bProgress;
@@ -165,7 +167,7 @@ namespace RootTools.Inspects
 		//	}
 		//}
 
-		public void InspectionDone()
+		public void InspectionDone(string inspIndexFilePath)
 		{
 			bool testFlag = false;
 			//여기서 DB관련동작 이하생략!
@@ -192,11 +194,13 @@ namespace RootTools.Inspects
 				{
 					System.IO.Directory.CreateDirectory(inspDefaultDir);
 				}
-				inspFileName = DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+				var nowTime = DateTime.Now;
+				inspFileName = nowTime.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
 				var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
 				string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
 
 				VSDBManager = new SqliteDataDB(targetVsPath, VSDB_configpath);
+				IndexDBManager = new SqliteDataDB(inspIndexFilePath, VSDB_configpath);
 
 				if (VSDBManager.Connect())
 				{
@@ -205,6 +209,11 @@ namespace RootTools.Inspects
 
 					VSDataInfoDT = VSDBManager.GetDataTable("Datainfo");
 					VSDataDT = VSDBManager.GetDataTable("Data");
+				}
+				if (IndexDBManager.Connect())
+				{
+					IndexDBManager.CreateTable("SearchTable");
+					SearchDataDT = IndexDBManager.GetDataTable("SearchTable");
 				}
 
 				//int stride = ImageWidth / 8;
@@ -219,6 +228,7 @@ namespace RootTools.Inspects
 				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
 				using (FileStream fs = new FileStream(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".vega_image"), FileMode.Create))
 				{
+					fs.Write(BitConverter.GetBytes(tempSet.Tables["tempdata"].Rows.Count), 0, sizeof(int));//defect 개수 저장
 					foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
 					{
 						System.Data.DataRow dataRow = VSDataDT.NewRow();
@@ -266,14 +276,25 @@ namespace RootTools.Inspects
 						string group = item["memGROUP"].ToString();
 						string memory = item["memMEMORY"].ToString();
 						var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
-						var imageBytes = new ImageData(tempMem).GetRectByteArray(ImageSizeBlock);
+						var img = new ImageData(tempMem);
+						var imageBytes = img.GetRectByteArray(ImageSizeBlock);
 
-						fs.Write(BitConverter.GetBytes(ImageWidth), 0, sizeof(int));
-						fs.Write(BitConverter.GetBytes(ImageHeight), 0, sizeof(int));
-						fs.Write(imageBytes, 0, imageBytes.Length);
-						//encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(BitmapToBitmapSource(image.GetRectImage(ImageSizeBlock))));
+						fs.Write(BitConverter.GetBytes(Convert.ToInt32(item["idx"].ToString())), 0, sizeof(int));//4
+						fs.Write(BitConverter.GetBytes(ImageWidth), 0, sizeof(int));//4
+						fs.Write(BitConverter.GetBytes(ImageHeight), 0, sizeof(int));//4
+						fs.Write(BitConverter.GetBytes(imageBytes.Length), 0, sizeof(int));//4
+						fs.Write(imageBytes, 0, imageBytes.Length);//바로직전거만큼
 					}
 				}
+				System.Data.DataRow searchDataRow = SearchDataDT.NewRow();
+				searchDataRow["Idx"] = SearchDataDT.Rows.Count;
+				searchDataRow["InspStartTime"] = nowTime.ToString("yyyy-MM-dd HH:mm:ss");//TODO 나중에 진짜 검사 시작시간(로딩 시작 시간)으로 바꿔야 함
+				searchDataRow["ReticleID"] = "RETICLEID";//TODO 나중에 진짜 retilce Id를 받아와서 넣어줘야 함
+				searchDataRow["RecipeName"] = "Rcp001";//TODO 나중에 진짜 recipe name을 받아와서 넣어줘야 함
+				searchDataRow["TotalDefectCount"] = tempSet.Tables["tempdata"].Rows.Count;
+				searchDataRow["DataFilePath"] = targetVsPath;
+				SearchDataDT.Rows.Add(searchDataRow);
+
 
 				//if (VSDataDT.Rows.Count > 0)
 				//{
@@ -284,8 +305,13 @@ namespace RootTools.Inspects
 				VSDBManager.SetDataTable(VSDataInfoDT);
 				VSDBManager.SetDataTable(VSDataDT);
 				VSDBManager.Disconnect();
+
+				IndexDBManager.SetDataTable(SearchDataDT);
+				IndexDBManager.Disconnect();
+
 				VSDataDT.Clear();
 				VSDataInfoDT.Clear();
+				SearchDataDT.Clear();
 
 
 				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
