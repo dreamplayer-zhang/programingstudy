@@ -163,7 +163,8 @@ namespace RootTools.Module
         void ThreadRun()
         {
             m_bThread = true;
-            Thread.Sleep(2000);
+            //Thread.Sleep(2000);
+            Thread.Sleep(5000);
             while (m_bThread)
             {
                 Thread.Sleep(10);
