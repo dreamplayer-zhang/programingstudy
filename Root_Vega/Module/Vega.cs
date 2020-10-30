@@ -78,8 +78,14 @@ namespace Root_Vega.Module
             m_doLamp.Write(eLamp.Red, EQ.p_eState == EQ.eState.Error);
             m_doLamp.Write(eLamp.Yellow, EQ.p_eState == EQ.eState.Run);
             m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Ready);
-            m_eBuzzer = eBuzzer.BuzzerOff;
-			m_doBuzzer.Write(m_eBuzzer);
+			//switch(EQ.p_eState)
+   //         {
+   //             case EQ.eState.Error : m_doBuzzer.Write(eBuzzer.Buzzer2); break;
+   //             case EQ.eState.Run: m_doBuzzer.Write(eBuzzer.Buzzer1); break;
+   //             case EQ.eState.Home: m_doBuzzer.Write(eBuzzer.Buzzer1); break;
+   //             case EQ.eState.Ready: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
+   //             case EQ.eState.Init: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
+   //         }
 			m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons", true);
 			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.", true);
             if (m_robot != null)
