@@ -337,12 +337,14 @@ namespace Root_Vega.Controls
 
 		public string[] SignArray = new string[] { ">=", "<=", "=" };
 
-		string dbFormatFilePath = @"C:\sqlite\db\vsdb.txt";
+		string dbFormatFilePath = @"C:\vsdb\init\vsdb.txt";
 
 		Dictionary<int, Bitmap> TDIImageDictionary { get; set; }
 		Dictionary<int, Bitmap> VRSImageDictionary { get; set; }
 		Dictionary<int, ImageInfo> ImageInfoDictionary { get; set; }
 		SqliteDataDB DataIndexDB { get; set; }
+
+		ColorPalette mono { get; set; }
 		bool ImageLoaded { get; set; }
 		public InspResultViewModel()
 		{
@@ -428,6 +430,18 @@ namespace Root_Vega.Controls
 					bmp.CacheOption = BitmapCacheOption.OnLoad;
 					this.CurrentMapImage = bmp.Clone();
 				}
+
+				Bitmap tempbmp = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+				mono = tempbmp.Palette;
+				System.Drawing.Color[] ent = mono.Entries;
+
+				Parallel.For(0, 256, (j) =>
+				{
+					System.Drawing.Color b = new System.Drawing.Color();
+					b = System.Drawing.Color.FromArgb((byte)j, (byte)j, (byte)j);
+					ent[j] = b;
+				});
+				tempbmp.Dispose();
 			}
 
 		}
@@ -510,6 +524,7 @@ namespace Root_Vega.Controls
 						//imageFile.SelectActiveFrame(frameDimensions, frame);
 						using (Bitmap bmp = new Bitmap(imageWidth,imageHeight,System.Drawing.Imaging.PixelFormat.Format8bppIndexed))
 						{
+							bmp.Palette = mono;
 							BitmapData data = bmp.LockBits(new Rectangle(0, 0, imageWidth, imageHeight), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
 							System.Runtime.InteropServices.Marshal.Copy(buffer, 0, data.Scan0, buffer.Length);
 							bmp.UnlockBits(data);
@@ -574,7 +589,7 @@ namespace Root_Vega.Controls
 		private void SetData(DataRowView selectedDataTable, ImageType type)
 		{
 			int idx = Convert.ToInt32(selectedDataTable["No"]);
-			int size = Convert.ToInt32(selectedDataTable["Size"]);
+			int size = Convert.ToInt32(selectedDataTable["AreaSize"]);
 			int dcode = Convert.ToInt32(selectedDataTable["DCode"]);
 			int posx = Convert.ToInt32(selectedDataTable["PosX"]);
 			int posy = Convert.ToInt32(selectedDataTable["PosY"]);
@@ -668,8 +683,8 @@ namespace Root_Vega.Controls
 			if (!File.Exists(this.DBDataPath) || !File.Exists(dbFormatFilePath))
 				return;
 
-			if (!IsInitialized)
-				return;
+			//if (!IsInitialized)
+			//	return;
 
 			//Data,*No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER),TdiImageExist(INTEGER),VrsImageExist(INTEGER)
 			string dCodeQuery = string.Format("DCode = {0}", DefectCode);
@@ -702,8 +717,8 @@ namespace Root_Vega.Controls
 				secondSearchEnable = true;
 			}
 
-			string defectSizeQuery_1 = string.Format("Size {0} {1}", firstSign, FirstSizeUm);
-			string defectSizeQuery_2 = string.Format("Size {0} {1}", secondSign, SecondSizeUm);
+			string defectSizeQuery_1 = string.Format("Length {0} {1}", firstSign, FirstSizeUm);
+			string defectSizeQuery_2 = string.Format("Length {0} {1}", secondSign, SecondSizeUm);
 
 
 
