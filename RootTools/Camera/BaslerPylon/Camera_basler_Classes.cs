@@ -71,20 +71,29 @@ namespace RootTools.Camera.BaslerPylon
         public Basler.Pylon.Camera m_Cam = null;
 
         //string IsCanGrab = "";
+        bool IsGrabbed = false;
         public bool _IsCanGrab
         {
             get
             {
-                if (m_Cam == null)
-                    return false;
-                if (m_Cam != null && m_Cam.IsOpen && m_Cam.StreamGrabber.IsGrabbing)
-                    return false;
-                else
-                    return true;
+                return IsGrabbed;
             }
             set
             {
-                RaisePropertyChanged();
+                SetValueProperty(ref IsGrabbed, value);
+            }
+        }
+
+        bool IsGrabbing = false;
+        public bool _IsGrabbing
+        {
+            get
+            {
+                return IsGrabbing;
+            }
+            set
+            {
+                SetValueProperty(ref IsGrabbing, value);
             }
         }
 
@@ -454,19 +463,95 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
         
-
         public string p_PixelFormat
         {
             get
             {
+                try
+                {
                 return m_Cam.Parameters[PLCamera.PixelFormat].GetValue();
+            }
+                catch
+                {
+                    return "Mono 8";
+                }
             }
             set
             {
-                
+                if (p_PixelFormat == value)
+                    return;
+                m_Cam.Parameters[PLCamera.PixelFormat].TrySetValue(value);
+                ValueChange(value);
+                _ExposureTimeRaw = 100;
             }
         }
+        public List<string> _PixelFormatEnum
+        {
+            get
+            {
+                try
+                {
+                    List<string> result = new List<string>() {"Mono8","YUV422Packed"};
+                    return result;
+                }
+                catch
+                {
+                    return new List<string>();
+                }
+            }
+            set
+            {
+            }
+        }
+        public long _ExposureTimeRaw
+        {
+            get
+            {
+                try
+                {
+                    return m_Cam.Parameters[PLCamera.ExposureTimeRaw].GetValue();
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+            set
+            {
+                if (_ExposureTimeRaw == value)
+                    return;
+                
+                if (m_Cam.Parameters[PLCamera.PixelFormat].GetValue().Equals(PLCamera.PixelFormat.Mono8))
+                {
+                    //GrayScale인 경우 frame rate를 60 이상 사용하지 않도록 제한
+                    if (value < 16638)
+                        m_Cam.Parameters[PLCamera.ExposureTimeRaw].TrySetValue(16638, IntegerValueCorrection.Nearest);
+                    else
+                        m_Cam.Parameters[PLCamera.ExposureTimeRaw].TrySetValue(value, IntegerValueCorrection.Nearest);
+            }
+                else
+                {
+                    //Color인 경우 frame rate를 30 이상 사용하지 않도록 제한
+                    if (value < 33300)
+                        m_Cam.Parameters[PLCamera.ExposureTimeRaw].TrySetValue(33300, IntegerValueCorrection.Nearest);
+                    else
+                        m_Cam.Parameters[PLCamera.ExposureTimeRaw].TrySetValue(value, IntegerValueCorrection.Nearest);
+        }
 
+                ValueChange(value);
+            }
+        }
+        public double _ResultingFrameRateAbs
+        {
+            get
+            {
+                return m_Cam.Parameters[PLCamera.ResultingFrameRateAbs].GetValue();
+            }
+            set
+            {
+                RaisePropertyChanged();
+            }
+        }
         public string _TransmissionType
         {
             get
@@ -505,9 +590,6 @@ namespace RootTools.Camera.BaslerPylon
         //    {
         //    }
         //}
-
-
-       
         public BaslerParameterSet()
         {
         

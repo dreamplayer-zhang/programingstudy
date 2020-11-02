@@ -66,7 +66,7 @@ namespace RootTools.GAFs
         {
             p_sMsg = sMsg; 
             p_bSet = bSet;
-            if (bEQError) EQ.p_eState = EQ.eState.Error;
+            if (bSet && bEQError) EQ.p_eState = EQ.eState.Error;
         }
 
         DateTime _dateTime = DateTime.Now;

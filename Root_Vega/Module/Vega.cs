@@ -37,6 +37,11 @@ namespace Root_Vega.Module
         DIO_I m_diMCReset;
         DIO_I m_diIonizer;
         DIO_I m_diCDALow;
+        DIO_I m_diBuzzerOff;
+        DIO_I m_diDoorLock;
+        DIO_I m_diInterlock_Key;
+        DIO_O m_doDoorLock_Use;
+
 
         public override void GetTools(bool bInit)
         {
@@ -47,6 +52,12 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
             p_sInfo = m_toolBox.Get(ref m_diIonizer, this, "Ionizer");
             p_sInfo = m_toolBox.Get(ref m_diCDALow, this, "CDA Low");
+            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
+            p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.Get(ref m_diInterlock_Key, this, "InterLock Key");
+            p_sInfo = m_toolBox.Get(ref m_doDoorLock_Use, this, "Door Lock Use");
+
+
             p_sInfo = m_RFID.GetTools(this, bInit);
             
                 if (bInit) InitALID(); 
@@ -60,6 +71,8 @@ namespace Root_Vega.Module
         ALID m_alidMCReset;
         ALID m_alidIonizer;
         ALID m_alidCDALow;
+        ALID m_alidDoorLock;
+        ALID m_alidInterlock_Key;
 
         void InitALID()
         {
@@ -68,26 +81,44 @@ namespace Root_Vega.Module
             m_alidMCReset = m_gaf.GetALID(this, "MC Reset", "MC Reset Error");
             m_alidIonizer = m_gaf.GetALID(this, "Ionizer", "Ionizer Error");
             m_alidCDALow = m_gaf.GetALID(this, "CDA Low", "CDA Low Error");
-		}
+            m_alidDoorLock = m_gaf.GetALID(this, "Door Lock", "Door Lock Error");
+            m_alidInterlock_Key = m_gaf.GetALID(this, "Interlock_Key", "Interlock Key State Check");
+        }
         #endregion
-
+        public EQ.eState status = EQ.eState.Init;
+        int lamp_count = 0;
         #region Thread
         protected override void RunThread()
         {
             base.RunThread();
+           
             m_doLamp.Write(eLamp.Red, EQ.p_eState == EQ.eState.Error);
             m_doLamp.Write(eLamp.Yellow, EQ.p_eState == EQ.eState.Run);
             m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Ready);
-			//switch(EQ.p_eState)
-   //         {
-   //             case EQ.eState.Error : m_doBuzzer.Write(eBuzzer.Buzzer2); break;
-   //             case EQ.eState.Run: m_doBuzzer.Write(eBuzzer.Buzzer1); break;
-   //             case EQ.eState.Home: m_doBuzzer.Write(eBuzzer.Buzzer1); break;
-   //             case EQ.eState.Ready: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
-   //             case EQ.eState.Init: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
-   //         }
-			m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons", true);
-			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.", true);
+           
+            if (m_diBuzzerOff.p_bIn)
+                m_doBuzzer.Write(eBuzzer.BuzzerOff);
+            else if (status != EQ.p_eState)
+            {
+                lamp_count = 0;
+                    switch (EQ.p_eState)
+                    {
+                        case EQ.eState.Error: m_doBuzzer.Write(eBuzzer.Buzzer2); break;
+                        case EQ.eState.Run: m_doBuzzer.Write(eBuzzer.Buzzer4); break;
+                        case EQ.eState.Home: m_doBuzzer.Write(eBuzzer.Buzzer3); break;
+                        case EQ.eState.Ready: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
+                        case EQ.eState.Init: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
+                    }
+                status = EQ.p_eState;
+            }
+            lamp_count++;
+            if (lamp_count>50)
+            {
+                m_doBuzzer.Write(eBuzzer.BuzzerOff);
+            }
+
+            m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons", true);
+			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.", false);
             if (m_robot != null)
             {
                 if (!m_diMCReset.p_bIn) m_robot.p_bDisableHomeWhenArmOpen = true; //CHECK
@@ -95,11 +126,12 @@ namespace Root_Vega.Module
             m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.", true);
             m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer", true);
 			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA", true);
+            m_alidDoorLock.Run(m_diDoorLock.p_bIn, "Please Check Doors", true);
         }
-		#endregion
+        #endregion
 
-		#region RFID
-		public class RFID
+        #region RFID
+        public class RFID
         {
             #region CRC
             ushort[] m_uCRC =
