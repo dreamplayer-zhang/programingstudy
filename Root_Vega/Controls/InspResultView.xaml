@@ -121,7 +121,7 @@
 						Padding="10,0"
 					  Grid.RowSpan="2">
 					<Button VerticalAlignment="Stretch"
-							IsEnabled="{Binding IsInitialized}"
+							
 							Style="{StaticResource BasicBtn}"
 							Content="Search"
 							Command="{Binding CommandOnStartSearchButton}"/>

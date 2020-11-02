@@ -33,5 +33,7 @@ namespace Root_Vega
 		public const string sD2DABSmem = "D2dABSMem";
 
 		public static string MainFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+
+		public static string indexFilePath = @"C:\vsdb\init\SearchIndex.sqlite";
 	}
 }
