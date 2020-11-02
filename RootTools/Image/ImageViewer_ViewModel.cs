@@ -678,88 +678,58 @@ namespace RootTools
 			{
 				if (p_ImageData != null)
 				{
-                    object o = new object();
-
 					if (p_ImageData.p_nByte == 1)
 					{
 						Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-
-                        IntPtr ptrMem = p_ImageData.GetPtr();
+						IntPtr ptrMem = m_ImageData.GetPtr();
 						if (ptrMem == IntPtr.Zero)
 							return;
 						int pix_x = 0;
 						int pix_y = 0;
-                        int rectX, rectY, rectWidth, rectHeight, sizeX;
-                        byte[,,] viewptr = view.Data;
-                        byte* imageptr = (byte*)ptrMem.ToPointer();
 
-                        rectX = p_View_Rect.X;
-                        rectY = p_View_Rect.Y;
-                        rectWidth = p_View_Rect.Width;
-                        rectHeight = p_View_Rect.Height;
-
-                        sizeX = p_ImageData.p_Size.X;
-
-
-                        Parallel.For(0, p_CanvasHeight, (yy) =>
-                         {
-                             lock (o)
+						for (int yy = 0; yy < p_CanvasHeight; yy++)
 						{
-                                 pix_y = rectY + yy * rectHeight / p_CanvasHeight;
-
 							for (int xx = 0; xx < p_CanvasWidth; xx++)
 							{
-                                     pix_x = rectX + xx * rectWidth / p_CanvasWidth;
-                                     viewptr[yy, xx, 0] = imageptr[pix_x + pix_y * sizeX];
+								pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
+								pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
+								view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
 							}
 						}
-                         });
 
 						p_ImgSource = ImageHelper.ToBitmapSource(view);
 
-                        p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
-
-                        if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y) == 0)
-                            p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), 2);
+						p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / m_ImageData.p_Size.Y), 0, 0);
+						if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y) == 0)
+							p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), 2);
 						else
-                            p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y));
+							p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y));
 
 					}
 					else if (p_ImageData.p_nByte == 3)
 					{
 						Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
-                        IntPtr ptrMem = p_ImageData.GetPtr();
-
+						IntPtr ptrMem = m_ImageData.GetPtr();
 						if (ptrMem == IntPtr.Zero)
 							return;
-
-                        byte[,,] viewPtr = view.Data;
-                        byte* imageptr = (byte*)ptrMem.ToPointer();
-                        long pix_x = 0;
-                        long pix_y = 0;
+						int pix_x = 0;
+						int pix_y = 0;
 						long pix_rect;
-                        int viewrectY = p_View_Rect.Y;
-                        int viewrectX = p_View_Rect.X;
-                        int viewrectHeight = p_View_Rect.Height;
-                        int viewrectWidth = p_View_Rect.Width;
-                        int sizeX = p_ImageData.p_Size.X;
 
-                        Parallel.For(1, p_CanvasHeight, (yy) =>
+						for (int yy = 1; yy < p_CanvasHeight; yy++)
 						{
-                            lock (o)
-                            {
-                                pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                                pix_rect = pix_y * sizeX;
+							pix_y = p_View_Rect.Y + yy * p_View_Rect.Height / p_CanvasHeight;
+							pix_rect = (long)pix_y * p_ImageData.p_Size.X;
 							for (int xx = 0; xx < p_CanvasWidth; xx++)
 							{
-                                    pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+								pix_x = p_View_Rect.X + xx * p_View_Rect.Width / p_CanvasWidth;
 
-                                    viewPtr[yy, xx, 2] = imageptr[0 + 3 * (pix_x + pix_rect)];
-                                    viewPtr[yy, xx, 1] = imageptr[1 + 3 * (pix_x + pix_rect)];
-                                    viewPtr[yy, xx, 0] = imageptr[2 + 3 * (pix_x + pix_rect)];
+								view.Data[yy, xx, 2] = ((byte*)ptrMem)[0 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
+								view.Data[yy, xx, 1] = ((byte*)ptrMem)[1 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
+								view.Data[yy, xx, 0] = ((byte*)ptrMem)[2 + m_ImageData.p_nByte * ((long)pix_x + pix_rect)];
+
 							}
 						}
-                        });
 
 						p_ImgSource = ImageHelper.ToBitmapSource(view);
 
