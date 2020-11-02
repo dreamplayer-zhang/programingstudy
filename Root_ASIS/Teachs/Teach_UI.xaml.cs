@@ -153,12 +153,16 @@ namespace Root_ASIS.Teachs
             m_teach.InvalidROI(); 
         }
 
-        private void treeViewROI_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void treeViewROI_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            AOIData aoiActive = m_teach.p_roiActive;
-            ((AOIData)e.NewValue).p_eROI = AOIData.eROI.Active;
-            m_teach.CalcROICount();
-            if (m_teach.m_nROIActive > 1) aoiActive.p_eROI = AOIData.eROI.Ready;
+            TextBlock tb = (TextBlock)e.OriginalSource;
+            if (tb.DataContext is AOIData)
+            {
+                AOIData aoiActive = m_teach.p_roiActive;
+                ((AOIData)tb.DataContext).p_eROI = AOIData.eROI.Active;
+                m_teach.CalcROICount();
+                if (m_teach.m_nROIActive > 1) aoiActive.p_eROI = AOIData.eROI.Ready;
+            }
         }
         #endregion
     }

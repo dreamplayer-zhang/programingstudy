@@ -7,7 +7,7 @@
              xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
              xmlns:memory="clr-namespace:RootTools.Memory;assembly=RootTools"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="800" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>

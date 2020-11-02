@@ -63,11 +63,11 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header=" ROI ">
-                    <TreeView x:Name="treeViewROI" Margin="3"
-                              SelectedItemChanged="treeViewROI_SelectedItemChanged">
+                    <TreeView x:Name="treeViewROI" Margin="3" PreviewMouseDown="treeViewROI_PreviewMouseDown">
                         <TreeView.ItemContainerStyle>
                             <Style TargetType="{x:Type TreeViewItem}">
                                 <Setter Property="IsExpanded" Value="True"/>
+                                <Setter Property="Focusable" Value="False"/>
                             </Style>
                         </TreeView.ItemContainerStyle>
                         <TreeView.ItemTemplate>
