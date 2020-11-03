@@ -98,6 +98,7 @@ namespace Root_Vega.Module
            
             if (m_diBuzzerOff.p_bIn)
                 m_doBuzzer.Write(eBuzzer.BuzzerOff);
+
             else if (status != EQ.p_eState)
             {
                 lamp_count = 0;
@@ -116,8 +117,9 @@ namespace Root_Vega.Module
             {
                 m_doBuzzer.Write(eBuzzer.BuzzerOff);
             }
-
-            m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons", true);
+            //m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors", true);
+            
+            m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the Emergency Buttons", true);
 			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.", false);
             if (m_robot != null)
             {
@@ -126,7 +128,6 @@ namespace Root_Vega.Module
             m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.", true);
             m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer", true);
 			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA", true);
-            m_alidDoorLock.Run(m_diDoorLock.p_bIn, "Please Check Doors", true);
         }
         #endregion
 

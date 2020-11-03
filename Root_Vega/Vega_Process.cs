@@ -361,7 +361,7 @@ namespace Root_Vega
             TreeRoot tree = m_treeSequence;
             tree.p_eMode = mode;
             Sequence[] aSequence = m_qSequence.ToArray();
-            for (int n = 0; n < (int)Math.Min(aSequence.Length, 100); n++)
+            for (int n = 0; n < (int)Math.Min(aSequence.Length, 5); n++)
             {
                 ModuleRunBase moduleRun = aSequence[n].m_moduleRun;
                 InfoReticle infoReticle = aSequence[n].m_infoReticle;

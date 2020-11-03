@@ -361,7 +361,7 @@ namespace Root_Vega.Module
             strLightName = "Align2_1";
             SetLightByName(strLightName, 60);
             Thread.Sleep(100);
-            m_CamAlign2.GrabOneShot();
+            m_CamAlign2.Grab();
             Thread.Sleep(100);
             SetLightByName(strLightName, 0);
 
@@ -429,7 +429,7 @@ namespace Root_Vega.Module
             strLightName = "Align2_1";
             SetLightByName(strLightName, 60);
             Thread.Sleep(100);
-            m_CamAlign2.GrabOneShot();
+            m_CamAlign2.Grab();
             Thread.Sleep(100);
             SetLightByName(strLightName, 0);
 
