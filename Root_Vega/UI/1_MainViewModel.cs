@@ -57,13 +57,6 @@ namespace Root_Vega
                 InitAlarmData();
             }
 
-            void HandlerInitialize()
-            {
-                EQ.p_bStop = false;
-                //    if (EQ.p_eState != EQ.eState.Run)
-                EQ.p_eState = EQ.eState.Home;
-            }
-
             void LoadLp1()
             {  
             }
@@ -140,14 +133,6 @@ namespace Root_Vega
                 get
                 {
                     return new RelayCommand(TestFunction2);
-                }
-            }
-
-            public RelayCommand InitializeCommand
-            {
-                get
-                {
-                    return new RelayCommand(HandlerInitialize);
                 }
             }
 
