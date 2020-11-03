@@ -94,6 +94,13 @@
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.6.7\lib\net45\NLog.dll</HintPath>
     </Reference>
+    <Reference Include="PylonC.NET, Version=4.2.0.0, Culture=neutral, PublicKeyToken=a77e8471c5919d5a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Camera\Silicon\DLL\PylonC.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="PylonC.NETSupportLibrary">
+      <HintPath>Camera\Silicon\DLL\PylonC.NETSupportLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="QRCoder, Version=1.3.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\QRCoder.1.3.6\lib\net40\QRCoder.dll</HintPath>
     </Reference>
@@ -137,6 +144,10 @@
     <Compile Include="Camera\Matrox\Camera_Matrox_UI.xaml.cs">
       <DependentUpon>Camera_Matrox_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Camera\Silicon\Camera_Silicon.cs" />
+    <Compile Include="Camera\Silicon\SiSoDefines.cs" />
+    <Compile Include="Camera\Silicon\SiSoFramegrabber.cs" />
+    <Compile Include="Camera\Silicon\SiSoSDKLib.cs" />
     <Compile Include="Control\DIO_Is.cs" />
     <Compile Include="crosstest.cs" />
     <Compile Include="ImageToolViewer\BasicTool.cs" />
