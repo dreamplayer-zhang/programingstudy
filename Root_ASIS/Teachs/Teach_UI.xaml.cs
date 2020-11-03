@@ -155,6 +155,7 @@ namespace Root_ASIS.Teachs
 
         private void treeViewROI_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            if ((e.OriginalSource is TextBlock) == false) return; 
             TextBlock tb = (TextBlock)e.OriginalSource;
             if (tb.DataContext is AOIData)
             {

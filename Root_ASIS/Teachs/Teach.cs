@@ -80,10 +80,10 @@ namespace Root_ASIS.Teachs
 
         public AOIData p_roiActive
         {
-            get { return GetActineROI(); }
+            get { return GetActiveROI(); }
         }
 
-        AOIData GetActineROI()
+        AOIData GetActiveROI()
         {
             CalcROICount();
             if (m_nROIActive == 1)
@@ -133,7 +133,7 @@ namespace Root_ASIS.Teachs
             if (p_roiActive == null) return;
             p_roiActive.LBD(bDown, cpImg);
             Draw(AOIData.eDraw.ROI);
-            GetActineROI(); 
+            GetActiveROI(); 
         }
 
         private void M_viewer_OnMouseMove(CPoint cpImg)
@@ -149,6 +149,49 @@ namespace Root_ASIS.Teachs
             draw.Clear();
             foreach (IAOI aoi in p_aROI) aoi.Draw(draw, eDraw); 
             draw.InvalidDraw(); 
+        }
+        #endregion
+
+        #region Recipe
+        public void SaveRecipe(string sFile)
+        {
+            Job job = new Job(sFile, true, m_log);
+            m_treeRootAOI.m_job = job;
+            job.Set(m_id, "AOI Count", p_aAOI.Count); 
+            for (int n = 0; n < p_aAOI.Count; n++)
+            {
+                string sKey = m_id + n.ToString("00");
+                job.Set(sKey, "AOI", p_aAOI[n].p_id); 
+            }
+            RunTreeAOI(Tree.eMode.JobSave);
+            job.Close();
+        }
+
+        public void OpenRecipe(string sFile)
+        {
+            Job job = new Job(sFile, false, m_log);
+            ClearAOI(); 
+            m_treeRootAOI.m_job = job;
+            int nAOI = job.Set(m_id, "AOI Count", p_aAOI.Count); 
+            for (int n = 0; n < nAOI; n++)
+            {
+                string sKey = m_id + n.ToString("00");
+                string sAOI = job.Set(sKey, "AOI", "");
+                IAOI aoi = NewAOI(sAOI); 
+                if (aoi != null) p_aAOI.Add(aoi); 
+            }
+            RunTreeAOI(Tree.eMode.JobOpen);
+            job.Close();
+            Draw(AOIData.eDraw.Inspect);
+        }
+
+        IAOI NewAOI(string sAOI)
+        {
+            foreach (IAOI aoi in m_aEnableAOI)
+            {
+                if (aoi.p_id == sAOI) return aoi.NewAOI(); 
+            }
+            return null; 
         }
         #endregion
 
@@ -210,7 +253,7 @@ namespace Root_ASIS.Teachs
             ClearAOI();
             InitTreeAOI();
             InitDraw();
-            GetActineROI(); 
+            GetActiveROI(); 
         }
     }
 }
