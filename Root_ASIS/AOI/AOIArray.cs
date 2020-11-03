@@ -24,17 +24,35 @@ namespace Root_ASIS.AOI
             public CPoint m_sz = new CPoint(100, 50);
             public AOIData m_aoiData;
             public string m_sInspect = "";
+            public int m_nID = 0;
+
+            public bool p_bEnable
+            {
+                get
+                {
+                    switch (m_nID)
+                    {
+                        case 1: return (Strip.p_szUnit.X > 1);
+                        case 2: return (Strip.p_szUnit.Y > 1);
+                        case 3: return (Strip.p_szBlock.X > 1);
+                        case 4: return (Strip.p_szBlock.Y > 1);
+                        default: return true;
+                    }
+                }
+            }
 
             public void RunTree(Tree tree)
             {
-                m_sz = tree.Set(m_sz, m_sz, "szROI", "szROI", false);
-                m_aoiData.RunTree(tree, false);
+                m_sz.X = tree.Set(m_sz.X, m_sz.X, "szROIX", "szROI", false);
+                m_sz.Y = tree.Set(m_sz.Y, m_sz.Y, "szROIY", "szROI", false);
+                m_aoiData.RunTree(tree);
             }
 
             public string m_id;
             AOIArray m_aoi;
-            public Unit(string id, AOIArray aoi)
+            public Unit(int nID, string id, AOIArray aoi)
             {
+                m_nID = nID; 
                 m_id = id;
                 m_aoi = aoi;
                 m_aoiData = new AOIData(id, m_sz);
@@ -44,14 +62,22 @@ namespace Root_ASIS.AOI
 
         void InitUnit()
         {
-            m_aUnit.Add(new Unit("Unit Origin", this));
-            m_aUnit.Add(new Unit("Unit Right", this));
-            m_aUnit.Add(new Unit("Unit Bottom", this));
-            m_aUnit.Add(new Unit("Block Right", this));
-            m_aUnit.Add(new Unit("Block Bottom", this));
-            p_aROI.Clear();
-            foreach (Unit unit in m_aUnit) p_aROI.Add(unit.m_aoiData);
+            m_aUnit.Add(new Unit(0, "Unit Origin", this));
+            m_aUnit.Add(new Unit(1, "Unit Right", this));
+            m_aUnit.Add(new Unit(2, "Unit Bottom", this));
+            m_aUnit.Add(new Unit(3, "Block Right", this));
+            m_aUnit.Add(new Unit(4, "Block Bottom", this));
+            InvalidROI(); 
+        }
 
+        public void InvalidROI()
+        {
+            p_aROI.Clear();
+            foreach (Unit unit in m_aUnit)
+            {
+                if (unit.p_bEnable) p_aROI.Add(unit.m_aoiData);
+                else unit.m_aoiData.p_eROI = AOIData.eROI.Done; 
+            }
         }
 
         void RunTreeUnit(Tree tree)
@@ -69,7 +95,10 @@ namespace Root_ASIS.AOI
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {
-            foreach (Unit unit in m_aUnit) unit.m_aoiData.Draw(draw, eDraw); 
+            foreach (Unit unit in m_aUnit)
+            {
+                if (unit.p_bEnable) unit.m_aoiData.Draw(draw, eDraw);
+            }
         }
 
         public ObservableCollection<AOIData> p_aROI { get; set; }

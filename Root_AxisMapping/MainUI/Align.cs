@@ -37,7 +37,7 @@ namespace Root_AxisMapping.MainUI
             public void RunTree(Tree tree)
             {
                 m_sz = tree.Set(m_sz, m_sz, "szROI", "szROI", false);
-                m_aoiData.RunTree(tree, false);
+                m_aoiData.RunTree(tree);
             }
 
             public string m_id;

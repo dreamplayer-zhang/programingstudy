@@ -29,8 +29,9 @@ namespace Root_ASIS.AOI
 
             public void RunTree(Tree tree)
             {
-                m_sz = tree.Set(m_sz, m_sz, "szROI", "szROI", false);
-                m_aoiData.RunTree(tree, false);
+                m_sz.X = tree.Set(m_sz.X, m_sz.X, "szROIX", "szROI", false);
+                m_sz.Y = tree.Set(m_sz.Y, m_sz.Y, "szROIY", "szROI", false);
+                m_aoiData.RunTree(tree);
             }
 
             public string m_id;

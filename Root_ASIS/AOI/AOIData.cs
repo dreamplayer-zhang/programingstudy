@@ -15,6 +15,7 @@ namespace Root_ASIS.AOI
         public CPoint m_cp0 = new CPoint();
         public CPoint m_sz;
         public RPoint m_rpCenter = new RPoint();
+        CPoint p_cp1 { get { return new CPoint(m_cp0.X + m_sz.X, m_cp0.Y + m_sz.Y); } }
         #endregion
 
         #region ROI State
@@ -91,7 +92,7 @@ namespace Root_ASIS.AOI
                     brush = Brushes.Green;
                     break; 
             }
-            draw.AddRectangle(brush, m_cp0, m_cp0 + m_sz);
+            draw.AddRectangle(brush, m_cp0, p_cp1);
             draw.AddText(brush, m_cp0, p_id);
             draw.AddText(brush, m_cp0.X, m_cp0.Y + m_sz.Y, m_sDisplay);
             if (m_bInspect) draw.AddCross(brush, new CPoint(m_rpCenter), 16); 
@@ -119,7 +120,10 @@ namespace Root_ASIS.AOI
                 {
                     case eShape.Set: m_cp0 = cpImg; break;
                     case eShape.Move: m_dpMove = cpImg - m_cp0; break;
-                    case eShape.Resize: m_dpResize = cpImg - m_sz; break; 
+                    case eShape.Resize: 
+                        m_dpResize.X = cpImg.X - m_sz.X;
+                        m_dpResize.Y = cpImg.Y - m_sz.Y;
+                        break; 
                 }
             }
             else if (m_eShape != eShape.None)
@@ -133,9 +137,15 @@ namespace Root_ASIS.AOI
         {
             switch (m_eShape)
             {
-                case eShape.Set: m_sz = cpImg - m_cp0; break; 
+                case eShape.Set: 
+                    m_sz.X = cpImg.X - m_cp0.X;
+                    m_sz.Y = cpImg.Y - m_cp0.Y;
+                    break; 
                 case eShape.Move: m_cp0 = cpImg - m_dpMove; break;
-                case eShape.Resize: m_sz = cpImg - m_dpResize; break; 
+                case eShape.Resize: 
+                    m_sz.X = cpImg.X - m_dpResize.X;
+                    m_sz.Y = cpImg.Y - m_dpResize.Y;
+                    break; 
                 default: break; 
             }
         }
@@ -146,8 +156,9 @@ namespace Root_ASIS.AOI
             int dL = Math.Min(m_sz.X, m_sz.Y) / 3; 
             CPoint dp = cpImg - m_cp0;
             if ((dp.X < dL) && (dp.Y < dL)) return eShape.Move;
-            dp = m_sz - cpImg;
-            if ((dp.X < dL) && (dp.Y < dL)) return eShape.Resize;
+            int dx = m_sz.X - cpImg.X;
+            int dy = m_sz.Y - cpImg.Y;
+            if ((dx < dL) && (dy < dL)) return eShape.Resize;
             return eShape.Set;
         }
 
@@ -161,10 +172,11 @@ namespace Root_ASIS.AOI
         #endregion
 
         #region Tree
-        public void RunTree(Tree treeParent, bool bVisible)
+        public void RunTree(Tree treeParent)
         {
-            Tree tree = treeParent.GetTree(p_id, false, bVisible);
-            m_cp0 = tree.Set(m_cp0, m_cp0, "cp0", "cp0", bVisible);
+            Tree tree = treeParent.GetTree(p_id, false, false);
+            m_cp0 = tree.Set(m_cp0, m_cp0, "cp0", "cp0", false);
+            p_eROI = (eROI)tree.Set(p_eROI, p_eROI, "ROI", "ROI", false); 
         }
 
         public void RunTreeROI(Tree tree)
@@ -185,7 +197,7 @@ namespace Root_ASIS.AOI
         public AOIData(string id, CPoint sz)
         {
             p_id = id;
-            m_sz = sz; 
+            m_sz = sz;
         }
     }
 }

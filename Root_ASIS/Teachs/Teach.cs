@@ -58,6 +58,7 @@ namespace Root_ASIS.Teachs
         {
             p_aROI.Clear();
             p_aROI.Add(m_aoiStrip);
+            m_aoiArray.InvalidROI(); 
             p_aROI.Add(m_aoiArray);
             foreach (IAOI aoi in p_aAOI) p_aROI.Add(aoi); 
         }
@@ -182,7 +183,8 @@ namespace Root_ASIS.Teachs
             }
             RunTreeAOI(Tree.eMode.JobOpen);
             job.Close();
-            Draw(AOIData.eDraw.Inspect);
+            Draw(AOIData.eDraw.ROI);
+            InvalidROI(); 
         }
 
         IAOI NewAOI(string sAOI)
