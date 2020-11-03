@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Root_AxisMapping.MainUI;
+using System.ComponentModel;
 using System.IO;
 using System.Windows;
 
@@ -28,13 +29,11 @@ namespace Root_AxisMapping
         #endregion
 
         AxisMapping_Engineer m_engineer = new AxisMapping_Engineer();
-        Mapping m_mapping; 
         void Init()
         {
             m_engineer.Init("AxisMapping");
             engineerUI.Init(m_engineer);
-            m_mapping = new Mapping("Mapping", m_engineer);
-            mappingUI.Init(m_mapping, m_engineer); 
+            mainUI.Init(m_engineer); 
         }
 
         void ThreadStop()

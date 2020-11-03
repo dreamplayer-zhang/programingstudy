@@ -6,6 +6,7 @@ using RootTools.Trees;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Windows.Media.Effects;
 
 namespace Root_ASIS.AOI
 {
@@ -19,6 +20,78 @@ namespace Root_ASIS.AOI
         StringTable.Group m_ST = StringTable.Get("AOIStrip", m_asStringTable);
         #endregion
 
+        #region Unit
+        public CPoint m_sz = new CPoint(100, 50);
+
+        class Unit
+        {
+            public AOIData m_aoiData;
+
+            public InfoStrip.UnitResult m_result;
+
+            string _id = "";
+            public string p_id
+            {
+                get { return _id; }
+                set
+                {
+                    if (_id == value) return;
+                    _id = value;
+                    m_aoiData.p_id = value;
+                }
+            }
+
+            int _nSize = 0;
+            public int p_nSize
+            {
+                get { return _nSize; }
+                set
+                {
+                    _nSize = value;
+                    m_aoiData.m_sDisplay = "Size = " + value.ToString();
+                }
+            }
+
+            public void RunTree(Tree tree)
+            {
+                m_aoiData.RunTree(tree);
+            }
+
+            AOI_Unit m_aoi;
+            public Unit(string id, AOI_Unit aoi, CPoint sz)
+            {
+                m_aoiData = new AOIData(id, sz);
+                p_id = id;
+                m_aoi = aoi;
+            }
+        }
+        List<Unit> m_aUnit = new List<Unit>();
+
+        void InitUnit(InfoStrip infoStrip)
+        {
+            while (m_aUnit.Count < Strip.p_lUnit)
+            {
+                Unit unit = new Unit(p_id + "." + m_aUnit.Count.ToString("000"), this, m_sz);
+                m_aUnit.Add(unit);
+            }
+            while (m_aUnit.Count > Strip.p_lUnit) m_aUnit.RemoveAt(m_aUnit.Count - 1);
+            for (int n = 0; n < m_aUnit.Count; n++)
+            {
+                m_aUnit[n].p_id = p_id + "." + n.ToString("000");
+                m_aUnit[n].m_result = (infoStrip != null) ? infoStrip.GetUnitResult(n) : null;
+            }
+            p_aROI.Clear();
+            p_aROI.Add(m_aUnit[0].m_aoiData);
+        }
+
+        void RunTreeUnit(Tree tree)
+        {
+            m_sz.X = tree.Set(m_sz.X, m_sz.X, "szROIX", "szROI", false);
+            m_sz.Y = tree.Set(m_sz.Y, m_sz.Y, "szROIY", "szROI", false);
+            foreach (Unit unit in m_aUnit) unit.RunTree(tree.GetTree(unit.p_id));
+        }
+        #endregion
+
         #region IAOI
         public bool p_bEnable { get; set; }
 
@@ -29,7 +102,11 @@ namespace Root_ASIS.AOI
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {
-            //forget
+            switch (eDraw)
+            {
+                case AOIData.eDraw.ROI: m_aUnit[0].m_aoiData.Draw(draw, eDraw); break;
+                default:foreach (Unit unit in m_aUnit) unit.m_aoiData.Draw(draw, eDraw); break;
+            }
         }
 
         public ObservableCollection<AOIData> p_aROI { get; set; }
@@ -61,77 +138,6 @@ namespace Root_ASIS.AOI
                 if (aoiData.p_eROI == eROI) return aoiData;
             }
             return null;
-        }
-        #endregion
-
-        #region Unit
-        public CPoint m_sz = new CPoint(100, 50);
-
-        class Unit
-        {
-            public AOIData m_aoiData;
-
-            public InfoStrip.UnitResult m_result; 
-
-            string _id = "";
-            public string p_id
-            {
-                get { return _id; }
-                set
-                {
-                    if (_id == value) return;
-                    _id = value;
-                    m_aoiData.p_id = value; 
-                }
-            }
-
-            int _nSize = 0; 
-            public int p_nSize
-            {
-                get { return _nSize; }
-                set
-                {
-                    _nSize = value;
-                    m_aoiData.m_sDisplay = "Size = " + value.ToString(); 
-                }
-            }
-
-            public void RunTree(Tree tree)
-            {
-                m_aoiData.RunTree(tree, false);
-            }
-
-            AOI_Unit m_aoi;
-            public Unit(string id, AOI_Unit aoi, CPoint sz)
-            {
-                m_aoiData = new AOIData(id, sz);
-                p_id = id;
-                m_aoi = aoi;
-            }
-        }
-        List<Unit> m_aUnit = new List<Unit>();
-
-        void InitUnit(InfoStrip infoStrip)
-        {
-            while (m_aUnit.Count < Strip.p_lUnit)
-            {
-                Unit unit = new Unit(p_id + "." + m_aUnit.Count.ToString("000"), this, m_sz);
-                m_aUnit.Add(unit); 
-            }
-            while (m_aUnit.Count > Strip.p_lUnit) m_aUnit.RemoveAt(m_aUnit.Count - 1);
-            for (int n = 0; n < m_aUnit.Count; n++)
-            {
-                m_aUnit[n].p_id = p_id + "." + n.ToString("000");
-                m_aUnit[n].m_result = (infoStrip != null) ? infoStrip.GetUnitResult(n) : null; 
-            }
-            p_aROI.Clear();
-            p_aROI.Add(m_aUnit[0].m_aoiData); 
-        }
-
-        void RunTreeUnit(Tree tree)
-        {
-            m_sz = tree.Set(m_sz, m_sz, "szROI", "szROI", false);
-            foreach (Unit unit in m_aUnit) unit.RunTree(tree.GetTree(unit.p_id)); 
         }
         #endregion
 

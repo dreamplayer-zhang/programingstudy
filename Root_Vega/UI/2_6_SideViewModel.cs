@@ -572,7 +572,7 @@ namespace Root_Vega
 
 		private void _endInsp()
 		{
-			m_Engineer.m_InspManager.InspectionDone();
+			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath);
 		}
 
 		public void _addRoi()

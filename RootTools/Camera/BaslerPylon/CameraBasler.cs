@@ -256,6 +256,32 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
+
+        void RunTreeAOI(Tree tree)
+        {
+            if (m_cam == null) return;
+            if (m_cam.IsOpen == false) return;
+            tree.Set(p_nByte, p_nByte, "Pixel Byte", "Camera Pixel Depth (Byte)", true, true); 
+            p_sz = tree.Set(p_sz, p_sz, "ROI", "Camera ROI Size");
+            p_cpOffset = tree.Set(p_cpOffset, p_cpOffset, "Offset", "Camera ROI Offset");
+        }
+        #endregion
+
+        #region Image Format Controls
+        string p_sPixelFormat
+        {
+            get
+            {
+                return (m_cam != null) ? m_cam.Parameters[PLCamera.PixelFormat].GetValue() : "";
+            }
+            set
+            {
+                if (m_cam == null) return;
+                m_cam.Parameters[PLCamera.PixelFormat].TrySetValue(value);
+                if (m_cam.Parameters[PLCamera.PixelFormat].GetValue().Equals(PLCamera.PixelFormat.Mono8))
+                OnPropertyChanged();
+            }
+        }
         public bool p_bReverseX
         {
             get { return (m_cam != null) ? m_cam.Parameters[PLCamera.ReverseX].GetValue() : false; }
@@ -267,15 +293,37 @@ namespace RootTools.Camera.BaslerPylon
                 OnPropertyChanged();
             }
         }
-
-        void RunTreeAOI(Tree tree)
+        void RunTreeImageFormatControls(Tree tree)
         {
             if (m_cam == null) return;
             if (m_cam.IsOpen == false) return;
-            tree.Set(p_nByte, p_nByte, "Pixel Byte", "Camera Pixel Depth (Byte)", true, true); 
-            p_sz = tree.Set(p_sz, p_sz, "ROI", "Camera ROI Size");
-            p_cpOffset = tree.Set(p_cpOffset, p_cpOffset, "Offset", "Camera ROI Offset");
-            p_bReverseX = tree.Set(p_bReverseX, p_bReverseX, "ReverseX", "Camera Image Mirror X"); 
+            p_sPixelFormat = tree.Set(p_sPixelFormat, p_sPixelFormat, "Pixel Format", "Sets the Format of the pixel data trasmitted for acquired images");
+            p_bReverseX = tree.Set(p_bReverseX, p_bReverseX, "ReverseX", "Enableds the horizontal flipping of the image");
+        }
+        #endregion
+
+        #region Acquisition Controls
+        public long _ExposureTimeRaw
+        {
+            get
+            {
+                return (m_cam != null) ? m_cam.Parameters[PLCamera.ExposureTimeRaw].GetValue() : 0;
+            }
+            set
+        {
+            if (m_cam == null) return;
+                if (m_cam.Parameters[PLCamera.ExposureTimeRaw].GetValue() == value) return;
+
+                if(m_cam.Parameters[PLCamera.PixelFormat].GetValue().Equals(PLCamera.PixelFormat.Mono8))
+                    m_cam.Parameters[PLCamera.ExposureTimeRaw].TrySetValue(value);
+                else
+                {
+                    //color인 경우 frame rate를 30 이상 사용하지 않도록 제한
+                    if(value >= 33300.000000)
+                        m_cam.Parameters[PLCamera.ExposureTimeRaw].TrySetValue(value);
+                }
+                OnPropertyChanged();
+            }
         }
         #endregion
 
@@ -574,6 +622,7 @@ namespace RootTools.Camera.BaslerPylon
             RunTreeMemory(p_treeRoot.GetTree("Memory", false));
             RunTreeGrab(p_treeRoot.GetTree("Start Grab", true, bOpen));
             RunTreeConfigurationSet(p_treeRoot.GetTree("Configuration Set", false, bOpen));
+            RunTreeImageFormatControls(p_treeRoot.GetTree("Image Format Controls", false, bOpen));
             RunTreeAOI(p_treeRoot.GetTree("AOI", false, bOpen));
             RunTreeAnalog(p_treeRoot.GetTree("Analog", false, bOpen));
         }
@@ -615,6 +664,10 @@ namespace RootTools.Camera.BaslerPylon
 
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
         public CPoint GetRoiSize() { return null; }
-        public double GetFps() { return 0; }
+
+        public double GetFps()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

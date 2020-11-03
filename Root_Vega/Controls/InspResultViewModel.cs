@@ -330,19 +330,21 @@ namespace Root_Vega.Controls
 		#endregion
 
 		string DBDataPath { get; set; }
-		string TiffDataPath
+		string VegaImagePath
 		{
-			get { return this.DBDataPath.Replace(".vega_result", ".tif"); }
+			get { return this.DBDataPath.Replace(".vega_result", ".vega_image"); }
 		}
 
 		public string[] SignArray = new string[] { ">=", "<=", "=" };
 
-		string dbFormatFilePath = @"C:\sqlite\db\vsdb.txt";
+		string dbFormatFilePath = @"C:\vsdb\init\vsdb.txt";
 
 		Dictionary<int, Bitmap> TDIImageDictionary { get; set; }
 		Dictionary<int, Bitmap> VRSImageDictionary { get; set; }
 		Dictionary<int, ImageInfo> ImageInfoDictionary { get; set; }
 		SqliteDataDB DataIndexDB { get; set; }
+
+		ColorPalette mono { get; set; }
 		bool ImageLoaded { get; set; }
 		public InspResultViewModel()
 		{
@@ -395,7 +397,7 @@ namespace Root_Vega.Controls
 				MakeDictionary(tempTable);
 				tempTable.Dispose();
 				//Data,*No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER),TdiImageExist(INTEGER),VrsImageExist(INTEGER)
-				_OriginResultDataTable = DataIndexDB.GetDataTable("Data", "No", "DCode", "Size", "Length", "Width", "Height", "InspMode", "PosX", "PosY");
+				_OriginResultDataTable = DataIndexDB.GetDataTable("Data", "No", "DCode", "AreaSize", "Length", "Width", "Height", "InspMode", "FOV", "PosX", "PosY");
 				ResultDataTable = _OriginResultDataTable.Copy();
 
 				//Datainfo,*LotIndexID(INTEGER),InspStartTime(TEXT),BCRID(TEXT)
@@ -428,6 +430,18 @@ namespace Root_Vega.Controls
 					bmp.CacheOption = BitmapCacheOption.OnLoad;
 					this.CurrentMapImage = bmp.Clone();
 				}
+
+				Bitmap tempbmp = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+				mono = tempbmp.Palette;
+				System.Drawing.Color[] ent = mono.Entries;
+
+				Parallel.For(0, 256, (j) =>
+				{
+					System.Drawing.Color b = new System.Drawing.Color();
+					b = System.Drawing.Color.FromArgb((byte)j, (byte)j, (byte)j);
+					ent[j] = b;
+				});
+				tempbmp.Dispose();
 			}
 
 		}
@@ -459,28 +473,26 @@ namespace Root_Vega.Controls
 				DataIndexDB.Disconnect();
 			}
 		}
-		public async Task LoadTiffImage(CancellationToken ct)
+		public async Task LoadVegaImage(CancellationToken ct)
 		{
 			this.ImageLoaded = false;
 			this.TDIImageDictionary = new Dictionary<int, Bitmap>();
 			this.VRSImageDictionary = new Dictionary<int, Bitmap>();
-			if (File.Exists(TiffDataPath))
+			if (File.Exists(VegaImagePath))
 			{
-				await Task.Factory.StartNew(() => ParseTiff(ct));
+				await Task.Factory.StartNew(() => ParseVegaImage(ct));
 			}
 		}
-		public bool ParseTiff(CancellationToken token)
+		public bool ParseVegaImage(CancellationToken token)
 		{
-			using (Image imageFile = Image.FromFile(TiffDataPath))
+			using (FileStream fs = new FileStream(System.IO.Path.Combine(VegaImagePath), FileMode.Open))
 			{
 				LoadStatusVisible = Visibility.Visible;
 				try
 				{
-					FrameDimension frameDimensions = new FrameDimension(
-					   imageFile.FrameDimensionsList[0]);
-
-					// Gets the number of pages from the tiff image (if multipage) 
-					int frameNum = imageFile.GetFrameCount(frameDimensions);
+					byte[] buffer = new byte[4];
+					fs.Read(buffer, 0, sizeof(int));
+					var frameNum = BitConverter.ToInt32(buffer, 0);
 
 					for (int frame = 0; frame < frameNum; frame++)
 					{
@@ -493,9 +505,30 @@ namespace Root_Vega.Controls
 							return false;
 						}
 
-						imageFile.SelectActiveFrame(frameDimensions, frame);
-						using (Bitmap bmp = new Bitmap(imageFile))
+						fs.Read(buffer, 0, sizeof(int));
+						int idx = BitConverter.ToInt32(buffer, 0);
+
+						fs.Read(buffer, 0, sizeof(int));
+						int imageWidth = BitConverter.ToInt32(buffer, 0);
+
+						fs.Read(buffer, 0, sizeof(int));
+						int imageHeight = BitConverter.ToInt32(buffer, 0);
+
+						fs.Read(buffer, 0, sizeof(int));
+						int length = BitConverter.ToInt32(buffer, 0);
+
+						buffer = new byte[length];
+						fs.Read(buffer, 0, length);
+
+
+						//imageFile.SelectActiveFrame(frameDimensions, frame);
+						using (Bitmap bmp = new Bitmap(imageWidth,imageHeight,System.Drawing.Imaging.PixelFormat.Format8bppIndexed))
 						{
+							bmp.Palette = mono;
+							BitmapData data = bmp.LockBits(new Rectangle(0, 0, imageWidth, imageHeight), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+							System.Runtime.InteropServices.Marshal.Copy(buffer, 0, data.Scan0, buffer.Length);
+							bmp.UnlockBits(data);
+
 							switch (ImageInfoDictionary[frame].Type)
 							{
 								case ImageType.TDI:
@@ -507,6 +540,7 @@ namespace Root_Vega.Controls
 								case ImageType.Mask:
 									break;
 							}
+							bmp.Dispose();
 						}
 					}
 					this.ImageLoaded = true;
@@ -555,7 +589,7 @@ namespace Root_Vega.Controls
 		private void SetData(DataRowView selectedDataTable, ImageType type)
 		{
 			int idx = Convert.ToInt32(selectedDataTable["No"]);
-			int size = Convert.ToInt32(selectedDataTable["Size"]);
+			int size = Convert.ToInt32(selectedDataTable["AreaSize"]);
 			int dcode = Convert.ToInt32(selectedDataTable["DCode"]);
 			int posx = Convert.ToInt32(selectedDataTable["PosX"]);
 			int posy = Convert.ToInt32(selectedDataTable["PosY"]);
@@ -649,8 +683,8 @@ namespace Root_Vega.Controls
 			if (!File.Exists(this.DBDataPath) || !File.Exists(dbFormatFilePath))
 				return;
 
-			if (!IsInitialized)
-				return;
+			//if (!IsInitialized)
+			//	return;
 
 			//Data,*No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER),TdiImageExist(INTEGER),VrsImageExist(INTEGER)
 			string dCodeQuery = string.Format("DCode = {0}", DefectCode);
@@ -683,8 +717,8 @@ namespace Root_Vega.Controls
 				secondSearchEnable = true;
 			}
 
-			string defectSizeQuery_1 = string.Format("Size {0} {1}", firstSign, FirstSizeUm);
-			string defectSizeQuery_2 = string.Format("Size {0} {1}", secondSign, SecondSizeUm);
+			string defectSizeQuery_1 = string.Format("Length {0} {1}", firstSign, FirstSizeUm);
+			string defectSizeQuery_2 = string.Format("Length {0} {1}", secondSign, SecondSizeUm);
 
 
 

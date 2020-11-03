@@ -1,14 +1,25 @@
 ﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using System.Windows;
+using System.Diagnostics;
 using System.Threading;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 using System.Windows.Media;
+using RootTools.Inspects;
+using RootTools.Memory;
+using MySql.Data.MySqlClient.Authentication;
 using System.Windows.Threading;
 
 namespace RootTools
@@ -91,6 +102,7 @@ namespace RootTools
 				if (value == 0)
 					return;
 				SetProperty(ref _CanvasWidth, value);
+                SetRoiRect();
 			}
 		}
 		private int _CanvasHeight = 100;
@@ -107,6 +119,7 @@ namespace RootTools
 				//_CanvasHeight = value / 10 * 10;
 				//RaisePropertyChanged();
 				SetProperty(ref _CanvasHeight, value);
+                //SetRoiRect();
 			}
 		}
 
@@ -135,6 +148,21 @@ namespace RootTools
 				//RaisePropertyChanged();
 				SetProperty(ref _ThumbHeight, value);
 			}
+		}
+
+		string _test;
+		public string test
+		{
+			get
+			{
+
+				return _test;
+			}
+			set
+			{
+				SetProperty(ref _test, value);
+			}
+
 		}
 
 		//public bool KeyPressedState = false;
@@ -534,6 +562,7 @@ namespace RootTools
 			image.OnCreateNewImage += image_NewImage;
 			image.OnUpdateImage += image_OnUpdateImage;
 			image.UpdateOpenProgress += image_UpdateOpenProgress;
+            //InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
 			InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
 			SetImageSource();
 		}
@@ -622,7 +651,7 @@ namespace RootTools
 			else if (p_ImageData.p_nByte == 3)
 			{
 				Image<Rgb, byte> view = new Image<Rgb, byte>(p_ThumbWidth, p_ThumbHeight);
-				IntPtr ptrMem = m_ImageData.GetPtr();
+                IntPtr ptrMem = p_ImageData.GetPtr();
 				if (ptrMem == IntPtr.Zero) return;
 				int pix_x = 0;
 				int pix_y = 0;
@@ -633,9 +662,9 @@ namespace RootTools
 					for (int xx = 0; xx < p_ThumbWidth; xx++)
 					{
 						pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
-						view.Data[yy, xx, 2] = ((byte*)ptrMem)[0 + m_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
-						view.Data[yy, xx, 1] = ((byte*)ptrMem)[1 + m_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
-						view.Data[yy, xx, 0] = ((byte*)ptrMem)[2 + m_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        view.Data[yy, xx, 2] = ((byte*)ptrMem)[0 + p_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        view.Data[yy, xx, 1] = ((byte*)ptrMem)[1 + p_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
+                        view.Data[yy, xx, 0] = ((byte*)ptrMem)[2 + p_ImageData.p_nByte * (pix_x + (long)pix_y * p_ImageData.p_Size.X)];
 					}
 				}
 				if (view.Width != 0 && view.Height != 0)

@@ -89,6 +89,22 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MainUI\Align_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainUI\Array_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainUI\Main_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainUI\Mapping_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -97,7 +113,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Mapping.cs" />
+    <Compile Include="MainUI\Align.cs" />
+    <Compile Include="MainUI\Align_UI.xaml.cs">
+      <DependentUpon>Align_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainUI\Array.cs" />
+    <Compile Include="MainUI\Array_UI.xaml.cs">
+      <DependentUpon>Array_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainUI\Main_UI.xaml.cs">
+      <DependentUpon>Main_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AxisMapping_Engineer.cs" />
     <Compile Include="AxisMapping_Engineer_UI.xaml.cs">
       <DependentUpon>AxisMapping_Engineer_UI.xaml</DependentUpon>
@@ -110,19 +136,16 @@
     <Compile Include="AxisMapping_Recipe_UI.xaml.cs">
       <DependentUpon>AxisMapping_Recipe_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MainUI\Mapping.cs" />
+    <Compile Include="MainUI\Mapping_UI.xaml.cs">
+      <DependentUpon>Mapping_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Mapping_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Mapping_UI.xaml.cs">
-      <DependentUpon>Mapping_UI.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Module\AxisMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
