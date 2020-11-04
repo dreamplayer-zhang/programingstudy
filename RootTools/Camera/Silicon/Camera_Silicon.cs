@@ -13,10 +13,11 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Drawing;
 using System.Windows;
+using System.ComponentModel;
 
 namespace RootTools.Camera.Silicon
 {
-    class Camera_Silicon : ObservableObject, ICamera
+    public class Camera_Silicon : ObservableObject, ICamera
     {
         public int m_Width;
         public int m_Height;
@@ -26,6 +27,8 @@ namespace RootTools.Camera.Silicon
         public delegate void Dele_ProgressBar(int value);
         public event Dele_ProgressBar ProgressBarUpdate;
 
+        BackgroundWorker bgw_Connect = new BackgroundWorker();
+
         Log m_log;
 
         public Framegrabber m_fgSiso;
@@ -34,8 +37,28 @@ namespace RootTools.Camera.Silicon
         NODEMAP_HANDLE m_hNodeMap;
 
         public bool m_bDeviceOpenError = false;
-        public int m_nDeviceIndex;
-        public string m_sMCF;
+        int m_nDeviceIndex;
+        public int p_nDeviceIndex
+        {
+            get
+            {
+                return m_nDeviceIndex;
+            }
+            set
+            {
+                SetProperty(ref m_nDeviceIndex, value);
+            }
+        }
+        string m_sMCF;
+        public string p_sMCF
+        {
+            get { return m_sMCF; }
+            set
+            {
+                SetProperty(ref m_sMCF, value);
+            }
+        }
+
 
         public int m_lBufGrab = 10;
         public IntPtr m_pBufGrab = IntPtr.Zero;
@@ -63,12 +86,33 @@ namespace RootTools.Camera.Silicon
             }
         }
 
-        public string p_id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string p_id { get; set; }
         public int p_nGrabProgress { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public TreeRoot p_treeRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        TreeRoot m_treeRoot = null;
+        public TreeRoot p_treeRoot 
+        {
+            get
+            {
+                return m_treeRoot;
+            }
+            set
+            {
+                SetProperty(ref m_treeRoot, value);
+            }
+        }
         public CPoint p_sz { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public UserControl p_ui => throw new NotImplementedException();
+        #region UI
+        public UserControl p_ui
+        {
+            get
+            {
+                Camera_Silicon_UI ui = new Camera_Silicon_UI();
+                ui.Init(this);
+                return (UserControl)ui;
+            }
+        }
+        #endregion
 
         public event EventHandler Grabed;
 
@@ -78,14 +122,86 @@ namespace RootTools.Camera.Silicon
             p_id = id;
             m_log = log;
             p_treeRoot = new TreeRoot(id, m_log);
-            m_fgSiso = new Framegrabber();
-            m_hDev = new PYLON_DEVICE_HANDLE();
+            bgw_Connect.DoWork += bgw_Connect_DoWork;
+            bgw_Connect.RunWorkerCompleted += bgw_Connect_RunWorkerCompleted;
             m_ImageLive = new ImageData(640, 480);
             p_ImageViewer = new ImageViewer_ViewModel(m_ImageLive);
+            RunTree(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.Init);
+            p_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
+            m_fgSiso = new Framegrabber();
+            m_hDev = new PYLON_DEVICE_HANDLE();   
+        }
+
+        public void M_treeRoot_UpdateTree()
+        {
+            RunTree(Tree.eMode.Update);
+            RunTree(Tree.eMode.Init);
+            RunTree(Tree.eMode.RegWrite);
+        }
+
+        public void RunTree(Tree.eMode mode)
+        {
+            p_treeRoot.p_eMode = mode;
+            RunTree(p_treeRoot);
+        }
+
+        public void RunTree(Tree treeRoot)
+        {
+            RunIndexTree(treeRoot.GetTree("Camera Index"));
+            RunSetTree(treeRoot.GetTree("Connect Set"));
+        }
+
+        void RunIndexTree(Tree tree)
+        {
+            p_nDeviceIndex = tree.Set(p_nDeviceIndex, 0, "Camera Index", "Camera Index");
+        }
+
+        void RunSetTree(Tree tree)
+        {
+            p_sMCF = tree.SetFile(p_sMCF, p_sMCF, "MCF", "CamFile", "CamFile");
+        }
+
+        void bgw_Connect_DoWork(object sender, DoWorkEventArgs e)
+        {
+            ConnectCamera();
+        }
+
+        void bgw_Connect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            RunTree(Tree.eMode.Init);
+        }
+
+        void ConnectCamera()
+        {
+            Initialize();
+        }
+
+        void DisconnectCamera()
+        {
+            if (m_hDev != null)
+            {
+                if (PylonC.NET.Pylon.DeviceIsOpen(m_hDev)) //disconnect
+                {
+                    PylonC.NET.Pylon.DeviceClose(m_hDev);
+                    if (m_pBufGrab != IntPtr.Zero)
+                    {
+                        m_fgSiso.FgFreeMemEx(m_pBufGrab);
+                        m_pBufGrab = IntPtr.Zero;
+                    }
+                    DeleteGrabberMem();
+                    m_fgSiso.FgFreeGrabber();
+                }
+            }
+            else
+            {
+                MessageBox.Show("카메라 연결을 확인하세요");
+            }
         }
 
         public void Initialize()
         {
+            // Basler Camera Connect
             try
             {
                 PylonC.NET.Pylon.Initialize();
@@ -94,7 +210,7 @@ namespace RootTools.Camera.Silicon
 
                 if (m_hDev == null)
                 {
-                    MessageBox.Show(m_nDeviceIndex.ToString("DeviceID 0 not Found!!"));
+                    MessageBox.Show(p_nDeviceIndex.ToString("DeviceID 0 not Found!!"));
                     return;
                 }
 
@@ -117,15 +233,18 @@ namespace RootTools.Camera.Silicon
                 MessageBox.Show("Camera Init Fail");
             }
 
-            fgErrorType ec = m_fgSiso.FgInitConfig(m_sMCF, (uint)m_nDeviceIndex);
+            // Silicon FrameGrabber Connect
+            fgErrorType ec = m_fgSiso.FgInitConfig(p_sMCF, (uint)p_nDeviceIndex);
             AllocateGrabberMem(szBuf);
+            RegisterAPC();
+
         }
 
         void PylonCreateDevice()
         {
-            if (m_nDeviceIndex >= 0)
-                m_hDev = PylonC.NET.Pylon.CreateDeviceByIndex((uint)m_nDeviceIndex);
-            if (m_nDeviceIndex < 0)
+            if (p_nDeviceIndex >= 0)
+                m_hDev = PylonC.NET.Pylon.CreateDeviceByIndex((uint)p_nDeviceIndex);
+            if (p_nDeviceIndex < 0)
                 MessageBox.Show("Device Index not Defined !!");
             if (m_hDev == null)
                 MessageBox.Show("Device Create Error !!");
@@ -161,7 +280,7 @@ namespace RootTools.Camera.Silicon
         {
             FgApcControlFlags flags = FgApcControlFlags.FG_APC_CONTROL_BASIC;
             FgApcControlCtrlFlags ctrlFlags = FgApcControlCtrlFlags.FG_APC_IGNORE_STOP | FgApcControlCtrlFlags.FG_APC_IGNORE_TIMEOUTS;
-            fgErrorType rc = m_fgSiso.FgRegisterAPCHandler(this, ApcEventHandler, (uint)m_nDeviceIndex, flags, ctrlFlags, m_pBufGrab);
+            fgErrorType rc = m_fgSiso.FgRegisterAPCHandler(this, ApcEventHandler, (uint)p_nDeviceIndex, flags, ctrlFlags, m_pBufGrab);
         }
 
         unsafe public int ApcEventHandler(object sender, APCEvent ev)
@@ -169,7 +288,7 @@ namespace RootTools.Camera.Silicon
             unsafe
             {
                 m_nGrab = (int)ev.imageNo;
-                IntPtr pBuf = m_fgSiso.FgGetImagePtrEx(ev.imageNo, (uint)m_nDeviceIndex, m_pBufGrab);
+                IntPtr pBuf = m_fgSiso.FgGetImagePtrEx(ev.imageNo, (uint)p_nDeviceIndex, m_pBufGrab);
                 GrabDone((int)ev.imageNo - 1, pBuf); //forget
             }
             return 0;
@@ -200,10 +319,10 @@ namespace RootTools.Camera.Silicon
             m_Height = szBuf.Y = (int)GenApi.IntegerGetValue(hNode);
 
             fgErrorType rc = fgErrorType.fgeOK;
-            rc = m_fgSiso.FgSetParameterByName("FG_GEN_WIDTH", m_Width, (uint)m_nDeviceIndex);
-            rc = m_fgSiso.FgSetParameterByName("FG_WIDTH", m_Width, (uint)m_nDeviceIndex);
-            rc = m_fgSiso.FgSetParameterByName("FG_GEN_HEIGHT", m_Height, (uint)m_nDeviceIndex);
-            rc = m_fgSiso.FgSetParameterByName("FG_HEIGHT", m_Height, (uint)m_nDeviceIndex);
+            rc = m_fgSiso.FgSetParameterByName("FG_GEN_WIDTH", m_Width, (uint)p_nDeviceIndex);
+            rc = m_fgSiso.FgSetParameterByName("FG_WIDTH", m_Width, (uint)p_nDeviceIndex);
+            rc = m_fgSiso.FgSetParameterByName("FG_GEN_HEIGHT", m_Height, (uint)p_nDeviceIndex);
+            rc = m_fgSiso.FgSetParameterByName("FG_HEIGHT", m_Height, (uint)p_nDeviceIndex);
         }
 
         public void StartGrab(long lGrab, bool Trigger = true)
@@ -230,13 +349,13 @@ namespace RootTools.Camera.Silicon
                 m_lGrab = (int)lGrab;
 
                 int nFlag = (int)FgAcquisitionFlags.ACQ_STANDARD;
-                fgErrorType rc = m_fgSiso.FgAcquireEx((uint)m_nDeviceIndex, m_lGrab, nFlag, m_pBufGrab);
+                fgErrorType rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, nFlag, m_pBufGrab);
 
                 if (rc != fgErrorType.fgeOK)
                 {
-                    rc = m_fgSiso.FgStopAcquireEx((uint)m_nDeviceIndex, m_pBufGrab, 0);
+                    rc = m_fgSiso.FgStopAcquireEx((uint)p_nDeviceIndex, m_pBufGrab, 0);
                     Thread.Sleep(100);
-                    rc = m_fgSiso.FgAcquireEx((uint)m_nDeviceIndex, m_lGrab, nFlag, m_pBufGrab);
+                    rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, nFlag, m_pBufGrab);
                     if (rc != fgErrorType.fgeOK)
                         MessageBox.Show("Start Grab Fail : " + rc.ToString() + m_fgSiso.GetLastError());
                 }
@@ -263,7 +382,7 @@ namespace RootTools.Camera.Silicon
         {
             unsafe
             {
-                fgErrorType rc = m_fgSiso.FgStopAcquireEx((uint)m_nDeviceIndex, m_pBufGrab, 0);
+                fgErrorType rc = m_fgSiso.FgStopAcquireEx((uint)p_nDeviceIndex, m_pBufGrab, 0);
                 if (rc != fgErrorType.fgeOK)
                 {
                     return "Stop Grab Error : " + rc.ToString();
@@ -281,5 +400,51 @@ namespace RootTools.Camera.Silicon
             
             throw new NotImplementedException();
         }
+
+        #region RelayCommand
+        public RelayCommand ConnectCommand
+        {
+            get
+            {
+                return new RelayCommand(delegate
+                {
+                    if (!bgw_Connect.IsBusy)
+                        bgw_Connect.RunWorkerAsync();
+                });
+            }
+        }
+        public RelayCommand DisConnectCommand
+        {
+            get
+            {
+                return new RelayCommand(delegate
+                {
+                    DisconnectCamera();
+                });
+            }
+        }
+
+        public RelayCommand LiveGrabCommand
+        {
+            get
+            {
+                return new RelayCommand(delegate
+                {
+                    
+                });
+            }
+        }
+
+        public RelayCommand StopGrabCommand
+        {
+            get
+            {
+                return new RelayCommand(delegate
+                {
+                    
+                });
+            }
+        }
+        #endregion
     }
 }

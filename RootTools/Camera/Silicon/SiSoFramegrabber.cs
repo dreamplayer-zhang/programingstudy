@@ -648,7 +648,7 @@ namespace SiSoFramegrabber
             hSiSoHal = IntPtr.Zero;
 
            //SiSoDllDirectory = ""; // use the default DLL
-            SiSoDllDirectory = @"C:\Program Files\SiliconSoftware\Runtime5.4.3";
+            SiSoDllDirectory = @"C:\Program Files\SiliconSoftware\Runtime5.7.0";
 
             maxSISOStringSize = MAXSISOSTRINGLEN;
 

@@ -145,6 +145,9 @@
       <DependentUpon>Camera_Matrox_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Camera\Silicon\Camera_Silicon.cs" />
+    <Compile Include="Camera\Silicon\Camera_Silicon_UI.xaml.cs">
+      <DependentUpon>Camera_Silicon_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Camera\Silicon\SiSoDefines.cs" />
     <Compile Include="Camera\Silicon\SiSoFramegrabber.cs" />
     <Compile Include="Camera\Silicon\SiSoSDKLib.cs" />
@@ -588,6 +591,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Camera\Matrox\Camera_Matrox_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Camera\Silicon\Camera_Silicon_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
