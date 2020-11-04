@@ -14,168 +14,76 @@
                     <ColumnDefinition Width="8*"/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="32*"/>
-                        <RowDefinition Height="15*"/>
-                        <RowDefinition Height="53*"/>
-                    </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0" Header="Progress">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="1.5*"/>
-                                <RowDefinition Height="1*"/>
-                                <RowDefinition Height="0.8*"/>
-                                <RowDefinition Height="1*"/>
-                            </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0" Margin="10,5" VerticalAlignment="Center">
-                                <TextBlock Text="Total Progress" FontSize="16" FontWeight="Bold"/>
-                                <Grid>
-                                    <ProgressBar Height="40" Margin="0,5" Value="55"/>
-                                    <TextBlock Text="55%" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                   FontWeight="Bold" FontSize="13"/>
-                                </Grid>
-                            </StackPanel>
-                            <StackPanel Grid.Row="1" Margin="10,2" VerticalAlignment="Center">
-                                <TextBlock Text="Sub Progress" FontSize="13" FontWeight="Bold"/>
-                                <Grid>
-                                    <ProgressBar Height="25" Value="80"/>
-                                    <TextBlock Text="Sub Process Name" 
-                                                   VerticalAlignment="Center" 
-                                                   HorizontalAlignment="Center"/>
-                                </Grid>
-                            </StackPanel>
-                            <UniformGrid Grid.Row="2"
-                                         Columns="2"
-                                         Margin="20,0">
-                                <TextBlock Text="Need" VerticalAlignment="Center"/>
-                                <TextBlock Text="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Run" VerticalAlignment="Center"/>
-                                <TextBlock Text="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            </UniformGrid>
-                            <Button Content="STOP" Grid.Row="3" Style="{StaticResource SetupPanelBtn}" Margin="9"/>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Grid.Row="1" Header="Product">
-                        <UniformGrid Margin="20,5" Columns="2">
-                            <TextBlock Text="Pod ID" VerticalAlignment="Center" />
-                            <TextBlock Text="-" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Lot ID" VerticalAlignment="Center"/>
-                            <TextBlock Text="-" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Reticle ID" VerticalAlignment="Center"/>
-                            <TextBlock Text="DummyWafer001" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Recipe" VerticalAlignment="Center"/>
-                            <TextBlock Text="test200804.rcp" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        </UniformGrid>
-                    </GroupBox>
-                    <GroupBox Grid.Row="2" Header="Module State">
+                    <GroupBox Grid.Row="1"  Header="Wafer List">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
+                                <RowDefinition Height="3*"/>
                             </Grid.RowDefinitions>
-                            <Grid Margin="10,5" Grid.Row="0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20"/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="LoadPort" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
-                                <Border Grid.Row="1" 
-                                                CornerRadius="2"
-                                                Margin="0,0,0,0"
-                                                BorderBrush="DimGray" 
-                                                BorderThickness="1"
-                                                Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
-                                </Border>
+                            <GroupBox Grid.Row="0">
+                                <GroupBox.Header>
+                                    <TextBlock Text="Search Option"/>
+                                </GroupBox.Header>
+                                <Grid Grid.Row="1">
+                                    <StackPanel Margin="10,0,10,0">
+                                        <StackPanel>
+                                            <CheckBox Content="Start Date" VerticalAlignment="Center" Margin="0,5,0,0"
+                                                  FontSize="12" x:Name="cbStart"/>
+                                            <DatePicker/>
+                                            <CheckBox Content="End Date" VerticalAlignment="Center" Margin="0,5,0,0"
+                                                  FontSize="12" x:Name="cbEnd"/>
+                                            <DatePicker/>
+                                            <Grid Margin="0,8,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="1.5*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <CheckBox Content="Wafer ID" VerticalAlignment="Center" x:Name="cbWafer"/>
+                                                <TextBox Grid.Column="1" IsEnabled="{Binding ElementName=cbWafer, Path=IsChecked}"/>
+                                            </Grid>
+                                            <Grid Margin="0,8,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="1.5*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <CheckBox Content="Recipe Name" VerticalAlignment="Center" x:Name="cbRecipe"/>
+                                                <TextBox Grid.Column="1" IsEnabled="{Binding ElementName=cbRecipe, Path=IsChecked}"/>
+                                            </Grid>
+                                            <Button 
+                                                    Content="Search" 
+                                                    Margin="0,12,0,0"
+                                                    Height="30"
+                                                    Command="{Binding btnSearch}"
+                                                    Style="{StaticResource SetupPanelBtn}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
 
-                            </Grid>
-                            <Grid Margin="10,5" Grid.Row="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20"/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="RTR" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
-                                <Border Grid.Row="1" 
-                                            CornerRadius="2"
-                                            BorderBrush="DimGray" 
-                                            BorderThickness="1"
-                                            Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"/>
-                                </Border>
-                            </Grid>
-                            <Grid Margin="10,5" Grid.Row="2">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20"/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="Pattern" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
-                                <Border Grid.Row="1" 
-                                            CornerRadius="2"
-                                            BorderBrush="DimGray" 
-                                            BorderThickness="1"
-                                            Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"/>
-                                </Border>
-                            </Grid>
-                            <Grid Margin="10,5" Grid.Row="3">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20"/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="Pellicle" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
-                                <Border Grid.Row="1" 
-                                            CornerRadius="2"
-                                            BorderBrush="DimGray" 
-                                            BorderThickness="1"
-                                            Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"/>
-                                </Border>
-                            </Grid>
-                            <Grid Margin="10,5" Grid.Row="4">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20"/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="LADS" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
-                                <Border Grid.Row="1" 
-                                            CornerRadius="2"
-                                            BorderBrush="DimGray" 
-                                            BorderThickness="1"
-                                            Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"/>
-                                </Border>
-                            </Grid>
-                            <Grid Margin="10,5" Grid.Row="5">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20"/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="Side" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
-                                <Border Grid.Row="1" 
-                                            CornerRadius="2"
-                                            BorderBrush="DimGray" 
-                                            BorderThickness="1"
-                                            Background="{StaticResource PanelBackGround}">
-                                    <TextBlock Text="Ready"
-                                                   VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"/>
-                                </Border>
-                            </Grid>
-
+                            <!--<tools:Database_DataView 
+                                    DataContext="{Binding p_DataViewer_Lotinfo}" 
+                                    Margin="0,5,0,0" 
+                                    Grid.Row="1"
+                                    >
+                                </tools:Database_DataView>-->
+                            <DataGrid 
+                                    Name="Lotinfo_Viewer" 
+                                    ItemsSource="{Binding pLotinfo_Datatable}"
+                                    SelectedItem ="{Binding pSelected_Lotinfo, Mode=TwoWay}"
+                                    SelectionMode="Extended"
+                                    IsReadOnly="True"
+                                    EnableColumnVirtualization = "True"
+                                    EnableRowVirtualization = "True"
+                                    ScrollViewer.CanContentScroll="True"
+                                    AutoGenerateColumns="True"
+                                    Grid.Row="1" Margin="2">
+                                <DataGrid.Resources>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.Resources>
+                            </DataGrid>
                         </Grid>
                     </GroupBox>
                 </Grid>

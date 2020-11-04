@@ -97,7 +97,7 @@
                                             <ColumnDefinition/>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock FontSize="12" Text="Red LAZER" Style="{StaticResource BasicTb}"/>
+                                        <TextBlock FontSize="12" Text="Red LASER" Style="{StaticResource BasicTb}"/>
                                         <Slider Grid.Column="1" VerticalAlignment="Center"/>
                                         <TextBox Grid.Column="2" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="0"/>
                                     </Grid>

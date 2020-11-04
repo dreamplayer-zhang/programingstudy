@@ -38,7 +38,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Grid Grid.Column="0">
-                            <GroupBox Grid.Column="0" Header="Backside Image">
+                            <GroupBox Grid.Column="0" Header="Frontside Image">
                                 <Grid Background="Black"/>
                             </GroupBox>
                         </Grid>
