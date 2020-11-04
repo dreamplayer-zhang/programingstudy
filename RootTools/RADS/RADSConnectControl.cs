@@ -25,6 +25,7 @@ namespace RootTools.RADS
 		#endregion
 
 		UdpClient listen = null;
+		int retryCount;
 
 		private UdpClient dataSocket;
 		//Socket listen = null;
@@ -51,6 +52,7 @@ namespace RootTools.RADS
 		public RADSConnectControl(RADSControl parent, bool bUseRADS)
 		{
 			p_parent = parent;
+			retryCount = 0;
 			p_CurrentController = null;
 
 			if (listen == null)
@@ -442,12 +444,21 @@ namespace RootTools.RADS
 				// The operation wasn't completed before the timeout and we're off the hook
 				sender.Close();
 				GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
-
-				return SetResetControllerPacket();
+				if (retryCount < 50)
+				{
+					retryCount++;
+					return SetResetControllerPacket();
+				}
+				else
+				{
+					retryCount = 0;
+					return false;
+				}
 			}
 
 			sender.Close();
 			GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
+			retryCount = 0;
 			return result;
 		}
 
@@ -704,12 +715,21 @@ namespace RootTools.RADS
 				// The operation wasn't completed before the timeout and we're off the hook
 				sender.Close();
 				GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
-
-				return WritePacket(address, value);
+				if (retryCount < 50)
+				{
+					retryCount++;
+					return WritePacket(address, value);
+				}
+				else
+				{
+					retryCount = 0;
+					return false;
+				}
 			}
 
-			
+
 			sender.Close();
+			retryCount = 0;
 			GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
 
 			return result;
