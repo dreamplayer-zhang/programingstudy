@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 
 namespace Root_ASIS.Teachs
 {
-    public class Teach
+    public class Teach : NotifyProperty
     {
         #region List AOI 
         AOIStrip m_aoiStrip;
@@ -133,7 +133,7 @@ namespace Root_ASIS.Teachs
         {
             if (p_roiActive == null) return;
             p_roiActive.LBD(bDown, cpImg);
-            Draw(AOIData.eDraw.ROI);
+            Draw();
             GetActiveROI(); 
         }
 
@@ -141,14 +141,27 @@ namespace Root_ASIS.Teachs
         {
             if (p_roiActive == null) return;
             p_roiActive.MouseMove(cpImg);
-            Draw(AOIData.eDraw.ROI);
+            Draw();
         }
 
-        public void Draw(AOIData.eDraw eDraw)
+        AOIData.eDraw _eDraw = AOIData.eDraw.ROI; 
+        public AOIData.eDraw p_eDraw
+        {
+            get { return _eDraw; }
+            set
+            {
+                if (_eDraw == value) return;
+                _eDraw = value;
+                OnPropertyChanged();
+                Draw(); 
+            }
+        }
+
+        public void Draw()
         {
             MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
             draw.Clear();
-            foreach (IAOI aoi in p_aROI) aoi.Draw(draw, eDraw); 
+            foreach (IAOI aoi in p_aROI) aoi.Draw(draw, p_eDraw); 
             draw.InvalidDraw(); 
         }
         #endregion
@@ -183,7 +196,7 @@ namespace Root_ASIS.Teachs
             }
             RunTreeAOI(Tree.eMode.JobOpen);
             job.Close();
-            Draw(AOIData.eDraw.ROI);
+            Draw();
             InvalidROI(); 
         }
 

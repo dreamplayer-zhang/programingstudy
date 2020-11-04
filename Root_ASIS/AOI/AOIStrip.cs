@@ -25,7 +25,8 @@ namespace Root_ASIS.AOI
         {
             public CPoint m_sz = new CPoint(100, 50);
             public AOIData m_aoiData;
-            public string m_sInspect = ""; 
+            public string m_sInspect = "";
+            public Blob m_blob = new Blob();
 
             public void RunTree(Tree tree)
             {
@@ -162,7 +163,6 @@ namespace Root_ASIS.AOI
             return "OK";
         }
 
-        Blob[] m_aBlob = new Blob[2] { new Blob(), new Blob() };
         Blob.eSort m_eSort = Blob.eSort.Size;
         public CPoint m_mmGV = new CPoint(100, 0); 
         double m_dSizeError = 20;
@@ -170,8 +170,8 @@ namespace Root_ASIS.AOI
         double m_dCenterError = 50; 
         string InspectBlob(eMode eMode, int iAOI)
         {
-            Unit data = m_aUnit[iAOI]; 
-            Blob blob = m_aBlob[iAOI];
+            Unit data = m_aUnit[iAOI];
+            Blob blob = m_aUnit[iAOI].m_blob; 
             blob.RunBlob(m_memory, 0, data.m_aoiData.m_cp0, data.m_aoiData.m_sz, m_mmGV.X, m_mmGV.Y, 3);
             blob.RunSort(m_eSort);
             if (blob.m_aSort.Count == 0) return "Find Fiducial Error"; 

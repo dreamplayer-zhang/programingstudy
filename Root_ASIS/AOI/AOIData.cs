@@ -89,7 +89,7 @@ namespace Root_ASIS.AOI
                     brush = Brushes.Red;
                     break;
                 case eDraw.All:
-                    brush = Brushes.Green;
+                    brush = Brushes.Cyan;
                     break; 
             }
             draw.AddRectangle(brush, m_cp0, p_cp1);

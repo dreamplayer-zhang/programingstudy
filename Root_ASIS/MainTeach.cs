@@ -1,7 +1,10 @@
 ﻿using Root_ASIS.Teachs;
 using RootTools;
 using RootTools.Trees;
+using System;
 using System.ComponentModel;
+using System.Net.Http.Headers;
+using System.Threading;
 
 namespace Root_ASIS
 {
@@ -43,6 +46,8 @@ namespace Root_ASIS
             {
                 p_sRecipe = sFile;
                 m_bgwRecipeSave.RunWorkerAsync(job);
+                m_bProgress = true; 
+                m_bgwRecipeProgress.RunWorkerAsync(m_msSave); 
             }
         }
 
@@ -54,20 +59,41 @@ namespace Root_ASIS
             {
                 p_sRecipe = sFile;
                 m_bgwRecipeOpen.RunWorkerAsync(job);
+                m_bProgress = true; 
+                m_bgwRecipeProgress.RunWorkerAsync(m_msOpen);
             }
         }
 
+        int _progressFile = 0; 
+        public int p_progressFile
+        {
+            get { return _progressFile; }
+            set
+            {
+                _progressFile = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        Registry m_reg; 
         public BackgroundWorker m_bgwRecipeSave = new BackgroundWorker();
         public BackgroundWorker m_bgwRecipeOpen = new BackgroundWorker();
+        public BackgroundWorker m_bgwRecipeProgress = new BackgroundWorker();
         void InitRecipe()
         {
+            m_reg = new Registry("MainTeachReg");
+            m_msSave = m_reg.Read("Save", m_msSave);
+            m_msOpen = m_reg.Read("Open", m_msOpen);
             m_bgwRecipeSave.DoWork += M_bgwRecipeSave_DoWork;
             m_bgwRecipeOpen.DoWork += M_bgwRecipeOpen_DoWork;
             m_bgwRecipeOpen.RunWorkerCompleted += M_bgwRecipeOpen_RunWorkerCompleted;
+            m_bgwRecipeProgress.DoWork += M_bgwRecipeProgress_DoWork;
         }
 
+        int m_msSave = 5000; 
         private void M_bgwRecipeSave_DoWork(object sender, DoWorkEventArgs e)
         {
+            StopWatch sw = new StopWatch(); 
             string sRecipe = p_sRecipe.Replace(".ASIS", "");
             Job job = (Job)e.Argument;
             m_treeRoot.m_job = job;
@@ -78,10 +104,15 @@ namespace Root_ASIS
             m_aTeach[0].m_memoryPool.m_viewer.p_memoryData.FileSaveBMP(sRecipe + "0.bmp", 0);
             m_aTeach[1].m_memoryPool.m_viewer.p_memoryData.FileSaveBMP(sRecipe + "1.bmp", 0);
             p_sInfo = "Save Recipe File Finished";
+            m_msSave = (m_msSave + (int)sw.ElapsedMilliseconds) / 2;
+            m_reg.Write("Save", m_msSave);
+            m_bProgress = false; 
         }
 
+        int m_msOpen = 5000; 
         private void M_bgwRecipeOpen_DoWork(object sender, DoWorkEventArgs e)
         {
+            StopWatch sw = new StopWatch();
             string sRecipe = p_sRecipe.Replace(".ASIS", "");
             Job job = (Job)e.Argument;
             m_treeRoot.m_job = job;
@@ -89,6 +120,9 @@ namespace Root_ASIS
             job.Close();
             m_aTeach[0].m_memoryPool.m_viewer.p_memoryData.FileOpenBMP(sRecipe + "0.bmp", 0);
             m_aTeach[1].m_memoryPool.m_viewer.p_memoryData.FileOpenBMP(sRecipe + "1.bmp", 0);
+            m_msOpen = (m_msOpen + (int)sw.ElapsedMilliseconds) / 2;
+            m_reg.Write("Open", m_msOpen);
+            m_bProgress = false; 
         }
 
         private void M_bgwRecipeOpen_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -100,6 +134,19 @@ namespace Root_ASIS
             m_aTeach[0].RunTreeAOI(Tree.eMode.Init);
             m_aTeach[1].RunTreeAOI(Tree.eMode.Init);
             p_sInfo = "Open Recipe File Finished";
+        }
+
+        bool m_bProgress = false; 
+        private void M_bgwRecipeProgress_DoWork(object sender, DoWorkEventArgs e)
+        {
+            int msProgress = (int)e.Argument; 
+            StopWatch sw = new StopWatch(); 
+            while (m_bProgress)
+            {
+                p_progressFile = (int)Math.Min((100 * sw.ElapsedMilliseconds / msProgress), 95); 
+                Thread.Sleep(10); 
+            }
+            p_progressFile = 100; 
         }
         #endregion
 

@@ -25,6 +25,7 @@ namespace Root_ASIS.AOI
             public AOIData m_aoiData;
             public string m_sInspect = "";
             public int m_nID = 0;
+            public Blob m_blob = new Blob(); 
 
             public bool p_bEnable
             {
@@ -86,6 +87,14 @@ namespace Root_ASIS.AOI
         }
         #endregion
 
+        #region ReAllocate
+        public string ReAllocate(InfoStrip infoStrip, MemoryData memory)
+        {
+            //forget
+            return "OK"; 
+        }
+        #endregion
+
         #region IAOI
         public string p_id { get; set; }
         public int p_nID { get; set; }
@@ -95,6 +104,7 @@ namespace Root_ASIS.AOI
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {
+            if (eDraw != AOIData.eDraw.ROI) return; 
             foreach (Unit unit in m_aUnit)
             {
                 if (unit.p_bEnable) unit.m_aoiData.Draw(draw, eDraw);

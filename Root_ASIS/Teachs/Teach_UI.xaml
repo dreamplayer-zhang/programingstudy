@@ -15,12 +15,7 @@
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Button Grid.Row="0" x:Name="buttonInspect" Content="Inspect" IsEnabled="False" Margin="3" Height="30" Click="buttonInspect_Click"/>
-            <TabControl Grid.Row="1">
+            <TabControl>
                 <TabItem Header=" AOI ">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -63,22 +58,40 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header=" ROI ">
-                    <TreeView x:Name="treeViewROI" Margin="3" PreviewMouseDown="treeViewROI_PreviewMouseDown">
-                        <TreeView.ItemContainerStyle>
-                            <Style TargetType="{x:Type TreeViewItem}">
-                                <Setter Property="IsExpanded" Value="True"/>
-                                <Setter Property="Focusable" Value="False"/>
-                            </Style>
-                        </TreeView.ItemContainerStyle>
-                        <TreeView.ItemTemplate>
-                            <HierarchicalDataTemplate ItemsSource="{Binding p_aROI}">
-                                <TextBlock Text="{Binding p_id}" Foreground="{Binding p_brushROI}" Height="{Binding p_nHeight}"/>
-                            </HierarchicalDataTemplate>
-                        </TreeView.ItemTemplate>
-                    </TreeView>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="3">
+                            <Button x:Name="buttonAllocate" Content=" ReAllocate " Margin="3" Click="buttonAllocate_Click"/>
+                            <Button x:Name="buttonViewROI" Content=" View ROI " Margin="33,3,3,3" Click="buttonViewROI_Click"/>
+                            <Button x:Name="buttonViewAll" Content=" View All " Margin="3" Click="buttonViewAll_Click"/>
+                        </StackPanel>
+                        <TreeView Grid.Row="1" x:Name="treeViewROI" Margin="3" PreviewMouseDown="treeViewROI_PreviewMouseDown">
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="{x:Type TreeViewItem}">
+                                    <Setter Property="IsExpanded" Value="True"/>
+                                    <Setter Property="Focusable" Value="False"/>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                            <TreeView.ItemTemplate>
+                                <HierarchicalDataTemplate ItemsSource="{Binding p_aROI}">
+                                    <TextBlock Text="{Binding p_id}" Foreground="{Binding p_brushROI}" Height="{Binding p_nHeight}"/>
+                                </HierarchicalDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
+                    </Grid>
                 </TabItem>
                 <TabItem Header=" Parameter ">
-                    <tree:TreeUI x:Name="treeAOIUI" Margin="3"/>
+                    <Grid x:Name="gridParameter">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Button Grid.Row="0" x:Name="buttonInspect" Content="Inspect" Margin="3" Height="30" Click="buttonInspect_Click"/>
+                        <tree:TreeUI Grid.Row="1" x:Name="treeAOIUI" Margin="3"/>
+                    </Grid>
                 </TabItem>
             </TabControl>
         </Grid>

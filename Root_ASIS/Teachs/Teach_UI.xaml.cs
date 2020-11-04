@@ -1,9 +1,11 @@
 ﻿using Root_ASIS.AOI;
 using RootTools.Trees;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Root_ASIS.Teachs
 {
@@ -31,11 +33,28 @@ namespace Root_ASIS.Teachs
             treeSetupUI.Init(teach.m_treeRootSetup);
             teach.RunTreeSetup(Tree.eMode.Init);
             InitAOI();
+            InitTimer(); 
         }
 
-        private void buttonInspect_Click(object sender, RoutedEventArgs e)
+        #region timer
+        DispatcherTimer m_timer = new DispatcherTimer(); 
+        void InitTimer()
         {
+            m_timer.Interval = TimeSpan.FromSeconds(0.1);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start(); 
         }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            bool bDoneROI = (m_teach.m_nROIReady == 0) && (m_teach.m_nROIActive == 0);
+            gridParameter.IsEnabled = bDoneROI;
+            buttonAllocate.IsEnabled = bDoneROI;
+            buttonViewAll.IsEnabled = bDoneROI;
+            buttonViewROI.Background = (m_teach.p_eDraw == AOIData.eDraw.ROI) ? Brushes.LightYellow : Brushes.LightGray;
+            buttonViewAll.Background = (m_teach.p_eDraw == AOIData.eDraw.All) ? Brushes.LightYellow : Brushes.LightGray;
+        }
+        #endregion
 
         #region AOI
         void InitAOI()
@@ -102,7 +121,7 @@ namespace Root_ASIS.Teachs
                 m_teach.p_aAOI.Remove(aoi);
                 m_teach.RunTreeAOI(Tree.eMode.Init);
                 m_teach.RunTreeAOI(Tree.eMode.Init);
-                InvalidROI(); 
+                m_teach.InvalidROI(); 
             }
         }
 
@@ -131,7 +150,7 @@ namespace Root_ASIS.Teachs
             }
             m_teach.RunTreeAOI(Tree.eMode.Init);
             m_teach.RunTreeAOI(Tree.eMode.Init);
-            InvalidROI();
+            m_teach.InvalidROI();
         }
 
         private static TAncestor FindAncestor<TAncestor>(DependencyObject dependencyObject) where TAncestor : DependencyObject
@@ -147,10 +166,19 @@ namespace Root_ASIS.Teachs
         #endregion
 
         #region ROI
-        public void InvalidROI()
+        private void buttonAllocate_Click(object sender, RoutedEventArgs e)
         {
-            buttonInspect.IsEnabled = (m_teach.m_nROIReady == 0) && (m_teach.m_nROIActive == 0);
-            m_teach.InvalidROI(); 
+
+        }
+
+        private void buttonViewROI_Click(object sender, RoutedEventArgs e)
+        {
+            m_teach.p_eDraw = AOIData.eDraw.ROI; 
+        }
+
+        private void buttonViewAll_Click(object sender, RoutedEventArgs e)
+        {
+            m_teach.p_eDraw = AOIData.eDraw.All; 
         }
 
         private void treeViewROI_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -169,6 +197,12 @@ namespace Root_ASIS.Teachs
                 m_teach.CalcROICount();
                 if (m_teach.m_nROIActive > 1) aoiActive.p_eROI = AOIData.eROI.Ready;
             }
+        }
+        #endregion
+
+        #region Parameter
+        private void buttonInspect_Click(object sender, RoutedEventArgs e)
+        {
         }
         #endregion
     }
