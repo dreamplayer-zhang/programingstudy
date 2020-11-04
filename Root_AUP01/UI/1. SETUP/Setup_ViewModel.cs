@@ -34,16 +34,16 @@ namespace Root_AOP01
             }
         }
 
-        MainWindow m_MainWindow;
+        public MainWindow m_MainWindow;
 
-        Home_ViewModel m_Home;
+        public SetupHome_ViewModel m_Home;
         public Maintenance_ViewModel m_Maintenance;
         public GEM_ViewModel m_GEM;
 
         public RecipeWizard_ViewModel m_RecipeWizard;
         public RecipeSpec_ViewModel m_RecipeSpec;
         public Recipe45D_ViewModel m_Recipe45D;
-        public RecipeBackside_ViewModel m_RecipeBackSide;
+        public RecipeFrontside_ViewModel m_RecipeFrontSide;
         public RecipeEdge_ViewModel m_RecipeEdge;
         public RecipeLADS_ViewModel m_RecipeLADS;
 
@@ -59,13 +59,13 @@ namespace Root_AOP01
 
         void Init_ViewModel()
         {
-            m_Home = new Home_ViewModel(this);
+            m_Home = new SetupHome_ViewModel(this);
             m_RecipeWizard = new RecipeWizard_ViewModel(this);
             m_Maintenance = new Maintenance_ViewModel(this);
             m_GEM = new GEM_ViewModel(this);
 
             m_Recipe45D = new Recipe45D_ViewModel(this);
-            m_RecipeBackSide = new RecipeBackside_ViewModel(this);
+            m_RecipeFrontSide = new RecipeFrontside_ViewModel(this);
             m_RecipeEdge = new RecipeEdge_ViewModel(this);
             m_RecipeLADS = new RecipeLADS_ViewModel(this);
             m_RecipeSpec = new RecipeSpec_ViewModel(this);
@@ -94,8 +94,8 @@ namespace Root_AOP01
             Navi_RecipeSummary.Btn.Click += NaviRecipeSummaryBtn_Click;
             Navi_45D = new NaviBtn("45D");
             Navi_45D.Btn.Click += Navi45DBtn_Click;
-            Navi_Backside = new NaviBtn("Backside");
-            Navi_Backside.Btn.Click += NaviBacksideBtn_Click;
+            Navi_Frontside = new NaviBtn("Frontside");
+            Navi_Frontside.Btn.Click += NaviFrontsideBtn_Click;
             Navi_Edge = new NaviBtn("Edge");
             Navi_Edge.Btn.Click += NaviEdgeBtn_Click;
             Navi_LADS = new NaviBtn("LADS");
@@ -120,7 +120,7 @@ namespace Root_AOP01
         public NaviBtn Navi_RecipeSummary;
         public NaviBtn Navi_RecipeSpec;
         public NaviBtn Navi_45D;
-        public NaviBtn Navi_Backside;
+        public NaviBtn Navi_Frontside;
         public NaviBtn Navi_Edge;
         public NaviBtn Navi_LADS;
 
@@ -145,9 +145,9 @@ namespace Root_AOP01
         {
             Set_RecipeEdgePanel();
         }
-        private void NaviBacksideBtn_Click(object sender, RoutedEventArgs e)
+        private void NaviFrontsideBtn_Click(object sender, RoutedEventArgs e)
         {
-            Set_RecipeBacksidePanel();
+            Set_RecipeFrontsidePanel();
         }
         private void Navi45DBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -230,15 +230,15 @@ namespace Root_AOP01
             CurrentPanel = m_RecipeWizard.Recipe45D;
             CurrentPanel.DataContext = m_Recipe45D;
         }
-        public void Set_RecipeBacksidePanel()
+        public void Set_RecipeFrontsidePanel()
         {
             NaviButtons.Clear();
             NaviButtons.Add(Navi_Setup);
             NaviButtons.Add(Navi_RecipeWizard);
-            NaviButtons.Add(Navi_Backside);
+            NaviButtons.Add(Navi_Frontside);
 
-            CurrentPanel = m_RecipeWizard.RecipeBackside;
-            CurrentPanel.DataContext = m_RecipeBackSide;
+            CurrentPanel = m_RecipeWizard.RecipeFrontside;
+            CurrentPanel.DataContext = m_RecipeFrontSide;
         }
         public void Set_RecipeEdgePanel()
         {

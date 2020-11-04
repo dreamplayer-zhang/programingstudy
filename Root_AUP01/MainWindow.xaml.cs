@@ -90,6 +90,7 @@ namespace Root_AOP01
         #region Mode UI
         public SelectMode ModeSelect;
         public Setup_Panel Setup;
+        public Review_Panel Review;
         public Run_Panel Run;
         #endregion
 
@@ -126,6 +127,9 @@ namespace Root_AOP01
             Setup = new Setup_Panel();
             Setup.DataContext = m_Setup;
 
+            Review = new Review_Panel();
+            //Review.DataContext =;;
+
             Run = new Run_Panel();
             Run.DataContext = this;
 
@@ -159,11 +163,11 @@ namespace Root_AOP01
             m_Setup.Set_Recipe45DPanel();
         }
 
-        private void NaviRecipeBackside_Click(object sender, RoutedEventArgs e)
+        private void NaviRecipeFrontside_Click(object sender, RoutedEventArgs e)
         {
             MainPanel.Children.Clear();
             MainPanel.Children.Add(Setup);
-            m_Setup.Set_RecipeBacksidePanel();
+            m_Setup.Set_RecipeFrontsidePanel();
         }
 
         private void NaviRecipeEdge_Click(object sender, RoutedEventArgs e)
@@ -196,7 +200,8 @@ namespace Root_AOP01
 
         private void NaviReview_Click(object sender, RoutedEventArgs e)
         {
-
+            MainPanel.Children.Clear();
+            MainPanel.Children.Add(Review);
         }
 
         private void NaviRun_click(object sender, RoutedEventArgs e)
@@ -205,18 +210,29 @@ namespace Root_AOP01
             MainPanel.Children.Add(Run);
         }
 
+
         private void ViewMenuItem_Click(object sender, RoutedEventArgs e)
         {
             bool check = false;
-
+            MenuItem item = sender as MenuItem;
             for (int i = 0; i < ViewMenu.Items.Count; i++)
             {
                 check = ((MenuItem)ViewMenu.Items[i]).IsChecked || check;
-                if ((sender as MenuItem) == (MenuItem)ViewMenu.Items[i])
+
+                if (item == (MenuItem)ViewMenu.Items[i])
                 {
-                    if ((sender as MenuItem).IsChecked)
+                    if (item.IsChecked)
+                    {
                         viewTab.SelectedIndex = i;
+                        foreach (TabItem tab in viewTab.Items)
+                        {
+                            if (tab.Visibility == Visibility.Visible)
+                                viewTab.SelectedIndex = tab.TabIndex;
+                        }
+                    }
                 }
+
+
 
             }
             if (check == false)

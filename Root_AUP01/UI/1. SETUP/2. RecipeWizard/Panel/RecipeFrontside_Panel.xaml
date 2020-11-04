@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Root_AOP01.RecipeBackside_Panel"
+﻿<UserControl x:Class="Root_AOP01.RecipeFrontside_Panel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -299,7 +299,7 @@
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                        <TextBlock FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                        <TextBlock FontWeight="Bold" FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Header="Align Key" Grid.Row="1">
@@ -309,7 +309,7 @@
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                        <TextBlock FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                        <TextBlock FontWeight="Bold" FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Header="Pattern Shift" Grid.Row="2">
@@ -326,7 +326,7 @@
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontSize="12" Text="Center" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <TextBlock FontSize="12" Text="Angle" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                        <TextBlock FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                        <TextBlock FontWeight="Bold" FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
                                         <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
                                         <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
                                     </Grid>
@@ -345,7 +345,7 @@
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontSize="12" Text="Center" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <TextBlock FontSize="12" Text="Angle" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                                        <TextBlock FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                        <TextBlock FontWeight="Bold" FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
                                         <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
                                         <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
                                     </Grid>

@@ -2,10 +2,10 @@
 
 namespace Root_AOP01
 {
-    class RecipeBackside_ViewModel : ObservableObject
+    class RecipeFrontside_ViewModel : ObservableObject
     {
         Setup_ViewModel m_Setup;
-        public RecipeBackside_ViewModel(Setup_ViewModel setup)
+        public RecipeFrontside_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
         }

@@ -11,7 +11,7 @@ namespace Root_AOP01
         public RecipeSpec_Page RecipeSpec = new RecipeSpec_Page();
 
         public Recipe45D_Panel Recipe45D = new Recipe45D_Panel();
-        public RecipeBackside_Panel RecipeBackside = new RecipeBackside_Panel();
+        public RecipeFrontside_Panel RecipeFrontside = new RecipeFrontside_Panel();
         public RecipeEdge_Panel RecipeEdge = new RecipeEdge_Panel();
         public RecipeLADS_Panel RecipeLADS = new RecipeLADS_Panel();
 
@@ -38,7 +38,7 @@ namespace Root_AOP01
                 });
             }
         }
-        public ICommand btnRecipeOption
+        public ICommand btnRecipeSpec
         {
             get
             {
@@ -64,13 +64,13 @@ namespace Root_AOP01
                 });
             }
         }
-        public ICommand btnBackside
+        public ICommand btnFrontside
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    m_Setup.Set_RecipeBacksidePanel();
+                    m_Setup.Set_RecipeFrontsidePanel();
                 });
             }
         }
@@ -101,6 +101,18 @@ namespace Root_AOP01
                 return new RelayCommand(() =>
                 {
                     m_Setup.Set_HomePanel();
+                });
+            }
+        }
+
+        public ICommand btnRun
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    m_Setup.m_MainWindow.MainPanel.Children.Clear();
+                    m_Setup.m_MainWindow.MainPanel.Children.Add(m_Setup.m_MainWindow.Review);
                 });
             }
         }

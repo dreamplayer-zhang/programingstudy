@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Root_AOP01
 {
     /// <summary>
-    /// RecipeBackside_Panel.xaml에 대한 상호 작용 논리
+    /// Review_Panel.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class RecipeBackside_Panel : UserControl
+    public partial class Review_Panel : UserControl
     {
-        public RecipeBackside_Panel()
+        public Review_Panel()
         {
             InitializeComponent();
         }

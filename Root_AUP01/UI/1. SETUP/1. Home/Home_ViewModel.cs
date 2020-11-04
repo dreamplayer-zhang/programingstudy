@@ -7,12 +7,12 @@ using System.Windows.Input;
 
 namespace Root_AOP01
 {
-    class Home_ViewModel : ObservableObject
+    class SetupHome_ViewModel : ObservableObject
     {
         public Home_Panel Home = new Home_Panel();
 
         Setup_ViewModel m_Setup;
-        public Home_ViewModel(Setup_ViewModel setup)
+        public SetupHome_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
         }

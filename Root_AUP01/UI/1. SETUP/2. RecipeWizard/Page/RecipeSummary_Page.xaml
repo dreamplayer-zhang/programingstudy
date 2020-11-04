@@ -31,8 +31,8 @@
                        FontWeight="Bold"/>
                 <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
                 <Grid Height="200"/>
-                <!--Backside-->
-                <TextBlock Text="Backside"
+                <!--Frontside-->
+                <TextBlock Text="Frontside"
                        Style="{StaticResource BasicTb}"
                        HorizontalAlignment="Right"
                        FontSize="25"

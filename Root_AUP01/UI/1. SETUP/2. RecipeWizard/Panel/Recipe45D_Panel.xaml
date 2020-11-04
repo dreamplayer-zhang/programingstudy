@@ -226,7 +226,8 @@
                                             <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock FontSize="12" Text="Result" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                        <TextBlock FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" />
+                                        <TextBlock FontSize="12" Text="Pass" Foreground="Green" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="0" 
+                                                   FontWeight="Bold"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="1" Header="Defect Image"

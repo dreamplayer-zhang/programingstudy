@@ -46,7 +46,7 @@ namespace Root_AOP01
         private void Review_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             m_MainWindow.MainPanel.Children.Clear();
-            m_MainWindow.MainPanel.Children.Add(m_MainWindow.Setup);
+            m_MainWindow.MainPanel.Children.Add(m_MainWindow.Review);
         }
 
         private void Run_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

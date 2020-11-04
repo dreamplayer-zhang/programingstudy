@@ -19,13 +19,13 @@
                                   Command="{Binding btnSummary}"
                                   Style="{StaticResource SetupPanelToggleBtn}"/>
                     <ToggleButton Content="Spec" x:Name="btnSpec"
-                                  Command="{Binding btnRecipeOption}"
+                                  Command="{Binding btnRecipeSpec}"
                                   Style="{StaticResource SetupPanelToggleBtn}"/>
                     <Button Content="45D"
                             Command="{Binding btn45D}"
                             Style="{StaticResource SetupPanelBtn}"/>
-                    <Button Content="Backside"
-                            Command="{Binding btnBackside}"
+                    <Button Content="Frontside"
+                            Command="{Binding btnFrontside}"
                             Style="{StaticResource SetupPanelBtn}"/>
                     <Button Content="Edge"
                             Command="{Binding btnEdge}"

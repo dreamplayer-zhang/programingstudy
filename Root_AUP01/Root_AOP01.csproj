@@ -72,6 +72,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="MVVM\Helper.cs" />
+    <Compile Include="UI\2. REVIEW\Review_Panel.xaml.cs">
+      <DependentUpon>Review_Panel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeSpec_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\Page\RecipeSpec_Page.xaml.cs">
       <DependentUpon>RecipeSpec_Page.xaml</DependentUpon>
@@ -101,8 +104,8 @@
     <Compile Include="UI\1. SETUP\2. RecipeWizard\Panel\Recipe45D_Panel.xaml.cs">
       <DependentUpon>Recipe45D_Panel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\1. SETUP\2. RecipeWizard\Panel\RecipeBackside_Panel.xaml.cs">
-      <DependentUpon>RecipeBackside_Panel.xaml</DependentUpon>
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\Panel\RecipeFrontside_Panel.xaml.cs">
+      <DependentUpon>RecipeFrontside_Panel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. SETUP\2. RecipeWizard\Panel\RecipeLADS_Panel.xaml.cs">
       <DependentUpon>RecipeLADS_Panel.xaml</DependentUpon>
@@ -159,6 +162,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\2. REVIEW\Review_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1. SETUP\2. RecipeWizard\Page\RecipeSpec_Page.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -175,7 +182,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\1. SETUP\2. RecipeWizard\Panel\RecipeBackside_Panel.xaml">
+    <Page Include="UI\1. SETUP\2. RecipeWizard\Panel\RecipeFrontside_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -286,7 +293,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Control\UserControl\" />
-    <Folder Include="UI\2. REVIEW\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
