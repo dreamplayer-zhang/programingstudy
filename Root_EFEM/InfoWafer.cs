@@ -130,6 +130,7 @@ namespace Root_EFEM
                 {
                     m_eWaferSize = waferSize;
                     m_sWaferSize = waferSize.ToString();
+                    if (waferSize == eWaferSize.e300mm) m_bEnable = true; 
                 }
 
                 public void RunTreeEnable(Tree tree, bool bVisible)
