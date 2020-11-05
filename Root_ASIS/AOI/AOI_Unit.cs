@@ -3,6 +3,7 @@ using RootTools;
 using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -98,6 +99,16 @@ namespace Root_ASIS.AOI
         public IAOI NewAOI()
         {
             return new AOI_Unit(p_id, m_log); 
+        }
+
+        public void ReAllocate(List<CPoint> aArray)
+        {
+            CPoint cp0 = m_aUnit[0].m_aoiData.m_cp0;
+            InitUnit(null); 
+            for (int n = 0; n < Math.Min(aArray.Count, m_aUnit.Count); n++)
+            {
+                m_aUnit[n].m_aoiData.m_cp0 = cp0 + aArray[n]; 
+            }
         }
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)

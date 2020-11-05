@@ -47,7 +47,7 @@ namespace Root_ASIS.Teachs
         List<IArray> _aAOIArray = new List<IArray>(); 
         void InitLIstAOIArray()
         {
-            _aAOIArray.Add(new AOIArray("AOIArray", m_log));
+            _aAOIArray.Add(new AOIArray("AOIArray", m_nID, m_log));
         }
 
 
@@ -145,6 +145,12 @@ namespace Root_ASIS.Teachs
         public void ClearActive()
         {
             foreach (IAOI aoi in p_aROI) aoi.ClearActive(); 
+        }
+
+        public void ReAllocate()
+        {
+            p_aoiArray.ReAllocate(m_memoryPool.m_viewer.p_memoryData);
+            foreach (IAOI aoi in p_aAOI) aoi.ReAllocate(p_aoiArray.p_aArray); 
         }
         #endregion
 
@@ -303,12 +309,14 @@ namespace Root_ASIS.Teachs
         #endregion
 
         public string m_id;
+        int m_nID; 
         Log m_log; 
-        public Teach(string id, MemoryPool memoryPool)
+        public Teach(string id, int nID, MemoryPool memoryPool)
         {
             p_aAOI = new ObservableCollection<IAOI>();
             p_aROI = new ObservableCollection<IAOI>();
             m_id = id;
+            m_nID = nID; 
             m_memoryPool = memoryPool; 
             m_log = LogView.GetLog(id);
             InitTreeSetup();

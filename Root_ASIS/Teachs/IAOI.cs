@@ -1,6 +1,8 @@
 ﻿using Root_ASIS.AOI;
+using RootTools;
 using RootTools.Memory;
 using RootTools.Trees;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Root_ASIS.Teachs
@@ -16,6 +18,8 @@ namespace Root_ASIS.Teachs
         void Draw(MemoryDraw draw, AOIData.eDraw eDraw);
 
         IAOI NewAOI();
+
+        void ReAllocate(List<CPoint> aArray);
 
         ObservableCollection<AOIData> p_aROI { get; set; }
 

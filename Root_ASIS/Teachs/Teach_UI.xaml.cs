@@ -170,7 +170,8 @@ namespace Root_ASIS.Teachs
         #region ROI
         private void buttonAllocate_Click(object sender, RoutedEventArgs e)
         {
-
+            m_teach.ReAllocate();
+            m_teach.p_eDraw = AOIData.eDraw.All;
         }
 
         private void buttonViewROI_Click(object sender, RoutedEventArgs e)

@@ -1,7 +1,9 @@
 ﻿using Root_ASIS.Teachs;
 using RootTools;
+using RootTools.Inspects;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -176,6 +178,26 @@ namespace Root_ASIS
             Strip.p_szBlock = tree.Set(Strip.p_szBlock, Strip.p_szBlock, "Block", "Number of Block");
             Strip.p_szUnit = tree.Set(Strip.p_szUnit, Strip.p_szUnit, "Unit", "Number of Unit");
             Strip.p_eUnitOrder = (Strip.eUnitOrder)tree.Set(Strip.p_eUnitOrder, Strip.p_eUnitOrder, "Order", "Unit Numbering Order");
+            List<string> asOrder = new List<string>();
+            string sOrder = Strip.p_eUnitSecondOrder.ToString(); 
+            switch (Strip.p_eUnitOrder)
+            {
+                case Strip.eUnitOrder.Left:
+                case Strip.eUnitOrder.Right:
+                    asOrder.Add(Strip.eUnitOrder.Down.ToString());
+                    asOrder.Add(Strip.eUnitOrder.Up.ToString());
+                    break;
+                case Strip.eUnitOrder.Down:
+                case Strip.eUnitOrder.Up:
+                    asOrder.Add(Strip.eUnitOrder.Left.ToString());
+                    asOrder.Add(Strip.eUnitOrder.Right.ToString());
+                    break;
+            }
+            sOrder = tree.Set(sOrder, sOrder, asOrder, "Second Order", "Unit Numbering Order");
+            foreach (Strip.eUnitOrder order in Enum.GetValues(typeof(Strip.eUnitOrder)))
+            {
+                if (order.ToString() == sOrder) Strip.p_eUnitSecondOrder = order; 
+            }
         }
         #endregion
 
