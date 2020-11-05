@@ -10,6 +10,9 @@
 이하 경로에서 파일을 받은 후 Lib폴더 안에 넣어주어야 정상적으로 실행이 가능합니다
 https://ati5344.sharepoint.com/:u:/s/SW1/Ebw10le_SzlPqDMpOOhSw7MBJsuflKh4IcvCAkm0U457-Q?e=Sm8Ej8
 
+SaperaLTSDKSetup8.51.01.2023
+https://ati5344-my.sharepoint.com/:u:/g/personal/joseph_ati2000_co_kr/ETMJ0pqp2aVGs_N_BhYxU_QB-PabWtPMdoMzkNjXMtj-Iw?e=2mcDaB
+
 해당 파일의 복사 행동이 빌드 후 이벤트에 등록되어있으므로 그 부분을 참고하시기 바랍니다
 
 ## Troubleshooting
