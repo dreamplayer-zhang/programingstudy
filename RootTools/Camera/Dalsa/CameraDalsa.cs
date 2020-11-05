@@ -79,7 +79,7 @@ namespace RootTools.Camera.Dalsa
             m_sapAcq = new SapAcquisition(m_sapLocation, m_sCamFile);
             if (m_sapAcq == null) return "SapAcqusition not Assigned + " + p_id;
             if (m_sapAcq.Create() == false) return "SapAcqusition Create Error : " + p_id;
-            m_sapBuf = new SapBuffer(m_nBuf, m_sapAcq, SapBuffer.MemoryType.ScatterGather);
+            m_sapBuf = new SapBuffer(p_nCamBuf, m_sapAcq, SapBuffer.MemoryType.ScatterGather);
             if (m_sapBuf == null) return "SapBuffer Assign Error : " + p_id; 
             if (m_sapBuf.Create() == false) return "SapBuffer Create Error : " + p_id;
             GetCameraAddress();
@@ -169,7 +169,6 @@ namespace RootTools.Camera.Dalsa
 
         string m_sServer = "";
         string m_sCamFile = "";
-        int m_nBuf = 32; 
         void RunTreeConnect(Tree tree)
         {
             m_sServer = tree.Set(m_sServer, m_sServer, "Server", "Camera Dalsa Server Name");
@@ -339,7 +338,7 @@ namespace RootTools.Camera.Dalsa
         int m_nXfer = 0; 
         private void M_sapXfer_XferNotify(object sender, SapXferNotifyEventArgs args)
         {
-            for (int n = 0; n < args.EventCount; n++)
+            //for (int n = 0; n < args.EventCount; n++)
             {
                 m_qGrab.Enqueue(m_nXfer);
                 m_log.Info("Xfer = " + m_nXfer.ToString()); 
