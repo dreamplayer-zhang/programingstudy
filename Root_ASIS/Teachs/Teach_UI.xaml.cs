@@ -27,11 +27,13 @@ namespace Root_ASIS.Teachs
             memoryViewerUI.Init(teach.m_memoryPool.m_viewer, false);
             listViewAOI.ItemsSource = teach.p_aAOI;
             listViewListAOI.ItemsSource = teach.m_aEnableAOI;
-            treeViewROI.ItemsSource = teach.p_aROI; 
-            treeAOIUI.Init(teach.m_treeRootAOI);
-            teach.RunTreeAOI(Tree.eMode.Init);
+            treeViewROI.ItemsSource = teach.p_aROI;
             treeSetupUI.Init(teach.m_treeRootSetup);
             teach.RunTreeSetup(Tree.eMode.Init);
+            treeROIUI.Init(teach.m_treeRootROI);
+            teach.RunTreeROI(Tree.eMode.Init);
+            treeAOIUI.Init(teach.m_treeRootAOI);
+            teach.RunTreeAOI(Tree.eMode.Init);
             InitAOI();
             InitTimer(); 
         }

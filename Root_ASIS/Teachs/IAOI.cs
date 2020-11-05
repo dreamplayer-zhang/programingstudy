@@ -23,7 +23,7 @@ namespace Root_ASIS.Teachs
 
         void CalcROICount(ref int nReady, ref int nActive);
 
-        AOIData GetAOIData(AOIData.eROI eROI); 
+        AOIData GetAOIData(AOIData.eROI eROI);
 
         void RunTreeAOI(Tree tree);
     }

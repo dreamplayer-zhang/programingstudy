@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 
 namespace Root_ASIS.AOI
 {
-    public class AOIArray : IAOI
+    public class AOIArray : NotifyProperty, IArray
     {
         #region StringTable
         static string[] m_asStringTable =
@@ -25,7 +25,16 @@ namespace Root_ASIS.AOI
             public AOIData m_aoiData;
             public string m_sInspect = "";
             public int m_nID = 0;
-            public Blob m_blob = new Blob(); 
+            Blob m_blob = new Blob();
+
+            public string FindCenter(MemoryData memory)
+            {
+                m_blob.RunBlob(memory, 0, m_aoiData.m_cp0, m_aoiData.m_sz, m_aoi.m_mmGV.X, m_aoi.m_mmGV.X, 5);
+                m_blob.RunSort(Blob.eSort.Size);
+                if (m_blob.m_aSort.Count > 0) m_aoiData.m_rpCenter = m_blob.m_aSort[0].m_rpCenter;
+                else m_aoiData.m_rpCenter = new RPoint(m_aoiData.m_cp0.X + m_sz.X / 2.0, m_aoiData.m_cp0.Y + m_sz.Y / 2.0);
+                return "OK"; 
+            }
 
             public bool p_bEnable
             {
@@ -88,10 +97,19 @@ namespace Root_ASIS.AOI
         #endregion
 
         #region ReAllocate
-        public string ReAllocate(InfoStrip infoStrip, MemoryData memory)
+        public CPoint m_mmGV = new CPoint(100, 0); 
+        Teach m_teach;
+        MemoryData m_memory;
+        public string ReAllocate(Teach teach, MemoryData memory)
         {
-            //forget
+            m_teach = teach;
+            m_memory = memory;
             return "OK"; 
+        }
+
+        public void RunTreeArray(Tree tree)
+        {
+            m_mmGV = tree.Set(m_mmGV, m_mmGV, "GV", m_ST.Get("Gray Value Range (0~255)"));
         }
         #endregion
 

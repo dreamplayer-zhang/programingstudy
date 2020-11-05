@@ -107,6 +107,7 @@
     <Compile Include="Strip.cs" />
     <Compile Include="MainTeach.cs" />
     <Compile Include="Teachs\IAOI.cs" />
+    <Compile Include="Teachs\IArray.cs" />
     <Compile Include="Teachs\Teach.cs" />
     <Compile Include="Teachs\Teach_UI.xaml.cs">
       <DependentUpon>Teach_UI.xaml</DependentUpon>
