@@ -335,7 +335,8 @@
                         </DataGrid>
                         <UniformGrid Grid.Row="2" Columns="3">
                             <Button Content="Stop" Margin="5"/>
-                            <Button Content="Route Optimization" Margin="5"/>
+                            <Button Content="Route Optimization" Margin="5">
+                            </Button>
                             <Border Margin="5" Background="#FFDDDDDD"
                                     BorderBrush="#FF707070" BorderThickness="1">
                                 <CheckBox Content="Show Route" 

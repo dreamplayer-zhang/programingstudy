@@ -39,7 +39,6 @@ namespace Root_CAMELLIA
         {
             StageMainView = rcpMgr.StageMainView;
             StagePreView = rcpMgr.StagePreView;
-            int a;
             VerticalScroll = rcpMgr.VerticalScroll;
             HorizontalScroll = rcpMgr.HorizontalScroll;
             dataManager = mainWindow.DataManager;
