@@ -5,6 +5,8 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using System.Windows.Media;
 using System;
+using RootTools;
+using Root_CAMELLIA.Data;
 
 namespace Root_CAMELLIA
 {
@@ -26,6 +28,16 @@ namespace Root_CAMELLIA
             }
 
             InitTimer();
+
+            Init();
+        }
+
+        private void Init()
+        {
+            recipe = new Dlg_RecipeManger();
+            DataManager = new DataManager();
+            m_RecipeManagerViewModel = new Dlg_RecipeManager_ViewModel(this, recipe);
+            recipe.DataContext = m_RecipeManagerViewModel;
         }
 
         #region Window
@@ -36,6 +48,19 @@ namespace Root_CAMELLIA
         private void Window_Closing(object sender, CancelEventArgs e)
         {
         }
+        #endregion
+
+
+        #region ViewModel
+        private Dlg_RecipeManager_ViewModel m_RecipeManagerViewModel;
+        #endregion
+
+        #region Dlg
+        private Dlg_RecipeManger recipe;
+        #endregion
+
+        #region Getter Setter
+        public DataManager DataManager { get; set; }
         #endregion
 
         #region Title Bar
@@ -103,11 +128,33 @@ namespace Root_CAMELLIA
             this.Close();
         }
 
+
+        bool test = false;
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Dlg_RecipeManger recipe = new Dlg_RecipeManger();
+            //recipe = new Dlg_RecipeManger();
+            //m_RecipeManagerViewModel = new Dlg_RecipeManager_ViewModel(recipe);
+            //recipe.DataContext = m_RecipeManagerViewModel;
 
-            recipe.ShowDialog();
+           
+
+            if (!test)
+            {
+
+                test = true;
+                recipe.Visibility = Visibility.Visible;
+                
+            }
+            else if (test)
+            {
+                recipe.Visibility = Visibility.Hidden;
+                test = false;
+            }
+            //recipe.Visibility = Visibility.Hidden;
+            //recipe.Close();
+
+
+
         }
     }
 }

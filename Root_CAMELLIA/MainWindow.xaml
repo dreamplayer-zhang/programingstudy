@@ -101,7 +101,8 @@
                 <Button Content="Load" VerticalAlignment="Center"
                         Height="40" Width="60" Margin="5"/>
                 <Button Content="Recipe" VerticalAlignment="Center"
-                        Height="40" Width="60" Margin="5" Click="Button_Click_1"/>
+                        Height="40" Width="60" Margin="5" Click="Button_Click_1">
+                </Button>
                 <Button Content="Engineer" VerticalAlignment="Center"
                         Height="40" Width="60" Margin="5"/>
             </StackPanel>

@@ -21,11 +21,15 @@ namespace Root_CAMELLIA
     {
         public Dlg_RecipeManger()
         {
+            
+
             InitializeComponent();
+       
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+           // this.Hide();
             this.Close();
         }
 

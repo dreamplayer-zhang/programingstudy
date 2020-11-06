@@ -3,6 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Icon"
         WindowStyle="None"
@@ -84,7 +86,7 @@
             <MenuItem Header="Save"/>
             <MenuItem Header="Save As"/>
         </Menu>
-        
+
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*"/>
@@ -121,10 +123,10 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <ToggleButton Content="13 Point" Grid.Column="0" Grid.Row="0" Margin="5"/>
-                        <ToggleButton Content="25 Point"  Grid.Column="1" Grid.Row="0" Margin="5"/>
-                        <ToggleButton Content="49 Point" Grid.Column="0" Grid.Row="1" Margin="5"/>
-                        <ToggleButton Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5"/>
+                        <Button Content="13 Point" Grid.Column="0" Grid.Row="0" Margin="5" Command="{Binding btn13Point}"/>
+                        <Button Content="25 Point"  Grid.Column="1" Grid.Row="0" Margin="5" Command="{Binding btn25Point}"/>
+                        <Button Content="49 Point" Grid.Column="0" Grid.Row="1" Margin="5" Command="{Binding btn49Point}"/>
+                        <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding btn73Point}"/>
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="File Loader" Grid.Row="2">
@@ -243,37 +245,74 @@
                         </Grid.ColumnDefinitions>
                         <GroupBox Header="Point Setting">
                             <UniformGrid Columns="4" Rows="1">
-                                <Button Content="Reset" Margin="5"/>
-                                <Button Content="Preset 1" Margin="5"/>
-                                <Button Content="Preset 2" Margin="5"/>
-                                <Button Content="Custermize" Margin="5"/>
+                                <Button Content="Reset" Margin="5" Command="{Binding btnReset}"/>
+                                <Button Content="Preset 1" Margin="5" Command="{Binding btnPreset1}"/>
+                                <Button Content="Preset 2" Margin="5" Command="{Binding btnPreset2}" />
+                                <Button Content="Custermize" Margin="5" Command="{Binding btnCustomize}"/>
                             </UniformGrid>
                         </GroupBox>
                         <GroupBox Header="Point Selector" Grid.Column="1">
                             <UniformGrid Columns="4" Rows="1">
-                                <TextBox Text="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5"/>
-                                <Button Content="Select %" Margin="5"/>
-                                <Button Content="Select All" Margin="5"/>
-                                <Button Content="Delete All" Margin="5"/>
+                                <TextBox Text="{Binding Percentage}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5"/>
+                                <Button Content="Select %" Margin="5" Command="{Binding btnSelectPercentage}"/>
+                                <Button Content="Select All" Margin="5" Command="{Binding btnSelectAll}"/>
+                                <Button Content="Delete All" Margin="5" Command="{Binding btnDeleteAll}"/>
                             </UniformGrid>
                         </GroupBox>
                     </Grid>
                     <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="30"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="30"/>
+                        </Grid.ColumnDefinitions>
                         <Viewbox Margin="10">
-                            <Canvas Width="1000" Height="1000">
-                                <Ellipse Fill="SlateGray" Width="1000" Height="1000"/>
+                            <Canvas x:Name="StageMainView" ClipToBounds="True" Margin="10" Width="1000" Height="1000" Background="#01FFFFFF">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseMove">
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseMove" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseWheel" >
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseWheel" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeftButtonDown" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeftButtonUp" >
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeftButtonUp" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseRightButtonDown" >
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseRightButtonDown" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseRightButtonUp" >
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseRightButtonUp" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseEnter" >
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseEnter" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeave" >
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeave" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
                             </Canvas>
+                           
                         </Viewbox>
+                        <ScrollBar Grid.Row="1" Maximum="10" Minimum="1" Value="10" Orientation="Horizontal" x:Name="HorizontalScroll" Visibility="Hidden" />
+                        <ScrollBar Grid.Column="1" Maximum="10" Minimum="1" Value="10" x:Name="VerticalScroll" Visibility="Hidden" />
                     </Grid>
                 </Grid>
             </GroupBox>
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="4*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="142*"/>
+                    <RowDefinition Height="272*"/>
+                    <RowDefinition Height="103*"/>
+                    <RowDefinition Height="413*"/>
                 </Grid.RowDefinitions>
-                <GroupBox Header="Measurement Point List">
+                <GroupBox Header="Measurement Point List" Grid.RowSpan="2">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition/>
@@ -282,16 +321,16 @@
                         </Grid.RowDefinitions>
                         <UniformGrid Grid.Row="0" Margin="2" Background="Gainsboro" Columns="3">
                             <TextBlock Text="Count" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <TextBlock Text="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                         </UniformGrid>
-                        <DataGrid Grid.Row="1">
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Index" Width="*"/>
-                                <DataGridTextColumn Header="X" Width="*"/>
-                                <DataGridTextColumn Header="Y" Width="*"/>
-                                <DataGridTextColumn Header="Offset X" Width="*"/>
-                                <DataGridTextColumn Header="Route" Width="*"/>
+                                <DataGridTextColumn Header="Index" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="X (mm)" Width="*" Binding="{Binding ListX}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Y (mm)" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Route" Width="*" Binding="{Binding ListRoute}" IsReadOnly="True"/>
                             </DataGrid.Columns>
                         </DataGrid>
                         <UniformGrid Grid.Row="2" Columns="3">
@@ -299,14 +338,23 @@
                             <Button Content="Route Optimization" Margin="5"/>
                             <Border Margin="5" Background="#FFDDDDDD"
                                     BorderBrush="#FF707070" BorderThickness="1">
-                                <RadioButton Content="Show Route" 
+                                <CheckBox Content="Show Route" 
                                              VerticalAlignment="Center"
-                                             HorizontalAlignment="Center"/>
+                                             HorizontalAlignment="Center" IsChecked="{Binding ShowRoute}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Checked" >
+                                            <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnCheckboxChange" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="Unchecked" >
+                                            <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnCheckboxChange" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </CheckBox>
                             </Border>
                         </UniformGrid>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="Position Information" Grid.Row="1">
+                <GroupBox Header="Position Information" Grid.Row="2">
                     <UniformGrid Columns="2" Rows="2">
                         <Grid Margin="5" Background="Gainsboro">
                             <Grid.ColumnDefinitions>
@@ -316,7 +364,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
-                            <TextBlock Text="0.0 mm" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                            <TextBlock Text="{Binding XPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
                         </Grid>
                         <Grid Margin="5" Background="Gainsboro">
                             <Grid.ColumnDefinitions>
@@ -326,7 +374,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
-                            <TextBlock Text="0.0 mm" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                            <TextBlock Text="{Binding YPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
                         </Grid>
                         <Grid Margin="5" Background="Gainsboro">
                             <Grid.ColumnDefinitions>
@@ -336,7 +384,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="R" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
-                            <TextBlock Text="0.0 mm" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                            <TextBlock Text="{Binding CurrentRadius}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
                         </Grid>
                         <Grid Margin="5" Background="Gainsboro">
                             <Grid.ColumnDefinitions>
@@ -346,16 +394,32 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="∠" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
-                            <TextBlock Text="0.0 mm" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                            <TextBlock Text="{Binding CurrentTheta}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
                         </Grid>
                     </UniformGrid>
                 </GroupBox>
-                <Grid Grid.Row="2">
-                    <Viewbox Margin="10">
-                        <Canvas Width="1000" Height="1000">
-                            <Ellipse Fill="SlateGray" Width="1000" Height="1000"/>
-                        </Canvas>
-                    </Viewbox>
+
+                <Grid Grid.Row="3">
+                    <GroupBox Header="PreView">
+                        <Viewbox Margin="10">
+                            <Canvas x:Name="StagePreView" Margin="10" Width="1000" Height="1000" ClipToBounds="True" Background="#01FFFFFF">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="MouseMove">
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseWheel" >
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseWheelPreView" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseRightButtonDown" >
+                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseRightButtonDownPreView" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Canvas>
+                        </Viewbox>
+                    </GroupBox>
                 </Grid>
             </Grid>
 
