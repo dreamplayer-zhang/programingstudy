@@ -6,6 +6,7 @@ using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Camera.Matrox;
+using RootTools.Camera.Silicon;
 using RootTools.Control;
 using RootTools.Control.Ajin;
 using RootTools.Inspects;
@@ -69,7 +70,8 @@ namespace Root_Vega.Module
         public Camera_Basler m_CamAlign1;
         public Camera_Basler m_CamAlign2;
         public Camera_Basler m_CamRADS;
-        public Camera_Matrox m_CamTest;
+        //public Camera_Matrox m_CamTest;
+        public Camera_Silicon m_CamSilicon;
 
         #region Light
         public LightSet m_lightSet;
@@ -120,7 +122,9 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
 
-            p_sInfo = m_toolBox.Get(ref m_CamTest, this, "Test");
+            //p_sInfo = m_toolBox.Get(ref m_CamTest, this, "Test");
+            p_sInfo = m_toolBox.Get(ref m_CamSilicon, this, "Silicon");
+            
 
             p_sInfo = m_toolBox.Get(ref m_diPatternReticleExistSensor, this, "Pattern Reticle Sensor");
 
