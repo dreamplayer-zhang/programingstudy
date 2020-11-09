@@ -869,6 +869,8 @@ namespace Root_Vega.Module
                 int nRefStartOffsetY = 0;
                 int nInspectStartIndex = 0;
 
+                Vega_Engineer engineer = (Vega_Engineer)m_module.m_engineer;
+
 
                 // implement
                 try
@@ -887,7 +889,7 @@ namespace Root_Vega.Module
                     if (m_bUseInspect)
                     {
                         // 검사 Queue Monitoring 시작 -> Side에서 검사가 먼저 시작됐을 경우 그냥 Return
-                        ((Vega_Engineer)m_module.m_engineer).m_InspManager.StartInspection();
+                        engineer.m_InspManager.StartInspection();
                     }
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
@@ -936,6 +938,7 @@ namespace Root_Vega.Module
                                 // Feature가 스캔됐는지 확인
                                 bFeatureScanned = m_mvvm.IsFeatureScanned(cpMemoryOffset_pixel.X, nCamWidth);
                             }
+                            #region Feature
                             if (bFeatureScanned && (bFoundFeature == false))
                             {
                                 // Feature 탐색 시작
@@ -967,6 +970,11 @@ namespace Root_Vega.Module
                                     }
                                 }
                             }
+                            #endregion
+                            #region Align Key
+                            // Align Key 추가해야함
+                            #endregion
+                            #region Inspect Area
                             if (bFoundFeature)
                             {
                                 Roi roiCurrent = m_mvvm.p_PatternRoiList[0];
@@ -988,12 +996,36 @@ namespace Root_Vega.Module
                                     if ((crtOverlapedRect.Width > 0) && (crtOverlapedRect.Height > 0))
                                     {
                                         // 3. Overlap된 Rect영역을 검사 쓰레드로 던져라
+                                        // UI
                                         var temp = new UIElementInfo(new Point(crtOverlapedRect.Left, crtOverlapedRect.Top), new Point(crtOverlapedRect.Right, crtOverlapedRect.Bottom));
+                                        System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+                                        rect.Width = crtOverlapedRect.Width;
+                                        rect.Height = crtOverlapedRect.Height;
+                                        System.Windows.Controls.Canvas.SetLeft(rect, crtOverlapedRect.Left);
+                                        System.Windows.Controls.Canvas.SetTop(rect, crtOverlapedRect.Top);
+                                        rect.StrokeThickness = 3;
+                                        rect.Stroke = MBrushes.Orange;
 
+                                        m_mvvm.p_RefFeatureDrawer.m_ListShape.Add(rect);
+                                        m_mvvm.p_RefFeatureDrawer.m_Element.Add(rect);
+                                        m_mvvm.p_RefFeatureDrawer.m_ListRect.Add(temp);
 
+                                        m_mvvm.p_ImageViewer.SetRoiRect();
+
+                                        int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
+
+                                        engineer.m_InspManager.SetStandardPos(nDefectCode, cptStandard);
+
+                                        MemoryData memory = engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem);
+                                        IntPtr p = memory.GetPtr(0);
+                                        engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
+                                            engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
+                                            engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
+                                            crtCurrentArea, 500, roiCurrent.Strip.ParameterList[0], nDefectCode, engineer.m_recipe.VegaRecipeData.UseDefectMerge, engineer.m_recipe.VegaRecipeData.MergeDistance, p);
                                     }
                                 }
                             }
+                            #endregion
                         }
                         #endregion
 
