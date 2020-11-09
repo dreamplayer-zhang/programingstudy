@@ -12,43 +12,38 @@ namespace Root_Vega
     {
         #region List InfoReticle
         /// <summary> 작업 할 InfoReticle List </summary>
-        List<InfoReticle> m_aInfoReticle = new List<InfoReticle>();
-        public string AddInfoReticle(InfoReticle infoReticle, int nRnR)
+        public List<InfoReticle> m_aInfoReticle = new List<InfoReticle>();
+        public string AddInfoReticle(InfoReticle infoReticle)
         {
             if (m_aInfoReticle.Count > 0) return "Already Exist InfoReticle";
             if (infoReticle.m_moduleRunList.m_aModuleRun.Count == 0) return "Empty Recipe";
-            CalcInfoReticleProcess(infoReticle, nRnR);
+            CalcInfoReticleProcess(infoReticle);
             RunTree(Tree.eMode.Init); 
             return "OK";
         }
 
-        void CalcInfoReticleProcess(InfoReticle infoReticle, int nRnR)
+        void CalcInfoReticleProcess(InfoReticle infoReticle)
         {
             Queue<ModuleRunBase> qProcess = infoReticle.m_qProcess;
             qProcess.Clear();
             string sLoadport = infoReticle.m_sLoadport;
-            Loadport loadport = GetLoadport(sLoadport); 
-            for (int iRnR = 0; iRnR < nRnR; iRnR++)
+            Loadport loadport = GetLoadport(sLoadport);
+            if (loadport == null) return;
+            if (loadport.m_infoPod.p_eState != InfoPod.eState.Load) qProcess.Enqueue(loadport.m_runLoad.Clone());
+            qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sLoadport));
+            for (int n = 0; n < infoReticle.m_moduleRunList.m_aModuleRun.Count; n++)
             {
-                if ((iRnR > 0) && (loadport != null))
-                {
-                    qProcess.Enqueue(loadport.m_runUnLoad.Clone());
-                    qProcess.Enqueue(loadport.m_runLoad.Clone()); 
-                }
-                qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sLoadport));
-                for (int n = 0; n < infoReticle.m_moduleRunList.m_aModuleRun.Count; n++)
-                {
-                    ModuleRunBase moduleRun = infoReticle.m_moduleRunList.m_aModuleRun[n];
-                    string sChild = moduleRun.m_moduleBase.p_id;
-                    bool bGetPut = (sChild != m_robot.p_id);
-                    bool bPut = !IsSameModule(infoReticle.m_moduleRunList, n - 1, n);
-                    if (bPut && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sChild));
-                    qProcess.Enqueue(moduleRun);
-                    bool bGet = !IsSameModule(infoReticle.m_moduleRunList, n, n + 1);
-                    if (bGet && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sChild));
-                }
-                qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sLoadport));
+                ModuleRunBase moduleRun = infoReticle.m_moduleRunList.m_aModuleRun[n];
+                string sChild = moduleRun.m_moduleBase.p_id;
+                bool bGetPut = (sChild != m_robot.p_id);
+                bool bPut = !IsSameModule(infoReticle.m_moduleRunList, n - 1, n);
+                if (bPut && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sChild));
+                qProcess.Enqueue(moduleRun);
+                bool bGet = !IsSameModule(infoReticle.m_moduleRunList, n, n + 1);
+                if (bGet && bGetPut) qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sChild));
             }
+            qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Put, sLoadport));
+            qProcess.Enqueue(loadport.m_runUnLoad.Clone());
             m_aInfoReticle.Add(infoReticle);
         }
 
@@ -293,6 +288,7 @@ namespace Root_Vega
         public string RunNextSequence()
         {
             if (!EQ.p_bSimulate && (EQ.p_eState != EQ.eState.Run)) return "EQ not Run";
+            if (EQ.IsStop()) return "OK";
             if (m_qSequence.Count == 0)
             {
                 EQ.p_eState = EQ.eState.Ready; 
@@ -361,7 +357,7 @@ namespace Root_Vega
             TreeRoot tree = m_treeSequence;
             tree.p_eMode = mode;
             Sequence[] aSequence = m_qSequence.ToArray();
-            for (int n = 0; n < (int)Math.Min(aSequence.Length, 100); n++)
+            for (int n = 0; n < (int)Math.Min(aSequence.Length, 5); n++)
             {
                 ModuleRunBase moduleRun = aSequence[n].m_moduleRun;
                 InfoReticle infoReticle = aSequence[n].m_infoReticle;

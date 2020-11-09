@@ -576,7 +576,7 @@ namespace Root_Vega
 			return ptRst;
 		}
 
-		void _clearInspReslut()
+		public void _clearInspReslut()
 		{
 			currentTotalIdx = 0;
 
@@ -594,7 +594,7 @@ namespace Root_Vega
 			connector.Close();
 		}
 
-		void ClearDrawList()
+		public void ClearDrawList()
 		{
 			if (refEnabled)
 			{
@@ -609,6 +609,8 @@ namespace Root_Vega
 			p_ImageViewer.SetRoiRect();
 			p_InformationDrawer.Redrawing();
 		}
+
+		
 
 		public void _startInsp()
 		{
@@ -769,9 +771,53 @@ namespace Root_Vega
 			m_Engineer.m_InspManager.StartInspection();//검사 시작!
 		}
 
-		private void _endInsp()
+		public void _endInsp()
 		{
 			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath);
+		}
+
+		public CRect GetOverlapedRect(CRect crtFirst, CRect crtSecond)
+        {
+			System.Drawing.Rectangle rtFirst = new System.Drawing.Rectangle(crtFirst.Left, crtFirst.Top, crtFirst.Width, crtFirst.Height);
+			System.Drawing.Rectangle rtSecond = new System.Drawing.Rectangle(crtSecond.Left, crtSecond.Top, crtSecond.Width, crtSecond.Height);
+			System.Drawing.Rectangle rtResult = System.Drawing.Rectangle.Intersect(rtFirst, rtSecond);
+			CRect crtResult = new CRect(rtResult.Left, rtResult.Top, rtResult.Right, rtResult.Bottom);
+			
+			return crtResult;
+        }
+
+		public bool IsFeatureScanned(int nMemoryOffset, int nCamWidth)
+        {
+			// variable
+			CRect crtSearchArea;
+			CPoint cptCenter;
+			Point ptStart;
+			Point ptEnd;
+
+			// implement
+			if (m_Engineer.m_recipe.Loaded)
+			{
+				for (int k = 0; k < p_PatternRoiList.Count; k++)
+				{
+					var roiCurrent = p_PatternRoiList[k];
+					for (int j = 0; j < roiCurrent.Strip.ParameterList.Count; j++)
+					{
+						foreach(var feature in roiCurrent.Position.ReferenceList)
+                        {
+							cptCenter = feature.RoiRect.Center();
+							ptStart = new Point(cptCenter.X - (feature.FeatureFindArea / 2.0), cptCenter.Y - (feature.FeatureFindArea / 2.0));
+							ptEnd = new Point(cptCenter.X + (feature.FeatureFindArea / 2.0), cptCenter.Y + (feature.FeatureFindArea / 2.0));
+							crtSearchArea = new CRect(ptStart, ptEnd);
+							if (crtSearchArea.Right < (nMemoryOffset + nCamWidth))
+                            {
+								return true;
+                            }
+                        }
+					}
+				}
+			}
+
+			return false;
 		}
 
 		public bool FindFeature(Feature feature, out CRect crtSearchArea, out Point ptMaxRelative, out int nWidthDiff, out int nHeightDiff)

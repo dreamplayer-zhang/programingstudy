@@ -82,8 +82,8 @@ namespace Root_MarsLogView
         void GetDateTime(string[] asMars)
         {
             DateTime dtNow = DateTime.Now;
-            asMars[0] = string.Format("{0:0000}/{1:00}/{2:00}\t", dtNow.Year, dtNow.Month, dtNow.Day);
-            asMars[1] = string.Format("{0:00}:{1:00}:{2:00}.{3:000}\t", dtNow.Hour, dtNow.Minute, dtNow.Second, dtNow.Millisecond);
+            asMars[0] = string.Format("{0:0000}/{1:00}/{2:00}", dtNow.Year, dtNow.Month, dtNow.Day);
+            asMars[1] = string.Format("{0:00}:{1:00}:{2:00}.{3:000}", dtNow.Hour, dtNow.Minute, dtNow.Second, dtNow.Millisecond);
         }
 
         #endregion

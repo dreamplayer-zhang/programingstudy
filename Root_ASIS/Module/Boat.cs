@@ -318,7 +318,7 @@ namespace Root_ASIS.Module
         public Teach m_teach; 
         void InitTeach()
         {
-            m_teach = new Teach(p_id, m_memoryPool); 
+            m_teach = new Teach(p_id, m_nID, m_memoryPool); 
         }
         #endregion
 

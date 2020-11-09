@@ -27,7 +27,7 @@ namespace Root_ASIS.AOI
             public void RunTree(Tree tree)
             {
                 m_sz = tree.Set(m_sz, m_sz, "szROI", "szROI", false);
-                m_aoiData.RunTree(tree, false);
+                m_aoiData.RunTree(tree);
             }
 
             public string m_id;
@@ -66,6 +66,7 @@ namespace Root_ASIS.AOI
         public bool p_bEnable { get; set; }
 
         public IAOI NewAOI() { return null; }
+        public void ReAllocate(List<CPoint> aArray) { }
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {

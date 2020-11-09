@@ -175,7 +175,7 @@ namespace Root_EFEM.Module
         {
             public eCmd m_eCmd;
             public string m_sCmd;
-            public double m_secWait = 2;
+            public double m_secWait = 6;
 
             public Command(eCmd eCmd, string sCmd)
             {

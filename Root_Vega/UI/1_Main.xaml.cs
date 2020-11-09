@@ -3,6 +3,7 @@ using Root_Vega.Module;
 using RootTools;
 using RootTools.Inspects;
 using RootTools.Module;
+using RootTools.Trees;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -112,8 +113,8 @@ namespace Root_Vega
         private void buttonInitialization_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableInitialization() == false) return;
-            EQ.p_bStop = false; 
-            m_handler.m_process.m_qSequence.Clear(); //forget 
+            EQ.p_bStop = false;
+            m_handler.m_process.ClearInfoReticle(); 
             EQ.p_eState = EQ.eState.Home;
 
             // Camera Connect

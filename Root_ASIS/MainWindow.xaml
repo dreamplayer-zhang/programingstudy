@@ -19,11 +19,11 @@
         </DataTemplate>
     </Window.Resources>
     <TabControl TabStripPlacement="Left">
-        <TabItem Header=" Main " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
-            <local:Main_UI x:Name="mainUI"/>
-        </TabItem>
         <TabItem Header=" Teach " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
             <local:MainTeach_UI x:Name="teachUI"/>
+        </TabItem>
+        <TabItem Header=" Main " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
+            <local:Main_UI x:Name="mainUI"/>
         </TabItem>
         <TabItem Header=" Engineer " HeaderTemplate="{DynamicResource TabItemHeaderTemplate}">
             <local:ASIS_Engineer_UI x:Name="engineerUI"/>
