@@ -771,6 +771,7 @@ namespace Root_Vega.Module
         {
             //------------------------------------------------------
             PatternVision m_module;
+            public _2_5_MainVisionViewModel m_mvvm;
             public RPoint m_rpReticleCenterPos_pulse = new RPoint();    // Reticle 중심의 XY Postiion [pulse]
             public CPoint m_cpMemoryOffset_pixel = new CPoint();        // Memory Offset [pixel]
             public bool m_bInvDir = false;                              // 역방향 스캔
@@ -782,6 +783,8 @@ namespace Root_Vega.Module
             public double m_dTriggerPeriod = 1;                         // Trigger Period [us]    
             public int m_nMaxFrame = 100;                               // Camera max Frame 스펙
             public int m_nScanRate = 100;                               // Camera Frame Spec 사용률 ? 1~100 %
+
+            public bool m_bUseInspect = false;                          // 검사 유무
             
             public GrabMode m_grabMode = null;
             string m_sGrabMode = "";
@@ -798,6 +801,7 @@ namespace Root_Vega.Module
             public Run_Grab(PatternVision module)
             {
                 m_module = module;
+                m_mvvm = m_module.m_mvvm;
                 InitModuleRun(module);
             }
             //------------------------------------------------------
@@ -817,6 +821,8 @@ namespace Root_Vega.Module
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanRate = m_nScanRate;
 
+                run.m_bUseInspect = m_bUseInspect;
+
                 return run;
             }
             //------------------------------------------------------
@@ -835,6 +841,8 @@ namespace Root_Vega.Module
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
                 if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
+
+                m_bUseInspect = tree.Set(m_bUseInspect, m_bUseInspect, "Use Inspection", "Use Inspection", bVisible);
             }
             //------------------------------------------------------
             public override string Run()
@@ -852,6 +860,8 @@ namespace Root_Vega.Module
                 int nReticleRangePulse = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleYSize_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
                 double dXScale = m_dResX_um * 10;
                 bool bUseRADS = false;
+                bool bFeatureScanned = false;
+                bool bFoundFeature = false;
 
                 // implement
                 try
@@ -903,6 +913,64 @@ namespace Root_Vega.Module
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                         //axisXY.p_axisY.RunTrigger(false);
+
+                        // Inspection
+                        if (m_bUseInspect == true)
+                        {
+                            if (bFeatureScanned == false) bFeatureScanned = m_mvvm.IsFeatureScanned(cpMemoryOffset_pixel.X, nCamWidth);
+                            if (bFeatureScanned && (bFoundFeature == false))
+                            {
+                                //0. 개수 초기화 및 Table Drop
+                                m_mvvm._clearInspReslut();
+                                m_mvvm.ClearDrawList();
+
+                                //2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
+                                for (int k = 0; k<m_mvvm.p_PatternRoiList.Count; k++)
+                                {
+                                    var roiCurrent = m_mvvm.p_PatternRoiList[k];
+                                    //ROI 개수만큼 회전하면서 검사영역을 생성한다
+                                    for (int j = 0; j < roiCurrent.Strip.ParameterList.Count; j++)
+                                    {
+                                        //검사영역 생성 기준
+                                        //1. 등록된 feature를 탐색한다. 지정된 score에 부합하는 feature가 없을 경우 2차, 3차로 넘어갈 수도 있다. 
+                                        //1.1. 만약 등록된 Feature가 없는 경우 기준 위치는 0,0으로한다
+                                        CPoint cptStandard = new CPoint(0, 0);
+                                        int nRefStartOffsetX = 0;
+                                        int nRefStartOffsetY = 0;
+
+                                        #region Feature
+                                        foreach (var feature in roiCurrent.Position.ReferenceList)
+                                        {
+                                            CRect crtSearchArea;
+                                            Point ptMaxRelative;
+                                            int nWidthDiff, nHeightDiff;
+                                            bFoundFeature = m_mvvm.FindFeature(feature, out crtSearchArea, out ptMaxRelative, out nWidthDiff, out nHeightDiff);
+
+                                            if (bFoundFeature)
+                                            {
+                                                //2. feature 중심위치가 확보되면 해당 좌표를 저장
+                                                cptStandard.X = crtSearchArea.Left + (int)ptMaxRelative.X + nWidthDiff / 2;
+                                                cptStandard.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + nHeightDiff / 2;
+                                                nRefStartOffsetX = feature.PatternDistX;
+                                                nRefStartOffsetY = feature.PatternDistY;
+                                                m_mvvm.DrawCross(new DPoint(cptStandard.X, cptStandard.Y), MBrushes.Red);
+
+                                                break;//찾았으니 중단
+                                            }
+                                            else
+                                            {
+                                                continue;
+                                            }
+                                        }
+                                        #endregion
+                                        #region Align Key
+                                        //3. 등록된 Align Key 3개를 탐색한다. feature의 위치 정보도 참조하여 회전 보정 시에 들어갈 값을 준비해둔다
+                                        #endregion
+                                    }
+                                }
+                            }
+
+                        }
 
                         nScanLine++;
                         cpMemoryOffset_pixel.X += nCamWidth;
