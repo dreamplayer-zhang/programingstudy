@@ -22,7 +22,7 @@ https://ati5344-my.sharepoint.com/:u:/g/personal/joseph_ati2000_co_kr/ETMJ0pqp2a
 * **opencv 관련 에러의 경우 C++ include 설정 혹은 구성관리자가 x64나 Any CPU로 설정되어 있는지 확인 바랍니다**
 
 
-##각 프로젝트 설명
+## 각 프로젝트 설명
 
 Root : RootTools Test용
 
