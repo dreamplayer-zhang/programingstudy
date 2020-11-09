@@ -150,21 +150,6 @@ namespace RootTools
 			}
 		}
 
-		string _test;
-		public string test
-		{
-			get
-			{
-
-				return _test;
-			}
-			set
-			{
-				SetProperty(ref _test, value);
-			}
-
-		}
-
 		//public bool KeyPressedState = false;
 		private System.Windows.Input.KeyEventArgs _keyEvent;
 		public System.Windows.Input.KeyEventArgs KeyEvent

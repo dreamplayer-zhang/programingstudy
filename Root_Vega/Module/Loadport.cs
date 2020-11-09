@@ -273,6 +273,7 @@ namespace Root_Vega.Module
         #region Load & Unload
         public string RunLoad()
         {
+            if (m_infoPod.p_eState == InfoPod.eState.Load) return "OK"; 
             if (m_axisZ.IsInPos(ePosZ.Ready, m_dInposZ) == false) return "AxisZ Position not Ready";
             if (m_axisPodLifter.IsInPos(ePosPodLifter.Ready, m_dInposLifter) == false) return "AxisPodLifter Position not Ready";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Ready, m_dInposReticle) == false) return "AxisReticleLifter Position not Ready";
@@ -294,6 +295,7 @@ namespace Root_Vega.Module
 
         public string RunUnload()
         {
+            if (m_infoPod.p_eState == InfoPod.eState.Placed) return "OK"; 
             if (m_axisZ.IsInPos(ePosZ.Load,m_dInposZ) == false) return "AxisZ Position not Load";
             if (m_axisPodLifter.IsInPos(ePosPodLifter.Lifting,m_dInposLifter) == false) return "AxisPodLifter Position not Lifting";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting,m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
