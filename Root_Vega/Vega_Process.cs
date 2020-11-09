@@ -288,6 +288,7 @@ namespace Root_Vega
         public string RunNextSequence()
         {
             if (!EQ.p_bSimulate && (EQ.p_eState != EQ.eState.Run)) return "EQ not Run";
+            if (EQ.IsStop()) return "OK";
             if (m_qSequence.Count == 0)
             {
                 EQ.p_eState = EQ.eState.Ready; 
