@@ -23,14 +23,25 @@ https://ati5344-my.sharepoint.com/:u:/g/personal/joseph_ati2000_co_kr/ETMJ0pqp2a
 
 
 ##각 프로젝트 설명
+
 Root : RootTools Test용
+
 Root_ASIS : ASIS-1000 소팅기
+
 Root_AUP01 : Tape 포장기
+
 Root_AxisMapping : Stage 축 Mapping Test용
+
 Root_EFEM : Wind2용 EFEM
+
 Root_Inspect : 검사용 실행파일 분리
+
 Loot_LogView : RootTools.Logs에서 저장한 Log Viewer
+
 Root_MarsLogViewer : MarsLog 저장 (EFEM, Vision with TCP/IP)
+
 Root_Memory : Memory 저장용 실행파일 분리
+
 Root_TactTime : Hander Tact Time Simulation용
+
 Root_Vega : VEGA
