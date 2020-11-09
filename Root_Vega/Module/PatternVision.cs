@@ -847,7 +847,7 @@ namespace Root_Vega.Module
             //------------------------------------------------------
             public override string Run()
             {
-                // variable
+                // Scan variable
                 AxisXY axisXY = m_module.p_axisXY;
                 Axis axisZ = m_module.p_axisZ;
                 CPoint cpMemoryOffset_pixel = new CPoint(m_cpMemoryOffset_pixel);
@@ -860,8 +860,15 @@ namespace Root_Vega.Module
                 int nReticleRangePulse = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleYSize_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
                 double dXScale = m_dResX_um * 10;
                 bool bUseRADS = false;
+
+                // Inspection variable
                 bool bFeatureScanned = false;
                 bool bFoundFeature = false;
+                CPoint cptStandard = new CPoint(0, 0);
+                int nRefStartOffsetX = 0;
+                int nRefStartOffsetY = 0;
+                int nInspectStartIndex = 0;
+
 
                 // implement
                 try
@@ -876,6 +883,12 @@ namespace Root_Vega.Module
                     }
 
                     cpMemoryOffset_pixel.X += (m_grabMode.m_ScanStartLine * nCamWidth);
+
+                    if (m_bUseInspect)
+                    {
+                        // 검사 Queue Monitoring 시작 -> Side에서 검사가 먼저 시작됐을 경우 그냥 Return
+                        ((Vega_Engineer)m_module.m_engineer).m_InspManager.StartInspection();
+                    }
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
@@ -913,63 +926,75 @@ namespace Root_Vega.Module
                         if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
+                        #region Inspection
                         // Inspection
                         if (m_bUseInspect == true)
                         {
-                            if (bFeatureScanned == false) bFeatureScanned = m_mvvm.IsFeatureScanned(cpMemoryOffset_pixel.X, nCamWidth);
+                            if (bFeatureScanned == false)
+                            {
+                                // Feature가 스캔됐는지 확인
+                                bFeatureScanned = m_mvvm.IsFeatureScanned(cpMemoryOffset_pixel.X, nCamWidth);
+                            }
                             if (bFeatureScanned && (bFoundFeature == false))
                             {
-                                //0. 개수 초기화 및 Table Drop
-                                m_mvvm._clearInspReslut();
-                                m_mvvm.ClearDrawList();
-
-                                //2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
-                                for (int k = 0; k<m_mvvm.p_PatternRoiList.Count; k++)
+                                // Feature 탐색 시작
+                                Roi roiCurrent = m_mvvm.p_PatternRoiList[0];
+                                foreach (var feature in roiCurrent.Position.ReferenceList)
                                 {
-                                    var roiCurrent = m_mvvm.p_PatternRoiList[k];
-                                    //ROI 개수만큼 회전하면서 검사영역을 생성한다
-                                    for (int j = 0; j < roiCurrent.Strip.ParameterList.Count; j++)
+                                    CRect crtSearchArea;
+                                    Point ptMaxRelative;
+                                    int nWidthDiff, nHeightDiff;
+                                    bFoundFeature = m_mvvm.FindFeature(feature, out crtSearchArea, out ptMaxRelative, out nWidthDiff, out nHeightDiff);
+
+                                    if (bFoundFeature == true)
                                     {
-                                        //검사영역 생성 기준
-                                        //1. 등록된 feature를 탐색한다. 지정된 score에 부합하는 feature가 없을 경우 2차, 3차로 넘어갈 수도 있다. 
-                                        //1.1. 만약 등록된 Feature가 없는 경우 기준 위치는 0,0으로한다
-                                        CPoint cptStandard = new CPoint(0, 0);
-                                        int nRefStartOffsetX = 0;
-                                        int nRefStartOffsetY = 0;
+                                        //2. feature 중심위치가 확보되면 해당 좌표를 저장
+                                        cptStandard.X = crtSearchArea.Left + (int)ptMaxRelative.X + (nWidthDiff / 2);
+                                        cptStandard.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + (nHeightDiff / 2);
+                                        nRefStartOffsetX = feature.PatternDistX;
+                                        nRefStartOffsetY = feature.PatternDistY;
+                                        m_mvvm.DrawCross(new DPoint(cptStandard.X, cptStandard.Y), MBrushes.Red);
 
-                                        #region Feature
-                                        foreach (var feature in roiCurrent.Position.ReferenceList)
-                                        {
-                                            CRect crtSearchArea;
-                                            Point ptMaxRelative;
-                                            int nWidthDiff, nHeightDiff;
-                                            bFoundFeature = m_mvvm.FindFeature(feature, out crtSearchArea, out ptMaxRelative, out nWidthDiff, out nHeightDiff);
-
-                                            if (bFoundFeature)
-                                            {
-                                                //2. feature 중심위치가 확보되면 해당 좌표를 저장
-                                                cptStandard.X = crtSearchArea.Left + (int)ptMaxRelative.X + nWidthDiff / 2;
-                                                cptStandard.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + nHeightDiff / 2;
-                                                nRefStartOffsetX = feature.PatternDistX;
-                                                nRefStartOffsetY = feature.PatternDistY;
-                                                m_mvvm.DrawCross(new DPoint(cptStandard.X, cptStandard.Y), MBrushes.Red);
-
-                                                break;//찾았으니 중단
-                                            }
-                                            else
-                                            {
-                                                continue;
-                                            }
-                                        }
-                                        #endregion
-                                        #region Align Key
-                                        //3. 등록된 Align Key 3개를 탐색한다. feature의 위치 정보도 참조하여 회전 보정 시에 들어갈 값을 준비해둔다
-                                        #endregion
+                                        // Origin 생성
+                                        CPoint ptOriginStart = new CPoint(cptStandard.X + nRefStartOffsetX, cptStandard.Y + nRefStartOffsetY);
+                                        roiCurrent.Origin.OriginRect = new CRect(ptOriginStart, (int)roiCurrent.Strip.ParameterList[0].InspAreaWidth, (int)roiCurrent.Strip.ParameterList[0].InspAreaHeight);
+                                        break;  // 찾았으니 중단
+                                    }
+                                    else
+                                    {
+                                        continue;   // 못 찾았으면 다음 Feature값으로 이동
                                     }
                                 }
                             }
+                            if (bFoundFeature)
+                            {
+                                Roi roiCurrent = m_mvvm.p_PatternRoiList[0];
+                                
+                                // 1. 검사영역 생성
+                                Point ptStartPos = new Point(cptStandard.X + nRefStartOffsetX + (nInspectStartIndex * nCamWidth), cptStandard.Y + nRefStartOffsetY);
+                                Point ptEndPos = new Point(ptStartPos.X + nCamWidth, ptStartPos.Y + (int)roiCurrent.Strip.ParameterList[0].InspAreaHeight);
+                                CRect crtCurrentArea = new CRect(ptStartPos, ptEndPos);
 
+                                // 1.2 생성된 검사영역이 스캔됐는지 판단
+                                //bool bScanned = m_mvvm.IsInspAreaScanned(cpMemoryOffset_pixel.X, nCamWidth, crtCurrentArea);
+                                bool bScanned = false;
+                                if (crtCurrentArea.Right < (cpMemoryOffset_pixel.X + nCamWidth)) bScanned = true;
+                                if (bScanned == true)
+                                {
+                                    nInspectStartIndex++;
+                                    // 2. 생성된 검사영역과 ROI의 겹치는 Rect 추출
+                                    CRect crtOverlapedRect = m_mvvm.GetOverlapedRect(crtCurrentArea, roiCurrent.Origin.OriginRect);
+                                    if ((crtOverlapedRect.Width > 0) && (crtOverlapedRect.Height > 0))
+                                    {
+                                        // 3. Overlap된 Rect영역을 검사 쓰레드로 던져라
+                                        var temp = new UIElementInfo(new Point(crtOverlapedRect.Left, crtOverlapedRect.Top), new Point(crtOverlapedRect.Right, crtOverlapedRect.Bottom));
+
+
+                                    }
+                                }
+                            }
                         }
+                        #endregion
 
                         nScanLine++;
                         cpMemoryOffset_pixel.X += nCamWidth;
