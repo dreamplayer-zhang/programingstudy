@@ -100,12 +100,8 @@ namespace Root_Vega.Module
            
             if (m_diBuzzerOff.p_bIn)
                 m_doBuzzer.Write(eBuzzer.BuzzerOff);
-<<<<<<< HEAD
 
-            else if (status != EQ.p_eState)
-=======
             else if (m_eStatus != EQ.p_eState)
->>>>>>> master
             {
                 m_nLamp_count = 0;
                     switch (EQ.p_eState)
