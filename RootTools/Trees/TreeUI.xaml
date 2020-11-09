@@ -4,11 +4,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" mc:Ignorable="d"
         xmlns:local="clr-namespace:RootTools.Trees" 
-        xmlns:obs="clr-namespace:nsSizeObserver"
-             SizeChanged="UserControl_SizeChanged"
+             xmlns:root="clr-namespace:RootTools"
+        SizeChanged="UserControl_SizeChanged"
         xmlns:convert="clr-namespace:ViewConverter" d:DesignHeight="500" 
               d:DesignWidth="500">
     <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source ="Dictionary_Icon.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
         <Color x:Key="BackgroundColor">#FFBEE6FD</Color>
         <Color x:Key="BorderColor">#FF707070</Color>
         <Color x:Key="ForegroundColor">#FF444444</Color>
@@ -48,7 +53,7 @@
                                     <ContentControl x:Name="Up_Arrow" VerticalAlignment="Center"
                                             HorizontalAlignment="Center" Focusable="True"
                                             IsTabStop="False">
-                                        
+                                        <Image Source="{StaticResource ResourceKey = ArrowUpCircle}"></Image>
                                         <!--<TextBlock Text="+" />-->
                                     </ContentControl>
                                     <ContentControl x:Name="Down_Arrow" VerticalAlignment="Center"

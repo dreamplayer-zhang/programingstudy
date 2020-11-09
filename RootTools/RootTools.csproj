@@ -636,6 +636,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dictionary_Icon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GAFs\ALIDList_PopupUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -867,6 +871,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Arrow_Up_Circle.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
