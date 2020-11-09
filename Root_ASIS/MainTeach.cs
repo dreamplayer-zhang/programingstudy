@@ -42,7 +42,7 @@ namespace Root_ASIS
 
         public void SaveRecipe(string sFile)
         {
-            Job job = new Job(p_sRecipe, true, m_log);
+            Job job = new Job(sFile, true, m_log);
             if (job == null) p_sInfo = "Recipe File Save Error : " + sFile;
             else
             {
@@ -55,7 +55,7 @@ namespace Root_ASIS
 
         public void OpenRecipe(string sFile)
         {
-            Job job = new Job(p_sRecipe, false, m_log);
+            Job job = new Job(sFile, false, m_log);
             if (job == null) p_sInfo = "Recipe File Open Error : " + sFile;
             else
             {

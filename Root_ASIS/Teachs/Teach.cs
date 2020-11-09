@@ -70,6 +70,51 @@ namespace Root_ASIS.Teachs
         }
         #endregion
 
+        #region Memory & Draw
+        public MemoryPool m_memoryPool;
+        void InitDraw()
+        {
+            m_memoryPool.m_viewer.OnLBD += M_viewer_OnLBD;
+            m_memoryPool.m_viewer.OnMouseMove += M_viewer_OnMouseMove;
+        }
+
+        private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
+        {
+            if (p_roiActive == null) return;
+            p_roiActive.LBD(bDown, cpImg);
+            Draw();
+            GetActiveROI();
+        }
+
+        private void M_viewer_OnMouseMove(CPoint cpImg)
+        {
+            if (p_roiActive == null) return;
+            p_roiActive.MouseMove(cpImg);
+            Draw();
+        }
+
+        AOIData.eDraw _eDraw = AOIData.eDraw.ROI;
+        public AOIData.eDraw p_eDraw
+        {
+            get { return _eDraw; }
+            set
+            {
+                if (_eDraw == value) return;
+                _eDraw = value;
+                OnPropertyChanged();
+                Draw();
+            }
+        }
+
+        public void Draw()
+        {
+            MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
+            draw.Clear();
+            foreach (IAOI aoi in p_aROI) aoi.Draw(draw, p_eDraw);
+            draw.InvalidDraw();
+        }
+        #endregion
+
         #region AOI
         /// <summary> Inspect를 위한 AOI List, AOI_Strip 제외 </summary>
         public ObservableCollection<IAOI> p_aAOI { get; set; }
@@ -154,48 +199,10 @@ namespace Root_ASIS.Teachs
         }
         #endregion
 
-        #region Memory & Draw
-        public MemoryPool m_memoryPool;
-        void InitDraw()
+        #region Inspect
+        public string Inspect(InfoStrip infoStrip)
         {
-            m_memoryPool.m_viewer.OnLBD += M_viewer_OnLBD;
-            m_memoryPool.m_viewer.OnMouseMove += M_viewer_OnMouseMove;
-        }
-
-        private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
-        {
-            if (p_roiActive == null) return;
-            p_roiActive.LBD(bDown, cpImg);
-            Draw();
-            GetActiveROI(); 
-        }
-
-        private void M_viewer_OnMouseMove(CPoint cpImg)
-        {
-            if (p_roiActive == null) return;
-            p_roiActive.MouseMove(cpImg);
-            Draw();
-        }
-
-        AOIData.eDraw _eDraw = AOIData.eDraw.ROI; 
-        public AOIData.eDraw p_eDraw
-        {
-            get { return _eDraw; }
-            set
-            {
-                if (_eDraw == value) return;
-                _eDraw = value;
-                OnPropertyChanged();
-                Draw(); 
-            }
-        }
-
-        public void Draw()
-        {
-            MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
-            draw.Clear();
-            foreach (IAOI aoi in p_aROI) aoi.Draw(draw, p_eDraw); 
-            draw.InvalidDraw(); 
+            return "OK";
         }
         #endregion
 
@@ -204,11 +211,11 @@ namespace Root_ASIS.Teachs
         {
             Job job = new Job(sFile, true, m_log);
             m_treeRootAOI.m_job = job;
-            job.Set(m_id, "AOI Count", p_aAOI.Count); 
+            job.Set(m_id, "AOI Count", p_aAOI.Count);
             for (int n = 0; n < p_aAOI.Count; n++)
             {
                 string sKey = m_id + n.ToString("00");
-                job.Set(sKey, "AOI", p_aAOI[n].p_id); 
+                job.Set(sKey, "AOI", p_aAOI[n].p_id);
             }
             RunTreeAOI(Tree.eMode.JobSave);
             job.Close();
@@ -217,29 +224,29 @@ namespace Root_ASIS.Teachs
         public void OpenRecipe(string sFile)
         {
             Job job = new Job(sFile, false, m_log);
-            ClearAOI(); 
+            ClearAOI();
             m_treeRootAOI.m_job = job;
-            int nAOI = job.Set(m_id, "AOI Count", p_aAOI.Count); 
+            int nAOI = job.Set(m_id, "AOI Count", p_aAOI.Count);
             for (int n = 0; n < nAOI; n++)
             {
                 string sKey = m_id + n.ToString("00");
                 string sAOI = job.Set(sKey, "AOI", "");
-                IAOI aoi = NewAOI(sAOI); 
-                if (aoi != null) p_aAOI.Add(aoi); 
+                IAOI aoi = NewAOI(sAOI);
+                if (aoi != null) p_aAOI.Add(aoi);
             }
             RunTreeAOI(Tree.eMode.JobOpen);
             job.Close();
             Draw();
-            InvalidROI(); 
+            InvalidROI();
         }
 
         IAOI NewAOI(string sAOI)
         {
             foreach (IAOI aoi in m_aEnableAOI)
             {
-                if (aoi.p_id == sAOI) return aoi.NewAOI(); 
+                if (aoi.p_id == sAOI) return aoi.NewAOI();
             }
-            return null; 
+            return null;
         }
         #endregion
 
@@ -266,27 +273,6 @@ namespace Root_ASIS.Teachs
         }
         #endregion
 
-        #region Tree ROI
-        public TreeRoot m_treeRootROI;
-        void InitTreeROI()
-        {
-            m_treeRootROI = new TreeRoot(m_id + ".ROI", m_log);
-            m_treeRootROI.UpdateTree += M_treeRootROI_UpdateTree;
-        }
-
-        private void M_treeRootROI_UpdateTree()
-        {
-            RunTreeROI(Tree.eMode.Update);
-            RunTreeROI(Tree.eMode.RegWrite);
-        }
-
-        public void RunTreeROI(Tree.eMode eMode)
-        {
-            m_treeRootROI.p_eMode = eMode;
-            RunTreeArray(m_treeRootROI.GetTree("Array"));
-        }
-        #endregion
-
         #region Tree AOI
         public TreeRoot m_treeRootAOI;
         void InitTreeAOI()
@@ -305,6 +291,27 @@ namespace Root_ASIS.Teachs
         {
             m_treeRootAOI.p_eMode = eMode;
             RunTreeAOI(m_treeRootAOI);
+        }
+        #endregion
+
+        #region Tree ROI
+        public TreeRoot m_treeRootROI;
+        void InitTreeROI()
+        {
+            m_treeRootROI = new TreeRoot(m_id + ".ROI", m_log);
+            m_treeRootROI.UpdateTree += M_treeRootROI_UpdateTree;
+        }
+
+        private void M_treeRootROI_UpdateTree()
+        {
+            RunTreeROI(Tree.eMode.Update);
+            RunTreeROI(Tree.eMode.RegWrite);
+        }
+
+        public void RunTreeROI(Tree.eMode eMode)
+        {
+            m_treeRootROI.p_eMode = eMode;
+            RunTreeArray(m_treeRootROI.GetTree("Array"));
         }
         #endregion
 

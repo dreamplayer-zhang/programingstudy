@@ -1,11 +1,10 @@
-﻿using Root_ASIS.AOI;
-using RootTools;
+﻿using RootTools;
 using RootTools.Memory;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Root_ASIS.Teachs
+namespace Root_ASIS.AOI
 {
     public interface IAOI
     {

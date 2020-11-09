@@ -92,7 +92,7 @@
                         </Grid>
                     </Grid>
                 </TabItem>
-                <TabItem Header=" Parameter ">
+                <TabItem Header=" Inspect ">
                     <Grid x:Name="gridParameter">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>

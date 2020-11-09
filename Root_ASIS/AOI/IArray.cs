@@ -3,7 +3,7 @@ using RootTools.Memory;
 using RootTools.Trees;
 using System.Collections.Generic;
 
-namespace Root_ASIS.Teachs
+namespace Root_ASIS.AOI
 {
     public interface IArray : IAOI
     {

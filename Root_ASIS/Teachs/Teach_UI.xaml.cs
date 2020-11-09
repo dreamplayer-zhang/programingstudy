@@ -206,6 +206,7 @@ namespace Root_ASIS.Teachs
         #region Parameter
         private void buttonInspect_Click(object sender, RoutedEventArgs e)
         {
+
         }
         #endregion
     }
