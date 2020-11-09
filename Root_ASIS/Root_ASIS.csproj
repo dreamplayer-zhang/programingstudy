@@ -83,6 +83,8 @@
     <Compile Include="AOI\AOI_StripID.cs" />
     <Compile Include="AOI\AOI_Unit.cs" />
     <Compile Include="AOI\Blob.cs" />
+    <Compile Include="AOI\IAOI.cs" />
+    <Compile Include="AOI\IArray.cs" />
     <Compile Include="Main_UI.xaml.cs">
       <DependentUpon>Main_UI.xaml</DependentUpon>
     </Compile>
@@ -106,7 +108,6 @@
     <Compile Include="Module\Turnover.cs" />
     <Compile Include="Strip.cs" />
     <Compile Include="MainTeach.cs" />
-    <Compile Include="Teachs\IAOI.cs" />
     <Compile Include="Teachs\Teach.cs" />
     <Compile Include="Teachs\Teach_UI.xaml.cs">
       <DependentUpon>Teach_UI.xaml</DependentUpon>

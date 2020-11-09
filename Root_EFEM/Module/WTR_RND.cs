@@ -382,7 +382,7 @@ namespace Root_EFEM.Module
 
         string ReplyCmd(string[] sMsgs)
         {
-            string sLastCmd = m_eSendCmd.ToString();
+            string sLastCmd = m_dicCmd[m_eSendCmd];            
             try
             {
                 if (sMsgs.Length > 1) return GetErrorString(sMsgs[1]);

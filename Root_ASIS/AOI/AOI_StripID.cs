@@ -66,6 +66,7 @@ namespace Root_ASIS.AOI
         public bool p_bEnable { get; set; }
 
         public IAOI NewAOI() { return null; }
+        public void ReAllocate(List<CPoint> aArray) { }
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {

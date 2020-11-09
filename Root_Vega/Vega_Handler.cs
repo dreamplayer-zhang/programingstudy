@@ -213,6 +213,7 @@ namespace Root_Vega
                             {
                                 m_process.p_sInfo = m_process.AddInfoReticle(m_infoSlot);
                                 m_nRnR--;
+                                EQ.p_eState = EQ.eState.Run; 
                             }
                         }
                         break;

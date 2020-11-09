@@ -25,7 +25,15 @@ namespace Root_ASIS.AOI
         {
             public CPoint m_sz = new CPoint(100, 50);
             public AOIData m_aoiData;
-            public string m_sInspect = ""; 
+            public string m_sInspect = "";
+            Blob m_blob = new Blob();
+
+            public Blob.Island RunBlob()
+            {
+                m_blob.RunBlob(m_aoi.m_memory, 0, m_aoiData.m_cp0, m_aoiData.m_sz, m_aoi.m_mmGV.X, m_aoi.m_mmGV.Y, 5);
+                m_blob.RunSort(m_aoi.m_eSort);
+                return (m_blob.m_aSort.Count > 0) ? m_blob.m_aSort[0] : null; 
+            }
 
             public void RunTree(Tree tree)
             {
@@ -162,7 +170,6 @@ namespace Root_ASIS.AOI
             return "OK";
         }
 
-        Blob[] m_aBlob = new Blob[2] { new Blob(), new Blob() };
         Blob.eSort m_eSort = Blob.eSort.Size;
         public CPoint m_mmGV = new CPoint(100, 0); 
         double m_dSizeError = 20;
@@ -170,17 +177,14 @@ namespace Root_ASIS.AOI
         double m_dCenterError = 50; 
         string InspectBlob(eMode eMode, int iAOI)
         {
-            Unit data = m_aUnit[iAOI]; 
-            Blob blob = m_aBlob[iAOI];
-            blob.RunBlob(m_memory, 0, data.m_aoiData.m_cp0, data.m_aoiData.m_sz, m_mmGV.X, m_mmGV.Y, 3);
-            blob.RunSort(m_eSort);
-            if (blob.m_aSort.Count == 0) return "Find Fiducial Error"; 
-            Blob.Island island = blob.m_aSort[0];
+            Unit unit = m_aUnit[iAOI];
+            Blob.Island island = unit.RunBlob(); 
+            if (island == null) return "Find Fiducial Error"; 
             Result.Unit result = m_aResult[eMode].m_aUnit[iAOI];
             result.m_maxLength = island.m_nLength;
             result.m_maxSize = island.m_nSize;
             result.m_rpCenter = island.m_rpCenter;
-            data.m_aoiData.m_sDisplay = "Size = " + island.m_nSize + ", " + island.m_sz.ToString(); 
+            unit.m_aoiData.m_sDisplay = "Size = " + island.m_nSize + ", " + island.m_sz.ToString(); 
             if (eMode == eMode.Inspect)
             {
                 if (Get_dSize(iAOI) >= m_dSizeError) return "Fiducial Size Error";
@@ -210,8 +214,8 @@ namespace Root_ASIS.AOI
         public string p_id { get; set; }
         public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
-
         public IAOI NewAOI() { return null; }
+        public void ReAllocate(List<CPoint> aArray) { }
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {
