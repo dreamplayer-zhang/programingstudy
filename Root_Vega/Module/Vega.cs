@@ -85,9 +85,11 @@ namespace Root_Vega.Module
             m_alidInterlock_Key = m_gaf.GetALID(this, "Interlock_Key", "Interlock Key State Check");
         }
         #endregion
-        public EQ.eState status = EQ.eState.Init;
-        int lamp_count = 0;
+
         #region Thread
+        public EQ.eState m_eStatus = EQ.eState.Init;
+        int m_nLamp_count = 0;
+
         protected override void RunThread()
         {
             base.RunThread();
@@ -98,9 +100,9 @@ namespace Root_Vega.Module
            
             if (m_diBuzzerOff.p_bIn)
                 m_doBuzzer.Write(eBuzzer.BuzzerOff);
-            else if (status != EQ.p_eState)
+            else if (m_eStatus != EQ.p_eState)
             {
-                lamp_count = 0;
+                m_nLamp_count = 0;
                     switch (EQ.p_eState)
                     {
                         case EQ.eState.Error: m_doBuzzer.Write(eBuzzer.Buzzer2); break;
@@ -109,10 +111,10 @@ namespace Root_Vega.Module
                         case EQ.eState.Ready: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
                         case EQ.eState.Init: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
                     }
-                status = EQ.p_eState;
+                m_eStatus = EQ.p_eState;
             }
-            lamp_count++;
-            if (lamp_count>50)
+            m_nLamp_count++;
+            if (m_nLamp_count>50)
             {
                 m_doBuzzer.Write(eBuzzer.BuzzerOff);
             }
