@@ -4,6 +4,7 @@ using RootTools;
 using RootTools.Memory;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Root_AxisMapping.MainUI
@@ -55,8 +56,10 @@ namespace Root_AxisMapping.MainUI
             }
         }
 
+        public int m_xSelect = 0; 
         public void OnSelect(int ix)
         {
+            m_xSelect = ix; 
             for (int x = 0; x < p_xArray; x++)
             {
                 for (int y = 0; y < p_yArray; y++)
@@ -199,26 +202,64 @@ namespace Root_AxisMapping.MainUI
         {
             MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
             draw.Clear();
-            m_aUnit[0].m_aoiData.Draw(draw, eDraw);
-            m_aUnit[1].m_aoiData.Draw(draw, eDraw);
+            switch (eDraw)
+            {
+                case AOIData.eDraw.ROI:
+                    m_aUnit[0].m_aoiData.Draw(draw, eDraw);
+                    m_aUnit[1].m_aoiData.Draw(draw, eDraw);
+                    break;
+                case AOIData.eDraw.Inspect:
+                    foreach (AOIData aoi in m_aAOI)
+                    {
+                        if (aoi.m_bEnable) aoi.Draw(draw, eDraw); 
+                    }
+                    break; 
+            }
             draw.InvalidDraw();
         }
         #endregion
 
         #region Inspect
-        double m_dx = 2.3; 
+        CPoint m_szAOI = new CPoint(); 
+        List<AOIData> m_aAOI = new List<AOIData>(); 
         MemoryData m_memory;
-        public string Inspect()
+        void InitInspect()
         {
-/*            m_degRotate = 0;
             m_memory = m_memoryPool.m_viewer.p_memoryData;
-            for (int n = 0; n < 2; n++)
+            m_szROI.X = Math.Max(m_aUnit[0].m_aoiData.m_sz.X, m_aUnit[1].m_aoiData.m_sz.X); 
+            m_szROI.Y = Math.Max(m_aUnit[0].m_aoiData.m_sz.Y, m_aUnit[1].m_aoiData.m_sz.Y);
+            int xp = Math.Min(m_aUnit[0].m_aoiData.m_cp0.X, m_aUnit[1].m_aoiData.m_cp0.X);
+            int y0 = m_aUnit[0].m_aoiData.m_cp0.Y;
+            int y1 = m_aUnit[1].m_aoiData.m_cp0.Y;
+            int yMin = p_yArray;
+            int yMax = 0; 
+            for (int y = 0; y < p_yArray; y++)
             {
-                m_aUnit[n].m_sInspect = InspectBlob(n);
-                if (m_aUnit[n].m_sInspect != "OK") return m_aUnit[n].m_sInspect;
+                if (yMin > y) yMin = y;
+                if (yMax < y) yMax = y; 
             }
-            m_rpDelta = m_aUnit[1].m_aoiData.m_rpCenter - m_aUnit[0].m_aoiData.m_rpCenter;
-            m_degRotate = 180 * Math.Atan2(m_rpDelta.X, m_rpDelta.Y) / Math.PI;*/
+            for (int y = 0; y < p_yArray; y++)
+            {
+                if (m_aAOI.Count <= y) m_aAOI.Add(new AOIData("AOI." + m_aAOI.Count.ToString(), m_szAOI));
+                m_aAOI[y].m_cp0 = new CPoint(xp, ((yMax - y) * y0 - (yMin - y) * y1) / (yMax - yMin));
+                m_aAOI[y].m_bEnable = false;
+            }
+        }
+
+        public string Inspect(int xSelect)
+        {
+            InitInspect();
+
+
+            /*            m_degRotate = 0;
+
+                        for (int n = 0; n < 2; n++)
+                        {
+                            m_aUnit[n].m_sInspect = InspectBlob(n);
+                            if (m_aUnit[n].m_sInspect != "OK") return m_aUnit[n].m_sInspect;
+                        }
+                        m_rpDelta = m_aUnit[1].m_aoiData.m_rpCenter - m_aUnit[0].m_aoiData.m_rpCenter;
+                        m_degRotate = 180 * Math.Atan2(m_rpDelta.X, m_rpDelta.Y) / Math.PI;*/
             return "OK";
         }
 
@@ -238,6 +279,7 @@ namespace Root_AxisMapping.MainUI
             return "OK";
         }
 
+        double m_dx = 2.3;
         void RunTreeInspect(Tree tree)
         {
             m_dx = tree.Set(m_dx, m_dx, "dX", "dX (unit)"); 
@@ -297,7 +339,7 @@ namespace Root_AxisMapping.MainUI
         public Mapping(string id, AxisMapping_Engineer engineer)
         {
             p_xArray = 15;
-            p_yArray = 20; 
+            p_yArray = 13; 
             m_id = id;
             m_engineer = engineer;
             m_axisMapping = ((AxisMapping_Handler)engineer.ClassHandler()).m_axisMapping;

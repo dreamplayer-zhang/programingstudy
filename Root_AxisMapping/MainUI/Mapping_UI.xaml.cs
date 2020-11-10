@@ -82,17 +82,24 @@ namespace Root_AxisMapping.MainUI
 
         private void buttonGrab_Click(object sender, RoutedEventArgs e)
         {
-
+            m_mapping.RunGrab();
+            m_mapping.InvalidROI();
         }
 
         private void listViewROI_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-
+            int nSelect = listViewROI.SelectedIndex;
+            if (nSelect < 0) return;
+            if (nSelect >= m_mapping.m_aROI.Count) return;
+            m_mapping.ClearActive();
+            m_mapping.m_aROI[nSelect].p_eROI = AOIData.eROI.Active;
+            m_mapping.Draw(AOIData.eDraw.ROI);
         }
 
         private void buttonInspect_Click(object sender, RoutedEventArgs e)
         {
-
+            m_mapping.Inspect(m_mapping.m_xSelect);
+            m_mapping.Draw(AOIData.eDraw.Inspect);
         }
     }
 }
