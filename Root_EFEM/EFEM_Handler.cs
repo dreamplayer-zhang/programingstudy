@@ -42,7 +42,9 @@ namespace Root_EFEM
             //            InitModule(m_efem);
             InitWTR(); 
             InitLoadport();
-            InitAligner(); 
+            InitAligner();
+            m_wtr.RunTree(Tree.eMode.RegRead);
+            m_wtr.RunTree(Tree.eMode.Init);
             //            m_FDC = new FDC("FDC", m_engineer);
             //            InitModule(m_FDC);
             ((IWTR)m_wtr).ReadInfoReticle_Registry(); 
