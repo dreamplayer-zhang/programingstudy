@@ -293,7 +293,7 @@ namespace Root_Vega
             if (EQ.IsStop()) return "OK";
             if (m_qSequence.Count == 0)
             {
-                if (GetPodState(sequence.m_infoReticle.m_sLoadport).m_eState != InfoPod.eState.Placed)
+                if (GetPodState(sequence.m_infoReticle.m_sLoadport).m_eState != InfoPod.eState.Placed && m_handler.m_nRnR ==0)
 				{
                     return "OK";
 				}
