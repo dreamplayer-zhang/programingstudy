@@ -287,14 +287,19 @@ namespace Root_Vega
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
         public string RunNextSequence()
         {
+            Sequence sequence = m_qSequence.Peek();
+
             if (!EQ.p_bSimulate && (EQ.p_eState != EQ.eState.Run)) return "EQ not Run";
             if (EQ.IsStop()) return "OK";
             if (m_qSequence.Count == 0)
             {
+                if (GetPodState(sequence.m_infoReticle.m_sLoadport).m_eState != InfoPod.eState.Placed)
+				{
+                    return "OK";
+				}
                 EQ.p_eState = EQ.eState.Ready; 
                 return "OK";
             }
-            Sequence sequence = m_qSequence.Peek();
             p_sInfo = sequence.m_moduleRun.Run();
             if (p_sInfo != "OK") EQ.p_bStop = true;
             else
