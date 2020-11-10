@@ -212,6 +212,7 @@ namespace Root_Vega
                             if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0) )
                             {
                                 m_process.p_sInfo = m_process.AddInfoReticle(m_infoSlot);
+                                m_process.ReCalcSequence();
                                 m_nRnR--;
                                 EQ.p_eState = EQ.eState.Run; 
                             }

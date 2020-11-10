@@ -380,6 +380,11 @@ namespace RootTools.Camera.Dalsa
             //m_iBlock = -1;
             m_sapBuf.Index = (int)(0);
             m_nGrabTrigger = 0;
+            if (m_sapXfer.Grabbing == true)
+            {
+                m_sapXfer.Freeze();
+                m_sapXfer.Wait(2000);
+            }
             m_sapXfer.Snap((int)(m_nGrabCount));
             p_CamInfo.p_eState = eCamState.GrabMem;
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
