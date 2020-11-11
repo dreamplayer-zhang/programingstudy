@@ -200,8 +200,12 @@ namespace Root_ASIS.Teachs
         #endregion
 
         #region Inspect
+        static InfoStrip m_infoStrip = new InfoStrip(0);
+
         public string Inspect(InfoStrip infoStrip)
         {
+            if (infoStrip == null) infoStrip = m_infoStrip; 
+            
             return "OK";
         }
         #endregion

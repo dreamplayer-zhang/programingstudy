@@ -1,11 +1,9 @@
 ﻿using Root_ASIS.Teachs;
 using RootTools;
-using RootTools.Inspects;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Net.Http.Headers;
 using System.Threading;
 
 namespace Root_ASIS

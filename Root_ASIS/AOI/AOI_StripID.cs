@@ -1,8 +1,8 @@
-﻿using Root_ASIS.Teachs;
-using RootTools;
+﻿using RootTools;
 using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -57,6 +57,16 @@ namespace Root_ASIS.AOI
         void RunTreeUnit(Tree tree)
         {
             p_lUnitID = tree.Set(p_lUnitID, p_lUnitID, "lUnitID", "StripID ROI Count"); 
+        }
+        #endregion
+
+        #region Inspect
+        public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+        public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+
+        public string Inspect(InfoStrip infoStrip, MemoryData memory) 
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

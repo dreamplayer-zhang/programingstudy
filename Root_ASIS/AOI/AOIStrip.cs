@@ -1,5 +1,4 @@
-﻿using Root_ASIS.Teachs;
-using RootTools;
+﻿using RootTools;
 using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -134,6 +133,14 @@ namespace Root_ASIS.AOI
         #endregion
 
         #region Inspect
+        public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+        public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+
+        public string Inspect(InfoStrip infoStrip, MemoryData memory)
+        {
+            throw new NotImplementedException();
+        }
+
         public enum eMode
         {
             Inspect,

@@ -76,10 +76,10 @@ namespace Root_Vega
 
         bool IsEnableLoad()
         {
-            bool bReadyLoadport = m_loadport.p_eState == ModuleBase.eState.Ready; 
-            bool bReadyToLoad = m_loadport.m_infoPod.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad;
+            bool bReadyLoadport = (m_loadport.p_eState == ModuleBase.eState.Ready); 
+            bool bReadyToLoad = (m_loadport.m_infoPod.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
             bReadyToLoad = true; 
-            bool bReadyBGW = m_bgwLoad.IsBusy == false;
+            bool bReadyBGW = (m_bgwLoad.IsBusy == false);
             return bReadyLoadport && bReadyToLoad && bReadyBGW; //forget 조건
         }
 

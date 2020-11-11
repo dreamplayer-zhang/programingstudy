@@ -1,5 +1,4 @@
-﻿using Root_ASIS.Teachs;
-using RootTools;
+﻿using RootTools;
 using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -7,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using System.Windows.Media.Effects;
 
 namespace Root_ASIS.AOI
 {
@@ -66,6 +64,7 @@ namespace Root_ASIS.AOI
                 m_aoi = aoi;
             }
         }
+        Unit m_unit; 
         List<Unit> m_aUnit = new List<Unit>();
 
         void InitUnit(InfoStrip infoStrip)
@@ -82,13 +81,14 @@ namespace Root_ASIS.AOI
                 m_aUnit[n].m_result = (infoStrip != null) ? infoStrip.GetUnitResult(n) : null;
             }
             p_aROI.Clear();
-            p_aROI.Add(m_aUnit[0].m_aoiData);
+            p_aROI.Add(m_unit.m_aoiData);
         }
 
         void RunTreeUnit(Tree tree)
         {
             m_sz.X = tree.Set(m_sz.X, m_sz.X, "szROIX", "szROI", false);
             m_sz.Y = tree.Set(m_sz.Y, m_sz.Y, "szROIY", "szROI", false);
+            m_unit.RunTree(tree.GetTree(m_unit.p_id)); 
             foreach (Unit unit in m_aUnit) unit.RunTree(tree.GetTree(unit.p_id));
         }
         #endregion
@@ -103,7 +103,7 @@ namespace Root_ASIS.AOI
 
         public void ReAllocate(List<CPoint> aArray)
         {
-            CPoint cp0 = m_aUnit[0].m_aoiData.m_cp0;
+            CPoint cp0 = m_unit.m_aoiData.m_cp0;
             InitUnit(null); 
             for (int n = 0; n < Math.Min(aArray.Count, m_aUnit.Count); n++)
             {
@@ -115,7 +115,7 @@ namespace Root_ASIS.AOI
         {
             switch (eDraw)
             {
-                case AOIData.eDraw.ROI: m_aUnit[0].m_aoiData.Draw(draw, eDraw); break;
+                case AOIData.eDraw.ROI: m_unit.m_aoiData.Draw(draw, eDraw); break;
                 default:foreach (Unit unit in m_aUnit) unit.m_aoiData.Draw(draw, eDraw); break;
             }
         }
@@ -153,6 +153,10 @@ namespace Root_ASIS.AOI
         #endregion
 
         #region Inspect
+        public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+        public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+
+
         InfoStrip.UnitResult.eLogic m_eLogic = InfoStrip.UnitResult.eLogic.Or; 
 
         const int c_lInspect = 24;
@@ -229,6 +233,7 @@ namespace Root_ASIS.AOI
             p_id = id;
             m_log = log;
             p_bEnable = true;
+            m_unit = new Unit(p_id, this, m_sz);
             InitUnit(null);
             InitInspect();
         }
