@@ -136,9 +136,12 @@
     <Compile Include="Module\Aligner_ATI.cs" />
     <Compile Include="Module\Aligner_ATI_AOI.cs" />
     <Compile Include="Module\Aligner_RND.cs" />
+    <Compile Include="Module\Vision_Backside.cs" />
+    <Compile Include="Module\Vision_EBR.cs" />
     <Compile Include="Module\IWTR.cs" />
     <Compile Include="Module\IWTRChild.cs" />
     <Compile Include="Module\Loadport_RND.cs" />
+    <Compile Include="Module\Vision.cs" />
     <Compile Include="Module\WTR_RND.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
