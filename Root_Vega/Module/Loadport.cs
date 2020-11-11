@@ -239,11 +239,13 @@ namespace Root_Vega.Module
 
         public string AfterGet()
         {
+            if (m_diReticle.p_bIn == true) return "Reticle Get Fail";
             return IsRunOK();
         }
 
         public string AfterPut()
         {
+            if (m_diReticle.p_bIn == false) return "Reticle Put Fail, Reticle Sensor not Detected";
             return IsRunOK();
         }
 
@@ -290,7 +292,7 @@ namespace Root_Vega.Module
             if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
             if (Run(MoveReticleLifter(ePosReticleLifter.Lifting))) return p_sInfo;
             if (Run(MoveZ(ePosZ.Load))) return p_sInfo;
-            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
+            //if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             return "OK"; 
         }
 
@@ -301,7 +303,7 @@ namespace Root_Vega.Module
             if (m_axisPodLifter.IsInPos(ePosPodLifter.Lifting,m_dInposLifter) == false) return "AxisPodLifter Position not Lifting";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting,m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
             if (m_axisTheta.IsInPos(ePosTheta.Open,m_dInposTheta) == false) return "AxisTheta Position not Open";
-            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
+            //if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
             if (Run(MoveReticleLifter(ePosReticleLifter.Mid))) return p_sInfo;
             if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
@@ -577,7 +579,10 @@ namespace Root_Vega.Module
                 m_infoPod.p_eState = InfoPod.eState.Load;
                 m_module.m_ceidLoad.Send();
                 m_module.m_ceidOpen.Send();
-                m_module.m_infoPod.SetInfoReticleExist(); 
+                if (m_module.m_diReticle.p_bIn == true)
+                {
+                    m_module.m_infoPod.SetInfoReticleExist();
+                }
                 m_module.m_infoPod.SendSlotMap();
                 return "OK";
             }

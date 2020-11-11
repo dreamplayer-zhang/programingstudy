@@ -288,8 +288,8 @@ namespace Root_Vega
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
         public string RunNextSequence()
         {
+            if (m_qSequence.Count == 0) return "OK";
             Sequence sequence = m_qSequence.Peek();
-
             if (!EQ.p_bSimulate && (EQ.p_eState != EQ.eState.Run)) return "EQ not Run";
             if (EQ.IsStop()) return "OK";
             if (m_qSequence.Count == 0)
