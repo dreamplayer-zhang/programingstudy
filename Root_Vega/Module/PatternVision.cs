@@ -856,9 +856,9 @@ namespace Root_Vega.Module
                 int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
                 int nReticleYSize_px = Convert.ToInt32(m_dReticleSize_mm * nMMPerUM / m_dResY_um);    // 레티클 영역(150mm -> 150,000um)의 Y픽셀 갯수
-                m_grabMode.m_dTrigger = 10 * m_dResY_um;        // 축해상도 0.1um로 하드코딩.
+                m_grabMode.m_dTrigger =m_dResY_um / 8 * 100;        // 축해상도 0.1um로 하드코딩.
                 int nReticleRangePulse = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleYSize_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                double dXScale = m_dResX_um * 10;
+                double dXScale = m_dResX_um / 10 * 100;
                 bool bUseRADS = false;
 
                 // Inspection variable
@@ -907,7 +907,7 @@ namespace Root_Vega.Module
                             dEndAxisPos = dTemp;
                             m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
                         }
-                        double dAxisPosX = m_rpReticleCenterPos_pulse.X + nReticleYSize_px * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
+                        double dAxisPosX = m_rpReticleCenterPos_pulse.X + (m_dReticleSize_mm * nMMPerUM / 0.08 / 2) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
 
                         if (m_module.Run(axisXY.StartMove(new RPoint(dAxisPosX, dStartAxisPos)))) return p_sInfo;
                         if (m_module.Run(axisZ.StartMove(m_dFocusPosZ_pulse))) return p_sInfo;
