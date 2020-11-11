@@ -145,6 +145,7 @@ namespace RootTools.Inspects
 							{
 								nInspectionCount++;
 								InspectionProperty ipQueue = p_qInspection.Dequeue();
+								Console.WriteLine("Queue Item Count : " + p_qInspection.Count);
 								InsepctionThread[i].StartInspection(ipQueue, i);
 							}
 						}
