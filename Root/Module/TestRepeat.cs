@@ -95,9 +95,9 @@ namespace Root.Module
             m_roi.m_bInspect = true;
             m_roi.m_rpCenter = island.m_rpCenter;
             m_roi.m_sDisplay = "Size = " + island.m_nSize + ", " + island.m_sz.ToString();
+            Draw(AOIData.eDraw.Inspect); 
             return "OK";
         }
-
         #endregion
 
         #region override
