@@ -10,7 +10,7 @@ namespace Root_AxisMapping.MainUI
         {
             Empty,
             Exist,
-            Select,
+            Setup,
         };
         eState _eState = eState.Empty;
         public eState p_eState
@@ -21,12 +21,7 @@ namespace Root_AxisMapping.MainUI
                 if (_eState == value) return;
                 _eState = value;
                 OnPropertyChanged();
-                switch (_eState)
-                {
-                    case eState.Empty: p_brush = Brushes.LightGray; break;
-                    case eState.Exist: p_brush = Brushes.Green; break;
-                    case eState.Select: p_brush = Brushes.YellowGreen; break;
-                }
+                ChangeBrush(false); 
             }
         }
 
@@ -40,6 +35,23 @@ namespace Root_AxisMapping.MainUI
                 OnPropertyChanged(); 
             }
         }
+
+        public void ChangeBrush(bool bBlink)
+        {
+            if (bBlink) p_brush = Brushes.AliceBlue;
+            else
+            {
+                switch (_eState)
+                {
+                    case eState.Empty: p_brush = Brushes.LightGray; break;
+                    case eState.Exist: p_brush = Brushes.Green; break;
+                    case eState.Setup: p_brush = Brushes.YellowGreen; break;
+                }
+            }
+        }
+
+        public bool m_bEnable = false; 
+        public RPoint m_rpCenter = new RPoint(); 
         #endregion
 
         #region UI
@@ -57,9 +69,14 @@ namespace Root_AxisMapping.MainUI
             }
         }
 
-        public void OnSelect()
+        public void OnActive()
         {
-            m_mapping.OnSelect(m_x); 
+            m_mapping.OnActive(m_x);
+        }
+
+        public void OnSetup()
+        {
+            m_mapping.OnSetup(m_x); 
         }
         #endregion
 

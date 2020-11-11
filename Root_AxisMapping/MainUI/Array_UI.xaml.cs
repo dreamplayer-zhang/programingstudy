@@ -22,7 +22,12 @@ namespace Root_AxisMapping.MainUI
 
         private void Grid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            m_array.OnSelect(); 
+            m_array.OnActive(); 
+        }
+
+        private void Grid_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            m_array.OnSetup();
         }
     }
 }

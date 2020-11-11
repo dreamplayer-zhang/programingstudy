@@ -6,6 +6,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace Root_AxisMapping.MainUI
 {
@@ -40,37 +41,48 @@ namespace Root_AxisMapping.MainUI
         public Array[,] m_aArray = null;
         public void InitArray()
         {
-            double xc = (p_xArray - 1.0) / 2; 
-            double yc = (p_yArray - 1.0) / 2;
             m_aArray = new Array[p_xArray, p_yArray];
+            double xc = (p_xArray - 1.0) / 2;
+            double yc = (p_yArray - 1.0) / 2;
             for (int x = 0; x < p_xArray; x++)
             {
-                for (int y = 0; y < p_yArray; y++) 
+                for (int y = 0; y < p_yArray; y++)
                 {
                     m_aArray[x, y] = new Array(this, x);
                     double dx = (x - xc) / (xc + 0.3);
                     double dy = (y - yc) / (yc + 0.3);
-                    double r = Math.Sqrt(dx * dx + dy * dy); 
-                    m_aArray[x, y].p_eState = (r < 1) ? Array.eState.Exist : Array.eState.Empty; 
+                    double r = Math.Sqrt(dx * dx + dy * dy);
+                    m_aArray[x, y].p_eState = (r < 1) ? Array.eState.Exist : Array.eState.Empty;
                 }
+            }
+            m_aArray[m_xSetup, 0].OnSetup();
+        }
+
+        public int m_xActive = 0;
+        public void OnActive(int ix)
+        {
+            m_xActive = ix;
+            for (int x = 0; x < p_xArray; x++)
+            {
+                for (int y = 0; y < p_yArray; y++) m_aArray[x, y].ChangeBrush(false); 
             }
         }
 
-        public int m_xSelect = 0; 
-        public void OnSelect(int ix)
+        public int m_xSetup = 0; 
+        public void OnSetup(int ix)
         {
-            m_xSelect = ix; 
+            m_xSetup = ix; 
             for (int x = 0; x < p_xArray; x++)
             {
                 for (int y = 0; y < p_yArray; y++)
                 {
                     Array.eState eState = m_aArray[x, y].p_eState;
-                    if (eState == Array.eState.Select) m_aArray[x, y].p_eState = Array.eState.Exist;
+                    if (eState == Array.eState.Setup) m_aArray[x, y].p_eState = Array.eState.Exist;
                 }
             }
             for (int y = 0; y < p_yArray; y++)
             {
-                if (m_aArray[ix, y].p_eState == Array.eState.Exist) m_aArray[ix, y].p_eState = Array.eState.Select; 
+                if (m_aArray[ix, y].p_eState == Array.eState.Exist) m_aArray[ix, y].p_eState = Array.eState.Setup; 
             }
         }
         #endregion
@@ -84,7 +96,9 @@ namespace Root_AxisMapping.MainUI
 
         public string RunGrab()
         {
-            m_axisMapping.StartRun(m_runGrab);
+            AxisMapping.Run_Grab runGrab = (AxisMapping.Run_Grab)m_runGrab.Clone();
+            runGrab.m_xStart += m_dx * (m_xActive - m_xSetup); 
+            m_axisMapping.StartRun(runGrab);
             return "OK";
         }
         void RunTreeGrab(Tree tree)
@@ -162,6 +176,7 @@ namespace Root_AxisMapping.MainUI
 
         public void InvalidROI()
         {
+            if (m_xSetup != m_xActive) return; 
             m_aROI[0].p_eROI = AOIData.eROI.Active;
             m_aROI[1].p_eROI = AOIData.eROI.Ready;
         }
@@ -226,6 +241,7 @@ namespace Root_AxisMapping.MainUI
         void InitInspect()
         {
             m_memory = m_memoryPool.m_viewer.p_memoryData;
+            m_aAOI.Clear(); 
             m_szROI.X = Math.Max(m_aUnit[0].m_aoiData.m_sz.X, m_aUnit[1].m_aoiData.m_sz.X); 
             m_szROI.Y = Math.Max(m_aUnit[0].m_aoiData.m_sz.Y, m_aUnit[1].m_aoiData.m_sz.Y);
             int xp = Math.Min(m_aUnit[0].m_aoiData.m_cp0.X, m_aUnit[1].m_aoiData.m_cp0.X);
@@ -235,48 +251,73 @@ namespace Root_AxisMapping.MainUI
             int yMax = 0; 
             for (int y = 0; y < p_yArray; y++)
             {
-                if (yMin > y) yMin = y;
-                if (yMax < y) yMax = y; 
+                if (m_aArray[m_xSetup, y].p_eState != Array.eState.Empty)
+                {
+                    if (yMin > y) yMin = y;
+                    if (yMax < y) yMax = y;
+                }
             }
             for (int y = 0; y < p_yArray; y++)
             {
-                if (m_aAOI.Count <= y) m_aAOI.Add(new AOIData("AOI." + m_aAOI.Count.ToString(), m_szAOI));
+                if (m_aAOI.Count <= y) m_aAOI.Add(new AOIData("AOI." + m_aAOI.Count.ToString(), m_szROI));
                 m_aAOI[y].m_cp0 = new CPoint(xp, ((yMax - y) * y0 - (yMin - y) * y1) / (yMax - yMin));
                 m_aAOI[y].m_bEnable = false;
             }
         }
 
-        public string Inspect(int xSelect)
+        public string Inspect()
         {
-            InitInspect();
-
-
-            /*            m_degRotate = 0;
-
-                        for (int n = 0; n < 2; n++)
-                        {
-                            m_aUnit[n].m_sInspect = InspectBlob(n);
-                            if (m_aUnit[n].m_sInspect != "OK") return m_aUnit[n].m_sInspect;
-                        }
-                        m_rpDelta = m_aUnit[1].m_aoiData.m_rpCenter - m_aUnit[0].m_aoiData.m_rpCenter;
-                        m_degRotate = 180 * Math.Atan2(m_rpDelta.X, m_rpDelta.Y) / Math.PI;*/
+            if (m_xActive == m_xSetup) InitInspect();
+            for (int y = 0; y < p_yArray; y++)
+            {
+                m_aAOI[y].m_bEnable = (m_aArray[m_xActive, y].p_eState != Array.eState.Empty);
+                if (m_aAOI[y].m_bEnable) InspectBlob(y);
+                m_aAOI[y].m_bInspect = m_aAOI[y].m_bEnable;
+                m_aArray[m_xActive, y].m_bEnable = m_aAOI[y].m_bEnable;
+                m_aArray[m_xActive, y].m_rpCenter = m_aAOI[y].m_bEnable ? m_aAOI[y].m_rpCenter : new RPoint(); 
+            }
+            Draw(AOIData.eDraw.Inspect);
+            SaveResult(); 
             return "OK";
         }
 
         Blob m_blob = new Blob();
         Blob.eSort m_eSort = Blob.eSort.Size;
-        public CPoint m_mmGV = new CPoint(100, 0);
+        public CPoint m_mmGV = new CPoint(200, 0);
         string InspectBlob(int iAOI)
         {
-            Unit data = m_aUnit[iAOI];
-            m_blob.RunBlob(m_memory, 0, data.m_aoiData.m_cp0, data.m_aoiData.m_sz, m_mmGV.X, m_mmGV.Y, 3);
+            AOIData aoi = m_aAOI[iAOI];
+            m_blob.RunBlob(m_memory, 0, aoi.m_cp0, aoi.m_sz, m_mmGV.X, m_mmGV.Y, 10); 
             m_blob.RunSort(m_eSort);
             if (m_blob.m_aSort.Count == 0) return "Find Fiducial Error";
             Blob.Island island = m_blob.m_aSort[0];
-            data.m_aoiData.m_bInspect = true;
-            data.m_aoiData.m_rpCenter = island.m_rpCenter;
-            data.m_aoiData.m_sDisplay = "Size = " + island.m_nSize + ", " + island.m_sz.ToString();
+            aoi.m_bInspect = true;
+            aoi.m_rpCenter = island.m_rpCenter;
+            aoi.m_sDisplay = "Size = " + island.m_nSize + ", " + island.m_sz.ToString();
             return "OK";
+        }
+
+        void SaveResult()
+        {
+            FileStream fs = new FileStream("c:\\Log\\Mapping" + m_xActive.ToString("00") + ".txt", FileMode.Create);
+            StreamWriter sw = new StreamWriter(fs); 
+            for (int y = 0; y < p_yArray; y++)
+            {
+                Array array = m_aArray[m_xActive, y];
+                sw.WriteLine(array.m_bEnable.ToString() + ", " + array.m_rpCenter.ToString()); 
+            }
+            sw.Close();
+            fs.Close(); 
+        }
+
+        public void InspectAll()
+        {
+            int xActive = m_xActive; 
+            for (m_xActive = 0; m_xActive < p_xArray; m_xActive++)
+            {
+                RunGrab();
+                Inspect(); 
+            }
         }
 
         double m_dx = 2.3;
@@ -339,7 +380,9 @@ namespace Root_AxisMapping.MainUI
         public Mapping(string id, AxisMapping_Engineer engineer)
         {
             p_xArray = 15;
-            p_yArray = 13; 
+            p_yArray = 13;
+            m_xActive = p_xArray / 2;
+            m_xSetup = p_xArray / 2;
             m_id = id;
             m_engineer = engineer;
             m_axisMapping = ((AxisMapping_Handler)engineer.ClassHandler()).m_axisMapping;

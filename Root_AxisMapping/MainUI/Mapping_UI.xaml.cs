@@ -44,10 +44,20 @@ namespace Root_AxisMapping.MainUI
             m_timer.Start();
         }
 
+        int m_iBlink = 0; 
+        bool m_bBlink = false; 
         private void M_timer_Tick(object sender, EventArgs e)
         {
             IsEnabled = (m_mapping.m_axisMapping.p_eState != ModuleBase.eState.Run) || EQ.p_bSimulate;
             buttonInspect.IsEnabled = (m_mapping.m_aROI[0].p_eROI == AOIData.eROI.Done) && (m_mapping.m_aROI[1].p_eROI == AOIData.eROI.Done);
+            if (m_iBlink > 3)
+            {
+                m_bBlink = !m_bBlink; 
+                for (int y = 0; y < m_mapping.p_yArray; y++) m_mapping.m_aArray[m_mapping.m_xActive, y].ChangeBrush(m_bBlink);
+                m_iBlink = 0; 
+            }
+            m_iBlink++;
+
         }
         #endregion
 
@@ -98,8 +108,13 @@ namespace Root_AxisMapping.MainUI
 
         private void buttonInspect_Click(object sender, RoutedEventArgs e)
         {
-            m_mapping.Inspect(m_mapping.m_xSelect);
+            m_mapping.Inspect();
             m_mapping.Draw(AOIData.eDraw.Inspect);
+        }
+
+        private void buttonInspectAll_Click(object sender, RoutedEventArgs e)
+        {
+            m_mapping.InspectAll(); 
         }
     }
 }
