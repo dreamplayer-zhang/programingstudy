@@ -916,7 +916,7 @@ namespace Root_Vega.Module
 
                         double dStartTriggerPos = m_rpReticleCenterPos_pulse.Y + nReticleRangePulse / 2;
                         double dEndTriggerPos = m_rpReticleCenterPos_pulse.Y - nReticleRangePulse / 2;
-                        //m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos, m_dTriggerPeriod, m_dTriggerUptime, true);
+                        m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos, m_dTriggerPeriod, m_dTriggerUptime, true);
 
                         string strPool = m_grabMode.m_memoryPool.p_id;
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
@@ -924,10 +924,10 @@ namespace Root_Vega.Module
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMem);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * (double)m_nScanRate / 100);
 
-                        //m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                        //axisXY.p_axisY.RunTrigger(false);
+                        axisXY.p_axisY.RunTrigger(false);
 
                         #region Inspection
                         // Inspection
@@ -978,10 +978,12 @@ namespace Root_Vega.Module
                             if (bFoundFeature)
                             {
                                 Roi roiCurrent = m_mvvm.p_PatternRoiList[0];
-                                
+
                                 // 1. 검사영역 생성
-                                Point ptStartPos = new Point(cptStandard.X + nRefStartOffsetX + (nInspectStartIndex * nCamWidth), cptStandard.Y + nRefStartOffsetY);
-                                Point ptEndPos = new Point(ptStartPos.X + nCamWidth, ptStartPos.Y + (int)roiCurrent.Strip.ParameterList[0].InspAreaHeight);
+                                //Point ptStartPos = new Point(cptStandard.X + nRefStartOffsetX + (nInspectStartIndex * nCamWidth), cptStandard.Y + nRefStartOffsetY);
+                                //Point ptEndPos = new Point(ptStartPos.X + nCamWidth, ptStartPos.Y + (int)roiCurrent.Strip.ParameterList[0].InspAreaHeight);
+                                Point ptStartPos = new Point(cptStandard.X + nRefStartOffsetX + (nInspectStartIndex * nCamWidth), 0);
+                                Point ptEndPos = new Point(ptStartPos.X + nCamWidth, nReticleYSize_px);
                                 CRect crtCurrentArea = new CRect(ptStartPos, ptEndPos);
 
                                 // 1.2 생성된 검사영역이 스캔됐는지 판단
