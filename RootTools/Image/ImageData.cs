@@ -635,15 +635,17 @@ namespace RootTools
 			br.Close();
 		}
 
-		public bool ReAllocate(CPoint sz, int nByte)
+		public unsafe bool ReAllocate(CPoint sz, int nByte)
 		{
 			if (nByte <= 0)
 				return false;
 			if ((sz.X < 1) || (sz.Y < 1))
 			return false;
-
-			Array.Resize(ref m_aBuf, sz.X * nByte* sz.Y);
-
+			if (m_eMode == eMode.ImageBuffer)
+			{
+				Array.Resize(ref m_aBuf, sz.X * nByte * sz.Y);
+			}
+	
 			return true;
 		}
 
