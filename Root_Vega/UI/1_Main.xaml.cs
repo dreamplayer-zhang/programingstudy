@@ -92,6 +92,7 @@ namespace Root_Vega
                 case EQ.eState.Run: return false;
                 case EQ.eState.Home: return false; 
             }
+            
             return true; 
         }
 

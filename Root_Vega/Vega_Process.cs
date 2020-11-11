@@ -173,6 +173,7 @@ namespace Root_Vega
             foreach (IRobotChild child in m_robot.m_aChild) CalcRecoverChild(child);
             ReCalcSequence();
             RunTree(Tree.eMode.Init);
+            if (m_handler.m_nRnR > 0) m_handler.m_nRnR = 0;
         }
 
         void CalcRecoverArm()
@@ -291,7 +292,8 @@ namespace Root_Vega
             if (EQ.IsStop()) return "OK";
             if (m_qSequence.Count == 0)
             {
-                EQ.p_eState = EQ.eState.Ready; 
+                EQ.p_eState = EQ.eState.Ready;
+                ClearInfoReticle();
                 return "OK";
             }
             Sequence sequence = m_qSequence.Peek();
