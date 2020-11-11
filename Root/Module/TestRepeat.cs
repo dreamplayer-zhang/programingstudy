@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_ASIS.AOI;
+using RootTools;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Control;
 using RootTools.Memory;
@@ -47,6 +48,58 @@ namespace Root.Module
         }
         #endregion
 
+        #region ROI
+        AOIData m_roi; 
+
+        void InitROI()
+        {
+            m_roi = new AOIData("ROI", new CPoint(100, 100)); 
+            m_memoryPool.m_viewer.OnLBD += M_viewer_OnLBD;
+            m_memoryPool.m_viewer.OnMouseMove += M_viewer_OnMouseMove;
+        }
+
+        private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
+        {
+            m_roi.LBD(bDown, cpImg);
+            Draw(AOIData.eDraw.ROI);
+        }
+
+        private void M_viewer_OnMouseMove(CPoint cpImg)
+        {
+            m_roi.MouseMove(cpImg);
+            Draw(AOIData.eDraw.ROI);
+        }
+
+        public void Draw(AOIData.eDraw eDraw)
+        {
+            if (m_memoryPool.m_viewer.p_memoryData == null) return; 
+            MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
+            draw.Clear();
+            m_roi.Draw(draw, eDraw);
+            draw.InvalidDraw();
+        }
+        #endregion
+
+        #region Inspect
+        Blob m_blob = new Blob();
+        Blob.eSort m_eSort = Blob.eSort.Size;
+        public CPoint m_mmGV = new CPoint(100, 0);
+        public string Inspect(int nGV)
+        {
+            MemoryData memory = m_memoryPool.m_viewer.p_memoryData;
+            if (memory == null) return "MemoryData not Assigned";
+            m_blob.RunBlob(memory, 0, m_roi.m_cp0, m_roi.m_sz, nGV, 0, 10);
+            m_blob.RunSort(m_eSort);
+            if (m_blob.m_aSort.Count == 0) return "Find Fiducial Error";
+            Blob.Island island = m_blob.m_aSort[0];
+            m_roi.m_bInspect = true;
+            m_roi.m_rpCenter = island.m_rpCenter;
+            m_roi.m_sDisplay = "Size = " + island.m_nSize + ", " + island.m_sz.ToString();
+            return "OK";
+        }
+
+        #endregion
+
         #region override
         public override void Reset()
         {
@@ -80,6 +133,7 @@ namespace Root.Module
         public TestRepeat(string id, IEngineer engineer)
         {
             InitBase(id, engineer);
+            InitROI(); 
         }
 
         public override void ThreadStop()
@@ -93,6 +147,8 @@ namespace Root.Module
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
             AddModuleRunList(new Run_AxisMove(this), false, "Axis Move");
             AddModuleRunList(new Run_GrabBasler(this), false, "Run Grab Basler Camera");
+            AddModuleRunList(new Run_Inspect(this), false, "Inspect");
+            AddModuleRunList(new Run_Repeat(this), false, "Repeat");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -176,6 +232,72 @@ namespace Root.Module
             {
                 if (EQ.p_bSimulate) return "OK";
                 if (m_module.Run(m_module.m_cam.GrabOne(0))) return p_sInfo;
+                return "OK";
+            }
+        }
+
+        public class Run_Inspect : ModuleRunBase
+        {
+            TestRepeat m_module;
+            public Run_Inspect(TestRepeat module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            int m_nGV = 150;
+            public override ModuleRunBase Clone()
+            {
+                Run_Inspect run = new Run_Inspect(m_module);
+                run.m_nGV = m_nGV;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_nGV = tree.Set(m_nGV, m_nGV, "GV", "Gray Value (0 ~ 255)", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.Inspect(m_nGV);
+            }
+        }
+
+        public class Run_Repeat : ModuleRunBase
+        {
+            TestRepeat m_module;
+            public Run_Repeat(TestRepeat module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            int m_nRepeat = 10; 
+            int m_nGV = 150;
+            public override ModuleRunBase Clone()
+            {
+                Run_Repeat run = new Run_Repeat(m_module);
+                run.m_nRepeat = m_nRepeat;
+                run.m_nGV = m_nGV;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_nRepeat = tree.Set(m_nRepeat, m_nRepeat, "Repeat", "Repeat Count", bVisible);
+                m_nGV = tree.Set(m_nGV, m_nGV, "GV", "Gray Value (0 ~ 255)", bVisible);
+            }
+
+            public override string Run()
+            {
+                if (EQ.p_bSimulate) return "OK";
+                for (int n = 0; n < m_nRepeat; n++)
+                {
+                    //Axis Move; 
+                    if (m_module.Run(m_module.m_cam.GrabOne(0))) return p_sInfo;
+                    if (m_module.Run(m_module.Inspect(m_nGV))) return p_sInfo;
+                }
                 return "OK";
             }
         }

@@ -260,6 +260,10 @@
       <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
       <Name>RootTools_CLR</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Root_ASIS\Root_ASIS.csproj">
+      <Project>{a1f831c0-f0f4-4ef1-b9b4-e7c424735f65}</Project>
+      <Name>Root_ASIS</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="License-LGPL.txt" />
