@@ -1,5 +1,4 @@
-﻿using Root_ASIS.Teachs;
-using RootTools;
+﻿using RootTools;
 using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -139,6 +138,20 @@ namespace Root_ASIS.AOI
             Inspect,
             Setup
         };
+        public string Setup(MemoryData memory)
+        {
+            m_memory = memory;
+            return Inspect(eMode.Setup); 
+        }
+
+        public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+        public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+
+        public string Inspect(InfoStrip infoStrip, MemoryData memory)
+        {
+            throw new NotImplementedException();
+        }
+
 
         InfoStrip m_infoStrip;
         MemoryData m_memory; 

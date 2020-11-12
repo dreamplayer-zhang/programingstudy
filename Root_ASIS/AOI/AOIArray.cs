@@ -1,11 +1,10 @@
-﻿using Root_ASIS.Teachs;
-using RootTools;
+﻿using RootTools;
 using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace Root_ASIS.AOI
 {
@@ -193,6 +192,16 @@ namespace Root_ASIS.AOI
         {
             m_eSide = (eSide)tree.Set(m_eSide, m_eSide, "Side", "Strip Side"); 
             m_mmGV = tree.Set(m_mmGV, m_mmGV, "GV", m_ST.Get("Gray Value Range (0~255)"));
+        }
+        #endregion
+
+        #region Inspect
+        public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+        public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+
+        public string Inspect(InfoStrip infoStrip, MemoryData memory)
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

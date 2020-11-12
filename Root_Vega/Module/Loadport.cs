@@ -221,7 +221,7 @@ namespace Root_Vega.Module
 
         public string BeforeGet()
         {
-            if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
+            if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Get Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
             if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             if (p_infoReticle == null) return p_id + " BeforeGet : InfoWafer = null";
@@ -230,19 +230,22 @@ namespace Root_Vega.Module
 
         public string BeforePut()
         {
-            if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Get Sequence";
+            if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
+            if (m_diReticle.p_bIn == true) return "Retile is exist in Loadport";
             if (p_infoReticle != null) return p_id + " BeforePut : InfoWafer != null";
             return IsRunOK();
         }
 
         public string AfterGet()
         {
+            if (m_diReticle.p_bIn == true) return "Reticle Get Fail";
             return IsRunOK();
         }
 
         public string AfterPut()
         {
+            if (m_diReticle.p_bIn == false) return "Reticle Put Fail, Reticle Sensor not Detected";
             return IsRunOK();
         }
 
@@ -273,6 +276,7 @@ namespace Root_Vega.Module
         #region Load & Unload
         public string RunLoad()
         {
+            if (m_infoPod.p_eState == InfoPod.eState.Load) return "OK"; 
             if (m_axisZ.IsInPos(ePosZ.Ready, m_dInposZ) == false) return "AxisZ Position not Ready";
             if (m_axisPodLifter.IsInPos(ePosPodLifter.Ready, m_dInposLifter) == false) return "AxisPodLifter Position not Ready";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Ready, m_dInposReticle) == false) return "AxisReticleLifter Position not Ready";
@@ -288,17 +292,18 @@ namespace Root_Vega.Module
             if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
             if (Run(MoveReticleLifter(ePosReticleLifter.Lifting))) return p_sInfo;
             if (Run(MoveZ(ePosZ.Load))) return p_sInfo;
-            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
+            //if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             return "OK"; 
         }
 
         public string RunUnload()
         {
+            if (m_infoPod.p_eState == InfoPod.eState.Placed) return "OK"; 
             if (m_axisZ.IsInPos(ePosZ.Load,m_dInposZ) == false) return "AxisZ Position not Load";
             if (m_axisPodLifter.IsInPos(ePosPodLifter.Lifting,m_dInposLifter) == false) return "AxisPodLifter Position not Lifting";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting,m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
             if (m_axisTheta.IsInPos(ePosTheta.Open,m_dInposTheta) == false) return "AxisTheta Position not Open";
-            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
+            //if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
             if (Run(MoveReticleLifter(ePosReticleLifter.Mid))) return p_sInfo;
             if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
@@ -574,7 +579,10 @@ namespace Root_Vega.Module
                 m_infoPod.p_eState = InfoPod.eState.Load;
                 m_module.m_ceidLoad.Send();
                 m_module.m_ceidOpen.Send();
-                m_module.m_infoPod.SetInfoReticleExist(); 
+                if (m_module.m_diReticle.p_bIn == true)
+                {
+                    m_module.m_infoPod.SetInfoReticleExist();
+                }
                 m_module.m_infoPod.SendSlotMap();
                 return "OK";
             }

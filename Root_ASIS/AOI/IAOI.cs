@@ -28,6 +28,12 @@ namespace Root_ASIS.AOI
 
         AOIData GetAOIData(AOIData.eROI eROI);
 
+        string BeforeInspect(InfoStrip infoStrip, MemoryData memory); 
+
+        string Inspect(InfoStrip infoStrip, MemoryData memory);
+
+        string AfterInspect(InfoStrip infoStrip, MemoryData memory);
+
         void RunTreeAOI(Tree tree);
     }
 }

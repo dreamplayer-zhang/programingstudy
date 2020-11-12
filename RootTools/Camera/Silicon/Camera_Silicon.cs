@@ -397,8 +397,6 @@ namespace RootTools.Camera.Silicon
 
         public void ThreadStop()
         {
-            
-            throw new NotImplementedException();
         }
 
         #region RelayCommand

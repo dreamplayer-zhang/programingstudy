@@ -159,7 +159,7 @@ namespace Root_AxisMapping.Module
                 }
                 set { _trigger = value; }
             }
-            double m_xStart = 0;
+            public double m_xStart = 0;
             double m_zStart = 0;
             double m_dyAcc = 3;
             double m_vGrab = 100;

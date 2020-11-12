@@ -60,12 +60,23 @@ namespace RootTools.Trees
             } 
         }
 
-        public bool m_bUse = true; 
+        public bool _bUse = true;
+        public bool p_bUse
+        {
+            get { return _bUse; }
+            set
+            {
+                if (_bUse == value) return; 
+                _bUse = value;
+                OnPropertyChanged(); 
+                OnPropertyChanged("p_bVisible");
+            }
+        }
 
         bool _bVisible = true;
         public bool p_bVisible
         {
-            get { return _bVisible; }
+            get { return _bVisible && _bUse; }
             set
             {
                 if (_bVisible == value) return;
@@ -82,10 +93,10 @@ namespace RootTools.Trees
             {
                 for (int n = p_aChild.Count - 1; n >= 0; n--)
                 {
-                    if (p_aChild[n].m_bUse) p_aChild[n].RunTreeRemove();
+                    if (p_aChild[n].p_bUse) p_aChild[n].RunTreeRemove();
                     else p_aChild.RemoveAt(n);
                 }
-                m_bUse = false;
+                p_bUse = false;
             });
         }
 
@@ -149,7 +160,7 @@ namespace RootTools.Trees
             {
                 if (item.p_sName == sName)
                 {
-                    item.m_bUse = true;
+                    item.p_bUse = true;
                     return item;
                 }
             }
@@ -164,8 +175,8 @@ namespace RootTools.Trees
         void AddTreeItem(Tree treeItem)
         {
             if (p_treeRoot.p_eMode != eMode.Init) return;
-            m_bUse = true;
-            treeItem.m_bUse = true;
+            p_bUse = true;
+            treeItem.p_bUse = true;
             m_aChildRunInit.Add(treeItem); 
         }
         #endregion

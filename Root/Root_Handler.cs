@@ -12,27 +12,30 @@ namespace Root
     {
         #region Module
         public ModuleList m_moduleList;
-        public Test m_test;
+        //public Test m_test;
         //public ScareCrow m_scarecrow;
         //public Siltron m_siltron;
         //public BayerConvert m_bayer;
-        public ACS m_acs;
-        public TestMars m_testMars;
+        //public ACS m_acs;
+        //public TestMars m_testMars;
+        public TestRepeat m_testRepeat; 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
-            m_test = new Test("Test", m_enginner);
-            InitModule(m_test);
+            //m_test = new Test("Test", m_enginner);
+            //InitModule(m_test);
             //m_scarecrow =new ScareCrow("ScareCrow", m_enginner);
             //InitModule(m_scarecrow);
             //m_siltron = new Siltron("Siltrion", m_enginner);
             //InitModule(m_siltron);
             //m_bayer = new BayerConvert("BayerConvert", m_enginner);
             //InitModule(m_bayer);
-            m_acs = new ACS("ACS", m_enginner);
-            InitModule(m_acs);
-            m_testMars = new TestMars("TestMars", m_enginner);
-            InitModule(m_testMars); 
+            //m_acs = new ACS("ACS", m_enginner);
+            //InitModule(m_acs);
+            //m_testMars = new TestMars("TestMars", m_enginner);
+            //InitModule(m_testMars);
+            m_testRepeat = new TestRepeat("TestRepeat", m_enginner);
+            InitModule(m_testRepeat); 
         }
 
         void InitModule(ModuleBase module)

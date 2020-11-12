@@ -70,8 +70,9 @@
                     <TextBlock Text="Run Mapping" Foreground="Black" FontWeight="Bold" />
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
-                    <Button x:Name="buttonInspect" Content="Run" Margin="3" Click="buttonInspect_Click"/>
+                    <Button x:Name="buttonInspect" Content="Inspect" Margin="3" Click="buttonInspect_Click"/>
                     <tree:TreeUI x:Name="treeInspectUI" Height="96" Margin="3"/>
+                    <Button x:Name="buttonInspectAll" Content="Inspect All" Margin="3" Click="buttonInspectAll_Click"/>
                 </StackPanel>
             </GroupBox>
         </StackPanel>

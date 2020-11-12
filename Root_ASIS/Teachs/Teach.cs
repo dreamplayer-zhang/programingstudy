@@ -2,8 +2,12 @@
 using RootTools;
 using RootTools.Memory;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace Root_ASIS.Teachs
 {
@@ -200,9 +204,66 @@ namespace Root_ASIS.Teachs
         #endregion
 
         #region Inspect
+        static InfoStrip m_infoStrip = new InfoStrip(0);
+        enum eTimer
+        {
+            Before,
+            After,
+            Stop
+        }
+        eTimer m_eTimer = eTimer.Stop;
+        InfoStrip m_inspectStrip = null;
+        MemoryData m_inspectMemory = null; 
         public string Inspect(InfoStrip infoStrip)
         {
+            if (infoStrip == null) infoStrip = m_infoStrip;
+            m_inspectStrip = infoStrip; 
+            m_inspectMemory = m_memoryPool.m_viewer.p_memoryData;
+            m_bgwInspect.RunWorkerAsync(); 
             return "OK";
+        }
+
+        BackgroundWorker m_bgwInspect = new BackgroundWorker(); 
+        void InitBackgroundWorker()
+        {
+            m_bgwInspect.DoWork += M_bgwInspect_DoWork;
+        }
+
+        private void M_bgwInspect_DoWork(object sender, DoWorkEventArgs e)
+        {
+            RunTimerInspect(eTimer.Before);
+            m_aoiStrip.Inspect(m_inspectStrip, m_inspectMemory);
+            foreach (IAOI aoi in p_aAOI) aoi.Inspect(m_inspectStrip, m_inspectMemory);
+            RunTimerInspect(eTimer.After);
+        }
+
+        DispatcherTimer m_timer = new DispatcherTimer(); 
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(1);
+            m_timer.Tick += M_timer_Tick;
+        }
+
+        void RunTimerInspect(eTimer eTimer)
+        {
+            m_eTimer = eTimer;
+            m_timer.Start();
+            while ((m_eTimer != eTimer.Stop) && (EQ.IsStop() == false)) Thread.Sleep(1); 
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            m_timer.Stop(); 
+            switch (m_eTimer)
+            {
+                case eTimer.Before:
+                    foreach (IAOI aoi in p_aAOI) aoi.BeforeInspect(m_inspectStrip, m_inspectMemory);
+                    break;
+                case eTimer.After:
+                    foreach (IAOI aoi in p_aAOI) aoi.AfterInspect(m_inspectStrip, m_inspectMemory);
+                    break;
+            }
+            m_eTimer = eTimer.Stop; 
         }
         #endregion
 
@@ -238,6 +299,7 @@ namespace Root_ASIS.Teachs
             job.Close();
             Draw();
             InvalidROI();
+            m_aoiStrip.Setup(m_memoryPool.m_viewer.p_memoryData); 
         }
 
         IAOI NewAOI(string sAOI)
@@ -332,7 +394,9 @@ namespace Root_ASIS.Teachs
             ClearAOI();
             InitTreeAOI();
             InitDraw();
-            GetActiveROI(); 
+            GetActiveROI();
+            InitBackgroundWorker(); 
+            InitTimer(); 
         }
     }
 }
