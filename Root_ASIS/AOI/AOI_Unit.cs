@@ -156,9 +156,7 @@ namespace Root_ASIS.AOI
         public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
         public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
 
-
         InfoStrip.UnitResult.eLogic m_eLogic = InfoStrip.UnitResult.eLogic.Or; 
-
         const int c_lInspect = 24;
         Blob[] m_aBlob = new Blob[c_lInspect]; 
         void InitInspect()

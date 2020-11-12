@@ -204,7 +204,7 @@ namespace Root_ASIS.Teachs
         #endregion
 
         #region Inspect
-        static InfoStrip m_infoStrip = new InfoStrip(0);
+        static InfoStrip m_defaultStrip = new InfoStrip(0);
         enum eTimer
         {
             Before,
@@ -216,7 +216,11 @@ namespace Root_ASIS.Teachs
         MemoryData m_inspectMemory = null; 
         public string Inspect(InfoStrip infoStrip)
         {
-            if (infoStrip == null) infoStrip = m_infoStrip;
+            if (infoStrip == null)
+            {
+                if (m_nID == 0) m_defaultStrip = new InfoStrip(0); 
+                infoStrip = m_defaultStrip;
+            }
             m_inspectStrip = infoStrip; 
             m_inspectMemory = m_memoryPool.m_viewer.p_memoryData;
             m_bgwInspect.RunWorkerAsync(); 

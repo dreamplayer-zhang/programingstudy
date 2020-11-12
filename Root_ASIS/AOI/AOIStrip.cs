@@ -92,8 +92,8 @@ namespace Root_ASIS.AOI
         Dictionary<eMode, Result> m_aResult = new Dictionary<eMode, Result>(); 
         void InitResult()
         {
-            m_aResult.Add(eMode.Inspect, new Result());
             m_aResult.Add(eMode.Setup, new Result());
+            m_aResult.Add(eMode.Inspect, new Result());
         }
 
         double Get_dSize(int iUnit)
@@ -149,24 +149,20 @@ namespace Root_ASIS.AOI
 
         public string Inspect(InfoStrip infoStrip, MemoryData memory)
         {
-            throw new NotImplementedException();
+            m_infoStrip = infoStrip; 
+            m_memory = memory;
+            string sInspect = Inspect(eMode.Inspect);
+            if (sInspect == "OK") return sInspect;
+            if (Get_dDistance() >= m_dDistanceError) return "Fiducial Distance Error";
+            SetInfoPos();
+            m_infoStrip.p_eResult = InfoStrip.eResult.Rework;
+            m_infoStrip.m_sError = sInspect;
+            return "OK"; 
         }
-
 
         InfoStrip m_infoStrip;
         MemoryData m_memory; 
         int m_dDistanceError = 10; 
-        public string Inspect(InfoStrip infoStrip, MemoryData memory, eMode eMode)
-        {
-            m_infoStrip = infoStrip;
-            m_memory = memory;
-            string sInspect = Inspect(eMode);
-            if (sInspect == "OK") return sInspect;
-            m_infoStrip.p_eResult = InfoStrip.eResult.Rework;
-            m_infoStrip.m_sError = sInspect;
-            return sInspect; 
-        }
-
         string Inspect(eMode eMode)
         {
             Parallel.For(0, 1, n => { m_aUnit[n].m_sInspect = InspectBlob(eMode, n); });
@@ -175,11 +171,6 @@ namespace Root_ASIS.AOI
                 if (data.m_sInspect != "OK") return data.m_sInspect;
             }
             m_aResult[eMode].CalcStripPos();
-            if (eMode == eMode.Inspect)
-            {
-                if (Get_dDistance() >= m_dDistanceError) return "Fiducial Distance Error";
-                SetInfoPos();
-            }
             return "OK";
         }
 
@@ -197,6 +188,7 @@ namespace Root_ASIS.AOI
             result.m_maxLength = island.m_nLength;
             result.m_maxSize = island.m_nSize;
             result.m_rpCenter = island.m_rpCenter;
+            unit.m_aoiData.m_bInspect = true; 
             unit.m_aoiData.m_sDisplay = "Size = " + island.m_nSize + ", " + island.m_sz.ToString(); 
             if (eMode == eMode.Inspect)
             {
