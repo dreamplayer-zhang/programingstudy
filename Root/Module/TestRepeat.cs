@@ -54,7 +54,7 @@ namespace Root.Module
 
         private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
         {
-            m_roi.LBD(bDown, cpImg);
+            m_roi.LBD(bDown, cpImg, m_memoryPool.m_viewer.p_memoryData);
             Draw(AOIData.eDraw.ROI);
         }
 

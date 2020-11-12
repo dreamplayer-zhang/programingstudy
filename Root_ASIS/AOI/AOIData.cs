@@ -116,6 +116,10 @@ namespace Root_ASIS.AOI
         #endregion
 
         #region Position
+        public delegate void dgOnLBD(bool bDown, MemoryData memory);
+        public event dgOnLBD OnLBD;
+
+
         public enum eShape
         {
             None,
@@ -127,7 +131,7 @@ namespace Root_ASIS.AOI
 
         CPoint m_dpMove = new CPoint();
         CPoint m_dpResize = new CPoint(); 
-        public void LBD(bool bDown, CPoint cpImg)
+        public void LBD(bool bDown, CPoint cpImg, MemoryData memory)
         {
             if (bDown && (m_eShape == eShape.None))
             {
@@ -147,6 +151,7 @@ namespace Root_ASIS.AOI
                 m_eShape = eShape.None;
                 p_eROI = eROI.Done; 
             }
+            if (OnLBD != null) OnLBD(bDown, memory); 
         }
 
         public void MouseMove(CPoint cpImg)

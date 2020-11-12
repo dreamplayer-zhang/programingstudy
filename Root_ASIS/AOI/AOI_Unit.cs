@@ -153,6 +153,8 @@ namespace Root_ASIS.AOI
         #endregion
 
         #region Inspect
+        public string Setup(MemoryData memory) { return "OK"; }
+        
         public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) 
         {
             InitUnit(infoStrip);

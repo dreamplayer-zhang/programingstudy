@@ -121,7 +121,7 @@ namespace Root_AxisMapping.MainUI
         private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
         {
             if (p_roiActive == null) return;
-            p_roiActive.LBD(bDown, cpImg);
+            p_roiActive.LBD(bDown, cpImg, m_memoryPool.m_viewer.p_memoryData);
             Draw(AOIData.eDraw.ROI);
             GetActineROI();
         }

@@ -57,7 +57,17 @@ namespace Root_ASIS.AOI
             m_aUnit.Add(new Unit("Strip Origin 0", this));
             m_aUnit.Add(new Unit("Strip Origin 1", this));
             p_aROI.Clear();
-            foreach (Unit unit in m_aUnit) p_aROI.Add(unit.m_aoiData); 
+            foreach (Unit unit in m_aUnit) p_aROI.Add(unit.m_aoiData);
+            m_aUnit[0].m_aoiData.OnLBD += M_aoiData_OnLBD;
+            m_aUnit[1].m_aoiData.OnLBD += M_aoiData_OnLBD;
+        }
+
+        private void M_aoiData_OnLBD(bool bDown, MemoryData memory)
+        {
+            if (bDown == false) return; 
+            if (m_aUnit[0].m_aoiData.p_eROI != AOIData.eROI.Done) return;
+            if (m_aUnit[1].m_aoiData.p_eROI != AOIData.eROI.Done) return;
+            Setup(memory);
         }
 
         void RunTreeUnit(Tree tree)

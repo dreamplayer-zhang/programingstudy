@@ -30,6 +30,8 @@ namespace Root_ASIS.AOI
 
         AOIData GetAOIData(AOIData.eROI eROI);
 
+        string Setup(MemoryData memory); 
+
         string BeforeInspect(InfoStrip infoStrip, MemoryData memory); 
 
         string Inspect(InfoStrip infoStrip, MemoryData memory);

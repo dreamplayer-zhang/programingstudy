@@ -39,73 +39,92 @@ namespace Root_ASIS.AOI
                 m_aoiData = new AOIData(id, m_sz);
             }
         }
-        List<UnitID> m_aUnitID = new List<UnitID>();
-        public int p_lUnitID
+        UnitID m_unit; 
+        void InitUnit()
         {
-            get { return m_aUnitID.Count; }
-            set
-            {
-                while (m_aUnitID.Count < value)
-                {
-                    UnitID unitID = new UnitID(p_id + "." + m_aUnitID.Count.ToString("00"), this); 
-                    m_aUnitID.Add(unitID); 
-                }
-                while (m_aUnitID.Count > value) m_aUnitID.RemoveAt(m_aUnitID.Count - 1);
-            }
-        }
-
-        void RunTreeUnit(Tree tree)
-        {
-            p_lUnitID = tree.Set(p_lUnitID, p_lUnitID, "lUnitID", "StripID ROI Count"); 
+            m_unit = new UnitID(p_id, this); 
         }
         #endregion
 
         #region Inspect
+        public string Setup(MemoryData memory)
+        {
+            return "OK"; 
+        }
+
         public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
-        public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
 
         public string Inspect(InfoStrip infoStrip, MemoryData memory) 
         {
             throw new NotImplementedException();
         }
+
+        public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
         #endregion
 
         #region IAOI
-        public string p_id { get; set; }
+        string _id = "";
+        public string p_id 
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (m_unit != null) m_unit.m_aoiData.p_id = value; 
+            }
+        }
         public string p_sAOI { get; set; }
         public int p_nID { get; set; }
-        public bool p_bEnable { get; set; }
+        //public bool p_bEnable { get; set; }
 
-        public IAOI NewAOI() { return null; }
+        bool _bEnable = false; 
+        public bool p_bEnable 
+        { 
+            get { return _bEnable; }
+            set
+            {
+                _bEnable = value; 
+            }
+        }
+
+
+        public IAOI NewAOI() 
+        {
+            return new AOI_StripID(p_id, m_log);  
+        }
+
         public void ReAllocate(List<CPoint> aArray) { }
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {
-            //forget
+            m_unit.m_aoiData.Draw(draw, eDraw); 
         }
 
         public ObservableCollection<AOIData> p_aROI { get; set; }
 
         public void ClearActive()
         {
-            throw new System.NotImplementedException();
+            if (m_unit.m_aoiData.p_eROI == AOIData.eROI.Active) m_unit.m_aoiData.p_eROI = AOIData.eROI.Ready; 
         }
 
         public void CalcROICount(ref int nReady, ref int nActive)
         {
-            throw new System.NotImplementedException();
+            switch (m_unit.m_aoiData.p_eROI)
+            {
+                case AOIData.eROI.Ready: nReady++; break;
+                case AOIData.eROI.Active: nActive++; break; 
+            }
         }
 
         public AOIData GetAOIData(AOIData.eROI eROI)
         {
-            throw new System.NotImplementedException();
+            return (m_unit.m_aoiData.p_eROI == eROI) ? m_unit.m_aoiData : null; 
         }
         #endregion
 
         #region Tree
         public void RunTreeAOI(Tree tree)
         {
-            RunTreeUnit(tree.GetTree("UnitID", false, false));
             //RunTreeInspect(tree.GetTree("Inspect", false));
         }
         #endregion
@@ -117,7 +136,7 @@ namespace Root_ASIS.AOI
             p_id = id;
             p_sAOI = id; 
             m_log = log;
-//            InitUnit();
+            InitUnit();
 //            InitResult();
         }
     }

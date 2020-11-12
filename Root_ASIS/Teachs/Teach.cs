@@ -20,11 +20,10 @@ namespace Root_ASIS.Teachs
         void InitListAOI()
         {
             m_aoiStrip = new AOIStrip("AOIStrip", m_log);
-            InitLIstAOIArray(); 
+            InitLIstAOIArray();
 
+            _aAOI.Add(new AOI_StripID("AOI_StripID", m_log));
             _aAOI.Add(new AOI_Unit("AOI_Unit", m_log));
-            //
-            InvalidateListAOI(); 
         }
 
         /// <summary> 활성화된 AOI List </summary>
@@ -85,7 +84,7 @@ namespace Root_ASIS.Teachs
         private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
         {
             if (p_roiActive == null) return;
-            p_roiActive.LBD(bDown, cpImg);
+            p_roiActive.LBD(bDown, cpImg, m_memoryPool.m_viewer.p_memoryData);
             Draw();
             GetActiveROI();
         }
@@ -149,7 +148,7 @@ namespace Root_ASIS.Teachs
             {
                 p_aAOI[n].p_nID = n;
                 p_aAOI[n].p_id = n.ToString("00") + "." + p_aAOI[n].p_sAOI; 
-                p_aAOI[n].RunTreeAOI(tree.GetTree(n, p_aAOI[n].p_id));
+                p_aAOI[n].RunTreeAOI(tree.GetTree(p_aAOI[n].p_id));
             }
         }
         #endregion
@@ -330,7 +329,6 @@ namespace Root_ASIS.Teachs
         void InitTreeSetup()
         {
             m_treeRootSetup = new TreeRoot(m_id + ".Setup", m_log);
-            RunTreeSetup(Tree.eMode.RegRead);
             m_treeRootSetup.UpdateTree += M_treeRootSetup_UpdateTree;
         }
 
@@ -403,6 +401,8 @@ namespace Root_ASIS.Teachs
             m_log = LogView.GetLog(id);
             InitTreeSetup();
             InitListAOI();
+            RunTreeSetup(Tree.eMode.RegRead);
+            InvalidateListAOI();
             InitTreeROI();
             ClearAOI();
             InitTreeAOI();
