@@ -82,7 +82,7 @@ namespace Root.Module
         {
             MemoryData memory = m_memoryPool.m_viewer.p_memoryData;
             if (memory == null) return "MemoryData not Assigned";
-            m_blob.RunBlob(memory, 0, m_roi.m_cp0, m_roi.m_sz, nGV, 0, 10);
+            m_blob.RunBlob(memory, 0, m_roi.p_cp0, m_roi.m_sz, nGV, 0, 10);
             m_blob.RunSort(m_eSort);
             if (m_blob.m_aSort.Count == 0) return "Find Fiducial Error";
             Blob.Island island = m_blob.m_aSort[0];

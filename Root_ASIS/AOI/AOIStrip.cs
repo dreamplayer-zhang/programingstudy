@@ -29,7 +29,7 @@ namespace Root_ASIS.AOI
 
             public Blob.Island RunBlob()
             {
-                m_blob.RunBlob(m_aoi.m_memory, 0, m_aoiData.m_cp0, m_aoiData.m_sz, m_aoi.m_mmGV.X, m_aoi.m_mmGV.Y, 5);
+                m_blob.RunBlob(m_aoi.m_memory, 0, m_aoiData.p_cp0, m_aoiData.m_sz, m_aoi.m_mmGV.X, m_aoi.m_mmGV.Y, 5);
                 m_blob.RunSort(m_aoi.m_eSort);
                 return (m_blob.m_aSort.Count > 0) ? m_blob.m_aSort[0] : null; 
             }
@@ -151,13 +151,18 @@ namespace Root_ASIS.AOI
         {
             m_infoStrip = infoStrip; 
             m_memory = memory;
-            string sInspect = Inspect(eMode.Inspect);
-            if (sInspect == "OK") return sInspect;
-            if (Get_dDistance() >= m_dDistanceError) return "Fiducial Distance Error";
-            SetInfoPos();
             m_infoStrip.p_eResult = InfoStrip.eResult.Rework;
-            m_infoStrip.m_sError = sInspect;
-            return "OK"; 
+            m_infoStrip.m_sError = Inspect(eMode.Inspect);
+            if (m_infoStrip.m_sError == "OK")
+            {
+                m_infoStrip.m_sError = (Get_dDistance() >= m_dDistanceError) ? "Fiducial Distance Error" : "OK";
+                if (m_infoStrip.m_sError == "OK")
+                {
+                    SetInfoPos();
+                    m_infoStrip.p_eResult = InfoStrip.eResult.Xout;
+                }
+            }
+            return m_infoStrip.m_sError; 
         }
 
         InfoStrip m_infoStrip;
@@ -165,7 +170,7 @@ namespace Root_ASIS.AOI
         int m_dDistanceError = 10; 
         string Inspect(eMode eMode)
         {
-            Parallel.For(0, 1, n => { m_aUnit[n].m_sInspect = InspectBlob(eMode, n); });
+            Parallel.For(0, 2, n => { m_aUnit[n].m_sInspect = InspectBlob(eMode, n); });
             foreach (Unit data in m_aUnit)
             {
                 if (data.m_sInspect != "OK") return data.m_sInspect;
@@ -217,6 +222,7 @@ namespace Root_ASIS.AOI
 
         #region IAOI
         public string p_id { get; set; }
+        public string p_sAOI { get; set; }
         public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
         public IAOI NewAOI() { return null; }
@@ -273,6 +279,7 @@ namespace Root_ASIS.AOI
         {
             p_aROI = new ObservableCollection<AOIData>(); 
             p_id = id;
+            p_sAOI = id; 
             m_log = log;
             InitUnit();
             InitResult(); 

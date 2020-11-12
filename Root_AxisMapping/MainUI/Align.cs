@@ -165,7 +165,7 @@ namespace Root_AxisMapping.MainUI
         string InspectBlob(int iAOI)
         {
             Unit data = m_aUnit[iAOI];
-            m_blob.RunBlob(m_memory, 0, data.m_aoiData.m_cp0, data.m_aoiData.m_sz, m_mmGV.X, m_mmGV.Y, 3);
+            m_blob.RunBlob(m_memory, 0, data.m_aoiData.p_cp0, data.m_aoiData.m_sz, m_mmGV.X, m_mmGV.Y, 3);
             m_blob.RunSort(m_eSort);
             if (m_blob.m_aSort.Count == 0) return "Find Fiducial Error";
             Blob.Island island = m_blob.m_aSort[0];

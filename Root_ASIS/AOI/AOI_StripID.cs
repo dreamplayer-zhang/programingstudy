@@ -72,6 +72,7 @@ namespace Root_ASIS.AOI
 
         #region IAOI
         public string p_id { get; set; }
+        public string p_sAOI { get; set; }
         public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
 
@@ -114,6 +115,7 @@ namespace Root_ASIS.AOI
         {
             p_aROI = new ObservableCollection<AOIData>(); 
             p_id = id;
+            p_sAOI = id; 
             m_log = log;
 //            InitUnit();
 //            InitResult();

@@ -114,7 +114,9 @@ namespace Root_ASIS.Teachs
         {
             MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
             draw.Clear();
-            foreach (IAOI aoi in p_aROI) aoi.Draw(draw, p_eDraw);
+            m_aoiStrip.Draw(draw, p_eDraw); 
+            p_aoiArray.Draw(draw, p_eDraw);
+            foreach (IAOI aoi in p_aAOI) aoi.Draw(draw, p_eDraw);
             draw.InvalidDraw();
         }
         #endregion
@@ -145,7 +147,8 @@ namespace Root_ASIS.Teachs
             p_aoiArray.RunTreeAOI(tree.GetTree(p_aoiArray.p_id, true, false)); 
             for (int n = 0; n < p_aAOI.Count; n++)
             {
-                p_aAOI[n].p_nID = n; 
+                p_aAOI[n].p_nID = n;
+                p_aAOI[n].p_id = n.ToString("00") + "." + p_aAOI[n].p_sAOI; 
                 p_aAOI[n].RunTreeAOI(tree.GetTree(n, p_aAOI[n].p_id));
             }
         }
@@ -231,6 +234,7 @@ namespace Root_ASIS.Teachs
         void InitBackgroundWorker()
         {
             m_bgwInspect.DoWork += M_bgwInspect_DoWork;
+            m_bgwInspect.RunWorkerCompleted += M_bgwInspect_RunWorkerCompleted;
         }
 
         private void M_bgwInspect_DoWork(object sender, DoWorkEventArgs e)
@@ -239,6 +243,11 @@ namespace Root_ASIS.Teachs
             m_aoiStrip.Inspect(m_inspectStrip, m_inspectMemory);
             foreach (IAOI aoi in p_aAOI) aoi.Inspect(m_inspectStrip, m_inspectMemory);
             RunTimerInspect(eTimer.After);
+        }
+
+        private void M_bgwInspect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Draw(); 
         }
 
         DispatcherTimer m_timer = new DispatcherTimer(); 

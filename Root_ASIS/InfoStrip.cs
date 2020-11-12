@@ -87,7 +87,7 @@ namespace Root_ASIS
         List<UnitResult> m_aUnitResult = new List<UnitResult>(); 
         public UnitResult GetUnitResult(int iUnit)
         {
-            while (m_aUnitResult.Count < iUnit) m_aUnitResult.Add(new UnitResult(this, m_aUnitResult.Count)); 
+            while (m_aUnitResult.Count <= iUnit) m_aUnitResult.Add(new UnitResult(this, m_aUnitResult.Count)); 
             return m_aUnitResult[iUnit]; 
         }
         #endregion
@@ -105,17 +105,13 @@ namespace Root_ASIS
             m_fSin = Math.Sin(m_fAngle); 
         }
 
-        public AOIData GetInfoPos(AOIData aoiData0)
+        public void CalcIncpectPos(AOIData aoiData)
         {
-            AOIData aoiData1 = aoiData0.Clone();
-            RPoint rpMid = new RPoint(aoiData1.m_cp0 + aoiData1.m_sz);
-            rpMid /= 2;
+            RPoint rpMid = new RPoint(aoiData.p_cp0 + aoiData.m_sz / 2);
             RPoint drp = rpMid - m_rpShift;
             double dx = m_fCos * drp.X - m_fSin * drp.Y + m_rpShift.X - rpMid.X; 
             double dy = m_fCos * drp.Y + m_fSin * drp.X + m_rpShift.Y - rpMid.Y;
-            aoiData1.m_cp0.X += (int)Math.Round(dx);
-            aoiData1.m_cp0.Y += (int)Math.Round(dy);
-            return aoiData1; 
+            aoiData.m_cpInspect = new CPoint((int)Math.Round(aoiData.p_cp0.X + dx), (int)Math.Round(aoiData.p_cp0.Y + dy)); 
         }
         #endregion
 

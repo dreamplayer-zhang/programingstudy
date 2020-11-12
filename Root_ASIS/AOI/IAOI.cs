@@ -10,6 +10,8 @@ namespace Root_ASIS.AOI
     {
         string p_id { get; set; }
 
+        string p_sAOI { get; set; }
+
         int p_nID { get; set; }
 
         bool p_bEnable { get; set; }
