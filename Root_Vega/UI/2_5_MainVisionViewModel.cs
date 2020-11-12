@@ -840,18 +840,21 @@ namespace Root_Vega
 			//TODO : Align과 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
 			System.Drawing.Bitmap bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
 			Emgu.CV.Image<Gray, byte> imgFeature = new Emgu.CV.Image<Gray, byte>(bmp);
-			Emgu.CV.Image<Gray, float> imgLaplaceFeature = imgFeature.Laplace(1);
+			//Emgu.CV.Image<Gray, float> imgLaplaceFeature = imgFeature.Laplace(1);
 
 			CPoint cptCenter = feature.RoiRect.Center();
 			Point ptStart = new Point(cptCenter.X - (feature.FeatureFindArea / 2.0), cptCenter.Y - (feature.FeatureFindArea / 2.0));
 			Point ptEnd = new Point(cptCenter.X + (feature.FeatureFindArea / 2.0), cptCenter.Y + (feature.FeatureFindArea / 2.0));
 			crtSearchArea = new CRect(ptStart, ptEnd);
 			Emgu.CV.Image<Gray, byte> imgSrc = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImagePattern(crtSearchArea));
-			Emgu.CV.Image<Gray, float> imgSrcLaplace = imgSrc.Laplace(1);
-			Emgu.CV.Image<Gray, float> imgResult = imgSrcLaplace.MatchTemplate(imgLaplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
+			//Emgu.CV.Image<Gray, float> imgSrcLaplace = imgSrc.Laplace(1);
+			//Emgu.CV.Image<Gray, float> imgResult = imgSrcLaplace.MatchTemplate(imgLaplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
+			Emgu.CV.Image<Gray, float> imgResult = imgSrc.MatchTemplate(imgFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
 
-			nWidthDiff = imgSrcLaplace.Width - imgResult.Width;
-			nHeightDiff = imgSrcLaplace.Height - imgResult.Height;
+			//nWidthDiff = imgSrcLaplace.Width - imgResult.Width;
+			//nHeightDiff = imgSrcLaplace.Height - imgResult.Height;
+			nWidthDiff = imgSrc.Width - imgResult.Width;
+			nHeightDiff = imgSrc.Height - imgResult.Height;
 
 			float[,,] matches = imgResult.Data;
 
