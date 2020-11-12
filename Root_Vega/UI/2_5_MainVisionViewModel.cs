@@ -148,13 +148,20 @@ namespace Root_Vega
 			m_Engineer.m_recipe.LoadComplete += () =>
 			{
 				SelectedRecipe = m_Engineer.m_recipe;
-				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
-				StripParamList = new ObservableCollection<StripParamData>();
 
 				_SelectedROI = null;
-
 				SelectedParam = new StripParamData();//UI 초기화를 위한 코드
 				SelectedParam = null;
+
+				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
+				SelectedROI = p_PatternRoiList.FirstOrDefault();
+
+				if (SelectedROI != null)
+				{
+					StripParamList = new ObservableCollection<StripParamData>(SelectedROI.Strip.ParameterList);
+					p_PatternReferenceList = new ObservableCollection<Reference>(SelectedROI.Position.ReferenceList);
+					p_PatternAlignList = new ObservableCollection<AlignData>(SelectedROI.Position.AlignList);
+				}
 			};
 		}
 
@@ -195,13 +202,9 @@ namespace Root_Vega
 			get { return _SelectedROI; }
 			set
 			{
-				SetProperty(ref _SelectedROI, value);
-
 				if (value != null)
 				{
-					StripParamList = new ObservableCollection<StripParamData>(value.Strip.ParameterList);
-					p_PatternReferenceList = new ObservableCollection<Reference>(value.Position.ReferenceList);
-					p_PatternAlignList = new ObservableCollection<AlignData>(value.Position.AlignList);
+					SetProperty(ref _SelectedROI, value);
 				}
 			}
 		}
@@ -530,8 +533,9 @@ namespace Root_Vega
 			ptDst[2] = new System.Drawing.PointF(400, 250);
 
 			Emgu.CV.Mat matAffine = Emgu.CV.CvInvoke.GetAffineTransform(ptSrc, ptDst);
+
 			float[] Coef = GetAffineArrayFromMat(matAffine);
-			
+
 			DrawCross(new DPoint((int)ptSrc[0].X, (int)ptSrc[0].Y), MBrushes.Red);
 			DrawCross(new DPoint((int)ptSrc[1].X, (int)ptSrc[1].Y), MBrushes.Red);
 			DrawCross(new DPoint((int)ptSrc[2].X, (int)ptSrc[2].Y), MBrushes.Red);
@@ -548,14 +552,14 @@ namespace Root_Vega
 
 			System.Drawing.PointF ptTest;
 			System.Drawing.PointF ptRst;
-			for(int n = 0; n<10; n++)
+			for (int n = 0; n < 10; n++)
 			{
 				ptTest = new System.Drawing.PointF(100, 100 + n * 10);
 				ptRst = AffineTransform(ptTest, Coef);
 				DrawCross(new DPoint((int)ptTest.X, (int)ptTest.Y), MBrushes.Green);
 				DrawCross(new DPoint((int)ptRst.X, (int)ptRst.Y), MBrushes.Orange);
 			}
-			
+
 			return;
 		}
 		//-----------------------------------------------------------------
@@ -620,7 +624,7 @@ namespace Root_Vega
 			p_InformationDrawer.Redrawing();
 		}
 
-		
+
 
 		public void _startInsp()
 		{
@@ -647,8 +651,8 @@ namespace Root_Vega
 					int nRefStartOffsetX = 0;
 					int nRefStartOffsetY = 0;
 
-                    #region Feature
-                    foreach (var feature in roiCurrent.Position.ReferenceList)
+					#region Feature
+					foreach (var feature in roiCurrent.Position.ReferenceList)
 					{
 						bool bFoundFeature = false;
 						CRect crtSearchArea;
@@ -672,11 +676,11 @@ namespace Root_Vega
 							continue;//못 찾았으면 다음 Feature값으로 이동
 						}
 					}
-                    #endregion
+					#endregion
 
-                    #region Align Key
-                    //3. 등록된 Align Key 3개를 탐색한다. feature의 위치 정보도 참조하여 회전 보정 시에 들어갈 값을 준비해둔다
-                    List<CPoint> alignKeyList = new List<CPoint>();
+					#region Align Key
+					//3. 등록된 Align Key 3개를 탐색한다. feature의 위치 정보도 참조하여 회전 보정 시에 들어갈 값을 준비해둔다
+					List<CPoint> alignKeyList = new List<CPoint>();
 
 					if (roiCurrent.Position.AlignList.Count == 3)
 					{
@@ -741,10 +745,10 @@ namespace Root_Vega
 					{
 						//align 탐색 성공. 좌표 보정 계산 시작
 					}
-                    #endregion
+					#endregion
 
-                    //4. 저장된 좌표를 기준으로 PatternDistX, PatternDistY만큼 더한다. 이 좌표가 Start Position이 된다
-                    var startPos = new Point(cptStandard.X + nRefStartOffsetX, cptStandard.Y + nRefStartOffsetY);
+					//4. 저장된 좌표를 기준으로 PatternDistX, PatternDistY만큼 더한다. 이 좌표가 Start Position이 된다
+					var startPos = new Point(cptStandard.X + nRefStartOffsetX, cptStandard.Y + nRefStartOffsetY);
 					//5. Start Position에 InspAreaWidth와 InspAreaHeight만큼 더해준다. 이 좌표가 End Position이 된다
 					var endPos = new Point(startPos.X + (int)roiCurrent.Strip.ParameterList[j].InspAreaWidth, startPos.Y + (int)roiCurrent.Strip.ParameterList[j].InspAreaHeight);
 					//6. Start Postiion과 End Position, Inspection Offset을 이용하여 검사 영역을 생성한다. 우선은 일괄 생성을 대상으로 한다
@@ -788,17 +792,17 @@ namespace Root_Vega
 		}
 
 		public CRect GetOverlapedRect(CRect crtFirst, CRect crtSecond)
-        {
+		{
 			System.Drawing.Rectangle rtFirst = new System.Drawing.Rectangle(crtFirst.Left, crtFirst.Top, crtFirst.Width, crtFirst.Height);
 			System.Drawing.Rectangle rtSecond = new System.Drawing.Rectangle(crtSecond.Left, crtSecond.Top, crtSecond.Width, crtSecond.Height);
 			System.Drawing.Rectangle rtResult = System.Drawing.Rectangle.Intersect(rtFirst, rtSecond);
 			CRect crtResult = new CRect(rtResult.Left, rtResult.Top, rtResult.Right, rtResult.Bottom);
-			
+
 			return crtResult;
-        }
+		}
 
 		public bool IsFeatureScanned(int nMemoryOffset, int nCamWidth)
-        {
+		{
 			// variable
 			CRect crtSearchArea;
 			CPoint cptCenter;
@@ -813,17 +817,17 @@ namespace Root_Vega
 					var roiCurrent = p_PatternRoiList[k];
 					for (int j = 0; j < roiCurrent.Strip.ParameterList.Count; j++)
 					{
-						foreach(var feature in roiCurrent.Position.ReferenceList)
-                        {
+						foreach (var feature in roiCurrent.Position.ReferenceList)
+						{
 							cptCenter = feature.RoiRect.Center();
 							ptStart = new Point(cptCenter.X - (feature.FeatureFindArea / 2.0), cptCenter.Y - (feature.FeatureFindArea / 2.0));
 							ptEnd = new Point(cptCenter.X + (feature.FeatureFindArea / 2.0), cptCenter.Y + (feature.FeatureFindArea / 2.0));
 							crtSearchArea = new CRect(ptStart, ptEnd);
 							if (crtSearchArea.Right < (nMemoryOffset + nCamWidth))
-                            {
+							{
 								return true;
-                            }
-                        }
+							}
+						}
 					}
 				}
 			}
@@ -943,7 +947,7 @@ namespace Root_Vega
 
 			if (p_AlignFeatureDrawer.m_ListRect.Count >= 1 && p_AlignFeatureDrawer.m_ListRect.Count <= 3)
 			{
-				for (int i = 0; i< p_AlignFeatureDrawer.m_ListRect.Count; i++)
+				for (int i = 0; i < p_AlignFeatureDrawer.m_ListRect.Count; i++)
 				{
 					var featureArea = p_AlignFeatureDrawer.m_ListRect[i];
 					var featureRect = new CRect(featureArea.StartPos, featureArea.EndPos);
@@ -970,12 +974,12 @@ namespace Root_Vega
 		{
 			if ((App.m_engineer.m_recipe.Loaded) && (App.m_engineer.m_recipe.VegaRecipeData.RoiList.Count > 0))
 				SelectedROI = App.m_engineer.m_recipe.VegaRecipeData.RoiList[0];
-			else 
+			else
 				return;
 
 			Roi roi = SelectedROI;
 			List<CPoint> lstAlignKeyCPoint = new List<CPoint>();
-			for (int j = 0; j<roi.Position.AlignList.Count; j++)
+			for (int j = 0; j < roi.Position.AlignList.Count; j++)
 			{
 				AlignData alignData = roi.Position.AlignList[j];
 				bool bFoundFeature = false;
@@ -1235,7 +1239,7 @@ namespace Root_Vega
 		//}
 		private void _btnInspDone()
 		{
-			
+
 		}
 		//private void _btnNextSnap()
 		//{
@@ -1255,7 +1259,7 @@ namespace Root_Vega
 		//	currentSnap++;//한줄 추가
 		//	m_Engineer.m_InspManager.StartInspection(nDefectCode, m_Image.p_Size.X, m_Image.p_Size.Y);
 		//}
-		
+
 		#endregion
 
 
