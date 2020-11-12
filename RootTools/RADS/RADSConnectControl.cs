@@ -113,71 +113,95 @@ namespace RootTools.RADS
 			IPEndPoint from = new IPEndPoint(0, 0);
 			while (true)
 			{
-				var echoBuffer = listen.Receive(ref from);
-				var ADSCP_Type = echoBuffer[0].ToString("X2") + echoBuffer[1].ToString("X2");
-				var ADSCP_Opcode = echoBuffer[2].ToString("X2") + echoBuffer[3].ToString("X2");
-				var ADSCP_Length = echoBuffer[4].ToString("X2") + echoBuffer[5].ToString("X2");
-				int ADSCP_seqNumber = (int)uint.Parse(echoBuffer[6].ToString("X2") + echoBuffer[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-				int ADSCP_address = (int)uint.Parse(echoBuffer[8].ToString("X2") + echoBuffer[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-				int ADSCP_value = (int)uint.Parse(echoBuffer[10].ToString("X2") + echoBuffer[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-
-				Console.WriteLine("Response IP Address : {0}", from);
-				Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
-					ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
-
-				if (ADSCP_Type == "0000" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_PONG) //Controller Discovery Pong!
+				//Receive가 중복해서 여러개 날아오기 때문에 어쩔 수 없음
+				//var echoBuffer = listen.Receive(ref from);
+				var asyncResult = listen.BeginReceive(null, null);
+				asyncResult.AsyncWaitHandle.WaitOne(1000);
+				if (asyncResult.IsCompleted)
 				{
-					byte[] controller_ip = new byte[4];
-					byte[] controller_mac = new byte[6];
-					byte[] controller_name = new byte[10];
-
-					for (int i = 0; i < 10; i++)
+					try
 					{
-						controller_name[i] = echoBuffer[i + 8];
-						if (i < 6) { controller_mac[i] = echoBuffer[i + 18]; }
-						if (i < 4) { controller_ip[i] = echoBuffer[i + 24]; }
+						IPEndPoint remoteEP = null;
+						byte[] echoBuffer = listen.EndReceive(asyncResult, ref remoteEP);
+						// EndReceive worked and we have received data and remote endpoint
+
+						var ADSCP_Type = echoBuffer[0].ToString("X2") + echoBuffer[1].ToString("X2");
+						var ADSCP_Opcode = echoBuffer[2].ToString("X2") + echoBuffer[3].ToString("X2");
+						var ADSCP_Length = echoBuffer[4].ToString("X2") + echoBuffer[5].ToString("X2");
+						int ADSCP_seqNumber = (int)uint.Parse(echoBuffer[6].ToString("X2") + echoBuffer[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+						int ADSCP_address = (int)uint.Parse(echoBuffer[8].ToString("X2") + echoBuffer[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+						int ADSCP_value = (int)uint.Parse(echoBuffer[10].ToString("X2") + echoBuffer[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+
+						Console.WriteLine("Response IP Address : {0}", from);
+						Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
+							ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
+
+						if (ADSCP_Type == "0000" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_PONG) //Controller Discovery Pong!
+						{
+							byte[] controller_ip = new byte[4];
+							byte[] controller_mac = new byte[6];
+							byte[] controller_name = new byte[10];
+
+							for (int i = 0; i < 10; i++)
+							{
+								controller_name[i] = echoBuffer[i + 8];
+								if (i < 6) { controller_mac[i] = echoBuffer[i + 18]; }
+								if (i < 4) { controller_ip[i] = echoBuffer[i + 24]; }
+							}
+							var MAC = controller_mac[0].ToString("X2") + ":" + controller_mac[1].ToString("X2") + ":" + controller_mac[2].ToString("X2") + ":" + (controller_mac[3]).ToString("X2") + ":" + (controller_mac[4]).ToString("X2") + ":" + (controller_mac[5]).ToString("X2");
+
+							RADS controller = new RADS();
+							controller.ADSCP_Type = ADSCP_Type;
+							controller.ADSCP_Opcode = ADSCP_Opcode;
+							controller.ADSCP_Length = ADSCP_Length;
+							controller.RawName = controller_name;
+							controller.p_MAC = MAC;
+							controller.p_IP = new IPAddress(controller_ip);
+
+							if (listen != null)
+							{
+								listen.Close();
+								listen = null;
+							}
+							//	GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
+
+							p_CurrentController = controller;
+
+							Console.WriteLine("Find Controller. Controller Info : ");
+							Console.WriteLine(p_CurrentController.GetInformation());
+
+							Console.WriteLine("Start Read Registry");
+
+							ReadPacket(0);
+							ReadPacket(1);
+							ReadPacket(2);
+							ReadPacket(3);
+							ReadPacket(4);
+							ReadPacket(5);
+							//6,7번은 어디로갔을깡...
+							ReadPacket(8);
+							ReadPacket(9);
+							//Console.WriteLine("Read Registry Finish");
+
+							//UPDATE 시점이 맞지 않음. ChangeRegistry 모든 flag가 완료되었을때 이 이벤트가 발생하도록 처리해야할 필요가 있음
+							//if (SearchComplete != null)
+							//{
+							//	SearchComplete();
+							//}
+							break;
+						}
 					}
-					var MAC = controller_mac[0].ToString("X2") + ":" + controller_mac[1].ToString("X2") + ":" + controller_mac[2].ToString("X2") + ":" + (controller_mac[3]).ToString("X2") + ":" + (controller_mac[4]).ToString("X2") + ":" + (controller_mac[5]).ToString("X2");
-
-					RADS controller = new RADS();
-					controller.ADSCP_Type = ADSCP_Type;
-					controller.ADSCP_Opcode = ADSCP_Opcode;
-					controller.ADSCP_Length = ADSCP_Length;
-					controller.RawName = controller_name;
-					controller.p_MAC = MAC;
-					controller.p_IP = new IPAddress(controller_ip);
-
-					if (listen != null)
+					catch (Exception ex)
 					{
-						listen.Close();
-						listen = null;
+						// EndReceive failed and we ended up here
+						Console.WriteLine(ex.Message);
 					}
-					//	GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
-
-					p_CurrentController = controller;
-
-					Console.WriteLine("Find Controller. Controller Info : ");
-					Console.WriteLine(p_CurrentController.GetInformation());
-
-					Console.WriteLine("Start Read Registry");
-
-					ReadPacket(0);
-					ReadPacket(1);
-					ReadPacket(2);
-					ReadPacket(3);
-					ReadPacket(4);
-					ReadPacket(5);
-					//6,7번은 어디로갔을깡...
-					ReadPacket(8);
-					ReadPacket(9);
-					Console.WriteLine("Read Registry Finish");
-
-
-					if (SearchComplete != null)
-					{
-						SearchComplete();
-					}
-					break;
+				}
+				else
+				{
+					// The operation wasn't completed before the timeout and we're off the hook
+					//정 안되면 아래쪽 주석을 살리기...
+					//GetDeviceInfo();
 				}
 			}
 		}
