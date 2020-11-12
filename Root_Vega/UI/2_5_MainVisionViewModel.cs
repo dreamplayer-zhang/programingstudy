@@ -515,7 +515,9 @@ namespace Root_Vega
 
 		}
 
-		public void Test()
+        #region AffineTransform
+		//-----------------------------------------------------------------
+        public void Test()
 		{
 			System.Drawing.PointF[] ptSrc = new System.Drawing.PointF[3];
 			ptSrc[0] = new System.Drawing.PointF(50, 50);
@@ -528,18 +530,7 @@ namespace Root_Vega
 			ptDst[2] = new System.Drawing.PointF(400, 250);
 
 			Emgu.CV.Mat matAffine = Emgu.CV.CvInvoke.GetAffineTransform(ptSrc, ptDst);
-			var data = matAffine.GetData();
-			float[] Coef = new float[matAffine.Width * matAffine.Height];
-			int k = 0;
-			for (int i = 0; i<matAffine.Height; i++)
-			{
-				for (int j = 0; j<matAffine.Width; j++)
-				{
-					double dTemp = (double)data.GetValue(i, j);
-					Coef[k] = (float)dTemp;
-					k++;
-				}
-			}
+			float[] Coef = GetAffineArrayFromMat(matAffine);
 			
 			DrawCross(new DPoint((int)ptSrc[0].X, (int)ptSrc[0].Y), MBrushes.Red);
 			DrawCross(new DPoint((int)ptSrc[1].X, (int)ptSrc[1].Y), MBrushes.Red);
@@ -567,7 +558,7 @@ namespace Root_Vega
 			
 			return;
 		}
-
+		//-----------------------------------------------------------------
 		System.Drawing.PointF AffineTransform(System.Drawing.PointF ptSrc, float[] Coef)
 		{
 			System.Drawing.PointF ptRst = new System.Drawing.PointF();
@@ -575,6 +566,25 @@ namespace Root_Vega
 			ptRst.Y = (int)Math.Ceiling(ptSrc.X * Coef[3] + ptSrc.Y * Coef[4] + Coef[5]);
 			return ptRst;
 		}
+		//-----------------------------------------------------------------
+		float[] GetAffineArrayFromMat(Emgu.CV.Mat matAffine)
+        {
+			var data = matAffine.GetData();
+			float[] Coef = new float[matAffine.Width * matAffine.Height];
+			int k = 0;
+			for (int i = 0; i<matAffine.Height; i++)
+            {
+				for (int j = 0; j<matAffine.Width; j++)
+                {
+					double dTemp = (double)data.GetValue(i, j);
+					Coef[k] = (float)dTemp;
+					k++;
+                }
+            }
+			return Coef;
+        }
+		//-----------------------------------------------------------------
+		#endregion
 
 		public void _clearInspReslut()
 		{
@@ -722,9 +732,10 @@ namespace Root_Vega
 						}
 					}
 					//TODO : 회전보정은 나중에하기
-					if (alignKeyList.Count != 2)
+					if (alignKeyList.Count != 3)
 					{
 						//align 실패. 에러를 띄우거나 회전 좌표 보정을 하지 않음
+						
 					}
 					else
 					{
