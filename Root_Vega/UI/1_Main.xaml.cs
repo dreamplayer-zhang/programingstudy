@@ -107,7 +107,9 @@ namespace Root_Vega
 
         bool IsRunModule(ModuleBase module)
         {
-            return (module.p_eState == ModuleBase.eState.Run) || (module.p_eState == ModuleBase.eState.Home); 
+            if (module.p_eState == ModuleBase.eState.Run) return true; 
+            if (module.p_eState == ModuleBase.eState.Home) return true; 
+            return (module.m_qModuleRun.Count > 0);
         }
 
         private void buttonInitialization_Click(object sender, RoutedEventArgs e)
