@@ -121,7 +121,7 @@ namespace Root_AxisMapping.MainUI
         private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
         {
             if (p_roiActive == null) return;
-            p_roiActive.LBD(bDown, cpImg);
+            p_roiActive.LBD(bDown, cpImg, m_memoryPool.m_viewer.p_memoryData);
             Draw(AOIData.eDraw.ROI);
             GetActineROI();
         }
@@ -165,7 +165,7 @@ namespace Root_AxisMapping.MainUI
         string InspectBlob(int iAOI)
         {
             Unit data = m_aUnit[iAOI];
-            m_blob.RunBlob(m_memory, 0, data.m_aoiData.m_cp0, data.m_aoiData.m_sz, m_mmGV.X, m_mmGV.Y, 3);
+            m_blob.RunBlob(m_memory, 0, data.m_aoiData.p_cp0, data.m_aoiData.m_sz, m_mmGV.X, m_mmGV.Y, 3);
             m_blob.RunSort(m_eSort);
             if (m_blob.m_aSort.Count == 0) return "Find Fiducial Error";
             Blob.Island island = m_blob.m_aSort[0];

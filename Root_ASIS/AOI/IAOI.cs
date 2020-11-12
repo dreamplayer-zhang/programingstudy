@@ -10,6 +10,8 @@ namespace Root_ASIS.AOI
     {
         string p_id { get; set; }
 
+        string p_sAOI { get; set; }
+
         int p_nID { get; set; }
 
         bool p_bEnable { get; set; }
@@ -27,6 +29,8 @@ namespace Root_ASIS.AOI
         void CalcROICount(ref int nReady, ref int nActive);
 
         AOIData GetAOIData(AOIData.eROI eROI);
+
+        string Setup(MemoryData memory); 
 
         string BeforeInspect(InfoStrip infoStrip, MemoryData memory); 
 

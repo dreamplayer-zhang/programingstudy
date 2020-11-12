@@ -103,11 +103,11 @@ namespace Root_ASIS.AOI
 
         public void ReAllocate(List<CPoint> aArray)
         {
-            CPoint cp0 = m_unit.m_aoiData.m_cp0;
+            CPoint cp0 = m_unit.m_aoiData.p_cp0;
             InitUnit(null); 
             for (int n = 0; n < Math.Min(aArray.Count, m_aUnit.Count); n++)
             {
-                m_aUnit[n].m_aoiData.m_cp0 = cp0 + aArray[n]; 
+                m_aUnit[n].m_aoiData.p_cp0 = cp0 + aArray[n]; 
             }
         }
 
@@ -116,7 +116,7 @@ namespace Root_ASIS.AOI
             switch (eDraw)
             {
                 case AOIData.eDraw.ROI: m_unit.m_aoiData.Draw(draw, eDraw); break;
-                default:foreach (Unit unit in m_aUnit) unit.m_aoiData.Draw(draw, eDraw); break;
+                default: foreach (Unit unit in m_aUnit) unit.m_aoiData.Draw(draw, eDraw); break;
             }
         }
 
@@ -153,12 +153,17 @@ namespace Root_ASIS.AOI
         #endregion
 
         #region Inspect
-        public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+        public string Setup(MemoryData memory) { return "OK"; }
+        
+        public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) 
+        {
+            InitUnit(infoStrip);
+            return "OK"; 
+        }
+
         public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
 
-
         InfoStrip.UnitResult.eLogic m_eLogic = InfoStrip.UnitResult.eLogic.Or; 
-
         const int c_lInspect = 24;
         Blob[] m_aBlob = new Blob[c_lInspect]; 
         void InitInspect()
@@ -173,7 +178,6 @@ namespace Root_ASIS.AOI
             m_infoStrip = infoStrip;
             m_memory = memory;
             if (infoStrip.p_eResult != InfoStrip.eResult.Xout) return "OK";
-            InitUnit(infoStrip); 
             Parallel.For(0, c_lInspect, iAOI => { Inspect(iAOI); });
             return "OK"; 
         }
@@ -194,8 +198,8 @@ namespace Root_ASIS.AOI
         string Inspect(Unit unit, Blob blob)
         {
             if (unit.m_aoiData.m_bEnable == false) return "OK";
-            AOIData aoiData = m_infoStrip.GetInfoPos(unit.m_aoiData);
-            blob.RunBlob(m_memory, 0, aoiData.m_cp0, m_sz, m_mmGV.X, m_mmGV.Y, 3);
+            m_infoStrip.CalcIncpectPos(unit.m_aoiData);
+            blob.RunBlob(m_memory, 0, unit.m_aoiData.m_cpInspect, m_sz, m_mmGV.X, m_mmGV.Y, 10);
             blob.RunSort(m_eSort);
             if (blob.m_aSort.Count == 0) return "Find Fiducial Error";
             Blob.Island island = blob.m_aSort[0];
@@ -223,7 +227,25 @@ namespace Root_ASIS.AOI
         }
         #endregion
 
-        public string p_id { get; set; }
+        string _id = "";
+        public string p_id 
+        { 
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (m_unit != null)
+                {
+                    m_unit.p_id = value;
+                    for (int n = 0; n < m_aUnit.Count; n++)
+                    {
+                        m_aUnit[n].p_id = p_id + "." + n.ToString("000");
+                    }
+                }
+            }
+        }
+
+        public string p_sAOI { get; set; }
         public int p_nID { get; set; }
 
         Log m_log;
@@ -231,6 +253,7 @@ namespace Root_ASIS.AOI
         {
             p_aROI = new ObservableCollection<AOIData>();
             p_id = id;
+            p_sAOI = id; 
             m_log = log;
             p_bEnable = true;
             m_unit = new Unit(p_id, this, m_sz);

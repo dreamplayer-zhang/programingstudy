@@ -49,7 +49,8 @@ namespace Root_AxisMapping.Module
 
         void RunTreeMemory(Tree tree)
         {
-            m_szGrab = tree.Set(m_szGrab, m_szGrab, "Grab Size", "Dalsa Grab Size (pixel)");
+            m_szGrab = tree.Set(m_szGrab, m_szGrab, "Grab Size", "Dalsa Grab Silze (pixel)");
+            if (m_szGrab != m_memoryGrab.p_sz) m_memoryGrab.p_sz = m_szGrab; //LYJ 201109
         }
         #endregion
 
@@ -160,13 +161,15 @@ namespace Root_AxisMapping.Module
             }
             public double m_xStart = 0;
             double m_zStart = 0;
-            double m_dyAcc = 3; 
+            double m_dyAcc = 3;
+            double m_vGrab = 100;
             public override ModuleRunBase Clone()
             {
                 Run_Grab run = new Run_Grab(m_module);
                 run.p_trigger = p_trigger.Clone();
                 run.m_xStart = m_xStart;
                 run.m_zStart = m_zStart;
+                run.m_vGrab = m_vGrab;
                 run.m_dyAcc = m_dyAcc; 
                 return run;
             }
@@ -175,6 +178,7 @@ namespace Root_AxisMapping.Module
             {
                 m_xStart = tree.Set(m_xStart, m_xStart, "X", "Axis X Position (Unit)", bVisible);
                 m_zStart = tree.Set(m_zStart, m_zStart, "Z", "Axis X Position (Unit)", bVisible);
+                m_vGrab = tree.Set(m_vGrab, m_vGrab, "V", "Axis X Position (Unit)", bVisible);
                 m_dyAcc = tree.Set(m_dyAcc, m_dyAcc, "dY Acc", "Axis Y Acc Length (Unit)", bVisible); 
                 p_trigger.RunTree(tree.GetTree("Trigger", true, bVisible), p_axisY.m_sUnit, bVisible);
             }
@@ -190,7 +194,7 @@ namespace Root_AxisMapping.Module
                 int nLine = (int)Math.Round((p_trigger.m_aPos[1] - p_trigger.m_aPos[0]) / p_trigger.m_dPos);
                 if (m_module.Run(p_cam.StartGrab(new CPoint(), nLine))) return p_sInfo; 
                 double y1 = p_trigger.m_aPos[1] + m_dyAcc;
-                if (m_module.Run(p_axisY.StartMove(y1))) return p_sInfo;
+                if (m_module.Run(p_axisY.StartMove(y1, m_vGrab))) return p_sInfo;
                 if (m_module.Run(p_axisY.WaitReady())) return p_sInfo;
                 p_axisY.RunTrigger(false); 
                 if (p_cam.p_bOnGrab) return "Dalsa Camera Grab not Finished"; 
