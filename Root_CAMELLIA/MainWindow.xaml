@@ -104,7 +104,7 @@
                         Height="40" Width="60" Margin="5" Click="Button_Click_1">
                 </Button>
                 <Button Content="Engineer" VerticalAlignment="Center"
-                        Height="40" Width="60" Margin="5"/>
+                        Height="40" Width="60" Margin="5" Click="Button_Click_2"/>
             </StackPanel>
             <Grid Grid.Column="1">
                 <TextBlock x:Name="tbTime"

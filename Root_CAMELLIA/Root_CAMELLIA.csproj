@@ -93,6 +93,12 @@
     <Compile Include="Data\PresetData.cs" />
     <Compile Include="Data\RecipeDataManager.cs" />
     <Compile Include="Data\RecipeData.cs" />
+    <Compile Include="Dlg_Engineer.xaml.cs">
+      <DependentUpon>Dlg_Engineer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dlg_PM.xaml.cs">
+      <DependentUpon>Dlg_PM.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GeneralFunction.cs" />
     <Compile Include="ShapeDraw\Arc.cs" />
     <Compile Include="ShapeDraw\Circle.cs" />
@@ -100,6 +106,14 @@
     <Compile Include="ShapeDraw\Line.cs" />
     <Compile Include="ShapeDraw\Polygon.cs" />
     <Compile Include="ShapeDraw\DrawGeometryManager.cs" />
+    <Page Include="Dlg_Engineer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dlg_PM.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dlg_RecipeManger.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

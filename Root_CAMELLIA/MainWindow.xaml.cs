@@ -156,5 +156,11 @@ namespace Root_CAMELLIA
 
 
         }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            Dlg_Engineer engineer = new Dlg_Engineer();
+            engineer.ShowDialog();
+        }
     }
 }
