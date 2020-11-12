@@ -1,15 +1,9 @@
 ﻿using Root_ASIS.AOI;
 using RootTools;
 using RootTools.Camera.BaslerPylon;
-using RootTools.Control;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Root.Module
 {
