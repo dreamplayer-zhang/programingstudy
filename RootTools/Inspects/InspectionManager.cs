@@ -39,10 +39,10 @@ namespace RootTools.Inspects
 		Inspection[] InsepctionThread;
 		StopWatch sw;
 
-		int nThreadNum = 10;
+		int nThreadNum = 20;
 		public int nInspectionCount = 0;
-		int ImageWidth = 640;
-		int ImageHeight = 480;
+		int ImageWidth = 320;
+		int ImageHeight = 240;
 		public ToolBox m_toolBox;
 
 
@@ -74,25 +74,19 @@ namespace RootTools.Inspects
 
 			IsInitialized = true;
 
-			if (0 < GetWaitQueue())
-			{
-				if (GetWaitQueue() < nThreadNum)
-				{
-					nThreadNum = GetWaitQueue();
-				}
-				inspThread = new Thread(DoInspection);
+            inspThread = new Thread(DoInspection);
 
-				//if (inspThread != null)
-				//{
-				//	if (inspThread.IsAlive)
-				//	{
-				//		inspThread.Abort();
-				//	}
-				//}
-				inspThread.Start();
-			}
-		}
-		public void DoInspection()
+            //if (inspThread != null)
+            //{
+            //	if (inspThread.IsAlive)
+            //	{
+            //		inspThread.Abort();
+            //	}
+            //}
+            inspThread.Start();
+
+        }
+        public void DoInspection()
 		{
 			if (!IsInitialized)
 				return;
