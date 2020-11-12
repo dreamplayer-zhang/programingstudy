@@ -5,6 +5,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 
 namespace Root_ASIS.AOI
 {
@@ -44,13 +45,84 @@ namespace Root_ASIS.AOI
         {
             m_unit = new UnitID(p_id, this); 
         }
+
+        void RunTreeUnit(Tree tree)
+        {
+            m_unit.RunTree(tree.GetTree(m_unit.m_id));
+        }
+        #endregion
+
+        #region ROI
+        byte[] m_aReference = null;
+        public string Setup(MemoryData memory)
+        {
+            CPoint cp0 = m_unit.m_aoiData.p_cp0; 
+            CPoint sz = m_unit.m_sz; 
+            m_aReference = new byte[sz.Y * sz.X]; 
+            for (int y = 0; y < sz.Y; y++)
+            {
+                IntPtr ip = memory.GetPtr(0, cp0.X, cp0.Y + y);
+                Marshal.Copy(ip, m_aReference, y * sz.X, sz.X); 
+            }
+            m_aROI.Clear();
+            SetupROI(cp0, 0, m_mmGV.X, (m_mmGV.Y == 0) ? 255 : m_mmGV.Y); 
+            return "OK"; 
+        }
+
+        List<AOIData> m_aROI = new List<AOIData>(); 
+        void SetupROI(CPoint cp0, int x, int nGV0, int nGV1)
+        {
+            while ((x < m_unit.m_sz.X) && (CalcCount(x, nGV0, nGV1) == 0)) x++;
+            int x0 = x;
+            while ((x < m_unit.m_sz.X) && (CalcCount(x, nGV0, nGV1) > 0)) x++;
+            int x1 = x;
+            if (x >= m_unit.m_sz.X) return;
+            int y0 = m_unit.m_sz.Y;
+            int y1 = 0;
+            int nSize = 0; 
+            for (int y = 0; y < m_unit.m_sz.Y; y++)
+            {
+                int nCount = CalcCount(y, x0, x1, nGV0, nGV1);
+                nSize += nCount; 
+                if (nCount > 0)
+                {
+                    if (y0 > y) y0 = y;
+                    if (y1 < y) y1 = y; 
+                }
+            }
+            if (nSize > m_minSize)
+            {
+                AOIData aoi = new AOIData(p_id + m_aROI.Count.ToString("00"), new CPoint(x1 - x0 + 1, y1 - y0 + 1));
+                aoi.p_cp0 = new CPoint(x0, y0); 
+                m_aROI.Add(aoi); 
+            }
+            SetupROI(cp0, x1, nGV0, nGV1); 
+        }
+
+        int CalcCount(int x, int nGV0, int nGV1)
+        {
+            int nCount = 0; 
+            for (int y = 0; y < m_unit.m_sz.Y; y++, x += m_unit.m_sz.X)
+            {
+                if ((m_aReference[x] > nGV0) && (m_aReference[x] <= nGV1)) nCount++; 
+            }
+            return nCount; 
+        }
+
+        int CalcCount(int y, int x0, int x1, int nGV0, int nGV1)
+        {
+            int nCount = 0; 
+            for (int x = x0, p = (x0 + y * m_unit.m_sz.X); x <= x1; x++, p++)
+            {
+                if ((m_aReference[p] > nGV0) && (m_aReference[p] <= nGV1)) nCount++;
+            }
+            return nCount; 
+        }
         #endregion
 
         #region Inspect
-        public string Setup(MemoryData memory)
-        {
-            return "OK"; 
-        }
+        CPoint m_mmGV = new CPoint(160, 0);
+        int m_minSize = 20;
 
         public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
 
@@ -60,6 +132,12 @@ namespace Root_ASIS.AOI
         }
 
         public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+
+        void RunTreeInspect(Tree tree)
+        {
+            m_mmGV = tree.Set(m_mmGV, m_mmGV, "GV", "Gray Value Range (0~255)");
+            m_minSize = tree.Set(m_minSize, m_minSize, "Min Size", "Minimum Size (Pixel)"); 
+        }
         #endregion
 
         #region IAOI
@@ -75,18 +153,7 @@ namespace Root_ASIS.AOI
         }
         public string p_sAOI { get; set; }
         public int p_nID { get; set; }
-        //public bool p_bEnable { get; set; }
-
-        bool _bEnable = false; 
-        public bool p_bEnable 
-        { 
-            get { return _bEnable; }
-            set
-            {
-                _bEnable = value; 
-            }
-        }
-
+        public bool p_bEnable { get; set; }
 
         public IAOI NewAOI() 
         {
@@ -125,7 +192,8 @@ namespace Root_ASIS.AOI
         #region Tree
         public void RunTreeAOI(Tree tree)
         {
-            //RunTreeInspect(tree.GetTree("Inspect", false));
+            RunTreeUnit(tree.GetTree("Unit", false, false));
+            RunTreeInspect(tree);
         }
         #endregion
 
