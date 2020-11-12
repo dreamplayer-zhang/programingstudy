@@ -148,13 +148,20 @@ namespace Root_Vega
 			m_Engineer.m_recipe.LoadComplete += () =>
 			{
 				SelectedRecipe = m_Engineer.m_recipe;
-				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
-				StripParamList = new ObservableCollection<StripParamData>();
 
 				_SelectedROI = null;
-
 				SelectedParam = new StripParamData();//UI 초기화를 위한 코드
 				SelectedParam = null;
+
+				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
+				SelectedROI = p_PatternRoiList.FirstOrDefault();
+
+				if(SelectedROI != null)
+				{
+				StripParamList = new ObservableCollection<StripParamData>(SelectedROI.Strip.ParameterList);
+				p_PatternReferenceList = new ObservableCollection<Reference>(SelectedROI.Position.ReferenceList);
+				p_PatternAlignList = new ObservableCollection<AlignData>(SelectedROI.Position.AlignList);
+				}
 			};
 		}
 
@@ -195,13 +202,9 @@ namespace Root_Vega
 			get { return _SelectedROI; }
 			set
 			{
-				SetProperty(ref _SelectedROI, value);
-
 				if (value != null)
 				{
-					StripParamList = new ObservableCollection<StripParamData>(value.Strip.ParameterList);
-					p_PatternReferenceList = new ObservableCollection<Reference>(value.Position.ReferenceList);
-					p_PatternAlignList = new ObservableCollection<AlignData>(value.Position.AlignList);
+					SetProperty(ref _SelectedROI, value);
 				}
 			}
 		}
