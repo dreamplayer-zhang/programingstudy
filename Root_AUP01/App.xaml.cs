@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Root_AUP01
+namespace Root_AOP01
 {
     /// <summary>
     /// App.xaml에 대한 상호 작용 논리

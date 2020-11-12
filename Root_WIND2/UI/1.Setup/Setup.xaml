@@ -25,20 +25,6 @@
                 <Menu>
                     <MenuItem Background="{StaticResource ControlBackGround}"
                                   BorderBrush="#FF707070"
-                                  Command="{Binding btnMode}"
-                                  BorderThickness="0,0,0,0">
-                        <MenuItem.Header>
-                            <Grid Width="70" Height="25">
-                                <TextBlock Text="Mode"
-                                               FontSize="13"
-                                               FontWeight="Bold"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
-                            </Grid>
-                        </MenuItem.Header>
-                    </MenuItem>
-                    <MenuItem Background="{StaticResource ControlBackGround}"
-                                  BorderBrush="#FF707070"
                                   BorderThickness="0,0,0,0">
                         <MenuItem.Header>
                             <Grid Width="70" Height="25">
@@ -64,6 +50,20 @@
                         <MenuItem Header="Save As">
                             
                         </MenuItem>
+                    </MenuItem>
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Command="{Binding btnMode}"
+                                  BorderThickness="0,0,0,0">
+                        <MenuItem.Header>
+                            <Grid Width="70" Height="25">
+                                <TextBlock Text="Mode"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                            </Grid>
+                        </MenuItem.Header>
                     </MenuItem>
                 </Menu>
                 <Menu>
