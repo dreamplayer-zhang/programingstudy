@@ -112,7 +112,7 @@ namespace Root_AOP01
                 return new RelayCommand(() =>
                 {
                     m_Setup.m_MainWindow.MainPanel.Children.Clear();
-                    m_Setup.m_MainWindow.MainPanel.Children.Add(m_Setup.m_MainWindow.Review);
+                    m_Setup.m_MainWindow.MainPanel.Children.Add(m_Setup.m_MainWindow.Run);
                 });
             }
         }
