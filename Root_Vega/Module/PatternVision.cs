@@ -25,6 +25,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using DPoint = System.Drawing.Point;
 using MBrushes = System.Windows.Media.Brushes;
 
@@ -957,7 +958,14 @@ namespace Root_Vega.Module
                                         cptStandard.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + (nHeightDiff / 2);
                                         nRefStartOffsetX = feature.PatternDistX;
                                         nRefStartOffsetY = feature.PatternDistY;
-                                        //m_mvvm.DrawCross(new DPoint(cptStandard.X, cptStandard.Y), MBrushes.Red);
+                                        
+                                        if (m_mvvm._dispatcher != null)
+                                        {
+                                            m_mvvm._dispatcher.Invoke(new Action(delegate ()
+                                            {
+                                                m_mvvm.DrawCross(new DPoint(cptStandard.X, cptStandard.Y), MBrushes.Red);
+                                            }));
+                                        }
 
                                         // Origin 생성
                                         CPoint cptOriginStart = new CPoint(cptStandard.X + nRefStartOffsetX, cptStandard.Y + nRefStartOffsetY);
@@ -980,14 +988,11 @@ namespace Root_Vega.Module
                                 Roi roiCurrent = m_mvvm.p_PatternRoiList[0];
 
                                 // 1. 검사영역 생성
-                                //Point ptStartPos = new Point(cptStandard.X + nRefStartOffsetX + (nInspectStartIndex * nCamWidth), cptStandard.Y + nRefStartOffsetY);
-                                //Point ptEndPos = new Point(ptStartPos.X + nCamWidth, ptStartPos.Y + (int)roiCurrent.Strip.ParameterList[0].InspAreaHeight);
                                 Point ptStartPos = new Point(cptStandard.X + nRefStartOffsetX + (nInspectStartIndex * nCamWidth), 0);
                                 Point ptEndPos = new Point(ptStartPos.X + nCamWidth, nReticleYSize_px);
                                 CRect crtCurrentArea = new CRect(ptStartPos, ptEndPos);
 
                                 // 1.2 생성된 검사영역이 스캔됐는지 판단
-                                //bool bScanned = m_mvvm.IsInspAreaScanned(cpMemoryOffset_pixel.X, nCamWidth, crtCurrentArea);
                                 bool bScanned = false;
                                 if (crtCurrentArea.Right < (cpMemoryOffset_pixel.X + nCamWidth)) bScanned = true;
                                 if (bScanned == true)
@@ -998,21 +1003,27 @@ namespace Root_Vega.Module
                                     if ((crtOverlapedRect.Width > 0) && (crtOverlapedRect.Height > 0))
                                     {
                                         // 3. Overlap된 Rect영역을 검사 쓰레드로 던져라
-                                        // UI
-                                        //var temp = new UIElementInfo(new Point(crtOverlapedRect.Left, crtOverlapedRect.Top), new Point(crtOverlapedRect.Right, crtOverlapedRect.Bottom));
-                                        //System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-                                        //rect.Width = crtOverlapedRect.Width;
-                                        //rect.Height = crtOverlapedRect.Height;
-                                        //System.Windows.Controls.Canvas.SetLeft(rect, crtOverlapedRect.Left);
-                                        //System.Windows.Controls.Canvas.SetTop(rect, crtOverlapedRect.Top);
-                                        //rect.StrokeThickness = 3;
-                                        //rect.Stroke = MBrushes.Orange;
+                                        if (m_mvvm._dispatcher != null)
+                                        {
+                                            m_mvvm._dispatcher.Invoke(new Action(delegate ()
+                                            {
+                                                // UI
+                                                var temp = new UIElementInfo(new Point(crtOverlapedRect.Left, crtOverlapedRect.Top), new Point(crtOverlapedRect.Right, crtOverlapedRect.Bottom));
+                                                System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+                                                rect.Width = crtOverlapedRect.Width;
+                                                rect.Height = crtOverlapedRect.Height;
+                                                System.Windows.Controls.Canvas.SetLeft(rect, crtOverlapedRect.Left);
+                                                System.Windows.Controls.Canvas.SetTop(rect, crtOverlapedRect.Top);
+                                                rect.StrokeThickness = 3;
+                                                rect.Stroke = MBrushes.Orange;
 
-                                        //m_mvvm.p_RefFeatureDrawer.m_ListShape.Add(rect);
-                                        //m_mvvm.p_RefFeatureDrawer.m_Element.Add(rect);
-                                        //m_mvvm.p_RefFeatureDrawer.m_ListRect.Add(temp);
+                                                m_mvvm.p_RefFeatureDrawer.m_ListShape.Add(rect);
+                                                m_mvvm.p_RefFeatureDrawer.m_Element.Add(rect);
+                                                m_mvvm.p_RefFeatureDrawer.m_ListRect.Add(temp);
 
-                                        //m_mvvm.p_ImageViewer.SetRoiRect();
+                                                m_mvvm.p_ImageViewer.SetRoiRect();
+                                            }));
+                                        }
 
                                         int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 
