@@ -96,7 +96,7 @@
             <StackPanel>
                 <Grid Height="40">
                     <StackPanel Orientation="Horizontal">
-                        <Button FontWeight="Bold" Content="PM" Width="100" Margin="5,5"/>
+                        <Button FontWeight="Bold" Content="PM" Width="100" Margin="5,5" Click="PMButton_Click"/>
                         <Button FontWeight="Bold" Content="VRS Viewer" Width="100" Margin="5,5"/>
                         <Button FontWeight="Bold" Content="Test" Width="100" Margin="5,5"/>
                     </StackPanel>
@@ -356,7 +356,7 @@
                                 Content="Loading"/>
                         <Button Style="{StaticResource SetupPanelBtn}" Grid.Row="5"
                                 Margin="15,20"
-                                Content="UnLoading"/>
+                                Content="Unloading"/>
                     </Grid>
                 </Grid>
             </StackPanel>

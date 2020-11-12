@@ -32,5 +32,11 @@ namespace Root_CAMELLIA
         {
             this.DragMove();
         }
+
+        private void PMButton_Click(object sender, RoutedEventArgs e)
+        {
+            Dlg_PM dlg_PM = new Dlg_PM();
+            dlg_PM.ShowDialog();
+        }
     }
 }
