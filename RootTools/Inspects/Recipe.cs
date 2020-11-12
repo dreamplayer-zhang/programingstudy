@@ -44,6 +44,7 @@ namespace RootTools.Inspects
 			}
 
 			string paramPath = Path.Combine(recipeDir, "Parameter.VegaVision");
+			this.RecipePath = paramPath;
 
 			//Feature 저장
 			if (VegaRecipeData != null)
