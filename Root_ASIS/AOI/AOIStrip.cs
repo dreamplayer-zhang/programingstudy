@@ -133,6 +133,17 @@ namespace Root_ASIS.AOI
         #endregion
 
         #region Inspect
+        public enum eMode
+        {
+            Inspect,
+            Setup
+        };
+        public string Setup(MemoryData memory)
+        {
+            m_memory = memory;
+            return Inspect(eMode.Setup); 
+        }
+
         public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
         public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
 
@@ -141,11 +152,6 @@ namespace Root_ASIS.AOI
             throw new NotImplementedException();
         }
 
-        public enum eMode
-        {
-            Inspect,
-            Setup
-        };
 
         InfoStrip m_infoStrip;
         MemoryData m_memory; 

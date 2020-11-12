@@ -273,7 +273,6 @@ namespace Root_AxisMapping.MainUI
                 m_aAOI[y].m_bEnable = (m_aArray[m_xActive, y].p_eState != Array.eState.Empty);
                 if (m_aAOI[y].m_bEnable) InspectBlob(y);
                 m_aAOI[y].m_bInspect = m_aAOI[y].m_bEnable;
-                m_aArray[m_xActive, y].m_bEnable = m_aAOI[y].m_bEnable;
                 m_aArray[m_xActive, y].m_rpCenter = m_aAOI[y].m_bEnable ? m_aAOI[y].m_rpCenter : new RPoint(); 
             }
             Draw(AOIData.eDraw.Inspect);
@@ -304,7 +303,7 @@ namespace Root_AxisMapping.MainUI
             for (int y = 0; y < p_yArray; y++)
             {
                 Array array = m_aArray[m_xActive, y];
-                sw.WriteLine(array.m_bEnable.ToString() + ", " + array.m_rpCenter.ToString()); 
+                sw.WriteLine((array.p_eState != Array.eState.Empty).ToString() + ", " + array.m_rpCenter.ToString()); 
             }
             sw.Close();
             fs.Close(); 
@@ -318,6 +317,7 @@ namespace Root_AxisMapping.MainUI
                 RunGrab();
                 Inspect(); 
             }
+            m_xActive = xActive; 
         }
 
         double m_dx = 2.3;

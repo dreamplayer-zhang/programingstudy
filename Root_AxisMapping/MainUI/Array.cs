@@ -50,7 +50,6 @@ namespace Root_AxisMapping.MainUI
             }
         }
 
-        public bool m_bEnable = false; 
         public RPoint m_rpCenter = new RPoint(); 
         #endregion
 
