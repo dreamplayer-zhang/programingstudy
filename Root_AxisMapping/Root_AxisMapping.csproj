@@ -198,6 +198,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MainUI\Result_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -232,6 +236,10 @@
     <Compile Include="MainUI\Mapping.cs" />
     <Compile Include="MainUI\Mapping_UI.xaml.cs">
       <DependentUpon>Mapping_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainUI\Result.cs" />
+    <Compile Include="MainUI\Result_UI.xaml.cs">
+      <DependentUpon>Result_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

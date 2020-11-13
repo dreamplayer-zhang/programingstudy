@@ -119,7 +119,7 @@ namespace Root_Vega
 
             public void RunTree(Tree tree)
             {
-                string sReticle = (p_infoReticle == null) ? "Empty" : p_infoReticle.p_id;
+                string sReticle = (p_infoReticle == null) ? "Empty" : p_infoReticle.p_sReticleID;
                 tree.GetTree("InfoReticle").Set(sReticle, sReticle, m_id, "InfoReticle ID", true, true);
                 m_bIgnoreExistSensor = tree.GetTree("Ignore Exist Sensor", false).Set(m_bIgnoreExistSensor, m_bIgnoreExistSensor, m_id, "Ignore Exist Check Sensor"); 
             }
