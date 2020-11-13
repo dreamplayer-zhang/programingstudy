@@ -60,7 +60,7 @@
                 <TabItem Header=" ROI ">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="1*"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="2*"/>
                         </Grid.RowDefinitions>

@@ -206,7 +206,8 @@ namespace Root_ASIS.Teachs
         #region Parameter
         private void buttonInspect_Click(object sender, RoutedEventArgs e)
         {
-
+            m_teach.Inspect(null); 
+            m_teach.p_eDraw = AOIData.eDraw.Inspect; 
         }
         #endregion
     }

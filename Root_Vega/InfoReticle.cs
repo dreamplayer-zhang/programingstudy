@@ -8,6 +8,22 @@ namespace Root_Vega
 {
     public class InfoReticle : GemSlotBase
     {
+        #region Property
+        string _sReticleID = "";
+        public string p_sReticleID
+        {
+            get { return (_sReticleID == "") ? p_id : _sReticleID; }
+            set
+            {
+                if (_sReticleID == value) return;
+                m_log.Info(p_id + " Reticle ID : " + _sReticleID + " -> " + value);
+                _sReticleID = value;
+                OnPropertyChanged();
+                RegWrite();
+            }
+        }
+        #endregion
+
         #region Recipe
         /// <summary> PJ.Recipe -> ModuleRunList </summary>
         public ModuleRunList m_moduleRunList;

@@ -201,7 +201,7 @@ namespace Root_AxisMapping.MainUI
         private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
         {
             if (p_roiActive == null) return;
-            p_roiActive.LBD(bDown, cpImg);
+            p_roiActive.LBD(bDown, cpImg, m_memoryPool.m_viewer.p_memoryData);
             Draw(AOIData.eDraw.ROI);
             GetActineROI();
         }
@@ -244,9 +244,9 @@ namespace Root_AxisMapping.MainUI
             m_aAOI.Clear(); 
             m_szROI.X = Math.Max(m_aUnit[0].m_aoiData.m_sz.X, m_aUnit[1].m_aoiData.m_sz.X); 
             m_szROI.Y = Math.Max(m_aUnit[0].m_aoiData.m_sz.Y, m_aUnit[1].m_aoiData.m_sz.Y);
-            int xp = Math.Min(m_aUnit[0].m_aoiData.m_cp0.X, m_aUnit[1].m_aoiData.m_cp0.X);
-            int y0 = m_aUnit[0].m_aoiData.m_cp0.Y;
-            int y1 = m_aUnit[1].m_aoiData.m_cp0.Y;
+            int xp = Math.Min(m_aUnit[0].m_aoiData.p_cp0.X, m_aUnit[1].m_aoiData.p_cp0.X);
+            int y0 = m_aUnit[0].m_aoiData.p_cp0.Y;
+            int y1 = m_aUnit[1].m_aoiData.p_cp0.Y;
             int yMin = p_yArray;
             int yMax = 0; 
             for (int y = 0; y < p_yArray; y++)
@@ -260,7 +260,7 @@ namespace Root_AxisMapping.MainUI
             for (int y = 0; y < p_yArray; y++)
             {
                 if (m_aAOI.Count <= y) m_aAOI.Add(new AOIData("AOI." + m_aAOI.Count.ToString(), m_szROI));
-                m_aAOI[y].m_cp0 = new CPoint(xp, ((yMax - y) * y0 - (yMin - y) * y1) / (yMax - yMin));
+                m_aAOI[y].p_cp0 = new CPoint(xp, ((yMax - y) * y0 - (yMin - y) * y1) / (yMax - yMin));
                 m_aAOI[y].m_bEnable = false;
             }
         }
@@ -273,7 +273,6 @@ namespace Root_AxisMapping.MainUI
                 m_aAOI[y].m_bEnable = (m_aArray[m_xActive, y].p_eState != Array.eState.Empty);
                 if (m_aAOI[y].m_bEnable) InspectBlob(y);
                 m_aAOI[y].m_bInspect = m_aAOI[y].m_bEnable;
-                m_aArray[m_xActive, y].m_bEnable = m_aAOI[y].m_bEnable;
                 m_aArray[m_xActive, y].m_rpCenter = m_aAOI[y].m_bEnable ? m_aAOI[y].m_rpCenter : new RPoint(); 
             }
             Draw(AOIData.eDraw.Inspect);
@@ -287,7 +286,7 @@ namespace Root_AxisMapping.MainUI
         string InspectBlob(int iAOI)
         {
             AOIData aoi = m_aAOI[iAOI];
-            m_blob.RunBlob(m_memory, 0, aoi.m_cp0, aoi.m_sz, m_mmGV.X, m_mmGV.Y, 10); 
+            m_blob.RunBlob(m_memory, 0, aoi.p_cp0, aoi.m_sz, m_mmGV.X, m_mmGV.Y, 10); 
             m_blob.RunSort(m_eSort);
             if (m_blob.m_aSort.Count == 0) return "Find Fiducial Error";
             Blob.Island island = m_blob.m_aSort[0];
@@ -304,7 +303,7 @@ namespace Root_AxisMapping.MainUI
             for (int y = 0; y < p_yArray; y++)
             {
                 Array array = m_aArray[m_xActive, y];
-                sw.WriteLine(array.m_bEnable.ToString() + ", " + array.m_rpCenter.ToString()); 
+                sw.WriteLine((array.p_eState != Array.eState.Empty).ToString() + ", " + array.m_rpCenter.ToString()); 
             }
             sw.Close();
             fs.Close(); 
@@ -318,6 +317,7 @@ namespace Root_AxisMapping.MainUI
                 RunGrab();
                 Inspect(); 
             }
+            m_xActive = xActive; 
         }
 
         double m_dx = 2.3;

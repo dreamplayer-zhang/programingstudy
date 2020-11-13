@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
              mc:Ignorable="d" 
-             d:DesignHeight="1818" d:DesignWidth="1683" 
+             d:DesignHeight="818" d:DesignWidth="1683" 
              Background="{StaticResource PanelBackGround}">
     <!--d:DesignHeight="818" d:DesignWidth="1683">-->
 
@@ -94,7 +94,7 @@
                 </GroupBox>
             </Grid>
             
-            <!--Alignment-->
+            <!--Alignment--><!--
             <TextBlock Text="Alignment"
                        HorizontalAlignment="Right"
                        FontSize="25"
@@ -203,7 +203,7 @@
                 </Grid>
             </Grid>
             
-            <!--General-->
+            --><!--General--><!--
             <TextBlock Text="General"
                        HorizontalAlignment="Right"
                        FontSize="25"
@@ -246,7 +246,7 @@
                 <GroupBox Header="Inspection" Grid.Column="1">
                     
                 </GroupBox>
-            </Grid>
+            </Grid>-->
         </StackPanel>
     </ScrollViewer>
 </UserControl>

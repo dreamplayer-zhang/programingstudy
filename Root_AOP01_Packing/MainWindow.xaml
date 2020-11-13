@@ -1,0 +1,343 @@
+﻿<Window x:Class="Root_AOP01.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Root_AOP01"
+        xmlns:icon="clr-namespace:Root_AOP01.Icon"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="False"
+        ResizeMode="CanResizeWithGrip"
+        Height="1080" Width="1920" 
+        Title="Root AOP01"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing">
+    <Window.Resources>
+        <local:BooleanToVisiblityConverter x:Key="BooleanToVisiblity"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="85*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" x:Name="ViewArea"/>
+        </Grid.RowDefinitions>
+        <!--Title Bar-->
+        <Grid Grid.Row="0"
+              Name="TitleBar"
+              Background="{DynamicResource MainThema}"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <StackPanel Orientation="Horizontal">
+                <Viewbox Margin="3" VerticalAlignment="Center">
+                    <icon:AtiLogo/>
+                </Viewbox>
+                <TextBlock Text="AOP01  -  Ver. 0.0.1"
+                           Foreground="White"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           Margin="5,0,0,0"
+                           Grid.Column="1" />
+            </StackPanel>
+            <TextBlock Text="Recipe Name.rcp"
+                       Foreground="White"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Grid.Column="2">
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MinimizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="MinimizeButton_Click">
+                    <Path Style="{StaticResource MinimizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MaximizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="MaximizeButton_Click">
+                    <Path Style="{StaticResource MaximizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="NormalizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="NormalizeButton_Click">
+                    <Path Style="{StaticResource NormalizeIconKey}" />
+                </Button>
+                <!--<Button Style="{StaticResource SystemButton}"
+                        x:Name="CloseButton"
+                        Width="30"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Foreground="White"
+                        Click="CloseButton_Click"
+                        VerticalAlignment="Bottom">
+                    <Path Style="{StaticResource CloseIconKey}" />
+                </Button>-->
+            </StackPanel>
+        </Grid>
+
+        <!--Menu-->
+        <Border Grid.Row="1"
+                Background="{StaticResource ControlBackGround}"
+                BorderBrush="DimGray"
+                BorderThickness="0,0,0,0">
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Menu Background="{StaticResource ControlBackGround}">
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  Width="70" Height="30"
+                                  Padding="0"
+                                  BorderBrush="#FF707070"
+                                  BorderThickness="0,0,0,0">
+                            <MenuItem.Header>
+                                <Grid Width="70">
+                                    <TextBlock Text="File"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="New">
+
+                            </MenuItem>
+                            <MenuItem Header="Load">
+
+                            </MenuItem>
+                            <MenuItem Header="Import">
+
+                            </MenuItem>
+                            <MenuItem Header="Save">
+
+                            </MenuItem>
+                            <MenuItem Header="Save As">
+
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"                                
+                                  BorderBrush="#FF707070"
+                                  Width="70" 
+                                  x:Name="ViewMenu"
+                                  BorderThickness="0,0,0,0" Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="70">
+                                    <TextBlock Text="View"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Log" IsCheckable="True" x:Name="viewLog" Click="ViewMenuItem_Click"/>
+                            <MenuItem Header="Alarm" IsCheckable="True" x:Name="viewAlarm" Click="ViewMenuItem_Click"/>
+                            <MenuItem Header="FDC" IsCheckable="True" x:Name="viewFDC" Click="ViewMenuItem_Click"/>
+
+
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="70"
+                                  BorderThickness="0,0,0,0" Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="70">
+                                    <TextBlock Text="Tool"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Login">
+                                
+                            </MenuItem>
+                            <MenuItem Header="Alarm">
+
+                            </MenuItem>
+                            <MenuItem Header="RTR">
+
+                            </MenuItem>
+                            <MenuItem Header="LoadPort">
+
+                            </MenuItem>
+                            <MenuItem Header="Setting">
+                                
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="100"
+                                  BorderThickness="0,0,0,0" Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="100">
+                                    <TextBlock Text="Navigation"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Setup">
+                                <MenuItem Header="Recipe Wizard">
+                                    <MenuItem Header="Recipe Summary" Click="NaviRecipeSummary_Click"/>
+                                    <MenuItem Header="Recipe Spec" Click="NaviRecipeSpec_Click"/>
+                                    <MenuItem Header="45D" Click="NaviRecipe45D_Click"/>
+                                    <MenuItem Header="Frontside" Click="NaviRecipeFrontside_Click"/>
+                                    <MenuItem Header="Edge" Click="NaviRecipeEdge_Click"/>
+                                    <MenuItem Header="LADS" Click="NaviRecipeLADS_Click"/>
+                                </MenuItem>
+                                <MenuItem Header="Matienance" Click="NaviMaintenance_Click"/>
+                                <MenuItem Header="GEM" Click="NaviGEM_Click"/>
+                            </MenuItem>
+                            <MenuItem Header="Review" Click="NaviReview_Click">
+                            </MenuItem>
+                            <MenuItem Header="Run" Click="NaviRun_click">
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="110"
+                                  BorderThickness="0,0,0,0" Padding="0"
+                                  Click="ModeSelect_Click">
+                            <MenuItem.Header>
+                                <Grid Width="110">
+                                    <TextBlock Text="Mode Select"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </Menu>
+                </StackPanel>
+                <Menu Background="{StaticResource ControlBackGround}" HorizontalAlignment="Right">
+                    <MenuItem Background="{StaticResource ControlBackGround}"
+                              Width="100" Height="30"
+                              Padding="0"
+                              HorizontalAlignment="Right"
+                              BorderBrush="#FF707070"
+                              BorderThickness="0,0,0,0" Click="CloseButton_Click">
+                        <MenuItem.Header>
+                            <Grid Width="100">
+                                <TextBlock Text="Exit"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+                </Menu>
+            </Grid>
+        </Border>
+
+        <!--Main Panel-->
+        <Grid Grid.Row="2" x:Name="MainPanel"/>
+
+        <!--Splitter-->
+        <GridSplitter Grid.Row="3" 
+                      Height="3"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      x:Name="splitter"
+                      Background="{StaticResource Splitter}"
+                      ShowsPreview="True" Grid.ColumnSpan="2"/>
+        
+        <!--Log-->
+        <Border Grid.Row="4" Grid.ColumnSpan="2" Panel.ZIndex="99">
+            <TabControl x:Name="viewTab">
+                <TabItem Width="50" Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                    <TabItem.Header>
+                        <TextBlock Text="Log" FontWeight="Bold"/>
+                    </TabItem.Header>
+                    <TabControl Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                        <TabItem Header="ALL" FontSize="10">
+                            <TextBlock Text="Log Area" Margin="5"/>
+                        </TabItem>
+                        <TabItem Header="System" FontSize="10"/>
+                        <TabItem Header="Inspection" FontSize="10"/>
+                        <TabItem Header="I/O" FontSize="10"/>
+                        <TabItem Header="Network" FontSize="10"/>
+                        <TabItem Header="Result" FontSize="10"/>
+                    </TabControl>
+                </TabItem>
+                <TabItem Width="50" Visibility="{Binding ElementName=viewAlarm, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                    <TabItem.Header>
+                        <TextBlock Text="Alarm" FontWeight="Bold"/>
+                    </TabItem.Header>
+                    <Grid  Visibility="{Binding ElementName=viewAlarm, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                        <StackPanel>
+                            <TextBlock Text="Alaram 001 - Vision Module Disconnected" FontSize="12" Margin="1" Foreground="Red" Background="LightGray"/>
+                            <TextBlock Text="Alaram 002 - " FontSize="12" Margin="1" Background="LightGray"/>
+                            <TextBlock Text="Alaram 003 -" FontSize="12" Margin="1" Background="LightGray"/>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <TabItem Width="50" Visibility="{Binding ElementName=viewFDC, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                    <TabItem.Header>
+                        <TextBlock Text="FDC" FontWeight="Bold"/>
+                    </TabItem.Header>
+                    <Grid Visibility="{Binding ElementName=viewFDC, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                        <UniformGrid Rows="2" Columns="3" Margin="10" TextElement.FontSize="14" TextElement.FontFamily="Arial" Background="AliceBlue">
+                            <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
+                                <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
+                                    <TextBlock Text="CDA" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="0.000(Mpa)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Blue"/>
+                                </UniformGrid>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
+                                <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
+                                    <TextBlock Text="Vaccum" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="0.000(Mpa)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Red"/>
+                                </UniformGrid>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,1,1,0">
+                                <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
+                                    <TextBlock Text="EFEM Pressure" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="0.000(inWG)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Red"/>
+                                </UniformGrid>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
+                                <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="50,0,80,0">
+                                    <TextBlock Text="Vision Module Pressure" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="0.000(inWG)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Blue"/>
+                                </UniformGrid>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,1,0,1">
+                                <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
+                                    <TextBlock Text="Electrostatic" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="0.000(%)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Blue"/>
+                                </UniformGrid>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,1,1,1">
+                                <UniformGrid Rows="1" Grid.Column="0" Grid.Row="0" Margin="80,0">
+                                    <TextBlock Text="Temp" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="0.000(℃)" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Blue"/>
+                                </UniformGrid>
+                            </Border>
+                        </UniformGrid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Border>
+    </Grid>
+</Window>

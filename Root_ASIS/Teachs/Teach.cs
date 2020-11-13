@@ -2,8 +2,12 @@
 using RootTools;
 using RootTools.Memory;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace Root_ASIS.Teachs
 {
@@ -16,11 +20,10 @@ namespace Root_ASIS.Teachs
         void InitListAOI()
         {
             m_aoiStrip = new AOIStrip("AOIStrip", m_log);
-            InitLIstAOIArray(); 
+            InitLIstAOIArray();
 
+            _aAOI.Add(new AOI_StripID("AOI_StripID", m_log));
             _aAOI.Add(new AOI_Unit("AOI_Unit", m_log));
-            //
-            InvalidateListAOI(); 
         }
 
         /// <summary> 활성화된 AOI List </summary>
@@ -81,7 +84,7 @@ namespace Root_ASIS.Teachs
         private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
         {
             if (p_roiActive == null) return;
-            p_roiActive.LBD(bDown, cpImg);
+            p_roiActive.LBD(bDown, cpImg, m_memoryPool.m_viewer.p_memoryData);
             Draw();
             GetActiveROI();
         }
@@ -110,7 +113,9 @@ namespace Root_ASIS.Teachs
         {
             MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
             draw.Clear();
-            foreach (IAOI aoi in p_aROI) aoi.Draw(draw, p_eDraw);
+            m_aoiStrip.Draw(draw, p_eDraw); 
+            p_aoiArray.Draw(draw, p_eDraw);
+            foreach (IAOI aoi in p_aAOI) aoi.Draw(draw, p_eDraw);
             draw.InvalidDraw();
         }
         #endregion
@@ -141,8 +146,9 @@ namespace Root_ASIS.Teachs
             p_aoiArray.RunTreeAOI(tree.GetTree(p_aoiArray.p_id, true, false)); 
             for (int n = 0; n < p_aAOI.Count; n++)
             {
-                p_aAOI[n].p_nID = n; 
-                p_aAOI[n].RunTreeAOI(tree.GetTree(n, p_aAOI[n].p_id));
+                p_aAOI[n].p_nID = n;
+                p_aAOI[n].p_id = n.ToString("00") + "." + p_aAOI[n].p_sAOI; 
+                p_aAOI[n].RunTreeAOI(tree.GetTree(p_aAOI[n].p_id));
             }
         }
         #endregion
@@ -200,9 +206,76 @@ namespace Root_ASIS.Teachs
         #endregion
 
         #region Inspect
+        static InfoStrip m_defaultStrip = new InfoStrip(0);
+        enum eTimer
+        {
+            Before,
+            After,
+            Stop
+        }
+        eTimer m_eTimer = eTimer.Stop;
+        InfoStrip m_inspectStrip = null;
+        MemoryData m_inspectMemory = null; 
         public string Inspect(InfoStrip infoStrip)
         {
+            if (infoStrip == null)
+            {
+                if (m_nID == 0) m_defaultStrip = new InfoStrip(0); 
+                infoStrip = m_defaultStrip;
+            }
+            m_inspectStrip = infoStrip; 
+            m_inspectMemory = m_memoryPool.m_viewer.p_memoryData;
+            m_bgwInspect.RunWorkerAsync(); 
             return "OK";
+        }
+
+        BackgroundWorker m_bgwInspect = new BackgroundWorker(); 
+        void InitBackgroundWorker()
+        {
+            m_bgwInspect.DoWork += M_bgwInspect_DoWork;
+            m_bgwInspect.RunWorkerCompleted += M_bgwInspect_RunWorkerCompleted;
+        }
+
+        private void M_bgwInspect_DoWork(object sender, DoWorkEventArgs e)
+        {
+            RunTimerInspect(eTimer.Before);
+            m_aoiStrip.Inspect(m_inspectStrip, m_inspectMemory);
+            foreach (IAOI aoi in p_aAOI) aoi.Inspect(m_inspectStrip, m_inspectMemory);
+            RunTimerInspect(eTimer.After);
+        }
+
+        private void M_bgwInspect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Draw(); 
+        }
+
+        DispatcherTimer m_timer = new DispatcherTimer(); 
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(1);
+            m_timer.Tick += M_timer_Tick;
+        }
+
+        void RunTimerInspect(eTimer eTimer)
+        {
+            m_eTimer = eTimer;
+            m_timer.Start();
+            while ((m_eTimer != eTimer.Stop) && (EQ.IsStop() == false)) Thread.Sleep(1); 
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            m_timer.Stop(); 
+            switch (m_eTimer)
+            {
+                case eTimer.Before:
+                    foreach (IAOI aoi in p_aAOI) aoi.BeforeInspect(m_inspectStrip, m_inspectMemory);
+                    break;
+                case eTimer.After:
+                    foreach (IAOI aoi in p_aAOI) aoi.AfterInspect(m_inspectStrip, m_inspectMemory);
+                    break;
+            }
+            m_eTimer = eTimer.Stop; 
         }
         #endregion
 
@@ -238,6 +311,7 @@ namespace Root_ASIS.Teachs
             job.Close();
             Draw();
             InvalidROI();
+            m_aoiStrip.Setup(m_memoryPool.m_viewer.p_memoryData); 
         }
 
         IAOI NewAOI(string sAOI)
@@ -255,7 +329,6 @@ namespace Root_ASIS.Teachs
         void InitTreeSetup()
         {
             m_treeRootSetup = new TreeRoot(m_id + ".Setup", m_log);
-            RunTreeSetup(Tree.eMode.RegRead);
             m_treeRootSetup.UpdateTree += M_treeRootSetup_UpdateTree;
         }
 
@@ -328,11 +401,15 @@ namespace Root_ASIS.Teachs
             m_log = LogView.GetLog(id);
             InitTreeSetup();
             InitListAOI();
+            RunTreeSetup(Tree.eMode.RegRead);
+            InvalidateListAOI();
             InitTreeROI();
             ClearAOI();
             InitTreeAOI();
             InitDraw();
-            GetActiveROI(); 
+            GetActiveROI();
+            InitBackgroundWorker(); 
+            InitTimer(); 
         }
     }
 }

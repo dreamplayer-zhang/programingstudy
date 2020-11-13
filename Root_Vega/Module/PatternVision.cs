@@ -25,6 +25,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using DPoint = System.Drawing.Point;
 using MBrushes = System.Windows.Media.Brushes;
 
@@ -856,9 +857,9 @@ namespace Root_Vega.Module
                 int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
                 int nReticleYSize_px = Convert.ToInt32(m_dReticleSize_mm * nMMPerUM / m_dResY_um);    // 레티클 영역(150mm -> 150,000um)의 Y픽셀 갯수
-                m_grabMode.m_dTrigger = 10 * m_dResY_um;        // 축해상도 0.1um로 하드코딩.
+                m_grabMode.m_dTrigger =m_dResY_um / 8 * 100;        // 축해상도 0.1um로 하드코딩.
                 int nReticleRangePulse = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleYSize_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                double dXScale = m_dResX_um * 10;
+                double dXScale = m_dResX_um / 10 * 100;
                 bool bUseRADS = false;
 
                 // Inspection variable
@@ -907,7 +908,7 @@ namespace Root_Vega.Module
                             dEndAxisPos = dTemp;
                             m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
                         }
-                        double dAxisPosX = m_rpReticleCenterPos_pulse.X + nReticleYSize_px * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
+                        double dAxisPosX = m_rpReticleCenterPos_pulse.X + (m_dReticleSize_mm * nMMPerUM / 0.08 / 2) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
 
                         if (m_module.Run(axisXY.StartMove(new RPoint(dAxisPosX, dStartAxisPos)))) return p_sInfo;
                         if (m_module.Run(axisZ.StartMove(m_dFocusPosZ_pulse))) return p_sInfo;
@@ -957,7 +958,14 @@ namespace Root_Vega.Module
                                         cptStandard.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + (nHeightDiff / 2);
                                         nRefStartOffsetX = feature.PatternDistX;
                                         nRefStartOffsetY = feature.PatternDistY;
-                                        //m_mvvm.DrawCross(new DPoint(cptStandard.X, cptStandard.Y), MBrushes.Red);
+                                        
+                                        if (m_mvvm._dispatcher != null)
+                                        {
+                                            m_mvvm._dispatcher.Invoke(new Action(delegate ()
+                                            {
+                                                m_mvvm.DrawCross(new DPoint(cptStandard.X, cptStandard.Y), MBrushes.Red);
+                                            }));
+                                        }
 
                                         // Origin 생성
                                         CPoint cptOriginStart = new CPoint(cptStandard.X + nRefStartOffsetX, cptStandard.Y + nRefStartOffsetY);
@@ -980,14 +988,11 @@ namespace Root_Vega.Module
                                 Roi roiCurrent = m_mvvm.p_PatternRoiList[0];
 
                                 // 1. 검사영역 생성
-                                //Point ptStartPos = new Point(cptStandard.X + nRefStartOffsetX + (nInspectStartIndex * nCamWidth), cptStandard.Y + nRefStartOffsetY);
-                                //Point ptEndPos = new Point(ptStartPos.X + nCamWidth, ptStartPos.Y + (int)roiCurrent.Strip.ParameterList[0].InspAreaHeight);
                                 Point ptStartPos = new Point(cptStandard.X + nRefStartOffsetX + (nInspectStartIndex * nCamWidth), 0);
                                 Point ptEndPos = new Point(ptStartPos.X + nCamWidth, nReticleYSize_px);
                                 CRect crtCurrentArea = new CRect(ptStartPos, ptEndPos);
 
                                 // 1.2 생성된 검사영역이 스캔됐는지 판단
-                                //bool bScanned = m_mvvm.IsInspAreaScanned(cpMemoryOffset_pixel.X, nCamWidth, crtCurrentArea);
                                 bool bScanned = false;
                                 if (crtCurrentArea.Right < (cpMemoryOffset_pixel.X + nCamWidth)) bScanned = true;
                                 if (bScanned == true)
@@ -998,21 +1003,27 @@ namespace Root_Vega.Module
                                     if ((crtOverlapedRect.Width > 0) && (crtOverlapedRect.Height > 0))
                                     {
                                         // 3. Overlap된 Rect영역을 검사 쓰레드로 던져라
-                                        // UI
-                                        //var temp = new UIElementInfo(new Point(crtOverlapedRect.Left, crtOverlapedRect.Top), new Point(crtOverlapedRect.Right, crtOverlapedRect.Bottom));
-                                        //System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-                                        //rect.Width = crtOverlapedRect.Width;
-                                        //rect.Height = crtOverlapedRect.Height;
-                                        //System.Windows.Controls.Canvas.SetLeft(rect, crtOverlapedRect.Left);
-                                        //System.Windows.Controls.Canvas.SetTop(rect, crtOverlapedRect.Top);
-                                        //rect.StrokeThickness = 3;
-                                        //rect.Stroke = MBrushes.Orange;
+                                        if (m_mvvm._dispatcher != null)
+                                        {
+                                            m_mvvm._dispatcher.Invoke(new Action(delegate ()
+                                            {
+                                                // UI
+                                                var temp = new UIElementInfo(new Point(crtOverlapedRect.Left, crtOverlapedRect.Top), new Point(crtOverlapedRect.Right, crtOverlapedRect.Bottom));
+                                                System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+                                                rect.Width = crtOverlapedRect.Width;
+                                                rect.Height = crtOverlapedRect.Height;
+                                                System.Windows.Controls.Canvas.SetLeft(rect, crtOverlapedRect.Left);
+                                                System.Windows.Controls.Canvas.SetTop(rect, crtOverlapedRect.Top);
+                                                rect.StrokeThickness = 3;
+                                                rect.Stroke = MBrushes.Orange;
 
-                                        //m_mvvm.p_RefFeatureDrawer.m_ListShape.Add(rect);
-                                        //m_mvvm.p_RefFeatureDrawer.m_Element.Add(rect);
-                                        //m_mvvm.p_RefFeatureDrawer.m_ListRect.Add(temp);
+                                                m_mvvm.p_RefFeatureDrawer.m_ListShape.Add(rect);
+                                                m_mvvm.p_RefFeatureDrawer.m_Element.Add(rect);
+                                                m_mvvm.p_RefFeatureDrawer.m_ListRect.Add(temp);
 
-                                        //m_mvvm.p_ImageViewer.SetRoiRect();
+                                                m_mvvm.p_ImageViewer.SetRoiRect();
+                                            }));
+                                        }
 
                                         int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 
@@ -1023,7 +1034,7 @@ namespace Root_Vega.Module
                                         engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
                                             engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
                                             engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
-                                            crtCurrentArea, 500, roiCurrent.Strip.ParameterList[0], nDefectCode, engineer.m_recipe.VegaRecipeData.UseDefectMerge, engineer.m_recipe.VegaRecipeData.MergeDistance, p);
+                                            crtOverlapedRect, 1500, roiCurrent.Strip.ParameterList[0], nDefectCode, engineer.m_recipe.VegaRecipeData.UseDefectMerge, engineer.m_recipe.VegaRecipeData.MergeDistance, p);
                                     }
                                 }
                             }

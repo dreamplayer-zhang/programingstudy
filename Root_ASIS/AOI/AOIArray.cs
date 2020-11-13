@@ -1,11 +1,10 @@
-﻿using Root_ASIS.Teachs;
-using RootTools;
+﻿using RootTools;
 using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace Root_ASIS.AOI
 {
@@ -33,10 +32,10 @@ namespace Root_ASIS.AOI
             {
                 if (p_bEnable == false) return "OK";
                 if (m_aoiData.p_eROI != AOIData.eROI.Done) return m_id + " ROI not Done"; 
-                m_blob.RunBlob(memory, 0, m_aoiData.m_cp0, m_aoiData.m_sz, m_aoi.m_mmGV.X, m_aoi.m_mmGV.X, 5);
+                m_blob.RunBlob(memory, 0, m_aoiData.p_cp0, m_aoiData.m_sz, m_aoi.m_mmGV.X, m_aoi.m_mmGV.X, 5);
                 m_blob.RunSort(Blob.eSort.Size);
                 if (m_blob.m_aSort.Count > 0) m_aoiData.m_rpCenter = m_blob.m_aSort[0].m_rpCenter;
-                else m_aoiData.m_rpCenter = new RPoint(m_aoiData.m_cp0.X + m_sz.X / 2.0, m_aoiData.m_cp0.Y + m_sz.Y / 2.0);
+                else m_aoiData.m_rpCenter = new RPoint(m_aoiData.p_cp0.X + m_sz.X / 2.0, m_aoiData.p_cp0.Y + m_sz.Y / 2.0);
                 return "OK"; 
             }
 
@@ -196,8 +195,21 @@ namespace Root_ASIS.AOI
         }
         #endregion
 
+        #region Inspect
+        public string Setup(MemoryData memory) { return "OK"; }
+        public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+
+        public string Inspect(InfoStrip infoStrip, MemoryData memory)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+        #endregion
+
         #region IAOI
         public string p_id { get; set; }
+        public string p_sAOI { get; set; }
         public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
 
@@ -258,6 +270,7 @@ namespace Root_ASIS.AOI
             p_aROI = new ObservableCollection<AOIData>();
             p_aArray = new List<CPoint>(); 
             p_id = id;
+            p_sAOI = id; 
             m_eSide = (eSide)nID; 
             m_log = log;
             InitUnit();

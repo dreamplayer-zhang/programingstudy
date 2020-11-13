@@ -14,6 +14,9 @@
             <TabItem Header=" Mapping ">
                 <local:Mapping_UI x:Name="mappingUI"/>
             </TabItem>
+            <TabItem Header=" Result ">
+                <local:Result_UI x:Name="resultUI"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>
