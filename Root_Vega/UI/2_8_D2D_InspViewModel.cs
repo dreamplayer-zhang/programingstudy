@@ -585,9 +585,9 @@ namespace Root_Vega
 
 
 
-			MemoryData sD2Dmemdata = ((Vega_Handler)(m_Engineer.ClassHandler())).m_patternVision.m_memoryPool2.GetGroup(App.sD2DGroup).GetMemory(App.sD2Dmem);
-			MemoryData sD2DABSmemdata = ((Vega_Handler)(m_Engineer.ClassHandler())).m_patternVision.m_memoryPool2.GetGroup(App.sD2DGroup).GetMemory(App.sD2DABSmem);
-			m_D2DInspect.StartInsp(m_Image, sD2Dmemdata, sD2DABSmemdata);
+			//MemoryData sD2Dmemdata = ((Vega_Handler)(m_Engineer.ClassHandler())).m_patternVision.m_memoryPool2.GetGroup(App.sD2DGroup).GetMemory(App.sD2Dmem);
+			//MemoryData sD2DABSmemdata = ((Vega_Handler)(m_Engineer.ClassHandler())).m_patternVision.m_memoryPool2.GetGroup(App.sD2DGroup).GetMemory(App.sD2DABSmem);
+			//m_D2DInspect.StartInsp(m_Image, sD2Dmemdata, sD2DABSmemdata);
 			//메모리 defult 사이즈 어디서 지정해야하지?
 
 			//MemoryPool pool =  m_Engineer.ClassMemoryTool().GetPool(App.sD2DPool, true);
