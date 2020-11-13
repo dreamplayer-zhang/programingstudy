@@ -59,6 +59,55 @@ namespace Root_Vega
             }
         }
 
+        private MiniViewer_ViewModel m_MiniImageViewer_Top;
+        public MiniViewer_ViewModel p_MiniImageViewer_Top
+        {
+            get
+            {
+                return m_MiniImageViewer_Top;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_Top, value);
+            }
+        }
+        private MiniViewer_ViewModel m_MiniImageViewer_Btm;
+        public MiniViewer_ViewModel p_MiniImageViewer_Btm
+        {
+            get
+            {
+                return m_MiniImageViewer_Btm;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_Btm, value);
+            }
+        }
+        private MiniViewer_ViewModel m_MiniImageViewer_Left;
+        public MiniViewer_ViewModel p_MiniImageViewer_Left
+        {
+            get
+            {
+                return m_MiniImageViewer_Left;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_Left, value);
+            }
+        }
+        private MiniViewer_ViewModel m_MiniImageViewer_Right;
+        public MiniViewer_ViewModel p_MiniImageViewer_Right
+        {
+            get
+            {
+                return m_MiniImageViewer_Right;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_Right, value);
+            }
+        }
+
         private readonly IDialogService m_DialogService;
 
         public _1_Mainview_ViewModel(Vega_Engineer engineer, IDialogService dialogService)
@@ -118,6 +167,10 @@ namespace Root_Vega
 
         void TestFunction()
         {
+            p_MiniImageViewer.SetImageSource();
+            p_MiniImageViewer.SetImageSource();
+            p_MiniImageViewer.SetImageSource();
+            p_MiniImageViewer.SetImageSource();
             p_MiniImageViewer.SetImageSource();
             //((GAF_Manager)m_Engineer.ClassGAFManager()).SetAlarm(this.ToString(), eAlarm.TestAlarm2);
 
