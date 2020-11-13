@@ -100,9 +100,9 @@ namespace Root_Vega.Module
         #endregion
 
         public MemoryPool m_memoryPool;
-        public MemoryPool m_memoryPool2;
+        
         MemoryData m_memoryMain;
-        MemoryData m_memoryD2D;
+        
         InspectTool m_inspectTool;
         ZoomLens m_ZoomLens;
         public RADSControl m_RADSControl;
@@ -119,7 +119,6 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_CamRADS, this, "RADS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "D2D");
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
 
@@ -151,8 +150,7 @@ namespace Root_Vega.Module
         {
             //forget
             m_memoryMain = m_memoryPool.GetGroup("PatternVision").CreateMemory("Main", 1, 1, 1000, 1000);
-            m_memoryD2D = m_memoryPool2.GetGroup(App.sD2DGroup).CreateMemory(App.sD2Dmem, 1, 1, 1000, 1000);
-            m_memoryD2D = m_memoryPool2.GetGroup(App.sD2DGroup).CreateMemory(App.sD2DABSmem, 1, 1, 1000, 1000);
+            
         }
         #endregion
 
@@ -598,7 +596,6 @@ namespace Root_Vega.Module
         {
             RunTreeDIODelay(tree.GetTree("DIO Delay", false));
             m_memoryPool.RunTreeModule(tree.GetTree("Memory", false));
-            m_memoryPool2.RunTreeModule(tree.GetTree("Memory2", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
         }
         #endregion
@@ -1034,7 +1031,7 @@ namespace Root_Vega.Module
                                         engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
                                             engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
                                             engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
-                                            crtOverlapedRect, 1500, roiCurrent.Strip.ParameterList[0], nDefectCode, engineer.m_recipe.VegaRecipeData.UseDefectMerge, engineer.m_recipe.VegaRecipeData.MergeDistance, p);
+                                            crtOverlapedRect, 1000, roiCurrent.Strip.ParameterList[0], nDefectCode, engineer.m_recipe.VegaRecipeData.UseDefectMerge, engineer.m_recipe.VegaRecipeData.MergeDistance, p);
                                     }
                                 }
                             }
