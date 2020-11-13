@@ -9,11 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RootTools", "RootTools\Root
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_Memory", "Root_Memory\Root_Memory.csproj", "{D9475847-4F5D-4647-8085-7F952187957E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_Wind", "Root_Wind\Root_Wind.csproj", "{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8D0A6CCE-B715-4BA7-A250-132F4D5203DC} = {8D0A6CCE-B715-4BA7-A250-132F4D5203DC}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_Inspect", "Root_Inspect\Root_Inspect.csproj", "{E229A2CC-CF52-410E-8159-3C461B8BAF63}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RootTools_CLR", "RootTools_CLR\RootTools_CLR.vcxproj", "{8037431C-5BB7-47CB-A0D1-AA12D577EB2A}"
@@ -24,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_Vega", "Root_Vega\Root
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_LogView", "Root_LogView\Root_LogView.csproj", "{0FC3EDCB-083F-47A1-A7ED-C23A92DF48A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_Siltron", "Root_Siltron\Root_Siltron.csproj", "{5761D9A5-6772-4FA4-AEF9-47A773779EDB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_SILTRON", "Root_Siltron\Root_SILTRON.csproj", "{5761D9A5-6772-4FA4-AEF9-47A773779EDB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_EFEM", "Root_EFEM\Root_EFEM.csproj", "{23175072-261B-4601-8909-152EE93B78F0}"
 EndProject
@@ -104,22 +99,6 @@ Global
 		{D9475847-4F5D-4647-8085-7F952187957E}.Release|x64.Build.0 = Release|x64
 		{D9475847-4F5D-4647-8085-7F952187957E}.Release|x86.ActiveCfg = Release|Any CPU
 		{D9475847-4F5D-4647-8085-7F952187957E}.Release|x86.Build.0 = Release|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Debug|x64.Build.0 = Debug|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Debug|x86.Build.0 = Debug|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Release|x64.ActiveCfg = Release|x64
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Release|x64.Build.0 = Release|x64
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Release|x86.ActiveCfg = Release|Any CPU
-		{56C5F7F6-23A9-44BA-80FB-B5A09959CA52}.Release|x86.Build.0 = Release|Any CPU
 		{E229A2CC-CF52-410E-8159-3C461B8BAF63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E229A2CC-CF52-410E-8159-3C461B8BAF63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E229A2CC-CF52-410E-8159-3C461B8BAF63}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
