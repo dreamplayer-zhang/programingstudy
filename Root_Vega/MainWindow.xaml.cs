@@ -104,7 +104,7 @@ namespace Root_Vega
         void ConnectViewModel(IDialogService dialogService)
         {
             mvm = new _1_Mainview_ViewModel(App.m_engineer, dialogService);
-            //_Main.DataContext = mvm;
+            _Main.DataContext = mvm;
 
             _Recipe.DataContext = new _2_RecipeViewModel(App.m_engineer);
 

@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="RootTools.MiniViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:obs="clr-namespace:nsSizeObserver"
+             xmlns:local="clr-namespace:RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Canvas Background="Black" obs:SizeObserver.Observe="true" Focusable="True"
+                obs:SizeObserver.ObservedWidth="{Binding p_CanvasWidth, Mode=OneWayToSource}"
+                obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}">
+            <Image Source="{Binding Path=p_ImgSource}"/>
+        </Canvas>
+    </Grid>
+</UserControl>
