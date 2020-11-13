@@ -15,7 +15,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RootTools_CLR", "RootTools_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RootTools_Cpp", "RootTools_Cpp\RootTools_Cpp.vcxproj", "{8D0A6CCE-B715-4BA7-A250-132F4D5203DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_Vega", "Root_Vega\Root_Vega.csproj", "{0FC7A5C2-CD74-4106-BE2D-DFD4A97CC74C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_VEGA", "Root_Vega\Root_VEGA.csproj", "{0FC7A5C2-CD74-4106-BE2D-DFD4A97CC74C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Root_LogView", "Root_LogView\Root_LogView.csproj", "{0FC3EDCB-083F-47A1-A7ED-C23A92DF48A7}"
 EndProject
