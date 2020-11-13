@@ -79,8 +79,9 @@ namespace Root_Vega
             bool bReadyLoadport = (m_loadport.p_eState == ModuleBase.eState.Ready); 
             bool bReadyToLoad = (m_loadport.m_infoPod.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
             bReadyToLoad = true; 
-            bool bReadyState = ((m_loadport.p_eState == ModuleBase.eState.Ready) && (m_loadport.m_qModuleRun.Count > 0));
-            return bReadyLoadport && bReadyToLoad && bReadyState; //forget 조건
+            bool bReadyState =  (m_loadport.m_qModuleRun.Count > 0);
+            bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
+            return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState; //forget 조건
         }
 
         private void ToggleButton_Click(object sender, RoutedEventArgs e)

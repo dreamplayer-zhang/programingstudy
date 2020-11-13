@@ -78,6 +78,7 @@ namespace Root_Vega
         #endregion
 
         #region StateHome
+        public bool m_bIsPossible_Recovery = false;
         public string StateHome()
         {
             string sInfo = StateHome(m_robot);
@@ -88,7 +89,8 @@ namespace Root_Vega
             }
             sInfo = StateHome(m_vega, m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision, m_FDC);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
-            return sInfo;
+            if (sInfo == "OK") m_bIsPossible_Recovery = true;
+                return sInfo;
         }
 
         protected string StateHome(params ModuleBase[] aModule)

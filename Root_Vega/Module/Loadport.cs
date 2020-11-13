@@ -542,7 +542,12 @@ namespace Root_Vega.Module
                 else
                 {
                     sResult = m_module.m_RFID.ReadRFID((byte)m_nCh, out sCarrierID);
-                    m_module.m_infoPod.p_sCarrierID = (sResult == "OK") ? sCarrierID : ""; 
+                    m_module.m_infoPod.p_sCarrierID = (sResult == "OK") ? sCarrierID : "";
+                    if (m_module.m_infoPod.p_infoReticle.p_sReticleID == m_module.m_infoPod.p_infoReticle.p_id)
+                    {
+                        m_module.m_infoPod.p_infoReticle.p_sReticleID = sCarrierID;
+                        m_module.p_infoReticle.p_sSlotID = m_module.m_infoPod.p_infoReticle.p_sReticleID;
+                    }
                 }
                 if (sResult == "OK") m_module.m_infoPod.SendCarrierID(sCarrierID); 
                 return sResult; 
