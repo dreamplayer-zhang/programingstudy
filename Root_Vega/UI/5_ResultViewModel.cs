@@ -493,7 +493,7 @@ namespace Root_Vega
 
 					window.DataContext = windowViewModel;
 					window.Show();
-					windowViewModel.LoadVegaImage(cts.Token);
+					//windowViewModel.LoadVegaImage(cts.Token);
 				}
 			}
 			else
