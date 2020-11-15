@@ -91,13 +91,15 @@ namespace RootTools
         }
 
         public bool Rotate = false;
+        public bool Circle = false;
 
-        public MiniViewer_ViewModel(ImageData image = null, bool bRotate = false)
+        public MiniViewer_ViewModel(ImageData image = null, bool bRotate = false, bool bCircle = false)
         {
             if (image != null)
             {
                 p_ImageData = image;
                 Rotate = bRotate;
+                Circle = bCircle;
                 //image.OnCreateNewImage += image_NewImage;
                 //image.OnUpdateImage += image_OnUpdateImage;
                 //image.UpdateOpenProgress += image_UpdateOpenProgress;
@@ -162,20 +164,7 @@ namespace RootTools
             if (p_ImageData != null)
             {
                 CPoint StartPt = new CPoint(0, 0);
-                bool bRatio_WH = false;
-
-                
-                    //bRatio_WH = (double)p_ImageData.p_Size.X / p_CanvasWidth < (double)p_ImageData.p_Size.Y / p_CanvasHeight;
-                    //if (bRatio_WH)
-                    //{ //세로가 길어
-                        p_View_Rect = new System.Drawing.Rectangle(StartPt.X, StartPt.Y, Convert.ToInt32(p_ImageData.p_Size.X), Convert.ToInt32(p_ImageData.p_Size.Y));
-                    //}
-                    //else
-                    //{
-                    //    p_View_Rect = new System.Drawing.Rectangle(StartPt.X, StartPt.Y, Convert.ToInt32(p_ImageData.p_Size.X * p_CanvasHeight / p_CanvasWidth), Convert.ToInt32(p_ImageData.p_Size.X ));
-                    //}
-                
-                //	_View_Rect.Height += 1;
+                p_View_Rect = new System.Drawing.Rectangle(StartPt.X, StartPt.Y, Convert.ToInt32(p_ImageData.p_Size.X), Convert.ToInt32(p_ImageData.p_Size.Y));
                 SetImageSource();
             }
         }
@@ -203,6 +192,38 @@ namespace RootTools
                                     pix_y = p_View_Rect.X + xx * p_View_Rect.Height / p_CanvasWidth;
                                     pix_x = p_View_Rect.Y + yy * p_View_Rect.Width / p_CanvasHeight;
                                     view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                }
+                            }
+                        }
+                        else if (Circle)
+                        {
+                            CPoint center = new CPoint(p_CanvasWidth / 2, p_CanvasHeight / 2);
+                            int nRadius = p_CanvasWidth < p_CanvasHeight ? p_CanvasWidth : p_CanvasHeight;
+                            int nLen = 30;
+                            double theta = 0;
+                            double max = Math.Pow(nRadius / 2, 2);
+                            double min = Math.Pow(nRadius / 2 - nLen, 2);
+                            double dist = 0;
+                            for (int yy = 0; yy < p_CanvasHeight; yy++)
+                            {
+                                for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                {
+                                    dist = Math.Pow(Math.Abs(center.X - xx), 2) + Math.Pow(Math.Abs(center.Y - yy), 2);
+                                    if (dist < max && dist > min)
+                                    {
+                                        theta = Math.Atan2(((double)xx - center.X), ((double)center.Y - yy)) * 180 / Math.PI;
+                                        if (theta < 0)
+                                        {
+                                            theta = theta + 360;
+                                        }
+                                        pix_x = Convert.ToInt32((dist - min) * p_View_Rect.Width / (max - min));
+                                        pix_y = Convert.ToInt32(theta * p_View_Rect.Height / 360);
+                                        view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                    }
+                                    else if (dist < min)
+                                    {
+                                        view.Data[yy, xx, 0] = 200;
+                                    }
                                 }
                             }
                         }
