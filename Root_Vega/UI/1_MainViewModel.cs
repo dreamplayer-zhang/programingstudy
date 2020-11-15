@@ -118,6 +118,10 @@ namespace Root_Vega
             p_Process = p_Handler.m_process;
             InitAlarmData();
             p_MiniImageViewer = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("PatternVision.Memory", "PatternVision", "Main")));
+            p_MiniImageViewer_Btm = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideBottom")), true);
+            p_MiniImageViewer_Top = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideTop")), true);
+            p_MiniImageViewer_Left = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideLeft")));
+            p_MiniImageViewer_Right = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideRight")));
         }
 
         void LoadLp1()
@@ -167,11 +171,12 @@ namespace Root_Vega
 
         void TestFunction()
         {
+            p_MiniImageViewer_Left.SetRoiRect();
             p_MiniImageViewer.SetImageSource();
-            p_MiniImageViewer.SetImageSource();
-            p_MiniImageViewer.SetImageSource();
-            p_MiniImageViewer.SetImageSource();
-            p_MiniImageViewer.SetImageSource();
+            p_MiniImageViewer_Btm.SetImageSource();
+            p_MiniImageViewer_Top.SetImageSource();
+            p_MiniImageViewer_Left.SetImageSource();
+            p_MiniImageViewer_Right.SetImageSource();
             //((GAF_Manager)m_Engineer.ClassGAFManager()).SetAlarm(this.ToString(), eAlarm.TestAlarm2);
 
             //if (EQ.p_eState == EQ.eState.Init)
