@@ -159,7 +159,7 @@ namespace Root_Vega.Module
         {
             GemCarrierBase.ePresent present;
             if (m_dioPlaced.p_bIn != m_dioPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
-            else present = m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            else present = !m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
             if (m_infoPod.CheckPlaced(present) != "OK")
             {
                 m_alidPlaced.p_sMsg = "Placed Sensor Remain Checked while Pod State = " + m_infoPod.p_eState;
@@ -269,7 +269,15 @@ namespace Root_Vega.Module
 
         public void ReadInfoReticle_Registry()
         {
-            m_infoPod.ReadInfoReticle_Registry();
+            if (m_dioPresent.p_bIn == false)
+            {
+                if (m_infoPod.p_infoReticle == null)
+                {
+                    m_infoPod.SetInfoReticleExist();
+                    return;
+                }
+                m_infoPod.ReadInfoReticle_Registry();
+            }
         }
         #endregion
 
@@ -360,6 +368,7 @@ namespace Root_Vega.Module
                 if (Run(Home_Reticle())) return p_sInfo;
             }
             m_infoPod.AfterHome();
+
             return "OK";
         }
 
@@ -543,6 +552,7 @@ namespace Root_Vega.Module
                 {
                     sResult = m_module.m_RFID.ReadRFID((byte)m_nCh, out sCarrierID);
                     m_module.m_infoPod.p_sCarrierID = (sResult == "OK") ? sCarrierID : "";
+
                     if (m_module.m_infoPod.p_infoReticle.p_sReticleID == m_module.m_infoPod.p_infoReticle.p_id)
                     {
                         m_module.m_infoPod.p_infoReticle.p_sReticleID = sCarrierID;
