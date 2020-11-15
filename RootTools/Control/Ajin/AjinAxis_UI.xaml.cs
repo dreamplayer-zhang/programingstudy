@@ -109,7 +109,7 @@ namespace RootTools.Control.Ajin
         void Jog(double fScale)
         {
             if (m_bRepeat) return; 
-            if (m_axis.p_eState > Axis.eState.Ready) return;
+            if (m_axis.p_eState != Axis.eState.Ready) return;
             m_axis.Jog(fScale, comboSpeedJog.Text); 
         }
         #endregion
@@ -121,7 +121,7 @@ namespace RootTools.Control.Ajin
         void Shift(int nDir)
         {
             if (m_bRepeat) return;
-            if (m_axis.p_eState > Axis.eState.Ready) return;
+            if (m_axis.p_eState != Axis.eState.Ready) return;
             try
             {
                 double dPos = nDir * Convert.ToInt32(textBoxShift.Text);
@@ -135,7 +135,7 @@ namespace RootTools.Control.Ajin
         private void buttonMove_Click(object sender, RoutedEventArgs e)
         {
             if (m_bRepeat) return;
-            if (m_axis.p_eState > Axis.eState.Ready) return;
+            if (m_axis.p_eState != Axis.eState.Ready) return;
             m_axis.StartMove(comboMovePos.Text, 0, comboSpeedMove.Text); 
         }
 

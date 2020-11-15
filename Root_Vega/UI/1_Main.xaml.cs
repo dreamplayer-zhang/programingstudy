@@ -141,6 +141,8 @@ namespace Root_Vega
         bool IsEnableRecovery()
         {
             if (IsRunModule()) return false;
+            if (m_handler.m_bIsPossible_Recovery == false) return false; 
+             // Daniel check
             if (EQ.p_eState != EQ.eState.Ready) return false;
             if (EQ.p_bStop == true) return false;
             return m_handler.IsEnableRecovery(); 
@@ -148,8 +150,8 @@ namespace Root_Vega
 
         private void buttonRecovery_Click(object sender, RoutedEventArgs e)
         {
-            if (m_handler.m_bIsPossible_Recovery == false) return; // Daniel check
             if (IsEnableRecovery() == false) return;
+            m_handler.m_bIsPossible_Recovery = false;
             m_handler.m_process.CalcRecover();
             EQ.p_eState = EQ.eState.Run; 
         }
