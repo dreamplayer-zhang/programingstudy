@@ -226,6 +226,7 @@ namespace Root.Module
             {
                 if (EQ.p_bSimulate) return "OK";
                 if (m_module.Run(m_module.m_cam.GrabOne(0))) return p_sInfo;
+                m_module.m_memoryPool.m_viewer.InvalidDraw(); 
                 return "OK";
             }
         }
