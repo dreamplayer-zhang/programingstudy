@@ -87,24 +87,6 @@ namespace Root_Vega
 			{
 				return;
 			}
-			//string tempInspDir = @"C:\vsdb\TEMP_IMAGE";
-
-			System.Data.DataRow dataRow = VSDataDT.NewRow();
-
-			//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-
-			dataRow["No"] = currentDefectIdx;
-			currentDefectIdx++;
-			dataRow["DCode"] = item.nClassifyCode;
-			dataRow["AreaSize"] = item.fAreaSize;
-			dataRow["Length"] = item.nLength;
-			dataRow["Width"] = item.nWidth;
-			dataRow["Height"] = item.nHeight;
-			//dataRow["FOV"] = item.FOV;
-			dataRow["PosX"] = item.fPosX;
-			dataRow["PosY"] = item.fPosY;
-
-			VSDataDT.Rows.Add(dataRow);
 			_dispatcher.Invoke(new Action(delegate ()
 			{
 				p_InformationDrawer.AddDefectInfo(item);
