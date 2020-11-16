@@ -17,6 +17,7 @@ namespace Root_AxisMapping.Module
         Axis m_axisZ;
         DIO_O m_doVacuum;
         public MemoryPool m_memoryPool;
+        public MemoryPool m_memoryPoolResult;
         CameraDalsa m_cam;
         public override void GetTools(bool bInit)
         {
@@ -25,19 +26,23 @@ namespace Root_AxisMapping.Module
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Camera Z"); 
             p_sInfo = m_toolBox.Get(ref m_doVacuum, this, "Vacuum");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPoolResult, this, "Memory Result");
             p_sInfo = m_toolBox.Get(ref m_cam, this, "Camera");
             if (bInit) InitTools();
         }
 
         void InitTools()
         {
-            if (m_memoryPool.p_gbPool < 4) m_memoryPool.p_gbPool = 4; 
+            if (m_memoryPool.p_gbPool < 4) m_memoryPool.p_gbPool = 4;
+            if (m_memoryPoolResult.p_gbPool < 1) m_memoryPoolResult.p_gbPool = 1;
         }
         #endregion
 
         #region Memory
         MemoryGroup m_memoryGroup;
+        MemoryGroup m_memoryGroupResult;
         MemoryData m_memoryGrab;
+        MemoryData m_memoryResult;
         CPoint m_szGrab = new CPoint(16000, 250000); 
         public override void InitMemorys()
         {
@@ -45,6 +50,9 @@ namespace Root_AxisMapping.Module
             m_memoryGrab = m_memoryGroup.CreateMemory("AlignGrab", 1, m_cam.p_nByte, m_szGrab);
             m_cam.SetMemoryData(m_memoryGrab);
             m_memoryPool.m_viewer.p_memoryData = m_memoryGrab;
+            m_memoryGroupResult = m_memoryPoolResult.GetGroup(p_id);
+            m_memoryResult = m_memoryGroupResult.CreateMemory("Result", 1, 1, new CPoint(15360, 15360));
+            m_memoryPoolResult.m_viewer.p_memoryData = m_memoryResult;
         }
 
         void RunTreeMemory(Tree tree)
