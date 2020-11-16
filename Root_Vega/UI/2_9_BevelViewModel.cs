@@ -330,49 +330,33 @@ namespace Root_Vega
 		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
 		private void M_InspManager_AddDefect(DefectDataWrapper item)
 		{
-			if (InspectionManager.GetInspectionType(item.nClassifyCode) != InspectionType.AbsoluteSurface && InspectionManager.GetInspectionType(item.nClassifyCode) != InspectionType.RelativeSurface)
+			var target = InspectionManager.GetInspectionTarget(item.nClassifyCode);
+			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
+				target >= InspectionTarget.BevelInspection && target <= InspectionTarget.BevelInspectionBottom)
 			{
-				return;
-			}
-			//string tempInspDir = @"C:\vsdb\TEMP_IMAGE";
-			//System.Data.DataRow dataRow = VSDataDT.NewRow();
-
-			////Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-
-			//dataRow["No"] = currentDefectIdx;
-			//currentDefectIdx++;
-			//dataRow["DCode"] = item.nClassifyCode;
-			//dataRow["AreaSize"] = item.fAreaSize;
-			//dataRow["Length"] = item.nLength;
-			//dataRow["Width"] = item.nWidth;
-			//dataRow["Height"] = item.nHeight;
-			////dataRow["FOV"] = item.FOV;
-			//dataRow["PosX"] = item.fPosX;
-			//dataRow["PosY"] = item.fPosY;
-
-			//VSDataDT.Rows.Add(dataRow);
-			_dispatcher.Invoke(new Action(delegate ()
-			{
-				int targetIdx = InspectionManager.GetInspectionTarget(item.nClassifyCode) - InspectionTarget.BevelInspectionBottom - 1;
-
-				p_InformationDrawerList[targetIdx].AddDefectInfo(item);
-
-				switch (targetIdx)
+				_dispatcher.Invoke(new Action(delegate ()
 				{
-					case 0:
-						p_ImageViewer_Top.RedrawingElement();
-						break;
-					case 1:
-						p_ImageViewer_Left.RedrawingElement();
-						break;
-					case 2:
-						p_ImageViewer_Right.RedrawingElement();
-						break;
-					case 3:
-						p_ImageViewer_Bottom.RedrawingElement();
-						break;
-				}
-			}));
+					int targetIdx = InspectionManager.GetInspectionTarget(item.nClassifyCode) - InspectionTarget.BevelInspectionBottom - 1;
+
+					p_InformationDrawerList[targetIdx].AddDefectInfo(item);
+
+					switch (targetIdx)
+					{
+						case 0:
+							p_ImageViewer_Top.RedrawingElement();
+							break;
+						case 1:
+							p_ImageViewer_Left.RedrawingElement();
+							break;
+						case 2:
+							p_ImageViewer_Right.RedrawingElement();
+							break;
+						case 3:
+							p_ImageViewer_Bottom.RedrawingElement();
+							break;
+					}
+				}));
+			}
 		}
 
 		void ClearDrawList()

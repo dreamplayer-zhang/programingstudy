@@ -83,15 +83,14 @@ namespace Root_Vega
 		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
 		private void M_InspManager_AddDefect(DefectDataWrapper item)
 		{
-			if (InspectionManager.GetInspectionType(item.nClassifyCode) != InspectionType.Strip)
+			if (InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.Strip && InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.Chrome)
 			{
-				return;
+				_dispatcher.Invoke(new Action(delegate ()
+				{
+					p_InformationDrawer.AddDefectInfo(item);
+					p_ImageViewer.RedrawingElement();
+				}));
 			}
-			_dispatcher.Invoke(new Action(delegate ()
-			{
-				p_InformationDrawer.AddDefectInfo(item);
-				p_ImageViewer.RedrawingElement();
-			}));
 		}
 
 		void Init(Vega_Engineer engineer, IDialogService dialogService)
