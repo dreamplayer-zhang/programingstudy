@@ -660,16 +660,18 @@ namespace Root_Vega.Controls
 						}
 						else
 						{
-							for (int i = 0; i < idx; i++)
-							{
-								buffer = new byte[skipLength];
-								fs.Read(buffer, 0, skipLength);
-							}
-							fs.Read(buffer, 0, sizeof(int));//버림
-							fs.Read(buffer, 0, sizeof(int));
+							//for (int i = 0; i < idx; i++)
+							//{
+							//	buffer = new byte[skipLength];
+							//	fs.Read(buffer, 0, skipLength);
+							//}
+							fs.Position += ((long)skipLength * (long)idx);
+							fs.Position += 16;
+							//fs.Read(buffer, 0, sizeof(int));//버림
+							//fs.Read(buffer, 0, sizeof(int));
 
-							fs.Read(buffer, 0, sizeof(int));
-							fs.Read(buffer, 0, sizeof(int));
+							//fs.Read(buffer, 0, sizeof(int));
+							//fs.Read(buffer, 0, sizeof(int));
 							buffer = new byte[length];
 							fs.Read(buffer, 0, length);//첫번째 이미지
 
