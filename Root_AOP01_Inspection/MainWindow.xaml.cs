@@ -110,7 +110,6 @@ namespace Root_AOP01
         {
             Init_ViewModel();
             Init_UI();
-
             m_engineer.Init("AOP01");
             m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
         }

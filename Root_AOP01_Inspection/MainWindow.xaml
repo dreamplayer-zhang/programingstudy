@@ -245,7 +245,9 @@
         </Border>
 
         <!--Main Panel-->
-        <Grid Grid.Row="2" x:Name="MainPanel"/>
+        <Grid Grid.Row="2" x:Name="MainPanel">
+            <!--<local:AOP01_Engineer_UI x:Name="test"/>-->
+        </Grid>
 
         <!--Splitter-->
         <GridSplitter Grid.Row="3" 
