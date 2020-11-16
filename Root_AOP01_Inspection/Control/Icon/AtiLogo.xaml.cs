@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_AOP01.Icon
+namespace Root_AOP01_Inspection.Icon
 {
     /// <summary>
     /// AtiLogo.xaml에 대한 상호 작용 논리

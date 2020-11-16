@@ -1,4 +1,4 @@
-﻿using Root_AOP01.Module;
+﻿using Root_AOP01_Inspection.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -8,7 +8,7 @@ using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Root_AOP01
+namespace Root_AOP01_Inspection
 {
     public class AOP01_Handler : IHandler
     {

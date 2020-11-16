@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Input;
 
-namespace Root_AOP01
+namespace Root_AOP01_Packing
 {
     public class RelayCommand<T> : ICommand
     {

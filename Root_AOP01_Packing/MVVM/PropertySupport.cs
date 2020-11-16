@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Root_AOP01
+namespace Root_AOP01_Packing
 {
     public static class PropertySupport
     {

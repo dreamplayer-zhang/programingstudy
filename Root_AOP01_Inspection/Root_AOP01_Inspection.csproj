@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{E07BDBC6-CCB6-40B3-B479-B15B34426467}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Root_AOP01</RootNamespace>
-    <AssemblyName>Root_AOP01</AssemblyName>
+    <RootNamespace>Root_AOP01_Inspection</RootNamespace>
+    <AssemblyName>Root_AOP01_Inspection</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -81,9 +81,6 @@
     </Compile>
     <Compile Include="UI\1. SETUP\2. RecipeWizard\Page\RecipeSummary_Page.xaml.cs">
       <DependentUpon>RecipeSummary_Page.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="test.xaml.cs">
-      <DependentUpon>test.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\3. RUN\Run_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\4. GEM\GEM_ViewModel.cs" />
@@ -171,10 +168,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. SETUP\2. RecipeWizard\Page\RecipeSummary_Page.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

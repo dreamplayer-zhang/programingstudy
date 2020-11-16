@@ -292,7 +292,7 @@ namespace RootTools.Memory
             RunTreeMemory(Tree.eMode.RegRead);
             RunTreeRun(Tree.eMode.RegRead);
             KillInspectProcess();
-            InitThreadProcess();
+            //InitThreadProcess();
         }
 
         public void ThreadStop()
