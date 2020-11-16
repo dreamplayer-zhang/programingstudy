@@ -78,8 +78,8 @@ namespace RootTools.Camera.Dalsa
                 SetProperty(ref m_CamParam, value);
             }
         }
-        const int c_nBuf = 100;
-        int _nBuf = 100;
+        const int c_nBuf = 300;
+        int _nBuf = 300;
         public int p_nBuf
         {
             get
@@ -380,11 +380,6 @@ namespace RootTools.Camera.Dalsa
             //m_iBlock = -1;
             m_sapBuf.Index = (int)(0);
             m_nGrabTrigger = 0;
-            if (m_sapXfer.Grabbing == true)
-            {
-                m_sapXfer.Freeze();
-                m_sapXfer.Wait(2000);
-            }
             m_sapXfer.Snap((int)(m_nGrabCount));
             p_CamInfo.p_eState = eCamState.GrabMem;
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));

@@ -933,6 +933,8 @@ namespace Root_Vega.Module
                         if (fScore >= m_fMinScore)
                         {
                             m_module.p_infoReticle.p_sSlotID = sOCR;
+                            m_module.p_infoReticle.p_sReticleID = m_module.p_infoReticle.p_sSlotID;
+
                             return "OK";
                         }
                         if (fScoreMax < fScore)

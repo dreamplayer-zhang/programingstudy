@@ -34,8 +34,7 @@ namespace Root_Vega
             textBoxPodID.DataContext = loadport.m_infoPod;
             textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
-            textBoxRecipe.DataContext = loadport.m_infoPod.m_aGemSlot[0];
-
+            //textBoxSlotID.DataContext = loadport.p_infoReticle.p_sReticleID;
             InitButtonLoad();
             InitTimer(); 
 
@@ -53,8 +52,8 @@ namespace Root_Vega
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            borderPlaced.Background = m_loadport.m_dioPlaced.p_bIn ? Brushes.LightGreen : null;
-            borderPresent.Background = m_loadport.m_dioPresent.p_bIn ? Brushes.LightGreen : null;
+            borderPlaced.Background = !m_loadport.m_dioPlaced.p_bIn ? Brushes.LightGreen : null;
+            borderPresent.Background = !m_loadport.m_dioPresent.p_bIn ? Brushes.LightGreen : null;
             borderLoad.Background = m_loadport.m_dioLoad.p_bIn ? Brushes.LightGreen : null;
             borderUnload.Background = m_loadport.m_dioUnload.p_bIn ? Brushes.LightGreen : null;
             borderAlarm.Background = (m_loadport.p_eState == ModuleBase.eState.Error) ? Brushes.Red : null;
@@ -79,8 +78,10 @@ namespace Root_Vega
             bool bReadyLoadport = (m_loadport.p_eState == ModuleBase.eState.Ready); 
             bool bReadyToLoad = (m_loadport.m_infoPod.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
             bReadyToLoad = true; 
-            bool bReadyState = ((m_loadport.p_eState == ModuleBase.eState.Ready) && (m_loadport.m_qModuleRun.Count > 0));
-            return bReadyLoadport && bReadyToLoad && bReadyState; //forget 조건
+            bool bReadyState =  (m_loadport.m_qModuleRun.Count == 0);
+            bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
+            if (m_handler.IsEnableRecovery() == true) return false;
+            return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState; //forget 조건
         }
 
         private void ToggleButton_Click(object sender, RoutedEventArgs e)

@@ -43,8 +43,8 @@ namespace Root_Vega.ManualJob
         {
             SetBrush(buttonStateLoading, m_OHT.m_doLoadReq.p_bOn && p_bBlink); 
             SetBrush(buttonStateUnloading, m_OHT.m_doUnloadReq.p_bOn && p_bBlink);
-            textBlockPlaced.Foreground = m_loadport.m_dioPlaced.p_bIn ? Brushes.White : Brushes.Gray;
-            textBlockPresent.Foreground = m_loadport.m_dioPresent.p_bIn ? Brushes.White : Brushes.Gray;
+            textBlockPlaced.Foreground = !m_loadport.m_dioPlaced.p_bIn ? Brushes.White : Brushes.Gray;
+            textBlockPresent.Foreground = !m_loadport.m_dioPresent.p_bIn ? Brushes.White : Brushes.Gray;
             bool bPodIn = p_bBlink ? m_loadport.m_dioPlaced.p_bIn : m_loadport.m_dioPresent.p_bIn;
             imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
             imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;

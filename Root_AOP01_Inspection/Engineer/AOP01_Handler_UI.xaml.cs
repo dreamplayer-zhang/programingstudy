@@ -32,7 +32,7 @@ namespace Root_AOP01
             {
                 TabItem tabItem = new TabItem();
                 tabItem.Header = kv.Key.p_id;
-                tabItem.Content = kv.Value;
+                //tabItem.Content = kv.Value;
                 tabItem.Background = m_handler.p_brushModule;
                 tabModule.Items.Add(tabItem);
             }
