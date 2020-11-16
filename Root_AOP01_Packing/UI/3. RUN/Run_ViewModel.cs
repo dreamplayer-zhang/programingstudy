@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Root_AOP01
+namespace Root_AOP01_Packing
 {
     class Run_ViewModel : ObservableObject
     {

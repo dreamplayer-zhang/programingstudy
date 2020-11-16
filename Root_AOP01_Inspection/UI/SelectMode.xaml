@@ -37,7 +37,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid>
-                            <Image Source="/Root_AOP01;component/Control/Icon/Resource/file_settings_127px.png" Margin="70"/>
+                            <Image Source="/Root_AOP01_Inspection;component/Control/Icon/Resource/file_settings_127px.png" Margin="70"/>
                         </Grid>
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>

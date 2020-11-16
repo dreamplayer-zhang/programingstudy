@@ -9,7 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace Root_AOP01
+namespace Root_AOP01_Packing
 {
     public static class AutoScrollHelper
     {

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
-namespace Root_AOP01
+namespace Root_AOP01_Packing
 {
     [Serializable]
     public abstract class ObservableObject : INotifyPropertyChanged

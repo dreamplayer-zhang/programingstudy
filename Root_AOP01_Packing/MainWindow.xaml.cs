@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Root_AOP01
+namespace Root_AOP01_Packing
 {
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리

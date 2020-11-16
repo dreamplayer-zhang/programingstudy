@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Root_AOP01
+namespace Root_AOP01_Packing
 {
     class GEM_ViewModel : ObservableObject
     {
