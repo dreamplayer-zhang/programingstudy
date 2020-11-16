@@ -59,6 +59,55 @@ namespace Root_Vega
             }
         }
 
+        private MiniViewer_ViewModel m_MiniImageViewer_Top;
+        public MiniViewer_ViewModel p_MiniImageViewer_Top
+        {
+            get
+            {
+                return m_MiniImageViewer_Top;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_Top, value);
+            }
+        }
+        private MiniViewer_ViewModel m_MiniImageViewer_Btm;
+        public MiniViewer_ViewModel p_MiniImageViewer_Btm
+        {
+            get
+            {
+                return m_MiniImageViewer_Btm;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_Btm, value);
+            }
+        }
+        private MiniViewer_ViewModel m_MiniImageViewer_Left;
+        public MiniViewer_ViewModel p_MiniImageViewer_Left
+        {
+            get
+            {
+                return m_MiniImageViewer_Left;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_Left, value);
+            }
+        }
+        private MiniViewer_ViewModel m_MiniImageViewer_Right;
+        public MiniViewer_ViewModel p_MiniImageViewer_Right
+        {
+            get
+            {
+                return m_MiniImageViewer_Right;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer_Right, value);
+            }
+        }
+
         private readonly IDialogService m_DialogService;
 
         public _1_Mainview_ViewModel(Vega_Engineer engineer, IDialogService dialogService)
@@ -68,7 +117,12 @@ namespace Root_Vega
             p_Handler = (Vega_Handler)engineer.ClassHandler();
             p_Process = p_Handler.m_process;
             InitAlarmData();
-            p_MiniImageViewer = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("PatternVision.Memory", "PatternVision", "Main")));
+            //p_MiniImageViewer = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("PatternVision.Memory", "PatternVision", "Main")), false, true);
+            p_MiniImageViewer = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideTop")), false, true);
+            p_MiniImageViewer_Btm = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideBottom")), true);
+            p_MiniImageViewer_Top = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideTop")), true);
+            p_MiniImageViewer_Left = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideLeft")));
+            p_MiniImageViewer_Right = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideRight")));
         }
 
         void LoadLp1()
@@ -118,7 +172,13 @@ namespace Root_Vega
 
         void TestFunction()
         {
+            p_MiniImageViewer_Left.SetRoiRect();
+            p_MiniImageViewer.SetRoiRect();
             p_MiniImageViewer.SetImageSource();
+            p_MiniImageViewer_Btm.SetImageSource();
+            p_MiniImageViewer_Top.SetImageSource();
+            p_MiniImageViewer_Left.SetImageSource();
+            p_MiniImageViewer_Right.SetImageSource();
             //((GAF_Manager)m_Engineer.ClassGAFManager()).SetAlarm(this.ToString(), eAlarm.TestAlarm2);
 
             //if (EQ.p_eState == EQ.eState.Init)

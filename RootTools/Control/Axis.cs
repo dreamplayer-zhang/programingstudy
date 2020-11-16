@@ -696,13 +696,13 @@ namespace RootTools.Control
         #region RelayCommand
         private void MJogFast()
         {
-            if (p_eState > Axis.eState.Ready) return;
+            if (p_eState != Axis.eState.Ready) return;
             Jog(-0.31, eSpeed.Jog.ToString());
         }
 
         private void PJogFast()
         {
-            if (p_eState > Axis.eState.Ready) return;
+            if (p_eState != Axis.eState.Ready) return;
             Jog(0.31, eSpeed.Jog.ToString());
         }
 
@@ -714,14 +714,14 @@ namespace RootTools.Control
 
         private void Move()
         {
-            if (p_eState > Axis.eState.Ready) return;
+            if (p_eState != Axis.eState.Ready) return;
             StartMove(p_strSelPos, 0, eSpeed.Move.ToString());
         }
 
         private void MRelativeMove()
         {
             int nDir = -1;
-            if (p_eState > Axis.eState.Ready) return;
+            if (p_eState != Axis.eState.Ready) return;
             try
             {
                 double dPos = Convert.ToInt32(p_dRelPos);
@@ -734,7 +734,7 @@ namespace RootTools.Control
         private void PRelativeMove()
         {
             int nDir = 1;
-            if (p_eState > Axis.eState.Ready) return;
+            if (p_eState != Axis.eState.Ready) return;
             try
             {
                 double dPos = Convert.ToInt32(p_dRelPos);

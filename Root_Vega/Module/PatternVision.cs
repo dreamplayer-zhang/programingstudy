@@ -421,7 +421,8 @@ namespace Root_Vega.Module
             if (bIgnoreExistSensor) bExist = (p_infoReticle != null);
             else
             {
-                //forget
+                bExist = m_diPatternReticleExistSensor.p_bIn;
+                
             }
             p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
             return bExist;
@@ -905,7 +906,8 @@ namespace Root_Vega.Module
                             dEndAxisPos = dTemp;
                             m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
                         }
-                        double dAxisPosX = m_rpReticleCenterPos_pulse.X + (m_dReticleSize_mm * nMMPerUM / 0.08 / 2) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
+                        //double dAxisPosX = m_rpReticleCenterPos_pulse.X + (m_dReticleSize_mm * nMMPerUM / 0.08 / 2) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
+                        double dAxisPosX = m_rpReticleCenterPos_pulse.X + (150 * nMMPerUM / 0.1 / 2) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
 
                         if (m_module.Run(axisXY.StartMove(new RPoint(dAxisPosX, dStartAxisPos)))) return p_sInfo;
                         if (m_module.Run(axisZ.StartMove(m_dFocusPosZ_pulse))) return p_sInfo;
@@ -1044,6 +1046,11 @@ namespace Root_Vega.Module
                     }
                     m_grabMode.m_camera.StopGrab();
                     return "OK";
+                }
+                catch(Exception e)
+                {
+                    MessageBox.Show(e.Message + "\n" + e.StackTrace);
+                    return e.Message +"\n"+ e.StackTrace;
                 }
                 finally
                 {
