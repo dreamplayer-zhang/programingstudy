@@ -304,7 +304,8 @@ namespace Root_ASIS.Teachs
             {
                 string sKey = m_id + n.ToString("00");
                 string sAOI = job.Set(sKey, "AOI", "");
-                IAOI aoi = NewAOI(sAOI);
+                string[] asAOI = sAOI.Split('.'); 
+                IAOI aoi = NewAOI(asAOI[1]);
                 if (aoi != null) p_aAOI.Add(aoi);
             }
             RunTreeAOI(Tree.eMode.JobOpen);
