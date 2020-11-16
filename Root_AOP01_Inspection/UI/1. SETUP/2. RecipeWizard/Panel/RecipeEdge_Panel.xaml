@@ -150,12 +150,12 @@
                                         <TextBlock FontSize="12" Text="GV LSL" Style="{StaticResource BasicTb}" Grid.Row="3"/>
                                         <TextBlock FontSize="12" Text="Size USL" Style="{StaticResource BasicTb}" Grid.Row="4"/>
                                         <TextBlock FontSize="12" Text="Size LSL" Style="{StaticResource BasicTb}" Grid.Row="5"/>
-                                        <TextBox Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="0"/>
-                                        <TextBox Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="0"/>
-                                        <TextBox Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="0"/>
-                                        <TextBox Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="0"/>
-                                        <TextBox Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="0"/>
-                                        <TextBox Grid.Column="2" Grid.Row="5" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="0"/>
+                                        <TextBox Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="11"/>
+                                        <TextBox Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="80"/>
+                                        <TextBox Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="140"/>
+                                        <TextBox Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="90"/>
+                                        <TextBox Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="5"/>
+                                        <TextBox Grid.Column="2" Grid.Row="5" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="1"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="3" Header="Defect Code">
@@ -255,12 +255,26 @@
                                             </Style>
                                         </DataGrid.Resources>
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="No." Binding="{Binding Path=no}" Width="0.5*"/>
-                                            <DataGridTextColumn Header="Location" Binding="{Binding Path=xy}" Width="1.5*"/>
-                                            <DataGridTextColumn Header="Size" Binding="{Binding Path=size}" Width="*"/>
-                                            <DataGridTextColumn Header="Gv" Binding="{Binding Path=gv}" Width="0.5*"/>
-                                            <DataGridTextColumn Header="Code" Binding="{Binding Path=dc}" Width="*"/>
+                                            <DataGridTextColumn Header="No." Binding="{Binding Path=a}" Width="0.5*"/>
+                                            <DataGridTextColumn Header="Location" Binding="{Binding Path=b}" Width="1.5*"/>
+                                            <DataGridTextColumn Header="Size" Binding="{Binding Path=c}" Width="*"/>
+                                            <DataGridTextColumn Header="Gv" Binding="{Binding Path=d}" Width="0.5*"/>
+                                            <DataGridTextColumn Header="Code" Binding="{Binding Path=e}" Width="*"/>
                                         </DataGrid.Columns>
+                                        <local:Dummy a="0" b="1078, 2395" c="1.4mm" d="32" e="0x000000"/>
+                                        <local:Dummy a="1" b="2395, 1078" c="2.2mm" d="24" e="0x000000"/>
+                                        <local:Dummy a="2" b="8078, 3355" c="1.1mm" d="57" e="0x000000"/>
+                                        <local:Dummy a="3" b="2678, 6345" c="1.8mm" d="61" e="0x000000"/>
+                                        <local:Dummy a="4" b="4378, 6385" c="1.6mm" d="55" e="0x000000"/>
+                                        <local:Dummy a="5" b="7178, 5375" c="1.6mm" d="71" e="0x000000"/>
+                                        <local:Dummy a="6" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="7" b="1078, 2395" c="1.4mm" d="32" e="0x000000"/>
+                                        <local:Dummy a="8" b="2395, 1078" c="2.2mm" d="24" e="0x000000"/>
+                                        <local:Dummy a="9" b="8078, 3355" c="1.1mm" d="57" e="0x000000"/>
+                                        <local:Dummy a="10" b="2678, 6345" c="1.8mm" d="61" e="0x000000"/>
+                                        <local:Dummy a="11" b="4378, 6385" c="1.6mm" d="55" e="0x000000"/>
+                                        <local:Dummy a="12" b="7178, 5375" c="1.6mm" d="71" e="0x000000"/>
+                                        <local:Dummy a="13" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
                                     </DataGrid>
                                 </GroupBox>
                             </Grid>
