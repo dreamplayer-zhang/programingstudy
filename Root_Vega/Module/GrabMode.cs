@@ -27,6 +27,7 @@ namespace Root_Vega.Module
         string m_sCamera = "";
         public ICamera m_camera = null;
         CameraSet m_cameraSet;
+
         void RunTreeCamera(Tree tree, bool bVisible, bool bReadOnly)
         {
             m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
@@ -138,6 +139,7 @@ namespace Root_Vega.Module
         public int m_intervalAcc = 100000;        // 가속 구간 point,  단위 0.1um
         public int m_ScanLineNum = 1;
         public int m_ScanStartLine = 0;
+        public int m_nXOffset = 0;
         #endregion
 
         public eScanPos m_eScanPos = eScanPos.Bottom;
@@ -150,6 +152,7 @@ namespace Root_Vega.Module
         void RunTreeScanPos(Tree tree, bool bVisible, bool bReadOnly)
         {
             m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible, bReadOnly);
+            m_nXOffset = tree.Set(m_nXOffset, m_nXOffset, "X Offset", "X Offset", bVisible, bReadOnly);
         }
 
         public string p_sName{get;set;}
@@ -184,6 +187,8 @@ namespace Root_Vega.Module
             dst.m_ScanStartLine = src.m_ScanStartLine;
             dst.m_sMemoryData = src.m_sMemoryData;
             dst.m_sMemoryGroup = src.m_sMemoryGroup;
+
+            dst.m_nXOffset = src.m_nXOffset;
 
             return dst;
         }
