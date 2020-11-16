@@ -43,7 +43,8 @@ namespace Root_AxisMapping.Module
         MemoryGroup m_memoryGroupResult;
         MemoryData m_memoryGrab;
         MemoryData m_memoryResult;
-        CPoint m_szGrab = new CPoint(16000, 250000); 
+        CPoint m_szGrab = new CPoint(16000, 250000);
+        CPoint m_szResult = new CPoint(14336, 14336); 
         public override void InitMemorys()
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
@@ -51,14 +52,16 @@ namespace Root_AxisMapping.Module
             m_cam.SetMemoryData(m_memoryGrab);
             m_memoryPool.m_viewer.p_memoryData = m_memoryGrab;
             m_memoryGroupResult = m_memoryPoolResult.GetGroup(p_id);
-            m_memoryResult = m_memoryGroupResult.CreateMemory("Result", 1, 1, new CPoint(15360, 15360));
+            m_memoryResult = m_memoryGroupResult.CreateMemory("Result", 1, 1, m_szResult);
             m_memoryPoolResult.m_viewer.p_memoryData = m_memoryResult;
         }
 
         void RunTreeMemory(Tree tree)
         {
-            m_szGrab = tree.Set(m_szGrab, m_szGrab, "Grab Size", "Dalsa Grab Silze (pixel)");
+            m_szGrab = tree.Set(m_szGrab, m_szGrab, "Grab Size", "Dalsa Grab Size (pixel)");
             if (m_szGrab != m_memoryGrab.p_sz) m_memoryGrab.p_sz = m_szGrab; //LYJ 201109
+            m_szResult = tree.Set(m_szResult, m_szResult, "Result Size", "Result Draw Size (pixel)");
+            if (m_szResult != m_memoryResult.p_sz) m_memoryResult.p_sz = m_szResult; //LYJ 201109
         }
         #endregion
 
