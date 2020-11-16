@@ -1,9 +1,9 @@
-﻿<UserControl x:Class="Root_AOP01.Icon.Calendar"
+﻿<UserControl x:Class="Root_AOP01_Inspection.Icon.Calendar"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Root_AOP01.Icon"
+             xmlns:local="clr-namespace:Root_AOP01_Inspection.Icon"
              mc:Ignorable="d" 
              d:DesignHeight="25" d:DesignWidth="20">
     <Grid>

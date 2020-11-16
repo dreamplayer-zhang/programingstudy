@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Root_AOP01
+namespace Root_AOP01_Inspection
 {
     /// <summary>
     /// AUP01_Process_UI.xaml에 대한 상호 작용 논리

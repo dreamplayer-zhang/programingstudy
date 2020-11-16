@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace Root_AOP01
+namespace Root_AOP01_Inspection
 {
     class Recipe45D_ViewModel : ObservableObject
     {

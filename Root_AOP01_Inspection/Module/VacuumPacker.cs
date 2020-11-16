@@ -5,7 +5,7 @@ using RootTools.Trees;
 using System;
 using System.Threading;
 
-namespace Root_AOP01.Module
+namespace Root_AOP01_Inspection.Module
 {
     public class VacuumPacker : ModuleBase
     {

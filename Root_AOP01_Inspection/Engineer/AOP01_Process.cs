@@ -1,7 +1,7 @@
 ﻿using RootTools;
 using RootTools.Trees;
 
-namespace Root_AOP01
+namespace Root_AOP01_Inspection
 {
     public class AOP01_Process
     {

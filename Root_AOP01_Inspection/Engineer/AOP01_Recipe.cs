@@ -2,7 +2,7 @@
 using RootTools.Module;
 using System.Collections.Generic;
 
-namespace Root_AOP01
+namespace Root_AOP01_Inspection
 {
     public class AOP01_Recipe
     {
