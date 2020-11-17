@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Root_CAMELLIA.ShapeDraw
 {
-    class Line : IShapeManager<Line>
+    public class Line : IShapeManager<Line>
     {
         #region Getter Setter
         public double X { get; set; }

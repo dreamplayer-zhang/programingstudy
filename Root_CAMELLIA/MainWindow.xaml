@@ -504,9 +504,16 @@
                 </GroupBox>
                 <GroupBox Header="Stage Map" Grid.Row="1">
                     <Viewbox Margin="10">
-                        <Canvas Width="1000" Height="1000">
-                            <Ellipse Fill="SlateGray" Width="1000" Height="1000"/>
-                        </Canvas>
+                        <ItemsControl ItemsSource="{Binding p_MainDrawElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas Width="1000" Height="1000">
+                                    </Canvas>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
                     </Viewbox>
                 </GroupBox>
             </Grid>

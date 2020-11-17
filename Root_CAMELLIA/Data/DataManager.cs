@@ -10,9 +10,11 @@ namespace Root_CAMELLIA.Data
     {
 
         public RecipeDataManager recipeDM { get; set; }
-        public DataManager()
+        public MainWindow Main { get; set; }
+        public DataManager(MainWindow main)
         {
             recipeDM = new RecipeDataManager(this);
+            Main = main;
         }
     }
 }

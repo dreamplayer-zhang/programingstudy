@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Root_CAMELLIA.ShapeDraw
 {
-    class Arc : IShapeManager<Arc>
+    public class Arc : IShapeManager<Arc>
     {
         #region Getter Setter
 

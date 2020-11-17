@@ -35,7 +35,7 @@ namespace Root_CAMELLIA
         private void Init()
         {
             recipe = new Dlg_RecipeManger();
-            DataManager = new DataManager();
+            DataManager = new DataManager(this);
             m_RecipeManagerViewModel = new Dlg_RecipeManager_ViewModel(this, recipe);
             recipe.DataContext = m_RecipeManagerViewModel;
         }
@@ -52,7 +52,7 @@ namespace Root_CAMELLIA
 
 
         #region ViewModel
-        private Dlg_RecipeManager_ViewModel m_RecipeManagerViewModel;
+        public Dlg_RecipeManager_ViewModel m_RecipeManagerViewModel;
         #endregion
 
         #region Dlg
@@ -104,6 +104,7 @@ namespace Root_CAMELLIA
         }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            recipe.Close();
             this.Close();
         }
         #endregion
@@ -125,6 +126,7 @@ namespace Root_CAMELLIA
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            recipe.Close();
             this.Close();
         }
 

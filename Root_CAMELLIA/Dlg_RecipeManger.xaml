@@ -7,6 +7,8 @@
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Icon"
+        xmlns:wpfx="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:converter="clr-namespace:Root_CAMELLIA.ShapeDraw"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
@@ -14,6 +16,9 @@
         Width="1820" Height="980"
         Background="{StaticResource PanelBackGround}"
         mc:Ignorable="d">
+    <Window.Resources>
+        <converter:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -81,10 +86,34 @@
         <!--Menu-->
         <Menu Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2"
               Height="25">
-            <MenuItem Header="New" Height="25"/>
-            <MenuItem Header="Open"/>
-            <MenuItem Header="Save"/>
-            <MenuItem Header="Save As"/>
+            <MenuItem x:Name="RecipeNew" Header="New"  Height="25">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click" >
+                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=RecipeNew, Mode=OneWay}" MethodName="OnNew_Click" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </MenuItem>
+            <MenuItem x:Name="RecipeOpen" Header="Open">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click" >
+                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=RecipeOpen, Mode=OneWay}" MethodName="OnOpen_Click" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </MenuItem>
+            <MenuItem x:Name="RecipeSave" Header="Save">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click" >
+                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=RecipeSave, Mode=OneWay}" MethodName="OnSave_Click" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </MenuItem>
+            <MenuItem x:Name="RecipeSaveAs" Header="Save As">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click" >
+                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=RecipeSaveAs, Mode=OneWay}" MethodName="OnSaveAs_Click" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </MenuItem>
         </Menu>
 
         <Grid Grid.Row="2">
@@ -237,6 +266,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="60"/>
                         <RowDefinition/>
+                        <RowDefinition Height="60"/>
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
@@ -263,46 +293,94 @@
                     <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
                             <RowDefinition/>
-                            <RowDefinition Height="30"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
-                            <ColumnDefinition Width="30"/>
                         </Grid.ColumnDefinitions>
-                        <Viewbox Margin="10">
-                            <Canvas x:Name="StageMainView" ClipToBounds="True" Margin="10" Width="1000" Height="1000" Background="#01FFFFFF">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseMove">
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseMove" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseWheel" >
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseWheel" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseLeftButtonDown" >
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeftButtonDown" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseLeftButtonUp" >
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeftButtonUp" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseRightButtonDown" >
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseRightButtonDown" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseRightButtonUp" >
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseRightButtonUp" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseEnter" >
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseEnter" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseLeave" >
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeave" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </Canvas>
-                           
+                        <Viewbox Margin="10" Width="780" Grid.Row="0">
+                            <!-- 이거 길이 동적으로..-->
+                            <ItemsControl ItemsSource="{Binding p_DrawElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas x:Name="StageMainView" ClipToBounds="True"  Width="1000" Height="1000" Background="#01FFFFFF" Focusable="true">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseMove">
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseMove" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseWheel" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseWheel" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeftButtonDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeftButtonUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeftButtonUp" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseRightButtonDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseRightButtonDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseRightButtonUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseRightButtonUp" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseEnter" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseEnter" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeave" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeave" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeave" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeave" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="KeyDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView}" MethodName="OnCanvasKeyDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="KeyUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView}" MethodName="OnCanvasKeyUp" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
                         </Viewbox>
-                        <ScrollBar Grid.Row="1" Maximum="10" Minimum="1" Value="10" Orientation="Horizontal" x:Name="HorizontalScroll" Visibility="Hidden" />
-                        <ScrollBar Grid.Column="1" Maximum="10" Minimum="1" Value="10" x:Name="VerticalScroll" Visibility="Hidden" />
                     </Grid>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="Tool Plus">
+                            <UniformGrid Columns="4">
+                                <Button Margin="5" x:Name="LockBtn" Content="{Binding LockState}" Background="{Binding LockBrush}" Command="{Binding UILock}"/>
+                                <Button Margin="5" x:Name="ShowBtn" Content="ShowIndex" Background="{Binding ShowIndexBrush}" Command="{Binding ShowIndex}"/>
+                            </UniformGrid>
+                        </GroupBox>
+                        <GroupBox Header="Key State" Grid.Column="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <UniformGrid Columns="3" Grid.Column="0">
+                                    <Border Margin="5" BorderThickness="1" Background="{Binding ShiftBrush}" BorderBrush="Black">
+                                        <TextBlock Text="Shift" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                                    </Border>
+                                    <Border Margin="5" BorderThickness="1" Background="{Binding CtrlBrush}" BorderBrush="Black">
+                                        <TextBlock Text="Ctrl" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                                    </Border>
+                                    <Border Margin="5" BorderThickness="1" Background="{Binding SBrush}" BorderBrush="Black">
+                                        <TextBlock Text="S" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                                    </Border>
+                                </UniformGrid>
+                                <Border Grid.Column="1" BorderThickness="1" Background="AliceBlue"  BorderBrush="Black">
+                                    <TextBlock Text="{Binding PointAddMode}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                                </Border>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                 
                 </Grid>
             </GroupBox>
             <Grid Grid.Column="2">
@@ -333,26 +411,68 @@
                                 <DataGridTextColumn Header="Route" Width="*" Binding="{Binding ListRoute}" IsReadOnly="True"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <UniformGrid Grid.Row="2" Columns="3">
-                            <Button Content="Stop" Margin="5"/>
-                            <Button Content="Route Optimization" Margin="5">
+                        <Grid Grid.Row="2" Grid.Column="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Button Grid.Column="0" Grid.RowSpan="2" Content="Reorder Route" Margin="5" Command="{Binding ReorderPoint}" Background="{Binding ReorderBrush}" />
+                            <Button Grid.Column="1" Grid.RowSpan="2" Margin="5" Command="{Binding RouteOptimizaion}">
+                                <TextBlock TextAlignment="Center">Find Nearest<LineBreak/>Next Point</TextBlock>
                             </Button>
-                            <Border Margin="5" Background="#FFDDDDDD"
-                                    BorderBrush="#FF707070" BorderThickness="1">
-                                <CheckBox Content="Show Route" 
+
+                            <Grid Grid.Column="2" Grid.RowSpan="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Border Margin="5" Background="#FFDDDDDD"
+                                    BorderBrush="#FF707070" BorderThickness="1" Grid.ColumnSpan="2">
+                                    <CheckBox x:Name="checkRoot" Content="Show Route" 
                                              VerticalAlignment="Center"
                                              HorizontalAlignment="Center" IsChecked="{Binding ShowRoute}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="Checked" >
-                                            <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnCheckboxChange" />
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="Unchecked" >
-                                            <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnCheckboxChange" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </CheckBox>
-                            </Border>
-                        </UniformGrid>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=checkRoot, Mode=OneWay}" MethodName="OnCheckboxChange" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=checkRoot, Mode=OneWay}" MethodName="OnCheckboxChange" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </CheckBox>
+                                </Border>
+                                <UniformGrid Grid.Row="1" Grid.ColumnSpan="2" Rows="1" Columns="3">
+                                    <wpfx:ColorPicker x:Name="colorPicker" DisplayColorAndName="False" Margin="5" AvailableColorsSortingMode="HueSaturationBrightness" ColorMode="ColorCanvas"
+                                                      SelectedColor="{Binding RouteBrush, Mode=TwoWay, Converter={StaticResource ColorToBrushConverter}, UpdateSourceTrigger=PropertyChanged}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectedColorChanged" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="ColorPicker_SelectedColorChanged" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Opened" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="colorPicker_Opened" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </wpfx:ColorPicker>
+                                    <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Thick"/>
+                                    <TextBox x:Name="thicknessTextBox" Text="{Binding RouteThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextAlignment="Center" VerticalContentAlignment="Center" Margin="5">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="TextChanged" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=thicknessTextBox, Mode=OneWay}" MethodName="OnThicknessChanged" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBox>
+                                </UniformGrid>
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="Position Information" Grid.Row="2">
@@ -403,22 +523,30 @@
                 <Grid Grid.Row="3">
                     <GroupBox Header="PreView">
                         <Viewbox Margin="10">
-                            <Canvas x:Name="StagePreView" Margin="10" Width="1000" Height="1000" ClipToBounds="True" Background="#01FFFFFF">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="MouseMove">
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseWheel" >
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseWheelPreView" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseLeftButtonDown" >
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseRightButtonDown" >
-                                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseRightButtonDownPreView" />
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </Canvas>
+                            <ItemsControl ItemsSource="{Binding p_PreviewDrawElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas x:Name="StagePreView" Margin="10" Width="1000" Height="1000" ClipToBounds="True" Background="#01FFFFFF">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseMove">
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseWheel" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseWheelPreView" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseRightButtonDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseRightButtonDownPreView" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
                         </Viewbox>
                     </GroupBox>
                 </Grid>

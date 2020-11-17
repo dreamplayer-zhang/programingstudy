@@ -14,6 +14,8 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -81,6 +83,21 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.1\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.1\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=4.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.0.1\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -93,9 +110,21 @@
     <Compile Include="Data\PresetData.cs" />
     <Compile Include="Data\RecipeDataManager.cs" />
     <Compile Include="Data\RecipeData.cs" />
+    <Compile Include="DictionarySet\SortedTupleBag.cs" />
+    <Compile Include="Draw\GeometryManager.cs" />
+    <Compile Include="Draw\ShapeManager.cs" />
+    <Compile Include="Draw\TextManager.cs" />
     <Compile Include="GeneralFunction.cs" />
+    <Compile Include="MainWindow_ViewModel.cs" />
+    <Compile Include="Priority_Queue\FastPriorityQueue.cs" />
+    <Compile Include="Priority_Queue\FastPriorityQueueNode.cs" />
+    <Compile Include="Priority_Queue\IFixedSizePriorityQueue.cs" />
+    <Compile Include="Priority_Queue\IPriorityQueue.cs" />
+    <Compile Include="Sequence\MeasureSequence.cs" />
+    <Compile Include="Sequence\SequenceManager.cs" />
     <Compile Include="ShapeDraw\Arc.cs" />
     <Compile Include="ShapeDraw\Circle.cs" />
+    <Compile Include="ShapeDraw\ColorToBrushConverter.cs" />
     <Compile Include="ShapeDraw\IShapeManager.cs" />
     <Compile Include="ShapeDraw\Line.cs" />
     <Compile Include="ShapeDraw\Polygon.cs" />
@@ -167,6 +196,9 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

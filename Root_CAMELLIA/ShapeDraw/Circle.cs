@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Root_CAMELLIA.ShapeDraw
 {
-    class Circle : IShapeManager<Circle>
+    public class Circle : IShapeManager<Circle>
     {
         #region Getter Setter
 

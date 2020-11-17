@@ -29,8 +29,8 @@ namespace Root_CAMELLIA
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-           // this.Hide();
-            this.Close();
+            this.Hide();
+           // this.Close();
         }
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
