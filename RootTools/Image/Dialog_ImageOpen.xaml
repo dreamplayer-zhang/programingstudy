@@ -33,9 +33,9 @@
             </Grid.ColumnDefinitions>
             <TextBox TextAlignment="Center" VerticalAlignment="Center"
                      Margin="10"
-                    Text="{Binding p_ImageViewer.p_CopyOffset.X}"></TextBox>
+                    Text="{Binding p_RootViewer.p_CopyOffset.X}"></TextBox>
             <TextBox TextAlignment="Center" VerticalAlignment="Center" Margin="10"
-                    Text="{Binding p_ImageViewer.p_CopyOffset.Y}" Grid.Column="2"></TextBox>
+                    Text="{Binding p_RootViewer.p_CopyOffset.Y}" Grid.Column="2"></TextBox>
         </Grid>
         <Grid Grid.Row="2" Margin="10">
             <Grid.ColumnDefinitions>

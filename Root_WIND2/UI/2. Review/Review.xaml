@@ -3,13 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:local="clr-namespace:Root_WIND2"
              mc:Ignorable="d" 
              d:DesignHeight="888" d:DesignWidth="1912"
              Background="{StaticResource PanelBackGround}">
-    <UserControl.DataContext>
-        <local:Review_ViewModel/>
-    </UserControl.DataContext>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -77,7 +76,8 @@
                 BorderThickness="0,0,0,0">
         </Border>
         <!--End Toolbar-->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Visible">
+        
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Disabled">
             <StackPanel>
                 <Grid Height="838">
                     <Grid.ColumnDefinitions>
@@ -273,7 +273,10 @@
 
                     </Grid>
                     <Grid Grid.Column="0" Visibility="Visible" x:Name="ReviewPanel">
-                        <GroupBox Grid.Row="1" Header="Wafer List">
+                        <GroupBox 
+                            Grid.Row="1" 
+                            Header="Wafer List"
+                            >
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
@@ -308,37 +311,330 @@
                                                     <CheckBox Content="Recipe Name" VerticalAlignment="Center" x:Name="cbRecipe"/>
                                                     <TextBox Grid.Column="1" IsEnabled="{Binding ElementName=cbRecipe, Path=IsChecked}"/>
                                                 </Grid>
-                                                <Button Content="Search" Margin="0,12,0,0"
-                                                Height="30"
-                                                Style="{StaticResource SetupPanelBtn}"/>
+                                                <Button 
+                                                    Content="Search" 
+                                                    Margin="0,12,0,0"
+                                                    Height="30"
+                                                    Command="{Binding btnSearch}"
+                                                    Style="{StaticResource PanelBtn}"/>
                                             </StackPanel>
                                         </StackPanel>
                                     </Grid>
                                 </GroupBox>
-                                <DataGrid Grid.Row="1" Margin="2">
+                                                               
+                                <!--<tools:Database_DataView 
+                                    DataContext="{Binding p_DataViewer_Lotinfo}" 
+                                    Margin="0,5,0,0" 
+                                    Grid.Row="1"
+                                    >
+                                </tools:Database_DataView>-->
+                                <DataGrid 
+                                    Name="Lotinfo_Viewer" 
+                                    ItemsSource="{Binding pLotinfo_Datatable}"
+                                    SelectedItem ="{Binding pSelected_Lotinfo, Mode=TwoWay}"
+                                    SelectionMode="Extended"
+                                    IsReadOnly="True"
+                                    EnableColumnVirtualization = "True"
+                                    EnableRowVirtualization = "True"
+                                    ScrollViewer.CanContentScroll="True"
+                                    AutoGenerateColumns="True"
+                                    Grid.Row="1" Margin="2"
+                                    >
                                     <DataGrid.Resources>
                                         <Style TargetType="DataGridColumnHeader">
                                             <Setter Property="HorizontalAlignment" Value="Stretch"/>
                                             <Setter Property="HorizontalContentAlignment" Value="Center"/>
                                         </Style>
                                     </DataGrid.Resources>
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="No." Binding="{Binding no}" Width="30"/>
-                                        <DataGridTextColumn Header="Wafer ID" Binding="{Binding id}" Width="*"/>
-                                        <DataGridTextColumn Header="Recipe" Binding="{Binding rcp}" Width="*"/>
-                                        <DataGridTextColumn Header="Date" Binding="{Binding date}" Width="*"/>
-                                    </DataGrid.Columns>
-                                    <local:DummyWafer no="0" id="Wafer0" rcp="Test1.rcp" date="2020-08-01"/>
-                                    <local:DummyWafer no="1" id="Wafer1" rcp="Test1.rcp" date="2020-08-01"/>
-                                    <local:DummyWafer no="2" id="Wafer2" rcp="Test1.rcp" date="2020-08-01"/>
-                                    <local:DummyWafer no="3" id="Wafer3" rcp="Test1.rcp" date="2020-08-01"/>
                                 </DataGrid>
                             </Grid>
                         </GroupBox>
                     </Grid>
 
                     <Grid Grid.Column="1">
-                        <local:View/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <!--Defect View-->
+                            <Grid Grid.Column="0">
+                                <GroupBox Grid.Row="1"
+                          Header="Defect View">
+                                    <Grid>
+                                        <StackPanel VerticalAlignment="Top"
+                                    Margin="10,10">
+                                            <Grid Margin="0,0,0,10" HorizontalAlignment="Left">
+                                                <CheckBox Content="Front" FontSize="15" FontWeight="Bold" x:Name="cb_Front"/>
+                                                <Grid Width="12" Height="12" Background="Red" Margin="70,0,0,0" HorizontalAlignment="Left"/>
+                                            </Grid>
+                                            <Grid Margin="0,0,0,10" HorizontalAlignment="Left">
+                                                <CheckBox Content="Back" FontSize="15" FontWeight="Bold" x:Name="cb_Back"/>
+                                                <Grid Width="12" Height="12" Background="Blue" Margin="70,0,0,0" HorizontalAlignment="Left"/>
+                                            </Grid>
+                                            <Grid Margin="0,0,0,10" HorizontalAlignment="Left">
+                                                <CheckBox Content="Edge" FontSize="15" FontWeight="Bold" x:Name="cb_EBR"/>
+                                                <Grid Width="12" Height="12" Background="Green" Margin="70,0,0,0" HorizontalAlignment="Left"/>
+                                            </Grid>
+                                            <Grid Margin="0,0,0,10" HorizontalAlignment="Left">
+                                                <CheckBox Content="EBR" FontSize="15" FontWeight="Bold" x:Name="cb_Edge"/>
+                                                <Grid Width="12" Height="12" Background="Black" Margin="70,0,0,0" HorizontalAlignment="Left"/>
+                                            </Grid>
+                                        </StackPanel>
+                                        <Grid VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10,10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Text="Wafer ID" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
+                                            <TextBlock Text="Recipe"   FontSize="15" FontWeight="Bold"  Grid.Row="1" Grid.Column="0" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Defect"   FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="0" Margin="0,5,0,5"  VerticalAlignment="Center"/>
+                                            <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                                            <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                                            <TextBlock Text="   :    " FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="1" Margin="0,5,0,5" VerticalAlignment="Center"/>
+                                            <TextBlock Text="DummyWafer001" FontSize="15" FontWeight="Bold" Grid.Row="0" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                            <TextBlock Text="test200804.rcp"    FontSize="15" FontWeight="Bold" Grid.Row="1" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                            <TextBlock Text="68423 (EA)"    FontSize="15" FontWeight="Bold" Grid.Row="2" Grid.Column="2" Margin="0,5,0,5" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                        </Grid>
+
+                                       
+                                        <Viewbox Margin="20,120,20,20">
+                                            <Canvas x:Name="ReviewWaferCanvas" Width="300" Height="300" 
+                                                        SnapsToDevicePixels="True"
+                                                        Margin="0"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center">
+                                            </Canvas>
+                                            <!--<Ellipse VerticalAlignment="Stretch"
+                                                     HorizontalAlignment="Stretch"
+                                                     Width="100" Height="100"
+                                                     Fill="Gainsboro"/>-->
+                                        </Viewbox>
+
+
+
+                                    </Grid>
+                                </GroupBox>
+                            </Grid>
+                            <!--End Defect View-->
+                            <GridSplitter Grid.Column="1"></GridSplitter>
+                            <Grid Grid.Column="2">
+                                <ItemsControl ItemsSource="{Binding p_Element}"></ItemsControl>
+                            </Grid>
+                            <Grid Grid.Column="3">
+                                <GroupBox Header="Detail">
+                                    <TabControl Background="{StaticResource PanelBackGround}"
+                        BorderThickness="1">
+                                        <TabItem Header="Inspection">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="40"/>
+                                                    <RowDefinition/>
+                                                    <RowDefinition Height="*"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1.2*"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="5,2">
+                                                    <CheckBox Content="Front" FontSize="15" FontWeight="Bold" Margin="0,0,15,0"/>
+                                                    <CheckBox Content="Back" FontSize="15" FontWeight="Bold"  Margin="0,0,15,0"/>
+                                                    <CheckBox Content="Edge" FontSize="15" FontWeight="Bold"  Margin="0,0,15,0"/>
+                                                    <CheckBox Content="EBR" FontSize="15" FontWeight="Bold"   Margin="0,0,15,0"/>
+                                                </StackPanel>
+                                                <Button Content="Tuning" Grid.Column="1"
+                                    Margin="3" FontWeight="Bold"/>
+                                                <GroupBox Grid.Row="2" Grid.RowSpan="3" Grid.ColumnSpan="2">
+                                                    <GroupBox.Header>
+                                                        <TextBlock Text="Result"/>
+                                                    </GroupBox.Header>
+                                                    
+                                     
+                                                    <DataGrid 
+                                                        Name="Defect_Viewer" 
+                                                        ItemsSource="{Binding pDefect_Datatable}"
+                                                        SelectedItem ="{Binding pSelected_Defect, Mode=TwoWay}"
+                                                        SelectionMode="Single"
+                                                        EnableColumnVirtualization = "True"
+                                                        EnableRowVirtualization = "True"
+                                                        VirtualizingPanel.VirtualizationMode="Recycling"
+                                                        ScrollViewer.CanContentScroll="True"
+
+                                                        IsReadOnly="True"
+                                                        AutoGenerateColumns="True"
+                                              
+                                                        Grid.Row="1">
+                                                        <DataGrid.Resources>
+                                                            <Style TargetType="DataGridColumnHeader">
+                                                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                            </Style>
+                                                        </DataGrid.Resources>
+                                                    </DataGrid>
+                                                </GroupBox>
+                                                <GroupBox  Grid.ColumnSpan="2" Grid.Row="1">
+                                                    <GroupBox.Header>
+                                                        <TextBlock Text="Defect Image"/>
+                                                    </GroupBox.Header>
+                                                    
+                                                    
+                                                    <Grid Background="Black">
+                                                        <Image 
+                                                            x:Name="DefectImage"
+                                                            Source="{Binding p_DefectImage}">
+                                                        </Image>
+                                                        <!--<TextBlock Text="Defect Image"
+                                                         Foreground="White"
+                                                         VerticalAlignment="Center"
+                                                         HorizontalAlignment="Center"/>-->
+                                                    </Grid>
+                                                    
+                                                    
+                                                </GroupBox>
+
+                                            </Grid>
+                                        </TabItem>
+                                        <TabItem Header="Metrology">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="40"/>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1.2*"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="Tuning" Grid.Column="1"
+                                    Margin="3" FontWeight="Bold"/>
+                                                <GroupBox Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
+                                                    <GroupBox.Header>
+                                                        <TextBlock Text="Result"/>
+                                                    </GroupBox.Header>
+                                                    <DataGrid IsReadOnly="True" Grid.Row="1">
+                                                        <DataGrid.Resources>
+                                                            <Style TargetType="DataGridColumnHeader">
+                                                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                            </Style>
+                                                        </DataGrid.Resources>
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="No." Binding="{Binding Path=no}" Width="0.5*"/>
+                                                            <DataGridTextColumn Header="Insp" Binding="{Binding Path=mode}" Width="0.7*"/>
+                                                            <DataGridTextColumn Header="Chip" Binding="{Binding Path=chip}" Width="0.8*"/>
+                                                            <DataGridTextColumn Header="Location" Binding="{Binding Path=xy}" Width="1.5*"/>
+                                                            <DataGridTextColumn Header="Gv" Binding="{Binding Path=gv}" Width="0.5*"/>
+                                                            <DataGridTextColumn Header="Size" Binding="{Binding Path=size}" Width="*"/>
+                                                            <DataGridTextColumn Header="Code" Binding="{Binding Path=dc}" Width="*"/>
+                                                        </DataGrid.Columns>
+
+                                                        <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="0" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="1" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="2" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="3" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="4" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="5" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="6" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="7" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="8" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                        <local:DummyResult no="9" mode="Front" chip="3,13" xy="25854,72838" gv="65" size="15x15" dc="00001"/>
+                                                    </DataGrid>
+                                                </GroupBox>
+                                                <GroupBox Grid.Column="1" Grid.Row="1">
+                                                    <GroupBox.Header>
+                                                        <TextBlock Text="Defect Image"/>
+                                                    </GroupBox.Header>
+                                                    <Grid Background="Black">
+                                                        <TextBlock Text="Defect Image"
+                                                   Foreground="White"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                                    </Grid>
+                                                </GroupBox>
+                                                <GroupBox Grid.Column="1" Grid.Row="2">
+                                                    <GroupBox.Header>
+                                                        <TextBlock Text="Map"/>
+                                                    </GroupBox.Header>
+                                                    <Grid>
+                                                        <Viewbox Margin="10">
+                                                            <Ellipse VerticalAlignment="Stretch"
+                                             HorizontalAlignment="Stretch"
+                                             Width="100" Height="100"
+                                             Fill="Gainsboro"/>
+
+                                                        </Viewbox>
+                                                        <Viewbox Margin="25">
+                                                            <Ellipse VerticalAlignment="Stretch"
+                                             HorizontalAlignment="Stretch"
+                                             Width="100" Height="100"
+                                             Fill="SteelBlue"/>
+
+                                                        </Viewbox>
+                                                    </Grid>
+                                                </GroupBox>
+                                                <GroupBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2">
+                                                    <GroupBox.Header>
+                                                        <TextBlock Text="Measurement Data"/>
+                                                    </GroupBox.Header>
+
+                                                    <Image Source="/Root_WIND2;component/Resources/ChartEBR.PNG"
+                                           Stretch="Fill"/>
+                                                </GroupBox>
+                                            </Grid>
+                                        </TabItem>
+                                    </TabControl>
+                                </GroupBox>
+                            </Grid>
+                        </Grid>
                     </Grid>
 
                 </Grid>

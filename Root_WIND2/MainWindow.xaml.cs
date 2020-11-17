@@ -7,6 +7,13 @@ using System.Windows.Threading;
 using System.Windows.Media;
 using RootTools.Memory;
 using RootTools;
+using RootTools_CLR;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using RootTools_Vision;
+using System.Drawing;
+using RootTools.Database;
 
 namespace Root_WIND2
 {
@@ -14,7 +21,7 @@ namespace Root_WIND2
     /// MainWindow.xaml에 대한 상호 작용 논리
     /// </summary>
     public partial class MainWindow : Window
-    {       
+    {
         #region Window Event
         public MainWindow()
         {
@@ -100,102 +107,113 @@ namespace Root_WIND2
         }
         #endregion
 
-        private void textLastError_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            
-        }
-
         #region UI
-        public Setup m_Setup;
-        private Setup_ViewModel m_SetupViewModel;
-
-        public Review m_Review;
-        private Review_ViewModel m_ReviewViewModel;
-
-        public Run m_Run;
-        private Run_ViewModel m_RunViewModel;
         public SelectMode m_ModeUI;
-
-
+        public Setup m_Setup;
+        public Review m_Review;
+        public Run m_Run;
         #endregion
 
-        WIND2_Engineer m_engineer = new WIND2_Engineer();
+        #region ViewModel
+        private Setup_ViewModel m_SetupViewModel;
+        private Review_ViewModel m_ReviewViewModel;
+        private Run_ViewModel m_RunViewModel;
+        #endregion
+
+        public WIND2_Engineer m_engineer = new WIND2_Engineer();
         MemoryTool m_memoryTool;
-        ImageData m_Image;
+        public ImageData m_Image;
+        public ImageData m_ROILayer;
+        public IDialogService dialogService;
         string sPool = "pool";
         string sGroup = "group";
         string sMem = "mem";
-        public int MemWidth = 12400;
-        public int MemHeight = 12400;
-        Viewer viewer = new Viewer();
+        string sMemROI = "ROI";
+        public int MemWidth = 80000;
+        public int MemHeight = 80000;
+        public int ROIWidth = 30000;
+        public int ROIHeight = 30000; // Chip 크기 최대 30,000 * 30,000  Origin ROI 메모리 할당 20.11.02 JTL
+
+        public RecipeManager m_RecipeMGR;
+        Recipe m_Recipe;
+        RecipeInfo m_RecipeInfo;
+        RecipeEditor m_RecipeEditor;
+
+        // DelegateLoadRecipe(object e)
+        //{
+        //    m_setupviewmodel.loadRecie(recipe);
+        //}
+        WIND2_InspectionManager m_InspectionManager;
+
         void Init()
         {
-            IDialogService dialogService = new DialogService(this);
+            dialogService = new DialogService(this);
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+
             m_engineer.Init("WIND2");
             m_memoryTool = m_engineer.ClassMemoryTool();
-            m_memoryTool.GetPool(sPool, true).p_gbPool = 1;
-            m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
+            m_memoryTool.GetPool(sPool, true).p_gbPool = 50;
+            m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 3, 1, new CPoint(MemWidth, MemHeight));
+            m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory("ROI", 1, 4, new CPoint(MemWidth, MemHeight));
             m_memoryTool.GetMemory(sPool, sGroup, sMem);
-            
-            m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem));
-            
-           //viewer.p_ImageViewer = new ImageToolViewer_VM(m_Image, dialogService);
-            //panel.DataContext = viewer.p_ImageViewer;
 
-            //_Maint.engineerUI.Init(m_engineer);
-            //Panel.DataContext = new NavigationManger();
-            InitUI();
+            m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem)); // Main ImageData
+            m_ROILayer = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMemROI)); // 4ch ROI BimtapLayer로 사용할 ImageData
+
+            // Recipe Manager
+            m_RecipeMGR = new RecipeManager();
+            //m_RecipeMGR.DelegateLoadRecipe +=
+            m_Recipe = m_RecipeMGR.GetRecipe();
+            m_RecipeEditor = m_Recipe.GetRecipeEditor();
+            m_RecipeInfo = m_Recipe.GetRecipeInfo();
+
+            // Inspction Manager
+            m_InspectionManager = new WIND2_InspectionManager(m_Image.GetPtr(), m_Image.p_Size.X, m_Image.p_Size.Y);
+            m_InspectionManager.Recipe = m_Recipe;
+
+            m_engineer.InspectionManager = m_InspectionManager;
+
+            ///////시연용 임시코드
+            DatabaseManager.Instance.SetDatabase(1);
+            //////
+
+            InitModeSelect();
             InitTimer();
-
-            var a = panel.DataContext;
+            InitSetupMode();
+            InitReviewMode();
+            InitRunMode();
         }
 
-        void InitUI()
+        void InitModeSelect()
         {
-            m_Setup = new Setup();
-            ((Setup_ViewModel)m_Setup.DataContext).init(this);
-            m_SetupViewModel = (Setup_ViewModel)m_Setup.DataContext;
-
-            m_Review = new Review();
-            ((Review_ViewModel)m_Review.DataContext).init(this);
-            m_ReviewViewModel = (Review_ViewModel)m_Review.DataContext;
-
-            m_Run = new Run();
-            
-            ((Run_ViewModel)m_Run.DataContext).init(this);
-            m_RunViewModel = (Run_ViewModel)m_Run.DataContext;
-
             m_ModeUI = new SelectMode();
             m_ModeUI.Init(this);
-
-            Home();
-        }
-        void Home()
-        {
             MainPanel.Children.Clear();
             MainPanel.Children.Add(m_ModeUI);
         }
+        void InitSetupMode()
+        {
+            m_Setup = new Setup();
+            m_SetupViewModel = new Setup_ViewModel(this, m_Recipe, m_InspectionManager);
+            m_Setup.DataContext = m_SetupViewModel;
+        }
+        void InitReviewMode()
+        {
+            m_Review = new Review();
+            m_ReviewViewModel = new Review_ViewModel(this, m_Review);
+            m_Review.DataContext = m_ReviewViewModel;
+        }
+        void InitRunMode()
+        {
+            m_Run = new Run();
+            m_RunViewModel = new Run_ViewModel(this);
+            m_Run.DataContext = m_RunViewModel;
+        }
+
 
         void ThreadStop()
         {
             m_engineer.ThreadStop();
-        }
-
-    }
-    public class Viewer : ObservableObject
-    {
-        private ImageToolViewer_VM m_ImageViewer;
-        public ImageToolViewer_VM p_ImageViewer
-        {
-            get
-            {
-                return m_ImageViewer;
-            }
-            set
-            {
-                SetProperty(ref m_ImageViewer, value);
-            }
         }
     }
 }

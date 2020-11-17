@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RootTools_Vision
+{
+    public enum WORKPLACE_STATE
+    {
+        //32개 가능?
+        NONE    = 0b0000001,
+        SNAP    = 0b0000010,
+        READY   = 0b0000100,
+        WORKING = 0b0001000,
+        DONE    = 0b0010000,
+    }
+
+    public class Workplace
+    {
+        public event StateChanged StateChanged;
+
+        private WORKPLACE_STATE state;
+
+        public WORKPLACE_STATE STATE
+        {
+            get { return state; }
+            set 
+            { 
+                state = value;
+
+                if( StateChanged != null)
+                    StateChanged(this);
+            }
+        }
+
+        public Workplace()
+        {
+
+        }
+    }
+}

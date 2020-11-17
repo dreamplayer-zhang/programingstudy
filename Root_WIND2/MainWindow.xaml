@@ -14,6 +14,7 @@
         Width="1920"
         Title="Siltron"
         Background="{StaticResource PanelBackGround}"
+        WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
         Closing="Window_Closing">
     <Grid>
@@ -25,7 +26,7 @@
         </Grid.RowDefinitions>
         <!--Title Bar Start-->
         <Grid Grid.Row="0"
-              Name="TitleBar"
+              Name="TitleBar"   
               Background="{StaticResource MainThema}"
               MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
             <Grid.ColumnDefinitions>
@@ -85,17 +86,9 @@
                 </Button>
             </StackPanel>
         </Grid>
-        <!--Title Bar End-->   
-        
+        <!--Title Bar End-->
         <Grid Grid.Row="1" x:Name="MainPanel">
-
-            <DockPanel x:Name="panel">
-                <Button Content="Open" DockPanel.Dock="Top" Command="{Binding OpenImage}"/>
-                <Button Content="Clear" DockPanel.Dock="Top" Command="{Binding ClearImage}"/>
-                <tools:ImageToolViewer/>
-            </DockPanel>
-
-            <!--<local:SelectMode/>-->
+            
         </Grid>
 
         <!--Log Area Start-->
@@ -110,7 +103,9 @@
                 <TabItem Header="ALL" FontSize="10">
                     <TextBlock Text="Log Area" Margin="5"/>
                 </TabItem>
-                <TabItem Header="System" FontSize="10"/>
+                <TabItem Header="System" FontSize="10">
+                   
+                </TabItem>
                 <TabItem Header="Inspection" FontSize="10"/>
                 <TabItem Header="I/O" FontSize="10"/>
                 <TabItem Header="Network" FontSize="10"/>

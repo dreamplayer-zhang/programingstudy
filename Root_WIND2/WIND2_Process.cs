@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Root_WIND2
 {
-    class WIND2_Process : NotifyProperty
+    public class WIND2_Process : NotifyProperty
     {
         #region List InfoWafer
         public string AddInfoWafer(InfoWafer infoWafer)

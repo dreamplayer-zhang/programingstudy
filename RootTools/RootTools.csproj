@@ -232,6 +232,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\Database_DataView.xaml.cs">
+      <DependentUpon>Database_DataView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Database\Database_DataView_VM.cs" />
+    <Compile Include="Database\Table\DatabaseManager.cs" />
+    <Compile Include="Database\Table\Database_ConnectSession.cs" />
+    <Compile Include="Database\Table\Defect\Defect.cs" />
+    <Compile Include="Database\Table\Defect\DefectManager.cs" />
+    <Compile Include="Database\Table\Lotinfo.cs" />
+    <Compile Include="Database\Table\Measurement\Measurement.cs" />
+    <Compile Include="Database\Table\Measurement\MeasurementManager.cs" />
     <Compile Include="Camera\Matrox\Camera_Matrox.cs" />
     <Compile Include="Camera\Matrox\Camera_Matrox_Classes.cs" />
     <Compile Include="Camera\Matrox\Camera_Matrox_UI.xaml.cs">
@@ -245,8 +256,6 @@
     <Compile Include="Camera\Silicon\SiSoFramegrabber.cs" />
     <Compile Include="Camera\Silicon\SiSoSDKLib.cs" />
     <Compile Include="Control\DIO_Is.cs" />
-    <Compile Include="crosstest.cs" />
-    <Compile Include="ImageToolViewer\BasicTool.cs" />
     <Compile Include="Camera\BaslerPylon\CameraBasler.cs" />
     <Compile Include="Camera\BaslerPylon\CameraBasler_UI.xaml.cs">
       <DependentUpon>CameraBasler_UI.xaml</DependentUpon>
@@ -373,10 +382,6 @@
     </Compile>
     <Compile Include="IHandler.cs" />
     <Compile Include="ImageProcess\FocusStacking.cs" />
-    <Compile Include="ImageToolViewer\ImageToolViewer_VM.cs" />
-    <Compile Include="ImageToolViewer\ImageToolViewer.xaml.cs">
-      <DependentUpon>ImageToolViewer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Image\CRect.cs" />
     <Compile Include="Comm\CyUSBTool.cs" />
     <Compile Include="Comm\CyUSBTool_UI.xaml.cs">
@@ -473,6 +478,11 @@
     <Compile Include="RADS\RADSControl_UI.xaml.cs">
       <DependentUpon>RADSControl_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Viewer\MaskTool_ViewModel.cs" />
+    <Compile Include="Viewer\RootViewer_ViewModel.cs" />
+    <Compile Include="Viewer\RootViewer.xaml.cs">
+      <DependentUpon>RootViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RTC5s\DataList.cs" />
     <Compile Include="RTC5s\DesignBase.cs" />
     <Compile Include="RTC5s\DesignOutline.cs" />
@@ -516,6 +526,7 @@
     <Compile Include="ToolBoxs\ToolSet_UI.xaml.cs">
       <DependentUpon>ToolSet_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Viewer\TShape.cs" />
     <Compile Include="Trees\ITreeItem.cs" />
     <Compile Include="Trees\TreeGroup.cs" />
     <Compile Include="Trees\TreeRoot.cs" />
@@ -751,6 +762,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Database\Database_DataView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dictionary_Icon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -776,10 +791,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Gem\XGem\XGem_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ImageToolViewer\ImageToolViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -915,6 +926,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Viewer\RootViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RTC5s\LaserBright\Laser_Bright_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -970,6 +985,7 @@
   <ItemGroup>
     <Folder Include="Control\ACS\DLL\" />
     <Folder Include="Printer\DLL\" />
+    <Folder Include="RecipeTool\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

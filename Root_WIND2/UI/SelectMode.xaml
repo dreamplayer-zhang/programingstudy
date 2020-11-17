@@ -8,13 +8,12 @@
     <ScrollViewer>
         <StackPanel>
             <Grid Height="883">
-                
-                <TextBlock Text="," Margin="177,37"
+                <TextBlock Text="," Margin="190,37"
                        VerticalAlignment="Top"
                        HorizontalAlignment="Left"
                        FontSize="30"
                        FontWeight="Normal"/>
-                <TextBlock Text="00:00:00" Margin="189,37"
+                <TextBlock Text="00:00:00" Margin="203,37"
                        VerticalAlignment="Top"
                        HorizontalAlignment="Left"
                        FontSize="30"
@@ -49,7 +48,12 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid>
-                                
+                                <!--<material:PackIcon Kind="Wrench"
+                                           Width=" 150" 
+                                           Height="150"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           Panel.ZIndex="2"/>-->
                             </Grid>
                             <Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
@@ -134,7 +138,11 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            
+                            <!--<material:PackIcon Kind="MonitorDashboard" 
+                                           Width=" 150" 
+                                           Height="150"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>-->
                             <Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
                                     <RowDefinition/>
@@ -216,7 +224,17 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            
+                            <!--<material:PackIcon Kind="Play"
+                                           Width="100"
+                                           Height="70"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,4,50"
+                                           HorizontalAlignment="Center"/>
+                            <material:PackIcon Kind="ComputerClassic" 
+                                           Width=" 150" 
+                                           Height="150"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>-->
                             <Grid Grid.Row="1">
                                 <TextBlock Text="Stop"
                                        Style="{StaticResource BasicTb}"
