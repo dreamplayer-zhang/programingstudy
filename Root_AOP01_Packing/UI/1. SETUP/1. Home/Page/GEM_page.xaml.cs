@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Root_AOP01_Packing
 {
     /// <summary>
-    /// RecipeFrontside_Panel.xaml에 대한 상호 작용 논리
+    /// GEM_page.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class RecipeFrontside_Panel : UserControl
+    public partial class GEM_page : UserControl
     {
-        public RecipeFrontside_Panel()
+        public GEM_page()
         {
             InitializeComponent();
         }

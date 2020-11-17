@@ -97,7 +97,7 @@ namespace RootTools.Inspects
 			Parallel.For(0, nThreadNum, i =>
 			{
 				InsepctionThread[i] = new Inspection(nThreadNum);
-				//InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
+				InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
 			});
 			//for (int i = 0; i < nThreadNum; i++)
 			//{
@@ -154,14 +154,14 @@ namespace RootTools.Inspects
 		/// </summary>
 		/// <param name="source">DefectData array</param>
 		/// <param name="args">추후 arguments가 필요하면 사용할것</param>
-		//private void InspectionManager_AddDefect(DefectDataWrapper item)
-		//{
-		//	//여기서 DB 에 추가되는 등의 동작을 해야함!
-		//	if (AddDefect != null)
-		//	{
-		//		AddDefect(item);
-		//	}
-		//}
+		private void InspectionManager_AddDefect(DefectDataWrapper item)
+		{
+			//여기서 DB 에 추가되는 등의 동작을 해야함!
+			if (AddDefect != null)
+			{
+				AddDefect(item);
+			}
+		}
 
 		public void InspectionDone(string inspIndexFilePath)
 		{
@@ -363,7 +363,7 @@ namespace RootTools.Inspects
 				for (int i = 0; i < InsepctionThread.Length; i++)
 				{
 					//이벤트 핸들러 제거
-					//InsepctionThread[i].AddDefect -= InspectionManager_AddDefect;
+					InsepctionThread[i].AddDefect -= InspectionManager_AddDefect;
 					//InsepctionThread[i].Dispose();
 				}
 			}

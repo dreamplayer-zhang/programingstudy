@@ -83,33 +83,14 @@ namespace Root_Vega
 		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
 		private void M_InspManager_AddDefect(DefectDataWrapper item)
 		{
-			if (InspectionManager.GetInspectionType(item.nClassifyCode) != InspectionType.Strip)
+			if (InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.Strip && InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.Chrome)
 			{
-				return;
+				_dispatcher.BeginInvoke(new Action(delegate ()
+				{
+					p_InformationDrawer.AddDefectInfo(item);
+					//p_ImageViewer.RedrawingElement();
+				}));
 			}
-			//string tempInspDir = @"C:\vsdb\TEMP_IMAGE";
-
-			System.Data.DataRow dataRow = VSDataDT.NewRow();
-
-			//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-
-			dataRow["No"] = currentDefectIdx;
-			currentDefectIdx++;
-			dataRow["DCode"] = item.nClassifyCode;
-			dataRow["AreaSize"] = item.fAreaSize;
-			dataRow["Length"] = item.nLength;
-			dataRow["Width"] = item.nWidth;
-			dataRow["Height"] = item.nHeight;
-			//dataRow["FOV"] = item.FOV;
-			dataRow["PosX"] = item.fPosX;
-			dataRow["PosY"] = item.fPosY;
-
-			VSDataDT.Rows.Add(dataRow);
-			_dispatcher.Invoke(new Action(delegate ()
-			{
-				p_InformationDrawer.AddDefectInfo(item);
-				p_ImageViewer.RedrawingElement();
-			}));
 		}
 
 		void Init(Vega_Engineer engineer, IDialogService dialogService)

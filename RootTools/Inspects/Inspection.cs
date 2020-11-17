@@ -97,14 +97,14 @@ namespace RootTools.Inspects
 					bState = InspectionState.Running;
 
 
-					//List<DefectDataWrapper> arrDefects = new List<DefectDataWrapper>();
+					List<DefectDataWrapper> arrDefects = new List<DefectDataWrapper>();
 					if (m_InspProp.p_InspType == InspectionType.AbsoluteSurface || m_InspProp.p_InspType == InspectionType.RelativeSurface)
 					{
 						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
 						{
 							unsafe
 							{
-								clrInsp.SurfaceInspection(
+								var temp = clrInsp.SurfaceInspection(
 								m_InspProp.MemoryPoolName,
 								m_InspProp.MemoryGroupName,
 								m_InspProp.MemoryName,
@@ -122,11 +122,12 @@ namespace RootTools.Inspects
 								m_InspProp.p_surfaceParam.UseDarkInspection,
 								m_InspProp.p_surfaceParam.UseAbsoluteInspection,
 								(void *)m_InspProp.p_ptrMemory);
+
+								foreach (var item in temp)
+								{
+									arrDefects.Add(new DefectDataWrapper(item));
+								}
 							}
-							//foreach (var item in temp)
-							//{
-							//	arrDefects.Add(new DefectDataWrapper(item));
-							//}
 						}
 					}
 					else if (m_InspProp.p_InspType == InspectionType.Strip)
@@ -135,7 +136,7 @@ namespace RootTools.Inspects
 						{
 							unsafe
 							{
-								clrInsp.StripInspection(
+								var temp = clrInsp.StripInspection(
 								m_InspProp.MemoryPoolName,
 								m_InspProp.MemoryGroupName,
 								m_InspProp.MemoryName,
@@ -153,25 +154,26 @@ namespace RootTools.Inspects
 								m_InspProp.p_StripParam.Intensity,
 								m_InspProp.p_StripParam.Bandwidth,
 								(void *)m_InspProp.p_ptrMemory);
+
+								foreach (var item in temp)
+								{
+									arrDefects.Add(new DefectDataWrapper(item));
+								}
 							}
-							//foreach (var item in temp)
-							//{
-							//	arrDefects.Add(new DefectDataWrapper(item));
-							//}
 						}
 					}
-					//if (m_InspProp.p_bDefectMerge)//TODO : 기능 개선이 필요함. UI에 표시할때의 변수가 별도로 있는 것이 좋을 것으로 보임 + Defect Clustering구현
-					//{
-					//	arrDefects = DefectDataWrapper.MergeDefect(arrDefects.ToArray(), m_InspProp.p_nMergeDistance);
-					//}
-					//if (AddDefect != null)//대리자 호출을 간단하게 만들 수 있으나 vs2013에서 호환이 안 될 가능성이 없어 보류
-					//{
-					//	foreach (var item in arrDefects)
-					//	{
-					//		AddDefect(item);
-					//	}
-					//}
-					//arrDefects.Clear();
+					if (m_InspProp.p_bDefectMerge)//TODO : 기능 개선이 필요함. UI에 표시할때의 변수가 별도로 있는 것이 좋을 것으로 보임 + Defect Clustering구현
+					{
+						arrDefects = DefectDataWrapper.MergeDefect(arrDefects.ToArray(), m_InspProp.p_nMergeDistance);
+					}
+					if (AddDefect != null)//대리자 호출을 간단하게 만들 수 있으나 vs2013에서 호환이 안 될 가능성이 없어 보류
+					{
+						foreach (var item in arrDefects)
+						{
+							AddDefect(new DefectDataWrapper(item));
+						}
+					}
+					arrDefects.Clear();
 				}
 				else if (bState == InspectionState.Running)
 				{

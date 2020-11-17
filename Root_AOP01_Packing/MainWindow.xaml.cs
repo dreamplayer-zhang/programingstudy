@@ -112,7 +112,7 @@ namespace Root_AOP01_Packing
             Init_UI();
 
             m_engineer.Init("AOP01");
-            m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
+            //m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
         }
         void Init_ViewModel()
         {
@@ -141,62 +141,6 @@ namespace Root_AOP01_Packing
             m_engineer.ThreadStop();
         }
 
-
-        private void NaviRecipeSummary_Click(object sender, RoutedEventArgs e)
-        {
-            MainPanel.Children.Clear();
-            MainPanel.Children.Add(Setup);
-            m_Setup.Set_RecipeSummary();
-        }
-
-        private void NaviRecipeSpec_Click(object sender, RoutedEventArgs e)
-        {
-            MainPanel.Children.Clear();
-            MainPanel.Children.Add(Setup);
-            m_Setup.Set_RecipeSpec();
-        }
-
-        private void NaviRecipe45D_Click(object sender, RoutedEventArgs e)
-        {
-            MainPanel.Children.Clear();
-            MainPanel.Children.Add(Setup);
-            m_Setup.Set_Recipe45DPanel();
-        }
-
-        private void NaviRecipeFrontside_Click(object sender, RoutedEventArgs e)
-        {
-            MainPanel.Children.Clear();
-            MainPanel.Children.Add(Setup);
-            m_Setup.Set_RecipeFrontsidePanel();
-        }
-
-        private void NaviRecipeEdge_Click(object sender, RoutedEventArgs e)
-        {
-            MainPanel.Children.Clear();
-            MainPanel.Children.Add(Setup);
-            m_Setup.Set_RecipeEdgePanel();
-        }
-
-        private void NaviRecipeLADS_Click(object sender, RoutedEventArgs e)
-        {
-            MainPanel.Children.Clear();
-            MainPanel.Children.Add(Setup);
-            m_Setup.Set_RecipeLADSPanel();
-        }
-
-        private void NaviMaintenance_Click(object sender, RoutedEventArgs e)
-        {
-            MainPanel.Children.Clear();
-            MainPanel.Children.Add(Setup);
-            m_Setup.Set_MaintenancePanel();
-        }
-
-        private void NaviGEM_Click(object sender, RoutedEventArgs e)
-        {
-            MainPanel.Children.Clear();
-            MainPanel.Children.Add(Setup);
-            m_Setup.Set_GEMPanel();
-        }
 
         private void NaviReview_Click(object sender, RoutedEventArgs e)
         {
@@ -243,9 +187,19 @@ namespace Root_AOP01_Packing
             else
             {
                 splitter.IsEnabled = true;
-                ViewArea.Height = new GridLength(200);
+                ViewArea.Height = new GridLength(150);
             }
 
+        }
+
+        private void NaviEngineer_Click(object sender, RoutedEventArgs e)
+        {
+            m_Setup.Set_EngineerPage();
+        }
+
+        private void NaviGEM_Click(object sender, RoutedEventArgs e)
+        {
+            m_Setup.Set_GEMPage();
         }
     }
 }
