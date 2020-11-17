@@ -300,6 +300,7 @@ namespace Root_Vega.Module
             if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
             if (Run(MoveReticleLifter(ePosReticleLifter.Lifting))) return p_sInfo;
             if (Run(MoveZ(ePosZ.Load))) return p_sInfo;
+            if(m_diReticle.p_bIn == false) p_infoReticle = null;
             //if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             return "OK"; 
         }
@@ -320,6 +321,10 @@ namespace Root_Vega.Module
             if (Run(MovePodLifter(ePosPodLifter.Ready))) return p_sInfo;
             if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
             if (Run(MoveTheta(ePosTheta.Close))) return p_sInfo;
+
+            // Inspection Done
+            //((Vega_Engineer)m_engineer).m_InspManager.InspectionDone(App.indexFilePath);
+
             return "OK"; 
         }
         #endregion
@@ -341,6 +346,13 @@ namespace Root_Vega.Module
         double[] m_aShiftReticle = new double[2] { 0, 0 };
         public override string StateHome()
         {
+            if (m_dioPresent.p_bIn == false)
+            {
+                m_infoPod.SetInfoReticleExist();
+            }
+            else
+                p_infoReticle = null;
+
             if (EQ.p_bSimulate) return "OK";
             m_log.Info(p_id + " Start StateHome");
             m_axisZ.ServoOn(true);
@@ -369,6 +381,7 @@ namespace Root_Vega.Module
             }
             m_infoPod.AfterHome();
 
+            m_infoPod.p_eState = InfoPod.eState.Placed;
             return "OK";
         }
 
@@ -553,7 +566,13 @@ namespace Root_Vega.Module
                     sResult = m_module.m_RFID.ReadRFID((byte)m_nCh, out sCarrierID);
                     m_module.m_infoPod.p_sCarrierID = (sResult == "OK") ? sCarrierID : "";
 
-                    if (m_module.m_infoPod.p_infoReticle.p_sReticleID == m_module.m_infoPod.p_infoReticle.p_id)
+                    if (m_module.m_infoPod.p_infoReticle == null)
+                    {
+                        if(m_module.m_dioPresent.p_bIn==false)
+                        m_module.m_infoPod.SetInfoReticleExist();
+                    }
+
+                    else if (m_module.m_infoPod.p_infoReticle.p_sReticleID == m_module.m_infoPod.p_infoReticle.p_id)
                     {
                         m_module.m_infoPod.p_infoReticle.p_sReticleID = sCarrierID;
                         m_module.p_infoReticle.p_sSlotID = m_module.m_infoPod.p_infoReticle.p_sReticleID;

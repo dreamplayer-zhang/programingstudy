@@ -514,7 +514,10 @@ namespace Root_Vega.Module
             m_reg = new Registry(p_id + ".InfoReticle");
             m_sInfoReticle = m_reg.Read("sInfoReticle", m_sInfoReticle);
             //p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
-            if (m_diPatternReticleExistSensor.p_bIn == false) p_infoReticle = null;
+            if (m_axisXY.p_axisY.IsInPos(eAxisPosY.ReticleCheck) == true)
+            {
+                if (m_diPatternReticleExistSensor.p_bIn == false) p_infoReticle = null;
+            }
             else p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
         }
         #endregion
@@ -580,6 +583,18 @@ namespace Root_Vega.Module
                 p_bStageVac = false;
                 p_eState = eState.Error;
                 return "AxisZ Home Error";
+            }
+
+            // Y축 레티클체크포지션으로 이동
+            if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.ReticleCheck))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (m_axisXY.p_axisY.IsInPos(eAxisPosY.ReticleCheck) == true)
+            {
+                if (p_infoReticle != null)
+                {
+                    if (m_diPatternReticleExistSensor.p_bIn == false) p_infoReticle = null;
+                }
             }
 
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
