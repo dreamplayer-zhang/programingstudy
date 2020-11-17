@@ -269,15 +269,15 @@ namespace Root_Vega.Module
 
         public void ReadInfoReticle_Registry()
         {
-            if (m_dioPresent.p_bIn == false)
-            {
-                if (m_infoPod.p_infoReticle == null)
-                {
-                    m_infoPod.SetInfoReticleExist();
-                    return;
-                }
-                m_infoPod.ReadInfoReticle_Registry();
-            }
+            //if (m_dioPresent.p_bIn == false)
+            //{
+            //    if (m_infoPod.p_infoReticle == null)
+            //    {
+            //        m_infoPod.SetInfoReticleExist();
+            //        return;
+            //    }
+            //    m_infoPod.ReadInfoReticle_Registry();
+            //}
         }
         #endregion
 
