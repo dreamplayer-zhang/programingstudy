@@ -85,10 +85,10 @@ namespace Root_Vega
 		{
 			if (InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.Strip && InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.Chrome)
 			{
-				_dispatcher.Invoke(new Action(delegate ()
+				_dispatcher.BeginInvoke(new Action(delegate ()
 				{
 					p_InformationDrawer.AddDefectInfo(item);
-					p_ImageViewer.RedrawingElement();
+					//p_ImageViewer.RedrawingElement();
 				}));
 			}
 		}

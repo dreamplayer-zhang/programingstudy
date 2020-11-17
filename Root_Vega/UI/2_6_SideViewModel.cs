@@ -66,21 +66,21 @@ namespace Root_Vega
 		}
 		#endregion
 
-		#region p_InformationDrawerList
+		//#region p_InformationDrawerList
 
-		private List<InformationDrawer> informationDrawerList;
-		public List<InformationDrawer> p_InformationDrawerList
-		{
-			get
-			{
-				return informationDrawerList;
-			}
-			set
-			{
-				SetProperty(ref informationDrawerList, value);
-			}
-		}
-		#endregion
+		//private List<InformationDrawer> informationDrawerList;
+		//public List<InformationDrawer> p_InformationDrawerList
+		//{
+		//	get
+		//	{
+		//		return informationDrawerList;
+		//	}
+		//	set
+		//	{
+		//		SetProperty(ref informationDrawerList, value);
+		//	}
+		//}
+		//#endregion
 
 		#region p_ImageViewer_List
 
@@ -263,11 +263,11 @@ namespace Root_Vega
 				p_ImageViewer_Bottom = p_ImageViewer_List[3];
 
 
-				p_InformationDrawerList = new List<InformationDrawer>();
-				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Top));
-				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Left));
-				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Right));
-				p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Bottom));
+				//p_InformationDrawerList = new List<InformationDrawer>();
+				//p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Top));
+				//p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Left));
+				//p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Right));
+				//p_InformationDrawerList.Add(new InformationDrawer(p_ImageViewer_Bottom));
 			}
 			m_Engineer.m_recipe.LoadComplete += () =>
 			{
@@ -335,25 +335,29 @@ namespace Root_Vega
 			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
 				target >= InspectionTarget.SideInspection && target <= InspectionTarget.SideInspectionBottom)
 			{
-				_dispatcher.Invoke(new Action(delegate ()
+				_dispatcher.BeginInvoke(new Action(delegate ()
 				{
 					int targetIdx = InspectionManager.GetInspectionTarget(item.nClassifyCode) - InspectionTarget.SideInspection - 1;
 
-					p_InformationDrawerList[targetIdx].AddDefectInfo(item);
+					//p_InformationDrawerList[targetIdx].AddDefectInfo(item);
 
 					switch (targetIdx)
 					{
 						case 0:
-							p_ImageViewer_Top.RedrawingElement();
+							p_ImageViewer_Top.SelectedTool.AddDefectInfo(item);
+							//p_ImageViewer_Top.RedrawingElement();
 							break;
 						case 1:
-							p_ImageViewer_Left.RedrawingElement();
+							p_ImageViewer_Left.SelectedTool.AddDefectInfo(item);
+							//p_ImageViewer_Left.RedrawingElement();
 							break;
 						case 2:
-							p_ImageViewer_Right.RedrawingElement();
+							p_ImageViewer_Right.SelectedTool.AddDefectInfo(item);
+							//p_ImageViewer_Right.RedrawingElement();
 							break;
 						case 3:
-							p_ImageViewer_Bottom.RedrawingElement();
+							p_ImageViewer_Bottom.SelectedTool.AddDefectInfo(item);
+							//p_ImageViewer_Bottom.RedrawingElement();
 							break;
 					}
 				}));
@@ -365,10 +369,10 @@ namespace Root_Vega
 			for (int i = 0; i < 4; i++)
 			{
 				p_SimpleShapeDrawer_List[i].Clear();
-				p_InformationDrawerList[i].Clear();
+				//p_InformationDrawerList[i].Clear();
 
 				p_ImageViewer_List[i].SetRoiRect();
-				p_InformationDrawerList[i].Redrawing();
+				//p_InformationDrawerList[i].Redrawing();
 			}
 		}
 		void _clearInspReslut()

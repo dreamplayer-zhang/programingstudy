@@ -334,7 +334,7 @@ namespace Root_Vega
 			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
 				target >= InspectionTarget.BevelInspection && target <= InspectionTarget.BevelInspectionBottom)
 			{
-				_dispatcher.Invoke(new Action(delegate ()
+				_dispatcher.BeginInvoke(new Action(delegate ()
 				{
 					int targetIdx = InspectionManager.GetInspectionTarget(item.nClassifyCode) - InspectionTarget.BevelInspectionBottom - 1;
 
@@ -343,16 +343,16 @@ namespace Root_Vega
 					switch (targetIdx)
 					{
 						case 0:
-							p_ImageViewer_Top.RedrawingElement();
+							p_ImageViewer_Top.SelectedTool.AddDefectInfo(item);
 							break;
 						case 1:
-							p_ImageViewer_Left.RedrawingElement();
+							p_ImageViewer_Left.SelectedTool.AddDefectInfo(item);
 							break;
 						case 2:
-							p_ImageViewer_Right.RedrawingElement();
+							p_ImageViewer_Right.SelectedTool.AddDefectInfo(item);
 							break;
 						case 3:
-							p_ImageViewer_Bottom.RedrawingElement();
+							p_ImageViewer_Bottom.SelectedTool.AddDefectInfo(item);
 							break;
 					}
 				}));

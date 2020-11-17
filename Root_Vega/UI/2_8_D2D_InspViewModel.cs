@@ -89,10 +89,10 @@ namespace Root_Vega
 		{
 			if (InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.D2D)
 			{
-				_dispatcher.Invoke(new Action(delegate ()
+				_dispatcher.BeginInvoke(new Action(delegate ()
 				{
 					p_InformationDrawer.AddDefectInfo(item);
-					p_ImageViewer.RedrawingElement();
+					//p_ImageViewer.RedrawingElement();
 				}));
 			}
 		}
