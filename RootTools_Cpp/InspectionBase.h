@@ -55,7 +55,10 @@ public:
 	}
 	inline void SetBufferWidthHeight(int w,int h)
 	{
+		assert(0 < w && w < Constants::MaxBufferSize);
 		nBufferW = w;
+		
+		assert(0 < h && h < Constants::MaxBufferSize);
 		nBufferH = h;
 	}
 

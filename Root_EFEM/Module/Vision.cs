@@ -165,6 +165,8 @@ namespace Root_EFEM.Module
             base.InitBase(id, engineer);
         }
 
+
+
         public override void ThreadStop()
         {
             base.ThreadStop();

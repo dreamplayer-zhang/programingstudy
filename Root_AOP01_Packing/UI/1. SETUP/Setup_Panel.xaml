@@ -8,7 +8,7 @@
              d:DesignHeight="866" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="0"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <!--Menu-->

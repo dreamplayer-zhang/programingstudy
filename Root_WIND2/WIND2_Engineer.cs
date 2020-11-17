@@ -11,7 +11,7 @@ using RootTools.Control;
 
 namespace Root_WIND2
 {
-    class WIND2_Engineer : IEngineer
+    public class WIND2_Engineer : IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
@@ -92,6 +92,10 @@ namespace Root_WIND2
         #endregion
 
         public WIND2_Handler m_handler = new WIND2_Handler();
+
+        private InspectionManager_Vision m_InspectionManager;
+        public InspectionManager_Vision InspectionManager { get => m_InspectionManager; set => m_InspectionManager = value; }
+
         public void Init(string id)
         {
             EQ.m_sModel = id;

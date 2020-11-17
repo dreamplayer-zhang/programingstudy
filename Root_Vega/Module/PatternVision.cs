@@ -534,7 +534,8 @@ namespace Root_Vega.Module
         public override string StateHome()  // 200804 ESCHO - 기존 Home Sequence의 경우 축들이 동시에 Home을 하기 때문에 충돌위험이 SideVision과 동일하게 새로 만듦.
         {
             p_sInfo = "OK";
-            if (EQ.p_bSimulate) return "OK";
+            if (EQ.p_bSimulate) 
+                return "OK";
             p_bStageVac = true;
             Thread.Sleep(200);
 
@@ -838,7 +839,7 @@ namespace Root_Vega.Module
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
+                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
 
                 m_bUseInspect = tree.Set(m_bUseInspect, m_bUseInspect, "Use Inspection", "Use Inspection", bVisible);
             }

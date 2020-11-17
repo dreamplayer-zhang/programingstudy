@@ -41,6 +41,7 @@
                            Margin="5,0,0,0"
                            Grid.Column="1" />
             </StackPanel>
+
             <TextBlock Text="Recipe Name.rcp"
                        Foreground="White"
                        VerticalAlignment="Center"
@@ -49,6 +50,9 @@
                         HorizontalAlignment="Right"
                         Orientation="Horizontal"
                         Grid.Column="2">
+                <TextBlock Text="OFFLINE"
+                       Foreground="White"
+                       VerticalAlignment="Center" Margin="20,0"/>
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="MinimizeButton"
                         Width="30"
@@ -161,19 +165,36 @@
                                 </Grid>
                             </MenuItem.Header>
                             <MenuItem Header="Login">
-                                
-                            </MenuItem>
-                            <MenuItem Header="Alarm">
 
                             </MenuItem>
-                            <MenuItem Header="RTR">
-
-                            </MenuItem>
-                            <MenuItem Header="LoadPort">
+                            <MenuItem Header="OHT">
 
                             </MenuItem>
                             <MenuItem Header="Setting">
                                 
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="100"
+                                  BorderThickness="0,0,0,0" Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="100">
+                                    <TextBlock Text="Network"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="ONLINE">
+
+                            </MenuItem>
+                            <MenuItem Header="OFFLINE">
+
+                            </MenuItem>
+                            <MenuItem Header="Setting">
+
                             </MenuItem>
                         </MenuItem>
                         <MenuItem Background="{StaticResource ControlBackGround}"
@@ -190,15 +211,7 @@
                                 </Grid>
                             </MenuItem.Header>
                             <MenuItem Header="Setup">
-                                <MenuItem Header="Recipe Wizard">
-                                    <MenuItem Header="Recipe Summary" Click="NaviRecipeSummary_Click"/>
-                                    <MenuItem Header="Recipe Spec" Click="NaviRecipeSpec_Click"/>
-                                    <MenuItem Header="45D" Click="NaviRecipe45D_Click"/>
-                                    <MenuItem Header="Frontside" Click="NaviRecipeFrontside_Click"/>
-                                    <MenuItem Header="Edge" Click="NaviRecipeEdge_Click"/>
-                                    <MenuItem Header="LADS" Click="NaviRecipeLADS_Click"/>
-                                </MenuItem>
-                                <MenuItem Header="Matienance" Click="NaviMaintenance_Click"/>
+                                <MenuItem Header="Matienance" Click="NaviEngineer_Click"/>
                                 <MenuItem Header="GEM" Click="NaviGEM_Click"/>
                             </MenuItem>
                             <MenuItem Header="Review" Click="NaviReview_Click">

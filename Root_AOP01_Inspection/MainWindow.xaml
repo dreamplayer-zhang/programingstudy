@@ -49,6 +49,9 @@
                         HorizontalAlignment="Right"
                         Orientation="Horizontal"
                         Grid.Column="2">
+                <TextBlock Text="OFFLINE"
+                       Foreground="White"
+                       VerticalAlignment="Center" Margin="20,0"/>
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="MinimizeButton"
                         Width="30"

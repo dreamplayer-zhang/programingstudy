@@ -1,0 +1,112 @@
+﻿<UserControl x:Class="Root_WIND2.BacksideROI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="838" d:DesignWidth="1683" 
+             Background="{StaticResource PanelBackGround}">
+    <UserControl.Resources>
+        <converter:TextBoxToIntConverter x:Key="TextBoxToInt"/>
+    </UserControl.Resources>
+    <ScrollViewer>
+        <StackPanel>
+            <Grid Height="838" DataContext="{Binding p_BacksideROI_VM}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Column="0"                       
+                          Header="Image View">
+                    <tools:RootViewer/>
+                </GroupBox>
+                <StackPanel Grid.Column="2">
+                    <GroupBox Grid.Column="2"
+                          Header="ROI Information" Margin="10">
+                        <Grid Margin="10,0,10,0" Height="150" VerticalAlignment="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="Center X" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                            <TextBlock Text="Center Y" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                            <TextBlock Text="Radius" Style="{StaticResource BasicTb}" Grid.Row="2"/>
+                            <TextBox Text="{Binding CenterPoint.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="0"
+                                     IsEnabled="{Binding ElementName=centerX, Path=IsChecked}"/>
+                            <TextBox Text="{Binding CenterPoint.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="1"
+                                     IsEnabled="{Binding ElementName=centerY, Path=IsChecked}"/>
+                            <TextBox Text="{Binding Radius, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}"
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="2"
+                                     IsEnabled="{Binding ElementName=Radius, Path=IsChecked}"/>
+                            <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Name="centerX" IsChecked="False"/>
+                            <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Name="centerY"/>
+                            <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Name="Radius"/>
+                        </Grid>
+
+                    </GroupBox>
+
+                    <GroupBox Grid.Row="1"
+                          Header="Map Information" Margin="10">
+                        <StackPanel>
+                            <Grid Margin="10,0,10,0" Grid.Row="1" Height="50" VerticalAlignment="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <Viewbox Height="20" >
+                                    <RadioButton Name="Include" GroupName="CreateMapMode"
+                                         IsChecked="{Binding Check_MapMode}" >Include Wafer Edge</RadioButton>
+                                </Viewbox>
+                                <Viewbox Height="20" Grid.Column="1">
+                                    <RadioButton Name="Exclude" GroupName="CreateMapMode"
+                                         >Exclude Wafer Exclude</RadioButton>
+                                </Viewbox>
+                            </Grid>
+
+                            <Grid Margin="10,0,10,0" Grid.Row="0" Height="50" VerticalAlignment="Top">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Map X" Style="{StaticResource BasicTb}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1"/>
+                                <TextBlock Text="Map Y" Style="{StaticResource BasicTb}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="3"/>
+                                <TextBox Text="{Binding MapSizeX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="100" Height="25" Grid.Row="1"
+                                     IsEnabled="{Binding ElementName=mapSize, Path=IsChecked}"/>
+                                <TextBox Text="{Binding MapSizeY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="4" Width="100" Height="25" Grid.Row="1"
+                                     IsEnabled="{Binding ElementName=mapSize, Path=IsChecked}"/>
+
+                                <CheckBox VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" Name="mapSize" IsChecked="False"/>
+                            </Grid>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+                <Button Content="Start ROI Teaching" VerticalAlignment="Bottom" Grid.Column="2"
+                    Command="{Binding OK}"
+                    Style="{StaticResource PanelBtn}"/>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

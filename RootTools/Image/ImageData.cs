@@ -20,6 +20,11 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Emgu.CV.Dnn;
+using System.Diagnostics;
+using System.Drawing.Imaging;
+using System.Collections;
+using RootTools_CLR;
+using System.Security.Cryptography.X509Certificates;
 
 namespace RootTools
 {
@@ -31,8 +36,11 @@ namespace RootTools
 		{
 			MemoryRead,
 			ImageBuffer,
+			OtherPCMem,
 		}
 		public eMode m_eMode = eMode.MemoryRead;
+
+		public MemoryTool m_ToolMemory;
 
 		string m_id = "";
 		public string p_id
@@ -56,7 +64,7 @@ namespace RootTools
 			}
 			set
 			{
-				if ((m_Size.X != value.X) && (m_Size.Y !=value.Y))
+				if ((m_Size.X != value.X) && (m_Size.Y !=value.Y) && m_eMode == eMode.ImageBuffer)
 				{
 					ReAllocate(value, p_nByte);
 				}
@@ -88,6 +96,7 @@ namespace RootTools
 		}
 
 		public IntPtr m_ptrImg;
+		MemoryData m_MemData;
 		public byte[] m_aBuf;
 		byte[] m_aBufFileOpen;
 
@@ -134,6 +143,7 @@ namespace RootTools
 		{
 			m_eMode = eMode.ImageBuffer;
 			p_Size = new CPoint(Width, Height);
+			p_nByte = nByte;
 			ReAllocate(p_Size, nByte);
 
 			var bmp = new Bitmap(1, 1, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
@@ -149,20 +159,54 @@ namespace RootTools
 				ent[j] = b;
 			});
 		}
-		public void SetData(IntPtr ptr, CRect rect, int stride)
+
+		public ImageData(string sIP, string sPool, string sGroup, string sMem, MemoryTool tool)
 		{
+			m_eMode = eMode.OtherPCMem;
+			m_ToolMemory = tool;
+		}
+
+		public byte[] GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
+		{
+			//m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight);
+			return new byte[5];
+		}
+		public unsafe void SetData(IntPtr ptr, CRect rect)
+		{
+			byte* imagePtr = (byte*)ptr;
 			for (int i = rect.Height - 1; i >= 0; i--)
 			{
-				Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * stride), m_aBuf, 0, rect.Width);
+				
 			}
+		}
+		public unsafe void SetData(IntPtr ptr, CRect rect, int stride, int nByte = 1)
+		{
+			for (int i = rect.Height-1; i >= 0; i--)
+			{
+				Marshal.Copy((IntPtr)((long)ptr + rect.Left * nByte + ((long)i + (long)rect.Top) * stride) , m_aBuf, i * rect.Width * nByte, rect.Width * nByte);
+				//Marshal.Copy((IntPtr)((long)ptr + nByte * (rect.Left / nByte + (stride / nByte / nByte) * ((long)i + (long)rect.Top))), m_aBuf , i * rect.Width , rect.Width);
+			}
+		}
+		public byte[] GetByteArray()
+		{
+			byte[] aBuf = new byte[p_Size.X * p_nByte * p_Size.Y];
+			int position = 0;
 
+			for (int i = 0; i < p_Size.Y; i++)
+			{
+				Marshal.Copy((IntPtr)( (long)GetPtr() + (((long)i) * p_Size.X)), aBuf, position, p_Size.X * p_nByte);
+				position += (p_Size.X * p_nByte);
+			}
+			return aBuf;
 		}
 		public ImageData(MemoryData data)
 		{
 			if (data == null) return;
 			m_eMode = eMode.MemoryRead;
 			m_ptrImg = data.GetPtr();
+			m_MemData = data;
 			p_Size = data.p_sz;
+			p_nByte = data.p_nByte;
 			SetBackGroundWorker();
 		}
 
@@ -176,35 +220,27 @@ namespace RootTools
 			Worker_MemoryClear.WorkerSupportsCancellation = true;
 		}
 
-
 		public void UpdateImage()
 		{
 			OnUpdateImage();
 		}
-		Bitmap GetBitmapToArray(int width, int height, byte[] imageData)
+		public Bitmap GetBitmapToArray(int width, int height, byte[] imageData)
 		{
 			var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
-			
-
 			bmp.Palette = mono;
-
 			using (var stream = new MemoryStream(imageData))
 			{
-
 				System.Drawing.Imaging.BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0,
 																bmp.Width,
 																bmp.Height),
 												  System.Drawing.Imaging.ImageLockMode.WriteOnly,
 												  bmp.PixelFormat);
-
 				IntPtr pNative = bmpData.Scan0;
 				Marshal.Copy(imageData, 0, pNative, imageData.Length);
-
 				bmp.UnlockBits(bmpData);
 			}
 			return bmp;
 		}
-
 		public Bitmap GetByteToBitmap(int width, int height, byte[] imageData)
 		{
 			var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
@@ -227,7 +263,6 @@ namespace RootTools
 			}
 			return bmp;
 		}
-
 		public byte[] GetRectByteArray(CRect rect)
 		{
 			int position = 0;
@@ -246,7 +281,6 @@ namespace RootTools
 			}
 			return aBuf;
 		}
-
 		public Bitmap GetRectImage(CRect rect)
 		{
 			#region TEMP
@@ -326,6 +360,10 @@ namespace RootTools
 			#endregion
 
 			int position = 0;
+			if (rect.Width % 4 != 0)
+			{
+				rect.Right += 4 - rect.Width % 4;
+			}
 			byte[] aBuf = new byte[rect.Width * rect.Height];
 			//나중에 거꾸로 나왔던것 확인해야 함. 일단 지금은 정순으로 바꿔둠
 			for (int i = 0; i < rect.Height; i++)
@@ -335,7 +373,62 @@ namespace RootTools
 			}
 			return GetBitmapToArray(rect.Width, rect.Height, aBuf);
 		}
+		public unsafe BitmapSource GetBitMapSource(int nByteCnt = 1)
+		{
+			if (nByteCnt == 1)
+			{
+				Image<Gray, byte> image = new Image<Gray, byte>(p_Size.X, p_Size.Y);
+				IntPtr ptrMem = GetPtr();
 
+				for (int y = 0; y < p_Size.Y; y++)
+					for (int x = 0; x < p_Size.X; x++)
+					{
+						image.Data[y, x, 0] = ((byte*)ptrMem)[(long)x + (long)y * p_Size.X];
+					}
+
+				return ImageHelper.ToBitmapSource(image);
+			}
+			else if (nByteCnt == 3)
+			{
+				Image<Rgb, byte> image = new Image<Rgb, byte>(p_Size.X, p_Size.Y);
+				IntPtr ptrMem = GetPtr();
+
+				for (int y = 0; y < p_Size.Y; y++)
+					for (int x = 0; x < p_Size.X; x++)
+					{
+						image.Data[y, x, 0] = ((byte*)ptrMem)[0 + p_nByte * (x + (long)y * p_Size.X)];
+						image.Data[y, x, 1] = ((byte*)ptrMem)[1 + p_nByte * (x + (long)y * p_Size.X)];
+						image.Data[y, x, 2] = ((byte*)ptrMem)[2 + p_nByte * (x + (long)y * p_Size.X)];
+					}
+				return ImageHelper.ToBitmapSource(image);
+			}
+			else if (nByteCnt == 4)
+			{
+				Image<Bgra, byte> image = new Image<Bgra, byte>(p_Size.X, p_Size.Y);
+				IntPtr ptrMem = GetPtr();
+
+				Parallel.For(0, p_Size.Y, y =>
+				{
+					Parallel.For(0, p_Size.X, x =>
+					{
+						image.Data[y, x, 0] = ((byte*)ptrMem)[0 + p_nByte * (x + (long)y * p_Size.X)];
+						image.Data[y, x, 1] = ((byte*)ptrMem)[1 + p_nByte * (x + (long)y * p_Size.X)];
+						image.Data[y, x, 2] = ((byte*)ptrMem)[2 + p_nByte * (x + (long)y * p_Size.X)];
+						image.Data[y, x, 3] = ((byte*)ptrMem)[3 + p_nByte * (x + (long)y * p_Size.X)];
+					});
+				});
+				//for (int y = 0; y < p_Size.Y; y++)
+				//	for (int x = 0; x < p_Size.X; x++)
+				//	{
+				//		image.Data[y, x, 0] = ((byte*)ptrMem)[0 + p_nByte * (x + (long)y * p_Size.X)];
+				//		image.Data[y, x, 1] = ((byte*)ptrMem)[1 + p_nByte * (x + (long)y * p_Size.X)];
+				//		image.Data[y, x, 2] = ((byte*)ptrMem)[2 + p_nByte * (x + (long)y * p_Size.X)];
+				//		image.Data[y, x, 3] = ((byte*)ptrMem)[3 + p_nByte * (x + (long)y * p_Size.X)];
+				//	}
+				return ImageHelper.ToBitmapSource(image);
+			}
+			return null;
+		}
 		public Bitmap GetRectImagePattern(CRect rect)
 		{
 			if (rect.Width % 4 != 0)
@@ -344,7 +437,6 @@ namespace RootTools
 			}
 			return GetByteToBitmap(rect.Width, rect.Height, GetRectByteArray(rect));
 		}
-
 		public void SaveRectImage(CRect memRect)
 		{
 			SaveFileDialog ofd = new SaveFileDialog();
@@ -371,7 +463,6 @@ namespace RootTools
 			Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
 			Worker_MemorySave.RunWorkerAsync(arguments);
 		}
-
 		public void SaveWholeImage()
 		{
 			SaveFileDialog ofd = new SaveFileDialog();
@@ -405,7 +496,6 @@ namespace RootTools
 		{
 			OpenBMPFile(filePath, null, offset);
 		}
-
 		void Worker_MemorySave_DoWork(object sender, DoWorkEventArgs e)
 		{
 			List<object> arguments = (List<object>)(e.Argument);
@@ -415,13 +505,16 @@ namespace RootTools
 
 			FileSaveBMP(sPath, m_ptrImg, MemRect);
 		}
-
 		unsafe void FileSaveBMP(string sFile, IntPtr ptr, CRect rect)
 		{
-			if (rect.Width % 4 != 0)
-			{
-				rect.Right += 4 - rect.Width % 4;
-			}
+			int width = (int)(rect.Right * 0.25);
+			int owidth = rect.Right;
+			if (width * 4 != rect.Right) rect.Right = (width + 1) * 4;
+
+			//if (rect.Width % 4 != 0)
+			//{
+			//	rect.Right += 4 - rect.Width % 4;
+			//}
 
 			FileStream fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
 			BinaryWriter bw = new BinaryWriter(fs);
@@ -500,6 +593,7 @@ namespace RootTools
 			}
 			else
 			{
+				ImageData data = new ImageData(123, 123);
 				//MessageBox.Show("OpenFile() - 파일이 존재 하지 않거나 열기에 실패하였습니다. - " + sFileName);
 			}
 		}
@@ -574,9 +668,9 @@ namespace RootTools
 			int a = 0;
 			UInt32 b = 0;
 			BinaryReader br = new BinaryReader(fs);
-			ushort bfType = br.ReadUInt16();
-			uint bfSize = br.ReadUInt32();
-			br.ReadUInt16();
+			ushort bfType = br.ReadUInt16();  //2 4 2 2 4 4 4 4 2  2 4 4 4 4 4 4 256*4 1024  54 
+			uint bfSize = br.ReadUInt32();    
+			br.ReadUInt16();                  
 			br.ReadUInt16();
 			uint bfOffBits = br.ReadUInt32();
 			if (bfType != 0x4D42)
@@ -593,30 +687,74 @@ namespace RootTools
 			b = br.ReadUInt32();
 			b = br.ReadUInt32();
 
+			if(bfOffBits != 54)   
+				br.ReadBytes((int)bfOffBits - 54);
+
 			int lowwidth = 0, lowheight = 0;
-			lowwidth = nWidth < p_Size.X - offset.X ? nWidth : p_Size.X - offset.X;
+			//lowwidth = nWidth < p_Size.X / p_nByte - offset.X ? nWidth : p_Size.X / p_nByte - offset.X;
+			lowwidth = nWidth < p_Size.X - offset.X ? nWidth : p_Size.X  - offset.X;
 			lowheight = nHeight < p_Size.Y - offset.Y ? nHeight : p_Size.Y - offset.Y;
+
 
 			if (m_eMode == eMode.MemoryRead)
 			{
 				p_nByte = nByte;
-				byte[] hRGB;
-				if (p_nByte != 3)
-					hRGB = br.ReadBytes(256 * 4);
-
-				for (int y = lowheight - 1; y >= 0; y--)
+				//byte[] hRGB;
+    //            if (p_nByte != 3)
+    //                hRGB = br.ReadBytes(256 * 4);
+				if (p_nByte == 1)
 				{
-					if (Worker_MemoryCopy.CancellationPending)
-						return;
 
-					byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+                    //Thread thread1 = new Thread(() => RunCopyThread(0,fs ,sFile, nWidth, nHeight, lowwidth , lowheight, offset));
 
-					Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X * ((long)offset.Y + y))), p_nByte * lowwidth);
-					p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+                    //thread1.Start();
+
+                    //bool alive = thread1.IsAlive;
+                    //               while (thread1.IsAlive)
+                    //               {
+                    //	Thread.Sleep(10);
+                    //               }
+
+                    for (int y = lowheight - 1; y >= 0; y--)
+                    {
+                        if (Worker_MemoryCopy.CancellationPending)
+                            return;
+
+                        byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+                        Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
+                        p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+                    }
+
+                }
+				else if(p_nByte == 3)
+				{
+					for (int y = lowheight - 1; y >= 0; y--)
+					{
+						if (Worker_MemoryCopy.CancellationPending)
+							return;
+
+						byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+						IntPtr ptrR =  m_MemData.GetPtr(0);					
+						IntPtr ptrG = m_MemData.GetPtr(1);
+						IntPtr ptrB = m_MemData.GetPtr(2);
+						if (ptrR == IntPtr.Zero || ptrB == IntPtr.Zero || ptrG == IntPtr.Zero)
+						{
+                            System.Windows.MessageBox.Show("Memory Count Error");
+							return;
+						}
+						for (int i = 0; i < lowwidth*3; i = i + 3)
+						{
+							((byte*)(ptrB))[i / 3 + (long)y * p_Size.X] = pBuf[i];
+                            ((byte*)(ptrG))[i / 3 + (long)y * p_Size.X] = pBuf[i+1];
+							((byte*)(ptrR))[i / 3 + (long)y * p_Size.X] = pBuf[i+2];
+						}
+						//Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
+						p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+					}
 				}
-			}
-			else
-			{
+            }
+            else
+            {
 				p_nByte = nByte;
 				if (p_nByte != 3)
 				{
@@ -633,6 +771,18 @@ namespace RootTools
 				}
 			}
 			br.Close();
+		}	
+
+		public void RunCopyThread(int idx, FileStream fs ,string sFile, int nWidth, int nHeight , int nLowWidth, int nLowHeight ,CPoint offset)
+		{
+			byte[] buf = new byte[nLowWidth];
+			fs.Seek(54 + 1024, SeekOrigin.Begin);
+			for (int i = 1; i < nLowHeight; i++)
+			{
+				fs.Read(buf,0, nWidth);
+				Marshal.Copy(buf, 0, (IntPtr)((long)m_ptrImg + (offset.X + p_Size.X * ((long)offset.Y + i))), nLowWidth);
+				//p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+			}
 		}
 
 		public unsafe bool ReAllocate(CPoint sz, int nByte)
@@ -655,6 +805,20 @@ namespace RootTools
 			arguments.Add("test");
 			Worker_MemoryClear.RunWorkerAsync(arguments);
 		}
+
+		public IntPtr GetPtr(int index)
+		{
+			IntPtr ip = (IntPtr)null;
+			if (m_eMode == eMode.MemoryRead)
+			{
+				ip = (IntPtr)((long)m_MemData.GetPtr(index));
+			}
+			else if (m_eMode == eMode.ImageBuffer)
+			{	
+			}
+			return ip;
+		}
+
 
 		public IntPtr GetPtr(int y = 0, int x = 0)
 		{
@@ -1002,7 +1166,36 @@ namespace RootTools
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static extern bool DeleteObject(IntPtr value);
 
-		public static BitmapSource GetImageStream(Image myImage)
+		public static Bitmap GetBitmap(BitmapSource source)
+		{
+			Bitmap bmp = new Bitmap
+			(
+			  source.PixelWidth,
+			  source.PixelHeight,
+			  System.Drawing.Imaging.PixelFormat.Format32bppPArgb
+			);
+
+			BitmapData data = bmp.LockBits
+			(
+				new System.Drawing.Rectangle(System.Drawing.Point.Empty, bmp.Size),
+				ImageLockMode.WriteOnly,
+				System.Drawing.Imaging.PixelFormat.Format32bppPArgb
+			);
+
+			source.CopyPixels
+			(
+			  Int32Rect.Empty,
+			  data.Scan0,
+			  data.Height * data.Stride,
+			  data.Stride
+			);
+
+			bmp.UnlockBits(data);
+
+			return bmp;
+		}
+
+		public static BitmapSource GetImageSource(Image myImage)
 		{
 			var bitmap = new Bitmap(myImage);
 			IntPtr bmpPt = bitmap.GetHbitmap();
@@ -1076,23 +1269,42 @@ namespace RootTools
 			Image returnImage = Image.FromStream(ms, true, false);
 			return returnImage;
 		}
-
-		public static BitmapSource ToBitmapSource(Image<Gray, byte> image)
+		public static Bitmap ToBitmap(Image<Gray, byte> image)
 		{
 			using (System.Drawing.Bitmap source = image.Bitmap)
 			{
-
-
 				var bitmapData = source.LockBits(
-		new System.Drawing.Rectangle(0, 0, source.Width, source.Height),
-		System.Drawing.Imaging.ImageLockMode.ReadOnly, source.PixelFormat);
+				new System.Drawing.Rectangle(0, 0, source.Width, source.Height),
+				System.Drawing.Imaging.ImageLockMode.ReadOnly, source.PixelFormat);
 
 				BitmapSource bitmapSource = BitmapSource.Create(
-	   source.Width, source.Height,
-	   source.HorizontalResolution, source.VerticalResolution,
-	   PixelFormats.Gray8, null,
-	   bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+				source.Width, source.Height,
+				source.HorizontalResolution, source.VerticalResolution,
+				PixelFormats.Gray8, null,
+				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
+
+
+				source.UnlockBits(bitmapData);
+			
+				return source;
+			}
+
+
+		}
+		public static BitmapSource ToBitmapSource(Image<Bgra, byte> image)
+		{
+			using (System.Drawing.Bitmap source = image.Bitmap)
+			{
+				var bitmapData = source.LockBits(
+				new System.Drawing.Rectangle(0, 0, source.Width, source.Height),
+				System.Drawing.Imaging.ImageLockMode.ReadOnly, source.PixelFormat);
+
+				BitmapSource bitmapSource = BitmapSource.Create(
+				source.Width, source.Height,
+				source.HorizontalResolution, source.VerticalResolution,
+				PixelFormats.Bgra32, null,
+				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
 				source.UnlockBits(bitmapData);
 
@@ -1100,7 +1312,27 @@ namespace RootTools
 				return bitmapSource;
 			}
 		}
+		public static BitmapSource ToBitmapSource(Image<Gray, byte> image)
+		{
+			using (System.Drawing.Bitmap source = image.Bitmap)
+			{
+                var bitmapData = source.LockBits(
+				new System.Drawing.Rectangle(0, 0, source.Width, source.Height),
+				System.Drawing.Imaging.ImageLockMode.ReadOnly, source.PixelFormat);
 
+                BitmapSource bitmapSource = BitmapSource.Create(
+				source.Width, source.Height,
+				source.HorizontalResolution, source.VerticalResolution,
+				PixelFormats.Gray8, null,
+				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+
+
+                source.UnlockBits(bitmapData);
+
+				//DeleteObject(ptr);
+				return bitmapSource;
+			}
+		}
 		public static BitmapSource ToBitmapSource(Image<Rgb, byte> image)
 		{
 			using (System.Drawing.Bitmap source = image.Bitmap)
@@ -1108,14 +1340,14 @@ namespace RootTools
 
 
 				var bitmapData = source.LockBits(
-		new System.Drawing.Rectangle(0, 0, source.Width, source.Height),
-		System.Drawing.Imaging.ImageLockMode.ReadOnly, source.PixelFormat);
+				new System.Drawing.Rectangle(0, 0, source.Width, source.Height),
+				System.Drawing.Imaging.ImageLockMode.ReadOnly, source.PixelFormat);
 
 				BitmapSource bitmapSource = BitmapSource.Create(
-	   source.Width, source.Height,
-	   source.HorizontalResolution, source.VerticalResolution,
-	   PixelFormats.Bgr24, null,
-	   bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+				source.Width, source.Height,
+				source.HorizontalResolution, source.VerticalResolution,
+				PixelFormats.Bgr24, null,
+				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
 
 				source.UnlockBits(bitmapData);
@@ -1125,5 +1357,32 @@ namespace RootTools
 			}
 
 		}
+
+		public static BitmapSource GetBitmapSourceFromBitmap(Bitmap bitmap)
+		{
+			BitmapSource bitmapSource;
+
+
+			IntPtr hBitmap = bitmap.GetHbitmap();
+			BitmapSizeOptions sizeOptions = BitmapSizeOptions.FromEmptyOptions();
+			bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, sizeOptions);
+			bitmapSource.Freeze();
+
+
+			return bitmapSource;
+		}
+
+
+		public static byte[] FileLoadBitmap(string sFilePath, int nW, int nH)
+		{
+			byte[] rawdata = new byte[nW * nH];
+			CLR_IP.Cpp_LoadBMP(sFilePath, rawdata, nW, nH);
+			return rawdata;
+		}
+
+		public static void FileSaveBitmap(string sFilePath, byte[] rawdata, int nW, int nH, int nByteCnt = 1)
+		{
+			CLR_IP.Cpp_SaveBMP(sFilePath, rawdata, nW, nH, nByteCnt);
+		}	
 	}
 }

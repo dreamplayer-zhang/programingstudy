@@ -131,10 +131,15 @@ namespace RootTools
             if (cp.Y < 0) return false;
             return true; 
         }
-
         public double Distance(CPoint cp)
         {
             return Math.Sqrt((X - cp.X) * (X - cp.X) + (Y - cp.Y) * (Y - cp.Y));
+        }
+        public void Transpose()
+        {
+            int n = X;
+            X = Y;
+            Y = n;
         }
     }
 }
