@@ -32,7 +32,7 @@ namespace Root_WIND2.Module
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "BackSide Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "BackSide Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
             p_sInfo = m_toolBox.Get(ref m_CamLADS, this, "LADSCam");

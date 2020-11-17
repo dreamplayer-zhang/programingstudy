@@ -91,8 +91,8 @@ namespace RootTools_Vision
                 _dispatcher = Dispatcher.CurrentDispatcher;
 
                 m_MemoryModule = m_engineer.ClassMemoryTool();
-                m_MemoryModule.GetPool(sPool, true).p_gbPool = 2;
-                m_MemoryModule.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
+                //m_MemoryModule.GetPool(sPool).p_gbPool = 2;
+                m_MemoryModule.GetPool(sPool).GetGroup(sGroup).CreateMemory(sMem, 1, 1, new CPoint(MemWidth, MemHeight));
                 m_MemoryModule.GetMemory(sPool, sGroup, sMem);
 
                 m_Image = new ImageData(m_MemoryModule.GetMemory(sPool, sGroup, sMem));

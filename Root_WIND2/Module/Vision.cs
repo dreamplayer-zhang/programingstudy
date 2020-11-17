@@ -39,7 +39,7 @@ namespace Root_WIND2.Module
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
             p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory",1);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
             p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");

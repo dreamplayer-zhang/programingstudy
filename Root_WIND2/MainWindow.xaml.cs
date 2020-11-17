@@ -157,9 +157,9 @@ namespace Root_WIND2
 
             m_engineer.Init("WIND2");
             m_memoryTool = m_engineer.ClassMemoryTool();
-            m_memoryTool.GetPool(sPool, true).p_gbPool = 12;
-            m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 3, 1, new CPoint(MemWidth, MemHeight));
-            m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMemROI, 1, 4, new CPoint(ROIWidth, ROIHeight));
+//            m_memoryTool.GetPool(sPool).p_gbPool = 12;
+            m_memoryTool.GetPool(sPool).GetGroup(sGroup).CreateMemory(sMem, 3, 1, new CPoint(MemWidth, MemHeight));
+            m_memoryTool.GetPool(sPool).GetGroup(sGroup).CreateMemory(sMemROI, 1, 4, new CPoint(ROIWidth, ROIHeight));
             m_memoryTool.GetMemory(sPool, sGroup, sMem);
 
             m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem)); // Main ImageData
