@@ -11,31 +11,31 @@
             <Grid Height="866">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="8*"/>
+                    <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="32*"/>
                         <RowDefinition Height="15*"/>
-                        <RowDefinition Height="53*"/>
+                        <RowDefinition Height="15*"/>
+                        <RowDefinition Height="65*"/>
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0" Header="Progress">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="1.5*"/>
                                 <RowDefinition Height="1*"/>
-                                <RowDefinition Height="0.8*"/>
+                                <!--<RowDefinition Height="1*"/>-->
                                 <RowDefinition Height="1*"/>
                             </Grid.RowDefinitions>
-                            <StackPanel Grid.Row="0" Margin="10,5" VerticalAlignment="Center">
-                                <TextBlock Text="Total Progress" FontSize="16" FontWeight="Bold"/>
+                            <StackPanel Grid.Row="0" Margin="10,2" VerticalAlignment="Center">
+                                <TextBlock Text="Total Progress" FontSize="15" FontWeight="Bold"/>
                                 <Grid>
-                                    <ProgressBar Height="40" Margin="0,5" Value="55"/>
+                                    <ProgressBar Height="40" Margin="0,0" Value="55"/>
                                     <TextBlock Text="55%" HorizontalAlignment="Center" VerticalAlignment="Center"
                                                    FontWeight="Bold" FontSize="13"/>
                                 </Grid>
                             </StackPanel>
-                            <StackPanel Grid.Row="1" Margin="10,2" VerticalAlignment="Center">
+                            <!--<StackPanel Grid.Row="1" Margin="10,2" VerticalAlignment="Center">
                                 <TextBlock Text="Sub Progress" FontSize="13" FontWeight="Bold"/>
                                 <Grid>
                                     <ProgressBar Height="25" Value="80"/>
@@ -43,7 +43,7 @@
                                                    VerticalAlignment="Center" 
                                                    HorizontalAlignment="Center"/>
                                 </Grid>
-                            </StackPanel>
+                            </StackPanel>-->
                             <UniformGrid Grid.Row="2"
                                          Columns="2"
                                          Margin="20,0">
@@ -52,19 +52,18 @@
                                 <TextBlock Text="Run" VerticalAlignment="Center"/>
                                 <TextBlock Text="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             </UniformGrid>
-                            <Button Content="STOP" Grid.Row="3" Style="{StaticResource SetupPanelBtn}" Margin="9"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="1" Header="Product">
-                        <UniformGrid Margin="20,5" Columns="2">
+                        <UniformGrid Margin="20,0" Columns="2">
                             <TextBlock Text="Pod ID" VerticalAlignment="Center" />
-                            <TextBlock Text="-" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="pod00001" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <TextBlock Text="Lot ID" VerticalAlignment="Center"/>
-                            <TextBlock Text="-" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="lot00001" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <TextBlock Text="Reticle ID" VerticalAlignment="Center"/>
-                            <TextBlock Text="DummyWafer001" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="dummyW001" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <TextBlock Text="Recipe" VerticalAlignment="Center"/>
-                            <TextBlock Text="test200804.rcp" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text="test00001.rcp" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </UniformGrid>
                     </GroupBox>
                     <GroupBox Grid.Row="2" Header="Module State">
@@ -76,13 +75,16 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                                 <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <Grid Margin="10,5" Grid.Row="0">
+                            <Grid Margin="10,3" Grid.Row="0">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="LoadPort" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="LOADPORT : RETICLE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
                                 <Border Grid.Row="1" 
                                                 CornerRadius="2"
                                                 Margin="0,0,0,0"
@@ -95,12 +97,12 @@
                                 </Border>
 
                             </Grid>
-                            <Grid Margin="10,5" Grid.Row="1">
+                            <Grid Margin="10,3" Grid.Row="1">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="RTR" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="LOADPORT : POD" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -111,12 +113,12 @@
                                                    HorizontalAlignment="Center"/>
                                 </Border>
                             </Grid>
-                            <Grid Margin="10,5" Grid.Row="2">
+                            <Grid Margin="10,3" Grid.Row="2">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="Pattern" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="LOADPORT : CASE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -127,12 +129,12 @@
                                                    HorizontalAlignment="Center"/>
                                 </Border>
                             </Grid>
-                            <Grid Margin="10,5" Grid.Row="3">
+                            <Grid Margin="10,3" Grid.Row="3">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="Pellicle" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="UNLOADPORT" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -143,12 +145,12 @@
                                                    HorizontalAlignment="Center"/>
                                 </Border>
                             </Grid>
-                            <Grid Margin="10,5" Grid.Row="4">
+                            <Grid Margin="10,3" Grid.Row="4">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="LADS" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="RTR : RETICLE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -159,12 +161,60 @@
                                                    HorizontalAlignment="Center"/>
                                 </Border>
                             </Grid>
-                            <Grid Margin="10,5" Grid.Row="5">
+                            <Grid Margin="10,3" Grid.Row="5">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="Side" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="RTR : POD / CASE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <Border Grid.Row="1" 
+                                            CornerRadius="2"
+                                            BorderBrush="DimGray" 
+                                            BorderThickness="1"
+                                            Background="{StaticResource PanelBackGround}">
+                                    <TextBlock Text="Ready"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                            <Grid Margin="10,3" Grid.Row="6">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="TAPING MODULE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <Border Grid.Row="1" 
+                                            CornerRadius="2"
+                                            BorderBrush="DimGray" 
+                                            BorderThickness="1"
+                                            Background="{StaticResource PanelBackGround}">
+                                    <TextBlock Text="Ready"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                            <Grid Margin="10,3" Grid.Row="7">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="SEALING MODULE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <Border Grid.Row="1" 
+                                            CornerRadius="2"
+                                            BorderBrush="DimGray" 
+                                            BorderThickness="1"
+                                            Background="{StaticResource PanelBackGround}">
+                                    <TextBlock Text="Ready"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                </Border>
+                            </Grid>
+                            <Grid Margin="10,3" Grid.Row="8">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="20"/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="PICKER MODULE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -179,157 +229,116 @@
                         </Grid>
                     </GroupBox>
                 </Grid>
-                <Grid Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <GroupBox Header="Image View" Grid.Column="0" Grid.Row="0">
-                        <Grid Margin="10">
+                <GroupBox Header="Overview" Grid.Column="1">
+                    <Grid Grid.Column="1" Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
                             </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="80"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="80"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Column="1" Grid.Row="0" Background="Black" Margin="5">
+                            <GroupBox Header="PICKER MODULE" Grid.Column="0">
 
-                            </Grid>
-                            <Grid Grid.Column="2" Grid.Row="1" Background="Black" Margin="5">
+                            </GroupBox>
+                            <GroupBox Header="SEALING MODULE" Grid.Column="1">
 
-                            </Grid>
-                            <Grid Grid.Column="0" Grid.Row="1" Background="Black" Margin="5">
+                            </GroupBox>
+                            <GroupBox Header="TAPING MODULE" Grid.Column="2">
 
-                            </Grid>
-                            <Grid Grid.Column="1" Grid.Row="2" Background="Black" Margin="5">
-
-                            </Grid>
-                            <Grid Grid.Column="1" Grid.Row="1" Background="Black" Margin="5">
-
-                            </Grid>
-                        </Grid>
-                    </GroupBox>
-                    <Grid Grid.Column="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition Height="0.5*"/>
-                                <RowDefinition Height="0.5*"/>
-                                <RowDefinition Height="0.5*"/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition Height="0.5*"/>
-                                <RowDefinition Height="0.5*"/>
-                                <RowDefinition Height="0.5*"/>
-                            </Grid.RowDefinitions>
-                            <GroupBox Header="Pellicle Expanding">
-                                <UniformGrid Margin="10" Rows="3" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Min" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Max" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                </UniformGrid>
-                            </GroupBox>
-                            <GroupBox Header="Pellicle Haze" Grid.Row="1">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                </UniformGrid>
-                            </GroupBox>
-                            <GroupBox Header="Pattern Discolor" Grid.Row="2">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                </UniformGrid>
-                            </GroupBox>
-                            <GroupBox Header="Align Key Exist" Grid.Row="3">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                </UniformGrid>
-                            </GroupBox>
-                            <GroupBox Header="Pattern Shift" Grid.Row="4">
-                                <UniformGrid Margin="10" Rows="3" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Center" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Angle" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                </UniformGrid>
-                            </GroupBox>
-                            <GroupBox Header="Pellicle Shift" Grid.Row="5">
-                                <UniformGrid Margin="10" Rows="3" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Center" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Angle" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                </UniformGrid>
-                            </GroupBox>
-                            <GroupBox Header="Pellicle FrontSide" Grid.Row="6">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
-                                    <TextBlock Text="Pellicle FrontSide" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                </UniformGrid>
-                            </GroupBox>
-                            <GroupBox Header="Barcode Scratch" Grid.Row="7">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
-                                    <TextBlock Text="Defect Count" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                </UniformGrid>
-                            </GroupBox>
-                            <GroupBox Header="Edge Broken" Grid.Row="8">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
-                                    <TextBlock Text="Defect Count" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                </UniformGrid>
                             </GroupBox>
                         </Grid>
-                        <Grid Grid.Column="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition Height="2*"/>
-                            </Grid.RowDefinitions>
-                            <GroupBox Header="Defect Image" Grid.Row="0">
-                                <Grid Background="Black"/>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Header="RTR : POD / CASE" Grid.Column="0">
+
                             </GroupBox>
-                            <GroupBox Header="Defect List" Grid.Row="1">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <WrapPanel>
-                                        <CheckBox Content="All" Margin="3"/>
-                                        <CheckBox Content="Pellicle" Margin="3"/>
-                                        <CheckBox Content="Barcode" Margin="3"/>
-                                        <CheckBox Content="Edge" Margin="3"/>
-                                    </WrapPanel>
-                                    <DataGrid Background="White" Grid.Row="1">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Index" Width="50"/>
-                                            <DataGridTextColumn Header="Location" Width="*"/>
-                                            <DataGridTextColumn Header="Size" Width="*"/>
-                                            <DataGridTextColumn Header="GV" Width="50"/>
-                                            <DataGridTextColumn Header="Defect Code" Width="*"/>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </Grid>
+                            <GroupBox Header="RTR : RETICLE" Grid.Column="1">
+
+                            </GroupBox>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Header="LOADPORT : CASE" Grid.Column="0">
+
+                            </GroupBox>
+                            <GroupBox Header="UNLOADPORT" Grid.Column="1">
+
+                            </GroupBox>
+                            <GroupBox Header="LOADPORT : POD" Grid.Column="2">
+
+                            </GroupBox>
+                            <GroupBox Header="LOADPORT : RETICLE" Grid.Column="3">
+
                             </GroupBox>
                         </Grid>
                     </Grid>
+                </GroupBox>
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="15*"/>
+                        <RowDefinition Height="85*"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Parameter">
+                        <Grid Margin="20,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Taping Num" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Style="{StaticResource BasicTbox}" Margin="20,10"
+                                 Text="0"/>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Vaccume Time" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Style="{StaticResource BasicTbox}" Margin="20,10"
+                                 Text="0"/>
+                                <TextBlock Text="sec" VerticalAlignment="Center" Grid.Column="2"/>
+
+                            </Grid>
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"/>
+                                    <ColumnDefinition Width="4*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Heating Time" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Style="{StaticResource BasicTbox}" Margin="20,10"
+                                 Text="0"/>
+                                <TextBlock Text="sec" VerticalAlignment="Center" Grid.Column="2"/>
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                    <StackPanel Grid.Row="1">
+                        <Button Content="Start / Stop" Style="{StaticResource SetupPanelBtn}"/>
+                        <Button Content="Initialize" Style="{StaticResource SetupPanelBtn}"/>
+                        <Button Content="Recovery" Style="{StaticResource SetupPanelBtn}"/>
+                        <Button Content="Module Run" Style="{StaticResource SetupPanelBtn}"/>
+                    </StackPanel>
                 </Grid>
             </Grid>
         </StackPanel>

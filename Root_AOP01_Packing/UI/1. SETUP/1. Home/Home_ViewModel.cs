@@ -10,6 +10,8 @@ namespace Root_AOP01_Packing
     class SetupHome_ViewModel : ObservableObject
     {
         public Home_Panel Home = new Home_Panel();
+        public Engineer_Page Engineer = new Engineer_Page();
+        public GEM_page GEM = new GEM_page();
 
         Setup_ViewModel m_Setup;
         public SetupHome_ViewModel(Setup_ViewModel setup)
@@ -17,36 +19,26 @@ namespace Root_AOP01_Packing
             m_Setup = setup;
         }
 
-        public ICommand btnSummary
+        public ICommand btnEngineer
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    Home.SummaryBtn.IsChecked = true;
+                    m_Setup.Set_EngineerPage();
                 });
-            }
-        }
-        public ICommand btnRecipeWizard
-        {
-            get
-            {
-                return new RelayCommand(m_Setup.Set_RecipeWizardPanel);
-            }
-        }
-        public ICommand btnMaintenance
-        {
-            get
-            {
-                return new RelayCommand(m_Setup.Set_MaintenancePanel);
             }
         }
         public ICommand btnGEM
         {
             get
             {
-                return new RelayCommand(m_Setup.Set_GEMPanel);
+                return new RelayCommand(() =>
+                {
+                    m_Setup.Set_GEMPage();
+                });
             }
         }
+
     }
 }
