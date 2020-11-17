@@ -40,7 +40,8 @@ namespace Root_WIND2.UI
             get
             {
                 return new RelayCommand(() =>
-                {   
+                {
+                    //m_ToolMemory.SendTest();
                 });
             }
         }

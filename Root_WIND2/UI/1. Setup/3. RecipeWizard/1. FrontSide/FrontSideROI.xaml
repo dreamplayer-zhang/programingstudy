@@ -57,11 +57,11 @@
                             <ScrollViewer helper:AutoScrollHelper.AutoScroll="True">
                                 <StackPanel>
                                     <DataGrid ItemsSource="{Binding p_cInspROI}"
-                                          SelectedItem="{Binding p_SelectedROI}"
-                                          SelectionMode="Single"
-                                          IsReadOnly="True"
-                                          RowHeaderWidth="0"
-                                          AutoGenerateColumns="False">
+                                              SelectedItem="{Binding p_SelectedROI}"
+                                              SelectionMode="Single"
+                                              IsReadOnly="True"
+                                              RowHeaderWidth="0"
+                                              AutoGenerateColumns="False">
                                         <DataGrid.Resources>
                                             <CollectionViewSource Source="{Binding p_cInspROI}" x:Key="items"/>
                                             <Style TargetType="DataGridColumnHeader">
@@ -86,7 +86,7 @@
                                             </DataGridTemplateColumn>
                                             <DataGridTextColumn Header="Index" Width="50"
                                                                 ElementStyle="{StaticResource TextInCellCenter}"
-                                                                Binding="{Binding Converter={StaticResource IndexConverter}, 
+                                                                Binding="{Binding Converter={StaticResource IndexConverter},  
                                                                 ConverterParameter={StaticResource ResourceKey=items}}"/>
 
                                             <DataGridTextColumn Header="Size(byte)" Width="*" Binding="{Binding p_Size}"
@@ -95,7 +95,7 @@
                                             <DataGridTemplateColumn Width="*" Header="Color">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <local:ColorPicker Tag="{Binding p_Color}"/>
+                                                        <local:ColorPicker Tag="{Binding p_Color, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>

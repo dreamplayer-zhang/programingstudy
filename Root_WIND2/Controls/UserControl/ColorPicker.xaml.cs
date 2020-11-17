@@ -9,10 +9,10 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Media;
 
 namespace Root_WIND2
 {
@@ -24,11 +24,10 @@ namespace Root_WIND2
         public ColorPicker()
         {
             InitializeComponent();
-            var asdf = typeof(Colors).GetProperties();
             cbxColors.ItemsSource = typeof(Colors).GetProperties();
             cbxColors.SelectedIndex = 0;
+            
         }
-
         private void cbxColors_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (cbxColors.DataContext == null)
@@ -41,8 +40,20 @@ namespace Root_WIND2
                 var selected = cbxColors.SelectedItem as PropertyInfo;
                 var selectColor = selected.GetValue(selected);
                 ROI.p_Color = (Color)selectColor;
+                
             }
 
         }
+
+        private void Picker_Loaded(object sender, RoutedEventArgs e)
+        {
+            var ff = cbxColors.SelectedItem;
+            InspectionROI roi = this.DataContext as InspectionROI;
+            var select = typeof(Colors).GetProperties()
+                        .Where(p => p.GetValue(null, null).ToString() == roi.p_Color.ToString())
+                        .Select(p => p).FirstOrDefault();
+            cbxColors.SelectedItem = select;
+        }
+
     }
 }

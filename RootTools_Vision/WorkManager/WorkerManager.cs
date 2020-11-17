@@ -12,10 +12,12 @@ namespace RootTools_Vision
     {
         List<Worker> workers;
 
+        List<WorkBundle> workBundleList = new List<WorkBundle>();
+
         WorkBundle workBundle;
         WorkplaceBundle workplaceBundle;
 
-        bool bWaitStateAllDone;
+        STATE_CHECK_TYPE eStateCheckType;
 
         Task task = null;
         CancellationTokenSource cancellationTokenSource;
@@ -27,9 +29,11 @@ namespace RootTools_Vision
         WORKPLACE_STATE excuteCondition = WORKPLACE_STATE.NONE;
 
 
-        public WorkerManager(List<Worker> _workers, WORKPLACE_STATE _resultState, WORKPLACE_STATE _excuteCondition, bool _bWaitStateAllDone = false)
+        private int m_nLine = 0;
+
+        public WorkerManager(List<Worker> _workers, WORKPLACE_STATE _resultState, WORKPLACE_STATE _excuteCondition, STATE_CHECK_TYPE _state_check_type = STATE_CHECK_TYPE.CHIP)
         {
-            this.bWaitStateAllDone = _bWaitStateAllDone;
+            this.eStateCheckType = _state_check_type;
             foreach (Worker worker in _workers)
             {
                 worker.WorkCompleted += WorkCompleted_Callback;
@@ -49,6 +53,14 @@ namespace RootTools_Vision
         {
             this.workBundle = _workbundle;
             this.workplaceBundle = _workplacebundle;
+            this.workBundleList.Clear();
+
+            foreach (Workplace wp in this.workplaceBundle)
+            {
+                this.workBundle.Workplace = wp;
+                this.workBundle.WorkplaceBundle = this.workplaceBundle;
+                this.workBundleList.Add(workBundle.Clone());
+            }
         }
 
         private void WorkplaceStateChanged_Callback(object obj)
@@ -62,7 +74,7 @@ namespace RootTools_Vision
 
         private void WorkCompleted_Callback(object obj)
         {
-            if(this.bWaitStateAllDone == true)
+            if (eStateCheckType == STATE_CHECK_TYPE.WAFER)
             {
                 this.workplaceBundle.SetStateAll(this.resultState);
             }
@@ -89,6 +101,7 @@ namespace RootTools_Vision
             return null;
         }
 
+
         private object LockObj = new object();
         public void AssignWorkToWorker()
         {
@@ -97,11 +110,10 @@ namespace RootTools_Vision
                 Worker worker = GetAvailableWorker();
                 while (worker != null)
                 {
-                    if(bWaitStateAllDone == true)
+                    if(eStateCheckType == STATE_CHECK_TYPE.WAFER)
                     {
                         if(this.workplaceBundle.CheckStateAll(this.excuteCondition) == true)
                         {
-                            // 201015 여기부터 개발해야뎀!!! 갓뎀
                             worker.eWorkerState = WORKER_STATE.WORK_ASSIGNED;
                             this.workplaceBundle[0].IsOccupied = true;
                             this.workBundle.Workplace = this.workplaceBundle[0];
@@ -117,11 +129,10 @@ namespace RootTools_Vision
                         if (workplace == null) return;
 
                         workplace.IsOccupied = true;
-                        this.workBundle.Workplace = workplace;
 
                         worker.eWorkerState = WORKER_STATE.WORK_ASSIGNED;
 
-                        worker.SetWorkBundle(this.workBundle.Clone());
+                        worker.SetWorkBundle(this.workBundleList[workplace.Index]);
                         worker.Start();
 
                         worker = GetAvailableWorker();

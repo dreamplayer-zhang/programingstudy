@@ -40,19 +40,19 @@ namespace Root_WIND2
         private void Setup_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             m_Mainwindow.MainPanel.Children.Clear();
-            m_Mainwindow.MainPanel.Children.Add(m_Mainwindow.m_Setup);
+            m_Mainwindow.MainPanel.Children.Add(m_Mainwindow.Setup);
         }
 
         private void Review_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             m_Mainwindow.MainPanel.Children.Clear();
-            m_Mainwindow.MainPanel.Children.Add(m_Mainwindow.m_Review);
+            m_Mainwindow.MainPanel.Children.Add(m_Mainwindow.Review);
         }
 
         private void Run_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             m_Mainwindow.MainPanel.Children.Clear();
-            m_Mainwindow.MainPanel.Children.Add(m_Mainwindow.m_Run);
+            m_Mainwindow.MainPanel.Children.Add(m_Mainwindow.Run);
         }
 
         private void button_Click(object sender, RoutedEventArgs e)

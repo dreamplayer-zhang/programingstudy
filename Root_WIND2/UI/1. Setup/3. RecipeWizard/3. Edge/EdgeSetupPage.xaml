@@ -41,8 +41,7 @@
                         <ColumnDefinition Width="75*"/>
                         <ColumnDefinition Width="25*"/>
                     </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0"
-                          Header="Scan Image">
+                    <GroupBox Grid.Column="0" Header="Scan Image">
                             <tools:RootViewer DataContext="{Binding p_DrawTool_VM}"/>
                             <!--<ScrollViewer>
                             <Grid Background="Black">
@@ -51,7 +50,7 @@
                             </Grid>
                         </ScrollViewer>-->
                     </GroupBox>
-                    <Grid Grid.Column="1">
+                            <Grid Grid.Column="1">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="2*"/>
                             <RowDefinition/>
@@ -71,10 +70,7 @@
                               Background="{StaticResource Splitter}" 
                               Width="3"
                               ShowsPreview="True"/>
-                <Canvas>
-                    
-                </Canvas>
-                <!--<Grid Grid.Column="2">
+                <Grid Grid.Column="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
@@ -161,14 +157,14 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock FontSize="12" Text="Exclusive Area" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                <TextBlock FontSize="12" Text="Intensity" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                                <TextBlock FontSize="12" Text="Inspection ROI Height" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                <TextBlock FontSize="12" Text="Defect Size Min (um)" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                 <TextBlock FontSize="12" Text="GV USL" Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                 <TextBlock FontSize="12" Text="GV LSL" Style="{StaticResource BasicTb}" Grid.Row="3"/>
                                 <TextBlock FontSize="12" Text="Size USL" Style="{StaticResource BasicTb}" Grid.Row="4"/>
                                 <TextBlock FontSize="12" Text="Size LSL" Style="{StaticResource BasicTb}" Grid.Row="5"/>
-                                <TextBox Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
-                                <TextBox Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding ROIHeight}" Grid.Column="2" Grid.Row="0" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
+                                <TextBox Text="{Binding DefectSizeMin}" Grid.Column="2" Grid.Row="1" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                                 <TextBox Grid.Column="2" Grid.Row="2" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                                 <TextBox Grid.Column="2" Grid.Row="3" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                                 <TextBox Grid.Column="2" Grid.Row="4" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
@@ -333,7 +329,7 @@
                         </GroupBox>
                     </Grid>
 
-                </Grid>-->
+                </Grid>
             </Grid>
         </StackPanel>
     </ScrollViewer>

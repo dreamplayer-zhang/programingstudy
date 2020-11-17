@@ -150,22 +150,22 @@ namespace Root_WIND2
             switch(color)
             {
                 case ColorType.MasterFeature :
-                    rectInfo = new TRect(Brushes.DarkMagenta, 2, 1);
+                    rectInfo = new TRect(Brushes.DarkMagenta, 4, 1);
                     break;
                 case ColorType.ShotFeature:
-                    rectInfo = new TRect(Brushes.Navy, 2, 1); 
+                    rectInfo = new TRect(Brushes.Navy, 4, 1); 
                     break;
                 case ColorType.ChipFeature:
-                    rectInfo = new TRect(Brushes.DarkBlue, 2, 1);
+                    rectInfo = new TRect(Brushes.DarkBlue, 4, 1);
                     break;
                 case ColorType.FeatureMatching:
-                    rectInfo = new TRect(Brushes.Gold, 2, 1);
+                    rectInfo = new TRect(Brushes.Gold, 4, 1);
                     break;
                 case ColorType.Defect:
-                    rectInfo = new TRect(Brushes.Red, 2, 1);
+                    rectInfo = new TRect(Brushes.Red, 4, 1);
                     break;
                 default:
-                    rectInfo = new TRect(Brushes.Black, 2, 1);
+                    rectInfo = new TRect(Brushes.Black, 4, 1);
                     break;
             }
             

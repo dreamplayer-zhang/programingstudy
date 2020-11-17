@@ -17,11 +17,11 @@ namespace Root_WIND2
 {
     class MapControl_ViewModel : ObservableObject
     {
-        WIND2_InspectionManager m_InspectionManger;
+        InspectionManager_Vision m_InspectionManger;
         Recipe m_Recipe;
         public byte[] Map;
         CPoint MapSize;
-        public MapControl_ViewModel(WIND2_InspectionManager inspectionManger)
+        public MapControl_ViewModel(InspectionManager_Vision inspectionManger)
         {
             m_InspectionManger = inspectionManger;
             m_InspectionManger.MapStateChanged += MapStateChanged_Callback;

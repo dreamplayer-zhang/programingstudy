@@ -18,8 +18,10 @@ namespace RootTools_Vision
 {
     public class D2D : WorkBase
     {
+        WorkplaceBundle workplaceBundle;
         Workplace workplace;
-        static byte[] GoldenImage;
+
+        byte[] GoldenImage = null;
 
         public override WORK_TYPE Type => WORK_TYPE.MAINWORK;
 
@@ -28,10 +30,46 @@ namespace RootTools_Vision
             m_sName = this.GetType().Name;
         }
 
+        public override bool DoPrework()
+        {
+            if(this.workplace.Index == 0)
+            {
+                return base.DoPrework();
+            }
+
+            if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP) == true &&
+                this.workplaceBundle.CheckStateLine(this.workplace.MapPositionX, WORKPLACE_STATE.READY) &&
+                this.IsPreworkDone == false)
+            {
+                CreateGoldenImage();
+
+                // Golden Image Workplace에 복사
+                foreach(Workplace wp in this.workplaceBundle)
+                {
+                    if(wp.MapPositionX == this.workplace.MapPositionX)
+                    {
+                        wp.SetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE, (object)(GoldenImage) /*Tools.ByteArrayToObject(GoldenImage)*/);
+                    }
+                }
+            }
+
+            if(this.workplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) != null)
+            {
+                this.GoldenImage = this.workplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) as byte[];
+                return base.DoPrework();
+            }
+            else
+            {
+                this.IsPreworkDone = false;
+                return false;
+            }
+        }
 
         public override void DoWork()
         {
             DoInspection();
+
+            base.DoWork();
         }
 
         public void SetGoldenImage(byte[] currentImage, int ChipW, int ChipH)
@@ -41,7 +79,7 @@ namespace RootTools_Vision
                 GoldenImage = new byte[ChipW * ChipH];
                 currentImage.CopyTo(GoldenImage, 0);
             }
-            else; // Update Golden Image
+            else // Update Golden Image
             { 
 
             }
@@ -63,8 +101,12 @@ namespace RootTools_Vision
                 return;
             }
 
-            int nChipH = this.workplace.SizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
-            int nChipW = this.workplace.SizeX;
+            WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+
+            return;
+
+            int nChipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
+            int nChipW = this.workplace.BufferSizeX;
 
             int nMemH = this.workplace.SharedBufferHeight;
             int nMemW = this.workplace.SharedBufferWidth;
@@ -136,6 +178,11 @@ namespace RootTools_Vision
             WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
 
+        public void CreateGoldenImage()
+        {
+            GoldenImage = new byte[this.workplace.BufferSizeX * this.workplace.BufferSizeY];
+        }
+
         public override void SetData(IRecipeData _recipeData, IParameterData _parameterData)
         {
 
@@ -149,8 +196,10 @@ namespace RootTools_Vision
             return (WorkBase)this.MemberwiseClone();
         }
 
-        public override void SetWorkplaceBundle(WorkplaceBundle workplace)
+        public override void SetWorkplaceBundle(WorkplaceBundle _workplaceBundle)
         {
+
+            this.workplaceBundle = _workplaceBundle;
             return;
         }
     }

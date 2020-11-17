@@ -55,7 +55,7 @@ namespace RootTools_Vision
             int waferCenterX = recipeData_Origin.Backside_CenterX;
             int waferCenterY = recipeData_Origin.Backside_CenterY;
             int radius = recipeData_Origin.Backside_Radius;
-            
+
             // 구조는 나중에 생각해봅시다...
             List<Defect> DefectList = CollectDefectData();
             if(isBackside) // Backside Option
@@ -170,7 +170,7 @@ namespace RootTools_Vision
             DefectList.AddRange(DefectList_Delete);
         }
 
-        public List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist)
+        private List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist)
         {
             string sDefectimagePath = @"D:\DefectImage";
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();

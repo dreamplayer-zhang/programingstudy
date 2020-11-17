@@ -116,5 +116,12 @@ namespace Root_WIND2
 
             }
         }
+
+        public void Clear()
+		{
+            gridFront.Children.Clear();
+            gridBack.Children.Clear();
+            gridEdge.Children.Clear();
+        }
     }
 }

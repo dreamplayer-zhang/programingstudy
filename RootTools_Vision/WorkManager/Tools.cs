@@ -5,8 +5,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace RootTools_Vision
 {
@@ -40,6 +42,44 @@ namespace RootTools_Vision
             }
 
             return typeList;
+        }
+
+        public static byte[] ObjectToByteArray(object obj)
+        {
+            if (obj == null) return null;
+
+            BinaryFormatter bf = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+            bf.Serialize(ms, obj);
+            return ms.ToArray();
+        }
+
+        public static object ByteArrayToObject(byte[] byteArr)
+        {
+            try
+            {
+                using (MemoryStream stream = new MemoryStream(byteArr))
+                {
+                    stream.Position = 0;
+                    BinaryFormatter bf = new BinaryFormatter();
+                    return bf.Deserialize(stream);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            return null;
+            //if (byteArr == null) return null;
+
+            //MemoryStream ms = new MemoryStream();
+            //BinaryFormatter bf = new BinaryFormatter();
+            //ms.Write(byteArr, 0, byteArr.Length);
+            //ms.Seek(0, SeekOrigin.Begin);
+            //object obj = (object)bf.Deserialize(ms);
+
+            //return obj;
         }
     }
 }

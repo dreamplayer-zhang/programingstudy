@@ -404,7 +404,7 @@ namespace RootTools
 			}
 			else if (nByteCnt == 4)
 			{
-				Image<Rgba, byte> image = new Image<Rgba, byte>(p_Size.X, p_Size.Y);
+				Image<Bgra, byte> image = new Image<Bgra, byte>(p_Size.X, p_Size.Y);
 				IntPtr ptrMem = GetPtr();
 
 				Parallel.For(0, p_Size.Y, y =>
@@ -1292,7 +1292,7 @@ namespace RootTools
 
 
 		}
-		public static BitmapSource ToBitmapSource(Image<Rgba, byte> image)
+		public static BitmapSource ToBitmapSource(Image<Bgra, byte> image)
 		{
 			using (System.Drawing.Bitmap source = image.Bitmap)
 			{
@@ -1303,7 +1303,7 @@ namespace RootTools
 				BitmapSource bitmapSource = BitmapSource.Create(
 				source.Width, source.Height,
 				source.HorizontalResolution, source.VerticalResolution,
-				PixelFormats.Bgr24, null,
+				PixelFormats.Bgra32, null,
 				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
 				source.UnlockBits(bitmapData);

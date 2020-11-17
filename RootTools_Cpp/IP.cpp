@@ -1,5 +1,6 @@
 
 #include "pch.h"
+
 #include "IP.h"
 
 void IP::Threshold(BYTE* pSrc, int nW, int nH, int threshold, bool bDark, BYTE* pDst)

@@ -31,10 +31,18 @@ namespace RootTools_Vision
 
         ParamData_Position parameterData_Position;
 
+
+        public override bool DoPrework()
+        {
+            return base.DoPrework();
+        }
         public override void DoWork()
         {
             DoPosition();
+
+            base.DoWork();
         }
+
 
         public override void SetData(IRecipeData _recipeData, IParameterData _parameterData)
         {
@@ -154,6 +162,21 @@ namespace RootTools_Vision
 
                 }
             }
+            else
+            {
+                //double sum = 0;
+                //int nCount = 1000;
+                //int nExtra = 5;
+                //for (int y = 0; y < nCount; y++)
+                //{
+                //    for (int j = 0; j < nCount; j++)
+                //    {
+                //        for(int n = 0; n < nExtra; n++)
+                //            sum += Math.Log(y * j) * Math.Log(y * j);
+                //    }
+                //}
+            }
+
 
             return true;
         }

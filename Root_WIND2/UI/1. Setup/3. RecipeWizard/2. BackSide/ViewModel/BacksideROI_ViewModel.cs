@@ -14,43 +14,48 @@ namespace Root_WIND2
 {
     class BacksideROI_ViewModel : RootViewer_ViewModel
     {
-        bool UIUpdateLock = false;
-
         public BacksideROI_ViewModel(ImageData image = null, IDialogService dialogService = null)
         {
             base.init(image, dialogService);
             p_VisibleMenu = Visibility.Visible;
             Shapes.CollectionChanged += Shapes_CollectionChanged;            
         }
-
-        private void Shapes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        public void init(Setup_ViewModel setup, Recipe recipe)
         {
-            if(!UIUpdateLock)
-            {
-                var shapes = sender as ObservableCollection<TShape>;
-                foreach (TShape shape in shapes)
-                {
-                    if (!p_UIElements.Contains(shape.UIElement))
-                        p_UIElements.Add(shape.UIElement);
-                }
-            }
+            this.recipe = recipe;
+            recipeData_Origin = recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
+            mapInfo = this.recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
+            base.init(setup.m_MainWindow.m_Image, setup.m_MainWindow.dialogService);
+            p_VisibleMenu = System.Windows.Visibility.Visible;
         }
-        public ObservableCollection<TShape> Shapes = new ObservableCollection<TShape>();
+        
+        #region [Variables]
         TShape rectInfo;
 
         Path CIRCLE_UI;
         Grid CENTERPOINT_UI;
         Polygon WAFEREDGE_UI;
         List<CPoint> PolygonPt = new List<CPoint>();
+        public ObservableCollection<TShape> Shapes = new ObservableCollection<TShape>();
+        bool UIUpdateLock = false;
 
-        Recipe m_Recipe;
-        RecipeData_Origin m_RecipeData_Origin;
-        RecipeInfo_MapData m_mapInfo;
-        
-        CPoint CanvasPoint;
-        CPoint MemoryPoint;
+        Recipe recipe;
+        RecipeData_Origin recipeData_Origin;
+        RecipeInfo_MapData mapInfo;
+
+        CPoint canvasPoint;
+        CPoint memoryPoint;
 
         bool isIncludeMode = true; // Map
+        private CPoint centerPoint = new CPoint();
+        private int mapSizeX = 40;
+        private int mapSizeY = 40;
+        private int radius = 20000;
+
+        private ObservableCollection<UIElement> m_UIElements = new ObservableCollection<UIElement>();
+        #endregion
+
+        #region [Getter Setter]
         public bool Check_MapMode
         {
             get { return this.isIncludeMode; }
@@ -62,58 +67,51 @@ namespace Root_WIND2
                 this.isIncludeMode = value;
             }
         }
-
-        private CPoint m_CenterPoint = new CPoint();
-        public CPoint p_CenterPoint
+        public CPoint CenterPoint
         {
             get
             {
-                return m_CenterPoint;
+                return centerPoint;
             }
             set
             {
-                SetProperty(ref m_CenterPoint, value);
+                SetProperty(ref centerPoint, value);
             }
         }
-        private int m_MapSizeX = 40;
-        private int m_MapSizeY = 40;
-        public int p_MapSizeX
+        public int MapSizeX
         {
             get
             {
-                return m_MapSizeX;
+                return mapSizeX;
             }
             set
             {
-                SetProperty(ref m_MapSizeX, value);
+                SetProperty(ref mapSizeX, value);
             }
         }
-        public int p_MapSizeY
+        public int MapSizeY
         {
             get
             {
-                return m_MapSizeY;
+                return mapSizeY;
             }
             set
             {
-                SetProperty(ref m_MapSizeY, value);
+                SetProperty(ref mapSizeY, value);
             }
         }
-        private int m_Radius = 20000;
-        public int p_Radius 
+        public int Radius
         {
             get
             {
-                return m_Radius;
+                return radius;
             }
             set
             {
-                SetProperty(ref m_Radius, value);
+                SetProperty(ref radius, value);
             }
         }
-
-        private ObservableCollection<UIElement> m_UIElements = new ObservableCollection<UIElement>();
-        public ObservableCollection<UIElement> p_UIElements
+        public ObservableCollection<UIElement> UIElements
         {
             get
             {
@@ -124,26 +122,128 @@ namespace Root_WIND2
                 m_UIElements = value;
             }
         }
-       
-        public void init(Setup_ViewModel setup, Recipe recipe)
-        {
-            m_Recipe = recipe;
-            m_RecipeData_Origin = recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
-            m_mapInfo = m_Recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
-            base.init(setup.m_MainWindow.m_Image, setup.m_MainWindow.dialogService);
-            p_VisibleMenu = System.Windows.Visibility.Visible;
-        }
+        #endregion
 
+        private void _StartRecipeTeaching()
+        {
+            int memH = p_ImageData.p_Size.Y;
+            int memW = p_ImageData.p_Size.X;
+
+            float centX = CenterPoint.X; // 레시피 티칭 값 가지고오기
+            float centY = CenterPoint.Y;
+
+            int outMapX = MapSizeX, outMapY = MapSizeY;
+            float outOriginX, outOriginY;
+            float outChipSzX, outChipSzY;
+            float outRadius = Radius;
+
+            IntPtr MainImage = new IntPtr();
+            if (p_ImageData.p_nByte == 3)
+            {
+                if (p_eColorViewMode != eColorViewMode.All)
+                    MainImage = p_ImageData.GetPtr((int)p_eColorViewMode - 1);
+                else
+                    MainImage = p_ImageData.GetPtr(0);
+            }
+            else
+            { // All 일때는 R채널로...
+                MainImage = p_ImageData.GetPtr(0);
+            }
+
+            Cpp_Point[] WaferEdge = null;
+            byte[] MapData = null;
+            unsafe
+            {
+                int DownSample = 20;
+
+                fixed (byte* pImg = new byte[(long)(memW / DownSample) * (long)(memH / DownSample)]) // 원본 이미지 너무 커서 안열림
+                {
+                    CLR_IP.Cpp_SubSampling((byte*)MainImage, pImg, memW, memH, 0, 0, memW, memH, DownSample);
+
+                    // Param Down Scale
+                    centX /= DownSample; centY /= DownSample;
+                    outRadius /= DownSample;
+                    memW /= DownSample; memH /= DownSample;
+
+                    WaferEdge = CLR_IP.Cpp_FindWaferEdge(pImg,
+                        &centX, &centY,
+                        &outRadius,
+                        memW, memH,
+                        1
+                        );
+
+                    MapData = CLR_IP.Cpp_GenerateMapData(
+                        WaferEdge,
+                        &outOriginX,
+                        &outOriginY,
+                        &outChipSzX,
+                        &outChipSzY,
+                        &outMapX,
+                        &outMapY,
+                        memW, memH,
+                        1,
+                        isIncludeMode
+                        );
+                }
+
+                // Param Up Scale
+                centX *= DownSample; centY *= DownSample;
+                outRadius *= DownSample;
+                outOriginX *= DownSample; outOriginY *= DownSample;
+                outChipSzX *= DownSample; outChipSzY *= DownSample;
+
+                PolygonPt.Clear();
+                if (WAFEREDGE_UI != null)
+                    WAFEREDGE_UI.Points.Clear();
+
+                for (int i = 0; i < WaferEdge.Length; i++)
+                    PolygonPt.Add(new CPoint(WaferEdge[i].x * DownSample, WaferEdge[i].y * DownSample));
+
+                // UI Data Update
+                CenterPoint = new CPoint((int)centX, (int)centY);
+                Radius = (int)outRadius;
+                MapSizeX = (int)outMapX;
+                MapSizeY = (int)outMapY;
+
+                canvasPoint = GetCanvasPoint(new CPoint(CenterPoint.X, CenterPoint.Y));
+                DrawCenterPoint(ColorType.WaferCenter);
+
+                // Wafer Edge Draw                
+                DrawPolygon(PolygonPt);
+                ReDrawWFCenter(ColorType.WaferCenter);
+
+                // Save Recipe
+                SetRecipeMapData(MapData, (int)outMapX, (int)outMapY, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
+
+                recipeData_Origin.Backside_CenterX = (int)centX;
+                recipeData_Origin.Backside_CenterY = (int)centY;
+                recipeData_Origin.Backside_Radius = (int)outRadius;
+
+                SaveContourMap((int)centX, (int)centY, (int)outRadius);
+            }
+        }
+        private void Shapes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (!UIUpdateLock)
+            {
+                var shapes = sender as ObservableCollection<TShape>;
+                foreach (TShape shape in shapes)
+                {
+                    if (!UIElements.Contains(shape.UIElement))
+                        UIElements.Add(shape.UIElement);
+                }
+            }
+        }
         public override void PreviewMouseDown(object sender, MouseEventArgs e)
         {
             base.PreviewMouseDown(sender, e);
             if (m_KeyEvent != null)
                 if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
                     return;
-            if (MemoryPoint.X == 0 && MemoryPoint.Y == 0)
+            if (memoryPoint.X == 0 && memoryPoint.Y == 0)
                 return;
 
-            p_CenterPoint = MemoryPoint;
+            CenterPoint = memoryPoint;
 
             if (p_ViewElement.Contains(WAFEREDGE_UI))
                 p_ViewElement.Remove(WAFEREDGE_UI);
@@ -175,12 +275,12 @@ namespace Root_WIND2
                 }
             }
             // Map Data Recipe 생성
-            m_RecipeData_Origin.OriginX = originX;
-            m_RecipeData_Origin.OriginY = originY;
-            m_RecipeData_Origin.DiePitchX = chipSzX;
-            m_RecipeData_Origin.DiePitchY = chipSzY;
+            recipeData_Origin.OriginX = originX;
+            recipeData_Origin.OriginY = originY;
+            recipeData_Origin.DiePitchX = chipSzX;
+            recipeData_Origin.DiePitchY = chipSzY;
 
-            m_mapInfo.m_WaferMap = new WaferMapInfo(mapX, mapY, mapData, ListWaferMap);
+            mapInfo.m_WaferMap = new WaferMapInfo(mapX, mapY, mapData, ListWaferMap);
 
             if (true) // Display Map Data Option화
                 DrawMapData(mapData, mapX, mapY, originX, originY, chipSzX, chipSzY);
@@ -258,8 +358,8 @@ namespace Root_WIND2
                 line.Stroke = GetColorBrushType(color);
             }
 
-            Canvas.SetLeft(CENTERPOINT_UI, CanvasPoint.X - 10);
-            Canvas.SetTop(CENTERPOINT_UI, CanvasPoint.Y - 10);
+            Canvas.SetLeft(CENTERPOINT_UI, canvasPoint.X - 10);
+            Canvas.SetTop(CENTERPOINT_UI, canvasPoint.Y - 10);
             p_ViewElement.Add(CENTERPOINT_UI);
         }
         private void DrawCircle(ColorType color)
@@ -278,11 +378,11 @@ namespace Root_WIND2
             }
 
             EllipseGeometry data = CIRCLE_UI.Data as EllipseGeometry;
-            data.Center = new Point(CanvasPoint.X, CanvasPoint.Y);
+            data.Center = new Point(canvasPoint.X, canvasPoint.Y);
 
-            int radius = p_CenterPoint.X + p_Radius;
+            int radius = CenterPoint.X + Radius;
             CPoint temp = GetCanvasPoint(new CPoint(radius, radius));
-            int CanvasRadius = temp.X - CanvasPoint.X;
+            int CanvasRadius = temp.X - canvasPoint.X;
 
             data.RadiusX = (double)CanvasRadius;
             data.RadiusY = (double)CanvasRadius;
@@ -382,115 +482,16 @@ namespace Root_WIND2
         {
             foreach (TShape shape in Shapes)
             {
-                if (p_UIElements.Contains(shape.UIElement))
-                    p_UIElements.Remove(shape.UIElement);
+                if (UIElements.Contains(shape.UIElement))
+                    UIElements.Remove(shape.UIElement);
             }
             Shapes.Clear();
         }
         public override void MouseMove(object sender, MouseEventArgs e)
         {
             base.MouseMove(sender, e);
-            MemoryPoint = new CPoint(p_MouseMemX, p_MouseMemY);
-            CanvasPoint = GetCanvasPoint(MemoryPoint);
-        }
-
-        private void _StartRecipeTeaching()
-        {
-            int nMemH = p_ImageData.p_Size.Y;
-            int nMemW = p_ImageData.p_Size.X;
-
-            float centX = p_CenterPoint.X; // 레시피 티칭 값 가지고오기
-            float centY = p_CenterPoint.Y;
-
-            int outMapX = m_MapSizeX, outMapY = m_MapSizeY;
-            float outOriginX, outOriginY;
-            float outChipSzX, outChipSzY;            
-            float outRadius = p_Radius;
-
-            IntPtr MainImage = new IntPtr();
-            if (p_ImageData.p_nByte == 3)
-            {
-                if (p_eColorViewMode != eColorViewMode.All)
-                    MainImage = p_ImageData.GetPtr((int)p_eColorViewMode - 1);
-                else
-                    MainImage = p_ImageData.GetPtr(0);
-            }
-            else
-            { // All 일때는 R채널로...
-                MainImage = p_ImageData.GetPtr(0);
-            }
-
-            Cpp_Point[] WaferEdge = null;
-            byte[] MapData = null;
-            unsafe
-            {
-                int DownSample = 10;
-
-                fixed (byte* pImg = new byte[(long)(nMemW / DownSample) * (long)(nMemH / DownSample)]) // 원본 이미지 너무 커서 안열림
-                {
-                    CLR_IP.Cpp_SubSampling((byte*)MainImage, pImg, nMemW, nMemH, 0, 0, nMemW, nMemH, DownSample);
-
-                    // Param Down Scale
-                    centX /= DownSample; centY /= DownSample;
-                    outRadius /= DownSample;
-                    nMemW /= DownSample; nMemH /= DownSample;
-
-                    WaferEdge = CLR_IP.Cpp_FindWaferEdge(pImg,
-                        &centX, &centY,
-                        &outRadius,
-                        nMemW, nMemH,
-                        1
-                        );
-
-                    MapData = CLR_IP.Cpp_GenerateMapData(
-                        WaferEdge,
-                        &outOriginX,
-                        &outOriginY,
-                        &outChipSzX,
-                        &outChipSzY,
-                        &outMapX,
-                        &outMapY,
-                        nMemW, nMemH,
-                        1,
-                        isIncludeMode
-                        );
-                }
-
-                // Param Up Scale
-                centX *= DownSample; centY *= DownSample;
-                outRadius *= DownSample;
-                outOriginX *= DownSample; outOriginY *= DownSample;
-                outChipSzX *= DownSample; outChipSzY *= DownSample;
-
-                PolygonPt.Clear();
-                if (WAFEREDGE_UI != null)
-                    WAFEREDGE_UI.Points.Clear();
-
-                for(int i = 0; i < WaferEdge.Length; i++)
-                    PolygonPt.Add(new CPoint(WaferEdge[i].x * DownSample, WaferEdge[i].y * DownSample));
-
-                // UI Data Update
-                p_CenterPoint = new CPoint((int)centX, (int)centY);
-                p_Radius = (int)outRadius;
-                p_MapSizeX = (int)outMapX;
-                p_MapSizeY = (int)outMapY;
-
-                CanvasPoint = GetCanvasPoint(new CPoint(p_CenterPoint.X, p_CenterPoint.Y));
-                DrawCenterPoint(ColorType.WaferCenter);
-
-                // Wafer Edge Draw                
-                DrawPolygon(PolygonPt);
-                ReDrawWFCenter(ColorType.WaferCenter);
-
-                // Save Recipe
-                SetRecipeMapData(MapData, (int)outMapX, (int)outMapY, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
-
-                m_RecipeData_Origin.Backside_CenterX = (int)centX;
-                m_RecipeData_Origin.Backside_CenterY = (int)centY;
-                m_RecipeData_Origin.Backside_Radius = (int)outRadius;
-
-                //SaveContourMap((int)centX, (int)centY, (int)outRadius);
-            }
+            memoryPoint = new CPoint(p_MouseMemX, p_MouseMemY);
+            canvasPoint = GetCanvasPoint(memoryPoint);
         }
         
         private void ReDrawPolygon()
@@ -500,17 +501,17 @@ namespace Root_WIND2
 
             int idx = 0;
 
-            Point[] arrPt = new Point[WAFEREDGE_UI.Points.Count];
+            Point[] Points = new Point[WAFEREDGE_UI.Points.Count];
             foreach (CPoint pt in PolygonPt)
             {
                 CPoint cPt = new CPoint();
                 cPt = GetCanvasPoint(new CPoint((int)pt.X, (int)pt.Y));
 
-                arrPt[idx++] = new Point(cPt.X, cPt.Y);
+                Points[idx++] = new Point(cPt.X, cPt.Y);
             }
             idx = 0;
 
-            foreach (Point pt in arrPt)
+            foreach (Point pt in Points)
             {
                 WAFEREDGE_UI.Points[idx++] = pt;
             }
@@ -523,12 +524,12 @@ namespace Root_WIND2
             if (p_ViewElement.Contains(CIRCLE_UI))
                 p_ViewElement.Remove(CIRCLE_UI);
 
-            CPoint WFCenter = GetCanvasPoint(new CPoint(p_CenterPoint.X, p_CenterPoint.Y));
+            CPoint WFCenter = GetCanvasPoint(new CPoint(CenterPoint.X, CenterPoint.Y));
 
             EllipseGeometry data = CIRCLE_UI.Data as EllipseGeometry;
             data.Center = new Point(WFCenter.X, WFCenter.Y);
 
-            int radius = p_CenterPoint.X + p_Radius;
+            int radius = CenterPoint.X + Radius;
             CPoint temp = GetCanvasPoint(new CPoint(radius, radius));
             int CanvasRadius = temp.X - WFCenter.X;
 
@@ -550,7 +551,7 @@ namespace Root_WIND2
                 line.Stroke = GetColorBrushType(color);
             }
 
-            CPoint WFCenter = GetCanvasPoint(new CPoint(p_CenterPoint.X, p_CenterPoint.Y));
+            CPoint WFCenter = GetCanvasPoint(new CPoint(CenterPoint.X, CenterPoint.Y));
             Canvas.SetLeft(CENTERPOINT_UI, WFCenter.X - 10);
             Canvas.SetTop(CENTERPOINT_UI, WFCenter.Y - 10);
 
@@ -669,8 +670,8 @@ namespace Root_WIND2
 
                     for (int i = 0; i < p_ImageData.p_nByte; i++)
                     {
-                        pImg[i] = new byte[(long)nMemW * (long)nMemH];
-                        pROIImg[i] = new byte[(long)nMemW * (long)nMemH];
+                        pImg[i] = new byte[(long)nMemW * nMemH];
+                        pROIImg[i] = new byte[(long)nMemW * nMemH];
 
                         CLR_IP.Cpp_SubSampling((byte*)p_ImageData.GetPtr(i), pImg[i], p_ImageData.p_Size.X, p_ImageData.p_Size.Y, 0, 0, p_ImageData.p_Size.X, p_ImageData.p_Size.Y, DownSample);
    

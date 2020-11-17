@@ -25,5 +25,6 @@ namespace Root_WIND2
             InitializeComponent();
             DummyWafer dd = new DummyWafer();
         }
-    }
+
+	}
 }

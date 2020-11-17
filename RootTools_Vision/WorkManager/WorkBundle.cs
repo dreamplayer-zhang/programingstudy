@@ -47,6 +47,7 @@ namespace RootTools_Vision
                 bundle.Add(work.Clone());
             }
             bundle.Workplace = this.Workplace;
+            bundle.workplaceBundle = this.workplaceBundle;
 
             return bundle;
         }
