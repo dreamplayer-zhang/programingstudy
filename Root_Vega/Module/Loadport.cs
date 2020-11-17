@@ -572,11 +572,11 @@ namespace Root_Vega.Module
                         m_module.m_infoPod.SetInfoReticleExist();
                     }
 
-                    else if (m_module.m_infoPod.p_infoReticle.p_sReticleID == m_module.m_infoPod.p_infoReticle.p_id)
-                    {
-                        m_module.m_infoPod.p_infoReticle.p_sReticleID = sCarrierID;
-                        m_module.p_infoReticle.p_sSlotID = m_module.m_infoPod.p_infoReticle.p_sReticleID;
-                    }
+                    //else if (m_module.m_infoPod.p_infoReticle.p_sReticleID == m_module.m_infoPod.p_infoReticle.p_id)
+                    //{
+                    //    m_module.m_infoPod.p_infoReticle.p_sReticleID = sCarrierID;
+                    //    m_module.p_infoReticle.p_sSlotID = m_module.m_infoPod.p_infoReticle.p_sReticleID;
+                    //}
                 }
                 if (sResult == "OK") m_module.m_infoPod.SendCarrierID(sCarrierID); 
                 return sResult; 
