@@ -18,8 +18,8 @@ namespace RootTools.Inspects
 		public delegate void EventHandler();
 		public EventHandler InspectionStart;
 		public EventHandler InspectionComplete;
-		//public delegate void ChangeDefectInfoEventHander(DefectDataWrapper item);
-		//public event ChangeDefectInfoEventHander AddDefect;
+		public delegate void ChangeDefectInfoEventHander(DefectDataWrapper item);
+		public event ChangeDefectInfoEventHander AddDefect;
 		#endregion
 
 		int threadIndex = -1;
