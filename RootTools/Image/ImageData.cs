@@ -704,16 +704,27 @@ namespace RootTools
     //                hRGB = br.ReadBytes(256 * 4);
 				if (p_nByte == 1)
 				{
-					for (int y = lowheight - 1; y >= 0; y--)
-					{
-						if (Worker_MemoryCopy.CancellationPending)
-							return;
 
-						byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
-						Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
-						p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
-					}
-				}
+                    //Thread thread1 = new Thread(() => RunCopyThread(0,fs ,sFile, nWidth, nHeight, lowwidth , lowheight, offset));
+
+                    //thread1.Start();
+
+                    //bool alive = thread1.IsAlive;
+                    //               while (thread1.IsAlive)
+                    //               {
+                    //	Thread.Sleep(10);
+                    //               }
+
+                    for (int y = lowheight - 1; y >= 0; y--)
+                    {
+                        if (Worker_MemoryCopy.CancellationPending)
+                            return;
+
+                        byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+                        Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
+                        p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+                    }
+                }
 				else if(p_nByte == 3)
 				{
 					for (int y = lowheight - 1; y >= 0; y--)
@@ -761,15 +772,15 @@ namespace RootTools
 			br.Close();
 		}	
 
-		public void RunCopyThread(int idx, string sFile ,int offset)
+		public void RunCopyThread(int idx, FileStream fs ,string sFile, int nWidth, int nHeight , int nLowWidth, int nLowHeight ,CPoint offset)
 		{
-			byte[] buf = new byte[10];
-			FileStream fs = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read, 32768, true);
-			for (int i = 0; i < 100; i++)
+			byte[] buf = new byte[nLowWidth];
+			fs.Seek(54 + 1024, SeekOrigin.Begin);
+			for (int i = 1; i < nLowHeight; i++)
 			{
-				Thread.Sleep(10);
-				fs.Read(buf, 0, 4);
-				Debug.WriteLine(idx + "  " + i);
+				fs.Read(buf,0, nWidth);
+				Marshal.Copy(buf, 0, (IntPtr)((long)m_ptrImg + (offset.X + p_Size.X * ((long)offset.Y + i))), nLowWidth);
+				//p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
 			}
 		}
 
