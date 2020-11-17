@@ -98,43 +98,60 @@ namespace RootTools.Memory
             MemoryPoolChanged();
             return "OK";
         }
-
-        /// <summary> Registry 관리용 </summary>
-        void RunTreeMemory(Tree tree, bool bVisible)
-        {
-            int nPool = p_aPool.Count;
-            bool bCount = (m_bMaster == false) || (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead);
-            if (bCount) nPool = tree.Set(nPool, nPool, "Count", "Pool Count", bVisible);
-            for (int n = 0; n < nPool; n++) RunTreeMemory(tree.GetTree(n.ToString("00")), n, bVisible);
-            foreach (MemoryPool pool in p_aPool) pool.RunTreeMemory(tree.GetTree(pool.p_id), bCount, bVisible);
-        }
-
-        void RunTreeMemory(Tree tree, int n, bool bVisible)
-        {
-//            string sPool = (p_aPool.Count > n) ? p_aPool[n].p_id : "Pool";
-//            sPool = tree.Set(sPool, sPool, "Name", "Pool Name", bVisible);
-//            MemoryPool memoryPool = GetPool(sPool, true);
-//            int gbPool = (p_aPool.Count > n) ? p_aPool[n].p_gbPool : 1;
-//            gbPool = tree.Set(gbPool, 1, "Size", "Pool size (Giga Byte)", bVisible);
-//            if (m_bMaster == false) memoryPool.p_gbPool = gbPool;
-        }
         #endregion
 
         #region Memoey
-        public void MemoryChanged(bool bUpdate)
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromSeconds(1);
+            m_timer.Tick += m_timer_Tick;
+            m_timer.Start();
+        }
+
+        void m_timer_Tick(object sender, EventArgs e)
+        {
+            MEMORYSTATUSEX stats = GlobalMemoryStatusEx();
+            p_fTotalPageFile = stats.ullTotalPageFile / c_fGB;
+            p_fAvailPageFile = stats.ullAvailPageFile / c_fGB;
+            if (m_bMaster) return; 
+            string sUpdateTime = m_reg.Read("Time", "Busy");
+            if (sUpdateTime == "Busy") return;
+            if (sUpdateTime == m_sUpdateTime) return;
+            UpdateMemoryData(); 
+            m_sUpdateTime = sUpdateTime;
+            OnChangeMemoryPool(); 
+        }
+
+        void UpdateMemoryData()
+        {
+            p_aPool.Clear(); 
+            int nPool = m_reg.Read("Count", 0); 
+            for (int n = 0; n < nPool; n++)
+            {
+                string sPool = m_reg.Read("MemoryPool" + n.ToString(), "");
+                MemoryPool pool = new MemoryPool(sPool, this, 1);
+                pool.UpdateMemoryData();
+                pool.RunTree(Tree.eMode.RegRead);
+                pool.RunTree(Tree.eMode.Init); 
+                p_aPool.Add(pool); 
+            }
+        }
+
+        string m_sUpdateTime = ""; 
+        public void MemoryChanged()
         {
             if (m_bMaster == false) return;
-            if (bUpdate == false) RunTreeMemory(Tree.eMode.RegRead);
-            RunTreeMemory(Tree.eMode.RegWrite);
-            RunTreeMemory(Tree.eMode.Init);
-            Process[] aProcess = Process.GetProcessesByName(m_idProcess);
-            try
+            m_reg.Write("Count", p_aPool.Count); 
+            for (int n = 0; n < p_aPool.Count; n++)
             {
-                foreach (Process process in aProcess) process.Kill();
+                m_reg.Write("MemoryPool" + n.ToString(), p_aPool[n].p_id);
+                p_aPool[n].RunTree(Tree.eMode.RegWrite); 
             }
-            catch(Exception) { }
             KillInspectProcess();
             RunTreeRun(Tree.eMode.Init);
+            m_sUpdateTime = DateTime.Now.ToString(); 
+            m_reg.Write("Time", m_sUpdateTime);
         }
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
@@ -147,22 +164,10 @@ namespace RootTools.Memory
         #region MemoryProcess
         bool m_bThreadProcess = false;
         Thread m_threadProcess = null;
-        DispatcherTimer m_timer = new DispatcherTimer();
         void InitThreadProcess()
         {
             m_threadProcess = new Thread(new ThreadStart(RunThreadProcess));
             m_threadProcess.Start();
-
-            m_timer.Interval = TimeSpan.FromSeconds(10);
-            m_timer.Tick += m_timer_Tick;
-            m_timer.Start();
-        }
-
-        void m_timer_Tick(object sender, EventArgs e)
-        {
-            MEMORYSTATUSEX stats = GlobalMemoryStatusEx();
-            p_fTotalPageFile = stats.ullTotalPageFile / c_fGB;
-            p_fAvailPageFile = stats.ullAvailPageFile / c_fGB;
         }
 
         void RunThreadProcess()
@@ -234,19 +239,6 @@ namespace RootTools.Memory
         #endregion
 
         #region Tree
-        private void M_treeRootMemory_UpdateTree()
-        {
-            RunTreeMemory(Tree.eMode.Update);
-            RunTreeMemory(Tree.eMode.RegWrite);
-            RunTreeMemory(Tree.eMode.Init);
-        }
-
-        public void RunTreeMemory(Tree.eMode mode)
-        {
-            m_treeRootMemory.p_eMode = mode;
-            RunTreeMemory(m_treeRootMemory.GetTree("Memory"), true);
-        }
-
         private void M_treeRootRun_UpdateTree()
         {
             RunTreeRun(Tree.eMode.Update);
@@ -274,10 +266,10 @@ namespace RootTools.Memory
         #endregion
 
         public string p_id { get; set; }
-        bool m_bMaster = true; 
+        public bool m_bMaster = true; 
         IEngineer m_engineer;
         public Log m_log;
-        public TreeRoot m_treeRootMemory;
+        Registry m_reg; 
         public TreeRoot m_treeRootRun;
         public MemoryTool(string id, IEngineer engineer, bool bMaster = true)
         {
@@ -289,14 +281,13 @@ namespace RootTools.Memory
             m_engineer = engineer;
             m_bMaster = bMaster; 
             m_log = LogView.GetLog(id);
-            m_treeRootMemory = new TreeRoot("Memory", m_log, true, "Memory");
-            m_treeRootMemory.UpdateTree += M_treeRootMemory_UpdateTree;
+            m_reg = new Registry("MemoryTool", "MemoryTools"); 
             m_treeRootRun = new TreeRoot(id, m_log);
             m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
-            RunTreeMemory(Tree.eMode.RegRead);
             RunTreeRun(Tree.eMode.RegRead);
             KillInspectProcess();
             InitThreadProcess();
+            if (bMaster == false) InitTimer(); 
         }
 
         public void ThreadStop()

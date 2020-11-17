@@ -23,7 +23,8 @@ namespace RootTools.Memory
             DataContext = memoryPool;
             memoryViewerUI.Init(memoryPool.m_viewer);
             treeRootUI.Init(m_memoryPool.m_treeRoot);
-            m_memoryPool.RunTree(Tree.eMode.Init); 
+            m_memoryPool.RunTree(Tree.eMode.Init);
+            textBoxGB.IsEnabled = m_memoryPool.m_memoryTool.m_bMaster; 
         }
 
         private void ListViewGroup_SelectionChanged(object sender, SelectionChangedEventArgs e)

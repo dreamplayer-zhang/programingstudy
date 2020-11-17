@@ -66,10 +66,11 @@ namespace RootTools.Memory
             if (memory != null) DeleteMemory(id); 
             memory = new MemoryData(this, id, nCount, nByte, xSize, ySize, ref _mbOffset);
             p_mbOffset = _mbOffset;
-            if (p_mbOffset > mbPool) return null; 
+            if (p_mbOffset > mbPool) m_log.Error("Memory Size Overrun"); 
             p_aMemory.Add(memory);
-            InitAddress();
-            m_pool.m_memoryTool.MemoryChanged(false); 
+            m_pool.RunTree(Tree.eMode.RegRead);
+            m_pool.RunTree(Tree.eMode.Init); 
+            m_pool.m_memoryTool.MemoryChanged(); 
             return memory; 
         }
 
@@ -82,6 +83,19 @@ namespace RootTools.Memory
             return "OK"; 
         }
 
+        public void UpdateMemoryData()
+        {
+            Registry reg = m_pool.m_reg;
+            string sID = p_id + '.'; 
+            p_aMemory.Clear();
+            int nMemory = reg.Read(sID + "Count", 0); 
+            for (int n = 0; n < nMemory; n++)
+            {
+                string sMemory = reg.Read(sID + "Memory" + n.ToString(), "");
+                MemoryData memory = CreateMemory(sMemory, 1, 1, new CPoint(1024, 1024));
+            }
+        }
+
         public List<string> m_asMemory = new List<string>();
         public void InitAddress()
         {
@@ -92,23 +106,19 @@ namespace RootTools.Memory
             foreach (MemoryData memory in p_aMemory) m_asMemory.Add(memory.p_id);
         }
 
-        public void RunTreeMemory(Tree tree, bool bCount, bool bVisible)
+        public void RunTree(Tree tree, bool bVisible, bool bReadonly)
         {
-            int nMemory = p_aMemory.Count;
-            if (bCount) nMemory = tree.Set(nMemory, nMemory, "Count", "Memory Count", bVisible); 
-            for (int n = 0; n < nMemory; n++)
+            if (tree.p_treeRoot.p_eMode == Tree.eMode.RegWrite)
             {
-                string sMemory = (p_aMemory.Count > n) ? p_aMemory[n].p_id : "Memory";
-                sMemory = tree.Set(sMemory, sMemory, "sMemory." + n.ToString(), "Memory Name", bVisible);
-                if (p_aMemory.Count <= n) CreateMemory(sMemory, 1, 1, 1, 1); 
+                Registry reg = m_pool.m_reg;
+                string sID = p_id + '.';
+                reg.Write(sID + "Count", p_aMemory.Count); 
+                for (int n = 0; n < p_aMemory.Count; n++)
+                {
+                    reg.Write(sID + "Memory" + n.ToString(), p_aMemory[n].p_id); 
+                }
             }
-            foreach (MemoryData memory in p_aMemory) memory.RunTree(tree.GetTree(memory.p_id), bVisible);
-            InitAddress(); 
-        }
-
-        public void RunTree(Tree tree, bool bVisible)
-        {
-            foreach (MemoryData memory in p_aMemory) memory.RunTree(tree.GetTree(memory.p_id, true, bVisible), bVisible);
+            foreach (MemoryData memory in p_aMemory) memory.RunTree(tree.GetTree(memory.p_id, true, bVisible), bVisible, bReadonly);
             InitAddress();
         }
         #endregion

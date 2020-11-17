@@ -432,11 +432,11 @@ namespace RootTools.Memory
         #endregion
 
         #region Tree
-        public void RunTree(Tree tree, bool bVisible)
+        public void RunTree(Tree tree, bool bVisible, bool bReadonly)
         {
-            p_nCount = tree.Set(p_nCount, p_nCount, "Count", "Memory Count", bVisible);
-            p_nByte = tree.Set(p_nByte, p_nByte, "Byte", "Memory Depth Byte (byte)", bVisible);
-            p_sz = tree.Set(p_sz, p_sz, "Size", "Memory Size", bVisible);
+            p_nCount = tree.Set(p_nCount, p_nCount, "Count", "Memory Count", bVisible, bReadonly);
+            p_nByte = tree.Set(p_nByte, p_nByte, "Byte", "Memory Depth Byte (byte)", bVisible, bReadonly);
+            p_sz = tree.Set(p_sz, p_sz, "Size", "Memory Size", bVisible, bReadonly);
             tree.Set(p_sSize, p_sSize, "Allocate", "Memory Allocate Size (MB)", bVisible, true);
         }
         #endregion

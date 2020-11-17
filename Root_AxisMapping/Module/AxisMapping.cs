@@ -53,14 +53,6 @@ namespace Root_AxisMapping.Module
             m_memoryResult = m_memoryGroupResult.CreateMemory("Result", 1, 1, m_szResult);
             m_memoryPoolResult.m_viewer.p_memoryData = m_memoryResult;
         }
-
-        void RunTreeMemory(Tree tree)
-        {
-            m_szGrab = tree.Set(m_szGrab, m_szGrab, "Grab Size", "Dalsa Grab Size (pixel)");
-            if (m_szGrab != m_memoryGrab.p_sz) m_memoryGrab.p_sz = m_szGrab; //LYJ 201109
-            m_szResult = tree.Set(m_szResult, m_szResult, "Result Size", "Result Draw Size (pixel)");
-            if (m_szResult != m_memoryResult.p_sz) m_memoryResult.p_sz = m_szResult; //LYJ 201109
-        }
         #endregion
 
         #region Override
@@ -72,7 +64,6 @@ namespace Root_AxisMapping.Module
 
         void RunTreeSetup(Tree tree)
         {
-            RunTreeMemory(tree.GetTree("Memory", false)); 
         }
 
         public override void Reset()
