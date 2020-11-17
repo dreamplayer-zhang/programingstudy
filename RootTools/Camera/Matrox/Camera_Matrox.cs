@@ -134,7 +134,7 @@ namespace RootTools.Camera.Matrox
                 _nBuf = (value > c_nBuf) ? c_nBuf : value;
             }
         }
-        int m_nGrabTrigger = 0;
+        //int m_nGrabTrigger = 0;
 
         public CPoint p_sz
         {

@@ -118,7 +118,7 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_CamAlign2, this, "Align2");
             p_sInfo = m_toolBox.Get(ref m_CamRADS, this, "RADS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
 
@@ -596,7 +596,6 @@ namespace Root_Vega.Module
         void RunTreeSetup(Tree tree)
         {
             RunTreeDIODelay(tree.GetTree("DIO Delay", false));
-            m_memoryPool.RunTreeModule(tree.GetTree("Memory", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
         }
         #endregion

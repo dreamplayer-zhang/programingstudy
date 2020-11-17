@@ -4,39 +4,34 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RootTools.Memory"
+             xmlns:tree="clr-namespace:RootTools.Trees"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <TabControl>
         <TabItem Header="Memory">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="3*"/>
                 </Grid.RowDefinitions>
-                <ListView Grid.Row="0" x:Name="listViewGroup" ItemsSource="{Binding p_aGroup}" SelectionChanged="ListViewGroup_SelectionChanged">
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <TextBlock Text="Pool Size" Margin="3"/>
+                    <TextBox x:Name="textBoxGB" Text="{Binding p_fGB}" MinWidth="40" TextAlignment="Center" Margin="3" PreviewKeyUp="textBoxGB_PreviewKeyUp"/>
+                    <TextBlock Text="Giga Byte" Margin="3"/>
+                </StackPanel>
+                <ListView Grid.Row="1" x:Name="listViewGroup" ItemsSource="{Binding p_aGroup}" SelectionChanged="ListViewGroup_SelectionChanged">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Group" DisplayMemberBinding="{Binding p_id}"/>
-                            <GridViewColumn Header="Use" DisplayMemberBinding="{Binding p_mbOffset}"/>
-                            <GridViewColumn Header="Available" DisplayMemberBinding="{Binding p_mbAvailable}"/>
+                            <GridViewColumn Header="Use" DisplayMemberBinding="{Binding p_gpOffset}"/>
+                            <GridViewColumn Header="Available" DisplayMemberBinding="{Binding p_gbAvailable}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
-                <ListView Grid.Row="2" x:Name="listViewMemory">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Memory" DisplayMemberBinding="{Binding p_id}"/>
-                            <GridViewColumn Header="Count" DisplayMemberBinding="{Binding p_nCount}"/>
-                            <GridViewColumn Header="Byte" DisplayMemberBinding="{Binding p_nByte}"/>
-                            <GridViewColumn Header="Size" DisplayMemberBinding="{Binding p_sz}"/>
-                            <GridViewColumn Header="Offset" DisplayMemberBinding="{Binding p_mbOffset}"/>
-                            <GridViewColumn Header="Allocate" DisplayMemberBinding="{Binding p_sSize}"/>
-                            <GridViewColumn Header="Info" DisplayMemberBinding="{Binding p_sInfo}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="AliceBlue" ShowsPreview="True" Height="3"/>
+                <tree:TreeUI Grid.Row="3" x:Name="treeRootUI"/>
             </Grid>
         </TabItem>
         <TabItem Header="Viewer">

@@ -30,7 +30,7 @@ namespace Root.Module
             p_sInfo = m_toolBox.Get(ref m_rs232WTR, this, "WTR");
             p_sInfo = m_toolBox.Get(ref m_rs232LP, this, "LP");
             //            p_sInfo = m_toolBox.Get(ref m_camBasler, this, "Basler");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_laser, this, "Laser");
         }
         #endregion

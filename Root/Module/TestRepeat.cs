@@ -14,11 +14,10 @@ namespace Root.Module
         CameraBasler m_cam;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_cam, this, "Camera");
             if (bInit)
             {
-                if (m_memoryPool.p_gbPool < 1) m_memoryPool.p_gbPool = 1;
                 m_cam.OnConnect += M_cam_OnConnect;
             }
         }

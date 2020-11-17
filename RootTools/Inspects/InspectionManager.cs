@@ -165,7 +165,7 @@ namespace RootTools.Inspects
 
 		public void InspectionDone(string inspIndexFilePath)
 		{
-			bool testFlag = false;
+			//bool testFlag = false;
 			//여기서 DB관련동작 이하생략!
 			DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
 			if (connector.Open())

@@ -24,8 +24,8 @@ namespace RootTools.Camera.Silicon
         public const int StopGrabCheck = 0;
         public const int StartGrabCheck = 1;
 
-        public delegate void Dele_ProgressBar(int value);
-        public event Dele_ProgressBar ProgressBarUpdate;
+        //public delegate void Dele_ProgressBar(int value);
+        //public event Dele_ProgressBar ProgressBarUpdate;
 
         BackgroundWorker bgw_Connect = new BackgroundWorker();
 
@@ -70,7 +70,7 @@ namespace RootTools.Camera.Silicon
 
         public bool IsLIVE = false;
         System.Drawing.Point szBuf = new System.Drawing.Point();
-        Thread m_thread;
+        //Thread m_thread;
 
         ImageData m_ImageLive;
         ImageViewer_ViewModel m_ImageViewer;
@@ -228,7 +228,7 @@ namespace RootTools.Camera.Silicon
                 m_hNode = hNode;
                 m_hNodeMap = hNodeMap;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 MessageBox.Show("Camera Init Fail");
             }

@@ -1,4 +1,5 @@
 ﻿using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -16,14 +17,27 @@ namespace RootTools.Memory
             set
             {
                 _mbOffset = value;
+                p_gpOffset = (value / 1024.0).ToString("0.0 GB");
                 RaisePropertyChanged();
-                RaisePropertyChanged("p_mbAvailable");
+                RaisePropertyChanged("p_gbAvailable");
             }
         }
 
-        public string p_mbAvailable
+        string _gbOffset = "";
+        public string p_gpOffset
         {
-            get { return (1024 * m_pool.p_gbPool - p_mbOffset).ToString() + " MB"; }
+            get { return _gbOffset; }
+            set
+            {
+                _gbOffset = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public string p_gbAvailable
+        {
+            get { return (m_pool.p_fGB - p_mbOffset / 1024.0).ToString("0.0 GB"); }
+            set { }
         }
         #endregion
 
@@ -47,7 +61,7 @@ namespace RootTools.Memory
 
         public MemoryData CreateMemory(string id, int nCount, int nByte, int xSize, int ySize)
         {
-            int mbPool = 1024 * m_pool.p_gbPool; 
+            int mbPool = (int)(1024 * m_pool.p_fGB); 
             MemoryData memory = GetMemory(id);
             if (memory != null) DeleteMemory(id); 
             memory = new MemoryData(this, id, nCount, nByte, xSize, ySize, ref _mbOffset);
@@ -90,6 +104,12 @@ namespace RootTools.Memory
             }
             foreach (MemoryData memory in p_aMemory) memory.RunTree(tree.GetTree(memory.p_id), bVisible);
             InitAddress(); 
+        }
+
+        public void RunTree(Tree tree, bool bVisible)
+        {
+            foreach (MemoryData memory in p_aMemory) memory.RunTree(tree.GetTree(memory.p_id, true, bVisible), bVisible);
+            InitAddress();
         }
         #endregion
 

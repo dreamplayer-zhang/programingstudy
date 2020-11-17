@@ -145,7 +145,7 @@ namespace RootTools
 
 
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 return false;
             }

@@ -146,14 +146,13 @@ namespace RootTools.ToolBoxs
             AddToolSet(m_memoryTool, m_memoryToolUI);
         }
 
-        public string Get(ref MemoryPool value, ModuleBase module, string id)
+        public string Get(ref MemoryPool value, ModuleBase module, string id, double fGB)
         {
             if (value == null)
             {
-                value = m_memoryTool.GetPool(module.p_id + "." + id, true);
+                value = m_memoryTool.CreatePool(module.p_id + "." + id, fGB);
                 module.m_aTool.Add(value);
             }
-            value.RunTreeToolBox(module.m_treeToolBox.GetTree(id));
             return "OK";
         }
         #endregion

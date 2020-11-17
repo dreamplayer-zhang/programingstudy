@@ -25,16 +25,14 @@ namespace Root_AxisMapping.Module
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Stage");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Camera Z"); 
             p_sInfo = m_toolBox.Get(ref m_doVacuum, this, "Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
-            p_sInfo = m_toolBox.Get(ref m_memoryPoolResult, this, "Memory Result");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 4);
+            p_sInfo = m_toolBox.Get(ref m_memoryPoolResult, this, "MemoryResult", 1);
             p_sInfo = m_toolBox.Get(ref m_cam, this, "Camera");
             if (bInit) InitTools();
         }
 
         void InitTools()
         {
-            if (m_memoryPool.p_gbPool < 4) m_memoryPool.p_gbPool = 4;
-            if (m_memoryPoolResult.p_gbPool < 1) m_memoryPoolResult.p_gbPool = 1;
         }
         #endregion
 

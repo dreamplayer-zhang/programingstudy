@@ -42,9 +42,9 @@ namespace RootTools
 		CPoint m_ptMouseBuffer = new CPoint();
 		System.Windows.Input.KeyEventArgs m_KeyEvent;
 
-		Key m_keyMove = Key.LeftCtrl;
-		Key m_keyZoom = Key.LeftCtrl;
-		Key m_keyDrawBasic = Key.LeftShift;
+		//Key m_keyMove = Key.LeftCtrl;
+		//Key m_keyZoom = Key.LeftCtrl;
+		//Key m_keyDrawBasic = Key.LeftShift;
 
 		private BasicTool m_BasicTool = new BasicTool();
 		public BasicTool p_BasicTool

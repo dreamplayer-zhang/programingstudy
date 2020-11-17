@@ -437,6 +437,7 @@ namespace RootTools.Memory
             p_nCount = tree.Set(p_nCount, p_nCount, "Count", "Memory Count", bVisible);
             p_nByte = tree.Set(p_nByte, p_nByte, "Byte", "Memory Depth Byte (byte)", bVisible);
             p_sz = tree.Set(p_sz, p_sz, "Size", "Memory Size", bVisible);
+            tree.Set(p_sSize, p_sSize, "Allocate", "Memory Allocate Size (MB)", bVisible, true);
         }
         #endregion
 

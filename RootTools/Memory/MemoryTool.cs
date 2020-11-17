@@ -73,22 +73,26 @@ namespace RootTools.Memory
             set { SetProperty(ref _aPool, value); }
         }
 
-        public MemoryPool GetPool(string sPool, bool bCreate)
+        public MemoryPool CreatePool(string sPool, double fGB)
         {
-            foreach (MemoryPool pool in p_aPool)
-            {
-                if (pool.p_id == sPool) return pool;
-            }
-            if (bCreate == false) return null;
-            MemoryPool memoryPool = new MemoryPool(sPool, this);
+            MemoryPool memoryPool = new MemoryPool(sPool, this, fGB);
             p_aPool.Add(memoryPool);
             MemoryPoolChanged();
             return memoryPool;
         }
 
+        public MemoryPool GetPool(string sPool)
+        {
+            foreach (MemoryPool pool in p_aPool)
+            {
+                if (pool.p_id == sPool) return pool;
+            }
+            return null; 
+        }
+
         public string DeletePool(string sPool)
         {
-            MemoryPool memoryPool = GetPool(sPool, false);
+            MemoryPool memoryPool = GetPool(sPool);
             if (memoryPool != null) return "Memory Pool Not Exist";
             p_aPool.Remove(memoryPool);
             MemoryPoolChanged();
@@ -107,12 +111,12 @@ namespace RootTools.Memory
 
         void RunTreeMemory(Tree tree, int n, bool bVisible)
         {
-            string sPool = (p_aPool.Count > n) ? p_aPool[n].p_id : "Pool";
-            sPool = tree.Set(sPool, sPool, "Name", "Pool Name", bVisible);
-            MemoryPool memoryPool = GetPool(sPool, true);
-            int gbPool = (p_aPool.Count > n) ? p_aPool[n].p_gbPool : 1;
-            gbPool = tree.Set(gbPool, 1, "Size", "Pool size (Giga Byte)", bVisible);
-            if (m_bMaster == false) memoryPool.p_gbPool = gbPool;
+//            string sPool = (p_aPool.Count > n) ? p_aPool[n].p_id : "Pool";
+//            sPool = tree.Set(sPool, sPool, "Name", "Pool Name", bVisible);
+//            MemoryPool memoryPool = GetPool(sPool, true);
+//            int gbPool = (p_aPool.Count > n) ? p_aPool[n].p_gbPool : 1;
+//            gbPool = tree.Set(gbPool, 1, "Size", "Pool size (Giga Byte)", bVisible);
+//            if (m_bMaster == false) memoryPool.p_gbPool = gbPool;
         }
         #endregion
 
@@ -135,7 +139,7 @@ namespace RootTools.Memory
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
         {
-            MemoryPool pool = GetPool(sPool, false);
+            MemoryPool pool = GetPool(sPool);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
         }
         #endregion
@@ -218,7 +222,7 @@ namespace RootTools.Memory
         {
             m_memory = null;
             m_sPool = tree.Set(m_sPool, "Pool", m_asPool, "Pool", "Pool Name");
-            MemoryPool pool = GetPool(m_sPool, false);
+            MemoryPool pool = GetPool(m_sPool);
             if (pool == null) return;
             m_sGroup = tree.Set(m_sGroup, m_sGroup, pool.m_asGroup, "Group", "Group Name");
             MemoryGroup group = pool.GetGroup(m_sGroup, false);
@@ -256,7 +260,7 @@ namespace RootTools.Memory
             RunTreeFile(m_treeRootRun.GetTree("File"));
             if (m_bMaster == false) return; 
             bool bVisible = (m_engineer.p_user.m_eLevel >= Login.eLevel.Admin); 
-            RunTreeProcess(m_treeRootRun.GetTree("Process", false), bVisible);
+            RunTreeProcess(m_treeRootRun.GetTree("Process"), bVisible);
         }
         #endregion
 
@@ -292,7 +296,7 @@ namespace RootTools.Memory
             RunTreeMemory(Tree.eMode.RegRead);
             RunTreeRun(Tree.eMode.RegRead);
             KillInspectProcess();
-            //InitThreadProcess();
+            InitThreadProcess();
         }
 
         public void ThreadStop()
@@ -376,7 +380,7 @@ namespace RootTools.Memory
                 int FullGb = 0;
                 for (int i = 0; i < tool.p_aPool.Count; i++)
                 {
-                    FullGb += tool.p_aPool[i].p_gbPool;
+                    FullGb += (int)Math.Round(tool.p_aPool[i].p_fGB);
                 }
                 double width = FullWidth * (fFullPage - fAvailPage - FullGb) / fFullPage;
                 return width;
