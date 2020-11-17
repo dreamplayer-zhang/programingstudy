@@ -14,6 +14,7 @@
         WindowStartupLocation="CenterScreen"
         WindowState="Normal"
         Width="1820" Height="980"
+        BorderBrush="Black" BorderThickness="1"
         Background="{StaticResource PanelBackGround}"
         mc:Ignorable="d">
     <Window.Resources>
@@ -42,6 +43,14 @@
             <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
                        FontSize="11"
                        Foreground="Black"
+                       VerticalAlignment="Center"
+                       Margin="5,0,0,0"
+                       Grid.Column="1" />
+            <TextBlock Text="RECIPE MANGER"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="Black"
+                       HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Margin="5,0,0,0"
                        Grid.Column="1" />
@@ -75,7 +84,7 @@
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="CloseButton"
                         Width="30"
-                        Height="20"
+                        Height="25"
                         Margin="2,0,0,0"
                         Click="CloseButton_Click"
                         VerticalAlignment="Bottom">
