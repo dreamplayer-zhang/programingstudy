@@ -20,6 +20,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Emgu.CV.Dnn;
+using System.Diagnostics;
 
 namespace RootTools
 {
@@ -574,9 +575,9 @@ namespace RootTools
 			int a = 0;
 			UInt32 b = 0;
 			BinaryReader br = new BinaryReader(fs);
-			ushort bfType = br.ReadUInt16();
-			uint bfSize = br.ReadUInt32();
-			br.ReadUInt16();
+			ushort bfType = br.ReadUInt16();  //2 4 2 2 4 4 4 4 2  2 4 4 4 4 4 4 256*4 1024  54 
+			uint bfSize = br.ReadUInt32();    
+			br.ReadUInt16();                  
 			br.ReadUInt16();
 			uint bfOffBits = br.ReadUInt32();
 			if (bfType != 0x4D42)
@@ -596,26 +597,31 @@ namespace RootTools
 			int lowwidth = 0, lowheight = 0;
 			lowwidth = nWidth < p_Size.X - offset.X ? nWidth : p_Size.X - offset.X;
 			lowheight = nHeight < p_Size.Y - offset.Y ? nHeight : p_Size.Y - offset.Y;
-
+			
 			if (m_eMode == eMode.MemoryRead)
 			{
 				p_nByte = nByte;
 				byte[] hRGB;
-				if (p_nByte != 3)
-					hRGB = br.ReadBytes(256 * 4);
+                if (p_nByte != 3)
+                    hRGB = br.ReadBytes(256 * 4);
 
-				for (int y = lowheight - 1; y >= 0; y--)
-				{
-					if (Worker_MemoryCopy.CancellationPending)
-						return;
+                //            Thread thread0 = new Thread(() => RunCopyThread(0, sFile, nWidth));
+                //            thread0.Start();
+                //Thread thread1 = new Thread(() => RunCopyThread(1, sFile, nWidth));
+                //            thread1.Start();
 
-					byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+                for (int y = lowheight - 1; y >= 0; y--)
+                {
+                    if (Worker_MemoryCopy.CancellationPending)
+                        return;
 
-					Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X * ((long)offset.Y + y))), p_nByte * lowwidth);
-					p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
-				}
-			}
-			else
+                    byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+
+                    Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X * ((long)offset.Y + y))), p_nByte * lowwidth);
+                    p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+                }
+            }
+            else
 			{
 				p_nByte = nByte;
 				if (p_nByte != 3)
@@ -629,10 +635,21 @@ namespace RootTools
 					byte[] pBuf = br.ReadBytes((int)nWidth * nByte);
 					Buffer.BlockCopy(pBuf, 0, m_aBuf, (int)(offset.X + (offset.Y + y) * p_Stride), (int)nWidth * nByte);
 					p_nProgress = Convert.ToInt32(((double)(p_Size.Y - y) / p_Size.Y) * 100);
-
 				}
 			}
 			br.Close();
+		}	
+
+		public void RunCopyThread(int idx, string sFile ,int offset)
+		{
+			byte[] buf = new byte[10];
+			FileStream fs = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read, 32768, true);
+			for (int i = 0; i < 100; i++)
+			{
+				Thread.Sleep(10);
+				fs.Read(buf, 0, 4);
+				Debug.WriteLine(idx + "  " + i);
+			}
 		}
 
 		public unsafe bool ReAllocate(CPoint sz, int nByte)
