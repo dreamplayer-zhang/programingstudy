@@ -756,15 +756,15 @@ namespace RootTools
             else
             {
 				p_nByte = nByte;
-				if (p_nByte != 3)
-				{
-					byte[] hRGB = br.ReadBytes(256 * 4);
-				}
+				
 				p_Size = new CPoint(nWidth + offset.X, nHeight + offset.Y);
 				ReAllocate(p_Size, _nByte);
+
+				byte[] pBuf = new byte[(int)nWidth * nByte];
+
 				for (int y = p_Size.Y - 1; y >= 0; y--)
 				{
-					byte[] pBuf = br.ReadBytes((int)nWidth * nByte);
+					pBuf = br.ReadBytes((int)nWidth * nByte);
 					Buffer.BlockCopy(pBuf, 0, m_aBuf, (int)(offset.X + (offset.Y + y) * p_Stride), (int)nWidth * nByte);
 					p_nProgress = Convert.ToInt32(((double)(p_Size.Y - y) / p_Size.Y) * 100);
 
