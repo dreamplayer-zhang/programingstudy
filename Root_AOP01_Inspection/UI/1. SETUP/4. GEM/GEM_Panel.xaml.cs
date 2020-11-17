@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_AOP01
+namespace Root_AOP01_Inspection
 {
     /// <summary>
     /// GEM_Panel.xaml에 대한 상호 작용 논리

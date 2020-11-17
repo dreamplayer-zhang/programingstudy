@@ -619,32 +619,106 @@ namespace Root_Vega.Controls
 
 			this.DefectInfoList = new List<InspectionInformation>(tempList);
 
-			if (ImageLoaded)
+			if (File.Exists(System.IO.Path.Combine(VegaImagePath)))
 			{
-				switch (type)
+				using (FileStream fs = new FileStream(System.IO.Path.Combine(VegaImagePath), FileMode.Open))
 				{
-					case ImageType.TDI:
-						if (this.TDIImageDictionary.ContainsKey(idx))
+					//LoadStatusVisible = Visibility.Visible;
+					try
+					{
+						byte[] buffer = new byte[4];
+						fs.Read(buffer, 0, sizeof(int));
+						var frameNum = BitConverter.ToInt32(buffer, 0);//개수
+
+						fs.Read(buffer, 0, sizeof(int));//버림
+						int cachedidx = BitConverter.ToInt32(buffer, 0);
+						fs.Read(buffer, 0, sizeof(int));
+						int imageWidth = BitConverter.ToInt32(buffer, 0);
+
+						fs.Read(buffer, 0, sizeof(int));
+						int imageHeight = BitConverter.ToInt32(buffer, 0);
+						fs.Read(buffer, 0, sizeof(int));
+						int length = BitConverter.ToInt32(buffer, 0);
+
+						int skipLength = sizeof(int) * 4 + imageWidth * imageHeight;
+
+						buffer = new byte[length];
+						fs.Read(buffer, 0, length);//첫번째 이미지
+						if (idx == cachedidx)
 						{
-							this.SelectedTDIImage = ConvertImage(this.TDIImageDictionary[idx]);
+							using (Bitmap bmp = new Bitmap(imageWidth, imageHeight, System.Drawing.Imaging.PixelFormat.Format8bppIndexed))
+							{
+								bmp.Palette = mono;
+								BitmapData data = bmp.LockBits(new Rectangle(0, 0, imageWidth, imageHeight), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+								System.Runtime.InteropServices.Marshal.Copy(buffer, 0, data.Scan0, buffer.Length);
+								bmp.UnlockBits(data);
+
+								this.SelectedTDIImage = ConvertImage(bmp);
+
+								bmp.Dispose();
+							}
 						}
 						else
 						{
-							this.SelectedTDIImage = null;
+							//for (int i = 0; i < idx; i++)
+							//{
+							//	buffer = new byte[skipLength];
+							//	fs.Read(buffer, 0, skipLength);
+							//}
+							fs.Position += ((long)skipLength * (long)idx);
+							fs.Position += 16;
+							//fs.Read(buffer, 0, sizeof(int));//버림
+							//fs.Read(buffer, 0, sizeof(int));
+
+							//fs.Read(buffer, 0, sizeof(int));
+							//fs.Read(buffer, 0, sizeof(int));
+							buffer = new byte[length];
+							fs.Read(buffer, 0, length);//첫번째 이미지
+
+							using (Bitmap bmp = new Bitmap(imageWidth, imageHeight, System.Drawing.Imaging.PixelFormat.Format8bppIndexed))
+							{
+								bmp.Palette = mono;
+								BitmapData data = bmp.LockBits(new Rectangle(0, 0, imageWidth, imageHeight), ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
+								System.Runtime.InteropServices.Marshal.Copy(buffer, 0, data.Scan0, buffer.Length);
+								bmp.UnlockBits(data);
+
+								this.SelectedTDIImage = ConvertImage(bmp);
+
+								bmp.Dispose();
+							}
+
 						}
-						break;
-					case ImageType.VRS:
-						if (this.VRSImageDictionary.ContainsKey(idx))
-						{
-							this.SelectedVRSImage = ConvertImage(this.VRSImageDictionary[idx]);
-						}
-						else
-						{
-							this.SelectedVRSImage = null;
-						}
-						break;
-					case ImageType.Mask:
-						break;
+
+						//switch (type)
+						//{
+						//	case ImageType.TDI:
+						//		if (this.TDIImageDictionary.ContainsKey(idx))
+						//		{
+						//			this.SelectedTDIImage = ConvertImage(this.TDIImageDictionary[idx]);
+						//		}
+						//		else
+						//		{
+						//			this.SelectedTDIImage = null;
+						//		}
+						//		break;
+						//	case ImageType.VRS:
+						//		if (this.VRSImageDictionary.ContainsKey(idx))
+						//		{
+						//			this.SelectedVRSImage = ConvertImage(this.VRSImageDictionary[idx]);
+						//		}
+						//		else
+						//		{
+						//			this.SelectedVRSImage = null;
+						//		}
+						//		break;
+						//	case ImageType.Mask:
+						//		break;
+						//}
+					}
+					catch(Exception ex)
+                    {
+
+                    }
 				}
 			}
 		}

@@ -5,7 +5,7 @@ using RootTools.Trees;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Root_AOP01
+namespace Root_AOP01_Packing
 {
     /// <summary>
     /// AUP01_Recipe_UI.xaml에 대한 상호 작용 논리

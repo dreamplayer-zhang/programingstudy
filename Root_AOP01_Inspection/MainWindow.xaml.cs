@@ -4,13 +4,40 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Root_AOP01
+namespace Root_AOP01_Inspection
 {
+    public class Dummy
+    {
+        public string a
+        {
+            get;set;
+        }
+        public string b
+        {
+            get; set;
+        }
+        public string c
+        {
+            get; set;
+        }
+        public string d
+        {
+            get; set;
+        }
+        public string e
+        {
+            get; set;
+        }
+    }
+
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
     /// </summary>
+    
     public partial class MainWindow : Window
     {
+
+
         #region Title Bar
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -110,7 +137,6 @@ namespace Root_AOP01
         {
             Init_ViewModel();
             Init_UI();
-
             m_engineer.Init("AOP01");
             m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
         }

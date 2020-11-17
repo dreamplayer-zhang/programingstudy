@@ -2,7 +2,7 @@
 using RootTools.Trees;
 using System.Windows.Controls;
 
-namespace Root_AOP01
+namespace Root_AOP01_Inspection
 {
     /// <summary>
     /// AUP01_Engineer_UI.xaml에 대한 상호 작용 논리
@@ -22,7 +22,7 @@ namespace Root_AOP01
             treeRootUI.Init(engineer.m_treeRoot);
             loginUI.Init(engineer.m_login);
             toolBoxUI.Init(engineer.ClassToolBox());
-            handlerUI.Init(engineer.m_handler);
+            //handlerUI.Init(engineer.m_handler); // 2020-11-13 
             engineer.RunTree(Tree.eMode.Init);
         }
     }

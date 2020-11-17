@@ -215,6 +215,7 @@ namespace Root_AxisMapping.MainUI
 
         public void Draw(AOIData.eDraw eDraw)
         {
+            if (m_memoryPool.m_viewer.p_memoryData == null) return; 
             MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
             draw.Clear();
             switch (eDraw)
@@ -273,6 +274,7 @@ namespace Root_AxisMapping.MainUI
                 m_aAOI[y].m_bEnable = (m_aArray[m_xActive, y].p_eState != Array.eState.Empty);
                 if (m_aAOI[y].m_bEnable) InspectBlob(y);
                 m_aAOI[y].m_bInspect = m_aAOI[y].m_bEnable;
+                m_aArray[m_xActive, y].m_bInspect = m_aAOI[y].m_bEnable;
                 m_aArray[m_xActive, y].m_rpCenter = m_aAOI[y].m_bEnable ? m_aAOI[y].m_rpCenter : new RPoint(); 
             }
             Draw(AOIData.eDraw.Inspect);
@@ -379,7 +381,7 @@ namespace Root_AxisMapping.MainUI
         Log m_log;
         public Mapping(string id, AxisMapping_Engineer engineer)
         {
-            p_xArray = 15;
+            p_xArray = 13;
             p_yArray = 13;
             m_xActive = p_xArray / 2;
             m_xSetup = p_xArray / 2;

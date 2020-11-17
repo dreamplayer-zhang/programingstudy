@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Controls;
 
-namespace Root_AOP01
+namespace Root_AOP01_Inspection
 {
     /// <summary>
     /// AUP01_Handler_UI.xaml에 대한 상호 작용 논리
@@ -32,7 +32,7 @@ namespace Root_AOP01
             {
                 TabItem tabItem = new TabItem();
                 tabItem.Header = kv.Key.p_id;
-                tabItem.Content = kv.Value;
+                //tabItem.Content = kv.Value;
                 tabItem.Background = m_handler.p_brushModule;
                 tabModule.Items.Add(tabItem);
             }

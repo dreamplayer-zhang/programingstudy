@@ -135,6 +135,7 @@ namespace Root_AxisMapping.MainUI
 
         public void Draw(AOIData.eDraw eDraw)
         {
+            if (m_memoryPool.m_viewer.p_memoryData == null) return; 
             MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
             draw.Clear();
             m_aUnit[0].m_aoiData.Draw(draw, eDraw);
