@@ -724,6 +724,7 @@ namespace RootTools
                         Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
                         p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
                     }
+
                 }
 				else if(p_nByte == 3)
 				{
