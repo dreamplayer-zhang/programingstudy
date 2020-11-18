@@ -313,7 +313,7 @@ namespace RootTools_Vision
             int posX = 0;
             int posY = 0;
 
-            int roiHeight = 100; // 검사 영역으로 자를 높이 - recipe
+            int roiHeight = 1000; // 검사 영역으로 자를 높이 - recipe
             int workplaceNum;
 
             if (sharedBufferHeight % roiHeight == 0)

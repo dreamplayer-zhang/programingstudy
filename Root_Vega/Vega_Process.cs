@@ -304,6 +304,7 @@ namespace Root_Vega
             }
             Sequence sequence = m_qSequence.Peek();
             p_sInfo = sequence.m_moduleRun.Run();
+            m_handler.m_bIsPossible_Recovery = false;
             if (p_sInfo != "OK") EQ.p_bStop = true;
             else
             {

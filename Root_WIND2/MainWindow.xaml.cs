@@ -158,9 +158,9 @@ namespace Root_WIND2
             m_engineer.Init("WIND2");
             m_memoryTool = m_engineer.ClassMemoryTool();
 //            m_memoryTool.GetPool(sPool).p_gbPool = 12;
-            m_memoryTool.GetPool(sPool).GetGroup(sGroup).CreateMemory(sMem, 3, 1, new CPoint(MemWidth, MemHeight));
-            m_memoryTool.GetPool(sPool).GetGroup(sGroup).CreateMemory(sMemROI, 1, 4, new CPoint(ROIWidth, ROIHeight));
-            m_memoryTool.GetMemory(sPool, sGroup, sMem);
+            //m_memoryTool.GetPool(sPool).GetGroup(sGroup).CreateMemory(sMem, 3, 1, new CPoint(MemWidth, MemHeight));
+            //m_memoryTool.GetPool(sPool).GetGroup(sGroup).CreateMemory(sMemROI, 1, 4, new CPoint(ROIWidth, ROIHeight));
+            //m_memoryTool.GetMemory(sPool, sGroup, sMem);
 
             m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem)); // Main ImageData
             m_ROILayer = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMemROI)); // 4ch ROI BimtapLayer로 사용할 ImageData
@@ -175,11 +175,12 @@ namespace Root_WIND2
             // Inspection Manager
             inspMgrVision = new InspectionManager_Vision(m_Image.GetPtr(), m_Image.p_Size.X, m_Image.p_Size.Y);
             inspMgrVision.Recipe = m_Recipe;
+            m_engineer.InspectionMgrVision = inspMgrVision;
 
             ImageData edgeImage = m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeTop);
             inspMgrEFEM = new InspectionManager_EFEM(edgeImage.GetPtr(), edgeImage.p_Size.X, edgeImage.p_Size.Y, 3);
             inspMgrEFEM.Recipe = m_Recipe;
-            m_engineer.InspectionManager = inspMgrVision;
+            m_engineer.InspectionMgrEFEM = inspMgrEFEM;
 
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1);

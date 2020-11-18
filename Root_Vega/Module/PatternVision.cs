@@ -150,7 +150,6 @@ namespace Root_Vega.Module
         {
             //forget
             m_memoryMain = m_memoryPool.GetGroup("PatternVision").CreateMemory("Main", 1, 1, 1000, 1000);
-            
         }
         #endregion
 
@@ -514,7 +513,10 @@ namespace Root_Vega.Module
             m_reg = new Registry(p_id + ".InfoReticle");
             m_sInfoReticle = m_reg.Read("sInfoReticle", m_sInfoReticle);
             //p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
-            if (m_diPatternReticleExistSensor.p_bIn == false) p_infoReticle = null;
+            if (m_axisXY.p_axisY.IsInPos(eAxisPosY.ReticleCheck) == true)
+            {
+                if (m_diPatternReticleExistSensor.p_bIn == false) p_infoReticle = null;
+            }
             else p_infoReticle = m_engineer.ClassHandler().GetGemSlot(m_sInfoReticle);
         }
         #endregion
@@ -581,6 +583,18 @@ namespace Root_Vega.Module
                 p_bStageVac = false;
                 p_eState = eState.Error;
                 return "AxisZ Home Error";
+            }
+
+            // Y축 레티클체크포지션으로 이동
+            if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.ReticleCheck))) return p_sInfo;
+            if (Run(m_axisXY.WaitReady())) return p_sInfo;
+
+            if (m_axisXY.p_axisY.IsInPos(eAxisPosY.ReticleCheck) == true)
+            {
+                if (p_infoReticle != null)
+                {
+                    if (m_diPatternReticleExistSensor.p_bIn == false) p_infoReticle = null;
+                }
             }
 
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
@@ -854,6 +868,8 @@ namespace Root_Vega.Module
                 int nMMPerUM = 1000;
                 int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+                nCamWidth = 3000;
+                nCamHeight = 200;
                 int nReticleYSize_px = Convert.ToInt32(m_dReticleSize_mm * nMMPerUM / m_dResY_um);    // 레티클 영역(150mm -> 150,000um)의 Y픽셀 갯수
                 m_grabMode.m_dTrigger =m_dResY_um / 8 * 100;        // 축해상도 0.1um로 하드코딩.
                 int nReticleRangePulse = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleYSize_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
@@ -909,14 +925,14 @@ namespace Root_Vega.Module
                         //double dAxisPosX = m_rpReticleCenterPos_pulse.X + (m_dReticleSize_mm * nMMPerUM / 0.08 / 2) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
                         double dAxisPosX = m_rpReticleCenterPos_pulse.X + (150 * nMMPerUM / 0.1 / 2) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
 
-                        if (m_module.Run(axisXY.StartMove(new RPoint(dAxisPosX, dStartAxisPos)))) return p_sInfo;
-                        if (m_module.Run(axisZ.StartMove(m_dFocusPosZ_pulse))) return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+                        //if (m_module.Run(axisXY.StartMove(new RPoint(dAxisPosX, dStartAxisPos)))) return p_sInfo;
+                        //if (m_module.Run(axisZ.StartMove(m_dFocusPosZ_pulse))) return p_sInfo;
+                        //if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        //if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
 
                         double dStartTriggerPos = m_rpReticleCenterPos_pulse.Y + nReticleRangePulse / 2;
                         double dEndTriggerPos = m_rpReticleCenterPos_pulse.Y - nReticleRangePulse / 2;
-                        m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos, m_dTriggerPeriod, m_dTriggerUptime, true);
+                        //m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos, m_dTriggerPeriod, m_dTriggerUptime, true);
 
                         string strPool = m_grabMode.m_memoryPool.p_id;
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
@@ -924,10 +940,10 @@ namespace Root_Vega.Module
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMem);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * (double)m_nScanRate / 100);
 
-                        m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                        axisXY.p_axisY.RunTrigger(false);
+                        //m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        //if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
+                        //if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        //axisXY.p_axisY.RunTrigger(false);
 
                         #region Inspection
                         // Inspection
@@ -1044,7 +1060,7 @@ namespace Root_Vega.Module
                         nScanLine++;
                         cpMemoryOffset_pixel.X += nCamWidth;
                     }
-                    m_grabMode.m_camera.StopGrab();
+                    //m_grabMode.m_camera.StopGrab();
                     return "OK";
                 }
                 catch(Exception e)
