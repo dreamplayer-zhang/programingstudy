@@ -24,7 +24,7 @@ namespace Root_EFEM.Module
         {
             p_sInfo = m_toolBox.Get(ref m_diWaferExist, this, "WaferExist");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_camOCR, this, "OCR");
             if (bInit)
             {

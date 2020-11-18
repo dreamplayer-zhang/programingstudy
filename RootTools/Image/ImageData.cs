@@ -404,7 +404,7 @@ namespace RootTools
 			}
 			else if (nByteCnt == 4)
 			{
-				Image<Rgba, byte> image = new Image<Rgba, byte>(p_Size.X, p_Size.Y);
+				Image<Bgra, byte> image = new Image<Bgra, byte>(p_Size.X, p_Size.Y);
 				IntPtr ptrMem = GetPtr();
 
 				Parallel.For(0, p_Size.Y, y =>
@@ -508,7 +508,6 @@ namespace RootTools
 		unsafe void FileSaveBMP(string sFile, IntPtr ptr, CRect rect)
 		{
 			int width = (int)(rect.Right * 0.25);
-			int owidth = rect.Right;
 			if (width * 4 != rect.Right) rect.Right = (width + 1) * 4;
 
 			//if (rect.Width % 4 != 0)
@@ -594,7 +593,7 @@ namespace RootTools
 			else
 			{
 				ImageData data = new ImageData(123, 123);
-				//MessageBox.Show("OpenFile() - 파일이 존재 하지 않거나 열기에 실패하였습니다. - " + sFileName);
+				System.Windows.MessageBox.Show("OpenFile() - 파일이 존재 하지 않거나 열기에 실패하였습니다. - " + sFileName);
 			}
 		}
 
@@ -651,6 +650,8 @@ namespace RootTools
 			OnCreateNewImage();
 		}
 
+		int nLine = 0;
+
 		unsafe void OpenBMPFile(string sFile, DoWorkEventArgs e, CPoint offset)
 		{
 			int nByte;
@@ -704,27 +705,39 @@ namespace RootTools
     //                hRGB = br.ReadBytes(256 * 4);
 				if (p_nByte == 1)
 				{
+					nLine = 0;
+					int nNum = 5;
+					Thread[] multiThread = new Thread[nNum];
 
-                    //Thread thread1 = new Thread(() => RunCopyThread(0,fs ,sFile, nWidth, nHeight, lowwidth , lowheight, offset));
-
-                    //thread1.Start();
-
-                    //bool alive = thread1.IsAlive;
-                    //               while (thread1.IsAlive)
-                    //               {
-                    //	Thread.Sleep(10);
-                    //               }
-
-                    for (int y = lowheight - 1; y >= 0; y--)
+					for (int i = 0; i < nNum; i++)
+					{
+						int nStartHeight = lowheight * (nNum-i) / nNum;
+						int nEndHeight = lowheight * (nNum - i-1) / nNum;
+						multiThread[i] = new Thread(() => RunCopyThread(sFile, nWidth, nHeight, lowwidth, lowheight, nStartHeight , nEndHeight, offset));
+						multiThread[i].Start();
+					}
+                    while (true)
                     {
-                        if (Worker_MemoryCopy.CancellationPending)
-                            return;
+						bool bEnd = true;
+						for (int i = 0; i < nNum; i++)
+						{
+							if (multiThread[i].IsAlive)
+								bEnd = false;
+						}
+						Thread.Sleep(10);
+						p_nProgress = Convert.ToInt32(((double)nLine / lowheight) * 100);
+						if (bEnd)
+							break;
+					}
+                    //for (int y = lowheight - 1; y >= 0; y--)
+                    //{
+                    //    if (Worker_MemoryCopy.CancellationPending)
+                    //        return;
 
-                        byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
-                        Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
-                        p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
-                    }
-
+                    //    byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+                    //    Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
+                    //    p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+                    //}
                 }
 				else if(p_nByte == 3)
 				{
@@ -756,15 +769,15 @@ namespace RootTools
             else
             {
 				p_nByte = nByte;
-				if (p_nByte != 3)
-				{
-					byte[] hRGB = br.ReadBytes(256 * 4);
-				}
+				
 				p_Size = new CPoint(nWidth + offset.X, nHeight + offset.Y);
 				ReAllocate(p_Size, _nByte);
+
+				byte[] pBuf = new byte[(int)nWidth * nByte];
+
 				for (int y = p_Size.Y - 1; y >= 0; y--)
 				{
-					byte[] pBuf = br.ReadBytes((int)nWidth * nByte);
+					pBuf = br.ReadBytes((int)nWidth * nByte);
 					Buffer.BlockCopy(pBuf, 0, m_aBuf, (int)(offset.X + (offset.Y + y) * p_Stride), (int)nWidth * nByte);
 					p_nProgress = Convert.ToInt32(((double)(p_Size.Y - y) / p_Size.Y) * 100);
 
@@ -773,16 +786,30 @@ namespace RootTools
 			br.Close();
 		}	
 
-		public void RunCopyThread(int idx, FileStream fs ,string sFile, int nWidth, int nHeight , int nLowWidth, int nLowHeight ,CPoint offset)
+		public void RunCopyThread(string sFile, int nWidth, int nHeight , int nLowWidth, int nLowHeight,int nStartHeight ,int nEndHeight ,CPoint offset)
 		{
-			byte[] buf = new byte[nLowWidth];
-			fs.Seek(54 + 1024, SeekOrigin.Begin);
-			for (int i = 1; i < nLowHeight; i++)
+			FileStream fss = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read, 32768, true);
+			byte[] buf = new byte[nWidth];
+			fss.Seek(54 + 1024 + (nLowHeight - nStartHeight) * (long)nWidth , SeekOrigin.Begin);
+			for (int i = nStartHeight -1 ; i >= nEndHeight; i--)
 			{
-				fs.Read(buf,0, nWidth);
+				if (Worker_MemoryCopy.CancellationPending)
+					return;
+				fss.Read(buf,0, nWidth);
 				Marshal.Copy(buf, 0, (IntPtr)((long)m_ptrImg + (offset.X + p_Size.X * ((long)offset.Y + i))), nLowWidth);
+				nLine++;
 				//p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
 			}
+			//for (int y = lowheight - 1; y >= 0; y--)
+			//{
+			//	if (Worker_MemoryCopy.CancellationPending)
+			//		return;
+
+			//	byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+			//	Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
+			//	p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+			//}
+			fss.Close();
 		}
 
 		public unsafe bool ReAllocate(CPoint sz, int nByte)
@@ -795,7 +822,7 @@ namespace RootTools
 			{
 				Array.Resize(ref m_aBuf, sz.X * nByte * sz.Y);
 			}
-	
+
 			return true;
 		}
 
@@ -1292,7 +1319,7 @@ namespace RootTools
 
 
 		}
-		public static BitmapSource ToBitmapSource(Image<Rgba, byte> image)
+		public static BitmapSource ToBitmapSource(Image<Bgra, byte> image)
 		{
 			using (System.Drawing.Bitmap source = image.Bitmap)
 			{
@@ -1303,7 +1330,7 @@ namespace RootTools
 				BitmapSource bitmapSource = BitmapSource.Create(
 				source.Width, source.Height,
 				source.HorizontalResolution, source.VerticalResolution,
-				PixelFormats.Bgr24, null,
+				PixelFormats.Bgra32, null,
 				bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
 				source.UnlockBits(bitmapData);

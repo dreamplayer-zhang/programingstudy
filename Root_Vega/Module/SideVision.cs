@@ -208,7 +208,7 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_axisClamp, this, "AxisClamp");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             //p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_CamBevel, this, "Bevel Main");
             p_sInfo = m_toolBox.Get(ref m_CamSide, this, "Side Main");
@@ -370,7 +370,7 @@ namespace Root_Vega.Module
             //bool bRet = ReticleExistCheck(m_CamAlign2);
             //if (bRet == false) return "Reticle Not Exist";
 
-            if (m_diSideReticleExistSensor.p_bIn == false) return "Reticle Not Exist";
+            //if (m_diSideReticleExistSensor.p_bIn == false) return "Reticle Not Exist";
 
             // 모든 축 Ready 위치로 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Safety))) return p_sInfo;
@@ -438,7 +438,7 @@ namespace Root_Vega.Module
             //bool bRet = ReticleExistCheck(m_CamAlign2);
             //if (bRet == false) return "Reticle Not Exist";
 
-            if (m_diSideReticleExistSensor.p_bIn == true) return "Reticle Exist";
+            //if (m_diSideReticleExistSensor.p_bIn == true) return "Reticle Exist";
 
             // 모든 축 Ready 위치로 이동
             if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Safety))) return p_sInfo;
@@ -495,7 +495,7 @@ namespace Root_Vega.Module
             if (bIgnoreExistSensor) bExist = (p_infoReticle != null);
             else
             {
-                bExist = m_diSideReticleExistSensor.p_bIn;
+                //bExist = m_diSideReticleExistSensor.p_bIn; //check
             }
             p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
             return bExist;
@@ -752,7 +752,6 @@ namespace Root_Vega.Module
         void RunTreeSetup(Tree tree)
         {
             RunTreeDIODelay(tree.GetTree("DIO Delay", false));
-            m_memoryPool.RunTreeModule(tree.GetTree("Memory", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
             RunTreeInspect(tree.GetTree("Inspect", false));
         }

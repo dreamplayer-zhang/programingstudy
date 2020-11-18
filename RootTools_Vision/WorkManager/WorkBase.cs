@@ -40,9 +40,25 @@ namespace RootTools_Vision
             set { m_sName = value; }
         }
 
-        public abstract UserTypes.WORK_TYPE Type { get; }
+        private bool bPreworkDone;
 
-        public abstract void DoWork();
+        public bool IsPreworkDone
+        {
+            get { return bPreworkDone; }
+            set { bPreworkDone = value; }
+        }
+
+        private bool bWorkDone;
+        public bool IsWorkDone
+        {
+            get { return bWorkDone; }
+            set { bWorkDone = value; }
+        }
+
+
+        public abstract WORK_TYPE Type { get; }
+
+
 
         public abstract void SetWorkplace(Workplace workplace);
 
@@ -51,5 +67,20 @@ namespace RootTools_Vision
         public abstract void SetData(IRecipeData _recipeData, IParameterData _parameterData);
 
         public abstract WorkBase Clone();
+
+        // Virtual
+        public virtual bool DoPrework()
+        {
+            // Prework 작업이 필요한 경우가 있을 때만 구현하고,
+            // 없을시 pass
+            this.IsPreworkDone = true;
+
+            return true;
+        }
+
+        public virtual void DoWork()
+        {
+            this.IsWorkDone = true; // 이거 반드시 true로 바꿔줘야 다음 검사 진행
+        }
     }
 }

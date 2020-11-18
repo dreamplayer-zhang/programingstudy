@@ -70,7 +70,7 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     m_MainWindow.MainPanel.Children.Clear();
-                    m_MainWindow.MainPanel.Children.Add(m_MainWindow.m_ModeUI);
+                    m_MainWindow.MainPanel.Children.Add(m_MainWindow.ModeUI);
                 });
             }
         }
@@ -196,7 +196,7 @@ namespace Root_WIND2
         public void DisplayDefectData(string sInspectionID)
         {
             SearchDefectData(sInspectionID);            // Draw Defect Wafer Map
-            //m_ReviewDefectlist = GetDefectFromDataTable(Defect_Datatable);
+            m_ReviewDefectlist = GetDefectFromDataTable(Defect_Datatable);
             //DisplayDefectWaferMap();            // Display Defect DataGrid
         }
 
@@ -256,8 +256,8 @@ namespace Root_WIND2
 
             foreach (Defect defect in m_ReviewDefectlist)
             {
-                int i = (int)defect.nChipIndexX;
-                int j = (int)defect.nCHipIndexY;
+                int i = (int)defect.m_nChipIndexX;
+                int j = (int)defect.m_nCHipIndexY;
 
 
                 Rectangle ellipse = new Rectangle();
@@ -275,8 +275,8 @@ namespace Root_WIND2
                 //Canvas.SetRight(ellipse, Right + (dPitchx * i) + (defect.fRelX + 10) * dSamplingRatio);
                 //Canvas.SetBottom(ellipse, Bottom + (dPitchy * j) + (defect.fRelY + 10) * dSamplingRatio);
 
-                Canvas.SetLeft(ellipse, dCanvasWaferCenterX + defect.fRelX * dSamplingRatio); // 
-                Canvas.SetTop(ellipse, dCanvasWaferCenterY + defect.fRelY * dSamplingRatio);
+                Canvas.SetLeft(ellipse, dCanvasWaferCenterX + defect.m_fRelX * dSamplingRatio); // 
+                Canvas.SetTop(ellipse, dCanvasWaferCenterY + defect.m_fRelY * dSamplingRatio);
                // Canvas.SetRight(ellipse, dCanvasWaferCenterX + (defect.fRelX + 10) * dSamplingRatio);
                // Canvas.SetBottom(ellipse, dCanvasWaferCenterY + (defect.fRelY + 10) * dSamplingRatio);
 
@@ -473,6 +473,8 @@ namespace Root_WIND2
             int nChipIndexX = 0;
             int nCHipIndexY = 0;
 
+            m_DefectView.Clear();
+            int count = 0;
             foreach (DataRow dataRow in table.Rows)
             {
                 for (int i = 0; i < table.Columns.Count; i++)
@@ -499,10 +501,15 @@ namespace Root_WIND2
                 int nNotch = 0;
                 double nTheta = 0;
                 if (fAbsY > nNotch)
-                    nTheta = (fAbsY - nNotch) / 5400000 * 360;
-                if (fAbsY > nNotch)
-                    nTheta = (nNotch - fAbsY) / 5400000 * 360;
-                m_DefectView.AddDefectFront(nTheta);
+                    nTheta = (fAbsY - nNotch) / 540000 * 360;
+                if (fAbsY < nNotch)
+                    nTheta = (nNotch - fAbsY) / 540000 * 360;
+
+                if (fSize > 150)
+                {
+                    count++;
+                    m_DefectView.AddDefectFront(nTheta);
+                }
             }
             return defects;
         }

@@ -4,6 +4,7 @@ using System;
 using System.CodeDom;
 using System.Collections.ObjectModel;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -537,11 +538,9 @@ namespace RootTools
                             IntPtr ptrMem = p_ImageData.GetPtr();
                             if (ptrMem == IntPtr.Zero)
                                 return;
-                            int pix_x = 0;
-                            int pix_y = 0;
+
                             int rectX, rectY, rectWidth, rectHeight, sizeX;
                             byte[,,] viewptr = view.Data;
-                            //byte* imageptr = (byte*)ptrMem.ToPointer();
 
                             rectX = p_View_Rect.X;
                             rectY = p_View_Rect.Y;
@@ -552,13 +551,12 @@ namespace RootTools
 
                             Parallel.For(0, p_CanvasHeight, (yy) =>
                             {
-                                lock (o)
                                 {
-                                    pix_y = rectY + yy * rectHeight / p_CanvasHeight;
+                                    long pix_y = rectY + yy * rectHeight / p_CanvasHeight;
 
                                     for (int xx = 0; xx < p_CanvasWidth; xx++)
                                     {
-                                        pix_x = rectX + xx * rectWidth / p_CanvasWidth;
+                                        long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
                                         viewptr[yy, xx, 0] = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];
                                     }
                                 }
@@ -592,8 +590,6 @@ namespace RootTools
                                 byte* imageptrG = (byte*)ptrMemG.ToPointer();
                                 byte* imageptrB = (byte*)ptrMemB.ToPointer();
 
-                                long pix_x = 0;
-                                long pix_y = 0;
                                 int viewrectY = p_View_Rect.Y;
                                 int viewrectX = p_View_Rect.X;
                                 int viewrectHeight = p_View_Rect.Height;
@@ -602,12 +598,12 @@ namespace RootTools
 
                                 Parallel.For(0, p_CanvasHeight, (yy) =>
                                 {
-                                    lock (o)
+                                    //lock (o)
                                     {
-                                        pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                                        long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
                                         for (int xx = 0; xx < p_CanvasWidth; xx++)
                                         {
-                                            pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                                            long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
                                             viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
                                             viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];
@@ -640,8 +636,7 @@ namespace RootTools
 
                                 byte[,,] viewPtr = view.Data;
                                 byte* imageptr = (byte*)ptrMem.ToPointer();
-                                long pix_x = 0;
-                                long pix_y = 0;
+                                
                                 int viewrectY = p_View_Rect.Y;
                                 int viewrectX = p_View_Rect.X;
                                 int viewrectHeight = p_View_Rect.Height;
@@ -650,12 +645,12 @@ namespace RootTools
 
                                 Parallel.For(0, p_CanvasHeight, (yy) =>
                                 {
-                                    lock (o)
+                                    //lock (o)
                                     {
-                                        pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                                        long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
                                         for (int xx = 0; xx < p_CanvasWidth; xx++)
                                         {
-                                            pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                                            long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
                                             viewPtr[yy, xx, 0] = imageptr[pix_x + (long)pix_y * sizeX];
                                         }
                                     }
@@ -689,8 +684,7 @@ namespace RootTools
                         IntPtr ptrMem = p_ROILayer.GetPtr();
                         if (ptrMem == IntPtr.Zero)
                             return;
-                        int pix_x = 0;
-                        int pix_y = 0;
+
                         int rectX, rectY, rectWidth, rectHeight, sizeX;
                         byte[,,] viewptr = view.Data;
                         byte* imageptr = (byte*)ptrMem.ToPointer();
@@ -704,13 +698,13 @@ namespace RootTools
 
                         Parallel.For(0, p_CanvasHeight, (yy) =>
                         {
-                            lock (o)
+                           // lock (o)
                             {
-                                pix_y = rectY + yy * rectHeight / p_CanvasHeight;
+                                long pix_y = rectY + yy * rectHeight / p_CanvasHeight;
 
                                 for (int xx = 0; xx < p_CanvasWidth; xx++)
                                 {
-                                    pix_x = rectX + xx * rectWidth / p_CanvasWidth;
+                                    long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
                                     viewptr[yy, xx, 0] = imageptr[pix_x + pix_y * sizeX];
                                 }
                             }
@@ -730,9 +724,6 @@ namespace RootTools
 
                         byte* imageptr = (byte*)ptrMem.ToPointer();
 
-                        long pix_x = 0;
-                        long pix_y = 0;
-                        long pix_rect;
                         int viewrectY = p_View_Rect.Y;
                         int viewrectX = p_View_Rect.X;
                         int viewrectHeight = p_View_Rect.Height;
@@ -741,13 +732,12 @@ namespace RootTools
 
                         Parallel.For(1, p_CanvasHeight, (yy) =>
                         {
-                            lock (o)
                             {
-                                pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                                pix_rect = pix_y * sizeX;
+                                long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                                long pix_rect = pix_y * sizeX;
                                 for (int xx = 0; xx < p_CanvasWidth; xx++)
                                 {
-                                    pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                                    long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
                                     viewPtr[yy, xx, 3] = imageptr[3 + 4 * (pix_x + pix_rect)]; //0;
                                     viewPtr[yy, xx, 2] = imageptr[2 + 4 * (pix_x + pix_rect)]; //0;//imageptr[0 + 3 * (pix_x + pix_rect)];
@@ -916,16 +906,26 @@ namespace RootTools
         #endregion
 
         #region Draw Method
-        public virtual unsafe void DrawRectBitmap(TRect rect, byte r, byte g, byte b, byte a, CPoint offset = null)
+        public virtual unsafe void CropRectSetData(ImageData imageData, CRect nowRect, CPoint offset = null)
         {
             IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
-            byte* imagePtr = (byte*)ptrMem.ToPointer();
 
-            Parallel.For(rect.MemoryRect.Left, rect.MemoryRect.Right + 1, x =>
+            CPoint StartPt = new CPoint(nowRect.Left - offset.X, nowRect.Top - offset.Y);
+            
+            IntPtr rectPtr = (IntPtr)((long)ptrMem + (long)StartPt.Y * p_ROILayer.p_Size.X * p_ROILayer.p_nByte + StartPt.X * p_ROILayer.p_nByte);
+            for (int i = 0; i < nowRect.Height; i++)
+            {
+                Marshal.Copy(imageData.m_aBuf, i * nowRect.Width*4, (IntPtr)((long)rectPtr + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * i), nowRect.Width * 4);
+            }
+
+        }
+        public virtual unsafe void DrawRectBitmap(CRect rect, byte r, byte g, byte b, byte a, CPoint offset = null)
+        {
+            Parallel.For(rect.Left, rect.Right + 1, x =>
               {
-                  Parallel.For(rect.MemoryRect.Top, rect.MemoryRect.Bottom + 1, y =>
+                  Parallel.For(rect.Top, rect.Bottom + 1, y =>
                   {
                       CPoint pixelPt = new CPoint(x - offset.X, y - offset.Y);
                       DrawPixelBitmap(pixelPt, r, g, b, a);
@@ -1299,7 +1299,7 @@ namespace RootTools
 
             if (m_KeyEvent == null)
                 return;
-            if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
+            if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
                 if (e.LeftButton == MouseButtonState.Pressed && m_swMouse.ElapsedMilliseconds > 0)
                 {
                     CanvasMovePoint_Ref(m_ptViewBuffer, m_ptMouseBuffer.X - p_MouseX, m_ptMouseBuffer.Y - p_MouseY);
@@ -1318,7 +1318,7 @@ namespace RootTools
             var viewer = sender as Grid;
             viewer.Focus();
 
-            if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
+            if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
             {
                 try
                 {
@@ -1370,6 +1370,16 @@ namespace RootTools
                 return new CPoint(nX, nY);
             }
             return new CPoint(0, 0);
+        }
+        protected Point GetCanvasDoublePoint(CPoint memPt)
+        {
+            if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)
+            {
+                double nX = ((double)memPt.X - (double)p_View_Rect.X) * (double)p_CanvasWidth / (double)p_View_Rect.Width + ((double)p_CanvasWidth / (double)p_View_Rect.Width) / 2;
+                double nY = ((double)memPt.Y - (double)p_View_Rect.Y) * (double)p_CanvasHeight / (double)p_View_Rect.Height + ((double)p_CanvasHeight / (double)p_View_Rect.Height) / 2;
+                return new Point(nX, nY);
+            }
+            return new Point(0, 0);
         }
     }
 }

@@ -58,7 +58,6 @@ namespace Root_WIND2
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            m_ModeUI.tbDate.Text = DateTime.Now.ToString("HH:mm:ss");
         }
         #endregion
 
@@ -112,6 +111,10 @@ namespace Root_WIND2
         public Setup m_Setup;
         public Review m_Review;
         public Run m_Run;
+        public SelectMode ModeUI;
+        public Setup Setup;
+        public Review Review;
+        public Run Run;
         #endregion
 
         #region ViewModel
@@ -129,21 +132,23 @@ namespace Root_WIND2
         string sGroup = "group";
         string sMem = "mem";
         string sMemROI = "ROI";
-        public int MemWidth = 80000;
-        public int MemHeight = 80000;
+        public int MemWidth = 40000;
+        public int MemHeight = 40000;
         public int ROIWidth = 30000;
-        public int ROIHeight = 30000; // Chip 크기 최대 30,000 * 30,000  Origin ROI 메모리 할당 20.11.02 JTL
+        public int ROIHeight = 30000; // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL
 
         public RecipeManager m_RecipeMGR;
         Recipe m_Recipe;
         RecipeInfo m_RecipeInfo;
         RecipeEditor m_RecipeEditor;
 
+        InspectionManager_Vision inspMgrVision;
+        InspectionManager_EFEM inspMgrEFEM;
+
         // DelegateLoadRecipe(object e)
         //{
         //    m_setupviewmodel.loadRecie(recipe);
         //}
-        WIND2_InspectionManager m_InspectionManager;
 
         void Init()
         {
@@ -152,10 +157,10 @@ namespace Root_WIND2
 
             m_engineer.Init("WIND2");
             m_memoryTool = m_engineer.ClassMemoryTool();
-            m_memoryTool.GetPool(sPool, true).p_gbPool = 50;
-            m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory(sMem, 3, 1, new CPoint(MemWidth, MemHeight));
-            m_memoryTool.GetPool(sPool, true).GetGroup(sGroup).CreateMemory("ROI", 1, 4, new CPoint(MemWidth, MemHeight));
-            m_memoryTool.GetMemory(sPool, sGroup, sMem);
+//            m_memoryTool.GetPool(sPool).p_gbPool = 12;
+            //m_memoryTool.GetPool(sPool).GetGroup(sGroup).CreateMemory(sMem, 3, 1, new CPoint(MemWidth, MemHeight));
+            //m_memoryTool.GetPool(sPool).GetGroup(sGroup).CreateMemory(sMemROI, 1, 4, new CPoint(ROIWidth, ROIHeight));
+            //m_memoryTool.GetMemory(sPool, sGroup, sMem);
 
             m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem)); // Main ImageData
             m_ROILayer = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMemROI)); // 4ch ROI BimtapLayer로 사용할 ImageData
@@ -167,11 +172,14 @@ namespace Root_WIND2
             m_RecipeEditor = m_Recipe.GetRecipeEditor();
             m_RecipeInfo = m_Recipe.GetRecipeInfo();
 
-            // Inspction Manager
-            m_InspectionManager = new WIND2_InspectionManager(m_Image.GetPtr(), m_Image.p_Size.X, m_Image.p_Size.Y);
-            m_InspectionManager.Recipe = m_Recipe;
+            // Inspection Manager
+            inspMgrVision = new InspectionManager_Vision(m_Image.GetPtr(), m_Image.p_Size.X, m_Image.p_Size.Y);
+            inspMgrVision.Recipe = m_Recipe;
 
-            m_engineer.InspectionManager = m_InspectionManager;
+            ImageData edgeImage = m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeTop);
+            inspMgrEFEM = new InspectionManager_EFEM(edgeImage.GetPtr(), edgeImage.p_Size.X, edgeImage.p_Size.Y, 3);
+            inspMgrEFEM.Recipe = m_Recipe;
+            m_engineer.InspectionManager = inspMgrVision;
 
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1);
@@ -186,31 +194,30 @@ namespace Root_WIND2
 
         void InitModeSelect()
         {
-            m_ModeUI = new SelectMode();
-            m_ModeUI.Init(this);
+            ModeUI = new SelectMode();
+            ModeUI.Init(this);
             MainPanel.Children.Clear();
-            MainPanel.Children.Add(m_ModeUI);
+            MainPanel.Children.Add(ModeUI);
         }
         void InitSetupMode()
         {
-            m_Setup = new Setup();
-            m_SetupViewModel = new Setup_ViewModel(this, m_Recipe, m_InspectionManager);
-            m_Setup.DataContext = m_SetupViewModel;
+            Setup = new Setup();
+            m_SetupViewModel = new Setup_ViewModel(this, m_Recipe, inspMgrVision, inspMgrEFEM);
+            Setup.DataContext = m_SetupViewModel;
         }
         void InitReviewMode()
         {
-            m_Review = new Review();
-            m_ReviewViewModel = new Review_ViewModel(this, m_Review);
-            m_Review.DataContext = m_ReviewViewModel;
+            Review = new Review();
+            m_ReviewViewModel = new Review_ViewModel(this, Review);
+            Review.DataContext = m_ReviewViewModel;
         }
         void InitRunMode()
         {
-            m_Run = new Run();
+            Run = new Run();
             m_RunViewModel = new Run_ViewModel(this);
-            m_Run.DataContext = m_RunViewModel;
+            Run.DataContext = m_RunViewModel;
         }
-
-
+        
         void ThreadStop()
         {
             m_engineer.ThreadStop();

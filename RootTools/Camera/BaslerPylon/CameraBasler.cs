@@ -385,7 +385,7 @@ namespace RootTools.Camera.BaslerPylon
             get { return (m_memoryPool != null) ? m_memoryPool.p_id : ""; }
             set 
             { 
-                m_memoryPool = m_memoryTool.GetPool(value, false);
+                m_memoryPool = m_memoryTool.GetPool(value);
                 OnPropertyChanged();
                 if (m_memoryPool != null)
                 {

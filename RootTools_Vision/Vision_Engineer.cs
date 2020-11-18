@@ -47,7 +47,7 @@ namespace RootTools_Vision
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
         {
-            MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool, false);
+            MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
         }
 

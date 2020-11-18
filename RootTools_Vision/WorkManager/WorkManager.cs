@@ -8,6 +8,21 @@ using RootTools_Vision.UserTypes;
 
 namespace RootTools_Vision
 {
+    public enum WORK_TYPE
+    {
+        PREPARISON,
+        MAINWORK,
+        AFTERWORK,
+        FINISHINGWORK
+    }
+
+    public enum STATE_CHECK_TYPE
+    {
+        CHIP = 0,
+        LINE,
+        WAFER
+    }
+
     public class WorkManager : IWorkable
     {
         private string id;
@@ -23,7 +38,7 @@ namespace RootTools_Vision
         /// <summary>
         /// WorkManager에서 객체를 생성해서 연결해주는 방식을 취함
         /// </summary>
-        public WorkManager(string _id, WORK_TYPE _type, WORKPLACE_STATE _resultState, WORKPLACE_STATE _excuteCondition, bool bWaitStateAllDone = false,  int workerNum = 1)
+        public WorkManager(string _id, WORK_TYPE _type, WORKPLACE_STATE _resultState, WORKPLACE_STATE _excuteCondition, STATE_CHECK_TYPE _state_check_type,  int workerNum = 1)
         {
             this.id = _id;
             if (workerNum < 1) workerNum = 1;
@@ -37,7 +52,7 @@ namespace RootTools_Vision
                 workers.Add(worker);
             }
 
-            this.workerManager = new WorkerManager(workers, _resultState, _excuteCondition, bWaitStateAllDone);
+            this.workerManager = new WorkerManager(workers, _resultState, _excuteCondition, _state_check_type);
         }
 
         public void SetBundles(WorkBundle _workbundle, WorkplaceBundle _workplacebundle)
@@ -52,7 +67,10 @@ namespace RootTools_Vision
 
             foreach (WorkBase work in _workbundle)
             {
-                if(work.Type == this.type)
+                work.IsPreworkDone = false;
+                work.IsWorkDone = false;
+
+                if (work.Type == this.type)
                     this.workbundle.Add(work);
             }
 

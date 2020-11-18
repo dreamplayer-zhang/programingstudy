@@ -170,7 +170,7 @@ namespace RootTools.Inspects
 					{
 						foreach (var item in arrDefects)
 						{
-							AddDefect(new DefectDataWrapper(item));
+							AddDefect(item);
 						}
 					}
 					arrDefects.Clear();

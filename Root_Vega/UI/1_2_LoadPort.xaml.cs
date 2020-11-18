@@ -81,7 +81,7 @@ namespace Root_Vega
             bool bReadyState =  (m_loadport.m_qModuleRun.Count == 0);
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
             if (m_handler.IsEnableRecovery() == true) return false;
-            return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState; //forget 조건
+            return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && !m_loadport.m_dioPresent.p_bIn; //forget 조건
         }
 
         private void ToggleButton_Click(object sender, RoutedEventArgs e)

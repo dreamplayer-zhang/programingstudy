@@ -79,7 +79,7 @@
                     <Rectangle Grid.Row="1" Fill="Lime" Width="100" Panel.ZIndex="2"
                             HorizontalAlignment="Left"></Rectangle>
                     <TextBlock Text="Pool 3GB" Grid.Row="1" Panel.ZIndex="10" VerticalAlignment="Center"></TextBlock>-->
-                    <TabControl Grid.Row="2" x:Name="tabControlPool" />
+                    <TabControl Grid.Row="2" x:Name="tabControlPool" Margin="0,3,0,0"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Run">
@@ -95,9 +95,6 @@
                     </StackPanel>
                     <tree:TreeUI Grid.Column="1" x:Name="treeRootUI" />
                 </Grid>
-            </TabItem>
-            <TabItem Header="Memory" Visibility="Visible">
-                <tree:TreeUI x:Name="treeRootMemoryUI"/>
             </TabItem>
         </TabControl>
     </Grid>

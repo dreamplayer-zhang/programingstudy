@@ -100,6 +100,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Inspection\D2D.cs" />
+    <Compile Include="Inspection\EdgeSurface.cs" />
     <Compile Include="Inspection\ProcessDefect_Wafer.cs" />
     <Compile Include="Inspection\Position_Chip.cs" />
     <Compile Include="Recipe\Base\Image_Bundle.cs" />

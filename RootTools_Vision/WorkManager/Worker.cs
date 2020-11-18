@@ -86,16 +86,32 @@ namespace RootTools_Vision
                         return;
                     }
 
+                    bool bWorkAllDone = true;
+
                     //WorkBundle workBundle = this.works.Clone();
                     foreach (WorkBase work in this.works)
                     {
-                        work.DoWork();
+                        work.DoPrework();
+
+                        if (work.IsPreworkDone == true) // Prework Done(0)
+                        {
+                            if (work.IsWorkDone == true)  // 이미 작업을 한 경우 다음 work올 넘어감
+                                continue;
+                            else
+                                work.DoWork();
+                        }
+                        else
+                        {
+                            bWorkAllDone = false;
+                            break; // Prework가 완료되지 않은 경우, Prework가 되기전까지 다시 work alloc 신호를 받아야 검사 진행
+                        }
+                            
                     }
 
 
                     _waitSignal.Reset();
 
-                    WorkDone();
+                    WorkDone(bWorkAllDone);
 
                 }
             }
@@ -113,12 +129,12 @@ namespace RootTools_Vision
             return true;
         }
 
-        private void WorkDone()
+        private void WorkDone(bool bAllWorkDone = true)
         {
             this.works.Workplace.IsOccupied = false;
             this.workerState = WORKER_STATE.WORK_COMPLETED;
 
-            if (WorkCompleted != null)
+            if (WorkCompleted != null && bAllWorkDone == true)
                 this.WorkCompleted(this.works.Workplace);
         }
 

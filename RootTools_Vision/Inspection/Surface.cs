@@ -48,15 +48,15 @@ namespace RootTools_Vision
             //    return;
             //}
 
-            int nChipH = this.workplace.SizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
-            int nChipW = this.workplace.SizeX;
+            int nChipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
+            int nChipW = this.workplace.BufferSizeX;
 
             int nMemH = this.workplace.SharedBufferHeight;
             int nMemW = this.workplace.SharedBufferWidth;
 
             bool bGetDarkInsp = true; // Option
-            int nGrayLevel = 70; // Option
-            int nDefectSz = 5; // Option
+            int nGrayLevel = 100; // Option
+            int nDefectSz = 1; // Option
             
             int Left = this.workplace.PositionX;
             int Top = this.workplace.PositionY - nChipH;

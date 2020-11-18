@@ -27,9 +27,12 @@ namespace RootTools_Vision
         RecipeData recipeData;
         Parameter parameter;
 
+
         public override void DoWork()
         {
             DoPosition();
+
+            base.DoWork();
         }
 
         public override void SetData(IRecipeData _recipeData, IParameterData _parameterData)

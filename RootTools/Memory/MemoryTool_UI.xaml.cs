@@ -19,8 +19,6 @@ namespace RootTools.Memory
         {
             m_memoryTool = memoryTool;
             this.DataContext = memoryTool;
-            treeRootMemoryUI.Init(memoryTool.m_treeRootMemory);
-            memoryTool.RunTreeMemory(Tree.eMode.Init);
             m_memoryTool.OnChangeMemoryPool += M_memoryTool_OnChangeTool;
             InitTabControl();
             treeRootUI.Init(memoryTool.m_treeRootRun);

@@ -6,12 +6,6 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision.UserTypes
 {
-    public enum WORK_TYPE
-    {
-        PREPARISON,
-        MAINWORK,
-        AFTERWORK,
-        FINISHINGWORK
-    }
+
 }
  

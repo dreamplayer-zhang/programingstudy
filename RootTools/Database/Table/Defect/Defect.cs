@@ -12,104 +12,104 @@ namespace RootTools.Database
 
 
         // 각 Inspection에서 올라오는 결과 데이터
-        public int nDefectIndex;
-        public string sInspectionID;
-        public int nDefectCode;
-        public float fSize; // Pxl Size
-        public float fWidth;
-        public float fHeight;
+        public int m_nDefectIndex;
+        public string m_strInspectionID;
+        public int m_nDefectCode;
+        public float m_fSize; // Pxl Size
+        public float m_fWidth;
+        public float m_fHeight;
         
-        public float fRelX; // 절대좌표 - CeterPoint
-        public float fRelY;
-        public float fAbsX; // 상대좌표 Origin 좌 하단 <-> Defect 좌 상단
-        public float fAbsY;
+        public float m_fRelX; // 절대좌표 - CeterPoint
+        public float m_fRelY;
+        public float m_fAbsX; // 상대좌표 Origin 좌 하단 <-> Defect 좌 상단
+        public float m_fAbsY;
         
-        public int fGV;
-        public int nChipIndexX; // Chip Index
-        public int nCHipIndexY;
+        public int m_nGV;
+        public int m_nChipIndexX; // Chip Index
+        public int m_nCHipIndexY;
         //public string sImagePath;
         
-        protected int nImgsizeX; 
-        protected int nImgsizeY;
+        protected int m_nImgsizeX; 
+        protected int m_nImgsizeY;
 
-        protected Rect DefectBox;
-        public Rect p_DefectBox { get => DefectBox; set => DefectBox = value; }
+        protected Rect m_rtDefectBox;
+        public Rect p_rtDefectBox { get => m_rtDefectBox; set => m_rtDefectBox = value; }
 
         // 모든 Defect 정보들 
         public Defect()
         {
         }
-        public Defect(string InspectionID, int defectCode, float defectSz, int fDefectGV, float defectW, float defectH, float fRelX, float fRelY, float fAbsX, float fAbsY, int chipIdxX, int chipIdxY)
+        public Defect(string strInspectionID, int nDefectCode, float fDefectSz, int nDefectGV, float fDefectW, float fDefectH, float fRelX, float fRelY, float fAbsX, float fAbsY, int nChipIdxX, int nChipIdxY)
         {
-            this.sInspectionID = InspectionID;
-            nDefectCode = defectCode;
+            m_strInspectionID = strInspectionID;
+            m_nDefectCode = nDefectCode;
 
-            fSize = defectSz; // Pxl Size
-            fGV = fDefectGV;
-            this.fRelX = fRelX; // 절대좌표 - CeterPoint
-            this.fRelY = fRelY;
-            this.fAbsX = fAbsX;
-            this.fAbsY = fAbsY;
+            m_fSize = fDefectSz; // Pxl Size
+            m_nGV = nDefectGV;
+            m_fRelX = fRelX; // 절대좌표 - CeterPoint
+            m_fRelY = fRelY;
+            m_fAbsX = fAbsX;
+            m_fAbsY = fAbsY;
 
-            fWidth = defectW;
-            fHeight = defectH;
+            m_fWidth = fDefectW;
+            m_fHeight = fDefectH;
 
-            DefectBox = new Rect(fAbsX - (defectW/2), fAbsY - (defectH/2), defectW, defectH);
+            m_rtDefectBox = new Rect(fAbsX - (fDefectW/2), fAbsY - (fDefectH/2), fDefectW, fDefectH);
 
-            nChipIndexX = chipIdxX;
-            nCHipIndexY = chipIdxY;
+            m_nChipIndexX = nChipIdxX;
+            m_nCHipIndexY = nChipIdxY;
         }
-        public Defect(string InspectionID, int defectCode, float defectSz, int fDefectGV, float defectAbsLeft, float defectAbsTop, float defectW, float defectH, int chipIdxX, int chipIdxY)
+        public Defect(string strInspectionID, int nDefectCode, float fDefectSz, int nDefectGV, float fDefectAbsLeft, float fDefectAbsTop, float fDefectW, float fDefectH, int nChipIdxX, int nChipIdxY)
         {
-            this.sInspectionID = InspectionID;
-            nDefectCode = defectCode;
+            m_strInspectionID = strInspectionID;
+            m_nDefectCode = nDefectCode;
 
-            fSize = defectSz; // Pxl Size
-            fGV = fDefectGV;
+            m_fSize = fDefectSz; // Pxl Size
+            m_nGV = nDefectGV;
 
-            fAbsX = defectAbsLeft + defectW / 2;
-            fAbsY = defectAbsTop + defectH / 2;
+            m_fAbsX = fDefectAbsLeft + fDefectW / 2;
+            m_fAbsY = fDefectAbsTop + fDefectH / 2;
 
-            fWidth = defectW;
-            fHeight = defectH;
+            m_fWidth = fDefectW;
+            m_fHeight = fDefectH;
 
-            DefectBox = new Rect(defectAbsLeft, defectAbsTop, defectW, defectH);
+            m_rtDefectBox = new Rect(fDefectAbsLeft, fDefectAbsTop, fDefectW, fDefectH);
 
-            nChipIndexX = chipIdxX;
-            nCHipIndexY = chipIdxY;
+            m_nChipIndexX = nChipIdxX;
+            m_nCHipIndexY = nChipIdxY;
         }
 
         public void SetDefectIndex(int nIndex)
         {
-            this.nDefectIndex = nIndex;
+            m_nDefectIndex = nIndex;
         }
 
-        public void SetDefectInfo(string insepctionID, int defectCode, float defectSz, int fDefectGV, float defectW, float defectH, float defectRelLeft, float defectRelTop, float defectAbsLeft, float defectAbsTop, int chipIdxX, int chipIdxY)
+        public void SetDefectInfo(string strInsepctionID, int nDefectCode, float fDefectSz, int nDefectGV, float fDefectW, float fDefectH, float fDefectRelLeft, float fDefectRelTop, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
         {
-            this.sInspectionID = insepctionID;
-            nDefectCode = defectCode;
+            m_strInspectionID = strInsepctionID;
+            m_nDefectCode = nDefectCode;
 
-            fSize = defectSz; // Pxl Size
-            fGV = fDefectGV;
+            m_fSize = fDefectSz; // Pxl Size
+            m_nGV = nDefectGV;
 
-            fWidth = defectW;
-            fHeight = defectH;
+            m_fWidth = fDefectW;
+            m_fHeight = fDefectH;
 
-            fRelX = defectRelLeft + defectW / 2;
-            fRelY = defectRelTop + defectH / 2;
+            m_fRelX = fDefectRelLeft + fDefectW / 2;
+            m_fRelY = fDefectRelTop + fDefectH / 2;
 
-            fAbsX = defectAbsLeft + defectW / 2;
-            fAbsY = defectAbsTop + defectH / 2;
+            m_fAbsX = fDefectAbsLeft + fDefectW / 2;
+            m_fAbsY = fDefectAbsTop + fDefectH / 2;
 
-            DefectBox = new Rect(defectAbsLeft, defectAbsTop, defectW, defectH);
+            m_rtDefectBox = new Rect(fDefectAbsLeft, fDefectAbsTop, fDefectW, fDefectH);
 
-            nChipIndexX = chipIdxX;
-            nCHipIndexY = chipIdxY;
+            m_nChipIndexX = nChipIdxX;
+            m_nCHipIndexY = nChipIdxY;
         }
         public void CalcAbsToRelPos(int nRefX, int nRefY)
         {
-            fRelX = fAbsX - nRefX;
-            fRelY = fAbsY - nRefY;
+            m_fRelX = m_fAbsX - nRefX;
+            m_fRelY = m_fAbsY - nRefY;
         }
     }
 }

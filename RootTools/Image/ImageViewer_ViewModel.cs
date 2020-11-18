@@ -21,6 +21,7 @@ using RootTools.Inspects;
 using RootTools.Memory;
 using MySql.Data.MySqlClient.Authentication;
 using System.Windows.Threading;
+using RootTools.Database;
 
 namespace RootTools
 {
@@ -76,6 +77,19 @@ namespace RootTools
 				SetProperty(ref m_ImageData, value);
 			}
 		}
+
+		private Defect m_Defect;
+		public Defect p_Defect
+        {
+            get
+            {
+				return m_Defect;
+            }
+            set
+            {
+				SetProperty(ref m_Defect, value);
+            }
+        }
 
 		private System.Windows.Input.Cursor m_MouseCursor;
 		public System.Windows.Input.Cursor p_MouseCursor

@@ -11,7 +11,6 @@
     <UserControl.Resources>
         <converter:TextBoxToIntConverter x:Key="TextBoxToInt"/>
     </UserControl.Resources>
-    
     <ScrollViewer>
         <StackPanel>
             <Grid Height="838" DataContext="{Binding p_BacksideROI_VM}">
@@ -43,15 +42,15 @@
                             <TextBlock Text="Center X" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                             <TextBlock Text="Center Y" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                             <TextBlock Text="Radius" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                            <TextBox Text="{Binding p_CenterPoint.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                            <TextBox Text="{Binding CenterPoint.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Column="2" Width="200" Height="25" Grid.Row="0"
                                      IsEnabled="{Binding ElementName=centerX, Path=IsChecked}"/>
-                            <TextBox Text="{Binding p_CenterPoint.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                            <TextBox Text="{Binding CenterPoint.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Column="2" Width="200" Height="25" Grid.Row="1"
                                      IsEnabled="{Binding ElementName=centerY, Path=IsChecked}"/>
-                            <TextBox Text="{Binding p_Radius, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}"
+                            <TextBox Text="{Binding Radius, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}"
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Column="2" Width="200" Height="25" Grid.Row="2"
                                      IsEnabled="{Binding ElementName=Radius, Path=IsChecked}"/>
@@ -90,11 +89,11 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Map X" Style="{StaticResource BasicTb}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1"/>
                                 <TextBlock Text="Map Y" Style="{StaticResource BasicTb}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="3"/>
-                                <TextBox Text="{Binding p_MapSizeX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                                <TextBox Text="{Binding MapSizeX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Column="2" Width="100" Height="25" Grid.Row="1"
                                      IsEnabled="{Binding ElementName=mapSize, Path=IsChecked}"/>
-                                <TextBox Text="{Binding p_MapSizeY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                                <TextBox Text="{Binding MapSizeY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Column="4" Width="100" Height="25" Grid.Row="1"
                                      IsEnabled="{Binding ElementName=mapSize, Path=IsChecked}"/>

@@ -48,6 +48,6 @@ namespace RootTools_Vision
         public static void OnUIRedraw(object obj, UIRedrawEventArgs args)
         {
             UIRedraw?.Invoke(obj, args);
-        }      
+        }
     }
 }

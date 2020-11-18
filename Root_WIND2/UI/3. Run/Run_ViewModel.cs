@@ -26,7 +26,7 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     m_MainWindow.MainPanel.Children.Clear();
-                    m_MainWindow.MainPanel.Children.Add(m_MainWindow.m_ModeUI);
+                    m_MainWindow.MainPanel.Children.Add(m_MainWindow.ModeUI);
                 });
             }
         }

@@ -62,7 +62,7 @@ namespace Root_WIND2
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
         {
-            MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool, false);
+            MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
         }
         #endregion
@@ -93,8 +93,8 @@ namespace Root_WIND2
 
         public WIND2_Handler m_handler = new WIND2_Handler();
 
-        private WIND2_InspectionManager m_InspectionManager;
-        public WIND2_InspectionManager InspectionManager { get => m_InspectionManager; set => m_InspectionManager = value; }
+        private InspectionManager_Vision m_InspectionManager;
+        public InspectionManager_Vision InspectionManager { get => m_InspectionManager; set => m_InspectionManager = value; }
 
         public void Init(string id)
         {

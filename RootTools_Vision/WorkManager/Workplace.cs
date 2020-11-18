@@ -21,7 +21,12 @@ namespace RootTools_Vision
     public enum WORKPLACE_SUB_STATE
     {
         POSITION_SUCCESS    = 0b00000001,
-        LINE_FIRST_CHIP     = 0b00000010
+        LINE_FIRST_CHIP     = 0b00000010,
+    }
+
+    public enum PREWORKDATA_KEY // PreworkdataList의 index로 반드시 0부터 빈틈없이 추가
+    {
+        D2D_GOLDEN_IMAGE = 0,
     }
 
     public delegate void EventPositionUpdated(object obj);
@@ -52,7 +57,7 @@ namespace RootTools_Vision
             }
         }
 
-        private int subState;  
+          
 
         #region [Variables]
         private int index;
@@ -72,7 +77,11 @@ namespace RootTools_Vision
 
         private bool isOccupied = false;
         private List<Defect> defectList = new List<Defect>();
+        //private List<object> preworkDataList = new List<object>();  // Prework에서 생성한 데이터를 넣는 곳으로 예를 들어 D2D의 골든 이미지가 있다.
 
+        private Dictionary<PREWORKDATA_KEY, object> preworkdataDicitonary = new Dictionary<PREWORKDATA_KEY, object>();
+
+        private int subState;
         #endregion
 
         #region [Getter Setter]
@@ -83,8 +92,8 @@ namespace RootTools_Vision
         public int PositionY { get => positionY; private  set => positionY = value; }
         public int TransX { get => transX; private  set => transX = value; }
         public int TransY { get => transY; private  set => transY = value; }
-        public int SizeX { get => sizeX; private set => sizeX = value; }
-        public int SizeY { get => sizeY; private set => sizeY = value; }
+        public int BufferSizeX { get => sizeX; private set => sizeX = value; }
+        public int BufferSizeY { get => sizeY; private set => sizeY = value; }
 
         public IntPtr SharedBuffer
         {
@@ -96,6 +105,10 @@ namespace RootTools_Vision
         public int SharedBufferByteCnt { get => sharedBufferByteCnt; private set => sharedBufferByteCnt = value; }
         public bool IsOccupied { get => isOccupied; set => isOccupied = value; }
         public List<Defect> DefectList { get => defectList; set => defectList = value; }
+
+
+        // 이 파라매터는 직접 호출하는 것을 지양하고, SetPreworkData()/GetPreworkData()함수를 통해서 호출
+        private Dictionary<PREWORKDATA_KEY, object> PreworkDataDictionary { get => preworkdataDicitonary; set => preworkdataDicitonary = value; }  
         #endregion
 
         public Workplace()
@@ -105,8 +118,28 @@ namespace RootTools_Vision
 
         public void Reset()
         {
-            this.state = WORKPLACE_STATE.NONE;
+            this.STATE = WORKPLACE_STATE.NONE;
+
+            this.PreworkDataDictionary.Clear();
+
+            foreach(PREWORKDATA_KEY key in Enum.GetValues(typeof(PREWORKDATA_KEY)))
+            {
+                this.preworkdataDicitonary.Add(key, null);
+            }            
         }
+
+        public void SetPreworkData(PREWORKDATA_KEY key, object dataObj)
+        {
+            this.preworkdataDicitonary[key] = dataObj;
+            //this.preworkDataList.Add(dataObj);
+        }
+
+        public object GetPreworkData(PREWORKDATA_KEY key)
+        {
+            return this.preworkdataDicitonary[key];
+        }
+
+
 
         public Workplace(int mapX, int mapY, int posX, int posY, int szX, int szY, int idx = 0) // Index는 Workbundle에서 자동설정
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,54 +9,68 @@ using System.Windows.Input;
 
 namespace Root_WIND2
 {
-    class Edge_ViewModel : ObservableObject
-    {
-        Setup_ViewModel m_Setup;
+	class Edge_ViewModel : ObservableObject
+	{
+		private Setup_ViewModel setupVM;
 
-        public Edge_Panel Main;
-        public EdgePanel_ViewModel m_EdgePanel_VM;
-        public EdgeSetupPage m_SetupPage;
-        public Edge_ViewModel(Setup_ViewModel setup)
-        {
-            m_Setup = setup;
-            init();
-        }
-        public void init()
-        {
-            Main = new Edge_Panel();
-            m_EdgePanel_VM = new EdgePanel_ViewModel(m_Setup);
-            
-            m_EdgePanel_VM.Init();
+		public Edge_Panel Main;
+		public EdgeSetup_ViewModel PanelVM;
+		public EdgeSetupPage SetupPage;
 
-            m_SetupPage = new EdgeSetupPage();
-            m_SetupPage.DataContext = m_EdgePanel_VM;
-        }
-        public void SetPage(UserControl page)
-        {
-            Main.SubPanel.Children.Clear();
-            Main.SubPanel.Children.Add(page);
-        }
+		public Edge_ViewModel(Setup_ViewModel setup)
+		{
+			this.setupVM = setup;
+			Init();
+		}
 
-        public ICommand btnEdgeSummary
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    SetPage(m_SetupPage);
-                });
-            }
-        }
+		public void Init()
+		{
+			Main = new Edge_Panel();
+			PanelVM = new EdgeSetup_ViewModel(setupVM);
+			PanelVM.Init();
 
-        public ICommand btnBack
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    m_Setup.SetRecipeWizard();
-                });
-            }
-        }
-    }
+			SetupPage = new EdgeSetupPage();
+			SetupPage.DataContext = PanelVM;
+			SetPage(SetupPage);
+		}
+
+		public ICommand btnEdgeSetup
+		{
+			get
+			{
+				return new RelayCommand(() => SetPage(SetupPage));
+			}
+		}
+
+		public ICommand btnEdgeSnap
+		{
+			get
+			{
+				return new RelayCommand(() => PanelVM.Scan());
+			}
+		}
+
+		public ICommand btnEdgeInsp
+		{
+			get
+			{
+				return new RelayCommand(() => PanelVM.Inspect());
+			}
+		}
+
+		public ICommand btnBack
+		{
+			get
+			{
+				return new RelayCommand(() => setupVM.SetRecipeWizard());
+			}
+		}
+
+		public void SetPage(UserControl page)
+		{
+			Main.SubPanel.Children.Clear();
+			Main.SubPanel.Children.Add(page);
+		}
+
+	}
 }

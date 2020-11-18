@@ -29,7 +29,7 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
 
-                    m_Setup.InspectionManager.Start();
+                    m_Setup.InspectionManagerVision.Start();
                 });
             }
         }

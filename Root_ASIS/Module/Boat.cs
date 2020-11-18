@@ -40,7 +40,7 @@ namespace Root_ASIS.Module
             p_sInfo = m_toolBox.Get(ref m_doWingBlow, this, "WingBlow");
             p_sInfo = m_toolBox.Get(ref m_doCleanBlow, this, "CleanBlow");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this); 
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_cam, this, "Camera");
             if (bInit) InitTools();
         }

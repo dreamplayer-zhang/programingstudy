@@ -324,7 +324,7 @@ namespace Root_WIND2
         {
             base.PreviewMouseDown(sender, e);
             if (m_KeyEvent != null)
-                if (m_KeyEvent.Key == Key.LeftCtrl && m_KeyEvent.IsDown)
+                if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
                     return;
 
             CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);

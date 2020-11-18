@@ -13,7 +13,7 @@ namespace Root_EFEM.Module
         MemoryPool m_memoryPool;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             if (bInit)
             {
                 InitMemory();

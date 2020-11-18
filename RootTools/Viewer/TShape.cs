@@ -37,10 +37,6 @@ namespace RootTools
                 _isSelected = value;
             }
         }
-        private void GetData()
-        {
-
-        }
     }
 
     public class PointLine : TShape
@@ -144,6 +140,44 @@ namespace RootTools
                 }
             }           
         }
+    }
+    public class TCropTool : TShape
+    {
+        public Rectangle _CanvasRect;
+        public Rectangle CanvasRect
+        {
+            get
+            {
+                return _CanvasRect;
+            }
+            set
+            {
+                base.UIElement = value;
+                base.UIElement.Tag = this;
+                _CanvasRect = value;
+            }
+        }
+        public Image CropImage;
+        public CRect MemoryRect;
+        public CPoint MemPointBuffer;
+        public ImageData CropImageData;
+        public TCropTool()
+        {
+            MemoryRect = new CRect();
+            CanvasRect = new Rectangle();
+        }
+        public TCropTool(Brush brush, double thickness, double opacity)
+        {
+            MemoryRect = new CRect();
+            CanvasRect = new Rectangle();
+            CanvasRect.Stroke = brush;
+            CanvasRect.StrokeThickness = thickness;
+            CanvasRect.Opacity = opacity;
+
+        }
+
+
+
     }
     public class TRect : TShape
     {

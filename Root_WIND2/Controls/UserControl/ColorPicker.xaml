@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Root_WIND2"
              mc:Ignorable="d"
              x:Name="Picker"
-             d:DesignHeight="30" d:DesignWidth="100">
+             d:DesignHeight="30" d:DesignWidth="100" Loaded="Picker_Loaded">
     <ComboBox x:Name="cbxColors" Height="30"
               SelectionChanged="cbxColors_SelectionChanged">
         <ComboBox.ItemTemplate>

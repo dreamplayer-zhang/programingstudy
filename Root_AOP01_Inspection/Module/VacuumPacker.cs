@@ -562,8 +562,8 @@ namespace Root_AOP01_Inspection.Module
         {
             VacuumPacker m_module;
 
-            eLoad m_eLoad = eLoad.Ready;            
-            eGuide m_eGuide = eGuide.Ready;
+            //eLoad m_eLoad = eLoad.Ready;            
+            //eGuide m_eGuide = eGuide.Ready;
 
 
             double m_sCartride = 1;

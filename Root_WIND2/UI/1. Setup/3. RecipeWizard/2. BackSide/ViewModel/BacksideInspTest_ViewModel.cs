@@ -75,7 +75,7 @@ namespace Root_WIND2
             Main = new BacksideInspTest_Panel();
             InspTest = new InspTestPage();
 
-            p_MapControl_VM = new MapControl_ViewModel(m_Setup.InspectionManager);
+            p_MapControl_VM = new MapControl_ViewModel(m_Setup.InspectionManagerVision);
             p_DrawTool_VM = new DrawTool_ViewModel(setup.m_MainWindow.m_Image, setup.m_MainWindow.dialogService);
 
             timer = new DispatcherTimer();
@@ -104,7 +104,7 @@ namespace Root_WIND2
             }
             else
             {
-                p_MapControl_VM.SetMap(m_Setup.InspectionManager.waferMapInfo, new CPoint(14, 14));
+                p_MapControl_VM.SetMap(m_Setup.InspectionManagerVision.WaferMapInfo, new CPoint(14, 14));
             }
 
 
@@ -193,11 +193,10 @@ namespace Root_WIND2
                 SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr();
             }
 
-            m_Setup.InspectionManager.PtrSharedBuffer = SharedBuf;
-            m_Setup.InspectionManager.p_InspectionMode = WIND2_InspectionManager.eInspectionMode.BACK;
-            m_Setup.InspectionManager.SharedBufferByteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
-            m_Setup.InspectionManager.CreateInspecion_Backside();
-            m_Setup.InspectionManager.Start();
+            m_Setup.InspectionManagerVision.SharedBuffer = SharedBuf;
+            m_Setup.InspectionManagerVision.SharedBufferByteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
+            m_Setup.InspectionManagerVision.CreateInspecion_Backside();
+            m_Setup.InspectionManagerVision.Start();
 
         }
     }

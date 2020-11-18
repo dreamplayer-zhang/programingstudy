@@ -42,37 +42,37 @@ namespace Root_WIND2
             }
         }
 
-       public Recipe pRecipe { get => m_Recipe; set => m_Recipe = value; }
+        private Recipe recipe;
+        public Recipe pRecipe { get => recipe; set => recipe = value; }
 
         public MainWindow m_MainWindow;
 
-        Home_ViewModel m_Home;
-        Inspection_ViewModel m_Inspection;
-        RecipeWizard_ViewModel m_Wizard;
-        Frontside_ViewModel m_FrontSide;
-        Backside_ViewModel m_BackSide;
-        EBR_ViewModel m_EBR;
-        Edge_ViewModel m_Edge;
-        InspTest_ViewModel m_InspTest;
-        BacksideInspTest_ViewModel m_BacksideInspTest;
-        Maintenance_ViewModel m_Maint;
-        GEM_ViewModel m_Gem;
+        private Home_ViewModel homeVM;
+        private Inspection_ViewModel inspectionVM;
+        private RecipeWizard_ViewModel wizardVM;
+        private Frontside_ViewModel frontsideVM;
+        private Backside_ViewModel backsideVM;
+        private EBR_ViewModel ebrVM;
+        private Edge_ViewModel edgeVM;
+        private InspTest_ViewModel inspTestVM;
+        private BacksideInspTest_ViewModel backsideInspTestVM;
+        private Maintenance_ViewModel maintVM;
+        private GEM_ViewModel gemVM;
 
-        Recipe m_Recipe;
-        WIND2_InspectionManager m_InspectionManager;
+        private InspectionManager_Vision inspectionMgrVision;
+        private InspectionManager_EFEM inspectionMgrEFEM;
 
-
-        public Setup_ViewModel(MainWindow main)
+        public Setup_ViewModel(MainWindow _main)
         {
-            init(main);
+            init(_main);
         }
 
-        public Setup_ViewModel(MainWindow main, Recipe recipe = null , WIND2_InspectionManager _InspectionManager = null)
+        public Setup_ViewModel(MainWindow _main, Recipe _recipe = null , InspectionManager_Vision _inspectionMgrVision = null, InspectionManager_EFEM _inspectionMgrEFEM = null)
         {        
-            m_Recipe = recipe;
-            m_InspectionManager = _InspectionManager;
-
-            init(main);            
+            this.recipe = _recipe;
+            inspectionMgrVision = _inspectionMgrVision;
+            inspectionMgrEFEM = _inspectionMgrEFEM;
+            init(_main);            
         }
 
         public void init(MainWindow main = null)
@@ -88,7 +88,7 @@ namespace Root_WIND2
         public void UI_Redraw()
         {
             DrawInsptestMap();
-            m_FrontSide.UI_Redraw();
+            frontsideVM.UI_Redraw();
             // Back
             // Edr
             // Edge
@@ -96,38 +96,38 @@ namespace Root_WIND2
 
         public void DrawInsptestMap()
         {
-            RecipeInfo_MapData mapdata = m_Recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
+            RecipeInfo_MapData mapdata = recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
             if (mapdata.m_WaferMap != null)
             {
                 int nMapX = mapdata.m_WaferMap.nMapSizeX;
                 int nMapY = mapdata.m_WaferMap.nMapSizeY;
 
-                if (p_CurrentPanel == m_InspTest.Main)
+                if (p_CurrentPanel == inspTestVM.Main)
                 {
-                    m_InspTest.p_MapControl_VM.SetMap(mapdata.m_WaferMap.pWaferMap, new CPoint(nMapX, nMapY));
-                    m_InspTest.p_MapControl_VM.CreateMapUI();
+                    inspTestVM.p_MapControl_VM.SetMap(mapdata.m_WaferMap.pWaferMap, new CPoint(nMapX, nMapY));
+                    inspTestVM.p_MapControl_VM.CreateMapUI();
                 }
                 else
                 {
-                    m_BacksideInspTest.p_MapControl_VM.SetMap(mapdata.m_WaferMap.pWaferMap, new CPoint(nMapX, nMapY));
-                    m_BacksideInspTest.p_MapControl_VM.CreateMapUI();
+                    backsideInspTestVM.p_MapControl_VM.SetMap(mapdata.m_WaferMap.pWaferMap, new CPoint(nMapX, nMapY));
+                    backsideInspTestVM.p_MapControl_VM.CreateMapUI();
                 }
             }     
         }
 
         private void InitAllPanel()
         {
-            m_Home = new Home_ViewModel(this);
-            m_Inspection = new Inspection_ViewModel(this);
+            homeVM = new Home_ViewModel(this);
+            inspectionVM = new Inspection_ViewModel(this);
             Wizard = new RecipeWizard_ViewModel(this);
-            m_FrontSide = new Frontside_ViewModel(this);
-            m_BackSide = new Backside_ViewModel(this);
-            m_EBR = new EBR_ViewModel(this);
-            m_Edge = new Edge_ViewModel(this);
-            m_InspTest = new InspTest_ViewModel(this);
-            m_BacksideInspTest = new BacksideInspTest_ViewModel(this);
-            m_Maint = new Maintenance_ViewModel(this);
-            m_Gem = new GEM_ViewModel(this);
+            frontsideVM = new Frontside_ViewModel(this);
+            backsideVM = new Backside_ViewModel(this);
+            ebrVM = new EBR_ViewModel(this);
+            edgeVM = new Edge_ViewModel(this);
+            inspTestVM = new InspTest_ViewModel(this);
+            backsideInspTestVM = new BacksideInspTest_ViewModel(this);
+            maintVM = new Maintenance_ViewModel(this);
+            gemVM = new GEM_ViewModel(this);
         }
         private void InitAllNaviBtn()
         {
@@ -196,7 +196,6 @@ namespace Root_WIND2
             }
         }
 
-
         object lockObj = new object();
         private void PositionDone_Callback(object obj, PositionDoneEventArgs args)
         {
@@ -211,9 +210,9 @@ namespace Root_WIND2
                         test += "Trans : {" + workplace.TransX.ToString() + ", " + workplace.TransY.ToString() + "}" + "\n";
                     }
                     if (workplace.Index == 0)
-                        m_InspTest.DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test);
+                        inspTestVM.DrawRectMasterFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test);
                     else
-                        m_InspTest.DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test);
+                        inspTestVM.DrawRectChipFeature(args.ptOldStart, args.ptOldEnd, args.ptNewStart, args.ptNewEnd, test);
                 }));
             }
         }
@@ -227,22 +226,22 @@ namespace Root_WIND2
                 String text = "";
 
                 if (true) // Display Option : Rel Position
-                    text += "Pos : {" + defectInfo.fRelX.ToString() + ", " + defectInfo.fRelY.ToString() + "}" + "\n";
+                    text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
                 if (true) // Display Option : Defect Size
-                    text += "Size : " + defectInfo.fSize.ToString() + "\n";
+                    text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
                 if (true) // Display Option : GV Value
-                    text += "GV : " + defectInfo.fGV.ToString() + "\n";
+                    text += "GV : " + defectInfo.m_nGV.ToString() + "\n";
 
-                rectList.Add(new CRect((int)defectInfo.p_DefectBox.Left, (int)defectInfo.p_DefectBox.Top, (int)defectInfo.p_DefectBox.Right, (int)defectInfo.p_DefectBox.Bottom));
+                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
                 textList.Add(text);
             }
 
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                if (p_CurrentPanel == m_InspTest.Main)
-                    m_InspTest.DrawRectDefect(rectList, textList, args.reDraw);
+                if (p_CurrentPanel == inspTestVM.Main)
+                    inspTestVM.DrawRectDefect(rectList, textList, args.reDraw);
                 else
-                    m_BacksideInspTest.DrawRectDefect(rectList, textList, args.reDraw);
+                    backsideInspTestVM.DrawRectDefect(rectList, textList, args.reDraw);
             }));
         }
 
@@ -252,10 +251,10 @@ namespace Root_WIND2
 
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                if (p_CurrentPanel == m_InspTest.Main)
-                    m_InspTest.UpdateDataGrid();
-                if (p_CurrentPanel == m_InspTest.Main)
-                    m_BacksideInspTest.UpdateDataGrid();
+                if (p_CurrentPanel == inspTestVM.Main)
+                    inspTestVM.UpdateDataGrid();
+                if (p_CurrentPanel == inspTestVM.Main)
+                    backsideInspTestVM.UpdateDataGrid();
             }));
         }
 
@@ -372,7 +371,7 @@ namespace Root_WIND2
                 {
                     SetHome();
                     m_MainWindow.MainPanel.Children.Clear();
-                    m_MainWindow.MainPanel.Children.Add(m_MainWindow.m_ModeUI);
+                    m_MainWindow.MainPanel.Children.Add(m_MainWindow.ModeUI);
                 });
             }
         }
@@ -383,7 +382,6 @@ namespace Root_WIND2
                 return new RelayCommand(SetHome);
             }
         }
-
         public ICommand btnTest
         {
             get
@@ -391,7 +389,6 @@ namespace Root_WIND2
                 return new RelayCommand(Test);
             }
         }
-
         public ICommand btnSaveRecipe
         {
             get
@@ -399,7 +396,6 @@ namespace Root_WIND2
                 return new RelayCommand(m_MainWindow.m_RecipeMGR.SaveRecipe);
             }
         }
-
         public ICommand btnLoadRecipe
         {
             get
@@ -407,20 +403,17 @@ namespace Root_WIND2
                 return new RelayCommand(m_MainWindow.m_RecipeMGR.LoadRecipe);
             }
         }
-
-
-        
+                
         public void Test()
         {
             string sMsg = string.Format("{0}, {1}", ((RecipeData_Origin)Recipe.GetRecipeData().GetRecipeData(typeof(RecipeData_Origin))).OriginX, ((RecipeData_Origin)Recipe.GetRecipeData().GetRecipeData(typeof(RecipeData_Origin))).OriginY);
             MessageBox.Show(sMsg);
         }
 
-        internal RecipeWizard_ViewModel Wizard { get => m_Wizard; set => m_Wizard 
-                = value; }
-        public Recipe Recipe { get => m_Recipe; set => m_Recipe = value; }
-        public WIND2_InspectionManager InspectionManager { get => m_InspectionManager; set => m_InspectionManager = value; }
-        
+        internal RecipeWizard_ViewModel Wizard { get => wizardVM; set => wizardVM = value; }
+        public Recipe Recipe { get => recipe; set => recipe = value; }
+        public InspectionManager_Vision InspectionManagerVision { get => inspectionMgrVision; set => inspectionMgrVision = value; }
+        public InspectionManager_EFEM InspectionManagerEFEM { get => inspectionMgrEFEM; set => inspectionMgrEFEM = value; }
 
         #endregion
 
@@ -431,17 +424,17 @@ namespace Root_WIND2
         {
             p_NaviButtons.Clear();
 
-            m_Home.SetPage(m_Home.Summary);
-            p_CurrentPanel = m_Home.Main;
-            p_CurrentPanel.DataContext = m_Home;
+            homeVM.SetPage(homeVM.Summary);
+            p_CurrentPanel = homeVM.Main;
+            p_CurrentPanel.DataContext = homeVM;
         }
         public void SetInspection()
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviInspection);
 
-            p_CurrentPanel = m_Inspection.Main;
-            p_CurrentPanel.DataContext = m_Inspection;
+            p_CurrentPanel = inspectionVM.Main;
+            p_CurrentPanel.DataContext = inspectionVM;
         }
         public void SetRecipeWizard()
         {
@@ -458,16 +451,16 @@ namespace Root_WIND2
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviMaintenance);
 
-            p_CurrentPanel = m_Maint.Main;
-            p_CurrentPanel.DataContext = m_Maint;
+            p_CurrentPanel = maintVM.Main;
+            p_CurrentPanel.DataContext = maintVM;
         }
         public void SetGEM()
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviGEM);
 
-            p_CurrentPanel = m_Gem.Main;
-            p_CurrentPanel.DataContext = m_Gem;
+            p_CurrentPanel = gemVM.Main;
+            p_CurrentPanel.DataContext = gemVM;
         }
         #endregion
 
@@ -478,10 +471,10 @@ namespace Root_WIND2
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
             p_NaviButtons.Add(m_btnNaviFrontSide);
 
-            m_FrontSide.SetPage(m_FrontSide.Summary);
+            frontsideVM.SetPage(frontsideVM.Summary);
 
-            p_CurrentPanel = m_FrontSide.Main;
-            p_CurrentPanel.DataContext = m_FrontSide;
+            p_CurrentPanel = frontsideVM.Main;
+            p_CurrentPanel.DataContext = frontsideVM;
         }
         public void SetWizardBackSide()
         {
@@ -489,8 +482,8 @@ namespace Root_WIND2
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
             p_NaviButtons.Add(m_btnNaviBackSide);
 
-            p_CurrentPanel = m_BackSide.Main;
-            p_CurrentPanel.DataContext = m_BackSide;
+            p_CurrentPanel = backsideVM.Main;
+            p_CurrentPanel.DataContext = backsideVM;
         }
         public void SetWizardEBR()
         {
@@ -498,8 +491,8 @@ namespace Root_WIND2
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
             p_NaviButtons.Add(m_btnNaviEBR);
 
-            p_CurrentPanel = m_EBR.Main;
-            p_CurrentPanel.DataContext = m_EBR;
+            p_CurrentPanel = ebrVM.Main;
+            p_CurrentPanel.DataContext = ebrVM;
         }
         public void SetWizardEdge()
         {
@@ -507,8 +500,8 @@ namespace Root_WIND2
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
             p_NaviButtons.Add(m_btnNaviEdge);
 
-            p_CurrentPanel = m_Edge.Main;
-            p_CurrentPanel.DataContext = m_Edge;
+            p_CurrentPanel = edgeVM.Main;
+            p_CurrentPanel.DataContext = edgeVM;
         }
 
         // FrontSide - Align
@@ -590,10 +583,10 @@ namespace Root_WIND2
             p_NaviButtons.Add(m_btnNaviFrontSide);
             p_NaviButtons.Add(m_btnNaviInspTest);
 
-            m_InspTest.SetPage(m_InspTest.InspTest);
+            inspTestVM.SetPage(inspTestVM.InspTest);
 
-            p_CurrentPanel = m_InspTest.Main;
-            p_CurrentPanel.DataContext = m_InspTest;
+            p_CurrentPanel = inspTestVM.Main;
+            p_CurrentPanel.DataContext = inspTestVM;
         }
         public void SetBacksideInspTest()
         {
@@ -602,10 +595,10 @@ namespace Root_WIND2
             p_NaviButtons.Add(m_btnNaviBackSide);
             p_NaviButtons.Add(m_btnNaviInspTest);
 
-            m_BacksideInspTest.SetPage(m_BacksideInspTest.InspTest);
+            backsideInspTestVM.SetPage(backsideInspTestVM.InspTest);
            
-            p_CurrentPanel = m_BacksideInspTest.Main;
-            p_CurrentPanel.DataContext = m_BacksideInspTest;
+            p_CurrentPanel = backsideInspTestVM.Main;
+            p_CurrentPanel.DataContext = backsideInspTestVM;
         }
         #endregion
 

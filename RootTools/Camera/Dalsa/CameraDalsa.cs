@@ -169,7 +169,6 @@ namespace RootTools.Camera.Dalsa
 
         string m_sServer = "";
         string m_sCamFile = "";
-        int m_nBuf = 32; 
         void RunTreeConnect(Tree tree)
         {
             m_sServer = tree.Set(m_sServer, m_sServer, "Server", "Camera Dalsa Server Name");
@@ -209,7 +208,7 @@ namespace RootTools.Camera.Dalsa
             get { return (m_memoryPool != null) ? m_memoryPool.p_id : ""; }
             set
             {
-                m_memoryPool = m_memoryTool.GetPool(value, false);
+                m_memoryPool = m_memoryTool.GetPool(value);
                 OnPropertyChanged();
                 if (m_memoryPool != null)
                 {

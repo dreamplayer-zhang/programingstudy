@@ -810,8 +810,11 @@ namespace Root_Vega.Module
                 else
                 {
                     m_module.p_infoReticle = null;
-                    if (child.IsReticleExist() == false) child.p_infoReticle = null;
-                    return "Robot Get Error : Reticle Check Sensor Detected at Arm";
+                    if (child.IsReticleExist() == false)
+                    {
+                        child.p_infoReticle = null;
+                        return "Robot Get Error : Reticle Check Sensor Detected at Arm";
+                    }
                 }
                 return child.AfterGet();
             }
@@ -871,8 +874,11 @@ namespace Root_Vega.Module
                     else
                     {
                         child.p_infoReticle = null;
-                        if (m_module.IsReticleExist() == false) m_module.p_infoReticle = null; 
-                        return "Robot Put Error : Reticle Check Sensor not Detected at Child = " + child.p_id;
+                        if (m_module.IsReticleExist() == false)
+                        {
+                            m_module.p_infoReticle = null;
+                            return "Robot Put Error : Reticle Check Sensor not Detected at Child = " + child.p_id;
+                        }
                     }
                     if (m_module.Run(child.AfterPut())) return p_sInfo;
                 }

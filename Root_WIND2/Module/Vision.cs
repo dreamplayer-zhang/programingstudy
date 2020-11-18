@@ -25,7 +25,9 @@ namespace Root_WIND2.Module
         DIO_O m_doVac;
         DIO_O m_doBlow;
         MemoryPool m_memoryPool;
+        MemoryPool m_memoryPool2;
         MemoryGroup m_memoryGroup;
+        MemoryGroup m_memoryGroup2;
         MemoryData m_memoryMain;
         LightSet m_lightSet;
         RADSControl m_RADSControl;
@@ -39,7 +41,8 @@ namespace Root_WIND2.Module
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
             p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory",1);
+            p_sInfo = m_toolBox.Get(ref m_memoryPool2, this, "pool", 1, true);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", false);
             p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
@@ -129,6 +132,8 @@ namespace Root_WIND2.Module
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 1, 1, 1000, 1000);
+            m_memoryGroup2= m_memoryPool2.GetGroup("group");
+            m_memoryGroup2.CreateMemory("mem", 1, 1, 1000, 1000);
         }
 
         #endregion

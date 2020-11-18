@@ -98,11 +98,52 @@ namespace RootTools_Vision
             return true;
         }
 
+        public bool CheckStateLine(int nLine, WORKPLACE_STATE state)
+        {
+            bool bRst = true;
+            foreach(Workplace workplace in this)
+            {
+                if (nLine < workplace.MapPositionX)
+                    continue;
+
+                if (nLine == workplace.MapPositionX && workplace.STATE == state)
+                    continue;
+
+                if (nLine == workplace.MapPositionX && workplace.STATE != state) // 해당 Line에 State가 다른 workplace가 있으면 false
+                {
+                    bRst = false;
+                    break;
+                }
+
+                if (nLine < workplace.MapPositionX) // 다음라인으로 넘어가면 검사 종료
+                    break;
+            }
+
+            return bRst;
+        }
+
         public void SetStateAll(WORKPLACE_STATE state)
         {
             foreach (Workplace workplace in this)
             {
                 workplace.STATE = state;
+            }
+        }
+
+        public void SetStateLine(int nLine, WORKPLACE_STATE state)
+        {
+            foreach (Workplace workplace in this)
+            {
+                if (nLine > workplace.MapPositionX)
+                    continue;
+
+                if (nLine == workplace.MapPositionX)
+                {
+                    workplace.STATE = state;
+                }
+
+                if (nLine < workplace.MapPositionX)
+                    break;
             }
         }
 
@@ -173,7 +214,6 @@ namespace RootTools_Vision
             int nOriginAbsX = recipeData_Origin.OriginX;
             int nOriginAbsY = recipeData_Origin.OriginY;
 
-
             bundle.mapSizeX = nSizeX;
             bundle.mapSizeY = nSizeY;
 
@@ -190,8 +230,13 @@ namespace RootTools_Vision
                         int nDieAbsX = nOriginAbsX + distX * nDiePitchX;
                         int nDieAbsY = nOriginAbsY + distY * nDiePitchY;
 
-
                         Workplace workplace = new Workplace(x, y, nDieAbsX, nDieAbsY, nDiePitchX, nDiePitchY);
+
+                        if(y ==  nMasterY)
+                        {
+                            workplace.SetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP, true);
+                        }
+
                         bundle.Add(workplace);
                     }
                 }
@@ -228,6 +273,12 @@ namespace RootTools_Vision
 
 
                         Workplace workplace = new Workplace(x, y, nDieAbsX, nDieAbsY, nDiePitchX, nDiePitchY);
+
+                        if (y == nMasterY)
+                        {
+                            workplace.SetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP, true);
+                        }
+
                         bundle.Add(workplace);
                     }
                 }
@@ -246,6 +297,34 @@ namespace RootTools_Vision
                         bundle.Add(workplace);
                     }
                 }
+            }
+
+            return bundle;
+        }
+
+        // edge 검사할때 workplace 영역설정 하려고 만든거
+        public static WorkplaceBundle CreateWorkplaceBundle(int shareBufferWidth, int sharedBufferHeight)
+		{
+            WorkplaceBundle bundle = new WorkplaceBundle();
+            
+            // edge는 map이 없음
+            int mapX = 0;
+            int mapY = 0;
+            int posX = 0;
+            int posY = 0;
+
+            int roiHeight = 100; // 검사 영역으로 자를 높이 - recipe
+            int workplaceNum;
+
+            if (sharedBufferHeight % roiHeight == 0)
+                workplaceNum = sharedBufferHeight / roiHeight;
+            else
+                workplaceNum = (sharedBufferHeight / roiHeight) + 1;
+
+            for (int i = 0; i < workplaceNum; i++)
+            {
+                Workplace workplace = new Workplace(mapX, mapY, posX, posY + (roiHeight*i), shareBufferWidth, roiHeight);
+                bundle.Add(workplace);
             }
 
             return bundle;
