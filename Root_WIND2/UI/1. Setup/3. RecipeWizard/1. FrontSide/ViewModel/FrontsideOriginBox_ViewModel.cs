@@ -9,7 +9,7 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2
 {
-    public class FrontsideOriginBox_ViewModel :RootViewer_ViewModel
+    public class FrontsideOriginBox_ViewModel : RootViewer_ViewModel
     {
         BoxProcess eBoxProcess;
         ModifyType eModifyType;

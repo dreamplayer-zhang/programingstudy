@@ -46,6 +46,7 @@ namespace Root_AOP01_Packing
             Init_NaviBtn();
 
             Set_HomePanel();
+            Set_EngineerPage();
         }
 
         void Init_ViewModel()
