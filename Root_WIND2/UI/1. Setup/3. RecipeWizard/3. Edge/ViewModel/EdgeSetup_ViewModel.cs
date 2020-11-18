@@ -13,24 +13,23 @@ namespace Root_WIND2
 {
 	public class EdgeSetup_ViewModel : ObservableObject
 	{
-		private Setup_ViewModel setupVM;
-		private DrawTool_ViewModel m_DrawTool_VM;
-		public DrawTool_ViewModel p_DrawTool_VM
-		{
-			get
-			{
-				return m_DrawTool_VM;
-			}
-			set
-			{
-				SetProperty(ref m_DrawTool_VM, value);
-			}
-		}
 		private WIND2_Engineer engineer;
+		private Setup_ViewModel setupVM;
+
+		private DrawTool_ViewModel drawToolVM;
+		public DrawTool_ViewModel DrawToolVM
+		{
+			get { return drawToolVM; }
+			set { SetProperty(ref drawToolVM, value); }
+		}
+		
+		public ICommand btnTop { get { return new RelayCommand(() => ChangeViewer("Top")); }}
+		public ICommand btnSide { get { return new RelayCommand(() => ChangeViewer("Side")); }}
+		public ICommand btnBottom { get { return new RelayCommand(() => ChangeViewer("Bottom")); }}
 
 		private int roiHeight;
-		private int defectSizeMin;
 		public int RoiHeight { get => roiHeight; set => roiHeight = value; }
+		private int defectSizeMin;
 		public int DefectSizeMin { get => defectSizeMin; set => defectSizeMin = value; }
 
 		public EdgeSetup_ViewModel(Setup_ViewModel _setup)
@@ -41,7 +40,7 @@ namespace Root_WIND2
 
 		public void Init()
 		{
-			p_DrawTool_VM = new DrawTool_ViewModel(setupVM.m_MainWindow.m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeTop), setupVM.m_MainWindow.dialogService);
+			DrawToolVM = new DrawTool_ViewModel(setupVM.m_MainWindow.m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeTop), setupVM.m_MainWindow.dialogService);
 		}
 
 		public void Scan()
@@ -60,27 +59,41 @@ namespace Root_WIND2
 
 		public void Inspect()
 		{
-			p_DrawTool_VM.Clear();
+			DrawToolVM.Clear();
 
 			IntPtr sharedBuf = new IntPtr();
-			if (p_DrawTool_VM.p_ImageData.p_nByte == 3)
+			if (DrawToolVM.p_ImageData.p_nByte == 3)
 			{
-				if (p_DrawTool_VM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
-					sharedBuf = p_DrawTool_VM.p_ImageData.GetPtr((int)p_DrawTool_VM.p_eColorViewMode - 1);
+				if (DrawToolVM.p_eColorViewMode != RootViewer_ViewModel.eColorViewMode.All)
+					sharedBuf = DrawToolVM.p_ImageData.GetPtr((int)DrawToolVM.p_eColorViewMode - 1);
 				else // All 일때는 R채널로...
-					sharedBuf = p_DrawTool_VM.p_ImageData.GetPtr(0);
+					sharedBuf = DrawToolVM.p_ImageData.GetPtr(0);
 			}
 			else
 			{
-				sharedBuf = p_DrawTool_VM.p_ImageData.GetPtr();
+				sharedBuf = DrawToolVM.p_ImageData.GetPtr();
 			}
 
 			setupVM.InspectionManagerEFEM.SharedBuffer = sharedBuf;
 			setupVM.InspectionManagerEFEM.InspectionMode = InspectionManager_EFEM.InsepectionMode.EDGE;
-			setupVM.InspectionManagerEFEM.SharedBufferByteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
+			setupVM.InspectionManagerEFEM.SharedBufferByteCnt = DrawToolVM.p_ImageData.p_nByte;
 			setupVM.InspectionManagerEFEM.CreateInspection_Edgeside();
 			setupVM.InspectionManagerEFEM.Start();
 		}
 
+		private void ChangeViewer(string dataName)
+		{
+			if (dataName == "Top")
+				DrawToolVM.ChangeImageData(setupVM.m_MainWindow.m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeTop), setupVM.m_MainWindow.dialogService);
+			else if (dataName == "Side")
+				DrawToolVM.ChangeImageData(setupVM.m_MainWindow.m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeSide), setupVM.m_MainWindow.dialogService);
+			else if (dataName == "Bottom")
+				DrawToolVM.ChangeImageData(setupVM.m_MainWindow.m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeBottom), setupVM.m_MainWindow.dialogService);
+		}
+
+		private void ClearDefectData()
+		{
+
+		}
 	}
 }

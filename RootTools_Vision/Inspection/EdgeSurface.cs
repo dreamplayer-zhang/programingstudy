@@ -64,7 +64,7 @@ namespace RootTools_Vision.Inspection
 			//if (this.workplace.Index == 0)
 			//	return;
 						
-			int roiHeight = 100; // recipe
+			int roiHeight = 1000; // recipe
 			int threshold = 12; // recipe
 			int defectSize = 5; // recipe
 
@@ -74,7 +74,7 @@ namespace RootTools_Vision.Inspection
 
 			int left = this.workplace.PositionX;
 			int top = this.workplace.PositionY;
-			int right = this.workplace.PositionX + this.workplace.SharedBufferWidth;
+			int right = this.workplace.PositionX + this.workplace.SharedBufferWidth; 
 			int bottom = this.workplace.PositionY + roiHeight;
 
 			byte[] arrSrc = new byte[memSize];

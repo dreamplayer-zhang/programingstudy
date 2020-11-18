@@ -505,11 +505,7 @@ namespace Root_WIND2
                 if (fAbsY < nNotch)
                     nTheta = (nNotch - fAbsY) / 540000 * 360;
 
-                if (fSize > 150)
-                {
-                    count++;
-                    m_DefectView.AddDefectFront(nTheta);
-                }
+                m_DefectView.AddDefectFront(nTheta);
             }
             return defects;
         }

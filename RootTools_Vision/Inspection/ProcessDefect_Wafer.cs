@@ -50,7 +50,7 @@ namespace RootTools_Vision
             // Option Param
             int mergeDist = 1;
             int backsideOffset = 50;
-            bool isBackside = true;
+            bool isBackside = false;
             // Recipe
             int waferCenterX = recipeData_Origin.Backside_CenterX;
             int waferCenterY = recipeData_Origin.Backside_CenterY;
