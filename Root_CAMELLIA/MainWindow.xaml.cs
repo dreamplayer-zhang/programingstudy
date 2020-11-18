@@ -183,9 +183,6 @@ namespace Root_CAMELLIA
             //}
             //recipe.Visibility = Visibility.Hidden;
             //recipe.Close();
-
-
-
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
