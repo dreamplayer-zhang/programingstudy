@@ -1,0 +1,754 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0FC7A5C2-CD74-4106-BE2D-DFD4A97CC74C}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Root_Vega</RootNamespace>
+    <AssemblyName>Root_Vega</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Basler.Pylon, Version=1.1.0.0, Culture=neutral, PublicKeyToken=e389355f398382ab" />
+    <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts">
+      <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf">
+      <HintPath>..\packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.BootstrapIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.BootstrapIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.BoxIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.BoxIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Codicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Codicons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Entypo, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Entypo.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.EvaIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.EvaIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.FeatherIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.FeatherIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.FileIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.FileIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Fontaudio, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Fontaudio.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.FontAwesome, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.FontAwesome.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.ForkAwesome, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.ForkAwesome.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Ionicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Ionicons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.JamIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.JamIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Material, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Material.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.MaterialDesign, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.MaterialDesign.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.MaterialLight, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.MaterialLight.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Microns, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Microns.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Modern, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Modern.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Octicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Octicons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.PicolIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.PicolIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.PixelartIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.PixelartIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.RadixIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.RadixIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.RemixIcon, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.RemixIcon.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.RPGAwesome, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.RPGAwesome.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.SimpleIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.SimpleIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Typicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Typicons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Unicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Unicons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.VaadinIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.VaadinIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.WeatherIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.WeatherIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Zondicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Zondicons.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Controls, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SDK.Expression.Blend.1.0.0\lib\net45\Microsoft.Expression.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Drawing, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SDK.Expression.Blend.1.0.0\lib\net45\Microsoft.Expression.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Effects, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SDK.Expression.Blend.1.0.0\lib\net45\Microsoft.Expression.Effects.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Prototyping.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SDK.Expression.Blend.1.0.0\lib\net45\Microsoft.Expression.Prototyping.Interactivity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Prototyping.SketchControls, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SDK.Expression.Blend.1.0.0\lib\net45\Microsoft.Expression.Prototyping.SketchControls.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SDK.Expression.Blend, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SDK.Expression.Blend.1.0.0\lib\net45\Microsoft.SDK.Expression.Blend.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.3\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\SQLite\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.4.7.0\lib\net461\System.Drawing.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="ZedGraph, Version=5.1.7.430, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZedGraph.5.1.7\lib\net35-Client\ZedGraph.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="UI\1_3EQSM_VM.cs" />
+    <Compile Include="UI\1_3EQSimulation.xaml.cs">
+      <DependentUpon>1_3EQSimulation.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\D2DInsp.cs" />
+    <Compile Include="UI\2_10_BevelEdgeBoxViewModel.cs" />
+    <Compile Include="UI\2_8_D2D_Insp.xaml.cs">
+      <DependentUpon>2_8_D2D_Insp.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_8_D2D_InspViewModel.cs" />
+    <Compile Include="Controls\FDC_ContorlViewModel.cs" />
+    <Compile Include="Controls\FDC_Control.xaml.cs">
+      <DependentUpon>FDC_Control.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Dialog_LADS.xaml.cs">
+      <DependentUpon>Dialog_LADS.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Dialog_LADS_ViewModel.cs" />
+    <Compile Include="Dialog\Dialog_SettingFDC.cs" />
+    <Compile Include="Dialog\Dialog_SettingFDC.xaml.cs">
+      <DependentUpon>Dialog_SettingFDC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ManualJob\ManualOCR.cs" />
+    <Compile Include="ManualJob\ManualOCR_UI.xaml.cs">
+      <DependentUpon>ManualOCR_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ManualJob\ManualOHTLoadport_UI.xaml.cs">
+      <DependentUpon>ManualOHTLoadport_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ManualJob\ManualOHT_UI.xaml.cs">
+      <DependentUpon>ManualOHT_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Setting_FDC.xaml.cs">
+      <DependentUpon>Setting_FDC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Setting_FDCViewModel.cs" />
+    <Compile Include="UI\10_Setting.xaml.cs">
+      <DependentUpon>10_Setting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\10_SettingViewModel.cs" />
+    <Compile Include="UI\1_1_Module.xaml.cs">
+      <DependentUpon>1_1_Module.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1_2_LoadPort.xaml.cs">
+      <DependentUpon>1_2_LoadPort.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1_Main.xaml.cs">
+      <DependentUpon>1_Main.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_5_MainVision.xaml.cs">
+      <DependentUpon>2_5_MainVision.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_5_MainVisionViewModel.cs" />
+    <Compile Include="UI\2_6_Side.xaml.cs">
+      <DependentUpon>2_6_Side.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_6_SideViewModel.cs" />
+    <Compile Include="UI\2_7_EdgeBox.xaml.cs">
+      <DependentUpon>2_7_EdgeBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_7_EdgeBoxViewModel.cs" />
+    <Compile Include="UI\2_9_Bevel.xaml.cs">
+      <DependentUpon>2_9_Bevel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_9_BevelViewModel.cs" />
+    <Compile Include="UI\2_Recipe.xaml.cs">
+      <DependentUpon>2_Recipe.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\3_Maint.xaml.cs">
+      <DependentUpon>3_Maint.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\4_Viewer.xaml.cs">
+      <DependentUpon>4_Viewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\4_ViewerViweModel.cs" />
+    <Compile Include="UI\5_Result.xaml.cs">
+      <DependentUpon>5_Result.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\5_ResultViewModel.cs" />
+    <Compile Include="UI\6_Log.xaml.cs">
+      <DependentUpon>6_Log.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\7_Alarm.xaml.cs">
+      <DependentUpon>7_Alarm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\7_AlarmViewModel.cs" />
+    <Compile Include="ManualJob\ManualJobSchedule.cs" />
+    <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
+      <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\Vega.cs" />
+    <Compile Include="Dialog\Dialog_AutoFocus.xaml.cs">
+      <DependentUpon>Dialog_AutoFocus.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Dialog_AutoFocus_ViewModel.cs" />
+    <Compile Include="Setting\ObservableCollection.cs" />
+    <Compile Include="Setting\Optic_MainVision.xaml.cs">
+      <DependentUpon>Optic_MainVision.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Optic_MainVisionViewModel.cs" />
+    <Compile Include="Setting\Optic_SideVision.xaml.cs">
+      <DependentUpon>Optic_SideVision.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Optic_SideVisionViewModel.cs" />
+    <Compile Include="UI\9_Yield.xaml.cs">
+      <DependentUpon>9_Yield.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DateTimePicker.xaml.cs">
+      <DependentUpon>DateTimePicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Icons\AtiLogo.xaml.cs">
+      <DependentUpon>AtiLogo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Icons\CalendarIcon.xaml.cs">
+      <DependentUpon>CalendarIcon.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\InspResultView.xaml.cs">
+      <DependentUpon>InspResultView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\InspResultViewModel.cs" />
+    <Compile Include="Converters\EnumToBooleanConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="Converters\ReverseBooleanConverter.cs" />
+    <Compile Include="Converters\StringToVisiblityConverter.cs" />
+    <Compile Include="Converters\UniversalBooleanToVisibilityConverter.cs" />
+    <Compile Include="Dialog\Dialog_InspResultView.xaml.cs">
+      <DependentUpon>Dialog_InspResultView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Dialog_InspResultViewModel.cs" />
+    <Compile Include="Dialog\Dialog_SideScan.xaml.cs">
+      <DependentUpon>Dialog_SideScan.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Dialog_Scan.xaml.cs">
+      <DependentUpon>Dialog_Scan.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Dialog_SideScan_ViewModel.cs" />
+    <Compile Include="Dialog\Dialog_Scan_ViewModel.cs" />
+    <Compile Include="Dialog\Dialog_ManualAlign.xaml.cs">
+      <DependentUpon>Dialog_ManualAlign.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Dialog_ManualAlignViewModel.cs" />
+    <Compile Include="Models\InspectionReview\ImageInfo.cs" />
+    <Compile Include="Models\InspectionReview\ImageType.cs" />
+    <Compile Include="Models\InspectionReview\InspectionInformation.cs" />
+    <Compile Include="Models\InspectionReview\InspectionModeInfo.cs" />
+    <Compile Include="Module\FDC.cs" />
+    <Compile Include="Module\GrabMode.cs" />
+    <Compile Include="InfoPod.cs" />
+    <Compile Include="InfoPod_UI.xaml.cs">
+      <DependentUpon>InfoPod_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="InfoReticle.cs" />
+    <Compile Include="IRobotChild.cs" />
+    <Compile Include="UI\1_MainViewModel.cs" />
+    <Compile Include="Module\Loadport.cs" />
+    <Compile Include="Module\PatternVision.cs" />
+    <Compile Include="Module\Robot_RND.cs" />
+    <Compile Include="Module\SideVision.cs" />
+    <Compile Include="Module\RunGrab.cs" />
+    <Compile Include="Setting\AjinInOutSetting.xaml.cs">
+      <DependentUpon>AjinInOutSetting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\AjinInOutSettingViewModel.cs" />
+    <Compile Include="Setting\Setting_Illumination.xaml.cs">
+      <DependentUpon>Setting_Illumination.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Setting_IlluminationViewModel.cs" />
+    <Compile Include="Setting\Setting_RADS.xaml.cs">
+      <DependentUpon>Setting_RADS.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Setting_RADSViewModel.cs" />
+    <Compile Include="UI\2_RecipeViewModel.cs" />
+    <Compile Include="UI\2_10_BevelEdgeBox.xaml.cs">
+      <DependentUpon>2_10_BevelEdgeBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Vega_Engineer.cs" />
+    <Compile Include="Vega_Engineer_UI.xaml.cs">
+      <DependentUpon>Vega_Engineer_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Vega_Handler.cs" />
+    <Compile Include="Vega_Handler_UI.xaml.cs">
+      <DependentUpon>Vega_Handler_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Vega_Process.cs" />
+    <Compile Include="Vega_Process_UI.xaml.cs">
+      <DependentUpon>Vega_Process_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Vega_Recipe.cs" />
+    <Compile Include="Vega_Recipe_UI.xaml.cs">
+      <DependentUpon>Vega_Recipe_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\6_LogViewModel.cs" />
+    <Page Include="UI\1_3EQSimulation.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2_8_D2D_Insp.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\FDC_Control.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialog\Dialog_LADS.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\Dialog_SettingFDC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ManualJob\ManualOCR_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ManualJob\ManualOHTLoadport_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ManualJob\ManualOHT_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Setting\Setting_FDC.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\10_Setting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1_1_Module.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1_2_LoadPort.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1_Main.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2_5_MainVision.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\2_6_Side.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2_7_EdgeBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2_9_Bevel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2_Recipe.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\3_Maint.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\4_Viewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\5_Result.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\6_Log.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\7_Alarm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ManualJob\ManualJobSchedule_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\Dialog_AutoFocus.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Setting\Optic_MainVision.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Setting\Optic_SideVision.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\9_Yield.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\DateTimePicker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\Icons\AtiLogo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Icons\CalendarIcon.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\InspResultView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialog\Dialog_InspResultView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialog\Dialog_SideScan.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialog\Dialog_Scan.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialog\Dialog_ManualAlign.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InfoPod_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Setting\AjinInOutSetting.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Setting\Setting_Illumination.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Setting\Setting_RADS.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\Controls.Button.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Controls.GridViewColumnHeader.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Controls.GroupBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Controls.TabControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Controls.TabItem.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Controls.TabLikeRadioButtonStyleKey.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Controls.TextBlock.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Controls.ToggleButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Controls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Styles\Dark.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\Purple.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2_10_BevelEdgeBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Vega_Engineer_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Vega_Handler_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Vega_Process_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Vega_Recipe_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RootTools\RootTools.csproj">
+      <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
+      <Name>RootTools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
+      <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
+      <Name>RootTools_CLR</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
+      <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
+      <Name>RootTools_CLR</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="License-LGPL.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\AJINModule.JPG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\InPod.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\OutPod.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="SPIIPLUSCOM660Lib">
+      <Guid>{A50D9364-B5CE-4F09-BED2-E460B41671F6}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
+copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
+IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
+copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.pdb" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.pdb"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\mariadbclient.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\mariadbclient.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\auth_gssapi_client.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\auth_gssapi_client.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\caching_sha2_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\caching_sha2_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\client_ed25519.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\client_ed25519.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\dialog.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\dialog.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\mysql_clear_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\mysql_clear_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_npipe.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_npipe.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_shmem.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_shmem.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\sha256_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\sha256_password.dll"
+copy /Y "$(SolutionDir)Lib\WibuCm64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\WibuCm64.dll"</PostBuildEvent>
+  </PropertyGroup>
+</Project>
