@@ -155,6 +155,15 @@ namespace RootTools.ToolBoxs
             }
             return "OK";
         }
+        public string Get(ref MemoryPool value, ModuleBase module, string id, double fGB , bool bTest)
+        {
+            if (value == null)
+            {
+                value = m_memoryTool.CreatePool(id, fGB);
+                module.m_aTool.Add(value);
+            }
+            return "OK";
+        }
         #endregion
 
         #region ITool Inspect

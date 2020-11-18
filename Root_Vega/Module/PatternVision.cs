@@ -150,7 +150,6 @@ namespace Root_Vega.Module
         {
             //forget
             m_memoryMain = m_memoryPool.GetGroup("PatternVision").CreateMemory("Main", 1, 1, 1000, 1000);
-            
         }
         #endregion
 
