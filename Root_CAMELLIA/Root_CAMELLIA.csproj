@@ -121,6 +121,7 @@
       <DependentUpon>Dlg_PM.xaml</DependentUpon>
     </Compile>
     <Compile Include="GeneralFunction.cs" />
+    <Compile Include="InfoWafer.cs" />
     <Compile Include="MainWindow_ViewModel.cs" />
     <Compile Include="Priority_Queue\FastPriorityQueue.cs" />
     <Compile Include="Priority_Queue\FastPriorityQueueNode.cs" />
@@ -135,6 +136,14 @@
     <Compile Include="ShapeDraw\Line.cs" />
     <Compile Include="ShapeDraw\Polygon.cs" />
     <Compile Include="ShapeDraw\DrawGeometryManager.cs" />
+    <Compile Include="CAMELLIA_Engineer.cs" />
+    <Compile Include="CAMELLIA_Handler.cs" />
+    <Compile Include="CAMELLIA_Process.cs" />
+    <Compile Include="CAMELLIA_Recipe.cs" />
+    <Compile Include="Module\Stage.cs" />
+    <Compile Include="WIND2_Hander_UI.xaml.cs">
+      <DependentUpon>WIND2_Hander_UI.xaml</DependentUpon>
+    </Compile>
     <Page Include="Dlg_Engineer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -177,6 +186,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="WIND2_Hander_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
