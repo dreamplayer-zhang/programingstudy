@@ -179,7 +179,7 @@
 
             </MenuItem>
         </Menu>
-        
+
         <!--Main Panel-->
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
@@ -503,20 +503,44 @@
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="Stage Map" Grid.Row="1">
-                    <Viewbox Margin="10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="55"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Header="Current Position Information" Grid.Row="0" Margin="3">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <UniformGrid Grid.Column="0" Columns="3" Background="Gainsboro" Margin="2">
+                                    <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                                    <TextBlock Text="{Binding XPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
+                                </UniformGrid>
+                                <UniformGrid Grid.Column="1" Columns="3" Background="Gainsboro" Margin="2">
+                                    <TextBlock Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                                    <TextBlock Text="{Binding YPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
+                                </UniformGrid>
+                            </Grid>
+                        </GroupBox>
+                        <Viewbox Margin="3" Grid.Row="1">
                         <ItemsControl ItemsSource="{Binding p_MainDrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <Canvas Width="1000" Height="1000">
+                                    <Canvas x:Name="StageMapView" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
                                     </Canvas>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>
                     </Viewbox>
+                    </Grid>
                 </GroupBox>
-            </Grid>
+        </Grid>
             <TabControl Grid.Column="2" Background="Transparent">
                 <TabItem Header="Review" Width="100">
                     <Grid Grid.Column="2">
@@ -529,22 +553,39 @@
 
                         </GroupBox>
                         <GroupBox Header="Measurement Data" Grid.Row="1">
-                            <TabControl>
+                            <TabControl Background="Transparent">
                                 <TabItem Header="Point List">
-                                    <DataGrid>
-                                        <DataGrid.Resources>
-                                            <Style TargetType="DataGridColumnHeader">
-                                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                            </Style>
-                                        </DataGrid.Resources>
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Index" Width="*"/>
-                                            <DataGridTextColumn Header="X" Width="*"/>
-                                            <DataGridTextColumn Header="Y" Width="*"/>
-                                            <DataGridTextColumn Header="Route" Width="*"/>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="5*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <UniformGrid Grid.Row="0" Margin="3" Background="Gainsboro" Columns="3" Grid.ColumnSpan="2">
+                                            <TextBlock Text="Count" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                            <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                        </UniformGrid>
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                                  EnableRowVirtualization="True" Grid.ColumnSpan="2">
+                                            <DataGrid.Resources>
+                                                <Style TargetType="DataGridColumnHeader">
+                                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                    <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+                                                </Style>
+                                            </DataGrid.Resources>
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Index" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
+                                                <DataGridTextColumn Header="X (mm)" Width="*" Binding="{Binding ListX}" IsReadOnly="True"/>
+                                                <DataGridTextColumn Header="Y (mm)" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
+                                                <DataGridTextColumn Header="Route" Width="*" Binding="{Binding ListRoute}" IsReadOnly="True"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Grid>
                                 </TabItem>
                                 <TabItem Header="Parameter">
                                 </TabItem>

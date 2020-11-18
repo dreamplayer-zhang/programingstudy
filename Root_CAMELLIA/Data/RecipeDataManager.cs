@@ -32,7 +32,7 @@ namespace Root_CAMELLIA.Data
                 strTeachingRecipeName = strTeachingRecipeName.Remove(strTeachingRecipeName.Length - 4);
                 dataManager.recipeDM.TeachingRD = null;
                 dataManager.recipeDM.TeachingRD = new RecipeData();
-                dataManager.Main.m_RecipeManagerViewModel.UpdateView();
+                //dataManager.Main.m_RecipeManagerViewModel.UpdateView();
                 GeneralFunction.Save(dataManager.recipeDM.TeachingRD, dialog.FileName);
             }
         }

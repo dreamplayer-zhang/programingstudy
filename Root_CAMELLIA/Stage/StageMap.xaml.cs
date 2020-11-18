@@ -1,5 +1,4 @@
-﻿using RootTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,23 +10,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_Vega
+namespace Root_CAMELLIA.Stage
 {
     /// <summary>
-    /// Dialog_ManualAlign.xaml에 대한 상호 작용 논리
+    /// StageMap.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Dialog_ManualAlign : Window, IDialog
+    public partial class StageMap : UserControl
     {
-        public Dialog_ManualAlign()
+        public StageMap()
         {
             InitializeComponent();
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

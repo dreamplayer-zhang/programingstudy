@@ -121,7 +121,9 @@
       <DependentUpon>Dlg_PM.xaml</DependentUpon>
     </Compile>
     <Compile Include="GeneralFunction.cs" />
+    <Compile Include="GeneralTools.cs" />
     <Compile Include="MainWindow_ViewModel.cs" />
+    <Compile Include="ModuleBase\CamelliaModuleBase.cs" />
     <Compile Include="Priority_Queue\FastPriorityQueue.cs" />
     <Compile Include="Priority_Queue\FastPriorityQueueNode.cs" />
     <Compile Include="Priority_Queue\IFixedSizePriorityQueue.cs" />
@@ -135,6 +137,10 @@
     <Compile Include="ShapeDraw\Line.cs" />
     <Compile Include="ShapeDraw\Polygon.cs" />
     <Compile Include="ShapeDraw\DrawGeometryManager.cs" />
+    <Compile Include="Stage\StageMap.xaml.cs">
+      <DependentUpon>StageMap.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Stage\StageMap_ViewModel.cs" />
     <Page Include="Dlg_Engineer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -177,6 +183,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Stage\StageMap.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -213,6 +223,9 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icon\locked.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

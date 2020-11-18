@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="Root_CAMELLIA.Stage.StageMap"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_CAMELLIA"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
+             mc:Ignorable="d" 
+             d:DesignHeight="1000" d:DesignWidth="1000">
+    <Grid>
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="MouseMove">
+                <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseMove" />
+            </i:EventTrigger>
+            <i:EventTrigger EventName="MouseWheel" >
+                <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseWheel" />
+            </i:EventTrigger>
+            <!--<i:EventTrigger EventName="MouseLeftButtonDown" >
+                <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonDown" />
+            </i:EventTrigger>
+            <i:EventTrigger EventName="MouseLeftButtonUp" >
+                <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUp" />
+            </i:EventTrigger>
+            <i:EventTrigger EventName="MouseRightButtonDown" >
+                <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseRightButtonDown" />
+            </i:EventTrigger>
+            <i:EventTrigger EventName="MouseRightButtonUp" >
+                <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseRightButtonUp" />
+            </i:EventTrigger>
+            <i:EventTrigger EventName="MouseEnter" >
+                <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseEnter" />
+            </i:EventTrigger>
+            <i:EventTrigger EventName="MouseLeave" >
+                <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeave" />
+            </i:EventTrigger>
+            <i:EventTrigger EventName="MouseLeave" >
+                <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeave" />
+            </i:EventTrigger>
+            <i:EventTrigger EventName="KeyDown" >
+                <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnCanvasKeyDown" />
+            </i:EventTrigger>
+            <i:EventTrigger EventName="KeyUp" >
+                <ei:CallMethodAction TargetObject="{Binding}" MethodName="OnCanvasKeyUp" />
+            </i:EventTrigger>-->
+        </i:Interaction.Triggers>
+        <ItemsControl ItemsSource="{Binding p_StageElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas x:Name="StageMainView" ClipToBounds="True">
+                    </Canvas>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        <ItemsControl ItemsSource="{Binding p_PostionElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas ClipToBounds="True" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </Grid>
+</UserControl>

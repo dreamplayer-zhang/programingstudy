@@ -86,8 +86,8 @@
                         Width="30"
                         Height="25"
                         Margin="2,0,0,0"
-                        Click="CloseButton_Click"
-                        VerticalAlignment="Bottom">
+                        VerticalAlignment="Bottom"
+                        Command="{Binding btnClose}">
                     <Path Style="{StaticResource CloseIconKey}" />
                 </Button>
             </StackPanel>
@@ -133,7 +133,7 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
+                    <!--<RowDefinition Height="1*"/>-->
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="1*"/>
                     <RowDefinition Height="5*"/>
@@ -141,7 +141,7 @@
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
-                <GroupBox Header="Mode">
+                <!--<GroupBox Header="Mode">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
@@ -150,8 +150,8 @@
                         <ToggleButton Content="Hole" Margin="5"/>
                         <ToggleButton Content="Die" Grid.Column="1" Margin="5"/>
                     </Grid>
-                </GroupBox>
-                <GroupBox Header="Preset" Grid.Row="1">
+                </GroupBox>-->
+                <GroupBox Header="Preset" Grid.Row="0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
@@ -167,7 +167,7 @@
                         <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding btn73Point}"/>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="File Loader" Grid.Row="2">
+                <GroupBox Header="File Loader" Grid.Row="1">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
@@ -177,7 +177,7 @@
                         <Button Content="Open CSV" Grid.Column="1" Margin="5"/>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="Measurement Parameter" Grid.Row="3">
+                <GroupBox Header="Measurement Parameter" Grid.Row="2">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition/>
@@ -230,7 +230,7 @@
                         </Grid>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="Wavelength Data" Grid.Row="4">
+                <GroupBox Header="Wavelength Data" Grid.Row="3">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
@@ -262,10 +262,10 @@
                         </Grid>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="VRS" Grid.Row="5">
+                <GroupBox Header="VRS" Grid.Row="4">
 
                 </GroupBox>
-                <GroupBox Header="Spec" Grid.Row="6">
+                <GroupBox Header="Spec" Grid.Row="5">
 
                 </GroupBox>
             </Grid>
@@ -306,14 +306,13 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Viewbox Margin="10" Width="780" Grid.Row="0">
-                            <!-- 이거 길이 동적으로..-->
+                        <Viewbox x:Name="test" Margin="10" Width="auto" Grid.Row="0">
                             <ItemsControl ItemsSource="{Binding p_DrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <Canvas x:Name="StageMainView" ClipToBounds="True"  Width="1000" Height="1000" Background="#01FFFFFF" Focusable="true">
+                                        <Canvas x:Name="StageMainView" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseMove">
                                                     <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseMove" />
@@ -389,7 +388,7 @@
                             </Grid>
                         </GroupBox>
                     </Grid>
-                 
+
                 </Grid>
             </GroupBox>
             <Grid Grid.Column="2">
@@ -488,13 +487,14 @@
                     <UniformGrid Columns="2" Rows="2">
                         <Grid Margin="5" Background="Gainsboro">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="2*"/>
                                 <ColumnDefinition/>
-                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="11*"/>
+                                <ColumnDefinition Width="6*"/>
+                                <ColumnDefinition Width="12*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
-                            <TextBlock Text="{Binding XPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                            <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                            <TextBlock Text="{Binding XPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
                         </Grid>
                         <Grid Margin="5" Background="Gainsboro">
                             <Grid.ColumnDefinitions>
@@ -534,10 +534,10 @@
                         <Viewbox Margin="10">
                             <ItemsControl ItemsSource="{Binding p_PreviewDrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <Canvas x:Name="StagePreView" Margin="10" Width="1000" Height="1000" ClipToBounds="True" Background="#01FFFFFF">
+                                        <Canvas x:Name="StagePreView" Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseMove">
                                                     <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />

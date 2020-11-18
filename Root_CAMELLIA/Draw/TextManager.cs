@@ -31,7 +31,7 @@ namespace Root_CAMELLIA.Draw
         public void SetData(string text, int fontSize = 9, double left = 0, double top = 0, System.Windows.HorizontalAlignment horizontalAlign = System.Windows.HorizontalAlignment.Center,
             System.Windows.VerticalAlignment verticalAlign = System.Windows.VerticalAlignment.Center)
         {
-            Text.Background = Brushes.Blue;
+            //Text.Background = Brushes.Blue;
             Text.Text = text;
             Text.HorizontalAlignment = horizontalAlign;
             Text.VerticalAlignment = verticalAlign;
