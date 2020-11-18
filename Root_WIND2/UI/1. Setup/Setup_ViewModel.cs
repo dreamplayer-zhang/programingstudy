@@ -226,13 +226,13 @@ namespace Root_WIND2
                 String text = "";
 
                 if (true) // Display Option : Rel Position
-                    text += "Pos : {" + defectInfo.fRelX.ToString() + ", " + defectInfo.fRelY.ToString() + "}" + "\n";
+                    text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
                 if (true) // Display Option : Defect Size
-                    text += "Size : " + defectInfo.fSize.ToString() + "\n";
+                    text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
                 if (true) // Display Option : GV Value
-                    text += "GV : " + defectInfo.fGV.ToString() + "\n";
+                    text += "GV : " + defectInfo.m_nGV.ToString() + "\n";
 
-                rectList.Add(new CRect((int)defectInfo.p_DefectBox.Left, (int)defectInfo.p_DefectBox.Top, (int)defectInfo.p_DefectBox.Right, (int)defectInfo.p_DefectBox.Bottom));
+                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
                 textList.Add(text);
             }
 
