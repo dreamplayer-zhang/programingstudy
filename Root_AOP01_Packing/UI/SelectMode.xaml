@@ -37,9 +37,18 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid>
-                            <Image Source="/Root_AOP01_Packing;component/Control/Icon/Resource/file_settings_127px.png" Margin="70"/>
+                            <Image Source="/Root_AOP01_Packing;component/Control/Icon/Pichon/file_settings_127px.png" Margin="70"/>
                         </Grid>
                         <Grid Grid.Row="1">
+                            <TextBlock Text="Setup Mode"
+                                       Style="{StaticResource BasicTb}"
+                                       Margin="0"
+                                       FontSize="45"
+                                       FontWeight="Bold"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                        <!--<Grid Grid.Row="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
@@ -92,7 +101,7 @@
                                        HorizontalAlignment="Right"
                                        FontSize="15"
                                        Margin="0,0,20,0"/>
-                        </Grid>
+                        </Grid>-->
                     </Grid>
 
                 </GroupBox>
@@ -123,10 +132,11 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <Image Source="/Root_AOP01_Packing;component/Control/Icon/Resource/system_task_127px.png" Margin="70"/>
+                            <Image Source="/Root_AOP01_Packing;component/Control/Icon/Pichon/system_task_127px.png" Margin="70"/>
                         </Grid>
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
+                                <RowDefinition/>
                                 <RowDefinition/>
                                 <RowDefinition/>
                                 <RowDefinition/>
@@ -143,37 +153,44 @@
                                        FontSize="18"
                                        Style="{StaticResource BasicTb}"
                                        FontWeight="Bold"/>
-                            <TextBlock Text="Result1" Grid.Row="1"
+                            <TextBlock Text="Pod1" Grid.Row="1"
                                        Style="{StaticResource BasicTb}"/>
                             <TextBlock Text="2020-07-20 09:38" Grid.Row="1" Grid.Column="1"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Right"
                                        FontSize="15"
                                        Margin="0,0,20,0"/>
-                            <TextBlock Text="Result2" Grid.Row="2"
+                            <TextBlock Text="Pod2" Grid.Row="2"
                                        Style="{StaticResource BasicTb}"/>
                             <TextBlock Text="2020-07-15 17:38" Grid.Row="2" Grid.Column="1"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Right"
                                        FontSize="15"
                                        Margin="0,0,20,0"/>
-                            <TextBlock Text="Result3" Grid.Row="3"
+                            <TextBlock Text="Pod3" Grid.Row="3"
                                        Style="{StaticResource BasicTb}"/>
                             <TextBlock Text="2020-07-05 17:38" Grid.Row="3" Grid.Column="1"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Right"
                                        FontSize="15"
                                        Margin="0,0,20,0"/>
-                            <TextBlock Text="Result4" Grid.Row="4"
+                            <TextBlock Text="Reticle1" Grid.Row="4"
                                        Style="{StaticResource BasicTb}"/>
                             <TextBlock Text="2020-07-02 17:38" Grid.Row="4" Grid.Column="1"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Right"
                                        FontSize="15"
                                        Margin="0,0,20,0"/>
-                            <TextBlock Text="Result5" Grid.Row="5"
+                            <TextBlock Text="Reticle2" Grid.Row="5"
                                        Style="{StaticResource BasicTb}"/>
                             <TextBlock Text="2020-07-02 17:38" Grid.Row="5" Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right"
+                                       FontSize="15"
+                                       Margin="0,0,20,0"/>
+                            <TextBlock Text="Reticle3" Grid.Row="6"
+                                       Style="{StaticResource BasicTb}"/>
+                            <TextBlock Text="2020-07-02 17:38" Grid.Row="6" Grid.Column="1"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Right"
                                        FontSize="15"
@@ -208,14 +225,15 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <Image Source="/Root_AOP01_Packing;component/Control/Icon/Resource/monitor_127px.png" Margin="70"/>
-                            <Image Source="/Root_AOP01_Packing;component/Control/Icon/Resource/play_127px.png" Margin="70,80,70,110"/>
+                            <Image Source="/Root_AOP01_Packing;component/Control/Icon/Pichon/monitor_127px.png" Margin="70"/>
+                            <Image Source="/Root_AOP01_Packing;component/Control/Icon/Pichon/play_127px.png" Margin="70,80,70,110"/>
                         </Grid>
                         <Grid Grid.Row="1">
-                            <TextBlock Text="Start"
+                            <TextBlock Text="Operation Mode"
                                        Style="{StaticResource BasicTb}"
                                        Margin="0"
                                        FontSize="45"
+                                       FontWeight="Bold"
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"/>
                         </Grid>
