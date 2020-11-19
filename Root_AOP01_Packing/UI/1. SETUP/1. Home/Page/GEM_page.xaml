@@ -9,7 +9,7 @@
     <ScrollViewer VerticalScrollBarVisibility="Visible">
         <StackPanel>
             <Grid Height="800">
-                <TextBlock Text="GEM" FontSize="50" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                
             </Grid>
         </StackPanel>
     </ScrollViewer>

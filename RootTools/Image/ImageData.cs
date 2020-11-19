@@ -705,30 +705,30 @@ namespace RootTools
     //                hRGB = br.ReadBytes(256 * 4);
 				if (p_nByte == 1)
 				{
-					nLine = 0;
-					int nNum = 5;
-					Thread[] multiThread = new Thread[nNum];
+                    nLine = 0;
+                    int nNum = 2;
+                    Thread[] multiThread = new Thread[nNum];
 
-					for (int i = 0; i < nNum; i++)
-					{
-						int nStartHeight = lowheight * (nNum-i) / nNum;
-						int nEndHeight = lowheight * (nNum - i-1) / nNum;
-						multiThread[i] = new Thread(() => RunCopyThread(sFile, nWidth, nHeight, lowwidth, lowheight, nStartHeight , nEndHeight, offset));
-						multiThread[i].Start();
-					}
+                    for (int i = 0; i < nNum; i++)
+                    {
+                        int nStartHeight = lowheight * (nNum - i) / nNum;
+                        int nEndHeight = lowheight * (nNum - i - 1) / nNum;
+                        multiThread[i] = new Thread(() => RunCopyThread(sFile, nWidth, nHeight, lowwidth, lowheight, nStartHeight, nEndHeight, offset));
+                        multiThread[i].Start();
+                    }
                     while (true)
                     {
-						bool bEnd = true;
-						for (int i = 0; i < nNum; i++)
-						{
-							if (multiThread[i].IsAlive)
-								bEnd = false;
-						}
-						Thread.Sleep(10);
-						p_nProgress = Convert.ToInt32(((double)nLine / lowheight) * 100);
-						if (bEnd)
-							break;
-					}
+                        bool bEnd = true;
+                        for (int i = 0; i < nNum; i++)
+                        {
+                            if (multiThread[i].IsAlive)
+                                bEnd = false;
+                        }
+                        Thread.Sleep(10);
+                        p_nProgress = Convert.ToInt32(((double)nLine / lowheight) * 100);
+                        if (bEnd)
+                            break;
+                    }
                     //for (int y = lowheight - 1; y >= 0; y--)
                     //{
                     //    if (Worker_MemoryCopy.CancellationPending)

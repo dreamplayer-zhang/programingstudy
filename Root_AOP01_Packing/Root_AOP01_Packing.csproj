@@ -170,6 +170,7 @@
     <Compile Include="Control\UserControl\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dummy.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="UI\2. REVIEW\Review_Panel.xaml.cs">
       <DependentUpon>Review_Panel.xaml</DependentUpon>
