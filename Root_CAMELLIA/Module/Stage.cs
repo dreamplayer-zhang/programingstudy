@@ -16,6 +16,7 @@ namespace Root_CAMELLIA.Module
     {
         #region ToolBox
         Axis m_axisRotate;
+        Axis m_axisX;
         AxisXY m_axisXZ;
         DIO_O m_doVac;
         DIO_O m_doBlow;
@@ -72,6 +73,7 @@ namespace Root_CAMELLIA.Module
 
             public override string Run()
             {
+                //m_module.m_axisX.StartMove(12902, 123021);
                 return "OK";
             }
         }

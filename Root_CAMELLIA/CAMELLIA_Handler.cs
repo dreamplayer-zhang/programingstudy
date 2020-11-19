@@ -47,11 +47,11 @@ namespace Root_CAMELLIA
         public ModuleList m_moduleList;
         public CAMELLIA_Recipe m_recipe;
         public CAMELLIA_Process m_process;
-        public Stage m_Stage;
+        public Root_CAMELLIA.Module.Stage m_Stage;
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
-            m_Stage = new Stage("Vision", m_enginner);
+            m_Stage = new Root_CAMELLIA.Module.Stage("Vision", m_enginner);
             InitModule(m_Stage);
             m_recipe = new CAMELLIA_Recipe("Recipe", m_enginner);
             m_recipe.AddModule(m_Stage);

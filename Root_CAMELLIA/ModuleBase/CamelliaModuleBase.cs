@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Root_CAMELLIA.ModuleBase
+namespace Root_CAMELLIA
 {
     public class CamelliaModuleBase : NotifyProperty
     {

@@ -49,7 +49,7 @@
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <Canvas x:Name="StageMainView" ClipToBounds="True">
+                    <Canvas x:Name="StageMainView" ClipToBounds="True" Background="#01FFFFFF">
                     </Canvas>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
