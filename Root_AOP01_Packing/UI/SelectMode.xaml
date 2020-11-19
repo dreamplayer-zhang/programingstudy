@@ -215,7 +215,7 @@
                               Cursor="Hand">
                     <GroupBox.Header>
                         <Grid>
-                            <TextBlock Text="Run" FontSize="35"
+                            <TextBlock Text="Operation" FontSize="35"
                                    FontWeight="Bold"/>
                         </Grid>
                     </GroupBox.Header>

@@ -108,7 +108,7 @@
                                 <DataGridTextColumn Header="Pod ID" Width="*" Binding="{Binding c}"/>
                                 <DataGridTextColumn Header="Reticle ID" Width="*" Binding="{Binding d}"/>
                                 <DataGridTextColumn Header="Taping Num" Width="*" Binding="{Binding e}"/>
-                                <DataGridTextColumn Header="Vaccume Time" Width="*" Binding="{Binding f}"/>
+                                <DataGridTextColumn Header="Vacuum Time" Width="*" Binding="{Binding f}"/>
                                 <DataGridTextColumn Header="Heating Time" Width="*" Binding="{Binding g}"/>
                                 <DataGridTextColumn Header="Result" Width="*" Binding="{Binding h}"/>
                             </DataGrid.Columns>
