@@ -7,7 +7,7 @@
              xmlns:teach="clr-namespace:Root_ASIS.Teachs"
              xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="1800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -16,13 +16,34 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" Background="Beige">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <StackPanel Grid.Column="0" Background="Beige" Orientation="Vertical">
+            <GroupBox BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Info" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <TextBlock Text="{Binding p_sInfo}" Margin="3"/>
+            </GroupBox>
+            <GroupBox BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="File" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="{Binding p_sRecipe}" Margin="3"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" x:Name="buttonOpen" Content=" Open " Margin="3" Click="buttonOpen_Click"/>
+                        <Button Grid.Column="1" x:Name="buttonSave" Content=" Save " Margin="3" Click="buttonSave_Click"/>
+                        <ProgressBar Grid.Column="2" Height="8" Margin="3" Orientation="Horizontal"
+                                     Minimum="0" Maximum="100" Value="{Binding p_progressFile}"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
             <tree:TreeUI Grid.Row="1" x:Name="treeUI"/>
-        </Grid>
+        </StackPanel>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <teach:Teach_UI Grid.Column="2" x:Name="teach0UI"/>
         <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>

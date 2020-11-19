@@ -203,22 +203,29 @@
                         BorderThickness="3">
                     <local:_2_6_Side x:Name="_Side"/>
                 </Border>
-            </TabItem>
-            <TabItem Header="Bevel"
+			</TabItem>
+			<TabItem Header="Side EdgeBox"
+                     Style="{StaticResource RcptabItem}">
+				<Border BorderBrush="Gray"
+                        BorderThickness="3">
+					<local:_2_7_EdgeBox x:Name="_SideEdgeBox"/>
+				</Border>
+			</TabItem>
+			<TabItem Header="Bevel"
                      Style="{StaticResource RcptabItem}">
                 <Border BorderBrush="Gray"
                         BorderThickness="3">
                     <local:_2_9_Bevel x:Name="_Bevel"/>
                 </Border>
-            </TabItem>
-            <TabItem Header="EdgeBox"
+			</TabItem>
+			<TabItem Header="Bevel EdgeBox"
                      Style="{StaticResource RcptabItem}">
-                <Border BorderBrush="Gray"
+				<Border BorderBrush="Gray"
                         BorderThickness="3">
-                    <local:_2_7_EdgeBox x:Name="_EdgeBox"/>
-                </Border>
-            </TabItem>
-            <TabItem Header="D2D_Insp"
+					<local:_2_10_BevelEdgeBox x:Name="_BevelEdgeBox"/>
+				</Border>
+			</TabItem>
+			<TabItem Header="D2D_Insp"
                      Style="{StaticResource RcptabItem}">
                 <Border BorderBrush="Gray"
                         BorderThickness="3">

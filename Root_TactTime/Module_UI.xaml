@@ -6,12 +6,16 @@
              xmlns:local="clr-namespace:Root_TactTime"
              mc:Ignorable="d" 
              d:DesignHeight="70" d:DesignWidth="150">
-    <StackPanel Orientation="Vertical" Background="Beige" Width="150" Height="70" AllowDrop="True">
-        <Label Content="{Binding p_id}"/>
-        <Label Content="{Binding p_sStrip}" 
+    <GroupBox BorderBrush="Black" BorderThickness="1" Width="150" Height="64">
+        <GroupBox.Header>
+            <TextBlock Text="{Binding p_id}" Foreground="Black" FontWeight="Bold" />
+        </GroupBox.Header>
+        <StackPanel Orientation="Vertical">
+            <Label Content="{Binding p_sStrip}"  AllowDrop="True"
                PreviewMouseLeftButtonDown="Label_PreviewMouseLeftButtonDown"
                PreviewMouseMove="Label_PreviewMouseMove"
                Drop="Label_Drop"/>
-        <ProgressBar Minimum="0" Maximum="100" Value="{Binding p_fProgress}" Height="10"/>
-    </StackPanel>
+            <ProgressBar Minimum="0" Maximum="100" Value="{Binding p_fProgress}" Height="10"/>
+        </StackPanel>
+    </GroupBox>
 </UserControl>

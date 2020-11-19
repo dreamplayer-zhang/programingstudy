@@ -1,0 +1,161 @@
+﻿<UserControl x:Class="Root_WIND2.FrontSideOrigin"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="838" d:DesignWidth="1683" 
+             Background="{StaticResource PanelBackGround}">
+    <UserControl.Resources>
+        <converter:TextBoxToIntConverter x:Key="TextBoxToInt"/>
+    </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Visible">
+        <StackPanel>
+            <Grid Height="838">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" DataContext="{Binding p_Origin_VM.p_OriginBoxTool_VM}">
+                    <GroupBox Grid.Row="0" Header="Image View"
+                              Background="{StaticResource GroupBoxBackground}">
+                        <tools:RootViewer/>
+                   </GroupBox>
+                </Grid>
+                <GridSplitter Grid.Column="1" 
+                              HorizontalAlignment="Stretch" 
+                              VerticalAlignment="Stretch" 
+                              Background="{StaticResource Splitter}" 
+                              Width="3"
+                              ShowsPreview="True"/>
+                <Grid Grid.Column="2" DataContext="{Binding p_Origin_VM.p_OriginTool_VM}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0" Header="Origin Tool"
+                              Background="{StaticResource GroupBoxBackground}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal" Background="{StaticResource ControlBackGround}">
+                                <ToggleButton Content="Origin Point" Width="100" Margin="0" BorderBrush="{x:Null}"
+                                              IsChecked="{Binding p_UseOrigin, Mode=TwoWay}"/>
+                                <ToggleButton Content="Pitch Point" Width="100" Margin="0" BorderBrush="{x:Null}"
+                                               IsChecked="{Binding p_UsePitch, Mode=TwoWay}"/>
+                                <Button Content="Clear" Width="100" Margin="0" BorderBrush="{x:Null}" Command="{Binding ClearOrigin}"/>
+                            </StackPanel>
+                            <tools:RootViewer Grid.Row="1"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Origin Information" Grid.Row="1"
+                              Background="{StaticResource GroupBoxBackground}">
+                        <Grid Margin="10,0,10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="Origin X" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                            <TextBlock Text="Origin Y" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                            <TextBlock Text="Pitch X" Style="{StaticResource BasicTb}" Grid.Row="2"/>
+                            <TextBlock Text="Pitch Y" Style="{StaticResource BasicTb}" Grid.Row="3"/>
+                            <TextBlock Text="Padding X" Style="{StaticResource BasicTb}" Grid.Row="4"/>
+                            <TextBlock Text="Padding Y" Style="{StaticResource BasicTb}" Grid.Row="5"/>
+                            <TextBox Text="{Binding p_OriginPoint.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="0"
+                                     IsEnabled="{Binding ElementName=originX, Path=IsChecked}"/>
+                            <TextBox Text="{Binding p_OriginPoint.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}" 
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="1"
+                                     IsEnabled="{Binding ElementName=originY, Path=IsChecked}"/>
+                            <TextBox Text="{Binding p_PitchSize.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}"
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="2"
+                                     IsEnabled="{Binding ElementName=pitchX, Path=IsChecked}"/>
+                            <TextBox Text="{Binding p_PitchSize.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=TextBoxToInt}}"
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="3"
+                                     IsEnabled="{Binding ElementName=pitchY, Path=IsChecked}"/>
+                            <TextBox Text="{Binding p_Padding.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TextBoxToInt}}"
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="4"/>
+                            <TextBox Text="{Binding p_Padding.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource TextBoxToInt}}"
+                                     Style="{StaticResource BasicTbox}" 
+                                     Grid.Column="2" Width="200" Height="25" Grid.Row="5"/>
+                            <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Name="originX" IsChecked="False"/>
+                            <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Name="originY"/>
+                            <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="2" Name="pitchX"/>
+                            <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="3" Name="pitchY"/>
+
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Column="3" Opacity="0.5" IsEnabled="False">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0" Header="Origin Die Tool"
+                              Background="{StaticResource GroupBoxBackground}">
+                        <Grid>
+                            <Image Source="/Root_WIND2;component/Resources/WaferMap.PNG"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Die Information" Grid.Row="1"
+                              Background="{StaticResource GroupBoxBackground}">
+                        <Grid Margin="10,0,10,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="1.5*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="Origin Die X" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                            <TextBlock Text="Origin Die Y" Style="{StaticResource BasicTb}" Grid.Row="1"/>
+                            <TextBlock Text="Map Size" Style="{StaticResource BasicTb}" Grid.Row="2"/>
+                            <TextBlock Text="Shot Size" Style="{StaticResource BasicTb}" Grid.Row="3"/>
+
+                            <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="0" Name="dieX" IsChecked="False"/>
+                            <CheckBox VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Name="dieY" IsChecked="False"/>
+                            
+                            <TextBox Style="{StaticResource BasicTbox}" Grid.Column="2" Width="200" Height="25" Grid.Row="0"
+                                     IsEnabled="{Binding ElementName=dieX, Path=IsChecked}"/>
+                            <TextBox Style="{StaticResource BasicTbox}" Grid.Column="2" Width="200" Height="25" Grid.Row="1"
+                                     IsEnabled="{Binding ElementName=dieY, Path=IsChecked}"/>
+                            <TextBlock Text="(x, y)" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="2" HorizontalAlignment="Center"/>
+                            <TextBlock Text="(width, height)" Style="{StaticResource BasicTb}" Grid.Column="2" Grid.Row="3" HorizontalAlignment="Center"/>
+                        </Grid>
+                    </GroupBox>
+                    <!--<Button Style="{StaticResource PanelBtn}" Grid.Column="0" Grid.Row="2" Content="Apply"
+                            Margin="2"/>-->
+
+                </Grid>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

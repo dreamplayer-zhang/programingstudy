@@ -19,7 +19,7 @@ public :
 protected:
 	int m_nInspOffset = 5;
 	byte inspbuffer[4000][4000];
-	byte inspbuffer2[16000000];
+	//byte inspbuffer2[16000000];
 	RECT inspbufferROI;
 	RECT GetInspbufferROI() const;
 	DefectDataStruct GetDefectData(RECT rt, POINT ptDPos, float nArea);

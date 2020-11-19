@@ -42,7 +42,10 @@ namespace Root_EFEM
             //            InitModule(m_efem);
             InitWTR(); 
             InitLoadport();
-            InitAligner(); 
+            InitAligner();
+            InitVision(); 
+            m_wtr.RunTree(Tree.eMode.RegRead);
+            m_wtr.RunTree(Tree.eMode.Init);
             //            m_FDC = new FDC("FDC", m_engineer);
             //            InitModule(m_FDC);
             ((IWTR)m_wtr).ReadInfoReticle_Registry(); 
@@ -96,13 +99,12 @@ namespace Root_EFEM
             RND,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>(); 
-        int m_nLoadport = 2; 
-
+        int m_lLoadport = 2; 
         void InitLoadport()
         {
             ModuleBase module;
             char cLP = 'A'; 
-            for (int n = 0; n < m_nLoadport; n++, cLP++)
+            for (int n = 0; n < m_lLoadport; n++, cLP++)
             {
                 string sID = "Loadport" + cLP;
                 switch (m_aLoadportType[n])
@@ -117,10 +119,10 @@ namespace Root_EFEM
 
         public void RunTreeLoadport(Tree tree)
         {
-            m_nLoadport = tree.Set(m_nLoadport, m_nLoadport, "Count", "Loadport Count");
-            while (m_aLoadportType.Count < m_nLoadport) m_aLoadportType.Add(eLoadport.RND);
+            m_lLoadport = tree.Set(m_lLoadport, m_lLoadport, "Count", "Loadport Count");
+            while (m_aLoadportType.Count < m_lLoadport) m_aLoadportType.Add(eLoadport.RND);
             Tree treeType = tree.GetTree("Type"); 
-            for (int n = 0; n < m_nLoadport; n++)
+            for (int n = 0; n < m_lLoadport; n++)
             {
                 m_aLoadportType[n] = (eLoadport)treeType.Set(m_aLoadportType[n], m_aLoadportType[n], n.ToString("00"), "Loadport Type"); 
             }
@@ -131,7 +133,8 @@ namespace Root_EFEM
         enum eAligner
         { 
             None,
-            ATI
+            ATI,
+            RND
         }
         eAligner m_eAligner = eAligner.ATI;
         void InitAligner()
@@ -139,7 +142,8 @@ namespace Root_EFEM
             ModuleBase module = null; 
             switch (m_eAligner)
             {
-                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break; 
+                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break;
+                case eAligner.RND: module = new Aligner_RND("Aligner", m_engineer); break; 
             }
             if (module != null)
             {
@@ -151,6 +155,63 @@ namespace Root_EFEM
         public void RunTreeAligner(Tree tree)
         {
             m_eAligner = (eAligner)tree.Set(m_eAligner, m_eAligner, "Type", "Aligner Type");
+        }
+        #endregion
+
+        #region Module Vision
+        enum eVision
+        {
+            Vision,
+            Backside,
+            EBR
+        }
+        List<eVision> m_aVisionType = new List<eVision>();
+        int m_lVision = 1; 
+        void InitVision()
+        {
+            ModuleBase module; 
+            for (int n = 0; n < m_lVision; n++)
+            {
+                string sN = n.ToString("00"); 
+                string sID = "Vision" + sN; 
+                switch (m_aVisionType[n])
+                {
+                    case eVision.Backside: module = new Vision_Backside(GetVisionID(n), m_engineer); break;
+                    case eVision.EBR: module = new Vision_EBR(GetVisionID(n), m_engineer); break;
+                    case eVision.Vision:
+                    default: module = new Vision(GetVisionID(n), m_engineer); break; 
+                }
+                InitModule(module);
+                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+            }
+        }
+
+        string GetVisionID(int n)
+        {
+            eVision eVision = m_aVisionType[n];
+            int nCount = 0;
+            foreach (eVision vision in m_aVisionType)
+            {
+                if (vision == eVision) nCount++; 
+            }
+            if (nCount == 1) return eVision.ToString();
+            nCount = 0; 
+            for (int i = 0; i < n; i++)
+            {
+                if (m_aVisionType[i] == eVision) nCount++;
+            }
+            return eVision.ToString() + nCount.ToString(); 
+        }
+
+        public void RunTreeVision(Tree tree)
+        {
+            m_lVision = tree.Set(m_lVision, m_lVision, "Count", "Vision Count");
+            while (m_aVisionType.Count < m_lVision) m_aVisionType.Add(eVision.Vision);
+            Tree treeType = tree.GetTree("Type");
+            for (int n = 0; n < m_lVision; n++)
+            {
+                m_aVisionType[n] = (eVision)treeType.Set(m_aVisionType[n], m_aVisionType[n], n.ToString("00"), "Vision Type");
+            }
         }
         #endregion
 

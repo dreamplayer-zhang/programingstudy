@@ -1,5 +1,4 @@
-﻿using Root_ASIS.Teachs;
-using RootTools;
+﻿using RootTools;
 using RootTools.Memory;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -7,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using System.Windows.Media;
 
 namespace Root_ASIS.AOI
 {
@@ -26,12 +24,21 @@ namespace Root_ASIS.AOI
         {
             public CPoint m_sz = new CPoint(100, 50);
             public AOIData m_aoiData;
-            public string m_sInspect = ""; 
+            public string m_sInspect = "";
+            Blob m_blob = new Blob();
+
+            public Blob.Island RunBlob()
+            {
+                m_blob.RunBlob(m_aoi.m_memory, 0, m_aoiData.p_cp0, m_aoiData.m_sz, m_aoi.m_mmGV.X, m_aoi.m_mmGV.Y, 5);
+                m_blob.RunSort(m_aoi.m_eSort);
+                return (m_blob.m_aSort.Count > 0) ? m_blob.m_aSort[0] : null; 
+            }
 
             public void RunTree(Tree tree)
             {
-                m_sz = tree.Set(m_sz, m_sz, "szROI", "szROI", false);
-                m_aoiData.RunTree(tree, false);
+                m_sz.X = tree.Set(m_sz.X, m_sz.X, "szROIX", "szROI", false);
+                m_sz.Y = tree.Set(m_sz.Y, m_sz.Y, "szROIY", "szROI", false);
+                m_aoiData.RunTree(tree);
             }
 
             public string m_id;
@@ -43,12 +50,24 @@ namespace Root_ASIS.AOI
                 m_aoiData = new AOIData(id, m_sz); 
             }
         }
-        Unit[] m_aUnit = new Unit[2]; 
+        List<Unit> m_aUnit = new List<Unit>();
 
         void InitUnit()
         {
-            m_aUnit[0] = new Unit("Origin 0", this);
-            m_aUnit[1] = new Unit("Origin 1", this);
+            m_aUnit.Add(new Unit("Strip Origin 0", this));
+            m_aUnit.Add(new Unit("Strip Origin 1", this));
+            p_aROI.Clear();
+            foreach (Unit unit in m_aUnit) p_aROI.Add(unit.m_aoiData);
+            m_aUnit[0].m_aoiData.OnLBD += M_aoiData_OnLBD;
+            m_aUnit[1].m_aoiData.OnLBD += M_aoiData_OnLBD;
+        }
+
+        private void M_aoiData_OnLBD(bool bDown, MemoryData memory)
+        {
+            if (bDown == false) return; 
+            if (m_aUnit[0].m_aoiData.p_eROI != AOIData.eROI.Done) return;
+            if (m_aUnit[1].m_aoiData.p_eROI != AOIData.eROI.Done) return;
+            Setup(memory);
         }
 
         void RunTreeUnit(Tree tree)
@@ -83,8 +102,8 @@ namespace Root_ASIS.AOI
         Dictionary<eMode, Result> m_aResult = new Dictionary<eMode, Result>(); 
         void InitResult()
         {
-            m_aResult.Add(eMode.Inspect, new Result());
             m_aResult.Add(eMode.Setup, new Result());
+            m_aResult.Add(eMode.Inspect, new Result());
         }
 
         double Get_dSize(int iUnit)
@@ -129,38 +148,47 @@ namespace Root_ASIS.AOI
             Inspect,
             Setup
         };
+        public string Setup(MemoryData memory)
+        {
+            m_memory = memory;
+            return Inspect(eMode.Setup); 
+        }
+
+        public string BeforeInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+        public string AfterInspect(InfoStrip infoStrip, MemoryData memory) { return "OK"; }
+
+        public string Inspect(InfoStrip infoStrip, MemoryData memory)
+        {
+            m_infoStrip = infoStrip; 
+            m_memory = memory;
+            m_infoStrip.p_eResult = InfoStrip.eResult.Rework;
+            m_infoStrip.m_sError = Inspect(eMode.Inspect);
+            if (m_infoStrip.m_sError == "OK")
+            {
+                m_infoStrip.m_sError = (Get_dDistance() >= m_dDistanceError) ? "Fiducial Distance Error" : "OK";
+                if (m_infoStrip.m_sError == "OK")
+                {
+                    SetInfoPos();
+                    m_infoStrip.p_eResult = InfoStrip.eResult.Xout;
+                }
+            }
+            return m_infoStrip.m_sError; 
+        }
 
         InfoStrip m_infoStrip;
         MemoryData m_memory; 
         int m_dDistanceError = 10; 
-        public string Inspect(InfoStrip infoStrip, MemoryData memory, eMode eMode)
-        {
-            m_infoStrip = infoStrip;
-            m_memory = memory;
-            string sInspect = Inspect(eMode);
-            if (sInspect == "OK") return sInspect;
-            m_infoStrip.p_eResult = InfoStrip.eResult.Rework;
-            m_infoStrip.m_sError = sInspect;
-            return sInspect; 
-        }
-
         string Inspect(eMode eMode)
         {
-            Parallel.For(0, 1, n => { m_aUnit[n].m_sInspect = InspectBlob(eMode, n); });
+            Parallel.For(0, 2, n => { m_aUnit[n].m_sInspect = InspectBlob(eMode, n); });
             foreach (Unit data in m_aUnit)
             {
                 if (data.m_sInspect != "OK") return data.m_sInspect;
             }
             m_aResult[eMode].CalcStripPos();
-            if (eMode == eMode.Inspect)
-            {
-                if (Get_dDistance() >= m_dDistanceError) return "Fiducial Distance Error";
-                SetInfoPos();
-            }
             return "OK";
         }
 
-        Blob[] m_aBlob = new Blob[2] { new Blob(), new Blob() };
         Blob.eSort m_eSort = Blob.eSort.Size;
         public CPoint m_mmGV = new CPoint(100, 0); 
         double m_dSizeError = 20;
@@ -168,17 +196,15 @@ namespace Root_ASIS.AOI
         double m_dCenterError = 50; 
         string InspectBlob(eMode eMode, int iAOI)
         {
-            Unit data = m_aUnit[iAOI]; 
-            Blob blob = m_aBlob[iAOI];
-            blob.RunBlob(m_memory, 0, data.m_aoiData.m_cp0, data.m_aoiData.m_sz, m_mmGV.X, m_mmGV.Y, 3);
-            blob.RunSort(m_eSort);
-            if (blob.m_aSort.Count == 0) return "Find Fiducial Error"; 
-            Blob.Island island = blob.m_aSort[0];
+            Unit unit = m_aUnit[iAOI];
+            Blob.Island island = unit.RunBlob(); 
+            if (island == null) return "Find Fiducial Error"; 
             Result.Unit result = m_aResult[eMode].m_aUnit[iAOI];
             result.m_maxLength = island.m_nLength;
             result.m_maxSize = island.m_nSize;
             result.m_rpCenter = island.m_rpCenter;
-            data.m_aoiData.m_sDisplay = "Size = " + island.m_nSize + ", " + island.m_sz.ToString(); 
+            unit.m_aoiData.m_bInspect = true; 
+            unit.m_aoiData.m_sDisplay = "Size = " + island.m_nSize + ", " + island.m_sz.ToString(); 
             if (eMode == eMode.Inspect)
             {
                 if (Get_dSize(iAOI) >= m_dSizeError) return "Fiducial Size Error";
@@ -204,37 +230,66 @@ namespace Root_ASIS.AOI
         }
         #endregion
 
-        #region Tree
-        public void RunTree(Tree tree)
-        {
-            RunTreeUnit(tree.GetTree("Unit", false, false));
-            RunTreeInspect(tree);
-        }
-        #endregion
-
         #region IAOI
         public string p_id { get; set; }
+        public string p_sAOI { get; set; }
         public int p_nID { get; set; }
         public bool p_bEnable { get; set; }
         public IAOI NewAOI() { return null; }
-
-        public void AddROI(ObservableCollection<AOIData> aROI)
-        {
-            aROI.Add(m_aUnit[0].m_aoiData);
-            aROI.Add(m_aUnit[1].m_aoiData);
-        }
+        public void ReAllocate(List<CPoint> aArray) { }
 
         public void Draw(MemoryDraw draw, AOIData.eDraw eDraw)
         {
             m_aUnit[0].m_aoiData.Draw(draw, eDraw);
             m_aUnit[1].m_aoiData.Draw(draw, eDraw);
         }
+
+        public ObservableCollection<AOIData> p_aROI { get; set; }
+
+        public void ClearActive()
+        {
+            foreach (AOIData aoiData in p_aROI)
+            {
+                if (aoiData.p_eROI == AOIData.eROI.Active) aoiData.p_eROI = AOIData.eROI.Ready;
+            }
+        }
+
+        public void CalcROICount(ref int nReady, ref int nActive)
+        {
+            foreach (AOIData aoiData in p_aROI)
+            {
+                switch (aoiData.p_eROI)
+                {
+                    case AOIData.eROI.Ready: nReady++; break;
+                    case AOIData.eROI.Active: nActive++; break; 
+                }
+            }
+        }
+
+        public AOIData GetAOIData(AOIData.eROI eROI)
+        {
+            foreach (AOIData aoiData in p_aROI)
+            {
+                if (aoiData.p_eROI == eROI) return aoiData; 
+            }
+            return null; 
+        }
+        #endregion
+
+        #region Tree
+        public void RunTreeAOI(Tree tree)
+        {
+            RunTreeUnit(tree.GetTree("Unit", false, false));
+            RunTreeInspect(tree);
+        }
         #endregion
 
         Log m_log;
         public AOIStrip(string id, Log log)
         {
+            p_aROI = new ObservableCollection<AOIData>(); 
             p_id = id;
+            p_sAOI = id; 
             m_log = log;
             InitUnit();
             InitResult(); 

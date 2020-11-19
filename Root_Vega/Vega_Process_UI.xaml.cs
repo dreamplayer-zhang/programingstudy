@@ -40,6 +40,7 @@ namespace Root_Vega
         private void buttonSetRecover_Click(object sender, RoutedEventArgs e)
         {
             m_process.CalcRecover();
+            EQ.p_eState = EQ.eState.Run;
         }
 
         private void buttonRunStep_Click(object sender, RoutedEventArgs e)

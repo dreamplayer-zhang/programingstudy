@@ -264,7 +264,6 @@ namespace RootTools.Control
             public void RunTree(Tree tree, string sUnit)
             {
                 m_v = tree.Set(m_v, -1, "Velocity", "Axis Moving Velocity (" + sUnit + " / sec)");
-                if (m_v < 0) m_v = tree.Set(m_v, m_v, "Velociry", "Axis Moving Velocity (" + sUnit + " / sec)");
                 m_acc = tree.Set(m_acc, m_acc, "Accelation", "Accelation Time (sec)");
                 m_dec = tree.Set(m_dec, m_dec, "Decelation", "Decelation Time (sec)");
             }
@@ -697,13 +696,13 @@ namespace RootTools.Control
         #region RelayCommand
         private void MJogFast()
         {
-            if (p_eState > Axis.eState.Ready) return;
+            if (p_eState != Axis.eState.Ready) return;
             Jog(-0.31, eSpeed.Jog.ToString());
         }
 
         private void PJogFast()
         {
-            if (p_eState > Axis.eState.Ready) return;
+            if (p_eState != Axis.eState.Ready) return;
             Jog(0.31, eSpeed.Jog.ToString());
         }
 
@@ -715,14 +714,14 @@ namespace RootTools.Control
 
         private void Move()
         {
-            if (p_eState > Axis.eState.Ready) return;
+            if (p_eState != Axis.eState.Ready) return;
             StartMove(p_strSelPos, 0, eSpeed.Move.ToString());
         }
 
         private void MRelativeMove()
         {
             int nDir = -1;
-            if (p_eState > Axis.eState.Ready) return;
+            if (p_eState != Axis.eState.Ready) return;
             try
             {
                 double dPos = Convert.ToInt32(p_dRelPos);
@@ -735,7 +734,7 @@ namespace RootTools.Control
         private void PRelativeMove()
         {
             int nDir = 1;
-            if (p_eState > Axis.eState.Ready) return;
+            if (p_eState != Axis.eState.Ready) return;
             try
             {
                 double dPos = Convert.ToInt32(p_dRelPos);

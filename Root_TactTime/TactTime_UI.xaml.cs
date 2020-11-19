@@ -1,4 +1,5 @@
 ﻿using RootTools.Trees;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Root_TactTime
@@ -19,25 +20,54 @@ namespace Root_TactTime
             m_tactTime = tactTime;
             DataContext = tactTime;
             InitModuleUI();
+            InitLoaderUI(); 
             treeUI.Init(tactTime.m_treeRoot);
             tactTime.RunTree(Tree.eMode.Init); 
         }
 
-        #region Module UI
+        #region Init UI
         void InitModuleUI()
         {
-            foreach (Module module in m_tactTime.m_aModule)
+            foreach (Module module in m_tactTime.m_aModule) canvasTact.Children.Add(module.p_ui);
+            foreach (Picker picker in m_tactTime.m_aPicker) canvasTact.Children.Add(picker.p_ui);
+        }
+
+        void InitLoaderUI()
+        {
+            foreach (Loader loader in m_tactTime.m_aLoader)
             {
-                Module_UI ui = new Module_UI();
-                ui.Init(module);
-                canvasTact.Children.Add(ui); 
+                TabItem item = new TabItem();
+                item.Content = loader.p_ui;
+                item.Header = loader.p_id; 
+                tabControl.Items.Add(item);
             }
         }
         #endregion
 
-        private void buttonClear_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonClear_Click(object sender, RoutedEventArgs e)
         {
-            m_tactTime.ClearSequence(); 
+            m_tactTime.ClearSequence(true); 
+        }
+
+        private void buttonSave_Click(object sender, RoutedEventArgs e)
+        {
+            m_tactTime.SaveSequence(); 
+        }
+
+        private void buttonOpen_Click(object sender, RoutedEventArgs e)
+        {
+            m_tactTime.OpenSequence();
+            m_tactTime.StartSimulation();
+        }
+
+        private void buttonRun_Click(object sender, RoutedEventArgs e)
+        {
+            m_tactTime.StartSimulation(); 
+        }
+
+        private void buttonUndo_Click(object sender, RoutedEventArgs e)
+        {
+            m_tactTime.Undo(); 
         }
     }
 }

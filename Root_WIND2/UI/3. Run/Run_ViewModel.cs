@@ -11,9 +11,9 @@ namespace Root_WIND2
     {
         MainWindow m_MainWindow;
 
-        public Run_ViewModel()
+        public Run_ViewModel(MainWindow main)
         {
-            init();
+            init(main);
         }
         public void init(MainWindow main = null)
         {
@@ -26,7 +26,7 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     m_MainWindow.MainPanel.Children.Clear();
-                    m_MainWindow.MainPanel.Children.Add(m_MainWindow.m_ModeUI);
+                    m_MainWindow.MainPanel.Children.Add(m_MainWindow.ModeUI);
                 });
             }
         }

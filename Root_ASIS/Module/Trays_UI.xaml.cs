@@ -1,6 +1,6 @@
 ﻿using RootTools;
 using System;
-using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -79,7 +79,7 @@ namespace Root_ASIS.Module
         }
         #endregion
 
-        private void buttonClear_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonClear_Click(object sender, RoutedEventArgs e)
         {
             m_trays.ClearTray(); 
         }

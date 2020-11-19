@@ -50,8 +50,9 @@ namespace Root_MarsLogView
 
         string GetVisionString(string sVision)
         {
-            string[] asMars = new string[14] { "", "", "", "'PRC'", "", "", "", "'Wafer'", "", "", "", "", "0", "$" };
+            string[] asMars = new string[14] { "", "", "", "'PRC'", "", "", "", "'Wafer'", "", "", "", "$", "0", "$" };
             string[] asVision = sVision.Split(',');
+            GetDateTime(asMars); 
             foreach (string sCmd in asVision)
             {
                 string[] asCmd = sCmd.Split(':');
@@ -59,25 +60,17 @@ namespace Root_MarsLogView
                 {
                     switch (asCmd[0])
                     {
-                        case "Time":
-                            string[] asDate = sCmd.Split(' ');
-                            if (asDate.Length >= 2)
-                            {
-                                asMars[0] = asDate[0].Substring(5, asDate[0].Length - 5);
-                                asMars[1] = asDate[1]; 
-                            }
-                            break;
                         case "ModuleID": asMars[2] = '\'' + asCmd[1] + '\''; break;
                         case "LogType": asMars[3] = '\'' + asCmd[1] + '\''; break;
                         case "EventID": asMars[4] = '\'' + asCmd[1] + '\''; break;
                         case "Status": asMars[5] = '\'' + asCmd[1] + '\''; break;
                         case "WaferID": asMars[6] = '\'' + asCmd[1] + '\''; break;
-                        case "SlotNo": asMars[8] = asCmd[1]; break;
+                        case "SlotNo": asMars[8] = "1"; break;
                         case "LotID": asMars[9] = '\'' + asCmd[1] + '\''; break;
                         case "RecipeName": asMars[10] = '\'' + asCmd[1] + '\''; break;
                         case "StepNumber": asMars[11] = asCmd[1]; break;
                         case "StepSeq": asMars[12] = asCmd[1]; break;
-                        case "StepName": asMars[13] = asCmd[1]; break;
+                        case "StepName": asMars[13] = '\'' + asCmd[1] + '\''; break;
                     }
                 }
             }
@@ -85,6 +78,14 @@ namespace Root_MarsLogView
             for (int n = 1; n < 14; n++) sLog += '\t' + asMars[n]; 
             return sLog; 
         }
+
+        void GetDateTime(string[] asMars)
+        {
+            DateTime dtNow = DateTime.Now;
+            asMars[0] = string.Format("{0:0000}/{1:00}/{2:00}", dtNow.Year, dtNow.Month, dtNow.Day);
+            asMars[1] = string.Format("{0:00}:{1:00}:{2:00}.{3:000}", dtNow.Hour, dtNow.Minute, dtNow.Second, dtNow.Millisecond);
+        }
+
         #endregion
 
         #region Error

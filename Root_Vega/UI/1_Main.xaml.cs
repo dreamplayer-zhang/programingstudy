@@ -3,6 +3,7 @@ using Root_Vega.Module;
 using RootTools;
 using RootTools.Inspects;
 using RootTools.Module;
+using RootTools.Trees;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -106,14 +107,15 @@ namespace Root_Vega
 
         bool IsRunModule(ModuleBase module)
         {
-            return (module.p_eState == ModuleBase.eState.Run) || (module.p_eState == ModuleBase.eState.Home); 
+            if (module.p_eState == ModuleBase.eState.Run) return true; 
+            if (module.p_eState == ModuleBase.eState.Home) return true; 
+            return (module.m_qModuleRun.Count > 0);
         }
-
         private void buttonInitialization_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableInitialization() == false) return;
-            EQ.p_bStop = false; 
-            m_handler.m_process.m_qSequence.Clear(); //forget 
+            EQ.p_bStop = false;
+            m_handler.m_process.ClearInfoReticle(); 
             EQ.p_eState = EQ.eState.Home;
 
             // Camera Connect
@@ -131,6 +133,7 @@ namespace Root_Vega
             if (sideVision.p_CamAlign1 != null && sideVision.p_CamAlign1.p_CamInfo._OpenStatus == false) sideVision.p_CamAlign1.Connect();
             if (sideVision.p_CamAlign2 != null && sideVision.p_CamAlign2.p_CamInfo._OpenStatus == false) sideVision.p_CamAlign2.Connect();
             if (sideVision.p_CamLADS != null && sideVision.p_CamLADS.p_CamInfo._OpenStatus == false) sideVision.p_CamLADS.Connect();
+
         }
         #endregion
 
@@ -138,13 +141,17 @@ namespace Root_Vega
         bool IsEnableRecovery()
         {
             if (IsRunModule()) return false;
+            if (m_handler.m_bIsPossible_Recovery == false) return false; 
+             // Daniel check
             if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (EQ.p_bStop == true) return false;
             return m_handler.IsEnableRecovery(); 
         }
 
         private void buttonRecovery_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableRecovery() == false) return;
+            m_handler.m_bIsPossible_Recovery = false;
             m_handler.m_process.CalcRecover();
             EQ.p_eState = EQ.eState.Run; 
         }

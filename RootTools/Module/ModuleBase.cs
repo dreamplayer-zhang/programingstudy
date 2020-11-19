@@ -163,7 +163,8 @@ namespace RootTools.Module
         void ThreadRun()
         {
             m_bThread = true;
-            Thread.Sleep(2000);
+            //Thread.Sleep(2000);
+            Thread.Sleep(5000);
             while (m_bThread)
             {
                 Thread.Sleep(10);
@@ -221,7 +222,7 @@ namespace RootTools.Module
         {
             RunTree(Tree.eMode.Update);
             RunTree(Tree.eMode.RegWrite);
-            RunTree(Tree.eMode.Init);
+         //   RunTree(Tree.eMode.Init);
         }
 
         public void RunTree(Tree.eMode mode)
@@ -233,7 +234,7 @@ namespace RootTools.Module
         private void M_treeToolBox_UpdateTree()
         {
             RunToolTree(Tree.eMode.Update);
-            RunToolTree(Tree.eMode.Init);
+            //RunToolTree(Tree.eMode.Init);
             RunToolTree(Tree.eMode.RegWrite);
         }
 

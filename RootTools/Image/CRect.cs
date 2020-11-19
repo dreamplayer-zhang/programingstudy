@@ -50,11 +50,11 @@ namespace RootTools
         {
             get
             {
-                return Right - Left;
+                return Math.Abs(Right - Left);
             }
             set
             {
-                Right = value + Left;
+                Right = Math.Abs(value + Left);
             }
         }
         [XmlIgnore]
@@ -62,11 +62,11 @@ namespace RootTools
         {
             get
             {
-                return Bottom - Top;
+                return Math.Abs(Bottom - Top);
             }
             set
             {
-                Bottom = value + Top;
+                Bottom = Math.Abs(value + Top);
             }
         }
         public CRect()
@@ -88,7 +88,16 @@ namespace RootTools
             X = ((Right - Left) / 2);
             Y = ((Bottom - Top) / 2);
         }
+        public CRect(CPoint startPoint, CPoint endPoint)
+        {
+            Left = (int)startPoint.X;
+            Top = (int)startPoint.Y;
+            Right = (int)endPoint.X;
+            Bottom = (int)endPoint.Y;
 
+            X = ((Right - Left) / 2);
+            Y = ((Bottom - Top) / 2);
+        }
         public CRect(int cenx, int ceny, int size)
         {
             X = cenx;
@@ -137,6 +146,7 @@ namespace RootTools
 			}
 			X = ((Right - Left) / 2);
 			Y = ((Bottom - Top) / 2);
+
 		}
         /// <summary>
         /// Top,Left,Bottom,Right를 위치에 맞게 재정렬한다

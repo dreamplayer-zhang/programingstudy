@@ -240,7 +240,7 @@ namespace Root_Vega
                     if (Grab.m_grabMode == null && BevelGrab.m_grabMode == null)
                     {
                         CameraSet cameraSet = p_SideVision.m_cameraSet;
-                        MemoryPool memoryPool = m_Engineer.ClassMemoryTool().GetPool("SideVision.Memory", false);
+                        MemoryPool memoryPool = m_Engineer.ClassMemoryTool().GetPool("SideVision.Memory");
 
                         List<SideVision.Run_SideGrab> aSideGrabs = new List<SideVision.Run_SideGrab>();
                         List<GrabMode> aSideModes = new List<GrabMode>();

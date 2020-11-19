@@ -1,0 +1,237 @@
+﻿<UserControl x:Class="Root_AOP01_Inspection.RecipeSpec_Page"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_AOP01_Inspection"
+             mc:Ignorable="d" 
+             d:DesignHeight="866" d:DesignWidth="1683" Background="{StaticResource PanelBackGround}">
+    <ScrollViewer VerticalScrollBarVisibility="Visible">
+        <StackPanel>
+            <Grid Height="866">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1.5*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Header="Spec" Margin="10" Height="700" VerticalAlignment="Top">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="5*"/>
+                                <ColumnDefinition Width="4*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0.5*"/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Border BorderBrush="Gray" BorderThickness="1" Grid.Column="0">
+                                <TextBlock Text="Enable" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="0,1,1,1" Grid.Column="1">
+                                <TextBlock Text="Inspection Item" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="0,1,1,1" Grid.Column="2">
+                                <TextBlock Text="Value" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="1">
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbEdge"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="2">
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbPatternShift"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="3">
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbDiscolor"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="4">
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbBarcode"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="5">
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbAlignKey"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="6">
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbPellicleShift"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="7">
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbHaze"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="8">
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbExpanding"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="1,0,1,1" Grid.Row="9">
+                                <CheckBox VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="cbFront"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="1">
+                                <TextBlock Style="{StaticResource BasicTb}" Text="Edge Broken"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="2">
+                                <TextBlock Style="{StaticResource BasicTb}" Text="Pattern Array Shift"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="3">
+                                <TextBlock Style="{StaticResource BasicTb}" Text="Pateern Discolor"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="4">
+                                <TextBlock Style="{StaticResource BasicTb}" Text="Barcode Scratch"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="5">
+                                <TextBlock Style="{StaticResource BasicTb}" Text="Align Key Exist"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="6">
+                                <TextBlock Style="{StaticResource BasicTb}" Text="Pellicle Shift"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="7">
+                                <TextBlock Style="{StaticResource BasicTb}" Text="Pellicle Haze"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="8">
+                                <TextBlock Style="{StaticResource BasicTb}" Text="Pellicle Expanding"/>
+                            </Border>
+                            <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Grid.Column="1" Grid.Row="9">
+                                <TextBlock Style="{StaticResource BasicTb}" Text="Pellicle Frontside"/>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="1" IsEnabled="{Binding ElementName=cbEdge, Path=IsChecked}"
+                                    BorderBrush="Gray" BorderThickness="0,0,1,1">
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="3" Margin="100,24"/>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="2" IsEnabled="{Binding ElementName=cbPatternShift, Path=IsChecked}"
+                                    BorderBrush="Gray" BorderThickness="0,0,1,1">
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="0.5" Margin="100,24"/>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="3" IsEnabled="{Binding ElementName=cbDiscolor, Path=IsChecked}"
+                                    BorderBrush="Gray" BorderThickness="0,0,1,1">
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="1" Margin="100,24"/>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="4" IsEnabled="{Binding ElementName=cbBarcode, Path=IsChecked}"
+                                    BorderBrush="Gray" BorderThickness="0,0,1,1">
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="1" Margin="100,24"/>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="5" IsEnabled="{Binding ElementName=cbAlignKey, Path=IsChecked}"
+                                    BorderBrush="Gray" BorderThickness="0,0,1,1">
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="30" Margin="100,24"/>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text="um" Margin="40,0" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="6" IsEnabled="{Binding ElementName=cbPellicleShift, Path=IsChecked}"
+                                    BorderBrush="Gray" BorderThickness="0,0,1,1">
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="0.3" Margin="100,24"/>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="7" IsEnabled="{Binding ElementName=cbHaze, Path=IsChecked}"
+                                    BorderBrush="Gray" BorderThickness="0,0,1,1">
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="1" Margin="100,24"/>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text="mm" Margin="40,0" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="8" IsEnabled="{Binding ElementName=cbExpanding, Path=IsChecked}"
+                                    BorderBrush="Gray" BorderThickness="0,0,1,1">
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="100" Margin="100,24"/>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text="um" Margin="40,0" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="9" IsEnabled="{Binding ElementName=cbFront, Path=IsChecked}"
+                                    BorderBrush="Gray" BorderThickness="0,0,1,1">
+                                <Grid>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text=">" Margin="55,0"/>
+                                    <TextBox Style="{StaticResource BasicTbox}" Text="10" Margin="100,24"/>
+                                    <TextBlock Style="{StaticResource BasicTb}" Text="um" Margin="40,0" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+
+                        </Grid>
+                    </GroupBox>
+                    <StackPanel Grid.Column="1" Margin="10">
+                        
+                        <GroupBox Header="Illumination" Grid.Column="1" Margin="10" Height="200" VerticalAlignment="Top">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1.3*"/>
+                                    <ColumnDefinition Width="0.7*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Edge LED" Style="{StaticResource BasicTb}"/>
+                                <Slider Grid.Column="1" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="0"/>
+                            </Grid>
+                            <Grid Margin="5" Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1.3*"/>
+                                    <ColumnDefinition Width="0.7*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="45D LED" Style="{StaticResource BasicTb}"/>
+                                <Slider Grid.Column="1" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="0"/>
+                            </Grid>
+                            <Grid Margin="5" Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1.3*"/>
+                                    <ColumnDefinition Width="0.7*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Frontside LED" Style="{StaticResource BasicTb}"/>
+                                <Slider Grid.Column="1" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="0"/>
+                            </Grid>
+                            <Grid Margin="5" Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1.3*"/>
+                                    <ColumnDefinition Width="0.7*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="LADS Razer" Style="{StaticResource BasicTb}"/>
+                                <Slider Grid.Column="1" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="2" Style="{StaticResource BasicTbox}" Width="80" Height="20" Text="0"/>
+                            </Grid>
+                        </Grid>
+                    </GroupBox>
+                        <Button Content="Run" Style="{StaticResource SetupPanelBtn}" Grid.Column="2" Height="50" Command="{Binding btnRun}"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

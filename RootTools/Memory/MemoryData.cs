@@ -322,14 +322,13 @@ namespace RootTools.Memory
             br.ReadInt32();
             br.ReadUInt32();
             br.ReadUInt32();
-            p_sz.X = Math.Max(p_sz.X, szBMP.X) / 4 * 4;
-            p_sz.Y = Math.Max(p_sz.Y, szBMP.Y);
-            p_sz = p_sz; 
+            if (p_sz.X < szBMP.X) p_sz.X = szBMP.X;
+            if (p_sz.Y < szBMP.Y) p_sz.Y = szBMP.Y;
             if (p_nByte == 1) br.ReadBytes(256 * 4); 
-            for (int y = 0; y < p_sz.Y; y++)
+            for (int y = 0; y < szBMP.Y; y++)
             {
-                byte[] pBuf = br.ReadBytes(p_nByte * p_sz.X);
-                Marshal.Copy(pBuf, 0, GetPtr(nIndex, 0, p_sz.Y - y - 1), p_nByte * p_sz.X); 
+                byte[] pBuf = br.ReadBytes(p_nByte * szBMP.X);
+                Marshal.Copy(pBuf, 0, GetPtr(nIndex, 0, szBMP.Y - y - 1), p_nByte * szBMP.X); 
             }
             br.Close();
             fs.Close();
@@ -433,11 +432,12 @@ namespace RootTools.Memory
         #endregion
 
         #region Tree
-        public void RunTree(Tree tree, bool bVisible)
+        public void RunTree(Tree tree, bool bVisible, bool bReadonly)
         {
-            p_nCount = tree.Set(p_nCount, p_nCount, "Count", "Memory Count", bVisible);
-            p_nByte = tree.Set(p_nByte, p_nByte, "Byte", "Memory Depth Byte (byte)", bVisible);
-            p_sz = tree.Set(p_sz, p_sz, "Size", "Memory Size", bVisible);
+            p_nCount = tree.Set(p_nCount, p_nCount, "Count", "Memory Count", bVisible, bReadonly);
+            p_nByte = tree.Set(p_nByte, p_nByte, "Byte", "Memory Depth Byte (byte)", bVisible, bReadonly);
+            p_sz = tree.Set(p_sz, p_sz, "Size", "Memory Size", bVisible, bReadonly);
+            tree.Set(p_sSize, p_sSize, "Allocate", "Memory Allocate Size (MB)", bVisible, true);
         }
         #endregion
 

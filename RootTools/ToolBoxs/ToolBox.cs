@@ -2,6 +2,8 @@
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.CognexOCR;
 using RootTools.Camera.Dalsa;
+using RootTools.Camera.Matrox;
+using RootTools.Camera.Silicon;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Gem;
@@ -144,14 +146,22 @@ namespace RootTools.ToolBoxs
             AddToolSet(m_memoryTool, m_memoryToolUI);
         }
 
-        public string Get(ref MemoryPool value, ModuleBase module, string id)
+        public string Get(ref MemoryPool value, ModuleBase module, string id, double fGB)
         {
             if (value == null)
             {
-                value = m_memoryTool.GetPool(module.p_id + "." + id, true);
+                value = m_memoryTool.CreatePool(module.p_id + "." + id, fGB);
                 module.m_aTool.Add(value);
             }
-            value.RunTreeToolBox(module.m_treeToolBox.GetTree(id));
+            return "OK";
+        }
+        public string Get(ref MemoryPool value, ModuleBase module, string id, double fGB , bool bTest)
+        {
+            if (value == null)
+            {
+                value = m_memoryTool.CreatePool(id, fGB);
+                module.m_aTool.Add(value);
+            }
             return "OK";
         }
         #endregion
@@ -266,6 +276,42 @@ namespace RootTools.ToolBoxs
                 {
                     InitCameraSet(module);
                     value = new Camera_Dalsa(module.p_id + "." + id, module.m_log);
+                    module.m_cameraSet.Add(value);
+                }
+                catch (Exception ee)
+                {
+                    MessageBox.Show(ee.ToString());
+                }
+            }
+            return "OK";
+        }
+
+        public string Get(ref Camera_Matrox value, ModuleBase module, string id)
+        {
+            if (value == null)
+            {
+                try
+                {
+                    InitCameraSet(module);
+                    value = new Camera_Matrox(module.p_id + "." + id, module.m_log);
+                    module.m_cameraSet.Add(value);
+                }
+                catch (Exception ee)
+                {
+                    MessageBox.Show(ee.ToString());
+                }
+            }
+            return "OK";
+        }
+
+        public string Get(ref Camera_Silicon value, ModuleBase module, string id)
+        {
+            if (value == null)
+            {
+                try
+                {
+                    InitCameraSet(module);
+                    value = new Camera_Silicon(module.p_id + "." + id, module.m_log);
                     module.m_cameraSet.Add(value);
                 }
                 catch (Exception ee)

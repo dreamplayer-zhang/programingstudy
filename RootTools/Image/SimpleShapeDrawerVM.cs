@@ -320,6 +320,20 @@ namespace RootTools
 		public abstract void DrawEnd();
 		public abstract void Clear();
 
+		public void AddDefectInfo(DefectDataWrapper item)
+		{
+			System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+			rect.Width = item.DrawWidth;
+			rect.Height = item.DrawHeight;
+			System.Windows.Controls.Canvas.SetLeft(rect, item.DrawStartPoint.X);
+			System.Windows.Controls.Canvas.SetTop(rect, item.DrawStartPoint.Y);
+			rect.StrokeThickness = 2;
+			rect.Stroke = Brushes.Red;
+
+			m_ListShape.Add(rect);
+			m_Element.Add(rect);
+			m_ListRect.Add(new UIElementInfo(new System.Windows.Point(item.DrawStartPoint.X, item.DrawStartPoint.Y), new System.Windows.Point(item.DrawStartPoint.X + rect.Width, item.DrawStartPoint.Y + rect.Height)));
+		}
 	}
 
 	public class SimpleShapeDrawerVM : DrawToolVM

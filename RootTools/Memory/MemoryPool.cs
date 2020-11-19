@@ -12,22 +12,25 @@ namespace RootTools.Memory
         const double c_fGB = 1024 * 1024 * 1024;
 
         #region MemoryPool MMF
-        int _gbPool = 0; 
-        public int p_gbPool 
+        double _fGB = 0; 
+        public double p_fGB
         {
-            get { return _gbPool; }
+            get { return _fGB; }
             set
             {
-                if (value == _gbPool) return;
-                if (_gbPool == 0) CreatePool(value);
-                _gbPool = value; 
+                if (value == _fGB) return;
+                if (_fGB != 0) m_MMF.Dispose();
+                CreatePool(value);
+                _fGB = value;
+                m_reg.Write("fGB", value);
+                m_memoryTool.MemoryChanged(); 
             }
         }
 
-        void CreatePool(int gbPool)
+        void CreatePool(double fGB)
         {
             StopWatch sw = new StopWatch();
-            long nPool = (long)Math.Ceiling(gbPool * c_fGB);
+            long nPool = (long)Math.Ceiling(fGB * c_fGB);
             m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool);
             m_log.Info(p_id + " Memory Pool Allocate Done " + sw.ElapsedMilliseconds.ToString() + " ms");
         }
@@ -80,17 +83,16 @@ namespace RootTools.Memory
             return "OK"; 
         }
 
-        public void RunTreeMemory(Tree tree, bool bCount, bool bVisible)
+        public void UpdateMemoryData()
         {
-            int nGroup = p_aGroup.Count;
-            if (bCount) nGroup = tree.Set(nGroup, nGroup, "Count", "Group Count", bVisible); 
+            p_aGroup.Clear();
+            int nGroup = m_reg.Read("Count", 0);
             for (int n = 0; n < nGroup; n++)
             {
-                string sGroup = (p_aGroup.Count > n) ? p_aGroup[n].p_id : "Group";
-                sGroup = tree.Set(sGroup, sGroup, "sGroup." + n.ToString(), "Group Name", bVisible);
-                if (p_aGroup.Count <= n) GetGroup(sGroup); 
+                string sGroup = m_reg.Read("Group" + n.ToString(), "");
+                MemoryGroup group = GetGroup(sGroup, true);
+                group.UpdateMemoryData();
             }
-            foreach (MemoryGroup group in p_aGroup) group.RunTreeMemory(tree.GetTree(group.p_id), bCount, bVisible); 
         }
         #endregion
 
@@ -107,35 +109,58 @@ namespace RootTools.Memory
         #endregion
 
         #region RunTree
-        public void RunTreeToolBox(Tree tree)
+        public TreeRoot m_treeRoot; 
+        void InitTree()
         {
-            p_gbPool = tree.Set(p_gbPool, 1, "Pool Size", "Memory Pool Size (Giga Byte)");
+            m_treeRoot = new TreeRoot(p_id, m_log, false, "MemoryTools");
+            m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
+            RunTree(Tree.eMode.RegRead); 
         }
 
-        public void RunTreeModule(Tree tree)
+        private void M_treeRoot_UpdateTree()
         {
-            foreach (MemoryGroup group in p_aGroup) RunTreeGroup(tree.GetTree(group.p_id, false), group);
-            if (tree.IsUpdated()) m_memoryTool.MemoryChanged(true);
+            RunTree(Tree.eMode.Update);
+            RunTree(Tree.eMode.RegWrite);
+            RunTree(Tree.eMode.Init);
         }
 
-        void RunTreeGroup(Tree tree, MemoryGroup group)
+        public string m_sSelectedGroup = ""; 
+        public void RunTree(Tree.eMode eMode)
         {
-            foreach (MemoryData memory in group.p_aMemory) memory.RunTree(tree.GetTree(memory.p_id, false), true);
+            m_treeRoot.p_eMode = eMode;
+            if (eMode == Tree.eMode.RegWrite)
+            {
+                m_reg.Write("Count", p_aGroup.Count); 
+                for (int n = 0; n < p_aGroup.Count; n++)
+                {
+                    m_reg.Write("Group" + n.ToString(), p_aGroup[n].p_id); 
+                }
+            }
+            foreach (MemoryGroup group in p_aGroup)
+            {
+                bool bVisible = (group.p_id == m_sSelectedGroup); 
+                group.RunTree(m_treeRoot, bVisible, !m_memoryTool.m_bMaster);
+            }
+            if (m_treeRoot.IsUpdated()) m_memoryTool.MemoryChanged();
         }
         #endregion
 
         public string p_id { get; set; }
         public Log m_log;
+        public Registry m_reg; 
         MemoryMappedFile m_MMF = null;
         public MemoryTool m_memoryTool;
         public MemoryViewer m_viewer; 
-        public MemoryPool(string id, MemoryTool memoryTool)
+        public MemoryPool(string id, MemoryTool memoryTool, double fGB)
         {
             p_aGroup = new ObservableCollection<MemoryGroup>();
             p_id = id;
             m_memoryTool = memoryTool;
             m_log = memoryTool.m_log;
             m_viewer = new MemoryViewer(id, this, m_log);
+            m_reg = new Registry(p_id, "MemoryTools");
+            p_fGB = m_reg.Read("fGB", fGB);
+            InitTree(); 
         }
 
         public void ThreadStop()

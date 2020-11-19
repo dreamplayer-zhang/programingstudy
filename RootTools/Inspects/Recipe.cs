@@ -44,6 +44,7 @@ namespace RootTools.Inspects
 			}
 
 			string paramPath = Path.Combine(recipeDir, "Parameter.VegaVision");
+			this.RecipePath = paramPath;
 
 			//Feature 저장
 			if (VegaRecipeData != null)
@@ -265,6 +266,25 @@ namespace RootTools.Inspects
 			_SideBottomUpperOffset = new Param<int>(10000, 0, int.MaxValue);
 			_SideBottomCenterOffset = new Param<int>(30000, 0, int.MaxValue);
 			_SideBottomUnderOffset = new Param<int>(10000, 0, int.MaxValue);
+
+			//TODO Bevel 기본 Parameter설정 필요
+			_BevelInspMargin = new Param<int>(100, 0, int.MaxValue);
+
+			_BevelTopUpperOffset = new Param<int>(10000, 0, int.MaxValue);
+			_BevelTopCenterOffset = new Param<int>(30000, 0, int.MaxValue);
+			_BevelTopUnderOffset = new Param<int>(10000, 0, int.MaxValue);
+
+			_BevelLeftUpperOffset = new Param<int>(10000, 0, int.MaxValue);
+			_BevelLeftCenterOffset = new Param<int>(30000, 0, int.MaxValue);
+			_BevelLeftUnderOffset = new Param<int>(10000, 0, int.MaxValue);
+
+			_BevelRightUpperOffset = new Param<int>(10000, 0, int.MaxValue);
+			_BevelRightCenterOffset = new Param<int>(30000, 0, int.MaxValue);
+			_BevelRightUnderOffset = new Param<int>(10000, 0, int.MaxValue);
+
+			_BevelBottomUpperOffset = new Param<int>(10000, 0, int.MaxValue);
+			_BevelBottomCenterOffset = new Param<int>(30000, 0, int.MaxValue);
+			_BevelBottomUnderOffset = new Param<int>(10000, 0, int.MaxValue);
 		}
 
 		#region SideInspMargin
@@ -285,7 +305,6 @@ namespace RootTools.Inspects
 			}
 		}
 		#endregion
-
 
 		#region SideTopUpperOffset
 
@@ -510,6 +529,253 @@ namespace RootTools.Inspects
 				if (_SideBottomUnderOffset._value == value)
 					return;
 				_SideBottomUnderOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelInspMargin
+
+		Param<int> _BevelInspMargin;
+		public int BevelInspMargin
+		{
+			get
+			{
+				return _BevelInspMargin._value;
+			}
+			set
+			{
+				if (_BevelInspMargin._value == value)
+					return;
+				_BevelInspMargin._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelTopUpperOffset
+
+		Param<int> _BevelTopUpperOffset;
+		public int BevelTopUpperOffset
+		{
+			get
+			{
+				return _BevelTopUpperOffset._value;
+			}
+			set
+			{
+				if (_BevelTopUpperOffset._value == value)
+					return;
+				_BevelTopUpperOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelTopCenterOffset
+
+		Param<int> _BevelTopCenterOffset;
+		public int BevelTopCenterOffset
+		{
+			get
+			{
+				return _BevelTopCenterOffset._value;
+			}
+			set
+			{
+				if (_BevelTopCenterOffset._value == value)
+					return;
+				_BevelTopCenterOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelTopUnderOffset
+
+		Param<int> _BevelTopUnderOffset;
+		public int BevelTopUnderOffset
+		{
+			get
+			{
+				return _BevelTopUnderOffset._value;
+			}
+			set
+			{
+				if (_BevelTopUnderOffset._value == value)
+					return;
+				_BevelTopUnderOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelLeftUpperOffset
+
+		Param<int> _BevelLeftUpperOffset;
+		public int BevelLeftUpperOffset
+		{
+			get
+			{
+				return _BevelLeftUpperOffset._value;
+			}
+			set
+			{
+				if (_BevelLeftUpperOffset._value == value)
+					return;
+				_BevelLeftUpperOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelLeftCenterOffset
+
+		Param<int> _BevelLeftCenterOffset;
+		public int BevelLeftCenterOffset
+		{
+			get
+			{
+				return _BevelLeftCenterOffset._value;
+			}
+			set
+			{
+				if (_BevelLeftCenterOffset._value == value)
+					return;
+				_BevelLeftCenterOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelLeftUnderOffset
+
+		Param<int> _BevelLeftUnderOffset;
+		public int BevelLeftUnderOffset
+		{
+			get
+			{
+				return _BevelLeftUnderOffset._value;
+			}
+			set
+			{
+				if (_BevelLeftUnderOffset._value == value)
+					return;
+				_BevelLeftUnderOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelRightUpperOffset
+
+		Param<int> _BevelRightUpperOffset;
+		public int BevelRightUpperOffset
+		{
+			get
+			{
+				return _BevelRightUpperOffset._value;
+			}
+			set
+			{
+				if (_BevelRightUpperOffset._value == value)
+					return;
+				_BevelRightUpperOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelRightCenterOffset
+
+		Param<int> _BevelRightCenterOffset;
+		public int BevelRightCenterOffset
+		{
+			get
+			{
+				return _BevelRightCenterOffset._value;
+			}
+			set
+			{
+				if (_BevelRightCenterOffset._value == value)
+					return;
+				_BevelRightCenterOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelRightUnderOffset
+
+		Param<int> _BevelRightUnderOffset;
+		public int BevelRightUnderOffset
+		{
+			get
+			{
+				return _BevelRightUnderOffset._value;
+			}
+			set
+			{
+				if (_BevelRightUnderOffset._value == value)
+					return;
+				_BevelRightUnderOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelBottomUpperOffset
+
+		Param<int> _BevelBottomUpperOffset;
+		public int BevelBottomUpperOffset
+		{
+			get
+			{
+				return _BevelBottomUpperOffset._value;
+			}
+			set
+			{
+				if (_BevelBottomUpperOffset._value == value)
+					return;
+				_BevelBottomUpperOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelBottomCenterOffset
+
+		Param<int> _BevelBottomCenterOffset;
+		public int BevelBottomCenterOffset
+		{
+			get
+			{
+				return _BevelBottomCenterOffset._value;
+			}
+			set
+			{
+				if (_BevelBottomCenterOffset._value == value)
+					return;
+				_BevelBottomCenterOffset._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region BevelBottomUnderOffset
+
+		Param<int> _BevelBottomUnderOffset;
+		public int BevelBottomUnderOffset
+		{
+			get
+			{
+				return _BevelBottomUnderOffset._value;
+			}
+			set
+			{
+				if (_BevelBottomUnderOffset._value == value)
+					return;
+				_BevelBottomUnderOffset._value = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -887,9 +1153,9 @@ namespace RootTools.Inspects
 		#endregion
 
 		#region AlignKeyPointF
-        #endregion
+		#endregion
 
-        public Position()
+		public Position()
 		{
 			_AlignSnapCount = new Param<int>(4, 0, int.MaxValue);
 			_AlignPositionIndex = new Param<int>(0, 0, int.MaxValue);

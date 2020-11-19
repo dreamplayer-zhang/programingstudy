@@ -104,11 +104,24 @@ namespace RootTools.Control.Ajin
         #endregion
 
         #region MOT
+        Registry m_reg = new Registry("AjinListAxis"); 
+        string _sMotFile = @"C:\VEGA\Init\VEGA.mot";
+        string p_sMotFile
+        {
+            get { return _sMotFile; }
+            set
+            {
+                _sMotFile = value;
+                m_reg.Write("p_sMotFile", value); 
+            }
+        }
+
         public void LoadMot()
         {
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.Filter = "Mot Files (*.Mot)|*.Mot";
             if (dlg.ShowDialog() == false) return;
+            p_sMotFile = dlg.FileName; 
             uint nError = CAXM.AxmMotLoadParaAll(dlg.FileName);
             if (nError > 0)
             {
@@ -120,8 +133,8 @@ namespace RootTools.Control.Ajin
 
         public void LoadMotFile()
         {
-            uint nError = CAXM.AxmMotLoadParaAll(m_strMotFile);
-            if (nError > 0) m_log.Error("AxmMotLoadParaAll Error : " + m_strMotFile + "  " + nError.ToString());
+            uint nError = CAXM.AxmMotLoadParaAll(p_sMotFile);
+            if (nError > 0) m_log.Error("AxmMotLoadParaAll Error : " + p_sMotFile + "  " + nError.ToString());
         }
 
         public void SaveMot()
@@ -137,9 +150,9 @@ namespace RootTools.Control.Ajin
         Log m_log;
         IEngineer m_engineer;
         bool m_bAXL = false;
-        string m_strMotFile = @"C:\VEGA\Init\VEGA.mot";
         public void Init(string id, IEngineer engineer, bool bAXL)
         {
+            _sMotFile = m_reg.Read("p_sMotFile", _sMotFile); 
             m_id = id;
             m_engineer = engineer;
             m_bAXL = bAXL;
@@ -161,7 +174,7 @@ namespace RootTools.Control.Ajin
 
         public void RunTree(Tree tree)
         {
-            m_strMotFile = tree.SetFile(m_strMotFile, m_strMotFile, "mot", "MotFile", "Motor 설정  File 위치");
+            tree.SetFile(p_sMotFile, p_sMotFile, "mot", "MotFile", "Motor 설정  File 위치", true, true);
             tree.Set(m_lAxisAjin, m_lAxisAjin, "Detect", "Detected Axis Count", true, true);
         }
 

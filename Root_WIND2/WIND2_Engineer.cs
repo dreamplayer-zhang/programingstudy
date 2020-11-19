@@ -11,7 +11,7 @@ using RootTools.Control;
 
 namespace Root_WIND2
 {
-    class WIND2_Engineer : IEngineer
+    public class WIND2_Engineer : IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();
@@ -62,7 +62,7 @@ namespace Root_WIND2
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
         {
-            MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool, false);
+            MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
         }
         #endregion
@@ -92,6 +92,12 @@ namespace Root_WIND2
         #endregion
 
         public WIND2_Handler m_handler = new WIND2_Handler();
+
+        private InspectionManager_Vision inspectionMgrVision;
+        public InspectionManager_Vision InspectionMgrVision { get => inspectionMgrVision; set => inspectionMgrVision = value; }
+        private InspectionManager_EFEM inspectionMgrEFEM;
+        public InspectionManager_EFEM InspectionMgrEFEM { get => inspectionMgrEFEM; set => inspectionMgrEFEM = value; }
+
         public void Init(string id)
         {
             EQ.m_sModel = id;

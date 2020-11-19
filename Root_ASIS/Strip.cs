@@ -6,10 +6,10 @@ namespace Root_ASIS
     {
         public enum eUnitOrder
         {
-            Right_Down,
-            Down_Right,
-            Left_Down,
-            Up_Right
+            Right,
+            Left,
+            Down,
+            Up
         };
 
         public static _Strip m_strip = new _Strip(); 
@@ -45,6 +45,12 @@ namespace Root_ASIS
         { 
             get { return m_strip.p_eUnitOrder; }
             set { m_strip.p_eUnitOrder = value; }
+        }
+
+        public static eUnitOrder p_eUnitSecondOrder
+        {
+            get { return m_strip.p_eUnitSecondOrder; }
+            set { m_strip.p_eUnitSecondOrder = value; }
         }
     }
 
@@ -98,7 +104,7 @@ namespace Root_ASIS
             }
         }
 
-        Strip.eUnitOrder _eUnitOrder = Strip.eUnitOrder.Right_Down; 
+        Strip.eUnitOrder _eUnitOrder = Strip.eUnitOrder.Right; 
         public Strip.eUnitOrder p_eUnitOrder
         {
             get { return _eUnitOrder; }
@@ -110,6 +116,16 @@ namespace Root_ASIS
             }
         }
 
-
+        Strip.eUnitOrder _eUnitSecondOrder = Strip.eUnitOrder.Down;
+        public Strip.eUnitOrder p_eUnitSecondOrder
+        {
+            get { return _eUnitSecondOrder; }
+            set
+            {
+                if (_eUnitSecondOrder == value) return;
+                _eUnitSecondOrder = value;
+                OnPropertyChanged();
+            }
+        }
     }
 }

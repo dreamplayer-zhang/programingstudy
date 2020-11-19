@@ -12,22 +12,23 @@ namespace RootTools
     {
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
 
-        ImageToolViewer_VM m_ImageViewer;
-        public ImageToolViewer_VM p_ImageViewer
+
+        RootViewer_ViewModel m_RootViewer;
+        public RootViewer_ViewModel p_RootViewer
         {
             get
             {
-                return m_ImageViewer;
+                return m_RootViewer;
             }
             set
             {
-                SetProperty(ref m_ImageViewer, value);
+                SetProperty(ref m_RootViewer, value);
             }
         }
 
-        public Dialog_ImageOpenViewModel(ImageToolViewer_VM imageviewer)
+        public Dialog_ImageOpenViewModel(RootViewer_ViewModel rootviewer)
         {
-            p_ImageViewer = imageviewer;
+            p_RootViewer = rootviewer;
         }
 
 

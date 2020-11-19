@@ -38,7 +38,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_doLightSide, this, "LightSide");
             p_sInfo = m_toolBox.Get(ref m_dioLift, this, "Lift", "Down", "Up");
             p_sInfo = m_toolBox.Get(ref m_diWaferExist, this, "WaferExist");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_camAlign, this, "Align");
             p_sInfo = m_toolBox.Get(ref m_camOCR, this, "OCR");
             if (bInit) InitTools();

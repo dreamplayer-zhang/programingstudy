@@ -22,6 +22,12 @@ namespace RootTools.Inspects
 		SideInspectionLeft = 11,
 		SideInspectionRight = 12,
 		SideInspectionBottom = 13,
+		BevelInspection = 14,
+		BevelInspectionTop = 15,
+		BevelInspectionLeft = 16,
+		BevelInspectionRight = 17,
+		BevelInspectionBottom = 18,
+		D2D = 19,
 	}
 	public enum InspectionType
 	{

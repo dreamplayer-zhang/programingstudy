@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace Root_WIND2
 {
-    class WIND2_Handler : IHandler
+    public class WIND2_Handler : IHandler
     {
         #region List InfoWafer
         public string AddInfoWafer(InfoWafer infoWafer)
@@ -48,11 +48,18 @@ namespace Root_WIND2
         public WIND2_Recipe m_recipe;
         public WIND2_Process m_process;
         public Vision m_vision;
+        public EdgeSideVision m_edgesideVision;
+        public BackSideVision m_backSideVision;
+
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
             m_vision = new Vision("Vision", m_enginner);
             InitModule(m_vision);
+            m_edgesideVision = new EdgeSideVision("EdgeSide Vision", m_enginner);
+            InitModule(m_edgesideVision);
+            m_backSideVision = new BackSideVision("BackSide Vision", m_enginner);
+            InitModule(m_backSideVision);
             m_recipe = new WIND2_Recipe("Recipe", m_enginner);
             m_recipe.AddModule(m_vision);
             m_process = new WIND2_Process("Process", m_enginner, this);
@@ -204,10 +211,7 @@ namespace Root_WIND2
                         StateHome();
                         break;
                     case EQ.eState.Run:
-                        if (m_moduleList.m_qModuleRun.Count == 0)
-                        {
-                            m_process.p_sInfo = m_process.RunNextSequence();
-                        }
+                        m_process.p_sInfo = m_process.RunNextSequence();
                         break;
                 }
             }

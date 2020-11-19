@@ -9,36 +9,24 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
         <tree:TreeUI Grid.Column="0" x:Name="treeUI" Margin="3"/>
-        <Canvas Grid.Column="1" x:Name="canvasTact">
+        <Canvas Grid.Column="1" x:Name="canvasTact" Background="Beige">
             <StackPanel Orientation="Horizontal"  Canvas.Left="10" Canvas.Top="10">
-                <Button x:Name="buttonClear" Content=" Clear " Click="buttonClear_Click"/>
-                <Label Content="{Binding p_secRun}" FontSize="20"/>
+                <Button x:Name="buttonClear" Content=" Clear " Margin="3" Click="buttonClear_Click"/>
+                <Button x:Name="buttonSave" Content=" Save " Margin="3" Click="buttonSave_Click"/>
+                <Button x:Name="buttonOpen" Content=" Open " Margin="3" Click="buttonOpen_Click"/>
+                <Button x:Name="buttonRun" Content=" Simulation " Margin="3" Click="buttonRun_Click"/>
+                <Button x:Name="buttonUndo" Content=" Undo " Margin="3" Click="buttonUndo_Click"/>
+                <Label Content="Time = " FontSize="20" Margin="3"/>
+                <TextBox Text="{Binding p_secRun}" FontSize="20" Margin="3" MinWidth="70"/>
+                <Label Content=" Tact = " FontSize="20" Margin="3"/>
+                <TextBox Text="{Binding p_secTact}" FontSize="20" Margin="3" MinWidth="70"/>
             </StackPanel>
         </Canvas>
-        <ListView Grid.Column="2" x:Name="listView" Margin="3">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="    Event    ">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding p_id}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="    Time    ">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding p_id}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <TabControl Grid.Column="2" x:Name="tabControl" Margin="3"/>
     </Grid>
 </UserControl>

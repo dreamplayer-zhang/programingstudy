@@ -25,6 +25,7 @@ namespace RootTools.RADS
 		#endregion
 
 		UdpClient listen = null;
+		int retryCount;
 
 		private UdpClient dataSocket;
 		//Socket listen = null;
@@ -51,6 +52,7 @@ namespace RootTools.RADS
 		public RADSConnectControl(RADSControl parent, bool bUseRADS)
 		{
 			p_parent = parent;
+			retryCount = 0;
 			p_CurrentController = null;
 
 			if (listen == null)
@@ -77,16 +79,16 @@ namespace RootTools.RADS
 		}
 		byte[] buffer = new byte[1024];
 
-        /// <summary>
-        /// 물리적으로 연결된 모든 네트워크에서 Piezo Controller를 탐색
-        /// </summary>
-        /// <param name="dest_ip">Broadcast IP. 기본값은 Piezo Broadcast IP인 100.11.255.255. 그 외 전역 탐색의 경우 255.255.255.255 사용 권장</param>
-        public void GetDeviceInfo(string dest_ip = "255.255.255.255")
+		/// <summary>
+		/// 물리적으로 연결된 모든 네트워크에서 Piezo Controller를 탐색
+		/// </summary>
+		/// <param name="dest_ip">Broadcast IP. 기본값은 Piezo Broadcast IP인 100.11.255.255. 그 외 전역 탐색의 경우 255.255.255.255 사용 권장</param>
+		public void GetDeviceInfo(string dest_ip = "255.255.255.255")
 		{
 			//100.11.0.12 Default IP Dest
 			//Broadcast Address : 100.11.255.255
 			//Normal Broadcast Address : 255.255.255.255
-		
+
 			string message = RADSControlInfo.ADSCP_TYPE_REQ + RADSControlInfo.ADSCP_OPCODE_PING;
 
 			if (seq_number < 65534)
@@ -109,73 +111,97 @@ namespace RootTools.RADS
 			listen.Send(bytes, bytes.Length, new IPEndPoint(IPAddress.Parse(dest_ip), RADSControlInfo.ADSCP_PORT));
 
 			IPEndPoint from = new IPEndPoint(0, 0);
-			while(true)
+			while (true)
 			{
-				var echoBuffer = listen.Receive(ref from);
-				var ADSCP_Type = echoBuffer[0].ToString("X2") + echoBuffer[1].ToString("X2");
-				var ADSCP_Opcode = echoBuffer[2].ToString("X2") + echoBuffer[3].ToString("X2");
-				var ADSCP_Length = echoBuffer[4].ToString("X2") + echoBuffer[5].ToString("X2");
-				int ADSCP_seqNumber = (int)uint.Parse(echoBuffer[6].ToString("X2") + echoBuffer[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-				int ADSCP_address = (int)uint.Parse(echoBuffer[8].ToString("X2") + echoBuffer[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-				int ADSCP_value = (int)uint.Parse(echoBuffer[10].ToString("X2") + echoBuffer[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-
-				Console.WriteLine("Response IP Address : {0}", from);
-				Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
-					ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
-
-				if (ADSCP_Type == "0000" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_PONG) //Controller Discovery Pong!
+				//Receive가 중복해서 여러개 날아오기 때문에 어쩔 수 없음
+				//var echoBuffer = listen.Receive(ref from);
+				var asyncResult = listen.BeginReceive(null, null);
+				asyncResult.AsyncWaitHandle.WaitOne(1000);
+				if (asyncResult.IsCompleted)
 				{
-					byte[] controller_ip = new byte[4];
-					byte[] controller_mac = new byte[6];
-					byte[] controller_name = new byte[10];
-
-					for (int i = 0; i < 10; i++)
+					try
 					{
-						controller_name[i] = echoBuffer[i + 8];
-						if (i < 6) { controller_mac[i] = echoBuffer[i + 18]; }
-						if (i < 4) { controller_ip[i] = echoBuffer[i + 24]; }
+						IPEndPoint remoteEP = null;
+						byte[] echoBuffer = listen.EndReceive(asyncResult, ref remoteEP);
+						// EndReceive worked and we have received data and remote endpoint
+
+						var ADSCP_Type = echoBuffer[0].ToString("X2") + echoBuffer[1].ToString("X2");
+						var ADSCP_Opcode = echoBuffer[2].ToString("X2") + echoBuffer[3].ToString("X2");
+						var ADSCP_Length = echoBuffer[4].ToString("X2") + echoBuffer[5].ToString("X2");
+						int ADSCP_seqNumber = (int)uint.Parse(echoBuffer[6].ToString("X2") + echoBuffer[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+						int ADSCP_address = (int)uint.Parse(echoBuffer[8].ToString("X2") + echoBuffer[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+						int ADSCP_value = (int)uint.Parse(echoBuffer[10].ToString("X2") + echoBuffer[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+
+						Console.WriteLine("Response IP Address : {0}", from);
+						Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
+							ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
+
+						if (ADSCP_Type == "0000" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_PONG) //Controller Discovery Pong!
+						{
+							byte[] controller_ip = new byte[4];
+							byte[] controller_mac = new byte[6];
+							byte[] controller_name = new byte[10];
+
+							for (int i = 0; i < 10; i++)
+							{
+								controller_name[i] = echoBuffer[i + 8];
+								if (i < 6) { controller_mac[i] = echoBuffer[i + 18]; }
+								if (i < 4) { controller_ip[i] = echoBuffer[i + 24]; }
+							}
+							var MAC = controller_mac[0].ToString("X2") + ":" + controller_mac[1].ToString("X2") + ":" + controller_mac[2].ToString("X2") + ":" + (controller_mac[3]).ToString("X2") + ":" + (controller_mac[4]).ToString("X2") + ":" + (controller_mac[5]).ToString("X2");
+
+							RADS controller = new RADS();
+							controller.ADSCP_Type = ADSCP_Type;
+							controller.ADSCP_Opcode = ADSCP_Opcode;
+							controller.ADSCP_Length = ADSCP_Length;
+							controller.RawName = controller_name;
+							controller.p_MAC = MAC;
+							controller.p_IP = new IPAddress(controller_ip);
+
+							if (listen != null)
+							{
+								listen.Close();
+								listen = null;
+							}
+							//	GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
+
+							p_CurrentController = controller;
+
+							Console.WriteLine("Find Controller. Controller Info : ");
+							Console.WriteLine(p_CurrentController.GetInformation());
+
+							Console.WriteLine("Start Read Registry");
+
+							ReadPacket(0);
+							ReadPacket(1);
+							ReadPacket(2);
+							ReadPacket(3);
+							ReadPacket(4);
+							ReadPacket(5);
+							//6,7번은 어디로갔을깡...
+							ReadPacket(8);
+							ReadPacket(9);
+							//Console.WriteLine("Read Registry Finish");
+
+							//UPDATE 시점이 맞지 않음. ChangeRegistry 모든 flag가 완료되었을때 이 이벤트가 발생하도록 처리해야할 필요가 있음
+							//if (SearchComplete != null)
+							//{
+							//	SearchComplete();
+							//}
+							break;
+						}
 					}
-					var MAC = controller_mac[0].ToString("X2") + ":" + controller_mac[1].ToString("X2") + ":" + controller_mac[2].ToString("X2") + ":" + (controller_mac[3]).ToString("X2") + ":" + (controller_mac[4]).ToString("X2") + ":" + (controller_mac[5]).ToString("X2");
-
-					RADS controller = new RADS();
-					controller.ADSCP_Type = ADSCP_Type;
-					controller.ADSCP_Opcode = ADSCP_Opcode;
-					controller.ADSCP_Length = ADSCP_Length;
-					controller.RawName = controller_name;
-					controller.p_MAC = MAC;
-					controller.p_IP = new IPAddress(controller_ip);
-
-					if (listen != null)
+					catch (Exception ex)
 					{
-						listen.Close();
-						listen = null;
+						// EndReceive failed and we ended up here
+						Console.WriteLine(ex.Message);
 					}
-					//	GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
-
-					p_CurrentController = controller;
-
-					Console.WriteLine("Find Controller. Controller Info : ");
-					Console.WriteLine(p_CurrentController.GetInformation());
-
-					Console.WriteLine("Start Read Registry");
-
-					ReadPacket(0);
-					ReadPacket(1);
-					ReadPacket(2);
-					ReadPacket(3);
-					ReadPacket(4);
-					ReadPacket(5);
-					//6,7번은 어디로갔을깡...
-					ReadPacket(8);
-					ReadPacket(9);
-					Console.WriteLine("Read Registry Finish");
-
-
-					if (SearchComplete != null)
-					{
-						SearchComplete();
-					}
-					break;
+				}
+				else
+				{
+					// The operation wasn't completed before the timeout and we're off the hook
+					//정 안되면 아래쪽 주석을 살리기...
+					//GetDeviceInfo();
 				}
 			}
 		}
@@ -331,7 +357,7 @@ namespace RootTools.RADS
 		private void OnReceive(IAsyncResult ar)
 		{
 			UdpClient u = (UdpClient)ar.AsyncState;
-			IPEndPoint ep=new IPEndPoint(0,0);
+			IPEndPoint ep = new IPEndPoint(0, 0);
 			var results = u.EndReceive(ar, ref ep);
 
 			var ADSCP_Type = results[0].ToString("X2") + results[1].ToString("X2");
@@ -351,10 +377,10 @@ namespace RootTools.RADS
 				p_CurrentController.p_reg[ADSCP_address] = ADSCP_value;
 				ChangeRegestry(ADSCP_address, ADSCP_value);
 				Console.WriteLine();
-				
+
 			}
 
-			
+
 			if (ADSCP_Type == "3202" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_SEND_DATA)
 			{
 				int ADSCP_ADS_up = (int)uint.Parse(results[8].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
@@ -366,7 +392,7 @@ namespace RootTools.RADS
 					p_CurrentController.p_ADS_down = ADSCP_ADS_down;
 					p_CurrentController.p_ADS_data = ADSCP_ADS_data;
 				}
-				
+
 			}
 			u.BeginReceive(OnReceive, u);
 		}
@@ -404,28 +430,59 @@ namespace RootTools.RADS
 
 			IPEndPoint remoteEP = new IPEndPoint(0, 0);
 
-			var results = sender.Receive(ref remoteEP);
+			var asyncResult = sender.BeginReceive(null, null);
 
-			var ADSCP_Type = results[0].ToString("X2") + results[1].ToString("X2");
-			var ADSCP_Opcode = results[2].ToString("X2") + results[3].ToString("X2");
-			var ADSCP_Length = results[4].ToString("X2") + results[5].ToString("X2");
-			int ADSCP_seqNumber = (int)uint.Parse(results[6].ToString("X2") + results[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-			int ADSCP_address = (int)uint.Parse(results[8].ToString("X2") + results[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-			int ADSCP_value = (int)uint.Parse(results[10].ToString("X2") + results[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-
-			Console.WriteLine("Response IP Address : {0}", remoteEP);
-			Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
-				ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
-
-			if (ADSCP_Type == "3202" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_RESET_RSP)
+			asyncResult.AsyncWaitHandle.WaitOne(1000);
+			if (asyncResult.IsCompleted)
 			{
-				//set base response!
-				Console.WriteLine("Reset Complete!");
-				result = true;
+				try
+				{
+					byte[] results = sender.EndReceive(asyncResult, ref remoteEP);
+					// EndReceive worked and we have received data and remote endpoint
+					var ADSCP_Type = results[0].ToString("X2") + results[1].ToString("X2");
+					var ADSCP_Opcode = results[2].ToString("X2") + results[3].ToString("X2");
+					var ADSCP_Length = results[4].ToString("X2") + results[5].ToString("X2");
+					int ADSCP_seqNumber = (int)uint.Parse(results[6].ToString("X2") + results[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+					int ADSCP_address = (int)uint.Parse(results[8].ToString("X2") + results[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+					int ADSCP_value = (int)uint.Parse(results[10].ToString("X2") + results[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+
+					Console.WriteLine("Response IP Address : {0}", remoteEP);
+					Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
+						ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
+
+					if (ADSCP_Type == "3202" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_RESET_RSP)
+					{
+						//set base response!
+						Console.WriteLine("Reset Complete!");
+						result = true;
+					}
+				}
+				catch (Exception ex)
+				{
+					// EndReceive failed and we ended up here
+					Debug.WriteLine("SetResetControllerPacket() - " + ex.Message);
+				}
+			}
+			else
+			{
+				// The operation wasn't completed before the timeout and we're off the hook
+				sender.Close();
+				GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
+				if (retryCount < 50)
+				{
+					retryCount++;
+					return SetResetControllerPacket();
+				}
+				else
+				{
+					retryCount = 0;
+					return false;
+				}
 			}
 
 			sender.Close();
 			GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
+			retryCount = 0;
 			return result;
 		}
 
@@ -572,7 +629,7 @@ namespace RootTools.RADS
 			p_CurrentController.p_limit = value;
 			return WritePacket(8, value);
 		}
-		
+
 		private bool SetFilter(RADS.eFilterType filter_type, bool yfilter_on, bool hfilter_on, bool wfilter_on)
 		{
 			if (p_CurrentController == null)
@@ -635,40 +692,73 @@ namespace RootTools.RADS
 			{
 				sender = new UdpClient(RADSControlInfo.ADSCP_PORT);
 			}
-			Thread.Sleep(100);
 			sender.Send(bytes, bytes.Length, new IPEndPoint(p_CurrentController.p_IP, RADSControlInfo.ADSCP_PORT));
 
 			IPEndPoint remoteEP = new IPEndPoint(0, 0);
-			Thread.Sleep(100);
-			var results = sender.Receive(ref remoteEP);
 
-			var ADSCP_Type = results[0].ToString("X2") + results[1].ToString("X2");
-			var ADSCP_Opcode = results[2].ToString("X2") + results[3].ToString("X2");
-			var ADSCP_Length = results[4].ToString("X2") + results[5].ToString("X2");
-			int ADSCP_seqNumber = (int)uint.Parse(results[6].ToString("X2") + results[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-			int ADSCP_address = (int)uint.Parse(results[8].ToString("X2") + results[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
-			int ADSCP_value = (int)uint.Parse(results[10].ToString("X2") + results[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+			var asyncResult = sender.BeginReceive(null, null);
+			asyncResult.AsyncWaitHandle.WaitOne(1000);
 
-
-			Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
-				ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
-
-			if (ADSCP_Type == "3202" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_WRITE_RSP)
+			if (asyncResult.IsCompleted)
 			{
-				//Write response!
-				Console.WriteLine("Write Packet Response");
+				try
+				{
+					byte[] results = sender.EndReceive(asyncResult, ref remoteEP);
+					// EndReceive worked and we have received data and remote endpoint
 
-				p_CurrentController.p_reg[ADSCP_address] = ADSCP_value;
-				ChangeRegestry(ADSCP_address, ADSCP_value);
-				Console.WriteLine();
-				result = true;
+					var ADSCP_Type = results[0].ToString("X2") + results[1].ToString("X2");
+					var ADSCP_Opcode = results[2].ToString("X2") + results[3].ToString("X2");
+					var ADSCP_Length = results[4].ToString("X2") + results[5].ToString("X2");
+					int ADSCP_seqNumber = (int)uint.Parse(results[6].ToString("X2") + results[7].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+					int ADSCP_address = (int)uint.Parse(results[8].ToString("X2") + results[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+					int ADSCP_value = (int)uint.Parse(results[10].ToString("X2") + results[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
+
+
+					Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
+						ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
+
+					if (ADSCP_Type == "3202" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_WRITE_RSP)
+					{
+						//Write response!
+						Console.WriteLine("Write Packet Response");
+
+						p_CurrentController.p_reg[ADSCP_address] = ADSCP_value;
+						ChangeRegestry(ADSCP_address, ADSCP_value);
+						Console.WriteLine();
+						result = true;
+					}
+				}
+				catch (Exception ex)
+				{
+					// EndReceive failed and we ended up here
+					Debug.WriteLine("WritePacket() - " + ex.Message);
+				}
 			}
+			else
+			{
+				// The operation wasn't completed before the timeout and we're off the hook
+				sender.Close();
+				GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
+				if (retryCount < 50)
+				{
+					retryCount++;
+					return WritePacket(address, value);
+				}
+				else
+				{
+					retryCount = 0;
+					return false;
+				}
+			}
+
+
 			sender.Close();
+			retryCount = 0;
 			GC.Collect();//TODO : 나중에 원인 찾아서 수정해야 함
 
 			return result;
 		}
-		
+
 		byte[] ConvertToByteArr(string out_packet)
 		{
 			// sendPacket

@@ -22,14 +22,14 @@
 		<!--Mode Select Start-->
 		<StackPanel TextOptions.TextFormattingMode="Ideal">
 			<RadioButton x:Name="CurrentInspData"
-						 IsChecked="True"
+						 IsChecked="False"
 						 Style="{StaticResource TabLikeRadioButtonStyleKey}">
 				<TextBlock Text="CurrentData"
 						   FontSize="16"
 						   Foreground="{Binding RelativeSource={RelativeSource AncestorType={x:Type RadioButton}}, Path=Foreground}" />
 			</RadioButton>
 			<RadioButton x:Name="SearchInspData"
-						 IsChecked="False"
+						 IsChecked="True"
 						 Style="{StaticResource TabLikeRadioButtonStyleKey}">
 				<TextBlock Text="Search DB"
 						   FontSize="16"
@@ -77,6 +77,7 @@
 								<RowDefinition Height="Auto"/>
 							</Grid.RowDefinitions>
 							<TextBlock Text="Inspection Time"
+									   Foreground="White"
 							   VerticalAlignment="Center"/>
 							<StackPanel Orientation="Horizontal"
 								Grid.Row="1"
@@ -85,19 +86,20 @@
 								<CheckBox Content="Start Time"
 								  VerticalAlignment="Center"
 								  IsChecked="{Binding IsDateSearch}"/>
-								<!--<controls:DateTimePicker SelectedDate="{Binding StartDate, Mode=TwoWay}"
+								<controls:DateTimePicker SelectedDate="{Binding StartDate, Mode=TwoWay}"
 												 Width="150"
 												 Margin="10,0,0,0"
 												 IsEnabled="{Binding IsDateSearch}"
-												 VerticalAlignment="Center"/>-->
+												 VerticalAlignment="Center"/>
 								<TextBlock Text="End Time"
 								   Margin="10,0,0,0"
+										   Foreground="White"
 								   VerticalAlignment="Center"/>
-								<!--<controls:DateTimePicker SelectedDate="{Binding EndDate, Mode=TwoWay}"
+								<controls:DateTimePicker SelectedDate="{Binding EndDate, Mode=TwoWay}"
 												 Width="150"
 												 Margin="10,0,0,0"
 												 IsEnabled="{Binding IsDateSearch}"
-												 VerticalAlignment="Center"/>-->
+												 VerticalAlignment="Center"/>
 							</StackPanel>
 						</Grid>
 						<StackPanel Grid.Row="1"

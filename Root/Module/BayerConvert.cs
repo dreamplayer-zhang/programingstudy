@@ -13,7 +13,7 @@ namespace Root.Module
         MemoryGroup m_memoryGroup;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
         }
         #endregion
 

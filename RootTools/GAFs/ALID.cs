@@ -62,10 +62,11 @@ namespace RootTools.GAFs
             }
         }
 
-        public void Run(bool bSet, string sMsg)
+        public void Run(bool bSet, string sMsg, bool bEQError)
         {
             p_sMsg = sMsg; 
-            p_bSet = bSet; 
+            p_bSet = bSet;
+            if (bSet && bEQError) EQ.p_eState = EQ.eState.Error;
         }
 
         DateTime _dateTime = DateTime.Now;

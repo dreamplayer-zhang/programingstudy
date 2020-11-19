@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="Root_WIND2.Edge_Panel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_WIND2"        
+             mc:Ignorable="d" 
+             d:DesignHeight="838" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="12*"/>
+            <ColumnDefinition Width="88*"/>
+        </Grid.ColumnDefinitions>
+        <Border BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
+            <Grid>
+                <StackPanel Margin="0,10,0,0">
+                    <Button Content="Setup"
+                            Style="{StaticResource PanelBtn}"
+                            Command="{Binding btnEdgeSetup}"/>
+                    <Button Content="Snap"
+                            Style="{StaticResource PanelBtn}"
+                            Command="{Binding btnEdgeSnap}"/>
+                    <Button Content="Inspection"
+                            Style="{StaticResource PanelBtn}"
+                            Command="{Binding btnEdgeInsp}"/>
+                </StackPanel>
+                <Button Content="Back"
+                        Command="{Binding btnBack}"
+                        VerticalAlignment="Bottom"
+                        Style="{StaticResource PanelBtn}"/>
+            </Grid>
+        </Border>
+        <Grid Grid.Column="1" x:Name="SubPanel">
+            <local:EdgeSetupPage/>
+        </Grid>
+
+
+    </Grid>
+</UserControl>

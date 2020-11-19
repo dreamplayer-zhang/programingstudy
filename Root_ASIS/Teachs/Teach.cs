@@ -2,33 +2,38 @@
 using RootTools;
 using RootTools.Memory;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace Root_ASIS.Teachs
 {
-    public class Teach
+    public class Teach : NotifyProperty
     {
         #region List AOI 
         AOIStrip m_aoiStrip;
-        AOIStripID m_aoiStripID;
+        /// <summary> 사용가능한 AOI List </summary>
         List<IAOI> _aAOI = new List<IAOI>();
         void InitListAOI()
         {
             m_aoiStrip = new AOIStrip("AOIStrip", m_log);
-            m_aoiStripID = new AOIStripID("AOIStripID", m_log);
+            InitLIstAOIArray();
 
+            _aAOI.Add(new AOI_StripID("AOI_StripID", m_log));
             _aAOI.Add(new AOI_Unit("AOI_Unit", m_log));
-            InvalidateListAOI(); 
         }
 
-        public ObservableCollection<IAOI> m_aListAOI = new ObservableCollection<IAOI>();
+        /// <summary> 활성화된 AOI List </summary>
+        public ObservableCollection<IAOI> m_aEnableAOI = new ObservableCollection<IAOI>();
         void InvalidateListAOI()
         {
-            m_aListAOI.Clear(); 
+            m_aEnableAOI.Clear();
             foreach (IAOI aoi in _aAOI)
             {
-                if (aoi.p_bEnable) m_aListAOI.Add(aoi);
+                if (aoi.p_bEnable) m_aEnableAOI.Add(aoi);
             }
         }
 
@@ -41,85 +46,30 @@ namespace Root_ASIS.Teachs
         }
         #endregion
 
-        #region AOI
-        public ObservableCollection<IAOI> m_aAOI = new ObservableCollection<IAOI>(); 
-        void ClearAOI()
+        #region AOI Array
+        List<IArray> _aAOIArray = new List<IArray>(); 
+        void InitLIstAOIArray()
         {
-            m_aAOI.Clear();
+            _aAOIArray.Add(new AOIArray("AOIArray", m_nID, m_log));
         }
 
-        void RunTreeAOI(Tree tree)
+
+        IArray p_aoiArray
         {
-            m_aoiStrip.RunTree(tree.GetTree("AOIStrip"));
-            m_aoiStripID.RunTree(tree.GetTree("AOIStripID"));
-            for (int n = 0; n < m_aAOI.Count; n++)
+            get 
             {
-                m_aAOI[n].p_nID = n; 
-                m_aAOI[n].RunTree(tree.GetTree(n, m_aAOI[n].p_id));
+                foreach (IArray aoi in _aAOIArray) if (aoi.p_id == m_sAOIArray) return aoi;
+                return _aAOIArray[0]; 
             }
         }
-        #endregion
 
-        #region ROI
-        public ObservableCollection<AOIData> m_aROI = new ObservableCollection<AOIData>();
-        public void InvalidListROI()
+        string m_sAOIArray = "AOIArray";
+        void RunTreeArray(Tree tree)
         {
-            m_aROI.Clear();
-            m_aoiStrip.AddROI(m_aROI);
-            m_aoiStripID.AddROI(m_aROI);
-            foreach (IAOI aoi in m_aAOI) aoi.AddROI(m_aROI);
-        }
-
-        public Dictionary<AOIData.eROI, int> m_nROI = new Dictionary<AOIData.eROI, int>();
-        void InitROI()
-        {
-            m_nROI.Add(AOIData.eROI.Ready, 0);
-            m_nROI.Add(AOIData.eROI.Active, 0);
-            m_nROI.Add(AOIData.eROI.Done, 0);
-            InvalidListROI();
-        }
-
-        public AOIData p_roiActive
-        {
-            get { return GetActineROI(); }
-        }
-
-        AOIData GetActineROI()
-        {
-            CalcROICount();
-            if (m_nROI[AOIData.eROI.Active] == 1)
-            {
-                foreach (AOIData roi in m_aROI)
-                {
-                    if (roi.p_eROI == AOIData.eROI.Active) return roi;
-                }
-            }
-            if (m_nROI[AOIData.eROI.Active] > 1) ClearActive();
-            foreach (AOIData roi in m_aROI)
-            {
-                if (roi.p_eROI == AOIData.eROI.Ready)
-                {
-                    roi.p_eROI = AOIData.eROI.Active;
-                    return roi;
-                }
-            }
-            return null;
-        }
-
-        void CalcROICount()
-        {
-            m_nROI[AOIData.eROI.Ready] = 0;
-            m_nROI[AOIData.eROI.Active] = 0;
-            m_nROI[AOIData.eROI.Done] = 0;
-            foreach (AOIData roi in m_aROI) m_nROI[roi.p_eROI]++;
-        }
-
-        public void ClearActive()
-        {
-            foreach (AOIData roi in m_aROI)
-            {
-                if (roi.p_eROI == AOIData.eROI.Active) roi.p_eROI = AOIData.eROI.Ready;
-            }
+            List<string> asAOIArray = new List<string>();
+            foreach (IAOI aoi in _aAOIArray) asAOIArray.Add(aoi.p_id);
+            m_sAOIArray = tree.Set(m_sAOIArray, m_sAOIArray, asAOIArray, "Array", "Select AOI Array");
+            p_aoiArray.RunTreeArray(tree.GetTree(p_aoiArray.p_id));
         }
         #endregion
 
@@ -134,26 +84,244 @@ namespace Root_ASIS.Teachs
         private void M_viewer_OnLBD(bool bDown, CPoint cpImg)
         {
             if (p_roiActive == null) return;
-            p_roiActive.LBD(bDown, cpImg);
-            Draw(AOIData.eDraw.ROI);
-            GetActineROI(); 
+            p_roiActive.LBD(bDown, cpImg, m_memoryPool.m_viewer.p_memoryData);
+            Draw();
+            GetActiveROI();
         }
 
         private void M_viewer_OnMouseMove(CPoint cpImg)
         {
             if (p_roiActive == null) return;
             p_roiActive.MouseMove(cpImg);
-            Draw(AOIData.eDraw.ROI);
+            Draw();
         }
 
-        public void Draw(AOIData.eDraw eDraw)
+        AOIData.eDraw _eDraw = AOIData.eDraw.ROI;
+        public AOIData.eDraw p_eDraw
+        {
+            get { return _eDraw; }
+            set
+            {
+                if (_eDraw == value) return;
+                _eDraw = value;
+                OnPropertyChanged();
+                Draw();
+            }
+        }
+
+        public void Draw()
         {
             MemoryDraw draw = m_memoryPool.m_viewer.p_memoryData.m_aDraw[0];
             draw.Clear();
-            m_aoiStrip.Draw(draw, eDraw);
-            m_aoiStripID.Draw(draw, eDraw);
-            foreach (IAOI aoi in m_aAOI) aoi.Draw(draw, eDraw); 
-            draw.InvalidDraw(); 
+            m_aoiStrip.Draw(draw, p_eDraw); 
+            p_aoiArray.Draw(draw, p_eDraw);
+            foreach (IAOI aoi in p_aAOI) aoi.Draw(draw, p_eDraw);
+            draw.InvalidDraw();
+        }
+        #endregion
+
+        #region AOI
+        /// <summary> Inspect를 위한 AOI List, AOI_Strip 제외 </summary>
+        public ObservableCollection<IAOI> p_aAOI { get; set; }
+        /// <summary> Inspect를 위한 AOI List, AOI_Strip 포함 </summary>
+        public ObservableCollection<IAOI> p_aROI { get; set; }
+        void ClearAOI()
+        {
+            p_aAOI.Clear();
+            InvalidROI(); 
+        }
+
+        public void InvalidROI()
+        {
+            p_aROI.Clear();
+            p_aROI.Add(m_aoiStrip);
+            p_aoiArray.InvalidROI(); 
+            p_aROI.Add(p_aoiArray);
+            foreach (IAOI aoi in p_aAOI) p_aROI.Add(aoi); 
+        }
+
+        void RunTreeAOI(Tree tree)
+        {
+            m_aoiStrip.RunTreeAOI(tree.GetTree("AOIStrip"));
+            p_aoiArray.RunTreeAOI(tree.GetTree(p_aoiArray.p_id, true, false)); 
+            for (int n = 0; n < p_aAOI.Count; n++)
+            {
+                p_aAOI[n].p_nID = n;
+                p_aAOI[n].p_id = n.ToString("00") + "." + p_aAOI[n].p_sAOI; 
+                p_aAOI[n].RunTreeAOI(tree.GetTree(p_aAOI[n].p_id));
+            }
+        }
+        #endregion
+
+        #region ROI
+        public int m_nROIReady = 0;
+        public int m_nROIActive = 0; 
+
+        public AOIData p_roiActive
+        {
+            get { return GetActiveROI(); }
+        }
+
+        AOIData GetActiveROI()
+        {
+            CalcROICount();
+            if (m_nROIActive == 1)
+            {
+                foreach (IAOI aoi in p_aROI)
+                {
+                    AOIData active = aoi.GetAOIData(AOIData.eROI.Active);
+                    if (active != null) return active; 
+                }
+            }
+            if (m_nROIActive > 1) ClearActive();
+            foreach (IAOI aoi in p_aROI)
+            {
+                AOIData active = aoi.GetAOIData(AOIData.eROI.Ready);
+                if (active != null)
+                {
+                    active.p_eROI = AOIData.eROI.Active;
+                    return active;
+                }
+            }
+            return null;
+        }
+
+        public void CalcROICount()
+        {
+            m_nROIReady = 0;
+            m_nROIActive = 0;
+            foreach (IAOI aoi in p_aROI) aoi.CalcROICount(ref m_nROIReady, ref m_nROIActive);
+        }
+
+        public void ClearActive()
+        {
+            foreach (IAOI aoi in p_aROI) aoi.ClearActive(); 
+        }
+
+        public void ReAllocate()
+        {
+            p_aoiArray.ReAllocate(m_memoryPool.m_viewer.p_memoryData);
+            foreach (IAOI aoi in p_aAOI) aoi.ReAllocate(p_aoiArray.p_aArray); 
+        }
+        #endregion
+
+        #region Inspect
+        static InfoStrip m_defaultStrip = new InfoStrip(0);
+        enum eTimer
+        {
+            Before,
+            After,
+            Stop
+        }
+        eTimer m_eTimer = eTimer.Stop;
+        InfoStrip m_inspectStrip = null;
+        MemoryData m_inspectMemory = null; 
+        public string Inspect(InfoStrip infoStrip)
+        {
+            if (infoStrip == null)
+            {
+                if (m_nID == 0) m_defaultStrip = new InfoStrip(0); 
+                infoStrip = m_defaultStrip;
+            }
+            m_inspectStrip = infoStrip; 
+            m_inspectMemory = m_memoryPool.m_viewer.p_memoryData;
+            m_bgwInspect.RunWorkerAsync(); 
+            return "OK";
+        }
+
+        BackgroundWorker m_bgwInspect = new BackgroundWorker(); 
+        void InitBackgroundWorker()
+        {
+            m_bgwInspect.DoWork += M_bgwInspect_DoWork;
+            m_bgwInspect.RunWorkerCompleted += M_bgwInspect_RunWorkerCompleted;
+        }
+
+        private void M_bgwInspect_DoWork(object sender, DoWorkEventArgs e)
+        {
+            RunTimerInspect(eTimer.Before);
+            m_aoiStrip.Inspect(m_inspectStrip, m_inspectMemory);
+            foreach (IAOI aoi in p_aAOI) aoi.Inspect(m_inspectStrip, m_inspectMemory);
+            RunTimerInspect(eTimer.After);
+        }
+
+        private void M_bgwInspect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Draw(); 
+        }
+
+        DispatcherTimer m_timer = new DispatcherTimer(); 
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(1);
+            m_timer.Tick += M_timer_Tick;
+        }
+
+        void RunTimerInspect(eTimer eTimer)
+        {
+            m_eTimer = eTimer;
+            m_timer.Start();
+            while ((m_eTimer != eTimer.Stop) && (EQ.IsStop() == false)) Thread.Sleep(1); 
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            m_timer.Stop(); 
+            switch (m_eTimer)
+            {
+                case eTimer.Before:
+                    foreach (IAOI aoi in p_aAOI) aoi.BeforeInspect(m_inspectStrip, m_inspectMemory);
+                    break;
+                case eTimer.After:
+                    foreach (IAOI aoi in p_aAOI) aoi.AfterInspect(m_inspectStrip, m_inspectMemory);
+                    break;
+            }
+            m_eTimer = eTimer.Stop; 
+        }
+        #endregion
+
+        #region Recipe
+        public void SaveRecipe(string sFile)
+        {
+            Job job = new Job(sFile, true, m_log);
+            m_treeRootAOI.m_job = job;
+            job.Set(m_id, "AOI Count", p_aAOI.Count);
+            for (int n = 0; n < p_aAOI.Count; n++)
+            {
+                string sKey = m_id + n.ToString("00");
+                job.Set(sKey, "AOI", p_aAOI[n].p_id);
+            }
+            RunTreeAOI(Tree.eMode.JobSave);
+            job.Close();
+        }
+
+        public void OpenRecipe(string sFile)
+        {
+            Job job = new Job(sFile, false, m_log);
+            ClearAOI();
+            m_treeRootAOI.m_job = job;
+            int nAOI = job.Set(m_id, "AOI Count", p_aAOI.Count);
+            for (int n = 0; n < nAOI; n++)
+            {
+                string sKey = m_id + n.ToString("00");
+                string sAOI = job.Set(sKey, "AOI", "");
+                string[] asAOI = sAOI.Split('.'); 
+                IAOI aoi = NewAOI(asAOI[1]);
+                if (aoi != null) p_aAOI.Add(aoi);
+            }
+            RunTreeAOI(Tree.eMode.JobOpen);
+            job.Close();
+            Draw();
+            InvalidROI();
+            m_aoiStrip.Setup(m_memoryPool.m_viewer.p_memoryData); 
+        }
+
+        IAOI NewAOI(string sAOI)
+        {
+            foreach (IAOI aoi in m_aEnableAOI)
+            {
+                if (aoi.p_id == sAOI) return aoi.NewAOI();
+            }
+            return null;
         }
         #endregion
 
@@ -162,7 +330,6 @@ namespace Root_ASIS.Teachs
         void InitTreeSetup()
         {
             m_treeRootSetup = new TreeRoot(m_id + ".Setup", m_log);
-            RunTreeSetup(Tree.eMode.RegRead);
             m_treeRootSetup.UpdateTree += M_treeRootSetup_UpdateTree;
         }
 
@@ -201,20 +368,49 @@ namespace Root_ASIS.Teachs
         }
         #endregion
 
-        public string m_id;
-        Log m_log; 
-        public Teach(string id, MemoryPool memoryPool)
+        #region Tree ROI
+        public TreeRoot m_treeRootROI;
+        void InitTreeROI()
         {
+            m_treeRootROI = new TreeRoot(m_id + ".ROI", m_log);
+            m_treeRootROI.UpdateTree += M_treeRootROI_UpdateTree;
+        }
+
+        private void M_treeRootROI_UpdateTree()
+        {
+            RunTreeROI(Tree.eMode.Update);
+            RunTreeROI(Tree.eMode.RegWrite);
+        }
+
+        public void RunTreeROI(Tree.eMode eMode)
+        {
+            m_treeRootROI.p_eMode = eMode;
+            RunTreeArray(m_treeRootROI.GetTree("Array"));
+        }
+        #endregion
+
+        public string m_id;
+        int m_nID; 
+        Log m_log; 
+        public Teach(string id, int nID, MemoryPool memoryPool)
+        {
+            p_aAOI = new ObservableCollection<IAOI>();
+            p_aROI = new ObservableCollection<IAOI>();
             m_id = id;
+            m_nID = nID; 
             m_memoryPool = memoryPool; 
             m_log = LogView.GetLog(id);
-            InitListAOI();
             InitTreeSetup();
+            InitListAOI();
+            RunTreeSetup(Tree.eMode.RegRead);
+            InvalidateListAOI();
+            InitTreeROI();
             ClearAOI();
             InitTreeAOI();
             InitDraw();
-            InitROI();
-            GetActineROI(); 
+            GetActiveROI();
+            InitBackgroundWorker(); 
+            InitTimer(); 
         }
     }
 }

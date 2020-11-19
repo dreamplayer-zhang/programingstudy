@@ -18,7 +18,7 @@ namespace Root
 
         public IGem ClassGem() { return null; }
 
-        public IControl ClassControl() { return m_acs; }
+        public IControl ClassControl() { return m_ajin; }
 
         GAF m_gaf = new GAF();
         public GAF ClassGAF() { return m_gaf; }
@@ -34,7 +34,7 @@ namespace Root
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
         {
-            MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool, false);
+            MemoryPool pool = m_toolBox.m_memoryTool.GetPool(sPool);
             return (pool == null) ? null : pool.GetMemory(sGroup, sMemory);
         }
         #endregion
@@ -70,8 +70,8 @@ namespace Root
             LogView.Init();
             m_login.Init();
             m_toolBox.Init(id, this);
-            //InitAjin();
-            InitACS();
+            InitAjin();
+            //InitACS();
             m_handler.Init(id, this);
         }
 

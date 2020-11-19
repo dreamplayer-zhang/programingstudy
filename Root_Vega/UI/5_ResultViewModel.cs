@@ -279,7 +279,6 @@ namespace Root_Vega
 		private readonly IDialogService m_DialogService;
 		SqliteDataDB DataIndexDB { get; set; }
 
-		string indexFilePath = @"C:\vsdb\init\SearchIndex.sqlite";
 		string dbFormatFilePath = @"C:\vsdb\init\vsdb.txt";
 
 		public InspResultViewModel CurrentResultViewModel { get; set; }
@@ -304,9 +303,9 @@ namespace Root_Vega
 
 			this.SelectedDefectCountFirst = 0;
 			this.SelectedDefectCountSecond = 0;
-			if (File.Exists(indexFilePath) && File.Exists(dbFormatFilePath))
+			if (File.Exists(App.indexFilePath) && File.Exists(dbFormatFilePath))
 			{
-				DataIndexDB = new SqliteDataDB(indexFilePath, dbFormatFilePath);//나중에 수정해야함. 파일 경로 할당을 설정 등으로 제어하는 부분이 필요함
+				DataIndexDB = new SqliteDataDB(App.indexFilePath, dbFormatFilePath);//나중에 수정해야함. 파일 경로 할당을 설정 등으로 제어하는 부분이 필요함
 				if (DataIndexDB.Connect())
 				{
 					//SearchTable,*Idx(INTEGER),InspStartTime(TEXT),ReticleID(TEXT),RecipeName(TEXT),TotalDefectCount(INTEGER),DataFilePath(TEXT)
@@ -319,7 +318,7 @@ namespace Root_Vega
 		}
 		public void StartSearch()
 		{
-			if (!File.Exists(indexFilePath) || !File.Exists(dbFormatFilePath))
+			if (!File.Exists(App.indexFilePath) || !File.Exists(dbFormatFilePath))
 				return;
 
 			string dateQuery = string.Format("InspStartTime >= CONVERT('{0}', 'System.DateTime') AND InspStartTime <= CONVERT('{1}', 'System.DateTime')",
@@ -412,9 +411,9 @@ namespace Root_Vega
 		}
 		public void RefreshList()
 		{
-			if (File.Exists(indexFilePath) && File.Exists(dbFormatFilePath))
+			if (File.Exists(App.indexFilePath) && File.Exists(dbFormatFilePath))
 			{
-				DataIndexDB = new SqliteDataDB(indexFilePath, dbFormatFilePath);//나중에 수정해야함. 파일 경로 할당을 설정 등으로 제어하는 부분이 필요함
+				DataIndexDB = new SqliteDataDB(App.indexFilePath, dbFormatFilePath);//나중에 수정해야함. 파일 경로 할당을 설정 등으로 제어하는 부분이 필요함
 				if (DataIndexDB.Connect())
 				{
 					//SearchTable,*Idx(INTEGER),InspStartTime(TEXT),ReticleID(TEXT),RecipeName(TEXT),TotalDefectCount(INTEGER),DataFilePath(TEXT)
@@ -434,15 +433,15 @@ namespace Root_Vega
 			OpenFileDialog dbDlg = new OpenFileDialog();
 			dbDlg.Filter = "SQlite DB file (*.sqlite)|*.sqlite|All file (*.*)|*.*";
 			dbDlg.FilterIndex = 0;
-			dbDlg.FileName = indexFilePath;
-			dbDlg.InitialDirectory = System.IO.Path.GetDirectoryName(indexFilePath);
+			dbDlg.FileName = App.indexFilePath;
+			dbDlg.InitialDirectory = System.IO.Path.GetDirectoryName(App.indexFilePath);
 			dbDlg.Title = "Select Index SQLite DB File";
 			var dbResult = dbDlg.ShowDialog();
 			if (dbResult == true)
 			{
-				if(indexFilePath!= dbDlg.FileName)
+				if (App.indexFilePath != dbDlg.FileName)
 				{
-					indexFilePath = dbDlg.FileName;
+					App.indexFilePath = dbDlg.FileName;
 					dbChange = true;
 				}
 			}
@@ -456,14 +455,14 @@ namespace Root_Vega
 			var keyResult = formatDlg.ShowDialog();
 			if (keyResult == true)
 			{
-				if(dbFormatFilePath != formatDlg.FileName)
+				if (dbFormatFilePath != formatDlg.FileName)
 				{
 					dbFormatFilePath = formatDlg.FileName;
 					formatChange = true;
 				}
 			}
 
-			if(dbChange || formatChange)
+			if (dbChange || formatChange)
 			{
 				RefreshList();
 			}
@@ -472,7 +471,7 @@ namespace Root_Vega
 		{
 			if (SelectedDataTable != null)
 			{
-				DataIndexDB = new SqliteDataDB(indexFilePath, dbFormatFilePath);//나중에 수정해야함. 파일 경로 할당을 설정 등으로 제어하는 부분이 필요함
+				DataIndexDB = new SqliteDataDB(App.indexFilePath, dbFormatFilePath);//나중에 수정해야함. 파일 경로 할당을 설정 등으로 제어하는 부분이 필요함
 				if (DataIndexDB.Connect())
 				{
 					cts = new CancellationTokenSource();
@@ -494,7 +493,7 @@ namespace Root_Vega
 
 					window.DataContext = windowViewModel;
 					window.Show();
-                    windowViewModel.LoadTiffImage(cts.Token);
+					//windowViewModel.LoadVegaImage(cts.Token);
 				}
 			}
 			else

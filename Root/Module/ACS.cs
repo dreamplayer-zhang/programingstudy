@@ -23,7 +23,7 @@ namespace Root.Module
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Stage");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Camera Z");
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_camBasler, this, "Camera Basler");
             p_sInfo = m_toolBox.Get(ref m_camDalsa, this, "Camera Dalsa");

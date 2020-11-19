@@ -115,6 +115,7 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
         BackgroundWorker bgw_Connect = new BackgroundWorker();
+        BackgroundWorker bgw_Grab = new BackgroundWorker();
 
         public Camera_Basler(string id, Log log)
         {
@@ -127,7 +128,7 @@ namespace RootTools.Camera.BaslerPylon
             p_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             bgw_Connect.DoWork += bgw_Connect_DoWork;
             bgw_Connect.RunWorkerCompleted += bgw_Connect_RunWorkerCompleted;
-            m_ImageGrab = new ImageData(640, 480);
+            m_ImageGrab = new ImageData(1000, 700);
             p_ImageViewer = new ImageViewer_ViewModel(m_ImageGrab, null, _dispatcher);
         }
 
@@ -150,6 +151,8 @@ namespace RootTools.Camera.BaslerPylon
             RunSetTree(treeRoot.GetTree("Connect Set"));
             RunAnalogControlTree(treeRoot.GetTree("Analog Control", false, p_CamInfo._OpenStatus));
             RunAOIControlsTree(treeRoot.GetTree("AOI Contorls", false, p_CamInfo._OpenStatus));
+            RunImageFormatControlsTree(treeRoot.GetTree("Image Format Controls", false,p_CamInfo._OpenStatus));
+            RunAcquisitionControlsTree(treeRoot.GetTree("Acquisition Controls", false, p_CamInfo._OpenStatus));
             RunDeviceInfomationTree(treeRoot.GetTree("Device Infomation", false, p_CamInfo._OpenStatus));
             RunConfigurationSetTree(treeRoot.GetTree("Configuration Set", false, p_CamInfo._OpenStatus));
             RunHostTransportLayerTree(treeRoot.GetTree("HostTransportLayer", false, p_CamInfo._OpenStatus));
@@ -184,7 +187,18 @@ namespace RootTools.Camera.BaslerPylon
                 tree.HideAllItem();
             }
         }
-
+        void RunImageFormatControlsTree(Tree tree)
+        {
+            if(m_Caminfo._OpenStatus)
+            {
+                p_CamParam.p_PixelFormat = tree.Set(p_CamParam.p_PixelFormat, "Mono 8",p_CamParam._PixelFormatEnum , "Pixel Format", "The Format of the pixel data transmitted for acquired images");
+                p_CamParam._ReverseX = tree.Set(p_CamParam._ReverseX, false, "Reverse X", "The Horizontal flipping of the image");
+            }
+            else
+            {
+                tree.HideAllItem();
+            }
+        }
         void RunAOIControlsTree(Tree tree)
         {
             if (p_CamInfo._OpenStatus)
@@ -200,7 +214,18 @@ namespace RootTools.Camera.BaslerPylon
                 tree.HideAllItem();
             }
         }
-
+        void RunAcquisitionControlsTree(Tree tree)
+        {
+            if(p_CamInfo._OpenStatus)
+            {
+                p_CamParam._ExposureTimeRaw = tree.Set(p_CamParam._ExposureTimeRaw, 0, "Exposure Time (Raw)","The 'Raw' Exposure Time");
+                p_CamParam._ResultingFrameRateAbs = tree.Set(p_CamParam._ResultingFrameRateAbs, 0, "Resulting Frame Rate (Abs) [Hz]", "The Maximum Allowed Frame Acquisition Rate",true,true);
+            }
+            else
+            {
+                tree.HideAllItem();
+            }
+        }
         void RunDeviceInfomationTree(Tree tree)
         {
             if (p_CamInfo._OpenStatus)
@@ -256,8 +281,11 @@ namespace RootTools.Camera.BaslerPylon
             if (cam == null)
                 p_CamInfo._OpenStatus = false;
             else
+            {
                 p_CamInfo._OpenStatus = cam.IsOpen;
-            p_CamInfo._IsCanGrab = false;
+                p_CamInfo._IsCanGrab = cam.IsOpen && !cam.StreamGrabber.IsGrabbing;
+                p_CamInfo._IsGrabbing = cam.IsOpen && cam.StreamGrabber.IsGrabbing;
+            }
         }
 
         void bgw_Connect_DoWork(object sender, DoWorkEventArgs e)
@@ -447,12 +475,8 @@ namespace RootTools.Camera.BaslerPylon
                 // Starts the grabbing of one image.
                 m_cam.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.SingleFrame);
                 m_cam.StreamGrabber.Start(1, GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
-                p_CamInfo._IsCanGrab = false;
             }
-            catch (Exception e) 
-            {
-                MessageBox.Show(e.Message.ToString());
-            }
+            catch (Exception) { }
         }
 
 
@@ -468,8 +492,29 @@ namespace RootTools.Camera.BaslerPylon
                     m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
                     // Start the grabbing of images until grabbing is stopped.
                     m_cam.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.Continuous);
+                    string s_curPixelFormat = m_cam.Parameters[PLCamera.PixelFormat].GetValue();
+                    int width = (int)m_cam.Parameters[PLCamera.Width].GetValue();
+                    int height = (int)m_cam.Parameters[PLCamera.Height].GetValue();
+                    CPoint sz = new CPoint(width, height);
+
+                    if (s_curPixelFormat.Equals(PLCamera.PixelFormat.Mono8.ToString()))
+                        m_ImageGrab.ReAllocate(sz, 1);
+                    else if (s_curPixelFormat.Equals(PLCamera.PixelFormat.YUV422Packed.ToString()))
+                        m_ImageGrab.ReAllocate(sz, 3);
+
+                    if (_dispatcher != null)
+                    {
+                        _dispatcher.Invoke(new Action(delegate ()
+                        {
+                            p_ImageViewer.SetRoiRect();
+                        }));
+                    }
+                    //RunTree를 하여, Enable해야할 항목 Update
+
                     m_cam.StreamGrabber.Start(GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
                     p_CamInfo._IsCanGrab = false;
+                    p_CamInfo._IsGrabbing = true;
+
                 }
             }
             catch (Exception e) 
@@ -484,6 +529,7 @@ namespace RootTools.Camera.BaslerPylon
             m_cam.StreamGrabber.Stop();
             m_cam.StreamGrabber.ImageGrabbed -= OnImageGrabbed;
             p_CamInfo._IsCanGrab = true;
+            p_CamInfo._IsGrabbing = false;
         }
 
         private Stopwatch stopWatch = new Stopwatch();
@@ -518,17 +564,17 @@ namespace RootTools.Camera.BaslerPylon
 
                             stopWatch.Reset();
 
-                            if (_dispatcher != null)
-                            {
-                                _dispatcher.Invoke(new Action(delegate ()
-                                {
-                                    m_ImageGrab.UpdateImage();
-                                }));
-                            }
-                            //Application.Current.Dispatcher.Invoke((Action)delegate
+                            //if (_dispatcher != null)
                             //{
-                            //    m_ImageGrab.UpdateImage();
-                            //});
+                            //    _dispatcher.Invoke(new Action(delegate ()
+                            //    {
+                            //        m_ImageGrab.UpdateImage();
+                            //    }));
+                            //}
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                m_ImageGrab.UpdateImage();
+                            });
                         }
                         else
                         {
@@ -638,6 +684,8 @@ namespace RootTools.Camera.BaslerPylon
                     m_cam.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.On);
                     m_cam.StreamGrabber.Start(GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
                     p_CamInfo._IsCanGrab = false;
+                    p_CamInfo._IsGrabbing = false;
+
                 }
             }
             catch (Exception e) 

@@ -159,8 +159,8 @@ namespace Root_Vega.Module
         {
             GemCarrierBase.ePresent present;
             if (m_dioPlaced.p_bIn != m_dioPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
-            else present = m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            //if (m_infoPod.CheckPlaced(present) != "OK")
+            else present = !m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            if (m_infoPod.CheckPlaced(present) != "OK")
             {
                 m_alidPlaced.p_sMsg = "Placed Sensor Remain Checked while Pod State = " + m_infoPod.p_eState;
                 m_alidPlaced.p_bSet = true;
@@ -169,6 +169,7 @@ namespace Root_Vega.Module
             {
                 case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;
                 case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
+                default: m_svidPlaced.p_value = true; break;
             }
             return m_svidPlaced.p_value;
         }
@@ -220,7 +221,7 @@ namespace Root_Vega.Module
 
         public string BeforeGet()
         {
-            if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
+            if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Get Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
             if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             if (p_infoReticle == null) return p_id + " BeforeGet : InfoWafer = null";
@@ -229,19 +230,22 @@ namespace Root_Vega.Module
 
         public string BeforePut()
         {
-            if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Get Sequence";
+            if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
+            if (m_diReticle.p_bIn == true) return "Retile is exist in Loadport";
             if (p_infoReticle != null) return p_id + " BeforePut : InfoWafer != null";
             return IsRunOK();
         }
 
         public string AfterGet()
         {
+            if (m_diReticle.p_bIn == true) return "Reticle Get Fail";
             return IsRunOK();
         }
 
         public string AfterPut()
         {
+            if (m_diReticle.p_bIn == false) return "Reticle Put Fail, Reticle Sensor not Detected";
             return IsRunOK();
         }
 
@@ -265,13 +269,22 @@ namespace Root_Vega.Module
 
         public void ReadInfoReticle_Registry()
         {
-            m_infoPod.ReadInfoReticle_Registry();
+            //if (m_dioPresent.p_bIn == false)
+            //{
+            //    if (m_infoPod.p_infoReticle == null)
+            //    {
+            //        m_infoPod.SetInfoReticleExist();
+            //        return;
+            //    }
+            //    m_infoPod.ReadInfoReticle_Registry();
+            //}
         }
         #endregion
 
         #region Load & Unload
         public string RunLoad()
         {
+            if (m_infoPod.p_eState == InfoPod.eState.Load) return "OK"; 
             if (m_axisZ.IsInPos(ePosZ.Ready, m_dInposZ) == false) return "AxisZ Position not Ready";
             if (m_axisPodLifter.IsInPos(ePosPodLifter.Ready, m_dInposLifter) == false) return "AxisPodLifter Position not Ready";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Ready, m_dInposReticle) == false) return "AxisReticleLifter Position not Ready";
@@ -287,17 +300,19 @@ namespace Root_Vega.Module
             if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
             if (Run(MoveReticleLifter(ePosReticleLifter.Lifting))) return p_sInfo;
             if (Run(MoveZ(ePosZ.Load))) return p_sInfo;
-            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
+            if(m_diReticle.p_bIn == false) p_infoReticle = null;
+            //if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             return "OK"; 
         }
 
         public string RunUnload()
         {
+            if (m_infoPod.p_eState == InfoPod.eState.Placed) return "OK"; 
             if (m_axisZ.IsInPos(ePosZ.Load,m_dInposZ) == false) return "AxisZ Position not Load";
             if (m_axisPodLifter.IsInPos(ePosPodLifter.Lifting,m_dInposLifter) == false) return "AxisPodLifter Position not Lifting";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting,m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
             if (m_axisTheta.IsInPos(ePosTheta.Open,m_dInposTheta) == false) return "AxisTheta Position not Open";
-            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
+            //if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             if (Run(MoveZ(ePosZ.Reticle))) return p_sInfo;
             if (Run(MoveReticleLifter(ePosReticleLifter.Mid))) return p_sInfo;
             if (Run(MoveZ(ePosZ.ReticleReady))) return p_sInfo;
@@ -306,6 +321,10 @@ namespace Root_Vega.Module
             if (Run(MovePodLifter(ePosPodLifter.Ready))) return p_sInfo;
             if (Run(MoveZ(ePosZ.Ready))) return p_sInfo;
             if (Run(MoveTheta(ePosTheta.Close))) return p_sInfo;
+
+            // Inspection Done
+            //((Vega_Engineer)m_engineer).m_InspManager.InspectionDone(App.indexFilePath);
+
             return "OK"; 
         }
         #endregion
@@ -327,6 +346,13 @@ namespace Root_Vega.Module
         double[] m_aShiftReticle = new double[2] { 0, 0 };
         public override string StateHome()
         {
+            if (m_dioPresent.p_bIn == false)
+            {
+                m_infoPod.SetInfoReticleExist();
+            }
+            else
+                p_infoReticle = null;
+
             if (EQ.p_bSimulate) return "OK";
             m_log.Info(p_id + " Start StateHome");
             m_axisZ.ServoOn(true);
@@ -354,6 +380,8 @@ namespace Root_Vega.Module
                 if (Run(Home_Reticle())) return p_sInfo;
             }
             m_infoPod.AfterHome();
+
+            m_infoPod.p_eState = InfoPod.eState.Placed;
             return "OK";
         }
 
@@ -536,7 +564,19 @@ namespace Root_Vega.Module
                 else
                 {
                     sResult = m_module.m_RFID.ReadRFID((byte)m_nCh, out sCarrierID);
-                    m_module.m_infoPod.p_sCarrierID = (sResult == "OK") ? sCarrierID : ""; 
+                    m_module.m_infoPod.p_sCarrierID = (sResult == "OK") ? sCarrierID : "";
+
+                    if (m_module.m_infoPod.p_infoReticle == null)
+                    {
+                        if(m_module.m_dioPresent.p_bIn==false)
+                        m_module.m_infoPod.SetInfoReticleExist();
+                    }
+
+                    //else if (m_module.m_infoPod.p_infoReticle.p_sReticleID == m_module.m_infoPod.p_infoReticle.p_id)
+                    //{
+                    //    m_module.m_infoPod.p_infoReticle.p_sReticleID = sCarrierID;
+                    //    m_module.p_infoReticle.p_sSlotID = m_module.m_infoPod.p_infoReticle.p_sReticleID;
+                    //}
                 }
                 if (sResult == "OK") m_module.m_infoPod.SendCarrierID(sCarrierID); 
                 return sResult; 
@@ -573,7 +613,10 @@ namespace Root_Vega.Module
                 m_infoPod.p_eState = InfoPod.eState.Load;
                 m_module.m_ceidLoad.Send();
                 m_module.m_ceidOpen.Send();
-                m_module.m_infoPod.SetInfoReticleExist(); 
+                if (m_module.m_diReticle.p_bIn == true)
+                {
+                    m_module.m_infoPod.SetInfoReticleExist();
+                }
                 m_module.m_infoPod.SendSlotMap();
                 return "OK";
             }
