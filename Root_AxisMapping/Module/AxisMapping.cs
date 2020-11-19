@@ -189,13 +189,13 @@ namespace Root_AxisMapping.Module
                 if (m_module.Run(p_axisZ.WaitReady())) return p_sInfo;
                 double y0 = p_trigger.m_aPos[0] - m_dyAcc;
                 if (m_module.Run(p_axisXY.StartMove(m_xStart, y0))) return p_sInfo;
-                if (m_module.Run(p_axisXY.WaitReady())) return p_sInfo;
+                if (m_module.Run(p_axisXY.WaitReady(10))) return p_sInfo;
                 p_axisY.RunTrigger(true, p_trigger);
                 int nLine = (int)Math.Round((p_trigger.m_aPos[1] - p_trigger.m_aPos[0]) / p_trigger.m_dPos);
                 if (m_module.Run(p_cam.StartGrab(new CPoint(), nLine))) return p_sInfo; 
                 double y1 = p_trigger.m_aPos[1] + m_dyAcc;
                 if (m_module.Run(p_axisY.StartMove(y1, m_vGrab))) return p_sInfo;
-                if (m_module.Run(p_axisY.WaitReady())) return p_sInfo;
+                if (m_module.Run(p_axisY.WaitReady(10))) return p_sInfo;
                 p_axisY.RunTrigger(false); 
                 if (p_cam.p_bOnGrab) return "Dalsa Camera Grab not Finished"; 
                 return "OK";

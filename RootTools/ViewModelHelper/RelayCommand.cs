@@ -138,7 +138,13 @@ namespace RootTools
 
         public void Execute(Object parameter)
         {
-            _execute();
+            try
+            {
+                _execute();
+            }
+            catch
+            {
+            }
         }
 
         #endregion

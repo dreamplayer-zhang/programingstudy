@@ -66,7 +66,7 @@ namespace Root_WIND2
 			}
 		}
 
-		public void SetPage(UserControl page)
+		private void SetPage(UserControl page)
 		{
 			Main.SubPanel.Children.Clear();
 			Main.SubPanel.Children.Add(page);

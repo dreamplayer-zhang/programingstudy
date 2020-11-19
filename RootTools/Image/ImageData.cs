@@ -507,14 +507,8 @@ namespace RootTools
 		}
 		unsafe void FileSaveBMP(string sFile, IntPtr ptr, CRect rect)
 		{
-			int width = (int)(rect.Right * 0.25);
-			int owidth = rect.Right;
-			if (width * 4 != rect.Right) rect.Right = (width + 1) * 4;
-
-			//if (rect.Width % 4 != 0)
-			//{
-			//	rect.Right += 4 - rect.Width % 4;
-			//}
+			//int width = (int)(rect.Right * 0.25);
+			//if (width * 4 != rect.Right) rect.Right = (width + 1) * 4;
 
 			FileStream fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
 			BinaryWriter bw = new BinaryWriter(fs);
@@ -561,6 +555,10 @@ namespace RootTools
 					bw.Write(Convert.ToByte(255));
 				}
 			}
+			if (rect.Width % 4 != 0)
+			{
+				rect.Right += 4 - rect.Width % 4;
+			}
 			byte[] aBuf = new byte[p_nByte * rect.Width];
 			for (int i = rect.Height - 1; i >= 0; i--)
 			{
@@ -594,7 +592,7 @@ namespace RootTools
 			else
 			{
 				ImageData data = new ImageData(123, 123);
-				//MessageBox.Show("OpenFile() - 파일이 존재 하지 않거나 열기에 실패하였습니다. - " + sFileName);
+				System.Windows.MessageBox.Show("OpenFile() - 파일이 존재 하지 않거나 열기에 실패하였습니다. - " + sFileName);
 			}
 		}
 
@@ -651,6 +649,8 @@ namespace RootTools
 			OnCreateNewImage();
 		}
 
+		int nLine = 0;
+
 		unsafe void OpenBMPFile(string sFile, DoWorkEventArgs e, CPoint offset)
 		{
 			int nByte;
@@ -704,27 +704,39 @@ namespace RootTools
     //                hRGB = br.ReadBytes(256 * 4);
 				if (p_nByte == 1)
 				{
+                    nLine = 0;
+                    int nNum = 2;
+                    Thread[] multiThread = new Thread[nNum];
 
-                    //Thread thread1 = new Thread(() => RunCopyThread(0,fs ,sFile, nWidth, nHeight, lowwidth , lowheight, offset));
-
-                    //thread1.Start();
-
-                    //bool alive = thread1.IsAlive;
-                    //               while (thread1.IsAlive)
-                    //               {
-                    //	Thread.Sleep(10);
-                    //               }
-
-                    for (int y = lowheight - 1; y >= 0; y--)
+                    for (int i = 0; i < nNum; i++)
                     {
-                        if (Worker_MemoryCopy.CancellationPending)
-                            return;
-
-                        byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
-                        Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
-                        p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+                        int nStartHeight = lowheight * (nNum - i) / nNum;
+                        int nEndHeight = lowheight * (nNum - i - 1) / nNum;
+                        multiThread[i] = new Thread(() => RunCopyThread(sFile, nWidth, nHeight, lowwidth, lowheight, nStartHeight, nEndHeight, offset));
+                        multiThread[i].Start();
                     }
+                    while (true)
+                    {
+                        bool bEnd = true;
+                        for (int i = 0; i < nNum; i++)
+                        {
+                            if (multiThread[i].IsAlive)
+                                bEnd = false;
+                        }
+                        Thread.Sleep(10);
+                        p_nProgress = Convert.ToInt32(((double)nLine / lowheight) * 100);
+                        if (bEnd)
+                            break;
+                    }
+                    //for (int y = lowheight - 1; y >= 0; y--)
+                    //{
+                    //    if (Worker_MemoryCopy.CancellationPending)
+                    //        return;
 
+                    //    byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+                    //    Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
+                    //    p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+                    //}
                 }
 				else if(p_nByte == 3)
 				{
@@ -773,16 +785,30 @@ namespace RootTools
 			br.Close();
 		}	
 
-		public void RunCopyThread(int idx, FileStream fs ,string sFile, int nWidth, int nHeight , int nLowWidth, int nLowHeight ,CPoint offset)
+		public void RunCopyThread(string sFile, int nWidth, int nHeight , int nLowWidth, int nLowHeight,int nStartHeight ,int nEndHeight ,CPoint offset)
 		{
-			byte[] buf = new byte[nLowWidth];
-			fs.Seek(54 + 1024, SeekOrigin.Begin);
-			for (int i = 1; i < nLowHeight; i++)
+			FileStream fss = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read, 32768, true);
+			byte[] buf = new byte[nWidth];
+			fss.Seek(54 + 1024 + (nLowHeight - nStartHeight) * (long)nWidth , SeekOrigin.Begin);
+			for (int i = nStartHeight -1 ; i >= nEndHeight; i--)
 			{
-				fs.Read(buf,0, nWidth);
+				if (Worker_MemoryCopy.CancellationPending)
+					return;
+				fss.Read(buf,0, nWidth);
 				Marshal.Copy(buf, 0, (IntPtr)((long)m_ptrImg + (offset.X + p_Size.X * ((long)offset.Y + i))), nLowWidth);
+				nLine++;
 				//p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
 			}
+			//for (int y = lowheight - 1; y >= 0; y--)
+			//{
+			//	if (Worker_MemoryCopy.CancellationPending)
+			//		return;
+
+			//	byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+			//	Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
+			//	p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+			//}
+			fss.Close();
 		}
 
 		public unsafe bool ReAllocate(CPoint sz, int nByte)
@@ -795,7 +821,7 @@ namespace RootTools
 			{
 				Array.Resize(ref m_aBuf, sz.X * nByte * sz.Y);
 			}
-	
+
 			return true;
 		}
 

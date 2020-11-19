@@ -78,8 +78,8 @@ namespace RootTools.Camera.Dalsa
                 SetProperty(ref m_CamParam, value);
             }
         }
-        const int c_nBuf = 300;
-        int _nBuf = 300;
+        const int c_nBuf = 500;
+        int _nBuf = 500;
         public int p_nBuf
         {
             get

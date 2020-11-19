@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_AOP01_Packing"
              mc:Ignorable="d" 
-             d:DesignHeight="866" d:DesignWidth="1683" Background="{StaticResource PanelBackGround}">
+             d:DesignHeight="800" d:DesignWidth="1683" Background="{StaticResource PanelBackGround}">
     <ScrollViewer VerticalScrollBarVisibility="Visible">
         <StackPanel>
-            <Grid Height="866">
+            <Grid Height="800">
                 <local:AOP01_Engineer_UI x:Name="Engineer_UI"/>
             </Grid>
         </StackPanel>

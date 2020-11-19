@@ -256,8 +256,8 @@ namespace Root_WIND2
 
             foreach (Defect defect in m_ReviewDefectlist)
             {
-                int i = (int)defect.nChipIndexX;
-                int j = (int)defect.nCHipIndexY;
+                int i = (int)defect.m_nChipIndexX;
+                int j = (int)defect.m_nCHipIndexY;
 
 
                 Rectangle ellipse = new Rectangle();
@@ -275,8 +275,8 @@ namespace Root_WIND2
                 //Canvas.SetRight(ellipse, Right + (dPitchx * i) + (defect.fRelX + 10) * dSamplingRatio);
                 //Canvas.SetBottom(ellipse, Bottom + (dPitchy * j) + (defect.fRelY + 10) * dSamplingRatio);
 
-                Canvas.SetLeft(ellipse, dCanvasWaferCenterX + defect.fRelX * dSamplingRatio); // 
-                Canvas.SetTop(ellipse, dCanvasWaferCenterY + defect.fRelY * dSamplingRatio);
+                Canvas.SetLeft(ellipse, dCanvasWaferCenterX + defect.m_fRelX * dSamplingRatio); // 
+                Canvas.SetTop(ellipse, dCanvasWaferCenterY + defect.m_fRelY * dSamplingRatio);
                // Canvas.SetRight(ellipse, dCanvasWaferCenterX + (defect.fRelX + 10) * dSamplingRatio);
                // Canvas.SetBottom(ellipse, dCanvasWaferCenterY + (defect.fRelY + 10) * dSamplingRatio);
 
@@ -505,11 +505,7 @@ namespace Root_WIND2
                 if (fAbsY < nNotch)
                     nTheta = (nNotch - fAbsY) / 540000 * 360;
 
-                if (fSize > 150)
-                {
-                    count++;
-                    m_DefectView.AddDefectFront(nTheta);
-                }
+                m_DefectView.AddDefectFront(nTheta);
             }
             return defects;
         }

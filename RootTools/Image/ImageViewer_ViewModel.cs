@@ -21,6 +21,7 @@ using RootTools.Inspects;
 using RootTools.Memory;
 using MySql.Data.MySqlClient.Authentication;
 using System.Windows.Threading;
+using RootTools.Database;
 
 namespace RootTools
 {
@@ -77,7 +78,20 @@ namespace RootTools
 			}
 		}
 
-		private System.Windows.Input.Cursor m_MouseCursor;
+		private List<DefectDataWrapper> m_arrDefectDataWrapper;
+		public List<DefectDataWrapper> p_arrDefectDataWrapper
+        {
+            get
+            {
+				return m_arrDefectDataWrapper;
+            }
+            set
+            {
+				SetProperty(ref m_arrDefectDataWrapper, value);
+            }
+        }
+
+        private System.Windows.Input.Cursor m_MouseCursor;
 		public System.Windows.Input.Cursor p_MouseCursor
 		{
 			get
@@ -431,6 +445,7 @@ namespace RootTools
 		bool InformationToolExist = false;
 		public DrawToolVM SelectedTool;
 		public DrawHistoryWorker m_HistoryWorker = new DrawHistoryWorker();
+		public SimpleShapeDrawerVM m_SimpleShapeDrawerVM;
 		public ModifyManager m_ModifyManager;
 		public InformationDrawer informationDrawer;
 
@@ -502,7 +517,6 @@ namespace RootTools
 				image.UpdateOpenProgress += image_UpdateOpenProgress;
 				InitRoiRect(p_ImageData.p_Size.X, p_ImageData.p_Size.Y);
 				SetImageSource();
-
 			}
 			if (dialogService != null)
 			{
@@ -725,7 +739,13 @@ namespace RootTools
 							p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / m_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / m_ImageData.p_Size.Y));
 
 					}
+					//if (p_arrDefectDataWrapper != null)
+     //               {
+					//	for (int i = 0; i<p_arrDefectDataWrapper.Count; i++)
+     //                   {
 
+     //                   }
+     //               }
 				}
 			}
 			catch (Exception ee)
