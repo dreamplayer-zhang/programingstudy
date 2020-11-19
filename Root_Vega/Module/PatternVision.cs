@@ -163,8 +163,8 @@ namespace Root_Vega.Module
             //forget
             m_memoryMain = m_memoryPool.GetGroup("PatternVision").CreateMemory("Main", 1, 1, 1000, 1000);
             m_memoryEBR = m_memoryPool.GetGroup(App.sEBRGroup).CreateMemory(App.sEBRmem, 1, 1, 1000, 1000);
-            m_memoryD2D = m_memoryPool2.GetGroup(App.sD2DGroup).CreateMemory(App.sD2Dmem, 1, 1, 1000, 1000);
-            m_memoryD2D = m_memoryPool2.GetGroup(App.sD2DGroup).CreateMemory(App.sD2DABSmem, 1, 1, 1000, 1000);
+            m_memoryD2D = m_memoryPool.GetGroup(App.sD2DGroup).CreateMemory(App.sD2Dmem, 1, 1, 1000, 1000);
+            m_memoryD2D = m_memoryPool.GetGroup(App.sD2DGroup).CreateMemory(App.sD2DABSmem, 1, 1, 1000, 1000);
         }
         #endregion
 
