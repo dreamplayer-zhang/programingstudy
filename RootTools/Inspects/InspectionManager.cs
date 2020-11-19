@@ -40,7 +40,6 @@ namespace RootTools.Inspects
 		StopWatch sw;
 
 		int nThreadNum = 10;
-		public int nInspectionCount = 0;
 		int ImageWidth = 640;
 		int ImageHeight = 480;
 		public ToolBox m_toolBox;
@@ -68,7 +67,6 @@ namespace RootTools.Inspects
 				return;
 			}
 			m_bProgress = false;
-			nInspectionCount = 0;
 			sw = new StopWatch();
 			sw.Start();
 
@@ -143,7 +141,6 @@ namespace RootTools.Inspects
 							if (InsepctionThread[i].bState == Inspection.InspectionState.Ready ||
 							InsepctionThread[i].bState == Inspection.InspectionState.None)
 							{
-								nInspectionCount++;
 								InspectionProperty ipQueue = p_qInspection.Dequeue();
 								InsepctionThread[i].StartInspection(ipQueue, i);
 							}
@@ -316,7 +313,6 @@ namespace RootTools.Inspects
 
 				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
 			}
-			nInspectionCount = 0;
 			sw.Stop();
 			Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
 			connector.Close();

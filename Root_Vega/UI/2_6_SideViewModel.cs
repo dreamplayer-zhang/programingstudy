@@ -26,7 +26,6 @@ namespace Root_Vega
 		/// 외부 Thread에서 UI를 Update하기 위한 Dispatcher
 		/// </summary>
 		public Dispatcher _dispatcher;
-		System.Threading.Timer resultTimer;
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
 		List<ImageData> m_Image = new List<ImageData>();
@@ -281,16 +280,7 @@ namespace Root_Vega
 				SelectedParam = null;
 			};
 
-			m_Engineer.m_InspManager.nInspectionCount = 0;//Inspection total count 초기화. 임시 db에서 데이터값을 정상적으로 끌어올때 사용한다
-
-			resultTimer = new System.Threading.Timer(checkAddDefect);
-			resultTimer.Change(0, 1000);
-
 			return;
-		}
-		~_2_6_SideViewModel()
-		{
-			resultTimer.Dispose();
 		}
 		private void checkAddDefect(object state)
 		{
