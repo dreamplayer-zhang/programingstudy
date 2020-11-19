@@ -25,6 +25,10 @@ namespace Root_Vega
 		public const string sPatternGroup = "PatternVision";
 		public const string sPatternmem = "Main";
 
+		public const string sEBRPool = "PatternVision.Memory";
+		public const string sEBRGroup = "PatternVision";
+		public const string sEBRmem = "EBR";
+
 		public const string sD2DPool = "sD2D.Memory";
 		public const string sD2DGroup = "sD2D";
 
