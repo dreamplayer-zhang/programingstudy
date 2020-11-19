@@ -156,6 +156,16 @@ namespace Root_Vega
 				SelectedParam = new StripParamData();//UI 초기화를 위한 코드
 				SelectedParam = null;
 			};
+			m_Engineer.m_recipe.RecipeData.AddComplete += () => 
+			{
+				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
+				StripParamList = new ObservableCollection<StripParamData>();
+
+				_SelectedROI = null;
+
+				SelectedParam = new StripParamData();//UI 초기화를 위한 코드
+				SelectedParam = null;
+			};
 		}
 
 		#region Property
@@ -476,6 +486,10 @@ namespace Root_Vega
 			m_Engineer.m_recipe.VegaRecipeData.RoiList.Add(temp);
 
 			p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
+			if (m_Engineer.m_recipe.RecipeData.AddComplete != null)
+			{
+				m_Engineer.m_recipe.RecipeData.AddComplete();
+			}
 		}
 
 		CPoint GetMemPoint(int canvasX, int canvasY)
