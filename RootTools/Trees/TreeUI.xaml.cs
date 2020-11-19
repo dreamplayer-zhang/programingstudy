@@ -28,13 +28,13 @@ namespace RootTools.Trees
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (ControlTree.ActualWidth < 16) return; 
-            Column1.Width = ControlTree.ActualWidth / 2; 
-            Column2.Width = ControlTree.ActualWidth / 2;
+            Column1.Width = ControlTree.ActualWidth / 2 - 2; 
+            Column2.Width = ControlTree.ActualWidth / 2 - 2;
         }
 
         private void ControlTree_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
-            Column2.Width = ControlTree.ActualWidth - Column1.ActualWidth; 
+            Column2.Width = ControlTree.ActualWidth - Column1.ActualWidth - 4; 
         }
     }
 }

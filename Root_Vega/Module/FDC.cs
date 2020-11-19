@@ -63,7 +63,7 @@ namespace Root_Vega.Module
             m_aSend[6] = (byte)(uCRC & 0xff); 
             m_aSend[7] = (byte)(uCRC >> 8);
             m_rs232.Send(m_aSend, 8);
-            m_aData[nFDC].p_bSend = true; 
+            if (m_aData.Count < nFDC) m_aData[nFDC].p_bSend = true; 
         }
 
         ushort[] m_uCRC =

@@ -272,7 +272,6 @@ namespace Root_EFEM.Module
             m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
             m_secMotion = tree.Set(m_secMotion, m_secMotion, "Motion", "Timeout (sec)");
         }
-
         #endregion
 
         #region RS232 Commend
@@ -444,7 +443,7 @@ namespace Root_EFEM.Module
         CEID m_ceidOpen;
         CEID m_ceidClose;
         ALID m_alidPlaced;
-        void InitGAF() //forget
+        void InitGAF() 
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
@@ -463,7 +462,7 @@ namespace Root_EFEM.Module
             p_id = id;
             m_infoCarrier = new InfoCarrier(this, id, engineer);
             m_aTool.Add(m_infoCarrier);
-            base.InitBase(id, engineer);
+            InitBase(id, engineer);
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
         }
@@ -475,12 +474,6 @@ namespace Root_EFEM.Module
 
         private void M_gem_OnRemoteCommand(string sCmd, Dictionary<string, string> dicParam, long[] pnResult)
         {
-
-        }
-
-        public ModuleRunBase GetRunUndocking()
-        {
-            return CloneModuleRun("Undocking");
         }
 
         #region ModuleRun
