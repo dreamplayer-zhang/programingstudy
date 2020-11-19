@@ -177,8 +177,6 @@ namespace Root_AOP01_Packing
                     }
                 }
 
-
-
             }
             if (check == false)
             {
