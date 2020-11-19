@@ -184,7 +184,19 @@ namespace RootTools
             }
         }
 
-        public void Set(CRect rt)
+		public CRect(CRect rect)
+		{
+            rect = ReAllocate(rect);
+
+            this.Top = rect.Top;
+            this.Bottom = rect.Bottom;
+            this.Right = rect.Right;
+            this.Left = rect.Left;
+            this.X = rect.Left + rect.Width / 2;
+            this.Y = rect.Top + rect.Height / 2;
+        }
+
+		public void Set(CRect rt)
         {
             X = rt.X;
             Y = rt.Y;

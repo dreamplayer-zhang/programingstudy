@@ -134,6 +134,14 @@
     </ApplicationDefinition>
     <Compile Include="Module\D2DInsp.cs" />
     <Compile Include="UI\2_10_BevelEdgeBoxViewModel.cs" />
+    <Compile Include="UI\2_11_EBR.xaml.cs">
+      <DependentUpon>2_11_EBR.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_11_EBRViewModel.cs" />
+    <Compile Include="UI\2_12_EBREdgeBox.xaml.cs">
+      <DependentUpon>2_12_EBREdgeBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2_12_EBREdgeBoxViewModel.cs" />
     <Compile Include="UI\2_8_D2D_Insp.xaml.cs">
       <DependentUpon>2_8_D2D_Insp.xaml</DependentUpon>
     </Compile>
@@ -320,6 +328,14 @@
       <DependentUpon>Vega_Recipe_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\6_LogViewModel.cs" />
+    <Page Include="UI\2_11_EBR.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2_12_EBREdgeBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\2_8_D2D_Insp.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

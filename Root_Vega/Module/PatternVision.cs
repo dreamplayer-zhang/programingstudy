@@ -102,6 +102,7 @@ namespace Root_Vega.Module
         public MemoryPool m_memoryPool2;
         MemoryData m_memoryMain;
         MemoryData m_memoryD2D;
+        MemoryData m_memoryEBR;
         InspectTool m_inspectTool;
         ZoomLens m_ZoomLens;
         public RADSControl m_RADSControl;
@@ -150,6 +151,7 @@ namespace Root_Vega.Module
         {
             //forget
             m_memoryMain = m_memoryPool.GetGroup("PatternVision").CreateMemory("Main", 1, 1, 1000, 1000);
+            m_memoryEBR = m_memoryPool.GetGroup(App.sEBRGroup).CreateMemory(App.sEBRmem, 1, 1, 1000, 1000);
             m_memoryD2D = m_memoryPool2.GetGroup(App.sD2DGroup).CreateMemory(App.sD2Dmem, 1, 1, 1000, 1000);
             m_memoryD2D = m_memoryPool2.GetGroup(App.sD2DGroup).CreateMemory(App.sD2DABSmem, 1, 1, 1000, 1000);
         }
@@ -1021,7 +1023,7 @@ namespace Root_Vega.Module
                                         engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
                                             engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
                                             engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
-                                            crtCurrentArea, 500, roiCurrent.Strip.ParameterList[0], nDefectCode, engineer.m_recipe.VegaRecipeData.UseDefectMerge, engineer.m_recipe.VegaRecipeData.MergeDistance, p);
+                                            crtCurrentArea, 500, roiCurrent.Strip.ParameterList[0], nDefectCode, engineer.m_recipe.VegaRecipeData.UseDefectMerge, engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p);
                                     }
                                 }
                             }
