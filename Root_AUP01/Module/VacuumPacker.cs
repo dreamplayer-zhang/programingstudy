@@ -181,38 +181,26 @@ namespace Root_AUP01.Module
         #endregion
 
         #region Step Function
-        string RunStep1(bool bOn)
+        string RunStep1(bool bOn) // 전체실린더
         {
-            RunSol(m_dioTopTotalHeaterUpdown, !bOn, m_sSolStep2);
-            RunSol(m_dioTopClampUpDown, bOn, m_sSolStep2);
-            RunSol(m_dioBtmClampUpDown, bOn, m_sSolStep2);
-
-            //m_dioTopTotalHeaterUpdown.Write(!bOn);
-            //m_dioTopClampUpDown.Write(bOn);
-            //m_dioBtmClampUpDown.Write(bOn);
-
-
-
-            //m_dioStep1[0].Write(bOn);
-            //m_dioStep1[1].Write(!bOn);
-            //int msWait = (int)(1000 * m_sSolStep1);
-            //while ((m_dioStep1[0].p_bDone != true) || (m_dioStep1[0].p_bDone != true))
-            //{
-            //    Thread.Sleep(10);
-            //    if (EQ.IsStop()) return p_id + " EQ Stop";
-            //    if (m_dioStep1[0].m_swWrite.ElapsedMilliseconds > msWait) return m_dioStep1[0].m_id + " Sol Valve Move Timeout";
-            //}
+            RunSol(m_dioTopTotalHeaterUpdown, bOn, m_sSolStep2);
             return "OK";
         }
 
-        string RunStep2(bool bOn)
+        string RunStep2(bool bOn) // 스펀지 실린더
+        {
+            RunSol(m_dioTopClampUpDown, bOn, m_sSolStep2);
+            RunSol(m_dioBtmClampUpDown, bOn, m_sSolStep2);
+            return "OK";
+            //return RunSol(m_dioStep2, bOn, m_sSolStep2);
+        }
+        string RunStep3(bool bOn)  // 히터 실린더 
         {
             RunSol(m_dioTopHeaterUpdown, bOn, m_sSolStep2);
             RunSol(m_dioBtmHeaterUpdown, bOn, m_sSolStep2);
             return "OK";
-            //return RunSol(m_dioStep2, bOn, m_sSolStep2);
         }
-        
+
 
         #endregion
 
@@ -532,6 +520,8 @@ namespace Root_AUP01.Module
         public class Run_Heating : ModuleRunBase
         {
             VacuumPacker m_module;
+            double m_sHeat = 0;
+            double m_sVacTime = 0;
             public Run_Heating(VacuumPacker module)
             {
                 m_module = module;
@@ -542,18 +532,34 @@ namespace Root_AUP01.Module
             public override ModuleRunBase Clone()
             {
                 Run_Heating run = new Run_Heating(m_module);
-                //run.m_sHeat = m_sHeat; 
+                run.m_sHeat = m_sHeat;
+                run.m_sVacTime = m_sVacTime;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                //m_sHeat = tree.Set(m_sHeat, m_sHeat, "Time", "Heating Time (sec)", bVisible);
+                m_sHeat = tree.Set(m_sHeat, m_sHeat, "Heating Time", "Heating Time (sec)", bVisible);
+                m_sVacTime = tree.Set(m_sVacTime, m_sVacTime, "Vaccume Time", "Vaccume Time (sec)", bVisible);
             }
 
             public override string Run()
             {
-                return "";// m_module.RunHeater(m_sHeat);
+                if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // Total 실린더 Up
+                if (m_module.Run(m_module.RunLoad(eLoad.Heating))) return p_sInfo; // Load 축 이동 히팅기랑 간섭없는 위치로 이동.
+                if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo; // side 축 레디위치로 이동.
+                if (m_module.Run(m_module.RunGuide(eGuide.Open))) return p_sInfo; // side 축 open위치로 이동.
+                if (m_module.Run(m_module.RunStep1(false))) return p_sInfo; // Total 실린더 down
+                if (m_module.Run(m_module.RunStep2(true))) return p_sInfo; // 상단, 하단클램프 닫음
+                Thread.Sleep((int)m_sVacTime * 1000); // 진공상태 대기.
+                if (m_module.Run(m_module.RunStep3(true))) return p_sInfo; // 상부, 하부 히팅 실린더 닫음.
+                if (m_module.Run(m_module.RunStep2(false))) return p_sInfo; // 상단, 하단클램프 실린더 열음
+                if (m_module.Run(m_module.RunHeater(m_sHeat))) return p_sInfo; // 히팅
+                if (m_module.Run(m_module.RunStep3(false))) return p_sInfo; // 상부, 하부 히팅 실린더 열음.
+                if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // 상단, 하단클램프 및 Total 실린더 업.
+                if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo; // Load 축 이동 히팅기랑 간섭없는 위치로 이동.
+                if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo; // side 축 레디위치로 이동.
+                return "OK";
             }
         }
         
@@ -607,19 +613,22 @@ namespace Root_AUP01.Module
                 {
                     if(m_module.TestNum == 1)
                     {
-                        if (m_module.Run(m_module.RunSol(m_module.m_dioTopTotalHeaterUpdown, true, m_module.m_sSolStep2))) return p_sInfo; // Total 실린더 Up
+                        if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // Total 실린더 Up
                         if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo; // side 축 레디위치로 이동.
                         if (m_module.Run(m_module.RunLoad(eLoad.VacuumPump))) return p_sInfo; // Load 축 이동 하드웨어 리밋정도까지 최대한 이동한 작업점까지.
                         if (m_module.Run(m_module.RunGuide(eGuide.Open))) return p_sInfo; // side 축 open위치로 이동.
-                        if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // 상단, 하단클램프 및 Total 실린더 다운.
+                        if (m_module.Run(m_module.RunStep1(false))) return p_sInfo; // Total 실린더 down
+                        if (m_module.Run(m_module.RunStep2(true))) return p_sInfo; // 상단, 하단클램프 닫음
                         Thread.Sleep((int)m_sVacTime * 1000); // 진공상태 대기.
                         if (m_module.Run(m_module.RunLoad(eLoad.Heating))) return p_sInfo; // Load 축 이동 히팅기랑 간섭없는 위치로 이동.
-                        if (m_module.Run(m_module.RunStep2(true))) return p_sInfo; // 상부 히팅 다운 하부 히팅 업.
+                        if (m_module.Run(m_module.RunStep3(true))) return p_sInfo; // 상부, 하부 히팅 실린더 닫음.
                         if (m_module.Run(m_module.RunHeater(m_sHeat))) return p_sInfo; // 히팅
-                        if (m_module.Run(m_module.RunStep2(false))) return p_sInfo; // 상부 히팅 업 하부 히팅 다운.
-                        if (m_module.Run(m_module.RunStep1(false))) return p_sInfo; // 상단, 하단클램프 및 Total 실린더 업.
+                        if (m_module.Run(m_module.RunStep2(false))) return p_sInfo; // 상단, 하단클램프 실린더 열음
+                        if (m_module.Run(m_module.RunStep3(false))) return p_sInfo; // 상부, 하부 히팅 실린더 열음.
+                        if (m_module.Run(m_module.RunStep1(true))) return p_sInfo; // 상단, 하단클램프 및 Total 실린더 업.
                         if (m_module.Run(m_module.RunGuide(eGuide.Ready))) return p_sInfo; // side 축 레디위치로 이동.
                         if (m_module.Run(m_module.RunLoad(eLoad.Ready))) return p_sInfo;
+
                     }
                     else
                     {
