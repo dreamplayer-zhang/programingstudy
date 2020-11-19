@@ -34,23 +34,27 @@ namespace Root_AxisMapping.MainUI
         {
             for (int ix = 0; ix < m_result.p_xArray; ix++)
             {
-                FileStream fs = new FileStream("c:\\Log\\Mapping" + ix.ToString("00") + ".txt", FileMode.Open);
-                StreamReader sr = new StreamReader(fs);
-                for (int iy = 0; iy < m_result.p_yArray; iy++)
+                try
                 {
-                    Array array = m_result.p_aArray[ix, iy];
-                    string sRead = sr.ReadLine();
-                    string[] asRead = sRead.Split(',');
-                    array.m_bInspect = (asRead[0] == "True");
-                    if (array.m_bInspect)
+                    FileStream fs = new FileStream("c:\\Log\\Mapping" + ix.ToString("00") + ".txt", FileMode.Open);
+                    StreamReader sr = new StreamReader(fs);
+                    for (int iy = 0; iy < m_result.p_yArray; iy++)
                     {
-                        double x = Convert.ToDouble(asRead[1].Replace('(', ' '));
-                        double y = Convert.ToDouble(asRead[2].Replace(')', ' '));
-                        array.m_rpCenter = new RPoint(x, y);
+                        Array array = m_result.p_aArray[ix, iy];
+                        string sRead = sr.ReadLine();
+                        string[] asRead = sRead.Split(',');
+                        array.m_bInspect = (asRead[0] == "True");
+                        if (array.m_bInspect)
+                        {
+                            double x = Convert.ToDouble(asRead[1].Replace('(', ' '));
+                            double y = Convert.ToDouble(asRead[2].Replace(')', ' '));
+                            array.m_rpCenter = new RPoint(x, y);
+                        }
                     }
+                    sr.Close();
+                    fs.Close();
                 }
-                sr.Close();
-                fs.Close();
+                catch (Exception) { }
             }
         }
 
