@@ -230,10 +230,17 @@ namespace Root_Vega
 			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) ||
 				InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.EBR)
 			{
-				_dispatcher.Invoke(new Action(delegate ()
+				try
 				{
-					p_ImageViewer.SelectedTool.AddDefectInfo(item);//TODO master merge후 활성화해야함
-				}));
+					_dispatcher.Invoke(new Action(delegate ()
+					{
+						p_ImageViewer.SelectedTool.AddDefectInfo(item);//TODO master merge후 활성화해야함
+					}));
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine(ex.Message);
+				}
 			}
 		}
 
