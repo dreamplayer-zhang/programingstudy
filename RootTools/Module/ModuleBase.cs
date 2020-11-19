@@ -222,7 +222,7 @@ namespace RootTools.Module
         {
             RunTree(Tree.eMode.Update);
             RunTree(Tree.eMode.RegWrite);
-         //   RunTree(Tree.eMode.Init);
+            RunTree(Tree.eMode.Init);
         }
 
         public void RunTree(Tree.eMode mode)
@@ -234,7 +234,7 @@ namespace RootTools.Module
         private void M_treeToolBox_UpdateTree()
         {
             RunToolTree(Tree.eMode.Update);
-            //RunToolTree(Tree.eMode.Init);
+            RunToolTree(Tree.eMode.Init);
             RunToolTree(Tree.eMode.RegWrite);
         }
 

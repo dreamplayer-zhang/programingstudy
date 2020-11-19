@@ -37,6 +37,17 @@ namespace Root_Vega.Module
         public _2_5_MainVisionViewModel m_mvvm;
         #endregion
 
+        #region DefectDataWraper
+        public List<DefectDataWrapper> m_arrDefectDataWraper;
+        private void M_InspManager_AddDefect(DefectDataWrapper item)
+        {
+            if (InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.Strip && InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.Chrome)
+            {
+                m_arrDefectDataWraper.Add(item);
+            }
+        }
+        #endregion
+
         #region ToolBox
         public DIO_I m_diPatternReticleExistSensor;
 
@@ -683,6 +694,8 @@ namespace Root_Vega.Module
         {
             base.InitBase(id, engineer);
             InitPosAlign();
+            m_arrDefectDataWraper = new List<DefectDataWrapper>();
+            ((Vega_Engineer)m_engineer).m_InspManager.AddDefect += M_InspManager_AddDefect;
         }
 
         public override void ThreadStop()
@@ -1308,9 +1321,10 @@ namespace Root_Vega.Module
                 return "OK";
             }
         }
-
+        //-------------------------------------------------------
         public class Run_AutoIllumination : ModuleRunBase
         {
+            //-------------------------------------------------------
             PatternVision m_module;
             public _2_5_MainVisionViewModel m_mvvm;
             public GrabMode m_grabMode = null;
@@ -1324,7 +1338,6 @@ namespace Root_Vega.Module
                     m_grabMode = m_module.GetGrabMode(value);
                 }
             }
-
             bool m_bInvDir = false;
             public RPoint m_rpCenterPos = new RPoint();
             public double m_fYRes = 1;
@@ -1335,14 +1348,14 @@ namespace Root_Vega.Module
             public int m_yLine = 1000;
             public int m_nThreshold = 128;  // Light Cal 원하는 밝기값
             public int m_nThreshTolereance = 3; // Light Cal 원하는 밝기값 +-허용치
-
+            //-------------------------------------------------------
             public Run_AutoIllumination(PatternVision module)
             {
                 m_module = module;
                 m_mvvm = m_module.m_mvvm;
                 InitModuleRun(module);
             }
-
+            //-------------------------------------------------------
             public override ModuleRunBase Clone()
             {
                 Run_AutoIllumination run = new Run_AutoIllumination(m_module);
@@ -1359,13 +1372,13 @@ namespace Root_Vega.Module
                 run.m_nThreshTolereance = m_nThreshTolereance;
                 return run;
             }
-
+            //-------------------------------------------------------
             public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
             {
                 treeRoot.p_eMode = mode;
                 RunTree(treeRoot, true);
             }
-
+            //-------------------------------------------------------
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_rpCenterPos = tree.Set(m_rpCenterPos, m_rpCenterPos, "Center Axis Position", "Center Axis Position (mm ?)", bVisible);
@@ -1378,10 +1391,10 @@ namespace Root_Vega.Module
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
                 if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
-                m_nThreshold = tree.Set(m_nThreshold, m_nThreshold, "Light Cal Threshold", "Light Cal Threshold", bVisible, true);
+                m_nThreshold = tree.Set(m_nThreshold, m_nThreshold, "Light Cal Threshold", "Light Cal Threshold", bVisible);
                 m_nThreshTolereance = tree.Set(m_nThreshTolereance, m_nThreshTolereance, "Light Cal Threshod Tolerance", "Light Cal Threshod Tolerance", bVisible);
             }
-
+            //-------------------------------------------------------
             public override string Run()
             {
                 // 0. Recipe Load 됐는지 체크
@@ -1521,7 +1534,7 @@ namespace Root_Vega.Module
                 
                 return "OK";
             }
-
+            //-------------------------------------------------------
             unsafe int AutoIllumination(MemoryData md, CRect rtROI)
             {
                 // variable
@@ -1542,6 +1555,7 @@ namespace Root_Vega.Module
 
                 return nResult;
             }
+            //-------------------------------------------------------
         }
         #endregion
 
