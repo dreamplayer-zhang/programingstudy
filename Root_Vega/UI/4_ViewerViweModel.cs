@@ -6,6 +6,7 @@ using RootTools.Camera.Dalsa;
 using RootTools.Memory;
 using RootTools.Module;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows;
@@ -28,6 +29,7 @@ namespace Root_Vega
                 SetProperty(ref m_ImageViewer, value);
             }
         }
+
         MemoryTool m_MemoryModule;
         public MemoryTool p_MemoryModule
         {
@@ -81,6 +83,21 @@ namespace Root_Vega
             }
         }
         ImageData m_imagedata;
+
+        List<DefectDataWrapper> m_arrDefectDataWraper;
+        private SimpleShapeDrawerVM m_SimpleShapeDrawer;
+        public SimpleShapeDrawerVM p_SimpleShapeDrawer
+        {
+            get 
+            {
+                return m_SimpleShapeDrawer; 
+            }
+            set
+            {
+                SetProperty(ref m_SimpleShapeDrawer, value);
+            }
+        }
+
         ICamera m_MainCamera;
         public ICamera p_MainCamera
         {
@@ -107,6 +124,11 @@ namespace Root_Vega
             Worker_ViewerUpdate.DoWork += Worker_ViewerUpdate_DoWork;
             Worker_ViewerUpdate.WorkerReportsProgress = true;
             Worker_ViewerUpdate.ProgressChanged += Worker_ViewerUpdate_ProgressChanged;
+
+            m_arrDefectDataWraper = new List<DefectDataWrapper>();
+            p_SimpleShapeDrawer = new SimpleShapeDrawerVM(p_ImageViewer);
+            p_SimpleShapeDrawer.RectangleKeyValue = System.Windows.Input.Key.D1;
+            p_ImageViewer.SetDrawer((DrawToolVM)p_SimpleShapeDrawer);
             
             InitAlarmData();
         }
@@ -116,6 +138,14 @@ namespace Root_Vega
             if (p_SelectedMemData == null)
                 return;
             m_imagedata = new ImageData(p_SelectedMemData);
+            if (p_SelectedMemData.p_id == "Main")
+            {
+                m_arrDefectDataWraper = m_Engineer.m_handler.m_patternVision.m_arrDefectDataWraper;
+                for (int i = 0; i<m_arrDefectDataWraper.Count; i++)
+                {
+                    p_ImageViewer.SelectedTool.AddDefectInfo(m_arrDefectDataWraper[i]);
+                }
+            }
             p_ImageViewer.SetImageData(m_imagedata);
         }
 
