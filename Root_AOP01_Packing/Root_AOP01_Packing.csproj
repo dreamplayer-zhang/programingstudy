@@ -164,6 +164,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Control\UserControl\LoadingBlock.xaml.cs">
+      <DependentUpon>LoadingBlock.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\UserControl\LoadingControl.xaml.cs">
+      <DependentUpon>LoadingControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="UI\2. REVIEW\Review_Panel.xaml.cs">
       <DependentUpon>Review_Panel.xaml</DependentUpon>
@@ -220,6 +226,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\Button\NaviBtn.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\UserControl\LoadingBlock.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\UserControl\LoadingControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -321,9 +335,7 @@
       <Name>RootTools</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Control\UserControl\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
       <Visible>False</Visible>
@@ -337,18 +349,31 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Control\Icon\Resource\file_settings_127px.png" />
-    <Resource Include="Control\Icon\Resource\system_task_127px.png" />
+    <Resource Include="Control\Icon\Pichon\file_settings_127px.png" />
+    <Resource Include="Control\Icon\Pichon\system_task_127px.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Control\Icon\Resource\monitor_127px.png" />
-    <Resource Include="Control\Icon\Resource\play_127px.png" />
+    <Resource Include="Control\Icon\Pichon\monitor_127px.png" />
+    <Resource Include="Control\Icon\Pichon\play_127px.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Control\Icon\Resource\arrow_pointing_left_127px.png" />
-    <Resource Include="Control\Icon\Resource\folder_127px.png" />
-    <Resource Include="Control\Icon\Resource\home_127px.png" />
-    <Resource Include="Control\Icon\Resource\save_127px.png" />
+    <Resource Include="Control\Icon\Pichon\arrow_pointing_left_127px.png" />
+    <Resource Include="Control\Icon\Pichon\folder_127px.png" />
+    <Resource Include="Control\Icon\Pichon\home_127px.png" />
+    <Resource Include="Control\Icon\Pichon\save_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\PACKING_LOADER.png" />
+    <Resource Include="Resource\PACKING_STAGE.png" />
+    <Resource Include="Resource\POD_LOADPORTpng.png" />
+    <Resource Include="Resource\PTR.png" />
+    <Resource Include="Resource\RETICLE_LOADPORT.png" />
+    <Resource Include="Resource\RTR.png" />
+    <Resource Include="Resource\TAPING_MODULE.png" />
+    <Resource Include="Resource\UNLOADPORT.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\INDIVISUAL_CASE_LOADERpng.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

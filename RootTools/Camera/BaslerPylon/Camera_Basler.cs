@@ -502,7 +502,13 @@ namespace RootTools.Camera.BaslerPylon
                     else if (s_curPixelFormat.Equals(PLCamera.PixelFormat.YUV422Packed.ToString()))
                         m_ImageGrab.ReAllocate(sz, 3);
 
-                    p_ImageViewer.SetRoiRect();
+                    if (_dispatcher != null)
+                    {
+                        _dispatcher.Invoke(new Action(delegate ()
+                        {
+                            p_ImageViewer.SetRoiRect();
+                        }));
+                    }
                     //RunTree를 하여, Enable해야할 항목 Update
 
                     m_cam.StreamGrabber.Start(GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);

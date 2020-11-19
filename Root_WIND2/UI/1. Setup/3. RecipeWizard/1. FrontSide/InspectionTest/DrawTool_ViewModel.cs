@@ -34,6 +34,7 @@ namespace Root_WIND2
             Shapes.CollectionChanged += Shapes_CollectionChanged;
             InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;
         }
+
         private void Shapes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             //if(!UIUpdateLock)
@@ -303,6 +304,11 @@ namespace Root_WIND2
             Shapes.Clear();
             InfoTextBolcks.Clear();
             p_DrawElement.Clear();
-        }        
+        }
+
+        public void ChangeImageData(ImageData image = null, IDialogService dialogService = null)
+        {
+            base.init(image, dialogService);
+        }
     }
 }

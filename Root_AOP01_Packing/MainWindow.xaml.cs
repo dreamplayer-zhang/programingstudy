@@ -112,6 +112,7 @@ namespace Root_AOP01_Packing
             Init_UI();
 
             m_engineer.Init("AOP01");
+            m_Setup.m_Home.Engineer.Engineer_UI.Init(m_engineer);
             //m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
         }
         void Init_ViewModel()
@@ -187,7 +188,7 @@ namespace Root_AOP01_Packing
             else
             {
                 splitter.IsEnabled = true;
-                ViewArea.Height = new GridLength(150);
+                ViewArea.Height = new GridLength(200);
             }
 
         }

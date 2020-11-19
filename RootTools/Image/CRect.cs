@@ -50,11 +50,11 @@ namespace RootTools
         {
             get
             {
-                return Math.Abs(Right - Left) + 1;
+                return Math.Abs(Right - Left);
             }
             set
             {
-                Right = Math.Abs(value + Left) + 1;
+                Right = Math.Abs(value + Left);
             }
         }
         [XmlIgnore]
@@ -62,11 +62,11 @@ namespace RootTools
         {
             get
             {
-                return Math.Abs(Bottom - Top) + 1;
+                return Math.Abs(Bottom - Top);
             }
             set
             {
-                Bottom = Math.Abs(value + Top) + 1;
+                Bottom = Math.Abs(value + Top);
             }
         }
         public CRect()
