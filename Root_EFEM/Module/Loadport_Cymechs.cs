@@ -5,9 +5,7 @@ using RootTools.Gem;
 using RootTools.Module;
 using RootTools.Trees;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading;
-using System.Windows.Threading;
 
 namespace Root_EFEM.Module
 {

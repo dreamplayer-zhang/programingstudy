@@ -196,8 +196,22 @@
                         BorderThickness="3">
                     <local:_2_5_MainVision x:Name="_Strip"/>
                 </Border>
-            </TabItem>
-            <TabItem Header="Side"
+			</TabItem>
+			<TabItem Header="EBR"
+                     Style="{StaticResource RcptabItem}">
+				<Border BorderBrush="Gray"
+                        BorderThickness="3">
+					<local:_2_11_EBR x:Name="_EBR"/>
+				</Border>
+			</TabItem>
+			<TabItem Header="EBR Edge"
+                     Style="{StaticResource RcptabItem}">
+				<Border BorderBrush="Gray"
+                        BorderThickness="3">
+					<local:_2_12_EBREdgeBox x:Name="_EBREdge"/>
+				</Border>
+			</TabItem>
+			<TabItem Header="Side"
                      Style="{StaticResource RcptabItem}">
                 <Border BorderBrush="Gray"
                         BorderThickness="3">

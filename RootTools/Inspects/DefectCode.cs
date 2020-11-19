@@ -28,6 +28,7 @@ namespace RootTools.Inspects
 		BevelInspectionRight = 17,
 		BevelInspectionBottom = 18,
 		D2D = 19,
+		EBR = 20,
 	}
 	public enum InspectionType
 	{

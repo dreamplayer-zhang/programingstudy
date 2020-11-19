@@ -356,7 +356,10 @@ namespace Root_Vega
 			{
 				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
 			};
-
+			m_Engineer.m_recipe.RecipeData.AddComplete += () =>
+			{
+				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+			};
 
 			return;
 		}
@@ -417,6 +420,10 @@ namespace Root_Vega
 			m_Engineer.m_recipe.VegaRecipeData.RoiList.Add(temp);
 
 			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+			if (m_Engineer.m_recipe.RecipeData.AddComplete != null)
+			{
+				m_Engineer.m_recipe.RecipeData.AddComplete();
+			}
 		}
 		private void _initSave()
 		{

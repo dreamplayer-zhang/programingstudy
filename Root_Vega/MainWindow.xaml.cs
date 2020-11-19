@@ -126,6 +126,12 @@ namespace Root_Vega
             _2_7_EdgeBoxViewModel evm = new _2_7_EdgeBoxViewModel(App.m_engineer, dialogService);
             _Recipe._SideEdgeBox.DataContext = evm;
 
+            _2_11_EBRViewModel ebvm = new _2_11_EBRViewModel(App.m_engineer, dialogService);
+            _Recipe._EBR.DataContext = ebvm;
+
+            _2_12_EBREdgeBoxViewModel ebedvm = new _2_12_EBREdgeBoxViewModel(App.m_engineer, dialogService);
+            _Recipe._EBREdge.DataContext = ebedvm;
+
             _2_10_BevelEdgeBoxViewModel bebvm = new _2_10_BevelEdgeBoxViewModel(App.m_engineer, dialogService);
             _Recipe._BevelEdgeBox.DataContext = bebvm;
 

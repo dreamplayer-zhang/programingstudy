@@ -356,9 +356,13 @@ namespace Root_Vega
 			{
 				p_BevelRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleBevel));
 			};
+			m_Engineer.m_recipe.RecipeData.AddComplete += () =>
+			{
+				p_BevelRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleBevel));
+			};
 
 
-			return;
+				return;
 		}
 		void _commandDeleteEdgeInfo()
 		{
@@ -417,6 +421,10 @@ namespace Root_Vega
 			m_Engineer.m_recipe.VegaRecipeData.RoiList.Add(temp);
 
 			p_BevelRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleBevel));
+			if (m_Engineer.m_recipe.RecipeData.AddComplete != null)
+			{
+				m_Engineer.m_recipe.RecipeData.AddComplete();
+			}
 		}
 		private void _initSave()
 		{

@@ -22,5 +22,15 @@ namespace RootTools.Comm
             treeRootUI.Init(rs232.m_treeRoot);
             rs232.RunTree(Tree.eMode.Init);
         }
+
+        RS232byte m_rs232byte; 
+        public void Init(RS232byte rs232)
+        {
+            m_rs232byte = rs232;
+            DataContext = rs232;
+            commLogUI.Init(rs232.m_commLog);
+            treeRootUI.Init(rs232.m_treeRoot);
+            rs232.RunTree(Tree.eMode.Init);
+        }
     }
 }
