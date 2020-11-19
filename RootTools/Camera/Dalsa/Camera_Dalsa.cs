@@ -7,6 +7,7 @@ using RootTools.Memory;
 using System.Threading;
 using RootTools.Trees;
 using System.Windows.Data;
+using System.Threading.Tasks;
 
 namespace RootTools.Camera.Dalsa
 {
@@ -399,27 +400,29 @@ namespace RootTools.Camera.Dalsa
 
             while (iBlock < m_nGrabCount)
             {
-                //if (swGrab.ElapsedMilliseconds > DelayGrab)
-                //{
-                //    p_sInfo = "Cam Grab Delay Error";
-                //    return;
-                //}
                 Thread.Sleep(1);
                 if (iBlock < m_nGrabTrigger)
                 {
                     IntPtr ipSrc = m_pSapBuf[(iBlock) % p_nBuf];
-                    for (int y = 0; y < p_CamParam.p_Height; y++)
-                    {  
-                        int yp = y + (iBlock) * p_CamParam.p_Height;
-                        if (p_CamParam.p_eDir == DalsaParameterSet.eDir.Reverse)
+                    if (p_CamParam.p_eDir == DalsaParameterSet.eDir.Reverse)
+                    {
+                        Parallel.For(0, p_CamParam.p_Height, (y) =>
                         {
-                            yp = lY - yp + m_nInverseYOffset;
-                        }
-                        IntPtr srcPtr = ipSrc + p_CamParam.p_Width*y;
-                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
-                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
-                        //IntPtr dstPtr = (IntPtr)((long)m_ImageLive.GetPtr() + m_cpScanOffset.X + (y + m_cpScanOffset.Y) * (long)m_ImageLive.p_Size.X);
-                        //Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
+                            int yp = y + (iBlock) * p_CamParam.p_Height;
+                            IntPtr srcPtr = ipSrc + p_CamParam.p_Width * y;
+                            IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
+                            Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
+                        });
+                    }
+                    else
+                    {
+                        Parallel.For(0, p_CamParam.p_Height, (y) =>
+                        {
+                            int yp = lY - (y + (iBlock) * p_CamParam.p_Height) + m_nInverseYOffset;
+                            IntPtr srcPtr = ipSrc + p_CamParam.p_Width * y;
+                            IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
+                            Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
+                        });
                     }
                     iBlock++;
 

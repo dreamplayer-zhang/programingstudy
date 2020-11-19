@@ -952,7 +952,8 @@ namespace Root_Vega.Module
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
                         string strMem = m_grabMode.m_memoryData.p_id;
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMem);
-                        int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * (double)m_nScanRate / 100);
+                        //int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * (double)m_nScanRate / 100);
+                        int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * (double)m_nScanRate / 100);
 
                         m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
