@@ -17,9 +17,9 @@
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20*"/>
+                        <RowDefinition Height="15*"/>
                         <RowDefinition Height="20*"/>
-                        <RowDefinition Height="20*"/>
-                        <RowDefinition Height="30*"/>
+                        <RowDefinition Height="45*"/>
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0" Header="Progress">
                         <Grid Margin="10,5">
@@ -30,9 +30,9 @@
                             <StackPanel Grid.Row="0" VerticalAlignment="Center">
                                 <TextBlock Text="Total Progress" FontSize="15" FontWeight="Bold"/>
                                 <Grid>
-                                    <ProgressBar Height="40" Margin="0,2" Value="55"/>
+                                    <ProgressBar Height="40" Margin="0,2" Value="55" Foreground="SeaGreen"/>
                                     <TextBlock Text="55%" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                   FontWeight="Bold" FontSize="13"/>
+                                                   FontWeight="Bold" FontSize="15"/>
                                 </Grid>
                             </StackPanel>
                             <UniformGrid Grid.Row="2" Columns="2">
@@ -43,19 +43,7 @@
                             </UniformGrid>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="1" Header="Product">
-                        <UniformGrid Margin="10,5" Columns="2">
-                            <TextBlock Text="Pod ID" VerticalAlignment="Center" />
-                            <TextBlock Text="pod00001" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                            <TextBlock Text="Lot ID" VerticalAlignment="Center"/>
-                            <TextBlock Text="lot00001" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                            <TextBlock Text="Reticle ID" VerticalAlignment="Center"/>
-                            <TextBlock Text="dummyW001" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                            <TextBlock Text="Recipe" VerticalAlignment="Center"/>
-                            <TextBlock Text="test00001.rcp" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                        </UniformGrid>
-                    </GroupBox>
-                    <GroupBox Grid.Row="2" Header="Setting">
+                    <GroupBox Grid.Row="1" Header="Parameter">
                         <Grid Margin="10,5">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -69,7 +57,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Taping Num" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1" Style="{StaticResource BasicTbox}" Margin="15,15"
+                                <TextBox Grid.Column="1" Style="{StaticResource BasicTbox}" Margin="15,5"
                                  Text="0"/>
                             </Grid>
                             <Grid Grid.Row="1">
@@ -79,7 +67,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Vaccume Time" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1" Style="{StaticResource BasicTbox}" Margin="15,15"
+                                <TextBox Grid.Column="1" Style="{StaticResource BasicTbox}" Margin="15,5"
                                  Text="0"/>
                                 <TextBlock Text="sec" VerticalAlignment="Center" Grid.Column="2"/>
 
@@ -91,15 +79,47 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Heating Time" VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1" Style="{StaticResource BasicTbox}" Margin="15,15"
+                                <TextBox Grid.Column="1" Style="{StaticResource BasicTbox}" Margin="15,5"
                                  Text="0"/>
                                 <TextBlock Text="sec" VerticalAlignment="Center" Grid.Column="2"/>
                             </Grid>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="3" Header="Option">
+                    <GroupBox Grid.Row="2" Header="Product">
+                        <UniformGrid Margin="10,5" Columns="2">
+                            <TextBlock Text="Pod ID" VerticalAlignment="Center" />
+                            <TextBlock Text="pod00001" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            <TextBlock Text="Lot ID" VerticalAlignment="Center"/>
+                            <TextBlock Text="lot00001" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            <TextBlock Text="Reticle ID" VerticalAlignment="Center"/>
+                            <TextBlock Text="dummyW001" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            <TextBlock Text="Recipe" VerticalAlignment="Center"/>
+                            <TextBlock Text="test00001.rcp" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                        </UniformGrid>
                     </GroupBox>
-                    <!--<GroupBox Grid.Row="2" Header="Module State">
+                    <GroupBox Grid.Row="3" Header="Module State">
+                        <UniformGrid Margin="10,5" Rows="9" Columns="2">
+                            <TextBlock Text="TAPING MODULE" VerticalAlignment="Center"/>
+                            <TextBlock Text="Working" VerticalAlignment="Center" Foreground="Coral"/>
+                            <TextBlock Text="PACKING LOADER" VerticalAlignment="Center"/>
+                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
+                            <TextBlock Text="PACKING MODULE" VerticalAlignment="Center"/>
+                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
+                            <TextBlock Text="RTR : RETICLE" VerticalAlignment="Center"/>
+                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
+                            <TextBlock Text="RTR : POD / CASE" VerticalAlignment="Center"/>
+                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
+                            <TextBlock Text="LOADPORT : RETICLE" VerticalAlignment="Center"/>
+                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
+                            <TextBlock Text="LOADPORT : POD" VerticalAlignment="Center"/>
+                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
+                            <TextBlock Text="INDIVISUAL PORT" VerticalAlignment="Center"/>
+                            <TextBlock Text="Error" VerticalAlignment="Center" Foreground="Red"/>
+                            <TextBlock Text="UNLOADPORT" VerticalAlignment="Center"/>
+                            <TextBlock Text="Ready" VerticalAlignment="Center" Foreground="Green"/>
+                        </UniformGrid>
+                    </GroupBox>
+                    <!--<GroupBox Grid.Row="3" Header="Module State">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -112,18 +132,18 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <Grid Margin="10,3" Grid.Row="0">
+                            <Grid Margin="10,0" Grid.Row="0">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="LOADPORT : RETICLE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="LOADPORT : RETICLE" VerticalAlignment="Bottom" FontSize="10"/>
                                 <Border Grid.Row="1" 
-                                                CornerRadius="2"
-                                                Margin="0,0,0,0"
-                                                BorderBrush="DimGray" 
-                                                BorderThickness="1"
-                                                Background="{StaticResource PanelBackGround}">
+                                        CornerRadius="2"
+                                        Margin="0,0,0,0"
+                                        BorderBrush="DimGray" 
+                                        BorderThickness="1"
+                                        Background="{StaticResource PanelBackGround}">
                                     <TextBlock Text="Ready"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
@@ -135,7 +155,7 @@
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="LOADPORT : POD" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="LOADPORT : POD" VerticalAlignment="Bottom" FontSize="10"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -151,7 +171,7 @@
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="LOADPORT : CASE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="LOADPORT : CASE" VerticalAlignment="Bottom" FontSize="10"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -167,7 +187,7 @@
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="UNLOADPORT" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="UNLOADPORT" VerticalAlignment="Bottom" FontSize="10" />
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -183,7 +203,7 @@
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="RTR : POD / CASE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="RTR : POD / CASE" VerticalAlignment="Bottom" FontSize="10"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -199,7 +219,7 @@
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="RTR" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="RTR" VerticalAlignment="Bottom" FontSize="10"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -215,7 +235,7 @@
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="TAPING MODULE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="TAPING MODULE" VerticalAlignment="Bottom" FontSize="10"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -232,7 +252,7 @@
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="PACKING LOADER" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="PACKING LOADER" VerticalAlignment="Bottom" FontSize="10"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -248,7 +268,7 @@
                                     <RowDefinition Height="20"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="PACKING MODULE" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold"/>
+                                <TextBlock Text="PACKING MODULE" VerticalAlignment="Bottom" FontSize="10"/>
                                 <Border Grid.Row="1" 
                                             CornerRadius="2"
                                             BorderBrush="DimGray" 
@@ -262,8 +282,9 @@
 
                         </Grid>
                     </GroupBox>-->
+
                 </Grid>
-                <Grid Grid.Column="1" Margin="10">
+                <Grid Grid.Column="1" Visibility="Collapsed" Opacity="0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1.1*"/>
                         <RowDefinition Height="0.9*"/>
@@ -469,6 +490,211 @@
                             </Grid>
                         </GroupBox>
                     </Grid>
+                </Grid>
+                <Grid Grid.Column="1" Visibility="Visible">
+                    <GroupBox Header="Process" Grid.Column="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="3*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0" Margin="5">
+                                <GroupBox Grid.Row="3" Header="Job List">
+                                    <StackPanel Background="Transparent" Margin="0,5">
+                                        <Label Content="Job 1" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 2" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 3" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 4" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 5" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 6" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 7" Background="SteelBlue"        Height="40" VerticalContentAlignment="Center"/>
+                                        
+                                            <Label Content="Job 8" Background="LightSteelBlue"        Height="40" VerticalContentAlignment="Center"/>
+                                            <Label Content="Job 9" Background="AliceBlue"        Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 10" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 11" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 12" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 13" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 14" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 15" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 16" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 17" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 18" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 19" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 20" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                        <Label Content="Job 21" Background="AliceBlue"       Height="40" VerticalContentAlignment="Center"/>
+                                    </StackPanel>
+                                </GroupBox>
+                            </Grid>
+                            <ScrollViewer Grid.Column="1" Margin="5">
+                                <StackPanel>
+                                    <GroupBox Header="LOADPORT : RETICLE" Height="200" Margin="0,0,0,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="1.2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/RETICLE_LOADPORT.png"/>
+                                            <Grid Grid.Column="1" Margin="40,50">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Done" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
+                                                <ProgressBar Grid.Row="1" Value="100" Foreground="SteelBlue" Margin="0,5"/>
+                                                <TextBlock Text="100%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="RTR : RETICLE" Height="200" Margin="0,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="1.2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/PTR.png"/>
+                                            <Grid Grid.Column="1" Margin="40,50">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Done" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
+                                                <ProgressBar Grid.Row="1" Value="100" Foreground="SteelBlue" Margin="0,5"/>
+                                                <TextBlock Text="100%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="TAPING MODULE" Height="200" Margin="0,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="1.2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/TAPING_MODULE.png" Opacity="0.3"/>
+                                            <local:LoadingControl/>
+                                            <Grid Grid.Column="1" Margin="40,50">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Working..." VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
+                                                <ProgressBar Grid.Row="1" Value="55" Foreground="SteelBlue" Margin="0,5"/>
+                                                <TextBlock Text="55%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="RTR : POD / CASE" Height="200" Margin="0,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="1.2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/RTR.png"/>
+                                            <Grid Grid.Column="1" Margin="40,50">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="PACKING LOADER" Height="200" Margin="0,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="1.2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/PACKING_LOADER.png"/>
+                                            <Grid Grid.Column="1" Margin="40,50">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="PACKING Module" Height="200" Margin="0,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="1.2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/PACKING_STAGE.png"/>
+                                            <Grid Grid.Column="1" Margin="40,50">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="PACKING LOADER" Height="200" Margin="0,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="1.2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/PACKING_LOADER.png"/>
+                                            <Grid Grid.Column="1" Margin="40,50">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="RTR : POD / CASE" Height="200" Margin="0,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="1.2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/RTR.png"/>
+                                            <Grid Grid.Column="1" Margin="40,50">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="UNLOADPORT" Height="200" Margin="0,5">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="1.2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Image Source="/Root_AOP01_Packing;component/Resource/UNLOADPORT.png"/>
+                                            <Grid Grid.Column="1" Margin="40,50">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Text="Ready" VerticalAlignment="Bottom" FontSize="20" FontFamily="Arial"/>
+                                                <ProgressBar Grid.Row="1" Value="0" Foreground="SteelBlue" Margin="0,5"/>
+                                                <TextBlock Text="0%" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </GroupBox>
                 </Grid>
                 <Grid Grid.Column="2">
                     <StackPanel Grid.Row="1" Margin="0,20">
