@@ -1110,35 +1110,6 @@ namespace Root_Vega
 			}
 		}
 
-		public RelayCommand CommandSaveAutoIlluminationFeature
-		{
-			get
-			{
-				return new RelayCommand(Test);
-			}
-		}
-
-		private void SaveAutoIlluminationFeature()
-		{
-			string strFileName = "AutoIlluminationFeature.bmp";
-			string strSaveTargetPath = $"C:/Recipe/AutoIllumination/";
-			if (!Directory.Exists(strSaveTargetPath))
-			{
-				Directory.CreateDirectory(strSaveTargetPath);
-			}
-			string strFullPath = System.IO.Path.Combine(strSaveTargetPath, strFileName);
-
-			if (p_ImageViewer.m_BasicTool.m_TempRect == null) return;
-			UIElementInfo uieROI = p_ImageViewer.m_BasicTool.m_TempRect;
-			int nLeft = (int)uieROI.StartPos.X;
-			int nTop = (int)uieROI.StartPos.Y;
-			int nRight = (int)uieROI.EndPos.X;
-			int nBottom = (int)uieROI.EndPos.Y;
-
-			p_ImageViewer.p_ImageData.SaveRectImage(new CRect(nLeft, nTop, nRight, nBottom), strFullPath);
-			return;
-		}
-
 		private void ClearUI()
 		{
 			if (p_InformationDrawer != null)
