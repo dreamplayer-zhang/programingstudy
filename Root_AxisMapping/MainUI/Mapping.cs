@@ -2,11 +2,13 @@
 using Root_AxisMapping.Module;
 using RootTools;
 using RootTools.Memory;
+using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading;
 
 namespace Root_AxisMapping.MainUI
 {
@@ -97,8 +99,8 @@ namespace Root_AxisMapping.MainUI
         public string RunGrab()
         {
             AxisMapping.Run_Grab runGrab = (AxisMapping.Run_Grab)m_runGrab.Clone();
-            runGrab.m_xStart += m_dx * (m_xActive - m_xSetup); 
-            m_axisMapping.StartRun(runGrab);
+            runGrab.m_xStart += m_dx * (-m_xActive + m_xSetup); 
+            runGrab.Run();
             return "OK";
         }
         void RunTreeGrab(Tree tree)
@@ -313,6 +315,7 @@ namespace Root_AxisMapping.MainUI
 
         public void InspectAll()
         {
+            if (m_axisMapping.m_qModuleRun.Count > 0) return; 
             int xActive = m_xActive; 
             for (m_xActive = 0; m_xActive < p_xArray; m_xActive++)
             {
