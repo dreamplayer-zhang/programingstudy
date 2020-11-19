@@ -232,7 +232,7 @@ namespace Root_Vega
 			{
 				_dispatcher.Invoke(new Action(delegate ()
 				{
-					//p_ImageViewer.SelectedTool.AddDefectInfo(item);//TODO master merge후 활성화해야함
+					p_ImageViewer.SelectedTool.AddDefectInfo(item);//TODO master merge후 활성화해야함
 				}));
 			}
 		}
