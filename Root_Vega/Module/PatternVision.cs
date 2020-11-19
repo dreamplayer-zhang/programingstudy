@@ -1544,18 +1544,24 @@ namespace Root_Vega.Module
                         Point ptEndPos = new Point(ptStartPos.X + nLightCalKeyWidth, ptStartPos.Y + nLightCalKeyHeight);
                         CRect crtLightCalKey = new CRect(ptStartPos, ptEndPos);
                         nResultThreshold = AutoIllumination(mem, crtLightCalKey);
-                        if (((m_nThreshold - m_nThreshTolerance) < nResultThreshold) && ((m_nThreshold + m_nThreshTolerance) > nResultThreshold))
+                        if (((m_nThreshold - m_nThreshTolerance) <= nResultThreshold) && ((m_nThreshold + m_nThreshTolerance) >= nResultThreshold))
                         {
                             bSuccessAutoIllumination = true;
                         }
                         else
                         {
-
+                            if ((m_nThreshold - m_nThreshTolerance) < nResultThreshold)
+                            {
+                                double dPower = m_module.GetGrabMode(p_sGrabMode).GetLightByName("Main Coax");
+                                m_module.GetGrabMode(p_sGrabMode).SetLightByName("Main Coax", (int)(dPower - 1));
+                            }
+                            else
+                            {
+                                double dPower = m_module.GetGrabMode(p_sGrabMode).GetLightByName("Main Coax");
+                                m_module.GetGrabMode(p_sGrabMode).SetLightByName("Main Coax", (int)(dPower + 1));
+                            }
                         }
                     }
-
-
-
                 }
                 catch (Exception e)
                 {
