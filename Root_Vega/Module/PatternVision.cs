@@ -606,9 +606,20 @@ namespace Root_Vega.Module
 
             if (m_axisXY.p_axisY.IsInPos(eAxisPosY.ReticleCheck) == true)
             {
-                if (p_infoReticle != null)
+
+                if (m_diPatternReticleExistSensor.p_bIn == false)
                 {
-                    if (m_diPatternReticleExistSensor.p_bIn == false) p_infoReticle = null;
+                    if (p_infoReticle != null)
+                    {
+                        p_infoReticle = null;
+                    }
+                }
+                else
+                {
+                    if (p_infoReticle == null)
+                    {
+                        p_sInfo = "Pattern Vision Reticle Info Error";
+                    }
                 }
             }
 
