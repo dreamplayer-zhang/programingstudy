@@ -621,7 +621,7 @@ namespace Root_EFEM.Module
             InitCmd();
             InitMotion();
             InitArms(id);
-            base.InitBase(id, engineer);
+            InitBase(id, engineer);
         }
 
         public override void ThreadStop()

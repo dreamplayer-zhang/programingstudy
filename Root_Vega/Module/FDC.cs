@@ -14,23 +14,23 @@ namespace Root_Vega.Module
     public class FDC : ModuleBase
     {
         #region ToolBox
-        public RS232 m_rs232;
+        public RS232byte m_rs232;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
             if (bInit)
             {
-                m_rs232.OnRecieve += M_rs232_OnRecieve;
+                m_rs232.OnRecieve += M_rs232_OnRecieve; 
                 m_rs232.p_bConnect = true;
             }
         }
-        #endregion
 
         #region RS232
-        private void M_rs232_OnRecieve(string sRead)
+        private void M_rs232_OnRecieve(byte[] aRead, ref int nRead)
         {
-            p_sInfo = ReadFDC(sRead); 
+            
         }
+        #endregion
 
         string ReadFDC(string sRead)
         {
