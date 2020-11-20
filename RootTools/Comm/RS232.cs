@@ -1,11 +1,9 @@
 ﻿using RootTools.Trees;
 using System;
-using System.Collections.Generic;
 using System.IO.Ports;
 using System.Text;
 using System.Threading;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace RootTools.Comm
 {
@@ -60,8 +58,7 @@ namespace RootTools.Comm
                 {
                     _sInfo = Connect();
                     m_commLog.Add(CommLog.eType.Info, _sInfo);
-                    if (_sInfo != "OK") //ThreadStop();  
-                        m_sp = null;
+                    if (_sInfo != "OK") m_sp = null;
                 }
                 else p_sInfo = DisConnect();
                 OnPropertyChanged(); 

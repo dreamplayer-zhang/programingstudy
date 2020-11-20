@@ -93,8 +93,10 @@ namespace Root_WIND2
 
         public WIND2_Handler m_handler = new WIND2_Handler();
 
-        private InspectionManager_Vision m_InspectionManager;
-        public InspectionManager_Vision InspectionManager { get => m_InspectionManager; set => m_InspectionManager = value; }
+        private InspectionManager_Vision inspectionMgrVision;
+        public InspectionManager_Vision InspectionMgrVision { get => inspectionMgrVision; set => inspectionMgrVision = value; }
+        private InspectionManager_EFEM inspectionMgrEFEM;
+        public InspectionManager_EFEM InspectionMgrEFEM { get => inspectionMgrEFEM; set => inspectionMgrEFEM = value; }
 
         public void Init(string id)
         {

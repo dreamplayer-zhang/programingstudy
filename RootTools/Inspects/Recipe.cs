@@ -250,6 +250,8 @@ namespace RootTools.Inspects
 		{
 			//일단 pixel 단위로 지정
 			_SideInspMargin = new Param<int>(100, 0, int.MaxValue);
+			_EBRInspMargin = new Param<int>(100, 0, int.MaxValue);
+			_EBRInspAreaSize = new Param<int>(1000, 0, int.MaxValue);
 
 			_SideTopUpperOffset = new Param<int>(10000, 0, int.MaxValue);
 			_SideTopCenterOffset = new Param<int>(30000, 0, int.MaxValue);
@@ -286,6 +288,44 @@ namespace RootTools.Inspects
 			_BevelBottomCenterOffset = new Param<int>(30000, 0, int.MaxValue);
 			_BevelBottomUnderOffset = new Param<int>(10000, 0, int.MaxValue);
 		}
+
+		#region EBRInspMargin
+
+		Param<int> _EBRInspMargin;
+		public int EBRInspMargin
+		{
+			get
+			{
+				return _EBRInspMargin._value;
+			}
+			set
+			{
+				if (_EBRInspMargin._value == value)
+					return;
+				_EBRInspMargin._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
+
+		#region EBRInspAreaSize
+
+		Param<int> _EBRInspAreaSize;
+		public int EBRInspAreaSize
+		{
+			get
+			{
+				return _EBRInspAreaSize._value;
+			}
+			set
+			{
+				if (_EBRInspAreaSize._value == value)
+					return;
+				_EBRInspAreaSize._value = value;
+				RaisePropertyChanged();
+			}
+		}
+		#endregion
 
 		#region SideInspMargin
 
@@ -783,6 +823,14 @@ namespace RootTools.Inspects
 	}
 	public class RecipeData : ObservableObject
 	{
+		#region EventHandler
+		/// <summary>
+		/// 이벤트 핸들러
+		/// </summary>
+		public delegate void EventHandler();
+		[XmlIgnore] public EventHandler AddComplete;
+		#endregion
+
 		public RecipeData()
 		{
 			_useDefectMerge = false;
@@ -1379,6 +1427,8 @@ namespace RootTools.Inspects
 			ReticlePattern,
 			ReticleSide,
 			ReticleBevel,
+			EBR,
+			D2D,
 		}
 	}
 	public class ItemParent : ObservableObject
@@ -1402,6 +1452,27 @@ namespace RootTools.Inspects
 				SetProperty(ref _parameterList, value);
 			}
 		}
+	}
+	public class EBR : ItemParent
+	{
+		public List<Pattern> PatternList;
+		public List<NonPattern> NonPatternList;
+
+		#region ParameterList
+
+		ObservableCollection<SurfaceParamData> _parameterList = new ObservableCollection<SurfaceParamData>();
+		public ObservableCollection<SurfaceParamData> ParameterList
+		{
+			get
+			{
+				return _parameterList;
+			}
+			set
+			{
+				SetProperty(ref _parameterList, value);
+			}
+		}
+		#endregion
 	}
 	public class Strip : ItemParent
 	{

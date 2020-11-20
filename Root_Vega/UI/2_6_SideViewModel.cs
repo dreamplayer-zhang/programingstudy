@@ -26,7 +26,6 @@ namespace Root_Vega
 		/// 외부 Thread에서 UI를 Update하기 위한 Dispatcher
 		/// </summary>
 		public Dispatcher _dispatcher;
-		System.Threading.Timer resultTimer;
 		Vega_Engineer m_Engineer;
 		MemoryTool m_MemoryModule;
 		List<ImageData> m_Image = new List<ImageData>();
@@ -280,17 +279,18 @@ namespace Root_Vega
 				SelectedParam = new SurfaceParamData();//UI 초기화를 위한 코드
 				SelectedParam = null;
 			};
+			m_Engineer.m_recipe.RecipeData.AddComplete += () =>
+			{
+				p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+				SideParamList = new ObservableCollection<SurfaceParamData>();
 
-			m_Engineer.m_InspManager.nInspectionCount = 0;//Inspection total count 초기화. 임시 db에서 데이터값을 정상적으로 끌어올때 사용한다
+				_SelectedROI = null;
 
-			resultTimer = new System.Threading.Timer(checkAddDefect);
-			resultTimer.Change(0, 1000);
+				SelectedParam = new SurfaceParamData();//UI 초기화를 위한 코드
+				SelectedParam = null;
+			};
 
 			return;
-		}
-		~_2_6_SideViewModel()
-		{
-			resultTimer.Dispose();
 		}
 		private void checkAddDefect(object state)
 		{
@@ -474,7 +474,7 @@ namespace Root_Vega
 							m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_sideMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).GetMBOffset(),
 								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.X,
 								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.Y,
-								adjustAreaList[n], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, p);
+								adjustAreaList[n], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p);
 						}
 						p_ImageViewer_List[i].SetRoiRect();
 					}
@@ -576,6 +576,10 @@ namespace Root_Vega
 			m_Engineer.m_recipe.VegaRecipeData.RoiList.Add(temp);
 
 			p_SideRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticleSide));
+			if (m_Engineer.m_recipe.RecipeData.AddComplete != null)
+			{
+				m_Engineer.m_recipe.RecipeData.AddComplete();
+			}
 		}
 		void _addParam()
 		{

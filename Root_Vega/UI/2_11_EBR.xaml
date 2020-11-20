@@ -1,0 +1,225 @@
+﻿<UserControl x:Class="Root_Vega._2_11_EBR"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:tools ="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:obs="clr-namespace:nsSizeObserver;assembly=RootTools"
+             xmlns:mouse="clr-namespace:mousebehavior;assembly=RootTools"
+             mc:Ignorable="d" Cursor="{Binding RecipeCursor}"
+             d:DesignHeight="900" d:DesignWidth="1442">
+	<UserControl.Resources>
+		<Style TargetType="{x:Type Button}"
+               x:Key="Btn">
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="{x:Type Button}">
+						<Border BorderBrush="{DynamicResource BtnBorderBrush}"
+                                BorderThickness="2"
+                                Background="{StaticResource BtnBackGround}"
+                                x:Name="Bdr">
+							<TextBlock FontSize="15"
+                                       Foreground="{StaticResource BtnForeGround}"
+                                       FontFamily="Arial"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="1" /></TextBlock>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+								<Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+								<Setter Property="Cursor"
+                                        Value="Hand" />
+							</Trigger>
+							<Trigger Property="Button.IsPressed"
+                                     Value="True">
+								<Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnPressed}" />
+							</Trigger>
+							<Trigger Property="Button.IsEnabled"
+                                     Value="False">
+								<Setter TargetName="Bdr"
+                                        Property="Opacity"
+                                        Value="0.5" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</UserControl.Resources>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="75*"/>
+			<ColumnDefinition Width="25*"/>
+		</Grid.ColumnDefinitions>
+		<Grid Grid.Column="0" >
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="20*"/>
+			</Grid.RowDefinitions>
+			<Grid Grid.Row="0" >
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="3*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<Button Content="LoadImage" Grid.Column="1"
+                        Style="{StaticResource Btn}"
+                        Command="{Binding p_ImageViewer.btnClickOpenImage}"
+                        Margin="3,0,0,3" />
+			</Grid>
+			<Border Grid.Row="1" Margin="2,2,2,2" BorderBrush ="Gray" BorderThickness="3">
+
+
+				<tools:ImageViewer DataContext="{Binding p_ImageViewer}"
+                               Width="{PriorityBinding}"
+                               Height="{PriorityBinding}"/>
+			</Border>
+		</Grid>
+		<Grid Grid.Column="1" Margin="0,15,15,15">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition  Height="*"/>
+			</Grid.RowDefinitions>
+			<ScrollViewer VerticalScrollBarVisibility="Auto"
+						  Background="{DynamicResource BtnMouseOver}" 
+						  Grid.Row="1">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<Grid Grid.Row="0"
+				  Background="{DynamicResource BtnMouseOver}" >
+						<StackPanel Margin="10,0,10,0">
+							<TextBlock Text="ROI List"
+							   Margin="0,10,0,0"
+							   Foreground="White"/>
+							<ListView ItemsSource="{Binding p_EBRRoiList}"
+                              Height="100"
+                              Background="#FF1B1B1C"
+                              SelectedItem="{Binding SelectedROI}">
+								<ListView.ItemTemplate>
+									<DataTemplate>
+										<TextBlock Text="{Binding Name}"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           FontSize="13" />
+									</DataTemplate>
+								</ListView.ItemTemplate>
+							</ListView>
+							<StackPanel DataContext="{Binding SelectedRecipe}">
+								<UniformGrid Columns="2" Margin="0,10,0,10">
+									<TextBlock  Text="Use Defect Merge"
+											Style="{StaticResource BasicTb}"/>
+									<ToggleButton Content="{Binding VegaRecipeData.UseDefectMerge}"
+											  Style="{StaticResource BasicToggle}"
+											  IsChecked="{Binding VegaRecipeData.UseDefectMerge}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,10">
+									<TextBlock Text="Defect Merge Distance(pxl)"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Text="{Binding VegaRecipeData.MergeDistance}"
+										 Style="{StaticResource BasicTbox}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,10">
+									<TextBlock Text="Overall Inspection Margin"
+										   Style="{StaticResource BasicTb}"/>
+									<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.EBRInspMargin}"/>
+								</UniformGrid>
+								<StackPanel>
+									<UniformGrid Columns="2" Margin="0,5,0,5">
+										<TextBlock Text="Inspection Area Range"
+										   Margin="20,0,0,0"
+										   HorizontalAlignment="Left"
+										   Style="{StaticResource BasicTb}"/>
+										<TextBox Style="{StaticResource BasicTbox}"
+											 Text="{Binding VegaRecipeData.EBRInspAreaSize}"/>
+									</UniformGrid>
+								</StackPanel>
+							</StackPanel>
+							<Button Grid.Column="0"
+							Margin="0,10,0,40"
+							Style="{StaticResource BasicBtn}"
+							Content="Add EBR Insp ROI"
+							Command="{Binding CommandAddRoi}"/>
+							<Button Content="Clear Result"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding CommandClearInspResult}"
+                            Margin="0,0,0,20" />
+							<Button Content="Start Inspection"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding CommandStartInsp}"
+                            Margin="0,0,0,10" />
+							<Button Content="Inspection Complete"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding CommandEndInsp}"
+                            Margin="0,0,0,10" />
+						</StackPanel>
+					</Grid>
+					<Grid Grid.Row="1">
+						<StackPanel Margin="10,0,10,0">
+							<TextBlock Text="Parameter List"
+							   Foreground="White"/>
+							<ListView ItemsSource="{Binding EBRParamList}"
+                              Height="100"
+                              Background="#FF1B1B1C"
+                              SelectedItem="{Binding SelectedParam}">
+								<ListView.ItemTemplate>
+									<DataTemplate>
+										<TextBlock Text="{Binding Name}"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           FontSize="13" />
+									</DataTemplate>
+								</ListView.ItemTemplate>
+							</ListView>
+							<Button Content="Add Parameter"
+                            Style="{StaticResource BasicBtn}"
+                            Command="{Binding CommandAddParam}"
+                            Margin="0,10,0,10" />
+							<StackPanel DataContext="{Binding SelectedParam}">
+								<UniformGrid Columns="2" Margin="0,10,0,10">
+									<TextBlock  Text="Dark Inspection"
+                                        Style="{StaticResource BasicTb}"/>
+									<ToggleButton Content="{Binding UseDarkInspection}"
+                                          Style="{StaticResource BasicToggle}"
+                                          IsChecked="{Binding UseDarkInspection}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,10">
+									<TextBlock  Text="Absolute Inspection"
+                                        Style="{StaticResource BasicTb}"/>
+									<ToggleButton Content="{Binding UseAbsoluteInspection}"
+                                          Style="{StaticResource BasicToggle}"
+                                          IsChecked="{Binding UseAbsoluteInspection}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,10">
+									<TextBlock  Text="{Binding TargetLabelText}"
+                                        Style="{StaticResource BasicTb}"/>
+									<TextBox Text="{Binding TargetGV}"
+                                     Style="{StaticResource BasicTbox}"/>
+								</UniformGrid>
+								<UniformGrid Columns="2" Margin="0,0,0,10">
+									<TextBlock  Text="DefectSize"
+                                        Style="{StaticResource BasicTb}"/>
+									<TextBox Text="{Binding DefectSize}"
+                                     Style="{StaticResource BasicTbox}"/>
+								</UniformGrid>
+							</StackPanel>
+						</StackPanel>
+					</Grid>
+				</Grid>
+			</ScrollViewer>
+		</Grid>
+	</Grid>
+</UserControl>

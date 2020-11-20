@@ -442,11 +442,11 @@ namespace Root_WIND2
             line.MemoryEndPoint = currentMemPt;
             line.SetData();
             CreateModifyTool_Line(line);
-            //foreach (CPoint pt in line.Data)
-            //{
-            //    base.DrawPixelBitmap(pt - BoxOffset, 255, 0, 0, 255);
-            //}
-            //base.SetLayerSource();
+            foreach (CPoint pt in line.Data)
+            {
+                base.DrawPixelBitmap(pt - BoxOffset, 255, 0, 0, 255);
+            }
+            base.SetLayerSource();
         }
 
         private void StartDrawRect(Brush color, double thickness, double opacity, CPoint startMemPt, CPoint startCanvasPt)

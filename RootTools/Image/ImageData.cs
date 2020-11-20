@@ -507,13 +507,8 @@ namespace RootTools
 		}
 		unsafe void FileSaveBMP(string sFile, IntPtr ptr, CRect rect)
 		{
-			int width = (int)(rect.Right * 0.25);
-			if (width * 4 != rect.Right) rect.Right = (width + 1) * 4;
-
-			//if (rect.Width % 4 != 0)
-			//{
-			//	rect.Right += 4 - rect.Width % 4;
-			//}
+			//int width = (int)(rect.Right * 0.25);
+			//if (width * 4 != rect.Right) rect.Right = (width + 1) * 4;
 
 			FileStream fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
 			BinaryWriter bw = new BinaryWriter(fs);
@@ -559,6 +554,10 @@ namespace RootTools
 					bw.Write(Convert.ToByte(i));
 					bw.Write(Convert.ToByte(255));
 				}
+			}
+			if (rect.Width % 4 != 0)
+			{
+				rect.Right += 4 - rect.Width % 4;
 			}
 			byte[] aBuf = new byte[p_nByte * rect.Width];
 			for (int i = rect.Height - 1; i >= 0; i--)
@@ -709,26 +708,26 @@ namespace RootTools
 					int nNum = 2;
 					Thread[] multiThread = new Thread[nNum];
 
-					for (int i = 0; i < nNum; i++)
-					{
-						int nStartHeight = lowheight * (nNum-i) / nNum;
-						int nEndHeight = lowheight * (nNum - i-1) / nNum;
-						multiThread[i] = new Thread(() => RunCopyThread(sFile, nWidth, nHeight, lowwidth, lowheight, nStartHeight , nEndHeight, offset));
-						multiThread[i].Start();
-					}
+                    for (int i = 0; i < nNum; i++)
+                    {
+                        int nStartHeight = lowheight * (nNum - i) / nNum;
+                        int nEndHeight = lowheight * (nNum - i - 1) / nNum;
+                        multiThread[i] = new Thread(() => RunCopyThread(sFile, nWidth, nHeight, lowwidth, lowheight, nStartHeight, nEndHeight, offset));
+                        multiThread[i].Start();
+                    }
                     while (true)
                     {
-						bool bEnd = true;
-						for (int i = 0; i < nNum; i++)
-						{
-							if (multiThread[i].IsAlive)
-								bEnd = false;
-						}
-						Thread.Sleep(10);
-						p_nProgress = Convert.ToInt32(((double)nLine / lowheight) * 100);
-						if (bEnd)
-							break;
-					}
+                        bool bEnd = true;
+                        for (int i = 0; i < nNum; i++)
+                        {
+                            if (multiThread[i].IsAlive)
+                                bEnd = false;
+                        }
+                        Thread.Sleep(10);
+                        p_nProgress = Convert.ToInt32(((double)nLine / lowheight) * 100);
+                        if (bEnd)
+                            break;
+                    }
                     //for (int y = lowheight - 1; y >= 0; y--)
                     //{
                     //    if (Worker_MemoryCopy.CancellationPending)

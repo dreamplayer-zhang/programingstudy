@@ -68,7 +68,6 @@ namespace RootTools.Inspects
 				return;
 			}
 			m_bProgress = false;
-			nInspectionCount = 0;
 			sw = new StopWatch();
 			sw.Start();
 
@@ -137,7 +136,6 @@ namespace RootTools.Inspects
 							if (InsepctionThread[i].bState == Inspection.InspectionState.Ready ||
 							InsepctionThread[i].bState == Inspection.InspectionState.None)
 							{
-								nInspectionCount++;
 								InspectionProperty ipQueue = p_qInspection.Dequeue();
 								if ( p_qInspection.Count == 0)
 									Console.WriteLine("Queue Item Count : " + p_qInspection.Count);
@@ -222,9 +220,9 @@ namespace RootTools.Inspects
 				//encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
 
 				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-				using (FileStream fs = new FileStream(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".vega_image"), FileMode.Create))
-				{
-					fs.Write(BitConverter.GetBytes(tempSet.Tables["tempdata"].Rows.Count), 0, sizeof(int));//defect 개수 저장
+				//using (FileStream fs = new FileStream(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".vega_image"), FileMode.Create))
+				//{
+					//fs.Write(BitConverter.GetBytes(tempSet.Tables["tempdata"].Rows.Count), 0, sizeof(int));//defect 개수 저장
 					foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
 					{
 						System.Data.DataRow dataRow = VSDataDT.NewRow();
@@ -273,15 +271,16 @@ namespace RootTools.Inspects
 						string memory = item["memMEMORY"].ToString();
 						var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
 						var img = new ImageData(tempMem);
-						var imageBytes = img.GetRectByteArray(ImageSizeBlock);
+					//var imageBytes = img.GetRectByteArray(ImageSizeBlock);
+					img.SaveRectImage(ImageSizeBlock, System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) +"_"+Convert.ToInt32(item["idx"]).ToString("D8") + ".bmp"));
 
-						fs.Write(BitConverter.GetBytes(Convert.ToInt32(item["idx"].ToString())), 0, sizeof(int));//4
-						fs.Write(BitConverter.GetBytes(ImageWidth), 0, sizeof(int));//4
-						fs.Write(BitConverter.GetBytes(ImageHeight), 0, sizeof(int));//4
-						fs.Write(BitConverter.GetBytes(imageBytes.Length), 0, sizeof(int));//4
-						fs.Write(imageBytes, 0, imageBytes.Length);//바로직전거만큼
+						//fs.Write(BitConverter.GetBytes(Convert.ToInt32(item["idx"].ToString())), 0, sizeof(int));//4
+						//fs.Write(BitConverter.GetBytes(ImageWidth), 0, sizeof(int));//4
+						//fs.Write(BitConverter.GetBytes(ImageHeight), 0, sizeof(int));//4
+						//fs.Write(BitConverter.GetBytes(imageBytes.Length), 0, sizeof(int));//4
+						//fs.Write(imageBytes, 0, imageBytes.Length);//바로직전거만큼
 					}
-				}
+				//}
 				System.Data.DataRow searchDataRow = SearchDataDT.NewRow();
 				searchDataRow["Idx"] = SearchDataDT.Rows.Count;
 				searchDataRow["InspStartTime"] = nowTime.ToString("yyyy-MM-dd HH:mm:ss");//TODO 나중에 진짜 검사 시작시간(로딩 시작 시간)으로 바꿔야 함
@@ -312,7 +311,6 @@ namespace RootTools.Inspects
 
 				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
 			}
-			nInspectionCount = 0;
 			sw.Stop();
 			Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
 			connector.Close();
@@ -400,9 +398,15 @@ namespace RootTools.Inspects
 		/// <param name="bDefectMerge"></param>
 		/// <param name="nMergeDistance"></param>
 		/// <returns></returns>
-		public List<CRect> CreateInspArea(string poolName, string groupName, string memoryName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int dCode, bool bDefectMerge, int nMergeDistance, IntPtr ptrMemory)
+		public List<CRect> CreateInspArea(string poolName, string groupName, string memoryName, ulong memOffset, int memWidth, int memHeight, CRect WholeInspArea, int blocksize, BaseParamData param, int dCode, bool bDefectMerge, int nMergeDistance, int nInnerRange, IntPtr ptrMemory)
 		{
 			List<CRect> inspblocklist = new List<CRect>();
+
+			CRect IgnoreArea = new CRect(
+				WholeInspArea.Left + nInnerRange,
+				WholeInspArea.Top + nInnerRange,
+				WholeInspArea.Right - nInnerRange,
+				WholeInspArea.Bottom - nInnerRange);//검사영역에서 제외될 Rect
 
 			int AreaStartX = WholeInspArea.Left;
 			int AreaEndX = WholeInspArea.Right;
@@ -463,8 +467,6 @@ namespace RootTools.Inspects
 						ip.p_TargetMemHeight = memHeight;
 						ip.p_ptrMemory = ptrMemory;
 
-						CRect inspblock = new CRect(sx, sy, ex, ey);
-						ip.p_Rect = inspblock;
 						if (ip.p_InspType == InspectionType.Strip)
 						{
 							ip.p_StripParam = (StripParamData)param;
@@ -474,13 +476,139 @@ namespace RootTools.Inspects
 							ip.p_surfaceParam = (SurfaceParamData)param;
 						}
 
-						AddInspection(ip, bDefectMerge, nMergeDistance);
-						blockcount++;
+						CRect inspblock = new CRect(sx, sy, ex, ey);
 
-						inspblocklist.Add(inspblock);
+						if (IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) && IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) && nInnerRange != 0)
+						{
+							//둘다 포함되는 경우엔 continue
+							continue;
+						}
+						else if (inspblock.Right == IgnoreArea.Left && inspblock.Bottom == IgnoreArea.Top && nInnerRange != 0)
+						{
+							ip.p_Rect = inspblock;
+							AddInspection(ip, bDefectMerge, nMergeDistance);
+							inspblocklist.Add(inspblock);
+							blockcount++;
+						}
+						else if (
+							IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Top)) &&
+							IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) &&
+							nInnerRange != 0)
+						{
+							inspblock.Right = IgnoreArea.Left;
+							ip.p_Rect = inspblock;
+							AddInspection(ip, bDefectMerge, nMergeDistance);
+							inspblocklist.Add(inspblock);
+							blockcount++;
+						}
+						else if (
+							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
+							IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Top)) &&
+							nInnerRange != 0)
+						{
+							inspblock.Top = IgnoreArea.Bottom;
+							ip.p_Rect = inspblock;
+							AddInspection(ip, bDefectMerge, nMergeDistance);
+							inspblocklist.Add(inspblock);
+							blockcount++;
+						}
+						else if (
+							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
+							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Bottom)) &&
+							nInnerRange != 0)
+						{
+							inspblock.Left = IgnoreArea.Right;
+							ip.p_Rect = inspblock;
+							AddInspection(ip, bDefectMerge, nMergeDistance);
+							inspblocklist.Add(inspblock);
+							blockcount++;
+						}
+						else if (
+							IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Bottom)) &&
+							IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) &&
+							nInnerRange != 0)
+						{
+							inspblock.Bottom = IgnoreArea.Top;
+							ip.p_Rect = inspblock;
+							AddInspection(ip, bDefectMerge, nMergeDistance);
+							inspblocklist.Add(inspblock);
+							blockcount++;
+						}
+						else if (IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
+							!IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) && 
+							nInnerRange != 0)
+						{
+							CRect first = new CRect(inspblock);
+							CRect second = new CRect(inspblock);
+							CRect third = new CRect(inspblock);
+							InspectionProperty ip2 = new InspectionProperty(ip);
+							InspectionProperty ip3 = new InspectionProperty(ip);
+
+							first.Left = IgnoreArea.Right;
+							first.Bottom = IgnoreArea.Bottom;
+							ip.p_Rect = first;
+
+							second.Top = IgnoreArea.Bottom;
+							second.Right = IgnoreArea.Right;
+							ip2.p_Rect = second;
+
+							third.Left = IgnoreArea.Right;
+							third.Top = IgnoreArea.Bottom;
+							ip3.p_Rect = third;
+
+							AddInspection(ip, bDefectMerge, nMergeDistance);
+							AddInspection(ip2, bDefectMerge, nMergeDistance);
+							AddInspection(ip3, bDefectMerge, nMergeDistance);
+
+							inspblocklist.Add(first);
+							inspblocklist.Add(second);
+							inspblocklist.Add(third);
+
+							blockcount += 3;
+						}
+						else if (IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) &&
+							!IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) && 
+							nInnerRange != 0)
+						{
+							//오른쪽 아래만 포함되는 경우. 세조각으로 자른다
+							CRect first = new CRect(inspblock);
+							CRect second = new CRect(inspblock);
+							CRect third = new CRect(inspblock);
+							InspectionProperty ip2 = new InspectionProperty(ip);
+							InspectionProperty ip3 = new InspectionProperty(ip);
+
+							first.Right = IgnoreArea.Left;
+							first.Bottom = IgnoreArea.Top;
+							ip.p_Rect = first;
+
+							second.Left = IgnoreArea.Left;
+							second.Bottom = IgnoreArea.Top;
+							ip2.p_Rect = second;
+
+							third.Right = IgnoreArea.Left;
+							third.Top = IgnoreArea.Top;
+							ip3.p_Rect = third;
+
+							AddInspection(ip, bDefectMerge, nMergeDistance);
+							AddInspection(ip2, bDefectMerge, nMergeDistance);
+							AddInspection(ip3, bDefectMerge, nMergeDistance);
+
+							inspblocklist.Add(first);
+							inspblocklist.Add(second);
+							inspblocklist.Add(third);
+
+							blockcount += 3;
+						}
+						else
+						{
+							//안겹치는 경우는 기존이랑 똑같이
+							ip.p_Rect = inspblock;
+							AddInspection(ip, bDefectMerge, nMergeDistance);
+							inspblocklist.Add(inspblock);
+							blockcount++;
+						}
 					}
 					//inspection offset, 모서리 영역 미구현
-
 				}
 			}
 
@@ -1001,6 +1129,26 @@ namespace RootTools.Inspects
 			}
 		}
 		int index = 0;
+		public InspectionProperty()
+		{
+
+		}
+		public InspectionProperty(InspectionProperty ip)
+		{
+			p_InspType = ip.p_InspType;
+			m_nDefectCode = ip.m_nDefectCode;
+			p_index = ip.p_index;
+			MemoryPoolName = ip.MemoryPoolName;
+			MemoryGroupName = ip.MemoryGroupName;
+			MemoryName = ip.MemoryName;
+			MemoryOffset = ip.MemoryOffset;
+			p_TargetMemWidth = ip.p_TargetMemWidth;
+			p_TargetMemHeight = ip.p_TargetMemHeight;
+			p_ptrMemory = ip.p_ptrMemory;
+			p_StripParam = ip.p_StripParam;
+			p_surfaceParam = ip.p_surfaceParam;
+		}
+
 		public int p_index
 		{
 			get

@@ -58,8 +58,8 @@ namespace Root_Vega.Module
         #endregion
 
         #region Light
-        LightSet m_lightSet;
-        List<double> m_aLightPower = new List<double>();
+        public LightSet m_lightSet;
+        public List<double> m_aLightPower = new List<double>();
         void RunTreeLight(Tree tree, bool bVisible, bool bReadOnly)
         {
             while (m_aLightPower.Count < m_lightSet.m_aLight.Count)
