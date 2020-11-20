@@ -78,7 +78,7 @@ namespace Root_Vega
                 p_StartLine = m_SelGrabMode.m_ScanStartLine;
                 p_ScanNum = m_SelGrabMode.m_ScanLineNum;
                 if (m_SelGrabMode.m_camera.p_sz.X != 0)
-                    p_ScanWholeLine = (int)Math.Ceiling(m_RunSideGrab.m_xLine * 1000 / (m_SelGrabMode.m_camera.p_sz.X * m_RunSideGrab.m_fRes));
+                    p_ScanWholeLine = (int)Math.Ceiling(m_RunSideGrab.m_xLine * 1000 / (m_SelGrabMode.m_camera.p_sz.X * m_RunSideGrab.m_dResY_um));
             }
         }
 

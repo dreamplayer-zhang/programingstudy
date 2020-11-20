@@ -1216,8 +1216,8 @@ namespace RootTools.Inspects
 			_PatternDistX = new Param<int>(1000, 0, int.MaxValue);
 			_PatternDistY = new Param<int>(1000, 0, int.MaxValue);
 
-			_LightCalDistX = new Param<int>(1000, 0, int.MaxValue);
-			_LightCalDistY = new Param<int>(1000, 0, int.MaxValue);
+			_LightCalDistX = new Param<int>(1000, int.MinValue, int.MaxValue);
+			_LightCalDistY = new Param<int>(1000, int.MinValue, int.MaxValue);
 
 			_LightCalWidth = new Param<int>(1000, 0, int.MaxValue);
 			_LightCalHeight = new Param<int>(1000, 0, int.MaxValue);

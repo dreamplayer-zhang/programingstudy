@@ -893,7 +893,8 @@ namespace Root_Vega.Module
             }
 
             public RPoint m_rpAxis = new RPoint();
-            public double m_fRes = 1;       //단위 um
+            public double m_dResY_um = 1;       //단위 um
+            public double m_dResX_um = 1;
             public int m_nFocusPos = 0;
             public CPoint m_cpMemory = new CPoint();
             public int m_nScanGap = 1000;
@@ -909,7 +910,8 @@ namespace Root_Vega.Module
             {
                 Run_SideGrab run = new Run_SideGrab(m_module);
                 run.p_sGrabMode = p_sGrabMode;
-                run.m_fRes = m_fRes;
+                run.m_dResY_um = m_dResY_um;
+                run.m_dResX_um = m_dResX_um;
                 run.m_nFocusPos = m_nFocusPos;
                 run.m_rpAxis = new RPoint(m_rpAxis);
                 run.m_cpMemory = new CPoint(m_cpMemory);
@@ -927,7 +929,8 @@ namespace Root_Vega.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_rpAxis = tree.Set(m_rpAxis, m_rpAxis, "Center Axis Position", "Center Axis Position (mm ?)", bVisible);
-                m_fRes = tree.Set(m_fRes, m_fRes, "Cam Resolution", "Resolution  um", bVisible);
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Resolution Y (um)", "Resolution  um", bVisible);
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam Resolution X (um)", "Resolution  um", bVisible);
                 m_nFocusPos = tree.Set(m_nFocusPos, 0, "Focus Z Pos", "Focus Z Pos", bVisible);
                 m_cpMemory = tree.Set(m_cpMemory, m_cpMemory, "Memory Position", "Grab Start Memory Position (pixel)", bVisible);
                 m_nScanGap = tree.Set(m_nScanGap, m_nScanGap, "Scan Gab", "Scan 방향간의 Memory 상 Gab (Bottom, Left 간의 Memory 위치 차이)", bVisible);
@@ -960,9 +963,10 @@ namespace Root_Vega.Module
                     int nScanLine = 0;
                     m_grabMode.SetLight(true);
                     m_grabMode.SetLightByName("Side Coax", 700);
-                    m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fRes);        // 축해상도 0.1um로 하드코딩. 트리거 발생 주기.
-                    int nLinesY = Convert.ToInt32(m_yLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
-                    int nLinesX = Convert.ToInt32(m_xLine * 1000 / m_fRes);      // Grab 할 총 Line 갯수.
+                    m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);        // 축해상도 0.1um로 하드코딩. 트리거 발생 주기.
+                    double dXScale = 10 * m_dResX_um;
+                    int nLinesY = Convert.ToInt32(m_yLine * 1000 / m_dResY_um);      // Grab 할 총 Line 갯수.
+                    int nLinesX = Convert.ToInt32(m_xLine * 1000 / m_dResY_um);      // Grab 할 총 Line 갯수.
                     m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X;
                     //m_cpMemory.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X + (int)m_eScanPos * (nLinesX + m_nScanGap);
 
@@ -977,9 +981,11 @@ namespace Root_Vega.Module
                         double yPos1 = m_rpAxis.Y - yAxis / 2 - m_grabMode.m_intervalAcc;   //y 축 이동 시작 지점 
                         double yPos0 = m_rpAxis.Y + yAxis / 2 + m_grabMode.m_intervalAcc;  // Y 축 이동 끝 지점.
                         //double nPosX = m_rpAxis.X + m_dXOffset;   // X축 찍을 위치 
-                        double nPosX = m_rpAxis.X + m_grabMode.m_nXOffset;   // X축 찍을 위치 
+                        //double nPosX = m_rpAxis.X + m_grabMode.m_nXOffset;   // X축 찍을 위치 
+                        double nPosX = m_module.m_dMaxScorePosX + m_grabMode.m_nXOffset;
                         //double nPosX = m_module.m_dMaxScorePosX + m_dXOffset;   // AF로 찾은 포커스 맞는 X위치
-                        double nPosZ = m_nFocusPos + nLinesX * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
+                        //double nPosZ = m_nFocusPos + nLinesX * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
+                        double nPosZ = m_nFocusPos + nLinesX * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * dXScale; //해상도추가필요
                         //double nPosZ = m_nFocusPos;
                         //double nPosX = m_rpAxis.X + nLines * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
                         double dPosTheta = axisTheta.GetPosValue(eAxisPosTheta.Snap) + (int)m_grabMode.m_eScanPos * 360000 / 4 + m_dThetaOffset;
@@ -1151,7 +1157,8 @@ namespace Root_Vega.Module
                         /* Grab하기 위해 이동할 Y축의 시작 끝 점*/
                         double yPos1 = m_rpAxis.Y - yAxis / 2 - m_grabMode.m_intervalAcc;   //y 축 이동 시작 지점 
                         double yPos0 = m_rpAxis.Y + yAxis / 2 + m_grabMode.m_intervalAcc;  // Y 축 이동 끝 지점.
-                        double nPosX = m_rpAxis.X;   // X축 찍을 위치 
+                        //double nPosX = m_rpAxis.X;   // X축 찍을 위치 
+                        double nPosX = m_module.m_dMaxScorePosX + m_grabMode.m_nXOffset;
                         //double nPosX = m_module.m_dMaxScorePosX + m_dXOffset;   // AF로 찾은 포커스 맞는 X위치
                         //double nPosZ = m_nFocusPos + nLinesX * m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * m_grabMode.m_dTrigger; //해상도추가필요
                         double nPosZ = m_nFocusPos;
