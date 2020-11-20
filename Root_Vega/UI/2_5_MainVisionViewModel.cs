@@ -144,6 +144,16 @@ namespace Root_Vega
 					p_PatternAlignList = new ObservableCollection<AlignData>(SelectedROI.Position.AlignList);
 				}
 			};
+			m_Engineer.m_recipe.RecipeData.AddComplete += () => 
+			{
+				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
+				StripParamList = new ObservableCollection<StripParamData>();
+
+				_SelectedROI = null;
+
+				SelectedParam = new StripParamData();//UI 초기화를 위한 코드
+				SelectedParam = null;
+			};
 		}
 
 		#region Property
@@ -460,6 +470,10 @@ namespace Root_Vega
 			m_Engineer.m_recipe.VegaRecipeData.RoiList.Add(temp);
 
 			p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
+			if (m_Engineer.m_recipe.RecipeData.AddComplete != null)
+			{
+				m_Engineer.m_recipe.RecipeData.AddComplete();
+			}
 		}
 
 		CPoint GetMemPoint(int canvasX, int canvasY)
@@ -760,7 +774,7 @@ namespace Root_Vega
 					m_Engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
 							m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
 							m_Engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
-							inspRect, 500, roiCurrent.Strip.ParameterList[j], nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, p);
+							inspRect, 500, roiCurrent.Strip.ParameterList[j], nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p);
 					//7. Strip검사를 시작한다
 				}
 			}
@@ -1108,35 +1122,6 @@ namespace Root_Vega
 			{
 				return new RelayCommand(SaveCurrentMask);
 			}
-		}
-
-		public RelayCommand CommandSaveAutoIlluminationFeature
-		{
-			get
-			{
-				return new RelayCommand(Test);
-			}
-		}
-
-		private void SaveAutoIlluminationFeature()
-		{
-			string strFileName = "AutoIlluminationFeature.bmp";
-			string strSaveTargetPath = $"C:/Recipe/AutoIllumination/";
-			if (!Directory.Exists(strSaveTargetPath))
-			{
-				Directory.CreateDirectory(strSaveTargetPath);
-			}
-			string strFullPath = System.IO.Path.Combine(strSaveTargetPath, strFileName);
-
-			if (p_ImageViewer.m_BasicTool.m_TempRect == null) return;
-			UIElementInfo uieROI = p_ImageViewer.m_BasicTool.m_TempRect;
-			int nLeft = (int)uieROI.StartPos.X;
-			int nTop = (int)uieROI.StartPos.Y;
-			int nRight = (int)uieROI.EndPos.X;
-			int nBottom = (int)uieROI.EndPos.Y;
-
-			p_ImageViewer.p_ImageData.SaveRectImage(new CRect(nLeft, nTop, nRight, nBottom), strFullPath);
-			return;
 		}
 
 		private void ClearUI()

@@ -113,7 +113,8 @@ namespace Root_Vega.Module
         public MemoryPool m_memoryPool;
         
         MemoryData m_memoryMain;
-        
+        MemoryData m_memoryD2D;
+        MemoryData m_memoryEBR;
         InspectTool m_inspectTool;
         ZoomLens m_ZoomLens;
         public RADSControl m_RADSControl;
@@ -161,6 +162,9 @@ namespace Root_Vega.Module
         {
             //forget
             m_memoryMain = m_memoryPool.GetGroup("PatternVision").CreateMemory("Main", 1, 1, 1000, 1000);
+            m_memoryEBR = m_memoryPool.GetGroup(App.sEBRGroup).CreateMemory(App.sEBRmem, 1, 1, 1000, 1000);
+            m_memoryD2D = m_memoryPool.GetGroup(App.sD2DGroup).CreateMemory(App.sD2Dmem, 1, 1, 1000, 1000);
+            m_memoryD2D = m_memoryPool.GetGroup(App.sD2DGroup).CreateMemory(App.sD2DABSmem, 1, 1, 1000, 1000);
         }
         #endregion
 
@@ -933,7 +937,6 @@ namespace Root_Vega.Module
                             dEndAxisPos = dTemp;
                             m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
                         }
-                        //double dAxisPosX = m_rpReticleCenterPos_pulse.X + (m_dReticleSize_mm * nMMPerUM / 0.08 / 2) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
                         double dAxisPosX = m_rpReticleCenterPos_pulse.X + (150 * nMMPerUM / 0.1 / 2) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
 
                         if (m_module.Run(axisXY.StartMove(new RPoint(dAxisPosX, dStartAxisPos)))) return p_sInfo;
@@ -1060,7 +1063,7 @@ namespace Root_Vega.Module
                                         engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
                                             engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
                                             engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
-                                            crtOverlapedRect, 1000, roiCurrent.Strip.ParameterList[0], nDefectCode, engineer.m_recipe.VegaRecipeData.UseDefectMerge, engineer.m_recipe.VegaRecipeData.MergeDistance, p);
+                                            crtOverlapedRect, 1000, roiCurrent.Strip.ParameterList[0], nDefectCode, engineer.m_recipe.VegaRecipeData.UseDefectMerge, engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p);
                                     }
                                 }
                             }
@@ -1326,7 +1329,25 @@ namespace Root_Vega.Module
         {
             //-------------------------------------------------------
             PatternVision m_module;
-            public _2_5_MainVisionViewModel m_mvvm;
+            public _2_5_MainVisionViewModel m_mvvm;                     
+            public RPoint m_rpReticleCenterPos_pulse = new RPoint();    // Reticle 중심의 XY Postiion [pulse]
+            public CPoint m_cpMemoryOffset_pixel = new CPoint();        // Memory Offset [pixel]
+            public bool m_bInvDir = false;                              // 역방향 스캔
+            public double m_dResX_um = 1;                               // Camera X Resolution [um]
+            public double m_dResY_um = 1;                               // Camera Y Resolution [um]
+            public double m_dReticleSize_mm = 1000;                     // Reticle Size [mm]
+            public double m_dFocusPosZ_pulse = 0;                       // Focus Z Position [pulse]
+            public double m_dTriggerUptime = 5;                         // Trigger Uptime [us]
+            public double m_dTriggerPeriod = 1;                         // Trigger Period [us]    
+            public int m_nMaxFrame = 100;                               // Camera max Frame 스펙
+            public int m_nScanRate = 100;                               // Camera Frame Spec 사용률 ? 1~100 %
+            public int m_nFeatureLine = 0;                              // Feature가 Scan되는 라인번호
+            public int m_nFeatureScanCount = 1;                         // Feature를 Scan하는데 필요한 라인 수
+            public int m_nLightCalKeyLine = 0;                          // Light Cal Key가 Scan되는 라인번호
+            public int m_nLightCalKeyScanCount = 1;                     // Light Cal Key를 Scan하는데 필요한 라인 수
+            
+            public int m_nThreshold = 128;                              // Light Cal 원하는 밝기값
+            public int m_nThreshTolerance = 3;                         // Light Cal 원하는 밝기값 +-허용치
             public GrabMode m_grabMode = null;
             string _sGrabMode = "";
             string p_sGrabMode
@@ -1338,16 +1359,6 @@ namespace Root_Vega.Module
                     m_grabMode = m_module.GetGrabMode(value);
                 }
             }
-            bool m_bInvDir = false;
-            public RPoint m_rpCenterPos = new RPoint();
-            public double m_fYRes = 1;
-            public double m_fXRes = 1;
-            public int m_nFocusPos = 0;
-            public int m_nMaxFrame = 100;  // Camera max Frame 스펙
-            public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
-            public int m_yLine = 1000;
-            public int m_nThreshold = 128;  // Light Cal 원하는 밝기값
-            public int m_nThreshTolereance = 3; // Light Cal 원하는 밝기값 +-허용치
             //-------------------------------------------------------
             public Run_AutoIllumination(PatternVision module)
             {
@@ -1360,59 +1371,77 @@ namespace Root_Vega.Module
             {
                 Run_AutoIllumination run = new Run_AutoIllumination(m_module);
                 run.p_sGrabMode = p_sGrabMode;
-                run.m_fYRes = m_fYRes;
-                run.m_fXRes = m_fXRes;
+                run.m_rpReticleCenterPos_pulse = m_rpReticleCenterPos_pulse;
+                run.m_cpMemoryOffset_pixel = m_cpMemoryOffset_pixel;
                 run.m_bInvDir = m_bInvDir;
-                run.m_nFocusPos = m_nFocusPos;
-                run.m_rpCenterPos = new RPoint(m_rpCenterPos);
-                run.m_yLine = m_yLine;
+                run.m_dResX_um = m_dResX_um;
+                run.m_dResY_um = m_dResY_um;
+                run.m_dReticleSize_mm = m_dReticleSize_mm;
+                run.m_dFocusPosZ_pulse = m_dFocusPosZ_pulse;
+                run.m_dTriggerUptime = m_dTriggerUptime;
+                run.m_dTriggerPeriod = m_dTriggerPeriod;
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanRate = m_nScanRate;
+                run.m_nFeatureLine = m_nFeatureLine;
+                run.m_nFeatureScanCount = m_nFeatureScanCount;
+                run.m_nLightCalKeyLine = m_nLightCalKeyLine;
+                run.m_nLightCalKeyScanCount = m_nLightCalKeyScanCount;
                 run.m_nThreshold = m_nThreshold;
-                run.m_nThreshTolereance = m_nThreshTolereance;
+                run.m_nThreshTolerance = m_nThreshTolerance;
+
                 return run;
-            }
-            //-------------------------------------------------------
-            public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
-            {
-                treeRoot.p_eMode = mode;
-                RunTree(treeRoot, true);
             }
             //-------------------------------------------------------
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_rpCenterPos = tree.Set(m_rpCenterPos, m_rpCenterPos, "Center Axis Position", "Center Axis Position (mm ?)", bVisible);
-                m_fYRes = tree.Set(m_fYRes, m_fYRes, "Cam YResolution", "YResolution  um", bVisible);
-                m_fXRes = tree.Set(m_fXRes, m_fXRes, "Cam XResolution", "XResolution  um", bVisible);
-                m_nFocusPos = tree.Set(m_nFocusPos, 0, "Focus Z Pos", "Focus Z Pos", bVisible);
+                m_rpReticleCenterPos_pulse = tree.Set(m_rpReticleCenterPos_pulse, m_rpReticleCenterPos_pulse, "Center Axis Position [Pulse]", "Center Axis Position [Pulse]", bVisible);
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution [um]", "Camera X Resolution [um]", bVisible);
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution [um]", "Camera Y Resolution [um]", bVisible);
+                m_dFocusPosZ_pulse = tree.Set(m_dFocusPosZ_pulse, m_dFocusPosZ_pulse, "Focus Z Position [Pulse]", "Focus Z Position [Pulse]", bVisible);
+                m_cpMemoryOffset_pixel = tree.Set(m_cpMemoryOffset_pixel, m_cpMemoryOffset_pixel, "Grab Start Memory Position [px]", "Grab Start Memory Position [px]", bVisible);
                 m_bInvDir = tree.Set(m_bInvDir, m_bInvDir, "Inverse Direction", "Grab Direction", bVisible);
-                m_yLine = tree.Set(m_yLine, m_yLine, "WaferSize", "# of Grab Lines", bVisible);
+                m_dReticleSize_mm = tree.Set(m_dReticleSize_mm, m_dReticleSize_mm, "Reticle Size [mm]", "Reticle Size [mm]", bVisible);
+                m_dTriggerUptime = (tree.GetTree("Trigger Parameter", false, bVisible)).Set(m_dTriggerUptime, m_dTriggerUptime, "Trigger Uptime [us]", "Trigger Uptime [us]", bVisible);
+                m_dTriggerPeriod = (tree.GetTree("Trigger Parameter", false, bVisible)).Set(m_dTriggerPeriod, m_dTriggerPeriod, "Trigger Period", "Trigger Period", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
+                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
                 m_nThreshold = tree.Set(m_nThreshold, m_nThreshold, "Light Cal Threshold", "Light Cal Threshold", bVisible);
-                m_nThreshTolereance = tree.Set(m_nThreshTolereance, m_nThreshTolereance, "Light Cal Threshod Tolerance", "Light Cal Threshod Tolerance", bVisible);
+                m_nThreshTolerance = tree.Set(m_nThreshTolerance, m_nThreshTolerance, "Light Cal Threshod Tolerance", "Light Cal Threshod Tolerance", bVisible);
             }
             //-------------------------------------------------------
             public override string Run()
             {
-                // 0. Recipe Load 됐는지 체크
-                if (!App.m_engineer.m_recipe.Loaded)
-                    return "Recipe Not Loaded";
-
-                // 1. Feature와 Light CAL.Key가 Scan되는 위치 Scan
-                if (m_grabMode == null) return "Grab Mode == null";
+                // Scan variable
+                AxisXY axisXY = m_module.p_axisXY;
+                Axis axisZ = m_module.p_axisZ;
+                CPoint cpMemoryOffset_pixel = new CPoint(m_cpMemoryOffset_pixel);
+                int nScanLine = 0;
+                int nMMPerUM = 1000;
+                int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
+                int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+                int nReticleYSize_px = Convert.ToInt32(m_dReticleSize_mm * nMMPerUM / m_dResY_um);    // 레티클 영역(150mm -> 150,000um)의 Y픽셀 갯수
+                m_grabMode.m_dTrigger = m_dResY_um / 8 * 100;        // 축해상도 0.1um로 하드코딩.
+                int nReticleRangePulse = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleYSize_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
+                double dXScale = m_dResX_um / 10 * 100;
                 bool bUseRADS = m_grabMode.GetUseRADS();
 
-                string strPool = m_grabMode.m_memoryPool.p_id;
-                string strGroup = m_grabMode.m_memoryGroup.p_id;
-                string strMem = m_grabMode.m_memoryData.p_id;
-                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMem);
+                // AutoIllumination variable
+                bool bFeatureScanned = false;
+                bool bFoundFeature = false;
+                CPoint cptStandard = new CPoint(0, 0);
+                int nLightCalKeyStartOffsetX = 0;
+                int nLightCalKeyStartOffsetY = 0;
+                int nLightCalKeyWidth = 100;
+                int nLightCalKeyHeight = 100;
+                int nResultThreshold = 0;
+                bool bSuccessAutoIllumination = false;
 
+                // implement
                 try
                 {
-                    int nScanLine = 0;
+                    if (m_grabMode == null) return "Grab Mode == null";
                     m_grabMode.SetLight(true);
                     if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == false))
                     {
@@ -1420,61 +1449,127 @@ namespace Root_Vega.Module
                         m_grabMode.m_RADSControl.StartRADS();
                         m_module.m_CamRADS.GrabContinuousShot();
                     }
-                    AxisXY axisXY = m_module.p_axisXY;
-                    Axis axisZ = m_module.p_axisZ;
-                    CPoint cpMemory = new CPoint();
-                    m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_fYRes); // 축해상도 0.1um로 하드코딩.
-                    double XScal = m_fXRes * 10;
-                    int nLines = Convert.ToInt32(m_yLine * 1000 / m_fYRes);
 
-                    while (m_grabMode.m_ScanLineNum > nScanLine)
+                    cpMemoryOffset_pixel.X += (m_grabMode.m_ScanStartLine * nCamWidth);
+
+                    if (EQ.IsStop()) return "OK";
+
+                    int nSpareDistancePulse = 300000;
+                    double dStartAxisPos = m_rpReticleCenterPos_pulse.Y + (nReticleRangePulse / 2) + nSpareDistancePulse;
+                    double dEndAxisPos = m_rpReticleCenterPos_pulse.Y - (nReticleRangePulse / 2) - nSpareDistancePulse;
+                    double dStartTriggerPos = m_rpReticleCenterPos_pulse.Y + nReticleRangePulse / 2;
+                    double dEndTriggerPos = m_rpReticleCenterPos_pulse.Y - nReticleRangePulse / 2;
+                    m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
+                    if (m_grabMode.m_bUseBiDirectionScan && Math.Abs(axisXY.p_axisY.p_posActual - dStartAxisPos) > Math.Abs(axisXY.p_axisY.p_posActual - dEndAxisPos))
                     {
-                        if (EQ.IsStop())
-                            return "OK";
-                        double yAxis = m_grabMode.m_dTrigger * nLines; // 총 획득할 Image Y 
-                        /*위에서 아래로 찍는것을 정방향으로 함, 즉 Y 축 값이 큰쪽에서 작은쪽으로 찍는것이 정방향*/
-                        /* Grab하기 위해 이동할 Y축의 시작 끝 점*/
-                        double dScanStartPosY = m_rpCenterPos.Y - yAxis / 2 + 300000;
-                        double dScanEndPosY = m_rpCenterPos.Y - yAxis / 2 - 300000;
+                        double dTemp = dStartAxisPos;
+                        dStartAxisPos = dEndAxisPos;
+                        dEndAxisPos = dTemp;
+                        m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
+                    }
+                    string strPool = m_grabMode.m_memoryPool.p_id;
+                    string strGroup = m_grabMode.m_memoryGroup.p_id;
+                    string strMem = m_grabMode.m_memoryData.p_id;
+                    MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMem);
+                    int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * (double)m_nScanRate / 100);
 
-                        m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
-                        if (m_grabMode.m_bUseBiDirectionScan && Math.Abs(axisXY.p_axisY.p_posActual - dScanStartPosY) > Math.Abs(axisXY.p_axisY.p_posActual - dScanEndPosY))
+                    // Feature Scan
+                    for (int i = 0; i<m_nFeatureScanCount; i++)
+                    {
+                        double dAxisPosX = m_rpReticleCenterPos_pulse.X + (150 * nMMPerUM / 0.1 / 2) - (nScanLine + m_nFeatureLine) * nCamWidth * dXScale;
+
+                        if (m_module.Run(axisXY.StartMove(new RPoint(dAxisPosX, dStartAxisPos)))) return p_sInfo;
+                        if (m_module.Run(axisZ.StartMove(m_dFocusPosZ_pulse))) return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+
+                        m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos, m_dTriggerPeriod, m_dTriggerUptime, true);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        axisXY.p_axisY.RunTrigger(false);
+                        nScanLine++;
+                    }
+
+                    // Feature 탐색
+                    Roi roiCurrent = m_mvvm.p_PatternRoiList[0];
+                    foreach (var feature in roiCurrent.Position.ReferenceList)
+                    {
+                        CRect crtSearchArea;
+                        Point ptMaxRelative;
+                        int nWidthDiff, nHeightDiff;
+                        bFoundFeature = m_mvvm.FindFeature(feature, out crtSearchArea, out ptMaxRelative, out nWidthDiff, out nHeightDiff);
+                        if (bFoundFeature == true)
                         {
-                            double buffer = dScanStartPosY;
-                            dScanStartPosY = dScanEndPosY;
-                            dScanEndPosY = buffer;
-                            m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
+                            cptStandard.X = crtSearchArea.Left + (int)ptMaxRelative.X + (nWidthDiff / 2);
+                            cptStandard.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + (nHeightDiff / 2);
+                            nLightCalKeyStartOffsetX = feature.LightCalDistX;
+                            nLightCalKeyStartOffsetY = feature.LightCalDistY;
+                            nLightCalKeyWidth = feature.LightCalWidth;
+                            nLightCalKeyHeight = feature.LightCalHeight;
+
+                            if (m_mvvm._dispatcher != null)
+                            {
+                                m_mvvm._dispatcher.Invoke(new Action(delegate ()
+                                {
+                                    m_mvvm.DrawCross(new DPoint(cptStandard.X, cptStandard.Y), MBrushes.Red);
+                                }));
+                            }
+                        }
+                        else
+                        {
+                            return "Feature Search Fail";
+                        }
+                    }
+
+                    // Light Cal Key Scan
+                    while (bSuccessAutoIllumination == false)
+                    {
+                        nScanLine = 0;
+                        for (int i = 0; i < m_nLightCalKeyScanCount; i++)
+                        {
+                            double dAxisPosX = m_rpReticleCenterPos_pulse.X + (150 * nMMPerUM / 0.1 / 2) - (nScanLine + m_nLightCalKeyLine) * nCamWidth * dXScale;
+
+                            if (m_module.Run(axisXY.StartMove(new RPoint(dAxisPosX, dStartAxisPos)))) return p_sInfo;
+                            if (m_module.Run(axisZ.StartMove(m_dFocusPosZ_pulse))) return p_sInfo;
+                            if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                            if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+
+                            m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos, m_dTriggerPeriod, m_dTriggerUptime, true);
+                            m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                            if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
+                            if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                            axisXY.p_axisY.RunTrigger(false);
+                            nScanLine++;
                         }
 
-                        double nPosX = m_rpCenterPos.X + nLines * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_camera.GetRoiSize().X * XScal; //해상도추가필요
-
-                        if (m_module.Run(axisZ.StartMove(m_nFocusPos)))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.StartMove(new RPoint(nPosX, dScanStartPosY))))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
-                        if (m_module.Run(axisZ.WaitReady()))
-                            return p_sInfo;
-
-                        double dTrigStartPosY = m_rpCenterPos.Y - yAxis / 2;
-                        double dTrigEndPosY = m_rpCenterPos.Y + yAxis / 2;
-                        m_module.p_axisXY.p_axisY.SetTrigger(dTrigStartPosY - 100000, dTrigEndPosY, m_grabMode.m_dTrigger, true);
-
-                        int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
-
-                        /* 방향 바꾸는 코드 들어가야함*/
-                        m_grabMode.StartGrab(mem, cpMemory, nLines, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dScanEndPosY, nScanSpeed)))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
-                        axisXY.p_axisY.RunTrigger(false);
-
-                        nScanLine++;
-                        cpMemory.X += m_grabMode.m_camera.GetRoiSize().X;
+                        // Light Cal Key 영역 생성
+                        Point ptStartPos = new Point(cptStandard.X + nLightCalKeyStartOffsetX, cptStandard.Y + nLightCalKeyStartOffsetY);
+                        Point ptEndPos = new Point(ptStartPos.X + nLightCalKeyWidth, ptStartPos.Y + nLightCalKeyHeight);
+                        CRect crtLightCalKey = new CRect(ptStartPos, ptEndPos);
+                        nResultThreshold = AutoIllumination(mem, crtLightCalKey);
+                        if (((m_nThreshold - m_nThreshTolerance) <= nResultThreshold) && ((m_nThreshold + m_nThreshTolerance) >= nResultThreshold))
+                        {
+                            bSuccessAutoIllumination = true;
+                        }
+                        else
+                        {
+                            if ((m_nThreshold - m_nThreshTolerance) < nResultThreshold)
+                            {
+                                double dPower = m_module.GetGrabMode(p_sGrabMode).GetLightByName("Main Coax");
+                                m_module.GetGrabMode(p_sGrabMode).SetLightByName("Main Coax", (int)(dPower - 1));
+                            }
+                            else
+                            {
+                                double dPower = m_module.GetGrabMode(p_sGrabMode).GetLightByName("Main Coax");
+                                m_module.GetGrabMode(p_sGrabMode).SetLightByName("Main Coax", (int)(dPower + 1));
+                            }
+                        }
                     }
-                    m_grabMode.m_camera.StopGrab();
+                }
+                catch (Exception e)
+                {
+
                 }
                 finally
                 {
@@ -1487,51 +1582,66 @@ namespace Root_Vega.Module
                     }
                 }
 
-                // 2. Feature 탐색
-                CPoint cpStandardPos = new CPoint(0, 0);
-                int nRefStartOffsetX = 0;
-                int nRefStartOffsetY = 0;
-                Point ptStartPos = new Point();
-                Point ptEndPos = new Point();
-                for (int k = 0; k < m_mvvm.p_PatternRoiList.Count; k++)
-                {
-                    var currentRoi = m_mvvm.p_PatternRoiList[k];
-                    for (int j = 0; j<currentRoi.Strip.ParameterList.Count; j++)
-                    {
-                        foreach (var feature in currentRoi.Position.ReferenceList)
-                        {
-                            bool bFoundFeature = false;
-                            CRect rtTargetRect;
-                            Point ptMaxRelativePoint;
-                            int nWidthDiff, nHeightDiff;
-                            //foundFeature = FindFeature(feature, out targetRect, out maxRelativePoint, out widthDiff, out heightDiff);
-                            bFoundFeature = m_mvvm.FindFeature(feature, out rtTargetRect, out ptMaxRelativePoint, out nWidthDiff, out nHeightDiff);
 
-                            if (bFoundFeature)
-                            {
-                                cpStandardPos.X = rtTargetRect.Left + (int)ptMaxRelativePoint.X + nWidthDiff / 2;
-                                cpStandardPos.Y = rtTargetRect.Top + (int)ptMaxRelativePoint.Y + nHeightDiff / 2;
-                                nRefStartOffsetX = feature.LightCalDistX;
-                                nRefStartOffsetY = feature.LightCalDistY;
-                                m_mvvm.DrawCross(new DPoint(cpStandardPos.X, cpStandardPos.Y), MBrushes.Red);
+                //// 1. Recipe Load 됐는지 체크
+                //if (!App.m_engineer.m_recipe.Loaded)
+                //    return "Recipe Not Loaded";
 
-                                ptStartPos = new Point(cpStandardPos.X + nRefStartOffsetX, cpStandardPos.Y + nRefStartOffsetY);
-                                ptEndPos = new Point(ptStartPos.X + feature.LightCalWidth, ptStartPos.Y + feature.LightCalHeight);
+                //// 2. Feature와 Light CAL.Key가 Scan되는 위치 Scan
+                //if (m_grabMode == null) return "Grab Mode == null";
 
-                                break;//찾았으니 중단
-                            }
-                            else
-                            {
-                                continue;//못 찾았으면 다음 Feature값으로 이동
-                            }
-                        }
-                    }
-                }
+                //string strPool = m_grabMode.m_memoryPool.p_id;
+                //string strGroup = m_grabMode.m_memoryGroup.p_id;
+                //string strMem = m_grabMode.m_memoryData.p_id;
+                //MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMem);
 
-                // 3. 탐색된 Feature위치를 기준으로 Light Cal.Key 영역 이미지를 AutoIllumination
-                CRect rtLightCal = new CRect(ptStartPos, ptEndPos);
-                int nResultThreshold = AutoIllumination(mem, rtLightCal);
-                
+
+
+                //// 2. Feature 탐색
+                //CPoint cpStandardPos = new CPoint(0, 0);
+                //int nRefStartOffsetX = 0;
+                //int nRefStartOffsetY = 0;
+                //Point ptStartPos = new Point();
+                //Point ptEndPos = new Point();
+                //for (int k = 0; k < m_mvvm.p_PatternRoiList.Count; k++)
+                //{
+                //    var currentRoi = m_mvvm.p_PatternRoiList[k];
+                //    for (int j = 0; j<currentRoi.Strip.ParameterList.Count; j++)
+                //    {
+                //        foreach (var feature in currentRoi.Position.ReferenceList)
+                //        {
+                //            bool bFoundFeature = false;
+                //            CRect rtTargetRect;
+                //            Point ptMaxRelativePoint;
+                //            int nWidthDiff, nHeightDiff;
+                //            //foundFeature = FindFeature(feature, out targetRect, out maxRelativePoint, out widthDiff, out heightDiff);
+                //            bFoundFeature = m_mvvm.FindFeature(feature, out rtTargetRect, out ptMaxRelativePoint, out nWidthDiff, out nHeightDiff);
+
+                //            if (bFoundFeature)
+                //            {
+                //                cpStandardPos.X = rtTargetRect.Left + (int)ptMaxRelativePoint.X + nWidthDiff / 2;
+                //                cpStandardPos.Y = rtTargetRect.Top + (int)ptMaxRelativePoint.Y + nHeightDiff / 2;
+                //                nRefStartOffsetX = feature.LightCalDistX;
+                //                nRefStartOffsetY = feature.LightCalDistY;
+                //                m_mvvm.DrawCross(new DPoint(cpStandardPos.X, cpStandardPos.Y), MBrushes.Red);
+
+                //                ptStartPos = new Point(cpStandardPos.X + nRefStartOffsetX, cpStandardPos.Y + nRefStartOffsetY);
+                //                ptEndPos = new Point(ptStartPos.X + feature.LightCalWidth, ptStartPos.Y + feature.LightCalHeight);
+
+                //                break;//찾았으니 중단
+                //            }
+                //            else
+                //            {
+                //                continue;//못 찾았으면 다음 Feature값으로 이동
+                //            }
+                //        }
+                //    }
+                //}
+
+                //// 3. 탐색된 Feature위치를 기준으로 Light Cal.Key 영역 이미지를 AutoIllumination
+                //CRect rtLightCal = new CRect(ptStartPos, ptEndPos);
+                //int nResultThreshold = AutoIllumination(mem, rtLightCal);
+
                 return "OK";
             }
             //-------------------------------------------------------

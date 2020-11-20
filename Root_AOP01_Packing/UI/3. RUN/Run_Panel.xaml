@@ -66,7 +66,7 @@
                                     <ColumnDefinition Width="4*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Vaccume Time" VerticalAlignment="Center"/>
+                                <TextBlock Text="Vacuum Time" VerticalAlignment="Center"/>
                                 <TextBox Grid.Column="1" Style="{StaticResource BasicTbox}" Margin="15,5"
                                  Text="0"/>
                                 <TextBlock Text="sec" VerticalAlignment="Center" Grid.Column="2"/>
