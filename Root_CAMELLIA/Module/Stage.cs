@@ -77,5 +77,91 @@ namespace Root_CAMELLIA.Module
                 return "OK";
             }
         }
+        public class Run_Calibration : ModuleRunBase
+        {
+            public Stage Module { get; private set; }
+            public Run_Calibration(Stage module)
+            {
+                Module = module;
+                InitModuleRun(module);
+            }
+            public override ModuleRunBase Clone()
+            {
+                Run_MovePoint run = new Run_MovePoint(Module);
+                return run;
+            }
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                //m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
+            }
+            public override string Run()
+            {
+
+                return "OK";
+            }
+        }
+        public class Run_Align : ModuleRunBase
+        {
+            public Stage Module { get; private set; }
+            public Run_Align(Stage module)
+            {
+                Module = module;
+                InitModuleRun(module);
+            }
+            public override ModuleRunBase Clone()
+            {
+                Run_MovePoint run = new Run_MovePoint(Module);
+                return run;
+            }
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                //m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
+            }
+            public override string Run()
+            {
+
+                return "OK";
+            }
+        }
+        public class Run_MovePoint : ModuleRunBase
+        {
+            public Stage Module { get; private set; }
+            public Run_MovePoint(Stage module)
+            {
+                Module = module;
+                InitModuleRun(module);
+            }
+            public override ModuleRunBase Clone()
+            {
+                Run_MovePoint run = new Run_MovePoint(Module);
+                return run;
+            }
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                //m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
+            }
+            public override string Run()
+            {
+
+                while (true)
+                {
+                    // Point 이동.
+
+
+                    // 계측.
+
+
+                    // Pause 누르면 잠시 멈춤
+                    /*
+                     * if(Pause){
+                     *      머 스탑..
+                     * }
+                    */
+                }
+
+
+                return "OK";
+            }
+        }
     }
 }

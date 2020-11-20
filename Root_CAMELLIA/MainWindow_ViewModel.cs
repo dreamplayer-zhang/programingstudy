@@ -12,8 +12,9 @@ using System.Windows;
 
 namespace Root_CAMELLIA
 {
-    public class MainWindow_ViewModel : ObservableObject
+    public class MainWindow_ViewModel : ObservableObject, IDialogRequestClose
     {
+
         public MainWindow_ViewModel(MainWindow main)
         {
             DataManager = main.DataManager;
@@ -78,6 +79,9 @@ namespace Root_CAMELLIA
         public ObservableCollection<GeometryManager> Geometry = new ObservableCollection<GeometryManager>();
 
         DataTable pointListItem = new DataTable();
+
+        public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
+
         public DataTable PointListItem
         {
             get

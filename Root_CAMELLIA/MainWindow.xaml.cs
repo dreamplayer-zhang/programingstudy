@@ -34,28 +34,15 @@ namespace Root_CAMELLIA
 
         private void Init()
         {
-            recipe = new Dlg_RecipeManger();
             DataManager = new DataManager(this);
-            //m_RecipeManagerViewModel = new Dlg_RecipeManager_ViewModel(this);
-            //recipe.DataContext = m_RecipeManagerViewModel;
-
-            //m_MainWindowViewModel = new MainWindow_ViewModel(this);
-            //this.DataContext = m_MainWindowViewModel;
-
             dialogService = new DialogService(this);
             DialogInit(dialogService);
-            //ConnectViewModel(dialogService);
         }
 
         void DialogInit(IDialogService dialogService)
         {
             dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManger>();
-            //dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
-            //dialogService.Register<Dialog_ManualAlignViewModel, Dialog_ManualAlign>();
-            //dialogService.Register<Dialog_SideScan_ViewModel, Dialog_SideScan>();
-            //dialogService.Register<Dialog_SettingFDC_ViewModel, Dialog_SettingFDC>();
-            //dialogService.Register<Dialog_AutoFocus_ViewModel, Dialog_AutoFocus>();
-            //dialogService.Register<Dialog_LADS_ViewModel, Dialog_LADS>();
+            //dialogService.Register<>
         }
 
 
@@ -77,7 +64,6 @@ namespace Root_CAMELLIA
 
         #region Dlg
         IDialogService dialogService;
-        private Dlg_RecipeManger recipe;
         #endregion
 
         #region Getter Setter
@@ -125,7 +111,6 @@ namespace Root_CAMELLIA
         }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            recipe.Close();
             this.Close();
         }
         #endregion
@@ -147,42 +132,16 @@ namespace Root_CAMELLIA
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            recipe.Close();
             this.Close();
         }
 
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            //if(this.recipe == null)
-            //{
-            //    m_RecipeManagerViewModel = new Dlg_RecipeManager_ViewModel(this);
-            //    recipe.DataContext = m_RecipeManagerViewModel;
-            //    //recipe = new Dlg_RecipeManger();
-            //}
 
             var viewModel = new Dlg_RecipeManager_ViewModel(this);
             Nullable<bool> result = dialogService.ShowDialog(viewModel);
-            //if (!dialog_result.HasValue || !dialog_result.Value)
-            //    return;
 
-            //recipe.Close();
-
-
-            //if (!test)
-            //{
-
-            //    test = true;
-            //    recipe.Visibility = Visibility.Visible;
-
-            //}
-            //else if (test)
-            //{
-            //    recipe.Visibility = Visibility.Hidden;
-            //    test = false;
-            //}
-            //recipe.Visibility = Visibility.Hidden;
-            //recipe.Close();
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)

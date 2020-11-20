@@ -1311,8 +1311,8 @@ namespace Root_CAMELLIA
 
                 System.Windows.Controls.Image myImage = new System.Windows.Controls.Image();
                 myImage.Source = new BitmapImage(new Uri(BaseDefine.Dir_LockImg, UriKind.RelativeOrAbsolute));
-                myImage.Width = 200;        
-                Canvas.SetLeft(myImage, 750);
+                myImage.Width = 100;        
+                Canvas.SetLeft(myImage, 850);
                 Canvas.SetTop(myImage, 50);
                 m_DrawElement.Add(myImage);
 
@@ -2917,6 +2917,8 @@ namespace Root_CAMELLIA
         public void OnOpen_Click(object sender, RoutedEventArgs e)
         {
             dataManager.recipeDM.RecipeOpen();
+            UpdateListView();
+            UpdateView();
         }
         public void OnSave_Click(object sender, RoutedEventArgs e)
         {
@@ -3049,14 +3051,36 @@ namespace Root_CAMELLIA
                 SBrush = normalBrush;
                 if (IsShowIndex)
                 {
-                    PointAddMode = "Normal";
+                    if (ShiftKeyDown)
+                    {
+                        PointAddMode = "Delete Select Mode";
+                    }
+                    else if (CtrlKeyDown)
+                    {
+                        PointAddMode = "Add Select Mode";
+                    }
+                    else
+                    {
+                        PointAddMode = "Normal";
+                    }
                 }
                 else if (IsKeyboardShowIndex)
                 {
                     IsKeyboardShowIndex = false;
                     //UpdateView();
                     RedrawStage();
-                    PointAddMode = "Normal";
+                    if (ShiftKeyDown)
+                    {
+                        PointAddMode = "Delete Select Mode";
+                    }
+                    else if (CtrlKeyDown)
+                    {
+                        PointAddMode = "Add Select Mode";
+                    }
+                    else
+                    {
+                        PointAddMode = "Normal";
+                    }
                 }
             }
             if (SetStartEndPointMode)
