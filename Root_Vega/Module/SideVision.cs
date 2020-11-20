@@ -738,6 +738,23 @@ namespace Root_Vega.Module
                 return "Error";
             if (m_axisTheta.WaitReady() != "OK")
                 return "Error";
+
+            //if (m_diSideReticleExistSensor.p_bIn == false)
+            //{
+            //    if (p_infoReticle != null)
+            //    {
+            //        p_infoReticle = null;
+            //    }
+            //}
+            //else
+            //{
+            //    if (p_infoReticle == null)
+            //    {
+            //        p_sInfo = "Side Vision Reticle Info Error";
+            //    }
+            //}
+
+
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             p_bStageVac = false;
             return p_sInfo;

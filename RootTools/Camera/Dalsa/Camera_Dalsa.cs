@@ -7,6 +7,7 @@ using RootTools.Memory;
 using System.Threading;
 using RootTools.Trees;
 using System.Windows.Data;
+using System.Threading.Tasks;
 
 namespace RootTools.Camera.Dalsa
 {
@@ -78,8 +79,8 @@ namespace RootTools.Camera.Dalsa
                 SetProperty(ref m_CamParam, value);
             }
         }
-        const int c_nBuf = 500;
-        int _nBuf = 500;
+        const int c_nBuf = 300;
+        int _nBuf = 300;
         public int p_nBuf
         {
             get
@@ -386,55 +387,124 @@ namespace RootTools.Camera.Dalsa
             m_GrabThread.Start();
         }
         private CRect m_LastROI = new CRect(0, 0, 0, 0);
-       unsafe void RunGrabLineScanThread()
+        unsafe void RunGrabLineScanThread()
         {
             StopWatch swGrab = new StopWatch();
             int DelayGrab = (int)(1000 * m_nGrabCount);
 
             if (m_sapBuf == null)
-                p_sInfo =  "CamDalsa Buffer Error !!";
+                p_sInfo = "CamDalsa Buffer Error !!";
 
             int lY = m_nGrabCount * Convert.ToInt32(p_CamParam.p_Height);
             int iBlock = 0;
 
-            while (iBlock < m_nGrabCount)
+            if (p_CamParam.p_eDir == DalsaParameterSet.eDir.Reverse)
             {
-                //if (swGrab.ElapsedMilliseconds > DelayGrab)
-                //{
-                //    p_sInfo = "Cam Grab Delay Error";
-                //    return;
-                //}
-                Thread.Sleep(1);
-                if (iBlock < m_nGrabTrigger)
+                while (iBlock < m_nGrabCount)
                 {
-                    IntPtr ipSrc = m_pSapBuf[(iBlock) % p_nBuf];
-                    for (int y = 0; y < p_CamParam.p_Height; y++)
-                    {  
-                        int yp = y + (iBlock) * p_CamParam.p_Height;
-                        if (p_CamParam.p_eDir == DalsaParameterSet.eDir.Reverse)
+                    //Thread.Sleep(1);
+                    if (iBlock < m_nGrabTrigger)
+                    {
+                        IntPtr ipSrc = m_pSapBuf[(iBlock) % p_nBuf];
+                        Parallel.For(0, p_CamParam.p_Height, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (y) =>
                         {
-                            yp = lY - yp + m_nInverseYOffset;
-                        }
-                        IntPtr srcPtr = ipSrc + p_CamParam.p_Width*y;
-                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
-                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
-                        //IntPtr dstPtr = (IntPtr)((long)m_ImageLive.GetPtr() + m_cpScanOffset.X + (y + m_cpScanOffset.Y) * (long)m_ImageLive.p_Size.X);
-                        //Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
+                            int yp = lY - (y + (iBlock) * p_CamParam.p_Height) + m_nInverseYOffset;
+                            IntPtr srcPtr = ipSrc + p_CamParam.p_Width * y;
+                            IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
+                            Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
+                        });
+                        iBlock++;
+
+                        m_LastROI.Left = m_cpScanOffset.X;
+                        m_LastROI.Right = m_cpScanOffset.X + p_CamParam.p_Width;
+                        m_LastROI.Top = m_cpScanOffset.Y;
+                        m_LastROI.Bottom = m_cpScanOffset.Y + p_CamParam.p_Height;
+                        GrabEvent();
+
+                        if (m_nGrabCount != 0)
+                            p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                     }
-                    iBlock++;
+                }
+            }
+            else
+            {
+                while (iBlock < m_nGrabCount)
+                {
+                    //Thread.Sleep(1);
+                    if (iBlock < m_nGrabTrigger)
+                    {
+                        IntPtr ipSrc = m_pSapBuf[(iBlock) % p_nBuf];
+                        Parallel.For(0, p_CamParam.p_Height, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (y) =>
+                        {
+                            int yp = y + (iBlock) * p_CamParam.p_Height;
+                            IntPtr srcPtr = ipSrc + p_CamParam.p_Width * y;
+                            IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
+                            Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
+                        });
+                        iBlock++;
 
-                    m_LastROI.Left = m_cpScanOffset.X;
-                    m_LastROI.Right = m_cpScanOffset.X + p_CamParam.p_Width;
-                    m_LastROI.Top = m_cpScanOffset.Y;
-                    m_LastROI.Bottom = m_cpScanOffset.Y + p_CamParam.p_Height;
-                    GrabEvent();
+                        m_LastROI.Left = m_cpScanOffset.X;
+                        m_LastROI.Right = m_cpScanOffset.X + p_CamParam.p_Width;
+                        m_LastROI.Top = m_cpScanOffset.Y;
+                        m_LastROI.Bottom = m_cpScanOffset.Y + p_CamParam.p_Height;
+                        GrabEvent();
 
-                    if (m_nGrabCount !=0)
-                        p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+                        if (m_nGrabCount != 0)
+                            p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+                    }
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;
         }
+        //unsafe void RunGrabLineScanThread()
+        //{
+        //    StopWatch swGrab = new StopWatch();
+        //    int DelayGrab = (int)(1000 * m_nGrabCount);
+
+        //    if (m_sapBuf == null)
+        //        p_sInfo = "CamDalsa Buffer Error !!";
+
+        //    int lY = m_nGrabCount * Convert.ToInt32(p_CamParam.p_Height);
+        //    int iBlock = 0;
+
+        //    while (iBlock < m_nGrabCount)
+        //    {
+        //        //if (swGrab.ElapsedMilliseconds > DelayGrab)
+        //        //{
+        //        //    p_sInfo = "Cam Grab Delay Error";
+        //        //    return;
+        //        //}
+        //        Thread.Sleep(1);
+        //        if (iBlock < m_nGrabTrigger)
+        //        {
+        //            IntPtr ipSrc = m_pSapBuf[(iBlock) % p_nBuf];
+        //            for (int y = 0; y < p_CamParam.p_Height; y++)
+        //            {
+        //                int yp = y + (iBlock) * p_CamParam.p_Height;
+        //                if (p_CamParam.p_eDir == DalsaParameterSet.eDir.Reverse)
+        //                {
+        //                    yp = lY - yp + m_nInverseYOffset;
+        //                }
+        //                IntPtr srcPtr = ipSrc + p_CamParam.p_Width * y;
+        //                IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
+        //                Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
+        //                //IntPtr dstPtr = (IntPtr)((long)m_ImageLive.GetPtr() + m_cpScanOffset.X + (y + m_cpScanOffset.Y) * (long)m_ImageLive.p_Size.X);
+        //                //Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
+        //            }
+        //            iBlock++;
+
+        //            m_LastROI.Left = m_cpScanOffset.X;
+        //            m_LastROI.Right = m_cpScanOffset.X + p_CamParam.p_Width;
+        //            m_LastROI.Top = m_cpScanOffset.Y;
+        //            m_LastROI.Bottom = m_cpScanOffset.Y + p_CamParam.p_Height;
+        //            GrabEvent();
+
+        //            if (m_nGrabCount != 0)
+        //                p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+        //        }
+        //    }
+        //    p_CamInfo.p_eState = eCamState.Ready;
+        //}
         void GrabEvent()
         {
             if (Grabed != null)

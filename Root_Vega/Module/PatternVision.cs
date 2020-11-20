@@ -606,9 +606,20 @@ namespace Root_Vega.Module
 
             if (m_axisXY.p_axisY.IsInPos(eAxisPosY.ReticleCheck) == true)
             {
-                if (p_infoReticle != null)
+
+                if (m_diPatternReticleExistSensor.p_bIn == false)
                 {
-                    if (m_diPatternReticleExistSensor.p_bIn == false) p_infoReticle = null;
+                    if (p_infoReticle != null)
+                    {
+                        p_infoReticle = null;
+                    }
+                }
+                else
+                {
+                    if (p_infoReticle == null)
+                    {
+                        p_sInfo = "Pattern Vision Reticle Info Error";
+                    }
                 }
             }
 
@@ -699,7 +710,7 @@ namespace Root_Vega.Module
             base.InitBase(id, engineer);
             InitPosAlign();
             m_arrDefectDataWraper = new List<DefectDataWrapper>();
-            ((Vega_Engineer)m_engineer).m_InspManager.AddDefect += M_InspManager_AddDefect;
+            //((Vega_Engineer)m_engineer).m_InspManager.AddDefect += M_InspManager_AddDefect;
         }
 
         public override void ThreadStop()
@@ -952,7 +963,8 @@ namespace Root_Vega.Module
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
                         string strMem = m_grabMode.m_memoryData.p_id;
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMem);
-                        int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * (double)m_nScanRate / 100);
+                        //int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * (double)m_nScanRate / 100);
+                        int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * (double)m_nScanRate / 100);
 
                         m_grabMode.StartGrab(mem, cpMemoryOffset_pixel, nReticleYSize_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
