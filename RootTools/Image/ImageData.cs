@@ -706,7 +706,7 @@ namespace RootTools
 				if (p_nByte == 1)
 				{
 					nLine = 0;
-					int nNum = 5;
+					int nNum = 2;
 					Thread[] multiThread = new Thread[nNum];
 
 					for (int i = 0; i < nNum; i++)
