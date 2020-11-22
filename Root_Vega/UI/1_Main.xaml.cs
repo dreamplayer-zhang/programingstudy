@@ -122,18 +122,20 @@ namespace Root_Vega
             PatternVision patternVision = m_handler.m_patternVision;
             SideVision sideVision = m_handler.m_sideVision;
 
+            // PatternVision Camera Connect
             if (patternVision.m_CamMain != null && patternVision.m_CamMain.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init) patternVision.m_CamMain.Connect();
+            if (patternVision.m_CamVRS != null && patternVision.m_CamVRS.p_CamInfo._OpenStatus == false) patternVision.m_CamVRS.Connect();
             if (patternVision.m_CamRADS != null && patternVision.m_CamRADS.p_CamInfo._OpenStatus == false) patternVision.m_CamRADS.Connect();
-            if (patternVision.m_CamAlign1 != null && patternVision.m_CamAlign1.p_CamInfo._OpenStatus == false) patternVision.m_CamAlign1.Connect();
-            if (patternVision.m_CamAlign2 != null && patternVision.m_CamAlign2.p_CamInfo._OpenStatus == false) patternVision.m_CamAlign2.Connect();
+            //if (patternVision.m_CamAlign1 != null && patternVision.m_CamAlign1.p_CamInfo._OpenStatus == false) patternVision.m_CamAlign1.Connect();
+            //if (patternVision.m_CamAlign2 != null && patternVision.m_CamAlign2.p_CamInfo._OpenStatus == false) patternVision.m_CamAlign2.Connect();
 
+            // SideVision Camera Connect
             if (sideVision.p_CamSide != null && sideVision.p_CamSide.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init) sideVision.p_CamSide.Connect();
             if (sideVision.p_CamBevel != null && sideVision.p_CamBevel.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init) sideVision.p_CamBevel.Connect();
             if (sideVision.p_CamSideVRS != null && sideVision.p_CamSideVRS.p_CamInfo._OpenStatus == false) sideVision.p_CamSideVRS.Connect();
-            if (sideVision.p_CamAlign1 != null && sideVision.p_CamAlign1.p_CamInfo._OpenStatus == false) sideVision.p_CamAlign1.Connect();
-            if (sideVision.p_CamAlign2 != null && sideVision.p_CamAlign2.p_CamInfo._OpenStatus == false) sideVision.p_CamAlign2.Connect();
             if (sideVision.p_CamLADS != null && sideVision.p_CamLADS.p_CamInfo._OpenStatus == false) sideVision.p_CamLADS.Connect();
-
+            //if (sideVision.p_CamAlign1 != null && sideVision.p_CamAlign1.p_CamInfo._OpenStatus == false) sideVision.p_CamAlign1.Connect();
+            //if (sideVision.p_CamAlign2 != null && sideVision.p_CamAlign2.p_CamInfo._OpenStatus == false) sideVision.p_CamAlign2.Connect();
         }
         #endregion
 

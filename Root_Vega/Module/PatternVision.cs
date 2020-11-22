@@ -324,8 +324,20 @@ namespace Root_Vega.Module
             if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
             // 레티클 유무 체크
+            StopWatch sw = new StopWatch();
             string strLightName = "Align1_1";
             SetLightByName(strLightName, 10);
+            if (m_CamAlign1.p_CamInfo._OpenStatus == false) m_CamAlign1.Connect();
+            sw.Start();
+            while (m_CamAlign1.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 10000)
+                {
+                    sw.Stop();
+                    return "Align1_1 Camera Not Connected";
+                }
+            }
+            sw.Stop();
             Thread.Sleep(100);
             m_CamAlign1.GrabOneShot();
             Thread.Sleep(100);
@@ -333,6 +345,17 @@ namespace Root_Vega.Module
 
             strLightName = "Align2_1";
             SetLightByName(strLightName, 10);
+            if (m_CamAlign2.p_CamInfo._OpenStatus == false) m_CamAlign2.Connect();
+            sw.Start();
+            while (m_CamAlign2.p_CamInfo._OpenStatus == false)
+            { 
+                if (sw.ElapsedMilliseconds > 10000)
+                {
+                    sw.Stop();
+                    return "Align2_1 Camera Not Connected";
+                }
+            }
+            sw.Stop();
             Thread.Sleep(100);
             m_CamAlign2.GrabOneShot();
             Thread.Sleep(100);
@@ -375,8 +398,20 @@ namespace Root_Vega.Module
             if (Run(m_axisZ.WaitReady())) return p_sInfo;
 
             // 레티클 유무 체크
+            StopWatch sw = new StopWatch();
             string strLightName = "Align1_1";
             SetLightByName(strLightName, 10);
+            if (m_CamAlign1.p_CamInfo._OpenStatus == false) m_CamAlign1.Connect();
+            sw.Start();
+            while (m_CamAlign1.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 10000)
+                {
+                    sw.Stop();
+                    return "Align1_1 Camera Not Connected";
+                }
+            }
+            sw.Stop();
             Thread.Sleep(100);
             m_CamAlign1.GrabOneShot();
             Thread.Sleep(100);
@@ -384,6 +419,17 @@ namespace Root_Vega.Module
 
             strLightName = "Align2_1";
             SetLightByName(strLightName, 10);
+            if (m_CamAlign2.p_CamInfo._OpenStatus == false) m_CamAlign2.Connect();
+            sw.Start();
+            while (m_CamAlign2.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 10000)
+                {
+                    sw.Stop();
+                    return "Align2_1 Camera Not Connected";
+                }
+            }
+            sw.Stop();
             Thread.Sleep(100);
             m_CamAlign2.GrabOneShot();
             Thread.Sleep(100);
@@ -922,6 +968,17 @@ namespace Root_Vega.Module
                     {
                         m_grabMode.m_RADSControl.p_IsRun = true;
                         m_grabMode.m_RADSControl.StartRADS();
+                        StopWatch sw = new StopWatch();
+                        if (m_module.m_CamRADS.p_CamInfo._OpenStatus == false) m_module.m_CamRADS.Connect();
+                        while (m_module.m_CamRADS.p_CamInfo._OpenStatus == false)
+                        {
+                            if (sw.ElapsedMilliseconds > 10000)
+                            {
+                                sw.Stop();
+                                return "RADS Camera Not Connected";
+                            }
+                        }
+                        sw.Stop();
                         m_module.m_CamRADS.GrabContinuousShot();
                     }
 
@@ -1101,7 +1158,7 @@ namespace Root_Vega.Module
                     {
                         m_grabMode.m_RADSControl.p_IsRun = false;
                         m_grabMode.m_RADSControl.StopRADS();
-                        m_module.m_CamRADS.StopGrab();
+                        if (m_module.m_CamRADS.p_CamInfo._IsGrabbing == true) m_module.m_CamRADS.StopGrab();
                     }
                 }
             }

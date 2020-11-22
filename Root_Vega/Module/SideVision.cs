@@ -351,15 +351,38 @@ namespace Root_Vega.Module
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // 레티클 유무 체크
+            StopWatch sw = new StopWatch();
             string strLightName = "Align1_1";
-            //SetLightByName(strLightName, 10);
-            //Thread.Sleep(100);
-            //m_CamAlign1.GrabOneShot();
-            //Thread.Sleep(100);
-            //SetLightByName(strLightName, 0);
+            SetLightByName(strLightName, 10);
+            if (m_CamAlign1.p_CamInfo._OpenStatus == false) m_CamAlign1.Connect();
+            sw.Start();
+            while (m_CamAlign1.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 10000)
+                {
+                    sw.Stop();
+                    return "Align1_1 Camera Not Connected";
+                }
+            }
+            sw.Stop();
+            Thread.Sleep(100);
+            m_CamAlign1.GrabOneShot();
+            Thread.Sleep(100);
+            SetLightByName(strLightName, 0);
 
             strLightName = "Align2_1";
             SetLightByName(strLightName, 60);
+            if (m_CamAlign2.p_CamInfo._OpenStatus == false) m_CamAlign2.Connect();
+            sw.Start();
+            while (m_CamAlign2.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 10000)
+                {
+                    sw.Stop();
+                    return "Align2_1 Camera Not Connected";
+                }
+            }
+            sw.Stop();
             Thread.Sleep(100);
             m_CamAlign2.Grab();
             Thread.Sleep(100);
@@ -419,17 +442,38 @@ namespace Root_Vega.Module
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // 레티클 유무 체크
+            StopWatch sw = new StopWatch();
             string strLightName = "Align1_1";
-            //SetLightByName(strLightName, 10);
-            //Thread.Sleep(100);
-            //m_CamAlign1.GrabOneShot();
-            //Thread.Sleep(100);
-            //SetLightByName(strLightName, 0);
+            SetLightByName(strLightName, 10);
+            if (m_CamAlign1.p_CamInfo._OpenStatus == false) m_CamAlign1.Connect();
+            sw.Start();
+            while (m_CamAlign1.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 10000)
+                {
+                    sw.Stop();
+                    return "Align2_1 Camera Not Connected";
+                }
+            }
+            sw.Stop();
+            Thread.Sleep(100);
+            m_CamAlign1.GrabOneShot();
+            Thread.Sleep(100);
+            SetLightByName(strLightName, 0);
 
             strLightName = "Align2_1";
             SetLightByName(strLightName, 60);
+            if (m_CamAlign2.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 10000)
+                {
+                    sw.Stop();
+                    return "Align2_1 Camera Not Connected";
+                }
+            }
+            sw.Stop();
             Thread.Sleep(100);
-            m_CamAlign2.Grab();
+            m_CamAlign2.GrabOneShot();
             Thread.Sleep(100);
             SetLightByName(strLightName, 0);
 
@@ -1673,7 +1717,17 @@ namespace Root_Vega.Module
 
                 try
                 {
-
+                    if (cam.p_CamInfo._OpenStatus == false) cam.Connect();
+                    StopWatch sw = new StopWatch();
+                    while (cam.p_CamInfo._OpenStatus == false)
+                    {
+                        if (sw.ElapsedMilliseconds > 10000)
+                        {
+                            sw.Stop();
+                            return "LADS Camera Not Connected";
+                        }
+                    }
+                    sw.Stop();
                     m_module.SetLightByName("LADS", 50);
 
                     if (m_nTestCheck == 0)
