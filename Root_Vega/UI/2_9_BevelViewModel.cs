@@ -469,7 +469,7 @@ namespace Root_Vega
 							m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_bevelMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_bevelMem[i]).GetMBOffset(),
 								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_bevelMem[i]).p_sz.X,
 								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_bevelMem[i]).p_sz.Y,
-								adjustAreaList[n], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p);
+								adjustAreaList[n], 100, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p);
 						}
 						p_ImageViewer_List[i].SetRoiRect();
 					}

@@ -1731,6 +1731,9 @@ namespace Root_Vega.Module
             public double m_dResY_um = 1;                       // um
             public double m_dResX_um = 1;                       // um
             public double m_dReticleSize_mm = 150;              // mm
+
+            public int m_nXPos = 0;
+            public int m_nYPos = 0;
             
             public Run_VRSReviewImagCapture(PatternVision module)
             {
@@ -1747,6 +1750,10 @@ namespace Root_Vega.Module
                 run.m_dResY_um = m_dResY_um;
                 run.m_dResX_um = m_dResX_um;
                 run.m_dReticleSize_mm = m_dReticleSize_mm;
+
+                run.m_nXPos = m_nXPos;
+                run.m_nYPos = m_nYPos;
+
                 return run;
             }
 
@@ -1763,6 +1770,11 @@ namespace Root_Vega.Module
                 m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera X Resolution", "Camera X Resolution (um)", bVisible);
                 m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera Y Resolution", "Camera Y Resolution (um)", bVisible);
                 m_dReticleSize_mm = tree.Set(m_dReticleSize_mm, m_dReticleSize_mm, "Reticle Size", "Reticle Size (mm)", bVisible);
+                p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
+
+                m_nXPos = tree.Set(m_nXPos, m_nXPos, "Memory X Coordinate", "Memory X Coordinate", bVisible);
+                m_nYPos = tree.Set(m_nYPos, m_nYPos, "Memory Y Coordinate", "Memory Y Coordinate", bVisible);
             }
 
             public override string Run()
@@ -1776,21 +1788,29 @@ namespace Root_Vega.Module
                 string strVRSImageFullPath = "";
 
                 // implement
-                List<CPoint> lstDefectPos = GetDefectPosList();
-                for (int i = 0; i<lstDefectPos.Count; i++)
-                {
-                    // Defect 위치로 이동
-                    RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectPos[i]);
-                    if (m_module.Run(axisXY.StartMove(rpDefectPos)))
-                        return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady()))
-                        return p_sInfo;
+                // TEST
+                RPoint rpDefectPos = GetAxisPosFromMemoryPos(new CPoint(m_nXPos,m_nYPos));
+                if (m_module.Run(axisXY.StartMove(rpDefectPos))) return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                if (m_module.Run(axisZ.StartMove(245700))) return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+                //
 
-                    // VRS 촬영 및 저장
-                    string strRet = cam.Grab();
-                    strVRSImageFullPath = string.Format(strVRSImageDirectoryPath + "VRSImage_{0}.bmp", i);
-                    img.SaveImageSync(strVRSImageFullPath);
-                }
+                //List<CPoint> lstDefectPos = GetDefectPosList();
+                //for (int i = 0; i < lstDefectPos.Count; i++)
+                //{
+                //    // Defect 위치로 이동
+                //    RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectPos[i]);
+                //    if (m_module.Run(axisXY.StartMove(rpDefectPos)))
+                //        return p_sInfo;
+                //    if (m_module.Run(axisXY.WaitReady()))
+                //        return p_sInfo;
+
+                //    // VRS 촬영 및 저장
+                //    string strRet = cam.Grab();
+                //    strVRSImageFullPath = string.Format(strVRSImageDirectoryPath + "VRSImage_{0}.bmp", i);
+                //    img.SaveImageSync(strVRSImageFullPath);
+                //}
 
                 return "OK";
             }
@@ -1821,18 +1841,20 @@ namespace Root_Vega.Module
             {
                 // variable
                 int nMMPerUM = 1000;
-                m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
+                //m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
+                m_grabMode.m_dTrigger = m_dResY_um / 8 * 100;  // 1pulse = 0.1um -> 10pulse = 1um
                 int nReticleYSize_px = Convert.ToInt32(m_dReticleSize_mm * nMMPerUM / m_dResY_um);    // 레티클 영역(150mm -> 150,000um)의 Y픽셀 갯수
-                int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleYSize_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
-                double dTriggerStartPosY = m_rpReticleCenterPos.Y + nTotalTriggerCount / 2;
+                int nReticleRangePulse = Convert.ToInt32(m_grabMode.m_dTrigger * nReticleYSize_px);   // 스캔영역 중 레티클 스캔 구간에서 발생할 Trigger 갯수
+                double dTriggerStartPosY = m_rpReticleCenterPos.Y + nReticleRangePulse / 2;
                 int nScanLine = cpMemory.X / m_grabMode.m_camera.GetRoiSize().X;
-                double dXScale = m_dResX_um * 10;
-                double dTriggerStartPosX = m_rpReticleCenterPos.X + nReticleYSize_px * (double)m_grabMode.m_dTrigger / 2 - nScanLine * m_grabMode.m_camera.GetRoiSize().X * dXScale;
+                double dXScale = m_dResX_um / 10 * 100;
+                double dTriggerStartPosX = m_rpReticleCenterPos.X + (150 * nMMPerUM / 0.1 / 2) - nScanLine * m_grabMode.m_camera.GetRoiSize().X * dXScale;
+                //double dAxisPosX = m_rpReticleCenterPos_pulse.X + (150 * nMMPerUM / 0.1 / 2) - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale; //해상도추가필요
                 int nSpareX = cpMemory.X % m_grabMode.m_camera.GetRoiSize().X;
                 RPoint rpAxis = new RPoint();
 
                 // implement
-                rpAxis.X = dTriggerStartPosX + (10 * m_dResX_um * nSpareX) + m_rpDistanceOfTDIToVRS_pulse.X;
+                rpAxis.X = dTriggerStartPosX - (10 * m_dResX_um * nSpareX) + m_rpDistanceOfTDIToVRS_pulse.X;
                 rpAxis.Y = dTriggerStartPosY - (m_grabMode.m_dTrigger * cpMemory.Y) - m_rpDistanceOfTDIToVRS_pulse.Y;
 
                 return rpAxis;

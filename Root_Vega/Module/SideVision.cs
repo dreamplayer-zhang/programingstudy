@@ -991,11 +991,10 @@ namespace Root_Vega.Module
                         if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
                         if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartAxisPos)))) return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-
-                        double dStartTriggerPos = m_rpReticleCenterPos_pulse.Y - dReticleRangePulse / 2;
-                        double dEndTriggerPos = m_rpReticleCenterPos_pulse.Y + dReticleRangePulse / 2;
+                        double dStartTriggerPos = m_rpReticleCenterPos_pulse.Y + dReticleRangePulse / 2;
+                        double dEndTriggerPos = m_rpReticleCenterPos_pulse.Y - dReticleRangePulse / 2;
                         //m_module.p_axisXY.p_axisY.SetTrigger(dEndAxisPos, dEndTriggerPos + 100000, m_grabMode.m_dTrigger, true);
-                        m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos + 100000, m_grabMode.m_dTrigger, true);
+                        m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos, m_grabMode.m_dTrigger, true);
                         string sPool = m_grabMode.m_memoryPool.p_id;
                         string sGroup = m_grabMode.m_memoryGroup.p_id;
                         string sMem = m_grabMode.m_eScanPos.ToString();
@@ -1141,10 +1140,10 @@ namespace Root_Vega.Module
                         if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartAxisPos)))) return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
 
-                        double dStartTriggerPos = m_rpReticleCenterPos_pulse.Y - dReticleRangePulse / 2;
-                        double dEndTriggerPos = m_rpReticleCenterPos_pulse.Y + dReticleRangePulse / 2;
+                        double dStartTriggerPos = m_rpReticleCenterPos_pulse.Y + dReticleRangePulse / 2;
+                        double dEndTriggerPos = m_rpReticleCenterPos_pulse.Y - dReticleRangePulse / 2;
                         //m_module.p_axisXY.p_axisY.SetTrigger(dEndAxisPos, dEndTriggerPos, m_grabMode.m_dTrigger, true);
-                        m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos + 100000, m_grabMode.m_dTrigger, true);
+                        m_module.p_axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos, m_grabMode.m_dTrigger, true);
 
                         string sPool = m_grabMode.m_memoryPool.p_id;
                         string sGroup = m_grabMode.m_memoryGroup.p_id;
