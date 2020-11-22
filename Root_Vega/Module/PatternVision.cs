@@ -1731,6 +1731,7 @@ namespace Root_Vega.Module
             public double m_dResY_um = 1;                       // um
             public double m_dResX_um = 1;                       // um
             public double m_dReticleSize_mm = 150;              // mm
+            public double m_dVRSFocusPosZ_pulse = 247500;
 
             public int m_nXPos = 0;
             public int m_nYPos = 0;
@@ -1750,6 +1751,7 @@ namespace Root_Vega.Module
                 run.m_dResY_um = m_dResY_um;
                 run.m_dResX_um = m_dResX_um;
                 run.m_dReticleSize_mm = m_dReticleSize_mm;
+                run.m_dVRSFocusPosZ_pulse = m_dVRSFocusPosZ_pulse;
 
                 run.m_nXPos = m_nXPos;
                 run.m_nYPos = m_nYPos;
@@ -1770,6 +1772,7 @@ namespace Root_Vega.Module
                 m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera X Resolution", "Camera X Resolution (um)", bVisible);
                 m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera Y Resolution", "Camera Y Resolution (um)", bVisible);
                 m_dReticleSize_mm = tree.Set(m_dReticleSize_mm, m_dReticleSize_mm, "Reticle Size", "Reticle Size (mm)", bVisible);
+                m_dVRSFocusPosZ_pulse = tree.Set(m_dVRSFocusPosZ_pulse, m_dVRSFocusPosZ_pulse, "VRS Camera Focus Pos Z", "VRS Camera Focus Pos Z", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
                 if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false, bVisible), bVisible, true);
 
@@ -1788,29 +1791,28 @@ namespace Root_Vega.Module
                 string strVRSImageFullPath = "";
 
                 // implement
-                // TEST
-                RPoint rpDefectPos = GetAxisPosFromMemoryPos(new CPoint(m_nXPos,m_nYPos));
-                if (m_module.Run(axisXY.StartMove(rpDefectPos))) return p_sInfo;
-                if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                if (m_module.Run(axisZ.StartMove(245700))) return p_sInfo;
-                if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
-                //
+                //RPoint rpDefectPos = GetAxisPosFromMemoryPos(new CPoint(m_nXPos,m_nYPos));
+                //if (m_module.Run(axisXY.StartMove(rpDefectPos))) return p_sInfo;
+                //if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                //if (m_module.Run(axisZ.StartMove(245700))) return p_sInfo;
+                //if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+                //return "OK";
 
-                //List<CPoint> lstDefectPos = GetDefectPosList();
-                //for (int i = 0; i < lstDefectPos.Count; i++)
-                //{
-                //    // Defect 위치로 이동
-                //    RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectPos[i]);
-                //    if (m_module.Run(axisXY.StartMove(rpDefectPos)))
-                //        return p_sInfo;
-                //    if (m_module.Run(axisXY.WaitReady()))
-                //        return p_sInfo;
+                List<CPoint> lstDefectPos = GetDefectPosList();
+                for (int i = 0; i < lstDefectPos.Count; i++)
+                {
+                    // Defect 위치로 이동
+                    RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectPos[i]);
+                    if (m_module.Run(axisXY.StartMove(rpDefectPos))) return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    if (m_module.Run(axisZ.StartMove(m_dVRSFocusPosZ_pulse))) return p_sInfo;  
+                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
 
-                //    // VRS 촬영 및 저장
-                //    string strRet = cam.Grab();
-                //    strVRSImageFullPath = string.Format(strVRSImageDirectoryPath + "VRSImage_{0}.bmp", i);
-                //    img.SaveImageSync(strVRSImageFullPath);
-                //}
+                    // VRS 촬영 및 저장
+                    string strRet = cam.Grab();
+                    strVRSImageFullPath = string.Format(strVRSImageDirectoryPath + "VRSImage_{0}.bmp", i);
+                    img.SaveImageSync(strVRSImageFullPath);
+                }
 
                 return "OK";
             }
@@ -1830,7 +1832,13 @@ namespace Root_Vega.Module
                     {
                         int posX = Convert.ToInt32(item["PosX"]);
                         int posY = Convert.ToInt32(item["PosY"]);
-                        lstDefectPos.Add(new CPoint(posX, posY));
+                        int nDefectCode = Convert.ToInt32(item["ClassifyCode"]);
+                        InspectionType eType = InspectionManager.GetInspectionType(nDefectCode);
+                        InspectionTarget eTarget = InspectionManager.GetInspectionTarget(nDefectCode);
+                        if ((eType == InspectionType.Strip) && (eTarget == InspectionTarget.Chrome))
+                        {
+                            lstDefectPos.Add(new CPoint(posX, posY));
+                        }
                     }
                 }
 
