@@ -1735,6 +1735,7 @@ namespace Root_Vega.Module
 
                         // 3. 좌우측 높이차 구하기   
                         double dDiff = dLeftHeight - dRightHeight;
+                        if ((dDiff < 0) || (dDiff > 102)) return "LADS Fail...";    // 높이측정 잘못 될 경우 Theta 계속 회전하는 문제 인터락
                         double dConvertingDiffHeightToPulse = dDiff * m_dPixelPerPulse;
                         double dDistanceOfLeftToRight = Math.Abs(dLeftSnapPosY - dRightSnapPosY);
                         double dThetaRadian = Math.Atan2(dConvertingDiffHeightToPulse, dDistanceOfLeftToRight);
@@ -1756,7 +1757,7 @@ namespace Root_Vega.Module
                         m_module.p_axisTheta.StartMove(dActualPos + dScaled);
                         m_module.p_axisTheta.m_aPos["Snap"] = (int)dScaled;
 
-                        // 6. Y축 Center 위치에서 Laser의 높이가 71.3(LineScan카메라 Focus가 맞는 위치)에 맞도록 X위치 찾기
+                        // 6. Y축 Center 위치에서 Laser의 높이가 LineScan카메라 Focus가 맞는 위치에 맞도록 X위치 찾기
                         p_afs.p_strStatus = "Center Snap...";
                         if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, m_rpCenterAxisPos.Y)))) return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
