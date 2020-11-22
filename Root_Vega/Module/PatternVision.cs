@@ -1855,6 +1855,20 @@ namespace Root_Vega.Module
                 //if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
                 //return "OK";
 
+                StopWatch sw = new StopWatch();
+                string strLightName = "MainVRS";
+                m_module.SetLightByName(strLightName, 20);
+                if (cam.p_CamInfo._OpenStatus == false) cam.Connect();
+                while (cam.p_CamInfo._OpenStatus == false)
+                {
+                    if (sw.ElapsedMilliseconds > 10000)
+                    {
+                        sw.Stop();
+                        return "Main VRS Camera Not Connected";
+                    }
+                }
+                sw.Stop();
+
                 List<CPoint> lstDefectPos = GetDefectPosList();
                 for (int i = 0; i < lstDefectPos.Count; i++)
                 {
@@ -1866,7 +1880,9 @@ namespace Root_Vega.Module
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
 
                     // VRS 촬영 및 저장
-                    string strRet = cam.Grab();
+                    Thread.Sleep(100);
+                    cam.GrabOneShot();
+                    Thread.Sleep(100);
                     strVRSImageFullPath = string.Format(strVRSImageDirectoryPath + "VRSImage_{0}.bmp", i);
                     img.SaveImageSync(strVRSImageFullPath);
                 }
