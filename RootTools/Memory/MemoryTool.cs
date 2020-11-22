@@ -176,7 +176,7 @@ namespace RootTools.Memory
             Thread.Sleep(1000);
             while (m_bThreadProcess)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
                 if (m_bStartProcess)
                 {
                     try

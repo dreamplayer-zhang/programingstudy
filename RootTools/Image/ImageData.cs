@@ -704,9 +704,9 @@ namespace RootTools
     //                hRGB = br.ReadBytes(256 * 4);
 				if (p_nByte == 1)
 				{
-                    nLine = 0;
-                    int nNum = 2;
-                    Thread[] multiThread = new Thread[nNum];
+					nLine = 0;
+					int nNum = 2;
+					Thread[] multiThread = new Thread[nNum];
 
                     for (int i = 0; i < nNum; i++)
                     {
@@ -740,29 +740,56 @@ namespace RootTools
                 }
 				else if(p_nByte == 3)
 				{
-					for (int y = lowheight - 1; y >= 0; y--)
-					{
-						if (Worker_MemoryCopy.CancellationPending)
-							return;
 
-						byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
-						IntPtr ptrR =  m_MemData.GetPtr(0);					
-						IntPtr ptrG = m_MemData.GetPtr(1);
-						IntPtr ptrB = m_MemData.GetPtr(2);
-						if (ptrR == IntPtr.Zero || ptrB == IntPtr.Zero || ptrG == IntPtr.Zero)
-						{
-                            System.Windows.MessageBox.Show("Memory Count Error");
-							return;
-						}
-						for (int i = 0; i < lowwidth*3; i = i + 3)
-						{
-							((byte*)(ptrB))[i / 3 + (long)y * p_Size.X] = pBuf[i];
-                            ((byte*)(ptrG))[i / 3 + (long)y * p_Size.X] = pBuf[i+1];
-							((byte*)(ptrR))[i / 3 + (long)y * p_Size.X] = pBuf[i+2];
-						}
-						//Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
-						p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+					nLine = 0;
+					int nNum = 2;
+					Thread[] multiThread = new Thread[nNum];
+
+					for (int i = 0; i < nNum; i++)
+					{
+						int nStartHeight = lowheight * (nNum - i) / nNum;
+						int nEndHeight = lowheight * (nNum - i - 1) / nNum;
+						multiThread[i] = new Thread(() => RunCopyThreadColor(sFile, nWidth, nHeight, lowwidth, lowheight, nStartHeight, nEndHeight, offset));
+						multiThread[i].Start();
 					}
+					while (true)
+					{
+						bool bEnd = true;
+						for (int i = 0; i < nNum; i++)
+						{
+							if (multiThread[i].IsAlive)
+								bEnd = false;
+						}
+						Thread.Sleep(10);
+						p_nProgress = Convert.ToInt32(((double)nLine / lowheight) * 100);
+						if (bEnd)
+							break;
+					}
+
+
+					//for (int y = lowheight - 1; y >= 0; y--)
+					//{
+					//	if (Worker_MemoryCopy.CancellationPending)
+					//		return;
+
+					//	byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
+					//	IntPtr ptrR =  m_MemData.GetPtr(0);					
+					//	IntPtr ptrG = m_MemData.GetPtr(1);
+					//	IntPtr ptrB = m_MemData.GetPtr(2);
+					//	if (ptrR == IntPtr.Zero || ptrB == IntPtr.Zero || ptrG == IntPtr.Zero)
+					//	{
+     //                       System.Windows.MessageBox.Show("Memory Count Error");
+					//		return;
+					//	}
+					//	for (int i = 0; i < lowwidth*3; i = i + 3)
+					//	{
+					//		((byte*)(ptrB))[i / 3 + (long)y * p_Size.X] = pBuf[i];
+     //                       ((byte*)(ptrG))[i / 3 + (long)y * p_Size.X] = pBuf[i+1];
+					//		((byte*)(ptrR))[i / 3 + (long)y * p_Size.X] = pBuf[i+2];
+					//	}
+					//	//Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
+					//	p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
+					//}
 				}
             }
             else
@@ -797,19 +824,65 @@ namespace RootTools
 				fss.Read(buf,0, nWidth);
 				Marshal.Copy(buf, 0, (IntPtr)((long)m_ptrImg + (offset.X + p_Size.X * ((long)offset.Y + i))), nLowWidth);
 				nLine++;
-				//p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
 			}
+			fss.Close();
+		}
+
+		public unsafe void RunCopyThreadColor(string sFile, int nWidth, int nHeight, int nLowWidth, int nLowHeight, int nStartHeight, int nEndHeight, CPoint offset)
+		{
+			int nByte = 3;
+			FileStream fss = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read, 32768, true);
+			byte[] buf = new byte[nWidth * nByte];
+            IntPtr ptrR = m_MemData.GetPtr(0);
+            IntPtr ptrG = m_MemData.GetPtr(1);
+            IntPtr ptrB = m_MemData.GetPtr(2);
+            if (ptrR == IntPtr.Zero || ptrB == IntPtr.Zero || ptrG == IntPtr.Zero)
+            {
+                System.Windows.MessageBox.Show("Memory Count Error");
+                return;
+            }
+            fss.Seek(54 + 1024 + (nLowHeight - nStartHeight) * (long)nWidth * nByte, SeekOrigin.Begin);
+			for (int y = nStartHeight - 1; y >= nEndHeight; y--)
+			{
+				if (Worker_MemoryCopy.CancellationPending)
+					return;
+				fss.Read(buf, 0, nWidth * nByte);
+                for (int i = 0; i < nLowHeight * 3; i = i + 3)
+                {
+                    ((byte*)(ptrB))[i / 3 + (long)y * p_Size.X] = buf[i];
+                    ((byte*)(ptrG))[i / 3 + (long)y * p_Size.X] = buf[i + 1];
+                    ((byte*)(ptrR))[i / 3 + (long)y * p_Size.X] = buf[i + 2];
+                }
+                nLine++;
+			}
+			fss.Close();
+
 			//for (int y = lowheight - 1; y >= 0; y--)
 			//{
 			//	if (Worker_MemoryCopy.CancellationPending)
 			//		return;
 
 			//	byte[] pBuf = br.ReadBytes(p_nByte * nWidth);
-			//	Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
+			//	IntPtr ptrR =  m_MemData.GetPtr(0);					
+			//	IntPtr ptrG = m_MemData.GetPtr(1);
+			//	IntPtr ptrB = m_MemData.GetPtr(2);
+			//	if (ptrR == IntPtr.Zero || ptrB == IntPtr.Zero || ptrG == IntPtr.Zero)
+			//	{
+			//                       System.Windows.MessageBox.Show("Memory Count Error");
+			//		return;
+			//	}
+			//	for (int i = 0; i < lowwidth*3; i = i + 3)
+			//	{
+			//		((byte*)(ptrB))[i / 3 + (long)y * p_Size.X] = pBuf[i];
+			//                       ((byte*)(ptrG))[i / 3 + (long)y * p_Size.X] = pBuf[i+1];
+			//		((byte*)(ptrR))[i / 3 + (long)y * p_Size.X] = pBuf[i+2];
+			//	}
+			//	//Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + p_nByte * (offset.X + p_Size.X / p_nByte * ((long)offset.Y + y))), p_nByte * lowwidth);
 			//	p_nProgress = Convert.ToInt32(((double)(lowheight - y) / lowheight) * 100);
 			//}
-			fss.Close();
+
 		}
+
 
 		public unsafe bool ReAllocate(CPoint sz, int nByte)
 		{

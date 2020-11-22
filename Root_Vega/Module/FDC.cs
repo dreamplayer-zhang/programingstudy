@@ -14,23 +14,23 @@ namespace Root_Vega.Module
     public class FDC : ModuleBase
     {
         #region ToolBox
-        public RS232 m_rs232;
+        public RS232byte m_rs232;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
             if (bInit)
             {
-                m_rs232.OnRecieve += M_rs232_OnRecieve;
+                m_rs232.OnRecieve += M_rs232_OnRecieve; 
                 m_rs232.p_bConnect = true;
             }
         }
-        #endregion
 
         #region RS232
-        private void M_rs232_OnRecieve(string sRead)
+        private void M_rs232_OnRecieve(byte[] aRead, ref int nRead)
         {
-            p_sInfo = ReadFDC(sRead); 
+            
         }
+        #endregion
 
         string ReadFDC(string sRead)
         {
@@ -50,7 +50,7 @@ namespace Root_Vega.Module
             return "OK"; 
         }
 
-        byte[] m_aSend = new byte[10]; 
+        byte[] m_aSend = new byte[8]; 
         void SendQuery(int nFDC, int nAdd)
         {
             m_aSend[0] = (byte)(nFDC + 1);
@@ -58,8 +58,8 @@ namespace Root_Vega.Module
             m_aSend[2] = (byte)(nAdd >> 8);
             m_aSend[3] = (byte)(nAdd & 0xff);
             m_aSend[4] = 0;
-            m_aSend[5] = 1;
-            ushort uCRC = CalcCRC(m_aSend, 6);
+            m_aSend[5] = 2;
+            uint uCRC = CalcCRC(m_aSend, 6);
             m_aSend[6] = (byte)(uCRC & 0xff); 
             m_aSend[7] = (byte)(uCRC >> 8);
             m_rs232.Send(m_aSend, 8);
@@ -102,14 +102,35 @@ namespace Root_Vega.Module
             0x6e17,    0x7e36,    0x4e55,    0x5e74,    0x2e93,    0x3eb2,    0x0ed1,    0x1ef0
         };
 
-        ushort CalcCRC(byte[] aByte, int nCount)
+        uint CalcCRC(byte[] aByte, int nCount)
         {
-            ushort uCRC = 0xffff;
-            for (int n = 0; n < nCount; n++)
-            {
-                uCRC = (ushort)((uCRC >> 8) ^ m_uCRC[(uCRC ^ aByte[n]) & 0xff]); 
-            }
-            return uCRC;
+            //ushort uCRC = 0xffff;
+            //for (int n = 0; n < nCount; n++)
+            //{
+            //    uCRC = (ushort)((uCRC >> 8) ^ m_uCRC[(uCRC ^ aByte[n]) & 0xff]); 
+            //}
+            //return uCRC;
+            UInt32 usCRC = 0xffff;
+            byte bytTemp;
+
+            for(int i =0;i<nCount; i+=1)
+			{
+                bytTemp = aByte[i];
+                usCRC = Convert.ToUInt32(usCRC ^ bytTemp);
+                for(int j =1;j<9;j++)
+				{
+                    if((usCRC & 1)==1)
+					{
+                        usCRC = usCRC >> 1;
+                        usCRC = Convert.ToUInt32(usCRC ^ Convert.ToUInt32(0xa001));
+					}
+					else
+                    {
+                        usCRC = usCRC >> 1;
+                    }
+				}
+			}
+            return usCRC;
         }
         #endregion
 
@@ -196,8 +217,10 @@ namespace Root_Vega.Module
                 p_id = id; 
             }
 
-            public void RunTree(Tree tree)
+            public void RunTree(Tree tree, int module_number)
             {
+                p_id = tree.Set(p_id, p_id, "ID." + module_number.ToString("00"), "FDC Module Name");
+
                 p_eUnit = (eUnit)tree.Set(p_eUnit, p_eUnit, "Unit", "FDC Unit");
                 m_nDigit = tree.Set(m_nDigit, m_nDigit, "Digit", "FDC Decimal Point");
                 m_fDiv = 1;
@@ -234,16 +257,20 @@ namespace Root_Vega.Module
                 while (m_aData.Count > value) m_aData.RemoveAt(m_aData.Count - 1);
             }
         }
-
+        
         void RunTreeData(Tree tree)
         {
+            int module_number = 0;
             p_lData = tree.Set(p_lData, p_lData, "Count", "FDC Module Count");
             for (int n = 0; n < m_aData.Count; n++)
             {
                 Data data = m_aData[n];
-                data.p_id = tree.Set(data.p_id, data.p_id, "ID." + n.ToString("00"), "FDC Module Name"); 
             }
-            foreach (Data data in m_aData) data.RunTree(tree.GetTree(data.p_id)); 
+            foreach (Data data in m_aData)
+            {
+                module_number++;
+                data.RunTree(tree.GetTree(data.p_id), module_number); 
+            }
         }
         #endregion
 
