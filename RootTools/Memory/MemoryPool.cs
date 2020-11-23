@@ -7,7 +7,7 @@ using System.Windows.Controls;
 
 namespace RootTools.Memory
 {
-    public class MemoryPool : ObservableObject, ITool
+    public class MemoryPool : NotifyProperty, ITool
     {
         const double c_fGB = 1024 * 1024 * 1024;
 
@@ -24,6 +24,7 @@ namespace RootTools.Memory
                     if (CreatePool(value)) m_memoryTool.MemoryChanged();
                 }
                 _fGB = value;
+                OnPropertyChanged(); 
                 m_reg.Write("fGB", value);
             }
         }
