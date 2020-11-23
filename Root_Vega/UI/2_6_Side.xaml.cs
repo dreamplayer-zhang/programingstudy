@@ -24,15 +24,15 @@ namespace Root_Vega
         public _2_6_Side()
         {
             InitializeComponent();
-			App.m_engineer.m_InspManager.AddDefect += App_AddDefect;
-			App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
-			InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
+			//App.m_engineer.m_InspManager.AddDefect += App_AddDefect;
+			//App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
+			//InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
 		}
 		~_2_6_Side()
 		{
-			App.m_engineer.m_InspManager.AddDefect -= App_AddDefect;
-			App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
-			InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
+			//App.m_engineer.m_InspManager.AddDefect -= App_AddDefect;
+			//App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
+			//InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
 		}
 
 		private void InspectionManager_RefreshDefect()

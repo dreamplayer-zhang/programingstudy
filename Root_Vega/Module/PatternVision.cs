@@ -793,7 +793,7 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
             AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
             AddModuleRunList(new Run_Grab(this), true, "Run Grab");
-            AddModuleRunList(new Run_Inspection(this), true, "Run Inspection");
+            AddModuleRunList(new Run_InspectionComplete(this), true, "Run Inspection Complete");
             AddModuleRunList(new Run_AutoIllumination(this), true, "Run AutoIllumination");
             AddModuleRunList(new Run_VRSReviewImagCapture(this), true, "Run VRSReviewImageCapture");
         }
@@ -1350,12 +1350,12 @@ namespace Root_Vega.Module
         //    }
         //}
 
-        public class Run_Inspection : ModuleRunBase
+        public class Run_InspectionComplete : ModuleRunBase
         {
             PatternVision m_module;
             public _2_5_MainVisionViewModel m_mvvm;
 
-            public Run_Inspection(PatternVision module)
+            public Run_InspectionComplete(PatternVision module)
             {
                 m_module = module;
                 m_mvvm = m_module.m_mvvm;
@@ -1364,7 +1364,7 @@ namespace Root_Vega.Module
 
             public override ModuleRunBase Clone()
             {
-                Run_Inspection run = new Run_Inspection(m_module);
+                Run_InspectionComplete run = new Run_InspectionComplete(m_module);
                 return run;
             }
 
@@ -1380,15 +1380,17 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
-                // 검사시작 전 확인사항 조건 추가해야함
+                while (((Vega_Engineer)m_module.m_engineer).m_InspManager.p_qInspection.Count != 0)
+                {
+                    Thread.Sleep(1000);
+                }
 
-                // 검사시작
                 m_mvvm._dispatcher.Invoke(new Action(delegate ()
                 {
-                    m_mvvm._startInsp();
+                    m_mvvm._endInsp();
+                    m_mvvm._clearInspReslut();
+                    ((Vega_Engineer)m_module.m_engineer).m_InspManager.ClearDefectList();
                 }));
-
-                // DB에 Write완료될때까지 기다리는 루틴 추가해야함
 
                 return "OK";
             }
