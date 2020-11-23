@@ -28,6 +28,12 @@ namespace Root_Vega
 			App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
 			InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
 		}
+		~_2_11_EBR()
+		{
+			App.m_engineer.m_InspManager.AddDefect -= App_AddDefect;
+			App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
+			InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
+		}
 
 		private void InspectionManager_RefreshDefect()
 		{
