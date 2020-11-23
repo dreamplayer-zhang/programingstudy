@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace Root_CAMELLIA
 {
-    class CAMELLIA_Handler : IHandler
+    public class CAMELLIA_Handler : IHandler
     {
         #region List InfoWafer
         //public string AddInfoWafer(InfoWafer infoWafer)

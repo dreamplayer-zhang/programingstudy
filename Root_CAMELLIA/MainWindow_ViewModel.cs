@@ -6,7 +6,7 @@ using System.Windows.Threading;
 
 namespace Root_CAMELLIA
 {
-    public class MainWindow_ViewModel : ObservableObject
+    public class MainWindow_ViewModel : ObservableObject, IDialogRequestClose
     {
         #region ViewModel
         private Dlg_RecipeManager_ViewModel _RecipeManager_ViewModel;

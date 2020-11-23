@@ -16,6 +16,12 @@ namespace Root_CAMELLIA
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        public CAMELLIA_Engineer m_engineer = new CAMELLIA_Engineer();
+        MemoryTool m_memoryTool;
+        Dlg_Engineer engineer;
+
+
         public MainWindow()
         {
             InitializeComponent();

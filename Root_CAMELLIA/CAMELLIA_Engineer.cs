@@ -11,7 +11,7 @@ using RootTools.Control;
 
 namespace Root_CAMELLIA
 {
-    class CAMELLIA_Engineer : IEngineer
+    public class CAMELLIA_Engineer : IEngineer
     {
         #region IEngineer
         public Login m_login = new Login();

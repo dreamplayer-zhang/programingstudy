@@ -148,6 +148,9 @@
     <Compile Include="CAMELLIA_Process.cs" />
     <Compile Include="CAMELLIA_Recipe.cs" />
     <Compile Include="Module\Stage.cs" />
+    <Compile Include="Camellia_Hander_UI.xaml.cs">
+      <DependentUpon>Camellia_Hander_UI.xaml</DependentUpon>
+    </Compile>
     <Page Include="Dlg_Engineer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -193,6 +196,10 @@
     <Page Include="Stage\StageMap.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Camellia_Hander_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

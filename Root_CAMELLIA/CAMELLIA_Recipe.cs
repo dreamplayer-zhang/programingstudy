@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Root_CAMELLIA
 {
-    class CAMELLIA_Recipe : NotifyProperty
+    public class CAMELLIA_Recipe : NotifyProperty
     {
         #region ModuleBase
         /// <summary> Recipe 편집에 필요한 Module 이름 List </summary>
