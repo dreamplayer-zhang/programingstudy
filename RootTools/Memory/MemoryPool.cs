@@ -36,9 +36,9 @@ namespace RootTools.Memory
             StopWatch sw = new StopWatch();
             long nPool = (long)Math.Ceiling(fGB * c_fGB);
             try { m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool); }
-            catch (Exception) {return false; }
+            catch (Exception) { return false; }
             m_log.Info(p_id + " Memory Pool Allocate Done " + sw.ElapsedMilliseconds.ToString() + " ms");
-            return true; 
+            return true;
         }
         #endregion
 
