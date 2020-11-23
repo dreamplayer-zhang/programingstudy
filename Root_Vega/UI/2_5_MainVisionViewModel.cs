@@ -73,7 +73,7 @@ namespace Root_Vega
 			m_Engineer = engineer;
 			Init(engineer, dialogService);
 
-			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
+			//m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
 			bUsingInspection = false;
 		}
 		/// <summary>
@@ -87,7 +87,7 @@ namespace Root_Vega
 			{
 				_dispatcher.BeginInvoke(new Action(delegate ()
 				{
-					p_InformationDrawer.AddDefectInfo(item);
+					//p_InformationDrawer.AddDefectInfo(item);
 					//p_ImageViewer.RedrawingElement();
 				}));
 			}

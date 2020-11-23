@@ -618,6 +618,7 @@ namespace RootTools
 				if (p_View_Rect.Height % 2 != 0)
 					_View_Rect.Height += 1;
 				SetImageSource();
+				InspectionManager.RefreshDefectDraw();
 			}
 		}
 		public void SetThumbNailSize(int width, int height)
@@ -852,6 +853,7 @@ namespace RootTools
 				MovePoint.Y = p_ImageData.p_Size.Y - p_View_Rect.Height;
 			SetViewRect(MovePoint);
 			SetImageSource();
+			InspectionManager.RefreshDefectDraw();
 		}
 		void CanvasMoveMousePoint()
 		{

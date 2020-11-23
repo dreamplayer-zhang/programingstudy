@@ -699,7 +699,7 @@ namespace Root_Vega.Module
             base.InitBase(id, engineer);
             InitPosAlign();
             m_arrDefectDataWraper = new List<DefectDataWrapper>();
-            ((Vega_Engineer)m_engineer).m_InspManager.AddDefect += M_InspManager_AddDefect;
+            //((Vega_Engineer)m_engineer).m_InspManager.AddDefect += M_InspManager_AddDefect;
         }
 
         public override void ThreadStop()

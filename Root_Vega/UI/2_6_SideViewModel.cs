@@ -226,7 +226,7 @@ namespace Root_Vega
 			m_Engineer = engineer;
 			Init(dialogService);
 
-			m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
+			//m_Engineer.m_InspManager.AddDefect += M_InspManager_AddDefect;
 			bUsingInspection = false;
 		}
 		void Init(IDialogService dialogService)
