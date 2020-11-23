@@ -29,10 +29,13 @@ namespace RootTools.Inspects
 		/// <param name="item">Defect Information</param>
 		/// <param name="args">arguments. 필요한 경우 수정해서 사용</param>
 		public delegate void ChangeDefectInfoEventHanlder(DefectDataWrapper item);
+		public delegate void EventHandler();
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
 		public event ChangeDefectInfoEventHanlder AddDefect;
+		public event EventHandler ClearDefect;
+		public static event EventHandler RefreshDefect;
 		#endregion
 
 		Thread inspThread;
@@ -336,6 +339,21 @@ namespace RootTools.Inspects
 				}
 			}
 
+		}
+
+		public void ClearDefectList()
+		{
+			if(this.ClearDefect != null)
+			{
+				this.ClearDefect();
+			}
+		}
+		public static void RefreshDefectDraw()
+		{
+			if(RefreshDefect != null)
+			{
+				RefreshDefect();
+			}
 		}
 		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
 		{

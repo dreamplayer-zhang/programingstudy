@@ -87,7 +87,7 @@ namespace Root_Vega
 			{
 				_dispatcher.BeginInvoke(new Action(delegate ()
 				{
-					p_InformationDrawer.AddDefectInfo(item);
+					//p_InformationDrawer.AddDefectInfo(item);
 					//p_ImageViewer.RedrawingElement();
 				}));
 			}
