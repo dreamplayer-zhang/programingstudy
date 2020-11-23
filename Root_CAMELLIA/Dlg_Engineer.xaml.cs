@@ -24,6 +24,11 @@ namespace Root_CAMELLIA
             InitializeComponent();
         }
 
+        public void Init(CAMELLIA_Handler handler)
+        {
+            HandlerUI.Init(handler);
+        }
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();

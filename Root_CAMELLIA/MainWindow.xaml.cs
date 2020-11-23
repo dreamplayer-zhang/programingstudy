@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System;
 using RootTools;
 using Root_CAMELLIA.Data;
+using RootTools.Memory;
 
 namespace Root_CAMELLIA
 {
@@ -15,6 +16,12 @@ namespace Root_CAMELLIA
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        public CAMELLIA_Engineer m_engineer = new CAMELLIA_Engineer();
+        MemoryTool m_memoryTool;
+        Dlg_Engineer engineer;
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -37,6 +44,7 @@ namespace Root_CAMELLIA
             DataManager = new DataManager(this);
             dialogService = new DialogService(this);
             DialogInit(dialogService);
+            m_engineer.Init("WIND2");
         }
 
         void DialogInit(IDialogService dialogService)
@@ -146,7 +154,8 @@ namespace Root_CAMELLIA
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            Dlg_Engineer engineer = new Dlg_Engineer();
+            engineer = new Dlg_Engineer();
+            engineer.Init(m_engineer.m_handler);
             engineer.ShowDialog();
         }
     }

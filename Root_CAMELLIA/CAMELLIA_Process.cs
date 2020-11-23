@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Root_CAMELLIA
 {
-    class CAMELLIA_Process : NotifyProperty
+    public class CAMELLIA_Process : NotifyProperty
     {
         #region List InfoWafer
         public string AddInfoWafer(InfoWafer infoWafer)
