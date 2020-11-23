@@ -55,7 +55,7 @@ namespace RootTools.Inspects
 		System.Data.DataTable VSDataDT;
 		System.Data.DataTable SearchDataDT;
 		Dictionary<int, CPoint> refPosDictionary;
-
+		private DateTime NowTime;
 		bool m_bProgress;
 
 		public bool IsInitialized { get; private set; }
@@ -67,6 +67,7 @@ namespace RootTools.Inspects
 				//강제로 리턴
 				return;
 			}
+			NowTime = DateTime.Now;
 			m_bProgress = false;
 			sw = new StopWatch();
 			sw.Start();
@@ -188,8 +189,8 @@ namespace RootTools.Inspects
 				{
 					System.IO.Directory.CreateDirectory(inspDefaultDir);
 				}
-				var nowTime = DateTime.Now;
-				inspFileName = nowTime.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+				//var nowTime = DateTime.Now;
+				inspFileName = NowTime.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
 				var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
 				string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
 
@@ -283,7 +284,7 @@ namespace RootTools.Inspects
 				//}
 				System.Data.DataRow searchDataRow = SearchDataDT.NewRow();
 				searchDataRow["Idx"] = SearchDataDT.Rows.Count;
-				searchDataRow["InspStartTime"] = nowTime.ToString("yyyy-MM-dd HH:mm:ss");//TODO 나중에 진짜 검사 시작시간(로딩 시작 시간)으로 바꿔야 함
+				searchDataRow["InspStartTime"] = NowTime.ToString("yyyy-MM-dd HH:mm:ss");//TODO 나중에 진짜 검사 시작시간(로딩 시작 시간)으로 바꿔야 함
 				searchDataRow["ReticleID"] = "RETICLEID";//TODO 나중에 진짜 retilce Id를 받아와서 넣어줘야 함
 				searchDataRow["RecipeName"] = "Rcp001";//TODO 나중에 진짜 recipe name을 받아와서 넣어줘야 함
 				searchDataRow["TotalDefectCount"] = tempSet.Tables["tempdata"].Rows.Count;
