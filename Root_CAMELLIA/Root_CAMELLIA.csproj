@@ -125,6 +125,7 @@
     <Compile Include="InfoWafer.cs" />
     <Compile Include="MainWindow_ViewModel.cs" />
     <Compile Include="ModuleBase\CamelliaModuleBase.cs" />
+    <Compile Include="MVVM\ObservableObject.cs" />
     <Compile Include="Priority_Queue\FastPriorityQueue.cs" />
     <Compile Include="Priority_Queue\FastPriorityQueueNode.cs" />
     <Compile Include="Priority_Queue\IFixedSizePriorityQueue.cs" />

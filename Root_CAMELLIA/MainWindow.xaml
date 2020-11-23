@@ -12,9 +12,7 @@
         Height="1080"
         Width="1920"
         Title="CAMELLIA2"
-        Background="{StaticResource PanelBackGround}"
-        Loaded="Window_Loaded"
-        Closing="Window_Closing">
+        Background="{StaticResource PanelBackGround}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -69,15 +67,6 @@
                         Click="NormalizeButton_Click">
                     <Path Style="{StaticResource NormalizeIconKey}" />
                 </Button>
-                <!--<Button Style="{StaticResource SystemButton}"
-                        x:Name="CloseButton"
-                        Width="30"
-                        Height="20"
-                        Margin="2,0,0,0"
-                        Click="CloseButton_Click"
-                        VerticalAlignment="Bottom">
-                    <Path Style="{StaticResource CloseIconKey}" />
-                </Button>-->
             </StackPanel>
         </Grid>
 
@@ -98,13 +87,9 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0"
                         Orientation="Horizontal" >
-                <Button Content="Load" VerticalAlignment="Center"
-                        Height="40" Width="60" Margin="5"/>
-                <Button Content="Recipe" VerticalAlignment="Center"
-                        Height="40" Width="60" Margin="5" Click="Button_Click_1">
-                </Button>
-                <Button Content="Engineer" VerticalAlignment="Center"
-                        Height="40" Width="60" Margin="5" Click="Button_Click_2"/>
+                <Button Content="Load" VerticalAlignment="Center" Height="40" Width="60" Margin="5"     Command="{Binding CmdLoad}"/>
+                <Button Content="Recipe" VerticalAlignment="Center" Height="40" Width="60" Margin="5"   Command="{Binding CmdRecipe}"/>
+                <Button Content="Engineer" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdEngineer}"/>
             </StackPanel>
             <Grid Grid.Column="1">
                 <TextBlock x:Name="tbTime"
@@ -135,12 +120,9 @@
             <StackPanel Grid.Column="4"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">
-                <Button Content="Setting" VerticalAlignment="Center"
-                        Height="40" Width="60" Margin="5"/>
-                <Button Content="Exit" VerticalAlignment="Center"
-                        Height="40" Width="60" Margin="5" Click="Button_Click"/>
-                <Border Width="60" Margin="5"
-                        BorderBrush="#FF707070" BorderThickness="1">
+                <Button Content="Setting" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Click="Button_Click"/>
+                <Button Content="Exit" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdExit}"/>
+                <Border Width="60" Margin="5" BorderBrush="#FF707070" BorderThickness="1">
                     <Grid Opacity="0.8">
                         <Grid.RowDefinitions>
                             <RowDefinition/>
@@ -526,14 +508,14 @@
                                 </UniformGrid>
                             </Grid>
                         </GroupBox>
-                        <Viewbox Margin="3" Grid.Row="1">
-                        <ItemsControl ItemsSource="{Binding p_MainDrawElement}"
+                        <Viewbox Margin="3" Grid.Row="1" DataContext="{Binding RecipeManagerViewModel}" x:Name="test">
+                            <ItemsControl ItemsSource="{Binding p_DrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <Canvas x:Name="StageMapView" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
-                                    </Canvas>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
+                                        </Canvas>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>

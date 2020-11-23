@@ -39,15 +39,6 @@ namespace Root_CAMELLIA
         private string strCurrentTheta;
         private string strCurrentRadius;
 
-
-        public ObservableCollection<ShapeManager> Shapes = new ObservableCollection<ShapeManager>();
-        public ObservableCollection<ShapeManager> PreviewShapes = new ObservableCollection<ShapeManager>();
-        public ObservableCollection<GeometryManager> Geometry = new ObservableCollection<GeometryManager>();
-        public ObservableCollection<GeometryManager> PreviewGeometry = new ObservableCollection<GeometryManager>();
-        public ObservableCollection<GeometryManager> ViewRectGeometry = new ObservableCollection<GeometryManager>();
-        public ObservableCollection<GeometryManager> SelectGeometry = new ObservableCollection<GeometryManager>();
-        public ObservableCollection<TextManager> TextBlocks = new ObservableCollection<TextManager>();
-
         private ObservableCollection<UIElement> m_DrawElement = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> p_DrawElement
         {
@@ -74,116 +65,24 @@ namespace Root_CAMELLIA
             }
         }
 
-        private void TextBlocks_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        #region Draw Elements
+        public List<ShapeManager> Shapes = new List<ShapeManager>();
+        public List<ShapeManager> PreviewShapes = new List<ShapeManager>();
+        public List<GeometryManager> Geometry = new List<GeometryManager>();
+        public List<GeometryManager> PreviewGeometry = new List<GeometryManager>();
+        public List<GeometryManager> ViewRectGeometry = new List<GeometryManager>();
+        public List<GeometryManager> SelectGeometry = new List<GeometryManager>();
+        public List<TextManager> TextBlocks = new List<TextManager>();
+        #endregion
+
+        public Dlg_RecipeManager_ViewModel(MainWindow_ViewModel main)
         {
-            var textBlock = sender as ObservableCollection<TextManager>;
-            //ShapeManager shape = shapes.;
-            //if(!IsShowIndex && !IsKeyboardShowIndex)
-            //{
-            //    textBlock[textBlock.Count - 1].Text.Visibility = Visibility.Hidden;
-            //}
-            p_DrawElement.Add(textBlock[textBlock.Count - 1].Text);
-            
-        }
-
-        private void Shapes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var shapes = sender as ObservableCollection<ShapeManager>;
-            //ShapeManager shape = shapes.;
-            p_DrawElement.Add(shapes[shapes.Count - 1].UIElement);
-            //foreach (ShapeManager shape in shapes)
-            //    {
-            //        if (!p_DrawElement.Contains(shape.UIElement))
-
-            //    }
-        }
-
-        private void PreviewShapes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var shapes = sender as ObservableCollection<ShapeManager>;
-            p_PreviewDrawElement.Add(shapes[shapes.Count - 1].UIElement);
-            //foreach (ShapeManager shape in shapes)
-            //{
-            //    if (!p_PreviewDrawElement.Contains(shape.UIElement))
-            //        p_PreviewDrawElement.Add(shape.UIElement);
-            //}
-
-        }
-
-        private void Geometry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-
-            var shapes = sender as ObservableCollection<GeometryManager>;
-            foreach (GeometryManager geometry in shapes)
-            {
-
-                if (!p_DrawElement.Contains(geometry.path))
-                    p_DrawElement.Add(geometry.path);
-            }
-
-        }
-
-        private void PreviewGeometry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-
-            var shapes = sender as ObservableCollection<GeometryManager>;
-            foreach (GeometryManager geometry in shapes)
-            {
-
-                if (!p_PreviewDrawElement.Contains(geometry.path))
-                    p_PreviewDrawElement.Add(geometry.path);
-            }
-
-        }
-
-        private void ViewRectGeometry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-
-            var shapes = sender as ObservableCollection<GeometryManager>;
-            foreach (GeometryManager geometry in shapes)
-            {
-
-                if (!p_PreviewDrawElement.Contains(geometry.path))
-                    p_PreviewDrawElement.Add(geometry.path);
-            }
-
-        }
-
-        private void SelectGeometry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-
-            var shapes = sender as ObservableCollection<GeometryManager>;
-            foreach (GeometryManager geometry in shapes)
-            {
-
-                if (!p_DrawElement.Contains(geometry.path))
-                    p_DrawElement.Add(geometry.path);
-            }
-
-        }
-
-        public Dlg_RecipeManager_ViewModel(MainWindow mainWindow)
-        {
-
-            // Event
-            Shapes.CollectionChanged += Shapes_CollectionChanged;
-            Geometry.CollectionChanged += Geometry_CollectionChanged;
-            PreviewGeometry.CollectionChanged += PreviewGeometry_CollectionChanged;
-            PreviewShapes.CollectionChanged += PreviewShapes_CollectionChanged;
-            ViewRectGeometry.CollectionChanged += ViewRectGeometry_CollectionChanged;
-            SelectGeometry.CollectionChanged += SelectGeometry_CollectionChanged;
-            TextBlocks.CollectionChanged += TextBlocks_CollectionChanged;
-            // 추후 수정 예정. 하나로 묶기..
-
-            //VerticalScroll = rcpMgr.VerticalScroll;
-            //HorizontalScroll = rcpMgr.HorizontalScroll;
-            dataManager = mainWindow.DataManager;
+            dataManager = main.DataManager;
             Init();
             InitStage();
             SetStage(false);
             SetStage(true);
             SetViewRect();
-
         }
 
         public DataManager dataManager { get; set; }
@@ -200,8 +99,7 @@ namespace Root_CAMELLIA
             PointListItem.Columns.Add(new DataColumn("ListX"));
             PointListItem.Columns.Add(new DataColumn("ListY"));
             PointListItem.Columns.Add(new DataColumn("ListRoute"));
-
-          
+        
             RouteThickness = "3";
             RouteThick = 3;
             XPosition = "0.000 mm";
@@ -398,6 +296,7 @@ namespace Root_CAMELLIA
              
             }
         }
+
         #region Stage
 
         #region DataStage     
@@ -425,6 +324,7 @@ namespace Root_CAMELLIA
         private List<ShapeEllipse> listPreviewSelectedPoint = new List<ShapeEllipse>();
 
         #endregion
+
         #region Getter Setter
         //public Circle DataStageField { get; set; } = new Circle();
         //public ShapeDraw.Line DataStageLineHole { get; set; } = new ShapeDraw.Line();
@@ -515,6 +415,7 @@ namespace Root_CAMELLIA
 
         public List<Circle> dataStageCircleHole = new List<Circle>();
         Circle viewStageCircleHole = new Circle();
+
         public void OpenStageCircleHole()
         {
             if (dataStageCircleHole.Count != 0)
@@ -850,7 +751,6 @@ namespace Root_CAMELLIA
         {
             //Preview Stage Shade
             {
-
                 Rect rect = DataViewPosition;
                 rect.X = rect.X / ZoomScale - OffsetX / ZoomScale * 1000 / (double)1000;
                 rect.Y = rect.Y / ZoomScale - OffsetY / ZoomScale * 1000 / (double)1000;
@@ -916,10 +816,9 @@ namespace Root_CAMELLIA
                 rightRect.SetData(RightRect);
                 stageShade.AddGroup(rightRect);
                 ViewRectGeometry.Add(stageShade);
+                p_DrawElement.Add(stageShade.path);
             }
-            ViewRectGeometry.CollectionChanged -= ViewRectGeometry_CollectionChanged;
         }
-
 
         GeometryManager stage;
         TextManager textManager;
@@ -929,6 +828,7 @@ namespace Root_CAMELLIA
         {
             GeneralTools.GbHole.GradientOrigin = new System.Windows.Point(0.3, 0.3);
             // 스테이지
+            
             stage = new CustomEllipseGeometry(GeneralTools.Gb, System.Windows.SystemColors.ControlBrush);
             CustomEllipseGeometry stageField = stage as CustomEllipseGeometry;
 
@@ -942,10 +842,12 @@ namespace Root_CAMELLIA
             if (!preview)
             {
                 Geometry.Add(stageField);
+                p_DrawElement.Add(stageField.path);
             }
             else
             {
                 PreviewGeometry.Add(stageField);
+                p_PreviewDrawElement.Add(stageField.path);
             }
 
             // Stage 중간 흰색 라인
@@ -961,10 +863,12 @@ namespace Root_CAMELLIA
             if (!preview)
             {
                 Geometry.Add(rectLine);
+                p_DrawElement.Add(rectLine.path);
             }
             else
             {
                 PreviewGeometry.Add(rectLine);
+                p_PreviewDrawElement.Add(rectLine.path);
             }
 
             // Stage 점선 가이드라인
@@ -982,11 +886,13 @@ namespace Root_CAMELLIA
                     ViewStageGuideLine[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
                     guideLine.SetData(ViewStageGuideLine[i], CenterX, CenterY, 5 * ZoomScale);
                     Geometry.Add(guideLine);
+                    p_DrawElement.Add(guideLine.path);
                 }
                 else
                 {
                     guideLine.SetData(ViewStageGuideLine[i], CenterX, CenterY, 5);
                     PreviewGeometry.Add(guideLine);
+                    p_PreviewDrawElement.Add(guideLine.path);
                 }
             }
 
@@ -1016,10 +922,12 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Geometry.Add(edgePath);
+                    p_DrawElement.Add(edgePath.path);
                 }
                 else
                 {
                     PreviewGeometry.Add(edgePath);
+                    p_PreviewDrawElement.Add(edgePath.path);
                 }
                 drawGeometryManager.ClearSegments();
             }
@@ -1050,10 +958,12 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Geometry.Add(doubleHole);
+                    p_DrawElement.Add(doubleHole.path);
                 }
                 else
                 {
                     PreviewGeometry.Add(doubleHole);
+                    p_PreviewDrawElement.Add(doubleHole.path);
                 }
                 drawGeometryManager.ClearSegments();
             }
@@ -1097,10 +1007,12 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Geometry.Add(topBotDoubleHole);
+                    p_DrawElement.Add(topBotDoubleHole.path);
                 }
                 else
                 {
                     PreviewGeometry.Add(topBotDoubleHole);
+                    p_PreviewDrawElement.Add(topBotDoubleHole.path);
                 }
                 drawGeometryManager.ClearSegments();
             }
@@ -1123,10 +1035,12 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Geometry.Add(circleHole);
+                    p_DrawElement.Add(circleHole.path);
                 }
                 else
                 {
                     PreviewGeometry.Add(circleHole);
+                    p_PreviewDrawElement.Add(circleHole.path);
                 }
             }
 
@@ -1149,11 +1063,13 @@ namespace Root_CAMELLIA
             {
                 stageEdge.SetData(viewStageField, CenterX, CenterY, 3 * ZoomScale);
                 Geometry.Add(stageEdge);
+                p_DrawElement.Add(stageEdge.path);
             }
             else
             {
                 stageEdge.SetData(viewStageField, CenterX, CenterY, 3);
                 PreviewGeometry.Add(stageEdge);
+                p_PreviewDrawElement.Add(stageEdge.path);
             }
 
 
@@ -1187,11 +1103,14 @@ namespace Root_CAMELLIA
                 {
                     //Geometry.Add(dataCandidatePoint);
                     Shapes.Add(dataCandidatePoint);
+                    p_DrawElement.Add(dataCandidatePoint.UIElement);
                     listCandidatePoint.Add(dataCandidatePoint);
+
                 }
                 else
                 {
                     PreviewShapes.Add(dataCandidatePoint);
+                    p_PreviewDrawElement.Add(dataCandidatePoint.UIElement);
                     listPreviewCandidatePoint.Add(dataCandidatePoint);
                 }
             }
@@ -1218,6 +1137,7 @@ namespace Root_CAMELLIA
                         drawGeometryManager.AddLine(line);
                         routeLine.SetData(drawGeometryManager.GetPathFigure(StartPoint), RouteThick * ZoomScale);
                         Geometry.Add(routeLine);
+                        p_DrawElement.Add(routeLine.path);
                         drawGeometryManager.ClearSegments();
                     }
                 }
@@ -1261,11 +1181,13 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Shapes.Add(dataSelectedPoint);
+                    p_DrawElement.Add(dataSelectedPoint.UIElement);
                     listSelectedPoint.Add(dataSelectedPoint);
                 }
                 else
                 {
                     PreviewShapes.Add(dataSelectedPoint);
+                    p_PreviewDrawElement.Add(dataSelectedPoint.UIElement);
                     listPreviewSelectedPoint.Add(dataSelectedPoint);
                 }
                 
@@ -1276,7 +1198,7 @@ namespace Root_CAMELLIA
                     textManager.SetVisibility(false);
                 }
                 TextBlocks.Add(textManager);
-
+                p_DrawElement.Add(textManager.Text);
 
             }
 
@@ -1291,6 +1213,7 @@ namespace Root_CAMELLIA
 
                 select.SetData(selectRect);
                 SelectGeometry.Add(select);
+                p_DrawElement.Add(select.path);
             }
 
             if (IsLockUI)
@@ -1303,6 +1226,7 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Geometry.Add(lockRect);
+                    p_DrawElement.Add(lockRect.path);
                 }
                 else
                 {
@@ -1319,19 +1243,6 @@ namespace Root_CAMELLIA
             }
 
 
-            if (!preview)
-            {
-                //AddElement(Geometry);
-                Geometry.CollectionChanged -= Geometry_CollectionChanged;
-                Shapes.CollectionChanged -= Shapes_CollectionChanged;
-                SelectGeometry.CollectionChanged -= SelectGeometry_CollectionChanged;
-                TextBlocks.CollectionChanged -= TextBlocks_CollectionChanged;
-            }
-            else
-            {
-                PreviewGeometry.CollectionChanged -= PreviewGeometry_CollectionChanged;
-                PreviewShapes.CollectionChanged -= PreviewShapes_CollectionChanged;
-            }
 
         }
 
@@ -1565,7 +1476,6 @@ namespace Root_CAMELLIA
 
         #endregion
 
-
         public void UpdateView(bool bMain = false)
         {
             CurrentCandidatePoint = -1;
@@ -1576,21 +1486,14 @@ namespace Root_CAMELLIA
             Shapes.Clear();
             TextBlocks.Clear();
             SelectGeometry.Clear();
-            Shapes.CollectionChanged += Shapes_CollectionChanged;
-            Geometry.CollectionChanged += Geometry_CollectionChanged;
-            SelectGeometry.CollectionChanged += SelectGeometry_CollectionChanged;
-            TextBlocks.CollectionChanged += TextBlocks_CollectionChanged;
+
             SetStage(false);
 
             p_PreviewDrawElement.Clear();
             PreviewGeometry.Clear();
-            PreviewGeometry.CollectionChanged += PreviewGeometry_CollectionChanged;
-            PreviewShapes.Clear();
-            PreviewShapes.CollectionChanged += PreviewShapes_CollectionChanged;
             SetStage(true);
 
             ViewRectGeometry.Clear();
-            ViewRectGeometry.CollectionChanged += ViewRectGeometry_CollectionChanged;
             SetViewRect();
         }
 
@@ -1704,7 +1607,6 @@ namespace Root_CAMELLIA
 
         public void RouteOptimizaionFunc()
         {
-
             int nTotalPoint = dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count;
             if(nTotalPoint == 0)
             {
@@ -1791,7 +1693,7 @@ namespace Root_CAMELLIA
 
         bool SetStartEndPointMode { get; set; } = false;
 
-        #region Command
+        #region ICommand
         public ICommand RouteOptimizaion
         {
             get
@@ -1909,6 +1811,18 @@ namespace Root_CAMELLIA
                 });
             }
         }
+
+        public ICommand btnClose
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+                });
+            }
+        }
+
         public ICommand btn13Point
         {
             get
@@ -1926,18 +1840,6 @@ namespace Root_CAMELLIA
                 });
             }
         }
-
-        public ICommand btnClose
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    CloseRequested(this, new DialogCloseRequestedEventArgs(false));
-                });
-            }
-        }
-
         public ICommand btn25Point
         {
             get
@@ -1955,7 +1857,6 @@ namespace Root_CAMELLIA
                 });
             }
         }
-
         public ICommand btn49Point
         {
             get
@@ -1972,7 +1873,6 @@ namespace Root_CAMELLIA
                 });
             }
         }
-
         public ICommand btn73Point
         {
             get
@@ -1990,6 +1890,8 @@ namespace Root_CAMELLIA
                 });
             }
         }
+
+
         #endregion
 
         public void ReadPreset(string presetName)
