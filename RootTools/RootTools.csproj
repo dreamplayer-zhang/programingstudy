@@ -232,6 +232,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Comm\Modbus.cs" />
     <Compile Include="Comm\RS232byte.cs" />
     <Compile Include="Database\Database_DataView.xaml.cs">
       <DependentUpon>Database_DataView.xaml</DependentUpon>

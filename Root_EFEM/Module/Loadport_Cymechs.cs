@@ -332,7 +332,7 @@ namespace Root_EFEM.Module
                 Done
             }
             public eState m_eState = eState.Queue;
-            public string m_sCmd = ""; 
+            string m_sCmd = ""; 
 
             public string SendCmd()
             {

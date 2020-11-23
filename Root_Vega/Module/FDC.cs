@@ -24,14 +24,14 @@ namespace Root_Vega.Module
                 m_rs232.p_bConnect = true;
             }
         }
+        #endregion
 
         #region RS232
         private void M_rs232_OnRecieve(byte[] aRead, ref int nRead)
         {
             
         }
-        #endregion
-
+        
         string ReadFDC(string sRead)
         {
             if (sRead.Length < 7) return "Short Message : " + sRead.Length.ToString();

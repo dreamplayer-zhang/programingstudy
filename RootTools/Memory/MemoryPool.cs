@@ -19,8 +19,7 @@ namespace RootTools.Memory
             set
             {
                 if (value == _fGB) return;
-                if (_fGB != 0) m_MMF.Dispose();
-                CreatePool(value);
+                if (_fGB == 0) CreatePool(value);
                 _fGB = value;
                 m_reg.Write("fGB", value);
                 m_memoryTool.MemoryChanged(); 
