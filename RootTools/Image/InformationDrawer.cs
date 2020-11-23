@@ -13,7 +13,7 @@ namespace RootTools
 		{
 		}
 
-		public void AddDefectInfo(DefectDataWrapper item)
+		public override void AddDefectInfo(DefectDataWrapper item)
 		{
 			AddRectInfo(item.DrawStartPoint.X, item.DrawStartPoint.Y, item.DrawWidth, item.DrawHeight, System.Windows.Media.Brushes.Red, 2);
 		}

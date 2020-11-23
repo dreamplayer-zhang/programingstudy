@@ -52,6 +52,23 @@ namespace Root_Vega
 		}
 		#endregion
 
+		#region p_InformationDrawer
+
+		//private InformationDrawer informationDrawer;
+		//public InformationDrawer p_InformationDrawer
+		//{
+		//	get
+		//	{
+		//		return informationDrawer;
+		//	}
+		//	set
+		//	{
+		//		SetProperty(ref informationDrawer, value);
+		//	}
+		//}
+
+		#endregion
+
 		#region p_SimpleShapeDrawer_List
 		private SimpleShapeDrawerVM m_SimpleShapeDrawer;
 		public SimpleShapeDrawerVM p_SimpleShapeDrawer
@@ -165,6 +182,9 @@ namespace Root_Vega
 
 				m_ImageViewer.SetDrawer(p_SimpleShapeDrawer);
 				m_ImageViewer.m_HistoryWorker = m_DrawHistoryWorker;
+
+				//p_InformationDrawer = new InformationDrawer(p_ImageViewer);
+				//p_ImageViewer.informationDrawer = p_InformationDrawer;
 			}
 			m_Engineer.m_recipe.LoadComplete += () =>
 			{
@@ -234,7 +254,7 @@ namespace Root_Vega
 				{
 					_dispatcher.Invoke(new Action(delegate ()
 					{
-						p_ImageViewer.SelectedTool.AddDefectInfo(item);//TODO master merge후 활성화해야함
+						//p_ImageViewer.informationDrawer.AddDefectInfo(item);//TODO master merge후 활성화해야함
 					}));
 				}
 				catch (Exception ex)
@@ -246,11 +266,9 @@ namespace Root_Vega
 
 		void ClearDrawList()
 		{
-			for (int i = 0; i < 4; i++)
-			{
-				p_SimpleShapeDrawer.Clear();
-				p_ImageViewer.SetRoiRect();
-			}
+			p_SimpleShapeDrawer.Clear();
+			p_ImageViewer.SetRoiRect();
+			App.m_engineer.m_InspManager.ClearDefectList();
 		}
 		void _clearInspReslut()
 		{

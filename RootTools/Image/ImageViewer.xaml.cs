@@ -15,19 +15,42 @@ using System.Windows.Shapes;
 
 namespace RootTools
 {
-    /// <summary>
-    /// ImageViewer.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class ImageViewer : UserControl
-    {
-        public ImageViewer()
-        {
-            InitializeComponent();
-        }
-        //private void Viewer_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //    ImageViewer_ViewModel vm = (ImageViewer_ViewModel)this.DataContext;
-        //    vm.KeyEvent = e;
-        //}
-    }
+	/// <summary>
+	/// ImageViewer.xaml에 대한 상호 작용 논리
+	/// </summary>
+	public partial class ImageViewer : UserControl
+	{
+		public ImageViewer()
+		{
+			InitializeComponent();
+			SetVisual(this);
+		}
+		public void SetVisual(Visual visual)
+		{
+			canvas.visual = visual;
+		}
+		//private void Viewer_KeyDown(object sender, KeyEventArgs e)
+		//{
+		//    ImageViewer_ViewModel vm = (ImageViewer_ViewModel)this.DataContext;
+		//    vm.KeyEvent = e;
+		//}
+		public void AddBlock(double left, double top, double width, double height, Brush color,Pen lineColor)
+		{
+			canvas.rects.Add(new CustomCanvas.CustomRect { Pen = lineColor, Brush = color, Rect = new Rect(left, top, width, height) });
+		}
+
+		public void ClearRect()
+		{
+			canvas.rects.Clear();
+		}
+
+		public void RefreshDraw()
+		{
+			var temp_vm = (ImageViewer_ViewModel)this.DataContext;
+			canvas.StartPoint = temp_vm.p_View_Rect;//여기에 왼쪽위 메모리 주소같은게 필요함
+			canvas.ImageSize = temp_vm.p_ImageData.p_Size;
+			canvas.Zoom = temp_vm.p_Zoom;
+			canvas.InvalidateVisual();
+		}
+	}
 }

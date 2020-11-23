@@ -6,6 +6,7 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:convert="clr-namespace:ViewConverter"
              xmlns:obs="clr-namespace:nsSizeObserver"
+			 xmlns:local ="clr-namespace:RootTools"
              xmlns:behavior="clr-namespace:mousebehavior"
               Cursor="{Binding p_MouseCursor}"
              mc:Ignorable="d"
@@ -48,12 +49,15 @@
             </Slider.Style>
         </Slider>
         <Grid Focusable="True">
-        <Canvas Background="Black" obs:SizeObserver.Observe="true" Focusable="True"
+			<Canvas Background="Black" obs:SizeObserver.Observe="true" Focusable="True"
                 obs:SizeObserver.ObservedWidth="{Binding p_CanvasWidth, Mode=OneWayToSource}"
-                obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}">
-            <Image Source="{Binding Path=p_ImgSource}"/>
-        </Canvas>
-            <ItemsControl ItemsSource="{Binding p_Element}" 
+                obs:SizeObserver.ObservedHeight="{Binding p_CanvasHeight, Mode=OneWayToSource}"
+					Panel.ZIndex="0">
+				<Image Source="{Binding Path=p_ImgSource}"/>
+			</Canvas>
+			<local:CustomCanvas x:Name="canvas" obs:SizeObserver.Observe="true" Focusable="True">
+			</local:CustomCanvas>
+			<ItemsControl ItemsSource="{Binding p_Element}" 
                           Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                           Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}"
                           Panel.ZIndex="5">

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools.Inspects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,54 @@ namespace Root_Vega
 		public _2_11_EBR()
 		{
 			InitializeComponent();
+			App.m_engineer.m_InspManager.AddDefect += App_AddDefect;
+			App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
+			InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
+		}
+
+		private void InspectionManager_RefreshDefect()
+		{
+			viewer.Dispatcher.Invoke(new Action(delegate ()
+			{
+				viewer.RefreshDraw();
+			}));
+		}
+
+		private void _ClearDefect()
+		{
+			try
+			{
+				viewer.Dispatcher.Invoke(new Action(delegate ()
+				{
+					viewer.ClearRect();
+					viewer.RefreshDraw();
+				}));
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
+
+		private void App_AddDefect(RootTools.DefectDataWrapper item)
+		{
+			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) ||
+				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.EBR)
+			{
+				try
+				{
+					viewer.Dispatcher.Invoke(new Action(delegate ()
+					{
+						int width = item.nWidth;
+						int height = item.nHeight;
+						viewer.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
+					}));
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine(ex.Message);
+				}
+			}
 		}
 	}
 }
