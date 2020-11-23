@@ -19,19 +19,26 @@ namespace RootTools.Memory
             set
             {
                 if (value == _fGB) return;
-                if (_fGB == 0) CreatePool(value);
-                _fGB = value;
-                m_reg.Write("fGB", value);
-                m_memoryTool.MemoryChanged(); 
+                if (_fGB == 0)
+                {
+                    if (CreatePool(value))
+                    {
+                        _fGB = value;
+                        m_reg.Write("fGB", value);
+                        m_memoryTool.MemoryChanged();
+                    }
+                }
             }
         }
 
-        void CreatePool(double fGB)
+        bool CreatePool(double fGB)
         {
             StopWatch sw = new StopWatch();
             long nPool = (long)Math.Ceiling(fGB * c_fGB);
-            m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool);
+            try { m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool); }
+            catch (Exception) {return false; }
             m_log.Info(p_id + " Memory Pool Allocate Done " + sw.ElapsedMilliseconds.ToString() + " ms");
+            return true; 
         }
         #endregion
 
