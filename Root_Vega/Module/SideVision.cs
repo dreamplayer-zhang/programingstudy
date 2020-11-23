@@ -1388,6 +1388,17 @@ namespace Root_Vega.Module
 
                 try
                 {
+                    StopWatch sw = new StopWatch();
+                    if (cam.p_CamInfo._OpenStatus == false) cam.Connect();
+                    while (cam.p_CamInfo._OpenStatus == false)
+                    {
+                        if (sw.ElapsedMilliseconds > 10000)
+                        {
+                            sw.Stop();
+                            return "Side VRS Camera Not Connected";
+                        }
+                    }
+                    sw.Stop();
                     m_module.SetLightByName("SideVRS Side", 10);
 
                     // 0. 스캔 포지션으로 Theta 돌리기

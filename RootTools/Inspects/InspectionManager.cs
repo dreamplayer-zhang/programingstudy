@@ -55,7 +55,7 @@ namespace RootTools.Inspects
 		System.Data.DataTable VSDataDT;
 		System.Data.DataTable SearchDataDT;
 		Dictionary<int, CPoint> refPosDictionary;
-		private DateTime NowTime;
+		public DateTime NowTime;
 		bool m_bProgress;
 
 		public bool IsInitialized { get; private set; }

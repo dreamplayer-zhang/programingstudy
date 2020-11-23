@@ -1520,6 +1520,17 @@ namespace Root_Vega.Module
                     {
                         m_grabMode.m_RADSControl.p_IsRun = true;
                         m_grabMode.m_RADSControl.StartRADS();
+                        StopWatch sw = new StopWatch();
+                        if (m_module.m_CamRADS.p_CamInfo._OpenStatus == false) m_module.m_CamRADS.Connect();
+                        while (m_module.m_CamRADS.p_CamInfo._OpenStatus == false)
+                        {
+                            if (sw.ElapsedMilliseconds > 10000)
+                            {
+                                sw.Stop();
+                                return "RADS Camera Not Connected";
+                            }
+                        }
+                        sw.Stop();
                         m_module.m_CamRADS.GrabContinuousShot();
                     }
 
@@ -1676,69 +1687,9 @@ namespace Root_Vega.Module
                     {
                         m_grabMode.m_RADSControl.p_IsRun = false;
                         m_grabMode.m_RADSControl.StopRADS();
-                        m_module.m_CamRADS.StopGrab();
+                        if (m_module.m_CamRADS.p_CamInfo._IsGrabbing == true) m_module.m_CamRADS.StopGrab();
                     }
                 }
-
-
-                //// 1. Recipe Load 됐는지 체크
-                //if (!App.m_engineer.m_recipe.Loaded)
-                //    return "Recipe Not Loaded";
-
-                //// 2. Feature와 Light CAL.Key가 Scan되는 위치 Scan
-                //if (m_grabMode == null) return "Grab Mode == null";
-
-                //string strPool = m_grabMode.m_memoryPool.p_id;
-                //string strGroup = m_grabMode.m_memoryGroup.p_id;
-                //string strMem = m_grabMode.m_memoryData.p_id;
-                //MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMem);
-
-
-
-                //// 2. Feature 탐색
-                //CPoint cpStandardPos = new CPoint(0, 0);
-                //int nRefStartOffsetX = 0;
-                //int nRefStartOffsetY = 0;
-                //Point ptStartPos = new Point();
-                //Point ptEndPos = new Point();
-                //for (int k = 0; k < m_mvvm.p_PatternRoiList.Count; k++)
-                //{
-                //    var currentRoi = m_mvvm.p_PatternRoiList[k];
-                //    for (int j = 0; j<currentRoi.Strip.ParameterList.Count; j++)
-                //    {
-                //        foreach (var feature in currentRoi.Position.ReferenceList)
-                //        {
-                //            bool bFoundFeature = false;
-                //            CRect rtTargetRect;
-                //            Point ptMaxRelativePoint;
-                //            int nWidthDiff, nHeightDiff;
-                //            //foundFeature = FindFeature(feature, out targetRect, out maxRelativePoint, out widthDiff, out heightDiff);
-                //            bFoundFeature = m_mvvm.FindFeature(feature, out rtTargetRect, out ptMaxRelativePoint, out nWidthDiff, out nHeightDiff);
-
-                //            if (bFoundFeature)
-                //            {
-                //                cpStandardPos.X = rtTargetRect.Left + (int)ptMaxRelativePoint.X + nWidthDiff / 2;
-                //                cpStandardPos.Y = rtTargetRect.Top + (int)ptMaxRelativePoint.Y + nHeightDiff / 2;
-                //                nRefStartOffsetX = feature.LightCalDistX;
-                //                nRefStartOffsetY = feature.LightCalDistY;
-                //                m_mvvm.DrawCross(new DPoint(cpStandardPos.X, cpStandardPos.Y), MBrushes.Red);
-
-                //                ptStartPos = new Point(cpStandardPos.X + nRefStartOffsetX, cpStandardPos.Y + nRefStartOffsetY);
-                //                ptEndPos = new Point(ptStartPos.X + feature.LightCalWidth, ptStartPos.Y + feature.LightCalHeight);
-
-                //                break;//찾았으니 중단
-                //            }
-                //            else
-                //            {
-                //                continue;//못 찾았으면 다음 Feature값으로 이동
-                //            }
-                //        }
-                //    }
-                //}
-
-                //// 3. 탐색된 Feature위치를 기준으로 Light Cal.Key 영역 이미지를 AutoIllumination
-                //CRect rtLightCal = new CRect(ptStartPos, ptEndPos);
-                //int nResultThreshold = AutoIllumination(mem, rtLightCal);
 
                 return "OK";
             }
@@ -1844,7 +1795,7 @@ namespace Root_Vega.Module
                 Axis axisZ = m_module.m_axisZ;
                 Camera_Basler cam = m_module.m_CamVRS;
                 ImageData img = cam.p_ImageViewer.p_ImageData;
-                string strVRSImageDirectoryPath = "D:\\VRSImage\\";
+                string strVRSImageDirectoryPath = "C:\\vsdb\\";
                 string strVRSImageFullPath = "";
 
                 // implement
@@ -1869,11 +1820,13 @@ namespace Root_Vega.Module
                 }
                 sw.Stop();
 
-                List<CPoint> lstDefectPos = GetDefectPosList();
-                for (int i = 0; i < lstDefectPos.Count; i++)
+                DateTime dtNow = ((Vega_Engineer)m_module.m_engineer).m_InspManager.NowTime;
+                string strNowTime = dtNow.ToString("yyyyMMdd_HHmmss");
+                List<DefectInfo> lstDefectInfo = GetDefectPosList();
+                for (int i = 0; i < lstDefectInfo.Count; i++)
                 {
                     // Defect 위치로 이동
-                    RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectPos[i]);
+                    RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectInfo[i].cptDefectPos);
                     if (m_module.Run(axisXY.StartMove(rpDefectPos))) return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                     if (m_module.Run(axisZ.StartMove(m_dVRSFocusPosZ_pulse))) return p_sInfo;  
@@ -1883,18 +1836,26 @@ namespace Root_Vega.Module
                     Thread.Sleep(100);
                     cam.GrabOneShot();
                     Thread.Sleep(100);
-                    strVRSImageFullPath = string.Format(strVRSImageDirectoryPath + "VRSImage_{0}.bmp", i);
+
+                    strVRSImageFullPath = System.IO.Path.Combine(strVRSImageDirectoryPath, strNowTime + "_VRS_" + lstDefectInfo[i].iDefectIndex + ".bmp");
                     img.SaveImageSync(strVRSImageFullPath);
                 }
 
                 return "OK";
             }
 
-            public List<CPoint> GetDefectPosList()
+            public struct DefectInfo
+            {
+                public CPoint cptDefectPos;
+                public int iDefectIndex;
+            }
+
+            public List<DefectInfo> GetDefectPosList()
             {
                 // variable
                 DBConnector dbConnector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
-                List<CPoint> lstDefectPos = new List<CPoint>();
+                //List<CPoint> lstDefectPos = new List<CPoint>();
+                List<DefectInfo> lstDefectInfo = new List<DefectInfo>();
 
                 // implement
                 if (dbConnector.Open())
@@ -1903,6 +1864,7 @@ namespace Root_Vega.Module
 
                     foreach (System.Data.DataRow item in dataSet.Tables["tempdata"].Rows)
                     {
+                        int iIndex = Convert.ToInt32(item["idx"]);
                         int posX = Convert.ToInt32(item["PosX"]);
                         int posY = Convert.ToInt32(item["PosY"]);
                         int nDefectCode = Convert.ToInt32(item["ClassifyCode"]);
@@ -1910,12 +1872,17 @@ namespace Root_Vega.Module
                         InspectionTarget eTarget = InspectionManager.GetInspectionTarget(nDefectCode);
                         if ((eType == InspectionType.Strip) && (eTarget == InspectionTarget.Chrome))
                         {
-                            lstDefectPos.Add(new CPoint(posX, posY));
+                            //lstDefectPos.Add(new CPoint(posX, posY));
+                            CPoint cptPos = new CPoint(posX, posY);
+                            DefectInfo diTemp = new DefectInfo();
+                            diTemp.cptDefectPos = cptPos;
+                            diTemp.iDefectIndex = iIndex;
+                            lstDefectInfo.Add(diTemp);
                         }
                     }
                 }
 
-                return lstDefectPos;
+                return lstDefectInfo;
             }
 
             public RPoint GetAxisPosFromMemoryPos(CPoint cpMemory)
