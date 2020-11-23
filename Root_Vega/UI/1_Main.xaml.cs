@@ -128,6 +128,7 @@ namespace Root_Vega
             //if (patternVision.m_CamRADS != null && patternVision.m_CamRADS.p_CamInfo._OpenStatus == false) patternVision.m_CamRADS.Connect();
             //if (patternVision.m_CamAlign1 != null && patternVision.m_CamAlign1.p_CamInfo._OpenStatus == false) patternVision.m_CamAlign1.Connect();
             //if (patternVision.m_CamAlign2 != null && patternVision.m_CamAlign2.p_CamInfo._OpenStatus == false) patternVision.m_CamAlign2.Connect();
+            patternVision.m_RADSControl.UpdateDeviceInfo();
 
             // SideVision Camera Connect
             if (sideVision.p_CamSide != null && sideVision.p_CamSide.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init) sideVision.p_CamSide.Connect();

@@ -331,7 +331,7 @@ namespace Root_Vega.Module
             sw.Start();
             while (m_CamAlign1.p_CamInfo._OpenStatus == false)
             {
-                if (sw.ElapsedMilliseconds > 10000)
+                if (sw.ElapsedMilliseconds > 15000)
                 {
                     sw.Stop();
                     return "Align1_1 Camera Not Connected";
@@ -349,7 +349,7 @@ namespace Root_Vega.Module
             sw.Start();
             while (m_CamAlign2.p_CamInfo._OpenStatus == false)
             { 
-                if (sw.ElapsedMilliseconds > 10000)
+                if (sw.ElapsedMilliseconds > 15000)
                 {
                     sw.Stop();
                     return "Align2_1 Camera Not Connected";
@@ -405,7 +405,7 @@ namespace Root_Vega.Module
             sw.Start();
             while (m_CamAlign1.p_CamInfo._OpenStatus == false)
             {
-                if (sw.ElapsedMilliseconds > 10000)
+                if (sw.ElapsedMilliseconds > 15000)
                 {
                     sw.Stop();
                     return "Align1_1 Camera Not Connected";
@@ -423,7 +423,7 @@ namespace Root_Vega.Module
             sw.Start();
             while (m_CamAlign2.p_CamInfo._OpenStatus == false)
             {
-                if (sw.ElapsedMilliseconds > 10000)
+                if (sw.ElapsedMilliseconds > 15000)
                 {
                     sw.Stop();
                     return "Align2_1 Camera Not Connected";
@@ -972,7 +972,7 @@ namespace Root_Vega.Module
                         if (m_module.m_CamRADS.p_CamInfo._OpenStatus == false) m_module.m_CamRADS.Connect();
                         while (m_module.m_CamRADS.p_CamInfo._OpenStatus == false)
                         {
-                            if (sw.ElapsedMilliseconds > 10000)
+                            if (sw.ElapsedMilliseconds > 15000)
                             {
                                 sw.Stop();
                                 return "RADS Camera Not Connected";
@@ -1807,12 +1807,12 @@ namespace Root_Vega.Module
                 //return "OK";
 
                 StopWatch sw = new StopWatch();
-                string strLightName = "MainVRS";
+                string strLightName = "VRS";
                 m_module.SetLightByName(strLightName, 20);
                 if (cam.p_CamInfo._OpenStatus == false) cam.Connect();
                 while (cam.p_CamInfo._OpenStatus == false)
                 {
-                    if (sw.ElapsedMilliseconds > 10000)
+                    if (sw.ElapsedMilliseconds > 15000)
                     {
                         sw.Stop();
                         return "Main VRS Camera Not Connected";
@@ -1833,9 +1833,9 @@ namespace Root_Vega.Module
                     if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
 
                     // VRS 촬영 및 저장
-                    Thread.Sleep(100);
-                    cam.GrabOneShot();
-                    Thread.Sleep(100);
+                    //Thread.Sleep(1000);
+                    string strTemp = cam.Grab();
+//                    Thread.Sleep(1000);
 
                     strVRSImageFullPath = System.IO.Path.Combine(strVRSImageDirectoryPath, strNowTime + "_VRS_" + lstDefectInfo[i].iDefectIndex + ".bmp");
                     img.SaveImageSync(strVRSImageFullPath);

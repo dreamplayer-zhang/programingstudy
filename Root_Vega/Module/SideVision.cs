@@ -358,7 +358,7 @@ namespace Root_Vega.Module
             sw.Start();
             while (m_CamAlign1.p_CamInfo._OpenStatus == false)
             {
-                if (sw.ElapsedMilliseconds > 10000)
+                if (sw.ElapsedMilliseconds > 15000)
                 {
                     sw.Stop();
                     return "Align1_1 Camera Not Connected";
@@ -376,7 +376,7 @@ namespace Root_Vega.Module
             sw.Start();
             while (m_CamAlign2.p_CamInfo._OpenStatus == false)
             {
-                if (sw.ElapsedMilliseconds > 10000)
+                if (sw.ElapsedMilliseconds > 15000)
                 {
                     sw.Stop();
                     return "Align2_1 Camera Not Connected";
@@ -384,7 +384,7 @@ namespace Root_Vega.Module
             }
             sw.Stop();
             Thread.Sleep(100);
-            m_CamAlign2.Grab();
+            m_CamAlign2.GrabOneShot();
             Thread.Sleep(100);
             SetLightByName(strLightName, 0);
 
@@ -1009,8 +1009,9 @@ namespace Root_Vega.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);
                     double dXScale = 10 * m_dResX_um;
                     int nReticleVerticalSize_px = Convert.ToInt32(m_dReticleVerticalSize_mm * nMMPerUM / m_dResY_um);      
-                    int nReticleHorizontalSize_px = Convert.ToInt32(m_dReticleHorizontalSize_mm * nMMPerUM / m_dResY_um);  
-                    m_cpMemoryOffset_pixel.X += (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth;
+                    int nReticleHorizontalSize_px = Convert.ToInt32(m_dReticleHorizontalSize_mm * nMMPerUM / m_dResY_um);
+                    CPoint cptMemoryOffset_pixel = new CPoint(m_cpMemoryOffset_pixel);
+                    cptMemoryOffset_pixel.X += (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth;
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
@@ -1044,13 +1045,13 @@ namespace Root_Vega.Module
                         string sMem = m_grabMode.m_eScanPos.ToString();
                         MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, "Side" + sMem);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * (double)m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, m_cpMemoryOffset_pixel, nReticleVerticalSize_px);
+                        m_grabMode.StartGrab(mem, cptMemoryOffset_pixel, nReticleVerticalSize_px);
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
                         if (m_module.Run(axisXY.p_axisY.WaitReady())) return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
                         nScanLine++;
-                        m_cpMemoryOffset_pixel.X += nCamWidth;
+                        cptMemoryOffset_pixel.X += nCamWidth;
                     }
 
                     return "OK";
@@ -1158,7 +1159,8 @@ namespace Root_Vega.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);        // 축해상도 0.1um로 하드코딩. 트리거 발생 주기.
                     int nReticleVerticalSize_px = Convert.ToInt32(m_dReticleVerticalSize_mm * nMMPerUM / m_dResY_um);      // Grab 할 총 Line 갯수.
                     int nReticleHorizontalSize_px = Convert.ToInt32(m_dReticleHorizontalSize_mm * nMMPerUM / m_dResY_um);      // Grab 할 총 Line 갯수.
-                    m_cpMemoryOffset.X += (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth;
+                    CPoint cptMemoryOffset_pixel = new CPoint(m_cpMemoryOffset);
+                    cptMemoryOffset_pixel.X += (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth;
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
@@ -1194,13 +1196,13 @@ namespace Root_Vega.Module
                         string sMem = m_grabMode.m_eScanPos.ToString();
                         MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(sPool, sGroup, "Bevel" + sMem);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * (double)m_nScanRate / 100);
-                        m_grabMode.StartGrab(mem, m_cpMemoryOffset, nReticleVerticalSize_px);
+                        m_grabMode.StartGrab(mem, cptMemoryOffset_pixel, nReticleVerticalSize_px);
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
                         if (m_module.Run(axisXY.p_axisY.WaitReady())) return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
                         nScanLine++;
-                        m_cpMemoryOffset.X += nCamWidth;
+                        cptMemoryOffset_pixel.X += nCamWidth;
                     }
 
                     return "OK";
@@ -1392,7 +1394,7 @@ namespace Root_Vega.Module
                     if (cam.p_CamInfo._OpenStatus == false) cam.Connect();
                     while (cam.p_CamInfo._OpenStatus == false)
                     {
-                        if (sw.ElapsedMilliseconds > 10000)
+                        if (sw.ElapsedMilliseconds > 15000)
                         {
                             sw.Stop();
                             return "Side VRS Camera Not Connected";
@@ -1732,7 +1734,7 @@ namespace Root_Vega.Module
                     StopWatch sw = new StopWatch();
                     while (cam.p_CamInfo._OpenStatus == false)
                     {
-                        if (sw.ElapsedMilliseconds > 10000)
+                        if (sw.ElapsedMilliseconds > 15000)
                         {
                             sw.Stop();
                             return "LADS Camera Not Connected";
@@ -1800,7 +1802,7 @@ namespace Root_Vega.Module
 
                         // 3. 좌우측 높이차 구하기   
                         double dDiff = dLeftHeight - dRightHeight;
-                        if ((dDiff < 0) || (dDiff > 102)) return "LADS Fail...";    // 높이측정 잘못 될 경우 Theta 계속 회전하는 문제 인터락
+                        if ((dDiff < -102) || (dDiff > 102)) return "LADS Fail...";    // 높이측정 잘못 될 경우 Theta 계속 회전하는 문제 인터락
                         double dConvertingDiffHeightToPulse = dDiff * m_dPixelPerPulse;
                         double dDistanceOfLeftToRight = Math.Abs(dLeftSnapPosY - dRightSnapPosY);
                         double dThetaRadian = Math.Atan2(dConvertingDiffHeightToPulse, dDistanceOfLeftToRight);
@@ -1977,18 +1979,18 @@ namespace Root_Vega.Module
                     m_sivm._startInsp();
                 }));
 
-                while (true)
-                {
-                    DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
-                    if (connector.Open())
-                    {
-                        string strQuery = "SELECT inspStatusNum FROM inspections.inspstatus where idx=0;";
-                        string strTemp = string.Empty;
-                        var result = connector.SendQuery(strQuery, ref strTemp);
-                        if (result == 0 && strTemp == "1") break;
-                    }
-                    Thread.Sleep(1000);
-                }
+                //while (true)
+                //{
+                //    DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+                //    if (connector.Open())
+                //    {
+                //        string strQuery = "SELECT inspStatusNum FROM inspections.inspstatus where idx=0;";
+                //        string strTemp = string.Empty;
+                //        var result = connector.SendQuery(strQuery, ref strTemp);
+                //        if (result == 0 && strTemp == "1") break;
+                //    }
+                //    Thread.Sleep(1000);
+                //}
 
                 return "OK";
             }
@@ -2033,18 +2035,18 @@ namespace Root_Vega.Module
                     m_bevm._startInsp();
                 }));
 
-                while (true)
-                {
-                    DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
-                    if (connector.Open())
-                    {
-                        string strQuery = "SELECT inspStatusNum FROM inspections.inspstatus where idx=0;";
-                        string strTemp = string.Empty;
-                        var result = connector.SendQuery(strQuery, ref strTemp);
-                        if (result == 0 && strTemp == "1") break;
-                    }
-                    Thread.Sleep(1000);
-                }
+                //while (true)
+                //{
+                //    DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+                //    if (connector.Open())
+                //    {
+                //        string strQuery = "SELECT inspStatusNum FROM inspections.inspstatus where idx=0;";
+                //        string strTemp = string.Empty;
+                //        var result = connector.SendQuery(strQuery, ref strTemp);
+                //        if (result == 0 && strTemp == "1") break;
+                //    }
+                //    Thread.Sleep(1000);
+                //}
 
                 return "OK";
             }

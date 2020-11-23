@@ -386,10 +386,20 @@ namespace RootTools.Camera.BaslerPylon
                 {
                     if (result.GrabSucceeded == false)
                         return p_id + " Grab Error : " + result.ErrorDescription;
-                    m_ImageGrab.p_nByte = ((m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString()) ? 1 : 3);
-                    m_ImageGrab.p_Size = new CPoint((int)m_CamParam._Width, (int)m_CamParam._Height);
-                    byte[] aBuf = result.PixelData as byte[];
-                    Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
+
+                    if (m_CamParam.p_PixelFormat == PLCamera.PixelFormat.Mono8.ToString())
+                    {
+                        m_ImageGrab.p_nByte = 1;
+                        m_ImageGrab.p_Size = new CPoint((int)m_CamParam._Width, (int)m_CamParam._Height);
+                        byte[] aBuf = result.PixelData as byte[];
+                        Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.p_nByte);
+                    }
+                    else
+                    {
+                        PixelDataConverter converter = new PixelDataConverter();
+                        converter.OutputPixelFormat = PixelType.BGR8packed;
+                        converter.Convert(m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y * m_ImageGrab.p_nByte, result);
+                    }
                     //p_ImageViewer.SetImageSource();
                     //Array.Copy(aBuf, m_ImageGrab.m_aBuf, m_ImageGrab.p_sz.X * m_ImageGrab.p_sz.Y);
                 }
@@ -564,17 +574,20 @@ namespace RootTools.Camera.BaslerPylon
 
                             stopWatch.Reset();
 
-                            //if (_dispatcher != null)
-                            //{
-                            //    _dispatcher.Invoke(new Action(delegate ()
-                            //    {
-                            //        m_ImageGrab.UpdateImage();
-                            //    }));
-                            //}
-                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            if (_dispatcher != null)
                             {
-                                m_ImageGrab.UpdateImage();
-                            });
+                                _dispatcher.Invoke(new Action(delegate ()
+                                {
+                                    m_ImageGrab.UpdateImage();
+                                }));
+                            }
+                            else
+                            {
+                                Application.Current.Dispatcher.Invoke((Action)delegate
+                                {
+                                    m_ImageGrab.UpdateImage();
+                                });
+                            }
                         }
                         else
                         {

@@ -97,6 +97,7 @@ namespace Root_Vega.Module
                 if (m_lightSet.m_aLight[i].m_sName.IndexOf(str) >= 0)
                 {
                     m_lightSet.m_aLight[i].m_light.p_fSetPower = nValue;
+                    m_aLightPower[i] = nValue;
                 }
             }
         }
