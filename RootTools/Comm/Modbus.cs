@@ -1,5 +1,6 @@
 ﻿using EasyModbus;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Threading;
@@ -26,9 +27,21 @@ namespace RootTools.Comm
             }
         }
 
-        //forget
-        public UserControl p_ui => throw new System.NotImplementedException();
+        public bool p_bConnect
+        {
+            get { return m_client.Connected; }
+            set { }
+        }
 
+        public UserControl p_ui
+        {
+            get
+            {
+                Modbus_UI ui = new Modbus_UI();
+                ui.Init(this);
+                return ui;
+            }
+        }
         #endregion
 
         #region Comm Type
@@ -85,135 +98,117 @@ namespace RootTools.Comm
             m_client.Connect();
             m_client.NumberOfRetries = 0; 
             if (m_client.Connected == false) return "Connection Error";
+            m_client.SendDataChanged += M_client_SendDataChanged;
             m_client.ReceiveDataChanged += M_client_ReceiveDataChanged;
+            OnPropertyChanged("p_bConnect"); 
             return "OK";
+        }
+
+        private void M_client_SendDataChanged(object sender)
+        {
+            m_commLog.Add(CommLog.eType.Send, BitConverter.ToString(m_client.sendData));
         }
 
         private void M_client_ReceiveDataChanged(object sender)
         {
-            byte[] aByte = m_client.receiveData; 
-            
+            m_commLog.Add(CommLog.eType.Receive, BitConverter.ToString(m_client.receiveData)); 
         }
         #endregion
 
         #region Send
         public string Send(string sMsg)
         {
-            throw new System.NotImplementedException();
+            return "Not Enable"; 
         }
         #endregion
 
-        #region eData
-        public enum eDataType
+        #region Protocol
+        public string ReadCoils(byte nUnit, int nAddress, ref bool bOn)
         {
-            Coils,              // bool, Read, Write
-            DiscreateInputs,    // bool, Read
-            HoldingRegister,    // int16, Read, Write
-            InputRegister,      // int16, Read
+            m_client.UnitIdentifier = nUnit;
+            bool[] abRead = m_client.ReadCoils(nAddress, 1);
+            if (abRead.Length > 0) bOn = abRead[0]; 
+            return "OK"; 
         }
 
-        public class Data : NotifyProperty
+        public string ReadCoils(byte nUnit, int nAddress, ref List<bool> abOn)
         {
-            public eDataType m_eType;
-            public byte m_nUnit; 
-            public int m_nAddress; 
-
-            public void ReadRequest()
-            {
-                m_modbus.m_client.UnitIdentifier = m_nUnit; 
-                switch (m_eType)
-                {
-                    case eDataType.Coils: 
-                        m_modbus.m_client.ReadCoils(m_nAddress, 1); 
-                        break;
-                    case eDataType.DiscreateInputs:
-                        m_modbus.m_client.ReadDiscreteInputs(m_nAddress, 1);
-                        break;
-                    case eDataType.HoldingRegister:
-                        m_modbus.m_client.ReadHoldingRegisters(m_nAddress, 1);
-                        break;
-                    case eDataType.InputRegister:
-                        m_modbus.m_client.ReadInputRegisters(m_nAddress, 1); 
-                        break;
-                }
-            }
-
-
-
-            dynamic _value; 
-            public dynamic p_value
-            {
-                get { return _value; }
-                set
-                {
-                    if (_value == value) return;
-                    _value = value;
-                    OnPropertyChanged(); 
-                }
-            }
-
-            public void RunTree(Tree tree)
-            {
-                tree.Set(m_eType, m_eType, "Type", "Modbus Data Type", true, true);
-                tree.Set(m_nUnit, m_nUnit, "Unit ID", "Modbus Unit ID", true, true);
-                tree.Set(m_nAddress, m_nAddress, "Address", "Modbus Address", true, true); 
-            }
-
-            Modbus m_modbus; 
-            public Data(Modbus modbus, eDataType eDataType, byte nUnit, int nAddress)
-            {
-                m_modbus = modbus;
-                m_eType = eDataType;
-                m_nUnit = nUnit;
-                m_nAddress = nAddress; 
-                switch (m_eType)
-                {
-                    case eDataType.Coils:
-                    case eDataType.DiscreateInputs:
-                        p_value = false;
-                        break;
-                    case eDataType.HoldingRegister:
-                    case eDataType.InputRegister:
-                        p_value = (int)0;
-                        break; 
-                }
-            }
-        }
-        List<Data> m_aData = new List<Data>(); 
-        public Data GetData(eDataType eDataType, byte nUnit, int nAddress)
-        {
-            Data data = new Data(this, eDataType, nUnit, nAddress);
-            m_aData.Add(data);
-            return data;
-        }
-        #endregion
-
-        #region Thread
-        bool m_bThread = false; 
-        Thread m_thread;
-        void InitThread()
-        {
-            m_thread = new Thread(new ThreadStart(RunThread));
-            m_thread.Start();
+            m_client.UnitIdentifier = nUnit;
+            bool[] abRead = m_client.ReadCoils(nAddress, abOn.Count);
+            for (int n = 0; n < Math.Min(abRead.Length, abOn.Count); n++) abOn[n] = abRead[n]; 
+            return "OK"; 
         }
 
-        Data m_dataRead = null; 
-        void RunThread()
+        public void WriteCoils(byte nUnit, int nAddress, bool bOn)
         {
-            m_bThread = true;
-            Thread.Sleep(2000);
-            int nIndex = 0; 
-            while (m_bThread)
-            {
-                Thread.Sleep(1);
-                if (m_dataRead == null)
-                {
-                    if (m_aData.Count >= nIndex) nIndex = 0;
-                    m_dataRead = m_aData[nIndex];
-                    m_dataRead.ReadRequest();
-                    nIndex++;
-                }
-            }
+            m_client.UnitIdentifier = nUnit;
+            m_client.WriteSingleCoil(nAddress, bOn); 
+        }
+
+        public void WriteCoils(byte nUnit, int nAddress, List<bool> abOn)
+        {
+            m_client.UnitIdentifier = nUnit;
+            m_client.WriteMultipleCoils(nAddress, abOn.ToArray()); 
+        }
+
+        public string ReadDiscreateInputs(byte nUnit, int nAddress, ref bool bOn)
+        {
+            m_client.UnitIdentifier = nUnit;
+            bool[] abRead = m_client.ReadDiscreteInputs(nAddress, 1);
+            if (abRead.Length > 0) bOn = abRead[0];
+            return "OK";
+        }
+
+        public string ReadDiscreateInputs(byte nUnit, int nAddress, ref List<bool> abOn)
+        {
+            m_client.UnitIdentifier = nUnit;
+            bool[] abRead = m_client.ReadDiscreteInputs(nAddress, abOn.Count);
+            for (int n = 0; n < Math.Min(abRead.Length, abOn.Count); n++) abOn[n] = abRead[n];
+            return "OK";
+        }
+
+        public string ReadHoldingRegister(byte nUnit, int nAddress, ref int nValue)
+        {
+            m_client.UnitIdentifier = nUnit;
+            int[] anRead = m_client.ReadHoldingRegisters(nAddress, 1);
+            if (anRead.Length > 0) nValue = anRead[0];
+            return "OK";
+        }
+
+        public string ReadHoldingRegister(byte nUnit, int nAddress, ref List<int> anValue)
+        {
+            m_client.UnitIdentifier = nUnit;
+            int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
+            for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
+            return "OK";
+        }
+
+        public void WriteHoldingRegister(byte nUnit, int nAddress, int nValue)
+        {
+            m_client.UnitIdentifier = nUnit;
+            m_client.WriteSingleRegister(nAddress, nValue); 
+        }
+
+        public void WriteHoldingRegister(byte nUnit, int nAddress, List<int> anValue)
+        {
+            m_client.UnitIdentifier = nUnit;
+            m_client.WriteMultipleRegisters(nAddress, anValue.ToArray());
+        }
+
+        public string ReadInputRegister(byte nUnit, int nAddress, ref int nValue)
+        {
+            m_client.UnitIdentifier = nUnit;
+            int[] anRead = m_client.ReadInputRegisters(nAddress, 1);
+            if (anRead.Length > 0) nValue = anRead[0];
+            return "OK";
+        }
+
+        public string ReadInputRegister(byte nUnit, int nAddress, ref List<int> anValue)
+        {
+            m_client.UnitIdentifier = nUnit;
+            int[] anRead = m_client.ReadInputRegisters(nAddress, anValue.Count);
+            for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
+            return "OK";
         }
         #endregion
 
@@ -229,8 +224,6 @@ namespace RootTools.Comm
             m_treeRoot.p_eMode = mode;
             RunTreeRS232(m_treeRoot.GetTree("RS232"));
             RunTreeTCPIP(m_treeRoot.GetTree("TCPIP"));
-            //            RunProtocolTree(m_treeRoot.GetTree("Protocol"));
-            //            RunTimeoutTree(m_treeRoot.GetTree("Timeout"));
         }
         #endregion
 
@@ -247,7 +240,6 @@ namespace RootTools.Comm
             m_treeRoot = new TreeRoot(id, log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);
-            InitThread(); 
         }
 
         public void ThreadStop()
