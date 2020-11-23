@@ -92,6 +92,7 @@ namespace RootTools.Comm
         private void M_client_ReceiveDataChanged(object sender)
         {
             byte[] aByte = m_client.receiveData; 
+            
         }
         #endregion
 
@@ -111,7 +112,7 @@ namespace RootTools.Comm
             InputRegister,      // int16, Read
         }
 
-        public class Data
+        public class Data : NotifyProperty
         {
             public eDataType m_eType;
             public byte m_nUnit; 
@@ -137,6 +138,27 @@ namespace RootTools.Comm
                 }
             }
 
+
+
+            dynamic _value; 
+            public dynamic p_value
+            {
+                get { return _value; }
+                set
+                {
+                    if (_value == value) return;
+                    _value = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            public void RunTree(Tree tree)
+            {
+                tree.Set(m_eType, m_eType, "Type", "Modbus Data Type", true, true);
+                tree.Set(m_nUnit, m_nUnit, "Unit ID", "Modbus Unit ID", true, true);
+                tree.Set(m_nAddress, m_nAddress, "Address", "Modbus Address", true, true); 
+            }
+
             Modbus m_modbus; 
             public Data(Modbus modbus, eDataType eDataType, byte nUnit, int nAddress)
             {
@@ -144,12 +166,23 @@ namespace RootTools.Comm
                 m_eType = eDataType;
                 m_nUnit = nUnit;
                 m_nAddress = nAddress; 
+                switch (m_eType)
+                {
+                    case eDataType.Coils:
+                    case eDataType.DiscreateInputs:
+                        p_value = false;
+                        break;
+                    case eDataType.HoldingRegister:
+                    case eDataType.InputRegister:
+                        p_value = (int)0;
+                        break; 
+                }
             }
         }
         List<Data> m_aData = new List<Data>(); 
         public Data GetData(eDataType eDataType, byte nUnit, int nAddress)
         {
-            Data data = new Data(this, eDataType.Coils, nUnit, nAddress);
+            Data data = new Data(this, eDataType, nUnit, nAddress);
             m_aData.Add(data);
             return data;
         }

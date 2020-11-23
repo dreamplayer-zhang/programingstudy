@@ -21,13 +21,10 @@ namespace RootTools.Memory
                 if (value == _fGB) return;
                 if (_fGB == 0)
                 {
-                    if (CreatePool(value))
-                    {
-                        _fGB = value;
-                        m_reg.Write("fGB", value);
-                        m_memoryTool.MemoryChanged();
-                    }
+                    if (CreatePool(value)) m_memoryTool.MemoryChanged();
                 }
+                _fGB = value;
+                m_reg.Write("fGB", value);
             }
         }
 
