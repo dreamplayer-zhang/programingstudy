@@ -1003,14 +1003,5 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Minus.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Plus.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Arrow_Up_Circle.png" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

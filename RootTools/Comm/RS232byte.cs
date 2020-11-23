@@ -151,6 +151,8 @@ namespace RootTools.Comm
         {
             lock (m_csLock)
             {
+                if (m_sp == null)
+                    return "Fail";
                 string sWrite = Encoding.ASCII.GetString(aWrite, nOffset, nWrite);
                 m_commLog.Add(CommLog.eType.Send, sWrite);
                 m_sp.Write(aWrite, nOffset, nWrite);
