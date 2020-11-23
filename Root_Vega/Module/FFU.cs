@@ -8,16 +8,11 @@ namespace Root_Vega.Module
     {
 
         #region ToolBox
-        public RS232 m_rs232;
+        public Modbus m_modbus;
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_modbus, this, "Modbus"); 
         }
-
-        private void M_rs232_OnRecieve(string sRead)
-        {
-            throw new System.NotImplementedException();
-        }
-
         #endregion
 
         public FFU(string id, IEngineer engineer)
