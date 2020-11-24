@@ -223,7 +223,7 @@ namespace RootTools.Trees
         {
             Type type = value.GetType();
             if (type == typeof(bool)) return new TreeItem_bool(sName, this, value, sDesc, m_log);
-            if (type == typeof(int)) return new TreeItem_int(sName, this, value, sDesc, m_log); 
+            if (type == typeof(int)) return new TreeItem_int(sName, this, value, sDesc, m_log);
             if (type == typeof(long)) return new TreeItem_long(sName, this, value, sDesc, m_log);
             if (type == typeof(double)) return new TreeItem_double(sName, this, value, sDesc, m_log);
             if (type == typeof(string)) return new TreeItem_string(sName, this, value, sDesc, m_log);
