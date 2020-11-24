@@ -231,7 +231,8 @@
                       Background="Black">
                         <tools:ImageViewer DataContext="{Binding p_ImageViewer}"
                                        Width="{PriorityBinding}"
-                                       Height="{PriorityBinding}" />
+                                       Height="{PriorityBinding}" 
+                                           x:Name="viewer"/>
                     </Grid>
                     <Grid Grid.Column="1"
                       Margin="0,15,15,0">
