@@ -22,7 +22,7 @@ namespace Root_CAMELLIA
 {
     public class Dlg_RecipeManager_ViewModel : ObservableObject, IDialogRequestClose
     {
-        public delegate void stageChanged();
+        public delegate void stageChanged(object e);
         public event stageChanged StageChanged;
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
 
@@ -199,7 +199,7 @@ namespace Root_CAMELLIA
         {
             get; set;
         }
-        public string lockState { get; set; } = "Lock UI";
+
         public string LockState
         {
             get
@@ -212,6 +212,7 @@ namespace Root_CAMELLIA
                 RaisePropertyChanged("LockState");
             }
         }
+        public string lockState = "Lock UI";
 
         public bool StageMouseHover
         {
@@ -777,7 +778,6 @@ namespace Root_CAMELLIA
             if (!LeftMouseDown)
             {
                 PrintMousePosition(MousePoint);
-
             }
 
             if (ColorPickerOpened)
@@ -1402,9 +1402,6 @@ namespace Root_CAMELLIA
             }
 
 
-
-
-
             Rect rect = DataViewPosition;
             rect.X = rect.X / ZoomScale - OffsetX / ZoomScale * 1000 / (double)1000;
             rect.Y = rect.Y / ZoomScale - OffsetY / ZoomScale * 1000 / (double)1000;
@@ -1466,6 +1463,7 @@ namespace Root_CAMELLIA
             select.SetData(selectRect);
             SelectGeometry[0] = select;
 
+            //StageChanged(p_DrawElement);
         }
 
         public void UpdateView(bool bMain = false)
@@ -2015,8 +2013,6 @@ namespace Root_CAMELLIA
                 m_DrawElement.Add(myImage);
 
             }
-
-
 
         }
 
