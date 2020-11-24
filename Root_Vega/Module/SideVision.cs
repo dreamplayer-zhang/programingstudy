@@ -1943,13 +1943,11 @@ namespace Root_Vega.Module
         {
             SideVision m_module;
             public _2_6_SideViewModel m_sivm;
-            //public _2_9_BevelViewModel m_bevm;
 
             public Run_SideInspection(SideVision module)
             {
                 m_module = module;
                 m_sivm = m_module.m_sivm;
-                //m_bevm = m_module.m_bevm;
                 InitModuleRun(module);
             }
 
@@ -1971,26 +1969,10 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
-                // 검사시작 전 확인사항 조건 추가해야함
-
-                // 검사시작
                 m_sivm._dispatcher.Invoke(new Action(delegate ()
                 {
                     m_sivm._startInsp();
                 }));
-
-                //while (true)
-                //{
-                //    DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
-                //    if (connector.Open())
-                //    {
-                //        string strQuery = "SELECT inspStatusNum FROM inspections.inspstatus where idx=0;";
-                //        string strTemp = string.Empty;
-                //        var result = connector.SendQuery(strQuery, ref strTemp);
-                //        if (result == 0 && strTemp == "1") break;
-                //    }
-                //    Thread.Sleep(1000);
-                //}
 
                 return "OK";
             }
@@ -2027,26 +2009,10 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
-                // 검사시작 전 확인사항 조건 추가해야함
-
-                // 검사시작
                 m_bevm._dispatcher.Invoke(new Action(delegate ()
                 {
                     m_bevm._startInsp();
                 }));
-
-                //while (true)
-                //{
-                //    DBConnector connector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
-                //    if (connector.Open())
-                //    {
-                //        string strQuery = "SELECT inspStatusNum FROM inspections.inspstatus where idx=0;";
-                //        string strTemp = string.Empty;
-                //        var result = connector.SendQuery(strQuery, ref strTemp);
-                //        if (result == 0 && strTemp == "1") break;
-                //    }
-                //    Thread.Sleep(1000);
-                //}
 
                 return "OK";
             }
