@@ -48,7 +48,6 @@ namespace Root_WIND2
 
         public DefectView m_DefectView = new DefectView();
 
-
         public Review_ViewModel(MainWindow main, Review review)
         {
             init(main);
@@ -102,6 +101,7 @@ namespace Root_WIND2
             }
 
         }
+
         private Database_DataView_VM m_DataViewer_Lotinfo = new Database_DataView_VM();
         public Database_DataView_VM p_DataViewer_Lotinfo
         {
@@ -115,7 +115,6 @@ namespace Root_WIND2
             get => Defect_Datatable;
             set => SetProperty(ref Defect_Datatable, value);
         }
-
 
         DataTable lotinfo_Datatable;
         public DataTable pLotinfo_Datatable
@@ -133,7 +132,7 @@ namespace Root_WIND2
                 SetProperty(ref selectedItem_Lotinfo, value);
 
                 DataRowView selectedRow = (DataRowView)pSelected_Lotinfo;
-                if(selectedRow != null)
+                if (selectedRow != null)
                 {
                     //string sInspectionID = (string)selectedRow.Row.ItemArray[0]; // Temp
 
@@ -148,7 +147,7 @@ namespace Root_WIND2
 
                         DisplayDefectData(sInspectionID);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         MessageBox.Show("pSelected_Lotinfo : " + ex.Message);
                     }
@@ -159,7 +158,6 @@ namespace Root_WIND2
         private object selectedItem_Defect;
         public object pSelected_Defect
         {
-
             get => selectedItem_Defect;
             set
             {
@@ -173,7 +171,7 @@ namespace Root_WIND2
                     string sInspectionID = (string)GetDataGridItem(Defect_Datatable, selectedRow, "sInspectionID");
                     string sFileName = nIndex.ToString() + ".bmp";
                     DisplayDefectImage(sInspectionID, sFileName);
-                   
+                    DisplaySelectedDefect(selectedRow); // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
                 }
             }
         }
@@ -193,11 +191,47 @@ namespace Root_WIND2
                 p_DefectImage = null;
         }
 
+        private void DisplaySelectedDefect(DataRowView selectedRow)
+		{
+            if (m_ReviewDefectlist == null)
+                return;
+
+            int index = (int)GetDataGridItem(Defect_Datatable, selectedRow, "nDefectIndex");
+            double absY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "fAbsY");
+            double theta = CalculateEdgeDefectTheta(absY);
+
+            m_DefectView.DisplaySelectedDefect(m_ReviewDefectlist.Count, index, theta);
+        }
+
         public void DisplayDefectData(string sInspectionID)
         {
             SearchDefectData(sInspectionID);            // Draw Defect Wafer Map
             m_ReviewDefectlist = GetDefectFromDataTable(Defect_Datatable);
+            DisplayEdgeDefectWaferMap();    // To-do edge 전용으로만 보이니까 추후에 구조 수정필요
             //DisplayDefectWaferMap();            // Display Defect DataGrid
+        }
+
+        private void DisplayEdgeDefectWaferMap()
+		{
+            m_DefectView.Clear();
+            foreach (Defect defect in m_ReviewDefectlist)
+            {
+                double theta = CalculateEdgeDefectTheta(defect.m_fAbsY);
+                m_DefectView.AddDefectFront(theta);
+            }
+        }
+
+        private double CalculateEdgeDefectTheta(double absY)
+		{
+            int nNotch = 0;
+            double nTheta = 0;
+
+            if (absY > nNotch)
+                nTheta = (absY - nNotch) / 540000 * 360;
+            if (absY < nNotch)
+                nTheta = (nNotch - absY) / 540000 * 360;
+
+            return nTheta;
         }
 
         public void DisplayDefectWaferMap()
@@ -224,10 +258,9 @@ namespace Root_WIND2
 
             RecipeData_Origin originData = m_reviewRecipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
             RecipeInfo_MapData mapdata = m_reviewRecipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
-
             WaferMapInfo LoadwaferMapInfo = mapdata.m_WaferMap;
             m_ListWaferMap = LoadwaferMapInfo.ListWaferMap;
-
+            
             double dWaferRaius = wafer_circle.Width / (double)2;
             double dSamplingRatio = dWaferRaius / (double)originData.Backside_Radius;
 
@@ -424,14 +457,12 @@ namespace Root_WIND2
             selected.Fill = Brushes.Blue;
         }
 
-
         public void SearchDefectData(string sInspectionID)
         {
             //Defect 갱신
             string sDefect = "defect";
             pDefect_Datatable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
         }
-
 
         public void SearchLotinfoData()
         {
@@ -454,7 +485,6 @@ namespace Root_WIND2
             return null;
         }
 
-
         public List<Defect> GetDefectFromDataTable(DataTable table)
         {
             List<Defect> defects = new List<Defect>();
@@ -473,7 +503,6 @@ namespace Root_WIND2
             int nChipIndexX = 0;
             int nCHipIndexY = 0;
 
-            m_DefectView.Clear();
             int count = 0;
             foreach (DataRow dataRow in table.Rows)
             {
@@ -493,19 +522,16 @@ namespace Root_WIND2
                     else if (table.Columns[i].ColumnName == "nChipIndexX") nChipIndexX = (int)dataRow.ItemArray[i];
                     else if (table.Columns[i].ColumnName == "nCHipIndexY") nCHipIndexY = (int)dataRow.ItemArray[i];
                 }
-                Defect defect = new Defect(sInpectionID, nDefectCode, (float)fSize, fGV, (float)fWidth, (float)fHeight, (float)fRelX, (float)fRelY, (float)fAbsX,
-                    (float)fAbsY, nChipIndexX, nCHipIndexY);
+
+                Defect defect = new Defect(sInpectionID
+                                            , nDefectCode
+                                            , (float)fSize, fGV
+                                            , (float)fWidth, (float)fHeight
+                                            , (float)fRelX, (float)fRelY
+                                            , (float)fAbsX, (float)fAbsY
+                                            , nChipIndexX, nCHipIndexY);
                 defect.SetDefectIndex(nDefectIndex);
                 defects.Add(defect);
-
-                int nNotch = 0;
-                double nTheta = 0;
-                if (fAbsY > nNotch)
-                    nTheta = (fAbsY - nNotch) / 540000 * 360;
-                if (fAbsY < nNotch)
-                    nTheta = (nNotch - fAbsY) / 540000 * 360;
-
-                m_DefectView.AddDefectFront(nTheta);
             }
             return defects;
         }
@@ -523,6 +549,5 @@ namespace Root_WIND2
             }
             return null;
         }
-
     }
 }
