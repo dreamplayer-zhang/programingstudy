@@ -24,15 +24,17 @@ namespace Root_Vega
         public _4_Viewer()
         {
             InitializeComponent();
-            App.m_engineer.m_InspManager.AddDefect += App_AddDefect;
-            App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
-            InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
+			//기능 임시 제거
+            //App.m_engineer.m_InspManager.AddChromeDefect += App_AddDefect;
+            //App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
+            //InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
         }
 		~_4_Viewer()
 		{
-			App.m_engineer.m_InspManager.AddDefect -= App_AddDefect;
-			App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
-			InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
+			//기능 임시 제거
+			//App.m_engineer.m_InspManager.AddChromeDefect -= App_AddDefect;
+			//App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
+			//InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
 		}
 		private void InspectionManager_RefreshDefect()
 		{
