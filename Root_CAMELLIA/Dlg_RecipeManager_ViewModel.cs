@@ -4,180 +4,35 @@ using Root_CAMELLIA.DictionarySet;
 using Root_CAMELLIA.Draw;
 using Root_CAMELLIA.ShapeDraw;
 using RootTools;
-using RootTools.Inspects;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Data;
-using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace Root_CAMELLIA
 {
     public class Dlg_RecipeManager_ViewModel : ObservableObject, IDialogRequestClose
     {
-        //private System.Windows.Controls.Primitives.ScrollBar VerticalScroll;
-        //private System.Windows.Controls.Primitives.ScrollBar HorizontalScroll;
+        public delegate void stageChanged();
+        public event stageChanged StageChanged;
+        public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
 
-        private string strXPosition;
-        private string strYPosition;
-        private string strCurrentTheta;
-        private string strCurrentRadius;
+        public DataManager dataManager { get; set; }
+        ShapeEllipse shape = new ShapeEllipse();
 
-
-        public ObservableCollection<ShapeManager> Shapes = new ObservableCollection<ShapeManager>();
-        public ObservableCollection<ShapeManager> PreviewShapes = new ObservableCollection<ShapeManager>();
-        public ObservableCollection<GeometryManager> Geometry = new ObservableCollection<GeometryManager>();
-        public ObservableCollection<GeometryManager> PreviewGeometry = new ObservableCollection<GeometryManager>();
-        public ObservableCollection<GeometryManager> ViewRectGeometry = new ObservableCollection<GeometryManager>();
-        public ObservableCollection<GeometryManager> SelectGeometry = new ObservableCollection<GeometryManager>();
-        public ObservableCollection<TextManager> TextBlocks = new ObservableCollection<TextManager>();
-
-        private ObservableCollection<UIElement> m_DrawElement = new ObservableCollection<UIElement>();
-        public ObservableCollection<UIElement> p_DrawElement
+        public Dlg_RecipeManager_ViewModel(MainWindow_ViewModel main)
         {
-            get
-            {
-                return m_DrawElement;
-            }
-            set
-            {
-                m_DrawElement = value;
-            }
-        }
-
-        private ObservableCollection<UIElement> m_PreviewDrawElement = new ObservableCollection<UIElement>();
-        public ObservableCollection<UIElement> p_PreviewDrawElement
-        {
-            get
-            {
-                return m_PreviewDrawElement;
-            }
-            set
-            {
-                m_PreviewDrawElement = value;
-            }
-        }
-
-        private void TextBlocks_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var textBlock = sender as ObservableCollection<TextManager>;
-            //ShapeManager shape = shapes.;
-            //if(!IsShowIndex && !IsKeyboardShowIndex)
-            //{
-            //    textBlock[textBlock.Count - 1].Text.Visibility = Visibility.Hidden;
-            //}
-            p_DrawElement.Add(textBlock[textBlock.Count - 1].Text);
-            
-        }
-
-        private void Shapes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var shapes = sender as ObservableCollection<ShapeManager>;
-            //ShapeManager shape = shapes.;
-            p_DrawElement.Add(shapes[shapes.Count - 1].UIElement);
-            //foreach (ShapeManager shape in shapes)
-            //    {
-            //        if (!p_DrawElement.Contains(shape.UIElement))
-
-            //    }
-        }
-
-        private void PreviewShapes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var shapes = sender as ObservableCollection<ShapeManager>;
-            p_PreviewDrawElement.Add(shapes[shapes.Count - 1].UIElement);
-            //foreach (ShapeManager shape in shapes)
-            //{
-            //    if (!p_PreviewDrawElement.Contains(shape.UIElement))
-            //        p_PreviewDrawElement.Add(shape.UIElement);
-            //}
-
-        }
-
-        private void Geometry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-
-            var shapes = sender as ObservableCollection<GeometryManager>;
-            foreach (GeometryManager geometry in shapes)
-            {
-
-                if (!p_DrawElement.Contains(geometry.path))
-                    p_DrawElement.Add(geometry.path);
-            }
-
-        }
-
-        private void PreviewGeometry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-
-            var shapes = sender as ObservableCollection<GeometryManager>;
-            foreach (GeometryManager geometry in shapes)
-            {
-
-                if (!p_PreviewDrawElement.Contains(geometry.path))
-                    p_PreviewDrawElement.Add(geometry.path);
-            }
-
-        }
-
-        private void ViewRectGeometry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-
-            var shapes = sender as ObservableCollection<GeometryManager>;
-            foreach (GeometryManager geometry in shapes)
-            {
-
-                if (!p_PreviewDrawElement.Contains(geometry.path))
-                    p_PreviewDrawElement.Add(geometry.path);
-            }
-
-        }
-
-        private void SelectGeometry_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-
-            var shapes = sender as ObservableCollection<GeometryManager>;
-            foreach (GeometryManager geometry in shapes)
-            {
-
-                if (!p_DrawElement.Contains(geometry.path))
-                    p_DrawElement.Add(geometry.path);
-            }
-
-        }
-
-        public Dlg_RecipeManager_ViewModel(MainWindow mainWindow)
-        {
-
-            // Event
-            Shapes.CollectionChanged += Shapes_CollectionChanged;
-            Geometry.CollectionChanged += Geometry_CollectionChanged;
-            PreviewGeometry.CollectionChanged += PreviewGeometry_CollectionChanged;
-            PreviewShapes.CollectionChanged += PreviewShapes_CollectionChanged;
-            ViewRectGeometry.CollectionChanged += ViewRectGeometry_CollectionChanged;
-            SelectGeometry.CollectionChanged += SelectGeometry_CollectionChanged;
-            TextBlocks.CollectionChanged += TextBlocks_CollectionChanged;
-            // 추후 수정 예정. 하나로 묶기..
-
-            //VerticalScroll = rcpMgr.VerticalScroll;
-            //HorizontalScroll = rcpMgr.HorizontalScroll;
-            dataManager = mainWindow.DataManager;
+            dataManager = main.DataManager;
             Init();
             InitStage();
             SetStage(false);
@@ -185,13 +40,6 @@ namespace Root_CAMELLIA
             SetViewRect();
         }
 
-        public DataManager dataManager { get; set; }
-        public void SetDataManager(DataManager DM)
-        {
-            dataManager = DM;
-        }
-
-        #region Init
         public void Init()
         {
             //pointListItem = new DataTable();
@@ -199,8 +47,7 @@ namespace Root_CAMELLIA
             PointListItem.Columns.Add(new DataColumn("ListX"));
             PointListItem.Columns.Add(new DataColumn("ListY"));
             PointListItem.Columns.Add(new DataColumn("ListRoute"));
-
-          
+        
             RouteThickness = "3";
             RouteThick = 3;
             XPosition = "0.000 mm";
@@ -239,9 +86,514 @@ namespace Root_CAMELLIA
             timer.Start();
 
         }
+
+        #region Collection Stage Canvas 
+        /// <summary>
+        /// Main Stage Canvas
+        /// </summary>
+        public ObservableCollection<UIElement> p_DrawElement
+        {
+            get
+            {
+                return m_DrawElement;
+            }
+            set
+            {
+                SetProperty(ref m_DrawElement, value);
+                //m_DrawElement = value;
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawElement = new ObservableCollection<UIElement>();
+
+        /// <summary>
+        /// Preview Stage Canvas
+        /// </summary>
+        public ObservableCollection<UIElement> p_PreviewDrawElement
+        {
+            get
+            {
+                return m_PreviewDrawElement;
+            }
+            set
+            {
+                m_PreviewDrawElement = value;
+            }
+        }
+        private ObservableCollection<UIElement> m_PreviewDrawElement = new ObservableCollection<UIElement>();
         #endregion
 
-        ShapeEllipse shape = new ShapeEllipse();
+        #region List Draw Object
+        public List<ShapeManager> Shapes = new List<ShapeManager>();
+        public List<ShapeManager> PreviewShapes = new List<ShapeManager>();
+        public List<GeometryManager> Geometry = new List<GeometryManager>();
+        public List<GeometryManager> PreviewGeometry = new List<GeometryManager>();
+        public List<GeometryManager> ViewRectGeometry = new List<GeometryManager>();
+        public List<GeometryManager> SelectGeometry = new List<GeometryManager>();
+        public List<TextManager> TextBlocks = new List<TextManager>();
+        #endregion
+
+        #region Property
+        public double RatioX
+        {
+            get; set;
+        }
+        public double RatioY
+        {
+            get; set;
+        }
+        public int CenterX
+        {
+            get; set;
+        }
+        public int CenterY
+        {
+            get; set;
+        }
+        public int OffsetX
+        {
+            get; set;
+        }
+        public int OffsetY
+        {
+            get; set;
+        }
+        public int OffsetScale
+        {
+            get; set;
+        }
+        public int PreviewCenterX
+        {
+            get; set;
+        }
+        public int PreviewCenterY
+
+        {
+            get; set;
+        }
+
+        public int CurrentCandidatePoint
+        {
+            get; set;
+        }
+        public int CurrentSelectPoint
+        {
+            get; set;
+        }
+        public int RouteThick
+        {
+            get;
+            set;
+        }
+
+        public bool ShiftKeyDown { get; set; } = false;
+        public bool CtrlKeyDown { get; set; } = false;
+        public bool ColorPickerOpened
+        {
+            get; set;
+        }
+
+        public bool IsShowIndex { get; set; } = false;
+        public bool IsKeyboardShowIndex { get; set; } = false;
+        public bool IsLockUI { get; set; } = false;
+        bool SetStartEndPointMode { get; set; } = false;
+        public bool ShowRoute
+        {
+            get; set;
+        }
+        public string lockState { get; set; } = "Lock UI";
+        public string LockState
+        {
+            get
+            {
+                return lockState;
+            }
+            set
+            {
+                lockState = value;
+                RaisePropertyChanged("LockState");
+            }
+        }
+
+        public bool StageMouseHover
+        {
+            get; set;
+        }
+        public bool StageMouseHoverUpdate
+        {
+            get; set;
+        }
+
+        public bool MouseMove
+        {
+            get; set;
+        }
+        public bool LeftMouseDown
+        {
+            get; set;
+        }
+        public bool RightMouseDown
+        {
+            get; set;
+        }
+        public System.Windows.Point MousePoint
+        {
+            get; set;
+        }
+        public System.Windows.Point CurrentMousePoint
+        {
+            get; set;
+        }
+        public System.Windows.Point MoveMousePoint
+        {
+            get; set;
+        }
+        public System.Windows.Point SelectStartPoint
+        {
+            get; set;
+        }
+        public System.Windows.Point SelectEndPoint
+        {
+            get; set;
+        }
+        public bool Drag
+        {
+            get; set;
+        }
+
+        public int ZoomScale
+        {
+            get
+            {
+                return _nZoomScale;
+            }
+            set
+            {
+                if (0 < value && value < 64)
+                {
+                    if (ZoomScale < value)
+                    {
+                        _nZoomScale = value;
+                        //VerticalScroll.Maximum = HorizontalScroll.Maximum = 10 * nZoomScale;
+                        //VerticalScroll.Visibility = Visibility.Visible;
+                        //HorizontalScroll.Visibility = Visibility.Visible;
+
+
+                        if (OffsetX != 0)
+                        {
+                            OffsetX *= 2;
+                        }
+                        if (OffsetY != 0)
+                        {
+                            OffsetY *= 2;
+                        }
+                    }
+                    else
+                    {
+                        _nZoomScale = value;
+                        // VerticalScroll.Maximum = HorizontalScroll.Maximum = 10 * nZoomScale;
+
+                        if (_nZoomScale == 1)
+                        {
+
+                            OffsetX = OffsetY = 0;
+                        }
+                        else
+                        {
+                            if (OffsetX != 0)
+                            {
+                                OffsetX /= 2;
+                            }
+                            if (OffsetY != 0)
+                            {
+                                OffsetY /= 2;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        int _nZoomScale;
+
+        public string Percentage
+        {
+            get
+            {
+                return strPercentage;
+            }
+            set
+            {
+                strPercentage = value;
+                RaisePropertyChanged("Percentage");
+            }
+        }
+        private string strPercentage;
+
+        public string XPosition
+        {
+            get
+            {
+                return _XPosition;
+            }
+            set
+            {
+                
+                _XPosition = value;
+                RaisePropertyChanged("XPosition");
+            }
+        }
+        private string _XPosition;
+
+        public string YPosition
+        {
+            get
+            {
+                return _YPosition;
+            }
+            set
+            {
+                _YPosition = value;
+                RaisePropertyChanged("YPosition");
+            }
+        }
+        private string _YPosition;
+
+        public string RouteThickness
+        {
+            get
+            {
+                return routeThickness;
+            }
+            set
+            {
+                routeThickness = value;
+                RaisePropertyChanged("RouteThickness");
+            }
+        }
+        private string routeThickness;
+
+        public string CurrentTheta
+        {
+            get
+            {
+                return _CurrentTheta;
+            }
+            set
+            {
+                _CurrentTheta = value;
+                RaisePropertyChanged("CurrentTheta");
+            }
+        }
+        private string _CurrentTheta;
+
+        public string CurrentRadius
+        {
+            get
+            {
+                return _CurrentRadius;
+            }
+            set
+            {
+                _CurrentRadius = value;
+                RaisePropertyChanged("CurrentRadius");
+            }
+        }
+        private string _CurrentRadius;
+
+        public string PointCount
+        {
+            get
+            {
+                return _PointCount;
+            }
+            set
+            {
+                _PointCount = value;
+                RaisePropertyChanged("PointCount");
+            }
+        }
+        private string _PointCount;
+
+        public DataTable PointListItem
+        {
+            get
+            {
+                return _PointListItem;
+            }
+            set
+            {
+                _PointListItem = value;
+                RaisePropertyChanged("PointListItem");
+            }
+        }
+        private DataTable _PointListItem = new DataTable();
+
+        public string PointAddMode
+        {
+            get
+            {
+                return pointAddMode;
+            }
+            set
+            {
+                pointAddMode = value;
+                RaisePropertyChanged("PointAddMode");
+            }
+        }
+        private string pointAddMode = "Normal";
+
+        #endregion
+
+        #region DataStage     
+        private Rect DataViewPosition = new Rect();
+        #endregion
+
+        #region ViewStage
+        public Circle viewStageField = new Circle();
+        public ShapeDraw.Line viewStageLineHole = new ShapeDraw.Line();
+        public Arc[] viewStageEdgeHoleArc = new Arc[8];
+        public Circle[] ViewStageGuideLine = new Circle[4];
+        public Arc[] viewStageDoubleHoleArc = new Arc[8];
+
+        public Arc[] viewStageTopHoleArc = new Arc[2];
+        public Arc[] viewStageBotHoleArc = new Arc[2];
+        #endregion
+
+        #region Geometry, Shape
+        private DrawGeometryManager drawGeometryManager = new DrawGeometryManager();
+
+        private List<ShapeEllipse> listCandidatePoint = new List<ShapeEllipse>();
+        private List<ShapeEllipse> listPreviewCandidatePoint = new List<ShapeEllipse>();
+        private List<ShapeEllipse> listSelectedPoint = new List<ShapeEllipse>();
+        private List<ShapeEllipse> listPreviewSelectedPoint = new List<ShapeEllipse>();
+        #endregion
+
+        #region CircleHole
+        private Circle viewStageCircleHole = new Circle();
+        public List<Circle> dataStageCircleHole = new List<Circle>();
+        #endregion
+
+        #region ViewRect
+        GeometryManager viewRect;
+        #endregion
+
+        #region Stage
+        GeometryManager stage;
+        TextManager textManager;
+        ShapeManager dataPoint;
+        GeometryManager selectRectangle;
+        #endregion
+
+        #region RouteOrder        
+        List<int> RouteOrder = new List<int>();
+        public int ReorderCnt { get; set; } = 0;
+        public List<CCircle> ListReorderPoint { get; set; } = new List<CCircle>();
+        public int Limit { get; set; } = 30;
+        #endregion
+
+        #region Brush
+        private SolidColorBrush normalBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(208, 221, 221, 221));
+        private SolidColorBrush buttonSelectBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 134, 255, 117));
+        //SolidColorBrush routeBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 0, 128));
+        public SolidColorBrush RouteBrush
+        {
+            get
+            {
+                return routeBrush;
+            }
+            set
+            {
+                routeBrush = value;
+                RaisePropertyChanged("RouteBrush");
+            }
+        } 
+        private SolidColorBrush routeBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 0, 0, 255));
+
+        public SolidColorBrush ReorderBrush
+        {
+            get
+            {
+                return _ReorderBrush;
+            }
+            set
+            {
+                _ReorderBrush = value;
+                RaisePropertyChanged("ReorderBrush");
+            }
+        }
+        private SolidColorBrush _ReorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(208, 221, 221, 221));
+
+        public SolidColorBrush LockBrush
+        {
+            get
+            {
+                return _LockBrush;
+            }
+            set
+            {
+                _LockBrush = value;
+                RaisePropertyChanged("LockBrush");
+            }
+        }
+        private SolidColorBrush _LockBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(208, 221, 221, 221));
+
+        public SolidColorBrush ShowIndexBrush
+        {
+            get
+            {
+                return _ShowIndexBrush;
+            }
+            set
+            {
+                _ShowIndexBrush = value;
+                RaisePropertyChanged("ShowIndexBrush");
+            }
+        }
+        private SolidColorBrush _ShowIndexBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(208, 221, 221, 221));
+
+        public SolidColorBrush ShiftBrush
+        {
+            get
+            {
+                return _ShiftBrush;
+            }
+            set
+            {
+                _ShiftBrush = value;
+                RaisePropertyChanged("ShiftBrush");
+            }
+        }
+        SolidColorBrush _ShiftBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 221, 221, 221));
+
+        public SolidColorBrush CtrlBrush
+        {
+            get
+            {
+                return _CtrlBrush;
+            }
+            set
+            {
+                _CtrlBrush = value;
+                RaisePropertyChanged("CtrlBrush");
+            }
+        }
+        SolidColorBrush _CtrlBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 221, 221, 221));
+
+        public SolidColorBrush SBrush
+        {
+            get
+            {
+                return _SBrush;
+            }
+            set
+            {
+                _SBrush = value;
+                RaisePropertyChanged("SBrush");
+            }
+        }
+        SolidColorBrush _SBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 221, 221, 221));
+        #endregion
+
+        #region Mouse Event
         private void MouseHover(object sender, EventArgs e)
         {
             Thread.Sleep(1);
@@ -335,8 +687,8 @@ namespace Root_CAMELLIA
                         }
                         else
                         {
-                        se.SetBrush(GeneralTools.GbHole);
-                        listPreviewSelectedPoint[idx].SetBrush(GeneralTools.GbHole);
+                            se.SetBrush(GeneralTools.GbHole);
+                            listPreviewSelectedPoint[idx].SetBrush(GeneralTools.GbHole);
 
                         }
                     }
@@ -357,7 +709,7 @@ namespace Root_CAMELLIA
                 if (StageMouseHoverUpdate)
                 {
                     int idx = 0;
-                  
+
                     foreach (ShapeEllipse se in listCandidatePoint)
                     {
                         se.SetBrush(GeneralTools.StageHoleBrush);
@@ -367,7 +719,7 @@ namespace Root_CAMELLIA
                     idx = 0;
                     foreach (ShapeEllipse se in listSelectedPoint)
                     {
-                        
+
                         if (SetStartEndPointMode)
                         {
                             int nDummyidx = -1;
@@ -387,61 +739,336 @@ namespace Root_CAMELLIA
                         }
                         else
                         {
-                        se.SetBrush(GeneralTools.GbHole);
-                        listPreviewSelectedPoint[idx].SetBrush(GeneralTools.GbHole);
+                            se.SetBrush(GeneralTools.GbHole);
+                            listPreviewSelectedPoint[idx].SetBrush(GeneralTools.GbHole);
                         }
                         idx++;
                     }
                     StageMouseHoverUpdate = false;
                 }
-             
+
             }
         }
-        #region Stage
+        public void OnMouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            UIElement el = sender as UIElement;
+            el.Focus();
+            StageMouseHover = true;
+            StageMouseHoverUpdate = false;
+        }
+        public void OnMouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            StageMouseHover = false;
+            StageMouseHoverUpdate = true;
+        }
+        public void OnMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
 
-        #region DataStage     
+            UIElement el = (UIElement)sender;
 
-        private Rect DataViewPosition = new Rect();
+            el.Focus();
+            System.Windows.Point pt = e.GetPosition((UIElement)sender);
+            MousePoint = new System.Windows.Point(pt.X, pt.Y);
+
+            if (IsLockUI)
+            {
+                return;
+            }
+          
+            if (!LeftMouseDown)
+            {
+                PrintMousePosition(MousePoint);
+
+            }
+
+            if (ColorPickerOpened)
+            {
+                return;
+            }
+
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                MouseMove = true;
+                RightMouseDown = true;
+                if (ZoomScale == 1)
+                {
+                   
+                    return;
+                }
+
+                SelectStartPoint = new System.Windows.Point(pt.X, pt.Y);
+                SelectEndPoint = new System.Windows.Point(pt.X, pt.Y);
+
+                MoveMousePoint = new System.Windows.Point(pt.X, pt.Y);
+                int nOffsetDiffX = (int)(MoveMousePoint.X - CurrentMousePoint.X);
+                int nOffsetDiffY = (int)(-MoveMousePoint.Y + CurrentMousePoint.Y);
+
+                OffsetX += (int)(MoveMousePoint.X - CurrentMousePoint.X);
+                OffsetY -= (int)(MoveMousePoint.Y - CurrentMousePoint.Y);
+
+                CurrentMousePoint = MoveMousePoint;
+
+
+                //if (Math.Abs(OffsetX + nOffsetDiffX) < OffsetScale * (HorizontalScroll.Maximum - HorizontalScroll.Minimum) / 2)
+                //{
+
+                //    CurrentMousePoint.X = MoveMousePoint.X;
+                //    hScrollBar1.Value = (hScrollBar1.Minimum + hScrollBar1.Maximum) / 2 - (int)Math.Round(nOffsetX / (double)nOffSetScale);
+
+                //}
+                //if (Math.Abs(nOffsetY + nOffsetDiffY) < nOffSetScale * (vScrollBar1.Maximum - vScrollBar1.Minimum) / 2)
+                //{
+
+                //    ptCurrentMouse.Y = ptLastMouse.Y;
+                //    vScrollBar1.Value = (vScrollBar1.Minimum + vScrollBar1.Maximum) / 2 + (int)Math.Round(nOffsetY / (double)nOffSetScale);
+                //}
+
+                RedrawStage();
+                // UpdateView();
+                MouseMove = false;
+
+            }
+            else if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Mouse.Capture((UIElement)sender, CaptureMode.Element);
+                if (Drag)
+                {
+                    SelectEndPoint = new System.Windows.Point(pt.X, pt.Y);
+
+                    RedrawStage();
+                }
+            }
+        }
+        public void OnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            int lines = e.Delta * System.Windows.Forms.SystemInformation.MouseWheelScrollLines / 120;
+
+            System.Windows.Point pt = e.GetPosition((UIElement)sender);
+
+
+
+            if (lines > 0 && !IsLockUI)
+            {
+                if (ZoomScale < 32)
+                {
+                    OffsetX += (CenterX - (int)pt.X);
+                    OffsetY += -(CenterY - (int)pt.Y);
+                }
+                ZoomScale *= 2;
+
+            }
+            else if (lines < 0 && !IsLockUI)
+            {
+                OffsetX += (CenterX - (int)pt.X);
+                OffsetY += -(CenterY - (int)pt.Y);
+                ZoomScale /= 2;
+                if (ZoomScale == 1)
+                {
+                    OffsetX = OffsetY = 0;
+                }
+
+
+            }
+            RedrawStage();
+        }
+        public void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            System.Windows.Point pt = e.GetPosition((UIElement)sender);
+
+            if (IsLockUI)
+            {
+                return;
+            }
+            if (ColorPickerOpened)
+            {
+                return;
+            }
+
+            SelectStartPoint = new System.Windows.Point(MousePoint.X, MousePoint.Y);
+            SelectEndPoint = new System.Windows.Point(MousePoint.X, MousePoint.Y);
+            LeftMouseDown = true;
+            Drag = true;
+        }
+        public void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            UIElement el = (UIElement)sender;
+            Drag = false;
+            System.Windows.Point pt = e.GetPosition((UIElement)sender);
+            el.ReleaseMouseCapture();
+
+            if (IsLockUI)
+            {
+                return;
+            }
+            if (ColorPickerOpened)
+            {
+                LeftMouseDown = false;
+                ColorPickerOpened = false;
+                return;
+            }
+            if (SetStartEndPointMode)
+            {
+                MethodStartEndSelect();
+
+                SelectStartPoint = new System.Windows.Point(pt.X, pt.Y);
+                SelectEndPoint = new System.Windows.Point(pt.X, pt.Y);
+                UpdateListView();
+                RedrawStage();
+            }
+            else
+            {
+                if (Math.Abs(SelectStartPoint.X - SelectEndPoint.X) > Limit || Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y) > Limit)
+                {
+                    if (ShiftKeyDown == false && CtrlKeyDown == false)
+                    {
+                        dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Clear();
+                        dataManager.recipeDM.TeachingRD.DataSelectedPoint.Clear();
+                    }
+
+
+                    double dStartSelectX = (SelectStartPoint.X - CenterX - OffsetX) / ZoomScale / RatioX;
+                    double dStartSelectY = (-SelectStartPoint.Y + CenterY - OffsetY) / ZoomScale / RatioY;
+                    double dEndSelectX = (SelectEndPoint.X - CenterX - OffsetX) / ZoomScale / RatioX;
+                    double dEndSelectY = (-SelectEndPoint.Y + CenterY - OffsetY) / ZoomScale / RatioY;
+
+                    double top = Math.Max(dStartSelectY, dEndSelectY);
+                    double bottom = Math.Min(dStartSelectY, dEndSelectY);
+                    double left = Math.Min(dStartSelectX, dEndSelectX);
+                    double right = Math.Max(dStartSelectX, dEndSelectX);
+
+                    foreach (CCircle circle in dataManager.recipeDM.TeachingRD.DataCandidatePoint)
+                    {
+                        if (circle.x > left && circle.x < right && circle.y > bottom && circle.y < top)
+                        {
+                            int _index = -1;
+                            if (ContainsData(dataManager.recipeDM.TeachingRD.DataSelectedPoint, circle, out _index) && ((ShiftKeyDown && CtrlKeyDown) || !CtrlKeyDown))
+                            {
+                                DeletePointNotInvalidate(_index, 1);
+                                //m_DM.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Point Editor - Delete - Index : " + (_index + 1).ToString()
+                                //    + ", X : " + Math.Round(circle.x, 3).ToString() + ", Y : " + Math.Round(circle.y, 3).ToString());
+                            }
+                            if (!ShiftKeyDown)
+                            {
+                                if (!ContainsData(dataManager.recipeDM.TeachingRD.DataSelectedPoint, circle, out _index))
+                                {
+                                    dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count);
+                                    dataManager.recipeDM.TeachingRD.DataSelectedPoint.Add(circle);
+                                    RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
+                                }
+                                //    m_DM.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Point Editor - Add - Index : " + m_DM.m_RDM.TeachingRD.DataSelectedPoint.Count.ToString()
+                                //        + ", X : " + Math.Round(circle.x, 3).ToString() + ", Y : " + Math.Round(circle.y, 3).ToString());
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (CurrentCandidatePoint == -1 && CurrentSelectPoint == -1)
+                    {
+                        MethodPointSelect(pt);
+                    }
+                    else
+                    {
+                        MethodCircleSelect();
+                    }
+                }
+
+                SelectStartPoint = new System.Windows.Point(pt.X, pt.Y);
+                SelectEndPoint = new System.Windows.Point(pt.X, pt.Y);
+                UpdateListView();
+                UpdateView();
+
+            }
+
+
+
+            LeftMouseDown = false;
+        }
+        public void OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MousePoint = e.GetPosition((UIElement)sender);
+            CurrentMousePoint = new System.Windows.Point(MousePoint.X, MousePoint.Y);
+            if (ColorPickerOpened)
+            {
+                ColorPickerOpened = false;
+                return;
+            }
+        }
+        public void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            RightMouseDown = false;
+        }
+        public void OnMouseMovePreView(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            System.Windows.Point pt = e.GetPosition((UIElement)sender);
+            PrintMousePositionPreView(pt);
+
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                if (ZoomScale == 1)
+                {
+                    return;
+                }
+
+                int nPreviewX = (int)(pt.X - CenterX);
+                int nPreviewY = (int)(pt.Y - CenterY);
+
+                OffsetX = -(int)((nPreviewX * ZoomScale));
+                OffsetY = (int)((nPreviewY * ZoomScale));
+
+                RedrawStage();
+            }
+        }
+        public void OnMouseLeftButtonDownPreView(object sender, MouseButtonEventArgs e)
+        {
+            MousePoint = e.GetPosition((UIElement)sender);
+
+            if (ZoomScale == 1)
+            {
+                return;
+            }
+
+            int nPreviewX = (int)(MousePoint.X - CenterX);
+            int nPreviewY = (int)(MousePoint.Y - CenterY);
+
+            OffsetX = -(int)((nPreviewX * ZoomScale));
+            OffsetY = (int)((nPreviewY * ZoomScale));
+
+
+            RedrawStage();
+        }
+        public void OnMouseWheelPreView(object sender, MouseWheelEventArgs e)
+        {
+            int lines = e.Delta * System.Windows.Forms.SystemInformation.MouseWheelScrollLines / 120;
+
+            MousePoint = e.GetPosition((UIElement)sender);
+
+            if (lines > 0)
+            {
+                if (ZoomScale < 32)
+                {
+                    OffsetX = (int)(CenterX - MousePoint.X) * ZoomScale;
+                    OffsetY = -(int)(CenterY - MousePoint.Y) * ZoomScale;
+                }
+                ZoomScale *= 2;
+
+            }
+            else if (lines < 0)
+            {
+                OffsetX = (int)(CenterX - MousePoint.X) * ZoomScale;
+                OffsetY = -(int)(CenterY - MousePoint.Y) * ZoomScale;
+                ZoomScale /= 2;
+                if (ZoomScale == 1)
+                {
+                    OffsetX = OffsetY = 0;
+                }
+            }
+            RedrawStage();
+
+        }
         #endregion
 
-        #region ViewStage
-        public Circle viewStageField = new Circle();
-        public ShapeDraw.Line viewStageLineHole = new ShapeDraw.Line();
-        public Arc[] viewStageEdgeHoleArc = new Arc[8];
-        public Circle[] ViewStageGuideLine = new Circle[4];
-        public Arc[] viewStageDoubleHoleArc = new Arc[8];
-
-        public Arc[] viewStageTopHoleArc = new Arc[2];
-        public Arc[] viewStageBotHoleArc = new Arc[2];
-        #endregion
-
-        #region Geometry, Shape
-        private DrawGeometryManager drawGeometryManager = new DrawGeometryManager();
-
-        private List<ShapeEllipse> listCandidatePoint = new List<ShapeEllipse>();
-        private List<ShapeEllipse> listPreviewCandidatePoint = new List<ShapeEllipse>();
-        private List<ShapeEllipse> listSelectedPoint = new List<ShapeEllipse>();
-        private List<ShapeEllipse> listPreviewSelectedPoint = new List<ShapeEllipse>();
-
-        #endregion
-        #region Getter Setter
-        //public Circle DataStageField { get; set; } = new Circle();
-        //public ShapeDraw.Line DataStageLineHole { get; set; } = new ShapeDraw.Line();
-        //public PointF[] DataStageEdgeHolePoint { get; set; } = new PointF[64];
-        //public Arc[] DataStageEdgeHoleArc { get; set; } = new Arc[8];
-        //public Circle[] DataStageGuideLine { get; set; } = new Circle[4];
-        //public Arc[] DataStageDoubleHoleArc { get; set; } = new Arc[8];
-        //public Arc[] DataStageTopHoleArc { get; set; } = new Arc[2];
-        //public Arc[] DataStageBotHoleArc { get; set; } = new Arc[2];
-
-        //public int ArcPointNum { get; set; }
-        //public int ArcPointNum2 { get; set; }
-        //public int EdgeNum { get; set; }
-        //public int DoubleHoleNum { get; set; }
-        //public int GuideLineNum { get; set; }
-   
-        #endregion
-
+        #region Method
         private void InitStage()
         {
             //ArcPointNum = 63;
@@ -512,8 +1139,6 @@ namespace Root_CAMELLIA
             //DataStageGuideLine[3].Set(0, 0, 196, 196);
         }
 
-        public List<Circle> dataStageCircleHole = new List<Circle>();
-        Circle viewStageCircleHole = new Circle();
         public void OpenStageCircleHole()
         {
             if (dataStageCircleHole.Count != 0)
@@ -844,12 +1469,66 @@ namespace Root_CAMELLIA
 
         }
 
-        GeometryManager viewRect;
+        public void UpdateView(bool bMain = false)
+        {
+            CurrentCandidatePoint = -1;
+            CurrentSelectPoint = -1;
+
+            p_DrawElement.Clear();
+            Geometry.Clear();
+            Shapes.Clear();
+            TextBlocks.Clear();
+            SelectGeometry.Clear();
+
+            SetStage(false);
+
+            p_PreviewDrawElement.Clear();
+            PreviewGeometry.Clear();
+            SetStage(true);
+
+            ViewRectGeometry.Clear();
+            SetViewRect();
+        }
+
+        public void UpdateListView()
+        {
+            PointListItem.Clear();
+            RouteOrder.Clear();
+            int nCount = 0;
+            int nSelCnt = dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count;
+            int[] MeasurementOrder = new int[nSelCnt];
+
+            for (int i = 0; i < nSelCnt; i++)
+            {
+                MeasurementOrder[dataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]] = i;
+            }
+
+            for(int i = 0; i < MeasurementOrder.Count(); i++)
+            {
+                RouteOrder.Add(MeasurementOrder[i]);
+            }
+
+            DataRow row;
+            for (int i = 0; i < nSelCnt; i++, nCount++)
+            {
+
+                CCircle c = dataManager.recipeDM.TeachingRD.DataSelectedPoint[i];
+                int nRoute = MeasurementOrder[i];
+                row = PointListItem.NewRow();
+                row["ListIndex"] = (nCount + 1).ToString();
+                row["ListX"] = Math.Round(c.x, 3).ToString();
+                row["ListY"] = Math.Round(c.y, 3).ToString();
+                row["ListRoute"] = (nRoute + 1).ToString();
+                PointListItem.Rows.Add(row);
+
+            }
+            PointCount = PointListItem.Rows.Count.ToString();
+        }
+
         private void SetViewRect()
         {
             //Preview Stage Shade
             {
-
                 Rect rect = DataViewPosition;
                 rect.X = rect.X / ZoomScale - OffsetX / ZoomScale * 1000 / (double)1000;
                 rect.Y = rect.Y / ZoomScale - OffsetY / ZoomScale * 1000 / (double)1000;
@@ -915,19 +1594,15 @@ namespace Root_CAMELLIA
                 rightRect.SetData(RightRect);
                 stageShade.AddGroup(rightRect);
                 ViewRectGeometry.Add(stageShade);
+                p_PreviewDrawElement.Add(stageShade.path);
             }
-            ViewRectGeometry.CollectionChanged -= ViewRectGeometry_CollectionChanged;
         }
 
-
-        GeometryManager stage;
-        TextManager textManager;
-        ShapeManager dataPoint;
-        GeometryManager selectRectangle;
         private void SetStage(bool preview)
         {
             GeneralTools.GbHole.GradientOrigin = new System.Windows.Point(0.3, 0.3);
             // 스테이지
+            
             stage = new CustomEllipseGeometry(GeneralTools.Gb, System.Windows.SystemColors.ControlBrush);
             CustomEllipseGeometry stageField = stage as CustomEllipseGeometry;
 
@@ -941,10 +1616,12 @@ namespace Root_CAMELLIA
             if (!preview)
             {
                 Geometry.Add(stageField);
+                p_DrawElement.Add(stageField.path);
             }
             else
             {
                 PreviewGeometry.Add(stageField);
+                p_PreviewDrawElement.Add(stageField.path);
             }
 
             // Stage 중간 흰색 라인
@@ -960,10 +1637,13 @@ namespace Root_CAMELLIA
             if (!preview)
             {
                 Geometry.Add(rectLine);
+                p_DrawElement.Add(rectLine.path);
+
             }
             else
             {
                 PreviewGeometry.Add(rectLine);
+                p_PreviewDrawElement.Add(rectLine.path);
             }
 
             // Stage 점선 가이드라인
@@ -981,11 +1661,13 @@ namespace Root_CAMELLIA
                     ViewStageGuideLine[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
                     guideLine.SetData(ViewStageGuideLine[i], CenterX, CenterY, 5 * ZoomScale);
                     Geometry.Add(guideLine);
+                    p_DrawElement.Add(guideLine.path);
                 }
                 else
                 {
                     guideLine.SetData(ViewStageGuideLine[i], CenterX, CenterY, 5);
                     PreviewGeometry.Add(guideLine);
+                    p_PreviewDrawElement.Add(guideLine.path);
                 }
             }
 
@@ -1015,10 +1697,12 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Geometry.Add(edgePath);
+                    p_DrawElement.Add(edgePath.path);
                 }
                 else
                 {
                     PreviewGeometry.Add(edgePath);
+                    p_PreviewDrawElement.Add(edgePath.path);
                 }
                 drawGeometryManager.ClearSegments();
             }
@@ -1049,10 +1733,12 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Geometry.Add(doubleHole);
+                    p_DrawElement.Add(doubleHole.path);
                 }
                 else
                 {
                     PreviewGeometry.Add(doubleHole);
+                    p_PreviewDrawElement.Add(doubleHole.path);
                 }
                 drawGeometryManager.ClearSegments();
             }
@@ -1096,10 +1782,12 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Geometry.Add(topBotDoubleHole);
+                    p_DrawElement.Add(topBotDoubleHole.path);
                 }
                 else
                 {
                     PreviewGeometry.Add(topBotDoubleHole);
+                    p_PreviewDrawElement.Add(topBotDoubleHole.path);
                 }
                 drawGeometryManager.ClearSegments();
             }
@@ -1122,10 +1810,12 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Geometry.Add(circleHole);
+                    p_DrawElement.Add(circleHole.path);
                 }
                 else
                 {
                     PreviewGeometry.Add(circleHole);
+                    p_PreviewDrawElement.Add(circleHole.path);
                 }
             }
 
@@ -1148,11 +1838,13 @@ namespace Root_CAMELLIA
             {
                 stageEdge.SetData(viewStageField, CenterX, CenterY, 3 * ZoomScale);
                 Geometry.Add(stageEdge);
+                p_DrawElement.Add(stageEdge.path);
             }
             else
             {
                 stageEdge.SetData(viewStageField, CenterX, CenterY, 3);
                 PreviewGeometry.Add(stageEdge);
+                p_PreviewDrawElement.Add(stageEdge.path);
             }
 
 
@@ -1186,11 +1878,14 @@ namespace Root_CAMELLIA
                 {
                     //Geometry.Add(dataCandidatePoint);
                     Shapes.Add(dataCandidatePoint);
+                    p_DrawElement.Add(dataCandidatePoint.UIElement);
                     listCandidatePoint.Add(dataCandidatePoint);
+
                 }
                 else
                 {
                     PreviewShapes.Add(dataCandidatePoint);
+                    p_PreviewDrawElement.Add(dataCandidatePoint.UIElement);
                     listPreviewCandidatePoint.Add(dataCandidatePoint);
                 }
             }
@@ -1217,6 +1912,7 @@ namespace Root_CAMELLIA
                         drawGeometryManager.AddLine(line);
                         routeLine.SetData(drawGeometryManager.GetPathFigure(StartPoint), RouteThick * ZoomScale);
                         Geometry.Add(routeLine);
+                        p_DrawElement.Add(routeLine.path);
                         drawGeometryManager.ClearSegments();
                     }
                 }
@@ -1260,11 +1956,13 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Shapes.Add(dataSelectedPoint);
+                    p_DrawElement.Add(dataSelectedPoint.UIElement);
                     listSelectedPoint.Add(dataSelectedPoint);
                 }
                 else
                 {
                     PreviewShapes.Add(dataSelectedPoint);
+                    p_PreviewDrawElement.Add(dataSelectedPoint.UIElement);
                     listPreviewSelectedPoint.Add(dataSelectedPoint);
                 }
                 
@@ -1275,7 +1973,7 @@ namespace Root_CAMELLIA
                     textManager.SetVisibility(false);
                 }
                 TextBlocks.Add(textManager);
-
+                p_DrawElement.Add(textManager.Text);
 
             }
 
@@ -1290,6 +1988,7 @@ namespace Root_CAMELLIA
 
                 select.SetData(selectRect);
                 SelectGeometry.Add(select);
+                p_DrawElement.Add(select.path);
             }
 
             if (IsLockUI)
@@ -1302,6 +2001,7 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Geometry.Add(lockRect);
+                    p_DrawElement.Add(lockRect.path);
                 }
                 else
                 {
@@ -1318,393 +2018,11 @@ namespace Root_CAMELLIA
             }
 
 
-            if (!preview)
-            {
-                //AddElement(Geometry);
-                Geometry.CollectionChanged -= Geometry_CollectionChanged;
-                Shapes.CollectionChanged -= Shapes_CollectionChanged;
-                SelectGeometry.CollectionChanged -= SelectGeometry_CollectionChanged;
-                TextBlocks.CollectionChanged -= TextBlocks_CollectionChanged;
-            }
-            else
-            {
-                PreviewGeometry.CollectionChanged -= PreviewGeometry_CollectionChanged;
-                PreviewShapes.CollectionChanged -= PreviewShapes_CollectionChanged;
-            }
 
-        }
-
-
-        #region Brush
-
-        private SolidColorBrush normalBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(208, 221, 221, 221));
-        private SolidColorBrush buttonSelectBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 134, 255, 117));
-
-        //SolidColorBrush routeBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 255, 0, 128));
-        private SolidColorBrush routeBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 0, 0, 255));
-
-        public SolidColorBrush RouteBrush
-        {
-            get
-            {
-                return routeBrush;
-            }
-            set
-            {
-                routeBrush = value;
-                RaisePropertyChanged("RouteBrush");
-            }
-        } 
-
-        #endregion
-
-        #region Getter, Setter
-        public int CurrentCandidatePoint { get; set; }
-        public int CurrentSelectPoint { get; set; }
-
-        public bool Drag { get; set; }
-
-        public bool ShowRoute { get; set; }
-        //public Canvas StageMainView { get; set; }
-
-        private Canvas StagePreView { get; set; }
-
-        private string strPercentage;
-        public string Percentage
-        {
-            get
-            {
-                return strPercentage;
-            }
-            set
-            {
-               
-                strPercentage = value;
-                RaisePropertyChanged("Percentage");
-            }
-        }
-        public string XPosition
-        {
-            get
-            {
-                return strXPosition;
-            }
-            set
-            {
-                strXPosition = value;
-                RaisePropertyChanged("XPosition");
-            }
-        }
-
-        public string ListIndex { get; set; }
-        public string ListX { get; set; }
-        public string ListY { get; set; }
-        public string ListRoute { get; set; }
-
-
-        private string strPointCount;
-        public string PointCount
-        {
-            get
-            {
-                return strPointCount;
-            }
-            set
-            {
-                strPointCount = value;
-                RaisePropertyChanged("PointCount");
-            }
-        }
-
-        DataTable pointListItem = new DataTable();
-        public DataTable PointListItem
-        {
-            get
-            {
-                return pointListItem;
-            }
-            set
-            {
-                pointListItem = value;
-                RaisePropertyChanged("PointListItem");
-            }
-        }
-
-        public int RouteThick { get; set; }
-
-        private string routeThickness;
-        public string RouteThickness
-        {
-            get
-            {
-                return routeThickness;
-            }
-            set
-            {
-                routeThickness = value;
-                RaisePropertyChanged("RouteThickness");
-            }
-        }
-
-        public string YPosition
-        {
-            get
-            {
-                return strYPosition;
-            }
-            set
-            {
-                strYPosition = value;
-                RaisePropertyChanged("YPosition");
-            }
-        }
-
-        public string CurrentTheta
-        {
-            get
-            {
-                return strCurrentTheta;
-            }
-            set
-            {
-                strCurrentTheta = value;
-                RaisePropertyChanged("CurrentTheta");
-            }
-        }
-
-        public string CurrentRadius
-        {
-            get
-            {
-                return strCurrentRadius;
-            }
-            set
-            {
-                strCurrentRadius = value;
-                RaisePropertyChanged("CurrentRadius");
-            }
-        }
-
-
-        public bool MouseMove { get; set; }
-        public bool LeftMouseDown { get; set; }
-        public bool RightMouseDown { get; set; }
-        public System.Windows.Point MousePoint { get; set; }
-
-        public System.Windows.Point CurrentMousePoint { get; set; }
-        public System.Windows.Point MoveMousePoint { get; set; }
-        public System.Windows.Point SelectStartPoint { get; set; }
-        public System.Windows.Point SelectEndPoint { get; set; }
-
-        public double RatioX { get; set; }
-        public double RatioY { get; set; }
-
-        public int CenterX { get; set; }
-        public int CenterY { get; set; }
-
-        public int OffsetX { get; set; }
-        public int OffsetY { get; set; }
-        public int OffsetScale { get; set; }
-
-        public int PreviewCenterX { get; set; }
-        public int PreviewCenterY { get; set; }
-
-        int nZoomScale;
-        public int ZoomScale
-        {
-            get
-            {
-                return nZoomScale;
-            }
-            set
-            {
-                if (0 < value && value < 64)
-                {
-                    if (ZoomScale < value)
-                    {
-                        nZoomScale = value;
-                        //VerticalScroll.Maximum = HorizontalScroll.Maximum = 10 * nZoomScale;
-                        //VerticalScroll.Visibility = Visibility.Visible;
-                        //HorizontalScroll.Visibility = Visibility.Visible;
-
-
-                        if (OffsetX != 0)
-                        {
-                            OffsetX *= 2;
-                        }
-                        if (OffsetY != 0)
-                        {
-                            OffsetY *= 2;
-                        }
-                    }
-                    else
-                    {
-                        nZoomScale = value;
-                       // VerticalScroll.Maximum = HorizontalScroll.Maximum = 10 * nZoomScale;
-
-                        if (nZoomScale == 1)
-                        {
-
-                            OffsetX = OffsetY = 0;
-                        }
-                        else
-                        {
-                            if (OffsetX != 0)
-                            {
-                                OffsetX /= 2;
-                            }
-                            if (OffsetY != 0)
-                            {
-                                OffsetY /= 2;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-
-        public void UpdateView(bool bMain = false)
-        {
-            CurrentCandidatePoint = -1;
-            CurrentSelectPoint = -1;
-
-            p_DrawElement.Clear();
-            Geometry.Clear();
-            Shapes.Clear();
-            TextBlocks.Clear();
-            SelectGeometry.Clear();
-            Shapes.CollectionChanged += Shapes_CollectionChanged;
-            Geometry.CollectionChanged += Geometry_CollectionChanged;
-            SelectGeometry.CollectionChanged += SelectGeometry_CollectionChanged;
-            TextBlocks.CollectionChanged += TextBlocks_CollectionChanged;
-            SetStage(false);
-
-            p_PreviewDrawElement.Clear();
-            PreviewGeometry.Clear();
-            PreviewGeometry.CollectionChanged += PreviewGeometry_CollectionChanged;
-            PreviewShapes.Clear();
-            PreviewShapes.CollectionChanged += PreviewShapes_CollectionChanged;
-            SetStage(true);
-
-            ViewRectGeometry.Clear();
-            ViewRectGeometry.CollectionChanged += ViewRectGeometry_CollectionChanged;
-            SetViewRect();
-        }
-
-        List<int> RouteOrder = new List<int>();
-        public void UpdateListView()
-        {
-            PointListItem.Clear();
-            RouteOrder.Clear();
-            int nCount = 0;
-            int nSelCnt = dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count;
-            int[] MeasurementOrder = new int[nSelCnt];
-
-            for (int i = 0; i < nSelCnt; i++)
-            {
-                MeasurementOrder[dataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]] = i;
-            }
-
-            for(int i = 0; i < MeasurementOrder.Count(); i++)
-            {
-                RouteOrder.Add(MeasurementOrder[i]);
-            }
-
-            DataRow row;
-            for (int i = 0; i < nSelCnt; i++, nCount++)
-            {
-
-                CCircle c = dataManager.recipeDM.TeachingRD.DataSelectedPoint[i];
-                int nRoute = MeasurementOrder[i];
-                row = PointListItem.NewRow();
-                row["ListIndex"] = (nCount + 1).ToString();
-                row["ListX"] = Math.Round(c.x, 3).ToString();
-                row["ListY"] = Math.Round(c.y, 3).ToString();
-                row["ListRoute"] = (nRoute + 1).ToString();
-                PointListItem.Rows.Add(row);
-
-            }
-            PointCount = PointListItem.Rows.Count.ToString();
-        }
-
-        private SolidColorBrush reorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(208, 221, 221, 221));
-
-        public SolidColorBrush ReorderBrush
-        {
-            get
-            {
-                return reorderBrush;
-            }
-            set
-            {
-                reorderBrush = value;
-                RaisePropertyChanged("ReorderBrush");
-            }
-        }
-
-        private SolidColorBrush lockBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(208, 221, 221, 221));
-        public SolidColorBrush LockBrush
-        {
-            get
-            {
-                return lockBrush;
-            }
-            set
-            {
-                lockBrush = value;
-                RaisePropertyChanged("LockBrush");
-            }
-        }
-        private SolidColorBrush showIndexBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(208, 221, 221, 221));
-        public SolidColorBrush ShowIndexBrush
-        {
-            get
-            {
-                return showIndexBrush;
-            }
-            set
-            {
-                showIndexBrush = value;
-                RaisePropertyChanged("ShowIndexBrush");
-            }
-        }
-        public bool IsShowIndex { get; set; } = false;
-        public bool IsKeyboardShowIndex { get; set; } = false;
-        public bool IsLockUI { get; set; } = false;
-        public string lockState { get; set; } = "Lock UI";
-        public string LockState
-        {
-            get
-            {
-                return lockState;
-            }
-            set
-            {
-                lockState = value;
-                RaisePropertyChanged("LockState");
-            }
-        }
-
-        struct Data
-        {
-            public int Current { get; private set; }
-            public int Next { get; private set; }
-            public double Dist { get; private set; }
-
-            public Data(int curr, int next, double dist)
-            {
-                Current = curr;
-                Next = next;
-                Dist = dist;
-            }
         }
 
         public void RouteOptimizaionFunc()
         {
-
             int nTotalPoint = dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count;
             if(nTotalPoint == 0)
             {
@@ -1789,90 +2107,6 @@ namespace Root_CAMELLIA
 
         }
 
-        bool SetStartEndPointMode { get; set; } = false;
-
-        #region Command
-        public ICommand RouteOptimizaion
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (IsLockUI)
-                    {
-                        return;
-                    }
-                    RouteOptimizaionFunc();
-                });
-            }
-        }
-        public ICommand ReorderPoint
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (IsLockUI)
-                    {
-                        return;
-                    }
-                    if(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count == 0)
-                    {
-                        return;
-                    }
-
-                    if (ShiftKeyDown)
-                    {
-                        ShiftKeyDown = false;
-                        ShiftBrush = normalBrush;
-                    }
-                    if (CtrlKeyDown)
-                    {
-                        CtrlKeyDown = false;
-                        CtrlBrush = normalBrush;
-                    }
-
-                    if (!SetStartEndPointMode)
-                    {
-                        ListReorderPoint.Clear();
-                        ReorderCnt = 0;
-                        SetStartEndPointMode = true;
-                        ReorderBrush = buttonSelectBrush;
-                        PointAddMode = "Reorder Mode";
-                    }
-                    else
-                    {
-                        SetStartEndPointMode = false;
-                        ReorderBrush = normalBrush;
-                        PointAddMode = "Normal";
-                    }
-                    //RedrawStage();
-                    UpdateView();
-                });
-            }
-        }
-        public ICommand ShowIndex
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {  
-                    if (IsShowIndex)
-                    {
-                        ShowIndexBrush = normalBrush;
-                        IsShowIndex = false;
-                    }
-                    else
-                    {
-                        ShowIndexBrush = buttonSelectBrush;
-                        IsShowIndex = true;
-
-                    }
-                    InitKeyButton();
-                    UpdateView();
-                });
-            }
-        }
         public void InitKeyButton()
         {
             IsKeyboardShowIndex = false;
@@ -1883,114 +2117,6 @@ namespace Root_CAMELLIA
             ShiftBrush = normalBrush;
             PointAddMode = "Normal";
         }
-        public ICommand UILock
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (IsLockUI)
-                    {
-                        LockBrush = normalBrush;
-                        LockState = "Lock UI";
-                        IsLockUI = false;
-                    }
-                    else
-                    {
-                        LockBrush = buttonSelectBrush;
-                        LockState = "UnLock UI";
-                        IsLockUI = true;
-
-                        ZoomScale = 1;
-                        //RedrawStage();
-                    }
-                    InitKeyButton();
-                    UpdateView();
-                });
-            }
-        }
-        public ICommand btn13Point
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (IsLockUI || SetStartEndPointMode)
-                    {
-                        return;
-                    }
-                    ReadPreset("13 Point.prs");
-
-                    UpdateListView();
-                    UpdateView();
-                });
-            }
-        }
-
-        public ICommand btnClose
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    CloseRequested(this, new DialogCloseRequestedEventArgs(false));
-                });
-            }
-        }
-
-        public ICommand btn25Point
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (IsLockUI || SetStartEndPointMode)
-                    {
-                        return;
-                    }
-                    ReadPreset("25 Point.prs");
-
-                    UpdateListView();
-                    UpdateView();
-                });
-            }
-        }
-
-        public ICommand btn49Point
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (IsLockUI || SetStartEndPointMode)
-                    {
-                        return;
-                    }
-                    ReadPreset("49 Point.prs");
-                    UpdateListView();
-                    UpdateView();
-                });
-            }
-        }
-
-        public ICommand btn73Point
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (IsLockUI || SetStartEndPointMode)
-                    {
-                        return;
-                    }
-                    ReadPreset("73 Point.prs");
-
-                    UpdateListView();
-                    UpdateView();
-                });
-            }
-        }
-        #endregion
 
         public void ReadPreset(string presetName)
         {
@@ -2044,306 +2170,6 @@ namespace Root_CAMELLIA
             return bRst;
         }
 
-        public void OnMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-
-            UIElement el = (UIElement)sender;
-
-            el.Focus();
-            System.Windows.Point pt = e.GetPosition((UIElement)sender);
-            MousePoint = new System.Windows.Point(pt.X, pt.Y);
-
-            if (IsLockUI)
-            {
-                return;
-            }
-          
-            if (!LeftMouseDown)
-            {
-                PrintMousePosition(MousePoint);
-
-            }
-
-            if (ColorPickerOpened)
-            {
-                return;
-            }
-
-            if (e.RightButton == MouseButtonState.Pressed)
-            {
-                MouseMove = true;
-                RightMouseDown = true;
-                if (ZoomScale == 1)
-                {
-                   
-                    return;
-                }
-
-                SelectStartPoint = new System.Windows.Point(pt.X, pt.Y);
-                SelectEndPoint = new System.Windows.Point(pt.X, pt.Y);
-
-                MoveMousePoint = new System.Windows.Point(pt.X, pt.Y);
-                int nOffsetDiffX = (int)(MoveMousePoint.X - CurrentMousePoint.X);
-                int nOffsetDiffY = (int)(-MoveMousePoint.Y + CurrentMousePoint.Y);
-
-                OffsetX += (int)(MoveMousePoint.X - CurrentMousePoint.X);
-                OffsetY -= (int)(MoveMousePoint.Y - CurrentMousePoint.Y);
-
-                CurrentMousePoint = MoveMousePoint;
-
-
-                //if (Math.Abs(OffsetX + nOffsetDiffX) < OffsetScale * (HorizontalScroll.Maximum - HorizontalScroll.Minimum) / 2)
-                //{
-
-                //    CurrentMousePoint.X = MoveMousePoint.X;
-                //    hScrollBar1.Value = (hScrollBar1.Minimum + hScrollBar1.Maximum) / 2 - (int)Math.Round(nOffsetX / (double)nOffSetScale);
-
-                //}
-                //if (Math.Abs(nOffsetY + nOffsetDiffY) < nOffSetScale * (vScrollBar1.Maximum - vScrollBar1.Minimum) / 2)
-                //{
-
-                //    ptCurrentMouse.Y = ptLastMouse.Y;
-                //    vScrollBar1.Value = (vScrollBar1.Minimum + vScrollBar1.Maximum) / 2 + (int)Math.Round(nOffsetY / (double)nOffSetScale);
-                //}
-
-                RedrawStage();
-                // UpdateView();
-                MouseMove = false;
-
-            }
-            else if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                Mouse.Capture((UIElement)sender, CaptureMode.Element);
-                if (Drag)
-                {
-                    SelectEndPoint = new System.Windows.Point(pt.X, pt.Y);
-
-                    RedrawStage();
-                }
-            }
-        }
-
-        public void OnMouseMovePreView(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-
-            System.Windows.Point pt = e.GetPosition((UIElement)sender);
-            PrintMousePositionPreView(pt);
-
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                if (ZoomScale == 1)
-                {
-                    return;
-                }
-
-                int nPreviewX = (int)(pt.X - CenterX);
-                int nPreviewY = (int)(pt.Y - CenterY);
-
-                OffsetX = -(int)((nPreviewX * ZoomScale));
-                OffsetY = (int)((nPreviewY * ZoomScale));
-
-                RedrawStage();
-            }
-        }
-
-        public void OnMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            int lines = e.Delta * System.Windows.Forms.SystemInformation.MouseWheelScrollLines / 120;
-
-            System.Windows.Point pt = e.GetPosition((UIElement)sender);
-
-
-
-            if (lines > 0 && !IsLockUI)
-            {
-                if (ZoomScale < 32)
-                {
-                    OffsetX += (CenterX - (int)pt.X);
-                    OffsetY += -(CenterY - (int)pt.Y);
-                }
-                ZoomScale *= 2;
-
-            }
-            else if (lines < 0 && !IsLockUI)
-            {
-                OffsetX += (CenterX - (int)pt.X);
-                OffsetY += -(CenterY - (int)pt.Y);
-                ZoomScale /= 2;
-                if (ZoomScale == 1)
-                {
-                    OffsetX = OffsetY = 0;
-                }
-
-
-            }
-            RedrawStage();
-        }
-
-        public void OnMouseWheelPreView(object sender, MouseWheelEventArgs e)
-        {
-            int lines = e.Delta * System.Windows.Forms.SystemInformation.MouseWheelScrollLines / 120;
-
-            MousePoint = e.GetPosition((UIElement)sender);
-
-            if (lines > 0)
-            {
-                if (ZoomScale < 32)
-                {
-                    OffsetX = (int)(CenterX - MousePoint.X) * ZoomScale;
-                    OffsetY = -(int)(CenterY - MousePoint.Y) * ZoomScale;
-                }
-                ZoomScale *= 2;
-
-            }
-            else if (lines < 0)
-            {
-                OffsetX = (int)(CenterX - MousePoint.X) * ZoomScale;
-                OffsetY = -(int)(CenterY - MousePoint.Y) * ZoomScale;
-                ZoomScale /= 2;
-                if (ZoomScale == 1)
-                {
-                    OffsetX = OffsetY = 0;
-                }
-            }
-            RedrawStage();
-
-        }
-
-        public void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            System.Windows.Point pt = e.GetPosition((UIElement)sender);
-
-            if (IsLockUI)
-            {
-                return;
-            }
-            if (ColorPickerOpened)
-            {
-                return;
-            }
-
-            SelectStartPoint = new System.Windows.Point(MousePoint.X, MousePoint.Y);
-            SelectEndPoint = new System.Windows.Point(MousePoint.X, MousePoint.Y);
-            LeftMouseDown = true;
-            Drag = true;
-        }
-
-        public void OnMouseLeftButtonDownPreView(object sender, MouseButtonEventArgs e)
-        {
-            MousePoint = e.GetPosition((UIElement)sender);
-
-            if (ZoomScale == 1)
-            {
-                return;
-            }
-
-            int nPreviewX = (int)(MousePoint.X - CenterX);
-            int nPreviewY = (int)(MousePoint.Y - CenterY);
-
-            OffsetX = -(int)((nPreviewX * ZoomScale));
-            OffsetY = (int)((nPreviewY * ZoomScale));
-
-
-            RedrawStage();
-        }
-
-        public int ReorderCnt { get; set; } = 0;
-        public int Limit { get; set; } = 30;
-        public void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            UIElement el = (UIElement)sender;
-            Drag = false;
-            System.Windows.Point pt = e.GetPosition((UIElement)sender);
-            el.ReleaseMouseCapture();
-
-            if (IsLockUI)
-            {
-                return;
-            }
-            if (ColorPickerOpened)
-            {
-                LeftMouseDown = false;
-                ColorPickerOpened = false;
-                return;
-            }
-            if (SetStartEndPointMode)
-            {
-                MethodStartEndSelect();
-
-                SelectStartPoint = new System.Windows.Point(pt.X, pt.Y);
-                SelectEndPoint = new System.Windows.Point(pt.X, pt.Y);
-                UpdateListView();
-                RedrawStage();
-            }
-            else
-            {
-                if (Math.Abs(SelectStartPoint.X - SelectEndPoint.X) > Limit || Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y) > Limit)
-                {
-                    if (ShiftKeyDown == false && CtrlKeyDown == false)
-                    {
-                        dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Clear();
-                        dataManager.recipeDM.TeachingRD.DataSelectedPoint.Clear();
-                    }
-
-
-                    double dStartSelectX = (SelectStartPoint.X - CenterX - OffsetX) / ZoomScale / RatioX;
-                    double dStartSelectY = (-SelectStartPoint.Y + CenterY - OffsetY) / ZoomScale / RatioY;
-                    double dEndSelectX = (SelectEndPoint.X - CenterX - OffsetX) / ZoomScale / RatioX;
-                    double dEndSelectY = (-SelectEndPoint.Y + CenterY - OffsetY) / ZoomScale / RatioY;
-
-                    double top = Math.Max(dStartSelectY, dEndSelectY);
-                    double bottom = Math.Min(dStartSelectY, dEndSelectY);
-                    double left = Math.Min(dStartSelectX, dEndSelectX);
-                    double right = Math.Max(dStartSelectX, dEndSelectX);
-
-                    foreach (CCircle circle in dataManager.recipeDM.TeachingRD.DataCandidatePoint)
-                    {
-                        if (circle.x > left && circle.x < right && circle.y > bottom && circle.y < top)
-                        {
-                            int _index = -1;
-                            if (ContainsData(dataManager.recipeDM.TeachingRD.DataSelectedPoint, circle, out _index) && ((ShiftKeyDown && CtrlKeyDown) ||!CtrlKeyDown))
-                            {
-                                DeletePointNotInvalidate(_index, 1);
-                                //m_DM.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Point Editor - Delete - Index : " + (_index + 1).ToString()
-                                //    + ", X : " + Math.Round(circle.x, 3).ToString() + ", Y : " + Math.Round(circle.y, 3).ToString());
-                            }
-                            if (!ShiftKeyDown)
-                            {
-                                if (!ContainsData(dataManager.recipeDM.TeachingRD.DataSelectedPoint, circle, out _index)){
-                                        dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count);
-                                        dataManager.recipeDM.TeachingRD.DataSelectedPoint.Add(circle);
-                                        RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
-                                }
-                                //    m_DM.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Point Editor - Add - Index : " + m_DM.m_RDM.TeachingRD.DataSelectedPoint.Count.ToString()
-                                //        + ", X : " + Math.Round(circle.x, 3).ToString() + ", Y : " + Math.Round(circle.y, 3).ToString());
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if (CurrentCandidatePoint == -1 && CurrentSelectPoint == -1)
-                    {
-                        MethodPointSelect(pt);
-                    }
-                    else
-                    {
-                        MethodCircleSelect();
-                    }
-                }
-
-                SelectStartPoint = new System.Windows.Point(pt.X, pt.Y);
-                SelectEndPoint = new System.Windows.Point(pt.X, pt.Y);
-                UpdateListView();
-                UpdateView();
-
-            }
-
-          
-
-            LeftMouseDown = false;
-        }
-
         private void MethodPointSelect(System.Windows.Point pt)
         {
             double dDistance = 0;
@@ -2369,50 +2195,6 @@ namespace Root_CAMELLIA
             }
         }
 
-
-        private void AddPoint(int nIndex)
-        {
-            double dOffsetX = 0;
-            double dOffsetY = 0;
-
-            //if (double.TryParse(tbOffsetX.Text, out dOffsetX) && double.TryParse(tbOffsetY.Text, out dOffsetY))
-            //{
-            CCircle circle = dataManager.recipeDM.TeachingRD.DataCandidatePoint[nIndex];
-            circle.MeasurementOffsetX = dOffsetX;
-            circle.MeasurementOffsetY = dOffsetY;
-
-            int _index = -1;
-            if (!ContainsSelectedData(dataManager.recipeDM.TeachingRD.DataSelectedPoint, circle, out _index))
-            {
-                if (!ShiftKeyDown)
-                {
-                    if (!ContainsData(dataManager.recipeDM.TeachingRD.DataSelectedPoint, circle, out _index))
-                    {
-                        dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count);
-                        dataManager.recipeDM.TeachingRD.DataSelectedPoint.Add(circle);
-                        RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
-                    }
-                }
-
-                //m_DM.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Point Editor - Add - Index : " + m_DM.m_RDM.TeachingRD.DataSelectedPoint.Count.ToString()
-                //                    + ", X : " + Math.Round(circle.x, 3).ToString() + ", Y : " + Math.Round(circle.y, 3).ToString());
-
-                //InvalidateView();
-            }
-            else
-            {
-                if (!CtrlKeyDown)
-                {
-                    DeletePoint(_index, 1);
-                }
-            }
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Input is Not Valid");
-            //}
-        }
-
         private double GetDistance(ShapeEllipse eg, System.Windows.Point pt)
         {
             double dResult = 0f;
@@ -2428,7 +2210,6 @@ namespace Root_CAMELLIA
 
             return Math.Round(dResult, 3);
         }
-
 
         public void DeletePointNotInvalidate(int nIndex, int nRange)
         {
@@ -2450,7 +2231,6 @@ namespace Root_CAMELLIA
             }
         }
 
-        public List<CCircle> ListReorderPoint { get; set; } = new List<CCircle>();
         private void MethodStartEndSelect()
         {
             if (CurrentSelectPoint != -1)
@@ -2588,6 +2368,49 @@ namespace Root_CAMELLIA
             }
         }
 
+        private void AddPoint(int nIndex)
+        {
+            double dOffsetX = 0;
+            double dOffsetY = 0;
+
+            //if (double.TryParse(tbOffsetX.Text, out dOffsetX) && double.TryParse(tbOffsetY.Text, out dOffsetY))
+            //{
+            CCircle circle = dataManager.recipeDM.TeachingRD.DataCandidatePoint[nIndex];
+            circle.MeasurementOffsetX = dOffsetX;
+            circle.MeasurementOffsetY = dOffsetY;
+
+            int _index = -1;
+            if (!ContainsSelectedData(dataManager.recipeDM.TeachingRD.DataSelectedPoint, circle, out _index))
+            {
+                if (!ShiftKeyDown)
+                {
+                    if (!ContainsData(dataManager.recipeDM.TeachingRD.DataSelectedPoint, circle, out _index))
+                    {
+                        dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count);
+                        dataManager.recipeDM.TeachingRD.DataSelectedPoint.Add(circle);
+                        RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
+                    }
+                }
+
+                //m_DM.m_LM.WriteLog(LOG.PARAMETER, "[Recipe Manager] Point Editor - Add - Index : " + m_DM.m_RDM.TeachingRD.DataSelectedPoint.Count.ToString()
+                //                    + ", X : " + Math.Round(circle.x, 3).ToString() + ", Y : " + Math.Round(circle.y, 3).ToString());
+
+                //InvalidateView();
+            }
+            else
+            {
+                if (!CtrlKeyDown)
+                {
+                    DeletePoint(_index, 1);
+                }
+            }
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Input is Not Valid");
+            //}
+        }
+
         public void DeletePoint(int nIndex, int nRange)
         {
             for (int i = nIndex; i < nIndex + nRange; i++)
@@ -2633,30 +2456,216 @@ namespace Root_CAMELLIA
             return bRst;
         }
 
-
-        public void OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void PrintMousePosition(System.Windows.Point pt)
         {
-            MousePoint = e.GetPosition((UIElement)sender);
-            CurrentMousePoint = new System.Windows.Point(MousePoint.X, MousePoint.Y);
-            if (ColorPickerOpened)
+            double mouseX = ((((int)pt.X - CenterX) - OffsetX) / (double)ZoomScale) / RatioX;
+            double mouseY = ((((int)-pt.Y + CenterY) - OffsetY) / (double)ZoomScale) / RatioY;
+
+            XPosition = Math.Round(mouseX, 3).ToString("0.###") + " mm";
+            YPosition = Math.Round(mouseY, 3).ToString("0.###") + " mm";
+            CurrentTheta = Math.Round((Math.Atan2(mouseY, mouseX) * 180 / Math.PI), 3).ToString("0.###") + " °";
+            CurrentRadius = Math.Round((Math.Sqrt(Math.Pow(mouseX, 2) + Math.Pow(mouseY, 2))), 3).ToString("0.###") + " mm";
+        }
+
+        private void PrintMousePositionPreView(System.Windows.Point pt)
+        {
+            double mouseX = ((int)pt.X - CenterX) / RatioX;
+            double mouseY = ((int)-pt.Y + CenterY) / RatioY;
+
+            XPosition = Math.Round(mouseX, 3).ToString("0.###") + " mm";
+            YPosition = Math.Round(mouseY, 3).ToString("0.###") + " mm";
+            CurrentTheta = Math.Round((Math.Atan2(mouseY, mouseX) * 180 / Math.PI), 3).ToString("0.###") + " °";
+            CurrentRadius = Math.Round((Math.Sqrt(Math.Pow(mouseX, 2) + Math.Pow(mouseY, 2))), 3).ToString("0.###") + " mm";
+        }
+        #endregion
+
+        #region ICommand&MethodAction
+
+        #region ICommand
+        public ICommand RouteOptimizaion
+        {
+            get
             {
-                ColorPickerOpened = false;
-                return;
+                return new RelayCommand(() =>
+                {
+                    if (IsLockUI)
+                    {
+                        return;
+                    }
+                    RouteOptimizaionFunc();
+                });
             }
         }
-
-        public void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        public ICommand ReorderPoint
         {
-            RightMouseDown = false;
-            
-        }
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (IsLockUI)
+                    {
+                        return;
+                    }
+                    if (dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count == 0)
+                    {
+                        return;
+                    }
 
-        public void OnMouseRightButtonDownPreView(object sender, MouseButtonEventArgs e)
+                    if (ShiftKeyDown)
+                    {
+                        ShiftKeyDown = false;
+                        ShiftBrush = normalBrush;
+                    }
+                    if (CtrlKeyDown)
+                    {
+                        CtrlKeyDown = false;
+                        CtrlBrush = normalBrush;
+                    }
+
+                    if (!SetStartEndPointMode)
+                    {
+                        ListReorderPoint.Clear();
+                        ReorderCnt = 0;
+                        SetStartEndPointMode = true;
+                        ReorderBrush = buttonSelectBrush;
+                        PointAddMode = "Reorder Mode";
+                    }
+                    else
+                    {
+                        SetStartEndPointMode = false;
+                        ReorderBrush = normalBrush;
+                        PointAddMode = "Normal";
+                    }
+                    //RedrawStage();
+                    UpdateView();
+                });
+            }
+        }
+        public ICommand ShowIndex
         {
-            MousePoint = e.GetPosition(StagePreView);
-            CurrentMousePoint = new System.Windows.Point(MousePoint.X, MousePoint.Y);
-        }
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (IsShowIndex)
+                    {
+                        ShowIndexBrush = normalBrush;
+                        IsShowIndex = false;
+                    }
+                    else
+                    {
+                        ShowIndexBrush = buttonSelectBrush;
+                        IsShowIndex = true;
 
+                    }
+                    InitKeyButton();
+                    UpdateView();
+                });
+            }
+        }
+        public ICommand UILock
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (IsLockUI)
+                    {
+                        LockBrush = normalBrush;
+                        LockState = "Lock UI";
+                        IsLockUI = false;
+                    }
+                    else
+                    {
+                        LockBrush = buttonSelectBrush;
+                        LockState = "UnLock UI";
+                        IsLockUI = true;
+
+                        ZoomScale = 1;
+                        //RedrawStage();
+                    }
+                    InitKeyButton();
+                    UpdateView();
+                });
+            }
+        }
+        public ICommand btnClose
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+                });
+            }
+        }
+        public ICommand btn13Point
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (IsLockUI || SetStartEndPointMode)
+                    {
+                        return;
+                    }
+                    ReadPreset("13 Point.prs");
+
+                    UpdateListView();
+                    UpdateView();
+                });
+            }
+        }
+        public ICommand btn25Point
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (IsLockUI || SetStartEndPointMode)
+                    {
+                        return;
+                    }
+                    ReadPreset("25 Point.prs");
+
+                    UpdateListView();
+                    UpdateView();
+                });
+            }
+        }
+        public ICommand btn49Point
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (IsLockUI || SetStartEndPointMode)
+                    {
+                        return;
+                    }
+                    ReadPreset("49 Point.prs");
+                    UpdateListView();
+                    UpdateView();
+                });
+            }
+        }
+        public ICommand btn73Point
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (IsLockUI || SetStartEndPointMode)
+                    {
+                        return;
+                    }
+                    ReadPreset("73 Point.prs");
+
+                    UpdateListView();
+                    UpdateView();
+                });
+            }
+        }
         public ICommand btnSelectPercentage
         {
             get
@@ -2707,7 +2716,6 @@ namespace Root_CAMELLIA
                 });
             }
         }
-
         public ICommand btnSelectAll
         {
             get
@@ -2735,7 +2743,6 @@ namespace Root_CAMELLIA
                 });
             }
         }
-
         public ICommand btnDeleteAll
         {
             get
@@ -2753,7 +2760,6 @@ namespace Root_CAMELLIA
                 });
             }
         }
-
         public ICommand btnReset
         {
             get
@@ -2774,7 +2780,6 @@ namespace Root_CAMELLIA
                 });
             }
         }
-
         public ICommand btnPreset1
         {
             get
@@ -2795,7 +2800,6 @@ namespace Root_CAMELLIA
                 });
             }
         }
-
         public ICommand btnPreset2
         {
             get
@@ -2816,9 +2820,6 @@ namespace Root_CAMELLIA
                 });
             }
         }
-
-
-
         public ICommand btnCustomize
         {
             get
@@ -2829,58 +2830,31 @@ namespace Root_CAMELLIA
                 });
             }
         }
-
         #endregion
 
-        private void PrintMousePosition(System.Windows.Point pt)
+        #region MethodAction
+        public void OnNew_Click(object sender, RoutedEventArgs e)
         {
-            double mouseX = ((((int)pt.X - CenterX) - OffsetX) / (double)ZoomScale) / RatioX;
-            double mouseY = ((((int)-pt.Y + CenterY) - OffsetY) / (double)ZoomScale) / RatioY;
-
-            XPosition = Math.Round(mouseX, 3).ToString("0.###") + " mm";
-            YPosition = Math.Round(mouseY, 3).ToString("0.###") + " mm";
-            CurrentTheta = Math.Round((Math.Atan2(mouseY, mouseX) * 180 / Math.PI), 3).ToString("0.###") + " °";
-            CurrentRadius = Math.Round((Math.Sqrt(Math.Pow(mouseX, 2) + Math.Pow(mouseY, 2))), 3).ToString("0.###") + " mm";
-
+            dataManager.recipeDM.RecipeNew();
         }
-
-        private void PrintMousePositionPreView(System.Windows.Point pt)
+        public void OnOpen_Click(object sender, RoutedEventArgs e)
         {
-            double mouseX = ((int)pt.X - CenterX) / RatioX;
-            double mouseY = ((int)-pt.Y + CenterY) / RatioY;
-
-
-
-            XPosition = Math.Round(mouseX, 3).ToString("0.###") + " mm";
-            YPosition = Math.Round(mouseY, 3).ToString("0.###") + " mm";
-            CurrentTheta = Math.Round((Math.Atan2(mouseY, mouseX) * 180 / Math.PI), 3).ToString("0.###") + " °";
-            CurrentRadius = Math.Round((Math.Sqrt(Math.Pow(mouseX, 2) + Math.Pow(mouseY, 2))), 3).ToString("0.###") + " mm";
-
+            dataManager.recipeDM.RecipeOpen();
+            UpdateListView();
+            UpdateView();
         }
-
-        public void OnMouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        public void OnSave_Click(object sender, RoutedEventArgs e)
         {
-
-            UIElement el = sender as UIElement;
-            el.Focus();
-            StageMouseHover = true;
-            StageMouseHoverUpdate = false;
+            dataManager.recipeDM.RecipeSave();
         }
-
-        public void OnMouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
-        {   
-            StageMouseHover = false;
-            StageMouseHoverUpdate = true;
+        public void OnSaveAs_Click(object sender, RoutedEventArgs e)
+        {
+            dataManager.recipeDM.RecipeSaveAs();
         }
-
-        public bool StageMouseHover { get; set; }
-        public bool StageMouseHoverUpdate { get; set; }
-
         public void OnCheckboxChange(object sender, RoutedEventArgs e)
         {
             UpdateView();
         }
-
         public void OnThicknessChanged(object sender, TextChangedEventArgs e)
         {
             int thick = 0;
@@ -2909,28 +2883,6 @@ namespace Root_CAMELLIA
             }
             UpdateView();
         }
-
-        public void OnNew_Click(object sender, RoutedEventArgs e)
-        {
-            dataManager.recipeDM.RecipeNew();
-        }
-        public void OnOpen_Click(object sender, RoutedEventArgs e)
-        {
-            dataManager.recipeDM.RecipeOpen();
-            UpdateListView();
-            UpdateView();
-        }
-        public void OnSave_Click(object sender, RoutedEventArgs e)
-        {
-            dataManager.recipeDM.RecipeSave();
-        }
-        public void OnSaveAs_Click(object sender, RoutedEventArgs e)
-        {
-            dataManager.recipeDM.RecipeSaveAs();
-        }
-
-
-
         public void ColorPicker_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<System.Windows.Media.Color?> e)
         {
             ColorPicker co = sender as ColorPicker;
@@ -2938,8 +2890,6 @@ namespace Root_CAMELLIA
             RedrawStage();
             //UpdateView();
         }
-
-        public bool ColorPickerOpened { get; set; }
         public void colorPicker_Opened(object sender, RoutedEventArgs e)
         {
             ColorPickerOpened = true;
@@ -2960,50 +2910,6 @@ namespace Root_CAMELLIA
                 CtrlBrush = normalBrush;
             }
             PointAddMode = "Normal";
-        }
-
-        public bool ShiftKeyDown { get; set; } = false;
-        public bool CtrlKeyDown { get; set; } = false;
-
-
-        SolidColorBrush shiftBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 221, 221, 221));
-        SolidColorBrush ctrlBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 221, 221, 221));
-        SolidColorBrush sBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 221, 221, 221));
-        public SolidColorBrush ShiftBrush
-        {
-            get
-            {
-                return shiftBrush;
-            }
-            set
-            {
-                shiftBrush = value;
-                RaisePropertyChanged("ShiftBrush");
-            }
-        }
-        public SolidColorBrush CtrlBrush
-        {
-            get
-            {
-                return ctrlBrush;
-            }
-            set
-            {
-                ctrlBrush = value;
-                RaisePropertyChanged("CtrlBrush");
-            }
-        }
-        public SolidColorBrush SBrush
-        {
-            get
-            {
-                return sBrush;
-            }
-            set
-            {
-                sBrush = value;
-                RaisePropertyChanged("SBrush");
-            }
         }
         public void OnCanvasKeyDown(object sender, KeyEventArgs e)
         {
@@ -3039,7 +2945,7 @@ namespace Root_CAMELLIA
                 CtrlBrush = buttonSelectBrush;
                 PointAddMode = "Add Select Mode";
             }
-            if(ShiftKeyDown && CtrlKeyDown)
+            if (ShiftKeyDown && CtrlKeyDown)
             {
                 PointAddMode = "Delete Select Mode";
             }
@@ -3126,22 +3032,31 @@ namespace Root_CAMELLIA
                 }
             }
         }
+        #endregion
 
-        private string pointAddMode = "Normal";
+        #endregion
 
-
-        public string PointAddMode {
-            get
+        struct Data
+        {
+            public int Current
             {
-                return pointAddMode;
+                get; private set;
             }
-            set
+            public int Next
             {
-                pointAddMode = value;
-                RaisePropertyChanged("PointAddMode");
+                get; private set;
+            }
+            public double Dist
+            {
+                get; private set;
+            }
+
+            public Data(int curr, int next, double dist)
+            {
+                Current = curr;
+                Next = next;
+                Dist = dist;
             }
         }
-
-        public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
     }
 }
