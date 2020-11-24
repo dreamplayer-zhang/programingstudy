@@ -17,9 +17,8 @@ namespace Root_CAMELLIA
     public partial class MainWindow : Window
     {
 
-        public CAMELLIA_Engineer m_engineer = new CAMELLIA_Engineer();
+        //public CAMELLIA_Engineer m_engineer = new CAMELLIA_Engineer();
         MemoryTool m_memoryTool;
-        Dlg_Engineer engineer;
 
 
         public MainWindow()
@@ -44,13 +43,14 @@ namespace Root_CAMELLIA
             DataManager = new DataManager(this);
             dialogService = new DialogService(this);
             DialogInit(dialogService);
-            m_engineer.Init("WIND2");
+            App.m_engineer.Init("CAMELLIA2");
+           
         }
 
         void DialogInit(IDialogService dialogService)
         {
             dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManger>();
-            //dialogService.Register<>
+            dialogService.Register<Dlg_Engineer_ViewModel, Dlg_Engineer>();
         }
 
 
@@ -61,9 +61,15 @@ namespace Root_CAMELLIA
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            ThreadStop();
         }
         #endregion
 
+
+        void ThreadStop()
+        {
+            App.m_engineer.ThreadStop();
+        }
 
         #region ViewModel
         //public Dlg_RecipeManager_ViewModel m_RecipeManagerViewModel;
@@ -149,14 +155,14 @@ namespace Root_CAMELLIA
 
             var viewModel = new Dlg_RecipeManager_ViewModel(this);
             Nullable<bool> result = dialogService.ShowDialog(viewModel);
+            
 
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            engineer = new Dlg_Engineer();
-            engineer.Init(m_engineer.m_handler);
-            engineer.ShowDialog();
+            var viewModel = new Dlg_Engineer_ViewModel(this);
+            Nullable<bool> result = dialogService.ShowDialog(viewModel);
         }
     }
 }

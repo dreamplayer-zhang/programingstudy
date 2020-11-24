@@ -1,4 +1,5 @@
-﻿using Root_CAMELLIA.Data;
+﻿using ColorPickerLib.Controls;
+using Root_CAMELLIA.Data;
 using Root_CAMELLIA.DictionarySet;
 using Root_CAMELLIA.Draw;
 using Root_CAMELLIA.ShapeDraw;
@@ -25,7 +26,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Xceed.Wpf.Toolkit;
 
 namespace Root_CAMELLIA
 {
@@ -183,7 +183,6 @@ namespace Root_CAMELLIA
             SetStage(false);
             SetStage(true);
             SetViewRect();
-
         }
 
         public DataManager dataManager { get; set; }
@@ -1379,6 +1378,7 @@ namespace Root_CAMELLIA
             }
             set
             {
+               
                 strPercentage = value;
                 RaisePropertyChanged("Percentage");
             }
@@ -3044,8 +3044,10 @@ namespace Root_CAMELLIA
                 PointAddMode = "Delete Select Mode";
             }
         }
+
         public void OnCanvasKeyUp(object sender, KeyEventArgs e)
         {
+
             if (Keyboard.IsKeyUp(Key.S))
             {
                 SBrush = normalBrush;

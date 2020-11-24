@@ -1,4 +1,4 @@
-﻿using Root_CAMELLIA.Module;
+﻿using Root_CAMELLIA;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -47,11 +47,12 @@ namespace Root_CAMELLIA
         public ModuleList m_moduleList;
         public CAMELLIA_Recipe m_recipe;
         public CAMELLIA_Process m_process;
-        public Root_CAMELLIA.Module.Stage m_Stage;
+        public PointMeasurement m_Stage;
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
-            m_Stage = new Root_CAMELLIA.Module.Stage("Vision", m_enginner);
+            //m_Stage = new Root_CAMELLIA.Module.Stage("Vision", m_enginner);
+            m_Stage = new PointMeasurement("Vision", m_enginner);
             InitModule(m_Stage);
             m_recipe = new CAMELLIA_Recipe("Recipe", m_enginner);
             m_recipe.AddModule(m_Stage);

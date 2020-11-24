@@ -13,5 +13,6 @@ namespace Root_CAMELLIA
     /// </summary>
     public partial class App : Application
     {
+        public static CAMELLIA_Engineer m_engineer = new CAMELLIA_Engineer();
     }
 }

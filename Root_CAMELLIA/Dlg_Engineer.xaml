@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Icon"
         xmlns:local="clr-namespace:Root_CAMELLIA"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         WindowState="Normal"
-        Width="1820" Height="980"
+        Width="1820" Height="1020"
         BorderBrush="Black" BorderThickness="1"
         Background="{StaticResource PanelBackGround}"
         mc:Ignorable="d">
@@ -380,6 +381,7 @@
                       Background="{StaticResource Splitter}"
                       ShowsPreview="True" Grid.ColumnSpan="2"/>
         <Border Grid.Row="4" Grid.ColumnSpan="2" Panel.ZIndex="99">
+            
             <TabControl>
                 <TabItem Header="ALL" FontSize="10">
                     <Grid>
@@ -391,6 +393,9 @@
                 <TabItem Header="I/O" FontSize="10"/>
                 <TabItem Header="Network" FontSize="10"/>
                 <TabItem Header="Result" FontSize="10"/>
+                <TabItem Header="Log" Background="DarkCyan">
+                    <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
+                </TabItem>
             </TabControl>
 
         </Border>

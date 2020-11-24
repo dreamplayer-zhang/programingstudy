@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,11 +18,12 @@ namespace Root_CAMELLIA
     /// <summary>
     /// Dlg_Engineer.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Dlg_Engineer : Window
+    public partial class Dlg_Engineer : Window, IDialog
     {
         public Dlg_Engineer()
         {
             InitializeComponent();
+            Init(App.m_engineer.m_handler);
         }
 
         public void Init(CAMELLIA_Handler handler)

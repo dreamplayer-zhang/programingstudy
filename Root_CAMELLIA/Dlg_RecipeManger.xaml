@@ -7,8 +7,8 @@
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Icon"
-        xmlns:wpfx="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:converter="clr-namespace:Root_CAMELLIA.ShapeDraw"
+        xmlns:cp="clr-namespace:ColorPickerLib.Controls;assembly=ColorPickerLib"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
@@ -459,7 +459,18 @@
                                     </CheckBox>
                                 </Border>
                                 <UniformGrid Grid.Row="1" Grid.ColumnSpan="2" Rows="1" Columns="3">
-                                    <wpfx:ColorPicker x:Name="colorPicker" DisplayColorAndName="False" Margin="5" AvailableColorsSortingMode="HueSaturationBrightness" ColorMode="ColorCanvas"
+                                    <cp:ColorPicker x:Name="colorPicker" DisplayColorAndName="False" Margin="5" AvailableColorsSortingMode="HueSaturationBrightness" ColorMode="ColorCanvas"
+                                                      SelectedColor="{Binding RouteBrush, Mode=TwoWay, Converter={StaticResource ColorToBrushConverter}, UpdateSourceTrigger=PropertyChanged}" Resources="{StaticResource theme}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectedColorChanged" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="ColorPicker_SelectedColorChanged" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Opened" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="colorPicker_Opened" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </cp:ColorPicker>
+                                    <!--<wpfx:ColorPicker x:Name="colorPicker" DisplayColorAndName="False" Margin="5" AvailableColorsSortingMode="HueSaturationBrightness" ColorMode="ColorCanvas"
                                                       SelectedColor="{Binding RouteBrush, Mode=TwoWay, Converter={StaticResource ColorToBrushConverter}, UpdateSourceTrigger=PropertyChanged}">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="SelectedColorChanged" >
@@ -469,7 +480,7 @@
                                                 <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="colorPicker_Opened" />
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                    </wpfx:ColorPicker>
+                                    </wpfx:ColorPicker>-->
                                     <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Thick"/>
                                     <TextBox x:Name="thicknessTextBox" Text="{Binding RouteThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextAlignment="Center" VerticalContentAlignment="Center" Margin="5">
                                         <i:Interaction.Triggers>

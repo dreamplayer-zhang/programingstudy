@@ -14,6 +14,7 @@ namespace Root_CAMELLIA.Data
         private DataManager dataManager { get; set; }
         public PresetData PresetData { get; set; }
         public RecipeData TeachingRD { get; set; }
+        public RecipeData MeasurementRD { get; set; }
         public string TeachingRecipePath { get; set; }
         public string TeachRecipeName { get; set; }
         public RecipeDataManager(DataManager DM)
@@ -22,6 +23,7 @@ namespace Root_CAMELLIA.Data
 
             PresetData = new PresetData();
             TeachingRD = new RecipeData();
+            MeasurementRD = new RecipeData();
         }
         public void RecipeNew()
         {
@@ -32,7 +34,7 @@ namespace Root_CAMELLIA.Data
             if(dialog.ShowDialog() == true)
             {
                 TeachingRecipePath = dialog.FileName;
-                string strTeachingRecipeName = System.IO.Path.GetFileName(dialog.FileName);
+                string strTeachingRecipeName = Path.GetFileName(dialog.FileName);
                 strTeachingRecipeName = strTeachingRecipeName.Remove(strTeachingRecipeName.Length - 4);
                 dataManager.recipeDM.TeachingRD = null;
                 dataManager.recipeDM.TeachingRD = new RecipeData();
@@ -52,7 +54,7 @@ namespace Root_CAMELLIA.Data
                 try
                 {
                     //m_DM.m_LM.WriteLog(LOG.CAMELLIA, "[Open Recipe] Recipe File Path - " + dialog.FileName);
-                    TeachRecipeName = System.IO.Path.GetFileName(dialog.FileName);
+                    TeachRecipeName = Path.GetFileName(dialog.FileName);
                     TeachRecipeName = TeachRecipeName.Remove(TeachRecipeName.Length - 4);
                     //m_DM.m_LM.WriteLog(LOG.CAMELLIA, "[Open Recipe] Recipe File Name - " + strTeachingRecipeName);
 
