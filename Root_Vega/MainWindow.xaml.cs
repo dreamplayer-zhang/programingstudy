@@ -128,6 +128,7 @@ namespace Root_Vega
 
             _2_11_EBRViewModel ebvm = new _2_11_EBRViewModel(App.m_engineer, dialogService);
             _Recipe._EBR.DataContext = ebvm;
+            ((Vega_Handler)App.m_engineer.ClassHandler()).m_patternVision.m_ebrvm = ebvm;
 
             _2_12_EBREdgeBoxViewModel ebedvm = new _2_12_EBREdgeBoxViewModel(App.m_engineer, dialogService);
             _Recipe._EBREdge.DataContext = ebedvm;

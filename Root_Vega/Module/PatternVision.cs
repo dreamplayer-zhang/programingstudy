@@ -35,6 +35,7 @@ namespace Root_Vega.Module
     {
         #region ViewModel
         public _2_5_MainVisionViewModel m_mvvm;
+        public _2_11_EBRViewModel m_ebrvm;
         #endregion
 
         #region DefectDataWraper
@@ -82,7 +83,6 @@ namespace Root_Vega.Module
         public Camera_Basler m_CamAlign1;
         public Camera_Basler m_CamAlign2;
         public Camera_Basler m_CamRADS;
-        //public Camera_Matrox m_CamTest;
         public Camera_Silicon m_CamSilicon;
 
         #region Light
@@ -133,10 +133,6 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
-
-            //p_sInfo = m_toolBox.Get(ref m_CamTest, this, "Test");
-            p_sInfo = m_toolBox.Get(ref m_CamSilicon, this, "Silicon");
-            
 
             p_sInfo = m_toolBox.Get(ref m_diPatternReticleExistSensor, this, "Pattern Reticle Sensor");
 
@@ -793,6 +789,7 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
             AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
             AddModuleRunList(new Run_Grab(this), true, "Run Grab");
+            AddModuleRunList(new Run_EBRInspection(this), true, "Run EBR Inspection");
             AddModuleRunList(new Run_InspectionComplete(this), true, "Run Inspection Complete");
             AddModuleRunList(new Run_AutoIllumination(this), true, "Run AutoIllumination");
             AddModuleRunList(new Run_VRSReviewImagCapture(this), true, "Run VRSReviewImageCapture");
@@ -1349,35 +1346,77 @@ namespace Root_Vega.Module
         //        }
         //    }
         //}
+        //--------------------------------------------------------
+        public class Run_EBRInspection : ModuleRunBase
+        {
+            //--------------------------------------------------------
+            PatternVision m_module;
+            public _2_11_EBRViewModel m_ebrvm;
+            //--------------------------------------------------------
+            public Run_EBRInspection(PatternVision module)
+            {
+                m_module = module;
+                m_ebrvm = m_module.m_ebrvm;
+                InitModuleRun(module);
+            }
+            //--------------------------------------------------------
+            public override ModuleRunBase Clone()
+            {
+                Run_EBRInspection run = new Run_EBRInspection(m_module);
+                return run;
+            }
+            //--------------------------------------------------------
+            public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+            {
+                treeRoot.p_eMode = mode;
+                RunTree(treeRoot, true);
+            }
+            //--------------------------------------------------------
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+            //--------------------------------------------------------
+            public override string Run()
+            {
+                m_ebrvm._dispatcher.Invoke(new Action(delegate ()
+                {
+                    m_ebrvm._startInsp();
+                }));
 
+                return "OK";
+            }
+            //--------------------------------------------------------
+        }
+        //--------------------------------------------------------
         public class Run_InspectionComplete : ModuleRunBase
         {
+            //--------------------------------------------------------
             PatternVision m_module;
             public _2_5_MainVisionViewModel m_mvvm;
-
+            //--------------------------------------------------------
             public Run_InspectionComplete(PatternVision module)
             {
                 m_module = module;
                 m_mvvm = m_module.m_mvvm;
                 InitModuleRun(module);
             }
-
+            //--------------------------------------------------------
             public override ModuleRunBase Clone()
             {
                 Run_InspectionComplete run = new Run_InspectionComplete(m_module);
                 return run;
             }
-
+            //--------------------------------------------------------
             public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
             {
                 treeRoot.p_eMode = mode;
                 RunTree(treeRoot, true);
             }
-
+            //--------------------------------------------------------
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
             }
-
+            //--------------------------------------------------------
             public override string Run()
             {
                 while (((Vega_Engineer)m_module.m_engineer).m_InspManager.p_qInspection.Count != 0)
@@ -1394,6 +1433,7 @@ namespace Root_Vega.Module
 
                 return "OK";
             }
+            //--------------------------------------------------------
         }
         //-------------------------------------------------------
         public class Run_AutoIllumination : ModuleRunBase
@@ -1719,10 +1759,11 @@ namespace Root_Vega.Module
             //-------------------------------------------------------
         }
         #endregion
-
+        //--------------------------------------------------------
         #region VRS Review Image Capture
         public class Run_VRSReviewImagCapture : ModuleRunBase
         {
+            //--------------------------------------------------------
             PatternVision m_module;
             public GrabMode m_grabMode = null;
             string _sGrabMode = "";
@@ -1745,13 +1786,13 @@ namespace Root_Vega.Module
 
             public int m_nXPos = 0;
             public int m_nYPos = 0;
-            
+            //--------------------------------------------------------
             public Run_VRSReviewImagCapture(PatternVision module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
-
+            //--------------------------------------------------------
             public override ModuleRunBase Clone()
             {
                 Run_VRSReviewImagCapture run = new Run_VRSReviewImagCapture(m_module);
@@ -1768,13 +1809,13 @@ namespace Root_Vega.Module
 
                 return run;
             }
-
+            //--------------------------------------------------------
             public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
             {
                 treeRoot.p_eMode = mode;
                 RunTree(treeRoot, true);
             }
-
+            //--------------------------------------------------------
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_rpReticleCenterPos = tree.Set(m_rpReticleCenterPos, m_rpReticleCenterPos, "Center Axis Position", "Center Axis Position (Pulse)", bVisible);
@@ -1789,7 +1830,7 @@ namespace Root_Vega.Module
                 m_nXPos = tree.Set(m_nXPos, m_nXPos, "Memory X Coordinate", "Memory X Coordinate", bVisible);
                 m_nYPos = tree.Set(m_nYPos, m_nYPos, "Memory Y Coordinate", "Memory Y Coordinate", bVisible);
             }
-
+            //--------------------------------------------------------
             public override string Run()
             {
                 // variable
@@ -1845,13 +1886,13 @@ namespace Root_Vega.Module
 
                 return "OK";
             }
-
+            //--------------------------------------------------------
             public struct DefectInfo
             {
                 public CPoint cptDefectPos;
                 public int iDefectIndex;
             }
-
+            //--------------------------------------------------------
             public List<DefectInfo> GetDefectPosList()
             {
                 // variable
@@ -1886,7 +1927,7 @@ namespace Root_Vega.Module
 
                 return lstDefectInfo;
             }
-
+            //--------------------------------------------------------
             public RPoint GetAxisPosFromMemoryPos(CPoint cpMemory)
             {
                 // variable
@@ -1909,7 +1950,9 @@ namespace Root_Vega.Module
 
                 return rpAxis;
             }
+            //--------------------------------------------------------
         }
         #endregion 
+        //--------------------------------------------------------
     }
 }
