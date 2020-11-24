@@ -1,13 +1,6 @@
-﻿using System.ComponentModel;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
-using System.Windows.Media;
-using System;
-using RootTools;
-using Root_CAMELLIA.Data;
-using System.Diagnostics;
+using RootTools.Memory;
 
 namespace Root_CAMELLIA
 {
@@ -85,7 +78,7 @@ namespace Root_CAMELLIA
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var adsf = test.DataContext;
+
         }
     }
 }

@@ -548,9 +548,6 @@
                                                 <i:EventTrigger EventName="MouseLeftButtonDown" >
                                                     <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
                                                 </i:EventTrigger>
-                                                <i:EventTrigger EventName="MouseRightButtonDown" >
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseRightButtonDownPreView" />
-                                                </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </Canvas>
                                     </ItemsPanelTemplate>

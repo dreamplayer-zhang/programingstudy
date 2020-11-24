@@ -6,23 +6,8 @@ using System.Windows.Threading;
 
 namespace Root_CAMELLIA
 {
-    public class MainWindow_ViewModel : ObservableObject, IDialogRequestClose
+    public class MainWindow_ViewModel : ObservableObject
     {
-        #region ViewModel
-        private Dlg_RecipeManager_ViewModel _RecipeManager_ViewModel;
-        public Dlg_RecipeManager_ViewModel RecipeManagerViewModel
-        {
-            get
-            {
-                return _RecipeManager_ViewModel;
-            }
-            set
-            {
-                SetProperty(ref _RecipeManager_ViewModel, value);
-            }
-        }
-        #endregion
-
         #region Property
         public DataManager DataManager
         {
@@ -32,6 +17,7 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Dialog
+        DialogService dialogService;
         private Dlg_RecipeManger DlgRecipeManager;
         private Dlg_Engineer DlgEngineer;
         #endregion
@@ -67,7 +53,8 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    DlgRecipeManager.ShowDialog();
+                    var viewModel = new Dlg_RecipeManager_ViewModel(this);
+                    Nullable<bool> result = dialogService.ShowDialog(viewModel);
                 });
             }
         }
@@ -88,24 +75,19 @@ namespace Root_CAMELLIA
         {
             m_MainWindow = mainwindow;
             Init();
-            //DialogInit(mainwindow);
+            DialogInit(mainwindow);
         }
 
         private void Init()
         {
-            DataManager = new DataManager();
-
-            DlgRecipeManager = new Dlg_RecipeManger();
-            RecipeManagerViewModel = new Dlg_RecipeManager_ViewModel(this);
-            DlgRecipeManager.DataContext = RecipeManagerViewModel;
-
-            DlgEngineer = new Dlg_Engineer();
+            DataManager = new DataManager();            
         }
-        //private void DialogInit(MainWindow main)
-        //{
-        //    dialogService = new DialogService(main);
-        //    dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManger>();
-        //}
+        private void DialogInit(MainWindow main)
+        {
+            dialogService = new DialogService(main);
+            dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManger>();
+            //dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_Engineer>();
+        }
 
 
         #region 이전코드

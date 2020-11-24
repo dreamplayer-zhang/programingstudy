@@ -508,8 +508,8 @@
                                 </UniformGrid>
                             </Grid>
                         </GroupBox>
-                        <Viewbox Margin="3" Grid.Row="1" DataContext="{Binding RecipeManagerViewModel}" x:Name="test">
-                            <ItemsControl ItemsSource="{Binding p_DrawElement}"
+                        <Viewbox Margin="3" Grid.Row="1">
+                            <ItemsControl
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                             <ItemsControl.ItemsPanel>
