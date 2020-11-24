@@ -3,7 +3,6 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
-using System.Threading;
 using System.Windows.Controls;
 
 namespace RootTools.Comm
@@ -44,6 +43,19 @@ namespace RootTools.Comm
         }
         #endregion
 
+        #region Client
+        ModbusClient m_client = new ModbusClient();
+        void InitClient()
+        {
+            m_client.SerialPort = "COM50";
+            m_client.Baudrate = 9600;
+            m_client.Parity = Parity.None;
+            m_client.StopBits = StopBits.One;
+            m_client.IPAddress = "192.0.0.1";
+            m_client.Port = 7700; 
+        }
+        #endregion
+
         #region Comm Type
         enum eComm
         {
@@ -66,6 +78,11 @@ namespace RootTools.Comm
         {
             m_reg = new Registry(id + ".Comm");
             p_eComm = (eComm)m_reg.Read("p_eComm", p_eComm);
+        }
+
+        void RunTreeCommunication(Tree tree)
+        {
+            p_eComm = (eComm)tree.Set(p_eComm, p_eComm, "Type", "Communication Type"); 
         }
         #endregion
 
@@ -95,9 +112,10 @@ namespace RootTools.Comm
         public string Connect()
         {
             if (m_client.Connected) return "OK"; 
-            m_client.Connect();
+            try { m_client.Connect(); }
+            catch (Exception) { return "Connection Error"; }
             m_client.NumberOfRetries = 0; 
-            if (m_client.Connected == false) return "Connection Error";
+            if (m_client.Connected == false) return "Connection False";
             m_client.SendDataChanged += M_client_SendDataChanged;
             m_client.ReceiveDataChanged += M_client_ReceiveDataChanged;
             OnPropertyChanged("p_bConnect"); 
@@ -125,6 +143,8 @@ namespace RootTools.Comm
         #region Protocol
         public string ReadCoils(byte nUnit, int nAddress, ref bool bOn)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             bool[] abRead = m_client.ReadCoils(nAddress, 1);
             if (abRead.Length > 0) bOn = abRead[0]; 
@@ -133,26 +153,36 @@ namespace RootTools.Comm
 
         public string ReadCoils(byte nUnit, int nAddress, ref List<bool> abOn)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             bool[] abRead = m_client.ReadCoils(nAddress, abOn.Count);
             for (int n = 0; n < Math.Min(abRead.Length, abOn.Count); n++) abOn[n] = abRead[n]; 
             return "OK"; 
         }
 
-        public void WriteCoils(byte nUnit, int nAddress, bool bOn)
+        public string WriteCoils(byte nUnit, int nAddress, bool bOn)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
-            m_client.WriteSingleCoil(nAddress, bOn); 
+            m_client.WriteSingleCoil(nAddress, bOn);
+            return "OK";
         }
 
-        public void WriteCoils(byte nUnit, int nAddress, List<bool> abOn)
+        public string WriteCoils(byte nUnit, int nAddress, List<bool> abOn)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
-            m_client.WriteMultipleCoils(nAddress, abOn.ToArray()); 
+            m_client.WriteMultipleCoils(nAddress, abOn.ToArray());
+            return "OK";
         }
 
         public string ReadDiscreateInputs(byte nUnit, int nAddress, ref bool bOn)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             bool[] abRead = m_client.ReadDiscreteInputs(nAddress, 1);
             if (abRead.Length > 0) bOn = abRead[0];
@@ -161,6 +191,8 @@ namespace RootTools.Comm
 
         public string ReadDiscreateInputs(byte nUnit, int nAddress, ref List<bool> abOn)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             bool[] abRead = m_client.ReadDiscreteInputs(nAddress, abOn.Count);
             for (int n = 0; n < Math.Min(abRead.Length, abOn.Count); n++) abOn[n] = abRead[n];
@@ -169,6 +201,8 @@ namespace RootTools.Comm
 
         public string ReadHoldingRegister(byte nUnit, int nAddress, ref int nValue)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             int[] anRead = m_client.ReadHoldingRegisters(nAddress, 1);
             if (anRead.Length > 0) nValue = anRead[0];
@@ -177,26 +211,36 @@ namespace RootTools.Comm
 
         public string ReadHoldingRegister(byte nUnit, int nAddress, ref List<int> anValue)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
             for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
             return "OK";
         }
 
-        public void WriteHoldingRegister(byte nUnit, int nAddress, int nValue)
+        public string WriteHoldingRegister(byte nUnit, int nAddress, int nValue)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
-            m_client.WriteSingleRegister(nAddress, nValue); 
+            m_client.WriteSingleRegister(nAddress, nValue);
+            return "OK";
         }
 
-        public void WriteHoldingRegister(byte nUnit, int nAddress, List<int> anValue)
+        public string WriteHoldingRegister(byte nUnit, int nAddress, List<int> anValue)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             m_client.WriteMultipleRegisters(nAddress, anValue.ToArray());
+            return "OK";
         }
 
         public string ReadInputRegister(byte nUnit, int nAddress, ref int nValue)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             int[] anRead = m_client.ReadInputRegisters(nAddress, 1);
             if (anRead.Length > 0) nValue = anRead[0];
@@ -205,6 +249,8 @@ namespace RootTools.Comm
 
         public string ReadInputRegister(byte nUnit, int nAddress, ref List<int> anValue)
         {
+            if (m_client.Connected == false) p_sInfo = Connect();
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             int[] anRead = m_client.ReadInputRegisters(nAddress, anValue.Count);
             for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
@@ -217,20 +263,22 @@ namespace RootTools.Comm
         {
             RunTree(Tree.eMode.Update);
             RunTree(Tree.eMode.RegWrite);
+            RunTree(Tree.eMode.Init);
         }
 
         public void RunTree(Tree.eMode mode)
         {
             m_treeRoot.p_eMode = mode;
-            RunTreeRS232(m_treeRoot.GetTree("RS232"));
-            RunTreeTCPIP(m_treeRoot.GetTree("TCPIP"));
+            RunTreeCommunication(m_treeRoot.GetTree("Type")); 
+            RunTreeRS232(m_treeRoot.GetTree("RS232", p_eComm == eComm.RS232));
+            RunTreeTCPIP(m_treeRoot.GetTree("TCPIP", p_eComm == eComm.TCPIP));
         }
         #endregion
 
         Log m_log;
         public CommLog m_commLog = null;
         public TreeRoot m_treeRoot;
-        ModbusClient m_client = new ModbusClient();
+        
         public Modbus(string id, Log log)
         {
             p_id = id;
@@ -239,6 +287,7 @@ namespace RootTools.Comm
             InitCommType(id); 
             m_treeRoot = new TreeRoot(id, log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
+            InitClient(); 
             RunTree(Tree.eMode.RegRead);
         }
 
