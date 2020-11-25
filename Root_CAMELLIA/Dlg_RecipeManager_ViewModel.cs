@@ -27,12 +27,19 @@ namespace Root_CAMELLIA
         public event stageChanged StageChanged;
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
 
-        public DataManager dataManager { get; set; }
+        public DataManager dataManager
+        {
+            get; set;
+        }
         ShapeEllipse shape = new ShapeEllipse();
 
-        public Dlg_RecipeManager_ViewModel(MainWindow_ViewModel main)
+        public Dlg_RecipeManager_ViewModel(MainWindow_ViewModel main = null)
         {
-            dataManager = main.DataManager;
+            if (main != null)
+            {
+                dataManager = main.DataManager;
+            }
+
             Init();
             InitStage();
             SetStage(false);
@@ -47,7 +54,7 @@ namespace Root_CAMELLIA
             PointListItem.Columns.Add(new DataColumn("ListX"));
             PointListItem.Columns.Add(new DataColumn("ListY"));
             PointListItem.Columns.Add(new DataColumn("ListRoute"));
-        
+
             RouteThickness = "3";
             RouteThick = 3;
             XPosition = "0.000 mm";
@@ -67,7 +74,7 @@ namespace Root_CAMELLIA
             RatioX = 1000 / BaseDefine.ViewSize;
             RatioY = 1000 / BaseDefine.ViewSize;
             OffsetScale = 100;
-            
+
             DataViewPosition.X = 0;
             DataViewPosition.Y = 0;
             DataViewPosition.Width = 1000;
@@ -75,7 +82,6 @@ namespace Root_CAMELLIA
             CurrentCandidatePoint = -1;
             CurrentSelectPoint = -1;
 
-            dataManager.recipeDM.TeachingRD.ClearPoint();
 
             DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.SystemIdle);    //객체생성
 
@@ -337,7 +343,7 @@ namespace Root_CAMELLIA
             }
             set
             {
-                
+
                 _XPosition = value;
                 RaisePropertyChanged("XPosition");
             }
@@ -507,7 +513,7 @@ namespace Root_CAMELLIA
                 routeBrush = value;
                 RaisePropertyChanged("RouteBrush");
             }
-        } 
+        }
         private SolidColorBrush routeBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 0, 0, 255));
 
         public SolidColorBrush ReorderBrush
@@ -776,7 +782,7 @@ namespace Root_CAMELLIA
             {
                 return;
             }
-          
+
             if (!LeftMouseDown)
             {
                 PrintMousePosition(MousePoint);
@@ -793,7 +799,7 @@ namespace Root_CAMELLIA
                 RightMouseDown = true;
                 if (ZoomScale == 1)
                 {
-                   
+
                     return;
                 }
 
@@ -804,16 +810,16 @@ namespace Root_CAMELLIA
                 int nOffsetDiffX = (int)(MoveMousePoint.X - CurrentMousePoint.X);
                 int nOffsetDiffY = (int)(-MoveMousePoint.Y + CurrentMousePoint.Y);
 
-                
-               
+
+
 
                 //CurrentMousePoint = MoveMousePoint;
-                if(Math.Abs(OffsetX + nOffsetDiffX) < 500 * ZoomScale)
+                if (Math.Abs(OffsetX + nOffsetDiffX) < 500 * ZoomScale)
                 {
                     OffsetX += (int)(MoveMousePoint.X - CurrentMousePoint.X);
                     CurrentMousePoint = new System.Windows.Point(MoveMousePoint.X, CurrentMousePoint.Y);
                 }
-                if(Math.Abs(OffsetY + nOffsetDiffY) < 500 * ZoomScale)
+                if (Math.Abs(OffsetY + nOffsetDiffY) < 500 * ZoomScale)
                 {
                     OffsetY -= (int)(MoveMousePoint.Y - CurrentMousePoint.Y);
                     CurrentMousePoint = new System.Windows.Point(CurrentMousePoint.X, MoveMousePoint.Y);
@@ -1395,7 +1401,7 @@ namespace Root_CAMELLIA
 
                 if (IsShowIndex || IsKeyboardShowIndex)
                 {
-                    if(TextBlocks.Count > 0)
+                    if (TextBlocks.Count > 0)
                     {
                         TextManager textBlock = TextBlocks[i];
                         textBlock.SetData((RouteOrder[i] + 1).ToString(), (int)c.Width, 98, dataSelectedPoint.CanvasLeft, dataSelectedPoint.CanvasTop - c.Height);
@@ -1403,7 +1409,7 @@ namespace Root_CAMELLIA
                         TextBlocks[i] = textBlock;
                     }
                 }
-                else if(!IsShowIndex && !IsKeyboardShowIndex)
+                else if (!IsShowIndex && !IsKeyboardShowIndex)
                 {
                     if (TextBlocks.Count > 0)
                     {
@@ -1476,8 +1482,6 @@ namespace Root_CAMELLIA
                 Math.Abs(SelectStartPoint.X - SelectEndPoint.X), Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y));
             select.SetData(selectRect, 99);
             SelectGeometry[0] = select;
-
-            //StageChanged(p_DrawElement);
         }
 
         public void UpdateView(bool bMain = false)
@@ -1500,6 +1504,24 @@ namespace Root_CAMELLIA
 
             ViewRectGeometry.Clear();
             SetViewRect();
+            //CurrentCandidatePoint = -1;
+            //CurrentSelectPoint = -1;
+
+            //p_DrawElement.Clear();
+            //Geometry.Clear();
+            //Shapes.Clear();
+            //TextBlocks.Clear();
+            //SelectGeometry.Clear();
+            //SetStage(false);
+            //SetPoint(false);
+
+            //p_PreviewDrawElement.Clear();
+            //PreviewGeometry.Clear();
+            //SetStage(true);
+            //SetPoint(true);
+
+            //ViewRectGeometry.Clear();
+            //SetViewRect();
         }
 
         public void UpdateListView()
@@ -1515,7 +1537,7 @@ namespace Root_CAMELLIA
                 MeasurementOrder[dataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]] = i;
             }
 
-            for(int i = 0; i < MeasurementOrder.Count(); i++)
+            for (int i = 0; i < MeasurementOrder.Count(); i++)
             {
                 RouteOrder.Add(MeasurementOrder[i]);
             }
@@ -1738,7 +1760,7 @@ namespace Root_CAMELLIA
         {
             GeneralTools.GbHole.GradientOrigin = new System.Windows.Point(0.3, 0.3);
             // 스테이지
-            
+
             stage = new CustomEllipseGeometry(GeneralTools.Gb, System.Windows.SystemColors.ControlBrush);
             CustomEllipseGeometry stageField = stage as CustomEllipseGeometry;
 
@@ -2012,7 +2034,7 @@ namespace Root_CAMELLIA
 
                 System.Windows.Controls.Image myImage = new System.Windows.Controls.Image();
                 myImage.Source = new BitmapImage(new Uri(BaseDefine.Dir_LockImg, UriKind.RelativeOrAbsolute));
-                myImage.Width = 100;        
+                myImage.Width = 100;
                 Canvas.SetLeft(myImage, 850);
                 Canvas.SetTop(myImage, 50);
                 m_DrawElement.Add(myImage);
@@ -2024,7 +2046,7 @@ namespace Root_CAMELLIA
         public void RouteOptimizaionFunc()
         {
             int nTotalPoint = dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count;
-            if(nTotalPoint == 0)
+            if (nTotalPoint == 0)
             {
                 return;
             }
@@ -2041,10 +2063,10 @@ namespace Root_CAMELLIA
             double dMaxValue = 0;
             for (int i = 0; i < nTotalPoint; i++)
             {
-                for(int j = 0; j < nTotalPoint; j++)
+                for (int j = 0; j < nTotalPoint; j++)
                 {
-                    double x = Math.Pow(dataManager.recipeDM.TeachingRD.DataSelectedPoint[i].x - dataManager.recipeDM.TeachingRD.DataSelectedPoint[j].x,2);
-                    double y = Math.Pow(dataManager.recipeDM.TeachingRD.DataSelectedPoint[i].y - dataManager.recipeDM.TeachingRD.DataSelectedPoint[j].y,2);
+                    double x = Math.Pow(dataManager.recipeDM.TeachingRD.DataSelectedPoint[i].x - dataManager.recipeDM.TeachingRD.DataSelectedPoint[j].x, 2);
+                    double y = Math.Pow(dataManager.recipeDM.TeachingRD.DataSelectedPoint[i].y - dataManager.recipeDM.TeachingRD.DataSelectedPoint[j].y, 2);
                     distance[i, j] = Math.Sqrt(x + y);
                     data.Add(new Data(i, j, distance[i, j]));
                 }
@@ -2052,10 +2074,10 @@ namespace Root_CAMELLIA
                 listWentPoint.Add(0);
             }
             data.Sort((x1, x2) => x1.Dist.CompareTo(x2.Dist));
-            foreach(var dt in data)
+            foreach (var dt in data)
             {
-                if(dt.Dist != 0)
-                    Console.WriteLine(dt.Current +"->"+ dt.Next + ", Dist : " + dt.Dist);
+                if (dt.Dist != 0)
+                    Console.WriteLine(dt.Current + "->" + dt.Next + ", Dist : " + dt.Dist);
             }
 
             int min_index = 0;
@@ -2069,17 +2091,17 @@ namespace Root_CAMELLIA
                     listWentPoint[i] = 1;
                     listPoint[i] = i;
                 }
-                if(nCurrentIdx == 0 || nCurrentIdx == 1)
+                if (nCurrentIdx == 0 || nCurrentIdx == 1)
                 {
-                currentPoint = nCurrentIdx = 0;
+                    currentPoint = nCurrentIdx = 0;
                 }
                 else
                 {
                     currentPoint = nCurrentIdx -= 1;
                 }
             }
-            
-            
+
+
             for (int i = nCurrentIdx + 1; i < nTotalPoint; i++)
             {
                 double min_dist = 1000000;
@@ -2201,7 +2223,7 @@ namespace Root_CAMELLIA
             float x = 0, y = 0, maxX = -1, maxY = -1, minX = 9999, minY = 9999;
 
 
-            dResult = Math.Sqrt(Math.Pow(eg.CenterX  - pt.X , 2) + Math.Pow(eg.CenterY - pt.Y,2));
+            dResult = Math.Sqrt(Math.Pow(eg.CenterX - pt.X, 2) + Math.Pow(eg.CenterY - pt.Y, 2));
 
             //x = (maxX + minX) * 0.5f;
             //y = (maxY + minY) * 0.5f;
