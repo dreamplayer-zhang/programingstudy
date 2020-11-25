@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-//using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -119,9 +118,9 @@ namespace Root_Vega
 			m_RefFeatureDrawer.RectangleKeyValue = Key.D1;
 			refEnabled = false;
 
-			_AlignFeatureDrawer = new SimpleShapeDrawerVM(m_ImageViewer);
-			_AlignFeatureDrawer.m_Stroke = MBrushes.BlueViolet;
-			_AlignFeatureDrawer.RectangleKeyValue = Key.D1;
+			m_AlignFeatureDrawer = new SimpleShapeDrawerVM(m_ImageViewer);
+			m_AlignFeatureDrawer.m_Stroke = MBrushes.BlueViolet;
+			m_AlignFeatureDrawer.RectangleKeyValue = Key.D1;
 			alignEnabled = false;
 
 			_SetRefDreawer();
@@ -239,6 +238,18 @@ namespace Root_Vega
 		#endregion
 
 		#region SelectedFeature
+		System.Windows.Media.Imaging.BitmapSource m_bmpFeatureSrc = null;
+		public System.Windows.Media.Imaging.BitmapSource p_bmpFeatureSrc
+		{
+			get
+			{
+				return m_bmpFeatureSrc;
+			}
+			set
+			{
+				SetProperty(ref m_bmpFeatureSrc, value);
+			}
+		}
 		Feature _SelectedFeature;
 		public Feature SelectedFeature
 		{
@@ -246,6 +257,7 @@ namespace Root_Vega
 			set
 			{
 				SetProperty(ref _SelectedFeature, value);
+				if (_SelectedFeature.m_Feature != null) p_bmpFeatureSrc = _SelectedFeature.m_Feature.GetBitMapSource();
 			}
 		}
 		#endregion
@@ -261,9 +273,21 @@ namespace Root_Vega
 				SetProperty(ref _PatternAlignList, value);
 			}
 		}
-		#endregion
+        #endregion
 
-		#region SelectedAlign
+        #region SelectedAlign
+        System.Windows.Media.Imaging.BitmapSource m_bmpAlignSrc = null;
+		public System.Windows.Media.Imaging.BitmapSource p_bmpAlignSrc
+        {
+            get
+            {
+				return m_bmpAlignSrc;
+            }
+            set
+            {
+				SetProperty(ref m_bmpAlignSrc, value);
+            }
+        }
 		AlignData _SelectedAlign;
 		public AlignData SelectedAlign
 		{
@@ -271,6 +295,7 @@ namespace Root_Vega
 			set
 			{
 				SetProperty(ref _SelectedAlign, value);
+				if (_SelectedAlign.m_Feature != null) p_bmpAlignSrc = _SelectedAlign.m_Feature.GetBitMapSource();
 			}
 		}
 		#endregion
@@ -368,16 +393,16 @@ namespace Root_Vega
 		#endregion
 
 		#region p_AlignFeatureDrawer
-		private SimpleShapeDrawerVM _AlignFeatureDrawer;
+		private SimpleShapeDrawerVM m_AlignFeatureDrawer;
 		public SimpleShapeDrawerVM p_AlignFeatureDrawer
 		{
 			get
 			{
-				return _AlignFeatureDrawer;
+				return m_AlignFeatureDrawer;
 			}
 			set
 			{
-				SetProperty(ref _AlignFeatureDrawer, value);
+				SetProperty(ref m_AlignFeatureDrawer, value);
 			}
 		}
 		#endregion
@@ -670,70 +695,20 @@ namespace Root_Vega
 
 					#region Align Key
 					//3. 등록된 Align Key 3개를 탐색한다. feature의 위치 정보도 참조하여 회전 보정 시에 들어갈 값을 준비해둔다
-					List<CPoint> alignKeyList = new List<CPoint>();
-
+					float[] farrCoef = null;
 					if (roiCurrent.Position.AlignList.Count == 3)
+                    {
+						farrCoef = GetAffineArray(roiCurrent);
+                    }
+
+					// 회전보정
+					if (farrCoef != null)
 					{
-						for (int n = 0; n < 3; n++)
-						{
-							//TODO : Reference와 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
-							var align = roiCurrent.Position.AlignList[n];
-							var bmp = align.m_Feature.GetRectImage(new CRect(0, 0, align.m_Feature.p_Size.X, align.m_Feature.p_Size.Y));
-							Emgu.CV.Image<Gray, byte> featureImage = new Emgu.CV.Image<Gray, byte>(bmp);
-							var laplaceFeature = featureImage.Laplace(1);
-
-							CRect targetRect = new CRect(
-								new Point(align.RoiRect.Center().X - align.FeatureFindArea / 2.0, align.RoiRect.Center().Y - align.FeatureFindArea / 2.0),
-								new Point(align.RoiRect.Center().X + align.FeatureFindArea / 2.0, align.RoiRect.Center().Y + align.FeatureFindArea / 2.0));
-							Emgu.CV.Image<Gray, byte> sourceImage = new Emgu.CV.Image<Gray, byte>(p_ImageViewer.p_ImageData.GetRectImage(targetRect));
-							var laplaceSource = sourceImage.Laplace(1);
-
-							var resultImage = laplaceSource.MatchTemplate(laplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
-
-							int widthDiff = laplaceSource.Width - resultImage.Width;
-							int heightDiff = laplaceSource.Height - resultImage.Height;
-
-							float[,,] matches = resultImage.Data;
-
-							Point maxRelativePoint = new Point();//상대위치
-
-							bool foundFeature = false;
-							float maxScore = float.MinValue;
-
-							for (int x = 0; x < matches.GetLength(1); x++)
-							{
-								for (int y = 0; y < matches.GetLength(0); y++)
-								{
-									if (maxScore < matches[y, x, 0] && align.FeatureTargetScore <= matches[y, x, 0])
-									{
-										maxScore = matches[y, x, 0];
-										maxRelativePoint.X = x;
-										maxRelativePoint.Y = y;
-										foundFeature = true;
-									}
-									//matches[y, x, 0] *= 256;
-								}
-							}
-							if (foundFeature)
-							{
-								//2. feature 중심위치가 확보되면 해당 좌표를 저장
-								CPoint tempPos = new CPoint();
-								tempPos.X = targetRect.Left + (int)maxRelativePoint.X + widthDiff / 2;
-								tempPos.Y = targetRect.Top + (int)maxRelativePoint.Y + heightDiff / 2;
-								DrawCross(new DPoint(tempPos.X, tempPos.Y), MBrushes.Crimson);
-								alignKeyList.Add(tempPos);
-							}
-						}
-					}
-					//TODO : 회전보정은 나중에하기
-					if (alignKeyList.Count != 3)
-					{
-						//align 실패. 에러를 띄우거나 회전 좌표 보정을 하지 않음
-						
+						//align 탐색 성공. 좌표 보정 계산 시작
 					}
 					else
 					{
-						//align 탐색 성공. 좌표 보정 계산 시작
+						// align 실패
 					}
 					#endregion
 
@@ -827,7 +802,6 @@ namespace Root_Vega
 
 		public bool FindFeature(Feature feature, out CRect crtSearchArea, out Point ptMaxRelative, out int nWidthDiff, out int nHeightDiff)
 		{
-			//TODO : Align과 중복되므로 나중에 별도 메소드로 만들어서 코드 중복을 최소화
 			System.Drawing.Bitmap bmp = feature.m_Feature.GetRectImage(new CRect(0, 0, feature.m_Feature.p_Size.X, feature.m_Feature.p_Size.Y));
 			Emgu.CV.Image<Gray, byte> imgFeature = new Emgu.CV.Image<Gray, byte>(bmp);
 			//Emgu.CV.Image<Gray, float> imgLaplaceFeature = imgFeature.Laplace(1);
@@ -841,8 +815,6 @@ namespace Root_Vega
 			//Emgu.CV.Image<Gray, float> imgResult = imgSrcLaplace.MatchTemplate(imgLaplaceFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
 			Emgu.CV.Image<Gray, float> imgResult = imgSrc.MatchTemplate(imgFeature, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
 
-			//nWidthDiff = imgSrcLaplace.Width - imgResult.Width;
-			//nHeightDiff = imgSrcLaplace.Height - imgResult.Height;
 			nWidthDiff = imgSrc.Width - imgResult.Width;
 			nHeightDiff = imgSrc.Height - imgResult.Height;
 
@@ -895,7 +867,6 @@ namespace Root_Vega
 			myLine.VerticalAlignment = VerticalAlignment.Center;
 			myLine.StrokeThickness = 2;
 
-
 			m_ImageViewer.SelectedTool.m_ListShape.Add(myLine);
 			UIElementInfo uei = new UIElementInfo(new System.Windows.Point(myLine.X1, myLine.Y1), new System.Windows.Point(myLine.X2, myLine.Y2));
 			m_ImageViewer.SelectedTool.m_ListRect.Add(uei);
@@ -904,8 +875,6 @@ namespace Root_Vega
 
 		void _SaveReferenceFeature()
 		{
-			//그려진 첫번째 빨간색영역 내의 이미지를 Feature 정보로 저장한다
-			//그린 정보는 SelectedFeature가 변경되면 Update되어야한다
 			if (!refEnabled)
 				return;
 
@@ -915,7 +884,6 @@ namespace Root_Vega
 				var featureRect = new CRect(featureArea.StartPos, featureArea.EndPos);
 				var featureImageArr = p_ImageViewer.p_ImageData.GetRectByteArray(featureRect);
 				var targetName = string.Format("{0}_Ref_{1}.bmp", SelectedROI.Name, SelectedROI.Position.ReferenceList.Count);
-				//TODO 이상하게 구현함. 나중에 수정 필요
 				Emgu.CV.Image<Gray, byte> temp = new Emgu.CV.Image<Gray, byte>(featureRect.Width, featureRect.Height);
 				temp.Bytes = featureImageArr;
 				temp.Save(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName));
@@ -931,10 +899,42 @@ namespace Root_Vega
 			}
 		}
 
+		void _DeleteReferenceFeature()
+        {
+			if (!refEnabled)
+				return;
+
+			if (p_RefFeatureDrawer.m_ListRect.Count >= 1)
+			{
+				for (int i = 0; i < p_RefFeatureDrawer.m_ListRect.Count; i++)
+                {
+					string strFileName = string.Format("{0}_Ref_{1}.bmp", SelectedROI.Name, i);
+					File.Delete(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), strFileName));
+				}
+				p_RefFeatureDrawer.m_ListRect.Clear();
+				SelectedROI.Position.ReferenceList.Clear();
+				p_PatternReferenceList = new ObservableCollection<Reference>(SelectedROI.Position.ReferenceList);
+				//var featureArea = p_RefFeatureDrawer.m_ListRect[0];
+				//var featureRect = new CRect(featureArea.StartPos, featureArea.EndPos);
+				//var featureImageArr = p_ImageViewer.p_ImageData.GetRectByteArray(featureRect);
+				//var targetName = string.Format("{0}_Ref_{1}.bmp", SelectedROI.Name, SelectedROI.Position.ReferenceList.Count);
+				//Emgu.CV.Image<Gray, byte> temp = new Emgu.CV.Image<Gray, byte>(featureRect.Width, featureRect.Height);
+				//temp.Bytes = featureImageArr;
+				//temp.Save(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName));
+
+				//Reference tempFeature = new Reference();
+				//tempFeature.Name = targetName;
+				//tempFeature.RoiRect = new CRect(featureArea.StartPos, featureArea.EndPos);
+				//tempFeature.m_Feature = new ImageData(featureRect.Width, featureRect.Height);
+				//tempFeature.m_Feature.LoadImageSync(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName), new CPoint(0, 0));
+				//SelectedROI.Position.ReferenceList.Add(tempFeature);
+
+				//p_PatternReferenceList = new ObservableCollection<Reference>(SelectedROI.Position.ReferenceList);
+			}
+		}
+
 		void _SaveAlignFeature()
 		{
-			//그려진 첫번째 빨간색영역 내의 이미지를 Feature 정보로 저장한다
-			//그린 정보는 SelectedFeature가 변경되면 Update되어야한다
 			if (!alignEnabled)
 				return;
 
@@ -946,7 +946,6 @@ namespace Root_Vega
 					var featureRect = new CRect(featureArea.StartPos, featureArea.EndPos);
 					var featureImageArr = p_ImageViewer.p_ImageData.GetRectByteArray(featureRect);
 					var targetName = string.Format("{0}_Align_{1}.bmp", SelectedROI.Name, i);
-					//TODO 이상하게 구현함. 나중에 수정 필요
 					Emgu.CV.Image<Gray, byte> temp = new Emgu.CV.Image<Gray, byte>(featureRect.Width, featureRect.Height);
 					temp.Bytes = featureImageArr;
 					temp.Save(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName));
@@ -963,7 +962,7 @@ namespace Root_Vega
 			}
 		}
 
-		void _FindAlignFeature()
+		public float[] GetAffineArray(Roi selectedRoi)
 		{
 			// variable
 			Roi roi;
@@ -981,12 +980,7 @@ namespace Root_Vega
 			float[] farrCoef;
 
 			// implement
-			if ((App.m_engineer.m_recipe.Loaded) && (App.m_engineer.m_recipe.VegaRecipeData.RoiList.Count > 0))
-				SelectedROI = App.m_engineer.m_recipe.VegaRecipeData.RoiList[0];
-			else
-				return;
-
-			roi = SelectedROI;
+			roi = selectedRoi;
 			arrAlignKeyOriginPointF = new System.Drawing.PointF[3];
 			arrAlignKeyTempPointF = new System.Drawing.PointF[3];
 			for (int j = 0; j < roi.Position.AlignList.Count; j++)
@@ -1010,16 +1004,13 @@ namespace Root_Vega
                 else
                 {
 					MessageBox.Show("Align Fail...");
-					return;
+					return null;
                 }
 			}
-
 			matAffine = Emgu.CV.CvInvoke.GetAffineTransform(arrAlignKeyTempPointF, arrAlignKeyOriginPointF);
 			farrCoef = GetAffineArrayFromMat(matAffine);
 
-			p_ImageViewer.p_ImageData.UpdateImage();
-
-			return;
+			return farrCoef;
 		}
 
 		#region Command
@@ -1079,19 +1070,19 @@ namespace Root_Vega
 			}
 		}
 
+		public ICommand DeleteReferenceFeatureCommand
+		{
+			get
+			{
+				return new RelayCommand(_DeleteReferenceFeature);
+			}
+		}
+
 		public ICommand SaveAlignFeatureCommand
 		{
 			get
 			{
 				return new RelayCommand(_SaveAlignFeature);
-			}
-		}
-
-		public ICommand FindAlignFeatureCommand
-		{
-			get
-			{
-				return new RelayCommand(_FindAlignFeature);
 			}
 		}
 

@@ -107,7 +107,8 @@
                                 </ListView>
                                 <Image Grid.Column="1"
 									   Width="100"
-									   Height="100"/>
+									   Height="100"
+                                       Source="{Binding p_bmpFeatureSrc}"/>
                             </Grid>
                             <Button Content="Start Drawing Reference"
 									Style="{StaticResource BasicBtn}"
@@ -119,6 +120,7 @@
 									Margin="0,0,0,10" />
                             <Button Content="Delete Feature"
 									Style="{StaticResource BasicBtn}"
+                                    Command="{Binding DeleteReferenceFeatureCommand}"
 									Margin="0,0,0,10" />
                             <UniformGrid Columns="2" Margin="0,0,0,10">
                                 <TextBlock Text="Search Area Size"
@@ -196,7 +198,8 @@
                                 </ListView>
                                 <Image Grid.Column="1"
 									   Width="100"
-									   Height="100"/>
+									   Height="100"
+                                       Source="{Binding p_bmpAlignSrc}"/>
                             </Grid>
                             <Button Content="Start Drawing Align"
 									Style="{StaticResource BasicBtn}"
@@ -209,10 +212,6 @@
                             <Button Content="Delete Feature"
 									Style="{StaticResource BasicBtn}"
 									Margin="0,0,0,10" />
-                            <Button Content="Find Align Feature Point"
-									Style="{StaticResource BasicBtn}"
-									Margin="0,0,0,10" 
-                                    Command="{Binding FindAlignFeatureCommand}"/>
                             <UniformGrid Columns="2" Margin="0,0,0,10">
                                 <TextBlock Text="Search Area Size"
 										   Style="{StaticResource BasicTb}"/>
