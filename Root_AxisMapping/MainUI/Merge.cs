@@ -27,8 +27,12 @@ namespace Root_AxisMapping.MainUI
         byte[] m_aZero = new byte[10]; 
         void ClearMemory()
         {
-            int w = p_memDst.p_sz.X; 
-            if (m_aZero.Length != w) m_aZero = new byte[w]; 
+            int w = p_memDst.p_sz.X;
+            if (m_aZero.Length != w)
+            {
+                m_aZero = new byte[w];
+                for (int n = 0; n < w; n++) m_aZero[n] = 0; 
+            }
             for (int y = 0; y < p_memDst.p_sz.Y; y++)
             {
                 IntPtr ip = p_memDst.GetPtr(0, 0, y);
@@ -37,21 +41,24 @@ namespace Root_AxisMapping.MainUI
         }
 
         int m_wCam = 12000; 
-        int m_wCamValid = 10000; 
-        void Run(int ix)
+        int m_wCamValid = 10000;
+        double m_pulsePerPixel = 12; 
+        void Run(int ix) //forget
         {
             double dx = p_dx * (p_xSetup - ix);
-            //forget Grab
+            int dPixel = (int)Math.Round(m_wCam / 2 - p_aArray[p_xArray / 2, p_yArray / 2].m_rpCenter.X);
+            RunGrab(dx + (dPixel + m_wCamValid / 2) * m_pulsePerPixel); 
             int wMargin = (m_wCam - m_wCamValid) / 2;
             ImageCopy(m_wCam - wMargin + m_wMargin, m_wCopy * ix + m_wMargin);
-            //forget Grab
+            RunGrab(dx + (dPixel - m_wCamValid / 2) * m_pulsePerPixel);
             ImageCopy(wMargin + m_wMargin, m_wCopy * ix + m_wCopy / 2); 
         }
 
         void RunTreeCam(Tree tree)
         {
             m_wCam = tree.Set(m_wCam, m_wCam, "Width", "Camera Valid Width (pixel)");
-            m_wCamValid = tree.Set(m_wCamValid, m_wCamValid, "Valid Width", "Camera Valid Width (pixel)"); 
+            m_wCamValid = tree.Set(m_wCamValid, m_wCamValid, "Valid Width", "Camera Valid Width (pixel)");
+            m_pulsePerPixel = tree.Set(m_pulsePerPixel, m_pulsePerPixel, "Pulse / Pixel", "Pulse / Pixel"); 
         }
         #endregion
 

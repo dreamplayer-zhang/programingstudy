@@ -18,7 +18,8 @@ namespace Root
         //public BayerConvert m_bayer;
         //public ACS m_acs;
         //public TestMars m_testMars;
-        public TestRepeat m_testRepeat; 
+        public TestRepeat m_testRepeat;
+        public ReadExcel m_readExcel; 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_enginner);
@@ -35,7 +36,9 @@ namespace Root
             //m_testMars = new TestMars("TestMars", m_enginner);
             //InitModule(m_testMars);
             m_testRepeat = new TestRepeat("TestRepeat", m_enginner);
-            InitModule(m_testRepeat); 
+            InitModule(m_testRepeat);
+            m_readExcel = new ReadExcel("ReadExcel", m_enginner);
+            InitModule(m_readExcel);
         }
 
         void InitModule(ModuleBase module)
