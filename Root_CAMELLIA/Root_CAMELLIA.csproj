@@ -109,6 +109,10 @@
     <Compile Include="Data\RecipeData.cs" />
     <Compile Include="DictionarySet\SortedTupleBag.cs" />
     <Compile Include="Dlg_Engineer_ViewModel.cs" />
+    <Compile Include="Draw\ArrowLineLib\ArrowEnds.cs" />
+    <Compile Include="Draw\ArrowLineLib\ArrowLine.cs" />
+    <Compile Include="Draw\ArrowLineLib\ArrowLineBase.cs" />
+    <Compile Include="Draw\ArrowLineLib\ArrowPolyline.cs" />
     <Compile Include="Draw\GeometryManager.cs" />
     <Compile Include="Draw\ShapeManager.cs" />
     <Compile Include="Draw\TextManager.cs" />

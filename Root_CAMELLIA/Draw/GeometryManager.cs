@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Ink;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -149,10 +150,12 @@ namespace Root_CAMELLIA.Draw
             path.Data = RectangleGeometry;
             path.StrokeThickness = thickness;
             path.Opacity = opcity;
+            
         }
-        public void SetData(Rect rect)
+        public void SetData(Rect rect, int zIndex = 0)
         {
             RectangleGeometry.Rect = rect;
+            Panel.SetZIndex(path, zIndex);
         }
 
         public void AddGroup(CustomRectangleGeometry rectangleGeometry)

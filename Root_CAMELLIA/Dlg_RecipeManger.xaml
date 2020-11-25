@@ -465,7 +465,7 @@
                                             <i:EventTrigger EventName="SelectedColorChanged" >
                                                 <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="ColorPicker_SelectedColorChanged" />
                                             </i:EventTrigger>
-                                            <i:EventTrigger EventName="Opened" >
+                                            <i:EventTrigger EventName="GotFocus" >
                                                 <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="colorPicker_Opened" />
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>

@@ -28,7 +28,7 @@ namespace Root_CAMELLIA.Draw
         {
             Text.Background = background;
         }
-        public void SetData(string text, int fontSize = 9, double left = 0, double top = 0, System.Windows.HorizontalAlignment horizontalAlign = System.Windows.HorizontalAlignment.Center,
+        public void SetData(string text, int fontSize = 9, int zindex = 0, double left = 0, double top = 0, System.Windows.HorizontalAlignment horizontalAlign = System.Windows.HorizontalAlignment.Center,
             System.Windows.VerticalAlignment verticalAlign = System.Windows.VerticalAlignment.Center)
         {
             //Text.Background = Brushes.Blue;
@@ -38,6 +38,7 @@ namespace Root_CAMELLIA.Draw
             Text.FontSize = fontSize;
             Canvas.SetLeft(Text, left);
             Canvas.SetTop(Text, top);
+            Panel.SetZIndex(Text, zindex);
         }
         public void SetVisibility(bool isVisible = true)
         {

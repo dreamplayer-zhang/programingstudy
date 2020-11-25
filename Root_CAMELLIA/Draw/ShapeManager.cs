@@ -1,12 +1,14 @@
-﻿using Root_CAMELLIA.ShapeDraw;
+﻿using Petzold.Media2D;
+using Root_CAMELLIA.ShapeDraw;
 using RootTools;
 using System;
 using System.Collections.Generic;
+using DrawingPoint = System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Media;
+using  System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace Root_CAMELLIA.Draw
@@ -64,7 +66,7 @@ namespace Root_CAMELLIA.Draw
 
         }
 
-        public ShapeEllipse(Brush Fillbrush, double thickness = 1, double opacity =1)
+        public ShapeEllipse(Brush Fillbrush, double thickness = 1, double opacity = 1)
         {
             CanvasEllipse = new Ellipse();
             Data = new List<PointLine>();
@@ -99,17 +101,41 @@ namespace Root_CAMELLIA.Draw
         {
             CanvasEllipse.Fill = fillBrush;
         }
-
-        //public override bool Equals(object obj)
-        //{
-        //    if (!(obj is ShapeEllipse)) return false;
-
-        //    ShapeEllipse shapeEllipse = obj as ShapeEllipse;
-        //    if(shapeEllipse.CanvasEllipse.Width == CanvasEllipse.Width)
-
-        //    return Equals((ShapeManager)obj);
-        //}
-
-        //public override int GetHashCode() => UIElement.GetHashCode();
+    }
+    public class ShapeArrowLine : ShapeManager
+    {
+        public ArrowLine _CanvasArrowLine;
+        public ArrowLine CanvasArrowLine
+        {
+            get
+            {
+                return _CanvasArrowLine;
+            }
+            set
+            {
+                base.UIElement = value;
+                base.UIElement.Tag = this;
+                _CanvasArrowLine = value;
+            }
+        }
+        public ShapeArrowLine(Brush strokeBrush, double thickness = 10, double opacity = 1)
+        {
+            CanvasArrowLine = new ArrowLine();
+            CanvasArrowLine.Stroke = strokeBrush;
+            CanvasArrowLine.StrokeThickness = thickness;
+            CanvasArrowLine.Opacity = opacity;
+            CanvasArrowLine.ArrowLength = 20;
+        }
+        public void SetData(DrawingPoint.PointF[] pt, Brush strokeBrush, int arrowLength, double thickness, int zIndex = 0)
+        {
+            CanvasArrowLine.StrokeThickness = thickness;
+            CanvasArrowLine.Stroke = strokeBrush;
+            CanvasArrowLine.ArrowLength = arrowLength;
+            CanvasArrowLine.X1 = pt[0].X;
+            CanvasArrowLine.Y1 = pt[0].Y;
+            CanvasArrowLine.X2 = pt[1].X;
+            CanvasArrowLine.Y2 = pt[1].Y;
+            Panel.SetZIndex(CanvasArrowLine, zIndex);
+        }
     }
 }

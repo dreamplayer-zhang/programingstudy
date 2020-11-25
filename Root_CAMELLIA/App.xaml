@@ -62,6 +62,13 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" FontWeight="Bold" FontFamily="sans-serif"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
             <Setter Property="FontFamily" Value="Arial"/>

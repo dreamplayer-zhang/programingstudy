@@ -13,6 +13,7 @@ namespace Root_CAMELLIA
         public const int MaxPoint = 50000;
         public const double CanvasWidth = 1000;
         public const double CanvasHeight = 1000;
+        public const int ArrowLength = 15;
 
         public const string Dir_Preset = @"C:\Camellia\Preset\";
         public const string Dir_StageMap = @"C:\Camellia\StageMap\";
