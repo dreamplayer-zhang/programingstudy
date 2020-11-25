@@ -184,7 +184,7 @@
                                 <ListView ItemsSource="{Binding p_PatternAlignList}"
 										  Height="100"
 										  Background="#FF1B1B1C"
-										  SelectedItem="{Binding SelectedFeature}">
+										  SelectedItem="{Binding SelectedAlign}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding Name}"
@@ -213,70 +213,6 @@
 									Style="{StaticResource BasicBtn}"
 									Margin="0,0,0,10" 
                                     Command="{Binding FindAlignFeatureCommand}"/>
-                            <UniformGrid Columns="2" Margin="0,0,0,10">
-                                <TextBlock Text="Search Area Size"
-										   Style="{StaticResource BasicTb}"/>
-                                <TextBox Text="{Binding SelectedFeature.FeatureFindArea}"
-										 Style="{StaticResource BasicTbox}"/>
-                            </UniformGrid>
-                            <UniformGrid Columns="2" Margin="0,0,0,10">
-                                <TextBlock Text="Target Score"
-										   Style="{StaticResource BasicTb}"/>
-                                <TextBox Text="{Binding SelectedFeature.FeatureTargetScore}"
-										 Style="{StaticResource BasicTbox}"/>
-                            </UniformGrid>
-                        </StackPanel>
-                    </Expander>
-                    <Expander Header="Align Parameters"
-							  Margin="0,0,0,10"
-							  Visibility="Collapsed"
-							  Foreground="White">
-                        <StackPanel>
-                            <Grid Margin="0,0,0,10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <ListView ItemsSource="{Binding p_PatternAlignList}"
-										  Height="100"
-										  Background="#FF1B1B1C"
-										  SelectedItem="{Binding SelectedAlign}">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding Name}"
-													   Foreground="White"
-													   FontWeight="Bold"
-													   FontSize="13" />
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
-                                <Image Grid.Column="1"
-									   Width="100"
-									   Height="100"/>
-                            </Grid>
-                            <Button Content="Start Align Reference"
-									Style="{StaticResource BasicBtn}"
-									Command="{Binding ChangeToolForAlign}"
-									Margin="0,0,0,10" />
-                            <Button Content="Save Align Feature"
-									Style="{StaticResource BasicBtn}"
-									Command="{Binding SaveAlignCommand}"
-									Margin="0,0,0,10" />
-                            <Button Content="Delete Align Feature"
-									Style="{StaticResource BasicBtn}"
-									Margin="0,0,0,10" />
-                            <UniformGrid Columns="2" Margin="0,0,0,10">
-                                <TextBlock Text="Snap Count"
-										   Style="{StaticResource BasicTb}"/>
-                                <TextBox Text="{Binding SelectedROI.Position.AlignSnapCount}"
-										 Style="{StaticResource BasicTbox}"/>
-                            </UniformGrid>
-                            <UniformGrid Columns="2" Margin="0,0,0,10">
-                                <TextBlock Text="Align Scan Position"
-										   Style="{StaticResource BasicTb}"/>
-                                <TextBox Text="{Binding SelectedROI.Position.AlignPositionIndex}"
-										 Style="{StaticResource BasicTbox}"/>
-                            </UniformGrid>
                             <UniformGrid Columns="2" Margin="0,0,0,10">
                                 <TextBlock Text="Search Area Size"
 										   Style="{StaticResource BasicTb}"/>

@@ -626,14 +626,16 @@ namespace RootTools
 
 		void Worker_MemoryClear_DoWork(object sender, DoWorkEventArgs e)
 		{
+			int nProgress = 0;
 			byte[] pBuf = new byte[p_Size.X];
-			for (int y = 0; y < p_Size.Y; y++)
+			Parallel.For(0, p_Size.Y, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (y) =>
 			{
 				if (Worker_MemoryClear.CancellationPending)
 					return;
 				Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + (long)p_Size.X * y), p_Size.X);
-				p_nProgress = Convert.ToInt32(((double)y / p_Size.Y) * 100);
-			}
+				p_nProgress = Convert.ToInt32(((double)nProgress / p_Size.Y) * 100);
+				nProgress++;
+			});
 		}
 
 		public void SaveImageSync(string targetPath)
@@ -705,7 +707,7 @@ namespace RootTools
 				if (p_nByte == 1)
 				{
 					nLine = 0;
-					int nNum = 2;
+					int nNum = 4;
 					Thread[] multiThread = new Thread[nNum];
 
                     for (int i = 0; i < nNum; i++)

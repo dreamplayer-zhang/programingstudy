@@ -137,20 +137,21 @@ namespace Root_Vega
 				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
 				SelectedROI = p_PatternRoiList.FirstOrDefault();
 
-				//if (SelectedROI != null)
-				//{
-				//	StripParamList = new ObservableCollection<StripParamData>(SelectedROI.Strip.ParameterList);
-				//	p_PatternReferenceList = new ObservableCollection<Reference>(SelectedROI.Position.ReferenceList);
-				//	p_PatternAlignList = new ObservableCollection<AlignData>(SelectedROI.Position.AlignList);
-				//}
+				if (SelectedROI != null)
+				{
+					StripParamList = new ObservableCollection<StripParamData>(SelectedROI.Strip.ParameterList);
+					p_PatternReferenceList = new ObservableCollection<Reference>(SelectedROI.Position.ReferenceList);
+					p_PatternAlignList = new ObservableCollection<AlignData>(SelectedROI.Position.AlignList);
+				}
 			};
 			m_Engineer.m_recipe.RecipeData.AddComplete += () => 
 			{
 				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
 				StripParamList = new ObservableCollection<StripParamData>();
 				p_PatternReferenceList = new ObservableCollection<Reference>();
+				p_PatternAlignList = new ObservableCollection<AlignData>();
 
-				SelectedROI = null;
+				_SelectedROI = null;
 
 				SelectedParam = new StripParamData();//UI 초기화를 위한 코드
 				SelectedParam = null;
@@ -249,10 +250,9 @@ namespace Root_Vega
 		}
 		#endregion
 
+        #region p_PatternAlignList
 
-		#region p_PatternAlignList
-
-		ObservableCollection<AlignData> _PatternAlignList;
+        ObservableCollection<AlignData> _PatternAlignList;
 		public ObservableCollection<AlignData> p_PatternAlignList
 		{
 			get { return _PatternAlignList; }
@@ -965,33 +965,61 @@ namespace Root_Vega
 
 		void _FindAlignFeature()
 		{
+			// variable
+			Roi roi;
+			AlignData alignData;
+			CRect crtSearchArea;
+			CPoint cptOriginCenter;
+			Point ptMaxRelative;
+			System.Drawing.PointF[] arrAlignKeyOriginPointF;
+			System.Drawing.PointF[] arrAlignKeyTempPointF;
+			System.Drawing.PointF ptfTemp;
+			System.Drawing.PointF ptfOriginCenter;
+			int nWidthDiff, nHeightDiff;
+			bool bFoundFeature = false;
+			Emgu.CV.Mat matAffine;
+			float[] farrCoef;
+
+			// implement
 			if ((App.m_engineer.m_recipe.Loaded) && (App.m_engineer.m_recipe.VegaRecipeData.RoiList.Count > 0))
-				SelectedROI = App.m_engineer.m_recipe.VegaRecipeData.RoiList[2];
+				SelectedROI = App.m_engineer.m_recipe.VegaRecipeData.RoiList[0];
 			else
 				return;
 
-			Roi roi = SelectedROI;
-			List<CPoint> lstAlignKeyCPoint = new List<CPoint>();
+			roi = SelectedROI;
+			arrAlignKeyOriginPointF = new System.Drawing.PointF[3];
+			arrAlignKeyTempPointF = new System.Drawing.PointF[3];
 			for (int j = 0; j < roi.Position.AlignList.Count; j++)
 			{
-				AlignData alignData = roi.Position.AlignList[j];
-				bool bFoundFeature = false;
-				CRect crtSearchArea;
-				Point ptMaxRelative;
-				int nWidthDiff, nHeightDiff;
+				alignData = roi.Position.AlignList[j];
 				bFoundFeature = FindFeature(alignData, out crtSearchArea, out ptMaxRelative, out nWidthDiff, out nHeightDiff);
 				if (bFoundFeature)
 				{
-					//2. feature 중심위치가 확보되면 해당 좌표를 저장
-					CPoint cptTemp = new CPoint();
-					cptTemp.X = crtSearchArea.Left + (int)ptMaxRelative.X + nWidthDiff / 2;
-					cptTemp.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + nHeightDiff / 2;
-					DrawCross(new DPoint(cptTemp.X, cptTemp.Y), MBrushes.Crimson);
-					lstAlignKeyCPoint.Add(cptTemp);
+					// Recipe에 저장된 Align Feature
+					cptOriginCenter = alignData.RoiRect.Center();
+					ptfOriginCenter = new System.Drawing.PointF(cptOriginCenter.X, cptOriginCenter.Y);
+					arrAlignKeyOriginPointF[j] = ptfOriginCenter;
+
+					// 새로 Scan된 Align Feature
+					ptfTemp = new System.Drawing.PointF();
+					ptfTemp.X = crtSearchArea.Left + (int)ptMaxRelative.X + nWidthDiff / 2;
+					ptfTemp.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + nHeightDiff / 2;
+					DrawCross(new DPoint((int)ptfTemp.X, (int)ptfTemp.Y), MBrushes.Crimson);
+					arrAlignKeyTempPointF[j] = ptfTemp;
 				}
+                else
+                {
+					MessageBox.Show("Align Fail...");
+					return;
+                }
 			}
 
+			matAffine = Emgu.CV.CvInvoke.GetAffineTransform(arrAlignKeyTempPointF, arrAlignKeyOriginPointF);
+			farrCoef = GetAffineArrayFromMat(matAffine);
+
 			p_ImageViewer.p_ImageData.UpdateImage();
+
+			return;
 		}
 
 		#region Command
