@@ -7,7 +7,7 @@ using System.Windows.Controls;
 
 namespace RootTools.Memory
 {
-    public class MemoryPool : ObservableObject, ITool
+    public class MemoryPool : NotifyProperty, ITool
     {
         const double c_fGB = 1024 * 1024 * 1024;
 
@@ -19,20 +19,24 @@ namespace RootTools.Memory
             set
             {
                 if (value == _fGB) return;
-                if (_fGB != 0) m_MMF.Dispose();
-                CreatePool(value);
+                if (_fGB == 0)
+                {
+                    if (CreatePool(value)) m_memoryTool.MemoryChanged();
+                }
                 _fGB = value;
+                OnPropertyChanged(); 
                 m_reg.Write("fGB", value);
-                m_memoryTool.MemoryChanged(); 
             }
         }
 
-        void CreatePool(double fGB)
+        bool CreatePool(double fGB)
         {
             StopWatch sw = new StopWatch();
             long nPool = (long)Math.Ceiling(fGB * c_fGB);
-            m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool);
+            try { m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool); }
+            catch (Exception) { return false; }
             m_log.Info(p_id + " Memory Pool Allocate Done " + sw.ElapsedMilliseconds.ToString() + " ms");
+            return true;
         }
         #endregion
 

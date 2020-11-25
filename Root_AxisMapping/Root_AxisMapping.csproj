@@ -25,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -198,6 +199,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MainUI\Merge_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainUI\Result_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -236,6 +241,10 @@
     <Compile Include="MainUI\Mapping.cs" />
     <Compile Include="MainUI\Mapping_UI.xaml.cs">
       <DependentUpon>Mapping_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainUI\Merge.cs" />
+    <Compile Include="MainUI\Merge_UI.xaml.cs">
+      <DependentUpon>Merge_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainUI\Result.cs" />
     <Compile Include="MainUI\Result_UI.xaml.cs">

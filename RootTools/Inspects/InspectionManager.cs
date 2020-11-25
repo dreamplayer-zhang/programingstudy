@@ -29,10 +29,35 @@ namespace RootTools.Inspects
 		/// <param name="item">Defect Information</param>
 		/// <param name="args">arguments. 필요한 경우 수정해서 사용</param>
 		public delegate void ChangeDefectInfoEventHanlder(DefectDataWrapper item);
+		public delegate void EventHandler();
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
-		public event ChangeDefectInfoEventHanlder AddDefect;
+		public event ChangeDefectInfoEventHanlder AddChromeDefect;
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddEBRDefect;
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddSideDefect;
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddBevelDefect;
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddD2DDefect;
+		/// <summary>
+		/// UI Defect을 지우기 위해 발생하는 Event
+		/// </summary>
+		public event EventHandler ClearDefect;
+		/// <summary>
+		/// UI에 추가된 Defect 정보를 새로고침 하기위한 Event
+		/// </summary>
+		public static event EventHandler RefreshDefect;
 		#endregion
 
 		Thread inspThread;
@@ -55,7 +80,7 @@ namespace RootTools.Inspects
 		System.Data.DataTable VSDataDT;
 		System.Data.DataTable SearchDataDT;
 		Dictionary<int, CPoint> refPosDictionary;
-
+		public DateTime NowTime;
 		bool m_bProgress;
 
 		public bool IsInitialized { get; private set; }
@@ -67,6 +92,7 @@ namespace RootTools.Inspects
 				//강제로 리턴
 				return;
 			}
+			NowTime = DateTime.Now;
 			m_bProgress = false;
 			sw = new StopWatch();
 			sw.Start();
@@ -96,7 +122,10 @@ namespace RootTools.Inspects
 			Parallel.For(0, nThreadNum, i =>
 			{
 				InsepctionThread[i] = new Inspection(nThreadNum);
-				InsepctionThread[i].AddDefect += InspectionManager_AddDefect;
+				InsepctionThread[i].AddChromeDefect += InspectionManager_AddChromeDefect;
+				InsepctionThread[i].AddSideDefect += InspectionManager_AddSideDefect;
+				InsepctionThread[i].AddBevelDefect += InspectionManager_AddBevelDefect;
+				InsepctionThread[i].AddEBRDefect += InspectionManager_AddEBRDefect;
 			});
 			//for (int i = 0; i < nThreadNum; i++)
 			//{
@@ -147,17 +176,40 @@ namespace RootTools.Inspects
 			}
 			//여기서 완료 이벤트 발생
 		}
+
+		private void InspectionManager_AddSideDefect(DefectDataWrapper item)
+		{
+			if (AddSideDefect != null)
+			{
+				AddSideDefect(item);
+			}
+		}
+
+		private void InspectionManager_AddEBRDefect(DefectDataWrapper item)
+		{
+			if (AddEBRDefect != null)
+			{
+				AddEBRDefect(item);
+			}
+		}
+
+		private void InspectionManager_AddBevelDefect(DefectDataWrapper item)
+		{
+			if (AddBevelDefect != null)
+			{
+				AddBevelDefect(item);
+			}
+		}
 		/// <summary>
 		/// Add Defect 이벤트가 발생할 때 실행될 메소드
 		/// </summary>
 		/// <param name="source">DefectData array</param>
 		/// <param name="args">추후 arguments가 필요하면 사용할것</param>
-		private void InspectionManager_AddDefect(DefectDataWrapper item)
+		private void InspectionManager_AddChromeDefect(DefectDataWrapper item)
 		{
-			//여기서 DB 에 추가되는 등의 동작을 해야함!
-			if (AddDefect != null)
+			if (AddChromeDefect != null)
 			{
-				AddDefect(item);
+				AddChromeDefect(item);
 			}
 		}
 
@@ -188,8 +240,8 @@ namespace RootTools.Inspects
 				{
 					System.IO.Directory.CreateDirectory(inspDefaultDir);
 				}
-				var nowTime = DateTime.Now;
-				inspFileName = nowTime.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
+				//var nowTime = DateTime.Now;
+				inspFileName = NowTime.ToString("yyyyMMdd_HHmmss") + "_inspResult.vega_result";
 				var targetVsPath = System.IO.Path.Combine(inspDefaultDir, inspFileName);
 				string VSDB_configpath = @"C:/vsdb/init/vsdb.txt";
 
@@ -283,7 +335,7 @@ namespace RootTools.Inspects
 				//}
 				System.Data.DataRow searchDataRow = SearchDataDT.NewRow();
 				searchDataRow["Idx"] = SearchDataDT.Rows.Count;
-				searchDataRow["InspStartTime"] = nowTime.ToString("yyyy-MM-dd HH:mm:ss");//TODO 나중에 진짜 검사 시작시간(로딩 시작 시간)으로 바꿔야 함
+				searchDataRow["InspStartTime"] = NowTime.ToString("yyyy-MM-dd HH:mm:ss");//TODO 나중에 진짜 검사 시작시간(로딩 시작 시간)으로 바꿔야 함
 				searchDataRow["ReticleID"] = "RETICLEID";//TODO 나중에 진짜 retilce Id를 받아와서 넣어줘야 함
 				searchDataRow["RecipeName"] = "Rcp001";//TODO 나중에 진짜 recipe name을 받아와서 넣어줘야 함
 				searchDataRow["TotalDefectCount"] = tempSet.Tables["tempdata"].Rows.Count;
@@ -336,6 +388,21 @@ namespace RootTools.Inspects
 			}
 
 		}
+
+		public void ClearDefectList()
+		{
+			if(this.ClearDefect != null)
+			{
+				this.ClearDefect();
+			}
+		}
+		public static void RefreshDefectDraw()
+		{
+			if(RefreshDefect != null)
+			{
+				RefreshDefect();
+			}
+		}
 		public System.Windows.Media.Imaging.BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
 		{
 			var bitmapData = bitmap.LockBits(
@@ -361,7 +428,7 @@ namespace RootTools.Inspects
 				for (int i = 0; i < InsepctionThread.Length; i++)
 				{
 					//이벤트 핸들러 제거
-					InsepctionThread[i].AddDefect -= InspectionManager_AddDefect;
+					InsepctionThread[i].AddChromeDefect -= InspectionManager_AddChromeDefect;
 					//InsepctionThread[i].Dispose();
 				}
 			}
@@ -643,10 +710,20 @@ namespace RootTools.Inspects
 			int result = MakeDefectCode(target, inspType, idx);
 			return result.ToString("D6");
 		}
+		/// <summary>
+		/// Defect Code로 검사 영역을 확인하는 메소드
+		/// </summary>
+		/// <param name="nDefectCode"></param>
+		/// <returns></returns>
 		public static InspectionTarget GetInspectionTarget(int nDefectCode)
 		{
 			return (InspectionTarget)(nDefectCode / 10000);
 		}
+		/// <summary>
+		/// Defect Code로 검출에 사용한 검사 알고리즘을 확인하는 메소드
+		/// </summary>
+		/// <param name="nDefectCode"></param>
+		/// <returns></returns>
 		public static InspectionType GetInspectionType(int nDefectCode)
 		{
 			int target = Convert.ToInt32(nDefectCode / 10000) * 10000;

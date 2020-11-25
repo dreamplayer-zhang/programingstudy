@@ -19,7 +19,7 @@
                 <StackPanel Grid.Row="0" Orientation="Horizontal">
                     <TextBlock Text="Pool Size" Margin="3"/>
                     <TextBox x:Name="textBoxGB" Text="{Binding p_fGB}" MinWidth="40" TextAlignment="Center" Margin="3" PreviewKeyUp="textBoxGB_PreviewKeyUp"/>
-                    <TextBlock Text="Giga Byte" Margin="3"/>
+                    <TextBlock Text="Giga Byte (Restart All)" Margin="3"/>
                 </StackPanel>
                 <ListView Grid.Row="1" x:Name="listViewGroup" ItemsSource="{Binding p_aGroup}" SelectionChanged="ListViewGroup_SelectionChanged">
                     <ListView.View>

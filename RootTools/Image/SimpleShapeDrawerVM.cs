@@ -320,7 +320,7 @@ namespace RootTools
 		public abstract void DrawEnd();
 		public abstract void Clear();
 
-		public void AddDefectInfo(DefectDataWrapper item)
+		public virtual void AddDefectInfo(DefectDataWrapper item)
 		{
 			System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
 			rect.Width = item.DrawWidth;

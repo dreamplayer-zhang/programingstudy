@@ -38,7 +38,7 @@
                                                     <ColumnDefinition/>
                                                     <ColumnDefinition Width="1.5*"/>
                                                 </Grid.ColumnDefinitions>
-                                                <CheckBox Content="Wafer ID" VerticalAlignment="Center" x:Name="cbWafer"/>
+                                                <CheckBox Content="Reticle ID" VerticalAlignment="Center" x:Name="cbWafer"/>
                                                 <TextBox Grid.Column="1" IsEnabled="{Binding ElementName=cbWafer, Path=IsChecked}"/>
                                             </Grid>
                                             <Grid Margin="0,8,0,0">

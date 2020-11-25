@@ -87,7 +87,7 @@ namespace Root_Vega
 			{
 				_dispatcher.BeginInvoke(new Action(delegate ()
 				{
-					p_InformationDrawer.AddDefectInfo(item);
+					//p_InformationDrawer.AddDefectInfo(item);
 					//p_ImageViewer.RedrawingElement();
 				}));
 			}
@@ -137,19 +137,20 @@ namespace Root_Vega
 				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
 				SelectedROI = p_PatternRoiList.FirstOrDefault();
 
-				if (SelectedROI != null)
-				{
-					StripParamList = new ObservableCollection<StripParamData>(SelectedROI.Strip.ParameterList);
-					p_PatternReferenceList = new ObservableCollection<Reference>(SelectedROI.Position.ReferenceList);
-					p_PatternAlignList = new ObservableCollection<AlignData>(SelectedROI.Position.AlignList);
-				}
+				//if (SelectedROI != null)
+				//{
+				//	StripParamList = new ObservableCollection<StripParamData>(SelectedROI.Strip.ParameterList);
+				//	p_PatternReferenceList = new ObservableCollection<Reference>(SelectedROI.Position.ReferenceList);
+				//	p_PatternAlignList = new ObservableCollection<AlignData>(SelectedROI.Position.AlignList);
+				//}
 			};
 			m_Engineer.m_recipe.RecipeData.AddComplete += () => 
 			{
 				p_PatternRoiList = new ObservableCollection<Roi>(m_Engineer.m_recipe.VegaRecipeData.RoiList.Where(x => x.RoiType == Roi.Item.ReticlePattern));
 				StripParamList = new ObservableCollection<StripParamData>();
+				p_PatternReferenceList = new ObservableCollection<Reference>();
 
-				_SelectedROI = null;
+				SelectedROI = null;
 
 				SelectedParam = new StripParamData();//UI 초기화를 위한 코드
 				SelectedParam = null;
@@ -193,10 +194,7 @@ namespace Root_Vega
 			get { return _SelectedROI; }
 			set
 			{
-				if (value != null)
-				{
-					SetProperty(ref _SelectedROI, value);
-				}
+				SetProperty(ref _SelectedROI, value);
 			}
 		}
 		#endregion
@@ -221,10 +219,7 @@ namespace Root_Vega
 			get { return _SelectedParam; }
 			set
 			{
-				if (value != null)
-				{
-					SetProperty(ref _SelectedParam, value);
-				}
+				SetProperty(ref _SelectedParam, value);
 			}
 		}
 		#endregion
@@ -971,7 +966,7 @@ namespace Root_Vega
 		void _FindAlignFeature()
 		{
 			if ((App.m_engineer.m_recipe.Loaded) && (App.m_engineer.m_recipe.VegaRecipeData.RoiList.Count > 0))
-				SelectedROI = App.m_engineer.m_recipe.VegaRecipeData.RoiList[0];
+				SelectedROI = App.m_engineer.m_recipe.VegaRecipeData.RoiList[2];
 			else
 				return;
 

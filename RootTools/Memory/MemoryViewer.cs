@@ -52,7 +52,7 @@ namespace RootTools.Memory
         Grid m_gridDraw; 
         public void Draw(Grid grid)
         {
-            m_gridDraw = grid;
+            if (grid != null) m_gridDraw = grid;
             m_timer.Start(); 
         }
         #endregion

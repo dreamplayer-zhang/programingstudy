@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_AOP01_Inspection"
              mc:Ignorable="d" 
-             d:DesignHeight="1832" d:DesignWidth="1895" Background="{StaticResource PanelBackGround}">
+             d:DesignHeight="832" d:DesignWidth="1895" Background="{StaticResource PanelBackGround}">
         <!--d:DesignHeight="832" d:DesignWidth="1895" Background="{StaticResource PanelBackGround}">-->
     <Grid>
         <Grid.ColumnDefinitions>
@@ -54,7 +54,7 @@
                        Margin="0,10,10,0"
                        FontWeight="Bold"/>
                     <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
-                    <Grid Height="200">
+                    <Grid Height="150">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
@@ -96,7 +96,7 @@
                        Margin="0,10,10,0"
                        FontWeight="Bold"/>
                     <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
-                    <Grid Height="200">
+                    <Grid Height="150">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
@@ -138,7 +138,7 @@
                        Margin="0,10,10,0"
                        FontWeight="Bold"/>
                     <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
-                    <Grid Height="200">
+                    <Grid Height="150">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
@@ -209,7 +209,7 @@
                        Margin="0,10,10,0"
                        FontWeight="Bold"/>
                     <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
-                    <Grid Height="200">
+                    <Grid Height="150">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
@@ -237,7 +237,7 @@
                             <TextBlock Text="192.0.0.0"              Grid.Row="0" Grid.Column="2"/>
                             <TextBlock Text="Port Num" FontWeight="Bold"   Grid.Row="1" Grid.Column="0"/>
                             <TextBlock Text=":"               Grid.Row="1" Grid.Column="1"/>
-                            <TextBlock Text="1000"               Grid.Row="1" Grid.Column="2"/>
+                            <TextBlock Text="3000"               Grid.Row="1" Grid.Column="2"/>
                             <TextBlock Text="Connect" FontWeight="Bold"        Grid.Row="2" Grid.Column="0"/>
                             <TextBlock Text=":"               Grid.Row="2" Grid.Column="1"/>
                             <TextBlock Text="False" Grid.Row="2" Grid.Column="2"/>

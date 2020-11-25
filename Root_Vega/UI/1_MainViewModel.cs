@@ -170,6 +170,20 @@ namespace Root_Vega
             //((GAF_Manager)m_Engineer.ClassGAFManager()).GetALID(this.ToString(), eAlarm.TestAlarm4, "Test Alarm 4", "?!._-특수문자 테스트!@#$| 되는지 확인");
         }
 
+        public bool bTest = false;
+
+        public bool p_test
+        {
+            get
+            {
+                return bTest;
+            }
+            set
+            {
+                SetProperty(ref bTest, value);
+            }
+        }
+
         void TestFunction()
         {
             p_MiniImageViewer_Left.SetRoiRect();
@@ -179,6 +193,8 @@ namespace Root_Vega
             p_MiniImageViewer_Top.SetImageSource();
             p_MiniImageViewer_Left.SetImageSource();
             p_MiniImageViewer_Right.SetImageSource();
+            p_test = !p_test;
+
             //((GAF_Manager)m_Engineer.ClassGAFManager()).SetAlarm(this.ToString(), eAlarm.TestAlarm2);
 
             //if (EQ.p_eState == EQ.eState.Init)

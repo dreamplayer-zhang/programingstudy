@@ -14,7 +14,7 @@ namespace Root_AxisMapping.MainUI
         AxisMapping.Run_Grab m_runGrab;
         void InitRunGrab()
         {
-            m_runGrab = (AxisMapping.Run_Grab)m_axisMapping.m_runGrab.Clone();
+            m_runGrab = (AxisMapping.Run_Grab)m_axisMapping.m_runGrab;
         }
 
         public string RunGrab()

@@ -17,6 +17,9 @@
             <TabItem Header=" Result ">
                 <local:Result_UI x:Name="resultUI"/>
             </TabItem>
+            <TabItem Header=" Merge ">
+                <local:Merge_UI x:Name="mergeUI"/>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

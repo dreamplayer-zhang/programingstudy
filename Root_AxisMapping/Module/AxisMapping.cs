@@ -18,7 +18,8 @@ namespace Root_AxisMapping.Module
         DIO_O m_doVacuum;
         public MemoryPool m_memoryPool;
         public MemoryPool m_memoryPoolResult;
-        CameraDalsa m_cam;
+        public MemoryPool m_memoryPoolMerge;
+        public CameraDalsa m_cam;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
@@ -27,6 +28,7 @@ namespace Root_AxisMapping.Module
             p_sInfo = m_toolBox.Get(ref m_doVacuum, this, "Vacuum");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 4);
             p_sInfo = m_toolBox.Get(ref m_memoryPoolResult, this, "MemoryResult", 1);
+            p_sInfo = m_toolBox.Get(ref m_memoryPoolMerge, this, "MemoryMerge", 1);
             p_sInfo = m_toolBox.Get(ref m_cam, this, "Camera");
             if (bInit) InitTools();
         }
@@ -38,11 +40,14 @@ namespace Root_AxisMapping.Module
 
         #region Memory
         MemoryGroup m_memoryGroup;
-        MemoryGroup m_memoryGroupResult;
         MemoryData m_memoryGrab;
-        MemoryData m_memoryResult;
         CPoint m_szGrab = new CPoint(16000, 250000);
-        CPoint m_szResult = new CPoint(14336, 14336); 
+        MemoryGroup m_memoryGroupResult;
+        MemoryData m_memoryResult;
+        CPoint m_szResult = new CPoint(14336, 14336);
+        MemoryGroup m_memoryGroupMerge;
+        MemoryData m_memoryMerge;
+        CPoint m_szMerge = new CPoint(13000, 13000);
         public override void InitMemorys()
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
@@ -52,6 +57,9 @@ namespace Root_AxisMapping.Module
             m_memoryGroupResult = m_memoryPoolResult.GetGroup(p_id);
             m_memoryResult = m_memoryGroupResult.CreateMemory("Result", 1, 1, m_szResult);
             m_memoryPoolResult.m_viewer.p_memoryData = m_memoryResult;
+            m_memoryGroupMerge = m_memoryPoolMerge.GetGroup(p_id);
+            m_memoryMerge = m_memoryGroupMerge.CreateMemory("Merge", 1, 1, m_szMerge);
+            m_memoryPoolMerge.m_viewer.p_memoryData = m_memoryMerge;
         }
         #endregion
 

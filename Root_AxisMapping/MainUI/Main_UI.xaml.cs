@@ -14,7 +14,8 @@ namespace Root_AxisMapping.MainUI
 
         Align m_align;
         Mapping m_mapping;
-        Result m_result; 
+        Result m_result;
+        Merge m_merge; 
         public void Init(AxisMapping_Engineer engineer)
         {
             m_align = new Align("Align", engineer);
@@ -22,7 +23,9 @@ namespace Root_AxisMapping.MainUI
             m_mapping = new Mapping("Mapping", engineer);
             mappingUI.Init(m_mapping);
             m_result = new Result("Result", m_mapping, engineer);
-            resultUI.Init(m_result); 
+            resultUI.Init(m_result);
+            m_merge = new Merge("Merge", m_mapping, m_result, engineer);
+            mergeUI.Init(m_merge); 
         }
     }
 }

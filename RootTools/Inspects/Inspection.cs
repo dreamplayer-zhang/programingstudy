@@ -19,7 +19,11 @@ namespace RootTools.Inspects
 		public EventHandler InspectionStart;
 		public EventHandler InspectionComplete;
 		public delegate void ChangeDefectInfoEventHander(DefectDataWrapper item);
-		public event ChangeDefectInfoEventHander AddDefect;
+		public event ChangeDefectInfoEventHander AddChromeDefect;
+		public event ChangeDefectInfoEventHander AddEBRDefect;
+		public event ChangeDefectInfoEventHander AddSideDefect;
+		public event ChangeDefectInfoEventHander AddBevelDefect;
+		public event ChangeDefectInfoEventHander AddD2DDefect;
 		#endregion
 
 		int threadIndex = -1;
@@ -50,15 +54,15 @@ namespace RootTools.Inspects
 		public void Dispose()
 		{
 			//clrInsp.Dispose();
-			if(_thread.IsAlive)
+			if (_thread.IsAlive)
 			{
 				//_thread.Interrupt();
 				_thread.Interrupt();
 				shouldStop = false;
 			}
 		}
-		
-		
+
+
 
 		public void D2DRectInsp(CCLRD2DStructure StrucRef)
 		{
@@ -121,7 +125,7 @@ namespace RootTools.Inspects
 								m_InspProp.p_surfaceParam.DefectSize,
 								m_InspProp.p_surfaceParam.UseDarkInspection,
 								m_InspProp.p_surfaceParam.UseAbsoluteInspection,
-								(void *)m_InspProp.p_ptrMemory);
+								(void*)m_InspProp.p_ptrMemory);
 
 								foreach (var item in temp)
 								{
@@ -153,7 +157,7 @@ namespace RootTools.Inspects
 								m_InspProp.p_StripParam.DefectSize,
 								m_InspProp.p_StripParam.Intensity,
 								m_InspProp.p_StripParam.Bandwidth,
-								(void *)m_InspProp.p_ptrMemory);
+								(void*)m_InspProp.p_ptrMemory);
 
 								foreach (var item in temp)
 								{
@@ -166,11 +170,73 @@ namespace RootTools.Inspects
 					{
 						arrDefects = DefectDataWrapper.MergeDefect(arrDefects.ToArray(), m_InspProp.p_nMergeDistance);
 					}
-					if (AddDefect != null)//대리자 호출을 간단하게 만들 수 있으나 vs2013에서 호환이 안 될 가능성이 없어 보류
+					if (AddChromeDefect != null)
 					{
-						foreach (var item in arrDefects)
+						if (arrDefects != null && arrDefects.Count > 0)
 						{
-							AddDefect(item);
+							if (InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.Chrome)
+							{
+								foreach (var item in arrDefects)
+								{
+									AddChromeDefect(item);
+								}
+							}
+						}
+					}
+					else if (AddEBRDefect != null)
+					{
+						if (arrDefects != null && arrDefects.Count > 0)
+						{
+							if (InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.EBR)
+							{
+								foreach (var item in arrDefects)
+								{
+									AddEBRDefect(item);
+								}
+							}
+						}
+					}
+					else if (AddD2DDefect != null)
+					{
+						if (arrDefects != null && arrDefects.Count > 0)
+						{
+							if(InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.D2D)
+							{
+								foreach (var item in arrDefects)
+								{
+									AddD2DDefect(item);
+								}
+							}
+						}
+					}
+					else if (AddSideDefect != null)
+					{
+						if(arrDefects != null && arrDefects.Count > 0)
+						{
+							if (
+								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) >= InspectionTarget.SideInspection &&
+								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) <= InspectionTarget.SideInspectionBottom)
+							{
+								foreach (var item in arrDefects)
+								{
+									AddSideDefect(item);
+								}
+							}
+						}
+					}
+					else if (AddBevelDefect != null )
+					{
+						if (arrDefects != null && arrDefects.Count > 0)
+						{
+							if (
+								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) >= InspectionTarget.BevelInspection &&
+								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) <= InspectionTarget.BevelInspectionBottom)
+							{
+								foreach (var item in arrDefects)
+								{
+									AddBevelDefect(item);
+								}
+							}
 						}
 					}
 					arrDefects.Clear();
@@ -180,7 +246,7 @@ namespace RootTools.Inspects
 					shouldStop = true;
 					bState = InspectionState.Done;
 					//여기서 완료이벤트?
-					if(_thread.ThreadState == ThreadState.WaitSleepJoin)
+					if (_thread.ThreadState == ThreadState.WaitSleepJoin)
 					{
 						_thread.Interrupt();
 					}
