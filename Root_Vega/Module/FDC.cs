@@ -28,28 +28,49 @@ namespace Root_Vega.Module
         #region RS232
         private void M_rs232_OnRecieve(byte[] aRead, ref int nRead)
         {
-            
-        }
+			p_sInfo = ReadFDC(aRead, ref nRead);
+		}
         #endregion
 
-        string ReadFDC(string sRead)
+        string ReadFDC(byte[] aByte, ref int nRead)
         {
-            if (sRead.Length < 7) return "Short Message : " + sRead.Length.ToString();
-            byte[] aByte = Encoding.UTF8.GetBytes(sRead);
-            int nFDC = aByte[0] - 1;
-            if (nFDC < 0) return "Invalid FDC Module ID : " + nFDC.ToString();
-            if (nFDC >= m_aData.Count) return "Invalid FDC Module ID : " + nFDC.ToString();
-            if (aByte[1] != 0x04) return "Function is not Read Input Register : " + aByte[1].ToString();
-            if (aByte[2] != 2) return "Data Byte is not 2 : " + aByte[2].ToString();
-            ushort uValue = aByte[3];
-            uValue = (ushort)((uValue << 8) + aByte[4]);
-            ushort uCRC = aByte[6];
-            uCRC = (ushort)((uCRC << 8) + aByte[5]);
-            if (uCRC != CalcCRC(aByte, 5)) return "Invalid CRC";
-            m_aData[nFDC].p_fValue = uValue;
-            return "OK"; 
+            try
+            {
+                Recieve_OK = true;
+                if (nRead != 9) return "Message Length Error: " + aByte.Length.ToString();
+                aByte[9] = (byte)0x00;
+                int nFDC = aByte[0] - 1;
+
+                int nData1 = (int)(char)aByte[3];
+                int nData2 = (int)(char)aByte[4];
+                if (nData1 > 127) nData1 = nData1 - 256;
+                int nData = nData1 * 16 * 16 + nData2;
+                m_aData[nFDC].p_fValue = nData;
+            }
+            catch (Exception ex)
+            {
+            }
+            return "OK";
+
+            ////if (sRead.Length < 7) return "Short Message : " + sRead.Length.ToString();
+            //Recieve_OK = true;
+            ////byte[] aByte = Encoding.UTF8.GetBytes(sRead);
+            //if (nRead < 7) return "Short Message : " + aByte.Length.ToString();
+            //int nFDC = aByte[0] - 1;
+            //if (nFDC < 0) return "Invalid FDC Module ID : " + nFDC.ToString();
+            //if (nFDC >= m_aData.Count) return "Invalid FDC Module ID : " + nFDC.ToString();
+            //if (aByte[1] != 0x04) return "Function is not Read Input Register : " + aByte[1].ToString();
+            ////if (aByte[2] != 2) return "Data Byte is not 2 : " + aByte[2].ToString();
+            //ushort uValue = aByte[3];
+            //uValue = (ushort)((uValue << 8) + aByte[4]);
+            ////ushort uCRC = aByte[6];
+            ////uCRC = (ushort)((uCRC << 8) + aByte[5]);
+            ////if (uCRC != CalcCRC(aByte, 5)) return "Invalid CRC";
+            //m_aData[nFDC].p_fValue = uValue;
         }
 
+
+        bool Recieve_OK = true;
         byte[] m_aSend = new byte[8]; 
         void SendQuery(int nFDC, int nAdd)
         {
@@ -146,6 +167,7 @@ namespace Root_Vega.Module
 
         public class Data : NotifyProperty
         {
+
             public string p_id { get; set; }
 
             eUnit _eUnit = eUnit.None;
@@ -176,6 +198,7 @@ namespace Root_Vega.Module
                 }
             }
             ALID m_alidSend;
+            public FDC_ControlViewModel viewModel;
 
             SVID m_svValue;
             int _nValue = 0; 
@@ -194,7 +217,9 @@ namespace Root_Vega.Module
                     double dValue = Math.Abs(m_svValue.p_value - (m_aLimit[0] + m_aLimit[1]) / 2);
                     int nRed = (int)(500 * dValue / (m_aLimit[1] - m_aLimit[0]));
                     if (nRed > 250) nRed = 250;
-                    p_color = Color.FromRgb((byte)nRed, (byte)(250 - nRed), 0); 
+                    p_color = Color.FromRgb((byte)nRed, (byte)(250 - nRed), 0);
+                    viewModel.p_CurrentValue = m_svValue.p_value;
+
                 }
             }
 
@@ -246,7 +271,6 @@ namespace Root_Vega.Module
 
         #region List Data
         public ObservableCollection<Data> m_aData = new ObservableCollection<Data>();
-
         public int p_lData
         {
             get { return m_aData.Count; }
@@ -257,10 +281,10 @@ namespace Root_Vega.Module
                 while (m_aData.Count > value) m_aData.RemoveAt(m_aData.Count - 1);
             }
         }
-        
+        int m_module_number = 0;
         void RunTreeData(Tree tree)
         {
-            int module_number = 0;
+
             p_lData = tree.Set(p_lData, p_lData, "Count", "FDC Module Count");
             for (int n = 0; n < m_aData.Count; n++)
             {
@@ -268,9 +292,10 @@ namespace Root_Vega.Module
             }
             foreach (Data data in m_aData)
             {
-                module_number++;
-                data.RunTree(tree.GetTree(data.p_id), module_number); 
+                m_module_number++;
+                data.RunTree(tree.GetTree(data.p_id), m_module_number); 
             }
+            m_module_number = 0;
         }
         #endregion
 
@@ -278,16 +303,32 @@ namespace Root_Vega.Module
         int m_iData = 0; 
         protected override void RunThread()
         {
-            base.RunThread();
-            Thread.Sleep(m_msInterval);
-            if (m_aData.Count > 0)
-            {
-                SendQuery(m_iData, 1000);
-                m_iData = (m_iData + 1) % m_aData.Count;
-            }
-        }
+            byte[] a=new byte[10];
+            int b=0;
+            ReadFDC(a, ref b);
+                base.RunThread();
+			Thread.Sleep(m_msInterval);
+			if (m_rs232.m_sp != null)
+			{
+				if (!m_rs232.m_sp.IsOpen)
+				{
+					m_rs232.Connect();
+					return;
+				}
+				if (Recieve_OK)
+				{
+					if (m_aData.Count > 0)
+					{
+						SendQuery(m_iData, 1000);
+						m_iData = (m_iData + 1) % m_aData.Count;
+						Recieve_OK = false;
 
-        int m_msInterval = 100; 
+					}
+				}
+			}
+		}
+
+		int m_msInterval = 100; 
         void RunTreeThread(Tree tree)
         {
             m_msInterval = tree.Set(m_msInterval, m_msInterval, "Interval", "Check Interval (ms)"); 
@@ -307,6 +348,7 @@ namespace Root_Vega.Module
         {
             p_id = id;
             base.InitBase(id, engineer);
+
         }
 
         public override void ThreadStop()

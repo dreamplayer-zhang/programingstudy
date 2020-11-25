@@ -65,7 +65,7 @@ namespace RootTools.Comm
             }
         }
 
-        string Connect()
+        public string Connect()
         {
             if (m_sp != null) ThreadStop();
             try
@@ -149,13 +149,17 @@ namespace RootTools.Comm
         static readonly object m_csLock = new object();
         public string Send(byte[] aWrite, int nWrite, int nOffset = 0)
         {
-            lock (m_csLock)
+            if (m_sp != null)
             {
-                string sWrite = Encoding.ASCII.GetString(aWrite, nOffset, nWrite);
-                m_commLog.Add(CommLog.eType.Send, sWrite);
-                m_sp.Write(aWrite, nOffset, nWrite);
-                return "OK";
+                lock (m_csLock)
+                {
+                    string sWrite = Encoding.ASCII.GetString(aWrite, nOffset, nWrite);
+                    m_commLog.Add(CommLog.eType.Send, sWrite);
+                    m_sp.Write(aWrite, nOffset, nWrite);
+                    return "OK";
+                }
             }
+            return "OK";
         }
         #endregion
 
