@@ -29,27 +29,31 @@ namespace Root_Vega.Module
         #region RS232
         private void M_rs232_OnRecieve(byte[] aRead, ref int nRead)
         {
-            
-        }
-        
-        string ReadFDC(string sRead)
-        {
-            if (sRead.Length < 7) return "Short Message : " + sRead.Length.ToString();
-            byte[] aByte = Encoding.UTF8.GetBytes(sRead);
-            int nFDC = aByte[0] - 1;
-            if (nFDC < 0) return "Invalid FDC Module ID : " + nFDC.ToString();
-            if (nFDC >= m_aData.Count) return "Invalid FDC Module ID : " + nFDC.ToString();
-            if (aByte[1] != 0x04) return "Function is not Read Input Register : " + aByte[1].ToString();
-            if (aByte[2] != 2) return "Data Byte is not 2 : " + aByte[2].ToString();
-            ushort uValue = aByte[3];
-            uValue = (ushort)((uValue << 8) + aByte[4]);
-            ushort uCRC = aByte[6];
-            uCRC = (ushort)((uCRC << 8) + aByte[5]);
-            if (uCRC != CalcCRC(aByte, 5)) return "Invalid CRC";
-            m_aData[nFDC].p_fValue = uValue;
-            return "OK"; 
+            p_sInfo = ReadFDC(aRead, ref nRead);
         }
 
+        string ReadFDC(byte[] aByte, ref int nRead)
+        {
+            try
+            {
+                Recieve_OK = true;
+                if (nRead != 9) return "Message Length Error: " + aByte.Length.ToString();
+                aByte[9] = (byte)0x00;
+                int nFDC = aByte[0] - 1;
+
+                int nData1 = (int)(char)aByte[3];
+                int nData2 = (int)(char)aByte[4];
+                if (nData1 > 127) nData1 = nData1 - 256;
+                int nData = nData1 * 16 * 16 + nData2;
+                m_aData[nFDC].p_fValue = nData;
+            }
+            catch (Exception ex)
+            {
+            }
+            return "OK";
+        }
+
+        bool Recieve_OK = true;
         byte[] m_aSend = new byte[8]; 
         void SendQuery(int nFDC, int nAdd)
         {
@@ -280,10 +284,23 @@ namespace Root_Vega.Module
         {
             base.RunThread();
             Thread.Sleep(m_msInterval);
-            if (m_aData.Count > 0)
+            if (m_rs232.m_sp != null)
             {
-                SendQuery(m_iData, 1000);
-                m_iData = (m_iData + 1) % m_aData.Count;
+                if (!m_rs232.m_sp.IsOpen)
+                {
+                    m_rs232.Connect();
+                    return;
+                }
+                if (Recieve_OK)
+                {
+                    if (m_aData.Count > 0)
+                    {
+                        SendQuery(m_iData, 1000);
+                        m_iData = (m_iData + 1) % m_aData.Count;
+                        Recieve_OK = false;
+
+                    }
+                }
             }
         }
 

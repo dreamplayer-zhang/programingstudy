@@ -65,7 +65,7 @@ namespace RootTools.Comm
             }
         }
 
-        string Connect()
+        public string Connect()
         {
             if (m_sp != null) ThreadStop();
             try
