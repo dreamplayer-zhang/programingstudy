@@ -25,7 +25,7 @@ namespace Root_WIND2
             InitializeComponent();
         }
 
-        public void init(bool useFront, bool useBack, bool useEdge, bool useEBR)
+        public void Init(bool useFront, bool useBack, bool useEdge, bool useEBR)
         {
             FrontOption.Visibility = VisibleOption(useFront);
             BackOption.Visibility = VisibleOption(useBack);
@@ -37,18 +37,46 @@ namespace Root_WIND2
         {
             AddDefect(gridFront, theta);
         }
+
+        public void DisplaySelectedDefect(int listCnt, int index, double theta)
+		{
+            CheckViewData(listCnt, index);
+            AddDefect(gridFront, theta, Brushes.Yellow);
+        }
+
+        protected void CheckViewData(int listCnt, int index)
+        {
+            if (gridFront.Children.Count > listCnt)
+                gridFront.Children.RemoveAt(gridFront.Children.Count - 1);
+
+            for (int i = 0; i < gridFront.Children.Count; i++)
+            {
+                if (gridFront.Children[i].Visibility == Visibility.Hidden)
+                {
+                    gridFront.Children[i].Visibility = Visibility.Visible;
+                    break;
+                }
+            }
+            gridFront.Children[index - 1].Visibility = Visibility.Hidden;
+        }
     
-        public void AddDefect(Grid gridArea, double theta)
+        private void AddDefect(Grid gridArea, double theta, Brush brush = null)
         {
             Rectangle defect = new Rectangle();
             defect.Width = 10;
             defect.Height = 10;
-            if(gridArea == gridFront)
-                defect.Fill = Brushes.Red;
-            if (gridArea == gridBack)
-                defect.Fill = Brushes.Blue;
-            if (gridArea == gridEdge)
-                defect.Fill = Brushes.Green;
+
+            if (brush != null)
+                defect.Fill = brush;
+            else
+            {
+                if (gridArea == gridFront)
+                    defect.Fill = Brushes.Red;
+                if (gridArea == gridBack)
+                    defect.Fill = Brushes.Blue;
+                if (gridArea == gridEdge)
+                    defect.Fill = Brushes.Green;
+            }
 
             defect.Stroke = Brushes.Black;
             defect.StrokeThickness = 0.5;
@@ -61,6 +89,7 @@ namespace Root_WIND2
 
             gridArea.Children.Add(defect);             
         }
+
         public void AddDefectList(List<EdgeDefect> listDefect)
         {
             foreach (EdgeDefect defect in listDefect)
@@ -85,7 +114,6 @@ namespace Root_WIND2
                 }
             }
         }
-
 
         private Visibility VisibleOption(bool use)
         {

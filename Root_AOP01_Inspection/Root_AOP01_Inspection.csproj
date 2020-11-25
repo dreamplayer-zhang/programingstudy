@@ -407,5 +407,8 @@
     <Resource Include="Control\Icon\Resource\home_127px.png" />
     <Resource Include="Control\Icon\Resource\save_127px.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\ChartEBR.PNG" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

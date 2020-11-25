@@ -54,15 +54,15 @@ namespace RootTools.Inspects
 		public void Dispose()
 		{
 			//clrInsp.Dispose();
-			if(_thread.IsAlive)
+			if (_thread.IsAlive)
 			{
 				//_thread.Interrupt();
 				_thread.Interrupt();
 				shouldStop = false;
 			}
 		}
-		
-		
+
+
 
 		public void D2DRectInsp(CCLRD2DStructure StrucRef)
 		{
@@ -125,7 +125,7 @@ namespace RootTools.Inspects
 								m_InspProp.p_surfaceParam.DefectSize,
 								m_InspProp.p_surfaceParam.UseDarkInspection,
 								m_InspProp.p_surfaceParam.UseAbsoluteInspection,
-								(void *)m_InspProp.p_ptrMemory);
+								(void*)m_InspProp.p_ptrMemory);
 
 								foreach (var item in temp)
 								{
@@ -157,7 +157,7 @@ namespace RootTools.Inspects
 								m_InspProp.p_StripParam.DefectSize,
 								m_InspProp.p_StripParam.Intensity,
 								m_InspProp.p_StripParam.Bandwidth,
-								(void *)m_InspProp.p_ptrMemory);
+								(void*)m_InspProp.p_ptrMemory);
 
 								foreach (var item in temp)
 								{
@@ -170,43 +170,73 @@ namespace RootTools.Inspects
 					{
 						arrDefects = DefectDataWrapper.MergeDefect(arrDefects.ToArray(), m_InspProp.p_nMergeDistance);
 					}
-					if (AddChromeDefect != null && InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.Chrome)
+					if (AddChromeDefect != null)
 					{
-						foreach (var item in arrDefects)
+						if (arrDefects != null && arrDefects.Count > 0)
 						{
-							AddChromeDefect(item);
+							if (InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.Chrome)
+							{
+								foreach (var item in arrDefects)
+								{
+									AddChromeDefect(item);
+								}
+							}
 						}
 					}
-					else if (AddEBRDefect != null && InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.EBR)
+					else if (AddEBRDefect != null)
 					{
-						foreach (var item in arrDefects)
+						if (arrDefects != null && arrDefects.Count > 0)
 						{
-							AddEBRDefect(item);
+							if (InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.EBR)
+							{
+								foreach (var item in arrDefects)
+								{
+									AddEBRDefect(item);
+								}
+							}
 						}
 					}
-					else if (AddD2DDefect != null && InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.D2D)
+					else if (AddD2DDefect != null)
 					{
-						foreach (var item in arrDefects)
+						if (arrDefects != null && arrDefects.Count > 0)
 						{
-							AddD2DDefect(item);
+							if(InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.D2D)
+							{
+								foreach (var item in arrDefects)
+								{
+									AddD2DDefect(item);
+								}
+							}
 						}
 					}
-					else if(AddSideDefect != null && 
-						InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) >= InspectionTarget.SideInspection &&
-						InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) <= InspectionTarget.SideInspectionBottom)
+					else if (AddSideDefect != null)
 					{
-						foreach (var item in arrDefects)
+						if(arrDefects != null && arrDefects.Count > 0)
 						{
-							AddSideDefect(item);
+							if (
+								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) >= InspectionTarget.SideInspection &&
+								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) <= InspectionTarget.SideInspectionBottom)
+							{
+								foreach (var item in arrDefects)
+								{
+									AddSideDefect(item);
+								}
+							}
 						}
 					}
-					else if (AddBevelDefect != null &&
-						InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) >= InspectionTarget.BevelInspection &&
-						InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) <= InspectionTarget.BevelInspectionBottom)
+					else if (AddBevelDefect != null )
 					{
-						foreach (var item in arrDefects)
+						if (arrDefects != null && arrDefects.Count > 0)
 						{
-							AddBevelDefect(item);
+							if (
+								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) >= InspectionTarget.BevelInspection &&
+								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) <= InspectionTarget.BevelInspectionBottom)
+							{
+								foreach (var item in arrDefects)
+								{
+									AddBevelDefect(item);
+								}
+							}
 						}
 					}
 					arrDefects.Clear();
@@ -216,7 +246,7 @@ namespace RootTools.Inspects
 					shouldStop = true;
 					bState = InspectionState.Done;
 					//여기서 완료이벤트?
-					if(_thread.ThreadState == ThreadState.WaitSleepJoin)
+					if (_thread.ThreadState == ThreadState.WaitSleepJoin)
 					{
 						_thread.Interrupt();
 					}

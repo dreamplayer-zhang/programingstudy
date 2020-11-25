@@ -120,9 +120,6 @@
                             <MenuItem Header="Load">
 
                             </MenuItem>
-                            <MenuItem Header="Import">
-
-                            </MenuItem>
                             <MenuItem Header="Save">
 
                             </MenuItem>
@@ -164,9 +161,6 @@
                                 </Grid>
                             </MenuItem.Header>
                             <MenuItem Header="Login">
-                                
-                            </MenuItem>
-                            <MenuItem Header="Alarm">
 
                             </MenuItem>
                             <MenuItem Header="RTR">
@@ -178,6 +172,30 @@
                             <MenuItem Header="Setting">
                                 
                             </MenuItem>
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="100"
+                                  BorderThickness="0,0,0,0" Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="100">
+                                    <TextBlock Text="Network"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Online">
+
+                            </MenuItem>
+                            <MenuItem Header="Offline" IsEnabled="False">
+
+                            </MenuItem>
+                            <MenuItem Header="GEM" IsEnabled="False">
+
+                            </MenuItem>
+                            
                         </MenuItem>
                         <MenuItem Background="{StaticResource ControlBackGround}"
                                   BorderBrush="#FF707070"
