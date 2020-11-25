@@ -15,36 +15,26 @@
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="32*"/>
-                        <RowDefinition Height="15*"/>
-                        <RowDefinition Height="53*"/>
+                        <RowDefinition Height="25*"/>
+                        <RowDefinition Height="20*"/>
+                        <RowDefinition Height="55*"/>
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0" Header="Progress">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="1.5*"/>
                                 <RowDefinition Height="1*"/>
-                                <RowDefinition Height="0.8*"/>
+                                <RowDefinition Height="1*"/>
                                 <RowDefinition Height="1*"/>
                             </Grid.RowDefinitions>
                             <StackPanel Grid.Row="0" Margin="10,5" VerticalAlignment="Center">
                                 <TextBlock Text="Total Progress" FontSize="16" FontWeight="Bold"/>
                                 <Grid>
-                                    <ProgressBar Height="40" Margin="0,5" Value="55"/>
+                                    <ProgressBar Height="30" Margin="0,5" Value="55"/>
                                     <TextBlock Text="55%" HorizontalAlignment="Center" VerticalAlignment="Center"
                                                    FontWeight="Bold" FontSize="13"/>
                                 </Grid>
                             </StackPanel>
-                            <StackPanel Grid.Row="1" Margin="10,2" VerticalAlignment="Center">
-                                <TextBlock Text="Sub Progress" FontSize="13" FontWeight="Bold"/>
-                                <Grid>
-                                    <ProgressBar Height="25" Value="80"/>
-                                    <TextBlock Text="Sub Process Name" 
-                                                   VerticalAlignment="Center" 
-                                                   HorizontalAlignment="Center"/>
-                                </Grid>
-                            </StackPanel>
-                            <UniformGrid Grid.Row="2"
+                            <UniformGrid Grid.Row="1"
                                          Columns="2"
                                          Margin="20,0">
                                 <TextBlock Text="Need" VerticalAlignment="Center"/>
@@ -52,11 +42,11 @@
                                 <TextBlock Text="Run" VerticalAlignment="Center"/>
                                 <TextBlock Text="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             </UniformGrid>
-                            <Button Content="STOP" Grid.Row="3" Style="{StaticResource SetupPanelBtn}" Margin="9"/>
+                            <Button Content="Start" Grid.Row="2" Style="{StaticResource SetupPanelBtn}" Margin="9"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="1" Header="Product">
-                        <UniformGrid Margin="20,5" Columns="2">
+                        <UniformGrid Margin="20,10" Columns="2">
                             <TextBlock Text="Pod ID" VerticalAlignment="Center" />
                             <TextBlock Text="-" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                             <TextBlock Text="Lot ID" VerticalAlignment="Center"/>
@@ -220,81 +210,172 @@
                         </Grid.ColumnDefinitions>
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition Height="0.5*"/>
-                                <RowDefinition Height="0.5*"/>
-                                <RowDefinition Height="0.5*"/>
+                                <RowDefinition Height="1.5*"/>
                                 <RowDefinition/>
                                 <RowDefinition/>
-                                <RowDefinition Height="0.5*"/>
-                                <RowDefinition Height="0.5*"/>
-                                <RowDefinition Height="0.5*"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="1.5*"/>
+                                <RowDefinition Height="1.5*"/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+
                             </Grid.RowDefinitions>
                             <GroupBox Header="Pellicle Expanding">
-                                <UniformGrid Margin="10" Rows="3" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Min" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Max" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                </UniformGrid>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="30"/>
+                                    </Grid.RowDefinitions>
+                                    <UniformGrid Margin="5" Rows="3" Columns="2">
+                                        <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Min" VerticalAlignment="Center"/>
+                                        <TextBlock Text="0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Max" VerticalAlignment="Center"/>
+                                        <TextBlock Text="0" VerticalAlignment="Center"/>
+                                    </UniformGrid>
+                                    <Grid Grid.Row="1" Margin="5">
+                                        <ProgressBar Value="100" Foreground="SteelBlue"/>
+                                        <TextBlock Text="100%" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Grid>
+                                </Grid>
                             </GroupBox>
                             <GroupBox Header="Pellicle Haze" Grid.Row="1">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                </UniformGrid>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="30"/>
+                                    </Grid.RowDefinitions>
+                                    <UniformGrid Margin="5" Rows="1" Columns="2">
+                                        <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                        <TextBlock Text="-" VerticalAlignment="Center"/>
+                                    </UniformGrid>
+                                    <Grid Grid.Row="1" Margin="5">
+                                        <ProgressBar Value="55" Foreground="SteelBlue"/>
+                                        <TextBlock Text="55%" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Grid>
+                                </Grid>
                             </GroupBox>
                             <GroupBox Header="Pattern Discolor" Grid.Row="2">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                </UniformGrid>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="30"/>
+                                    </Grid.RowDefinitions>
+                                    <UniformGrid Margin="5" Rows="1" Columns="2">
+                                        <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                        <TextBlock Text="-" Foreground="Green" VerticalAlignment="Center"/>
+                                    </UniformGrid>
+                                    <Grid Grid.Row="1" Margin="5">
+                                        <ProgressBar Value="0" Foreground="SteelBlue"/>
+                                        <TextBlock Text="0%" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Grid>
+                                </Grid>
                             </GroupBox>
                             <GroupBox Header="Align Key Exist" Grid.Row="3">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                </UniformGrid>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="30"/>
+                                    </Grid.RowDefinitions>
+                                    <UniformGrid Margin="5" Rows="1" Columns="2">
+                                        <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                        <TextBlock Text="-" Foreground="Green" VerticalAlignment="Center"/>
+                                    </UniformGrid>
+                                    <Grid Grid.Row="1" Margin="5">
+                                        <ProgressBar Value="0" Foreground="SteelBlue"/>
+                                        <TextBlock Text="0%" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Grid>
+                                </Grid>
                             </GroupBox>
                             <GroupBox Header="Pattern Shift" Grid.Row="4">
-                                <UniformGrid Margin="10" Rows="3" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Center" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Angle" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                </UniformGrid>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="30"/>
+                                    </Grid.RowDefinitions>
+                                    <UniformGrid Margin="5" Rows="3" Columns="2">
+                                        <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                        <TextBlock Text="-" Foreground="Green" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Text="0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Angle" VerticalAlignment="Center"/>
+                                        <TextBlock Text="0" VerticalAlignment="Center"/>
+                                    </UniformGrid>
+                                    <Grid Grid.Row="1" Margin="5">
+                                        <ProgressBar Value="0" Foreground="SteelBlue"/>
+                                        <TextBlock Text="0%" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Grid>
+                                </Grid>
                             </GroupBox>
                             <GroupBox Header="Pellicle Shift" Grid.Row="5">
-                                <UniformGrid Margin="10" Rows="3" Columns="2">
-                                    <TextBlock Text="Result" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Pass" Foreground="Green" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Center" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Angle" VerticalAlignment="Center"/>
-                                    <TextBlock Text="0" VerticalAlignment="Center"/>
-                                </UniformGrid>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="30"/>
+                                    </Grid.RowDefinitions>
+                                    <UniformGrid Margin="5" Rows="3" Columns="2">
+                                        <TextBlock Text="Result" VerticalAlignment="Center"/>
+                                        <TextBlock Text="-" Foreground="Green" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Text="0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Angle" VerticalAlignment="Center"/>
+                                        <TextBlock Text="0" VerticalAlignment="Center"/>
+                                    </UniformGrid>
+                                    <Grid Grid.Row="1" Margin="5">
+                                        <ProgressBar Value="0" Foreground="SteelBlue"/>
+                                        <TextBlock Text="0%" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Grid>
+                                </Grid>
                             </GroupBox>
                             <GroupBox Header="Pellicle FrontSide" Grid.Row="6">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="30"/>
+                                    </Grid.RowDefinitions>
+                                    <UniformGrid Margin="5" Rows="1" Columns="2">
                                     <TextBlock Text="Pellicle FrontSide" VerticalAlignment="Center"/>
                                     <TextBlock Text="0" VerticalAlignment="Center"/>
                                 </UniformGrid>
+                                    <Grid Grid.Row="1" Margin="5">
+                                        <ProgressBar Value="0" Foreground="SteelBlue"/>
+                                        <TextBlock Text="0%" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Grid>
+                                </Grid>
                             </GroupBox>
                             <GroupBox Header="Barcode Scratch" Grid.Row="7">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="30"/>
+                                    </Grid.RowDefinitions>
+                                    <UniformGrid Margin="10" Rows="1" Columns="2">
                                     <TextBlock Text="Defect Count" VerticalAlignment="Center"/>
                                     <TextBlock Text="0" VerticalAlignment="Center"/>
                                 </UniformGrid>
+                                    <Grid Grid.Row="1" Margin="5">
+                                        <ProgressBar Value="0" Foreground="SteelBlue"/>
+                                        <TextBlock Text="0%" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Grid>
+                                </Grid>
                             </GroupBox>
                             <GroupBox Header="Edge Broken" Grid.Row="8">
-                                <UniformGrid Margin="10" Rows="1" Columns="2">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="30"/>
+                                    </Grid.RowDefinitions>
+                                    <UniformGrid Margin="5" Rows="1" Columns="2">
                                     <TextBlock Text="Defect Count" VerticalAlignment="Center"/>
                                     <TextBlock Text="0" VerticalAlignment="Center"/>
                                 </UniformGrid>
+                                    <Grid Grid.Row="1" Margin="5">
+                                        <ProgressBar Value="0" Foreground="SteelBlue"/>
+                                        <TextBlock Text="0%" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    </Grid>
+                                </Grid>
                             </GroupBox>
                         </Grid>
                         <Grid Grid.Column="1">

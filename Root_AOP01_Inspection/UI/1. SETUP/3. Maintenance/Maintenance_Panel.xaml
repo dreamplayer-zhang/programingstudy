@@ -17,7 +17,7 @@
                     <ToggleButton Content="Engineer" x:Name="EngineerBtn"
                                   IsChecked="True"
                             Style="{StaticResource SetupPanelToggleBtn}"/>
-                    <Button Content="Other"
+                    <Button Content="Test"
                             Style="{StaticResource SetupPanelBtn}"/>
                 </StackPanel>
                 <Button Content="Back"
