@@ -509,7 +509,7 @@
                             </Grid>
                         </GroupBox>
                         <Viewbox Margin="3" Grid.Row="1">
-                            <ItemsControl
+                            <ItemsControl ItemsSource="{Binding p_MainStage}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                             <ItemsControl.ItemsPanel>

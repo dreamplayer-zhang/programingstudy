@@ -1,6 +1,8 @@
 ﻿using Root_CAMELLIA.Data;
 using RootTools;
 using System;
+using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -8,12 +10,40 @@ namespace Root_CAMELLIA
 {
     public class MainWindow_ViewModel : ObservableObject
     {
-        #region Property
-        public DataManager DataManager
+        private MainWindow m_MainWindow;
+        public Dlg_RecipeManager_ViewModel RecipeViewModel;
+        public DataManager DataManager;
+        public MainWindow_ViewModel(MainWindow mainwindow)
         {
-            get;
-            set;
+            m_MainWindow = mainwindow;
+            Init();
+            DialogInit(mainwindow);
         }
+
+        private void Init()
+        {
+            DataManager = new DataManager();            
+        }
+        private void DialogInit(MainWindow main)
+        {
+            dialogService = new DialogService(main);
+            dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManger>();
+            //dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_Engineer>();
+        }
+
+        #region Property
+        public ObservableCollection<UIElement> p_MainStage
+        {
+            get
+            {
+                return m_MainStage;
+            }
+            set
+            {
+                SetProperty(ref m_MainStage, value);
+            }
+        }
+        private ObservableCollection<UIElement> m_MainStage = new ObservableCollection<UIElement>();
         #endregion
 
         #region Dialog
@@ -54,10 +84,24 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     var viewModel = new Dlg_RecipeManager_ViewModel(this);
+                    viewModel.StageChanged += ViewModel_StageChanged1;
+                    
                     Nullable<bool> result = dialogService.ShowDialog(viewModel);
                 });
             }
         }
+
+        private void ViewModel_StageChanged1(object e)
+        {
+            p_MainStage = e as ObservableCollection<UIElement>;
+
+        }
+
+        private void RecipeViewModel_StageChanged(object e)
+        {
+            p_MainStage = e as ObservableCollection<UIElement>;
+        }
+
         public ICommand CmdEngineer
         {
             get
@@ -69,26 +113,6 @@ namespace Root_CAMELLIA
             }
         }
         #endregion
-
-        private MainWindow m_MainWindow;
-        public MainWindow_ViewModel(MainWindow mainwindow)
-        {
-            m_MainWindow = mainwindow;
-            Init();
-            DialogInit(mainwindow);
-        }
-
-        private void Init()
-        {
-            DataManager = new DataManager();            
-        }
-        private void DialogInit(MainWindow main)
-        {
-            dialogService = new DialogService(main);
-            dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManger>();
-            //dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_Engineer>();
-        }
-
 
         #region 이전코드
         //public MainWindow_ViewModel(MainWindow main)
