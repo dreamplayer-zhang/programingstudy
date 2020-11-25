@@ -76,6 +76,6 @@
                 </StackPanel>
             </GroupBox>
         </StackPanel>
-        <memory:MemoryViewer_UI Grid.Column="1" x:Name="memoryViewerAlignUI"/>
+        <memory:MemoryViewer_UI Grid.Column="1" x:Name="memoryViewerUI"/>
     </Grid>
 </UserControl>

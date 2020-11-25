@@ -85,7 +85,7 @@ namespace Root_AxisMapping.MainUI
 
         double m_yPeriod = 20;
         double m_yPixelSize = 1.2;
-        double p_yGap { get { return 1000 * m_yPeriod / m_yPixelSize; } }
+        public double p_yGap { get { return 1000 * m_yPeriod / m_yPixelSize; } }
         CPoint GetResult(MemoryDraw draw, Brush brush, int x, int y)
         {
             RPoint dp = p_aArray[x, y].m_rpCenter - m_rpCenter;
