@@ -11,19 +11,19 @@ namespace Root_CAMELLIA
     public class MainWindow_ViewModel : ObservableObject
     {
         private MainWindow m_MainWindow;
-        public Dlg_RecipeManager_ViewModel RecipeViewModel;
-        //public DataManager DataManager;
+        public DataManager DataManager;
         public MainWindow_ViewModel(MainWindow mainwindow)
         {
             m_MainWindow = mainwindow;
             Init();
             DialogInit(mainwindow);
         }
-
         private void Init()
         {
-            //DataManager = new DataManager();            
+            DataManager = new DataManager();
+            RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);
         }
+
         private void DialogInit(MainWindow main)
         {
             dialogService = new DialogService(main);
@@ -31,19 +31,19 @@ namespace Root_CAMELLIA
             //dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_Engineer>();
         }
 
-        #region Property
-        public ObservableCollection<UIElement> p_MainStage
+        #region ViewModel
+        public Dlg_RecipeManager_ViewModel RecipeViewModel
         {
             get
             {
-                return m_MainStage;
+                return _RecipeViewModel;
             }
             set
             {
-                SetProperty(ref m_MainStage, value);
+                SetProperty(ref _RecipeViewModel, value);
             }
         }
-        private ObservableCollection<UIElement> m_MainStage = new ObservableCollection<UIElement>();
+        private Dlg_RecipeManager_ViewModel _RecipeViewModel;
         #endregion
 
         #region Dialog
@@ -67,13 +67,15 @@ namespace Root_CAMELLIA
         #endregion
 
         #region ICommand
-        public ICommand CmdExit
+        public ICommand CmdLoad
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    m_MainWindow.Close();
+                    RecipeViewModel.dataManager.recipeDM.RecipeOpen();
+                    RecipeViewModel.UpdateListView();
+                    RecipeViewModel.UpdateView();
                 });
             }
         }
@@ -83,31 +85,31 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    var viewModel = new Dlg_RecipeManager_ViewModel();
-                    viewModel.StageChanged += ViewModel_StageChanged1;
-                    
+                   var viewModel = new Dlg_RecipeManager_ViewModel(this);
+                    viewModel.dataManager = DataManager;
+                    viewModel.UpdateListView();
+                    viewModel.UpdateView();
                     Nullable<bool> result = dialogService.ShowDialog(viewModel);
                 });
             }
         }
-
-        private void ViewModel_StageChanged1(object e)
-        {
-            p_MainStage = e as ObservableCollection<UIElement>;
-        }
-
-        private void RecipeViewModel_StageChanged(object e)
-        {
-            p_MainStage = e as ObservableCollection<UIElement>;
-        }
-
         public ICommand CmdEngineer
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-
+                   var asdf = RecipeViewModel.dataManager;
+                });
+            }
+        }
+        public ICommand CmdExit
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    m_MainWindow.Close();
                 });
             }
         }

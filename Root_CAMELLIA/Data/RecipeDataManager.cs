@@ -43,6 +43,10 @@ namespace Root_CAMELLIA.Data
                 GeneralFunction.Save(dataManager.recipeDM.TeachingRD, dialog.FileName);
             }
         }
+        public void ReadRecipe(string path)
+        {
+
+        }
         public void RecipeOpen(string path = null)
         {
             OpenFileDialog dialog = new OpenFileDialog();

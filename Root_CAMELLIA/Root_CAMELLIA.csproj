@@ -129,6 +129,7 @@
     <Compile Include="Measurement\Measurement.cs" />
     <Compile Include="Measurement\MeasurementManager.cs" />
     <Compile Include="ModuleBase\CamelliaModuleBase.cs" />
+    <Compile Include="Module\Camellia.cs" />
     <Compile Include="MVVM\ObservableObject.cs" />
     <Compile Include="Priority_Queue\FastPriorityQueue.cs" />
     <Compile Include="Priority_Queue\FastPriorityQueueNode.cs" />

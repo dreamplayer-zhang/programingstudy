@@ -8,7 +8,6 @@ namespace Root_CAMELLIA.Data
 {
     public class DataManager
     {
-
         public RecipeDataManager recipeDM { get; set; }
         public MainWindow Main { get; set; }
 
