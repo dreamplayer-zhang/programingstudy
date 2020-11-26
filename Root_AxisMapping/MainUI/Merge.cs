@@ -21,6 +21,7 @@ namespace Root_AxisMapping.MainUI
         #region Run
         public void Run()
         {
+            ClearMemory(); 
             for (int ix = 0; ix < p_xArray; ix++) Run(ix); 
         }
 
@@ -49,9 +50,9 @@ namespace Root_AxisMapping.MainUI
             int dPixel = (int)Math.Round(m_wCam / 2 - p_aArray[p_xArray / 2, p_yArray / 2].m_rpCenter.X);
             RunGrab(dx + (dPixel + m_wCamValid / 2) * m_pulsePerPixel); 
             int wMargin = (m_wCam - m_wCamValid) / 2;
-            ImageCopy(m_wCam - wMargin + m_wMargin, m_wCopy * ix + m_wMargin);
+            ImageCopy(m_wCam - wMargin - m_wCopy / 2 + m_wMargin, m_wCopy * ix + m_wMargin);
             RunGrab(dx + (dPixel - m_wCamValid / 2) * m_pulsePerPixel);
-            ImageCopy(wMargin + m_wMargin, m_wCopy * ix + m_wCopy / 2); 
+            ImageCopy(wMargin, m_wCopy * ix + m_wCopy / 2); 
         }
 
         void RunTreeCam(Tree tree)
@@ -80,7 +81,7 @@ namespace Root_AxisMapping.MainUI
             CPoint cpCenter = new CPoint(p_aArray[p_xArray / 2, p_yArray / 2].m_rpCenter);
             for (int y = 0; y < p_yArray; y++)
             {
-                int yp = (int)(Math.Round(cpCenter.Y + p_yGap * (y - p_yArray / 2)));
+                int yp = (int)(Math.Round(cpCenter.Y + p_yGap * (y - p_yArray / 2))); //forget
                 ImageCopy(new CPoint(x0, yp - m_wCopy / 2 + m_wMargin), new CPoint(x1, y * m_wCopy + m_wMargin)); 
             }
         }

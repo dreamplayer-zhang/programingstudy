@@ -27,8 +27,6 @@ namespace Root_AxisMapping.MainUI
             DataContext = mapping; 
             memoryViewerUI.Init(mapping.m_axisMapping.m_memoryPool.m_viewer, false);
             InitArray();
-            treeGrabUI.Init(mapping.m_treeRootGrab);
-            mapping.RunTreeGrab(Tree.eMode.Init);
             listViewROI.ItemsSource = mapping.m_aROI;
             treeInspectUI.Init(mapping.m_treeRootInspect);
             mapping.RunTreeInspect(Tree.eMode.Init);
