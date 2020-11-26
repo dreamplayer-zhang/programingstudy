@@ -1,7 +1,7 @@
 #pragma once
 #include "DefectData.h"
 #include "../RootTools_Cpp/TypeDefines.h"
-ref class CDefectDataWrapper : DefectData
+public ref class CDefectDataWrapper : DefectData
 {
 public:
 	bool IsCluster();
