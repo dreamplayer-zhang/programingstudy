@@ -62,10 +62,12 @@ namespace Root_CAMELLIA.Data
                     TeachRecipeName = TeachRecipeName.Remove(TeachRecipeName.Length - 4);
                     //m_DM.m_LM.WriteLog(LOG.CAMELLIA, "[Open Recipe] Recipe File Name - " + strTeachingRecipeName);
 
-                    dataManager.recipeDM.TeachingRD.ClearPoint();
+                    dataManager.recipeDM.MeasurementRD.ClearPoint();
                     //Read(dialog.FileName);                        
-                    dataManager.recipeDM.TeachingRD = (RecipeData)GeneralFunction.Read(dataManager.recipeDM.TeachingRD, dialog.FileName);
-                    dataManager.recipeDM.TeachingRD.CheckCircleSize();
+                    dataManager.recipeDM.MeasurementRD = (RecipeData)GeneralFunction.Read(dataManager.recipeDM.MeasurementRD, dialog.FileName);
+                    dataManager.recipeDM.MeasurementRD.CheckCircleSize();
+                    dataManager.recipeDM.MeasurementRD.Clone(dataManager.recipeDM.TeachingRD);
+
                     // dataManager.recipeDM.TeachingRD.CheckLayerData();
                     // dataManager.recipeDM.TeachingRD.CheckWavelengthData();
                     //m_DM.Main.m_DlgRecipeManager.CheckWavelengthBound();
@@ -110,6 +112,7 @@ namespace Root_CAMELLIA.Data
                     //strTeachingRecipeName = strTeachingRecipeName.Remove(strTeachingRecipeName.Length - 4);
 
                 GeneralFunction.Save(dataManager.recipeDM.TeachingRD, TeachingRecipePath);
+                dataManager.recipeDM.TeachingRD.Clone(dataManager.recipeDM.MeasurementRD);
                 MessageBox.Show("Save Done!");
             
             }
@@ -130,6 +133,7 @@ namespace Root_CAMELLIA.Data
                 //m_DM.m_LM.WriteLog(LOG.CAMELLIA, "[Save As Recipe] Recipe File Name - " + strTeachingRecipeName);
 
                 GeneralFunction.Save(dataManager.recipeDM.TeachingRD, dialog.FileName);
+                dataManager.recipeDM.TeachingRD.Clone(dataManager.recipeDM.MeasurementRD);
                 MessageBox.Show("Save Done!");
             }
         }

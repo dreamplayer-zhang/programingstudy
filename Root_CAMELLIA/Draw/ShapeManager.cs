@@ -77,7 +77,7 @@ namespace Root_CAMELLIA.Draw
             CanvasEllipse.Opacity = opacity;
 
         }
-        public void SetData(Circle circle, int nCenterX = 0, int nCenterY = 0, bool isSelected = false)
+        public void SetData(Circle circle, int nCenterX = 0, int nCenterY = 0, int zIndex = 0, bool isSelected = false)
         {
             CanvasEllipse.Width = circle.Width;
             CanvasEllipse.Height = circle.Height;
@@ -88,6 +88,7 @@ namespace Root_CAMELLIA.Draw
             CenterX = nCenterX + circle.X - (circle.Width / 2);
             CenterY = nCenterY - circle.Y - (circle.Height / 2);
             IsSelected = isSelected;
+            Panel.SetZIndex(CanvasEllipse, zIndex);
             //Data.Clear();
             //Ellipse.Width = 
         }

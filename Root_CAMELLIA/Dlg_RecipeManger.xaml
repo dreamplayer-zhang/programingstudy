@@ -306,7 +306,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Viewbox x:Name="test" Margin="10" Width="auto" Grid.Row="0">
+                        <Viewbox Margin="10" Width="auto" Grid.Row="0">
                             <ItemsControl ItemsSource="{Binding p_DrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
@@ -348,6 +348,65 @@
                                                     <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView}" MethodName="OnCanvasKeyUp" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                        <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                            <ItemsControl ItemsSource="{Binding p_DrawPointElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas x:Name="test" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseMove">
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseMove" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseWheel" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseWheel" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseLeftButtonDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeftButtonUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseLeftButtonUp" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseRightButtonDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseRightButtonDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseRightButtonUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseRightButtonUp" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseEnter" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseEnter" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeave" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseLeave" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeave" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseLeave" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="KeyDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test}" MethodName="OnCanvasKeyDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="KeyUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView}" MethodName="OnCanvasKeyUp" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                        <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                            <ItemsControl ItemsSource="{Binding p_DrawSelectElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
                                         </Canvas>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
@@ -470,17 +529,6 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </cp:ColorPicker>
-                                    <!--<wpfx:ColorPicker x:Name="colorPicker" DisplayColorAndName="False" Margin="5" AvailableColorsSortingMode="HueSaturationBrightness" ColorMode="ColorCanvas"
-                                                      SelectedColor="{Binding RouteBrush, Mode=TwoWay, Converter={StaticResource ColorToBrushConverter}, UpdateSourceTrigger=PropertyChanged}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="SelectedColorChanged" >
-                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="ColorPicker_SelectedColorChanged" />
-                                            </i:EventTrigger>
-                                            <i:EventTrigger EventName="Opened" >
-                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="colorPicker_Opened" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </wpfx:ColorPicker>-->
                                     <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Thick"/>
                                     <TextBox x:Name="thicknessTextBox" Text="{Binding RouteThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextAlignment="Center" VerticalContentAlignment="Center" Margin="5">
                                         <i:Interaction.Triggers>

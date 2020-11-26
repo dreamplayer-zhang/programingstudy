@@ -17,7 +17,6 @@ namespace Root_CAMELLIA
             Home,
             Ready,
             Run,
-            Pause,
             Error
         };
         #endregion

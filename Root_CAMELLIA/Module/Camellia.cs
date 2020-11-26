@@ -61,6 +61,7 @@ namespace Root_CAMELLIA.Module
         public Camellia(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
+            m_DataManager = DataManager.Instance;
         }
 
         public override void ThreadStop()
@@ -266,4 +267,6 @@ namespace Root_CAMELLIA.Module
             }
         }
     }
+
+    
 }

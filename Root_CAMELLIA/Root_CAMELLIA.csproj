@@ -64,6 +64,9 @@
     <Reference Include="ColorPickerLib, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.ColorPickerLib.1.6.2\lib\net40\ColorPickerLib.dll</HintPath>
     </Reference>
+    <Reference Include="LibSR_Met">
+      <HintPath>..\Lib\LibSR_Met.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
@@ -75,6 +78,9 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.4.7.0\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
@@ -102,12 +108,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BaseDefine.cs" />
-    <Compile Include="CamelliaState.cs" />
     <Compile Include="Data\DataManager.cs" />
     <Compile Include="Data\PresetData.cs" />
     <Compile Include="Data\RecipeDataManager.cs" />
     <Compile Include="Data\RecipeData.cs" />
-    <Compile Include="DictionarySet\SortedTupleBag.cs" />
     <Compile Include="Dlg_Engineer_ViewModel.cs" />
     <Compile Include="Draw\ArrowLineLib\ArrowEnds.cs" />
     <Compile Include="Draw\ArrowLineLib\ArrowLine.cs" />
@@ -130,13 +134,6 @@
     <Compile Include="Measurement\MeasurementManager.cs" />
     <Compile Include="ModuleBase\CamelliaModuleBase.cs" />
     <Compile Include="Module\Camellia.cs" />
-    <Compile Include="MVVM\ObservableObject.cs" />
-    <Compile Include="Priority_Queue\FastPriorityQueue.cs" />
-    <Compile Include="Priority_Queue\FastPriorityQueueNode.cs" />
-    <Compile Include="Priority_Queue\IFixedSizePriorityQueue.cs" />
-    <Compile Include="Priority_Queue\IPriorityQueue.cs" />
-    <Compile Include="Sequence\MeasureSequence.cs" />
-    <Compile Include="Sequence\SequenceManager.cs" />
     <Compile Include="ShapeDraw\Arc.cs" />
     <Compile Include="ShapeDraw\Circle.cs" />
     <Compile Include="ShapeDraw\ColorToBrushConverter.cs" />
@@ -144,10 +141,6 @@
     <Compile Include="ShapeDraw\Line.cs" />
     <Compile Include="ShapeDraw\Polygon.cs" />
     <Compile Include="ShapeDraw\DrawGeometryManager.cs" />
-    <Compile Include="Stage\StageMap.xaml.cs">
-      <DependentUpon>StageMap.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Stage\StageMap_ViewModel.cs" />
     <Compile Include="CAMELLIA_Engineer.cs" />
     <Compile Include="CAMELLIA_Handler.cs" />
     <Compile Include="CAMELLIA_Process.cs" />
@@ -198,10 +191,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Stage\StageMap.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Camellia_Hander_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

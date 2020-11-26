@@ -1,4 +1,5 @@
-﻿using Root_CAMELLIA.Data;
+﻿using Met = LibSR_Met;
+using Root_CAMELLIA.Data;
 using RootTools;
 using System;
 using System.Collections.ObjectModel;
@@ -12,6 +13,7 @@ namespace Root_CAMELLIA
     {
         private MainWindow m_MainWindow;
         public DataManager DataManager;
+        public Met.Nanoview NanoView { get; set; }
         public MainWindow_ViewModel(MainWindow mainwindow)
         {
             m_MainWindow = mainwindow;
@@ -20,8 +22,9 @@ namespace Root_CAMELLIA
         }
         private void Init()
         {
-            DataManager = new DataManager();
+            DataManager = DataManager.Instance;
             RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);
+            //NanoView = new Met.Nanoview();
         }
 
         private void DialogInit(MainWindow main)
@@ -74,8 +77,8 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     RecipeViewModel.dataManager.recipeDM.RecipeOpen();
-                    RecipeViewModel.UpdateListView();
-                    RecipeViewModel.UpdateView();
+                    RecipeViewModel.UpdateListView(true);
+                    RecipeViewModel.UpdateView(true);
                 });
             }
         }
@@ -85,11 +88,17 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                   var viewModel = new Dlg_RecipeManager_ViewModel(this);
-                    viewModel.dataManager = DataManager;
-                    viewModel.UpdateListView();
-                    viewModel.UpdateView();
+                    //var viewModel = new Dlg_RecipeManager_ViewModel(this);
+                    var viewModel = new Dlg_RecipeManager_ViewModel(this); ;
+                    viewModel.dataManager = RecipeViewModel.dataManager;
+                    viewModel.UpdateListView(true);
+                    viewModel.UpdateView(true);
+
                     Nullable<bool> result = dialogService.ShowDialog(viewModel);
+                    RecipeViewModel.UpdateListView(true);
+                    RecipeViewModel.UpdateView(true);
+
+
                 });
             }
         }

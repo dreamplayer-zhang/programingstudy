@@ -1,6 +1,5 @@
 ﻿using ColorPickerLib.Controls;
 using Root_CAMELLIA.Data;
-using Root_CAMELLIA.DictionarySet;
 using Root_CAMELLIA.Draw;
 using Root_CAMELLIA.ShapeDraw;
 using RootTools;
@@ -38,12 +37,13 @@ namespace Root_CAMELLIA
             if (main != null)
             {
                 MainViewModel = main;
-                dataManager = main.DataManager;
+                dataManager = DataManager.Instance;
             }
 
             Init();
             InitStage();
             SetStage(false);
+            SetSelectRect();
             SetStage(true);
             SetViewRect();
         }
@@ -127,6 +127,32 @@ namespace Root_CAMELLIA
             }
         }
         private ObservableCollection<UIElement> m_PreviewDrawElement = new ObservableCollection<UIElement>();
+
+        public ObservableCollection<UIElement> p_DrawPointElement
+        {
+            get
+            {
+                return m_DrawPointElement;
+            }
+            set
+            {
+                m_DrawPointElement = value;
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawPointElement = new ObservableCollection<UIElement>();
+
+        public ObservableCollection<UIElement> p_DrawSelectElement
+        {
+            get
+            {
+                return m_DrawSelectElement;
+            }
+            set
+            {
+                m_DrawSelectElement = value;
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawSelectElement = new ObservableCollection<UIElement>();
         #endregion
 
         #region List Draw Object
@@ -778,15 +804,10 @@ namespace Root_CAMELLIA
             el.Focus();
             System.Windows.Point pt = e.GetPosition((UIElement)sender);
             MousePoint = new System.Windows.Point(pt.X, pt.Y);
-
+            PrintMousePosition(MousePoint);
             if (IsLockUI)
             {
                 return;
-            }
-
-            if (!LeftMouseDown)
-            {
-                PrintMousePosition(MousePoint);
             }
 
             if (ColorPickerOpened)
@@ -838,6 +859,7 @@ namespace Root_CAMELLIA
                 {
                     SelectEndPoint = new System.Windows.Point(pt.X, pt.Y);
 
+                    //DrawSelectRect();
                     RedrawStage();
                 }
             }
@@ -1065,7 +1087,7 @@ namespace Root_CAMELLIA
         }
         public void OnMouseWheelPreView(object sender, MouseWheelEventArgs e)
         {
-            int lines = e.Delta * System.Windows.Forms.SystemInformation.MouseWheelScrollLines / 120;
+            int lines = e.Delta * System.Windows.Forms.SystemInformation.MouseWheelScrollLines / 240;
 
             MousePoint = e.GetPosition((UIElement)sender);
 
@@ -1232,9 +1254,7 @@ namespace Root_CAMELLIA
                 viewStageEdgeHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
             }
 
-            PointF[] points;
-            PointF[] pt = new PointF[2];
-            System.Windows.Point StartPoint;
+ 
             for (int n = 0; n < GeneralTools.EdgeNum; n++)
             {
                 CustomPathGeometry edgeArc = Geometry[index] as CustomPathGeometry;
@@ -1341,7 +1361,7 @@ namespace Root_CAMELLIA
                 circle.ScaleOffset(ZoomScale, OffsetX, OffsetY);
 
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
-                dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height));
+                dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height), 95);
                 Shapes[i] = dataCandidatePoint;
                 shapeIndex++;
             }
@@ -1380,7 +1400,7 @@ namespace Root_CAMELLIA
 
                 circle.ScaleOffset(ZoomScale, OffsetX, OffsetY);
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
-                dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), true);
+                dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), 96, true);
                 if (SetStartEndPointMode)
                 {
                     CCircle reorderCircle = dataManager.recipeDM.TeachingRD.DataSelectedPoint[i];
@@ -1485,26 +1505,50 @@ namespace Root_CAMELLIA
             SelectGeometry[0] = select;
         }
 
-        public void UpdateView(bool bMain = false)
+        public void SetSelectRect()
         {
+                selectRectangle = new CustomRectangleGeometry(GeneralTools.SelectPointBrush);
+                CustomRectangleGeometry select = selectRectangle as CustomRectangleGeometry;
+
+                Rect selectRect = new Rect(Math.Min(SelectStartPoint.X, SelectEndPoint.X), Math.Min(SelectStartPoint.Y, SelectEndPoint.Y),
+                    Math.Abs(SelectStartPoint.X - SelectEndPoint.X), Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y));
+
+                select.SetData(selectRect, 99);
+                SelectGeometry.Add(select);
+                m_DrawSelectElement.Add(select.path);
+        }
+
+        public void UpdateView(bool MeasurementLoad = false, bool bMain = false)
+        {
+            RecipeData data = dataManager.recipeDM.TeachingRD;
+            if (MeasurementLoad)
+            {
+                dataManager.recipeDM.MeasurementRD.Clone(dataManager.recipeDM.TeachingRD);
+            }
             CurrentCandidatePoint = -1;
             CurrentSelectPoint = -1;
 
-            p_DrawElement.Clear();
-            Geometry.Clear();
+            p_DrawPointElement.Clear();
+            //p_DrawElement.Clear();
+            //Geometry.Clear();
             Shapes.Clear();
             TextBlocks.Clear();
+            p_DrawSelectElement.Clear();
             SelectGeometry.Clear();
-            SetStage(false);
-            SetPoint(false);
-
+            //SetStage(false);
+            SetPoint(false, data);
+            SetSelectRect();
             p_PreviewDrawElement.Clear();
             PreviewGeometry.Clear();
             SetStage(true);
-            SetPoint(true);
+            SetPoint(true, data);
 
             ViewRectGeometry.Clear();
             SetViewRect();
+
+
+
+
             //CurrentCandidatePoint = -1;
             //CurrentSelectPoint = -1;
 
@@ -1525,8 +1569,13 @@ namespace Root_CAMELLIA
             //SetViewRect();
         }
 
-        public void UpdateListView()
+        public void UpdateListView(bool MeasurementLoad = false)
         {
+            RecipeData data = dataManager.recipeDM.TeachingRD;
+            if (MeasurementLoad)
+            {
+                dataManager.recipeDM.MeasurementRD.Clone(dataManager.recipeDM.TeachingRD);
+            }
             PointListItem.Clear();
             RouteOrder.Clear();
             int nCount = 0;
@@ -1633,7 +1682,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        private void SetPoint(bool preview)
+        public void SetPoint(bool preview, RecipeData recipe)
         {
             if (!preview)
             {
@@ -1644,13 +1693,13 @@ namespace Root_CAMELLIA
                 listPreviewCandidatePoint.Clear();
             }
 
-            for (int i = 0; i < dataManager.recipeDM.TeachingRD.DataCandidatePoint.Count; i++)
+            for (int i = 0; i < recipe.DataCandidatePoint.Count; i++)
             {
                 dataPoint = new ShapeEllipse(GeneralTools.StageHoleBrush);
                 ShapeEllipse dataCandidatePoint = dataPoint as ShapeEllipse;
 
-                CCircle circle = new CCircle(dataManager.recipeDM.TeachingRD.DataCandidatePoint[i].x, dataManager.recipeDM.TeachingRD.DataCandidatePoint[i].y, dataManager.recipeDM.TeachingRD.DataCandidatePoint[i].width,
-                    dataManager.recipeDM.TeachingRD.DataCandidatePoint[i].height, dataManager.recipeDM.TeachingRD.DataCandidatePoint[i].MeasurementOffsetX, dataManager.recipeDM.TeachingRD.DataCandidatePoint[i].MeasurementOffsetY);
+                CCircle circle = new CCircle(recipe.DataCandidatePoint[i].x, recipe.DataCandidatePoint[i].y, recipe.DataCandidatePoint[i].width,
+                    recipe.DataCandidatePoint[i].height, recipe.DataCandidatePoint[i].MeasurementOffsetX, recipe.DataCandidatePoint[i].MeasurementOffsetY);
                 circle.Transform(RatioX, RatioY);
 
                 if (!preview)
@@ -1658,11 +1707,11 @@ namespace Root_CAMELLIA
                     circle.ScaleOffset(ZoomScale, OffsetX, OffsetY);
                 }
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
-                dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height));
+                dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height), 95);
                 if (!preview)
                 {
                     Shapes.Add(dataCandidatePoint);
-                    p_DrawElement.Add(dataCandidatePoint.UIElement);
+                    p_DrawPointElement.Add(dataCandidatePoint.UIElement);
                     listCandidatePoint.Add(dataCandidatePoint);
 
                 }
@@ -1678,12 +1727,12 @@ namespace Root_CAMELLIA
             {
                 if (ShowRoute)
                 {
-                    for (int i = 0; i < dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Count - 1; i++)
+                    for (int i = 0; i < recipe.DataMeasurementRoute.Count - 1; i++)
                     {
                         dataRoute = new ShapeArrowLine(RouteBrush, RouteThick * ZoomScale);
                         ShapeArrowLine arrowLine = dataRoute as ShapeArrowLine;
-                        CCircle from = dataManager.recipeDM.TeachingRD.DataSelectedPoint[dataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]];
-                        CCircle to = dataManager.recipeDM.TeachingRD.DataSelectedPoint[dataManager.recipeDM.TeachingRD.DataMeasurementRoute[i + 1]];
+                        CCircle from = recipe.DataSelectedPoint[recipe.DataMeasurementRoute[i]];
+                        CCircle to = recipe.DataSelectedPoint[recipe.DataMeasurementRoute[i + 1]];
 
                         from.Transform(RatioX, RatioY);
                         from.ScaleOffset(ZoomScale, OffsetX, OffsetY);
@@ -1694,7 +1743,7 @@ namespace Root_CAMELLIA
                         PointF[] line = { new PointF((float)from.x + CenterX, (float)-from.y + CenterY), new PointF((float)to.x + CenterX, (float)-to.y + CenterY) };
                         arrowLine.SetData(line, routeBrush, (int)to.width, RouteThick * ZoomScale, 97);
                         Shapes.Add(arrowLine);
-                        p_DrawElement.Add(arrowLine.UIElement);
+                        p_DrawPointElement.Add(arrowLine.UIElement);
                     }
                 }
             }
@@ -1708,12 +1757,12 @@ namespace Root_CAMELLIA
                 listPreviewSelectedPoint.Clear();
             }
             int nDummyIdx = -1;
-            for (int i = 0; i < dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count; i++)
+            for (int i = 0; i < recipe.DataSelectedPoint.Count; i++)
             {
                 dataPoint = new ShapeEllipse(GeneralTools.GbHole);
                 ShapeEllipse dataSelectedPoint = dataPoint as ShapeEllipse;
-                CCircle circle = new CCircle(dataManager.recipeDM.TeachingRD.DataSelectedPoint[i].x, dataManager.recipeDM.TeachingRD.DataSelectedPoint[i].y, dataManager.recipeDM.TeachingRD.DataSelectedPoint[i].width,
-                    dataManager.recipeDM.TeachingRD.DataSelectedPoint[i].height, dataManager.recipeDM.TeachingRD.DataSelectedPoint[i].MeasurementOffsetX, dataManager.recipeDM.TeachingRD.DataSelectedPoint[i].MeasurementOffsetY);
+                CCircle circle = new CCircle(recipe.DataSelectedPoint[i].x, recipe.DataSelectedPoint[i].y, recipe.DataSelectedPoint[i].width,
+                    recipe.DataSelectedPoint[i].height, recipe.DataSelectedPoint[i].MeasurementOffsetX, recipe.DataSelectedPoint[i].MeasurementOffsetY);
                 circle.Transform(RatioX, RatioY);
                 if (!preview)
                 {
@@ -1721,7 +1770,7 @@ namespace Root_CAMELLIA
                 }
 
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
-                dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), true);
+                dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), 96, true);
                 if (SetStartEndPointMode)
                 {
                     CCircle reorderCircle = dataManager.recipeDM.TeachingRD.DataSelectedPoint[i];
@@ -1737,7 +1786,7 @@ namespace Root_CAMELLIA
                 if (!preview)
                 {
                     Shapes.Add(dataSelectedPoint);
-                    p_DrawElement.Add(dataSelectedPoint.UIElement);
+                    p_DrawPointElement.Add(dataSelectedPoint.UIElement);
                     listSelectedPoint.Add(dataSelectedPoint);
                     textManager = new TextManager(new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 0, 0, 255)));
                     textManager.SetData((RouteOrder[i] + 1).ToString(), (int)c.Width, 98, dataSelectedPoint.CanvasLeft, dataSelectedPoint.CanvasTop - c.Height);
@@ -1746,7 +1795,7 @@ namespace Root_CAMELLIA
                         textManager.SetVisibility(false);
                     }
                     TextBlocks.Add(textManager);
-                    p_DrawElement.Add(textManager.Text);
+                    p_DrawPointElement.Add(textManager.Text);
                 }
                 else
                 {
@@ -1757,7 +1806,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        private void SetStage(bool preview)
+        public void SetStage(bool preview)
         {
             GeneralTools.GbHole.GradientOrigin = new System.Windows.Point(0.3, 0.3);
             // 스테이지
@@ -2003,18 +2052,7 @@ namespace Root_CAMELLIA
                 p_PreviewDrawElement.Add(stageEdge.path);
             }
 
-            if (!preview)
-            {
-                selectRectangle = new CustomRectangleGeometry(GeneralTools.SelectPointBrush);
-                CustomRectangleGeometry select = selectRectangle as CustomRectangleGeometry;
 
-                Rect selectRect = new Rect(Math.Min(SelectStartPoint.X, SelectEndPoint.X), Math.Min(SelectStartPoint.Y, SelectEndPoint.Y),
-                    Math.Abs(SelectStartPoint.X - SelectEndPoint.X), Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y));
-
-                select.SetData(selectRect, 99);
-                SelectGeometry.Add(select);
-                p_DrawElement.Add(select.path);
-            }
 
             if (IsLockUI)
             {

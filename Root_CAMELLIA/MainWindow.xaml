@@ -520,6 +520,18 @@
                             </ItemsControl.ItemsPanel>
                         </ItemsControl>
                     </Viewbox>
+                        <Viewbox Margin="3" Grid.Row="1">
+                            <ItemsControl ItemsSource="{Binding RecipeViewModel.p_DrawPointElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
                     </Grid>
                 </GroupBox>
         </Grid>

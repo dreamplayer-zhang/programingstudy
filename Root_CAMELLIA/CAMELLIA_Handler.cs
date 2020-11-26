@@ -53,6 +53,7 @@ namespace Root_CAMELLIA
             m_moduleList = new ModuleList(m_enginner);
             //m_Stage = new Root_CAMELLIA.Module.Stage("Vision", m_enginner);
             m_Stage = new PointMeasurement("Vision", m_enginner);
+            
             InitModule(m_Stage);
             m_recipe = new CAMELLIA_Recipe("Recipe", m_enginner);
             m_recipe.AddModule(m_Stage);

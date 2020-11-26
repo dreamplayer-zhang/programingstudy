@@ -11,24 +11,23 @@ namespace Root_CAMELLIA.Data
         public List<CCircle> DataCandidatePoint { get; set; } = new List<CCircle>();
         public List<CCircle> DataSelectedPoint { get; set; } = new List<CCircle>();
         public List<int> DataMeasurementRoute { get; set; } = new List<int>();
-        public double SubPointInterval { get; set; }
-
-        public int CircleCount { get; set; }
-
+        public float LowerWaveLength { get; set; } = 350;
+        public float UpperWaveLength { get; set; }
+        public int LMIteration { get; set; }
+        public List<double> WaveLengthReflectance { get; set; } = new List<double>();
+        public List<double> WaveLengthTransmittance { get; set; } = new List<double>();
+        public int VISIntegrationTime { get; set; } = 20;
+        public int NIRIntegrationTime { get; set; } = 150;
         public void ClearPoint()
         {
             DataCandidatePoint.Clear();
             DataSelectedPoint.Clear();
             DataMeasurementRoute.Clear();
-
-            CircleCount = 0;
         }
 
         public void ClearCandidatePoint()
         {
             DataCandidatePoint.Clear();
-          
-            CircleCount = 0;
         }
 
 
@@ -54,6 +53,19 @@ namespace Root_CAMELLIA.Data
             }
         }
 
+        public void Clone(RecipeData data)
+        {
+            data.DataCandidatePoint = new List<CCircle>(DataCandidatePoint.ToArray());
+            data.DataSelectedPoint = new List<CCircle>(DataSelectedPoint.ToArray());
+            data.DataMeasurementRoute = new List<int>(DataMeasurementRoute.ToArray());
+            data.LowerWaveLength = LowerWaveLength;
+            data.UpperWaveLength = UpperWaveLength;
+            data.LMIteration = LMIteration;
+            data.WaveLengthReflectance = new List<double>(WaveLengthReflectance.ToArray());
+            data.WaveLengthTransmittance = new List<double>(WaveLengthTransmittance.ToArray());
+            data.VISIntegrationTime = VISIntegrationTime;
+            data.NIRIntegrationTime = NIRIntegrationTime;
+        }
 
         public bool ContainsData(List<CCircle> list, CCircle circle, out int nIndex)
         {
@@ -61,6 +73,7 @@ namespace Root_CAMELLIA.Data
             nIndex = -1;
 
             int nCount = 0;
+
             foreach (var item in list)
             {
                 if (Math.Round(item.x, 3) == Math.Round(circle.x, 3) && Math.Round(item.y, 3) == Math.Round(circle.y, 3))
