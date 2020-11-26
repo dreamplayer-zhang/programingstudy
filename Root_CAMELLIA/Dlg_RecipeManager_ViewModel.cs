@@ -26,7 +26,7 @@ namespace Root_CAMELLIA
         public delegate void stageChanged(object e);
         public event stageChanged StageChanged;
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
-
+        private MainWindow_ViewModel MainViewModel;
         public DataManager dataManager
         {
             get; set;
@@ -37,6 +37,7 @@ namespace Root_CAMELLIA
         {
             if (main != null)
             {
+                MainViewModel = main;
                 dataManager = main.DataManager;
             }
 
@@ -2868,6 +2869,10 @@ namespace Root_CAMELLIA
         public void OnSave_Click(object sender, RoutedEventArgs e)
         {
             dataManager.recipeDM.RecipeSave();
+            MainViewModel.DataManager = dataManager;
+            MainViewModel.RecipeViewModel.dataManager = dataManager;
+            MainViewModel.RecipeViewModel.UpdateListView();
+            MainViewModel.RecipeViewModel.UpdateView();
         }
         public void OnSaveAs_Click(object sender, RoutedEventArgs e)
         {

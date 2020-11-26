@@ -89,7 +89,7 @@
                         Orientation="Horizontal" >
                 <Button Content="Load" VerticalAlignment="Center" Height="40" Width="60" Margin="5"     Command="{Binding CmdLoad}"/>
                 <Button Content="Recipe" VerticalAlignment="Center" Height="40" Width="60" Margin="5"   Command="{Binding CmdRecipe}"/>
-                <Button Content="Engineer" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdEngineer}"/>
+                <Button Content="Engineer" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Click="Button_Click_1"/>
             </StackPanel>
             <Grid Grid.Column="1">
                 <TextBlock x:Name="tbTime"

@@ -31,7 +31,7 @@ namespace Root_CAMELLIA
             //dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_Engineer>();
         }
 
-        #region Property
+        #region ViewModel
         public Dlg_RecipeManager_ViewModel RecipeViewModel
         {
             get
@@ -85,11 +85,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    //var viewModel = new Dlg_RecipeManager_ViewModel(this);
-                    //viewModel.dataManager = RecipeViewModel.dataManager;
-                    //RecipeViewModel.UpdateListView();
-                    //RecipeViewModel.UpdateView();
-                    Nullable<bool> result = dialogService.ShowDialog(RecipeViewModel);
+                   var viewModel = new Dlg_RecipeManager_ViewModel(this);
+                    viewModel.dataManager = DataManager;
+                    viewModel.UpdateListView();
+                    viewModel.UpdateView();
+                    Nullable<bool> result = dialogService.ShowDialog(viewModel);
                 });
             }
         }
