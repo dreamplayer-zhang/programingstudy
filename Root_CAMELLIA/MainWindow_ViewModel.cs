@@ -12,7 +12,7 @@ namespace Root_CAMELLIA
     {
         private MainWindow m_MainWindow;
         public Dlg_RecipeManager_ViewModel RecipeViewModel;
-        public DataManager DataManager;
+        //public DataManager DataManager;
         public MainWindow_ViewModel(MainWindow mainwindow)
         {
             m_MainWindow = mainwindow;
@@ -22,7 +22,7 @@ namespace Root_CAMELLIA
 
         private void Init()
         {
-            DataManager = new DataManager();            
+            //DataManager = new DataManager();            
         }
         private void DialogInit(MainWindow main)
         {
@@ -83,7 +83,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    var viewModel = new Dlg_RecipeManager_ViewModel(this);
+                    var viewModel = new Dlg_RecipeManager_ViewModel();
                     viewModel.StageChanged += ViewModel_StageChanged1;
                     
                     Nullable<bool> result = dialogService.ShowDialog(viewModel);
@@ -94,7 +94,6 @@ namespace Root_CAMELLIA
         private void ViewModel_StageChanged1(object e)
         {
             p_MainStage = e as ObservableCollection<UIElement>;
-
         }
 
         private void RecipeViewModel_StageChanged(object e)

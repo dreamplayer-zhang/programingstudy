@@ -30,9 +30,9 @@ namespace Root_CAMELLIA
         public DataManager dataManager { get; set; }
         ShapeEllipse shape = new ShapeEllipse();
 
-        public Dlg_RecipeManager_ViewModel(MainWindow_ViewModel main)
+        public Dlg_RecipeManager_ViewModel()
         {
-            dataManager = main.DataManager;
+            dataManager = DataManager.Instance;
             Init();
             InitStage();
             SetStage(false);
