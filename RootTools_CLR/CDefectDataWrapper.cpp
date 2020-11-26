@@ -128,6 +128,11 @@ int CDefectDataWrapper::GetDrawHeight()
 	}
 }
 
+CDefectDataWrapper::CDefectDataWrapper()
+{
+
+}
+
 CDefectDataWrapper::CDefectDataWrapper(DefectData item)
 {
 

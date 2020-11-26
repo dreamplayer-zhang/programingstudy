@@ -1,5 +1,6 @@
 #pragma once
 #include "DefectData.h"
+#include "../RootTools_Cpp/TypeDefines.h"
 ref class CDefectDataWrapper : DefectData
 {
 public:
@@ -13,6 +14,7 @@ public:
 	int GetDrawHeight();
 	bool bMergeUsed;
 
+	CDefectDataWrapper();
 	CDefectDataWrapper(DefectData item);
 	CDefectDataWrapper(CDefectDataWrapper^ item);
 	void AddCluster(CDefectDataWrapper^ data);
