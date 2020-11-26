@@ -187,7 +187,7 @@ namespace Root_Vega
 			int CVM_Counter = m_FDC.p_lData;
 			for (int index = 0; index < CVM_Counter; index++)
 			{
-				m_CVM[index].p_CurrentValue = m_FDC.m_aData[index].p_fValue;
+				//m_CVM[index].p_CurrentValue = m_FDC.m_aData[index].p_fValue;
 			}
 		}
 
