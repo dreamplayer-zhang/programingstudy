@@ -1035,10 +1035,10 @@ namespace Root_Vega.Module
                                 bFeatureScanned = m_mvvm.IsFeatureScanned(cpMemoryOffset_pixel.X, nCamWidth);
                             }
                             #region Feature
+                            Roi roiCurrent = m_mvvm.p_PatternRoiList[0];
                             if (bFeatureScanned && (bFoundFeature == false))
                             {
                                 // Feature 탐색 시작
-                                Roi roiCurrent = m_mvvm.p_PatternRoiList[0];
                                 foreach (var feature in roiCurrent.Position.ReferenceList)
                                 {
                                     CRect crtSearchArea;
@@ -1075,13 +1075,28 @@ namespace Root_Vega.Module
                             }
                             #endregion
                             #region Align Key
-                            // Align Key 추가해야함
+                            ////  등록된 Align Key 3개를 탐색하여 AffineCoef를 구한다.
+                            //if (bFoundFeature)
+                            //{
+                            //    float[] farrCoef = null;
+                            //    if (roiCurrent.Position.AlignList.Count == 3)
+                            //    {
+                            //        farrCoef = m_mvvm.GetAffineArray(roiCurrent);
+                            //    }
+                            //    // 회전보정에 사용할 Coef
+                            //    if (farrCoef != null)
+                            //    {
+                            //        // align 탐색 성공. 좌표 보정 계산 시작
+                            //    }
+                            //    else
+                            //    {
+                            //        // align 실패
+                            //    }
+                            //}
                             #endregion
                             #region Inspect Area
                             if (bFoundFeature)
                             {
-                                Roi roiCurrent = m_mvvm.p_PatternRoiList[0];
-
                                 // 1. 검사영역 생성
                                 Point ptStartPos = new Point(cptStandard.X + nRefStartOffsetX + (nInspectStartIndex * nCamWidth), 0);
                                 Point ptEndPos = new Point(ptStartPos.X + nCamWidth, nReticleYSize_px);
