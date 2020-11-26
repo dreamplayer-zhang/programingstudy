@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Trees;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Root_EFEM
@@ -35,7 +36,7 @@ namespace Root_EFEM
             return -1;
         }
 
-        private void buttonAdd_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
             if (EQ.p_bSimulate == false) return;
             if (comboBoxIndex.SelectedValue == null) return;
@@ -47,7 +48,7 @@ namespace Root_EFEM
             m_infoCarrier.RunTreeWafer(Tree.eMode.Init);
         }
 
-        private void buttonRemove_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonRemove_Click(object sender, RoutedEventArgs e)
         {
             if (EQ.p_bSimulate == false) return;
             if (comboBoxIndex.SelectedValue == null) return;
@@ -59,18 +60,18 @@ namespace Root_EFEM
             m_infoCarrier.RunTreeWafer(Tree.eMode.Init);
         }
 
-        private void buttonRemoveAll_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonRemoveAll_Click(object sender, RoutedEventArgs e)
         {
             m_infoCarrier.ClearInfoWafer();
             m_infoCarrier.RunTreeWafer(Tree.eMode.Init);
         }
 
-        private void buttonRefresh_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonRefresh_Click(object sender, RoutedEventArgs e)
         {
             m_infoCarrier.RunTreeWafer(Tree.eMode.Init);
         }
 
-        private void buttonStart_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
             if (comboBoxIndex.SelectedValue == null) return;
             string sWafer = comboBoxIndex.SelectedValue.ToString();
@@ -78,7 +79,7 @@ namespace Root_EFEM
             m_infoCarrier.RunTreeWafer(Tree.eMode.Init);
         }
 
-        private void buttonStartAll_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonStartAll_Click(object sender, RoutedEventArgs e)
         {
             m_infoCarrier.StartAllProcess();
             m_infoCarrier.RunTreeWafer(Tree.eMode.Init);

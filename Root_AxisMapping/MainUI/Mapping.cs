@@ -97,13 +97,9 @@ namespace Root_AxisMapping.MainUI
         public string RunGrab()
         {
             AxisMapping.Run_Grab runGrab = (AxisMapping.Run_Grab)m_runGrab.Clone();
-            runGrab.m_xStart += m_dx * (-m_xActive + m_xSetup); 
+            runGrab.m_xStart += m_dx * (m_xSetup - m_xActive); 
             runGrab.Run();
             return "OK";
-        }
-        void RunTreeGrab(Tree tree)
-        {
-            m_runGrab.RunTree(tree, true);
         }
         #endregion
 
@@ -331,28 +327,6 @@ namespace Root_AxisMapping.MainUI
         }
         #endregion
 
-        #region Tree Grab
-        public TreeRoot m_treeRootGrab;
-        void InitTreeGrab()
-        {
-            m_treeRootGrab = new TreeRoot(m_id, m_log);
-            RunTreeGrab(Tree.eMode.RegRead);
-            m_treeRootGrab.UpdateTree += M_treeRootGrab_UpdateTree;
-        }
-
-        private void M_treeRootGrab_UpdateTree()
-        {
-            RunTreeGrab(Tree.eMode.Update);
-            RunTreeGrab(Tree.eMode.RegWrite);
-        }
-
-        public void RunTreeGrab(Tree.eMode eMode)
-        {
-            m_treeRootGrab.p_eMode = eMode;
-            RunTreeGrab(m_treeRootGrab.GetTree("Grab"));
-        }
-        #endregion
-
         #region Tree Inspect
         public TreeRoot m_treeRootInspect;
         void InitTreeInspect()
@@ -393,7 +367,6 @@ namespace Root_AxisMapping.MainUI
             m_log = LogView.GetLog(id);
             InitUnit();
             InitRunGrab();
-            InitTreeGrab();
             InitTreeInspect();
             InitDraw();
             InitROI();

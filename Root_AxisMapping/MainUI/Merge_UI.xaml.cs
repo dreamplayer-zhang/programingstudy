@@ -37,11 +37,16 @@ namespace Root_AxisMapping.MainUI
         void InitBackgroundWorker()
         {
             m_bgw.DoWork += M_bgw_DoWork;
+            m_bgw.RunWorkerCompleted += M_bgw_RunWorkerCompleted;
         }
 
         private void M_bgw_DoWork(object sender, DoWorkEventArgs e)
         {
             m_merge.Run(); 
+        }
+
+        private void M_bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
         }
         #endregion
     }

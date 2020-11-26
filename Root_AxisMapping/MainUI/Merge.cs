@@ -21,37 +21,29 @@ namespace Root_AxisMapping.MainUI
         #region Run
         public void Run()
         {
-            for (int ix = 0; ix < p_xArray; ix++) Run(ix); 
-        }
-
-        byte[] m_aZero = new byte[10]; 
-        void ClearMemory()
-        {
-            int w = p_memDst.p_sz.X; 
-            if (m_aZero.Length != w) m_aZero = new byte[w]; 
-            for (int y = 0; y < p_memDst.p_sz.Y; y++)
-            {
-                IntPtr ip = p_memDst.GetPtr(0, 0, y);
-                Marshal.Copy(m_aZero, 0, ip, w); 
-            }
+            for (int ix = 0; ix < p_xArray; ix++) Run(ix);
+            EraseMargin(); 
         }
 
         int m_wCam = 12000; 
-        int m_wCamValid = 10000; 
-        void Run(int ix)
+        int m_wCamValid = 10000;
+        double m_pulsePerPixel = 12; 
+        void Run(int ix) //forget
         {
             double dx = p_dx * (p_xSetup - ix);
-            //forget Grab
+            int dPixel = (int)Math.Round(m_wCam / 2 - p_aArray[p_xArray / 2, p_yArray / 2].m_rpCenter.X);
+            RunGrab(dx + (dPixel + m_wCamValid / 2) * m_pulsePerPixel); 
             int wMargin = (m_wCam - m_wCamValid) / 2;
-            ImageCopy(m_wCam - wMargin + m_wMargin, m_wCopy * ix + m_wMargin);
-            //forget Grab
-            ImageCopy(wMargin + m_wMargin, m_wCopy * ix + m_wCopy / 2); 
+            ImageCopy(m_wCam - wMargin - m_wCopy / 2, m_wCopy * ix);
+            RunGrab(dx + (dPixel - m_wCamValid / 2) * m_pulsePerPixel);
+            ImageCopy(wMargin, m_wCopy * ix + m_wCopy / 2); 
         }
 
         void RunTreeCam(Tree tree)
         {
             m_wCam = tree.Set(m_wCam, m_wCam, "Width", "Camera Valid Width (pixel)");
-            m_wCamValid = tree.Set(m_wCamValid, m_wCamValid, "Valid Width", "Camera Valid Width (pixel)"); 
+            m_wCamValid = tree.Set(m_wCamValid, m_wCamValid, "Valid Width", "Camera Valid Width (pixel)");
+            m_pulsePerPixel = tree.Set(m_pulsePerPixel, m_pulsePerPixel, "Pulse / Pixel", "Pulse / Pixel"); 
         }
         #endregion
 
@@ -67,14 +59,14 @@ namespace Root_AxisMapping.MainUI
 
         #region Image Copy
         int m_wCopy = 1000; 
-        int m_wMargin = 2;
+        int m_wMargin = 10;
         void ImageCopy(int x0, int x1)
         {
             CPoint cpCenter = new CPoint(p_aArray[p_xArray / 2, p_yArray / 2].m_rpCenter);
             for (int y = 0; y < p_yArray; y++)
             {
-                int yp = (int)(Math.Round(cpCenter.Y + p_yGap * (y - p_yArray / 2)));
-                ImageCopy(new CPoint(x0, yp - m_wCopy / 2 + m_wMargin), new CPoint(x1, y * m_wCopy + m_wMargin)); 
+                int yp = (int)(Math.Round(cpCenter.Y + p_yGap * (y - p_yArray / 2))); //forget
+                ImageCopy(new CPoint(x0, yp - m_wCopy / 2), new CPoint(x1, y * m_wCopy)); 
             }
         }
 
@@ -82,12 +74,47 @@ namespace Root_AxisMapping.MainUI
         MemoryData p_memDst { get { return m_axisMapping.m_memoryPoolMerge.m_viewer.p_memoryData; } }
         unsafe void ImageCopy(CPoint cp0, CPoint cp1)
         {
-            int l = m_wCopy / 2 - m_wMargin; 
-            for (int y = 0; y < 2 * l; y++)
+            for (int y = 0; y < m_wCopy; y++)
             {
                 IntPtr ipSrc = p_memSrc.GetPtr(0, cp0.X, cp0.Y + y);
                 IntPtr ipDst = p_memDst.GetPtr(0, cp1.X, cp1.Y + y); 
-                Buffer.MemoryCopy(ipSrc.ToPointer(), ipDst.ToPointer(), l, l); 
+                Buffer.MemoryCopy(ipSrc.ToPointer(), ipDst.ToPointer(), m_wCopy / 2, m_wCopy / 2); 
+            }
+        }
+
+        void EraseMargin()
+        {
+            m_aZeroY = new byte[p_memDst.p_sz.X];
+            for (int x = 0; x < p_memDst.p_sz.X; x++) m_aZeroY[x] = 0; 
+            for (int y = 0; y < p_yArray; y++) EraseMarginY(y);
+            m_aZeroX = new byte[m_wMargin];
+            for (int x = 0; x < m_wMargin; x++) m_aZeroX[x] = 0;
+            for (int x = 0; x < p_xArray; x++) EraseMarginX(x); 
+        }
+
+        byte[] m_aZeroY = null; 
+        void EraseMarginY(int iy)
+        {
+            for (int i = 0; i < m_wMargin; i++)
+            {
+                IntPtr ip = p_memDst.GetPtr(0, 0, m_wCopy * iy + i);
+                Marshal.Copy(m_aZeroY, 0, ip, p_memDst.p_sz.X);
+                ip = p_memDst.GetPtr(0, 0, m_wCopy * (iy + 1) - i - 1);
+                Marshal.Copy(m_aZeroY, 0, ip, p_memDst.p_sz.X);
+            }
+        }
+
+        byte[] m_aZeroX = null;
+        void EraseMarginX(int ix)
+        {
+            int xp0 = ix * m_wCopy;
+            int xp1 = (ix + 1) * m_wCopy - m_wMargin; 
+            for (int y = 0; y < p_memDst.p_sz.Y; y++)
+            {
+                IntPtr ip = p_memDst.GetPtr(0, xp0, y);
+                Marshal.Copy(m_aZeroX, 0, ip, m_wMargin);
+                ip = p_memDst.GetPtr(0, xp1, y);
+                Marshal.Copy(m_aZeroX, 0, ip, m_wMargin);
             }
         }
 
