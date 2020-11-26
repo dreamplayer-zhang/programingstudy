@@ -87,7 +87,7 @@
             </StackPanel>
         </Grid>
         <TabControl Grid.Row="1">
-            <TabItem Header="Engineer" Width="40">
+            <TabItem Header="Engineer" Width="100">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40"></RowDefinition>
@@ -370,8 +370,9 @@
                     </ScrollViewer>
                 </Grid>
             </TabItem>
-            <TabItem Header="Handler" Width="40">
-                <local:Camellia_Hander_UI x:Name="HandlerUI"></local:Camellia_Hander_UI>
+            <TabItem Header="Handler" Width="100">
+                <local:Camellia_Engineer_UI x:Name="EngineerUI"/>
+                
             </TabItem>
         </TabControl>
         <GridSplitter Grid.Row="3" 

@@ -23,12 +23,15 @@ namespace Root_CAMELLIA
         public Dlg_Engineer()
         {
             InitializeComponent();
-            Init(App.m_engineer.m_handler);
+            CAMELLIA_Engineer engineer = new CAMELLIA_Engineer();
+            //Init(App.m_engineer.m_handler);
+            engineer.Init("Camellia");
+            Init(engineer);
         }
 
-        public void Init(CAMELLIA_Handler handler)
+        public void Init(CAMELLIA_Engineer engineer)
         {
-            HandlerUI.Init(handler);
+            EngineerUI.Init(engineer);
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)

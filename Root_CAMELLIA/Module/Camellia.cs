@@ -6,17 +6,13 @@ using RootTools.Light;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 
 namespace Root_CAMELLIA.Module
 {
     class Camellia : ModuleBase
     {
-        #region Data
-        public DataManager m_DataManager
-        {
-            get; set;
-        }
-        #endregion
+        public DataManager m_DataManager;
 
         #region ToolBox
         AxisXY m_axisXY;
@@ -151,18 +147,15 @@ namespace Root_CAMELLIA.Module
         }
         public class Run_InitCalibration : ModuleRunBase
         {
-            public Camellia Module
-            {
-                get; private set;
-            }
+            Camellia m_module;
             public Run_InitCalibration(Camellia module)
             {
-                Module = module;
+                m_module = module;
                 InitModuleRun(module);
             }
             public override ModuleRunBase Clone()
             {
-                Run_InitCalibration run = new Run_InitCalibration(Module);
+                Run_InitCalibration run = new Run_InitCalibration(m_module);
                 return run;
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
@@ -202,24 +195,27 @@ namespace Root_CAMELLIA.Module
         }
         public class Run_Measure : ModuleRunBase
         {
-            public Camellia Module
-            {
-                get; private set;
-            }
-            public DataManager m_DataManager
-            {
-                get; private set;
-            }
+            Camellia m_module;
+
+            public DataManager m_DataManager;
+            public RPoint m_WaferCenterPos = new RPoint(); // Pulse
+            public double m_dResX_um = 1;
+            public double m_dResY_um = 1;
+
+
             public Run_Measure(Camellia module)
             {
-                Module = module;
+                m_module = module;
                 m_DataManager = module.m_DataManager;
                 InitModuleRun(module);
             }
             public override ModuleRunBase Clone()
             {
-                Run_Measure run = new Run_Measure(Module);
-                m_DataManager = Module.m_DataManager;
+                Run_Measure run = new Run_Measure(m_module);
+                run.m_DataManager = m_module.m_DataManager;
+                run.m_WaferCenterPos = m_WaferCenterPos;
+                run.m_dResX_um = m_dResX_um;
+                run.m_dResY_um = m_dResY_um;
                 return run;
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
@@ -228,39 +224,30 @@ namespace Root_CAMELLIA.Module
             }
             public override string Run()
             {
-
-                //? 계산 thread 동작 시작
-
+                AxisXY axisXY = m_module.m_axisXY;
+                Axis axisZ = m_module.m_axisZ;
+                Camera_Basler VRS = m_module.m_CamVRS;
+                ImageData img = VRS.p_ImageViewer.p_ImageData;
+                string strVRSImageDir = "D:\\";
+                string strVRSImageFullPath = "";
+                RPoint MeasurePoint;
                 for (int i = 0; i < m_DataManager.recipeDM.TeachingRD.DataSelectedPoint.Count; i++)
                 {
-
-                    // Point 이동.
-                    // Align 후 보정해야함
                     double dX = m_DataManager.recipeDM.TeachingRD.DataSelectedPoint[m_DataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]].x * 10000;
                     double dY = m_DataManager.recipeDM.TeachingRD.DataSelectedPoint[m_DataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]].y * 10000;
-                    //if (Module.Run(Module.m_axisX.StartMove(dX, dY)))
-                    //{
-                    //    return p_sInfo;
-                    //}
+                    MeasurePoint = new RPoint(dX, dY);
 
-                    //if (Module.Run(Module.m_axisX.WaitReady()))
-                    //{
-                    //    return p_sInfo;
-                    //}
+                    if (m_module.Run(axisXY.StartMove(MeasurePoint)))
+                        return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady()))
+                        return p_sInfo;
 
-                    // 계측.
-                    // 측정
-                    for (int n = 0; n < int.MaxValue; n++)
-                        ; // 임시  --> 계측까지!
-
-
-                    //이동시간..?
-                    // Pause 누르면 잠시 멈춤
-                    /*
-                     * if(Pause){
-                     *      머 스탑..
-                     * }
-                    */
+                    if (VRS.Grab() != "OK")
+                    {
+                        //Grab error
+                    }
+                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", i);
+                    img.SaveImageSync(strVRSImageFullPath);
                 }
                 return "OK";
             }

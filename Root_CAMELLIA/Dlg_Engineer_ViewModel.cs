@@ -11,7 +11,7 @@ namespace Root_CAMELLIA
     {
         public Dlg_Engineer_ViewModel(MainWindow main)
         {
-
+            CAMELLIA_Engineer engineer = new CAMELLIA_Engineer();
         }
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
     }
