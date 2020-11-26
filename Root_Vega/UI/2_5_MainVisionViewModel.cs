@@ -257,7 +257,11 @@ namespace Root_Vega
 			set
 			{
 				SetProperty(ref _SelectedFeature, value);
-				if (_SelectedFeature.m_Feature != null) p_bmpFeatureSrc = _SelectedFeature.m_Feature.GetBitMapSource();
+				if (_SelectedFeature != null)
+                {
+					if (_SelectedFeature.m_Feature != null)
+						p_bmpFeatureSrc = _SelectedFeature.m_Feature.GetBitMapSource();
+				}
 			}
 		}
 		#endregion
@@ -901,37 +905,49 @@ namespace Root_Vega
 
 		void _DeleteReferenceFeature()
         {
-			if (!refEnabled)
-				return;
-
-			if (p_RefFeatureDrawer.m_ListRect.Count >= 1)
-			{
-				for (int i = 0; i < p_RefFeatureDrawer.m_ListRect.Count; i++)
+			_SetRefDreawer();
+			
+			if (p_PatternReferenceList.Count >= 1)
+            {
+				for (int i = 0; i<p_PatternReferenceList.Count; i++)
                 {
 					string strFileName = string.Format("{0}_Ref_{1}.bmp", SelectedROI.Name, i);
 					File.Delete(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), strFileName));
 				}
+
+				p_RefFeatureDrawer.m_ListShape.Clear();
+				p_RefFeatureDrawer.m_Element.Clear();
 				p_RefFeatureDrawer.m_ListRect.Clear();
-				SelectedROI.Position.ReferenceList.Clear();
+				
+				if (SelectedROI != null) SelectedROI.Position.ReferenceList.Clear();
 				p_PatternReferenceList = new ObservableCollection<Reference>(SelectedROI.Position.ReferenceList);
-				//var featureArea = p_RefFeatureDrawer.m_ListRect[0];
-				//var featureRect = new CRect(featureArea.StartPos, featureArea.EndPos);
-				//var featureImageArr = p_ImageViewer.p_ImageData.GetRectByteArray(featureRect);
-				//var targetName = string.Format("{0}_Ref_{1}.bmp", SelectedROI.Name, SelectedROI.Position.ReferenceList.Count);
-				//Emgu.CV.Image<Gray, byte> temp = new Emgu.CV.Image<Gray, byte>(featureRect.Width, featureRect.Height);
-				//temp.Bytes = featureImageArr;
-				//temp.Save(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName));
 
-				//Reference tempFeature = new Reference();
-				//tempFeature.Name = targetName;
-				//tempFeature.RoiRect = new CRect(featureArea.StartPos, featureArea.EndPos);
-				//tempFeature.m_Feature = new ImageData(featureRect.Width, featureRect.Height);
-				//tempFeature.m_Feature.LoadImageSync(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), targetName), new CPoint(0, 0));
-				//SelectedROI.Position.ReferenceList.Add(tempFeature);
-
-				//p_PatternReferenceList = new ObservableCollection<Reference>(SelectedROI.Position.ReferenceList);
+				p_ImageViewer.SetRoiRect();
 			}
 		}
+
+		void _DeleteAlignFeature()
+        {
+			_SetAlignDrawer();
+
+			if (p_PatternAlignList.Count >= 1)
+            {
+				for (int i = 0; i<p_PatternAlignList.Count; i++)
+                {
+					string strFileName = string.Format("{0}_Align_{1}.bmp", SelectedROI.Name, i);
+					File.Delete(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(SelectedRecipe.RecipePath), strFileName));
+				}
+
+				p_AlignFeatureDrawer.m_ListRect.Clear();
+				p_AlignFeatureDrawer.m_Element.Clear();
+				p_AlignFeatureDrawer.m_ListRect.Clear();
+
+				if (SelectedROI != null) SelectedROI.Position.AlignList.Clear();
+				p_PatternAlignList = new ObservableCollection<AlignData>(SelectedROI.Position.AlignList);
+
+				p_ImageViewer.SetRoiRect();
+            }
+        }
 
 		void _SaveAlignFeature()
 		{
@@ -1075,6 +1091,14 @@ namespace Root_Vega
 			get
 			{
 				return new RelayCommand(_DeleteReferenceFeature);
+			}
+		}
+
+		public ICommand DeleteAlignFeatureCommand
+		{
+			get
+			{
+				return new RelayCommand(_DeleteAlignFeature);
 			}
 		}
 

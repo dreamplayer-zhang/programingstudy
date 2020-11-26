@@ -118,7 +118,7 @@
 									Style="{StaticResource BasicBtn}"
 									Command="{Binding SaveReferenceFeatureCommand}"
 									Margin="0,0,0,10" />
-                            <Button Content="Delete Feature"
+                            <Button Content="Delete Reference Feature"
 									Style="{StaticResource BasicBtn}"
                                     Command="{Binding DeleteReferenceFeatureCommand}"
 									Margin="0,0,0,10" />
@@ -209,8 +209,9 @@
 									Style="{StaticResource BasicBtn}"
 									Command="{Binding SaveAlignFeatureCommand}"
 									Margin="0,0,0,10" />
-                            <Button Content="Delete Feature"
+                            <Button Content="Delete Align Feature"
 									Style="{StaticResource BasicBtn}"
+                                    Command="{Binding DeleteAlignFeatureCommand}"
 									Margin="0,0,0,10" />
                             <UniformGrid Columns="2" Margin="0,0,0,10">
                                 <TextBlock Text="Search Area Size"
