@@ -120,7 +120,7 @@
             <StackPanel Grid.Column="4"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">
-                <Button Content="Setting" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Click="Button_Click"/>
+                <Button Content="Setting" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdSetting}"/>
                 <Button Content="Exit" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdExit}"/>
                 <Border Width="60" Margin="5" BorderBrush="#FF707070" BorderThickness="1">
                     <Grid Opacity="0.8">

@@ -92,6 +92,7 @@ namespace Root_CAMELLIA
             AddModuleRunList(new Run_Calibration(this), false, "Calibration");
             AddModuleRunList(new Run_Align(this), false, "Center Align");
             AddModuleRunList(new Run_MovePointMeasurement(this), false, "Measurement");
+            AddModuleRunList(new Run_MovePointMeasurement(this), false, "Measurement");
         }
 
         public class Run_Delay : ModuleRunBase

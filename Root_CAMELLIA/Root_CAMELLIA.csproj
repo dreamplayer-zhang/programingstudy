@@ -108,6 +108,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BaseDefine.cs" />
+    <Compile Include="CamelliaState.cs" />
+    <Compile Include="Camellia_Engineer_UI.xaml.cs">
+      <DependentUpon>Camellia_Engineer_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Data\DataManager.cs" />
     <Compile Include="Data\PresetData.cs" />
     <Compile Include="Data\RecipeDataManager.cs" />
@@ -134,6 +138,14 @@
     <Compile Include="Measurement\MeasurementManager.cs" />
     <Compile Include="ModuleBase\CamelliaModuleBase.cs" />
     <Compile Include="Module\Camellia.cs" />
+    <Compile Include="Module\Module_Camellia.cs" />
+    <Compile Include="MVVM\ObservableObject.cs" />
+    <Compile Include="Priority_Queue\FastPriorityQueue.cs" />
+    <Compile Include="Priority_Queue\FastPriorityQueueNode.cs" />
+    <Compile Include="Priority_Queue\IFixedSizePriorityQueue.cs" />
+    <Compile Include="Priority_Queue\IPriorityQueue.cs" />
+    <Compile Include="Sequence\MeasureSequence.cs" />
+    <Compile Include="Sequence\SequenceManager.cs" />
     <Compile Include="ShapeDraw\Arc.cs" />
     <Compile Include="ShapeDraw\Circle.cs" />
     <Compile Include="ShapeDraw\ColorToBrushConverter.cs" />
@@ -149,6 +161,10 @@
     <Compile Include="Camellia_Hander_UI.xaml.cs">
       <DependentUpon>Camellia_Hander_UI.xaml</DependentUpon>
     </Compile>
+    <Page Include="Camellia_Engineer_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dlg_Engineer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
