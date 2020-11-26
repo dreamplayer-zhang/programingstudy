@@ -440,16 +440,12 @@ namespace Root_EFEM.Module
         SVID m_svidPlaced;
         CEID m_ceidDocking;
         CEID m_ceidUnDocking;
-        CEID m_ceidOpen;
-        CEID m_ceidClose;
         ALID m_alidPlaced;
         void InitGAF() 
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
             m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
-            m_ceidOpen = m_gaf.GetCEID(this, "Door Open");
-            m_ceidClose = m_gaf.GetCEID(this, "Door Close");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
         }
         #endregion
@@ -515,6 +511,7 @@ namespace Root_EFEM.Module
                 if (m_module.Run(m_module.CmdLoad(m_bMapping))) return p_sInfo;
                 if (m_module.Run(m_module.CmdGetMapData())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+                m_module.m_ceidDocking.Send(); 
                 return "OK";
             }
         }
@@ -548,6 +545,7 @@ namespace Root_EFEM.Module
                 if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock) return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 if (m_module.Run(m_module.CmdUnload())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_module.m_ceidUnDocking.Send(); 
                 return "OK";
             }
         }
