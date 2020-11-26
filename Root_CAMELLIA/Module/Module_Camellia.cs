@@ -7,10 +7,11 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Root_CAMELLIA.Module
 {
-    class Camellia : ModuleBase
+    public class Module_Camellia : ModuleBase
     {
         public DataManager m_DataManager;
 
@@ -54,7 +55,7 @@ namespace Root_CAMELLIA.Module
         }
         #endregion
 
-        public Camellia(string id, IEngineer engineer)
+        public Module_Camellia(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
         }
@@ -73,8 +74,8 @@ namespace Root_CAMELLIA.Module
 
         public class Run_Delay : ModuleRunBase
         {
-            Camellia m_module;
-            public Run_Delay(Camellia module)
+            Module_Camellia m_module;
+            public Run_Delay(Module_Camellia module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -98,8 +99,8 @@ namespace Root_CAMELLIA.Module
         }
         public class Run_WaferCentering : ModuleRunBase
         {
-            Camellia m_module;
-            public Run_WaferCentering(Camellia module)
+            Module_Camellia m_module;
+            public Run_WaferCentering(Module_Camellia module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -122,8 +123,8 @@ namespace Root_CAMELLIA.Module
         }
         public class Run_Calibration : ModuleRunBase
         {
-            Camellia m_module;
-            public Run_Calibration(Camellia module)
+            Module_Camellia m_module;
+            public Run_Calibration(Module_Camellia module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -147,8 +148,8 @@ namespace Root_CAMELLIA.Module
         }
         public class Run_InitCalibration : ModuleRunBase
         {
-            Camellia m_module;
-            public Run_InitCalibration(Camellia module)
+            Module_Camellia m_module;
+            public Run_InitCalibration(Module_Camellia module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -170,8 +171,8 @@ namespace Root_CAMELLIA.Module
         }
         public class Run_MonitorCalibration : ModuleRunBase
         {
-            Camellia m_module;
-            public Run_MonitorCalibration(Camellia module)
+            Module_Camellia m_module;
+            public Run_MonitorCalibration(Module_Camellia module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -195,15 +196,15 @@ namespace Root_CAMELLIA.Module
         }
         public class Run_Measure : ModuleRunBase
         {
-            Camellia m_module;
+            Module_Camellia m_module;
 
             public DataManager m_DataManager;
-            public RPoint m_WaferCenterPos = new RPoint(); // Pulse
+            public RPoint m_WaferCenterPos_pulse = new RPoint(); // Pulse
             public double m_dResX_um = 1;
             public double m_dResY_um = 1;
+            public double m_dFocusZ_pulse = 1; // Pulse
 
-
-            public Run_Measure(Camellia module)
+            public Run_Measure(Module_Camellia module)
             {
                 m_module = module;
                 m_DataManager = module.m_DataManager;
@@ -213,13 +214,17 @@ namespace Root_CAMELLIA.Module
             {
                 Run_Measure run = new Run_Measure(m_module);
                 run.m_DataManager = m_module.m_DataManager;
-                run.m_WaferCenterPos = m_WaferCenterPos;
+                run.m_WaferCenterPos_pulse = m_WaferCenterPos_pulse;
                 run.m_dResX_um = m_dResX_um;
                 run.m_dResY_um = m_dResY_um;
                 return run;
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_WaferCenterPos_pulse = tree.Set(m_WaferCenterPos_pulse, m_WaferCenterPos_pulse, "Wafer Center Axis Position", "Wafer Center Axis Position(Pulse)");
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)");
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)");
+                m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)");
                 //m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
             }
             public override string Run()
@@ -241,7 +246,8 @@ namespace Root_CAMELLIA.Module
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
-
+                    Thread.Sleep(1000);
+                    VRS.GrabContinuousShot();
                     if (VRS.Grab() != "OK")
                     {
                         //Grab error

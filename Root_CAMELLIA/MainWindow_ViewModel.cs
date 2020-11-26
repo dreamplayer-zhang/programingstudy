@@ -103,6 +103,16 @@ namespace Root_CAMELLIA
                 });
             }
         }
+        public ICommand CmdSetting
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //m_Vision.StartRun(p_RunLADS);
+                });
+            }
+        }
         public ICommand CmdExit
         {
             get
