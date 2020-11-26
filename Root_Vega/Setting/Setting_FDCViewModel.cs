@@ -129,8 +129,8 @@ namespace Root_Vega
 				SetProperty(ref m_IndexPort, value);
 				//m_IndexPort = value;
 				//OnPropertyChanged();
-				m_FDC.m_rs232.RunTree(Tree.eMode.Update);
-				m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
+				//m_FDC.m_rs232.RunTree(Tree.eMode.Update);
+				//m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
 			}
 		}
 		private int m_IndexBaudrate;
@@ -144,8 +144,8 @@ namespace Root_Vega
 				SetProperty(ref m_IndexBaudrate, value);
 				//m_IndexBaudrate = value;
 				//OnPropertyChanged();
-				m_FDC.m_rs232.RunTree(Tree.eMode.Update);
-				m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
+				//m_FDC.m_rs232.RunTree(Tree.eMode.Update);
+				//m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
 			}
 		}
 		private int m_IndexParity;
@@ -161,9 +161,9 @@ namespace Root_Vega
 				SetProperty(ref m_IndexParity, value);
 				//m_IndexParity = value;
 				//OnPropertyChanged();
-				m_FDC.m_rs232.m_eParity = (Parity)m_IndexParity;
-				m_FDC.m_rs232.RunTree(Tree.eMode.Update);
-				m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
+				//m_FDC.m_rs232.m_eParity = (Parity)m_IndexParity;
+				//m_FDC.m_rs232.RunTree(Tree.eMode.Update);
+				//m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
 			}
 		}
 		private int m_IndexDataBits;
@@ -180,9 +180,9 @@ namespace Root_Vega
 				SetProperty(ref m_IndexDataBits, value);
 				//m_IndexDataBits = value;
 				//OnPropertyChanged();
-				m_FDC.m_rs232.m_nDataBit = m_IndexDataBits;
-				m_FDC.m_rs232.RunTree(Tree.eMode.Update);
-				m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
+				//m_FDC.m_rs232.m_nDataBit = m_IndexDataBits;
+				//m_FDC.m_rs232.RunTree(Tree.eMode.Update);
+				//m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
 			}
 		}
 		private int m_IndexStopBits;
@@ -196,8 +196,8 @@ namespace Root_Vega
 				SetProperty(ref m_IndexStopBits, value);
 				//m_IndexStopBits = value;
 				//OnPropertyChanged();
-				m_FDC.m_rs232.RunTree(Tree.eMode.Update);
-				m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
+				//m_FDC.m_rs232.RunTree(Tree.eMode.Update);
+				//m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
 			}
 		}
 
@@ -362,7 +362,7 @@ namespace Root_Vega
 		{
 			if (p_PortCollection.Count != 0)
 			{
-				m_CVM_manager.m_FDC.m_rs232.p_bConnect = true;// 커넥트 연결
+				//m_CVM_manager.m_FDC.m_rs232.p_bConnect = true;// 커넥트 연결
 				p_bConnectState = true;//커넥트 ui 비활성화
 				
 
@@ -392,7 +392,7 @@ namespace Root_Vega
 		void ClickDisonnect_Function()
 		{
 			p_bConnectState = false;
-			m_CVM_manager.m_FDC.m_rs232.p_bConnect = false;
+			//m_CVM_manager.m_FDC.m_rs232.p_bConnect = false;
 			//m_SerialComm.UpdateStop();
 		}
 		void ClickSelect_Function()
@@ -449,20 +449,20 @@ namespace Root_Vega
 				System.Reflection.MemberInfo[] memInfo = type.GetMember(EachEnum.ToString());
 				object[] attrs = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
 				p_BaudrateCollection.Add(((DescriptionAttribute)attrs[0]).Description);
-				if(((DescriptionAttribute)attrs[0]).Description == m_FDC.m_rs232.m_nBaudrate.ToString())
-				{
-					p_IndexBaudrate = m_IndexBaudrate;
-				}
+				//if(((DescriptionAttribute)attrs[0]).Description == m_FDC.m_rs232.m_nBaudrate.ToString())
+				//{
+					//p_IndexBaudrate = m_IndexBaudrate;
+				//}
 				m_IndexBaudrate++;
 			}
 			p_ParityCollection.Clear();
 			foreach (Parity EachEnum in Enum.GetValues(typeof(Parity)))
 			{
 				p_ParityCollection.Add(EachEnum);
-				if(EachEnum == m_FDC.m_rs232.m_eParity)
-				{
-					p_IndexParity = m_IndexParity;
-				}
+				//if(EachEnum == m_FDC.m_rs232.m_eParity)
+				//{
+					//p_IndexParity = m_IndexParity;
+				//}
 				m_IndexParity++;
 			}
 			p_DataBitsCollection.Clear();
@@ -472,20 +472,20 @@ namespace Root_Vega
 				System.Reflection.MemberInfo[] memInfo = type.GetMember(EachEnum.ToString());
 				object[] attrs = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
 				p_DataBitsCollection.Add(((DescriptionAttribute)attrs[0]).Description);
-				if(((DescriptionAttribute)attrs[0]).Description == m_FDC.m_rs232.m_nDataBit.ToString())
-				{
-					p_IndexDataBits = m_IndexDataBits;
-				}
+				//if(((DescriptionAttribute)attrs[0]).Description == m_FDC.m_rs232.m_nDataBit.ToString())
+				//{
+					//p_IndexDataBits = m_IndexDataBits;
+				//}
 				m_IndexDataBits++;
 			}
 			p_StopBitsCollection.Clear();
 			foreach (StopBits EachEnum in Enum.GetValues(typeof(StopBits)))
 			{
 				p_StopBitsCollection.Add(EachEnum);
-				if (EachEnum == m_FDC.m_rs232.m_eStopbits)
-				{
-					p_IndexStopBits= m_IndexStopBits;
-				}
+				//if (EachEnum == m_FDC.m_rs232.m_eStopbits)
+				//{
+					//p_IndexStopBits= m_IndexStopBits;
+				//}
 				m_IndexStopBits++;
 			}
 
