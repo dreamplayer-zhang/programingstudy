@@ -38,7 +38,7 @@ namespace RootTools_CLR
 			delete pInspReticle;
 		}
 
-		array<DefectData^>^ SurfaceInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute, void* ptrMemory)
+		array<DefectData^>^ SurfaceInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute, bool bMerge, int nMergeDistance, void* ptrMemory)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -68,6 +68,7 @@ namespace RootTools_CLR
 
 				pInspSurface->CopyImageToBuffer(bDark);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
 				vTempResult = pInspSurface->SurfaceInspection(bAbsolute, nDefectCode);//TODO : absolute GV 구현해야함
+				//vTempResult를 Merge해서 다시 정렬해야함
 
 				bool bResultExist = vTempResult.size() > 0;
 				array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
@@ -149,7 +150,7 @@ namespace RootTools_CLR
 				return local;
 			}
 		}
-		array<DefectData^>^ StripInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth, void *ptrMemory)
+		array<DefectData^>^ StripInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth, bool bMerge, int nMergeDistance, void *ptrMemory)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -172,6 +173,7 @@ namespace RootTools_CLR
 
 			pInspReticle->CopyImageToBuffer(true);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
 			vTempResult = pInspReticle->StripInspection(nBandwidth, nIntensity, nDefectCode);
+			//vTempResult를 Merge해서 다시 정렬해야함
 
 			bool bResultExist = vTempResult.size() > 0;
 			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
