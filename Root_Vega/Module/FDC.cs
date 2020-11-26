@@ -18,6 +18,8 @@ namespace Root_Vega.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            
+
             if (bInit)
             {
                 m_rs232.OnRecieve += M_rs232_OnRecieve; 
@@ -31,7 +33,6 @@ namespace Root_Vega.Module
         {
             p_sInfo = ReadFDC(aRead, ref nRead);
         }
-
         string ReadFDC(byte[] aByte, ref int nRead)
         {
             try
