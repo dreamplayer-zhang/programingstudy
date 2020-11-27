@@ -20,7 +20,8 @@
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
                     <Button x:Name="buttonGrab" Content="Grab" Margin="3" Click="buttonGrab_Click"/>
-                    <tree:TreeUI x:Name="treeUI" Height="220" Margin="3"/>
+                    <tree:TreeUI x:Name="treeUI" Height="250" Margin="3"/>
+                    <Button x:Name="buttonInspect" Content="Inspect" Margin="3" Click="buttonInspect_Click"/>
                 </StackPanel>
             </GroupBox>
         </StackPanel>

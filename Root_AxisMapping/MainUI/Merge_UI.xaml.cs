@@ -49,5 +49,12 @@ namespace Root_AxisMapping.MainUI
         {
         }
         #endregion
+
+        #region Inspect
+        private void buttonInspect_Click(object sender, RoutedEventArgs e)
+        {
+            m_merge.Inspect(); 
+        }
+        #endregion
     }
 }
