@@ -410,5 +410,12 @@
   <ItemGroup>
     <Resource Include="Resource\ChartEBR.PNG" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\bottom.PNG" />
+    <Resource Include="Resource\Front.PNG" />
+    <Resource Include="Resource\Left.PNG" />
+    <Resource Include="Resource\Right.PNG" />
+    <Resource Include="Resource\top.PNG" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
