@@ -11,23 +11,10 @@ namespace Root_EFEM.Module
 {
     public class Loadport_Cymechs : ModuleBase, IWTRChild
     {
-        //forget
         #region ToolBox
-//        DIO_I m_diPlaced;
-//        DIO_I m_diPresent;
-//        DIO_I m_diLoad;
-//        DIO_I m_diUnload;
-//        DIO_I m_diDoorOpen;
-//        DIO_I m_diDocked;
         RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
-//            p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
-//            p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
-//            p_sInfo = m_toolBox.Get(ref m_diLoad, this, "Load");
-//            p_sInfo = m_toolBox.Get(ref m_diUnload, this, "Unload");
-//            p_sInfo = m_toolBox.Get(ref m_diDoorOpen, this, "DoorOpen");
-//            p_sInfo = m_toolBox.Get(ref m_diDocked, this, "Docked");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
             if (bInit)
             {
@@ -39,20 +26,17 @@ namespace Root_EFEM.Module
 
         //forget
         #region DIO Function
+        bool m_bPlaced = false;
         public bool CheckPlaced()
         {
-            GemCarrierBase.ePresent present;
-            //            if (m_diPlaced.p_bIn != m_diPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
-            //            else present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            //            if (m_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + m_infoCarrier.p_eState, true);
-            //            switch (m_infoCarrier.p_ePresentSensor)
-            //            {
-            //                case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;
-            //                case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
-            //            }
-            //            return m_svidPlaced.p_value;
-
-            return false; //forget
+            GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            if (m_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + m_infoCarrier.p_eState, true);
+            switch (m_infoCarrier.p_ePresentSensor)
+            {
+                case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;
+                case GemCarrierBase.ePresent.Exist: m_svidPlaced.p_value = true; break;
+            }
+            return m_svidPlaced.p_value;
         }
         #endregion
 
@@ -261,7 +245,23 @@ namespace Root_EFEM.Module
             FOUP_IncorrectPos,
             EStopPushed,
         }
-        public eEventState m_eEvnetState = eEventState.DisConnected;
+        eEventState _eEvnetState = eEventState.DisConnected;
+        public eEventState p_eEvnetState
+        {
+            get { return _eEvnetState; }
+            set
+            {
+                if (_eEvnetState == value) return;
+                _eEvnetState = value;
+                OnPropertyChanged(); 
+                switch (value)
+                {
+                    case eEventState.POD_IN: m_bPlaced = true; break;
+                    case eEventState.POD_OUT: m_bPlaced = false; break; 
+                }
+            }
+        }
+
         class EventState
         {
             public string m_sCode;
@@ -294,7 +294,7 @@ namespace Root_EFEM.Module
             {
                 if (eventState.m_sCode == sCode)
                 {
-                    m_eEvnetState = eventState.m_eEvent;
+                    p_eEvnetState = eventState.m_eEvent;
                     return "OK";
                 }
             }
@@ -585,11 +585,11 @@ namespace Root_EFEM.Module
         public override string StateReady()
         {
             CheckPlaced();
-            /*            if (m_infoCarrier.m_bReqReadCarrierID)
-                        {
-                            m_infoCarrier.m_bReqReadCarrierID = false;
-                            StartRun(m_runReadPodID);
-                        } */
+/*            if (m_infoCarrier.m_bReqReadCarrierID)
+            {
+                m_infoCarrier.m_bReqReadCarrierID = false;
+                StartRun(m_runReadPodID);
+            } */
             if (m_infoCarrier.m_bReqLoad)
             {
                 m_infoCarrier.m_bReqLoad = false;
@@ -608,16 +608,12 @@ namespace Root_EFEM.Module
         SVID m_svidPlaced;
         CEID m_ceidDocking;
         CEID m_ceidUnDocking;
-        CEID m_ceidOpen;
-        CEID m_ceidClose;
         ALID m_alidPlaced;
         void InitGAF() 
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
             m_ceidDocking = m_gaf.GetCEID(this, "Docking");
             m_ceidUnDocking = m_gaf.GetCEID(this, "UnDocking");
-            m_ceidOpen = m_gaf.GetCEID(this, "Door Open");
-            m_ceidClose = m_gaf.GetCEID(this, "Door Close");
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
         }
         #endregion
@@ -690,6 +686,7 @@ namespace Root_EFEM.Module
                 if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed) return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 if (m_module.Run(m_module.CmdLoad())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+                m_module.m_ceidDocking.Send(); 
                 return "OK";
             }
         }
@@ -723,6 +720,7 @@ namespace Root_EFEM.Module
                 if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock) return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 if (m_module.Run(m_module.CmdUnload())) return p_sInfo;
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_module.m_ceidUnDocking.Send(); 
                 return "OK";
             }
         }
