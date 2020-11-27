@@ -195,16 +195,16 @@
 					SelectedIndex="{Binding p_IndexParity, Mode=TwoWay}"  >
 
                     </ComboBox>
-                    <TextBlock Grid.Row="3" Grid.Column="0"
+                    <!--<TextBlock Grid.Row="3" Grid.Column="0"
                                     TextWrapping="Wrap" Text="DataBits" Style="{StaticResource PortProperty}"  />
                     <ComboBox Grid.Row="3" Grid.Column="2"  Height="28"
                               ItemsSource="{Binding  p_DataBitsCollection}"
 					SelectedIndex="{Binding p_IndexDataBits, Mode=TwoWay}" >
-                    </ComboBox>
+                    </ComboBox>-->
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" 
+                    <TextBlock Grid.Row="3" Grid.Column="0" 
                                TextWrapping="Wrap" Text="StopBits" Style="{StaticResource PortProperty}"  />
-                    <ComboBox Grid.Row="4" Grid.Column="2"  Height="28" 
+                    <ComboBox Grid.Row="3" Grid.Column="2"  Height="28" 
                               ItemsSource="{Binding   p_StopBitsCollection}"
 					SelectedIndex="{Binding p_IndexStopBits, Mode=TwoWay}"  >
 

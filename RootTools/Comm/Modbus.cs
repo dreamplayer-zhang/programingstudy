@@ -44,7 +44,7 @@ namespace RootTools.Comm
         #endregion
 
         #region Client
-        ModbusClient m_client = new ModbusClient();
+        public ModbusClient m_client = new ModbusClient();
         void InitClient()
         {
             m_client.SerialPort = "COM50";

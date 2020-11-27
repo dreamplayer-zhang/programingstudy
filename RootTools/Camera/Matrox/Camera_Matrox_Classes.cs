@@ -20,6 +20,9 @@ namespace RootTools.Camera.Matrox
     public class UserDataObject
     {
         public MIL_INT NbGrabStart;
+        //public int grabbedFrames;
+        //public int archivedFrames;
+
     }
 
     public class MatroxCamInfo : ObservableObject
