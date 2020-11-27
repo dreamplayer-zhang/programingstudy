@@ -38,9 +38,7 @@
 
                         <Grid Grid.Column="0">
                             <GroupBox Header="45D Image">
-                                <ScrollViewer>
-                                    <Grid Background="Black"/>
-                                </ScrollViewer>
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/Front.PNG"/>
                             </GroupBox>
                         </Grid>
                         <GridSplitter Grid.Column="1" 
