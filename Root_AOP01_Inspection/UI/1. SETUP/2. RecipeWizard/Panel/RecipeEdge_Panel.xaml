@@ -240,7 +240,7 @@
                                 <GroupBox Grid.Row="0" Grid.Column="1" Header="Defect Image"
                                   Background="{StaticResource GroupBoxBackground}">
                                     <Grid Background="Black">
-
+                                        <Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG" />
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="1" Grid.Column="1" Header="Insepction Info"

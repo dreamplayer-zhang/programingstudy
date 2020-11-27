@@ -38,7 +38,7 @@
 
                         <Grid Grid.Column="0">
                             <GroupBox Header="45D Image">
-                                <Image Source="/Root_AOP01_Inspection;component/Resource/Front.PNG"/>
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/ReticleMap2.PNG"/>
                             </GroupBox>
                         </Grid>
                         <GridSplitter Grid.Column="1" 
@@ -229,7 +229,7 @@
                                 <GroupBox Grid.Row="1" Header="Defect Image"
                                   Background="{StaticResource GroupBoxBackground}">
                                     <Grid Background="Black">
-
+                                        <Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="2" Header="Insepction Info"

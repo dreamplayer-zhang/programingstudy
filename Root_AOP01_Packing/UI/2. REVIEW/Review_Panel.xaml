@@ -59,8 +59,25 @@
                                     </StackPanel>
                                 </Grid>
                             </GroupBox>
-
-                            <DataGrid  Visibility="Collapsed"
+                            <DataGrid IsReadOnly="True" Grid.Row="1">
+                                <DataGrid.Resources>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn  Header="No." Binding="{Binding Path=a}" Width="0.4*"/>
+                                    <DataGridTextColumn  Header="Date" Binding="{Binding Path=b}" Width="1.2*"/>
+                                    <DataGridTextColumn  Header="Reticle" Binding="{Binding Path=c}" Width="1*"/>
+                                    <DataGridTextColumn  Header="Recipe" Binding="{Binding Path=d}" Width="1*"/>
+                                </DataGrid.Columns>
+                                <local:Dummy a="0" b="2020-11-27-05:55" c="Reticle001" d="Recipe001.rcp"/>
+                                <local:Dummy a="1" b="2020-11-27-07:05" c="Reticle002" d="Recipe002.rcp"/>
+                                <local:Dummy a="2" b="2020-11-27-08:12" c="Reticle003" d="Recipe003.rcp"/>
+                                <local:Dummy a="3" b="2020-11-27-11:34" c="Reticle004" d="Recipe004.rcp"/>
+                            </DataGrid>
+                            <!--<DataGrid  Visibility="Collapsed"
                                     Name="Lotinfo_Viewer" 
                                     ItemsSource="{Binding pLotinfo_Datatable}"
                                     SelectedItem ="{Binding pSelected_Lotinfo, Mode=TwoWay}"
@@ -77,7 +94,7 @@
                                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
                                     </Style>
                                 </DataGrid.Resources>
-                            </DataGrid>
+                            </DataGrid>-->
                         </Grid>
                     </GroupBox>
                 </Grid>
