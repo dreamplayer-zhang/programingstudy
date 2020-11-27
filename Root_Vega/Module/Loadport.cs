@@ -379,6 +379,11 @@ namespace Root_Vega.Module
                 if (Run(MoveZ(ePosZ.Check))) return p_sInfo;
                 if (Run(Home_Reticle())) return p_sInfo;
             }
+
+            if (Run(MoveTheta(ePosTheta.Close))) return p_sInfo;
+
+
+
             m_infoPod.AfterHome();
 
             m_infoPod.p_eState = InfoPod.eState.Placed;

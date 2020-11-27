@@ -83,7 +83,7 @@ namespace Root_Vega
         {
             m_DialogService = DialogService;
 
-			m_timer.Interval = TimeSpan.FromMilliseconds(10);
+			m_timer.Interval = TimeSpan.FromMilliseconds(500);
 			m_timer.Tick += new EventHandler(timer_Tick);
 			m_timer.Start();
 		}
@@ -146,6 +146,8 @@ namespace Root_Vega
 		public Root_Vega.Module.FDC m_FDC;
         Registry m_reg;
 
+
+
 		public void Loaded()
 		{ 
             m_reg = new Registry("TK4S");
@@ -175,10 +177,7 @@ namespace Root_Vega
 			int CVM_Counter = m_FDC.p_lData;
 			for (int index = 0; index < CVM_Counter; index++)
 			{
-				if (m_CVM != null)
-				{
-					m_CVM[index].p_CurrentValue = m_FDC.m_aData[index].p_fValue;
-				}
+				//m_CVM[index].p_CurrentValue = m_FDC.m_aData[index].p_fValue;
 			}
 		}
 

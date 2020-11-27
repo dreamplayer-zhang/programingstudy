@@ -104,23 +104,29 @@ namespace RootTools.Memory
         DispatcherTimer m_timer = new DispatcherTimer();
         void InitTimer()
         {
-            m_timer.Interval = TimeSpan.FromSeconds(1);
+            m_timer.Interval = TimeSpan.FromSeconds(0.2);
             m_timer.Tick += m_timer_Tick;
             m_timer.Start();
         }
 
+        int m_nChanged = 0; 
+        const string c_sBusy = "Busy";
         void m_timer_Tick(object sender, EventArgs e)
         {
             MEMORYSTATUSEX stats = GlobalMemoryStatusEx();
             p_fTotalPageFile = stats.ullTotalPageFile / c_fGB;
             p_fAvailPageFile = stats.ullAvailPageFile / c_fGB;
             if (m_bMaster) return; 
-            string sUpdateTime = m_reg.Read("Time", "Busy");
-            if (sUpdateTime == "Busy") return;
+            string sUpdateTime = m_reg.Read("Time", c_sBusy);
+            if (sUpdateTime == c_sBusy) return;
             if (sUpdateTime == m_sUpdateTime) return;
-            UpdateMemoryData(); 
-            m_sUpdateTime = sUpdateTime;
-            OnChangeMemoryPool(); 
+            if (m_nChanged < 7) m_nChanged++;
+            else
+            {
+                UpdateMemoryData();
+                m_sUpdateTime = sUpdateTime;
+                OnChangeMemoryPool();
+            }
         }
 
         void UpdateMemoryData()
@@ -152,6 +158,11 @@ namespace RootTools.Memory
             RunTreeRun(Tree.eMode.Init);
             m_sUpdateTime = DateTime.Now.ToString(); 
             m_reg.Write("Time", m_sUpdateTime);
+        }
+
+        public void MemoryChanging()
+        {
+            m_reg.Write("Time", c_sBusy);
         }
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
@@ -281,7 +292,8 @@ namespace RootTools.Memory
             m_engineer = engineer;
             m_bMaster = bMaster; 
             m_log = LogView.GetLog(id);
-            m_reg = new Registry("MemoryTool", "MemoryTools"); 
+            m_reg = new Registry("MemoryTool", "MemoryTools");
+            if (bMaster) m_reg.Write("Time", c_sBusy);
             m_treeRootRun = new TreeRoot(id, m_log);
             m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
             RunTreeRun(Tree.eMode.RegRead);
