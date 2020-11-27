@@ -83,7 +83,7 @@ namespace Root_Vega
         {
             m_DialogService = DialogService;
 
-			m_timer.Interval = TimeSpan.FromMilliseconds(0.01);
+			m_timer.Interval = TimeSpan.FromMilliseconds(500);
 			m_timer.Tick += new EventHandler(timer_Tick);
 			m_timer.Start();
 		}
@@ -143,16 +143,6 @@ namespace Root_Vega
             }
         }
 
-		public void SetFDC(int nslave, double dValue)
-		{
-			for (int i = 0; i < m_CVM.Count; i++)
-			{
-				if (nslave == m_SlaveList[i])
-				{
-					m_CVM[i].p_CurrentValue = dValue;
-				}
-			}
-		}
 		public Root_Vega.Module.FDC m_FDC;
         Registry m_reg;
 
