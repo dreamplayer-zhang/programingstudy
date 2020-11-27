@@ -57,9 +57,27 @@
                                                     Style="{StaticResource SetupPanelBtn}"/>
                                         </StackPanel>
                                     </StackPanel>
+                                    
                                 </Grid>
                             </GroupBox>
-
+                            <DataGrid IsReadOnly="True" Grid.Row="1">
+                                <DataGrid.Resources>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGrid.Resources>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn  Header="No." Binding="{Binding Path=a}" Width="0.4*"/>
+                                    <DataGridTextColumn  Header="Date" Binding="{Binding Path=b}" Width="1.2*"/>
+                                    <DataGridTextColumn  Header="Reticle" Binding="{Binding Path=c}" Width="1*"/>
+                                    <DataGridTextColumn  Header="Recipe" Binding="{Binding Path=d}" Width="1*"/>
+                                </DataGrid.Columns>
+                                <local:Dummy a="0" b="2020-11-27-05:55" c="Reticle001" d="Recipe001.rcp"/>
+                                <local:Dummy a="1" b="2020-11-27-07:05" c="Reticle002" d="Recipe002.rcp"/>
+                                <local:Dummy a="2" b="2020-11-27-08:12" c="Reticle003" d="Recipe003.rcp"/>
+                                <local:Dummy a="3" b="2020-11-27-11:34" c="Reticle004" d="Recipe004.rcp"/>
+                            </DataGrid>
                             <!--<tools:Database_DataView 
                                     DataContext="{Binding p_DataViewer_Lotinfo}" 
                                     Margin="0,5,0,0" 
@@ -105,19 +123,19 @@
                                 <RowDefinition Height="80"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Column="1" Grid.Row="0" Background="Black" Margin="5">
-                                <Image/>
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/top.PNG"/>
                             </Grid>
                             <Grid Grid.Column="2" Grid.Row="1" Background="Black" Margin="5">
-
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/Right.PNG"/>
                             </Grid>
                             <Grid Grid.Column="0" Grid.Row="1" Background="Black" Margin="5">
-
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/Left.PNG"/>
                             </Grid>
                             <Grid Grid.Column="1" Grid.Row="2" Background="Black" Margin="5">
-
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/bottom.PNG"/>
                             </Grid>
                             <Grid Grid.Column="1" Grid.Row="1" Background="Black" Margin="5">
-
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/Front.PNG"/>
                             </Grid>
                         </Grid>
                     </GroupBox>
