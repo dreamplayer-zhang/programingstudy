@@ -26,7 +26,7 @@ namespace Root_EFEM
             checkBoxPause.DataContext = EQ.m_EQ;
             checkBoxSimulate.DataContext = EQ.m_EQ;
 
-//            treeReticleUI.Init(process.m_treeReticle);
+//            treeInfoWaferUI.Init(process.m_treeReticle);
 //            treeLocateUI.Init(process.m_treeLocate);
 //            treeSequenceUI.Init(process.m_treeSequence);
 //            process.RunTree(Tree.eMode.Init);

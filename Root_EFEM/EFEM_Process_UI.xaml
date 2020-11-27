@@ -28,8 +28,8 @@
         </StackPanel>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <TabControl Grid.Column="2">
-            <TabItem Header="InfoReticle">
-                <tree:TreeUI x:Name="treeReticleUI"/>
+            <TabItem Header="InfoWafer">
+                <tree:TreeUI x:Name="treeInfoWaferUI"/>
             </TabItem>
             <TabItem Header="Locate">
                 <tree:TreeUI x:Name="treeLocateUI"/>

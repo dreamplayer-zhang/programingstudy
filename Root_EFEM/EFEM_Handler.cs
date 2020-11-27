@@ -49,7 +49,7 @@ namespace Root_EFEM
             //            InitModule(m_FDC);
             ((IWTR)m_wtr).ReadInfoReticle_Registry(); 
             m_recipe = new EFEM_Recipe("Recipe", m_engineer);
-            m_recipe.AddModule();
+            foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
 //            m_process = new EFEM_Process("Process", m_engineer, this);
         }
 
