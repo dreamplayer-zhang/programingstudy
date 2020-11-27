@@ -37,7 +37,7 @@
 
                         <Grid Grid.Column="0">
                             <GroupBox Grid.Column="0" Header="Frontside Image">
-                                <Grid Background="Black"/>
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/Front.PNG"/>
                             </GroupBox>
                         </Grid>
                         <GridSplitter Grid.Column="1" 
