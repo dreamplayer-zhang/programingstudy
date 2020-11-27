@@ -5,8 +5,7 @@ bool CDefectDataWrapper::IsCluster()
 {
 	if (ClusterItems == nullptr)
 		return false;
-
-	if (ClusterItems->Length > 0)
+	if (ClusterItems->size() > 0)
 		return true;
 	else
 		return false;
@@ -17,7 +16,7 @@ int CDefectDataWrapper::GetStartPointX()
 	if (IsCluster())
 	{
 		int left = INT_MAX;
-		for (int i = 0; i < ClusterItems->Length; i++)
+		for (int i = 0; i < ClusterItems->size(); i++)
 		{
 			if (left > ClusterItems[i]->GetStartPointX())
 			{
@@ -40,7 +39,7 @@ int CDefectDataWrapper::GetStartPointY()
 	if (IsCluster())
 	{
 		int top = INT_MAX;
-		for (int i = 0; i < ClusterItems->Length; i++)
+		for (int i = 0; i < ClusterItems->size(); i++)
 		{
 			if (top > ClusterItems[i]->GetStartPointY())
 			{
@@ -63,7 +62,7 @@ int CDefectDataWrapper::GetEndPointX()
 	if (IsCluster())
 	{
 		int right = INT_MIN;
-		for (int i = 0; i < ClusterItems->Length; i++)
+		for (int i = 0; i < ClusterItems->size(); i++)
 		{
 			if (right < ClusterItems[i]->GetEndPointX())
 			{
@@ -86,7 +85,7 @@ int CDefectDataWrapper::GetEndPointY()
 	if (IsCluster())
 	{
 		int bot = INT_MIN;
-		for (int i = 0; i < ClusterItems->Length; i++)
+		for (int i = 0; i < ClusterItems->size(); i++)
 		{
 			if (bot < ClusterItems[i]->GetEndPointY())
 			{
@@ -147,7 +146,7 @@ CDefectDataWrapper::CDefectDataWrapper(DefectData item)
 	nLength = item.nLength;
 	bMergeUsed = false;
 
-	ClusterItems = gcnew array<CDefectDataWrapper^>(0);//DefectData 클래스에는 Cluster가 없음
+	ClusterItems = gcnew cliext::vector<CDefectDataWrapper^>();
 }
 CDefectDataWrapper::CDefectDataWrapper(CDefectDataWrapper^ item)
 {
@@ -161,89 +160,75 @@ CDefectDataWrapper::CDefectDataWrapper(CDefectDataWrapper^ item)
 	nIdx = item->nIdx;
 	nLength = item->nLength;
 	bMergeUsed = false;
-
-	ClusterItems = gcnew array<CDefectDataWrapper^>(item->ClusterItems->Length);//DefectData 클래스에는 Cluster가 없음
-	ClusterItems = item->ClusterItems;
+	if (item->ClusterItems != nullptr)
+	{
+		ClusterItems = gcnew cliext::vector<CDefectDataWrapper^>(item->ClusterItems);//DefectData 클래스에는 Cluster가 없음
+	}
 }
 
 void CDefectDataWrapper::AddCluster(CDefectDataWrapper^ data)
 {
 	if (ClusterItems == nullptr)
-		ClusterItems = gcnew array<CDefectDataWrapper^>(0);
+		ClusterItems = gcnew cliext::vector<CDefectDataWrapper^>();
 
-	array< CDefectDataWrapper^>^ tempList = gcnew array<CDefectDataWrapper^>(ClusterItems->Length + 1);
-	tempList = ClusterItems;
-	tempList[ClusterItems->Length] = data;
-	ClusterItems = gcnew array<CDefectDataWrapper^>(ClusterItems->Length + 1);
-	ClusterItems = tempList;
+	ClusterItems->push_back(data);
 	MergeClusterInfo();
 }
 
-void CDefectDataWrapper::AddRangeCluster(array<CDefectDataWrapper^>^ dataList)
+void CDefectDataWrapper::AddRangeCluster(cliext::vector<CDefectDataWrapper^>^ dataList)
 {
-	array<CDefectDataWrapper^>^ tempList = gcnew array<CDefectDataWrapper^>(ClusterItems->Length + dataList->Length);
-
-	int targetIdx = 0;
-	for (targetIdx = 0; targetIdx < ClusterItems->Length; targetIdx++)
+	for (int i = 0; i < dataList->size(); i++)
 	{
-		tempList[targetIdx] = ClusterItems[targetIdx];
-	}
-	for (int i = 0; i < dataList->Length; i++, targetIdx++)
-	{
-		tempList[targetIdx] = dataList[i];
+		ClusterItems->push_back(dataList[i]);
 	}
 	MergeClusterInfo();
 }
 
 void CDefectDataWrapper::RemoveCluster(int idx)
 {
-	array<CDefectDataWrapper^>^ tempList = gcnew array<CDefectDataWrapper^>(ClusterItems->Length - 1);
+	if (ClusterItems->size() == 0)
+		return;
+
 	int targetIdx = 0;
-	for (int i = 0; i < tempList->Length; targetIdx++)
-	{
-		if (idx != i)
-		{
-			tempList[i] = ClusterItems[targetIdx];
-		}
-	}
+	ClusterItems->erase(ClusterItems->begin() + (idx - 1));
 	MergeClusterInfo();
 }
 
 void CDefectDataWrapper::MergeClusterInfo()
 {
-	if (ClusterItems->Length > 0)
+	if (ClusterItems->size() > 0)
 	{
 		float floatTemp = 0.0;
 		int intTemp = 0;
-		for (int i = 0; i < ClusterItems->Length; i++)
+		for (int i = 0; i < ClusterItems->size(); i++)
 		{
 			floatTemp += ClusterItems[i]->fPosX;
 		}
-		fPosX = floatTemp / ClusterItems->Length;
+		fPosX = floatTemp / ClusterItems->size();
 
 		floatTemp = 0.0;
-		for (int i = 0; i < ClusterItems->Length; i++)
+		for (int i = 0; i < ClusterItems->size(); i++)
 		{
 			floatTemp += ClusterItems[i]->fPosY;
 		}
-		fPosY = floatTemp / ClusterItems->Length;
+		fPosY = floatTemp / ClusterItems->size();
 
 		floatTemp = 0.0;
-		for (int i = 0; i < ClusterItems->Length; i++)
+		for (int i = 0; i < ClusterItems->size(); i++)
 		{
 			floatTemp += ClusterItems[i]->fAreaSize;
 		}
-		fAreaSize = floatTemp / ClusterItems->Length;
+		fAreaSize = floatTemp / ClusterItems->size();
 
 		nClassifyCode = ClusterItems[0]->nClassifyCode;
 		nFOV = ClusterItems[0]->nFOV;
 
 		intTemp = 0.0;//nWidth
-		for (int i = 0; i < ClusterItems->Length; i++)
+		for (int i = 0; i < ClusterItems->size(); i++)
 		{
 			intTemp += ClusterItems[i]->fAreaSize;
 		}
-		fAreaSize = intTemp / ClusterItems->Length;
+		fAreaSize = intTemp / ClusterItems->size();
 
 		/*
 		 = ClusterItems.Sum(x = > x.nWidth);
@@ -252,35 +237,35 @@ void CDefectDataWrapper::MergeClusterInfo()
 	}
 }
 
-array<CDefectDataWrapper^>^ CDefectDataWrapper::RearrangeCluster(CDefectDataWrapper^ data, int mergeDistance)
+cliext::vector<CDefectDataWrapper^>^ CDefectDataWrapper::RearrangeCluster(CDefectDataWrapper^ data, int mergeDistance)
 {
-	if (data->ClusterItems == nullptr || data->ClusterItems->Length <= 1)
+	if (data->ClusterItems == nullptr || data->ClusterItems->size() <= 1)
 	{
 		//Cluster가 비이있거나 하나밖에 없는 경우 자기 자신을 list로 반환
-		array<CDefectDataWrapper^>^ result = gcnew array<CDefectDataWrapper^>(1);
-		result[0] = data;
+		cliext::vector<CDefectDataWrapper^>^ result = gcnew cliext::vector<CDefectDataWrapper^>();
+		result->push_back(data);
 		return result;
 	}
 
 	return CreateClusterList(data->ClusterItems, mergeDistance);
 }
 
-array<CDefectDataWrapper^>^ CDefectDataWrapper::CreateClusterList(array<CDefectDataWrapper^>^ datas, int mergeDistance)
+cliext::vector<CDefectDataWrapper^>^ CDefectDataWrapper::CreateClusterList(cliext::vector<CDefectDataWrapper^>^ datas, int mergeDistance)
 {
-	array<CDefectDataWrapper^>^ result = gcnew array<CDefectDataWrapper^>(0);
-	if (datas->Length <= 1)
+	cliext::vector<CDefectDataWrapper^>^ result = gcnew cliext::vector<CDefectDataWrapper^>();
+	if (datas->size() <= 1)
 	{
 		return datas;
 	}
 
-	for (int i = 0; i < datas->Length - 1; i++)
+	for (int i = 0; i < datas->size() - 1; i++)
 	{
 		bool merged = false;
 		if (datas[i]->bMergeUsed)
 			continue;
 
 		CDefectDataWrapper^ cluster = gcnew CDefectDataWrapper(datas[i]);
-		for (int j = i + 1; j < datas->Length; j++)
+		for (int j = i + 1; j < datas->size(); j++)
 		{
 			if (CheckMerge(datas[i], datas[j], mergeDistance))
 			{
@@ -294,53 +279,35 @@ array<CDefectDataWrapper^>^ CDefectDataWrapper::CreateClusterList(array<CDefectD
 			datas[i]->bMergeUsed = true;
 			cluster->AddCluster(datas[i]);//다 끝나고 merge가 한번이라도 되었다면 자기 자신도 넣고 끝낸다
 											  //merge가 안 된 경우에는 clusteritems에 defect이 하나도 없게 됨
-
 			cluster->MergeClusterInfo();//Cluster내의 정보를 병합해서 본체에 덮어씌운다
-			array<CDefectDataWrapper^>^ tempResult = gcnew array<CDefectDataWrapper^>(result->Length + 1);
-			tempResult = result;
-			tempResult[result->Length] = cluster;
-			result = gcnew array<CDefectDataWrapper^>(tempResult->Length);
-			result = tempResult;
+			result->push_back(cluster);
 		}
 		else
 		{
 			//merge에 진입하지 않은 경우, 자기 자신을 결과에 넣는다
-			array<CDefectDataWrapper^>^ tempResult = gcnew array<CDefectDataWrapper^>(result->Length + 1);
-			tempResult = result;
-			tempResult[result->Length] = datas[i];
-			result = gcnew array<CDefectDataWrapper^>(tempResult->Length);
-			result = tempResult;
+			result->push_back(datas[i]);
 		}
 	}
 	return result;
 }
 
-array<CDefectDataWrapper^>^ CDefectDataWrapper::MergeDefect(array<CDefectDataWrapper^>^ datas, int mergeDistance)
+cliext::vector<CDefectDataWrapper^>^ CDefectDataWrapper::MergeDefect(cliext::vector<CDefectDataWrapper^>^ datas, int mergeDistance)
 {
-	array<CDefectDataWrapper^>^ tempList = gcnew array<CDefectDataWrapper^>(0);
+	cliext::vector<CDefectDataWrapper^>^ tempList = gcnew cliext::vector<CDefectDataWrapper^>();
 
-	for (int i = 0; i < datas->Length; i++)
+	for (int i = 0; i < datas->size(); i++)
 	{
 		//받아온 모든 List의 ClusterItems 및 요소를 치환한다
 		if (datas[i]->IsCluster())
 		{
-			//tempList->AddRange(datas[i]->ClusterItems);
-			array<CDefectDataWrapper^>^ tempResult = gcnew array<CDefectDataWrapper^>(tempList->Length + datas[i]->ClusterItems->Length);
-			tempResult = tempList;
-			for (int i = 0; i < datas[i]->ClusterItems->Length; i++)
+			for (int j = 0; j < datas[i]->ClusterItems->size(); j++)
 			{
-				tempResult[i + tempList->Length - 1] = datas[i]->ClusterItems[i];
+				tempList->push_back(datas[i]->ClusterItems[j]);
 			}
-			tempList = gcnew array<CDefectDataWrapper^>(tempList->Length + datas[i]->ClusterItems->Length);
-			tempList = tempResult;
 		}
 		else
 		{
-			array<CDefectDataWrapper^>^ tempResult = gcnew array<CDefectDataWrapper^>(tempList->Length + 1);
-			tempResult = tempList;
-			tempResult[tempList->Length] = datas[i];
-			tempList = gcnew array<CDefectDataWrapper^>(tempResult->Length);
-			tempList = tempResult;
+			tempList->push_back(datas[i]);
 		}
 	}
 
@@ -371,7 +338,7 @@ bool CDefectDataWrapper::CheckMerge(CDefectDataWrapper^ data1, CDefectDataWrappe
 		//겹침
 		return true;
 	}
-	else 
+	else
 	{
 		//안겹침
 		return false;

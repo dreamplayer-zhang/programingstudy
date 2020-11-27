@@ -187,7 +187,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddEBRDefect != null)
+					if (AddEBRDefect != null)
 					{
 						if (arrDefects != null && arrDefects.Count > 0)
 						{
@@ -200,7 +200,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddD2DDefect != null)
+					if (AddD2DDefect != null)
 					{
 						if (arrDefects != null && arrDefects.Count > 0)
 						{
@@ -213,7 +213,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddSideDefect != null)
+					if (AddSideDefect != null)
 					{
 						if(arrDefects != null && arrDefects.Count > 0)
 						{
@@ -228,7 +228,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddBevelDefect != null )
+					if (AddBevelDefect != null )
 					{
 						if (arrDefects != null && arrDefects.Count > 0)
 						{

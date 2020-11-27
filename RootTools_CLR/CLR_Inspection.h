@@ -13,6 +13,7 @@
 #include <vcclr.h> // for PtrToStringChars 
 #include <stdio.h> // for wprintf
 #include <msclr\marshal_cppstd.h>
+#include <cliext/vector>
 
 #include "MySQLDBConnector.h"
 
@@ -72,7 +73,7 @@ namespace RootTools_CLR
 				//vTempResult를 Merge해서 다시 정렬해야함
 
 				bool bResultExist = vTempResult.size() > 0;
-				array<CDefectDataWrapper^>^ local = gcnew array<CDefectDataWrapper^>(vTempResult.size());
+				cliext::vector<CDefectDataWrapper^>^ local = gcnew cliext::vector<CDefectDataWrapper^>(vTempResult.size());
 				if (bMerge)
 				{
 					for (int i = 0; i < vTempResult.size(); i++)
@@ -99,7 +100,7 @@ namespace RootTools_CLR
 
 					int count = vTempResult.size();
 					if (bMerge)
-						count = local->Length;
+						count = local->size();
 
 					for (int i = 0; i < count; i++)
 					{
@@ -167,8 +168,13 @@ namespace RootTools_CLR
 						}
 					}
 				}
+				array<CDefectDataWrapper^>^ arrLocal = gcnew array<CDefectDataWrapper^>(local->size());
+				for (int i = 0; i < local->size(); i++)
+				{
+					arrLocal[i] = local[i];
+				}
 
-				return local;
+				return arrLocal;
 			}
 			else
 			{
@@ -202,7 +208,7 @@ namespace RootTools_CLR
 			//vTempResult를 Merge해서 다시 정렬해야함
 
 			bool bResultExist = vTempResult.size() > 0;
-			array<CDefectDataWrapper^>^ local = gcnew array<CDefectDataWrapper^>(vTempResult.size());
+			cliext::vector<CDefectDataWrapper^>^ local = gcnew cliext::vector<CDefectDataWrapper^>(vTempResult.size());
 			if (bMerge)
 			{
 				for (int i = 0; i < vTempResult.size(); i++)
@@ -229,7 +235,7 @@ namespace RootTools_CLR
 
 				int count = vTempResult.size();
 				if (bMerge)
-					count = local->Length;
+					count = local->size();
 
 				for (int i = 0; i < count; i++)
 				{
@@ -295,9 +301,20 @@ namespace RootTools_CLR
 						//DBOpen 실패
 					}
 				}
-			}
 
-			return local;
+				array<CDefectDataWrapper^>^ arrLocal = gcnew array<CDefectDataWrapper^>(local->size());
+				for (int i = 0; i < local->size(); i++)
+				{
+					arrLocal[i] = local[i];
+				}
+
+				return arrLocal;
+			}
+			else
+			{
+				array<CDefectDataWrapper^>^ local = gcnew array<CDefectDataWrapper^>(0);
+				return local;
+			}
 		}
 		void PaintOutline(int nY, int nOutline, byte* pByte, int nX)
 		{
