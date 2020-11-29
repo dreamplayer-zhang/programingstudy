@@ -416,6 +416,9 @@ namespace Root_Vega
 		{
 			string[] ports = SerialPort.GetPortNames();
 			p_PortCollection.Clear();
+			int IndexBaudrate = 0;
+			int IndexParity = 0;
+			int IndexStopBits = 0;
 
 			foreach (string port in ports)
 			{
@@ -430,8 +433,9 @@ namespace Root_Vega
 				p_BaudrateCollection.Add(((DescriptionAttribute)attrs[0]).Description);
 				if (((DescriptionAttribute)attrs[0]).Description == m_FDC.m_modbus.m_client.Baudrate.ToString())
 				{
-					p_IndexBaudrate = Convert.ToInt32(((DescriptionAttribute)attrs[0]).Description);
+					p_IndexBaudrate = IndexBaudrate;
 				}
+				IndexBaudrate++;
 			}
 			p_ParityCollection.Clear();
 			foreach (Parity EachEnum in Enum.GetValues(typeof(Parity)))
@@ -439,9 +443,9 @@ namespace Root_Vega
 				p_ParityCollection.Add(EachEnum);
 				if (EachEnum == m_FDC.m_modbus.m_client.Parity)
 				{
-					p_IndexParity = Convert.ToInt32(EachEnum);
+					p_IndexParity = IndexParity;
 				}
-				m_IndexParity++;
+				IndexParity++;
 			}
 			//p_DataBitsCollection.Clear();
 			//foreach (DataBits EachEnum in Enum.GetValues(typeof(DataBits)))
@@ -462,32 +466,12 @@ namespace Root_Vega
 				p_StopBitsCollection.Add(EachEnum);
 				if (EachEnum == m_FDC.m_modbus.m_client.StopBits)
 				{
-					p_IndexStopBits = m_IndexStopBits;
+					p_IndexStopBits = IndexStopBits;
 				}
-				m_IndexStopBits++;
+				IndexStopBits++;
 			}
 
 			p_IndexPort = m_reg.Read(Member.GetName(() => p_IndexPort), (int)0);
-			
-
-			//p_IndexBaudrate = (int)Enum.ToObject(typeof(Baudrate), m_FDC.m_rs232.m_nBaudrate);
-			//p_IndexBaudrate = (int)Baudratem_FDC.m_rs232.m_nBaudrate);
-			//p_IndexParity = (int)Enum.ToObject(typeof(Parity), m_FDC.m_rs232.m_eParity);
-			//p_IndexDataBits= (int)Enum.ToObject(typeof(DataBits), m_FDC.m_rs232.m_nDataBit);
-			//p_IndexStopBits= (int)Enum.ToObject(typeof(StopBits), m_FDC.m_rs232.m_eStopbits);
-			//p_IndexBaudrate = (int)m_FDC.m_rs232.m_nBaudrate;
-			//p_IndexParity = (int)m_FDC.m_rs232.m_eParity;
-			//p_IndexDataBits = m_FDC.m_rs232.m_nDataBit;
-			//p_IndexStopBits = (int)m_FDC.m_rs232.m_eStopbits;
-
-
-
-			//p_IndexPort = m_reg.Read(Member.GetName(() => p_IndexPort), (int)0);
-			//p_IndexBaudrate = m_reg.Read(Member.GetName(() => p_IndexBaudrate), (int)0);
-			//p_IndexParity = m_reg.Read(Member.GetName(() => p_IndexParity), (int)0);
-			//p_IndexDataBits = m_reg.Read(Member.GetName(() => p_IndexDataBits), (int)0);
-			//p_IndexStopBits = m_reg.Read(Member.GetName(() => p_IndexStopBits), (int)0);
-
 
 			m_CVM_manager.Loaded();
 
