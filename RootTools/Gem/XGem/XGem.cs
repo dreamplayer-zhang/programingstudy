@@ -25,7 +25,7 @@ namespace RootTools.Gem.XGem
             WAITCRA,
             COMMUNICATING,
         }
-        eCommunicate _eComm = eCommunicate.NULL;
+        eCommunicate _eComm = eCommunicate.DISABLE;
         public eCommunicate p_eComm
         {
             get { return _eComm; }
