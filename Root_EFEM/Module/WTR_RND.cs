@@ -880,18 +880,21 @@ namespace Root_EFEM.Module
                 }
                 if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
-                child.p_bLock = true;
-                if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
-                if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                child.p_bLock = false;
-                if (m_module.m_dicArm[m_eArm].IsWaferExist())
+                m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                try
                 {
-                    m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
-                    if (child.IsWaferExist(m_nChildID)) return "WTR Get Error : Wafer Check Sensor Detected at Child = " + child.p_id;
-                    child.SetInfoWafer(m_nChildID, null);
-                    return child.AfterGet(m_nChildID);
+                    child.p_bLock = true;
+                    if (m_module.Run(m_module.WriteCmd(eCmd.Get, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
+                    if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                    child.p_bLock = false;
                 }
-                else return "WTR Get Error : Wafer Check Sensor not Detected at Arm = " + m_eArm.ToString();
+                finally
+                {
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                    else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                }
+                if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
+                return "WTR Get Error : Wafer Check Sensor not Detected at Arm = " + m_eArm.ToString();
             }
         }
 
@@ -952,18 +955,21 @@ namespace Root_EFEM.Module
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
-                child.p_bLock = true;
-                if (m_module.Run(m_module.WriteCmd(eCmd.Put, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
-                if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                child.p_bLock = false;
-                if (child.IsWaferExist(m_nChildID))
+                child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
+                try
                 {
-                    child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "WTR Put Error : Wafer Check Sensor Detected at Arm = " + m_eArm.ToString();
-                    m_module.m_dicArm[m_eArm].p_infoWafer = null;
-                    return child.AfterPut(m_nChildID);
+                    child.p_bLock = true;
+                    if (m_module.Run(m_module.WriteCmd(eCmd.Put, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
+                    if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                    child.p_bLock = false;
                 }
-                else return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;
+                finally
+                {
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                    else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                }
+                if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
+                return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;
             }
         }
         #endregion

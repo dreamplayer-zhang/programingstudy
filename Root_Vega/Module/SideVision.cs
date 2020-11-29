@@ -1765,6 +1765,7 @@ namespace Root_Vega.Module
                         string strRet = cam.Grab();
                         dLeftHeight = CalculatingHeight(img);
                         img.SaveImageSync($"D:/BottomLeft.bmp");
+                        if (dLeftHeight > 102 || dLeftHeight < 0) return "Left LADS Fail";
                         System.Drawing.Bitmap bmpLeft = null;
                         bmpLeft = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                         if (_dispatcher != null)
@@ -1787,6 +1788,7 @@ namespace Root_Vega.Module
                         strRet = cam.Grab();
                         dRightHeight = CalculatingHeight(img);
                         img.SaveImageSync($"D:/BottomRight.bmp");
+                        if (dRightHeight > 102 || dRightHeight < 0) return "Right LADS Fail";
                         System.Drawing.Bitmap bmpRight = null;
                         bmpRight = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                         if (_dispatcher != null)
@@ -1830,6 +1832,7 @@ namespace Root_Vega.Module
                         if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                         strRet = cam.Grab();
                         dCenterHeight = CalculatingHeight(img);
+                        if (dCenterHeight > 102 || dCenterHeight < 0) return "Center LADS Fail";
                         System.Drawing.Bitmap bmpCenter = null;
                         bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                         if (_dispatcher != null)
@@ -1849,6 +1852,7 @@ namespace Root_Vega.Module
                         if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
                         strRet = cam.Grab();
                         dCenterHeight = CalculatingHeight(img);
+                        if (dCenterHeight > 102 || dCenterHeight < 0) return "Center LADS Fail";
                         bmpCenter = null;
                         bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
                         if (_dispatcher != null)
@@ -1868,6 +1872,7 @@ namespace Root_Vega.Module
                         string strRet = cam.Grab();
                         Thread.Sleep(1000);
                         double dHeight = CalculatingHeight(img);
+                        if (dHeight > 102 || dHeight < 0) return "LADS Fail";
                         MessageBox.Show(dHeight.ToString());
                     }
                 }
@@ -1920,6 +1925,7 @@ namespace Root_Vega.Module
                     nHitCount++;
                     dSum += daHeight[i];
                 }
+                if (nHitCount == 0) return -1;
                 return dSum / nHitCount;
             }
             //------------------------------------
