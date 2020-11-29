@@ -55,8 +55,8 @@ namespace Root_Vega
             InitModule(m_patternVision);
             m_FDC = new FDC("FDC", m_engineer);
             InitModule(m_FDC);
-            m_FFU = new FFU("FFU", m_engineer);
-            InitModule(m_FFU); 
+            //m_FFU = new FFU("FFU", m_engineer);
+            //InitModule(m_FFU); 
             m_robot.AddChild(m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision);
             m_robot.ReadInfoReticle_Registry();
             m_recipe = new Vega_Recipe("Recipe", m_engineer);

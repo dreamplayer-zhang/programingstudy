@@ -175,9 +175,12 @@ namespace Root_Vega
 		private void timer_Tick(object sender, EventArgs e)//check
 		{
 			int CVM_Counter = m_FDC.p_lData;
-			for (int index = 0; index < CVM_Counter; index++)
+			if (m_CVM != null)
 			{
-				//m_CVM[index].p_CurrentValue = m_FDC.m_aData[index].p_fValue;
+				for (int index = 0; index < CVM_Counter; index++)
+				{
+					m_CVM[index].p_CurrentValue = m_FDC.m_aData[index].p_fValue;
+				}
 			}
 		}
 

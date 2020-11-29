@@ -7,6 +7,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows.Media;
+using EasyModbus;
 
 namespace Root_Vega.Module
 {
@@ -81,18 +82,17 @@ namespace Root_Vega.Module
             }
 
             int m_nUnitID = 0;
-            int m_nAddress = 0; 
+            //int m_nAddress = 0; 
             public void ReadInputRegister(Modbus modbus)
             {
                 int nValue = (int)(p_fValue * m_fDiv);
-                modbus.ReadInputRegister((byte)m_nUnitID, m_nAddress, ref nValue);
+                modbus.ReadInputRegister((byte)m_nUnitID, ref nValue);
                 p_fValue = nValue / m_fDiv; 
             }
 
             public void RunTree(Tree tree, int module_number)
             {
                 p_id = tree.Set(p_id, p_id, "ID." + module_number.ToString("00"), "FDC Module Name");
-
                 p_eUnit = (eUnit)tree.Set(p_eUnit, p_eUnit, "Unit", "FDC Unit");
                 m_nDigit = tree.Set(m_nDigit, m_nDigit, "Digit", "FDC Decimal Point");
                 m_fDiv = 1;
@@ -109,8 +109,8 @@ namespace Root_Vega.Module
                 }
                 m_alid[0].p_id = "LowerLimit";
                 m_alid[1].p_id = "UpperLimit";
-                m_nUnitID = tree.Set(m_nUnitID, m_nUnitID, "Comm UnitID", "RS485 UnitID");
-                m_nAddress = tree.Set(m_nAddress, m_nAddress, "Comm Address", "RS485 Address");
+                m_nUnitID = tree.Set(m_nUnitID, m_nUnitID, "Comm UnitID", "RS485 UnitID, 1보다 큰 숫자");
+                //m_nAddress = tree.Set(m_nAddress, m_nAddress, "Comm Address", "RS485 Address");
             }
 
             ModuleBase m_module;
@@ -153,12 +153,16 @@ namespace Root_Vega.Module
         #endregion
 
         #region Check Thread
-        int m_iData = 0; 
+        int m_iData = 0;
         protected override void RunThread()
         {
             base.RunThread();
             Thread.Sleep(m_msInterval);
-            if (m_aData.Count > m_iData)
+			if (!m_modbus.m_client.Connected)
+			{
+				m_modbus.Connect();
+			}
+			if (m_aData.Count > m_iData)
             {
                 m_aData[m_iData].ReadInputRegister(m_modbus); 
                 m_iData = (m_iData + 1) % m_aData.Count;
