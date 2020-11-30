@@ -29,6 +29,17 @@ namespace Root_Vega
         #endregion
 
         public ModuleRunList m_moduleRunList;
+        public ModuleRunList p_moduleRunList
+        {
+            get
+            {
+                return m_moduleRunList;
+            }
+            set
+            {
+                SetProperty(ref m_moduleRunList, value);
+            }
+        }
 
         public string m_id;
         IEngineer m_engineer;
@@ -38,7 +49,7 @@ namespace Root_Vega
             m_id = id;
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
-            m_moduleRunList = new ModuleRunList(id, engineer);
+            p_moduleRunList = new ModuleRunList(id, engineer);
         }
     }
 }

@@ -165,7 +165,7 @@ namespace RootTools.Module
         public void StartModuleRuns()
         {
             EQ.p_bStop = false;
-            foreach (ModuleRunBase moduleRun in m_moduleRunList.m_aModuleRun) m_qModuleRun.Enqueue(moduleRun);
+            foreach (ModuleRunBase moduleRun in m_moduleRunList.p_aModuleRun) m_qModuleRun.Enqueue(moduleRun);
             p_maxRun = m_qModuleRun.Count;
             EQ.p_eState = EQ.eState.Run;
         }
@@ -174,7 +174,7 @@ namespace RootTools.Module
         {
             if (EQ.p_eState != EQ.eState.Ready) return "EQ p_eSrate Not Ready";
             EQ.p_bStop = false;
-            foreach (ModuleRunBase moduleRun in m_moduleRunList.m_aModuleRun)
+            foreach (ModuleRunBase moduleRun in m_moduleRunList.p_aModuleRun)
             {
                 if (moduleRun.p_id == p_sRunStep)
                 {
@@ -243,7 +243,7 @@ namespace RootTools.Module
             EQ.p_bStop = false;
             for (int n = 0; n < p_nRnR; n++)
             {
-                foreach (ModuleRunBase moduleRun in m_moduleRunList.m_aModuleRun) m_qModuleRun.Enqueue(moduleRun);
+                foreach (ModuleRunBase moduleRun in m_moduleRunList.p_aModuleRun) m_qModuleRun.Enqueue(moduleRun);
             }
             p_maxRun = m_qModuleRun.Count;
             EQ.p_eState = EQ.eState.Run;
