@@ -373,6 +373,8 @@ namespace Root_Vega
 
 				p_ImageViewer_List[i].SetRoiRect();
 				//p_InformationDrawerList[i].Redrawing();
+
+				App.m_engineer.m_InspManager.ClearDefectList();
 			}
 		}
 		void _clearInspReslut()

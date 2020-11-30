@@ -32,7 +32,7 @@ namespace RootTools.Camera
         string StopGrab();
 
         void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0);
-
+        void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReverseOffsetY = 0);
         double GetFps();
     }
 

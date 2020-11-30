@@ -92,7 +92,7 @@ namespace RootTools.Inspects
 		{
 			if (!IsInitialized)
 				return;
-
+			CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height);
 			while (shouldStop == false)
 			{
 				if (bState == InspectionState.Run)
@@ -104,8 +104,6 @@ namespace RootTools.Inspects
 					List<DefectDataWrapper> arrDefects = new List<DefectDataWrapper>();
 					if (m_InspProp.p_InspType == InspectionType.AbsoluteSurface || m_InspProp.p_InspType == InspectionType.RelativeSurface)
 					{
-						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
-						{
 							unsafe
 							{
 								var temp = clrInsp.SurfaceInspection(
@@ -125,6 +123,8 @@ namespace RootTools.Inspects
 								m_InspProp.p_surfaceParam.DefectSize,
 								m_InspProp.p_surfaceParam.UseDarkInspection,
 								m_InspProp.p_surfaceParam.UseAbsoluteInspection,
+								m_InspProp.p_bDefectMerge,
+								m_InspProp.p_nMergeDistance,
 								(void*)m_InspProp.p_ptrMemory);
 
 								foreach (var item in temp)
@@ -132,12 +132,10 @@ namespace RootTools.Inspects
 									arrDefects.Add(new DefectDataWrapper(item));
 								}
 							}
-						}
+						
 					}
 					else if (m_InspProp.p_InspType == InspectionType.Strip)
 					{
-						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
-						{
 							unsafe
 							{
 								var temp = clrInsp.StripInspection(
@@ -157,19 +155,21 @@ namespace RootTools.Inspects
 								m_InspProp.p_StripParam.DefectSize,
 								m_InspProp.p_StripParam.Intensity,
 								m_InspProp.p_StripParam.Bandwidth,
+								m_InspProp.p_bDefectMerge,
+								m_InspProp.p_nMergeDistance,
 								(void*)m_InspProp.p_ptrMemory);
 
-								foreach (var item in temp)
-								{
-									arrDefects.Add(new DefectDataWrapper(item));
-								}
-							}
-						}
+                                foreach (var item in temp)
+                                {
+                                    arrDefects.Add(new DefectDataWrapper(item));
+                                }
+                            }
+						
 					}
-					if (m_InspProp.p_bDefectMerge)//TODO : 기능 개선이 필요함. UI에 표시할때의 변수가 별도로 있는 것이 좋을 것으로 보임 + Defect Clustering구현
-					{
-						arrDefects = DefectDataWrapper.MergeDefect(arrDefects.ToArray(), m_InspProp.p_nMergeDistance);
-					}
+					//if (m_InspProp.p_bDefectMerge)//TODO : 기능 개선이 필요함. UI에 표시할때의 변수가 별도로 있는 것이 좋을 것으로 보임 + Defect Clustering구현
+					//{
+					//	arrDefects = DefectDataWrapper.MergeDefect(arrDefects.ToArray(), m_InspProp.p_nMergeDistance);
+					//}
 					if (AddChromeDefect != null)
 					{
 						if (arrDefects != null && arrDefects.Count > 0)
@@ -183,7 +183,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddEBRDefect != null)
+					if (AddEBRDefect != null)
 					{
 						if (arrDefects != null && arrDefects.Count > 0)
 						{
@@ -196,7 +196,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddD2DDefect != null)
+					if (AddD2DDefect != null)
 					{
 						if (arrDefects != null && arrDefects.Count > 0)
 						{
@@ -209,7 +209,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddSideDefect != null)
+					if (AddSideDefect != null)
 					{
 						if(arrDefects != null && arrDefects.Count > 0)
 						{
@@ -224,7 +224,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddBevelDefect != null )
+					if (AddBevelDefect != null )
 					{
 						if (arrDefects != null && arrDefects.Count > 0)
 						{
@@ -252,6 +252,7 @@ namespace RootTools.Inspects
 					}
 				}
 			}
+			clrInsp.Dispose();
 		}
 
 		public enum InspectionState

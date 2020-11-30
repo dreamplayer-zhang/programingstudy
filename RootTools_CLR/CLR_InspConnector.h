@@ -6,7 +6,7 @@
 namespace RootTools_CLR
 {
 	//Box 단위로 들어온 surface 검사 구현 및 db연동화
-	ref class CLR_InspConnector
+	class CLR_InspConnector
 	{
 		public:
 			CLR_InspConnector(int processornum);//검사 멀티쓰레드로 돌릴 시 각 쓰레드별 할당된 번호(visionworks처럼)

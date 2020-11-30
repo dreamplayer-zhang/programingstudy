@@ -417,6 +417,8 @@ namespace RootTools.Camera.Matrox
             return;
         }
 
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
+
         #region RelayCommand
         public RelayCommand ConnectCommand
         {

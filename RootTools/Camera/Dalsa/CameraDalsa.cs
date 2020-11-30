@@ -475,5 +475,7 @@ namespace RootTools.Camera.Dalsa
         }
 
         public double GetFps() { return 0; }
+
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
     }
 }

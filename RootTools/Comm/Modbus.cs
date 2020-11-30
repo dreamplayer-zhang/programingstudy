@@ -93,20 +93,19 @@ namespace RootTools.Comm
         Parity oldParity = Parity.None;
         StopBits oldStopBits = StopBits.None;
         void RunTreeRS232(Tree tree)
-
         {
             if (p_eComm != eComm.RS232) return;
             lock (m_csLock)
             {
                 try
                 {
-                    if ((oldSerialPort != m_client.SerialPort) || (oldBaudrate != m_client.Baudrate) || (oldParity != m_client.Parity) || (oldStopBits != m_client.StopBits))
-                    {
+                    //if ((oldSerialPort != m_client.SerialPort) || (oldBaudrate != m_client.Baudrate) || (oldParity != m_client.Parity) || (oldStopBits != m_client.StopBits))
+                    //{
                         m_client.SerialPort = tree.Set(m_client.SerialPort, m_client.SerialPort, "Port ID", "RS232 Port Name (COM5)");
                         m_client.Baudrate = tree.Set(m_client.Baudrate, m_client.Baudrate, "Baud Rate", "Baud Rate (bit/sec), 9600, 19200, 38400 ...");
                         m_client.Parity = (Parity)tree.Set(m_client.Parity, m_client.Parity, "Parity", "Parity");
                         m_client.StopBits = (StopBits)tree.Set(m_client.StopBits, m_client.StopBits, "Stop Bit", "Stop Bit");
-                    }
+                    //}
                 }
                 catch (Exception e) { p_sInfo = e + " Modbus RS232 Error"; }
                 if (tree.m_bUpdated && m_client.Connected && ((oldSerialPort != m_client.SerialPort) || (oldBaudrate != m_client.Baudrate) || (oldParity != m_client.Parity) || (oldStopBits != m_client.StopBits)))
@@ -175,6 +174,9 @@ namespace RootTools.Comm
         #endregion
 
         #region Protocol
+        static readonly object m_csLock = new object();
+        static readonly object m_csLockFFU = new object();
+
         public string ReadCoils(byte nUnit, int nAddress, ref bool bOn)
         {
             if (m_client.Connected == false) return "Not Connect";
@@ -238,11 +240,22 @@ namespace RootTools.Comm
 
         public string ReadHoldingRegister(byte nUnit, int nAddress, ref List<int> anValue)
         {
-            if (m_client.Connected == false) return p_sInfo = "Not Connect";
-            m_client.UnitIdentifier = nUnit;
-            int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
-            for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
-            return "OK";
+            if (m_client.Connected == false)
+			{
+				return p_sInfo = "Not Connect";
+			}
+			m_client.UnitIdentifier = nUnit;
+			try
+			{
+				int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
+				for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
+			}
+			catch { }
+			//if (m_client.Connected == false) return p_sInfo = "Not Connect";
+			//m_client.UnitIdentifier = nUnit;
+			//int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
+			//for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
+			return "OK";
         }
 
         public string WriteHoldingRegister(byte nUnit, int nAddress, int nValue)
@@ -260,7 +273,6 @@ namespace RootTools.Comm
             m_client.WriteMultipleRegisters(nAddress, anValue.ToArray());
             return "OK";
         }
-        static readonly object m_csLock = new object();
         public string ReadInputRegister(byte nUnit, ref int nValue)
         {
             if (m_client.Connected == false)
@@ -302,9 +314,15 @@ namespace RootTools.Comm
         {
             m_treeRoot.p_eMode = mode;
             RunTreeCommunication(m_treeRoot.GetTree("Type"));
-            RunTreeLog(m_treeRoot.GetTree("Log")); 
-            RunTreeRS232(m_treeRoot.GetTree("RS232", p_eComm == eComm.RS232));
-            RunTreeTCPIP(m_treeRoot.GetTree("TCPIP", p_eComm == eComm.TCPIP));
+            RunTreeLog(m_treeRoot.GetTree("Log"));
+            if (p_eComm == eComm.RS232)
+            {
+                RunTreeRS232(m_treeRoot.GetTree("RS232", p_eComm == eComm.RS232));
+            }
+            else if (p_eComm == eComm.TCPIP)
+            {
+                RunTreeTCPIP(m_treeRoot.GetTree("TCPIP", p_eComm == eComm.TCPIP));
+            }
         }
         #endregion
 

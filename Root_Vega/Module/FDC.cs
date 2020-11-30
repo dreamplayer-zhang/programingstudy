@@ -33,8 +33,17 @@ namespace Root_Vega.Module
 
         public class Data : NotifyProperty
         {
-            public string m_id = ""; 
-            public string p_id { get; set; }
+            public string m_id = "";
+            public string m_pid = "";
+            public string p_id 
+            {
+                get { return m_pid; }
+                set {
+                    if (m_pid == value) return;
+                    m_pid = value; 
+                    OnPropertyChanged(); 
+                } 
+            }
 
             eUnit _eUnit = eUnit.None;
             public eUnit p_eUnit
@@ -52,21 +61,34 @@ namespace Root_Vega.Module
             double m_fDiv = 100;
             public int[] m_aLimit = new int[2] { 0, 0 };
             ALID[] m_alid = new ALID[2] { null, null };
+            bool m_palid = false;
+			public bool p_alid
+			{
+                get { return m_palid; }
+                set 
+                {
+                    m_palid = value;
+                    OnPropertyChanged();
+                }
+			}
+
             SVID m_svValue;
             public double p_fValue
             {
-                get { return (m_svValue.p_value != null) ? m_svValue.p_value : 0; }
+                get { 
+                    return (m_svValue.p_value != null) ? m_svValue.p_value : 0; }
                 set
                 {
-                    if ((m_svValue.p_value != null) && (m_svValue.p_value == value)) return; 
-                    m_svValue.p_value = value;
                     OnPropertyChanged();
+                    //if ((m_svValue.p_value != null) && (m_svValue.p_value == value)) return; 
+                    m_svValue.p_value = value;
                     m_alid[0].p_bSet = (m_svValue.p_value < m_aLimit[0]);
                     m_alid[1].p_bSet = (m_svValue.p_value > m_aLimit[1]);
+                    p_alid = (m_alid[0].p_bSet || m_alid[1].p_bSet);
                     double dValue = Math.Abs(m_svValue.p_value - (m_aLimit[0] + m_aLimit[1]) / 2);
                     int nRed = (int)(500 * dValue / (m_aLimit[1] - m_aLimit[0]));
                     if (nRed > 250) nRed = 250;
-                    p_color = Color.FromRgb((byte)nRed, (byte)(250 - nRed), 0); 
+                    p_color = Color.FromRgb((byte)nRed, (byte)(250 - nRed), 0);
                 }
             }
 
@@ -126,8 +148,20 @@ namespace Root_Vega.Module
 
         #region List Data
         public ObservableCollection<Data> m_aData = new ObservableCollection<Data>();
-
-        public int p_lData
+        public ObservableCollection<Data> p_aData
+		{
+			get
+			{
+				return m_aData;
+			}
+			set
+			{
+				if (m_aData == value) return;
+				m_aData = value;
+				OnPropertyChanged();
+			}
+		}
+		public int p_lData
         {
             get { return m_aData.Count; }
             set
@@ -156,13 +190,20 @@ namespace Root_Vega.Module
 
         #region Check Thread
         int m_iData = 0;
+        int n = 0;
         protected override void RunThread()
         {
             base.RunThread();
             Thread.Sleep(m_msInterval);
+            
 			if (!m_modbus.m_client.Connected)
 			{
-				m_modbus.Connect();
+                n++;
+                if (n > 10)
+                {
+                    m_modbus.Connect();
+                    n = 0;
+                }
 			}
 			if (m_aData.Count > m_iData)
             {

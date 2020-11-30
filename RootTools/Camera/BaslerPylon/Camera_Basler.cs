@@ -712,5 +712,6 @@ namespace RootTools.Camera.BaslerPylon
             GrabStop();
             return "OK"; 
         }
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
     }
 }

@@ -12,7 +12,7 @@ namespace Root_EFEM.Module
 
         bool p_bLock { get; set; }
 
-        List<InfoWafer> p_aInfoWafer { get; }
+        InfoWafer p_infoWafer { get; set; }
 
         List<string> p_asChildSlot { get; }
 

@@ -287,7 +287,6 @@ namespace RootTools.Camera.Dalsa
             m_SapGrabber.GetCapability(SapAcquisition.Cap.HACTIVE_MAX, out nBuff);
             m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_WIDTH, out m_Width);
             m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_HEIGHT, out m_Height);
-       
         }
         
         public void SetCamHandle(SapAcqDevice device, SapAcquisition acquisition)
