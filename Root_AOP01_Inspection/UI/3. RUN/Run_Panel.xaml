@@ -199,7 +199,7 @@
                                 <Image Source="/Root_AOP01_Inspection;component/Resource/bottom.PNG"/>
                             </Grid>
                             <Grid Grid.Column="1" Grid.Row="1" Background="Black" Margin="5">
-                                <Image Source="/Root_AOP01_Inspection;component/Resource/Front.PNG"/>
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/ReticlDefect.PNG"/>
                             </Grid>
                         </Grid>
                     </GroupBox>
@@ -384,7 +384,9 @@
                                 <RowDefinition Height="2*"/>
                             </Grid.RowDefinitions>
                             <GroupBox Header="Defect Image" Grid.Row="0">
-                                <Grid Background="Black"/>
+                                <Grid Background="Black">
+                                    <Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG"/>
+                                </Grid>
                             </GroupBox>
                             <GroupBox Header="Defect List" Grid.Row="1">
                                 <Grid>

@@ -162,7 +162,7 @@ namespace Root_Vega.Module
             Thread.Sleep(m_msInterval);
             if (m_aData.Count > m_iData)
             {
-//                m_aData[m_iData].ReadInputRegister(m_modbus); 
+                m_aData[m_iData].ReadInputRegister(m_modbus); 
                 m_iData = (m_iData + 1) % m_aData.Count;
             }
         }
