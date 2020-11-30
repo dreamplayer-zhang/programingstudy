@@ -64,7 +64,7 @@ namespace RootTools.Inspects
 		Inspection[] InsepctionThread;
 		StopWatch sw;
 
-		int nThreadNum = 20;
+		int nThreadNum = 5;
 		public int nInspectionCount = 0;
 		int ImageWidth = 320;
 		int ImageHeight = 240;
@@ -118,7 +118,6 @@ namespace RootTools.Inspects
 
 			int nInspDoneNum = 0;
 			InsepctionThread = new Inspection[nThreadNum];
-
 			Parallel.For(0, nThreadNum, i =>
 			{
 				InsepctionThread[i] = new Inspection(nThreadNum);
@@ -167,7 +166,11 @@ namespace RootTools.Inspects
 							{
 								InspectionProperty ipQueue = p_qInspection.Dequeue();
 								if ( p_qInspection.Count == 0)
+                                {
 									Console.WriteLine("Queue Item Count : " + p_qInspection.Count);
+									sw.Stop();
+									Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
+								}
 								InsepctionThread[i].StartInspection(ipQueue, i);
 							}
 						}
@@ -363,8 +366,7 @@ namespace RootTools.Inspects
 
 				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
 			}
-			sw.Stop();
-			Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
+			
 			connector.Close();
 
 			//Monitor.Wait(lockObj);

@@ -92,7 +92,7 @@ namespace RootTools.Inspects
 		{
 			if (!IsInitialized)
 				return;
-
+			CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height);
 			while (shouldStop == false)
 			{
 				if (bState == InspectionState.Run)
@@ -104,8 +104,6 @@ namespace RootTools.Inspects
 					List<DefectDataWrapper> arrDefects = new List<DefectDataWrapper>();
 					if (m_InspProp.p_InspType == InspectionType.AbsoluteSurface || m_InspProp.p_InspType == InspectionType.RelativeSurface)
 					{
-						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
-						{
 							unsafe
 							{
 								var temp = clrInsp.SurfaceInspection(
@@ -132,12 +130,10 @@ namespace RootTools.Inspects
 									arrDefects.Add(new DefectDataWrapper(item));
 								}
 							}
-						}
+						
 					}
 					else if (m_InspProp.p_InspType == InspectionType.Strip)
 					{
-						using (CLR_Inspection clrInsp = new CLR_Inspection(m_nThreadNum, m_InspProp.p_Rect.Width, m_InspProp.p_Rect.Height))
-						{
 							unsafe
 							{
 								var temp = clrInsp.StripInspection(
@@ -159,12 +155,12 @@ namespace RootTools.Inspects
 								m_InspProp.p_StripParam.Bandwidth,
 								(void*)m_InspProp.p_ptrMemory);
 
-								foreach (var item in temp)
-								{
-									arrDefects.Add(new DefectDataWrapper(item));
-								}
-							}
-						}
+                                foreach (var item in temp)
+                                {
+                                    arrDefects.Add(new DefectDataWrapper(item));
+                                }
+                            }
+						
 					}
 					if (m_InspProp.p_bDefectMerge)//TODO : 기능 개선이 필요함. UI에 표시할때의 변수가 별도로 있는 것이 좋을 것으로 보임 + Defect Clustering구현
 					{
@@ -252,6 +248,7 @@ namespace RootTools.Inspects
 					}
 				}
 			}
+			clrInsp.Dispose();
 		}
 
 		public enum InspectionState

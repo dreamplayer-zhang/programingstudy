@@ -21,19 +21,20 @@ namespace RootTools_CLR
 	public ref class CLR_Inspection
 	{
 	protected:
-		CLR_InspConnector^ m_InspConn = nullptr;
+		CLR_InspConnector* m_InspConn = nullptr;
 		CInspectionSurface* pInspSurface = nullptr;
 		CInspectionReticle* pInspReticle = nullptr;
 	public:
 		CLR_Inspection(int nThreadNum, int nROIWidth, int nROIHeight)
 		{
-			m_InspConn = gcnew CLR_InspConnector(nThreadNum);
+			m_InspConn = new CLR_InspConnector(nThreadNum);
 			pInspSurface = new CInspectionSurface(nROIWidth, nROIHeight);
 			pInspReticle = new CInspectionReticle(nROIWidth, nROIHeight);
 		}
 
 		virtual ~CLR_Inspection()
 		{
+			delete m_InspConn;
 			delete pInspSurface;
 			delete pInspReticle;
 		}
