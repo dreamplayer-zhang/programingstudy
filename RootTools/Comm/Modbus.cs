@@ -146,15 +146,24 @@ namespace RootTools.Comm
             OnPropertyChanged("p_bConnect"); 
             return p_sInfo ="Connect OK";
         }
-        List<byte> Senddata = new List<byte>();
+
+        bool m_bLogSend = false; 
         private void M_client_SendDataChanged(object sender)
         { 
-            //m_commLog.Add(CommLog.eType.Send, BitConverter.ToString(m_client.sendData));
+            if (m_bLogSend) m_commLog.Add(CommLog.eType.Send, BitConverter.ToString(m_client.sendData));
         }
 
+        bool m_bLogReceive = false; 
         private void M_client_ReceiveDataChanged(object sender)
         {
-           //m_commLog.Add(CommLog.eType.Receive, BitConverter.ToString(m_client.receiveData)); 
+           if (m_bLogReceive) m_commLog.Add(CommLog.eType.Receive, BitConverter.ToString(m_client.receiveData)); 
+        }
+
+        void RunTreeLog(Tree tree)
+		{
+            m_bLogSend = tree.Set(m_bLogSend, m_bLogSend, "Send", "Send Log Enable");
+            m_bLogReceive = tree.Set(m_bLogReceive, m_bLogReceive, "Receive", "Receive Log Enable");
+
         }
         #endregion
 
@@ -292,7 +301,8 @@ namespace RootTools.Comm
         public void RunTree(Tree.eMode mode)
         {
             m_treeRoot.p_eMode = mode;
-            RunTreeCommunication(m_treeRoot.GetTree("Type")); 
+            RunTreeCommunication(m_treeRoot.GetTree("Type"));
+            RunTreeLog(m_treeRoot.GetTree("Log")); 
             RunTreeRS232(m_treeRoot.GetTree("RS232", p_eComm == eComm.RS232));
             RunTreeTCPIP(m_treeRoot.GetTree("TCPIP", p_eComm == eComm.TCPIP));
         }
