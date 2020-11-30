@@ -46,7 +46,7 @@ namespace Root_WIND2.UI
         public void Init(MemoryTool tool)
         {
             m_ToolMemory = tool;
-            p_MiniImageViewer = new MiniViewer_ViewModel(new ImageData(m_ToolMemory.GetMemory("Vision.Memory", "Vision", "Main")), false, true);
+            //p_MiniImageViewer = new MiniViewer_ViewModel(new ImageData(m_ToolMemory.GetMemory("Vision.Memory", "Vision", "Main")), false, true);
         }
 
         public RelayCommand btnTest
