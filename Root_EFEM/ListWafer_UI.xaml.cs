@@ -19,12 +19,13 @@ namespace Root_EFEM
         public void Init(IWTRChild module)
         {
             m_module = module;
-            DataContext = module; 
+            DataContext = module;
+            InitTree();
         }
 
         #region Tree
         public TreeRoot m_treeRoot;
-        void InitTreeGrab()
+        void InitTree()
         {
             m_treeRoot = new TreeRoot(m_module.p_id, null);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
@@ -44,6 +45,10 @@ namespace Root_EFEM
                 if (infoWafer != null) infoWafer.RunTree(m_treeRoot.GetTree(infoWafer.p_id)); 
             }
         }
+        #endregion
+
+        #region Timer
+
         #endregion
 
         #region Button

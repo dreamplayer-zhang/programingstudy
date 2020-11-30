@@ -22,7 +22,9 @@ namespace RootTools.Trees
         private void ToggleButton_PreviewKeyDown(object sender, KeyEventArgs e)
         {  
             if (e.Key == Key.Enter)
+            {
                 ((TextBox)sender).MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            }
         }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -35,6 +37,16 @@ namespace RootTools.Trees
         private void ControlTree_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             Column2.Width = ControlTree.ActualWidth - Column1.ActualWidth - 4; 
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

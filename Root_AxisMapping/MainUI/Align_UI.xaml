@@ -68,6 +68,8 @@
                     <tree:TreeUI x:Name="treeRotateUI" Height="100" Margin="3"/>
                 </StackPanel>
             </GroupBox>
+            <ComboBox x:Name="comboFocus" GotFocus="comboFocus_GotFocus" LostFocus="comboFocus_LostFocus"/>
+            <CheckBox x:Name="checkFocus"/>
         </StackPanel>
         <memory:MemoryViewer_UI Grid.Column="1" x:Name="memoryViewerAlignUI"/>
     </Grid>
