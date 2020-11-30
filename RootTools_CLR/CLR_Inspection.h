@@ -8,10 +8,12 @@
 #include "..\RootTools_Cpp\\InspectionSurface.h"
 #include "..\RootTools_Cpp\\InspectionReticle.h"
 #include "DefectData.h"
+#include "CDefectDataWrapper.h"
 
 #include <vcclr.h> // for PtrToStringChars 
 #include <stdio.h> // for wprintf
 #include <msclr\marshal_cppstd.h>
+#include <cliext/vector>
 
 #include "MySQLDBConnector.h"
 
@@ -39,7 +41,7 @@ namespace RootTools_CLR
 			delete pInspReticle;
 		}
 
-		array<DefectData^>^ SurfaceInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute, void* ptrMemory)
+		array<CDefectDataWrapper^>^ SurfaceInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64  memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, bool bDark, bool bAbsolute, bool bMerge, int nMergeDistance, void* ptrMemory)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -69,18 +71,15 @@ namespace RootTools_CLR
 
 				pInspSurface->CopyImageToBuffer(bDark);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
 				vTempResult = pInspSurface->SurfaceInspection(bAbsolute, nDefectCode);//TODO : absolute GV 구현해야함
+				//vTempResult를 Merge해서 다시 정렬해야함
 
 				bool bResultExist = vTempResult.size() > 0;
-				array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
-
-				if (bResultExist)
+				cliext::vector<CDefectDataWrapper^>^ local = gcnew cliext::vector<CDefectDataWrapper^>(vTempResult.size());
+				if (bMerge)
 				{
-					MySQLDBConnector^ connector = gcnew MySQLDBConnector();
-					unsigned int errorCode = connector->OpenDatabase();
-
 					for (int i = 0; i < vTempResult.size(); i++)
 					{
-						local[i] = gcnew DefectData();
+						local[i] = gcnew CDefectDataWrapper();
 						local[i]->nIdx = vTempResult[i].nIdx;
 						local[i]->nClassifyCode = nDefectCode;//vTempResult[i].nClassifyCode;
 						local[i]->fAreaSize = vTempResult[i].fAreaSize;
@@ -90,6 +89,35 @@ namespace RootTools_CLR
 						local[i]->nFOV = vTempResult[i].nFOV;
 						local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
 						local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+					}
+					local = CDefectDataWrapper::MergeDefect(local, nMergeDistance);
+				}
+
+
+				if (bResultExist)
+				{
+					MySQLDBConnector^ connector = gcnew MySQLDBConnector();
+					unsigned int errorCode = connector->OpenDatabase();
+
+					int count = vTempResult.size();
+					if (bMerge)
+						count = local->size();
+
+					for (int i = 0; i < count; i++)
+					{
+						if (!bMerge)
+						{
+							local[i] = gcnew CDefectDataWrapper();
+							local[i]->nIdx = vTempResult[i].nIdx;
+							local[i]->nClassifyCode = nDefectCode;//vTempResult[i].nClassifyCode;
+							local[i]->fAreaSize = vTempResult[i].fAreaSize;
+							local[i]->nLength = vTempResult[i].nLength;
+							local[i]->nWidth = vTempResult[i].nWidth;
+							local[i]->nHeight = vTempResult[i].nHeight;
+							local[i]->nFOV = vTempResult[i].nFOV;
+							local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+							local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+						}
 
 						if (errorCode == 0)
 						{
@@ -97,7 +125,7 @@ namespace RootTools_CLR
 
 							System::String^ query;
 							query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
-								vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+								local[i]->nClassifyCode, local[i]->fAreaSize, local[i]->nLength, local[i]->nWidth, local[i]->nHeight, local[i]->nFOV, local[i]->fPosX, local[i]->fPosY,
 								poolName, groupName, memoryName);
 
 							errorCode = connector->RunQuery(query);
@@ -116,7 +144,7 @@ namespace RootTools_CLR
 								{
 									//insert재실행
 									query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
-										vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+										local[i]->nClassifyCode, local[i]->fAreaSize, local[i]->nLength, local[i]->nWidth, local[i]->nHeight, local[i]->nFOV, local[i]->fPosX, local[i]->fPosY,
 										poolName, groupName, memoryName);
 
 									errorCode = connector->RunQuery(query);
@@ -141,16 +169,21 @@ namespace RootTools_CLR
 						}
 					}
 				}
+				array<CDefectDataWrapper^>^ arrLocal = gcnew array<CDefectDataWrapper^>(local->size());
+				for (int i = 0; i < local->size(); i++)
+				{
+					arrLocal[i] = local[i];
+				}
 
-				return local;
+				return arrLocal;
 			}
 			else
 			{
-				array<DefectData^>^ local = gcnew array<DefectData^>(0);
+				array<CDefectDataWrapper^>^ local = gcnew array<CDefectDataWrapper^>(0);
 				return local;
 			}
 		}
-		array<DefectData^>^ StripInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth, void *ptrMemory)
+		array<CDefectDataWrapper^>^ StripInspection(System::String^ poolName, System::String^ groupName, System::String^ memoryName, unsigned __int64 memOffset, int threadindex, int nDefectCode, int RoiLeft, int RoiTop, int RoiRight, int RoiBottom, int  memwidth, int  memHeight, int GV, int DefectSize, int nIntensity, int nBandwidth, bool bMerge, int nMergeDistance, void *ptrMemory)
 		{
 			RECT targetRect;
 			std::vector<DefectDataStruct> vTempResult;
@@ -173,18 +206,15 @@ namespace RootTools_CLR
 
 			pInspReticle->CopyImageToBuffer(true);//opencv pitsize 가져오기 전까지는 buffer copy가 필요함
 			vTempResult = pInspReticle->StripInspection(nBandwidth, nIntensity, nDefectCode);
+			//vTempResult를 Merge해서 다시 정렬해야함
 
 			bool bResultExist = vTempResult.size() > 0;
-			array<DefectData^>^ local = gcnew array<DefectData^>(vTempResult.size());
-
-			if (bResultExist)
+			cliext::vector<CDefectDataWrapper^>^ local = gcnew cliext::vector<CDefectDataWrapper^>(vTempResult.size());
+			if (bMerge)
 			{
-				MySQLDBConnector^ connector = gcnew MySQLDBConnector();
-				unsigned int errorCode = connector->OpenDatabase();
-
 				for (int i = 0; i < vTempResult.size(); i++)
 				{
-					local[i] = gcnew DefectData();
+					local[i] = gcnew CDefectDataWrapper();
 					local[i]->nIdx = vTempResult[i].nIdx;
 					local[i]->nClassifyCode = nDefectCode;//vTempResult[i].nClassifyCode;
 					local[i]->fAreaSize = vTempResult[i].fAreaSize;
@@ -194,13 +224,42 @@ namespace RootTools_CLR
 					local[i]->nFOV = vTempResult[i].nFOV;
 					local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
 					local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+				}
+				local = CDefectDataWrapper::MergeDefect(local, nMergeDistance);
+			}
+
+			if (bResultExist)
+			{
+				MySQLDBConnector^ connector = gcnew MySQLDBConnector();
+				unsigned int errorCode = connector->OpenDatabase();
+
+
+				int count = vTempResult.size();
+				if (bMerge)
+					count = local->size();
+
+				for (int i = 0; i < count; i++)
+				{
+					if (!bMerge)
+					{
+						local[i] = gcnew CDefectDataWrapper();
+						local[i]->nIdx = vTempResult[i].nIdx;
+						local[i]->nClassifyCode = nDefectCode;//vTempResult[i].nClassifyCode;
+						local[i]->fAreaSize = vTempResult[i].fAreaSize;
+						local[i]->nLength = vTempResult[i].nLength;
+						local[i]->nWidth = vTempResult[i].nWidth;
+						local[i]->nHeight = vTempResult[i].nHeight;
+						local[i]->nFOV = vTempResult[i].nFOV;
+						local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+						local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
+					}
 					if (errorCode == 0)
 					{
 						//DB Open성공
 
 						System::String^ query;
 						query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
-							vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+							local[i]->nClassifyCode, local[i]->fAreaSize, local[i]->nLength, local[i]->nWidth, local[i]->nHeight, local[i]->nFOV, local[i]->fPosX, local[i]->fPosY,
 							poolName, groupName, memoryName);
 
 						errorCode = connector->RunQuery(query);
@@ -219,7 +278,7 @@ namespace RootTools_CLR
 							{
 								//insert재실행
 								query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10})';",
-									vTempResult[i].nClassifyCode, vTempResult[i].fAreaSize, vTempResult[i].nLength, vTempResult[i].nWidth, vTempResult[i].nHeight, vTempResult[i].nFOV, vTempResult[i].fPosX + targetRect.left, vTempResult[i].fPosY + targetRect.top,
+									local[i]->nClassifyCode, local[i]->fAreaSize, local[i]->nLength, local[i]->nWidth, local[i]->nHeight, local[i]->nFOV, local[i]->fPosX, local[i]->fPosY,
 									poolName, groupName, memoryName);
 
 								errorCode = connector->RunQuery(query);
@@ -243,9 +302,20 @@ namespace RootTools_CLR
 						//DBOpen 실패
 					}
 				}
-			}
 
-			return local;
+				array<CDefectDataWrapper^>^ arrLocal = gcnew array<CDefectDataWrapper^>(local->size());
+				for (int i = 0; i < local->size(); i++)
+				{
+					arrLocal[i] = local[i];
+				}
+
+				return arrLocal;
+			}
+			else
+			{
+				array<CDefectDataWrapper^>^ local = gcnew array<CDefectDataWrapper^>(0);
+				return local;
+			}
 		}
 		void PaintOutline(int nY, int nOutline, byte* pByte, int nX)
 		{

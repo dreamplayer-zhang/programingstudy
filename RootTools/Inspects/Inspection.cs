@@ -123,6 +123,8 @@ namespace RootTools.Inspects
 								m_InspProp.p_surfaceParam.DefectSize,
 								m_InspProp.p_surfaceParam.UseDarkInspection,
 								m_InspProp.p_surfaceParam.UseAbsoluteInspection,
+								m_InspProp.p_bDefectMerge,
+								m_InspProp.p_nMergeDistance,
 								(void*)m_InspProp.p_ptrMemory);
 
 								foreach (var item in temp)
@@ -153,6 +155,8 @@ namespace RootTools.Inspects
 								m_InspProp.p_StripParam.DefectSize,
 								m_InspProp.p_StripParam.Intensity,
 								m_InspProp.p_StripParam.Bandwidth,
+								m_InspProp.p_bDefectMerge,
+								m_InspProp.p_nMergeDistance,
 								(void*)m_InspProp.p_ptrMemory);
 
                                 foreach (var item in temp)
@@ -162,10 +166,10 @@ namespace RootTools.Inspects
                             }
 						
 					}
-					if (m_InspProp.p_bDefectMerge)//TODO : 기능 개선이 필요함. UI에 표시할때의 변수가 별도로 있는 것이 좋을 것으로 보임 + Defect Clustering구현
-					{
-						arrDefects = DefectDataWrapper.MergeDefect(arrDefects.ToArray(), m_InspProp.p_nMergeDistance);
-					}
+					//if (m_InspProp.p_bDefectMerge)//TODO : 기능 개선이 필요함. UI에 표시할때의 변수가 별도로 있는 것이 좋을 것으로 보임 + Defect Clustering구현
+					//{
+					//	arrDefects = DefectDataWrapper.MergeDefect(arrDefects.ToArray(), m_InspProp.p_nMergeDistance);
+					//}
 					if (AddChromeDefect != null)
 					{
 						if (arrDefects != null && arrDefects.Count > 0)
@@ -179,7 +183,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddEBRDefect != null)
+					if (AddEBRDefect != null)
 					{
 						if (arrDefects != null && arrDefects.Count > 0)
 						{
@@ -192,7 +196,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddD2DDefect != null)
+					if (AddD2DDefect != null)
 					{
 						if (arrDefects != null && arrDefects.Count > 0)
 						{
@@ -205,7 +209,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddSideDefect != null)
+					if (AddSideDefect != null)
 					{
 						if(arrDefects != null && arrDefects.Count > 0)
 						{
@@ -220,7 +224,7 @@ namespace RootTools.Inspects
 							}
 						}
 					}
-					else if (AddBevelDefect != null )
+					if (AddBevelDefect != null )
 					{
 						if (arrDefects != null && arrDefects.Count > 0)
 						{

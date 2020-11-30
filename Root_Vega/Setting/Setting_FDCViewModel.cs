@@ -283,17 +283,17 @@ namespace Root_Vega
 
 		public Setting_FDCViewModel(Vega_Engineer engineer, IDialogService DialogService)
 		{
-			m_Engineer = engineer;
-			m_FDC = m_Engineer.m_handler.m_FDC;
-			m_FDC.RunTree(Tree.eMode.RegRead);
-			m_FDC.RunTree(Tree.eMode.Init);
+			//m_Engineer = engineer;
+			//m_FDC = m_Engineer.m_handler.m_FDC;
+			//m_FDC.RunTree(Tree.eMode.RegRead);
+			//m_FDC.RunTree(Tree.eMode.Init);
 
-			//m_Engineer.m_handler.m_FDC.m_aData
-			m_DialogService = DialogService;
-			m_CVM_manager = new CVM_Manager(m_DialogService);
+			////m_Engineer.m_handler.m_FDC.m_aData
+			//m_DialogService = DialogService;
+			//m_CVM_manager = new CVM_Manager(m_DialogService);
 			
-			m_CVM_manager.m_FDC = m_FDC;
-			p_Item = new ObservableCollection<FDC_Control>();
+			//m_CVM_manager.m_FDC = m_FDC;
+			//p_Item = new ObservableCollection<FDC_Control>();
 
 			
 		}
