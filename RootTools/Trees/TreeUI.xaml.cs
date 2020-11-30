@@ -33,6 +33,7 @@ namespace RootTools.Trees
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ((ComboBox)sender).MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            if(m_treeRoot!=null)
             m_treeRoot.m_bFocus = false;
         }
 
