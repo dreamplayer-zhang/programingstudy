@@ -41,6 +41,8 @@ namespace Root_EFEM.Module
         #endregion
 
         #region IWTRChild
+        public List<InfoWafer> p_aInfoWafer { get {return m_infoCarrier.m_aInfoWafer; } }
+
         public bool p_bLock { get; set; }
 
         bool IsLock()

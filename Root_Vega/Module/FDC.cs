@@ -32,6 +32,7 @@ namespace Root_Vega.Module
 
         public class Data : NotifyProperty
         {
+            public string m_id = ""; 
             public string p_id { get; set; }
 
             eUnit _eUnit = eUnit.None;
@@ -117,6 +118,7 @@ namespace Root_Vega.Module
             public Data(ModuleBase module, string id)
             {
                 m_module = module;
+                m_id = id; 
                 p_id = id;
             }
         }
@@ -131,7 +133,7 @@ namespace Root_Vega.Module
             set
             {
                 if (m_aData.Count == value) return;
-                while (m_aData.Count < value) m_aData.Add(new Data(this, m_aData.Count.ToString()));
+                while (m_aData.Count < value) m_aData.Add(new Data(this, "FDC " + m_aData.Count.ToString()));
                 while (m_aData.Count > value) m_aData.RemoveAt(m_aData.Count - 1);
             }
         }
@@ -147,7 +149,7 @@ namespace Root_Vega.Module
             foreach (Data data in m_aData)
             {
                 module_number++;
-                data.RunTree(tree.GetTree(data.p_id), module_number); 
+                data.RunTree(tree.GetTree(data.m_id), module_number); 
             }
         }
         #endregion
