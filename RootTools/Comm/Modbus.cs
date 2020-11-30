@@ -241,24 +241,21 @@ namespace RootTools.Comm
         public string ReadHoldingRegister(byte nUnit, int nAddress, ref List<int> anValue)
         {
             if (m_client.Connected == false)
-            {
-                return p_sInfo = "Not Connect";
-            }
-            m_client.UnitIdentifier = nUnit;
-            try
-            {
-                lock (m_csLockFFU)
-                {
-                    int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
-                    for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
-                }
-            }
-            catch { }
-            //if (m_client.Connected == false) return p_sInfo = "Not Connect";
-            //m_client.UnitIdentifier = nUnit;
-            //int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
-            //for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
-            return "OK";
+			{
+				return p_sInfo = "Not Connect";
+			}
+			m_client.UnitIdentifier = nUnit;
+			try
+			{
+				int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
+				for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
+			}
+			catch { }
+			//if (m_client.Connected == false) return p_sInfo = "Not Connect";
+			//m_client.UnitIdentifier = nUnit;
+			//int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
+			//for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
+			return "OK";
         }
 
         public string WriteHoldingRegister(byte nUnit, int nAddress, int nValue)

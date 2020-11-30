@@ -304,7 +304,6 @@ namespace Root_Vega
 			m_CVM_manager.m_FDC = m_FDC;
 			p_Item = new ObservableCollection<FDC_Control>();
 
-
 		}
 
 		#region ICommand

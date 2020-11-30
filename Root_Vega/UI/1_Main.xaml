@@ -437,7 +437,7 @@
                                                     <Grid.Style>
                                                         <Style>
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding p_test}" Value="True">
+                                                                <DataTrigger Binding="{Binding p_aUnit[0].p_aFan[0].p_bRunOK}" Value="True">
                                                                     <DataTrigger.EnterActions>
                                                                         <BeginStoryboard x:Name="EndAnimation">
                                                                             <Storyboard>
@@ -456,7 +456,7 @@
                                                         </Style>
                                                     </Grid.Style>
                                                 </Grid>
-                                                <TextBlock HorizontalAlignment="Center" Grid.Row="1" Text="RPM 100" Foreground="White" ></TextBlock>
+                                                <TextBlock HorizontalAlignment="Center" Grid.Row="1" Text="{Binding p_aUnit[0].p_aFan[0].p_fFanRPM}" Foreground="White" ></TextBlock>
                                             </Grid>
                                             <Grid Grid.Row="1">
                                                 <Grid.RowDefinitions>
@@ -477,7 +477,7 @@
                                                     <Grid.Style>
                                                         <Style>
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding p_aFan[0].p_bRunOK}" Value="True">
+                                                                <DataTrigger Binding="{Binding p_aUnit[0].p_aFan[1].p_bRunOK}" Value="True">
                                                                     <DataTrigger.EnterActions>
                                                                         <BeginStoryboard x:Name="EndAnimation">
                                                                             <Storyboard>
@@ -496,7 +496,7 @@
                                                         </Style>
                                                     </Grid.Style>
                                                 </Grid>
-                                                <TextBlock HorizontalAlignment="Center" Grid.Row="1" Text="{Binding p_aFan[0].p_fFanRPM}" Foreground="White" ></TextBlock>
+                                                <TextBlock HorizontalAlignment="Center" Grid.Row="1" Text="{Binding p_aUnit[0].p_aFan[1].p_fFanRPM}" Foreground="White" ></TextBlock>
                                             </Grid>
                                             <Grid Grid.Row="2">
                                                 <Grid.RowDefinitions>
