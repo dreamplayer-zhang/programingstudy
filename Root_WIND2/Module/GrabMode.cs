@@ -42,7 +42,11 @@ namespace Root_WIND2.Module
             m_camera.GrabLineScan(memory, cpScanOffset, nLine, bInvY, m_nReverseOffsetY);
             m_camera.Grabed += m_camera_Grabed;
         }
-
+        public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false)
+        {
+            m_camera.GrabLineScanColor(memory, cpScanOffset, nLine, bInvY, m_nReverseOffsetY);
+            m_camera.Grabed += m_camera_Grabed;
+        }
         void m_camera_Grabed(object sender, System.EventArgs e)
         {
             if (Grabed != null)
