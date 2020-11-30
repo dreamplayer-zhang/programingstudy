@@ -262,7 +262,7 @@ namespace RootTools.Memory
             m_treeRootRun.p_eMode = mode;
             RunTreeFile(m_treeRootRun.GetTree("File"));
             if (m_bMaster == false) return; 
-            bool bVisible = (m_engineer.p_user.m_eLevel >= Login.eLevel.Admin); 
+            bool bVisible = true; 
             RunTreeProcess(m_treeRootRun.GetTree("Process"), bVisible);
         }
         #endregion

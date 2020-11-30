@@ -13,7 +13,10 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <tools:RootViewer DataContext="{Binding p_Viewer}"/>
+            <!--<tools:RootViewer DataContext="{Binding p_Viewer}"/>-->
+            <tools:MiniViewer DataContext="{Binding p_MiniImageViewer}"
+                                                          Width="{PriorityBinding}"
+                                                          Height="{PriorityBinding}"></tools:MiniViewer>
         </Grid>
         <Button  Grid.Column="1" Width="50" Height="50" Command="{Binding btnTest}"></Button>
             

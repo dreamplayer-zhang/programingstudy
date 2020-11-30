@@ -369,8 +369,6 @@
                                                 Style="{StaticResource BasicTb}"
                                                 FontWeight="Bold"
                                                    Foreground="{StaticResource Black}"/>
-
-
                                                 <TextBlock Text="0.000 (Mpa)"
                                                    Grid.Column="1"
                                                    Grid.Row="0"

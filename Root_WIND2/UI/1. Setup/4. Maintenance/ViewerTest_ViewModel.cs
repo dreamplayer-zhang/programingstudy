@@ -23,6 +23,19 @@ namespace Root_WIND2.UI
             }
         }
 
+        private MiniViewer_ViewModel m_MiniImageViewer;
+        public MiniViewer_ViewModel p_MiniImageViewer
+        {
+            get
+            {
+                return m_MiniImageViewer;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer, value);
+            }
+        }
+
         MemoryTool m_ToolMemory;
 
         public ViewerTest_ViewModel()
@@ -33,6 +46,7 @@ namespace Root_WIND2.UI
         public void Init(MemoryTool tool)
         {
             m_ToolMemory = tool;
+            p_MiniImageViewer = new MiniViewer_ViewModel(new ImageData(m_ToolMemory.GetMemory("Vision.Memory", "Vision", "Main")), false, true);
         }
 
         public RelayCommand btnTest
@@ -41,7 +55,7 @@ namespace Root_WIND2.UI
             {
                 return new RelayCommand(() =>
                 {
-                    //m_ToolMemory.SendTest();
+                    p_MiniImageViewer.SetImageSource();
                 });
             }
         }
