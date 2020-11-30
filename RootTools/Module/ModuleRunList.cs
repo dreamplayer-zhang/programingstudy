@@ -1,5 +1,6 @@
 ﻿using RootTools.Trees;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace RootTools.Module
 {
@@ -7,7 +8,15 @@ namespace RootTools.Module
     public class ModuleRunList : ObservableObject
     {
         #region ModuleRun List
-        public List<ModuleRunBase> m_aModuleRun = new List<ModuleRunBase>();
+        ObservableCollection<ModuleRunBase> m_aModuleRun = new ObservableCollection<ModuleRunBase>();
+        public ObservableCollection<ModuleRunBase> p_aModuleRun
+        {
+            get { return m_aModuleRun; }
+            set
+            {
+                SetProperty(ref m_aModuleRun, value);
+            }
+        }
 
         public void Add(string sModule, string sModuleRun)
         {
@@ -29,12 +38,12 @@ namespace RootTools.Module
             if (module == null) return;
             if (moduleRun == null) return;
             moduleRun.m_moduleBase = module;
-            m_aModuleRun.Add(moduleRun);
+            p_aModuleRun.Add(moduleRun);
         }
 
         public void Clear()
         {
-            m_aModuleRun.Clear();
+            p_aModuleRun.Clear();
             RunTree(Tree.eMode.Init);
         }
 
@@ -67,11 +76,11 @@ namespace RootTools.Module
             try
             {
                 job = new Job(sFile, true, m_log);
-                job.Set("ModuleRuns", "Count", m_aModuleRun.Count);
-                for (int n = 0; n < m_aModuleRun.Count; n++)
+                job.Set("ModuleRuns", "Count", p_aModuleRun.Count);
+                for (int n = 0; n < p_aModuleRun.Count; n++)
                 {
                     string sKey = n.ToString("00");
-                    ModuleRunBase moduleRun = m_aModuleRun[n];
+                    ModuleRunBase moduleRun = p_aModuleRun[n];
                     job.Set(sKey, "Module", moduleRun.m_moduleBase.p_id);
                     job.Set(sKey, "ModuleRun", moduleRun.m_sModuleRun);
                 }
@@ -86,13 +95,13 @@ namespace RootTools.Module
 
         public void OpenJob(string sFile, bool bClear = true)
         {
-            if (bClear) m_aModuleRun.Clear();
+            if (bClear) p_aModuleRun.Clear();
             Job job = null;
             if (sFile == "") return;
             try
             {
                 job = new Job(sFile, false, m_log);
-                int lRun = job.Set("ModuleRuns", "Count", m_aModuleRun.Count);
+                int lRun = job.Set("ModuleRuns", "Count", p_aModuleRun.Count);
                 for (int n = 0; n < lRun; n++)
                 {
                     string sKey = n.ToString("00");
@@ -127,9 +136,9 @@ namespace RootTools.Module
 
         public void RunTree(Tree tree)
         {
-            for (int n = 0; n < m_aModuleRun.Count; n++)
+            for (int n = 0; n < p_aModuleRun.Count; n++)
             {
-                ModuleRunBase moduleRun = m_aModuleRun[n];
+                ModuleRunBase moduleRun = p_aModuleRun[n];
                 moduleRun.RunTree(tree.GetTree(n, moduleRun.p_id, false), true);
             }
         }

@@ -590,4 +590,24 @@ namespace ViewConverter
             throw new NotSupportedException();
         }
     }
+
+    public class SequenceStateToColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            RootTools.Module.ModuleRunBase.eRunState eState = (RootTools.Module.ModuleRunBase.eRunState)value;
+            switch(eState)
+            {
+                case RootTools.Module.ModuleRunBase.eRunState.Done: return Brushes.SeaGreen;
+                case RootTools.Module.ModuleRunBase.eRunState.Ready: return Brushes.DimGray;
+                case RootTools.Module.ModuleRunBase.eRunState.Run: return Brushes.Yellow;
+                default: return Brushes.DimGray;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
 }
