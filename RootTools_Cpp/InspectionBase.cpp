@@ -102,7 +102,6 @@ RECT InspectionBase::GetInspbufferROI() const
 void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, int nBackGround, BOOL bInterpolation)
 {
 	//opencv 전의 test용으로 interpolation 내용 미구현
-
 	byte* mem = pBuffer;
 	INT64 nW = nBufferW;//80000;
 	RECT rt = rtROI;
@@ -122,48 +121,33 @@ void InspectionBase::CopyImageToBuffer(bool bDark)//byte* mem, int nW, RECT rt, 
 	inspbufferROI.bottom = nHeight;
 
 	INT64 nOffset = m_nInspOffset;
-	//	LPBYTE* ppBuffer = m_ppImageBuffer2;
 
 		// Copy Area
 	int nStart = 0;
 	int nEndX = Functions::GetWidth(rt);
 	int nEndY = Functions::GetHeight(rt);
 
-	//inspbuffer2 = new byte[nEndX * nEndY*6];
-
-	//for (int i = 0; i < nHeight; i++)
+	////버퍼 복사를 이상하게 하고있음. 문제 확인 후 조치 필요함
+	//for (INT64 i = nStart; i < nEndY; i++)
 	//{
-	//	for (int j = 0; j < nWidth; j++)
+	//	for (INT64 j = nStart; j < nEndX; j++)
 	//	{
-	//		inspbuffer2[i * nW + j] = nBackGround;
+	//		INT64 xtarget = j + rt.left + (nOffset - 5) * 2;
+	//		INT64 ytarget = i + rt.top + (nOffset - 5) * 2;
+	//		INT64 iIndex = (ytarget)*nW + (xtarget);
+	//		inspbuffer[i + nOffset][nOffset + j] = mem[iIndex];
+	//		//mem[iIndex] = 255;//테스트용 코드
+	//		//inspbuffer2[(i+nOffset)* nWidth + (nOffset + j)] = mem[(ytarget)*nW + (xtarget)];
 	//	}
-	//}
-	
-	//버퍼 복사를 이상하게 하고있음. 문제 확인 후 조치 필요함
+	//} 
+
+	// 201130 ESCHO
 	for (INT64 i = nStart; i < nEndY; i++)
 	{
-		for (INT64 j = nStart; j < nEndX; j++)
-		{
-			INT64 ytarget = i + rt.top + (nOffset - 5) * 2;
-			INT64 xtarget = j + rt.left + (nOffset - 5) * 2;
-
-			INT64 iIndex = (ytarget)*nW + (xtarget);
-			inspbuffer[i + nOffset][nOffset + j] = mem[iIndex];
-			//mem[iIndex] = 255;//테스트용 코드
-			//inspbuffer2[(i+nOffset)* nWidth + (nOffset + j)] = mem[(ytarget)*nW + (xtarget)];
-		}
-	} 
-	
-	//for (int i = 0; i < m_nInspOffset; i++) {//Jerry
-	//	memset(&inspbuffer2[i], nBackGround, nWidth);
-	//	memset(&inspbuffer2[nHeight - 1 - i], nBackGround, nWidth);
-	//	for (int j = 0; j < nHeight; j++) {
-	//		inspbuffer2[j*nWidth + i] = nBackGround;
-	//		inspbuffer2[j*nWidth + (nWidth - 1 - i)] = nBackGround;
-	//		//inspbuffer2[j][i] = nBackGround;
-	//		//inspbuffer2[j][nWidth - 1 - i] = nBackGround;
-	//	}
-	//}
+		INT64 ytarget = i + rt.top + (nOffset - 5) * 2;
+		INT64 iIndex = (ytarget)*nW + rt.left;
+		memcpy(inspbuffer[i + nOffset], &mem[iIndex], nEndX - nStart);
+	}
 
 
 	for (int i = 0; i < m_nInspOffset; i++) {//Jerry
