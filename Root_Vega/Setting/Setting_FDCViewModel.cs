@@ -126,13 +126,14 @@ namespace Root_Vega
 			{
 				p_bConnectState = false;
 				//m_SerialComm.UpdateStop();
-				SetProperty(ref m_IndexPort, value);
-				if (m_IndexPort != m_FDC.m_modbus.m_client.Port)
+				if(m_IndexPort == -1)
 				{
-					m_FDC.m_modbus.m_client.Port = m_IndexPort;
-					m_FDC.m_modbus.RunTree(Tree.eMode.Update);
-					m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
+					m_IndexPort= m_FDC.m_modbus.m_client.Port;
 				}
+				SetProperty(ref m_IndexPort, value);
+				m_FDC.m_modbus.RunTree(Tree.eMode.Update);
+				m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
+
 			}
 		}
 		private int m_IndexBaudrate;
@@ -143,12 +144,13 @@ namespace Root_Vega
 			{
 				p_bConnectState = false;
 				//m_SerialComm.UpdateStop();
-				SetProperty(ref m_IndexBaudrate, value);
-				if (m_IndexBaudrate != m_FDC.m_modbus.m_client.Baudrate)
+				if (m_IndexBaudrate== -1)
 				{
-					m_FDC.m_modbus.RunTree(Tree.eMode.Update);
-					m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
+					m_IndexBaudrate = m_FDC.m_modbus.m_client.Baudrate;
 				}
+				SetProperty(ref m_IndexBaudrate, value);
+				m_FDC.m_modbus.RunTree(Tree.eMode.Update);
+				m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
 			}
 		}
 		private int m_IndexParity;
@@ -161,12 +163,13 @@ namespace Root_Vega
 			set
 			{
 				p_bConnectState = false;
-				SetProperty(ref m_IndexParity, value);
-				if (m_FDC.m_modbus.m_client.Parity != (Parity)m_IndexParity)
+				if (m_IndexParity == -1)
 				{
-					m_FDC.m_modbus.RunTree(Tree.eMode.Update);
-					m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
+					m_IndexParity = (int)m_FDC.m_modbus.m_client.Parity;
 				}
+				SetProperty(ref m_IndexParity, value);
+				m_FDC.m_modbus.RunTree(Tree.eMode.Update);
+				m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
 			}
 		}
 		//private int m_IndexDataBits;
@@ -192,12 +195,13 @@ namespace Root_Vega
 			set
 			{
 				p_bConnectState = false;
-				SetProperty(ref m_IndexStopBits, value);
-				if (m_FDC.m_modbus.m_client.StopBits != (StopBits)m_IndexStopBits)
+				if (m_IndexStopBits == -1)
 				{
-					m_FDC.m_modbus.RunTree(Tree.eMode.Update);
-					m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
+					m_IndexStopBits = (int)m_FDC.m_modbus.m_client.StopBits;
 				}
+				SetProperty(ref m_IndexStopBits, value); 
+				m_FDC.m_modbus.RunTree(Tree.eMode.Update);
+				m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
 			}
 		}
 
@@ -487,6 +491,7 @@ namespace Root_Vega
 				m_CVM_manager.GetCVM(index).SendDelegate += (this.MakeDelegate);
 				m_CVM_manager.GetCVM(index).DeleteDelegate += (this.DeleteDelegate);
 			}
+
 		}
 
 		void BtnAddClick_Function()

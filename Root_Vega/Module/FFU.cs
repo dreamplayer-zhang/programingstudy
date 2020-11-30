@@ -11,10 +11,10 @@ namespace Root_Vega.Module
     public class FFU : ModuleBase
     {
         #region ToolBox
-        public Modbus m_modbus;
+        //public Modbus m_modbus;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_modbus, this, "Modbus"); 
+            //p_sInfo = m_toolBox.Get(ref m_modbus, this, "Modbus"); 
         }
         #endregion
 
@@ -98,23 +98,23 @@ namespace Root_Vega.Module
             public void RunThreadFan()
             {
                 Thread.Sleep(10);
-                m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 0, ref m_aFanRPM);
-                Thread.Sleep(10);
-                m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 64, ref m_aFanState);
-                Thread.Sleep(10);
-                m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 128, ref m_aFanPressure);
-                if (m_bInvalidSet)
-                {
-                    Thread.Sleep(10);
-                    m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 32, m_aFanSet); 
-                }
-                if (m_FFU.m_bResetFan)
-                {
-                    Thread.Sleep(10);
-                    for (int n = 0; n < c_lFan; n++) m_aFanReset[n] = 1; 
-                    m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 96, m_aFanReset);
-                    m_FFU.m_bResetFan = false; 
-                }
+                //m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 0, ref m_aFanRPM);
+                //Thread.Sleep(10);
+                //m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 64, ref m_aFanState);
+                //Thread.Sleep(10);
+                //m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 128, ref m_aFanPressure);
+                //if (m_bInvalidSet)
+                //{
+                //    Thread.Sleep(10);
+                //    m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 32, m_aFanSet); 
+                //}
+                //if (m_FFU.m_bResetFan)
+                //{
+                //    Thread.Sleep(10);
+                //    for (int n = 0; n < c_lFan; n++) m_aFanReset[n] = 1; 
+                //    m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 96, m_aFanReset);
+                //    m_FFU.m_bResetFan = false; 
+                //}
             }
 
             bool m_bInvalidSet = false;
