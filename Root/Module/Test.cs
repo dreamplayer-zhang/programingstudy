@@ -91,10 +91,6 @@ namespace Root.Module
         public override void Reset()
         {
             base.Reset();
-            int n = 0;
-            int d = n + 1;
-            double f = 3.15;
-            int i = 0;
             //
         }
 

@@ -40,6 +40,8 @@ namespace RootTools.Trees
                 }
             }
         }
+
+        public bool m_bFocus = false; 
         #endregion
 
         #region Timer Init
