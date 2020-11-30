@@ -38,8 +38,8 @@ namespace RootTools
 					Rect temp = new Rect();
 					temp.Width = Rect.Width / Scale;//이건 맞음
 					temp.Height = Rect.Height / Scale;//이것도 맞음
-					temp.X = (Rect.X - StartPos.X) / Scale - temp.Width;
-					temp.Y = (Rect.Y - StartPos.Y) / Scale - temp.Height;
+					temp.X = (Rect.X - StartPos.X) / Scale - (temp.Width / 2.0);
+					temp.Y = (Rect.Y - StartPos.Y) / Scale - (temp.Height / 2.0);
 
 					return temp;
 				}
