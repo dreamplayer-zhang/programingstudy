@@ -26,15 +26,14 @@ namespace RootTools.Trees
             if (e.Key == Key.Enter)
             {
                 ((TextBox)sender).MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-                m_treeRoot.m_bFocus = false;
+                if (m_treeRoot != null) m_treeRoot.m_bFocus = false;
             }
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ((ComboBox)sender).MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
-            if(m_treeRoot!=null)
-            m_treeRoot.m_bFocus = false;
+            if (m_treeRoot != null) m_treeRoot.m_bFocus = false;
         }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -51,12 +50,12 @@ namespace RootTools.Trees
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            m_treeRoot.m_bFocus = true; 
+            if (m_treeRoot != null) m_treeRoot.m_bFocus = true; 
         }
 
         private void TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            m_treeRoot.m_bFocus = false;
+            if (m_treeRoot != null) m_treeRoot.m_bFocus = false;
         }
     }
 }

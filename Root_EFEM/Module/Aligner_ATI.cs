@@ -94,22 +94,22 @@ namespace Root_EFEM.Module
             }
         }
 
-        public List<InfoWafer> p_aInfoWafer
-        {
-            get
-            {
-                List<InfoWafer> aInfoWafer = new List<InfoWafer>();
-                aInfoWafer.Add(p_infoWafer);
-                return aInfoWafer;
-            }
-        }
-
         Registry m_reg = null;
         public void ReadInfoWafer_Registry()
         {
             m_reg = new Registry(p_id + ".InfoWafer");
             m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
             p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
+        }
+        #endregion
+
+        #region InfoWafer UI
+        InfoWaferChild_UI m_ui;
+        void InitInfoWaferUI()
+        {
+            m_ui = new InfoWaferChild_UI();
+            m_ui.Init(this);
+            m_aTool.Add(m_ui);
         }
         #endregion
 
@@ -468,6 +468,7 @@ namespace Root_EFEM.Module
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             m_aoi = new Aligner_ATI_AOI(m_log);
             base.InitBase(id, engineer);
+            InitInfoWaferUI(); 
         }
 
         public override void ThreadStop()

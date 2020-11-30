@@ -23,6 +23,19 @@ namespace Root_WIND2.UI
             }
         }
 
+        private MiniViewer_ViewModel m_MiniImageViewer;
+        public MiniViewer_ViewModel p_MiniImageViewer
+        {
+            get
+            {
+                return m_MiniImageViewer;
+            }
+            set
+            {
+                SetProperty(ref m_MiniImageViewer, value);
+            }
+        }
+
         MemoryTool m_ToolMemory;
         ImageData m_imagedata;
 
@@ -46,7 +59,7 @@ namespace Root_WIND2.UI
             {
                 return new RelayCommand(() =>
                 {
-                    //m_ToolMemory.SendTest();
+                    p_MiniImageViewer.SetImageSource();
                 });
             }
         }

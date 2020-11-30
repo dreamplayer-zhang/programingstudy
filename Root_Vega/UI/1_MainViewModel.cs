@@ -4,6 +4,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
 using RootTools.Module;
+using Root_Vega.Module;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Root_Vega
@@ -58,7 +59,6 @@ namespace Root_Vega
                 SetProperty(ref m_MiniImageViewer, value);
             }
         }
-
         private MiniViewer_ViewModel m_MiniImageViewer_Top;
         public MiniViewer_ViewModel p_MiniImageViewer_Top
         {
@@ -107,6 +107,7 @@ namespace Root_Vega
                 SetProperty(ref m_MiniImageViewer_Right, value);
             }
         }
+
 
         private readonly IDialogService m_DialogService;
 
@@ -439,6 +440,30 @@ namespace MainViewerConverter
 
         #endregion
     }
+    public class FDCConverter : IValueConverter
+    {
+        #region IValueConverter Members
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            BrushConverter bc = new BrushConverter();
+            System.Windows.Media.Brush result = System.Windows.Media.Brushes.DimGray;
+            bool state = (bool)value;
 
+            switch (state)
+            {
+                case true: return Colors.Red;
+                case false: return Colors.Green;
+                default:
+                    break;
+            }
+            return result;
+        }
 
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
 }
