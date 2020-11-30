@@ -31,7 +31,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
             if (bInit)
             {
-                m_rs232.OnRecieve += M_rs232_OnRecieve;
+                m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
             }
         }
@@ -54,6 +54,8 @@ namespace Root_EFEM.Module
         #endregion
 
         #region IWTRChild
+        public List<InfoWafer> p_aInfoWafer { get { return m_infoCarrier.m_aInfoWafer; } }
+
         public bool p_bLock { get; set; }
 
         bool IsLock()
@@ -210,7 +212,7 @@ namespace Root_EFEM.Module
         #endregion
 
         #region RS232
-        private void M_rs232_OnRecieve(string sRead)
+        private void M_rs232_OnReceive(string sRead)
         {
             string[] sReads = sRead.Split(' ');
             m_log.Info(" <-- Recv] " + sRead);

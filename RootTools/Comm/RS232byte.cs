@@ -110,9 +110,9 @@ namespace RootTools.Comm
         }
         #endregion
 
-        #region Recieve
-        public delegate void dgOnRecieve(byte[] aRead, ref int nRead);
-        public event dgOnRecieve OnRecieve;
+        #region Receive
+        public delegate void dgOnReceive(byte[] aRead, ref int nRead);
+        public event dgOnReceive OnReceive;
 
         public int p_lRead
         {
@@ -126,12 +126,12 @@ namespace RootTools.Comm
         public byte[] m_aRead = new byte[80]; 
         private void M_sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (OnRecieve == null) return;
+            if (OnReceive == null) return;
             SerialPort sp = (SerialPort)sender;
             int nRead = sp.Read(m_aRead, 0, p_lRead);
             string sRead = Encoding.ASCII.GetString(m_aRead, 0, nRead);
             m_commLog.Add(CommLog.eType.Receive, sRead);
-            if (OnRecieve != null) OnRecieve(m_aRead, ref nRead); 
+            if (OnReceive != null) OnReceive(m_aRead, ref nRead); 
         }
         #endregion
 

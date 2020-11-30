@@ -64,7 +64,7 @@ namespace RootTools.Light
                 return ":1" + m_nCh.ToString("0") + nPower.ToString("000");
             }
 
-            private void M_rs232_OnRecieve(string sRead)
+            private void M_rs232_OnReceive(string sRead)
             {
                 p_fGetPower = p_fSetPower; 
             }
@@ -81,7 +81,7 @@ namespace RootTools.Light
                 m_nCh = nCh;
                 p_rs232 = rs232;
                 Init(id + "." + nCh.ToString("00"), nCh);
-                p_rs232.OnRecieve += M_rs232_OnRecieve;
+                p_rs232.OnReceive += M_rs232_OnReceive;
             }
         }
 

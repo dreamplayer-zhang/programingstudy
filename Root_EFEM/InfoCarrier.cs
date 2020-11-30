@@ -162,7 +162,7 @@ namespace Root_EFEM
         #endregion
 
         #region InfoWafer
-        List<InfoWafer> m_aInfoWafer = new List<InfoWafer>();
+        public List<InfoWafer> m_aInfoWafer = new List<InfoWafer>();
         InfoWafer GetInfoWafer(string sWafer)
         {
             foreach (InfoWafer infoWafer in m_aInfoWafer)

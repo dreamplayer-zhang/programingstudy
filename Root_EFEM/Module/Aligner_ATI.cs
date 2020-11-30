@@ -94,6 +94,16 @@ namespace Root_EFEM.Module
             }
         }
 
+        public List<InfoWafer> p_aInfoWafer
+        {
+            get
+            {
+                List<InfoWafer> aInfoWafer = new List<InfoWafer>();
+                aInfoWafer.Add(p_infoWafer);
+                return aInfoWafer;
+            }
+        }
+
         Registry m_reg = null;
         public void ReadInfoWafer_Registry()
         {

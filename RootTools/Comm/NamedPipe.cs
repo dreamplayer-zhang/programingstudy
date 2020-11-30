@@ -84,7 +84,7 @@ namespace RootTools.Comm
         #endregion
 
         #region Name
-        string m_sRecieveID = "";
+        string m_sReceiveID = "";
         string m_sSendID = "";
         string _sTarget = "";
         public string p_sTarget
@@ -93,7 +93,7 @@ namespace RootTools.Comm
             set
             {
                 if (_sTarget == value) return;
-                m_sRecieveID = value + "-" + p_id;
+                m_sReceiveID = value + "-" + p_id;
                 m_sSendID = p_id + "-" + value;
                 m_log.Info(p_id + " Change Target : " + _sTarget + " -> " + value);
                 _sTarget = value;
@@ -226,7 +226,7 @@ namespace RootTools.Comm
         }
         #endregion
 
-        #region Recieve
+        #region Receive
         bool m_bRunThreadListen = false;
         Thread m_threadListen;
         void RunThreadListen()
@@ -236,7 +236,7 @@ namespace RootTools.Comm
             while (m_bRunThreadListen)
             {
                 Thread.Sleep(10);
-                SafeFileHandle handle = CreateNamedPipe(@"\\.\pipe\" + m_sRecieveID, c_nOpenMode, 0, 255, (uint)m_lBufRecieve, (uint)m_lBufRecieve, 0, IntPtr.Zero);
+                SafeFileHandle handle = CreateNamedPipe(@"\\.\pipe\" + m_sReceiveID, c_nOpenMode, 0, 255, (uint)m_lBufReceive, (uint)m_lBufReceive, 0, IntPtr.Zero);
                 if (handle.IsInvalid == false)
                 {
                     int nConnect = ConnectNamedPipe(handle, IntPtr.Zero);
@@ -257,15 +257,15 @@ namespace RootTools.Comm
             {
                 ASCIIEncoding encoder = new ASCIIEncoding();
                 int nRead = 0;
-                byte[] bufRead = new byte[m_lBufRecieve];
-                streamRead = new FileStream(handle, FileAccess.Read, (int)m_lBufRecieve, true);
+                byte[] bufRead = new byte[m_lBufReceive];
+                streamRead = new FileStream(handle, FileAccess.Read, (int)m_lBufReceive, true);
                 if (streamRead == null) return;
                 StopWatch swRead = new StopWatch();
-                while (swRead.ElapsedMilliseconds < m_msRecieveTimeout)
+                while (swRead.ElapsedMilliseconds < m_msReceiveTimeout)
                 {
                     try
                     {
-                        int nByte = streamRead.Read(bufRead, nRead, (int)m_lBufRecieve - nRead);
+                        int nByte = streamRead.Read(bufRead, nRead, (int)m_lBufReceive - nRead);
                         nRead += nByte;
                     }
                     catch (Exception e) { p_sInfo = "ThreadListen Read Error : " + e.Message; }
@@ -304,14 +304,14 @@ namespace RootTools.Comm
             }
         }
 
-        int m_lBufRecieve = 1024;
-        double m_secRecieveTimeout = 2;
-        int m_msRecieveTimeout = 2000; 
-        void RunRecieveTree(Tree tree)
+        int m_lBufReceive = 1024;
+        double m_secReceiveTimeout = 2;
+        int m_msReceiveTimeout = 2000; 
+        void RunReceiveTree(Tree tree)
         {
-            m_lBufRecieve = tree.Set(m_lBufRecieve, 1024, "Buffer", "Buffer Size (byte)");
-            m_secRecieveTimeout = tree.Set(m_secRecieveTimeout, 2, "Timeout", "Read Timeout (sec)");
-            m_msRecieveTimeout = (int)(1000 * m_secRecieveTimeout); 
+            m_lBufReceive = tree.Set(m_lBufReceive, 1024, "Buffer", "Buffer Size (byte)");
+            m_secReceiveTimeout = tree.Set(m_secReceiveTimeout, 2, "Timeout", "Read Timeout (sec)");
+            m_msReceiveTimeout = (int)(1000 * m_secReceiveTimeout); 
         }
         #endregion
 
@@ -333,7 +333,7 @@ namespace RootTools.Comm
         {
             RunNameTree(treeRoot.GetTree("Name"));
             RunSendTree(treeRoot.GetTree("Send"));
-            RunRecieveTree(treeRoot.GetTree("Recieve"));
+            RunReceiveTree(treeRoot.GetTree("Receive"));
         }
         #endregion
 
@@ -366,7 +366,7 @@ namespace RootTools.Comm
                 SendData send = new SendData("ThreadStop");
                 while (m_threadListen.IsAlive)
                 {
-                    SendPipe(send, m_sRecieveID);
+                    SendPipe(send, m_sReceiveID);
                     Thread.Sleep(20);
                 }
                 m_threadListen.Interrupt();

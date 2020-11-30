@@ -21,7 +21,7 @@ namespace Root_EFEM.Module
             m_dicArm[eArm.Lower].GetTools(m_toolBox);
             if (bInit)
             {
-                m_rs232.OnRecieve += M_rs232_OnRecieve;
+                m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
             }
         }
@@ -387,7 +387,7 @@ namespace Root_EFEM.Module
             {
                 if (sMsgs.Length > 1) return GetErrorString(sMsgs[1]);
                 else if (sMsgs[0] == sLastCmd && sMsgs.Length == 1) return "Received Successfully : " + sLastCmd;
-                else return "Cannot Recieve Status Command : " + sLastCmd;
+                else return "Cannot Receive Status Command : " + sLastCmd;
             }
             catch (Exception)
             {
@@ -423,7 +423,7 @@ namespace Root_EFEM.Module
         #endregion
 
         #region RS232
-        private void M_rs232_OnRecieve(string sRead)
+        private void M_rs232_OnReceive(string sRead)
         {
             string[] sReads = sRead.Split(' ');
             if (sReads[0] == "ERR") m_log.Error(GetErrorString(sReads[1]));

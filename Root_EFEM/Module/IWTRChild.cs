@@ -12,6 +12,8 @@ namespace Root_EFEM.Module
 
         bool p_bLock { get; set; }
 
+        List<InfoWafer> p_aInfoWafer { get; }
+
         List<string> p_asChildSlot { get; }
 
         InfoWafer GetInfoWafer(int nID);

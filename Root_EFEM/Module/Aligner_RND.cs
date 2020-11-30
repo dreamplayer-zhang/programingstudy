@@ -29,16 +29,16 @@ namespace Root_EFEM.Module
             if (bInit)
             {
                 InitMemory();
-                m_rs232.OnRecieve += M_rs232_OnRecieve;
+                m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
             }
         }
 
-        private void M_rs232_OnRecieve(string sRead)
+        private void M_rs232_OnReceive(string sRead)
         {
             if (m_protocolSend != null)
             {
-                p_sInfo = m_protocolSend.OnRecieve(sRead);
+                p_sInfo = m_protocolSend.OnReceive(sRead);
                 m_protocolSend.m_bDone = true;
             }
         }
@@ -376,20 +376,20 @@ namespace Root_EFEM.Module
                 m_bSend = true;
             }
 
-            public string OnRecieve(string sRead)
+            public string OnReceive(string sRead)
             {
                 string[] sReads = sRead.Split(' ');
                 m_aligner.m_log.Info(" <-- Recv] " + sRead);
-                if (sReads.Length < 1) return "OnRecieve String too Short : " + sRead;
-                eCmd eCmdRecieve = m_aligner.GetCommand(sReads[0]).m_eCmd;
-                if (m_eCmd != eCmdRecieve) return "OnRecieve Protocol MissMatch !!"; 
+                if (sReads.Length < 1) return "OnReceive String too Short : " + sRead;
+                eCmd eCmdReceive = m_aligner.GetCommand(sReads[0]).m_eCmd;
+                if (m_eCmd != eCmdReceive) return "OnReceive Protocol MissMatch !!"; 
                 if ((sReads.Length > 2) && (sReads[1] == "E12")) m_aligner.m_qSend.Enqueue(new Protocol(m_aligner, eCmd.CrearError));
                 try
                 {
-                    switch (eCmdRecieve)
+                    switch (eCmdReceive)
                     {
                         case eCmd.GetPos:
-                            if (sReads.Length < 3) return "OnRecieve Get Position Massage too Short";
+                            if (sReads.Length < 3) return "OnReceive Get Position Massage too Short";
                             m_aligner.p_pulseRotate = Convert.ToInt32(sReads[1]);
                             m_aligner.p_rpAxis = new RPoint(Convert.ToDouble(sReads[2]), Convert.ToDouble(sReads[3]));
                             break;
@@ -413,19 +413,19 @@ namespace Root_EFEM.Module
                             break;
                     }
                 }
-                catch (Exception e) { m_aligner.p_sInfo = "OnRecieve Exception : " + e.Message; }
+                catch (Exception e) { m_aligner.p_sInfo = "OnReceive Exception : " + e.Message; }
                 return "OK"; 
             }
 
             StopWatch m_swWait = new StopWatch(); 
-            public string WaitRecieve()
+            public string WaitReceive()
             {
                 int msWait = (int)(1000 * m_aligner.GetCommand(m_eCmd).m_secWait); 
                 while (true)
                 {
                     Thread.Sleep(10);
                     if (m_bDone) return "OK";
-                    if (m_bSend && (m_swWait.ElapsedMilliseconds > msWait)) return "Wait Recieve Timeout : " + m_eCmd.ToString();
+                    if (m_bSend && (m_swWait.ElapsedMilliseconds > msWait)) return "Wait Receive Timeout : " + m_eCmd.ToString();
                     if (EQ.IsStop()) return "EQ Stop"; 
                 }
             }
@@ -443,7 +443,7 @@ namespace Root_EFEM.Module
         {
             Protocol protocol = new Protocol(this, eCmd);
             m_qSend.Enqueue(protocol);
-            if (Run(protocol.WaitRecieve())) return p_sInfo;
+            if (Run(protocol.WaitReceive())) return p_sInfo;
             return "OK";
         }
 
@@ -453,7 +453,7 @@ namespace Root_EFEM.Module
             string sCmd = "0,0," + nDeg.ToString(); 
             Protocol protocol = new Protocol(this, eCmd.AlignRotate, sCmd);
             m_qSend.Enqueue(protocol);
-            if (Run(protocol.WaitRecieve())) return p_sInfo;
+            if (Run(protocol.WaitReceive())) return p_sInfo;
             return "OK";
         }
 
@@ -501,6 +501,16 @@ namespace Root_EFEM.Module
                 _infoWafer = value;
                 if (m_reg != null) m_reg.Write("sInfoWafer", m_sInfoWafer);
                 OnPropertyChanged();
+            }
+        }
+
+        public List<InfoWafer> p_aInfoWafer
+        {
+            get
+            {
+                List<InfoWafer> aInfoWafer = new List<InfoWafer>();
+                aInfoWafer.Add(p_infoWafer);
+                return aInfoWafer;
             }
         }
 
