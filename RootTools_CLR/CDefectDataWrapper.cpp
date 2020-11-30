@@ -177,6 +177,9 @@ void CDefectDataWrapper::AddCluster(CDefectDataWrapper^ data)
 
 void CDefectDataWrapper::AddRangeCluster(cliext::vector<CDefectDataWrapper^>^ dataList)
 {
+	if (ClusterItems == nullptr)
+		ClusterItems = gcnew cliext::vector<CDefectDataWrapper^>();
+
 	for (int i = 0; i < dataList->size(); i++)
 	{
 		ClusterItems->push_back(dataList[i]);
@@ -218,17 +221,15 @@ void CDefectDataWrapper::MergeClusterInfo()
 		{
 			floatTemp += ClusterItems[i]->fAreaSize;
 		}
-		fAreaSize = floatTemp / ClusterItems->size();
+		fAreaSize = floatTemp;// / ClusterItems->size();
 
 		nClassifyCode = ClusterItems[0]->nClassifyCode;
 		nFOV = ClusterItems[0]->nFOV;
 
-		intTemp = 0.0;//nWidth
-		for (int i = 0; i < ClusterItems->size(); i++)
-		{
-			intTemp += ClusterItems[i]->fAreaSize;
-		}
-		fAreaSize = intTemp / ClusterItems->size();
+		nWidth = GetDrawWidth();
+		nHeight = GetDrawHeight();
+
+		nIdx = ClusterItems[0]->nIdx;
 
 		/*
 		 = ClusterItems.Sum(x = > x.nWidth);
@@ -258,7 +259,7 @@ cliext::vector<CDefectDataWrapper^>^ CDefectDataWrapper::CreateClusterList(cliex
 		return datas;
 	}
 
-	for (int i = 0; i < datas->size() - 1; i++)
+	for (int i = 0; i < datas->size(); i++)
 	{
 		bool merged = false;
 		if (datas[i]->bMergeUsed)
