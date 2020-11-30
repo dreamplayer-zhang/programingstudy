@@ -191,7 +191,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ListWafer_UI.xaml">
+    <Page Include="InfoWaferChild_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="InfoWaferWTR_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -224,8 +228,11 @@
       <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="InfoWafer.cs" />
-    <Compile Include="ListWafer_UI.xaml.cs">
-      <DependentUpon>ListWafer_UI.xaml</DependentUpon>
+    <Compile Include="InfoWaferChild_UI.xaml.cs">
+      <DependentUpon>InfoWaferChild_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="InfoWaferWTR_UI.xaml.cs">
+      <DependentUpon>InfoWaferWTR_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
