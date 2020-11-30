@@ -39,7 +39,7 @@ namespace RootTools.Module
         {
             m_asModuleRun.Clear();
             comboBoxRunStep.ItemsSource = null;
-            foreach (ModuleRunBase moduleRun in m_moduleRunList.m_aModuleRun)
+            foreach (ModuleRunBase moduleRun in m_moduleRunList.p_aModuleRun)
             {
                 m_asModuleRun.Add(moduleRun.p_id);
             }

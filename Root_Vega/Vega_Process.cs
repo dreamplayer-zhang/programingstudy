@@ -16,7 +16,7 @@ namespace Root_Vega
         public string AddInfoReticle(InfoReticle infoReticle)
         {
             if (m_aInfoReticle.Count > 0) return "Already Exist InfoReticle";
-            if (infoReticle.m_moduleRunList.m_aModuleRun.Count == 0) return "Empty Recipe";
+            if (infoReticle.m_moduleRunList.p_aModuleRun.Count == 0) return "Empty Recipe";
             CalcInfoReticleProcess(infoReticle);
             RunTree(Tree.eMode.Init); 
             return "OK";
@@ -31,9 +31,9 @@ namespace Root_Vega
             if (loadport == null) return;
             if (loadport.m_infoPod.p_eState != InfoPod.eState.Load) qProcess.Enqueue(loadport.m_runLoad.Clone());
             qProcess.Enqueue(m_robot.GetRunMotion(Robot_RND.eMotion.Get, sLoadport));
-            for (int n = 0; n < infoReticle.m_moduleRunList.m_aModuleRun.Count; n++)
+            for (int n = 0; n < infoReticle.m_moduleRunList.p_aModuleRun.Count; n++)
             {
-                ModuleRunBase moduleRun = infoReticle.m_moduleRunList.m_aModuleRun[n];
+                ModuleRunBase moduleRun = infoReticle.m_moduleRunList.p_aModuleRun[n];
                 string sChild = moduleRun.m_moduleBase.p_id;
                 bool bGetPut = (sChild != m_robot.p_id);
                 bool bPut = !IsSameModule(infoReticle.m_moduleRunList, n - 1, n);
@@ -59,8 +59,8 @@ namespace Root_Vega
         bool IsSameModule(ModuleRunList moduleRunList, int i0, int i1)
         {
             if (i0 < 0) return false;
-            if (i1 >= moduleRunList.m_aModuleRun.Count) return false;
-            return (moduleRunList.m_aModuleRun[i0].m_moduleBase.p_id == moduleRunList.m_aModuleRun[i1].m_moduleBase.p_id); 
+            if (i1 >= moduleRunList.p_aModuleRun.Count) return false;
+            return (moduleRunList.p_aModuleRun[i0].m_moduleBase.p_id == moduleRunList.p_aModuleRun[i1].m_moduleBase.p_id); 
         }
 
         public void ClearInfoReticle()
