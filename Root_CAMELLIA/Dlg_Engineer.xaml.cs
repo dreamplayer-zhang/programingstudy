@@ -23,10 +23,9 @@ namespace Root_CAMELLIA
         public Dlg_Engineer()
         {
             InitializeComponent();
-            CAMELLIA_Engineer engineer = new CAMELLIA_Engineer();
+            //CAMELLIA_Engineer engineer = new CAMELLIA_Engineer();
             //Init(App.m_engineer.m_handler);
-            engineer.Init("Camellia");
-            Init(engineer);
+            Init(App.m_engineer);
         }
 
         public void Init(CAMELLIA_Engineer engineer)

@@ -24,7 +24,9 @@ namespace Root_CAMELLIA
         {
             DataManager = DataManager.Instance;
             RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);
-            //NanoView = new Met.Nanoview();
+            NanoView = new Met.Nanoview();
+
+            //NanoView.InitializeSR(@".\Reference", 2000);
         }
 
         private void DialogInit(MainWindow main)
@@ -32,6 +34,10 @@ namespace Root_CAMELLIA
             dialogService = new DialogService(main);
             dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManger>();
             //dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_Engineer>();
+            App.m_engineer.Init("Camellia");
+            ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia.Nanoview = NanoView;
+            ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia.mwvm = this;
+
         }
 
         #region ViewModel

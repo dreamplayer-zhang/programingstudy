@@ -1529,15 +1529,13 @@ namespace Root_CAMELLIA
             CurrentSelectPoint = -1;
 
             p_DrawPointElement.Clear();
-            //p_DrawElement.Clear();
-            //Geometry.Clear();
             Shapes.Clear();
             TextBlocks.Clear();
             p_DrawSelectElement.Clear();
             SelectGeometry.Clear();
-            //SetStage(false);
             SetPoint(false, data);
             SetSelectRect();
+
             p_PreviewDrawElement.Clear();
             PreviewGeometry.Clear();
             SetStage(true);
@@ -1545,28 +1543,6 @@ namespace Root_CAMELLIA
 
             ViewRectGeometry.Clear();
             SetViewRect();
-
-
-
-
-            //CurrentCandidatePoint = -1;
-            //CurrentSelectPoint = -1;
-
-            //p_DrawElement.Clear();
-            //Geometry.Clear();
-            //Shapes.Clear();
-            //TextBlocks.Clear();
-            //SelectGeometry.Clear();
-            //SetStage(false);
-            //SetPoint(false);
-
-            //p_PreviewDrawElement.Clear();
-            //PreviewGeometry.Clear();
-            //SetStage(true);
-            //SetPoint(true);
-
-            //ViewRectGeometry.Clear();
-            //SetViewRect();
         }
 
         public void UpdateListView(bool MeasurementLoad = false)
@@ -2059,7 +2035,7 @@ namespace Root_CAMELLIA
                 stage = new CustomRectangleGeometry(GeneralTools.StageShadeBrush, GeneralTools.StageShadeBrush);
                 CustomRectangleGeometry lockRect = stage as CustomRectangleGeometry;
                 Rect shadeRect = new Rect(0, 0, 1000, 1000);
-                lockRect.SetData(shadeRect);
+                lockRect.SetData(shadeRect,100);
 
                 if (!preview)
                 {
@@ -2891,31 +2867,55 @@ namespace Root_CAMELLIA
                 });
             }
         }
+        public ICommand RecipeNew
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    dataManager.recipeDM.RecipeNew();
+                });
+            }
+        }
+        public ICommand RecipeOpen
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    dataManager.recipeDM.RecipeOpen();
+                    UpdateListView();
+                    UpdateView();
+                });
+            }
+        }
+        public ICommand RecipeSave
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    dataManager.recipeDM.RecipeSave();
+                    MainViewModel.DataManager = dataManager;
+                    MainViewModel.RecipeViewModel.dataManager = dataManager;
+                    MainViewModel.RecipeViewModel.UpdateListView();
+                    MainViewModel.RecipeViewModel.UpdateView();
+                });
+            }
+        }
+        public ICommand RecipeSaveAs
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    dataManager.recipeDM.RecipeSaveAs();
+                });
+            }
+        }
         #endregion
 
         #region MethodAction
-        public void OnNew_Click(object sender, RoutedEventArgs e)
-        {
-            dataManager.recipeDM.RecipeNew();
-        }
-        public void OnOpen_Click(object sender, RoutedEventArgs e)
-        {
-            dataManager.recipeDM.RecipeOpen();
-            UpdateListView();
-            UpdateView();
-        }
-        public void OnSave_Click(object sender, RoutedEventArgs e)
-        {
-            dataManager.recipeDM.RecipeSave();
-            MainViewModel.DataManager = dataManager;
-            MainViewModel.RecipeViewModel.dataManager = dataManager;
-            MainViewModel.RecipeViewModel.UpdateListView();
-            MainViewModel.RecipeViewModel.UpdateView();
-        }
-        public void OnSaveAs_Click(object sender, RoutedEventArgs e)
-        {
-            dataManager.recipeDM.RecipeSaveAs();
-        }
         public void OnCheckboxChange(object sender, RoutedEventArgs e)
         {
             UpdateView();

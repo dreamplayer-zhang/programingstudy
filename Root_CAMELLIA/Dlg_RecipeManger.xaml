@@ -95,34 +95,10 @@
         <!--Menu-->
         <Menu Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2"
               Height="25">
-            <MenuItem x:Name="RecipeNew" Header="New"  Height="25">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Click" >
-                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=RecipeNew, Mode=OneWay}" MethodName="OnNew_Click" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </MenuItem>
-            <MenuItem x:Name="RecipeOpen" Header="Open">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Click" >
-                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=RecipeOpen, Mode=OneWay}" MethodName="OnOpen_Click" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </MenuItem>
-            <MenuItem x:Name="RecipeSave" Header="Save">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Click" >
-                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=RecipeSave, Mode=OneWay}" MethodName="OnSave_Click" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </MenuItem>
-            <MenuItem x:Name="RecipeSaveAs" Header="Save As">
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Click" >
-                        <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=RecipeSaveAs, Mode=OneWay}" MethodName="OnSaveAs_Click" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </MenuItem>
+            <MenuItem x:Name="RecipeNew" Header="New"  Height="25" Command="{Binding RecipeNew}"/>
+            <MenuItem x:Name="RecipeOpen" Header="Open" Command="{Binding RecipeOpen}"/>
+            <MenuItem x:Name="RecipeSave" Header="Save" Command="{Binding RecipeSave}"/>
+            <MenuItem x:Name="RecipeSaveAs" Header="Save As" Command="{Binding RecipeSaveAs}"/>
         </Menu>
 
         <Grid Grid.Row="2">
@@ -359,40 +335,40 @@
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <Canvas x:Name="test" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                        <Canvas x:Name="asgsgas" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
                                             <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseMove">
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseMove" />
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseMove" />
                                                 </i:EventTrigger>
                                                 <i:EventTrigger EventName="MouseWheel" >
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseWheel" />
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseWheel" />
                                                 </i:EventTrigger>
                                                 <i:EventTrigger EventName="MouseLeftButtonDown" >
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseLeftButtonDown" />
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeftButtonDown" />
                                                 </i:EventTrigger>
                                                 <i:EventTrigger EventName="MouseLeftButtonUp" >
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseLeftButtonUp" />
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeftButtonUp" />
                                                 </i:EventTrigger>
                                                 <i:EventTrigger EventName="MouseRightButtonDown" >
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseRightButtonDown" />
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseRightButtonDown" />
                                                 </i:EventTrigger>
                                                 <i:EventTrigger EventName="MouseRightButtonUp" >
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseRightButtonUp" />
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseRightButtonUp" />
                                                 </i:EventTrigger>
                                                 <i:EventTrigger EventName="MouseEnter" >
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseEnter" />
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseEnter" />
                                                 </i:EventTrigger>
                                                 <i:EventTrigger EventName="MouseLeave" >
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseLeave" />
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeave" />
                                                 </i:EventTrigger>
                                                 <i:EventTrigger EventName="MouseLeave" >
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test, Mode=OneWay}" MethodName="OnMouseLeave" />
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeave" />
                                                 </i:EventTrigger>
                                                 <i:EventTrigger EventName="KeyDown" >
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=test}" MethodName="OnCanvasKeyDown" />
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas}" MethodName="OnCanvasKeyDown" />
                                                 </i:EventTrigger>
                                                 <i:EventTrigger EventName="KeyUp" >
-                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView}" MethodName="OnCanvasKeyUp" />
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas}" MethodName="OnCanvasKeyUp" />
                                                 </i:EventTrigger>
                                             </i:Interaction.Triggers>
                                         </Canvas>

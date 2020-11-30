@@ -58,7 +58,6 @@ namespace Root_CAMELLIA
             m_recipe = new CAMELLIA_Recipe("Recipe", m_enginner);
             m_recipe.AddModule(m_camellia);
             m_process = new CAMELLIA_Process("Process", m_enginner, this);
-
         }
 
         void InitModule(ModuleBase module)

@@ -6,15 +6,15 @@ using RootTools.Light;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Threading;
+using Met = LibSR_Met;
 
 namespace Root_CAMELLIA.Module
 {
     public class Module_Camellia : ModuleBase
     {
-        public DataManager m_DataManager;
-
+        public DataManager m_DataManager { get; set; }
+        public Met.Nanoview Nanoview { get; set; }
+        public MainWindow_ViewModel mwvm { get; set; }
         #region ToolBox
         AxisXY m_axisXY;
         Axis m_axisZ;
@@ -46,6 +46,7 @@ namespace Root_CAMELLIA.Module
         #endregion
 
 
+
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
@@ -69,7 +70,58 @@ namespace Root_CAMELLIA.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
+            AddModuleRunList(new Run_Calibration(this), false, "Calibration");
+            AddModuleRunList(new Run_WaferCentering(this), false, "Centering");
             AddModuleRunList(new Run_Measure(this), false, "Measurement");
+
+        }
+
+        protected override void RunThread()
+        {
+            switch (p_eState)
+            {
+                case eState.Init:
+                    p_bEnableHome = true;
+                    p_sRun = "Initialize";
+                    break;
+                case eState.Home:
+                    p_bEnableHome = false;
+                    p_sRun = "Stop";
+                    string sStateHome = StateHome();
+                    if (sStateHome == "OK") p_eState = eState.Ready;
+                    else StopHome();
+                    break;
+                case eState.Ready:
+                    p_bEnableHome = true;
+                    p_sRun = p_sModuleRun;
+                    string sStateReady = StateReady();
+                    if (sStateReady != "OK")
+                    {
+                        p_eState = eState.Error;
+                        m_qModuleRun.Clear();
+                    }
+                    if (m_qModuleRun.Count > 0) p_eState = eState.Run;
+                    break;
+                case eState.Run:
+                    p_bEnableHome = false;
+                    p_sRun = "Stop";
+                    string sStateRun = StateRun();
+                    if (sStateRun != "OK")
+                    {
+                        p_eState = eState.Error;
+                        m_qModuleRun.Clear();
+                    }
+                    if (m_qModuleRun.Count == 0) p_eState = eState.Ready;
+                    break;
+                case eState.Error:
+                    p_bEnableHome = false;
+                    p_sRun = "Reset";
+                    break;
+                default:
+                    p_bEnableHome = true;
+                    break;
+
+            }
         }
 
 
@@ -101,6 +153,9 @@ namespace Root_CAMELLIA.Module
         public class Run_WaferCentering : ModuleRunBase
         {
             Module_Camellia m_module;
+            public RPoint m_WaferLT_pulse = new RPoint(); // Pulse
+            public RPoint m_WaferRT_pulse = new RPoint(); // Pulse
+            public RPoint m_WaferRB_pulse = new RPoint(); // Pulse
             public Run_WaferCentering(Module_Camellia module)
             {
                 m_module = module;
@@ -115,19 +170,56 @@ namespace Root_CAMELLIA.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_WaferLT_pulse = tree.Set(m_WaferLT_pulse, m_WaferLT_pulse,"Wafer Left Top", "Wafer Left Top (Pulse)");
+                m_WaferRT_pulse = tree.Set(m_WaferRT_pulse, m_WaferRT_pulse, "Wafer Right Top", "Wafer Right Top (Pulse)");
+                m_WaferRB_pulse = tree.Set(m_WaferRB_pulse, m_WaferRB_pulse, "Wafer Right Bottom", "Wafer Right Bottom (Pulse)");
             }
 
             public override string Run()
             {
+                AxisXY axisXY = m_module.m_axisXY;
+
+                Camera_Basler VRS = m_module.m_CamVRS;
+                ImageData img = VRS.p_ImageViewer.p_ImageData;
+
+
+                if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
+                    return p_sInfo;
+                if(m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+                //? 엣지 따는 함수 추가
+
+
+                if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+                //? 엣지 따는 함수 추가
+
+                if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+                //? 엣지 따는 함수 추가
+
                 return "OK";
             }
         }
         public class Run_Calibration : ModuleRunBase
         {
             Module_Camellia m_module;
+            Met.Nanoview m_NanoView;
+            int m_BGIntTime_VIS = 50;
+            int m_BGIntTime_NIR = 150;
+            int m_Average_VIS = 5;
+            int m_Average_NIR = 3;
+            bool m_InitialCal = false;
+            public RPoint m_CalWaferCenterPos_pulse = new RPoint(); // Pulse
+            public RPoint m_RefWaferCenterPos_pulse = new RPoint(); // Pulse
             public Run_Calibration(Module_Camellia module)
             {
                 m_module = module;
+                m_NanoView = module.Nanoview;
                 InitModuleRun(module);
             }
 
@@ -139,75 +231,51 @@ namespace Root_CAMELLIA.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_BGIntTime_VIS = tree.Set(m_BGIntTime_VIS, m_BGIntTime_VIS, "VIS Background cal integration time", "VIS Background cal integration(exposure) time");
+                m_BGIntTime_NIR = tree.Set(m_BGIntTime_NIR, m_BGIntTime_NIR, "NIR Background cal integration time", "NIR Background cal integration(exposure) time");
+                m_Average_VIS = tree.Set(m_Average_VIS, m_Average_VIS, "VIS Spectrum Count", "VIS Spectrum Count");
+                m_Average_NIR = tree.Set(m_Average_NIR, m_Average_NIR, "NIR Spectrum Count", "NIR Spectrum Count");
+                m_InitialCal = tree.Set(m_InitialCal, m_InitialCal, "Initial Calibration", "Initial Calibration");
+                m_CalWaferCenterPos_pulse = tree.Set(m_CalWaferCenterPos_pulse, m_CalWaferCenterPos_pulse, "Calibration Wafer Center Axis Position", "Calibration Wafer Center Axis Position(Pulse)");
+                m_RefWaferCenterPos_pulse = tree.Set(m_RefWaferCenterPos_pulse, m_RefWaferCenterPos_pulse, "Reference Wafer Center Axis Position", "Reference Wafer Center Axis Position(Pulse)");
             }
 
             public override string Run()
             {
-                //m_module.m_axisX.StartMove(12902, 123021);
-                return "OK";
-            }
-        }
-        public class Run_InitCalibration : ModuleRunBase
-        {
-            Module_Camellia m_module;
-            public Run_InitCalibration(Module_Camellia module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-            public override ModuleRunBase Clone()
-            {
-                Run_InitCalibration run = new Run_InitCalibration(m_module);
-                return run;
-            }
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                //m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
-            }
-            public override string Run()
-            {
-
-                return "OK";
-            }
-        }
-        public class Run_MonitorCalibration : ModuleRunBase
-        {
-            Module_Camellia m_module;
-            public Run_MonitorCalibration(Module_Camellia module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            public override ModuleRunBase Clone()
-            {
-                Run_MonitorCalibration run = new Run_MonitorCalibration(m_module);
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-            }
-
-            public override string Run()
-            {
-                //m_module.m_axisX.StartMove(12902, 123021);
+                AxisXY axisXY = m_module.m_axisXY;
+                RPoint MovePoint;
+                if (m_InitialCal)
+                {
+                    MovePoint = new RPoint(m_CalWaferCenterPos_pulse);
+                }
+                else
+                {
+                    MovePoint = new RPoint(m_RefWaferCenterPos_pulse);
+                }
+                if(m_module.Run(axisXY.StartMove(MovePoint)))
+                    return p_sInfo;
+                if(m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+                m_NanoView.Calibration(m_BGIntTime_VIS,m_BGIntTime_NIR,m_Average_VIS,m_Average_NIR, m_InitialCal);
                 return "OK";
             }
         }
         public class Run_Measure : ModuleRunBase
         {
             Module_Camellia m_module;
-
-            public DataManager m_DataManager;
-            public RPoint m_WaferCenterPos_pulse = new RPoint(); // Pulse
-            public double m_dResX_um = 1;
-            public double m_dResY_um = 1;
-            public double m_dFocusZ_pulse = 1; // Pulse
+            Met.Nanoview m_NanoView;
+            MainWindow_ViewModel m_mwvm;
+            DataManager m_DataManager;
+            RPoint m_WaferCenterPos_pulse = new RPoint(); // Pulse
+            double m_dResX_um = 1;
+            double m_dResY_um = 1;
+            double m_dFocusZ_pulse = 1; // Pulse
 
             public Run_Measure(Module_Camellia module)
             {
                 m_module = module;
+                m_NanoView = module.Nanoview;
+                m_mwvm = module.mwvm;
                 m_DataManager = module.m_DataManager;
                 InitModuleRun(module);
             }
@@ -226,10 +294,10 @@ namespace Root_CAMELLIA.Module
                 m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)");
                 m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)");
                 m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)");
-                //m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
             }
             public override string Run()
             {
+                //m_module.p_eState = (eState)5;
                 AxisXY axisXY = m_module.m_axisXY;
                 Axis axisZ = m_module.m_axisZ;
                 Camera_Basler VRS = m_module.m_CamVRS;
@@ -237,17 +305,19 @@ namespace Root_CAMELLIA.Module
                 string strVRSImageDir = "D:\\";
                 string strVRSImageFullPath = "";
                 RPoint MeasurePoint;
-                for (int i = 0; i < m_DataManager.recipeDM.TeachingRD.DataSelectedPoint.Count; i++)
+                for (int i = 0; i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count; i++)
                 {
-                    double dX = m_DataManager.recipeDM.TeachingRD.DataSelectedPoint[m_DataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]].x * 10000;
-                    double dY = m_DataManager.recipeDM.TeachingRD.DataSelectedPoint[m_DataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]].y * 10000;
+                    double dX = m_WaferCenterPos_pulse.X + m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].x * 10000;
+                    double dY = m_WaferCenterPos_pulse.Y + m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].y * 10000;
                     MeasurePoint = new RPoint(dX, dY);
 
                     if (m_module.Run(axisXY.StartMove(MeasurePoint)))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
-                    Thread.Sleep(1000);
+
+                    
+
                     VRS.GrabContinuousShot();
                     if (VRS.Grab() != "OK")
                     {
