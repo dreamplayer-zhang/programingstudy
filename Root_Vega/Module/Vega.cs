@@ -191,14 +191,14 @@ namespace Root_Vega.Module
                 string sInfo = module.m_toolBox.Get(ref m_rs232, module, "RFID RS232");
                 if (bInit)
                 {
-                    m_rs232.OnRecieve += M_rs232_OnRecieve;
+                    m_rs232.OnReceive += M_rs232_OnReceive;
                     m_rs232.p_bConnect = true;
                 }
                 return sInfo;
             }
 
             string m_sRFID = ""; 
-            private void M_rs232_OnRecieve(string sRead)
+            private void M_rs232_OnReceive(string sRead)
             {
                 if (sRead.Length < 14) return;
                 byte[] aBuf = Encoding.ASCII.GetBytes(sRead);

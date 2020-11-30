@@ -256,7 +256,7 @@ namespace DragDrop
             _dragDropPreviewControl.Opacity = 0.7;
 
             _dragDropContainer.Children.Add(_dragDropPreviewControl);
-            _mouseCaptured = Mouse.Capture(_dragDropPreviewControl); //have the preview control recieve and be able to handle mouse events    
+            _mouseCaptured = Mouse.Capture(_dragDropPreviewControl); //have the preview control receive and be able to handle mouse events    
 
             //offset it just a bit so it looks like it's underneath the mouse
             Mouse.OverrideCursor = Cursors.Hand;

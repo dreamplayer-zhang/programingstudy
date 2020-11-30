@@ -227,11 +227,11 @@ namespace RootTools.Comm
         Log m_log;
         public TreeRoot m_treeRoot;
         public CommLog m_commLog = null;
-        public TCPIPClient(string id, Log log, int nBufRecieve = -1)
+        public TCPIPClient(string id, Log log, int nBufReceive = -1)
         {
             p_id = id;
             m_log = log;
-            m_aBufRead = new byte[(nBufRecieve > 0) ? nBufRecieve : 4096]; 
+            m_aBufRead = new byte[(nBufReceive > 0) ? nBufReceive : 4096]; 
 
             m_commLog = new CommLog(this, m_log);
 

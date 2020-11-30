@@ -170,25 +170,25 @@ namespace RootTools.Comm
         }
         #endregion
 
-        #region Recieve
-        public delegate void dgOnRecieve(string sRead);
-        public event dgOnRecieve OnRecieve;
+        #region Receive
+        public delegate void dgOnReceive(string sRead);
+        public event dgOnReceive OnReceive;
 
         public string m_sRead = "";
         private void M_sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (OnRecieve == null) return;
+            if (OnReceive == null) return;
             SerialPort sp = (SerialPort)sender;
             string sRead = m_sRead + sp.ReadExisting();
             m_commLog.Add(CommLog.eType.Receive, sRead.Trim());
-            m_nDataRecieve = 0; 
-            DataRecieve(sRead, sender); 
+            m_nDataReceive = 0; 
+            DataReceive(sRead, sender); 
         }
 
-        int m_nDataRecieve = 0;
-        void DataRecieve(string sRead, object sender)
+        int m_nDataReceive = 0;
+        void DataReceive(string sRead, object sender)
         {
-            m_nDataRecieve++; 
+            m_nDataReceive++; 
             if ((m_sRead == "") && (p_eStartBit != eStartBit.None))
             {
                 int nIndex = sRead.IndexOf(m_sStart);
@@ -200,11 +200,11 @@ namespace RootTools.Comm
                 nIndex += m_sStart.Length; 
                 sRead = sRead.Substring(nIndex, sRead.Length - nIndex); 
             }
-            string sRecieve = DataRead(sRead, sender);
-            if ((sRecieve != "") && (sRead != sRecieve))
+            string sReceive = DataRead(sRead, sender);
+            if ((sReceive != "") && (sRead != sReceive))
             {
-                m_sRead = sRecieve; 
-                DataRecieve(sRecieve, sender);
+                m_sRead = sReceive; 
+                DataReceive(sReceive, sender);
             }
         }
 
@@ -215,7 +215,7 @@ namespace RootTools.Comm
             {
                 if (p_eEndBit == eEndBit.None)
                 {
-                    OnRecieve(sRead);
+                    OnReceive(sRead);
                     return "";
                 }
                 else if (p_eEndBit == eEndBit.LFCR_4CH)
@@ -238,12 +238,12 @@ namespace RootTools.Comm
                             }
                         }
                     }
-                    OnRecieve(sRead.Substring(0, nIndex));
+                    OnReceive(sRead.Substring(0, nIndex));
                     return "";
                 }
                 nIndex = sRead.IndexOf(m_sEnd);
                 if (nIndex < 0) return sRead;
-                OnRecieve(sRead.Substring(0, nIndex));
+                OnReceive(sRead.Substring(0, nIndex));
                 nIndex += m_sEnd.Length;
                 if (sRead.Length < nIndex) return "";
                 else return sRead.Substring(nIndex, sRead.Length - nIndex);

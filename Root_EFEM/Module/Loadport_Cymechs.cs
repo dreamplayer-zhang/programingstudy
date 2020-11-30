@@ -18,7 +18,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
             if (bInit)
             {
-                m_rs232.OnRecieve += M_rs232_OnRecieve;
+                m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
             }
         }
@@ -406,7 +406,7 @@ namespace Root_EFEM.Module
             }
         }
 
-        private void M_rs232_OnRecieve(string sRead)
+        private void M_rs232_OnReceive(string sRead)
         {
             m_log.Info(" <-- Recv] " + sRead);
             if (sRead.Length < 1) return;

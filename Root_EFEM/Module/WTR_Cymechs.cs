@@ -21,7 +21,7 @@ namespace Root_EFEM.Module
             m_dicArm[eArm.B].GetTools(m_toolBox);
             if (bInit)
             {
-                m_rs232.OnRecieve += M_rs232_OnRecieve;
+                m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
             }
         }
@@ -440,7 +440,7 @@ namespace Root_EFEM.Module
             public eState m_eState = eState.Queue;
             string m_sCmd = "";
 
-            public bool OnRecieve(string sRead)
+            public bool OnReceive(string sRead)
             {
                 if (m_eType == eType.Command)
                 {
@@ -540,12 +540,12 @@ namespace Root_EFEM.Module
             }
         }
 
-        private void M_rs232_OnRecieve(string sRead)
+        private void M_rs232_OnReceive(string sRead)
         {
             m_log.Info(" <-- Recv] " + sRead);
             if (m_protocolSend != null)
             {
-                bool bDone = m_protocolSend.OnRecieve(sRead);
+                bool bDone = m_protocolSend.OnReceive(sRead);
                 if (bDone) m_protocolSend = null; 
             }
         }
