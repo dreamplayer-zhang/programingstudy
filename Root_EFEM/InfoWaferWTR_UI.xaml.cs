@@ -53,6 +53,7 @@ namespace Root_EFEM
         {
             m_treeRoot.p_eMode = eMode;
             //if (m_wtr.p_infoWafer != null) m_wtr.p_infoWafer.RunTree(m_treeRoot.GetTree(m_wtr.p_infoWafer.p_id));
+            //forget
         }
         #endregion
 

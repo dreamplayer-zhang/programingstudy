@@ -1,7 +1,6 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Module;
-using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -9,16 +8,13 @@ using System.Threading;
 
 namespace Root_EFEM.Module
 {
-    public class WTR_Cymechs : ModuleBase//, IWTR
+    public class WTR_Cymechs : ModuleBase, IWTR
     {
-        //forget
         #region ToolBox
         RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            m_dicArm[eArm.A].GetTools(m_toolBox);
-            m_dicArm[eArm.B].GetTools(m_toolBox);
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -41,68 +37,34 @@ namespace Root_EFEM.Module
             m_dicArm.Add(eArm.B, new Arm(id, eArm.B, this));
         }
 
-        public class Arm : NotifyProperty
+        public class Arm : WTRArm
         {
-            public eArm m_eArm;
-            string m_sInfoWafer = "";
-            InfoWafer _infoWafer = null;
-            public InfoWafer p_infoWafer
+            enum eWaferExist
             {
-                get { return _infoWafer; }
-                set
+                Sensor,
+                InfoWafer
+            }
+            eWaferExist m_eWaferExist = eWaferExist.Sensor;
+            public bool IsWaferExist()
+            {
+                switch (m_eWaferExist)
                 {
-                    m_sInfoWafer = (value == null) ? "" : value.p_id;
-                    _infoWafer = value;
-                    m_reg.Write("sInfoWafer", m_sInfoWafer);
-                    OnPropertyChanged();
+                    //case eWaferExist.Sensor: return m_diCheckVac.p_bIn; //forget
+                    default: return (p_infoWafer != null);
                 }
             }
 
-            Registry m_reg;
-            public void ReadInfoWafer_Registry()
+            public override void RunTree(Tree tree)
             {
-                m_reg = new Registry(m_id);
-                m_sInfoWafer = (string)m_reg.Read("sInfoWafer", m_sInfoWafer);
-                p_infoWafer = m_module.m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
+                m_eWaferExist = (eWaferExist)tree.Set(m_eWaferExist, m_eWaferExist, "WaferExist", "Wafer Exist Check");
+                base.RunTree(tree);
             }
 
-            public string m_id;
-            WTR_Cymechs m_module;
-            InfoWafer.WaferSize m_waferSize;
-            public Arm(string id, eArm arm, WTR_Cymechs module)
+            public eArm m_eArm;
+            public Arm(string id, eArm eArm, WTR_Cymechs wtr)
             {
-                m_eArm = arm;
-                m_module = module;
-                m_id = id + "." + arm.ToString();
-                m_waferSize = new InfoWafer.WaferSize(m_id, true, false);
-            }
-
-            public bool IsEnableWaferSize(InfoWafer infoWafer)
-            {
-                if (m_bEnable == false) return false;
-                return m_waferSize.GetData(infoWafer.p_eSize).m_bEnable;
-            }
-
-            public bool m_bEnable = true;
-            public void RunTree(Tree tree)
-            {
-                m_bEnable = tree.Set(m_bEnable, m_bEnable, "Enable", "Enable WTR Arm");
-                m_waferSize.RunTree(tree.GetTree("Wafer Size", false), m_bEnable);
-            }
-
-            //            public DIO_I m_diCheckVac;
-            //            public DIO_I m_diArmClose;
-            public void GetTools(ToolBox toolBox)
-            {
-                //                m_module.p_sInfo = toolBox.Get(ref m_diCheckVac, m_module, m_eArm.ToString() + ".CheckVac");
-                //                m_module.p_sInfo = toolBox.Get(ref m_diArmClose, m_module, m_eArm.ToString() + ".ArmClose");
-            }
-
-            public bool IsWaferExist(bool bIgnoreExistSensor = false)
-            {
-                if (bIgnoreExistSensor) return (p_infoWafer != null);
-                //                return m_diCheckVac.p_bIn;
-                return (p_infoWafer != null);
+                m_eArm = eArm;
+                Init(id + "." + eArm.ToString(), wtr);
             }
         }
         #endregion
@@ -569,6 +531,17 @@ namespace Root_EFEM.Module
         public override void ThreadStop()
         {
             base.ThreadStop();
+        }
+
+        //forget
+        public void AddChild(params IWTRChild[] childs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadInfoReticle_Registry()
+        {
+            throw new NotImplementedException();
         }
     }
 }

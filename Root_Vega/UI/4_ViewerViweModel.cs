@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows;
-
+using System.Windows.Threading;
 
 namespace Root_Vega
 {
@@ -114,9 +114,11 @@ namespace Root_Vega
         Vega_Engineer m_Engineer;
         private readonly IDialogService m_DialogService;
         public BackgroundWorker Worker_ViewerUpdate = new BackgroundWorker();
+        public Dispatcher _dispatcher;
 
         public _4_ViewerViweModel(Vega_Engineer engineer, IDialogService dialogService)
         {
+            _dispatcher = Dispatcher.CurrentDispatcher;
             m_Engineer = engineer;
             m_DialogService = dialogService;
             p_MemoryModule = m_Engineer.ClassMemoryTool();
