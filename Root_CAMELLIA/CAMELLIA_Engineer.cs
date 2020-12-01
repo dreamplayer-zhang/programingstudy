@@ -99,7 +99,7 @@ namespace Root_CAMELLIA
             m_login.Init();
             m_toolBox.Init(id, this);
             InitAjin();
-            //            InitXGem();
+            //InitXGem();
             m_handler.Init(id, this);
             m_gaf.Init(id, this);
         }

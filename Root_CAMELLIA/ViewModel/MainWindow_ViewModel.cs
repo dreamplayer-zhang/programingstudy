@@ -12,6 +12,7 @@ namespace Root_CAMELLIA
     public class MainWindow_ViewModel : ObservableObject
     {
         private MainWindow m_MainWindow;
+        DialogService dialogService;
         public DataManager DataManager;
         public Met.Nanoview NanoView;
 
@@ -26,8 +27,8 @@ namespace Root_CAMELLIA
         private void Init()
         {
             DataManager = DataManager.Instance;
-            //NanoView = new Met.Nanoview();
-            //NanoView.InitializeSR(@".\Reference", 2000);
+            NanoView = new Met.Nanoview();
+            //NanoView.InitializeSR(@".\Reference", 2000); //(FilePath, PortNum)
 
             App.m_engineer.Init("Camellia");
             ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia.Nanoview = NanoView;
@@ -66,12 +67,6 @@ namespace Root_CAMELLIA
         private Dlg_RecipeManager_ViewModel _RecipeViewModel;
         #endregion
 
-        #region Dialog
-        DialogService dialogService;
-        private Dlg_RecipeManager DlgRecipeManager; 
-        private Dlg_Engineer DlgEngineer;
-        #endregion
-
         #region Timer
         DispatcherTimer m_timer = new DispatcherTimer();
         void InitTimer()
@@ -87,6 +82,18 @@ namespace Root_CAMELLIA
         #endregion
 
         #region ICommand
+        public ICommand CmdPM
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    var viewModel = PMViewModel;
+                    Nullable<bool> result = dialogService.ShowDialog(viewModel);
+                });
+            }
+        }
+
         public ICommand CmdLoad
         {
             get
@@ -126,8 +133,6 @@ namespace Root_CAMELLIA
                     var dialog = dialogService.GetDialog(viewModel) as Dlg_Engineer;
                     dialog.EngineerUI.Init(App.m_engineer);
                     Nullable<bool> result = dialog.ShowDialog();
-                    ////dialog.ShowDialog();
-                    ////Nullable<bool> result = dialogService.ShowDialog(viewModel);
                 });
             }
         }
@@ -146,94 +151,13 @@ namespace Root_CAMELLIA
             get
             {
                 return new RelayCommand(() =>
-                {
-                    
+                {               
                     m_MainWindow.Close();
                     App.m_engineer.ThreadStop();
                 });
             }
         }
         #endregion
-
-        #region 이전코드
-        //public MainWindow_ViewModel(MainWindow main)
-        //{
-        //    DataManager = main.DataManager;
-        //    Init();
-        //}
-
-        //public void Init()
-        //{
-        //    PointListItem.Columns.Add(new DataColumn("ListIndex"));
-        //    PointListItem.Columns.Add(new DataColumn("ListX"));
-        //    PointListItem.Columns.Add(new DataColumn("ListY"));
-        //    PointListItem.Columns.Add(new DataColumn("ListRoute"));
-        //}
-
-        //public void UpdateListView()
-        //{
-        //    PointListItem.Clear();
-        //    int nCount = 0;
-        //    int nSelCnt = DataManager.recipeDM.TeachingRD.DataSelectedPoint.Count;
-        //    int[] MeasurementOrder = new int[nSelCnt];
-
-        //    for (int i = 0; i < nSelCnt; i++)
-        //    {
-        //        MeasurementOrder[DataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]] = i;
-        //    }
-
-        //    DataRow row;
-        //    for (int i = 0; i < nSelCnt; i++, nCount++)
-        //    {
-
-        //        CCircle c = DataManager.recipeDM.TeachingRD.DataSelectedPoint[i];
-        //        int nRoute = MeasurementOrder[i];
-        //        row = PointListItem.NewRow();
-        //        row["ListIndex"] = (nCount + 1).ToString();
-        //        row["ListX"] = Math.Round(c.x, 3).ToString();
-        //        row["ListY"] = Math.Round(c.y, 3).ToString();
-        //        row["ListRoute"] = (nRoute + 1).ToString();
-        //        PointListItem.Rows.Add(row);
-
-        //    }
-        //    PointCount = PointListItem.Rows.Count.ToString();
-        //}
-
-        //public DataManager DataManager { get; set; }
-
-        //private ObservableCollection<UIElement> m_MainDrawElement = new ObservableCollection<UIElement>();
-        //public ObservableCollection<UIElement> p_MainDrawElement
-        //{
-        //    get
-        //    {
-        //        return m_MainDrawElement;
-        //    }
-        //    set
-        //    {
-        //        m_MainDrawElement = value;
-        //    }
-        //}
-
-        //public string PointCount { get; set; } = "0";
-
-        //public ObservableCollection<ShapeManager> Shapes = new ObservableCollection<ShapeManager>();
-        //public ObservableCollection<GeometryManager> Geometry = new ObservableCollection<GeometryManager>();
-
-        //DataTable pointListItem = new DataTable();
-        //public DataTable PointListItem
-        //{
-        //    get
-        //    {
-        //        return pointListItem;
-        //    }
-        //    set
-        //    {
-        //        pointListItem = value;
-        //        RaisePropertyChanged("PointListItem");
-        //    }
-        //}
-        #endregion
-
 
     }
 }

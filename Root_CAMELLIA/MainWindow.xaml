@@ -157,9 +157,9 @@
                 <MenuItem Header="Send Test"/>
                 <MenuItem Header="Filmetrics Test"/>
             </MenuItem>
-            <MenuItem Header="PM">
+            <MenuItem Header="PM" Command="{Binding CmdPM}"/>
 
-            </MenuItem>
+
         </Menu>
 
         <!--Main Panel-->

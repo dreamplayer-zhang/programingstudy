@@ -5,19 +5,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Root_CAMELLIA
 {
     public class Dlg_Engineer_ViewModel : ObservableObject, IDialogRequestClose
     {
-        Camellia_Engineer_UI EngineerUI;
-
-        public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
-        {
-            EngineerUI = new Camellia_Engineer_UI();
-            EngineerUI.Init(App.m_engineer);
-        }
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
 
+
+        MainWindow_ViewModel MainViewModel;
+        public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
+        {
+            MainViewModel = main;
+        }
+
+        #region ICommand
+        public ICommand CmdClose
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+                });
+            }
+        }
+        #endregion
     }
 }
