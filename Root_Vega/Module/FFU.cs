@@ -79,7 +79,7 @@ namespace Root_Vega.Module
                 }
             }
 
-            public class Fan : ModuleBase
+            public class Fan : NotifyProperty
             {
                 public int p_fFanRPM 
                 {
@@ -133,35 +133,26 @@ namespace Root_Vega.Module
                 }
 
                 public bool p_bRunOK 
-                { 
-                    get 
+                {
+                    get
                     {
-                        if (m_log != null)
-                        {
-                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-                        }
-                        return ((p_fFanState & 0x0001) == 0); 
-                    } 
+                        if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
+                        return ((p_fFanState & 0x0001) == 0);
+                    }
                 }
                 public bool p_bPressureOK 
                 {
-                    get 
+                    get
                     {
-                        if (m_log != null)
-                        {
-                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-                        }
-                        return ((p_fFanState & 0x0002) == 0); 
-                    } 
+                        if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
+                        return ((p_fFanState & 0x0002) == 0);
+                    }
                 }
                 public bool p_bRPMHigh
                 {
                     get
                     {
-                        if (m_log != null)
-                        {
-                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-                        }
+                        if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
                         return ((p_fFanState & 0x0004) == 0);
                     }
                 }
@@ -169,10 +160,7 @@ namespace Root_Vega.Module
                 {
                     get
                     {
-                        if (m_log != null)
-                        {
-                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-                        }
+                        if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
                         return ((p_fFanState & 0x0008) == 0);
                     }
                 }
@@ -180,10 +168,7 @@ namespace Root_Vega.Module
                 {
                     get
                     {
-                        if (m_log != null)
-                        {
-                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-                        }
+                        if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
                         return ((p_fFanState & 0x0010) == 0);
                     }
                 }
@@ -191,10 +176,7 @@ namespace Root_Vega.Module
                 {
                     get
                     {
-                        if (m_log != null)
-                        {
-                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-                        }
+                        if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
                         return ((p_fFanState & 0x0020) == 0);
                     }
                 }
@@ -202,10 +184,7 @@ namespace Root_Vega.Module
                 {
                     get
                     {
-                        if (m_log != null)
-                        {
-                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-                        }
+                        if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
                         return ((p_fFanState & 0x0040) == 0);
                     }
                 }
@@ -220,9 +199,13 @@ namespace Root_Vega.Module
                 public string p_sFan { get; set; }
                 int m_nID;
                 Unit m_unit;
+                FFU m_FFU; 
+                Log m_log; 
                 public Fan(Unit unit, int nID)
                 {
                     m_unit = unit;
+                    m_FFU = unit.m_FFU; 
+                    m_log = m_FFU.m_log; 
                     m_nID = nID;
                     m_id = "Fan" + nID.ToString("00");
                     p_sFan = m_id;
@@ -304,7 +287,7 @@ namespace Root_Vega.Module
 			}
 
             bool m_bInvalidSet = false;
-            FFU m_FFU;
+            public FFU m_FFU;
             int m_nID;
             byte m_idUnit = 0; 
             public string m_id; 

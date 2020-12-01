@@ -53,11 +53,20 @@ namespace Root_Vega.Module
             return "OK";
         }
 
-        public bool IsReticleExist(bool bIgnoreExistSensor = false)
+        enum eReticleExist
+        {
+            Sensor,
+            InfoWafer
+        }
+        eReticleExist m_eReticleExist = eReticleExist.Sensor;
+        public bool IsReticleExist()
         {
             bool bExist = false; 
-            if (bIgnoreExistSensor) bExist = (p_infoReticle != null); 
-            else bExist = m_diCheckVac.p_bIn;
+            switch (m_eReticleExist)
+            {
+                case eReticleExist.Sensor: bExist = m_diCheckVac.p_bIn; break;
+                default: bExist = (p_infoReticle != null); break; 
+            }
             p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
             return bExist; 
         }
@@ -571,6 +580,7 @@ namespace Root_Vega.Module
 
         void RunTreeSetup(Tree tree)
         {
+            m_eReticleExist = (eReticleExist)tree.Set(m_eReticleExist, m_eReticleExist, "ReticleExist", "Reticle Exist Check");
             foreach (IRobotChild child in m_aChild) child.RunTeachTree(tree.GetTree("Teach", false));
             RunTimeoutTree(tree.GetTree("Timeout", false));
             RunTreeTeach(tree.GetTree("Teach", false));
@@ -804,7 +814,7 @@ namespace Root_Vega.Module
                 if (m_module.IsReticleExist())
                 {
                     child.p_infoReticle = null;
-                    if (child.IsReticleExist(true)) return "Robot Get Error : Reticle Check Sensor Detected at Child = " + child.p_id;
+                    if (child.IsReticleExist()) return "Robot Get Error : Reticle Check Sensor Detected at Child = " + child.p_id;
                     //child.p_infoReticle = null;
                 }
                 else
@@ -865,7 +875,7 @@ namespace Root_Vega.Module
                     if (m_module.Run(m_module.WriteCmd(eCmd.Put, posRobot, 1, 1))) return p_sInfo;
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                     child.p_bLock = false;
-                    if (child.IsReticleExist(true))
+                    if (child.IsReticleExist())
                     {
                         m_module.p_infoReticle = null;
                         if (m_module.IsReticleExist()) return "Robot Put Error : Reticle Check Sensor Detected at Arm";

@@ -471,14 +471,19 @@ namespace Root_Vega.Module
             return "OK";
         }
 
-        public bool IsReticleExist(bool bIgnoreExistSensor = false)
+        enum eReticleExist
+        {
+            Sensor,
+            InfoWafer
+        }
+        eReticleExist m_eReticleExist = eReticleExist.Sensor;
+        public bool IsReticleExist()
         {
             bool bExist = false;
-            if (bIgnoreExistSensor) bExist = (p_infoReticle != null);
-            else
+            switch (m_eReticleExist)
             {
-                bExist = m_diPatternReticleExistSensor.p_bIn;
-                
+                case eReticleExist.Sensor: bExist = m_diPatternReticleExistSensor.p_bIn; break;
+                default: bExist = (p_infoReticle != null); break; 
             }
             p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
             return bExist;
@@ -678,6 +683,7 @@ namespace Root_Vega.Module
 
         void RunTreeSetup(Tree tree)
         {
+            m_eReticleExist = (eReticleExist)tree.Set(m_eReticleExist, m_eReticleExist, "ReticleExist", "Reticle Exist Check");
             RunTreeDIODelay(tree.GetTree("DIO Delay", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
         }
