@@ -159,18 +159,6 @@ namespace RootTools.Camera.Dalsa
                 if (m_sapXfer != null) GetCameraAddress(); 
             }
         }
-        int _nResourceCnt = 0;
-        public int p_nResourceCnt
-        {
-            get
-            {
-                return _nResourceCnt;
-            }
-            set
-            {
-                _nResourceCnt = value;
-            }
-        }
 
         IntPtr[] m_aCamBuf = null; 
         void GetCameraAddress()

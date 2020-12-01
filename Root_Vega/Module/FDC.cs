@@ -79,16 +79,20 @@ namespace Root_Vega.Module
                     return (m_svValue.p_value != null) ? m_svValue.p_value : 0; }
                 set
                 {
-                    OnPropertyChanged();
-                    //if ((m_svValue.p_value != null) && (m_svValue.p_value == value)) return; 
-                    m_svValue.p_value = value;
-                    m_alid[0].p_bSet = (m_svValue.p_value < m_aLimit[0]);
-                    m_alid[1].p_bSet = (m_svValue.p_value > m_aLimit[1]);
-                    p_alid = (m_alid[0].p_bSet || m_alid[1].p_bSet);
-                    double dValue = Math.Abs(m_svValue.p_value - (m_aLimit[0] + m_aLimit[1]) / 2);
-                    int nRed = (int)(500 * dValue / (m_aLimit[1] - m_aLimit[0]));
-                    if (nRed > 250) nRed = 250;
-                    p_color = Color.FromRgb((byte)nRed, (byte)(250 - nRed), 0);
+                    try
+                    {
+                        OnPropertyChanged();
+                        //if ((m_svValue.p_value != null) && (m_svValue.p_value == value)) return; 
+                        m_svValue.p_value = value;
+                        m_alid[0].p_bSet = (m_svValue.p_value < m_aLimit[0]);
+                        m_alid[1].p_bSet = (m_svValue.p_value > m_aLimit[1]);
+                        p_alid = (m_alid[0].p_bSet || m_alid[1].p_bSet);
+                        double dValue = Math.Abs(m_svValue.p_value - (m_aLimit[0] + m_aLimit[1]) / 2);
+                        int nRed = (int)(500 * dValue / (m_aLimit[1] - m_aLimit[0]));
+                        if (nRed > 250) nRed = 250;
+                        p_color = Color.FromRgb((byte)nRed, (byte)(250 - nRed), 0);
+                    }
+                    catch { }
                 }
             }
 

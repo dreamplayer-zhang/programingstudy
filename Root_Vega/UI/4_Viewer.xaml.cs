@@ -13,35 +13,42 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Root_Vega
 {
-    /// <summary>
-    /// _4_Viewer.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class _4_Viewer : UserControl
-    {
-        public _4_Viewer()
-        {
-            InitializeComponent();
-			//기능 임시 제거
-            //App.m_engineer.m_InspManager.AddChromeDefect += App_AddDefect;
-            //App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
-            //InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
-        }
+	/// <summary>
+	/// _4_Viewer.xaml에 대한 상호 작용 논리
+	/// </summary>
+	public partial class _4_Viewer : UserControl
+	{
+		public Dispatcher _Dispatcher;
+		public _4_Viewer()
+		{
+			InitializeComponent();
+			App.m_engineer.m_InspManager.AddChromeDefect += App_AddDefect;
+			App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
+			InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
+		}
 		~_4_Viewer()
 		{
-			//기능 임시 제거
-			//App.m_engineer.m_InspManager.AddChromeDefect -= App_AddDefect;
-			//App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
-			//InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
+			App.m_engineer.m_InspManager.AddChromeDefect -= App_AddDefect;
+			App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
+			InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
 		}
 		private void InspectionManager_RefreshDefect()
 		{
-			viewer.Dispatcher.Invoke(new Action(delegate ()
+			try
 			{
-				viewer.RefreshDraw();
-			}));
+				viewer.Dispatcher.Invoke(new Action(delegate ()
+				{
+					viewer.RefreshDraw();
+				}));
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine(ex.Message);
+			}
 		}
 
 		private void _ClearDefect()
@@ -56,7 +63,7 @@ namespace Root_Vega
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.Message);
+				System.Diagnostics.Debug.WriteLine(ex.Message);
 			}
 		}
 
@@ -76,9 +83,13 @@ namespace Root_Vega
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine(ex.Message);
+					System.Diagnostics.Debug.WriteLine(ex.Message);
 				}
 			}
 		}
+
+		//private void Button_Click(object sender, RoutedEventArgs e)
+		//{
+		//}
 	}
 }

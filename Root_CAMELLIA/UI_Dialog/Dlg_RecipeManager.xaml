@@ -1,0 +1,599 @@
+﻿<Window x:Class="Root_CAMELLIA.Dlg_RecipeManager"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" 
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
+        xmlns:local="clr-namespace:Root_CAMELLIA"
+        xmlns:Icon="clr-namespace:Root_CAMELLIA.Icon"
+        xmlns:converter="clr-namespace:Root_CAMELLIA.ShapeDraw"
+        xmlns:cp="clr-namespace:ColorPickerLib.Controls;assembly=ColorPickerLib"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Normal"
+        Width="1820" Height="980"
+        BorderBrush="Black" BorderThickness="1"
+        Background="{StaticResource PanelBackGround}"
+        mc:Ignorable="d">
+    <Window.Resources>
+        <converter:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!--Title Bar-->
+        <Grid Grid.Row="0"
+              Name="TitleBar"
+              Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Icon:AtiLogo Width="30"
+                          Height="21"
+                          VerticalAlignment="Center"
+                          Margin="2"/>
+            <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
+                       FontSize="11"
+                       Foreground="Black"
+                       VerticalAlignment="Center"
+                       Margin="5,0,0,0"
+                       Grid.Column="1" />
+            <TextBlock Text="RECIPE MANGER"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="Black"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Margin="5,0,0,0"
+                       Grid.Column="1" />
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                        Orientation="Horizontal"
+                        Grid.Column="2">
+                <!--<Button Style="{StaticResource SystemButton}"
+                        x:Name="MinimizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="2,0"
+                        Click="MinimizeButton_Click">
+                    <Path Style="{StaticResource MinimizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="MaximizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="2,0"
+                        Click="MaximizeButton_Click">
+                    <Path Style="{StaticResource MaximizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="NormalizeButton"
+                        Width="30"
+                        Height="25"
+                        Margin="2,0"
+                        Click="NormalizeButton_Click">
+                    <Path Style="{StaticResource NormalizeIconKey}" />
+                </Button>-->
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="CloseButton"
+                        Width="30"
+                        Height="25"
+                        Margin="2,0,0,0"
+                        VerticalAlignment="Bottom"
+                        Command="{Binding CmdClose}">
+                    <Path Style="{StaticResource CloseIconKey}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+        <!--Menu-->
+        <Menu Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2"
+              Height="25">
+            <MenuItem x:Name="RecipeNew" Header="New"  Height="25" Command="{Binding CmdRecipeNew}"/>
+            <MenuItem x:Name="RecipeOpen" Header="Open" Command="{Binding CmdRecipeOpen}"/>
+            <MenuItem x:Name="RecipeSave" Header="Save" Command="{Binding CmdRecipeSave}"/>
+            <MenuItem x:Name="RecipeSaveAs" Header="Save As" Command="{Binding CmdRecipeSaveAs}"/>
+        </Menu>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="4.5*"/>
+                <ColumnDefinition Width="2.5*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <!--<RowDefinition Height="1*"/>-->
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="5*"/>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <!--<GroupBox Header="Mode">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ToggleButton Content="Hole" Margin="5"/>
+                        <ToggleButton Content="Die" Grid.Column="1" Margin="5"/>
+                    </Grid>
+                </GroupBox>-->
+                <GroupBox Header="Preset" Grid.Row="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Button Content="13 Point" Grid.Column="0" Grid.Row="0" Margin="5" Command="{Binding Cmd13Point}"/>
+                        <Button Content="25 Point"  Grid.Column="1" Grid.Row="0" Margin="5" Command="{Binding Cmd25Point}"/>
+                        <Button Content="49 Point" Grid.Column="0" Grid.Row="1" Margin="5" Command="{Binding Cmd49Point}"/>
+                        <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding Cmd73Point}"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="File Loader" Grid.Row="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Content="Open Klarf" Margin="5"/>
+                        <Button Content="Open CSV" Grid.Column="1" Margin="5"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Measurement Parameter" Grid.Row="2">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <DataGrid Margin="2">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="" Width="*"/>
+                                <DataGridTextColumn Header="Host" Width="*"/>
+                                <DataGridTextColumn Header="Guest1" Width="*"/>
+                                <DataGridTextColumn Header="fv1" Width="*"/>
+                                <DataGridCheckBoxColumn Header="fit" Width="*"/>
+                                <DataGridTextColumn Header="Guest2" Width="*"/>
+                                <DataGridTextColumn Header="fv2" Width="*"/>
+                                <DataGridCheckBoxColumn Header="fit" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Material" VerticalAlignment="Bottom" Margin="5,0"/>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+
+                                <ListBox Margin="2" Grid.RowSpan="2"/>
+                                <UniformGrid Grid.Column="1" Columns="1" Rows="2">
+                                    <Button Content="Add material"  Margin="5"/>
+                                    <Button Content="Delete material" Margin="5"/>
+                                </UniformGrid>
+                                <UniformGrid Grid.Column="2" Columns="2" Rows="2" Margin="2">
+                                    <Button Content="Insert Layer" Margin="5"/>
+                                    <Button Content="Delete Layer" Margin="5"/>
+                                    <Button Content="Open Model" Margin="5"/>
+                                    <Button Content="Save Model" Margin="5"/>
+                                </UniformGrid>
+                                <TextBlock Text="Model File" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Margin="100,2,2,2" Grid.ColumnSpan="2"/>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Wavelength Data" Grid.Row="3">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Margin="5">
+                            <ListBox/>
+                            <TextBlock Text="Reflectance" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,2"/>
+                        </Grid>
+                        <Grid Grid.Column="1" Margin="5">
+                            <ListBox/>
+                            <TextBlock Text="Transmittance" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,2"/>
+                        </Grid>
+                        <Grid Grid.Column="2" Margin="5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <UniformGrid Rows="3" Columns="1">
+                                <RadioButton Content="Reflectance" VerticalAlignment="Center"/>
+                                <RadioButton Content="Transmittance" VerticalAlignment="Center"/>
+                                <TextBox/>
+                            </UniformGrid>
+                            <UniformGrid Rows="1" Columns="2" Grid.Row="1">
+                                <Button Content="Add" Margin="0,5,2,5"/>
+                                <Button Content="Delete" Margin="2,5,1,5"/>
+                            </UniformGrid>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="VRS" Grid.Row="4">
+
+                </GroupBox>
+                <GroupBox Header="Spec" Grid.Row="5">
+
+                </GroupBox>
+            </Grid>
+
+            <GroupBox Header="Point Editor" Grid.Column="1">
+                <Grid Margin="0,5,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition/>
+                        <RowDefinition Height="60"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="Point Setting">
+                            <UniformGrid Columns="4" Rows="1">
+                                <Button Content="Reset" Margin="5" Command="{Binding CmdReset}"/>
+                                <Button Content="Preset 1" Margin="5" Command="{Binding CmdPreset1}"/>
+                                <Button Content="Preset 2" Margin="5" Command="{Binding CmdPreset2}" />
+                                <Button Content="Custermize" Margin="5" Command="{Binding CmdCustomize}"/>
+                            </UniformGrid>
+                        </GroupBox>
+                        <GroupBox Header="Point Selector" Grid.Column="1">
+                            <UniformGrid Columns="4" Rows="1">
+                                <TextBox Text="{Binding Percentage}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5"/>
+                                <Button Content="Select %" Margin="5" Command="{Binding CmdSelectPercentage}"/>
+                                <Button Content="Select All" Margin="5" Command="{Binding CmdSelectAll}"/>
+                                <Button Content="Delete All" Margin="5" Command="{Binding CmdDeleteAll}"/>
+                            </UniformGrid>
+                        </GroupBox>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                            <ItemsControl ItemsSource="{Binding p_DrawElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas x:Name="StageMainView" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseMove">
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseMove" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseWheel" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseWheel" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeftButtonDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeftButtonUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeftButtonUp" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseRightButtonDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseRightButtonDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseRightButtonUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseRightButtonUp" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseEnter" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseEnter" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeave" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeave" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeave" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView, Mode=OneWay}" MethodName="OnMouseLeave" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="KeyDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView}" MethodName="OnCanvasKeyDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="KeyUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StageMainView}" MethodName="OnCanvasKeyUp" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                        <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                            <ItemsControl ItemsSource="{Binding p_DrawPointElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas x:Name="asgsgas" ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseMove">
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseMove" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseWheel" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseWheel" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeftButtonDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeftButtonUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeftButtonUp" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseRightButtonDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseRightButtonDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseRightButtonUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseRightButtonUp" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseEnter" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseEnter" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeave" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeave" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeave" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas, Mode=OneWay}" MethodName="OnMouseLeave" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="KeyDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas}" MethodName="OnCanvasKeyDown" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="KeyUp" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=asgsgas}" MethodName="OnCanvasKeyUp" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                        <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                            <ItemsControl ItemsSource="{Binding p_DrawSelectElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                    </Grid>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Header="Tool Plus">
+                            <UniformGrid Columns="4">
+                                <Button Margin="5" x:Name="LockBtn" Content="{Binding LockState}" Background="{Binding LockBrush}" Command="{Binding CmdUILock}"/>
+                                <Button Margin="5" x:Name="ShowBtn" Content="ShowIndex" Background="{Binding ShowIndexBrush}" Command="{Binding CmdShowIndex}"/>
+                            </UniformGrid>
+                        </GroupBox>
+                        <GroupBox Header="Key State" Grid.Column="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <UniformGrid Columns="3" Grid.Column="0">
+                                    <Border Margin="5" BorderThickness="1" Background="{Binding ShiftBrush}" BorderBrush="Black">
+                                        <TextBlock Text="Shift" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                                    </Border>
+                                    <Border Margin="5" BorderThickness="1" Background="{Binding CtrlBrush}" BorderBrush="Black">
+                                        <TextBlock Text="Ctrl" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                                    </Border>
+                                    <Border Margin="5" BorderThickness="1" Background="{Binding SBrush}" BorderBrush="Black">
+                                        <TextBlock Text="S" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                                    </Border>
+                                </UniformGrid>
+                                <Border Grid.Column="1" BorderThickness="1" Background="AliceBlue"  BorderBrush="Black">
+                                    <TextBlock Text="{Binding PointAddMode}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                                </Border>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+
+                </Grid>
+            </GroupBox>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="142*"/>
+                    <RowDefinition Height="272*"/>
+                    <RowDefinition Height="103*"/>
+                    <RowDefinition Height="413*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Header="Measurement Point List" Grid.RowSpan="2">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="7*"/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                        <UniformGrid Grid.Row="0" Margin="2" Background="Gainsboro" Columns="3">
+                            <TextBlock Text="Count" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                        </UniformGrid>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Index" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="X (mm)" Width="*" Binding="{Binding ListX}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Y (mm)" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Route" Width="*" Binding="{Binding ListRoute}" IsReadOnly="True"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Grid Grid.Row="2" Grid.Column="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Button Grid.Column="0" Grid.RowSpan="2" Content="Reorder Route" Margin="5" Command="{Binding CmdReorderPoint}" Background="{Binding ReorderBrush}" />
+                            <Button Grid.Column="1" Grid.RowSpan="2" Margin="5" Command="{Binding CmdRouteOptimizaion}">
+                                <TextBlock TextAlignment="Center">Find Nearest<LineBreak/>Next Point</TextBlock>
+                            </Button>
+
+                            <Grid Grid.Column="2" Grid.RowSpan="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Border Margin="5" Background="#FFDDDDDD"
+                                    BorderBrush="#FF707070" BorderThickness="1" Grid.ColumnSpan="2">
+                                    <CheckBox x:Name="checkRoot" Content="Show Route" 
+                                             VerticalAlignment="Center"
+                                             HorizontalAlignment="Center" IsChecked="{Binding ShowRoute}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="Checked" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=checkRoot, Mode=OneWay}" MethodName="OnCheckboxChange" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="Unchecked" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=checkRoot, Mode=OneWay}" MethodName="OnCheckboxChange" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </CheckBox>
+                                </Border>
+                                <UniformGrid Grid.Row="1" Grid.ColumnSpan="2" Rows="1" Columns="3">
+                                    <cp:ColorPicker x:Name="colorPicker" DisplayColorAndName="False" Margin="5" AvailableColorsSortingMode="HueSaturationBrightness" ColorMode="ColorCanvas"
+                                                      SelectedColor="{Binding RouteBrush, Mode=TwoWay, Converter={StaticResource ColorToBrushConverter}, UpdateSourceTrigger=PropertyChanged}" Resources="{StaticResource theme}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectedColorChanged" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="ColorPicker_SelectedColorChanged" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="GotFocus" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="colorPicker_Opened" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </cp:ColorPicker>
+                                    <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Thick"/>
+                                    <TextBox x:Name="thicknessTextBox" Text="{Binding RouteThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextAlignment="Center" VerticalContentAlignment="Center" Margin="5">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="TextChanged" >
+                                                <ei:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=thicknessTextBox, Mode=OneWay}" MethodName="OnThicknessChanged" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBox>
+                                </UniformGrid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Position Information" Grid.Row="2">
+                    <UniformGrid Columns="2" Rows="2">
+                        <Grid Margin="5" Background="Gainsboro">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="11*"/>
+                                <ColumnDefinition Width="6*"/>
+                                <ColumnDefinition Width="12*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                            <TextBlock Text="{Binding XPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
+                        </Grid>
+                        <Grid Margin="5" Background="Gainsboro">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                            <TextBlock Text="{Binding YPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                        </Grid>
+                        <Grid Margin="5" Background="Gainsboro">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="R" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                            <TextBlock Text="{Binding CurrentRadius}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                        </Grid>
+                        <Grid Margin="5" Background="Gainsboro">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="∠" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                            <TextBlock Text="{Binding CurrentTheta}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                        </Grid>
+                    </UniformGrid>
+                </GroupBox>
+
+                <Grid Grid.Row="3">
+                    <GroupBox Header="PreView">
+                        <Viewbox Margin="10">
+                            <ItemsControl ItemsSource="{Binding p_PreviewDrawElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas x:Name="StagePreView" Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="MouseMove">
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseWheel" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseWheelPreView" />
+                                                </i:EventTrigger>
+                                                <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                                    <ei:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                    </GroupBox>
+                </Grid>
+            </Grid>
+
+        </Grid>
+
+    </Grid>
+</Window>

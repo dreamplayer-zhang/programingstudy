@@ -1,0 +1,18 @@
+[
+  {
+    "Id": "680730",
+    "ThreadId": "274960",
+    "Html": "\r\n<p>Any idea of setting the color value to the color picker.</p>\r\n<p>For example i want to set the color Red as default selected color and&nbsp; i tried this code</p>\r\n<p>&nbsp;&nbsp; colorBack.SelectedColor = System.Windows.Media.Colors.Red;</p>\r\n<p>but is not working.When the page loads it seems that White color is selected as&nbsp; default</p>\r\n<p>Thanks</p>\r\n<p>Jibin</p>\r\n",
+    "PostedDate": "2011-10-06T04:04:48.283-07:00",
+    "UserRole": null,
+    "MarkedAsAnswerDate": null
+  },
+  {
+    "Id": "1479297",
+    "ThreadId": "274960",
+    "Html": "This is a super old question, but I just found this project and ran into the same problem. It's easy to fix, you just need to modify the CustomColorPicker.xaml.cs file. Change this:<br />\n<pre><code>String _hexValue = string.Empty;\npublic String HexValue\n{\n    get { return _hexValue; }\n    set { _hexValue = value; }\n}\n\nprivate Color selectedColor = Colors.Transparent;\npublic Color SelectedColor\n{\n    get { return selectedColor; }\n    set\n    {\n        if (selectedColor != value)\n        {\n            selectedColor = value;\n        }\n    }\n}\n</code></pre>\n\nTo this:<br />\n<pre><code>private String _hexValue = string.Empty;\npublic String HexValue\n{\n    get { return _hexValue; }\n    set\n    {\n        _hexValue = value;\n\n        var newColor = ColorTranslator.FromHtml(HexValue);\n        recContent.Fill = new SolidColorBrush(Color.FromArgb(newColor.A, newColor.R, newColor.G, newColor.B));\n    }\n}\n\nprivate Color selectedColor = Colors.Transparent;\npublic Color SelectedColor\n{\n    get { return selectedColor; }\n    set\n    {\n        if (selectedColor != value)\n        {\n            selectedColor = value;\n        }\n\n        recContent.Fill = new SolidColorBrush(selectedColor);\n    }\n}</code></pre>\n\n",
+    "PostedDate": "2016-07-19T10:47:43.69-07:00",
+    "UserRole": null,
+    "MarkedAsAnswerDate": null
+  }
+]
