@@ -610,27 +610,31 @@
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type local:TreeItem_int}">
                                 <TextBox Style="{StaticResource BorderChangeTextBox}"
-                                            IsEnabled="{Binding p_bEnable}"
-                                            Text="{Binding p_value, Converter={StaticResource TextBoxToIntConverters}}"
-                                            PreviewKeyDown="ToggleButton_PreviewKeyDown" />
+                                         IsEnabled="{Binding p_bEnable}"
+                                         Text="{Binding p_value, Converter={StaticResource TextBoxToIntConverters}}"
+                                         GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                         PreviewKeyDown="ToggleButton_PreviewKeyDown" />
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type local:TreeItem_double}">
                                 <TextBox IsEnabled="{Binding p_bEnable}"
-                                            Text="{Binding p_value, Converter={StaticResource TextBoxToDoubleConverters}}"
-                                            PreviewKeyDown="ToggleButton_PreviewKeyDown"
-                                            Style="{StaticResource BorderChangeTextBox}" />
+                                         Text="{Binding p_value, Converter={StaticResource TextBoxToDoubleConverters}}"
+                                         GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                         PreviewKeyDown="ToggleButton_PreviewKeyDown"
+                                         Style="{StaticResource BorderChangeTextBox}" />
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type local:TreeItem_long}">
                                 <TextBox IsEnabled="{Binding p_bEnable}"
-                                            Text="{Binding p_value, Converter={StaticResource TextBoxToLongConverters}}"
-                                            PreviewKeyDown="ToggleButton_PreviewKeyDown"
-                                            Style="{StaticResource BorderChangeTextBox}" />
+                                         Text="{Binding p_value, Converter={StaticResource TextBoxToLongConverters}}"
+                                         GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                         PreviewKeyDown="ToggleButton_PreviewKeyDown"
+                                         Style="{StaticResource BorderChangeTextBox}" />
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type local:TreeItem_Password}">
                                 <TextBox Text="{Binding p_value}"
-                                            IsEnabled="{Binding p_bEnable}"
-                                            Style="{StaticResource BorderChangeTextBox}"
-                                            PreviewKeyDown="ToggleButton_PreviewKeyDown" />
+                                         IsEnabled="{Binding p_bEnable}"
+                                         Style="{StaticResource BorderChangeTextBox}"
+                                         GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                         PreviewKeyDown="ToggleButton_PreviewKeyDown" />
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type local:TreeItem_FileName}">
                                 <Grid>
@@ -654,30 +658,34 @@
                                         </Button.Template>
                                     </Button>
                                     <TextBox Text="{Binding p_value}" Grid.Column="1"
-                                                IsEnabled="{Binding p_bEnable}"
-                                                Style="{StaticResource BorderChangeTextBox}"
-                                                PreviewKeyDown="ToggleButton_PreviewKeyDown" />
+                                             IsEnabled="{Binding p_bEnable}"
+                                             Style="{StaticResource BorderChangeTextBox}"
+                                             GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                             PreviewKeyDown="ToggleButton_PreviewKeyDown" />
                                 </Grid>
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type local:TreeItem_string}">
                                 <TextBox Text="{Binding p_value}"
-                                            IsEnabled="{Binding p_bEnable}"
-                                            Style="{StaticResource BorderChangeTextBox}"
-                                            PreviewKeyDown="ToggleButton_PreviewKeyDown" />
+                                         IsEnabled="{Binding p_bEnable}"
+                                         Style="{StaticResource BorderChangeTextBox}"
+                                         GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                         PreviewKeyDown="ToggleButton_PreviewKeyDown" />
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type local:TreeItem_CPoint}">
                                 <WrapPanel>
                                     <TextBlock Text=" ( "></TextBlock>
                                     <TextBox IsEnabled="{Binding p_bEnable}"
-                                                Text="{Binding p_valueX, Converter= {StaticResource TextBoxToIntConverters}}"
-                                                Style="{StaticResource BorderChangeTextBox}"
-                                                PreviewKeyDown="ToggleButton_PreviewKeyDown" />
+                                             Text="{Binding p_valueX, Converter= {StaticResource TextBoxToIntConverters}}"
+                                             Style="{StaticResource BorderChangeTextBox}"
+                                             GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                             PreviewKeyDown="ToggleButton_PreviewKeyDown" />
                                     <!--<TextBlock Text=" Y : "></TextBlock>-->
                                     <TextBlock Text=" , "></TextBlock>
                                     <TextBox IsEnabled="{Binding p_bEnable}"
-                                                Text="{Binding p_valueY, Converter= {StaticResource TextBoxToIntConverters}}"
-                                                Style="{StaticResource BorderChangeTextBox}"
-                                                PreviewKeyDown="ToggleButton_PreviewKeyDown" />
+                                             Text="{Binding p_valueY, Converter= {StaticResource TextBoxToIntConverters}}"
+                                             Style="{StaticResource BorderChangeTextBox}"
+                                             GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                             PreviewKeyDown="ToggleButton_PreviewKeyDown" />
                                     <TextBlock Text=" )"></TextBlock>
                                 </WrapPanel>
                             </DataTemplate>
@@ -685,21 +693,25 @@
                                 <WrapPanel>
                                     <TextBlock Text=" ( "></TextBlock>
                                     <TextBox IsEnabled="{Binding p_bEnable}"
-                                                Text="{Binding p_valueX, Converter= {StaticResource TextBoxToDoubleConverters}}"
-                                                Style="{StaticResource BorderChangeTextBox}"
-                                                PreviewKeyDown="ToggleButton_PreviewKeyDown" />
+                                             Text="{Binding p_valueX, Converter= {StaticResource TextBoxToDoubleConverters}}"
+                                             Style="{StaticResource BorderChangeTextBox}"
+                                             GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                             PreviewKeyDown="ToggleButton_PreviewKeyDown" />
                                     <TextBlock Text=" , "></TextBlock>
                                     <TextBox IsEnabled="{Binding p_bEnable}"
-                                                Text="{Binding p_valueY, Converter= {StaticResource TextBoxToDoubleConverters}}"
-                                                Style="{StaticResource BorderChangeTextBox}"
-                                                PreviewKeyDown="ToggleButton_PreviewKeyDown" />
+                                             Text="{Binding p_valueY, Converter= {StaticResource TextBoxToDoubleConverters}}"
+                                             Style="{StaticResource BorderChangeTextBox}"
+                                             GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                             PreviewKeyDown="ToggleButton_PreviewKeyDown" />
                                     <TextBlock Text=" )"></TextBlock>
                                 </WrapPanel>
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type local:TreeItem_stringList}">
                                 <ComboBox SelectedValue="{Binding p_value}"
-                                            IsEnabled="{Binding p_bEnable}"
-                                            ItemsSource="{Binding p_list}" />
+                                          IsEnabled="{Binding p_bEnable}"
+                                          ItemsSource="{Binding p_list}" 
+                                          GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
+                                          SelectionChanged="ComboBox_SelectionChanged"/>
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type local:TreeItem_ICommand}">
                                 <Button Command="{Binding p_value}"

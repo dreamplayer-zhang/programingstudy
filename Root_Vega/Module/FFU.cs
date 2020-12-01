@@ -19,21 +19,107 @@ namespace Root_Vega.Module
         #endregion
 
         #region Unit
-        public class Unit
+        public class Unit : NotifyProperty
         {
             #region Fan
             const int c_lFan = 32;
             List<int> m_aFanRPM = new List<int>();
+            List<int> p_aFanRPM
+			{
+                get { return m_aFanRPM; }
+                set 
+                {
+                    if (m_aFanRPM == value) return;
+                    m_aFanRPM = value;
+                    OnPropertyChanged();
+                }
+			}
             List<int> m_aFanSet = new List<int>();
-            List<int> m_aFanState = new List<int>();
-            List<int> m_aFanReset = new List<int>();
-            List<int> m_aFanPressure = new List<int>();
-
-            public class Fan
+            List<int> p_aFanSet
             {
-                public int p_fFanRPM { get { return m_unit.m_aFanRPM[m_nID]; } }
-                public int p_fFanState { get { return m_unit.m_aFanState[m_nID]; } }
-                public int p_fFanPressure { get { return m_unit.m_aFanPressure[m_nID]; } }
+                get { return m_aFanSet; }
+                set
+                {
+                    if (m_aFanSet == value) return;
+                    m_aFanSet = value;
+                    OnPropertyChanged();
+                }
+            }
+            List<int> m_aFanState = new List<int>();
+            List<int> p_aFanState
+            {
+                get { return m_aFanState; }
+                set
+                {
+                    if (m_aFanState == value) return;
+                    m_aFanState = value;
+                    OnPropertyChanged();
+                }
+            }
+            List<int> m_aFanReset = new List<int>();
+            List<int> p_aFanReset
+            {
+                get { return m_aFanReset; }
+                set
+                {
+                    if (m_aFanReset == value) return;
+                    m_aFanReset = value;
+                    OnPropertyChanged();
+                }
+            }
+            List<int> m_aFanPressure = new List<int>();
+            List<int> p_aFanPressure
+            {
+                get { return m_aFanPressure; }
+                set
+                {
+                    if (m_aFanPressure == value) return;
+                    m_aFanPressure = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            public class Fan : ModuleBase
+            {
+                public int p_fFanRPM 
+                {
+                    get 
+                    { 
+                        return (m_unit.m_aFanRPM[m_nID]<0) ? 0: m_unit.m_aFanRPM[m_nID]; 
+                    } 
+                    set
+					{
+						if (m_unit.m_aFanRPM[m_nID] == value) return;
+						m_unit.m_aFanRPM[m_nID] = value;
+						OnPropertyChanged();
+					}
+                }
+                public int p_fFanState 
+                { 
+                    get 
+                    {
+                        return m_unit.m_aFanState[m_nID]; 
+                    }
+                    set
+                    {
+                        if (m_unit.m_aFanState[m_nID] == value) return;
+                        m_unit.m_aFanState[m_nID] = value;
+                        OnPropertyChanged();
+                    }
+                }
+                public int p_fFanPressure 
+                { 
+                    get 
+                    { 
+                        return m_unit.m_aFanPressure[m_nID]; 
+                    }
+                    set
+                    {
+                        if (m_unit.m_aFanPressure[m_nID] == value) return;
+                        m_unit.m_aFanPressure[m_nID] = value;
+                        OnPropertyChanged();
+                    }
+                }
                 public int p_fFanSet
                 {
                     get { return m_unit.m_aFanSet[m_nID]; }
@@ -42,16 +128,87 @@ namespace Root_Vega.Module
                         if (m_unit.m_aFanSet[m_nID] == value) return;
                         m_unit.m_aFanSet[m_nID] = value;
                         m_unit.m_bInvalidSet = true; 
+                        OnPropertyChanged();
                     }
                 }
 
-                public bool p_bRunOK { get { return ((p_fFanState & 0x0001) == 0); } }
-                public bool p_bPressureOK { get { return ((p_fFanState & 0x0002) == 0); } }
-                public bool p_bRPMHigh { get { return ((p_fFanState & 0x0004) != 0); } }
-                public bool p_bRPMLow { get { return ((p_fFanState & 0x0008) != 0); } }
-                public bool p_bPressureLow { get { return ((p_fFanState & 0x0010) != 0); } }
-                public bool p_bTimeover { get { return ((p_fFanState & 0x0020) != 0); } }
-                public bool p_bCommOK { get { return ((p_fFanState & 0x0040) == 0); } }
+                public bool p_bRunOK 
+                { 
+                    get 
+                    {
+                        if (m_log != null)
+                        {
+                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
+                        }
+                        return ((p_fFanState & 0x0001) == 0); 
+                    } 
+                }
+                public bool p_bPressureOK 
+                {
+                    get 
+                    {
+                        if (m_log != null)
+                        {
+                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
+                        }
+                        return ((p_fFanState & 0x0002) == 0); 
+                    } 
+                }
+                public bool p_bRPMHigh
+                {
+                    get
+                    {
+                        if (m_log != null)
+                        {
+                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
+                        }
+                        return ((p_fFanState & 0x0004) == 0);
+                    }
+                }
+                public bool p_bRPMLow
+                {
+                    get
+                    {
+                        if (m_log != null)
+                        {
+                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
+                        }
+                        return ((p_fFanState & 0x0008) == 0);
+                    }
+                }
+                public bool p_bPressureLow
+                {
+                    get
+                    {
+                        if (m_log != null)
+                        {
+                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
+                        }
+                        return ((p_fFanState & 0x0010) == 0);
+                    }
+                }
+                public bool p_bTimeover
+                {
+                    get
+                    {
+                        if (m_log != null)
+                        {
+                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
+                        }
+                        return ((p_fFanState & 0x0020) == 0);
+                    }
+                }
+                public bool p_bCommOK
+                {
+                    get
+                    {
+                        if (m_log != null)
+                        {
+                            if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
+                        }
+                        return ((p_fFanState & 0x0040) == 0);
+                    }
+                }
 
                 public void RunTree(Tree tree)
                 {
@@ -72,15 +229,35 @@ namespace Root_Vega.Module
                 }
             }
             public ObservableCollection<Fan> m_aFan = new ObservableCollection<Fan>();
+            public ObservableCollection<Fan> p_aFan
+			{
+                get { return m_aFan; }
+                set 
+                {
+                    if (m_aFan == value) return;
+                    m_aFan = value;
+                    OnPropertyChanged();
+                }
+			}
+
             public void InitFan()
             {
                 for (int n = 0; n < c_lFan; n++)
                 {
-                    m_aFanRPM.Add(0);
-                    m_aFanSet.Add(0);
-                    m_aFanState.Add(0);
-                    m_aFanReset.Add(0);
-                    m_aFanPressure.Add(0);
+                    p_aFanRPM.Add(0);
+                    m_aTempRPM.Add(0);
+
+                    p_aFanSet.Add(0);
+                    m_aTempSet.Add(0);
+
+                    p_aFanState.Add(0);
+                    m_aTempState.Add(0);
+
+                    p_aFanReset.Add(0);
+                    m_aTempReset.Add(0);
+
+                    p_aFanPressure.Add(0);
+                    m_aTempPressure.Add(0);
                     m_aFan.Add(new Fan(this, n));
                 }
             }
@@ -94,28 +271,37 @@ namespace Root_Vega.Module
                 for (int n = 0; n < m_lFan; n++) m_aFan[n].RunTree(tree.GetTree(m_aFan[n].m_id));
             }
             #endregion
-
+            List<int> m_aTempRPM = new List<int>();
+            List<int> m_aTempState = new List<int>();
+            List<int> m_aTempPressure = new List<int>();
+            List<int> m_aTempSet = new List<int>();
+            List<int> m_aTempReset = new List<int>();
             public void RunThreadFan()
             {
                 Thread.Sleep(10);
-                m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 0, ref m_aFanRPM);
+				m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 0, ref m_aTempRPM);
+                p_aFanRPM = m_aTempRPM;
                 Thread.Sleep(10);
-                m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 64, ref m_aFanState);
-                Thread.Sleep(10);
-                m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 128, ref m_aFanPressure);
+				m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 64, ref m_aTempState);
+                p_aFanState = m_aTempState;
+				Thread.Sleep(10);
+				m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 128, ref m_aTempPressure);
+                p_aFanPressure = m_aTempPressure;
                 if (m_bInvalidSet)
-                {
-                    Thread.Sleep(10);
-                    m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 32, m_aFanSet); 
-                }
-                if (m_FFU.m_bResetFan)
-                {
-                    Thread.Sleep(10);
-                    for (int n = 0; n < c_lFan; n++) m_aFanReset[n] = 1; 
-                    m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 96, m_aFanReset);
-                    m_FFU.m_bResetFan = false; 
-                }
-            }
+				{
+					Thread.Sleep(10);
+					m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 32, m_aTempSet);
+                    p_aFanSet = m_aTempSet;
+				}
+				if (m_FFU.m_bResetFan)
+				{
+					Thread.Sleep(10);
+					for (int n = 0; n < c_lFan; n++) m_aFanReset[n] = 1;
+					m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 96, m_aTempReset);
+                    p_aFanReset = m_aTempReset;
+					m_FFU.m_bResetFan = false;
+				}
+			}
 
             bool m_bInvalidSet = false;
             FFU m_FFU;
@@ -131,8 +317,21 @@ namespace Root_Vega.Module
                 p_sUnit = m_id; 
             }
         }
-        List<Unit> m_aUnit = new List<Unit>(); 
-        public int m_nUnit = 1; 
+        List<Unit> m_aUnit = new List<Unit>();
+		public List<Unit> p_aUnit
+		{
+			get
+			{
+				return m_aUnit;
+			}
+			set
+			{
+				if (m_aUnit == value) return;
+				m_aUnit = value;
+				OnPropertyChanged();
+			}
+		}
+		public int m_nUnit = 1; 
         void RunTreeUnit(Tree tree)
         {
             m_nUnit = tree.Set(m_nUnit, m_nUnit, "Count", "Unit Count");

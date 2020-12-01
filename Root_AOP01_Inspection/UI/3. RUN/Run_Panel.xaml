@@ -187,19 +187,19 @@
                                 <RowDefinition Height="80"/>
                             </Grid.RowDefinitions>
                             <Grid Grid.Column="1" Grid.Row="0" Background="Black" Margin="5">
-
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/top.PNG"/>
                             </Grid>
                             <Grid Grid.Column="2" Grid.Row="1" Background="Black" Margin="5">
-
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/Right.PNG"/>
                             </Grid>
                             <Grid Grid.Column="0" Grid.Row="1" Background="Black" Margin="5">
-
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/Left.PNG"/>
                             </Grid>
                             <Grid Grid.Column="1" Grid.Row="2" Background="Black" Margin="5">
-
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/bottom.PNG"/>
                             </Grid>
                             <Grid Grid.Column="1" Grid.Row="1" Background="Black" Margin="5">
-
+                                <Image Source="/Root_AOP01_Inspection;component/Resource/ReticlDefect.PNG"/>
                             </Grid>
                         </Grid>
                     </GroupBox>
@@ -384,7 +384,9 @@
                                 <RowDefinition Height="2*"/>
                             </Grid.RowDefinitions>
                             <GroupBox Header="Defect Image" Grid.Row="0">
-                                <Grid Background="Black"/>
+                                <Grid Background="Black">
+                                    <Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG"/>
+                                </Grid>
                             </GroupBox>
                             <GroupBox Header="Defect List" Grid.Row="1">
                                 <Grid>
@@ -393,19 +395,57 @@
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
                                     <WrapPanel>
-                                        <CheckBox Content="All" Margin="3"/>
+                                        <CheckBox Content="All" Margin="3" IsChecked="True"/>
                                         <CheckBox Content="Pellicle" Margin="3"/>
                                         <CheckBox Content="Barcode" Margin="3"/>
                                         <CheckBox Content="Edge" Margin="3"/>
                                     </WrapPanel>
-                                    <DataGrid Background="White" Grid.Row="1">
+                                    <DataGrid IsReadOnly="True" Grid.Row="1">
+                                        <DataGrid.Resources>
+                                            <Style TargetType="DataGridColumnHeader">
+                                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            </Style>
+                                        </DataGrid.Resources>
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Index" Width="50"/>
-                                            <DataGridTextColumn Header="Location" Width="*"/>
-                                            <DataGridTextColumn Header="Size" Width="*"/>
-                                            <DataGridTextColumn Header="GV" Width="50"/>
-                                            <DataGridTextColumn Header="Defect Code" Width="*"/>
+                                            <DataGridTextColumn  Header="No." Binding="{Binding Path=a}" Width="0.5*"/>
+                                            <DataGridTextColumn  Header="Location" Binding="{Binding Path=b}" Width="1.5*"/>
+                                            <DataGridTextColumn  Header="Size" Binding="{Binding Path=c}" Width="*"/>
+                                            <DataGridTextColumn  Header="Gv" Binding="{Binding Path=d}" Width="0.5*"/>
+                                            <DataGridTextColumn  Header="Code" Binding="{Binding Path=e}" Width="*"/>
                                         </DataGrid.Columns>
+                                        <local:Dummy a="0" b="1078, 2395" c="1.4mm" d="32" e="0x000000"/>
+                                        <local:Dummy a="1" b="2395, 1078" c="2.2mm" d="24" e="0x000000"/>
+                                        <local:Dummy a="2" b="8078, 3355" c="1.1mm" d="57" e="0x000000"/>
+                                        <local:Dummy a="3" b="2678, 6345" c="1.8mm" d="61" e="0x000000"/>
+                                        <local:Dummy a="4" b="4378, 6385" c="1.6mm" d="55" e="0x000000"/>
+                                        <local:Dummy a="5" b="7178, 5375" c="1.6mm" d="71" e="0x000000"/>
+                                        <local:Dummy a="6" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="7" b="1078, 2395" c="1.4mm" d="32" e="0x000000"/>
+                                        <local:Dummy a="8" b="2395, 1078" c="2.2mm" d="24" e="0x000000"/>
+                                        <local:Dummy a="9" b="8078, 3355" c="1.1mm" d="57" e="0x000000"/>
+                                        <local:Dummy a="10" b="2678, 6345" c="1.8mm" d="61" e="0x000000"/>
+                                        <local:Dummy a="11" b="4378, 6385" c="1.6mm" d="55" e="0x000000"/>
+                                        <local:Dummy a="12" b="7178, 5375" c="1.6mm" d="71" e="0x000000"/>
+                                        <local:Dummy a="13" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="14" b="2678, 6345" c="1.8mm" d="61" e="0x000000"/>
+                                        <local:Dummy a="15" b="4378, 6385" c="1.6mm" d="55" e="0x000000"/>
+                                        <local:Dummy a="16" b="7178, 5375" c="1.6mm" d="71" e="0x000000"/>
+                                        <local:Dummy a="17" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="18" b="2678, 6345" c="1.8mm" d="61" e="0x000000"/>
+                                        <local:Dummy a="19" b="4378, 6385" c="1.6mm" d="55" e="0x000000"/>
+                                        <local:Dummy a="20" b="7178, 5375" c="1.6mm" d="71" e="0x000000"/>
+                                        <local:Dummy a="21" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="22" b="2678, 6345" c="1.8mm" d="61" e="0x000000"/>
+                                        <local:Dummy a="23" b="4378, 6385" c="1.6mm" d="55" e="0x000000"/>
+                                        <local:Dummy a="24" b="7178, 5375" c="1.6mm" d="71" e="0x000000"/>
+                                        <local:Dummy a="25" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="26" b="7178, 5375" c="1.6mm" d="71" e="0x000000"/>
+                                        <local:Dummy a="27" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="28" b="2678, 6345" c="1.8mm" d="61" e="0x000000"/>
+                                        <local:Dummy a="29" b="4378, 6385" c="1.6mm" d="55" e="0x000000"/>
+                                        <local:Dummy a="30" b="7178, 5375" c="1.6mm" d="71" e="0x000000"/>
+                                        <local:Dummy a="31" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
                                     </DataGrid>
                                 </Grid>
                             </GroupBox>

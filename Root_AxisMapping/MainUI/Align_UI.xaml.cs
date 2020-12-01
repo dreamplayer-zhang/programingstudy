@@ -88,5 +88,15 @@ namespace Root_AxisMapping.MainUI
             m_align.InvalidROI();
         }
         #endregion
+
+        private void comboFocus_GotFocus(object sender, RoutedEventArgs e)
+        {
+            checkFocus.IsChecked = true; 
+        }
+
+        private void comboFocus_LostFocus(object sender, RoutedEventArgs e)
+        {
+            checkFocus.IsChecked = false; 
+        }
     }
 }

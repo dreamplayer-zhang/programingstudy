@@ -79,14 +79,14 @@ namespace Root_ASIS.Module
                 m_trays.p_sInfo = toolBox.Get(ref m_rs232, m_trays, m_id);
                 if (bInit)
                 {
-                    m_rs232.OnRecieve += M_rs232_OnRecieve;
+                    m_rs232.OnReceive += M_rs232_OnReceive;
                     m_rs232.p_bConnect = true;
                     m_bgw.RunWorkerAsync(); 
                 }
             }
 
             bool m_bSend = false; 
-            private void M_rs232_OnRecieve(string sRead)
+            private void M_rs232_OnReceive(string sRead)
             {
                 Thread.Sleep(10); 
                 m_bSend = false; 

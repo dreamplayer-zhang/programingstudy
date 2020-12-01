@@ -21,12 +21,11 @@ namespace RootTools.Camera.Matrox
         BackgroundWorker bgw_Connect = new BackgroundWorker();
         ImageData m_ImageLive;
 
-
-        public MIL_ID m_MilApplication;                     // Application -> 프로그램당 하나
-        public MIL_ID m_MilSystem;                          // 프레임그래버
-        public MIL_ID m_MilDigitizer;                       // 카메라
-        public MIL_ID m_MilDisplay;                         // 디스플레이
-        public MIL_ID[] m_MilBuffers = new MIL_ID[c_nBuf];  // 버퍼
+        private MIL_ID m_MilApplication;                     // Application -> 프로그램당 하나
+        private MIL_ID m_MilSystem;                          // 프레임그래버
+        private MIL_ID m_MilDigitizer;                       // 카메라
+        private MIL_ID m_MilDisplay;                         // 디스플레이
+        private MIL_ID[] m_MilBuffers = new MIL_ID[c_nBuf];  // 버퍼
         
         int m_nWidth = 0;
         public int p_nWidth
@@ -216,6 +215,12 @@ namespace RootTools.Camera.Matrox
             p_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
         }
 
+        public void Connect()
+        {
+            if (!bgw_Connect.IsBusy && p_CamInfo.p_eState == eCamState.Init)
+                bgw_Connect.RunWorkerAsync();
+        }
+
         void bgw_Connect_Dowork(object sender, DoWorkEventArgs e)
         {
             ConnectCamera();
@@ -305,6 +310,19 @@ namespace RootTools.Camera.Matrox
             // variable
             UserDataObject userObject = new UserDataObject();
 
+            int nbFrames = 0;
+            int n = 0;
+            int nbFramesReplayed = 0;
+            double frameRate = 0;
+            double timeWait = 0;
+            double totalReplay = 0;
+            double grabScale = 1.0;
+
+            MIL_INT licenseModules = 0;
+            MIL_INT frameCount = 0;
+            MIL_INT frameMissed = 0;
+            MIL_INT compressAttribute = 0;
+
             // implement
             if (m_MilApplication == MIL.M_NULL) return;
             if (m_MilSystem == MIL.M_NULL) return;
@@ -318,7 +336,7 @@ namespace RootTools.Camera.Matrox
             userObject.NbGrabStart = 0;
             GCHandle userObjectHandle = GCHandle.Alloc(userObject);
 
-            MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(HookFunction);
+            MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(ArchiveFunction);
             MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_END, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
 
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
@@ -336,7 +354,7 @@ namespace RootTools.Camera.Matrox
             userObjectHandle.Free();
         }
 
-        MIL_INT HookFunction(MIL_INT HookType, MIL_ID EventId, IntPtr UserDataPtr)
+        MIL_INT ArchiveFunction(MIL_INT HookType, MIL_ID EventId, IntPtr UserDataPtr)
         {
             // variable
 
@@ -346,6 +364,7 @@ namespace RootTools.Camera.Matrox
             {
                 GCHandle userObjectHandle = GCHandle.FromIntPtr(UserDataPtr);
                 UserDataObject userData = userObjectHandle.Target as UserDataObject;
+
                 if (userData != null)
                 {
                     MIL.MbufGet2d(m_MilBuffers[(userData.NbGrabStart) % p_nBuf], 0, 0, p_nWidth, p_nHeight, m_ImageLive.m_aBuf);
@@ -377,6 +396,14 @@ namespace RootTools.Camera.Matrox
             return;
         }
 
+        public string StartGrab()
+        {
+            if (m_MilDigitizer == MIL.M_NULL)
+                return "Digitizer is NULL";
+            MIL.MdigGrabContinuous(m_MilDigitizer, m_MilBuffers[0]);
+            return "OK";
+        }
+
         public string StopGrab()
         {
             if (m_MilDigitizer == MIL.M_NULL)
@@ -389,6 +416,8 @@ namespace RootTools.Camera.Matrox
         {
             return;
         }
+
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
 
         #region RelayCommand
         public RelayCommand ConnectCommand

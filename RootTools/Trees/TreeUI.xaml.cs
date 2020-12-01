@@ -14,15 +14,26 @@ namespace RootTools.Trees
             InitializeComponent();
         }
 
-        public void Init(Tree root)
+        TreeRoot m_treeRoot; 
+        public void Init(TreeRoot treeRoot)
         {
-            this.DataContext = root;
+            m_treeRoot = treeRoot; 
+            this.DataContext = treeRoot;
         }
 
         private void ToggleButton_PreviewKeyDown(object sender, KeyEventArgs e)
         {  
             if (e.Key == Key.Enter)
+            {
                 ((TextBox)sender).MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                if (m_treeRoot != null) m_treeRoot.m_bFocus = false;
+            }
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ((ComboBox)sender).MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            if (m_treeRoot != null) m_treeRoot.m_bFocus = false;
         }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -35,6 +46,16 @@ namespace RootTools.Trees
         private void ControlTree_PreviewMouseUp(object sender, MouseButtonEventArgs e)
         {
             Column2.Width = ControlTree.ActualWidth - Column1.ActualWidth - 4; 
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (m_treeRoot != null) m_treeRoot.m_bFocus = true; 
+        }
+
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (m_treeRoot != null) m_treeRoot.m_bFocus = false;
         }
     }
 }

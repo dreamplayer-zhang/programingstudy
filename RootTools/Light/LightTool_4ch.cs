@@ -60,7 +60,7 @@ namespace RootTools.Light
                 m_rs232.Send(str);
             }
 
-            //private void M_rs232_OnRecieve(string sRead)
+            //private void M_rs232_OnReceive(string sRead)
             //{
             //    if (sRead.Length < 11) return;
             //    if (sRead.Substring(0, 6) != m_sGet) return;
@@ -69,7 +69,7 @@ namespace RootTools.Light
             //    else p_fGetPower = Convert.ToDouble(sPower) / p_fScalePower;
             //}
 
-            private void M_rs232_OnRecieve(string sRead)
+            private void M_rs232_OnReceive(string sRead)
             {
                 if (sRead.Length < 9) return;
                 string sPower = sRead.Substring(6, 3);
@@ -93,7 +93,7 @@ namespace RootTools.Light
                 m_sGet = "<Get " + m_nCh.ToString();
                 m_sSet = "<Set " + m_nCh.ToString();
                 
-                m_rs232.OnRecieve += M_rs232_OnRecieve;
+                m_rs232.OnReceive += M_rs232_OnReceive;
             }
         }
 

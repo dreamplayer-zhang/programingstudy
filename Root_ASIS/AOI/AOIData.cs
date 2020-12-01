@@ -110,7 +110,7 @@ namespace Root_ASIS.AOI
             CPoint cp1 = cp + m_sz; 
             draw.AddRectangle(brush, cp, cp1);
             draw.AddText(brush, cp, p_id);
-            draw.AddText(brush, cp.X, cp.Y + m_sz.Y, m_sDisplay);
+            draw.AddText(brush, (int)m_rpCenter.X, (int)m_rpCenter.Y + m_sz.Y, m_sDisplay);
             if (m_bInspect) draw.AddCross(brush, new CPoint(m_rpCenter), 16);
         }
         #endregion

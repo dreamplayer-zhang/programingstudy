@@ -1,4 +1,5 @@
 ﻿using RootTools.Trees;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace RootTools.Comm
@@ -21,6 +22,11 @@ namespace RootTools.Comm
             commLogUI.Init(modbus.m_commLog);
             treeRootUI.Init(modbus.m_treeRoot);
             modbus.RunTree(Tree.eMode.Init); 
+        }
+
+        private void checkBoxConnect_Click(object sender, RoutedEventArgs e)
+        {
+            m_modbus.Connect(); 
         }
     }
 }

@@ -103,6 +103,16 @@ namespace Root_EFEM.Module
         }
         #endregion
 
+        #region InfoWafer UI
+        InfoWaferChild_UI m_ui;
+        void InitInfoWaferUI()
+        {
+            m_ui = new InfoWaferChild_UI();
+            m_ui.Init(this);
+            m_aTool.Add(m_ui);
+        }
+        #endregion
+
         #region Camera Align
         public enum ePosAlign
         {
@@ -458,6 +468,7 @@ namespace Root_EFEM.Module
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             m_aoi = new Aligner_ATI_AOI(m_log);
             base.InitBase(id, engineer);
+            InitInfoWaferUI(); 
         }
 
         public override void ThreadStop()

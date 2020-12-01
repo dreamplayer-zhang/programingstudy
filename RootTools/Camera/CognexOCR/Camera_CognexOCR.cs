@@ -251,5 +251,6 @@ namespace RootTools.Camera.CognexOCR
         {
             return "FALSE";
         }
+        public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0) { }
     }
 }

@@ -87,7 +87,7 @@ namespace Root_Vega
 			bool InputBool = !(bool)value;
 			string result;
 			if (InputBool)
-				result = "Delete";
+				result = "Select";
 			else
 				result = "Confirm";
 
@@ -121,104 +121,108 @@ namespace Root_Vega
 		private int m_IndexPort;
 		public int p_IndexPort
 		{
-			get { return m_IndexPort; }
+			get { return (m_IndexPort == -1) ? 0 : m_IndexPort; }
 			set
 			{
 				p_bConnectState = false;
 				//m_SerialComm.UpdateStop();
+				//if(m_IndexPort == -1)
+				//{
+				//	m_IndexPort= m_FDC.m_modbus.m_client.Port;
+				//}
 				SetProperty(ref m_IndexPort, value);
-				//m_IndexPort = value;
-				//OnPropertyChanged();
-				m_FDC.m_rs232.RunTree(Tree.eMode.Update);
-				m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
+				m_FDC.m_modbus.RunTree(Tree.eMode.Update);
+				m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
+
 			}
+		}
+		public int p_SelectedPort
+		{
+			get; set;
 		}
 		private int m_IndexBaudrate;
 		public int p_IndexBaudrate
 		{
-			get { return m_IndexBaudrate; }
+			get { return (m_IndexBaudrate == -1) ? 0 : m_IndexBaudrate; }
 			set
 			{
 				p_bConnectState = false;
 				//m_SerialComm.UpdateStop();
+				//if (m_IndexBaudrate== -1)
+				//{
+				//	m_IndexBaudrate = m_FDC.m_modbus.m_client.Baudrate;
+				//}
 				SetProperty(ref m_IndexBaudrate, value);
-				//m_IndexBaudrate = value;
-				//OnPropertyChanged();
-				m_FDC.m_rs232.RunTree(Tree.eMode.Update);
-				m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
+				m_FDC.m_modbus.RunTree(Tree.eMode.Update);
+				m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
 			}
 		}
+		public int p_SelectedBaudrate
+		{
+			get;set;
+		}
+
 		private int m_IndexParity;
 		public int p_IndexParity
 		{
-			get {
-				return m_IndexParity;
-			
+			get
+			{
+				return (m_IndexParity == -1) ? 0 : m_IndexParity;
 			}
 			set
 			{
 				p_bConnectState = false;
+				//if (m_IndexParity == -1)
+				//{
+				//	m_IndexParity = (int)m_FDC.m_modbus.m_client.Parity;
+				//}
 				SetProperty(ref m_IndexParity, value);
-				//m_IndexParity = value;
-				//OnPropertyChanged();
-				m_FDC.m_rs232.m_eParity = (Parity)m_IndexParity;
-				m_FDC.m_rs232.RunTree(Tree.eMode.Update);
-				m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
+				m_FDC.m_modbus.RunTree(Tree.eMode.Update);
+				m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
 			}
 		}
-		private int m_IndexDataBits;
-		public int p_IndexDataBits
+		public int p_SelectedParity
 		{
-			get {
-				//m_IndexDataBits = m_FDC.m_rs232.m_nDataBit;
-				return m_IndexDataBits; 
-			}
-			set
-			{
-				p_bConnectState = false;
-				//m_SerialComm.UpdateStop();
-				SetProperty(ref m_IndexDataBits, value);
-				//m_IndexDataBits = value;
-				//OnPropertyChanged();
-				m_FDC.m_rs232.m_nDataBit = m_IndexDataBits;
-				m_FDC.m_rs232.RunTree(Tree.eMode.Update);
-				m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
-			}
+			get; set;
 		}
+
 		private int m_IndexStopBits;
 		public int p_IndexStopBits
 		{
-			get { return m_IndexStopBits; }
+			get { return (m_IndexStopBits == -1) ? 0 : m_IndexStopBits; }
 			set
 			{
 				p_bConnectState = false;
-				//m_SerialComm.UpdateStop();
+				//if (m_IndexStopBits == -1)
+				//{
+				//	m_IndexStopBits = (int)m_FDC.m_modbus.m_client.StopBits;
+				//}
 				SetProperty(ref m_IndexStopBits, value);
-				//m_IndexStopBits = value;
-				//OnPropertyChanged();
-				m_FDC.m_rs232.RunTree(Tree.eMode.Update);
-				m_FDC.m_rs232.RunTree(Tree.eMode.RegWrite);
+				m_FDC.m_modbus.RunTree(Tree.eMode.Update);
+				m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
 			}
+		}
+		public int p_SelectedStopBits
+		{
+			get; set;
 		}
 
 		private bool m_bConnectState = false;
 		public bool p_bConnectState
 		{
 			get { return m_bConnectState; }
-			set {
+			set
+			{
 				SetProperty(ref m_bConnectState, value);
-				//m_bConnectState = value;
-				//OnPropertyChanged();
 			}
 		}
 		private bool m_bDeleteState = false;
 		public bool p_bDeleteState
 		{
 			get { return m_bDeleteState; }
-			set {
-				SetProperty(ref m_bDeleteState, value); 
-				//m_bDeleteState = value;
-				//OnPropertyChanged();
+			set
+			{
+				SetProperty(ref m_bDeleteState, value);
 			}
 		}
 		#endregion
@@ -228,65 +232,56 @@ namespace Root_Vega
 		public ObservableCollection<FDC_Control> p_Item
 		{
 			get { return m_Item; }
-			set {
+			set
+			{
 				SetProperty(ref m_Item, value);
-				//m_Item = value;
-				//OnPropertyChanged();
-				}
+			}
 		}
 		private ObservableCollection<string> m_PortCollection = new ObservableCollection<string>();
 		public ObservableCollection<string> p_PortCollection
 		{
 			get { return m_PortCollection; }
-			set { 
-				SetProperty(ref m_PortCollection, value); 
-				//m_PortCollection = value;
-				//OnPropertyChanged();
+			set
+			{
+				SetProperty(ref m_PortCollection, value);
 			}
 		}
 		private ObservableCollection<string> m_BaudrateCollection = new ObservableCollection<string>();
 		public ObservableCollection<string> p_BaudrateCollection
 		{
 			get { return m_BaudrateCollection; }
-			set {
-				SetProperty(ref m_BaudrateCollection, value); 
-				//m_BaudrateCollection = value;
-				//OnPropertyChanged();
-				
+			set
+			{
+				SetProperty(ref m_BaudrateCollection, value);
+
 			}
 		}
 		private ObservableCollection<Parity> m_ParityCollection = new ObservableCollection<Parity>();
 		public ObservableCollection<Parity> p_ParityCollection
 		{
 			get { return m_ParityCollection; }
-			set {
-				SetProperty(ref m_ParityCollection, value); 
-				//m_ParityCollection = value;
-				//OnPropertyChanged();
+			set
+			{
+				SetProperty(ref m_ParityCollection, value);
 			}
 		}
-		private ObservableCollection<string> m_DataBitsCollection = new ObservableCollection<string>();
-		public ObservableCollection<string> p_DataBitsCollection
-		{
-			get { return m_DataBitsCollection; }
-			set {
-				SetProperty(ref m_DataBitsCollection, value); 
-				//m_DataBitsCollection = value;
-				//OnPropertyChanged();
-			}
-		}
+		//private ObservableCollection<string> m_DataBitsCollection = new ObservableCollection<string>();
+		//public ObservableCollection<string> p_DataBitsCollection
+		//{
+		//	get { return m_DataBitsCollection; }
+		//	set {
+		//		SetProperty(ref m_DataBitsCollection, value); 
+		//	}
+		//}
 		private ObservableCollection<StopBits> m_StopBitsCollection = new ObservableCollection<StopBits>();
 		public ObservableCollection<StopBits> p_StopBitsCollection
 		{
 			get { return m_StopBitsCollection; }
-			set {
-				SetProperty(ref m_StopBitsCollection, value); 
-				//m_StopBitsCollection = value;
-				//OnPropertyChanged();
+			set
+			{
+				SetProperty(ref m_StopBitsCollection, value);
 			}
 		}
-		//private FDC
-			//m_Engineer.m_handler.m_FDC.m_aData
 		public Root_Vega.Module.FDC m_FDC;
 		#endregion
 
@@ -305,11 +300,10 @@ namespace Root_Vega
 			//m_Engineer.m_handler.m_FDC.m_aData
 			m_DialogService = DialogService;
 			m_CVM_manager = new CVM_Manager(m_DialogService);
-			
+
 			m_CVM_manager.m_FDC = m_FDC;
 			p_Item = new ObservableCollection<FDC_Control>();
 
-			
 		}
 
 		#region ICommand
@@ -362,9 +356,15 @@ namespace Root_Vega
 		{
 			if (p_PortCollection.Count != 0)
 			{
-				m_CVM_manager.m_FDC.m_rs232.p_bConnect = true;// 커넥트 연결
+				m_CVM_manager.m_FDC.m_modbus.m_client.Port = p_SelectedPort;
+				m_CVM_manager.m_FDC.m_modbus.m_client.Baudrate = p_SelectedBaudrate;
+				m_CVM_manager.m_FDC.m_modbus.m_client.Parity = (Parity)p_SelectedParity;
+				m_CVM_manager.m_FDC.m_modbus.m_client.StopBits = (StopBits)p_SelectedStopBits;
+				m_FDC.m_modbus.RunTree(Tree.eMode.Update);
+				m_FDC.m_modbus.RunTree(Tree.eMode.RegWrite);
+
 				p_bConnectState = true;//커넥트 ui 비활성화
-				
+
 
 
 				//m_SerialComm.SetPort(p_PortCollection[p_IndexPort],
@@ -392,7 +392,8 @@ namespace Root_Vega
 		void ClickDisonnect_Function()
 		{
 			p_bConnectState = false;
-			m_CVM_manager.m_FDC.m_rs232.p_bConnect = false;
+			m_CVM_manager.m_FDC.m_modbus.m_client.Disconnect();
+			//m_CVM_manager.m_FDC.m_rs232.p_bConnect = false;
 			//m_SerialComm.UpdateStop();
 		}
 		void ClickSelect_Function()
@@ -416,13 +417,13 @@ namespace Root_Vega
 			m_CVM_manager.bDeleteState = p_bDeleteState;
 			m_FDC.m_aData = new ObservableCollection<Root_Vega.Module.FDC.Data>();
 			foreach (FDC_ControlViewModel _Control in m_CVM_manager.m_CVMDeleteList)
-				{
-				 int _deleteIndex = m_CVM_manager.Remove(_Control);
-				 _Control.DeleteDelegate(_deleteIndex);
-				}
-				m_CVM_manager.m_CVMDeleteList.Clear();
+			{
+				int _deleteIndex = m_CVM_manager.Remove(_Control);
+				_Control.DeleteDelegate(_deleteIndex);
+			}
+			m_CVM_manager.m_CVMDeleteList.Clear();
 
-				
+
 			//m_SerialComm.UpdateStop();
 
 
@@ -432,11 +433,9 @@ namespace Root_Vega
 		{
 			string[] ports = SerialPort.GetPortNames();
 			p_PortCollection.Clear();
-
-			int m_IndexBaudrate = 0;
-			int m_IndexParity = 0;
-			int m_IndexDataBits = 0;
-			int m_IndexStopBits = 0;
+			int IndexBaudrate = 0;
+			int IndexParity = 0;
+			int IndexStopBits = 0;
 
 			foreach (string port in ports)
 			{
@@ -449,67 +448,47 @@ namespace Root_Vega
 				System.Reflection.MemberInfo[] memInfo = type.GetMember(EachEnum.ToString());
 				object[] attrs = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
 				p_BaudrateCollection.Add(((DescriptionAttribute)attrs[0]).Description);
-				if(((DescriptionAttribute)attrs[0]).Description == m_FDC.m_rs232.m_nBaudrate.ToString())
+				if (((DescriptionAttribute)attrs[0]).Description == m_FDC.m_modbus.m_client.Baudrate.ToString())
 				{
-					p_IndexBaudrate = m_IndexBaudrate;
+					p_IndexBaudrate = IndexBaudrate;
 				}
-				m_IndexBaudrate++;
+				IndexBaudrate++;
 			}
 			p_ParityCollection.Clear();
 			foreach (Parity EachEnum in Enum.GetValues(typeof(Parity)))
 			{
 				p_ParityCollection.Add(EachEnum);
-				if(EachEnum == m_FDC.m_rs232.m_eParity)
+				if (EachEnum == m_FDC.m_modbus.m_client.Parity)
 				{
-					p_IndexParity = m_IndexParity;
+					p_IndexParity = IndexParity;
 				}
-				m_IndexParity++;
+				IndexParity++;
 			}
-			p_DataBitsCollection.Clear();
-			foreach (DataBits EachEnum in Enum.GetValues(typeof(DataBits)))
-			{
-				Type type = EachEnum.GetType();
-				System.Reflection.MemberInfo[] memInfo = type.GetMember(EachEnum.ToString());
-				object[] attrs = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
-				p_DataBitsCollection.Add(((DescriptionAttribute)attrs[0]).Description);
-				if(((DescriptionAttribute)attrs[0]).Description == m_FDC.m_rs232.m_nDataBit.ToString())
-				{
-					p_IndexDataBits = m_IndexDataBits;
-				}
-				m_IndexDataBits++;
-			}
-			p_StopBitsCollection.Clear();
+			//p_DataBitsCollection.Clear();
+			//foreach (DataBits EachEnum in Enum.GetValues(typeof(DataBits)))
+			//{
+			//	Type type = EachEnum.GetType();
+			//	System.Reflection.MemberInfo[] memInfo = type.GetMember(EachEnum.ToString());
+			//	object[] attrs = memInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
+			//	p_DataBitsCollection.Add(((DescriptionAttribute)attrs[0]).Description);
+			//	if (((DescriptionAttribute)attrs[0]).Description == m_FDC.m_m.ToString())
+			//	{
+			//		p_IndexDataBits = m_IndexDataBits;
+			//	}
+			//	m_IndexDataBits++;
+			//}
+			//p_StopBitsCollection.Clear();
 			foreach (StopBits EachEnum in Enum.GetValues(typeof(StopBits)))
 			{
 				p_StopBitsCollection.Add(EachEnum);
-				if (EachEnum == m_FDC.m_rs232.m_eStopbits)
+				if (EachEnum == m_FDC.m_modbus.m_client.StopBits)
 				{
-					p_IndexStopBits= m_IndexStopBits;
+					p_IndexStopBits = IndexStopBits;
 				}
-				m_IndexStopBits++;
+				IndexStopBits++;
 			}
 
 			p_IndexPort = m_reg.Read(Member.GetName(() => p_IndexPort), (int)0);
-			
-
-			//p_IndexBaudrate = (int)Enum.ToObject(typeof(Baudrate), m_FDC.m_rs232.m_nBaudrate);
-			//p_IndexBaudrate = (int)Baudratem_FDC.m_rs232.m_nBaudrate);
-			//p_IndexParity = (int)Enum.ToObject(typeof(Parity), m_FDC.m_rs232.m_eParity);
-			//p_IndexDataBits= (int)Enum.ToObject(typeof(DataBits), m_FDC.m_rs232.m_nDataBit);
-			//p_IndexStopBits= (int)Enum.ToObject(typeof(StopBits), m_FDC.m_rs232.m_eStopbits);
-			//p_IndexBaudrate = (int)m_FDC.m_rs232.m_nBaudrate;
-			//p_IndexParity = (int)m_FDC.m_rs232.m_eParity;
-			//p_IndexDataBits = m_FDC.m_rs232.m_nDataBit;
-			//p_IndexStopBits = (int)m_FDC.m_rs232.m_eStopbits;
-
-
-
-			//p_IndexPort = m_reg.Read(Member.GetName(() => p_IndexPort), (int)0);
-			//p_IndexBaudrate = m_reg.Read(Member.GetName(() => p_IndexBaudrate), (int)0);
-			//p_IndexParity = m_reg.Read(Member.GetName(() => p_IndexParity), (int)0);
-			//p_IndexDataBits = m_reg.Read(Member.GetName(() => p_IndexDataBits), (int)0);
-			//p_IndexStopBits = m_reg.Read(Member.GetName(() => p_IndexStopBits), (int)0);
-
 
 			m_CVM_manager.Loaded();
 
@@ -525,6 +504,9 @@ namespace Root_Vega
 				m_CVM_manager.GetCVM(index).SendDelegate += (this.MakeDelegate);
 				m_CVM_manager.GetCVM(index).DeleteDelegate += (this.DeleteDelegate);
 			}
+			if (m_FDC.m_modbus.m_client.Connected) p_bConnectState = true;
+			else p_bConnectState= false;
+
 		}
 
 		void BtnAddClick_Function()

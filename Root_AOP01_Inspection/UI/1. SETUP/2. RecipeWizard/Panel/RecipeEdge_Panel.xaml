@@ -44,22 +44,22 @@
                             </Grid.ColumnDefinitions>
                             <GroupBox Grid.Column="0" Header="Left">
                                 <ScrollViewer>
-                                    <Grid Background="Black"/>
+                                    <Image Source="/Root_AOP01_Inspection;component/Resource/Left.PNG"/>
                                 </ScrollViewer>
                             </GroupBox>
                             <GroupBox Grid.Column="1" Header="Top">
                                 <ScrollViewer>
-                                    <Grid Background="Black"/>
+                                    <Image Source="/Root_AOP01_Inspection;component/Resource/top_vertical.PNG"/>
                                 </ScrollViewer>
                             </GroupBox>
                             <GroupBox Grid.Column="2" Header="Right">
                                 <ScrollViewer>
-                                    <Grid Background="Black"/>
+                                    <Image Source="/Root_AOP01_Inspection;component/Resource/Right.PNG"/>
                                 </ScrollViewer>
                             </GroupBox>
                             <GroupBox Grid.Column="3" Header="Bottom">
                                 <ScrollViewer>
-                                    <Grid Background="Black"/>
+                                    <Image Source="/Root_AOP01_Inspection;component/Resource/bottom_vertical.PNG"/>
                                 </ScrollViewer>
                             </GroupBox>
                         </Grid>
@@ -240,7 +240,7 @@
                                 <GroupBox Grid.Row="0" Grid.Column="1" Header="Defect Image"
                                   Background="{StaticResource GroupBoxBackground}">
                                     <Grid Background="Black">
-
+                                        <Image Source="/Root_AOP01_Inspection;component/Resource/Defect.PNG" />
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="1" Grid.Column="1" Header="Insepction Info"

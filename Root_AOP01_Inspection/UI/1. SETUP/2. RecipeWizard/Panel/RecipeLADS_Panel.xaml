@@ -36,8 +36,26 @@
                         </Grid.ColumnDefinitions>
 
                         <Grid Grid.Column="0">
-                            <GroupBox Grid.Column="0" Header="LADS">
-                                <Grid Background="Black"/>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1.5*"/>
+                                <RowDefinition Height="6*"/>
+                                <RowDefinition Height="2.5*"/>
+                            </Grid.RowDefinitions>
+                            <GroupBox Grid.Row="0" Header="LADS Live">
+                                <Grid Background="Black" Margin="5">
+                                    <Grid Height="3" VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                                          Background="Crimson"/>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Grid.Row="1" Header="LADS Map">
+                                <Grid Background="White" Margin="5">
+                                    <Image Source="/Root_AOP01_Inspection;component/Resource/LADSMAP.PNG" Margin="100,10" Stretch="Fill"/>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Grid.Row="2" Header="2D Graph">
+                                <Grid Background="Black" Margin="5">
+                                    <Image Source="/Root_AOP01_Inspection;component/Resource/ChartEBR.PNG" Stretch="Fill"/>
+                                </Grid>
                             </GroupBox>
                         </Grid>
                         <GridSplitter Grid.Column="1" 
@@ -56,9 +74,7 @@
                                     <RowDefinition Height="2*"/>
                                     <RowDefinition Height="1*"/>
                                     <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="2*"/>
-                                    <RowDefinition Height="2*"/>
-                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="6*"/>
                                 </Grid.RowDefinitions>
                                 <GroupBox Grid.Row="0" Header="Option">
                                     <Grid Margin="5">
@@ -120,8 +136,7 @@
                             <Grid Grid.Column="1">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="2*"/>
-                                    <RowDefinition Height="2*"/>
-                                    <RowDefinition Height="6*"/>
+                                    <RowDefinition Height="8*"/>
                                 </Grid.RowDefinitions>
                                 <GroupBox Header="Pellicle Expanding" Grid.Row="0">
                                     <Grid Margin="5">
@@ -141,9 +156,6 @@
                                         <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="1" />
                                         <TextBlock FontSize="12" Text="0" Style="{StaticResource BasicTb}" Grid.Column="1" Grid.Row="2" />
                                     </Grid>
-                                </GroupBox>
-                                <GroupBox Grid.Row="1"  Header="Graph" Background="{StaticResource GroupBoxBackground}">
-                                    <Image Source="/Root_AOP01_Inspection;component/Resource/ChartEBR.PNG" Margin="5"/>
                                 </GroupBox>
                                 <GroupBox Grid.Row="2"  Header="Insepction Info" Background="{StaticResource GroupBoxBackground}">
                                     <DataGrid IsReadOnly="True">
@@ -183,6 +195,31 @@
                                         <local:Dummy a="22" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
                                         <local:Dummy a="23" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
                                         <local:Dummy a="24" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="25" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="26" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="27" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="28" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="29" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="30" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="31" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="32" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="33" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="34" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="35" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="36" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="37" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="38" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="39" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="40" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="41" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="42" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="43" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="44" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="45" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="46" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="47" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="48" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
+                                        <local:Dummy a="49" b="8978, 3305" c="2.4mm" d="56" e="0x000000"/>
                                     </DataGrid>
                                 </GroupBox>
                             </Grid>

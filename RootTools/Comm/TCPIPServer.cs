@@ -94,7 +94,7 @@ namespace RootTools.Comm
                 }
             }
 
-            int m_nBufRecieve = 1024 * 1024;
+            int m_nBufReceive = 1024 * 1024;
             byte[] m_aReadBuff = null;
             void CallBack_Receive(IAsyncResult ar)
             {
@@ -118,18 +118,18 @@ namespace RootTools.Comm
                 }
                 catch (Exception eX)
                 {
-                    m_commLog.Add(CommLog.eType.Info, "Recieve Exception : " + eX.Message);
+                    m_commLog.Add(CommLog.eType.Info, "Receive Exception : " + eX.Message);
                 }
             }
 
             public string p_id { get; set; }
-            public TCPSocket(TCPIPServer server, Socket socket, int nBufRecieve = -1)
+            public TCPSocket(TCPIPServer server, Socket socket, int nBufReceive = -1)
             {
                 p_id = socket.RemoteEndPoint.ToString(); 
                 m_socket = socket;
                 m_commLog = server.m_commLog;
-                m_nBufRecieve = (nBufRecieve > 0) ? nBufRecieve : m_nBufRecieve;
-                if ((m_aReadBuff == null) || (m_aReadBuff.Length != m_nBufRecieve)) m_aReadBuff = new byte[m_nBufRecieve];
+                m_nBufReceive = (nBufReceive > 0) ? nBufReceive : m_nBufReceive;
+                if ((m_aReadBuff == null) || (m_aReadBuff.Length != m_nBufReceive)) m_aReadBuff = new byte[m_nBufReceive];
                 socket.BeginReceive(m_aReadBuff, 0, m_aReadBuff.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
                 m_thread = new Thread(new ThreadStart(RunThread));
                 m_thread.Start();
@@ -205,17 +205,17 @@ namespace RootTools.Comm
 
         public string p_id { get; set; }
         Log m_log;
-        int m_nBufRecieve = 1024 * 1024;
+        int m_nBufReceive = 1024 * 1024;
         public TreeRoot m_treeRoot;
         Socket m_socket = null;
         public CommLog m_commLog;
 
-        public TCPIPServer(string id, Log log, int nBufRecieve = -1)
+        public TCPIPServer(string id, Log log, int nBufReceive = -1)
         {
             p_id = id;
             m_log = log;
             m_commLog = new CommLog(this, log); 
-            m_nBufRecieve = (nBufRecieve > 0) ? nBufRecieve : m_nBufRecieve;
+            m_nBufReceive = (nBufReceive > 0) ? nBufReceive : m_nBufReceive;
 
             m_treeRoot = new TreeRoot(id, log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;

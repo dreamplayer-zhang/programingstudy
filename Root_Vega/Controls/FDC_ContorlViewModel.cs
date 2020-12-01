@@ -74,6 +74,7 @@ namespace Root_Vega
 		private List<FDC_ControlViewModel> m_CVM;
 		private int[] m_SlaveList;
         public readonly IDialogService m_DialogService;
+		DispatcherTimer m_timer = new DispatcherTimer();
 
 		public List<FDC_ControlViewModel> m_CVMDeleteList = new List<FDC_ControlViewModel>();
 		public bool bDeleteState = false;
@@ -81,7 +82,11 @@ namespace Root_Vega
         public CVM_Manager(IDialogService DialogService)
         {
             m_DialogService = DialogService;
-        }
+
+			m_timer.Interval = TimeSpan.FromMilliseconds(500);
+			m_timer.Tick += new EventHandler(timer_Tick);
+			m_timer.Start();
+		}
 
         public void Add_CVM()
         {
@@ -137,8 +142,12 @@ namespace Root_Vega
                 }
             }
         }
+
 		public Root_Vega.Module.FDC m_FDC;
         Registry m_reg;
+
+
+
 		public void Loaded()
 		{ 
             m_reg = new Registry("TK4S");
@@ -159,10 +168,23 @@ namespace Root_Vega
 				//m_CVM[index].p_LowerValue = m_reg.Read(Member.GetName(() => m_CVM[index].p_LowerValue), (double)0);
 				//m_CVM[index].p_UpperValue = m_reg.Read(Member.GetName(() => m_CVM[index].p_UpperValue), (double)0);
 			}
+                                    
 			m_SlaveList = SlaveList();
         }
 
-        public void ModifyRegistry()
+		private void timer_Tick(object sender, EventArgs e)//check
+		{
+			int CVM_Counter = m_FDC.p_lData;
+			if (m_CVM != null)
+			{
+				for (int index = 0; index < CVM_Counter; index++)
+				{
+					m_CVM[index].p_CurrentValue = m_FDC.m_aData[index].p_fValue;
+				}
+			}
+		}
+
+		public void ModifyRegistry()
         {
             m_reg = new Registry("TK4S");
             int CVM_Counter = m_CVM.Count;

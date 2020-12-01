@@ -10,9 +10,25 @@ using System.Windows.Media;
 
 namespace Root_Vega
 {
-    public class Vega_Handler : IHandler
+    public class Vega_Handler : ObservableObject,IHandler
     {
         #region UI Binding
+        public FDC p_FDC
+        {
+            get { return m_FDC; }
+            set
+            {
+                SetProperty(ref m_FDC, value);
+            }
+        }
+        public FFU p_FFU
+        {
+            get { return m_FFU; }
+            set
+            {
+                SetProperty(ref m_FFU, value);
+            }
+        }
         public Brush p_brushHandler 
         {  
             get { return Brushes.MediumAquamarine; } 
@@ -55,9 +71,9 @@ namespace Root_Vega
             InitModule(m_patternVision);
             m_FDC = new FDC("FDC", m_engineer);
             InitModule(m_FDC);
-            m_FFU = new FFU("FFU", m_engineer);
-            InitModule(m_FFU); 
-            m_robot.AddChild(m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision);
+			m_FFU = new FFU("FFU", m_engineer);
+			InitModule(m_FFU);
+			m_robot.AddChild(m_aLoadport[0], m_aLoadport[1], m_sideVision, m_patternVision);
             m_robot.ReadInfoReticle_Registry();
             m_recipe = new Vega_Recipe("Recipe", m_engineer);
             m_recipe.AddModule(m_sideVision, m_patternVision, m_robot);

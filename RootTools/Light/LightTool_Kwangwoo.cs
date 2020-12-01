@@ -78,14 +78,14 @@ namespace RootTools.Light
                 return "";
             }
 
-            private void M_rs232_OnRecieve(string sRead)
+            private void M_rs232_OnReceive(string sRead)
             {
-                m_lightTool.p_sInfo = Recieve(sRead);
+                m_lightTool.p_sInfo = Receive(sRead);
                 if (m_lightTool.p_sInfo == "OK") p_fGetPower = p_fSetPower;
                 else m_lightTool.m_log.Warn(m_sSend + " -> " + sRead);
             }
 
-            string Recieve(string sRead)
+            string Receive(string sRead)
             {
                 switch (m_lightTool.m_eType)
                 {
@@ -93,7 +93,7 @@ namespace RootTools.Light
                     case eType.Power4:
                         if (sRead.Length != m_sSend.Length) return "Invalid Protocol Length";
                         sRead = sRead.Replace('R', 'W');
-                        if (sRead != m_sSend) return "Invalid Protocol Recieve";
+                        if (sRead != m_sSend) return "Invalid Protocol Receive";
                         break; 
                 }
                 return "OK"; 
@@ -113,7 +113,7 @@ namespace RootTools.Light
                 m_lightTool = lightTool; 
                 p_rs232 = lightTool.p_rs232;
                 Init(id + "." + nCh.ToString("00"), nCh);
-                p_rs232.OnRecieve += M_rs232_OnRecieve;
+                p_rs232.OnReceive += M_rs232_OnReceive;
             }
 
             string m_sAddress = "00";

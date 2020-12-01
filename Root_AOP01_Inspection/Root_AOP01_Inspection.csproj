@@ -408,7 +408,29 @@
     <Resource Include="Control\Icon\Resource\save_127px.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resource\bottom.PNG" />
+    <Resource Include="Resource\Left.PNG" />
+    <Resource Include="Resource\Right.PNG" />
+    <Resource Include="Resource\top.PNG" />
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="Resource\ChartEBR.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\bottom_vertical.PNG" />
+    <Resource Include="Resource\top_vertical.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\Defect.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\ReticleMap2.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\ReticlDefect.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\LADSMAP.PNG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

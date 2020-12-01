@@ -198,7 +198,7 @@
                               Cursor="Hand">
                     <GroupBox.Header>
                         <Grid>
-                            <TextBlock Text="Run" FontSize="35"
+                            <TextBlock Text="Operation" FontSize="35"
                                    FontWeight="Bold"/>
                         </Grid>
                     </GroupBox.Header>
@@ -212,7 +212,7 @@
                             <Image Source="/Root_AOP01_Inspection;component/Control/Icon/Resource/play_127px.png" Margin="70,80,70,110"/>
                         </Grid>
                         <Grid Grid.Row="1">
-                            <TextBlock Text="Start"
+                            <TextBlock Text="Operation Mode"
                                        Style="{StaticResource BasicTb}"
                                        Margin="0"
                                        FontSize="45"

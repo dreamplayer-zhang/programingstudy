@@ -175,14 +175,14 @@
 
                     <TextBlock Grid.Row="0" Grid.Column="0"
                  TextWrapping="Wrap" Text="Port" Style="{StaticResource PortProperty}" />
-                    <ComboBox  Grid.Row="0" Grid.Column="2"
+                    <ComboBox  SelectedItem="{Binding p_SelectedPort}" Grid.Row="0" Grid.Column="2"
                         Height="28"  
 					ItemsSource="{Binding p_PortCollection, Mode=TwoWay}"    
 					SelectedIndex="{Binding p_IndexPort, Mode=TwoWay}" />
 
                     <TextBlock  Grid.Row="1" Grid.Column="0"
                           TextWrapping="Wrap" Text="BaudRate" Style="{StaticResource PortProperty}"  />
-                    <ComboBox Grid.Row="1"  Grid.Column="2"
+                    <ComboBox SelectedItem="{Binding p_SelectedBaudrate}" Grid.Row="1"  Grid.Column="2"
                        Height="28"  
                               ItemsSource="{Binding p_BaudrateCollection}"
 					SelectedIndex="{Binding p_IndexBaudrate, Mode=TwoWay}"   >
@@ -190,21 +190,21 @@
                     </ComboBox>
                     <TextBlock Grid.Row="2" Grid.Column="0" 
                                TextWrapping="Wrap" Text="Parity" Style="{StaticResource PortProperty}" />
-                    <ComboBox Grid.Row="2" Grid.Column="2"  Height="28" 
+                    <ComboBox SelectedItem="{Binding p_SelectedParity}" Grid.Row="2" Grid.Column="2"  Height="28" 
                               ItemsSource="{Binding  p_ParityCollection}"
 					SelectedIndex="{Binding p_IndexParity, Mode=TwoWay}"  >
 
                     </ComboBox>
-                    <TextBlock Grid.Row="3" Grid.Column="0"
+                    <!--<TextBlock Grid.Row="3" Grid.Column="0"
                                     TextWrapping="Wrap" Text="DataBits" Style="{StaticResource PortProperty}"  />
                     <ComboBox Grid.Row="3" Grid.Column="2"  Height="28"
                               ItemsSource="{Binding  p_DataBitsCollection}"
 					SelectedIndex="{Binding p_IndexDataBits, Mode=TwoWay}" >
-                    </ComboBox>
+                    </ComboBox>-->
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" 
+                    <TextBlock Grid.Row="3" Grid.Column="0" 
                                TextWrapping="Wrap" Text="StopBits" Style="{StaticResource PortProperty}"  />
-                    <ComboBox Grid.Row="4" Grid.Column="2"  Height="28" 
+                    <ComboBox SelectedItem="{Binding p_SelectedStopBits}" Grid.Row="3" Grid.Column="2"  Height="28" 
                               ItemsSource="{Binding   p_StopBitsCollection}"
 					SelectedIndex="{Binding p_IndexStopBits, Mode=TwoWay}"  >
 

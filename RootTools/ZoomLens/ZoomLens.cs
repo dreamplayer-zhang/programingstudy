@@ -57,10 +57,10 @@ namespace RootTools.ZoomLens
             m_log = log;
 
             m_rs232 = new RS232(id, m_log);
-            m_rs232.OnRecieve += M_rs232_OnRecieve;
+            m_rs232.OnReceive += M_rs232_OnReceive;
         }
 
-        private void M_rs232_OnRecieve(string sRead)
+        private void M_rs232_OnReceive(string sRead)
         {
             // 반환값이 있는 명령에 대한 처리
             switch (eLastCommand)

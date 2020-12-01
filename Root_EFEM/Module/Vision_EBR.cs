@@ -51,6 +51,16 @@ namespace Root_EFEM.Module
         }
         #endregion
 
+        #region InfoWafer UI
+        InfoWaferChild_UI m_ui;
+        void InitInfoWaferUI()
+        {
+            m_ui = new InfoWaferChild_UI();
+            m_ui.Init(this);
+            m_aTool.Add(m_ui);
+        }
+        #endregion
+
         #region IWTRChild
         bool _bLock = false;
         public bool p_bLock
@@ -163,6 +173,7 @@ namespace Root_EFEM.Module
         {
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
+            InitInfoWaferUI(); 
         }
 
         public override void ThreadStop()

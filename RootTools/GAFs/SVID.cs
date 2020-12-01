@@ -44,7 +44,7 @@ namespace RootTools.GAFs
         dynamic _value;
         public dynamic p_value
         {
-            get { return (_value != null) ? _value : ""; }
+            get { return _value; }
             set
             {
                 if (_value == value) return;

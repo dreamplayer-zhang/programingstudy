@@ -107,7 +107,8 @@
                                 </ListView>
                                 <Image Grid.Column="1"
 									   Width="100"
-									   Height="100"/>
+									   Height="100"
+                                       Source="{Binding p_bmpFeatureSrc}"/>
                             </Grid>
                             <Button Content="Start Drawing Reference"
 									Style="{StaticResource BasicBtn}"
@@ -117,8 +118,9 @@
 									Style="{StaticResource BasicBtn}"
 									Command="{Binding SaveReferenceFeatureCommand}"
 									Margin="0,0,0,10" />
-                            <Button Content="Delete Feature"
+                            <Button Content="Delete Reference Feature"
 									Style="{StaticResource BasicBtn}"
+                                    Command="{Binding DeleteReferenceFeatureCommand}"
 									Margin="0,0,0,10" />
                             <UniformGrid Columns="2" Margin="0,0,0,10">
                                 <TextBlock Text="Search Area Size"
@@ -184,62 +186,6 @@
                                 <ListView ItemsSource="{Binding p_PatternAlignList}"
 										  Height="100"
 										  Background="#FF1B1B1C"
-										  SelectedItem="{Binding SelectedFeature}">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding Name}"
-													   Foreground="White"
-													   FontWeight="Bold"
-													   FontSize="13" />
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
-                                <Image Grid.Column="1"
-									   Width="100"
-									   Height="100"/>
-                            </Grid>
-                            <Button Content="Start Drawing Align"
-									Style="{StaticResource BasicBtn}"
-									Command="{Binding ChangeToolForAlign}"
-									Margin="0,0,0,10" />
-                            <Button Content="Save Feature"
-									Style="{StaticResource BasicBtn}"
-									Command="{Binding SaveAlignFeatureCommand}"
-									Margin="0,0,0,10" />
-                            <Button Content="Delete Feature"
-									Style="{StaticResource BasicBtn}"
-									Margin="0,0,0,10" />
-                            <Button Content="Find Align Feature Point"
-									Style="{StaticResource BasicBtn}"
-									Margin="0,0,0,10" 
-                                    Command="{Binding FindAlignFeatureCommand}"/>
-                            <UniformGrid Columns="2" Margin="0,0,0,10">
-                                <TextBlock Text="Search Area Size"
-										   Style="{StaticResource BasicTb}"/>
-                                <TextBox Text="{Binding SelectedFeature.FeatureFindArea}"
-										 Style="{StaticResource BasicTbox}"/>
-                            </UniformGrid>
-                            <UniformGrid Columns="2" Margin="0,0,0,10">
-                                <TextBlock Text="Target Score"
-										   Style="{StaticResource BasicTb}"/>
-                                <TextBox Text="{Binding SelectedFeature.FeatureTargetScore}"
-										 Style="{StaticResource BasicTbox}"/>
-                            </UniformGrid>
-                        </StackPanel>
-                    </Expander>
-                    <Expander Header="Align Parameters"
-							  Margin="0,0,0,10"
-							  Visibility="Collapsed"
-							  Foreground="White">
-                        <StackPanel>
-                            <Grid Margin="0,0,0,10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <ListView ItemsSource="{Binding p_PatternAlignList}"
-										  Height="100"
-										  Background="#FF1B1B1C"
 										  SelectedItem="{Binding SelectedAlign}">
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
@@ -252,31 +198,21 @@
                                 </ListView>
                                 <Image Grid.Column="1"
 									   Width="100"
-									   Height="100"/>
+									   Height="100"
+                                       Source="{Binding p_bmpAlignSrc}"/>
                             </Grid>
-                            <Button Content="Start Align Reference"
+                            <Button Content="Start Drawing Align"
 									Style="{StaticResource BasicBtn}"
 									Command="{Binding ChangeToolForAlign}"
 									Margin="0,0,0,10" />
-                            <Button Content="Save Align Feature"
+                            <Button Content="Save Feature"
 									Style="{StaticResource BasicBtn}"
-									Command="{Binding SaveAlignCommand}"
+									Command="{Binding SaveAlignFeatureCommand}"
 									Margin="0,0,0,10" />
                             <Button Content="Delete Align Feature"
 									Style="{StaticResource BasicBtn}"
+                                    Command="{Binding DeleteAlignFeatureCommand}"
 									Margin="0,0,0,10" />
-                            <UniformGrid Columns="2" Margin="0,0,0,10">
-                                <TextBlock Text="Snap Count"
-										   Style="{StaticResource BasicTb}"/>
-                                <TextBox Text="{Binding SelectedROI.Position.AlignSnapCount}"
-										 Style="{StaticResource BasicTbox}"/>
-                            </UniformGrid>
-                            <UniformGrid Columns="2" Margin="0,0,0,10">
-                                <TextBlock Text="Align Scan Position"
-										   Style="{StaticResource BasicTb}"/>
-                                <TextBox Text="{Binding SelectedROI.Position.AlignPositionIndex}"
-										 Style="{StaticResource BasicTbox}"/>
-                            </UniformGrid>
                             <UniformGrid Columns="2" Margin="0,0,0,10">
                                 <TextBlock Text="Search Area Size"
 										   Style="{StaticResource BasicTb}"/>
