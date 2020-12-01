@@ -1121,36 +1121,36 @@ namespace Root_Vega.Module
                                     CRect crtOverlapedRect = m_mvvm.GetOverlapedRect(crtCurrentArea, roiCurrent.Origin.OriginRect);
                                     if ((crtOverlapedRect.Width > 0) && (crtOverlapedRect.Height > 0))
                                     {
-                                        // 3. Overlap된 Rect영역을 검사 쓰레드로 던져라
-                                        if (m_mvvm._dispatcher != null)
-                                        {
-                                            m_mvvm._dispatcher.Invoke(new Action(delegate ()
-                                            {
-                                                // UI
-                                                var temp = new UIElementInfo(new Point(crtOverlapedRect.Left, crtOverlapedRect.Top), new Point(crtOverlapedRect.Right, crtOverlapedRect.Bottom));
-                                                System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-                                                rect.Width = crtOverlapedRect.Width;
-                                                rect.Height = crtOverlapedRect.Height;
-                                                System.Windows.Controls.Canvas.SetLeft(rect, crtOverlapedRect.Left);
-                                                System.Windows.Controls.Canvas.SetTop(rect, crtOverlapedRect.Top);
-                                                rect.StrokeThickness = 3;
-                                                rect.Stroke = MBrushes.Orange;
+                                        //// 3. Overlap된 Rect영역을 검사 쓰레드로 던져라
+                                        //if (m_mvvm._dispatcher != null)
+                                        //{
+                                        //    m_mvvm._dispatcher.Invoke(new Action(delegate ()
+                                        //    {
+                                        //        // UI
+                                        //        var temp = new UIElementInfo(new Point(crtOverlapedRect.Left, crtOverlapedRect.Top), new Point(crtOverlapedRect.Right, crtOverlapedRect.Bottom));
+                                        //        System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+                                        //        rect.Width = crtOverlapedRect.Width;
+                                        //        rect.Height = crtOverlapedRect.Height;
+                                        //        System.Windows.Controls.Canvas.SetLeft(rect, crtOverlapedRect.Left);
+                                        //        System.Windows.Controls.Canvas.SetTop(rect, crtOverlapedRect.Top);
+                                        //        rect.StrokeThickness = 3;
+                                        //        rect.Stroke = MBrushes.Orange;
 
-                                                m_mvvm.p_RefFeatureDrawer.m_ListShape.Add(rect);
-                                                m_mvvm.p_RefFeatureDrawer.m_Element.Add(rect);
-                                                m_mvvm.p_RefFeatureDrawer.m_ListRect.Add(temp);
+                                        //        m_mvvm.p_RefFeatureDrawer.m_ListShape.Add(rect);
+                                        //        m_mvvm.p_RefFeatureDrawer.m_Element.Add(rect);
+                                        //        m_mvvm.p_RefFeatureDrawer.m_ListRect.Add(temp);
 
-                                                m_mvvm.p_ImageViewer.SetRoiRect();
-                                            }));
-                                        }
-                                        // MiniViewer Update
-                                        if (m_mvm._dispatcher != null)
-                                        {
-                                            m_mvm._dispatcher.Invoke(new Action(delegate ()
-                                            {
-                                                m_mvm.TestFunction();
-                                            }));
-                                        }
+                                        //        m_mvvm.p_ImageViewer.SetRoiRect();
+                                        //    }));
+                                        //}
+                                        //// MiniViewer Update
+                                        //if (m_mvm._dispatcher != null)
+                                        //{
+                                        //    m_mvm._dispatcher.Invoke(new Action(delegate ()
+                                        //    {
+                                        //        m_mvm.TestFunction();
+                                        //    }));
+                                        //}
 
                                         int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 
