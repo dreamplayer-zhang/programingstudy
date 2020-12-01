@@ -22,7 +22,7 @@ namespace Root
         public ReadExcel m_readExcel; 
         void InitModule()
         {
-            m_moduleList = new ModuleList(m_enginner);
+            m_moduleList = new ModuleList(m_engineer);
             //m_test = new Test("Test", m_enginner);
             //InitModule(m_test);
             //m_scarecrow =new ScareCrow("ScareCrow", m_enginner);
@@ -35,9 +35,9 @@ namespace Root
             //InitModule(m_acs);
             //m_testMars = new TestMars("TestMars", m_enginner);
             //InitModule(m_testMars);
-            m_testRepeat = new TestRepeat("TestRepeat", m_enginner);
+            m_testRepeat = new TestRepeat("TestRepeat", m_engineer);
             InitModule(m_testRepeat);
-            m_readExcel = new ReadExcel("ReadExcel", m_enginner);
+            m_readExcel = new ReadExcel("ReadExcel", m_engineer);
             InitModule(m_readExcel);
         }
 
@@ -141,14 +141,15 @@ namespace Root
         #endregion
 
         string m_id;
-        public Root_Engineer m_enginner;
+        public Root_Engineer m_engineer;
         GAF m_gaf; 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_enginner = (Root_Engineer)engineer;
+            m_engineer = (Root_Engineer)engineer;
             m_gaf = engineer.ClassGAF(); 
-            InitModule(); 
+            InitModule();
+            m_engineer.ClassMemoryTool().InitThreadProcess();
         }
 
         public void ThreadStop()

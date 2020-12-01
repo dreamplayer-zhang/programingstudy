@@ -359,6 +359,7 @@ namespace Root_EFEM
             m_gem = engineer.ClassGem();
             InitModule();
             InitThread();
+            m_engineer.ClassMemoryTool().InitThreadProcess();
         }
 
         public void ThreadStop()

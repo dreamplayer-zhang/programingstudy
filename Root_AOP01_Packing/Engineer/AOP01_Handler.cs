@@ -203,6 +203,7 @@ namespace Root_AOP01_Packing
             m_gem = engineer.ClassGem();
             InitModule();
             InitThread();
+            m_engineer.ClassMemoryTool().InitThreadProcess();
         }
 
         public void ThreadStop()

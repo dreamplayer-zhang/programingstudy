@@ -77,6 +77,7 @@ namespace RootTools.Memory
         {
             MemoryPool memoryPool = new MemoryPool(sPool, this, fGB);
             p_aPool.Add(memoryPool);
+            MemoryChanged(); 
             MemoryPoolChanged();
             return memoryPool;
         }
@@ -161,7 +162,7 @@ namespace RootTools.Memory
 
         public void NotifyMemoryChange()
         {
-            if (m_bStartProcess == false) m_reg.Write("Time", c_sBusy);
+            if (m_bThreadProcess == false) m_reg.Write("Time", c_sBusy);
             else
             {
                 m_sUpdateTime = DateTime.Now.ToString();
@@ -198,7 +199,10 @@ namespace RootTools.Memory
                     try
                     {
                         Process[] aProcess = Process.GetProcessesByName(m_idProcess);
-                        if (aProcess.Length == 0) Process.Start(m_sProcessFile);
+                        if (aProcess.Length == 0)
+                        {
+                            Process.Start(m_sProcessFile);
+                        }
                     }
                     catch (Exception e) { p_sInfo = p_id + " StartProcess Error : " + e.Message; }
                 }
