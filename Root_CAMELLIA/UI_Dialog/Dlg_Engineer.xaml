@@ -18,6 +18,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="260"/>
         </Grid.RowDefinitions>
         <!--Title Bar-->
@@ -58,12 +59,10 @@
                         VerticalAlignment="Bottom">
                     <Path Style="{StaticResource CloseIconKey}" />
                 </Button>
-                <Button Content="test"
-                        Click="Button_Click"
-                        />
             </StackPanel>
         </Grid>
-        <TabControl Grid.Row="1">
+        
+        <TabControl Grid.Row="2">
             <TabItem Header="Handler" Width="100">
                 <Grid>
                     <local:Camellia_Engineer_UI x:Name="EngineerUI"/>
@@ -166,8 +165,8 @@
                                                 <RowDefinition/>
                                             </Grid.RowDefinitions>
                                             <Button Content="Wafer Centering" Margin="5" Grid.Row="0"/>
-                                            <Button Content="Init Calibration" Margin="5" Grid.Row="1"/>
-                                            <Button Content="Measure Background" Margin="5" Grid.Row="2"/>
+                                            <Button Content="Init Calibration : Calibration(initcal:true)" Margin="5" Grid.Row="1"/>
+                                            <Button Content="Measure Background : Calibration(initcal:False)" Margin="5" Grid.Row="2"/>
                                             <Button Content="Measure Sample" Margin="5" Grid.Row="3"/>
                                             <Button Content="Repeat Measurement" Margin="5" Grid.Row="4"/>
                                         </Grid>

@@ -48,7 +48,6 @@ namespace Root_CAMELLIA.Module
             AddModuleRunList(new Run_Calibration(this), false, "Calibration");
             AddModuleRunList(new Run_WaferCentering(this), false, "Centering");
             AddModuleRunList(new Run_Measure(this), false, "Measurement");
-
         }
 
         protected override void RunThread()
@@ -100,6 +99,7 @@ namespace Root_CAMELLIA.Module
         }
 
 
+        
         public class Run_Delay : ModuleRunBase
         {
             Module_Camellia m_module;
@@ -219,19 +219,10 @@ namespace Root_CAMELLIA.Module
             {
                 AxisXY axisXY = m_module.m_axisXY;
                 RPoint MovePoint;
-                if (m_InitialCal)
-                {
-                    MovePoint = new RPoint(m_CalWaferCenterPos_pulse);
-                }
-                else
-                {
-                    MovePoint = new RPoint(m_RefWaferCenterPos_pulse);
-                }
-                if(m_module.Run(axisXY.StartMove(MovePoint)))
-                    return p_sInfo;
-                if(m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
-                m_NanoView.Calibration(m_BGIntTime_VIS,m_BGIntTime_NIR,m_Average_VIS,m_Average_NIR, m_InitialCal);
+                //m_InitalCal은 지금은 무조건 false로 쓰니깐 하드코딩해놓고 보류...
+                //centring 하면서 Cal은 동시에 진행해도 됨
+                //calibration : 지금 위치에서 그냥 바로 cal 시작
+                m_NanoView.Calibration(m_BGIntTime_VIS, m_BGIntTime_NIR, m_Average_VIS, m_Average_NIR, false); //m_InitialCal);
                 return "OK";
             }
         }
