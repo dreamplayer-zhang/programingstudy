@@ -156,13 +156,17 @@ namespace RootTools.Memory
             }
             KillInspectProcess();
             RunTreeRun(Tree.eMode.Init);
-            m_sUpdateTime = DateTime.Now.ToString(); 
-            m_reg.Write("Time", m_sUpdateTime);
+            NotifyMemoryChange(); 
         }
 
-        public void MemoryChanging()
+        public void NotifyMemoryChange()
         {
-            m_reg.Write("Time", c_sBusy);
+            if (m_bStartProcess == false) m_reg.Write("Time", c_sBusy);
+            else
+            {
+                m_sUpdateTime = DateTime.Now.ToString();
+                m_reg.Write("Time", m_sUpdateTime);
+            }
         }
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
@@ -175,15 +179,16 @@ namespace RootTools.Memory
         #region MemoryProcess
         bool m_bThreadProcess = false;
         Thread m_threadProcess = null;
-        void InitThreadProcess()
+        public void InitThreadProcess()
         {
+            m_bThreadProcess = true;
             m_threadProcess = new Thread(new ThreadStart(RunThreadProcess));
             m_threadProcess.Start();
+            NotifyMemoryChange(); 
         }
 
         void RunThreadProcess()
         {
-            m_bThreadProcess = true;
             Thread.Sleep(1000);
             while (m_bThreadProcess)
             {
@@ -293,12 +298,11 @@ namespace RootTools.Memory
             m_bMaster = bMaster; 
             m_log = LogView.GetLog(id);
             m_reg = new Registry("MemoryTool", "MemoryTools");
-            if (bMaster) m_reg.Write("Time", c_sBusy);
+            if (bMaster) NotifyMemoryChange(); 
             m_treeRootRun = new TreeRoot(id, m_log);
             m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
             RunTreeRun(Tree.eMode.RegRead);
             KillInspectProcess();
-            InitThreadProcess();
             if (bMaster == false) InitTimer(); 
         }
 
