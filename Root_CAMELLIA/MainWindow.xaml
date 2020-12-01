@@ -120,7 +120,7 @@
             <StackPanel Grid.Column="4"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">
-                <Button Content="Setting" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Click="Button_Click"/>
+                <Button Content="Setting" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdSetting}"/>
                 <Button Content="Exit" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdExit}"/>
                 <Border Width="60" Margin="5" BorderBrush="#FF707070" BorderThickness="1">
                     <Grid Opacity="0.8">
@@ -509,20 +509,32 @@
                             </Grid>
                         </GroupBox>
                         <Viewbox Margin="3" Grid.Row="1">
-                            <ItemsControl
+                            <ItemsControl ItemsSource="{Binding RecipeViewModel.p_DrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
                                         <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
                                         </Canvas>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </Viewbox>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                        <Viewbox Margin="3" Grid.Row="1">
+                            <ItemsControl ItemsSource="{Binding RecipeViewModel.p_DrawPointElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
                     </Grid>
                 </GroupBox>
-        </Grid>
+            </Grid>
             <TabControl Grid.Column="2" Background="Transparent">
                 <TabItem Header="Review" Width="100">
                     <Grid Grid.Column="2">

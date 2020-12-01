@@ -1,0 +1,18 @@
+[
+  {
+    "Id": "521152",
+    "ThreadId": "234484",
+    "Html": "\r\n<p>Hello,</p>\r\n<p>I'm added the DropDownCustomColorPicker project to my solution, and everything seems to work fine except the color Preview. &nbsp;When you select a color, it remains blank..</p>\r\n<p>&nbsp;</p>\r\n<p>Thanks!</p>\r\n<p>Jenna</p>\r\n",
+    "PostedDate": "2010-11-12T08:31:07.857-08:00",
+    "UserRole": null,
+    "MarkedAsAnswerDate": null
+  },
+  {
+    "Id": "680729",
+    "ThreadId": "234484",
+    "Html": "<p>Any idea of setting the color value to the color picker.</p>\r\n<p>For example i want to set the color Red as default selected color and&nbsp; i tried this code</p>\r\n<p>&nbsp;&nbsp; colorBack.SelectedColor = System.Windows.Media.Colors.Red;</p>\r\n<p>but is not working.When the page loads it seems that White color is selected as&nbsp; default</p>\r\n<p>Thanks</p>\r\n<p>Jibin</p>",
+    "PostedDate": "2011-10-06T04:02:16.693-07:00",
+    "UserRole": null,
+    "MarkedAsAnswerDate": null
+  }
+]
