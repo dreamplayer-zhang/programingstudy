@@ -317,7 +317,7 @@ namespace RootTools.Camera.Dalsa
             m_nLine = nLine;
             m_bInvY = bInvY;
             m_yInvOffset = yInvOffset;
-            int nGrabCount = (int)Math.Ceiling(1.0 * nLine / p_sz.Y);
+            int nGrabCount = (int)(1.0 * nLine / p_sz.Y);
             m_sapBuf.Index = 0;
             m_sapXfer.Snap(nGrabCount);
             m_log.Info("m_sapXfer.Snap = " + nGrabCount.ToString());
