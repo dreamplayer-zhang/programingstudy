@@ -230,7 +230,7 @@ namespace RootTools.Camera.Dalsa
                 return;
             }
             
-            SapLocation loc = new SapLocation(p_CamInfo.p_sServer, 1);
+            SapLocation loc = new SapLocation(p_CamInfo.p_sServer, 0);
             SapManager.GetServerName(loc);
 
             int aa = SapManager.GetResourceCount(p_CamInfo.p_sServer, SapManager.ResourceType.Acq);
@@ -682,7 +682,6 @@ namespace RootTools.Camera.Dalsa
         {
             Camera_Dalsa cam = args.Context as Camera_Dalsa;
                 cam.m_nGrabTrigger++;
-            System.Diagnostics.Debug.WriteLine("ttt : " + cam.m_nGrabTrigger);
         }
         #endregion
 
