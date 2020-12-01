@@ -11,13 +11,12 @@ using System.Windows;
 using RootTools;
 using RootTools.Database;
 using RootTools_CLR;
-using RootTools_Vision.Temp_Recipe;
-using RootTools_Vision.UserTypes;
 
 namespace RootTools_Vision
 {
     public class D2D : WorkBase
     {
+        #region [Member variables]
         WorkplaceBundle workplaceBundle;
         Workplace workplace;
 
@@ -25,9 +24,20 @@ namespace RootTools_Vision
 
         public override WORK_TYPE Type => WORK_TYPE.MAINWORK;
 
+        // D2D Recipe & Parameter
+        private D2DParameter parameter;
+        private D2DRecipe recipe;
+        #endregion
+
         public D2D() : base()
         {
             m_sName = this.GetType().Name;
+        }
+
+        public override void SetRecipe(Recipe _recipe)
+        {
+            this.parameter = _recipe.GetRecipe<D2DParameter>();
+            this.recipe = _recipe.GetRecipe<D2DRecipe>();
         }
 
         public override bool DoPrework()
@@ -183,14 +193,6 @@ namespace RootTools_Vision
             GoldenImage = new byte[this.workplace.BufferSizeX * this.workplace.BufferSizeY];
         }
 
-        public override void SetData(IRecipeData _recipeData, IParameterData _parameterData)
-        {
-
-            RecipeData recipe = _recipeData as RecipeData;
-            Parameter parameter = _parameterData as Parameter;
-            //throw new NotImplementedException();
-        }
-
         public override WorkBase Clone()
         {
             return (WorkBase)this.MemberwiseClone();
@@ -202,5 +204,7 @@ namespace RootTools_Vision
             this.workplaceBundle = _workplaceBundle;
             return;
         }
+
+
     }
 }

@@ -67,29 +67,28 @@ namespace Root_WIND2
         private InspectionMode inspectionMode = InspectionMode.FRONT;
         public InspectionMode p_InspectionMode { get => inspectionMode; set => inspectionMode = value; }
 
-		public byte[] WaferMapInfo = new byte[14 * 14];
+		public int[] mapdata = new int[14 * 14];
 
         public void CreateInspecion_Backside()
         {
-            //RecipeInfo_MapData mapInfo = m_Recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
-            RecipeInfo_MapData recipeInfo = recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
-            WaferMapInfo mapInfo = new WaferMapInfo(recipeInfo.m_WaferMap.nMapSizeX, recipeInfo.m_WaferMap.nMapSizeY, recipeInfo.m_WaferMap.pWaferMap, recipeInfo.m_WaferMap.ListWaferMap);
+            //RecipeType_WaferMap mapInfo = m_Recipe.GetRecipeInfo(typeof(RecipeType_WaferMap)) as RecipeType_WaferMap;
+            RecipeType_WaferMap waferMap = recipe.WaferMap;
 
             WorkBundle works = new WorkBundle();
 
             Surface surface = new Surface();
-            surface.SetData(recipe.GetRecipeData(), recipe.GetParameter());
+            surface.SetRecipe(recipe);
 
             works.Add(surface);
 
             ProcessDefect processDefect = new ProcessDefect();
             works.Add(processDefect);
 
-            WorkplaceBundle workplaces = WorkplaceBundle.CreateWaferMap(mapInfo, this.recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin);            
+            WorkplaceBundle workplaces = WorkplaceBundle.CreateWaferMap(waferMap, this.recipe.GetRecipe<OriginRecipe>());            
             workplaces.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
 
             ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-            processDefect_Wafer.SetData(recipe.GetRecipeData(), recipe.GetParameter());
+            processDefect_Wafer.SetRecipe(recipe);
             processDefect_Wafer.SetWorkplaceBundle(workplaces);
             works.Add(processDefect_Wafer);
 
@@ -101,51 +100,44 @@ namespace Root_WIND2
 
         public void CreateInspecion(/*WaferMapInfo*/)
         {
-            RecipeInfo_MapData TEST = recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
+            RecipeType_WaferMap waferMap = recipe.WaferMap;
 
-            if (TEST.m_WaferMap == null)
+            if (waferMap == null)
             {
                 MessageBox.Show("Map 정보가 없습니다.");
                 return;
             }
            
-            int InspectionNumber = 0;
-            int nMapSize = 14;
-
-            WaferMapInfo mapInfo = new WaferMapInfo(TEST.m_WaferMap.nMapSizeX, TEST.m_WaferMap.nMapSizeY, TEST.m_WaferMap.pWaferMap);
             WorkBundle works = new WorkBundle();
             Position position = new Position();
-            Position_Chip position_chip = new Position_Chip();
-            ParamData_Position param = recipe.GetParameter(typeof(ParamData_Position)) as ParamData_Position;
-            param.SearchRangeX = 100;
-            param.SearchRangeY = 100;
-            param.MinScoreLimit = 60;
+            position.SetRecipe(recipe);
+            PositionParameter positionParam = recipe.GetRecipe<PositionParameter>();
+            positionParam.SearchRangeX = 100;
+            positionParam.SearchRangeY = 100;
+            positionParam.MinScoreLimit = 60;
 
-            position.SetData(recipe.GetRecipeData(), recipe.GetParameter());
-            position_chip.SetData(recipe.GetRecipeData(), recipe.GetParameter());
+            position.SetRecipe(recipe);
 
-
-            WorkplaceBundle workplaces = WorkplaceBundle.CreateWaferMap(mapInfo, this.recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin);
+            WorkplaceBundle workplaces = WorkplaceBundle.CreateWaferMap(waferMap, this.recipe.GetRecipe<OriginRecipe>());
 
             Surface surface = new Surface();
-            surface.SetData(recipe.GetRecipeData(), recipe.GetParameter());
+            surface.SetRecipe(recipe);
             surface.SetWorkplaceBundle(workplaces);
 
             D2D d2d = new D2D();
-            d2d.SetData(recipe.GetRecipeData(), recipe.GetParameter());
+            d2d.SetRecipe(recipe);
             d2d.SetWorkplaceBundle(workplaces);
-            d2d.SetData(recipe.GetRecipeData(), recipe.GetParameter());
+
             works.Add(position);
-            works.Add(position_chip);
-            works.Add(surface);
-            works.Add(d2d);
+            //works.Add(surface);
+            //works.Add(d2d);
 
             ProcessDefect processDefect = new ProcessDefect();
             works.Add(processDefect);
             workplaces.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
 
             ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-            processDefect_Wafer.SetData(recipe.GetRecipeData(), recipe.GetParameter());
+            processDefect_Wafer.SetRecipe(recipe);
             processDefect_Wafer.SetWorkplaceBundle(workplaces);
             works.Add(processDefect_Wafer);
 
@@ -168,7 +160,7 @@ namespace Root_WIND2
 
         public new void Start()
         {
-            if (this.Recipe == null)
+            if (this.Recipe == null && this.Recipe.WaferMap == null)
                 return;
 
             string lotId = "Lotid";
@@ -177,7 +169,7 @@ namespace Root_WIND2
             string cstId = "CSTid";
             string waferId = "WaferID";
             //string sRecipe = "RecipeID";
-            string recipeName = recipe.m_RecipeInfo.m_RecipeName;
+            string recipeName = recipe.Name;
 
             DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
 

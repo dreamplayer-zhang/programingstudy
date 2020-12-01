@@ -123,100 +123,46 @@ namespace Root_WIND2
         private Run_ViewModel m_RunViewModel;
         #endregion
 
-        public WIND2_Engineer m_engineer = new WIND2_Engineer();
-        MemoryTool m_memoryTool;
-        public ImageData m_Image;
-        public ImageData m_ROILayer;
+
         public IDialogService dialogService;
-        string sPool = "pool";
-        string sGroup = "group";
-        string sMem = "mem";
-        string sMemROI = "ROI";
-        public int MemWidth = 40000;
-        public int MemHeight = 40000;
-        public int ROIWidth = 30000;
-        public int ROIHeight = 30000; 
 
-        public RecipeManager m_RecipeMGR;
-        Recipe m_Recipe;
-        RecipeInfo m_RecipeInfo;
-        RecipeEditor m_RecipeEditor;
-
-        InspectionManager_Vision inspMgrVision;
-        InspectionManager_EFEM inspMgrEFEM;
-
-        // DelegateLoadRecipe(object e)
-        //{
-        //    m_setupviewmodel.loadRecie(recipe);
-        //}
+        private ProgramManager program;
 
         void Init()
         {
             dialogService = new DialogService(this);
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
 
-            m_engineer.Init("WIND2");
-            m_memoryTool = m_engineer.ClassMemoryTool();
-            m_Image = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMem)); // Main ImageData
-            m_ROILayer = new ImageData(m_memoryTool.GetMemory(sPool, sGroup, sMemROI)); // 4ch ROI BimtapLayer로 사용할 ImageData
+            if(ProgramManager.Instance.Initialize() == false)
+            {
+                MessageBox.Show("Program Initialization fail");
+                return;
+            }
 
-            // Recipe Manager
-            m_RecipeMGR = new RecipeManager();
-            //m_RecipeMGR.DelegateLoadRecipe +=
-            m_Recipe = m_RecipeMGR.GetRecipe();
-            m_RecipeEditor = m_Recipe.GetRecipeEditor();
-            m_RecipeInfo = m_Recipe.GetRecipeInfo();
+            ProgramManager.Instance.DialogService = this.dialogService;
 
-            // Inspection Manager
-            inspMgrVision = new InspectionManager_Vision(m_Image.GetPtr(), m_Image.p_Size.X, m_Image.p_Size.Y);
-            inspMgrVision.Recipe = m_Recipe;
-            m_engineer.InspectionMgrVision = inspMgrVision;
 
-            ImageData edgeImage = m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeTop);
-            inspMgrEFEM = new InspectionManager_EFEM(edgeImage.GetPtr(), edgeImage.p_Size.X, edgeImage.p_Size.Y, 3);
-            inspMgrEFEM.Recipe = m_Recipe;
-            m_engineer.InspectionMgrEFEM = inspMgrEFEM;
+            if(UIManager.Instance.Initialize(ProgramManager.Instance) == false)
+            {
+                MessageBox.Show("UI Initialization fail");
+                return;
+            }
+
+            // WPF 파라매터 연결
+            UIManager.Instance.MainPanel = this.MainPanel;
+
+            UIManager.Instance.ChangUIMode();
 
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1);
             //////
 
-            InitModeSelect();
             InitTimer();
-            InitSetupMode();
-            InitReviewMode();
-            InitRunMode();
         }
 
-        void InitModeSelect()
-        {
-            ModeUI = new SelectMode();
-            ModeUI.Init(this);
-            MainPanel.Children.Clear();
-            MainPanel.Children.Add(ModeUI);
-        }
-        void InitSetupMode()
-        {
-            Setup = new Setup();
-            m_SetupViewModel = new Setup_ViewModel(this, m_Recipe, inspMgrVision, inspMgrEFEM);
-            Setup.DataContext = m_SetupViewModel;
-        }
-        void InitReviewMode()
-        {
-            Review = new Review();
-            m_ReviewViewModel = new Review_ViewModel(this, Review);
-            Review.DataContext = m_ReviewViewModel;
-        }
-        void InitRunMode()
-        {
-            Run = new Run();
-            m_RunViewModel = new Run_ViewModel(this);
-            Run.DataContext = m_RunViewModel;
-        }
-        
         void ThreadStop()
         {
-            m_engineer.ThreadStop();
+            this.program.Engineer.ThreadStop();
         }
     }
 }

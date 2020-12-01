@@ -11,8 +11,6 @@ using System.Windows;
 using RootTools;
 using RootTools.Database;
 using RootTools_CLR;
-using RootTools_Vision.Temp_Recipe;
-using RootTools_Vision.UserTypes;
 
 namespace RootTools_Vision
 {
@@ -22,11 +20,20 @@ namespace RootTools_Vision
 
         public override WORK_TYPE Type => WORK_TYPE.MAINWORK;
 
+
+        private SurfaceParameter parameter;
+        private SurfaceRecipe recipe;
+
         public Surface() : base()
         {
             m_sName = this.GetType().Name;
         }
 
+        public override void SetRecipe(Recipe _recipe)
+        {
+            this.parameter = _recipe.GetRecipe<SurfaceParameter>();
+            this.recipe = _recipe.GetRecipe<SurfaceRecipe>();
+        }
 
         public override void DoWork()
         {
@@ -162,13 +169,6 @@ namespace RootTools_Vision
             //}
         }
 
-        public override void SetData(IRecipeData _recipeData, IParameterData _parameterData)
-        {
-           
-            RecipeData recipe = _recipeData as RecipeData;
-            Parameter parameter = _parameterData as Parameter;
-            //throw new NotImplementedException();
-        }
 
         public override WorkBase Clone()
         {
@@ -179,5 +179,7 @@ namespace RootTools_Vision
         {
             return;
         }
+
+
     }
 }

@@ -23,14 +23,14 @@ namespace RootTools.Camera.Dalsa
         {
             get
             {
-                return m_nGrabProgress;        
+                return m_nGrabProgress;
             }
             set
             {
                 SetProperty(ref m_nGrabProgress, value);
             }
         }
-        
+
 
         string _sInfo = "";
         public string p_sInfo
@@ -95,7 +95,7 @@ namespace RootTools.Camera.Dalsa
                 _nBuf = (value > c_nBuf) ? c_nBuf : value;
             }
         }
-        int m_nGrabTrigger=0;
+        int m_nGrabTrigger = 0;
         #endregion
 
         #region UI
@@ -181,6 +181,8 @@ namespace RootTools.Camera.Dalsa
         {
             p_CamInfo.p_sServer = tree.Set(p_CamInfo.p_sServer, "Dalsa", "Server", "Cam Server Name");
             p_CamInfo.p_sFile = tree.SetFile(p_CamInfo.p_sFile, p_CamInfo.p_sFile, "ccf", "CamFile", "Cam File");
+            p_CamInfo.p_nResourceCnt = tree.Set(p_CamInfo.p_nResourceCnt, p_CamInfo.p_nResourceCnt, "Resource Count", "Resource Count");
+
             //p_CamInfo._DeviceUserID = tree.Set(p_CamInfo._DeviceUserID, "Basler", "ID", "Device User ID");
             //m_nGrabTimeout = tree.Set(m_nGrabTimeout, 2000, "Timeout", "Grab Timeout (ms)");
         }
@@ -229,8 +231,8 @@ namespace RootTools.Camera.Dalsa
                 p_sInfo = p_id + "Empty Config File Name";
                 return;
             }
-            
-            SapLocation loc = new SapLocation(p_CamInfo.p_sServer, 1);
+
+            SapLocation loc = new SapLocation(p_CamInfo.p_sServer, p_CamInfo.p_nResourceCnt);
             SapManager.GetServerName(loc);
 
             int aa = SapManager.GetResourceCount(p_CamInfo.p_sServer, SapManager.ResourceType.Acq);
@@ -248,15 +250,10 @@ namespace RootTools.Camera.Dalsa
 
                 SapFormat bufformat = m_sapAcq.XferParams.Format;
 
-                if(bufformat>0)
+                if (bufformat > 0)
                     m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq.XferParams.Width, m_sapAcq.XferParams.Height, bufformat, SapBuffer.MemoryType.ScatterGather);
-                else //gray의 bufformat이 뭔지..
-                m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq, SapBuffer.MemoryType.ScatterGather);
-
-                //if (bufformat != SapFormat.RGB8888) //buf format 확인할 수 있는지 확인 필요 아니면 param으로 설정해줘야됨
-                //    m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq, SapBuffer.MemoryType.ScatterGather);
-                //else
-                //    m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq.XferParams.Width, m_sapAcq.XferParams.Height, bufformat, SapBuffer.MemoryType.ScatterGather);
+                else 
+                    m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq, SapBuffer.MemoryType.ScatterGather);
 
                 m_sapXfer = new SapAcqToBuf(m_sapAcq, m_sapBuf);
             }
@@ -272,7 +269,7 @@ namespace RootTools.Camera.Dalsa
             m_sapXfer.XferNotify += new SapXferNotifyHandler(xfer_XferNotify);
             m_sapXfer.XferNotifyContext = this;
 
-            if ( m_sapDevice != null && !m_sapDevice.Create())
+            if (m_sapDevice != null && !m_sapDevice.Create())
             {
                 p_sInfo = DestroysObjects(p_id + "Error during SapDevice creation");
                 return;
@@ -309,14 +306,14 @@ namespace RootTools.Camera.Dalsa
                 m_sapXfer.Dispose();
                 m_sapXfer = null;
             }
-          
+
             if (m_sapBuf != null)
             {
                 m_sapBuf.Destroy();
                 m_sapBuf.Dispose();
                 m_sapBuf = null;
             }
-            if(m_sapDevice != null)
+            if (m_sapDevice != null)
             {
                 m_sapDevice.Destroy();
                 m_sapDevice.Dispose();
@@ -362,8 +359,8 @@ namespace RootTools.Camera.Dalsa
         }
 
         public int GetGrabProgress()
-        {  
-            return Convert.ToInt32((double)m_nGrabTrigger*100/m_nGrabCount);
+        {
+            return Convert.ToInt32((double)m_nGrabTrigger * 100 / m_nGrabCount);
         }
 
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReverseOffsetY = 0)
@@ -378,17 +375,17 @@ namespace RootTools.Camera.Dalsa
                 p_sInfo = p_id + " State not Ready : " + p_CamInfo.p_eState.ToString();
                 return;
             }
-            if (memory.p_nByte != 1)
-            {
-                p_sInfo = p_id + " MemoryData Byte not 1";
-                return;
-            }
+            //if (memory.p_nByte != 1)
+            //{
+            //    p_sInfo = p_id + " MemoryData Byte not 1";
+            //    return;
+            //}
 
             p_CamParam.p_eDir = bInvY ? DalsaParameterSet.eDir.Reverse : DalsaParameterSet.eDir.Forward;
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
-            
-            if(m_sapBuf.BytesPerPixel >1)
+
+            if (m_sapBuf.BytesPerPixel > 1)
             {
                 m_RedMemPtr = m_Memory.GetPtr(0);
                 m_GreenMemPtr = m_Memory.GetPtr(1);
@@ -402,14 +399,14 @@ namespace RootTools.Camera.Dalsa
             m_pSapBuf = new IntPtr[p_nBuf];
             for (int n = 0; n < p_nBuf; n++)
                 m_sapBuf.GetAddress(n, out m_pSapBuf[n]);
-        
+
             //m_iBlock = -1;
             m_sapBuf.Index = (int)(0);
             m_nGrabTrigger = 0;
             m_sapXfer.Snap((int)(m_nGrabCount));
             p_CamInfo.p_eState = eCamState.GrabMem;
             if (m_sapBuf.BytesPerPixel == 1)
-            m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
+                m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
             else
                 m_GrabThread = new Thread(new ThreadStart(RunGrabLineColorScanThread));
 
@@ -431,7 +428,7 @@ namespace RootTools.Camera.Dalsa
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
             m_RedMemPtr = m_Memory.GetPtr(0);
-            m_GreenMemPtr = m_Memory.GetPtr(1); 
+            m_GreenMemPtr = m_Memory.GetPtr(1);
             m_BlueMemPtr = m_Memory.GetPtr(2);
 
             m_cpScanOffset = cpScanOffset;
@@ -461,44 +458,43 @@ namespace RootTools.Camera.Dalsa
             int lY = m_nGrabCount * Convert.ToInt32(p_CamParam.p_Height);
             int iBlock = 0;
             int nByteCnt = m_sapBuf.BytesPerPixel;
-                while (iBlock < m_nGrabCount)
+            while (iBlock < m_nGrabCount)
+            {
+                if (iBlock < m_nGrabTrigger)
                 {
-                    if (iBlock < m_nGrabTrigger)
-                    {
-                        IntPtr ipSrc = m_pSapBuf[(iBlock) % p_nBuf];
+                    IntPtr ipSrc = m_pSapBuf[(iBlock) % p_nBuf];
                     Parallel.For(0, p_CamParam.p_Height, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
                         {
-                          int yp;
+                            int yp;
 
-                          if (p_CamParam.p_eDir == DalsaParameterSet.eDir.Reverse)
-                              yp = lY - (y + (iBlock) * p_CamParam.p_Height) + m_nInverseYOffset;
-                          else
-                              yp = y + (iBlock) * p_CamParam.p_Height;
+                            if (p_CamParam.p_eDir == DalsaParameterSet.eDir.Reverse)
+                                yp = lY - (y + (iBlock) * p_CamParam.p_Height) + m_nInverseYOffset;
+                            else
+                                yp = y + (iBlock) * p_CamParam.p_Height;
 
 
-                          IntPtr srcPtr = ipSrc + p_CamParam.p_Width * y * nByteCnt;
+                            IntPtr srcPtr = ipSrc + p_CamParam.p_Width * y * nByteCnt;
                             IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
                             Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
                         });
-                        iBlock++;
+                    iBlock++;
 
-                        m_LastROI.Left = m_cpScanOffset.X;
-                        m_LastROI.Right = m_cpScanOffset.X + p_CamParam.p_Width;
-                        m_LastROI.Top = m_cpScanOffset.Y;
-                        m_LastROI.Bottom = m_cpScanOffset.Y + p_CamParam.p_Height;
-                        GrabEvent();
+                    m_LastROI.Left = m_cpScanOffset.X;
+                    m_LastROI.Right = m_cpScanOffset.X + p_CamParam.p_Width;
+                    m_LastROI.Top = m_cpScanOffset.Y;
+                    m_LastROI.Bottom = m_cpScanOffset.Y + p_CamParam.p_Height;
+                    GrabEvent();
 
-                        if (m_nGrabCount != 0)
-                            p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
-                    }
+                    if (m_nGrabCount != 0)
+                        p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
-            p_CamInfo.p_eState = eCamState.Ready;
             }
+            p_CamInfo.p_eState = eCamState.Ready;
+        }
 
         unsafe void RunGrabLineColorScanThread()
-            {
+        {
             StopWatch swGrab = new StopWatch();
-            swGrab.Start();
             int DelayGrab = 1000 * m_nGrabCount;
 
             if (m_sapBuf == null)
@@ -510,36 +506,33 @@ namespace RootTools.Camera.Dalsa
             int nScanOffsetY = m_cpScanOffset.Y;
             int nCamWidth = p_CamParam.p_Width;
             int nCamHeight = p_CamParam.p_Height;
-            int nBufSize = nCamHeight * nCamWidth; 
+            int nBufSize = nCamHeight * nCamWidth;
             long nMemWidth = m_Memory.W;
 
-                while (iBlock < m_nGrabCount)
+            while (iBlock < m_nGrabCount)
+            {
+                if (iBlock < m_nGrabTrigger)
                 {
-                    if (iBlock < m_nGrabTrigger)
-                    {
-                        IntPtr ipSrc = m_pSapBuf[(iBlock) % p_nBuf];
+                    IntPtr ipSrc = m_pSapBuf[iBlock % p_nBuf];
                     Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
                     {
-                        int yp = y + (iBlock) * nCamHeight + nScanOffsetY;
+                        int yp = y + iBlock * nCamHeight + nScanOffsetY;
                         long n = nScanOffsetX + yp * nMemWidth;
                         IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt;
                         IntPtr RedPtr = (IntPtr)((long)m_RedMemPtr + n);
                         IntPtr GreenPtr = (IntPtr)((long)m_GreenMemPtr + n);
                         IntPtr BluePtr = (IntPtr)((long)m_BlueMemPtr + n);
 
-                        if(m_sapBuf.Format == SapFormat.RGB8888)
+                        if (m_sapBuf.Format == SapFormat.RGB8888)
                         {
                             byte* pRed = (byte*)RedPtr.ToPointer();
                             byte* pGreen = (byte*)GreenPtr.ToPointer();
                             byte* pBlue = (byte*)BluePtr.ToPointer();
                             int* pSrc = (int*)srcPtr.ToPointer();
 
-                            //Int32* pSrc = (Int32*)srcPtr.ToPointer();
-
                             byte R = 0x00, G = 0x00, B = 0x00;
                             for (int i = 0; i < nCamWidth; i++)
                             {
-                                //Int32 utmp = pSrc[i];
                                 int utmp = pSrc[i];
 
                                 B = (byte)((utmp) & 0xff);
@@ -554,26 +547,25 @@ namespace RootTools.Camera.Dalsa
                         else if (m_sapBuf.Format == SapFormat.RGBP8)
                         {
                             Buffer.MemoryCopy((void*)srcPtr, (void*)RedPtr, nCamWidth, nCamWidth);
-                            Buffer.MemoryCopy((void*)(srcPtr+ nBufSize), (void*)GreenPtr, nCamWidth, nCamWidth);
-                            Buffer.MemoryCopy((void*)(srcPtr+ nBufSize * 2), (void*)BluePtr, nCamWidth, nCamWidth);
+                            Buffer.MemoryCopy((void*)(srcPtr + nBufSize), (void*)GreenPtr, nCamWidth, nCamWidth);
+                            Buffer.MemoryCopy((void*)(srcPtr + nBufSize * 2), (void*)BluePtr, nCamWidth, nCamWidth);
                         }
-                        });
-                        iBlock++;
+                    });
+                    iBlock++;
 
                     m_LastROI.Left = nScanOffsetX;
                     m_LastROI.Right = nScanOffsetX + nCamWidth;
                     m_LastROI.Top = nScanOffsetY;
                     m_LastROI.Bottom = nScanOffsetX + nCamHeight;
-                        GrabEvent();
+                    GrabEvent();
 
-                        if (m_nGrabCount != 0)
-                            p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
-                    }
+                    if (m_nGrabCount != 0)
+                        p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
-            swGrab.Stop();
-            Console.WriteLine(swGrab.Elapsed.ToString());
+            }
             p_CamInfo.p_eState = eCamState.Ready;
         }
+
         //unsafe void RunGrabLineScanThread()
         //{
         //    StopWatch swGrab = new StopWatch();
@@ -681,7 +673,7 @@ namespace RootTools.Camera.Dalsa
         static void xfer_XferNotify(object sender, SapXferNotifyEventArgs args)
         {
             Camera_Dalsa cam = args.Context as Camera_Dalsa;
-                cam.m_nGrabTrigger++;
+            cam.m_nGrabTrigger++;
             System.Diagnostics.Debug.WriteLine("ttt : " + cam.m_nGrabTrigger);
         }
         #endregion
@@ -751,7 +743,7 @@ namespace RootTools.Camera.Dalsa
             }
 
         }
-         
+
 
         #endregion
     }
@@ -767,7 +759,7 @@ namespace RootTools.Camera.Dalsa
         {
             eCamState state = (eCamState)value;
             switch (state)
-            { 
+            {
                 case eCamState.Init:
                     return false;
                 default:

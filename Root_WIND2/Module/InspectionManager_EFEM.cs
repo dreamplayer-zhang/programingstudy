@@ -56,11 +56,11 @@ namespace Root_WIND2
 			workplaces.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
 
 			EdgeSurface edgeSurface = new EdgeSurface();
-			edgeSurface.SetData(recipe.GetRecipeData(), recipe.GetParameter());
+			edgeSurface.SetRecipe(this.recipe);
 			edgeSurface.SetWorkplaceBundle(workplaces);
 
 			ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
-			processDefect_Wafer.SetData(recipe.GetRecipeData(), recipe.GetParameter());
+			processDefect_Wafer.SetRecipe(this.recipe);
 			processDefect_Wafer.SetWorkplaceBundle(workplaces);
 			//ProcessDefect processDefect = new ProcessDefect();
 			//processDefect.SetData(recipe.GetRecipeData(), recipe.GetParameter());
@@ -84,7 +84,7 @@ namespace Root_WIND2
 			string cstId = "CSTid";
 			string waferId = "WaferID";
 			//string sRecipe = "RecipeID";
-			string recipeName = recipe.m_RecipeInfo.m_RecipeName;
+			string recipeName = recipe.Name;
 
 			DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
 

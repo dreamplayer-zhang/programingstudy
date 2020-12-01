@@ -1,5 +1,4 @@
-﻿using RootTools_Vision.UserTypes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,8 +17,9 @@ namespace RootTools_Vision
         Workplace workplace;
         WorkplaceBundle workplaceBundle;
 
-        RecipeData recipeData;
-        RecipeData_Origin recipeData_Origin;
+
+        Recipe recipe;
+        BacksideRecipe recipeBackside;
 
         public ProcessDefect_Wafer()
         {
@@ -30,6 +30,12 @@ namespace RootTools_Vision
         public override void DoWork()
         {
             DoProcessDefect_Wafer();
+        }
+
+        public override void SetRecipe(Recipe _recipe)
+        {
+            this.recipe = _recipe;
+            this.recipeBackside = _recipe.GetRecipe<BacksideRecipe>();
         }
 
         public override void SetWorkplace(Workplace _workplace)
@@ -52,9 +58,9 @@ namespace RootTools_Vision
             int backsideOffset = 50;
             bool isBackside = false;
             // Recipe
-            int waferCenterX = recipeData_Origin.Backside_CenterX;
-            int waferCenterY = recipeData_Origin.Backside_CenterY;
-            int radius = recipeData_Origin.Backside_Radius;
+            int waferCenterX = recipeBackside.CenterX;
+            int waferCenterY = recipeBackside.CenterY;
+            int radius = recipeBackside.Radius;
 
             // 구조는 나중에 생각해봅시다...
             List<Defect> DefectList = CollectDefectData();
@@ -98,15 +104,6 @@ namespace RootTools_Vision
             }
 
             WorkEventManager.OnInspectionDone(displayDefect, new InspectionDoneEventArgs(new List<CRect>(), true));
-        }
-
-        public override void SetData(IRecipeData _recipeData, IParameterData _parameterData)
-        {
-            m_sName = this.GetType().Name;
-            this.recipeData = _recipeData as RecipeData;
-            this.recipeData_Origin = recipeData.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
-
-            //throw new NotImplementedException();
         }
 
         public override WorkBase Clone()
@@ -257,5 +254,7 @@ namespace RootTools_Vision
                     );
             }
         }
+
+
     }
 }

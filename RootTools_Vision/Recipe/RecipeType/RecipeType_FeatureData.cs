@@ -13,14 +13,15 @@ namespace RootTools_Vision
     {
 
         Bitmap featureBitmap;
-        byte[] rawData;
+        byte[] rawData = new byte[0];
         int positionX;
         int positionY;
         int centerPositionX;
         int centerPositionY;
-        int featureWidth;
-        int featureHeight;
+        int width;
+        int height;
         int byteCnt;
+        string fileName = string.Empty;
 
         [XmlIgnore] public Bitmap FeatureBitmap { get => featureBitmap; set => featureBitmap = value; }
         [XmlIgnore] public byte[] RawData { get => rawData; set => rawData = value; }
@@ -28,21 +29,25 @@ namespace RootTools_Vision
         public int PositionY { get => positionY; set => positionY = value; }
         public int CenterPositionX { get => centerPositionX; set => centerPositionX = value; }
         public int CenterPositionY { get => centerPositionY; set => centerPositionY = value; }
-        public int FeatureWidth { get => featureWidth; set => featureWidth = value; }
-        public int FeatureHeight { get => featureHeight; set => featureHeight = value; }
+        public int Width { get => width; set => width = value; }
+        public int Height { get => height; set => height = value; }
         public int ByteCnt { get => byteCnt; set => byteCnt = value; }
+        public string FileName { get => this.fileName; set => this.fileName = value; }
         public RecipeType_FeatureData()
         {
+            this.FileName = string.Empty;
         }
-        public RecipeType_FeatureData(int positionX, int positionY, int featureWidth, int featureHeight, int byteCnt)
+        public RecipeType_FeatureData(int positionX, int positionY, int featureWidth, int featureHeight, int byteCnt, byte[] rawData)
         {
             this.positionX = positionX;
             this.positionY = positionY;
-            this.featureWidth = featureWidth;
-            this.featureHeight = featureHeight;
+            this.width = featureWidth;
+            this.height = featureHeight;
             this.byteCnt = byteCnt;
             this.centerPositionX = positionX + featureWidth / 2;
             this.centerPositionY = positionY + featureHeight / 2;
+            this.rawData = rawData;
+            this.FileName = string.Empty;
         }
 
         public void SetRawData(byte[] rawData)
@@ -56,16 +61,20 @@ namespace RootTools_Vision
             this.RawData = rawData;
         }
 
-
-        public RecipeType_FeatureData(int positionX, int positionY, int featureWidth, int featureHeight, byte[] rawData)
+        public bool Save(string recipeFolderPath)
         {
-            this.rawData = rawData;
-            this.positionX = positionX;
-            this.positionY = positionY;
-            this.featureWidth = featureWidth;
-            this.featureHeight = featureHeight;
-            this.centerPositionX = positionX + featureWidth/2;
-            this.centerPositionY = positionY + featureHeight/2;
+            return Tools.SaveRawdataToBitmap(recipeFolderPath + this.FileName , RawData, Width, Height, ByteCnt);
+        }
+
+        public bool Read(string recipeFolderPath)
+        {
+            //this.rawData = new byte[this.featureWidth * this.featureHeight * this.byteCnt];
+            return Tools.LoadBitmapToRawdata(recipeFolderPath + this.FileName, ref this.rawData, ref this.width, ref this.height, ref this.byteCnt);
+        }
+
+        public Bitmap GetFeatureBitmap()
+        {
+            return Tools.CovertArrayToBitmap(this.rawData, this.width, this.height, this.byteCnt);
         }
     }
 }

@@ -53,7 +53,18 @@ namespace RootTools.Camera.Dalsa
                 SetValueProperty(ref _sFile, value);
             }
         }
-       
+        int _nResourceCnt = 0;
+        public int p_nResourceCnt
+        {
+            get
+            {
+                return _nResourceCnt;
+            }
+            set
+            {
+                SetValueProperty(ref _nResourceCnt, value);
+            }
+        }
 
         public DalseCamInfo(Log log)
         {

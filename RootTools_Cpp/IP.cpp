@@ -416,7 +416,7 @@ std::vector<Point> IP::FindWaferEdge(BYTE* pSrc, float& inoutCenterX, float& ino
     return contours[largest_contour_index];
 }
 
-std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOriginX, float& outOriginY, float& outChipSzX, float& outChipSzY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode)
+std::vector<int> IP::GenerateMapData(std::vector<Point> vtContour, float& outOriginX, float& outOriginY, float& outChipSzX, float& outChipSzY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode)
 {
     Mat GridMapMask = Mat(nH / downScale, nW / downScale, CV_8UC1);
     GridMapMask = Scalar(0);
@@ -442,8 +442,8 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOr
     outChipSzX = nChipSzX * downScale;
     outChipSzY = nChipSzY * downScale;
 
-    std::vector<byte> pMapData;// ; [nMapX * nMapY] ;
-    std::vector<byte> pMapData_Trans;
+    std::vector<int> pMapData;// ; [nMapX * nMapY] ;
+    std::vector<int> pMapData_Trans;
 
     bool isOrigin = true;
     for (int c = 0; c < mapX; c++) {
@@ -482,7 +482,7 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOr
     return pMapData_Trans;
 }
 
-std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float&outOriginX, float&outOriginY, int &outMapX, int &outMapY, int nW, int nH, int downScale, bool isIncludeMode)
+std::vector<int> IP::GenerateMapData(std::vector<Point> vtContour, float&outOriginX, float&outOriginY, int &outMapX, int &outMapY, int nW, int nH, int downScale, bool isIncludeMode)
 {
     Mat GridMapMask = Mat(nH / downScale, nW / downScale, CV_8UC1);
     GridMapMask = Scalar(0);
@@ -502,8 +502,8 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float&outOri
     outMapX = ceil(bounding_rect.width / nChipSz); // Backside Inspection Size 1000 x 1000
     outMapY = ceil(bounding_rect.height / nChipSz); // 100 * downScale = 1000
    
-    std::vector<byte> pMapData;// ; [nMapX * nMapY] ;
-    std::vector<byte> pMapData_Trans;
+    std::vector<int> pMapData;// ; [nMapX * nMapY] ;
+    std::vector<int> pMapData_Trans;
 
     bool isOrigin = true;
     for (int c = 0; c < mapX; c++) {

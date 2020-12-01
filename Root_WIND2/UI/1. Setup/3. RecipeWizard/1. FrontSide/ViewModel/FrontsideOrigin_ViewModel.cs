@@ -58,11 +58,13 @@ namespace Root_WIND2
 
         public void LoadOriginData()
         {
-            RecipeData_Origin origin = m_Recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
+            OriginRecipe origin = m_Recipe.GetRecipe<OriginRecipe>();
             CPoint ptOrigin = new CPoint(origin.OriginX, origin.OriginY);
             CPoint ptPitchSize = new CPoint(origin.DiePitchX, origin.DiePitchY);
             CPoint ptPadding = new CPoint(origin.InspectionBufferOffsetX, origin.InspectionBufferOffsetY);
             p_OriginTool_VM.LoadOriginData(ptOrigin, ptPitchSize, ptPadding);
+            p_OriginBoxTool_VM.SetRoiRect();
+            //여기서 박스 그리기?
         }
 
 
