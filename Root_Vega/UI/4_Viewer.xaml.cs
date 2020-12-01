@@ -13,28 +13,28 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Root_Vega
 {
-    /// <summary>
-    /// _4_Viewer.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class _4_Viewer : UserControl
-    {
-        public _4_Viewer()
-        {
-            InitializeComponent();
-			//기능 임시 제거
-            //App.m_engineer.m_InspManager.AddChromeDefect += App_AddDefect;
-            //App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
-            //InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
-        }
+	/// <summary>
+	/// _4_Viewer.xaml에 대한 상호 작용 논리
+	/// </summary>
+	public partial class _4_Viewer : UserControl
+	{
+		public Dispatcher _Dispatcher;
+		public _4_Viewer()
+		{
+			InitializeComponent();
+			App.m_engineer.m_InspManager.AddChromeDefect += App_AddDefect;
+			App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
+			InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
+		}
 		~_4_Viewer()
 		{
-			//기능 임시 제거
-			//App.m_engineer.m_InspManager.AddChromeDefect -= App_AddDefect;
-			//App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
-			//InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
+			App.m_engineer.m_InspManager.AddChromeDefect -= App_AddDefect;
+			App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
+			InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
 		}
 		private void InspectionManager_RefreshDefect()
 		{
@@ -62,8 +62,16 @@ namespace Root_Vega
 
 		private void App_AddDefect(RootTools.DefectDataWrapper item)
 		{
+			bool isChrome = false;
+
+			_Dispatcher.Invoke(new Action(delegate ()
+			{
+				var temp = (_4_ViewerViweModel)this.DataContext;
+				isChrome = temp.p_SelectedMemPool.p_id == App.sPatternPool && temp.p_SelectedMemGroup.p_id == App.sPatternGroup && temp.p_SelectedMemData.p_id == App.sPatternmem;
+			}));
+
 			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.Strip) &&
-				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.Chrome)
+				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.Chrome && isChrome)
 			{
 				try
 				{
@@ -80,5 +88,9 @@ namespace Root_Vega
 				}
 			}
 		}
+
+		//private void Button_Click(object sender, RoutedEventArgs e)
+		//{
+		//}
 	}
 }

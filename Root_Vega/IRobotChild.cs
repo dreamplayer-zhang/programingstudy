@@ -22,7 +22,7 @@ namespace Root_Vega
 
         string AfterPut();
 
-        bool IsReticleExist(bool bIgnoreExistSensor = false);
+        bool IsReticleExist();
 
         void RunTeachTree(Tree tree);
 

@@ -249,7 +249,7 @@ namespace Root_Vega.Module
             return IsRunOK();
         }
 
-        public bool IsReticleExist(bool bIgnoreExistSensor = false)
+        public bool IsReticleExist()
         {
             //if (m_infoPod.p_ePresentSensor != GemCarrierBase.ePresent.Exist) return false; //ePresentSensor가 비어있는 상태
             return (m_infoPod.p_infoReticle != null); 
