@@ -42,7 +42,7 @@ namespace Root_WIND2
             BufferInspROI.CollectionChanged += BufferInspROI_CollectionChanged;
             SetBackGroundWorker();
 
-            p_ROILayer = setup.m_MainWindow.m_ROILayer;
+            p_ROILayer = ProgramManager.Instance.ROILayer;
             m_Recipe = recipe;
         }
         public void SetOrigin(object e)

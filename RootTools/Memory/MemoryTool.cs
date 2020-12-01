@@ -77,6 +77,7 @@ namespace RootTools.Memory
         {
             MemoryPool memoryPool = new MemoryPool(sPool, this, fGB);
             p_aPool.Add(memoryPool);
+            MemoryChanged(); 
             MemoryPoolChanged();
             return memoryPool;
         }
@@ -156,13 +157,17 @@ namespace RootTools.Memory
             }
             KillInspectProcess();
             RunTreeRun(Tree.eMode.Init);
-            m_sUpdateTime = DateTime.Now.ToString(); 
-            m_reg.Write("Time", m_sUpdateTime);
+            NotifyMemoryChange(); 
         }
 
-        public void MemoryChanging()
+        public void NotifyMemoryChange()
         {
-            m_reg.Write("Time", c_sBusy);
+            if (m_bThreadProcess == false) m_reg.Write("Time", c_sBusy);
+            else
+            {
+                m_sUpdateTime = DateTime.Now.ToString();
+                m_reg.Write("Time", m_sUpdateTime);
+            }
         }
 
         public MemoryData GetMemory(string sPool, string sGroup, string sMemory)
@@ -175,15 +180,16 @@ namespace RootTools.Memory
         #region MemoryProcess
         bool m_bThreadProcess = false;
         Thread m_threadProcess = null;
-        void InitThreadProcess()
+        public void InitThreadProcess()
         {
+            m_bThreadProcess = true;
             m_threadProcess = new Thread(new ThreadStart(RunThreadProcess));
             m_threadProcess.Start();
+            NotifyMemoryChange(); 
         }
 
         void RunThreadProcess()
         {
-            m_bThreadProcess = true;
             Thread.Sleep(1000);
             while (m_bThreadProcess)
             {
@@ -193,7 +199,10 @@ namespace RootTools.Memory
                     try
                     {
                         Process[] aProcess = Process.GetProcessesByName(m_idProcess);
-                        if (aProcess.Length == 0) Process.Start(m_sProcessFile);
+                        if (aProcess.Length == 0)
+                        {
+                            Process.Start(m_sProcessFile);
+                        }
                     }
                     catch (Exception e) { p_sInfo = p_id + " StartProcess Error : " + e.Message; }
                 }
@@ -262,7 +271,7 @@ namespace RootTools.Memory
             m_treeRootRun.p_eMode = mode;
             RunTreeFile(m_treeRootRun.GetTree("File"));
             if (m_bMaster == false) return; 
-            bool bVisible = (m_engineer.p_user.m_eLevel >= Login.eLevel.Admin); 
+            bool bVisible = true; 
             RunTreeProcess(m_treeRootRun.GetTree("Process"), bVisible);
         }
         #endregion
@@ -293,12 +302,11 @@ namespace RootTools.Memory
             m_bMaster = bMaster; 
             m_log = LogView.GetLog(id);
             m_reg = new Registry("MemoryTool", "MemoryTools");
-            if (bMaster) m_reg.Write("Time", c_sBusy);
+            if (bMaster) NotifyMemoryChange(); 
             m_treeRootRun = new TreeRoot(id, m_log);
             m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
             RunTreeRun(Tree.eMode.RegRead);
             KillInspectProcess();
-            InitThreadProcess();
             if (bMaster == false) InitTimer(); 
         }
 

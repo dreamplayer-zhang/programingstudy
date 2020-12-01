@@ -28,12 +28,12 @@ namespace Root_WIND2
             HandlerUI = new WIND2_Hander_UI();
             ToolBoxUI= new ToolBox_UI();
             ToolViewerTest_VM = new ViewerTest_ViewModel();
-            ToolViewerTest_VM.Init(setup.m_MainWindow.m_engineer.ClassMemoryTool());
+            ToolViewerTest_VM.Init(ProgramManager.Instance.Engineer.ClassMemoryTool());
             ToolViewerTest = new ViewerTest();
             ToolViewerTest.DataContext = ToolViewerTest_VM;
 
-            HandlerUI.Init(setup.m_MainWindow.m_engineer.m_handler);
-            ToolBoxUI.Init(setup.m_MainWindow.m_engineer.ClassToolBox());
+            HandlerUI.Init(ProgramManager.Instance.Engineer.m_handler);
+            ToolBoxUI.Init(ProgramManager.Instance.Engineer.ClassToolBox());
 
             init();
         }

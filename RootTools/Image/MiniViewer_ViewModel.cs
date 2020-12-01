@@ -197,13 +197,23 @@ namespace RootTools
                         }
                         else if (Circle)
                         {
+                            IntPtr ptrMemSide = m_ImageData.GetPtr(1);
+                            IntPtr ptrMemBtm = m_ImageData.GetPtr(2);
                             CPoint center = new CPoint(p_CanvasWidth / 2, p_CanvasHeight / 2);
-                            int nRadius = p_CanvasWidth < p_CanvasHeight ? p_CanvasWidth : p_CanvasHeight;
                             int nLen = 30;
+                            int nRadius = p_CanvasWidth < p_CanvasHeight ? p_CanvasWidth : p_CanvasHeight;
+                            int nRadius2 = nRadius - nLen;
+                            int nRadius3 = nRadius - nLen *2;
+                            
                             double theta = 0;
                             double max = Math.Pow(nRadius / 2, 2);
-                            double min = Math.Pow(nRadius / 2 - nLen, 2);
+                            double min = Math.Pow(nRadius / 2 - nLen/2, 2);
+                            double max2 = Math.Pow(nRadius2 / 2, 2);
+                            double min2 = Math.Pow(nRadius2 / 2 - nLen / 2, 2);
+                            double max3 = Math.Pow(nRadius3 / 2, 2);
+                            double min3 = Math.Pow(nRadius3 / 2 - nLen / 2, 2);
                             double dist = 0;
+                            double offset = 51;
                             for (int yy = 0; yy < p_CanvasHeight; yy++)
                             {
                                 for (int xx = 0; xx < p_CanvasWidth; xx++)
@@ -211,19 +221,48 @@ namespace RootTools
                                     dist = Math.Pow(Math.Abs(center.X - xx), 2) + Math.Pow(Math.Abs(center.Y - yy), 2);
                                     if (dist < max && dist > min)
                                     {
-                                        theta = Math.Atan2(((double)xx - center.X), ((double)center.Y - yy)) * 180 / Math.PI;
+                                        theta = Math.Atan2(((double)xx - center.X), ((double)center.Y - yy)) * 180 / Math.PI +offset;
                                         if (theta < 0)
                                         {
                                             theta = theta + 360;
                                         }
-                                        pix_x = Convert.ToInt32((dist - min) * p_View_Rect.Width / (max - min));
+                                        pix_x = 3000 - Convert.ToInt32((dist - min) * p_View_Rect.Width / (max - min));
                                         pix_y = Convert.ToInt32(theta * p_View_Rect.Height / 360);
+                                        if (pix_y < 500)
+                                            pix_y = 500;
                                         view.Data[yy, xx, 0] = ((byte*)ptrMem)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                     }
-                                    else if (dist < min)
+                                    else if (dist < max2 && dist > min2)
                                     {
-                                        view.Data[yy, xx, 0] = 200;
+                                        theta = Math.Atan2(((double)xx - center.X), ((double)center.Y - yy)) * 180 / Math.PI +45 + offset;
+                                        if (theta < 0)
+                                        {
+                                            theta = theta + 360;
+                                        }
+                                        pix_x = (Convert.ToInt32((dist - min2) * p_View_Rect.Width / (max2 - min2)) * 600) / 3000 + 1200;
+                                        pix_y = Convert.ToInt32(theta * p_View_Rect.Height / 360);
+                                        if (pix_y < 500)
+                                            pix_y = 500;
+                                        view.Data[yy, xx, 0] = ((byte*)ptrMemSide)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
                                     }
+                                    else if (dist < max3 && dist > min3)
+                                    {
+                                        theta = Math.Atan2(((double)xx - center.X), ((double)center.Y - yy)) * 180 / Math.PI + 90 + offset;
+                                        if (theta < 0)
+                                        {
+                                            theta = theta + 360;
+                                        }
+                                        pix_x = Convert.ToInt32((dist - min3) * p_View_Rect.Width / (max3 - min3));
+                                        pix_y = Convert.ToInt32(theta * p_View_Rect.Height / 360);
+                                        if (pix_y < 500)
+                                            pix_y = 500;
+                                        view.Data[yy, xx, 0] = ((byte*)ptrMemBtm)[(long)pix_x + (long)pix_y * p_ImageData.p_Size.X];
+                                    }
+
+                                    //else if (dist < min)
+                                    //{
+                                    //    view.Data[yy, xx, 0] = 200;
+                                    //}
                                 }
                             }
                         }

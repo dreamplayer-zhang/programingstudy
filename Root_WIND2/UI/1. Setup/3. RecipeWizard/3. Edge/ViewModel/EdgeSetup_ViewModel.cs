@@ -35,12 +35,12 @@ namespace Root_WIND2
 		public EdgeSetup_ViewModel(Setup_ViewModel _setup)
 		{
 			setupVM = _setup;
-			engineer = _setup.m_MainWindow.m_engineer;
+			engineer = ProgramManager.Instance.Engineer;
 		}
 
 		public void Init()
 		{
-			DrawToolVM = new DrawTool_ViewModel(setupVM.m_MainWindow.m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeTop), setupVM.m_MainWindow.dialogService);
+			DrawToolVM = new DrawTool_ViewModel();
 		}
 
 		public void Scan()
@@ -84,11 +84,11 @@ namespace Root_WIND2
 		private void ChangeViewer(string dataName)
 		{
 			if (dataName == "Top")
-				DrawToolVM.ChangeImageData(setupVM.m_MainWindow.m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeTop), setupVM.m_MainWindow.dialogService);
+				DrawToolVM.ChangeImageData(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeTop), ProgramManager.Instance.DialogService);
 			else if (dataName == "Side")
-				DrawToolVM.ChangeImageData(setupVM.m_MainWindow.m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeSide), setupVM.m_MainWindow.dialogService);
+				DrawToolVM.ChangeImageData(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeSide), ProgramManager.Instance.DialogService);
 			else if (dataName == "Bottom")
-				DrawToolVM.ChangeImageData(setupVM.m_MainWindow.m_engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.eMemData.EdgeBottom), setupVM.m_MainWindow.dialogService);
+				DrawToolVM.ChangeImageData(ProgramManager.Instance.GetEdgeMemory(EdgeSideVision.EDGE_TYPE.EdgeBottom), ProgramManager.Instance.DialogService);
 		}
 
 		private void ClearDefectData()

@@ -257,6 +257,7 @@ namespace Root_Vega
             m_gem = engineer.ClassGem();
             InitModule();
             InitThread();
+            m_engineer.ClassMemoryTool().InitThreadProcess(); 
         }
 
         public void ThreadStop()

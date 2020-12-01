@@ -28,7 +28,7 @@ namespace Root_WIND2
 
         public void init(Setup_ViewModel setup, Recipe recipe)
         {
-            base.init(setup.m_MainWindow.m_Image, setup.m_MainWindow.dialogService);
+            base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
             p_VisibleMenu = System.Windows.Visibility.Visible;
 
             m_Recipe = recipe;

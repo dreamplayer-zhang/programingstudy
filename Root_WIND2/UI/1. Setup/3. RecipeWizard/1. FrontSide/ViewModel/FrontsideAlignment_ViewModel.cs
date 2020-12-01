@@ -31,23 +31,23 @@ namespace Root_WIND2
         TShape BOX;
         ImageData BoxImage;
 
-        TRect InspArea;
+        TRect InspArea; 
 
         CPoint PointBuffer;
 
         Recipe m_Recipe;
-        RecipeData_Origin m_RecipeData_Origin;
-        RecipeData_Position m_RecipeData_Position;
+        OriginRecipe m_OriginRecipe;
+        PositionRecipe m_PositionRecipe;
 
         public void init(Setup_ViewModel setup, Recipe recipe)
         {
-            base.init(setup.m_MainWindow.m_Image, setup.m_MainWindow.dialogService);
+            base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
             p_VisibleMenu = System.Windows.Visibility.Visible;
 
             m_Recipe = recipe;
-            m_RecipeData_Origin = recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin; ;
-            m_RecipeData_Position = recipe.GetRecipeData(typeof(RecipeData_Position)) as RecipeData_Position;
-            p_Origin = new CPoint(m_RecipeData_Origin.OriginX, m_RecipeData_Origin.OriginY);
+            m_OriginRecipe = recipe.GetRecipe<OriginRecipe>();
+            m_PositionRecipe = recipe.GetRecipe<PositionRecipe>();
+            p_Origin = new CPoint(m_OriginRecipe.OriginX, m_OriginRecipe.OriginY);
             CheckEmpty();
         }
 
@@ -81,15 +81,15 @@ namespace Root_WIND2
             get
             {
                 SetRoiRect();
-                m_Origin = new CPoint(m_RecipeData_Origin.OriginX, m_RecipeData_Origin.OriginY);
+                m_Origin = new CPoint(m_OriginRecipe.OriginX, m_OriginRecipe.OriginY);
 
                 if(InspArea == null)
                     InspArea = new TRect(Brushes.Yellow, 1, 1);
 
-                InspArea.MemoryRect.Left = m_Origin.X - m_RecipeData_Origin.InspectionBufferOffsetX;
-                InspArea.MemoryRect.Bottom = m_Origin.Y + m_RecipeData_Origin.InspectionBufferOffsetY;
-                InspArea.MemoryRect.Right = m_Origin.X + m_RecipeData_Origin.DiePitchX + m_RecipeData_Origin.InspectionBufferOffsetX;
-                InspArea.MemoryRect.Top = m_Origin.Y - m_RecipeData_Origin.DiePitchY - m_RecipeData_Origin.InspectionBufferOffsetY;
+                InspArea.MemoryRect.Left = m_Origin.X - m_OriginRecipe.InspectionBufferOffsetX;
+                InspArea.MemoryRect.Bottom = m_Origin.Y + m_OriginRecipe.InspectionBufferOffsetY;
+                InspArea.MemoryRect.Right = m_Origin.X + m_OriginRecipe.DiePitchX + m_OriginRecipe.InspectionBufferOffsetX;
+                InspArea.MemoryRect.Top = m_Origin.Y - m_OriginRecipe.DiePitchY - m_OriginRecipe.InspectionBufferOffsetY;
                 AddInspArea(InspArea);
                 return m_Origin;
             }
@@ -674,8 +674,7 @@ namespace Root_WIND2
             if (BoxImage == null)
                 return;
             //RecipeType_FeatureData rtf = new RecipeType_FeatureData(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.GetByteArray());
-            RecipeType_FeatureData rtf = new RecipeType_FeatureData(m_Offset.X * BoxImage.p_nByte, m_Offset.Y, m_SizeWH.X * BoxImage.p_nByte, m_SizeWH.Y, BoxImage.p_nByte);
-            m_RecipeData_Position.AddMasterFeature(rtf, BoxImage);
+            m_PositionRecipe.AddMasterFeature(m_Offset.X * BoxImage.p_nByte, m_Offset.Y, m_SizeWH.X * BoxImage.p_nByte, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset.X = m_Offset.X;
@@ -688,8 +687,8 @@ namespace Root_WIND2
         {
             if (BoxImage == null)
                 return;
-            RecipeType_FeatureData rtf = new RecipeType_FeatureData(m_Offset.X * BoxImage.p_nByte, m_Offset.Y, m_SizeWH.X * BoxImage.p_nByte, m_SizeWH.Y, BoxImage.p_nByte);
-            m_RecipeData_Position.AddShotFeature(rtf, BoxImage);
+
+            m_PositionRecipe.AddShotFeature(m_Offset.X * BoxImage.p_nByte, m_Offset.Y, m_SizeWH.X * BoxImage.p_nByte, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
@@ -701,8 +700,8 @@ namespace Root_WIND2
         {
             if (BoxImage == null)
                 return;
-            RecipeType_FeatureData rtf = new RecipeType_FeatureData(m_Offset.X * BoxImage.p_nByte, m_Offset.Y, m_SizeWH.X * BoxImage.p_nByte, m_SizeWH.Y, BoxImage.p_nByte);
-            m_RecipeData_Position.AddChipFeature(rtf, BoxImage);
+
+            m_PositionRecipe.AddChipFeature(m_Offset.X * BoxImage.p_nByte, m_Offset.Y, m_SizeWH.X * BoxImage.p_nByte, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
@@ -715,50 +714,50 @@ namespace Root_WIND2
         {
             p_WaferMark.Clear();
             p_ChipMark.Clear();
-            m_RecipeData_Position = m_Recipe.GetRecipeData(typeof(RecipeData_Position)) as RecipeData_Position;
+            m_PositionRecipe = m_Recipe.GetRecipe<PositionRecipe>();
 
-            //List<ImageData> listMasterFeautreimage = m_RecipeData_Position.ListMasterImageFeatures;
-            List<RecipeType_FeatureData> listMasterFeature = m_RecipeData_Position.ListMasterFeature;
+            //List<ImageData> listMasterFeautreimage = m_PositionRecipe.ListMasterImageFeatures;
+            List<RecipeType_FeatureData> listMasterFeature = m_PositionRecipe.ListMasterFeature;
             for(int i = 0; i < listMasterFeature.Count; i ++)
             {
                 FeatureControl fc = new FeatureControl();
                 CPoint offset = new CPoint(listMasterFeature[i].PositionX, listMasterFeature[i].PositionY);
-                int nW = listMasterFeature[i].FeatureWidth;
-                int nH = listMasterFeature[i].FeatureHeight;
+                int nW = listMasterFeature[i].Width;
+                int nH = listMasterFeature[i].Height;
                 byte[] rawdata = listMasterFeature[i].RawData;
                 fc.p_Offset = offset;
                 //fc.p_ImageSource = listMasterFeautreimage[i].GetBitMapSource();
-                fc.p_ImageSource = ImageHelper.GetBitmapSourceFromBitmap(listMasterFeature[i].FeatureBitmap);
+                fc.p_ImageSource = ImageHelper.GetBitmapSourceFromBitmap(listMasterFeature[i].GetFeatureBitmap());
                 p_WaferMark.Add((fc.Clone() as FeatureControl));
             }
 
-            //List<ImageData> listShotFeautreimage = m_RecipeData_Position.ListShotImageFeatures;
-            List<RecipeType_FeatureData> listShotFeature = m_RecipeData_Position.ListShotFeature;
+            //List<ImageData> listShotFeautreimage = m_PositionRecipe.ListShotImageFeatures;
+            List<RecipeType_FeatureData> listShotFeature = m_PositionRecipe.ListShotFeature;
             for (int i = 0; i < listShotFeature.Count; i++)
             {
                 FeatureControl fc = new FeatureControl();
                 CPoint offset = new CPoint(listShotFeature[i].PositionX, listShotFeature[i].PositionY);
-                int nW = listShotFeature[i].FeatureWidth;
-                int nH = listShotFeature[i].FeatureHeight;
+                int nW = listShotFeature[i].Width;
+                int nH = listShotFeature[i].Height;
                 byte[] rawdata = listShotFeature[i].RawData;
                 fc.p_Offset = offset;
                 //fc.p_ImageSource = listShotFeature[i].GetBitMapSource();
-                fc.p_ImageSource = ImageHelper.GetBitmapSourceFromBitmap(listShotFeature[i].FeatureBitmap);
+                fc.p_ImageSource = ImageHelper.GetBitmapSourceFromBitmap(listShotFeature[i].GetFeatureBitmap());
                 p_ShotMark.Add((fc.Clone() as FeatureControl));
             }
 
-            //List<ImageData> listDieFeautreimage = m_RecipeData_Position.ListDieImageFeatures;
-            List<RecipeType_FeatureData> listDieFeature = m_RecipeData_Position.ListDieFeature;
+            //List<ImageData> listDieFeautreimage = m_PositionRecipe.ListDieImageFeatures;
+            List<RecipeType_FeatureData> listDieFeature = m_PositionRecipe.ListDieFeature;
             for (int i = 0; i < listDieFeature.Count; i++)
             {
                 FeatureControl fc = new FeatureControl();
                 CPoint offset = new CPoint(listDieFeature[i].PositionX, listDieFeature[i].PositionY);
-                int nW = listDieFeature[i].FeatureWidth;
-                int nH = listDieFeature[i].FeatureHeight;
+                int nW = listDieFeature[i].Width;
+                int nH = listDieFeature[i].Height;
                 byte[] rawdata = listDieFeature[i].RawData;
                 fc.p_Offset = offset;
                 //fc.p_ImageSource = listDieFeature[i].GetBitMapSource();
-                fc.p_ImageSource = ImageHelper.GetBitmapSourceFromBitmap(listDieFeature[i].FeatureBitmap);
+                fc.p_ImageSource = ImageHelper.GetBitmapSourceFromBitmap(listDieFeature[i].GetFeatureBitmap());
                 p_ChipMark.Add((fc.Clone() as FeatureControl));
             }
         }

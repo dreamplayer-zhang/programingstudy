@@ -27,9 +27,9 @@ namespace Root_WIND2
     public class DrawTool_ViewModel : RootViewer_ViewModel
     {
         bool UIUpdateLock = false; 
-        public DrawTool_ViewModel(ImageData image = null, IDialogService dialogService = null)
+        public DrawTool_ViewModel()
         {
-            base.init(image, dialogService);
+            base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
             p_VisibleMenu = Visibility.Visible;
             Shapes.CollectionChanged += Shapes_CollectionChanged;
             InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;

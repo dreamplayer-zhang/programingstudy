@@ -92,7 +92,7 @@ namespace Root_WIND2
         public Frontside_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
-            m_Recipe = setup.m_MainWindow.m_RecipeMGR.m_Recipe;
+            m_Recipe = setup.Recipe;
 
             p_Origin_VM = new FrontsideOrigin_ViewModel();
             p_Origin_VM.SetOrigin += P_Origin_VM_SetOrigin;

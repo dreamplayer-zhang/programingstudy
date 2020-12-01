@@ -1,7 +1,6 @@
 ﻿using RootTools;
 using RootTools.Database;
 using RootTools_CLR;
-using RootTools_Vision.UserTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,25 +15,13 @@ namespace RootTools_Vision.Inspection
 	{
 		WorkplaceBundle workplaceBundle;
 		Workplace workplace;
-		RecipeData recipeData;
-		Parameter parameter;
+
 
 		public override WORK_TYPE Type => WORK_TYPE.MAINWORK;
 
 		public override WorkBase Clone()
 		{
-			EdgeSurface clone = new EdgeSurface();
-			try
-			{
-				clone.SetData(this.recipeData, this.parameter);
-				clone.SetWorkplace(this.workplace);
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.Message);
-			}
-
-			return clone;
+			return (WorkBase)this.MemberwiseClone();
 		}
 
 		public override void DoWork()
@@ -43,10 +30,9 @@ namespace RootTools_Vision.Inspection
 			//base.DoWork();
 		}
 
-		public override void SetData(IRecipeData _recipeData, IParameterData _parameterData)
+		public override void SetRecipe(Recipe _recipe)
 		{
-			this.recipeData = _recipeData as RecipeData;
-			this.parameter = _parameterData as Parameter;
+			
 		}
 
 		public override void SetWorkplace(Workplace _workplace)

@@ -69,7 +69,7 @@ namespace Root_WIND2
             m_Recipe = setup.Recipe;
 
             init(setup);
-            m_DialogService = setup.m_MainWindow.dialogService;
+            m_DialogService = ProgramManager.Instance.DialogService;
              
         }
 
@@ -78,8 +78,8 @@ namespace Root_WIND2
             Main = new InspTestPanel();
             InspTest = new InspTestPage();
 
-            p_MapControl_VM = new MapControl_ViewModel(m_Setup.InspectionManagerVision);
-            p_DrawTool_VM = new DrawTool_ViewModel(setup.m_MainWindow.m_Image, setup.m_MainWindow.dialogService);
+            p_MapControl_VM = new MapControl_ViewModel(m_Setup.InspectionVision);
+            p_DrawTool_VM = new DrawTool_ViewModel();
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromTicks(100000);
@@ -96,18 +96,18 @@ namespace Root_WIND2
 
         public void SetPage(UserControl page)
         {
-            RecipeInfo_MapData mapdata = m_Recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
+            RecipeType_WaferMap waferMap = m_Recipe.WaferMap;
 
-            if (mapdata.m_WaferMap != null)
+            if (waferMap.Data != null)
             {
-                int nMapX = mapdata.m_WaferMap.nMapSizeX;
-                int nMapY = mapdata.m_WaferMap.nMapSizeY;
+                int nMapX = waferMap.MapSizeX;
+                int nMapY = waferMap.MapSizeY;
 
-                p_MapControl_VM.SetMap(mapdata.m_WaferMap.pWaferMap, new CPoint(nMapX, nMapY));
+                p_MapControl_VM.SetMap(waferMap.Data, new CPoint(nMapX, nMapY));
             }
             else
             {
-                p_MapControl_VM.SetMap(m_Setup.InspectionManagerVision.WaferMapInfo, new CPoint(14, 14));
+                p_MapControl_VM.SetMap(m_Setup.InspectionVision.mapdata, new CPoint(14, 14));
             }
 
 
@@ -188,7 +188,7 @@ namespace Root_WIND2
         public void _btnSnap()
         {
             EQ.p_bStop = false;
-            Vision vision = ((WIND2_Handler)m_Setup.m_MainWindow.m_engineer.ClassHandler()).m_vision;
+            Vision vision = ((WIND2_Handler)ProgramManager.Instance.Engineer.ClassHandler()).m_vision;
             if (vision.p_eState != ModuleBase.eState.Ready)
             {
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
@@ -238,10 +238,10 @@ namespace Root_WIND2
                 SharedBuf = p_DrawTool_VM.p_ImageData.GetPtr();
             }
             
-            m_Setup.InspectionManagerVision.SharedBuffer = SharedBuf;
-            m_Setup.InspectionManagerVision.SharedBufferByteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
-            m_Setup.InspectionManagerVision.CreateInspecion();
-            m_Setup.InspectionManagerVision.Start();
+            m_Setup.InspectionVision.SharedBuffer = SharedBuf;
+            m_Setup.InspectionVision.SharedBufferByteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
+            m_Setup.InspectionVision.CreateInspecion();
+            m_Setup.InspectionVision.Start();
 
         }
     }

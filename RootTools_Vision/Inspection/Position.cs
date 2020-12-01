@@ -1,4 +1,4 @@
-﻿using RootTools_Vision.UserTypes;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,7 +10,6 @@ using RootTools_CLR;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using RootTools_Vision.Temp_Recipe;
 using RootTools;
 using System.Windows;
 
@@ -18,19 +17,19 @@ namespace RootTools_Vision
 {
     public class Position : WorkBase
     {
-
+        #region [Member Variables]
         public override WORK_TYPE Type => WORK_TYPE.PREPARISON;
 
         Workplace workplace;
 
-        RecipeData recipeData;
-        Parameter parameter;
+        Recipe recipe;
 
-        RecipeData_Origin recipeData_Origin;
-        RecipeData_Position recipeData_Position;
+        PositionRecipe positionRecipe;
+        PositionParameter parameter;
 
-        ParamData_Position parameterData_Position;
+        OriginRecipe recipeOrigin;
 
+        #endregion
 
         public override bool DoPrework()
         {
@@ -44,17 +43,16 @@ namespace RootTools_Vision
         }
 
 
-        public override void SetData(IRecipeData _recipeData, IParameterData _parameterData)
+        public override void SetRecipe(Recipe _recipe)
         {
             m_sName = this.GetType().Name;
 
-            this.recipeData = _recipeData as RecipeData;
-            this.parameter = _parameterData as Parameter;
+            this.recipe = _recipe;
+            this.positionRecipe = _recipe.GetRecipe<PositionRecipe>();
+            this.parameter = _recipe.GetRecipe<PositionParameter>();
 
-            this.recipeData_Origin = recipeData.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
-            this.recipeData_Position = recipeData.GetRecipeData(typeof(RecipeData_Position)) as RecipeData_Position;
+            this.recipeOrigin = _recipe.GetRecipe<OriginRecipe>();
 
-            this.parameterData_Position = parameter.GetParameter(typeof(ParamData_Position)) as ParamData_Position;
         }
 
         public override void SetWorkplace(Workplace _workplace)
@@ -62,16 +60,33 @@ namespace RootTools_Vision
             this.workplace = _workplace;
         }
 
-        public CPoint ConvertRelToAbs(CPoint ptRel)
+        public CPoint ConvertRelToAbs_Wafer(CPoint ptRel)
         {
-            return new CPoint(this.recipeData_Origin.OriginX + ptRel.X, this.recipeData_Origin.OriginY + ptRel.Y);
+            return new CPoint(this.recipeOrigin.OriginX + ptRel.X, this.recipeOrigin.OriginY + ptRel.Y);
+        }
+
+        public CPoint ConvertRelToAbs_Chip(CPoint ptRel)
+        {
+            return new CPoint(this.workplace.PositionX + ptRel.X, this.workplace.PositionY + ptRel.Y);
         }
 
         public bool DoPosition()
         {
+            if (this.workplace.MapPositionX == -1 && this.workplace.MapPositionX == -1) // Master
+            {
+                return DoPosition_Wafer();
+            }
+            else  // Position Chip
+            {
+                return DoPosition_Chip();
+            }
+        }
+
+        public bool DoPosition_Wafer()
+        {
             if(this.workplace.MapPositionX == -1 && this.workplace.MapPositionX == -1) // Master
             {
-                if (this.recipeData_Position.IndexMaxScoreMasterFeature == -1) // Feature가 셋팅이 안되어 있는 경우 전체 Feature 사용
+                if (this.positionRecipe.IndexMaxScoreMasterFeature == -1) // Feature가 셋팅이 안되어 있는 경우 전체 Feature 사용
                 {
                     int outX = 0, outY = 0;
                     int maxX = 0, maxY = 0;
@@ -82,20 +97,20 @@ namespace RootTools_Vision
                     int i = 0;
                     int maxIndex = -1;
 
-                    foreach(RecipeType_FeatureData feature in this.recipeData_Position.ListMasterFeature)
+                    foreach(RecipeType_FeatureData feature in this.positionRecipe.ListMasterFeature)
                     {
-                        CPoint absPos = ConvertRelToAbs(new CPoint(feature.PositionX, feature.PositionY));
-                        int startX = (absPos.X - this.parameterData_Position.SearchRangeX) < 0 ? 0 : (absPos.X - this.parameterData_Position.SearchRangeX);
-                        int startY = (absPos.Y - this.parameterData_Position.SearchRangeY) < 0 ? 0 : (absPos.Y - this.parameterData_Position.SearchRangeY);
-                        int endX = (absPos.X + feature.FeatureWidth + this.parameterData_Position.SearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (absPos.X + feature.FeatureWidth + this.parameterData_Position.SearchRangeX);
-                        int endY = (absPos.Y + feature.FeatureHeight + this.parameterData_Position.SearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (absPos.Y + feature.FeatureHeight + this.parameterData_Position.SearchRangeY);
+                        CPoint absPos = ConvertRelToAbs_Wafer(new CPoint(feature.PositionX, feature.PositionY));
+                        int startX = (absPos.X - this.parameter.SearchRangeX) < 0 ? 0 : (absPos.X - this.parameter.SearchRangeX);
+                        int startY = (absPos.Y - this.parameter.SearchRangeY) < 0 ? 0 : (absPos.Y - this.parameter.SearchRangeY);
+                        int endX = (absPos.X + feature.Width + this.parameter.SearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (absPos.X + feature.Width + this.parameter.SearchRangeX);
+                        int endY = (absPos.Y + feature.Height + this.parameter.SearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (absPos.Y + feature.Height + this.parameter.SearchRangeY);
 
                         unsafe
                         {
                             score =  CLR_IP.Cpp_TemplateMatching(
                                 (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY, 
                                 this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
-                                feature.FeatureWidth, feature.FeatureHeight,
+                                feature.Width, feature.Height,
                                 startX, startY, endX, endY, 5);
                         }
 
@@ -117,16 +132,16 @@ namespace RootTools_Vision
 
                     if (maxIndex == -1) return false;
 
-                    if (maxScore < this.parameterData_Position.MinScoreLimit)
+                    if (maxScore < this.parameter.MinScoreLimit)
                     {
                         return false;
                     }
 
-                    CPoint ptAbs = ConvertRelToAbs(new CPoint(this.recipeData_Position.ListMasterFeature[maxIndex].PositionX, this.recipeData_Position.ListMasterFeature[maxIndex].PositionY));
+                    CPoint ptAbs = ConvertRelToAbs_Chip(new CPoint(this.positionRecipe.ListMasterFeature[maxIndex].PositionX, this.positionRecipe.ListMasterFeature[maxIndex].PositionY));
                     int tplStartX = ptAbs.X;
                     int tplStartY = ptAbs.Y;
-                    int tplW = this.recipeData_Position.ListMasterFeature[maxIndex].FeatureWidth;
-                    int tplH = this.recipeData_Position.ListMasterFeature[maxIndex].FeatureHeight;
+                    int tplW = this.positionRecipe.ListMasterFeature[maxIndex].Width;
+                    int tplH = this.positionRecipe.ListMasterFeature[maxIndex].Height;
 
                     float tplCenterX = (float)ptAbs.X + tplW/2;
                     float tplCenterY = (float)ptAbs.Y + tplH/2;
@@ -181,13 +196,152 @@ namespace RootTools_Vision
             return true;
         }
 
+        public bool DoPosition_Chip()
+        {
+            int outX = 0, outY = 0;
+            int maxX = 0, maxY = 0;
+            int maxStartX = 0, maxStartY = 0;
+            int maxEndX = 0, maxEndY = 0;
+            float score = 0;
+            float maxScore = 0;
+            int i = 0;
+            int maxIndex = -1;
+
+            try
+            {
+                if (this.positionRecipe.IndexMaxScoreChipFeature == -1) // Feature가 셋팅이 안되어 있는 경우 전체 Feature 사용
+                {
+
+                    foreach (RecipeType_FeatureData feature in this.positionRecipe.ListDieFeature)
+                    {
+                        CPoint absPos = ConvertRelToAbs_Chip(new CPoint(feature.PositionX, feature.PositionY));
+
+                        int startX = (absPos.X - this.parameter.SearchRangeX) < 0 ? 0 : (absPos.X - this.parameter.SearchRangeX);
+                        int startY = (absPos.Y - this.parameter.SearchRangeY) < 0 ? 0 : (absPos.Y - this.parameter.SearchRangeY);
+                        int endX = (absPos.X + feature.Width + this.parameter.SearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (absPos.X + feature.Width + this.parameter.SearchRangeX);
+                        int endY = (absPos.Y + feature.Height + this.parameter.SearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (absPos.Y + feature.Height + this.parameter.SearchRangeY);
+
+                        unsafe
+                        {
+                            score = CLR_IP.Cpp_TemplateMatching(
+                                (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
+                                this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
+                                feature.Width, feature.Height,
+                                startX, startY, endX, endY, 5);
+                        }
+
+                        if (score > maxScore)
+                        {
+                            maxScore = score;
+                            maxX = outX;
+                            maxY = outY;
+                            maxIndex = i;
+
+                            maxStartX = startX;
+                            maxStartY = startY;
+                            maxEndX = endX;
+                            maxEndY = endY;
+                        }
+
+                        i++;
+                    }
+
+                }
+                else
+                {
+                    maxIndex = this.positionRecipe.IndexMaxScoreChipFeature;
+
+                    RecipeType_FeatureData feature = this.positionRecipe.ListDieFeature[maxIndex];
+
+                    CPoint absPos = ConvertRelToAbs_Chip(new CPoint(feature.PositionX, feature.PositionY));
+
+                    int startX = (absPos.X - this.parameter.SearchRangeX) < 0 ? 0 : (absPos.X - this.parameter.SearchRangeX);
+                    int startY = (absPos.Y - this.parameter.SearchRangeY) < 0 ? 0 : (absPos.Y - this.parameter.SearchRangeY);
+                    int endX = (absPos.X + feature.Width + this.parameter.SearchRangeX) >= this.workplace.SharedBufferWidth ? this.workplace.SharedBufferWidth : (absPos.X + feature.Width + this.parameter.SearchRangeX);
+                    int endY = (absPos.Y + feature.Height + this.parameter.SearchRangeY) >= this.workplace.SharedBufferHeight ? this.workplace.SharedBufferHeight : (absPos.Y + feature.Height + this.parameter.SearchRangeY);
+
+                    unsafe
+                    {
+                        score = CLR_IP.Cpp_TemplateMatching(
+                            (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
+                            this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
+                            feature.Width, feature.Height,
+                            startX, startY, endX, endY, 5);
+                    }
+
+                    maxScore = score;
+                    maxX = outX;
+                    maxY = outY;
+                    maxStartX = startX;
+                    maxStartY = startY;
+                    maxEndX = endX;
+                    maxEndY = endY;
+
+                }
+
+                if (maxIndex == -1) return false;
+
+                if (maxScore < this.parameter.MinScoreLimit)
+                {
+                    this.workplace.SetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS, false);
+                    return false;
+                }
+
+                this.workplace.SetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS, true);
+
+                CPoint ptAbs = ConvertRelToAbs_Chip(new CPoint(this.positionRecipe.ListDieFeature[maxIndex].PositionX, this.positionRecipe.ListDieFeature[maxIndex].PositionY));
+                int tplStartX = ptAbs.X;
+                int tplStartY = ptAbs.Y;
+                int tplW = this.positionRecipe.ListDieFeature[maxIndex].Width;
+                int tplH = this.positionRecipe.ListDieFeature[maxIndex].Height;
+
+                float tplCenterX = (float)ptAbs.X + tplW / 2;
+                float tplCenterY = (float)ptAbs.Y + tplH / 2;
+
+                maxX += maxStartX; // ROI에서 image 좌표로 변환
+                maxY += maxStartY;
+
+                // ROI 중심 위치
+                float centerROIX = (maxStartX + maxEndX) / 2;   //이거 필요없는듯
+                float centerROIY = (maxStartY + maxEndY) / 2;
+
+                // Matching 중심 위치
+                float centerMatchingX = (int)(maxX + tplW / 2);
+                float centerMatchingY = (int)(maxY + tplH / 2);
+
+                //int transX = (int)(centerROIX - centerMatchingX);
+                //int transY = (int)(centerROIY - centerMatchingY);
+
+                int transX = (int)(centerMatchingX - tplCenterX);
+                int transY = (int)(centerMatchingY - tplCenterY);
+
+                this.workplace.MoveImagePosition(transX, transY);
+
+                maxStartX += this.parameter.SearchRangeX;
+                maxStartY -= this.parameter.SearchRangeY;
+                maxEndX += this.parameter.SearchRangeX;
+                maxEndY -= this.parameter.SearchRangeY;
+
+                ExtractCurrentWorkplace();
+
+                WorkEventManager.OnPositionDone(this.workplace, new PositionDoneEventArgs(new CPoint(tplStartX, tplStartY), new CPoint(tplStartX + tplW, tplStartY + tplH),
+                        new CPoint(tplStartX + transX, tplStartY + transY), new CPoint(tplStartX + tplW + transX, tplStartY + tplH + transY)));
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            return true;
+        }
+
         public override WorkBase Clone()
         {
 
             Position clone = new Position();
             try
             {
-                clone.SetData(this.recipeData, this.parameter);
+                clone.SetRecipe(this.recipe);
                 clone.SetWorkplace(this.workplace);
             }
             catch(Exception ex)
@@ -202,6 +356,25 @@ namespace RootTools_Vision
         public override void SetWorkplaceBundle(WorkplaceBundle workplace)
         {
             return;
+        }
+
+        private void ExtractCurrentWorkplace()
+        {
+            // Copy 
+            int chipH = this.workplace.BufferSizeY;
+            int chipW = this.workplace.BufferSizeX;
+
+            int Left = this.workplace.PositionX;
+            int Top = this.workplace.PositionY - chipH;
+            int Right = this.workplace.PositionX + chipW;
+            int Bottom = this.workplace.PositionY;
+
+            int memH = this.workplace.SharedBufferHeight;
+            int memW = this.workplace.SharedBufferWidth;
+
+            //for (int cnt = Top; cnt < Bottom; cnt++)
+            //    Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)memW + Left))
+            //        , this.workplace.WorkplaceBuffer, chipW * (cnt - Top), chipW);
         }
     }
 }

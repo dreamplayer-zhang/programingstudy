@@ -64,7 +64,7 @@ namespace RootTools_Vision
 
         public abstract void SetWorkplaceBundle(WorkplaceBundle workplace);
 
-        public abstract void SetData(IRecipeData _recipeData, IParameterData _parameterData);
+        public abstract void SetRecipe(Recipe _recipe);
 
         public abstract WorkBase Clone();
 

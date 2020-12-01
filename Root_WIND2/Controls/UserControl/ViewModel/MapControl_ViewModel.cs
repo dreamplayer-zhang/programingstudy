@@ -19,7 +19,7 @@ namespace Root_WIND2
     {
         InspectionManager_Vision m_InspectionManger;
         Recipe m_Recipe;
-        public byte[] Map;
+        public int[] Map;
         CPoint MapSize;
         public MapControl_ViewModel(InspectionManager_Vision inspectionManger)
         {
@@ -75,7 +75,7 @@ namespace Root_WIND2
 
 
 
-        public void CreateMapUI(byte[] map = null, CPoint mapsize = null)
+        public void CreateMapUI(int[] map = null, CPoint mapsize = null)
         {
             if (map == null)
             {
@@ -111,7 +111,7 @@ namespace Root_WIND2
 
         }
 
-        public void SetMap(byte[] map = null, CPoint mapsize = null)
+        public void SetMap(int[] map = null, CPoint mapsize = null)
         {
             if (map == null)
             {
@@ -120,13 +120,13 @@ namespace Root_WIND2
             }
 
             MapSize = new CPoint(mapsize.X, mapsize.Y);
-            Map = new byte[mapsize.X * mapsize.Y];
+            Map = new int[mapsize.X * mapsize.Y];
             Map = map;
 
             CreateMapUI();
             
         }
-        public byte[] GetMap()
+        public int[] GetMap()
         {
             return Map;
         }

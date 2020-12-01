@@ -133,7 +133,7 @@ namespace Root_WIND2.Module
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 1, 1, 1000, 1000);
             m_memoryGroup2= m_memoryPool2.GetGroup("group");
-            m_memoryGroup2.CreateMemory("mem", 1, 1, 1000, 1000);
+            m_memoryGroup2.CreateMemory("mem", 3, 1, 40000, 40000);
             m_memoryGroup2.CreateMemory("ROI", 1, 4, 30000,30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
         }
 
@@ -155,6 +155,8 @@ namespace Root_WIND2.Module
             //            p_bStageBlow = false;
             //            p_bStageVac = true;
             Thread.Sleep(200);
+            if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
+                m_CamMain.Connect();
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             //p_bStageVac = false;
@@ -336,7 +338,7 @@ namespace Root_WIND2.Module
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                     int nWaferSizeY_px = Convert.ToInt32(m_nWaferSize_mm * nMMPerUM / m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
-                    int nScanOffset_pulse = 300000;
+                    int nScanOffset_pulse = 30000;
 
                     while(m_grabMode.m_ScanLineNum > nScanLine)
                     {
@@ -372,16 +374,16 @@ namespace Root_WIND2.Module
                         double dTriggerEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2;
                         axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
-                        //string strPool = m_grabMode.m_memoryPool.p_id;
-                        //string strGroup = m_grabMode.m_memoryGroup.p_id;
-                        //string strMemory = m_grabMode.m_memoryData.p_id;
-                        string strPool = "pool";
-                        string strGroup = "group";
-                        string strMemory = "mem";
+                        string strPool = m_grabMode.m_memoryPool.p_id;
+                        string strGroup = m_grabMode.m_memoryGroup.p_id;
+                        string strMemory = m_grabMode.m_memoryData.p_id;
+
                         MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * m_grabMode.m_camera.GetRoiSize().Y * (double)m_nScanRate / 100);
 
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+                        //m_grabMode.StartGrabColor(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))

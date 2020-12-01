@@ -83,39 +83,39 @@
                             <TextBlock Text="X" Style="{StaticResource BasicTb}" Grid.Row="3" Grid.Column="1"/>
                             <TextBlock Text="Y" Style="{StaticResource BasicTb}" Grid.Row="3" Grid.Column="3"/>
 
-                            <TextBox Text="{Binding pWaferSize}" 
+                            <TextBox Text="{Binding WaferSize}" 
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Row="0" 
                                      Grid.Column="2" 
                                      Grid.ColumnSpan="3"
                                      Margin="10" 
                                      />
-                            <TextBox Text="{Binding pMapsizeX, Mode=TwoWay}" 
+                            <TextBox Text="{Binding MapSizeX, Mode=TwoWay}" 
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Row="1" 
                                      Grid.Column="2"
                                      Margin="10"/>
-                            <TextBox Text="{Binding pMapsizeY, Mode=TwoWay}" 
+                            <TextBox Text="{Binding MapSizeY, Mode=TwoWay}" 
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Row="1" 
                                      Grid.Column="4"
                                      Margin="10"/>
-                            <TextBox Text="{Binding pOriginX}" 
+                            <TextBox Text="{Binding OriginX}" 
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Row="2" 
                                      Grid.Column="2"
                                      Margin="10"/>
-                            <TextBox Text="{Binding pOriginY}" 
+                            <TextBox Text="{Binding OriginY}" 
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Row="2" 
                                      Grid.Column="4"
                                      Margin="10"/>
-                            <TextBox Text="{Binding pChipsizeX}" 
+                            <TextBox Text="{Binding ChipsizeX}" 
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Row="3" 
                                      Grid.Column="2"
                                      Margin="10"/>
-                            <TextBox Text="{Binding pChipsizeY}" 
+                            <TextBox Text="{Binding ChipsizeY}" 
                                      Style="{StaticResource BasicTbox}" 
                                      Grid.Row="3" 
                                      Grid.Column="4"

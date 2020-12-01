@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using RootTools_Vision.UserTypes;
-
 namespace RootTools_Vision
 {
     public enum WORK_TYPE

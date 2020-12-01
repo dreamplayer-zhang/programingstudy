@@ -9,15 +9,14 @@ namespace Root_WIND2
 {
     class Run_ViewModel : ObservableObject
     {
-        MainWindow m_MainWindow;
 
-        public Run_ViewModel(MainWindow main)
+        public Run_ViewModel()
         {
-            init(main);
+            init();
         }
-        public void init(MainWindow main = null)
+        public void init()
         {
-            m_MainWindow = main;
+
         }
         public ICommand btnMode
         {
@@ -25,8 +24,7 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    m_MainWindow.MainPanel.Children.Clear();
-                    m_MainWindow.MainPanel.Children.Add(m_MainWindow.ModeUI);
+                    UIManager.Instance.ChangUIMode();
                 });
             }
         }
