@@ -79,16 +79,20 @@ namespace Root_Vega.Module
                     return (m_svValue.p_value != null) ? m_svValue.p_value : 0; }
                 set
                 {
-                    OnPropertyChanged();
-                    //if ((m_svValue.p_value != null) && (m_svValue.p_value == value)) return; 
-                    m_svValue.p_value = value;
-                    m_alid[0].p_bSet = (m_svValue.p_value < m_aLimit[0]);
-                    m_alid[1].p_bSet = (m_svValue.p_value > m_aLimit[1]);
-                    p_alid = (m_alid[0].p_bSet || m_alid[1].p_bSet);
-                    double dValue = Math.Abs(m_svValue.p_value - (m_aLimit[0] + m_aLimit[1]) / 2);
-                    int nRed = (int)(500 * dValue / (m_aLimit[1] - m_aLimit[0]));
-                    if (nRed > 250) nRed = 250;
-                    p_color = Color.FromRgb((byte)nRed, (byte)(250 - nRed), 0);
+                    try
+                    {
+                        OnPropertyChanged();
+                        //if ((m_svValue.p_value != null) && (m_svValue.p_value == value)) return; 
+                        m_svValue.p_value = value;
+                        m_alid[0].p_bSet = (m_svValue.p_value < m_aLimit[0]);
+                        m_alid[1].p_bSet = (m_svValue.p_value > m_aLimit[1]);
+                        p_alid = (m_alid[0].p_bSet || m_alid[1].p_bSet);
+                        double dValue = Math.Abs(m_svValue.p_value - (m_aLimit[0] + m_aLimit[1]) / 2);
+                        int nRed = (int)(500 * dValue / (m_aLimit[1] - m_aLimit[0]));
+                        if (nRed > 250) nRed = 250;
+                        p_color = Color.FromRgb((byte)nRed, (byte)(250 - nRed), 0);
+                    }
+                    catch { }
                 }
             }
 
@@ -190,13 +194,29 @@ namespace Root_Vega.Module
 
         #region Check Thread
         int m_iData = 0;
-        int n = 0;
+        int m_index = 0;
         protected override void RunThread()
         {
             base.RunThread();
             Thread.Sleep(m_msInterval);
-            
-			if (m_aData.Count > m_iData)
+
+            if (!m_modbus.m_client.Connected)
+            {
+                Thread.Sleep(10);
+                m_index++;
+                if (m_index > 50)
+                {
+                    try
+                    {
+                        m_modbus.Connect();
+                        m_index = 0;
+                    }
+                    catch (Exception e) { if (m_log != null) p_sInfo = e + "Connect Error"; }
+
+                }
+            }
+
+            if (m_aData.Count > m_iData)
             {
                 m_aData[m_iData].ReadInputRegister(m_modbus); 
                 m_iData = (m_iData + 1) % m_aData.Count;
