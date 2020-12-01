@@ -146,6 +146,7 @@ namespace Root_Vega
 
             vvm = new _4_ViewerViweModel(App.m_engineer, dialogService);
             _Viewer.DataContext = vvm;
+            _Viewer._Dispatcher = vvm._dispatcher;
 
             _6_LogViewModel lvm = new _6_LogViewModel(App.m_engineer);
             _Log.DataContext = lvm;
