@@ -50,12 +50,14 @@ namespace RootTools.Trees
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (m_treeRoot != null) m_treeRoot.m_bFocus = true; 
+            if(m_treeRoot != null)
+                m_treeRoot.m_bFocus = true; 
         }
 
         private void TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (m_treeRoot != null) m_treeRoot.m_bFocus = false;
+            if (m_treeRoot != null)
+                m_treeRoot.m_bFocus = false;
         }
     }
 }

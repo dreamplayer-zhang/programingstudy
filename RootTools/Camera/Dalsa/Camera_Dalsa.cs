@@ -231,7 +231,6 @@ namespace RootTools.Camera.Dalsa
                 p_sInfo = p_id + "Empty Config File Name";
                 return;
             }
-
             SapLocation loc = new SapLocation(p_CamInfo.p_sServer, p_CamInfo.p_nResourceCnt);
             SapManager.GetServerName(loc);
 
@@ -674,7 +673,6 @@ namespace RootTools.Camera.Dalsa
         {
             Camera_Dalsa cam = args.Context as Camera_Dalsa;
             cam.m_nGrabTrigger++;
-            System.Diagnostics.Debug.WriteLine("ttt : " + cam.m_nGrabTrigger);
         }
         #endregion
 
