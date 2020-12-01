@@ -47,13 +47,10 @@ namespace RootTools
 		public void RefreshDraw()
 		{
 			var temp_vm = (ImageViewer_ViewModel)this.DataContext;
-			if(temp_vm.p_ImageData!=null)
-			{
-				canvas.StartPoint = temp_vm.p_View_Rect;//여기에 왼쪽위 메모리 주소같은게 필요함
-				canvas.ImageSize = temp_vm.p_ImageData.p_Size;
-				canvas.Zoom = temp_vm.p_Zoom;
-				canvas.InvalidateVisual();
-			}
+			canvas.StartPoint = temp_vm.p_View_Rect;//여기에 왼쪽위 메모리 주소같은게 필요함
+			canvas.ImageSize = temp_vm.p_ImageData.p_Size;
+			canvas.Zoom = temp_vm.p_Zoom;
+			canvas.InvalidateVisual();
 		}
 	}
 }

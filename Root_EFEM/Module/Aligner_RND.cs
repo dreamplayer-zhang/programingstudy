@@ -603,19 +603,10 @@ namespace Root_EFEM.Module
             return sPut; 
         }
 
-        enum eWaferExist
+        public bool IsWaferExist(int nID, bool bIgnoreExistSensor = false)
         {
-            Sensor,
-            InfoWafer
-        }
-        eWaferExist m_eWaferExist = eWaferExist.Sensor;
-        public bool IsWaferExist(int nID)
-        {
-            switch (m_eWaferExist)
-            {
-                case eWaferExist.Sensor: return m_diWaferExist.p_bIn;
-                default: return (p_infoWafer != null);
-            }
+            if (bIgnoreExistSensor) return (p_infoWafer != null);
+            return m_diWaferExist.p_bIn;
         }
 
         InfoWafer.WaferSize m_waferSize;
@@ -679,7 +670,6 @@ namespace Root_EFEM.Module
 
         void RunTreeSetup(Tree tree)
         {
-            m_eWaferExist = (eWaferExist)tree.Set(m_eWaferExist, m_eWaferExist, "WaferExist", "Wafer Exist Check");
             m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
             RunTreeCommand(tree.GetTree("Command Timeout", false));
             RunTreeCheckWaferExist(tree.GetTree("Check Wafer Exist", false));
