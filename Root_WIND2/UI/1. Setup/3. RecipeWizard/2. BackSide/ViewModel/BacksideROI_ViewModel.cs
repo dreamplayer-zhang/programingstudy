@@ -20,12 +20,12 @@ namespace Root_WIND2
             p_VisibleMenu = Visibility.Visible;
             Shapes.CollectionChanged += Shapes_CollectionChanged;            
         }
-        public void init(Setup_ViewModel setup, Recipe recipe)
+        public void init(Setup_ViewModel setup, Recipe _recipe)
         {
-            this.recipe = recipe;
-            recipeData_Origin = recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
-            mapInfo = this.recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
-            base.init(setup.m_MainWindow.m_Image, setup.m_MainWindow.dialogService);
+            this.recipe = _recipe;
+            backsideRecipe = _recipe.GetRecipe<BacksideRecipe>();
+            mapInfo = _recipe.WaferMap;
+            base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
             p_VisibleMenu = System.Windows.Visibility.Visible;
         }
         
@@ -40,8 +40,8 @@ namespace Root_WIND2
         bool UIUpdateLock = false;
 
         Recipe recipe;
-        RecipeData_Origin recipeData_Origin;
-        RecipeInfo_MapData mapInfo;
+        BacksideRecipe backsideRecipe;
+        RecipeType_WaferMap mapInfo;
 
         CPoint canvasPoint;
         CPoint memoryPoint;
@@ -151,7 +151,7 @@ namespace Root_WIND2
             }
 
             Cpp_Point[] WaferEdge = null;
-            byte[] MapData = null;
+            int[] mapData = null;
             unsafe
             {
                 int DownSample = 20;
@@ -172,7 +172,7 @@ namespace Root_WIND2
                         1
                         );
 
-                    MapData = CLR_IP.Cpp_GenerateMapData(
+                    mapData = CLR_IP.Cpp_GenerateMapData(
                         WaferEdge,
                         &outOriginX,
                         &outOriginY,
@@ -213,11 +213,11 @@ namespace Root_WIND2
                 ReDrawWFCenter(ColorType.WaferCenter);
 
                 // Save Recipe
-                SetRecipeMapData(MapData, (int)outMapX, (int)outMapY, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
+                SetRecipeMapData(mapData, (int)outMapX, (int)outMapY, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
 
-                recipeData_Origin.Backside_CenterX = (int)centX;
-                recipeData_Origin.Backside_CenterY = (int)centY;
-                recipeData_Origin.Backside_Radius = (int)outRadius;
+                backsideRecipe.CenterX = (int)centX;
+                backsideRecipe.CenterY = (int)centY;
+                backsideRecipe.Radius = (int)outRadius;
 
                 SaveContourMap((int)centX, (int)centY, (int)outRadius);
             }
@@ -251,36 +251,15 @@ namespace Root_WIND2
             DrawCenterPoint(ColorType.Teaching);
             DrawCircle(ColorType.Teaching);
         }
-        private void SetRecipeMapData(byte[] mapData, int mapX, int mapY, int originX, int originY, int chipSzX, int chipSzY)
+        private void SetRecipeMapData(int[] mapData, int mapX, int mapY, int originX, int originY, int chipSzX, int chipSzY)
         {
-            List<ChipData> ListWaferMap = new List<ChipData>();
-            
-            for (int y = 0; y < mapY; y++)
-            {
-                for (int x = 0; x < mapX; x++)
-                {
-                    ChipData chipInfo = new ChipData();
-                    chipInfo.MapIndex = new Point(x, y);
-                    chipInfo.DiePoint = new Point(x, y);
-
-                    if (mapData[y + mapX * x] == 0)
-                    {
-                        chipInfo.chipinfo = ChipInfo.No_Chip;
-                    }
-                    else
-                    {
-                        chipInfo.chipinfo = ChipInfo.Normal_Chip;
-                    }
-                    ListWaferMap.Add(chipInfo);
-                }
-            }
             // Map Data Recipe 생성
-            recipeData_Origin.OriginX = originX;
-            recipeData_Origin.OriginY = originY;
-            recipeData_Origin.DiePitchX = chipSzX;
-            recipeData_Origin.DiePitchY = chipSzY;
+            backsideRecipe.OriginX = originX;
+            backsideRecipe.OriginY = originY;
+            backsideRecipe.DiePitchX = chipSzX;
+            backsideRecipe.DiePitchY = chipSzY;
 
-            mapInfo.m_WaferMap = new WaferMapInfo(mapX, mapY, mapData, ListWaferMap);
+            mapInfo = new RecipeType_WaferMap(mapX, mapY, mapData);
 
             if (true) // Display Map Data Option화
                 DrawMapData(mapData, mapX, mapY, originX, originY, chipSzX, chipSzY);
@@ -454,7 +433,7 @@ namespace Root_WIND2
 
             return shape;
         }
-        private void DrawMapData(byte[] mapData, int mapX, int mapY, int OriginX, int OriginY, int ChipSzX, int ChipSzY)
+        private void DrawMapData(int[] mapData, int mapX, int mapY, int OriginX, int OriginY, int ChipSzX, int ChipSzY)
         {
             RemoveMapDataRect();
             // Map Display

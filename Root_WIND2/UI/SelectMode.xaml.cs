@@ -25,9 +25,8 @@ namespace Root_WIND2
         {
             InitializeComponent();
         }
-        public void Init(MainWindow main = null)
+        public void Init()
         {
-            m_Mainwindow = main;
         }
         private void GroupBox_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -39,20 +38,17 @@ namespace Root_WIND2
         }
         private void Setup_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            m_Mainwindow.MainPanel.Children.Clear();
-            m_Mainwindow.MainPanel.Children.Add(m_Mainwindow.Setup);
+            UIManager.Instance.ChangUISetup();
         }
 
         private void Review_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            m_Mainwindow.MainPanel.Children.Clear();
-            m_Mainwindow.MainPanel.Children.Add(m_Mainwindow.Review);
+            UIManager.Instance.ChangUIReview();
         }
 
         private void Run_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            m_Mainwindow.MainPanel.Children.Clear();
-            m_Mainwindow.MainPanel.Children.Add(m_Mainwindow.Run);
+            UIManager.Instance.ChangUIRun();
         }
 
         private void button_Click(object sender, RoutedEventArgs e)

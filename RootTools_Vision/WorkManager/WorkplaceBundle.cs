@@ -198,21 +198,21 @@ namespace RootTools_Vision
         }
 
 
-        public static WorkplaceBundle CreateWaferMap(WaferMapInfo mapInfo, RecipeData_Origin recipeData_Origin)
+        public static WorkplaceBundle CreateWaferMap(RecipeType_WaferMap mapInfo, OriginRecipe originRecipe)
         {
             WorkplaceBundle bundle = new WorkplaceBundle();
 
 
-            byte[] wafermap = mapInfo.WaferMapData;
+            var wafermap = mapInfo.Data;
             int nSizeX = mapInfo.MapSizeX;
             int nSizeY = mapInfo.MapSizeY;
             int nMasterX = mapInfo.MasterDieX;
             int nMasterY = mapInfo.MasterDieY;
-            int nDiePitchX = recipeData_Origin.DiePitchX;    //DitPitch 필요없음 삭제 예정
-            int nDiePitchY = recipeData_Origin.DiePitchY;
+            int nDiePitchX = originRecipe.DiePitchX;    //DitPitch 필요없음 삭제 예정
+            int nDiePitchY = originRecipe.DiePitchY;
 
-            int nOriginAbsX = recipeData_Origin.OriginX;
-            int nOriginAbsY = recipeData_Origin.OriginY;
+            int nOriginAbsX = originRecipe.OriginX;
+            int nOriginAbsY = originRecipe.OriginY;
 
             bundle.mapSizeX = nSizeX;
             bundle.mapSizeY = nSizeY;

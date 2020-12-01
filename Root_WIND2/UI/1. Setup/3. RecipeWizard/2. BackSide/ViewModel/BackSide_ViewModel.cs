@@ -47,7 +47,7 @@ namespace Root_WIND2
         public Backside_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
-            m_Recipe = setup.m_MainWindow.m_RecipeMGR.GetRecipe();
+            m_Recipe = setup.Recipe;
 
             p_BacksideSetup_VM = new BacksideSetup_ViewModel();
 

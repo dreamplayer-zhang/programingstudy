@@ -1,6 +1,4 @@
 ﻿using RootTools.Database;
-using RootTools_Vision.Temp_Recipe;
-using RootTools_Vision.UserTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +18,10 @@ namespace RootTools_Vision
 
         public override WORK_TYPE Type => WORK_TYPE.FINISHINGWORK;
 
+        public override void SetRecipe(Recipe _recipe)
+        {
+            m_sName = this.GetType().Name;
+        }
 
         public override void DoWork()
         {
@@ -53,11 +55,6 @@ namespace RootTools_Vision
             WorkEventManager.OnProcessDefectDone(this.workplace, new PocessDefectDoneEventArgs());
         }
 
-        public override void SetData(IRecipeData _recipeData, IParameterData _parameterData)
-        {
-            m_sName = this.GetType().Name;
-        }
-
         public override WorkBase Clone()
         {
             return (WorkBase)this.MemberwiseClone();
@@ -67,5 +64,7 @@ namespace RootTools_Vision
         {
             return;
         }
+
+
     }
 }

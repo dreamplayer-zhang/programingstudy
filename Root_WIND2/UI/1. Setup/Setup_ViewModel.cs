@@ -45,7 +45,8 @@ namespace Root_WIND2
         private Recipe recipe;
         public Recipe pRecipe { get => recipe; set => recipe = value; }
 
-        public MainWindow m_MainWindow;
+        //public MainWindow m_MainWindow;
+        public ProgramManager programManager;
 
         private Home_ViewModel homeVM;
         private Inspection_ViewModel inspectionVM;
@@ -62,23 +63,21 @@ namespace Root_WIND2
         private InspectionManager_Vision inspectionMgrVision;
         private InspectionManager_EFEM inspectionMgrEFEM;
 
-        public Setup_ViewModel(MainWindow _main)
+        public Setup_ViewModel()
         {
-            init(_main);
+            init();
         }
 
-        public Setup_ViewModel(MainWindow _main, Recipe _recipe = null , InspectionManager_Vision _inspectionMgrVision = null, InspectionManager_EFEM _inspectionMgrEFEM = null)
+        public Setup_ViewModel(Recipe _recipe = null , InspectionManager_Vision _inspectionMgrVision = null, InspectionManager_EFEM _inspectionMgrEFEM = null)
         {        
             this.recipe = _recipe;
             inspectionMgrVision = _inspectionMgrVision;
             inspectionMgrEFEM = _inspectionMgrEFEM;
-            init(_main);            
+            init();            
         }
 
-        public void init(MainWindow main = null)
+        public void init()
         {
-            m_MainWindow = main;
-
             InitAllPanel();
             InitAllNaviBtn();
             InitEvent();
@@ -96,20 +95,20 @@ namespace Root_WIND2
 
         public void DrawInsptestMap()
         {
-            RecipeInfo_MapData mapdata = recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
-            if (mapdata.m_WaferMap != null)
+            RecipeType_WaferMap mapdata = recipe.WaferMap;
+            if (mapdata.Data != null)
             {
-                int nMapX = mapdata.m_WaferMap.nMapSizeX;
-                int nMapY = mapdata.m_WaferMap.nMapSizeY;
+                int nMapX = mapdata.MapSizeX;
+                int nMapY = mapdata.MapSizeY;
 
                 if (p_CurrentPanel == inspTestVM.Main)
                 {
-                    inspTestVM.p_MapControl_VM.SetMap(mapdata.m_WaferMap.pWaferMap, new CPoint(nMapX, nMapY));
+                    inspTestVM.p_MapControl_VM.SetMap(mapdata.Data, new CPoint(nMapX, nMapY));
                     inspTestVM.p_MapControl_VM.CreateMapUI();
                 }
                 else
                 {
-                    backsideInspTestVM.p_MapControl_VM.SetMap(mapdata.m_WaferMap.pWaferMap, new CPoint(nMapX, nMapY));
+                    backsideInspTestVM.p_MapControl_VM.SetMap(mapdata.Data, new CPoint(nMapX, nMapY));
                     backsideInspTestVM.p_MapControl_VM.CreateMapUI();
                 }
             }     
@@ -370,8 +369,7 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     SetHome();
-                    m_MainWindow.MainPanel.Children.Clear();
-                    m_MainWindow.MainPanel.Children.Add(m_MainWindow.ModeUI);
+                    UIManager.Instance.ChangUIMode();
                 });
             }
         }
@@ -382,37 +380,25 @@ namespace Root_WIND2
                 return new RelayCommand(SetHome);
             }
         }
-        public ICommand btnTest
-        {
-            get
-            {
-                return new RelayCommand(Test);
-            }
-        }
         public ICommand btnSaveRecipe
         {
             get
             {
-                return new RelayCommand(m_MainWindow.m_RecipeMGR.SaveRecipe);
+                return new RelayCommand(ProgramManager.Instance.ShowDialogSaveRecipe);
             }
         }
         public ICommand btnLoadRecipe
         {
             get
             {
-                return new RelayCommand(m_MainWindow.m_RecipeMGR.LoadRecipe);
+                return new RelayCommand(ProgramManager.Instance.ShowDialogLoadRecipe);
             }
         }
                 
-        public void Test()
-        {
-            string sMsg = string.Format("{0}, {1}", ((RecipeData_Origin)Recipe.GetRecipeData().GetRecipeData(typeof(RecipeData_Origin))).OriginX, ((RecipeData_Origin)Recipe.GetRecipeData().GetRecipeData(typeof(RecipeData_Origin))).OriginY);
-            MessageBox.Show(sMsg);
-        }
 
         internal RecipeWizard_ViewModel Wizard { get => wizardVM; set => wizardVM = value; }
         public Recipe Recipe { get => recipe; set => recipe = value; }
-        public InspectionManager_Vision InspectionManagerVision { get => inspectionMgrVision; set => inspectionMgrVision = value; }
+        public InspectionManager_Vision InspectionVision { get => inspectionMgrVision; set => inspectionMgrVision = value; }
         public InspectionManager_EFEM InspectionManagerEFEM { get => inspectionMgrEFEM; set => inspectionMgrEFEM = value; }
 
         #endregion

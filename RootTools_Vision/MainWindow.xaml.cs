@@ -166,42 +166,42 @@ namespace RootTools_Vision
 
         private void BtnAddPosition(object sender, RoutedEventArgs e)
         {
-            Temp_Recipe.Recipe recipe = new Temp_Recipe.Recipe();
+            //Temp_Recipe.Recipe recipe = new Temp_Recipe.Recipe();
 
-            Temp_Recipe.Parameter parameter = new Temp_Recipe.Parameter();
+            //Temp_Recipe.Parameter parameter = new Temp_Recipe.Parameter();
 
-            //Recipe Data
-
-
-            Bitmap bitmap = new Bitmap(@"D:\test\template images\template3.bmp");
-
-            byte[] tplBuffer = new byte[bitmap.Width * bitmap.Height];
-
-            BitmapData bmpData =
-                bitmap.LockBits(
-                    new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), //bitmap 영역
-                    ImageLockMode.ReadOnly,  //읽기 모드
-                    System.Drawing.Imaging.PixelFormat.Format8bppIndexed); //bitmap 형식
-            IntPtr ptr = bmpData.Scan0;  //비트맵의 첫째 픽셀 데이터 주소를 가져오거나 설정합니다.
-            Marshal.Copy(ptr, tplBuffer, 0, bitmap.Width * bitmap.Height);
-            bitmap.UnlockBits(bmpData);
+            ////Recipe Data
 
 
-            RecipePosition recipePosition = recipe.GetRecipe(typeof(RecipePosition)) as RecipePosition;
+            //Bitmap bitmap = new Bitmap(@"D:\test\template images\template3.bmp");
 
-            recipePosition.ListMasterFeature.Add(new RecipeType_FeatureData(49, 49, 40, 40, tplBuffer));
+            //byte[] tplBuffer = new byte[bitmap.Width * bitmap.Height];
 
-            Temp_Recipe.ParameterPosition param = parameter.GetParameter(typeof(Temp_Recipe.ParameterPosition)) as Temp_Recipe.ParameterPosition;
+            //BitmapData bmpData =
+            //    bitmap.LockBits(
+            //        new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), //bitmap 영역
+            //        ImageLockMode.ReadOnly,  //읽기 모드
+            //        System.Drawing.Imaging.PixelFormat.Format8bppIndexed); //bitmap 형식
+            //IntPtr ptr = bmpData.Scan0;  //비트맵의 첫째 픽셀 데이터 주소를 가져오거나 설정합니다.
+            //Marshal.Copy(ptr, tplBuffer, 0, bitmap.Width * bitmap.Height);
+            //bitmap.UnlockBits(bmpData);
 
-            param.MinScoreLimit = 80;
-            param.SearchRangeX = 100;
-            param.SearchRangeY = 100;
 
-            Position position = new Position();
-            //position.SetData(recipe.GetRecipeData(typeof(RecipePosition)), parameter.GetParameter(typeof(Temp_Recipe.ParameterPosition)));
-            this.workbundle.Add(position);
+            //RecipePosition recipePosition = recipe.GetRecipe(typeof(RecipePosition)) as RecipePosition;
 
-            RefeshWorkBundleStack();
+            //recipePosition.ListMasterFeature.Add(new RecipeType_FeatureData(49, 49, 40, 40, tplBuffer));
+
+            //Temp_Recipe.ParameterPosition param = parameter.GetParameter(typeof(Temp_Recipe.ParameterPosition)) as Temp_Recipe.ParameterPosition;
+
+            //param.MinScoreLimit = 80;
+            //param.SearchRangeX = 100;
+            //param.SearchRangeY = 100;
+
+            //Position position = new Position();
+            ////position.SetData(recipe.GetRecipeData(typeof(RecipePosition)), parameter.GetParameter(typeof(Temp_Recipe.ParameterPosition)));
+            //this.workbundle.Add(position);
+
+            //RefeshWorkBundleStack();
         }
 
         private void BtnAddInspectionSurface(object sender, RoutedEventArgs e)
@@ -232,49 +232,49 @@ namespace RootTools_Vision
 
         private void BtnRegisterWorkplaceBundle(object sender, RoutedEventArgs e)
         {
-            int sizeX = Convert.ToInt32(this.tbMapSizeX.Text);
-            int sizeY = Convert.ToInt32(this.tbMapSizeY.Text);
+            //int sizeX = Convert.ToInt32(this.tbMapSizeX.Text);
+            //int sizeY = Convert.ToInt32(this.tbMapSizeY.Text);
 
-            if (sizeX == 0 || sizeY == 0) return;
+            //if (sizeX == 0 || sizeY == 0) return;
 
-            byte[] wafermap = new byte[sizeX * sizeY];
-            for (int y = 0; y < sizeY; y++)
-            {
-                for (int x = 0; x < sizeX; x++)
-                {
-                    double cx = (double)sizeX / 2.0f;
-                    double cy = (double)sizeY / 2.0f;
+            //byte[] wafermap = new byte[sizeX * sizeY];
+            //for (int y = 0; y < sizeY; y++)
+            //{
+            //    for (int x = 0; x < sizeX; x++)
+            //    {
+            //        double cx = (double)sizeX / 2.0f;
+            //        double cy = (double)sizeY / 2.0f;
 
-                    double r = Math.Sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
+            //        double r = Math.Sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
 
-                    if(r <= cx)
-                    {
-                        wafermap[y * sizeX + x] = 1;
-                    }
-                    else
-                    {
-                        wafermap[y * sizeX + x] = 0;
-                    }
-                }
-            }
+            //        if(r <= cx)
+            //        {
+            //            wafermap[y * sizeX + x] = 1;
+            //        }
+            //        else
+            //        {
+            //            wafermap[y * sizeX + x] = 0;
+            //        }
+            //    }
+            //}
 
 
 
-            //WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap, 1430, 1090);
-            WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap);
+            ////WaferMapInfo mapInfo = new WaferMapInfo(sizeX, sizeY, wafermap, 1430, 1090);
+            //WaferMapData mapInfo = new WaferMapData(sizeX, sizeY, wafermap);
 
-            WorkplaceBundle workplacebundle = new WorkplaceBundle();
-            //workplacebundle = WorkplaceBundle.CreateWaferMap(mapInfo , );
-            workplacebundle.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
+            //WorkplaceBundle workplacebundle = new WorkplaceBundle();
+            ////workplacebundle = WorkplaceBundle.CreateWaferMap(mapInfo , );
+            //workplacebundle.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
 
-            this.workplacebundleList.Add(workplacebundle);
+            //this.workplacebundleList.Add(workplacebundle);
 
-            this.workplacebundle.Clear();
-            this.gridMap.Children.Clear();
-            this.gridMap.RowDefinitions.Clear();
-            this.gridMap.ColumnDefinitions.Clear();
+            //this.workplacebundle.Clear();
+            //this.gridMap.Children.Clear();
+            //this.gridMap.RowDefinitions.Clear();
+            //this.gridMap.ColumnDefinitions.Clear();
 
-            RefreshListWorkplaceBundleStack();
+            //RefreshListWorkplaceBundleStack();
         }
 
         private void SetInspectionMap(int sizeX, int sizeY)

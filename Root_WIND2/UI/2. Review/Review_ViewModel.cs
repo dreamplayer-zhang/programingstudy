@@ -27,10 +27,7 @@ namespace Root_WIND2
 {
     class Review_ViewModel : ObservableObject
     {
-        MainWindow m_MainWindow;
-        RecipeManager m_reviewRecipeManager;
-        Recipe m_reviewRecipe;
-        List<ChipData> m_ListWaferMap;
+        Recipe recipe;
         List<Defect> m_ReviewDefectlist;
 
         private ObservableCollection<UIElement> m_Element = new ObservableCollection<UIElement>();
@@ -48,16 +45,13 @@ namespace Root_WIND2
 
         public DefectView m_DefectView = new DefectView();
 
-        public Review_ViewModel(MainWindow main, Review review)
+        public Review_ViewModel(Review review)
         {
-            init(main);
+            init();
             ReviewWaferCanvas = review.ReviewWaferCanvas;
         }
-        public void init(MainWindow main = null)
+        public void init()
         {
-            m_MainWindow = main;
-            m_reviewRecipeManager = new RecipeManager();
-            m_reviewRecipe = m_reviewRecipeManager.GetRecipe();
             p_Element.Add(m_DefectView);
         }
 
@@ -68,8 +62,7 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    m_MainWindow.MainPanel.Children.Clear();
-                    m_MainWindow.MainPanel.Children.Add(m_MainWindow.ModeUI);
+                    UIManager.Instance.ChangUIMode();
                 });
             }
         }
@@ -101,6 +94,7 @@ namespace Root_WIND2
             }
 
         }
+        public Recipe Recipe { get => recipe; set => recipe = value; }
 
         private Database_DataView_VM m_DataViewer_Lotinfo = new Database_DataView_VM();
         public Database_DataView_VM p_DataViewer_Lotinfo
@@ -175,6 +169,8 @@ namespace Root_WIND2
                 }
             }
         }
+
+
 
         #endregion
 
@@ -256,19 +252,17 @@ namespace Root_WIND2
             wafer_circle.StrokeThickness = 0.5;
             ReviewWaferCanvas.Children.Add(wafer_circle);
 
-            RecipeData_Origin originData = m_reviewRecipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
-            RecipeInfo_MapData mapdata = m_reviewRecipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
-            WaferMapInfo LoadwaferMapInfo = mapdata.m_WaferMap;
-            m_ListWaferMap = LoadwaferMapInfo.ListWaferMap;
+            BacksideRecipe backsideRecipe = Recipe.GetRecipe<BacksideRecipe>();
+            RecipeType_WaferMap mapdata = Recipe.WaferMap;
             
             double dWaferRaius = wafer_circle.Width / (double)2;
-            double dSamplingRatio = dWaferRaius / (double)originData.Backside_Radius;
+            double dSamplingRatio = dWaferRaius / (double)backsideRecipe.Radius;
 
-            int nOriginRelx = originData.OriginX - originData.Backside_CenterX;
-            int nOriginRely = originData.OriginY - originData.Backside_CenterY;
+            int nOriginRelx = backsideRecipe.OriginX - backsideRecipe.CenterX;
+            int nOriginRely = backsideRecipe.OriginY - backsideRecipe.CenterY;
 
-            double dPitchx = (double)originData.DiePitchX * dSamplingRatio;
-            double dPitchy = (double)originData.DiePitchY * dSamplingRatio;
+            double dPitchx = (double)backsideRecipe.DiePitchX * dSamplingRatio;
+            double dPitchy = (double)backsideRecipe.DiePitchY * dSamplingRatio;
 
             // 
             //double dPitchx = (double)ReviewWaferCanvas.Width / (double)LoadwaferMapInfo.MapSizeX;
@@ -282,9 +276,9 @@ namespace Root_WIND2
 
 
             double Left = dCanvasWaferCenterX + dRelx;
-            double Top = (dCanvasWaferCenterY + dRely) - (dPitchy * (mapdata.m_WaferMap.MasterDieY + 1));
+            double Top = (dCanvasWaferCenterY + dRely) - (dPitchy * (mapdata.MasterDieY + 1));
             double Right = dCanvasWaferCenterX + dRelx + dPitchx;
-            double Bottom = dCanvasWaferCenterY + dRely - (dPitchy * (mapdata.m_WaferMap.MasterDieY + 1)) + dPitchy;
+            double Bottom = dCanvasWaferCenterY + dRely - (dPitchy * (mapdata.MasterDieY + 1)) + dPitchy;
 
 
             foreach (Defect defect in m_ReviewDefectlist)
@@ -300,18 +294,11 @@ namespace Root_WIND2
                 ellipse.Height = 3;
                 ellipse.Opacity = 0.7;
 
-                //ellipse.StrokeThickness = 0.2;
                 Canvas.SetZIndex(ellipse, 99);
-
-                //Canvas.SetLeft(ellipse, Left + (dPitchx * i) + defect.fRelX * dSamplingRatio); // 
-                //Canvas.SetTop(ellipse, Top + (dPitchy * j) + defect.fRelY * dSamplingRatio);
-                //Canvas.SetRight(ellipse, Right + (dPitchx * i) + (defect.fRelX + 10) * dSamplingRatio);
-                //Canvas.SetBottom(ellipse, Bottom + (dPitchy * j) + (defect.fRelY + 10) * dSamplingRatio);
 
                 Canvas.SetLeft(ellipse, dCanvasWaferCenterX + defect.m_fRelX * dSamplingRatio); // 
                 Canvas.SetTop(ellipse, dCanvasWaferCenterY + defect.m_fRelY * dSamplingRatio);
-               // Canvas.SetRight(ellipse, dCanvasWaferCenterX + (defect.fRelX + 10) * dSamplingRatio);
-               // Canvas.SetBottom(ellipse, dCanvasWaferCenterY + (defect.fRelY + 10) * dSamplingRatio);
+
 
                 ReviewWaferCanvas.Children.Add(ellipse);
                 ellipse.MouseLeftButtonDown += Defect_MouseLeftButtonDown;
@@ -319,141 +306,46 @@ namespace Root_WIND2
 
             #region Backside ChipMap 그리기
 
-            foreach (ChipData chipData in m_ListWaferMap)
+            for(int y = 0; y < this.Recipe.WaferMap.MapSizeY; y++)
             {
-                int i = (int)chipData.MapIndex.X;
-                int j = (int)chipData.MapIndex.Y;
-
-                Rectangle crect = new Rectangle();
-                crect.Width = dPitchx;
-                crect.Height = dPitchy;
-
-                Canvas.SetLeft(crect, Left + (dPitchx * i));
-                Canvas.SetTop(crect, Top + (dPitchy * j));
-                Canvas.SetRight(crect, Right + (dPitchx * i));
-                Canvas.SetBottom(crect, Bottom + (dPitchy * j));
-
-                // 
-                if (chipData.chipinfo == ChipInfo.Normal_Chip)
+                for (int x = 0; x < this.Recipe.WaferMap.MapSizeX; x++)
                 {
-                    crect.Stroke = Brushes.Transparent;
-                    crect.Fill = Brushes.Green;
-                    chipData.chipinfo = ChipInfo.Normal_Chip;
-                    crect.Opacity = 0.5;
-                    crect.StrokeThickness = 0.2;
-                    Canvas.SetZIndex(crect, 99);
-                    // ReviewWaferCanvas.Children.Add(crect);
+                    Rectangle crect = new Rectangle();
+                    crect.Width = dPitchx;
+                    crect.Height = dPitchy;
 
-                    //Ellipse ellipse = new Ellipse();
-                    //ellipse.Stroke = Brushes.Transparent;
-                    //ellipse.Fill = Brushes.Red;
-                    //ellipse.Width = 2;
-                    //ellipse.Height = 2;
-                    //ellipse.Opacity = 0.7;
-                    //ellipse.StrokeThickness = 0.2;
-                    //Canvas.SetZIndex(ellipse, 99);
+                    Canvas.SetLeft(crect, Left + (dPitchx * x));
+                    Canvas.SetTop(crect, Top + (dPitchy * y));
+                    Canvas.SetRight(crect, Right + (dPitchx * x));
+                    Canvas.SetBottom(crect, Bottom + (dPitchy * y));
 
-                    //Canvas.SetLeft(ellipse, Left + (dPitchx * i) + 10);
-                    //Canvas.SetTop(ellipse, Top + (dPitchy * j) + 10);
-                    //Canvas.SetRight(ellipse, Left + (dPitchx * i) + 30);
-                    //Canvas.SetBottom(ellipse, Top + (dPitchx * i) + 30);
-                    //ReviewWaferCanvas.Children.Add(ellipse);
-                    //ellipse.MouseLeftButtonDown += Defect_MouseLeftButtonDown;
+                    // 
+
+                    if(this.Recipe.WaferMap.GetChipType(x, y) == CHIP_TYPE.NORMAL)
+                    {
+                        crect.Stroke = Brushes.Transparent;
+                        crect.Fill = Brushes.Green;
+                        crect.Opacity = 0.5;
+                        crect.StrokeThickness = 0.2;
+                        Canvas.SetZIndex(crect, 99);
+                    }
+                    else
+                    {
+                        crect.Stroke = Brushes.Transparent;
+                        crect.Fill = Brushes.DimGray;
+                        crect.Opacity = 0.5;
+                        crect.StrokeThickness = 0.2;
+                        Canvas.SetZIndex(crect, 99);
+                    }
                 }
-                //else
-                //{
-                //    //chipInfo.chipinfo = ChipInfo.No_Chip;
-                //    crect.Stroke = Brushes.Transparent;
-                //    crect.Fill = Brushes.DimGray;
-                //    crect.Opacity = 0.7;
-                //    crect.StrokeThickness = 0.2;
-                //    Canvas.SetZIndex(crect, 99);
-                //}
-
-
-                //ReviewWaferCanvas.Children.Add(crect);
             }
 
             #endregion
-
-            #region Front Chip Map 그리기
-
-            // Front 그리기
-            //if (LoadwaferMapInfo != null)
-            //{
-            //    //m_ListWaferMap.Clear();
-            //    nMapsizeX = LoadwaferMapInfo.nMapSizeX;
-            //    nMapsizeY = LoadwaferMapInfo.nMapSizeY;
-            //    ListWaferMap = LoadwaferMapInfo.ListWaferMap;
-
-            //    /////////
-            //    ReviewWaferCanvas.Children.Clear(); // 초기화
-            //    int waferSize = nWaferSize;
-            //    int r = waferSize / 2;
-
-            //    double dChipX = (double)ReviewWaferCanvas.Width / (double)nMapsizeX;
-            //    double dChipY = (double)ReviewWaferCanvas.Height / (double)nMapsizeY;
-
-            //    int x = 0;
-            //    int y = 0;
-            //    int nChip_Left = 0;
-            //    int nChip_Top = 0;
-            //    int nChip_Right = nMapsizeX;
-            //    int nChip_Bottom = nMapsizeY;
-
-            //    Size chipSize = new Size(dChipX, dChipY);
-            //    Point originPt = new Point(0, 0); // ???
-
-            //    foreach (ChipData chipData in ListWaferMap)
-            //    {
-            //        int i = (int)chipData.MapIndex.X;
-            //        int j = (int)chipData.MapIndex.Y;
-            //        Rectangle crect = new Rectangle();
-            //        crect.Width = chipSize.Width;
-            //        crect.Height = chipSize.Height;
-            //        Canvas.SetLeft(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * i));
-            //        Canvas.SetRight(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * i) + chipSize.Width);
-            //        Canvas.SetTop(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * j));
-            //        Canvas.SetBottom(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * j) + chipSize.Height);
-
-            //        if (chipData.chipinfo == ChipInfo.Normal_Chip)
-            //        {
-            //            crect.Tag = chipData;
-            //            crect.ToolTip = chipData.DiePoint.X.ToString() + ", " + chipData.DiePoint.Y.ToString(); // chip index
-            //            crect.Stroke = Brushes.Transparent;
-            //            crect.Fill = Brushes.Green;
-            //            chipData.chipinfo = ChipInfo.Normal_Chip;
-            //            crect.Opacity = 0.7;
-            //            crect.StrokeThickness = 2;
-            //            Canvas.SetZIndex(crect, 99);
-            //            //m_ListWaferMap.Add(chipData);
-            //        }
-            //        //else
-            //        //{
-            //        //    //chipInfo.chipinfo = ChipInfo.No_Chip;
-            //        //    crect.Tag = chipData;
-            //        //    crect.ToolTip = chipData.DiePoint.X.ToString() + ", " + chipData.DiePoint.Y.ToString(); // chip index
-            //        //    crect.Stroke = Brushes.Transparent;
-            //        //    crect.Fill = Brushes.DimGray;
-            //        //    crect.Opacity = 0.7;
-            //        //    crect.StrokeThickness = 2;
-            //        //    Canvas.SetZIndex(crect, 99);
-            //        //}
-            //        ReviewWaferCanvas.Children.Add(crect);
-            //        //crect.MouseLeftButtonDown += crect_MouseLeftButtonDown;
-            //    }
-            //}
-
-
-            #endregion
-
         }
 
         private void Defect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Rectangle selected = (Rectangle)sender;
-            //ChipData chipData = (ChipData)selected.Tag;
-            //int stride = (int)m_MapData.PartialMapSize.Height;
             selected.Fill = Brushes.Blue;
         }
 

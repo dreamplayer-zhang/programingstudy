@@ -31,14 +31,16 @@ namespace Root_WIND2
     {
         private Canvas canvas;
         int nWaferSize = 300;
-        int nMapsizeX = 14;
-        int nMapsizeY = 14;
+        int mapSizeX = 14;
+        int mapSizeY = 14;
         int nOriginX = 10;
         int nOriginY = 10;
         int nShotX = 1;
         int nShotY = 1;
         int nChipsizeX = 14;
         int nChipsizeY = 14;
+
+        int[] mapdata;
 
         // Shot Info
         float fShotOriginX = 0F;
@@ -48,34 +50,32 @@ namespace Root_WIND2
         int nShotSizeX = 1;
         int nShotSizeY = 1;
 
-        List<ChipData> m_ListWaferMap;
-        Recipe m_Recipe;
-        RecipeInfo m_RecipeInfo;
+        Recipe recipe;
         //MapData m_WaferMap;
         #region GET/SET
         public Canvas myCanvas { get => canvas; set => canvas = value; }
-        public int pWaferSize { get => nWaferSize; set => nWaferSize = value; }
-        public int pMapsizeX 
+        public int WaferSize { get => nWaferSize; set => nWaferSize = value; }
+        public int MapSizeX 
         { 
-            get => nMapsizeX; 
+            get => mapSizeX; 
             set
             {
-                SetProperty(ref nMapsizeX, value);                
+                SetProperty(ref mapSizeX, value);                
             }
         }
-        public int pMapsizeY
+        public int MapSizeY
         {
-            get => nMapsizeY;
+            get => mapSizeY;
             set
             {
-                SetProperty(ref nMapsizeY, value);
+                SetProperty(ref mapSizeY, value);
             }
         }
-        public int pOriginX { get => nOriginX; set => nOriginX = value; }
-        public int pOriginY { get => nOriginY; set => nOriginY = value; }
-        public int pShotX { get => nShotX; set => nShotX = value; }
-        public int pShotY { get => nShotY; set => nShotY = value; }
-        public int pChipsizeX
+        public int OriginX { get => nOriginX; set => nOriginX = value; }
+        public int OriginY { get => nOriginY; set => nOriginY = value; }
+        public int ShotX { get => nShotX; set => nShotX = value; }
+        public int ShotY { get => nShotY; set => nShotY = value; }
+        public int ChipsizeX
         {
             get => nChipsizeX;
             set
@@ -83,7 +83,7 @@ namespace Root_WIND2
                 SetProperty(ref nChipsizeX, value);
             }
         }
-        public int pChipsizeY
+        public int ChipsizeY
         {
             get => nChipsizeY;
             set
@@ -101,7 +101,7 @@ namespace Root_WIND2
 
         #endregion
 
-        public byte[] defaultWaferMap = new byte[] // 14x14
+        public int[] defaultWaferMap = new int[] // 14x14
         {
                 0,0,0,0,0,1,1,1,1,0,0,0,0,0,//1 x+(y * width)
                 0,0,0,1,1,1,1,1,1,1,1,0,0,0,//2
@@ -165,17 +165,22 @@ namespace Root_WIND2
         {
         }
 
-        public void Init(Setup_ViewModel setup, FrontSideMap map, Recipe recipe)
+        public void Init(Setup_ViewModel setup, FrontSideMap map, Recipe _recipe)
         {
-            canvas = map.myCanvas;
-            m_ListWaferMap = new List<ChipData>();
-            m_Recipe = recipe;
-            m_RecipeInfo = recipe.GetRecipeInfo();
+            this.canvas = map.myCanvas;
+            this.recipe = _recipe;
+
+            this.MapSizeX = this.recipe.WaferMap.MapSizeX;
+            this.MapSizeY = this.recipe.WaferMap.MapSizeY;
+            this.mapdata = new int[this.MapSizeX * this.MapSizeY];
             DrawMaps();
         }
 
         public void CreateWaferMap()
         {
+            this.mapdata = new int[this.mapSizeX * this.mapSizeY];
+            for (int i = 0; i < this.mapSizeX * this.mapSizeY; i++)
+                this.mapdata[i] = (int)CHIP_TYPE.NORMAL;
 
             DrawMaps();
             //DrawWaferCircle();
@@ -191,94 +196,56 @@ namespace Root_WIND2
         public void SetDefaultMap()
         {
             myCanvas.Children.Clear(); // 초기화
-            m_ListWaferMap.Clear();
-            int nX = 14;
-            int nY = 14;
-            byte[] wafermap = defaultWaferMap;
 
-            int nOriginX = 0;
-            int nOriginY = 0;
+            this.mapdata = (int[])defaultWaferMap.Clone();
 
-            for (int y = 0; y < 14; y++)
-            {
-                for (int x = 0; x < 14; x++)
-                {
-                    ChipData chipInfo = new ChipData();
-                    chipInfo.MapIndex = new Point(x, y);
-                    chipInfo.DiePoint = new Point(x - nOriginX, y - nOriginY);
-
-                    if (wafermap[y + nX * x] == 0)
-                    {
-                        chipInfo.chipinfo = ChipInfo.No_Chip;
-                    }
-                    else
-                    {
-                        chipInfo.chipinfo = ChipInfo.Normal_Chip;
-                    }
-                    m_ListWaferMap.Add(chipInfo);
-                }
-            }
-
-
-            WaferMapInfo waferMapInfo = new WaferMapInfo(nX, nY, wafermap, m_ListWaferMap);
-            pMapsizeX = waferMapInfo.nMapSizeX;
-            pMapsizeY = waferMapInfo.nMapSizeY;
-            m_ListWaferMap = waferMapInfo.ListWaferMap;
+            this.MapSizeX = 14;
+            this.MapSizeY = 14;
 
 
             int waferSize = nWaferSize;
             int r = waferSize / 2;
 
-            double dChipX = (double)myCanvas.Width / (double)nMapsizeX;
-            double dChipY = (double)myCanvas.Height / (double)nMapsizeY;
+            double dChipX = (double)myCanvas.Width / (double)mapSizeX;
+            double dChipY = (double)myCanvas.Height / (double)mapSizeY;
             int nChip_Left = 0;
             int nChip_Top = 0;
-            int nChip_Right = nMapsizeX;
-            int nChip_Bottom = nMapsizeY;
+            int nChip_Right = mapSizeX;
+            int nChip_Bottom = mapSizeY;
 
             Size chipSize = new Size(dChipX, dChipY);
             Point originPt = new Point(0, 0); // ???
 
-            foreach (ChipData chipData in m_ListWaferMap)
+            for(int y = 0; y < this.MapSizeY; y++)
             {
-                int i = (int)chipData.MapIndex.X;
-                int j = (int)chipData.MapIndex.Y;
-                Rectangle crect = new Rectangle();
-                crect.Width = chipSize.Width;
-                crect.Height = chipSize.Height;
-                Canvas.SetLeft(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * i));
-                Canvas.SetRight(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * i) + chipSize.Width);
-                Canvas.SetTop(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * j));
-                Canvas.SetBottom(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * j) + chipSize.Height);
+                for(int x = 0; x < this.MapSizeX; x++)
+                {
+                    Rectangle crect = new Rectangle();
+                    crect.Width = chipSize.Width;
+                    crect.Height = chipSize.Height;
+                    Canvas.SetLeft(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * x));
+                    Canvas.SetRight(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * x) + chipSize.Width);
+                    Canvas.SetTop(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * y));
+                    Canvas.SetBottom(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * y) + chipSize.Height);
 
-                if (chipData.chipinfo == ChipInfo.Normal_Chip)
-                {
-                    crect.Tag = chipData;
-                    crect.ToolTip = chipData.DiePoint.X.ToString() + ", " + chipData.DiePoint.Y.ToString(); // chip index
-                    crect.Stroke = Brushes.Transparent;
-                    crect.Fill = Brushes.Green;
-                    chipData.chipinfo = ChipInfo.Normal_Chip;
-                    crect.Opacity = 0.7;
-                    crect.StrokeThickness = 2;
-                    Canvas.SetZIndex(crect, 99);
-                    //m_ListWaferMap.Add(chipData);
-                }
-                else
-                {
-                    //chipInfo.chipinfo = ChipInfo.No_Chip;
-                    crect.Tag = chipData;
-                    crect.ToolTip = chipData.DiePoint.X.ToString() + ", " + chipData.DiePoint.Y.ToString(); // chip index
+                    crect.Tag = new CPoint(x, y);
+                    crect.ToolTip = string.Format("({0}, {1})", x, y); // chip index
                     crect.Stroke = Brushes.Transparent;
                     crect.Fill = Brushes.DimGray;
                     crect.Opacity = 0.7;
                     crect.StrokeThickness = 2;
+
+                    if (this.mapdata[y * this.MapSizeX + x] == 0) // No Chip
+                        crect.Fill = Brushes.DimGray;
+                    else
+                        crect.Fill = Brushes.Green;
+
                     Canvas.SetZIndex(crect, 99);
 
+                    myCanvas.Children.Add(crect);
+                    crect.MouseLeftButtonDown += crect_MouseLeftButtonDown;
                 }
-                myCanvas.Children.Add(crect);
-                crect.MouseLeftButtonDown += crect_MouseLeftButtonDown;
             }
-
             SetMapData();
         }
 
@@ -286,99 +253,65 @@ namespace Root_WIND2
 
         public void SetMapData()
         {
-            int nSize = m_ListWaferMap.Count;
-            int nX = pMapsizeX;
-            int nY = pMapsizeY;
-            byte[] wafermap = new byte[nSize];
-
-            int nIndex = 0;
-            foreach(ChipData chipData in m_ListWaferMap)
-            {
-                switch (chipData.chipinfo)
-                {
-                    case ChipInfo.Normal_Chip:
-                        wafermap[nIndex++] = 1;
-                        break;
-
-                    case ChipInfo.No_Chip:
-                        wafermap[nIndex++] = 0;
-                        break;                  
-                }
-            }
-            RecipeInfo_MapData mapdata = m_Recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
-            WaferMapInfo waferMapInfo = new WaferMapInfo(nX, nY, wafermap, m_ListWaferMap);
-            mapdata.SetWaferMapData(waferMapInfo);
+            this.recipe.WaferMap.CreateWaferMap(MapSizeX, MapSizeY, mapdata);
         }
 
-        //public void LoadMapData(WaferMapInfo LoadwaferMapInfo)
         public void LoadMapData()
         {     
-            RecipeInfo_MapData mapdata = m_Recipe.GetRecipeInfo(typeof(RecipeInfo_MapData)) as RecipeInfo_MapData;
-            WaferMapInfo LoadwaferMapInfo = mapdata.m_WaferMap;
+            RecipeType_WaferMap waferMap = recipe.WaferMap;
 
-            if(LoadwaferMapInfo != null)
+            if(waferMap.Data != null)
             {
-                m_ListWaferMap.Clear();
-                pMapsizeX = LoadwaferMapInfo.nMapSizeX;
-                pMapsizeY = LoadwaferMapInfo.nMapSizeY;
-                m_ListWaferMap = LoadwaferMapInfo.ListWaferMap;
-
+                this.MapSizeX = waferMap.MapSizeX;
+                this.MapSizeY = waferMap.MapSizeY;
                 /////////
                 myCanvas.Children.Clear(); // 초기화
                 int waferSize = nWaferSize;
                 int r = waferSize / 2;
 
-                double dChipX = (double)myCanvas.Width / (double)nMapsizeX;
-                double dChipY = (double)myCanvas.Height / (double)nMapsizeY;
+                double dChipX = (double)myCanvas.Width / (double)mapSizeX;
+                double dChipY = (double)myCanvas.Height / (double)mapSizeY;
 
-                int x = 0;
-                int y = 0;
                 int nChip_Left = 0;
                 int nChip_Top = 0;
-                int nChip_Right = nMapsizeX;
-                int nChip_Bottom = nMapsizeY;
+                int nChip_Right = mapSizeX;
+                int nChip_Bottom = mapSizeY;
+
+                mapdata = new int[mapSizeX * mapSizeY];
 
                 Size chipSize = new Size(dChipX, dChipY);
                 Point originPt = new Point(0, 0); // ???
 
-                foreach (ChipData chipData in m_ListWaferMap)
+                for (int y = 0; y < this.MapSizeY; y++)
                 {
-                    int i = (int)chipData.MapIndex.X;
-                    int j = (int)chipData.MapIndex.Y;
-                    Rectangle crect = new Rectangle();
-                    crect.Width = chipSize.Width;
-                    crect.Height = chipSize.Height;
-                    Canvas.SetLeft(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * i));
-                    Canvas.SetRight(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * i) + chipSize.Width);
-                    Canvas.SetTop(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * j));
-                    Canvas.SetBottom(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * j) + chipSize.Height);
+                    for (int x = 0; x < this.MapSizeX; x++)
+                    {
+                        Rectangle crect = new Rectangle();
+                        crect.Width = chipSize.Width;
+                        crect.Height = chipSize.Height;
+                        Canvas.SetLeft(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * x));
+                        Canvas.SetRight(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * x) + chipSize.Width);
+                        Canvas.SetTop(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * y));
+                        Canvas.SetBottom(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * y) + chipSize.Height);
 
-                    if (chipData.chipinfo == ChipInfo.Normal_Chip)
-                    {
-                        crect.Tag = chipData;
-                        crect.ToolTip = chipData.DiePoint.X.ToString() + ", " + chipData.DiePoint.Y.ToString(); // chip index
-                        crect.Stroke = Brushes.Transparent;
-                        crect.Fill = Brushes.Green;
-                        chipData.chipinfo = ChipInfo.Normal_Chip;
-                        crect.Opacity = 0.7;
-                        crect.StrokeThickness = 2;
-                        Canvas.SetZIndex(crect, 99);
-                        //m_ListWaferMap.Add(chipData);
-                    }
-                    else
-                    {
-                        //chipInfo.chipinfo = ChipInfo.No_Chip;
-                        crect.Tag = chipData;
-                        crect.ToolTip = chipData.DiePoint.X.ToString() + ", " + chipData.DiePoint.Y.ToString(); // chip index
+                        crect.Tag = new CPoint(x, y);
+                        crect.ToolTip = string.Format("({0}, {1})", x, y); // chip index
                         crect.Stroke = Brushes.Transparent;
                         crect.Fill = Brushes.DimGray;
                         crect.Opacity = 0.7;
                         crect.StrokeThickness = 2;
+
+                        mapdata[y * MapSizeX + x] = (int)waferMap.GetChipType(x, y);
+                        if (waferMap.GetChipType(x, y) == CHIP_TYPE.NO_CHIP) // No Chip
+                            crect.Fill = Brushes.DimGray;
+                        else
+                            crect.Fill = Brushes.Green;
+
                         Canvas.SetZIndex(crect, 99);
 
+                        myCanvas.Children.Add(crect);
+                        crect.MouseLeftButtonDown += crect_MouseLeftButtonDown;
                     }
-                    myCanvas.Children.Add(crect);
-                    crect.MouseLeftButtonDown += crect_MouseLeftButtonDown;
                 }
             }
         }
@@ -434,139 +367,56 @@ namespace Root_WIND2
         public void DrawMaps()
         {
             myCanvas.Children.Clear(); // 초기화
-            m_ListWaferMap.Clear();
             int waferSize = nWaferSize;
             int r = waferSize / 2;
 
-            double dChipX = (double)myCanvas.Width / (double)nMapsizeX;
-            double dChipY = (double)myCanvas.Height / (double)nMapsizeY;
+            double dChipX = (double)myCanvas.Width / (double)mapSizeX;
+            double dChipY = (double)myCanvas.Height / (double)mapSizeY;
 
-            int x = 0;
-            int y = 0;
             int nChip_Left = 0;
             int nChip_Top = 0;
-            int nChip_Right = nMapsizeX;
-            int nChip_Bottom = nMapsizeY;
+            int nChip_Right = mapSizeX;
+            int nChip_Bottom = mapSizeY;
 
             Size chipSize = new Size(dChipX, dChipY);
-            //Size chipSize = new Size(nChipsizeX, nChipsizeY);
-            Point originPt = new Point(0, 0); // ???
+            Point originPt = new Point(0, 0); 
 
-            for (int j = 0; j < (nChip_Top + nChip_Bottom); j++)
-                for (int i = 0; i < (nChip_Left + nChip_Right); i++)
+            for (int y = 0; y < this.MapSizeY; y++)
+            {
+                for (int x = 0; x < this.MapSizeX; x++)
                 {
-                    ChipData chipInfo = new ChipData();
-                    chipInfo.MapIndex = new Point(i, j);
-                    chipInfo.DiePoint = new Point(i - x, j - y);
-
                     Rectangle crect = new Rectangle();
                     crect.Width = chipSize.Width;
                     crect.Height = chipSize.Height;
+                    Canvas.SetLeft(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * x));
+                    Canvas.SetRight(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * x) + chipSize.Width);
+                    Canvas.SetTop(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * y));
+                    Canvas.SetBottom(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * y) + chipSize.Height);
 
-                    Canvas.SetLeft(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * i));
-                    Canvas.SetRight(crect, originPt.X - (nChip_Left * chipSize.Width) + (chipSize.Width * i) + chipSize.Width);
-                    Canvas.SetTop(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * j));
-                    Canvas.SetBottom(crect, originPt.Y - (nChip_Top * chipSize.Height) + (chipSize.Height * j) + chipSize.Height);
-                    double left = Canvas.GetLeft(crect);
-                    double top = Canvas.GetTop(crect);
-                    double right = Canvas.GetRight(crect);
-                    double bottom = Canvas.GetBottom(crect);
-                    double leftPow = Math.Pow(left - r, 2);
-                    double topPow = Math.Pow(top - r, 2);
-                    double RightPow = Math.Pow(right - r, 2);
-                    double BottomPow = Math.Pow(bottom - r, 2);
-                    double rPow = Math.Pow(r, 2);
-                    bool lt = leftPow + topPow <= rPow;
-                    bool lb = leftPow + BottomPow <= rPow;
-                    bool rt = RightPow + topPow <= rPow;
-                    bool rb = RightPow + BottomPow <= rPow;
+                    crect.Tag = new CPoint(x, y);
+                    crect.ToolTip = string.Format("({0}, {1})", x, y); // chip index
+                    crect.Stroke = Brushes.Transparent;
+                    crect.Fill = Brushes.DimGray;
+                    crect.Opacity = 0.7;
+                    crect.StrokeThickness = 2;
 
-                    List<bool> condition = new List<bool>();
-                    if (lt)
-                        condition.Add(lt);
-                    if (lb)
-                        condition.Add(lb);
-                    if (rt)
-                        condition.Add(rt);
-                    if (rb)
-                        condition.Add(rb);
-
-                    bool bAutoDraw = false;
-                    if (bAutoDraw)
-                    {
-
-                        if (condition.Count == 4) // inner
-                        {
-                            crect.Tag = chipInfo;
-                            crect.ToolTip = chipInfo.DiePoint.X.ToString() + ", " + chipInfo.DiePoint.Y.ToString(); // chip index
-                            crect.Stroke = Brushes.Transparent;
-                            crect.Fill = Brushes.Green;
-                            chipInfo.chipinfo = ChipInfo.Normal_Chip;
-                            crect.Opacity = 0.7;
-                            crect.StrokeThickness = 2;
-                            Canvas.SetZIndex(crect, 99);
-                            m_ListWaferMap.Add(chipInfo);
-                        }
-                        else if (condition.Count >= 1) // Partial
-                        {
-                            chipInfo.chipinfo = ChipInfo.Partial_Chip;
-                            crect.Tag = chipInfo;
-                            crect.ToolTip = chipInfo.DiePoint.X.ToString() + ", " + chipInfo.DiePoint.Y.ToString(); // chip index
-                            crect.Stroke = Brushes.Transparent;
-                            crect.Fill = Brushes.Blue;
-                            crect.Opacity = 0.7;
-                            crect.StrokeThickness = 2;
-                            Canvas.SetZIndex(crect, 99);
-                            m_ListWaferMap.Add(chipInfo);
-                        }
-                        else
-                        {
-                            chipInfo.chipinfo = ChipInfo.No_Chip;
-                            crect.Tag = chipInfo;
-                            crect.ToolTip = chipInfo.DiePoint.X.ToString() + ", " + chipInfo.DiePoint.Y.ToString(); // chip index
-                            crect.Stroke = Brushes.Transparent;
-                            crect.Fill = Brushes.DimGray;
-                            crect.Opacity = 0.7;
-                            crect.StrokeThickness = 2;
-                            Canvas.SetZIndex(crect, 99);
-                            m_ListWaferMap.Add(chipInfo);
-                        }
-                    }
+                    if (this.mapdata[y * this.MapSizeX + x] == 0) // No Chip
+                        crect.Fill = Brushes.DimGray;
                     else
-                    {
-                        
-                        crect.Tag = chipInfo;
-                        crect.ToolTip = chipInfo.DiePoint.X.ToString() + ", " + chipInfo.DiePoint.Y.ToString(); // chip index
-                        crect.Stroke = Brushes.Transparent;
                         crect.Fill = Brushes.Green;
-                        chipInfo.chipinfo = ChipInfo.Normal_Chip;
-                        crect.Opacity = 0.7;
-                        crect.StrokeThickness = 2;
-                        Canvas.SetZIndex(crect, 99);
-                        m_ListWaferMap.Add(chipInfo);
-                    }
 
+                    Canvas.SetZIndex(crect, 99);
 
-                    //var cl = Math.Round(Canvas.GetLeft(crect) * 1000) / 1000;
-                    //var ct = Math.Round(Canvas.GetTop(crect) * 1000) / 1000;
-
-                    //if (cl == Math.Round(originPt.X * 1000) / 1000 && ct == Math.Round((originPt.Y - chipSize.Height) * 1000) / 1000)
-                    //{
-                    //    crect.Fill = Brushes.Red;
-                    //    ChipData chip = (ChipData)crect.Tag;
-                    //    //m_MapData.CenterIndex = new System.Drawing.Point((int)chip.DiePoint.X, (int)chip.DiePoint.Y);
-                    //}
-
-                    // Edit을 위한 Event 추가
                     myCanvas.Children.Add(crect);
                     crect.MouseLeftButtonDown += crect_MouseLeftButtonDown;
                 }
+            }
         }
 
         public void DrawMaps_Shot()
         {
             myCanvas.Children.Clear(); // 초기화
-            m_ListWaferMap.Clear();
+
             float wafer_size = (float)nWaferSize * 1000; // [mm] -> [um]
 
             float wafer_center_x = wafer_size / 2;
@@ -577,14 +427,8 @@ namespace Root_WIND2
             float shot_origin_x = wafer_center_x - fShotOriginX;   // Shot Origin 좌하단 기준
             float shot_origin_y = wafer_center_y + fShotOriginY;
 
-            //float shot_count_x = (float)wafer_size / (float)nShotSizeX;
-            //float shot_count_y = (float)wafer_size / (float)nShotSizeY;
-
             float die_size_x = (float)nShotSizeX / (float)nShotMatrixX;
             float die_size_y = (float)nShotSizeX / (float)nShotMatrixY;
-
-            //float chip_count_x = shot_count_x * nShotMatrixX;
-            //float chip_count_y = shot_count_y * nShotMatrixY;
 
             int left_die_count_x = (int)(shot_origin_x / die_size_x);
             int right_die_count_x = (int)((wafer_size - shot_origin_x) / die_size_x);
@@ -655,11 +499,6 @@ namespace Root_WIND2
             {
                 for(int x = 0; x < die_count_x; x++)
                 {
-                    ChipData chip_data = new ChipData();
-
-                    chip_data.MapIndex = new Point(x, y);
-                    chip_data.DiePoint = new Point(x, y);
-
                     Rectangle canvas_rect = new Rectangle();
                     canvas_rect.Width = canvas_die_size_x;
                     canvas_rect.Height = canvas_die_size_y;
@@ -674,8 +513,8 @@ namespace Root_WIND2
                         (left * left) + (bottom * bottom) > (radius * radius)||
                         (right * right) + (bottom * bottom) > (radius * radius))
                     {
-                        chip_data.chipinfo = ChipInfo.No_Chip;
-                        m_ListWaferMap.Add(chip_data);
+                        //this.recipe.WaferMap.SetChipType(x, y, CHIP_TYPE.NO_CHIP);
+                        this.mapdata[x + y * mapSizeX] = (int)CHIP_TYPE.NO_CHIP;
                         continue;
                     }
 
@@ -685,17 +524,13 @@ namespace Root_WIND2
                     Canvas.SetTop(canvas_rect, (top + wafer_center_y) * ratio_wafer_to_canvas_y);
                     Canvas.SetBottom(canvas_rect, (bottom + wafer_center_y) * ratio_wafer_to_canvas_y);
 
-                    chip_data.chipinfo = ChipInfo.Normal_Chip;
-
-                    canvas_rect.Tag = chip_data;
-                    canvas_rect.ToolTip = chip_data.DiePoint.X.ToString() + ", " + chip_data.DiePoint.Y.ToString(); // chip index
+                    canvas_rect.Tag = new CPoint(x, y);
+                    canvas_rect.ToolTip = string.Format("({0}, {1})", x, y); // chip index
                     canvas_rect.Stroke = Brushes.Transparent;
                     canvas_rect.Fill = Brushes.Green;
                     canvas_rect.Opacity = 0.7;
                     canvas_rect.StrokeThickness = 2;
                     Canvas.SetZIndex(canvas_rect, 99);
-                    m_ListWaferMap.Add(chip_data);
-
 
                     myCanvas.Children.Add(canvas_rect);
                     canvas_rect.MouseLeftButtonDown += crect_MouseLeftButtonDown;
@@ -704,10 +539,10 @@ namespace Root_WIND2
 
             // Set MapInfo
 
-            pMapsizeX = die_count_x;
-            pMapsizeY = die_count_y;
-            pChipsizeX = (int)die_size_x;
-            pChipsizeY = (int)die_size_y;
+            MapSizeX = die_count_x;
+            MapSizeY = die_count_y;
+            ChipsizeX = (int)die_size_x;
+            ChipsizeY = (int)die_size_y;
 
             SetMapData();
         }
@@ -715,18 +550,19 @@ namespace Root_WIND2
         private void crect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Rectangle selected = (Rectangle)sender;
-            ChipData chipData = (ChipData)selected.Tag;
+            CPoint pos = (CPoint)selected.Tag;
             //int stride = (int)m_MapData.PartialMapSize.Height;
+            
 
-            if(chipData.chipinfo == ChipInfo.Normal_Chip)
-            {
-                selected.Fill = Brushes.DimGray;
-                chipData.chipinfo = ChipInfo.No_Chip;
-            }
-            else if(chipData.chipinfo == ChipInfo.No_Chip)
+            if (this.mapdata[this.mapSizeX * pos.Y + pos.X] == (int)CHIP_TYPE.NO_CHIP)
             {
                 selected.Fill = Brushes.Green;
-                chipData.chipinfo = ChipInfo.Normal_Chip;
+                this.mapdata[this.mapSizeX * pos.Y + pos.X] = (int)CHIP_TYPE.NORMAL;
+            }
+            else if (this.mapdata[this.mapSizeX * pos.Y + pos.X] == (int)CHIP_TYPE.NORMAL)
+            {
+                selected.Fill = Brushes.DimGray;
+                this.mapdata[this.mapSizeX * pos.Y + pos.X] = (int)CHIP_TYPE.NO_CHIP;
             }
 
             SetMapData();

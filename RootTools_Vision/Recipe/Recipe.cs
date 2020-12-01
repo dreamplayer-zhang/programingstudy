@@ -4,175 +4,178 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Serialization;
-using RootTools;
 
 namespace RootTools_Vision
 {
-    public class Recipe
+    public class Recipe : IRecipe
     {
+        #region [Member Variables]
+        private string name = "";
 
-        [XmlIgnore] RecipeEditor m_RecipeEditor; // 그리기 데이터
-        public RecipeInfo m_RecipeInfo; // 레시피 정보 데이터
-        public RecipeData m_ReicpeData; // ROI 정보 데이터
-        public Parameter m_Parameter; // 파라미터
+        RecipeType_WaferMap waferMap = new RecipeType_WaferMap();
+
+        private List<RecipeBase> recipeItemList;
+        private List<ParameterBase> parameterItemList;
+        #endregion
+
+        #region [Getter Setter]
+        public string Name { get => name; set => name = value; }
+        public RecipeType_WaferMap WaferMap { get => waferMap; set => waferMap = value; }
+
+        [XmlIgnore]
+        public List<RecipeBase> RecipeItemList { get => recipeItemList; set => recipeItemList = value; }
+
+        [XmlIgnore]
+        public List<ParameterBase> ParameterItemList { get => parameterItemList; set => parameterItemList = value; }
+        #endregion
+        //private List<WaferInfoBase> waferInfoItemList;
+
 
         public Recipe()
         {
-            Init();
+            RecipeItemList = Tools.GetEnumerableOfType<RecipeBase>().ToList<RecipeBase>();
+            ParameterItemList = Tools.GetEnumerableOfType<ParameterBase>().ToList<ParameterBase>();
+            //waferInfoItemList = Tools.GetEnumerableOfType<WaferInfoBase>().ToList<WaferInfoBase>();
         }
 
-        public void Init()
+        public bool Read(string recipePath)
         {
-            m_ReicpeData = new RecipeData(true);
-            m_RecipeInfo = new RecipeInfo(true);
-            m_Parameter = new Parameter();
-            m_RecipeEditor = new RecipeEditor(m_ReicpeData);
-        }
+            bool rst = true;
 
-        #region [ Recipe Save / Load ]
+            string recipeName;
+            string recipeFolderPath;
 
-        public void Save(string sFilePath)
-        {
-            SaveRecipeData(sFilePath);
-            SaveRecipeInfo(sFilePath);
-            SaveRecipeParameter(sFilePath);
-        }
-
-        public void Load(string sFilePath)
-        {
-            LoadRecipeData(sFilePath);
-            LoadRecipeInfo(sFilePath);
-            LoadRecipeParameter(sFilePath);
-        }
-
-        public void SaveRecipeParameter(string sFilePath)
-        {
-            string sPath = Path.GetDirectoryName(sFilePath);
-            string sFileName = Path.GetFileNameWithoutExtension(sFilePath);
-            string sNewFileName = sFileName + "_Parameter.xml";
-            string sResultFilePath = Path.Combine(sPath, sNewFileName);
-
-            FileInfo fi = new FileInfo(sResultFilePath);
-            if (fi.Exists)
-                fi.Delete();
-
-            using (TextWriter tw = new StreamWriter(sResultFilePath))
+            if (File.Exists(recipePath))
             {
-                XmlSerializer xml = new XmlSerializer(m_Parameter.GetType());
-                xml.Serialize(tw, m_Parameter);
+                recipePath = recipePath.Replace(".rcp", "");
+                this.name = recipePath.Substring(recipePath.LastIndexOf("\\") + 1);
+
+                recipeName = recipePath.Substring(recipePath.LastIndexOf("\\") + 1);
+                recipeFolderPath = recipePath.Substring(0, recipePath.LastIndexOf("\\") + 1);
             }
-        }
+            else
+                return false;
 
-        public void LoadRecipeParameter(string sFilePath)
-        {
-            string sPath = Path.GetDirectoryName(sFilePath);
-            string sFileName = Path.GetFileNameWithoutExtension(sFilePath);
-            string sNewFileName = sFileName + "_Parameter.xml";
-            string sResultFilePath = Path.Combine(sPath, sNewFileName);
-
-            XmlSerializer xml = new XmlSerializer(m_Parameter.GetType());
-            using (Stream reader = new FileStream(sResultFilePath, FileMode.Open))
+            try
             {
-                m_Parameter = (Parameter)xml.Deserialize(reader);
+                using (Stream reader = new FileStream(recipeFolderPath + "Base.xml", FileMode.Open))
+                {
+                    XmlSerializer xml = new XmlSerializer(this.GetType());
+                    Recipe temp = this;
+                    temp = (Recipe)xml.Deserialize(reader);
+
+                    this.WaferMap = temp.WaferMap;
+                }
+
+                // Parameter
+                using (Stream reader = new FileStream(recipeFolderPath + "Parameter.xml", FileMode.Open))
+                {
+                    XmlSerializer xml = new XmlSerializer(this.ParameterItemList.GetType());
+                    this.ParameterItemList = (List<ParameterBase>)xml.Deserialize(reader);
+                }
+                // Recipe
+                using (Stream reader = new FileStream(recipeFolderPath + "Recipe.xml", FileMode.Open))
+                {
+                    XmlSerializer xml = new XmlSerializer(this.RecipeItemList.GetType());
+                    this.RecipeItemList = (List<RecipeBase>)xml.Deserialize(reader);
+                }
+
+                // Inspection Info(?)
+
+
+
+                // Xml 파일을 읽은 뒤 이미지나 ROI 등을 불러오기 위해서 각 class에 대한 Read 함수를 호출한다.
+                foreach(ParameterBase param in this.ParameterItemList)
+                {
+                    param.Read(recipeFolderPath);
+                }
+
+                foreach(RecipeBase recipe in this.RecipeItemList)
+                {
+                    recipe.Read(recipeFolderPath);
+                }
             }
-        }
-        
-        public void SaveRecipeInfo(string sFilePath)
-        {
-            string sPath = Path.GetDirectoryName(sFilePath);
-            string sFileName = Path.GetFileNameWithoutExtension(sFilePath);
-            string sNewFileName = sFileName + "_RecipeInfo.xml";
-            string sResultFilePath = Path.Combine(sPath, sNewFileName);
-
-            m_RecipeInfo.SetRecipeInfo(sFileName); // FileName
-
-            FileInfo fi = new FileInfo(sResultFilePath);
-            if (fi.Exists)
-                fi.Delete();
-
-            using (TextWriter tw = new StreamWriter(sResultFilePath))
+            catch(Exception ex)
             {
-                XmlSerializer xml = new XmlSerializer(m_RecipeInfo.GetType());
-                xml.Serialize(tw, m_RecipeInfo);
+                rst = false;
             }
+            
+            return rst;
         }
 
-        public void LoadRecipeInfo(string sFilePath)
+        public bool Save(string recipePath)
         {
-            string sPath = Path.GetDirectoryName(sFilePath);
-            string sFileName = Path.GetFileNameWithoutExtension(sFilePath);
-            string sNewFileName = sFileName + "_RecipeInfo.xml";
-            string sResultFilePath = Path.Combine(sPath, sNewFileName);
+            bool rst = true;
 
-            XmlSerializer xml = new XmlSerializer(m_RecipeInfo.GetType());
-            using (Stream reader = new FileStream(sResultFilePath, FileMode.Open))
+            recipePath = recipePath.Replace(".rcp", "");
+            string recipeName = recipePath.Substring(recipePath.LastIndexOf("\\") + 1);
+            string recipeFolderPath = recipePath.Substring(0 ,recipePath.LastIndexOf("\\") + 1);
+
+            // Xml 파일을 읽은 뒤 이미지나 ROI 등을 불러오기 위해서 각 class에 대한 Save 함수를 호출한다.
+            foreach (ParameterBase param in this.ParameterItemList)
             {
-                m_RecipeInfo = (RecipeInfo)xml.Deserialize(reader);
-            }
-        }
-
-        public void SaveRecipeData(string sFilePath)
-        {
-            string sPath = Path.GetDirectoryName(sFilePath);
-            string sFileName = Path.GetFileNameWithoutExtension(sFilePath);
-            string sNewFileName = sFileName + "_RecipeData.xml";
-            string sResultFilePath = Path.Combine(sPath, sNewFileName);
-
-            FileInfo fi = new FileInfo(sResultFilePath);
-            if (fi.Exists)
-                fi.Delete();
-
-            using (TextWriter tw = new StreamWriter(sResultFilePath))
-            {
-                XmlSerializer xml = new XmlSerializer(m_ReicpeData.GetType());
-                xml.Serialize(tw, m_ReicpeData);
+                param.Save(recipeFolderPath);
             }
 
-            // Recipe Data의 ImageFeature
-            RecipeData_Position position = m_ReicpeData.GetRecipeData(typeof(RecipeData_Position)) as RecipeData_Position;
-            position.SaveFeatures(sPath);
-            //
-        }
-
-        public void LoadRecipeData(string sFilePath)
-        {
-            string sPath = Path.GetDirectoryName(sFilePath);
-            string sFileName = Path.GetFileNameWithoutExtension(sFilePath);
-            string sNewFileName = sFileName + "_RecipeData.xml";
-            string sResultFilePath = Path.Combine(sPath, sNewFileName);
-
-            XmlSerializer xml = new XmlSerializer(m_ReicpeData.GetType());
-            using (Stream reader = new FileStream(sResultFilePath, FileMode.Open))
+            foreach (RecipeBase recipe in this.RecipeItemList)
             {
-                m_ReicpeData = (RecipeData)xml.Deserialize(reader);
+                recipe.Save(recipeFolderPath);
             }
 
-            // Recipe Data의 ImageFeature
-            RecipeData_Position position = m_ReicpeData.GetRecipeData(typeof(RecipeData_Position)) as RecipeData_Position;
-            position.LoadFeatures(sPath);
-            //
+            try
+            {
+                using (TextWriter tw = new StreamWriter(recipeFolderPath + "Base.xml", false))
+                {
+                    XmlSerializer xml = new XmlSerializer(this.GetType());
+                    xml.Serialize(tw, this);
+                }
+
+                using (TextWriter tw = new StreamWriter(recipeFolderPath + "Parameter.xml", false))
+                {
+                    XmlSerializer xml = new XmlSerializer(this.ParameterItemList.GetType());
+                    xml.Serialize(tw, this.ParameterItemList);
+                }
+
+                // Recipe
+                using (TextWriter tw = new StreamWriter(recipeFolderPath + "Recipe.xml", false))
+                {
+                    XmlSerializer xml = new XmlSerializer(this.RecipeItemList.GetType());
+                    xml.Serialize(tw, this.RecipeItemList);
+                }
+            }
+            catch(Exception ex)
+            {
+                rst = false;
+            }
+
+            return rst;
         }
 
-        #endregion
-
-        public ref RecipeData GetRecipeData() { return ref m_ReicpeData; }
-        public ref RecipeInfo GetRecipeInfo() { return ref m_RecipeInfo; }
-        public ref RecipeEditor GetRecipeEditor() { return ref m_RecipeEditor; }
-        public ref Parameter GetParameter() { return ref m_Parameter; }
-
-        public IRecipeData GetRecipeData(Type type)
+        public T GetRecipe<T>()
         {
-            return this.m_ReicpeData.GetRecipeData(type);
-        }
-        public IParameterData GetParameter(Type type)
-        {
-            return this.m_Parameter.GetParameter(type);
-        }
-        public IRecipeInfo GetRecipeInfo(Type type)
-        {
-            return this.m_RecipeInfo.GetRecipeInfo(type);
+            foreach (IRecipe recipe in RecipeItemList)
+            {
+                if (recipe.GetType() == typeof(T))
+                    return (T)recipe;
+            }
+
+            foreach (IRecipe recipe in this.ParameterItemList)
+            {
+                if (recipe.GetType() == typeof(T))
+                    return (T)recipe;
+            }
+
+            return default(T);
         }
 
+        public int CompareTo(IRecipe other)
+        {
+            if (this == other)
+                return 0;
+            else
+                return 1;
+        }
     }
 }

@@ -26,13 +26,13 @@ namespace Root_WIND2
         CPoint PitchPoint = new CPoint();
 
         Recipe m_Recipe;
-        RecipeData_Origin m_RecipeData_Origin;
+        OriginRecipe m_OriginRecipe;
 
         public FrontsideOriginTool_ViewModel(Recipe _recipe)
         {
             base.init();
             m_Recipe = _recipe;
-            m_RecipeData_Origin = _recipe.GetRecipeData(typeof(RecipeData_Origin)) as RecipeData_Origin;
+            m_OriginRecipe = _recipe.GetRecipe<OriginRecipe>();
         }
 
 
@@ -104,14 +104,14 @@ namespace Root_WIND2
                     DrawOriginArea(m_Padding);
                 }
 
-                m_RecipeData_Origin.OriginX = m_OriginPoint.X;
-                m_RecipeData_Origin.OriginY = m_OriginPoint.Y;
+                m_OriginRecipe.OriginX = m_OriginPoint.X;
+                m_OriginRecipe.OriginY = m_OriginPoint.Y;
                 return m_OriginPoint;
             }
             set
             {
-                m_RecipeData_Origin.OriginX = value.X;
-                m_RecipeData_Origin.OriginY = value.Y;
+                m_OriginRecipe.OriginX = value.X;
+                m_OriginRecipe.OriginY = value.Y;
 
                 SetProperty(ref m_OriginPoint, value);
             }
@@ -129,15 +129,15 @@ namespace Root_WIND2
                 //    DrawPitchPoint(PitchPoint);
                 //    DrawOriginArea(m_Padding);
                 //}
-                m_RecipeData_Origin.DiePitchX = m_PitchSize.X;
-                m_RecipeData_Origin.DiePitchY = m_PitchSize.Y;
+                m_OriginRecipe.DiePitchX = m_PitchSize.X;
+                m_OriginRecipe.DiePitchY = m_PitchSize.Y;
 
                 return m_PitchSize;
             }
             set
             {
-                m_RecipeData_Origin.DiePitchX = value.X;
-                m_RecipeData_Origin.DiePitchY = value.Y;
+                m_OriginRecipe.DiePitchX = value.X;
+                m_OriginRecipe.DiePitchY = value.Y;
 
                 SetProperty(ref m_PitchSize, value);
             }
@@ -148,16 +148,16 @@ namespace Root_WIND2
             get
             {
                 DrawOriginArea(m_Padding);
-                m_RecipeData_Origin.InspectionBufferOffsetX = m_Padding.X;
-                m_RecipeData_Origin.InspectionBufferOffsetY = m_Padding.Y;
+                m_OriginRecipe.InspectionBufferOffsetX = m_Padding.X;
+                m_OriginRecipe.InspectionBufferOffsetY = m_Padding.Y;
 
                 return m_Padding;
             }
             set
             {
                 DrawOriginArea(value);
-                m_RecipeData_Origin.InspectionBufferOffsetX = value.X;
-                m_RecipeData_Origin.InspectionBufferOffsetY = value.Y;
+                m_OriginRecipe.InspectionBufferOffsetX = value.X;
+                m_OriginRecipe.InspectionBufferOffsetY = value.Y;
 
                 SetProperty(ref m_Padding, value);
             }
@@ -220,8 +220,8 @@ namespace Root_WIND2
             p_ViewElement.Add(Origin_UI); // UI
 
             // Recipe
-            m_RecipeData_Origin.OriginX = memPt.X; 
-            m_RecipeData_Origin.OriginY = memPt.Y;
+            m_OriginRecipe.OriginX = memPt.X; 
+            m_OriginRecipe.OriginY = memPt.Y;
         }
         private void DrawPitchPoint(CPoint memPt)
         {

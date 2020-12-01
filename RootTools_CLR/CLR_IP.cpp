@@ -315,17 +315,17 @@ namespace RootTools_CLR
 		return local;
 	}
 
-	array<byte>^ CLR_IP::Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode)
+	array<int>^ CLR_IP::Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode)
 	{
 		std::vector<Point> vtPoint;
 		
 		for (int i = 0; i < Contour->Length; i++)
 			vtPoint.push_back(Point(Contour[i]->x / downScale, Contour[i]->y / downScale));
 
-		std::vector<byte> vtMap;
+		std::vector<int> vtMap;
 		vtMap = IP::GenerateMapData(vtPoint, outOriginX, outOriginY, outMapX, outMapY, nW, nH, downScale, isIncludeMode);
 
-		array<byte>^ map = gcnew array<byte>(vtMap.size());
+		array<int>^ map = gcnew array<int>(vtMap.size());
 		bool bResultExist = vtMap.size() > 0;
 
 		if (bResultExist)
@@ -337,17 +337,17 @@ namespace RootTools_CLR
 		}
 		return map;
 	}
-	array<byte>^ CLR_IP::Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, float& outChipSzX, float& outChipSzY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode)
+	array<int>^ CLR_IP::Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, float& outChipSzX, float& outChipSzY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode)
 	{
 		std::vector<Point> vtPoint;
 
 		for (int i = 0; i < Contour->Length; i++)
 			vtPoint.push_back(Point(Contour[i]->x / downScale, Contour[i]->y / downScale));
 
-		std::vector<byte> vtMap;
+		std::vector<int> vtMap;
 		vtMap = IP::GenerateMapData(vtPoint, outOriginX, outOriginY, outChipSzX, outChipSzY, outMapX, outMapY, nW, nH, downScale, isIncludeMode);
 
-		array<byte>^ map = gcnew array<byte>(outMapX * outMapY);
+		array<int>^ map = gcnew array<int>(outMapX * outMapY);
 		bool bResultExist = vtMap.size() > 0;
 
 		if (bResultExist)

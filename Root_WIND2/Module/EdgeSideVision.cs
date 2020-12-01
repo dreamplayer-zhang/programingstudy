@@ -226,7 +226,7 @@ namespace Root_WIND2.Module
 		int nBaslerX = 2048;
 		int nBaslerY = 1080;
 
-		public enum eMemData
+		public enum EDGE_TYPE
 		{
 			EdgeTop,
 			EdgeSide,
@@ -237,14 +237,14 @@ namespace Root_WIND2.Module
 		{
 			int nImageY = (int)(dPulse360 * dTriggerratio + dMargin);
 			int nImageX = 3000;
-			m_memoryEdgeTop = m_memoryPool.GetGroup(p_id).CreateMemory(eMemData.EdgeTop.ToString(), 1, 1, nImageX, nImageY);
-            m_memoryEdgeSide = m_memoryPool.GetGroup(p_id).CreateMemory(eMemData.EdgeSide.ToString(), 1, 1, nImageX, nImageY);
-            m_memoryEdgeBottom = m_memoryPool.GetGroup(p_id).CreateMemory(eMemData.EdgeBottom.ToString(), 1, 1, nImageX, nImageY);
+			m_memoryEdgeTop = m_memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeTop.ToString(), 1, 1, nImageX, nImageY);
+            m_memoryEdgeSide = m_memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeSide.ToString(), 1, 1, nImageX, nImageY);
+            m_memoryEdgeBottom = m_memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeBottom.ToString(), 1, 1, nImageX, nImageY);
             //m_memoryNotch = m_memoryPool.GetGroup(p_id).CreateMemory("Notch", 1, 1, nBaslerX * 9, nBaslerY * 40);
 			//InitStackMemory(3, 20, 3, 20, 3, 20);
 		}
 
-        public ImageData GetMemoryData(eMemData data)
+        public ImageData GetMemoryData(EDGE_TYPE data)
 		{
 			ImageData result = new ImageData(m_memoryPool.GetMemory(p_id, data.ToString()));
 			return result;
