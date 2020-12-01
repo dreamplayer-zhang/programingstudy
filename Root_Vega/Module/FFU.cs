@@ -360,14 +360,17 @@ namespace Root_Vega.Module
 		public int m_nUnit = 1;
 		void RunTreeUnit(Tree tree)
 		{
-			m_nUnit = tree.Set(m_nUnit, m_nUnit, "Count", "Unit Count");
-			while (p_aUnit.Count < m_nUnit)
+			lock (m_csLock)
 			{
-				Unit unit = new Unit(this, p_aUnit.Count);
-				unit.InitFan();
-				p_aUnit.Add(unit);
+				m_nUnit = tree.Set(m_nUnit, m_nUnit, "Count", "Unit Count");
+				while (p_aUnit.Count < m_nUnit)
+				{
+					Unit unit = new Unit(this, p_aUnit.Count);
+					unit.InitFan();
+					p_aUnit.Add(unit);
+				}
+				for (int n = 0; n < m_nUnit; n++) p_aUnit[n].RunTreeUnit(tree.GetTree(p_aUnit[n].m_id, false));
 			}
-			for (int n = 0; n < m_nUnit; n++) p_aUnit[n].RunTreeUnit(tree.GetTree(p_aUnit[n].m_id, false));
 		}
 		#endregion
 
@@ -381,6 +384,7 @@ namespace Root_Vega.Module
 			m_threadFan.Start();
 		} 
 		int m_n = 0;
+		static readonly object m_csLock = new object();
 		void RunThreadFan()
 		{
 			m_bThreadFan = true;
@@ -405,7 +409,12 @@ namespace Root_Vega.Module
 					}
 				}
 				else
-					foreach (Unit unit in p_aUnit) unit.RunThreadFan();
+				{
+					lock (m_csLock)
+					{
+						foreach (Unit unit in p_aUnit) unit.RunThreadFan();
+					}
+				}
 			}
 		}
 		#endregion
