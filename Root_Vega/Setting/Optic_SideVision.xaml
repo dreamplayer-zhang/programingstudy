@@ -1231,7 +1231,7 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
+                                            <!--<ColumnDefinition Width="*"/>-->
                                         </Grid.ColumnDefinitions>
                                         <Button Grid.Column="0"
                                             Margin="5"
@@ -1259,7 +1259,7 @@
                                                 </StackPanel>
                                             </Button.Content>
                                         </Button>
-                                        <Button Grid.Column="2"
+                                        <!--<Button Grid.Column="2"
                                                 Margin="5"
                                                 Command="{Binding CommandTest}"
                                                 Style="{StaticResource BasicBtn}">
@@ -1271,7 +1271,7 @@
                                                            FontSize="15"></TextBlock>
                                                 </StackPanel>
                                             </Button.Content>
-                                        </Button>
+                                        </Button>-->
                                     </Grid>
                                 </Grid>
                                 <Grid Grid.Row="1">

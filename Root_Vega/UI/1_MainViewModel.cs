@@ -6,11 +6,13 @@ using System.Collections.ObjectModel;
 using RootTools.Module;
 using Root_Vega.Module;
 using System.Security.Cryptography.X509Certificates;
+using System.Windows.Threading;
 
 namespace Root_Vega
 {
-    class _1_Mainview_ViewModel : ObservableObject
+    public class _1_Mainview_ViewModel : ObservableObject
     {
+        public Dispatcher _dispatcher;
         Vega_Engineer m_Engineer;
         public Vega_Engineer p_Engineer
         {
@@ -113,6 +115,7 @@ namespace Root_Vega
 
         public _1_Mainview_ViewModel(Vega_Engineer engineer, IDialogService dialogService)
         {
+            _dispatcher = Dispatcher.CurrentDispatcher;
             m_DialogService = dialogService;
             m_Engineer = engineer;
             p_Handler = (Vega_Handler)engineer.ClassHandler();
@@ -185,7 +188,7 @@ namespace Root_Vega
             }
         }
 
-        void TestFunction()
+        public void TestFunction()
         {
             p_MiniImageViewer_Left.SetRoiRect();
             p_MiniImageViewer.SetRoiRect();
