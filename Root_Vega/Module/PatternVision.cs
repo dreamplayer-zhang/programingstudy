@@ -120,6 +120,30 @@ namespace Root_Vega.Module
         ZoomLens m_ZoomLens;
         public RADSControl m_RADSControl;
         public ZoomLens p_ZoomLens;
+
+        bool m_bRunPatternVision = false;
+        public bool p_bRunPatternVision
+        {
+            get { return m_bRunPatternVision; }
+            set
+            {
+                if (m_bRunPatternVision == value) return;
+                m_bRunPatternVision = value;
+                OnPropertyChanged();
+            }
+        }
+        double m_dInspectionProgress = 0.0;
+        public double p_dInspectionProgress
+        {
+            get { return m_dInspectionProgress; }
+            set
+            {
+                if (m_dInspectionProgress == value) return;
+                m_dInspectionProgress = value;
+                OnPropertyChanged();
+            }
+        }
+
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
@@ -819,7 +843,9 @@ namespace Root_Vega.Module
             }
             public override string Run()
             {
+                m_module.p_bRunPatternVision = true;
                 Thread.Sleep((int)(1000 * m_secDelay));
+                m_module.p_bRunPatternVision = false;
                 return "OK";
             }
         }
@@ -847,7 +873,9 @@ namespace Root_Vega.Module
             }
             public override string Run()
             {
+                m_module.p_bRunPatternVision = true;
                 Thread.Sleep((int)(1000 * m_secDelay));
+                m_module.p_bRunPatternVision = false;
                 return "OK";
             }
         }
@@ -962,6 +990,9 @@ namespace Root_Vega.Module
                 // implement
                 try
                 {
+                    m_module.p_bRunPatternVision = true;
+                    m_module.p_dInspectionProgress = 0.0;
+
                     if (m_grabMode == null) return "Grab Mode == null";
                     m_grabMode.SetLight(true);
                     if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == false))
@@ -1111,6 +1142,10 @@ namespace Root_Vega.Module
                                 if (bScanned == true)
                                 {
                                     nInspectStartIndex++;
+                                    // 검사 Progress 계산
+                                    int nTotalInspectAreaSnapCount = roiCurrent.Origin.OriginRect.Width / nCamWidth;
+                                    m_module.p_dInspectionProgress = (double)(nInspectStartIndex - 1) / (double)nTotalInspectAreaSnapCount * 100;
+                                    //
                                     // 2. 생성된 검사영역과 ROI의 겹치는 Rect 추출
                                     CRect crtOverlapedRect = m_mvvm.GetOverlapedRect(crtCurrentArea, roiCurrent.Origin.OriginRect);
                                     if ((crtOverlapedRect.Width > 0) && (crtOverlapedRect.Height > 0))
@@ -1176,6 +1211,7 @@ namespace Root_Vega.Module
                 }
                 finally
                 {
+                    m_module.p_bRunPatternVision = false;
                     m_grabMode.SetLight(false);
                     if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == true))
                     {
@@ -1404,11 +1440,12 @@ namespace Root_Vega.Module
             //--------------------------------------------------------
             public override string Run()
             {
+                m_module.p_bRunPatternVision = true;
                 m_ebrvm._dispatcher.Invoke(new Action(delegate ()
                 {
                     m_ebrvm._startInsp();
                 }));
-
+                m_module.p_bRunPatternVision = false;
                 return "OK";
             }
             //--------------------------------------------------------
@@ -1445,6 +1482,7 @@ namespace Root_Vega.Module
             //--------------------------------------------------------
             public override string Run()
             {
+                m_module.p_bRunPatternVision = true;
                 while (((Vega_Engineer)m_module.m_engineer).m_InspManager.p_qInspection.Count != 0)
                 {
                     Thread.Sleep(1000);
@@ -1456,7 +1494,7 @@ namespace Root_Vega.Module
                     m_mvvm._clearInspReslut();
                     ((Vega_Engineer)m_module.m_engineer).m_InspManager.ClearDefectList();
                 }));
-
+                m_module.p_bRunPatternVision = false;
                 return "OK";
             }
             //--------------------------------------------------------
@@ -1582,6 +1620,8 @@ namespace Root_Vega.Module
                 // implement
                 try
                 {
+                    m_module.p_bRunPatternVision = true;
+
                     if (m_grabMode == null) return "Grab Mode == null";
                     m_grabMode.SetLight(true);
                     if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == false))
@@ -1750,6 +1790,7 @@ namespace Root_Vega.Module
                 }
                 finally
                 {
+                    m_module.p_bRunPatternVision = false;
                     m_grabMode.SetLight(false);
                     if (bUseRADS && (m_grabMode.m_RADSControl.p_IsRun == true))
                     {
@@ -1859,6 +1900,7 @@ namespace Root_Vega.Module
             //--------------------------------------------------------
             public override string Run()
             {
+                m_module.p_bRunPatternVision = true;
                 // variable
                 AxisXY axisXY = m_module.m_axisXY;
                 Axis axisZ = m_module.m_axisZ;
@@ -1868,49 +1910,53 @@ namespace Root_Vega.Module
                 string strVRSImageFullPath = "";
 
                 // implement
-                //RPoint rpDefectPos = GetAxisPosFromMemoryPos(new CPoint(m_nXPos,m_nYPos));
-                //if (m_module.Run(axisXY.StartMove(rpDefectPos))) return p_sInfo;
-                //if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                //if (m_module.Run(axisZ.StartMove(245700))) return p_sInfo;
-                //if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
-                //return "OK";
-
-                StopWatch sw = new StopWatch();
-                string strLightName = "VRS";
-                m_module.SetLightByName(strLightName, 20);
-                if (cam.p_CamInfo._OpenStatus == false) cam.Connect();
-                while (cam.p_CamInfo._OpenStatus == false)
+                try
                 {
-                    if (sw.ElapsedMilliseconds > 15000)
+                    m_module.p_bRunPatternVision = true;
+
+                    StopWatch sw = new StopWatch();
+                    string strLightName = "VRS";
+                    m_module.SetLightByName(strLightName, 20);
+                    if (cam.p_CamInfo._OpenStatus == false) cam.Connect();
+                    while (cam.p_CamInfo._OpenStatus == false)
                     {
-                        sw.Stop();
-                        return "Main VRS Camera Not Connected";
+                        if (sw.ElapsedMilliseconds > 15000)
+                        {
+                            sw.Stop();
+                            return "Main VRS Camera Not Connected";
+                        }
                     }
-                }
-                sw.Stop();
+                    sw.Stop();
 
-                DateTime dtNow = ((Vega_Engineer)m_module.m_engineer).m_InspManager.NowTime;
-                string strNowTime = dtNow.ToString("yyyyMMdd_HHmmss");
-                List<DefectInfo> lstDefectInfo = GetDefectPosList();
-                for (int i = 0; i < lstDefectInfo.Count; i++)
+                    DateTime dtNow = ((Vega_Engineer)m_module.m_engineer).m_InspManager.NowTime;
+                    string strNowTime = dtNow.ToString("yyyyMMdd_HHmmss");
+                    List<DefectInfo> lstDefectInfo = GetDefectPosList();
+                    for (int i = 0; i < lstDefectInfo.Count; i++)
+                    {
+                        // Defect 위치로 이동
+                        RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectInfo[i].cptDefectPos);
+                        if (m_module.Run(axisXY.StartMove(rpDefectPos))) return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        if (m_module.Run(axisZ.StartMove(m_dVRSFocusPosZ_pulse))) return p_sInfo;
+                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+
+                        // VRS 촬영 및 저장
+                        //Thread.Sleep(1000);
+                        string strTemp = cam.Grab();
+                        //                    Thread.Sleep(1000);
+
+                        strVRSImageFullPath = System.IO.Path.Combine(strVRSImageDirectoryPath, strNowTime + "_VRS_" + lstDefectInfo[i].iDefectIndex + ".bmp");
+                        img.SaveImageSync(strVRSImageFullPath);
+                    }
+
+                    return "OK";
+                }
+                finally
                 {
-                    // Defect 위치로 이동
-                    RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectInfo[i].cptDefectPos);
-                    if (m_module.Run(axisXY.StartMove(rpDefectPos))) return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                    if (m_module.Run(axisZ.StartMove(m_dVRSFocusPosZ_pulse))) return p_sInfo;  
-                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
-
-                    // VRS 촬영 및 저장
-                    //Thread.Sleep(1000);
-                    string strTemp = cam.Grab();
-//                    Thread.Sleep(1000);
-
-                    strVRSImageFullPath = System.IO.Path.Combine(strVRSImageDirectoryPath, strNowTime + "_VRS_" + lstDefectInfo[i].iDefectIndex + ".bmp");
-                    img.SaveImageSync(strVRSImageFullPath);
+                    m_module.p_bRunPatternVision = false;
+                    string strLightName = "VRS";
+                    m_module.SetLightByName(strLightName, 0);
                 }
-
-                return "OK";
             }
             //--------------------------------------------------------
             public struct DefectInfo
