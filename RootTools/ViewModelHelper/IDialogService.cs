@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Windows;
-
 namespace RootTools
 {
     public interface IDialogService
@@ -9,6 +7,5 @@ namespace RootTools
                                            where TView : IDialog;
 
         Nullable<bool> ShowDialog<TViewModel>(TViewModel viewModel) where TViewModel : IDialogRequestClose;
-        IDialog GetDialog<TViewModel>(TViewModel viewModel) where TViewModel : IDialogRequestClose;
     }
 }

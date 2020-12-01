@@ -109,7 +109,7 @@ namespace Root_EFEM.Module
             return IsRunOK();
         }
 
-        public bool IsWaferExist(int nID)
+        public bool IsWaferExist(int nID = 0, bool bUseSensor = true)
         {
             switch (m_infoCarrier.p_eState)
             {

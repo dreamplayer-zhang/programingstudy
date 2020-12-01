@@ -33,33 +33,6 @@
             Mappings.Add(typeof(TViewModel), typeof(TView));
         }
 
-        public IDialog GetDialog<TViewModel>(TViewModel viewModel) where TViewModel: IDialogRequestClose
-        {
-            Type viewType = Mappings[typeof(TViewModel)];
-            IDialog dialog = (IDialog)Activator.CreateInstance(viewType);
-
-            EventHandler<DialogCloseRequestedEventArgs> handler = null;
-            handler = (sender, e) =>
-            {
-                viewModel.CloseRequested -= handler;
-
-                if (e.DialogResult.HasValue)
-                {
-                    dialog.DialogResult = e.DialogResult;
-                }
-                else
-                {
-                    dialog.Close();
-                }
-            };
-
-            viewModel.CloseRequested += handler;
-
-            dialog.DataContext = viewModel;
-            dialog.Owner = owner;
-
-            return dialog;
-        }
         public bool? ShowDialog<TViewModel>(TViewModel viewModel) where TViewModel : IDialogRequestClose
         {
             Type viewType = Mappings[typeof(TViewModel)];

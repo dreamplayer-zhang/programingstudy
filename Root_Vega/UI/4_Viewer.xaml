@@ -291,9 +291,6 @@
                     Style="{StaticResource BasicBtn}"
                     Margin="0,0,0,10"
                     Command="{Binding p_ImageViewer.CommandImageClear}" />
-			<!--<Button Content="TEST"
-                    Style="{StaticResource BasicBtn}"
-                    Margin="0,0,0,10" Click="Button_Click" />-->
-		</StackPanel>
+        </StackPanel>
     </Grid>
 </UserControl>

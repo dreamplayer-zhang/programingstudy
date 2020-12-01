@@ -138,7 +138,7 @@
                                     Background="{StaticResource ControlBackGround}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Back"/>-->
-                                <!--<material:PackIcon Kind="ArrowLeftBold"/>-->
+                                <material:PackIcon Kind="ArrowLeftBold"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -150,7 +150,7 @@
                                     Background="{StaticResource ControlBackGround}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Home"/>-->
-                                <!--<material:PackIcon Kind="Home"/>-->
+                                <material:PackIcon Kind="Home"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -162,7 +162,7 @@
                                     Command="{Binding btnLoadRecipe}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Load"/>-->
-                                <!--<material:PackIcon Kind="FileUpload"/>-->
+                                <material:PackIcon Kind="FileUpload"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -175,7 +175,7 @@
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
                                     <!--<TextBlock Text="Save"/>-->
-                                    <!--<material:PackIcon Kind="ContentSave"/>-->
+                                    <material:PackIcon Kind="ContentSave"/>
                                 </StackPanel>
                             </Button.Content>
                         </Button>
