@@ -186,6 +186,7 @@ namespace RootTools.Camera.Dalsa
         {
             m_sServer = tree.Set(m_sServer, m_sServer, "Server", "Camera Dalsa Server Name");
             m_sCamFile = tree.SetFile(m_sCamFile, m_sCamFile, "ccf", "Cam File", "Camera Dalsa Cam File");
+            p_nCamBuf = tree.Set(p_nCamBuf, p_nCamBuf, "Buffer", "Camera Buffer Count");
         }
         #endregion
 
@@ -317,7 +318,7 @@ namespace RootTools.Camera.Dalsa
             m_nLine = nLine;
             m_bInvY = bInvY;
             m_yInvOffset = yInvOffset;
-            int nGrabCount = (int)Math.Ceiling(1.0 * nLine / p_sz.Y);
+            int nGrabCount = (int)(1.0 * nLine / p_sz.Y);
             m_sapBuf.Index = 0;
             m_sapXfer.Snap(nGrabCount);
             m_log.Info("m_sapXfer.Snap = " + nGrabCount.ToString());
