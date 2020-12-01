@@ -38,10 +38,17 @@ namespace Root_Vega
 		}
 		private void InspectionManager_RefreshDefect()
 		{
-			viewer.Dispatcher.Invoke(new Action(delegate ()
+			try
 			{
-				viewer.RefreshDraw();
-			}));
+				viewer.Dispatcher.Invoke(new Action(delegate ()
+				{
+					viewer.RefreshDraw();
+				}));
+			}
+			catch (Exception ex)
+			{
+				System.Diagnostics.Debug.WriteLine(ex.Message);
+			}
 		}
 
 		private void _ClearDefect()
@@ -56,22 +63,14 @@ namespace Root_Vega
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.Message);
+				System.Diagnostics.Debug.WriteLine(ex.Message);
 			}
 		}
 
 		private void App_AddDefect(RootTools.DefectDataWrapper item)
 		{
-			bool isChrome = false;
-
-			_Dispatcher.Invoke(new Action(delegate ()
-			{
-				var temp = (_4_ViewerViweModel)this.DataContext;
-				isChrome = temp.p_SelectedMemPool.p_id == App.sPatternPool && temp.p_SelectedMemGroup.p_id == App.sPatternGroup && temp.p_SelectedMemData.p_id == App.sPatternmem;
-			}));
-
 			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.Strip) &&
-				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.Chrome && isChrome)
+				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.Chrome)
 			{
 				try
 				{
@@ -84,7 +83,7 @@ namespace Root_Vega
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine(ex.Message);
+					System.Diagnostics.Debug.WriteLine(ex.Message);
 				}
 			}
 		}
