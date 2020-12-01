@@ -36,12 +36,13 @@ namespace Root_Vega.Module
 						Thread.Sleep(5);
 						if ((p_aFanState[i] & 0x0200) == 0)
 						{
-							p_aIsFanRun[i] = false;
+							m_aTempFanRun[i] = false;
 							m_aFanRPM[i] = 0;
 						}
 						else
-							p_aIsFanRun[i] = true;
+							m_aTempFanRun[i] = true;
 					}
+					p_aIsFanRun = m_aTempFanRun; 
 					OnPropertyChanged();
 				}
 			}
@@ -66,6 +67,7 @@ namespace Root_Vega.Module
 					OnPropertyChanged();
 				}
 			}
+			List<bool> m_aTempFanRun = new List<bool>();
 			List<bool> m_aIsFanRun = new List<bool>();
 			public List<bool> p_aIsFanRun
 			{
@@ -279,6 +281,8 @@ namespace Root_Vega.Module
 					p_aFanPressure.Add(0);
 					m_aTempPressure.Add(0);
 
+					m_aTempFanRun.Add(false);
+					m_aIsFanRun.Add(false);
 					p_aIsFanRun.Add(false);
 					m_aFan.Add(new Fan(this, n));
 				}

@@ -75,15 +75,18 @@ namespace Root_Vega.Module
             SVID m_svValue;
             public double p_fValue
             {
-                get { 
-                    return (m_svValue.p_value != null) ? m_svValue.p_value : 0; }
+                get {
+                    if (m_svValue == null) return 0;
+                    else
+                        return (m_svValue.p_value != null) ? m_svValue.p_value : 0; 
+                }
                 set
                 {
                     try
                     {
-                        OnPropertyChanged();
                         //if ((m_svValue.p_value != null) && (m_svValue.p_value == value)) return; 
                         m_svValue.p_value = value;
+                        OnPropertyChanged();
                         m_alid[0].p_bSet = (m_svValue.p_value < m_aLimit[0]);
                         m_alid[1].p_bSet = (m_svValue.p_value > m_aLimit[1]);
                         p_alid = (m_alid[0].p_bSet || m_alid[1].p_bSet);
@@ -165,17 +168,18 @@ namespace Root_Vega.Module
 				OnPropertyChanged();
 			}
 		}
-		public int p_lData
+        public int p_lData
         {
             get { return m_aData.Count; }
             set
             {
-                if (m_aData.Count == value) return;
-                while (m_aData.Count < value) m_aData.Add(new Data(this, "FDC " + m_aData.Count.ToString()));
-                while (m_aData.Count > value) m_aData.RemoveAt(m_aData.Count - 1);
+
+                    if (m_aData.Count == value) return;
+                    while (m_aData.Count < value) m_aData.Add(new Data(this, "FDC " + m_aData.Count.ToString()));
+                    while (m_aData.Count > value) m_aData.RemoveAt(m_aData.Count - 1);
             }
         }
-        
+
         void RunTreeData(Tree tree)
         {
             int module_number = 0;
@@ -187,7 +191,7 @@ namespace Root_Vega.Module
             foreach (Data data in m_aData)
             {
                 module_number++;
-                data.RunTree(tree.GetTree(data.m_id), module_number); 
+                data.RunTree(tree.GetTree(data.m_id), module_number);
             }
         }
         #endregion
@@ -215,11 +219,13 @@ namespace Root_Vega.Module
 
                 }
             }
-
-            if (m_aData.Count > m_iData)
+            else
             {
-                m_aData[m_iData].ReadInputRegister(m_modbus); 
-                m_iData = (m_iData + 1) % m_aData.Count;
+                if (m_aData.Count > m_iData)
+                {
+                    m_aData[m_iData].ReadInputRegister(m_modbus);
+                    m_iData = (m_iData + 1) % m_aData.Count;
+                }
             }
         }
 

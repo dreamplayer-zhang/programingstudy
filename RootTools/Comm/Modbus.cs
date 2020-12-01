@@ -134,7 +134,8 @@ namespace RootTools.Comm
         public string Connect()
         {
           if (m_client.Connected) return "OK";
-            try { m_client.Connect(); }
+            try { m_client.Connect();
+            }
             catch (Exception) { return "Connection Error"; }
             //m_client.NumberOfRetries = 0; 
             if (m_client.Connected == false) return "Connection False";
