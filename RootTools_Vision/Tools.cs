@@ -173,6 +173,11 @@ namespace RootTools_Vision
             return ms.ToArray();
         }
 
+        public static T CreateInstance<T>()
+        {
+            return Activator.CreateInstance<T>();
+        }
+
         public static object ByteArrayToObject(byte[] byteArr)
         {
             try

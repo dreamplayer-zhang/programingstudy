@@ -30,7 +30,7 @@ namespace Root_Siltron
 
         string AfterPut(int nID);
 
-        bool IsWaferExist(int nID = 0, bool bIgnoreExistSensor = false);
+        bool IsWaferExist(int nID = 0);
 
         void RunTeachTree(Tree tree);
 

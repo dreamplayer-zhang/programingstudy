@@ -162,7 +162,7 @@ namespace Root_WIND2
 
         void ThreadStop()
         {
-            this.program.Engineer.ThreadStop();
+            ProgramManager.Instance.Engineer.ThreadStop();
         }
     }
 }
