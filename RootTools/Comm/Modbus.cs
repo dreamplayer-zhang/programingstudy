@@ -11,7 +11,6 @@ namespace RootTools.Comm
     {
         #region Property
         public string p_id { get; set; }
-
         string _sInfo = "";
         public string p_sInfo
         {
@@ -72,7 +71,6 @@ namespace RootTools.Comm
                 m_reg.Write("p_eComm", (int)p_eComm);
             }
         }
-
         Registry m_reg;
         void InitCommType(string id)
         {

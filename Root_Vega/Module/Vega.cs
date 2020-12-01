@@ -129,7 +129,7 @@ namespace Root_Vega.Module
             }
             m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.", true);
             m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer", true);
-			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA", true);
+			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA", false);
         }
         #endregion
 
