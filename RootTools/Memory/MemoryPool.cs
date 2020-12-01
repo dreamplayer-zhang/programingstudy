@@ -19,10 +19,7 @@ namespace RootTools.Memory
             set
             {
                 if (value == _fGB) return;
-                if (_fGB == 0)
-                {
-                    if (CreatePool(value)) m_memoryTool.MemoryChanged();
-                }
+                if (_fGB == 0) CreatePool(value); 
                 _fGB = value;
                 OnPropertyChanged(); 
                 m_reg.Write("fGB", value);
@@ -34,7 +31,11 @@ namespace RootTools.Memory
             StopWatch sw = new StopWatch();
             long nPool = (long)Math.Ceiling(fGB * c_fGB);
             try { m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool); }
-            catch (Exception) { return false; }
+            catch (Exception) 
+            {
+                m_log.Error(p_id + " Memory Pool Allocate Error : ReStart PC");
+                return false; 
+            }
             m_log.Info(p_id + " Memory Pool Allocate Done " + sw.ElapsedMilliseconds.ToString() + " ms");
             return true;
         }

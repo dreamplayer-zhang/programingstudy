@@ -13,7 +13,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <CheckBox Grid.Row="0" x:Name="checkBoxConnect" Content="Connect" Margin="2"
-                  IsChecked="{Binding p_bConnect}" Click="checkBoxConnect_Click"/>
+                  IsChecked="{Binding m_client.Connected}" Checked="checkBoxConnect_Checked" Unchecked="checkBoxConnect_Unchecked"/>
         <TabControl Grid.Row="1">
             <TabItem Header="CommLog">
                 <local:CommLog_UI x:Name="commLogUI"/>

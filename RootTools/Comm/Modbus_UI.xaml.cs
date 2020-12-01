@@ -24,9 +24,14 @@ namespace RootTools.Comm
             modbus.RunTree(Tree.eMode.Init); 
         }
 
-        private void checkBoxConnect_Click(object sender, RoutedEventArgs e)
-        {
-            m_modbus.Connect(); 
+		private void checkBoxConnect_Checked(object sender, RoutedEventArgs e)
+		{
+            m_modbus.Connect();
         }
-    }
+
+        private void checkBoxConnect_Unchecked(object sender, RoutedEventArgs e)
+		{
+            m_modbus.m_client.Disconnect();
+        }
+	}
 }

@@ -196,15 +196,6 @@ namespace Root_Vega.Module
             base.RunThread();
             Thread.Sleep(m_msInterval);
             
-			if (!m_modbus.m_client.Connected)
-			{
-                n++;
-                if (n > 10)
-                {
-                    m_modbus.Connect();
-                    n = 0;
-                }
-			}
 			if (m_aData.Count > m_iData)
             {
                 m_aData[m_iData].ReadInputRegister(m_modbus); 

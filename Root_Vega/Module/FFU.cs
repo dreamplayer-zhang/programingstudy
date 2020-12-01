@@ -335,13 +335,13 @@ namespace Root_Vega.Module
         void RunTreeUnit(Tree tree)
         {
             m_nUnit = tree.Set(m_nUnit, m_nUnit, "Count", "Unit Count");
-            while (m_aUnit.Count < m_nUnit)
+            while (p_aUnit.Count < m_nUnit)
             {
-                Unit unit = new Unit(this, m_aUnit.Count);
-                unit.InitFan(); 
-                m_aUnit.Add(unit);
+                Unit unit = new Unit(this, p_aUnit.Count);
+                unit.InitFan();
+                p_aUnit.Add(unit);
             }
-            for (int n = 0; n < m_nUnit; n++) m_aUnit[n].RunTreeUnit(tree.GetTree(m_aUnit[n].m_id, false));
+            for (int n = 0; n < m_nUnit; n++) p_aUnit[n].RunTreeUnit(tree.GetTree(p_aUnit[n].m_id, false));
         }
         #endregion
 
@@ -362,7 +362,7 @@ namespace Root_Vega.Module
             while (m_bThreadFan)
             {
                 Thread.Sleep(10);
-                foreach (Unit unit in m_aUnit) unit.RunThreadFan(); 
+                foreach (Unit unit in p_aUnit) unit.RunThreadFan(); 
             }
         }
         #endregion
