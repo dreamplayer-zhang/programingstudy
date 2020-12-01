@@ -194,13 +194,29 @@ namespace Root_Vega.Module
 
         #region Check Thread
         int m_iData = 0;
-        int n = 0;
+        int m_index = 0;
         protected override void RunThread()
         {
             base.RunThread();
             Thread.Sleep(m_msInterval);
-            
-			if (m_aData.Count > m_iData)
+
+            if (!m_modbus.m_client.Connected)
+            {
+                Thread.Sleep(10);
+                m_index++;
+                if (m_index > 50)
+                {
+                    try
+                    {
+                        m_modbus.Connect();
+                        m_index = 0;
+                    }
+                    catch (Exception e) { if (m_log != null) p_sInfo = e + "Connect Error"; }
+
+                }
+            }
+
+            if (m_aData.Count > m_iData)
             {
                 m_aData[m_iData].ReadInputRegister(m_modbus); 
                 m_iData = (m_iData + 1) % m_aData.Count;

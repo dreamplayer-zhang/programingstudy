@@ -397,7 +397,7 @@ namespace Root_Vega.Module
 				{
 					Thread.Sleep(10);
 					m_n++;
-					if (m_n > 10)
+					if (m_n > 50)
 					{
 						try
 						{
