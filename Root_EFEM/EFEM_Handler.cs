@@ -164,7 +164,8 @@ namespace Root_EFEM
         {
             Vision,
             Backside,
-            EBR
+            EBR,
+            AOP
         }
         List<eVision> m_aVisionType = new List<eVision>();
         int m_lVision = 1; 
@@ -179,6 +180,7 @@ namespace Root_EFEM
                 {
                     case eVision.Backside: module = new Vision_Backside(GetVisionID(n), m_engineer); break;
                     case eVision.EBR: module = new Vision_EBR(GetVisionID(n), m_engineer); break;
+                    case eVision.AOP: module = new Vision_AOP(GetVisionID(n), m_engineer); break;
                     case eVision.Vision:
                     default: module = new Vision(GetVisionID(n), m_engineer); break; 
                 }
