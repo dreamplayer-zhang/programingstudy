@@ -34,6 +34,7 @@ namespace Root_Vega.Module
     public class PatternVision : ModuleBase, IRobotChild
     {
         #region ViewModel
+        public _1_Mainview_ViewModel m_mvm;
         public _2_5_MainVisionViewModel m_mvvm;
         public _2_11_EBRViewModel m_ebrvm;
         #endregion
@@ -884,6 +885,7 @@ namespace Root_Vega.Module
         {
             //------------------------------------------------------
             PatternVision m_module;
+            public _1_Mainview_ViewModel m_mvm;
             public _2_5_MainVisionViewModel m_mvvm;
             public RPoint m_rpReticleCenterPos_pulse = new RPoint();    // Reticle 중심의 XY Postiion [pulse]
             public CPoint m_cpMemoryOffset_pixel = new CPoint();        // Memory Offset [pixel]
@@ -914,6 +916,7 @@ namespace Root_Vega.Module
             public Run_Grab(PatternVision module)
             {
                 m_module = module;
+                m_mvm = m_module.m_mvm;
                 m_mvvm = m_module.m_mvvm;
                 InitModuleRun(module);
             }
@@ -1165,6 +1168,13 @@ namespace Root_Vega.Module
                                                 m_mvvm.p_RefFeatureDrawer.m_ListRect.Add(temp);
 
                                                 m_mvvm.p_ImageViewer.SetRoiRect();
+                                            }));
+                                        }
+                                        if (m_mvm._dispatcher != null)
+                                        {
+                                            m_mvm._dispatcher.Invoke(new Action(delegate ()
+                                            {
+                                                m_mvm.TestFunction();
                                             }));
                                         }
 

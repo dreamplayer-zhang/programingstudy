@@ -319,7 +319,7 @@ namespace ViewConverter
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             double dValue = (double)value;
-            return dValue.ToString() + "%";
+            return dValue.ToString("0.0") + "%";
         }
 
         // No need to implement converting back on a one-way binding 

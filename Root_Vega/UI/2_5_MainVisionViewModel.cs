@@ -656,6 +656,8 @@ namespace Root_Vega
 
 			ClearDrawList();
 
+			((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision.p_nTotalBlockCount = 0;
+
 			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
 			for (int k = 0; k < p_PatternRoiList.Count; k++)
 			{
@@ -722,7 +724,7 @@ namespace Root_Vega
 					var endPos = new Point(startPos.X + (int)roiCurrent.Strip.ParameterList[j].InspAreaWidth, startPos.Y + (int)roiCurrent.Strip.ParameterList[j].InspAreaHeight);
 					//6. Start Postiion과 End Position, Inspection Offset을 이용하여 검사 영역을 생성한다. 우선은 일괄 생성을 대상으로 한다
 					var inspRect = new CRect(startPos, endPos);
-
+					((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision.p_nTotalBlockCount = GetTotalBlockCountInPatternInspArea(inspRect, 500);
 					var temp = new UIElementInfo(new Point(inspRect.Left, inspRect.Top), new Point(inspRect.Right, inspRect.Bottom));
 
 					System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
@@ -753,6 +755,27 @@ namespace Root_Vega
 				}
 			}
 			m_Engineer.m_InspManager.StartInspection();//검사 시작!
+		}
+
+		int GetTotalBlockCountInPatternInspArea(CRect crtArea, int nBlockSize)
+		{
+			// variable
+			int nOriginWidth = crtArea.Width;
+			int nOriginHeight = crtArea.Height;
+			int nHorizontalBlockCount = 0;
+			int nVerticalBlockCount = 0;
+			int nTotalBlockCount = 0;
+
+			// implement
+			nHorizontalBlockCount = nOriginWidth / nBlockSize;
+			if (nOriginWidth % nBlockSize != 0) nHorizontalBlockCount++;
+
+			nVerticalBlockCount = nOriginHeight / nBlockSize;
+			if (nOriginHeight % nBlockSize != 0) nVerticalBlockCount++;
+
+			nTotalBlockCount = nHorizontalBlockCount * nVerticalBlockCount;
+
+			return nTotalBlockCount;
 		}
 
 		public void _endInsp()

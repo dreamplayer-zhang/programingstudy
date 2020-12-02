@@ -263,12 +263,12 @@
                                                 </Grid>
                                                 <Grid Grid.Row="3"
                                                       Margin="0,6,0,6">
-                                                    <ProgressBar Value="33"
+                                                    <ProgressBar Value="{Binding p_dSideInspProgress}"
                                                                  Maximum="100"
                                                                  Minimum="0"
                                                                  Background="{StaticResource DarkGray}"
                                                                  Foreground="{StaticResource Green}"/>
-                                                    <TextBlock Text="33%"
+                                                    <TextBlock Text="{Binding p_dSideInspProgress, Converter={StaticResource DoubleToPercentStringConverters}}"
                                                                Style="{StaticResource BasicTb}"
                                                                FontWeight="Black"/>
                                                 </Grid>
@@ -323,7 +323,7 @@
                                                    Grid.Row="1"
                                                    Style="{StaticResource BasicTb}"
                                                    Foreground="{StaticResource Black}"/>
-                                                <TextBlock Text="0"
+                                                <TextBlock Text="{Binding p_nTotalDefectCount}"
                                                    Grid.Column="1"
                                                    Grid.Row="2"
                                                    Style="{StaticResource BasicTb}"

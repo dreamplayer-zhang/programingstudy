@@ -10,8 +10,9 @@ using System.Windows.Threading;
 
 namespace Root_Vega
 {
-    class _1_Mainview_ViewModel : ObservableObject
+    public class _1_Mainview_ViewModel : ObservableObject
     {
+        public Dispatcher _dispatcher;
         Vega_Engineer m_Engineer;
         public Vega_Engineer p_Engineer
         {
@@ -148,10 +149,21 @@ namespace Root_Vega
             }
         }
 
+        int m_nTotalDefectCount = 0;
+        public int p_nTotalDefectCount
+        {
+            get { return m_nTotalDefectCount; }
+            set
+            {
+                SetProperty(ref m_nTotalDefectCount, value);
+            }
+        }
+
         private readonly IDialogService m_DialogService;
 
         public _1_Mainview_ViewModel(Vega_Engineer engineer, IDialogService dialogService)
         {
+            _dispatcher = Dispatcher.CurrentDispatcher;
             m_DialogService = dialogService;
             m_Engineer = engineer;
             m_dispatcherTimer = new DispatcherTimer();
@@ -174,7 +186,13 @@ namespace Root_Vega
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            p_dPatternInspProgress = (double)p_Engineer.m_InspManager.p_nPatternInspDoneNum / (double)p_PatternVision.p_nTotalBlockCount * 100;
+            if (p_PatternVision.p_nTotalBlockCount == 0) p_dPatternInspProgress = 0.0;
+            else p_dPatternInspProgress = (double)p_Engineer.m_InspManager.p_nPatternInspDoneNum / (double)p_PatternVision.p_nTotalBlockCount * 100;
+
+            if (p_SideVision.p_nTotalBlockCount == 0) p_dSideInspProgress = 0.0;
+            else p_dSideInspProgress = (double)p_Engineer.m_InspManager.p_nSideInspDoneNum / (double)p_SideVision.p_nTotalBlockCount * 100;
+
+            p_nTotalDefectCount = p_Engineer.m_InspManager.m_nTotalDefectCount;
         }
 
         void LoadLp1()
@@ -236,7 +254,7 @@ namespace Root_Vega
             }
         }
 
-        void TestFunction()
+        public void TestFunction()
         {
             p_MiniImageViewer_Left.SetRoiRect();
             p_MiniImageViewer.SetRoiRect();

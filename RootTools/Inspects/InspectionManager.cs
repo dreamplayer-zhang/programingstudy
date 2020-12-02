@@ -105,6 +105,8 @@ namespace RootTools.Inspects
             }
         }
 
+		public int m_nTotalDefectCount = 0;
+
 		public bool IsInitialized { get; private set; }
 		public void StartInspection()
 		{
@@ -122,6 +124,7 @@ namespace RootTools.Inspects
 			IsInitialized = true;
 			p_nPatternInspDoneNum = 0;
 			p_nSideInspDoneNum = 0;
+			m_nTotalDefectCount = 0;
 			
 			inspThread = new Thread(DoInspection);
 
@@ -200,7 +203,7 @@ namespace RootTools.Inspects
 								// InspectionTarget별 검사 진행 Counting
 								InspectionTarget inspTarget = GetInspectionTarget(ipQueue.m_nDefectCode);
 								if (inspTarget == InspectionTarget.Chrome || inspTarget == InspectionTarget.EBR) p_nPatternInspDoneNum++;
-								else p_nSideInspDoneNum++;
+								else if (inspTarget > InspectionTarget.SideInspection && inspTarget <= InspectionTarget.SideInspectionBottom) p_nSideInspDoneNum++;
 							}
 						}
 					}
@@ -214,6 +217,7 @@ namespace RootTools.Inspects
 			if (AddSideDefect != null)
 			{
 				AddSideDefect(item);
+				m_nTotalDefectCount++;
 			}
 		}
 
@@ -222,6 +226,7 @@ namespace RootTools.Inspects
 			if (AddEBRDefect != null)
 			{
 				AddEBRDefect(item);
+				m_nTotalDefectCount++;
 			}
 		}
 
@@ -230,6 +235,7 @@ namespace RootTools.Inspects
 			if (AddBevelDefect != null)
 			{
 				AddBevelDefect(item);
+				m_nTotalDefectCount++;
 			}
 		}
 		/// <summary>
@@ -242,6 +248,7 @@ namespace RootTools.Inspects
 			if (AddChromeDefect != null)
 			{
 				AddChromeDefect(item);
+				m_nTotalDefectCount++;
 			}
 		}
 

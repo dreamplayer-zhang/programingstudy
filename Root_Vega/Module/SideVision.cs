@@ -31,6 +31,7 @@ namespace Root_Vega.Module
     public class SideVision : ModuleBase, IRobotChild
     {
         #region ViewModel
+        public _1_Mainview_ViewModel m_mvm;
         public _2_6_SideViewModel m_sivm;
         public _2_9_BevelViewModel m_bevm;
         #endregion
@@ -660,6 +661,18 @@ namespace Root_Vega.Module
             }
         }
 
+        int m_nTotalBlockCount = 0;
+        public int p_nTotalBlockCount
+        {
+            get { return m_nTotalBlockCount; }
+            set
+            {
+                if (m_nTotalBlockCount == value) return;
+                m_nTotalBlockCount = value;
+                OnPropertyChanged();
+            }
+        }
+
         public static ushort[] m_aHeight;
         double m_fScaleH = 0;
         public override void InitMemorys()
@@ -931,6 +944,7 @@ namespace Root_Vega.Module
 
         public class Run_SideGrab : ModuleRunBase
         {
+            _1_Mainview_ViewModel m_mvm;
             SideVision m_module;
             public GrabMode m_grabMode = null;
             string _sGrabMode = "";
@@ -962,6 +976,7 @@ namespace Root_Vega.Module
             public Run_SideGrab(SideVision module)
             {
                 m_module = module;
+                m_mvm = m_module.m_mvm;
                 InitModuleRun(module);
             }
 
@@ -1020,6 +1035,7 @@ namespace Root_Vega.Module
                 try
                 {
                     m_module.p_bRunSideVision = true;
+                    m_module.p_nTotalBlockCount = 0;
                     int nScanLine = 0;
                     m_grabMode.SetLight(true);
                     m_grabMode.SetLightByName("Side Coax", 700);    // SetLight로 켜지면 지워라
@@ -1069,6 +1085,15 @@ namespace Root_Vega.Module
 
                         nScanLine++;
                         cptMemoryOffset_pixel.X += nCamWidth;
+
+                        // MiniViewer Update
+                        if (m_mvm._dispatcher != null)
+                        {
+                            m_mvm._dispatcher.Invoke(new Action(delegate ()
+                            {
+                                m_mvm.TestFunction();
+                            }));
+                        }
                     }
 
                     return "OK";
