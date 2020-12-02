@@ -28,7 +28,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using DPoint = System.Drawing.Point;
 using MBrushes = System.Windows.Media.Brushes;
-
+ 
 namespace Root_Vega.Module
 {
     public class PatternVision : ModuleBase, IRobotChild
