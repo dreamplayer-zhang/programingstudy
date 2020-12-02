@@ -54,7 +54,7 @@ namespace RootTools.Camera.Dalsa
             }
         }
         int _nResourceCnt = 0;
-        public int p_nResourceCnt
+        public int p_nResourceIdx
         {
             get
             {
