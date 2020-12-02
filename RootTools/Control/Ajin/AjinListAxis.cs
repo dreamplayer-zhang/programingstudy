@@ -174,7 +174,7 @@ namespace RootTools.Control.Ajin
 
         public void RunTree(Tree tree)
         {
-            tree.SetFile(p_sMotFile, p_sMotFile, "mot", "MotFile", "Motor 설정  File 위치", true, true);
+            p_sMotFile = tree.SetFile(p_sMotFile, p_sMotFile, "mot", "MotFile", "Motor 설정  File 위치", true, false);
             tree.Set(m_lAxisAjin, m_lAxisAjin, "Detect", "Detected Axis Count", true, true);
         }
 
