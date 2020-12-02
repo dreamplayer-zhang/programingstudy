@@ -1,5 +1,6 @@
 ﻿using Root_CAMELLIA.Data;
 using RootTools;
+using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Control;
 using RootTools.Light;
@@ -7,7 +8,30 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using Met = LibSR_Met;
-
+using Emgu.CV;
+using Emgu.CV.Cvb;
+using Emgu.CV.Structure;
+using RootTools.ImageProcess;
+using RootTools.Camera.Dalsa;
+using RootTools.Control;
+using RootTools.Control.Ajin;
+using RootTools.Inspects;
+using RootTools.Light;
+using RootTools.Memory;
+using RootTools.Module;
+using RootTools.RADS;
+using RootTools.Trees;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading;
+using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using static RootTools.Control.Axis;
+using System.Windows.Diagnostics;
 namespace Root_CAMELLIA.Module
 {
     public class Module_Camellia : ModuleBase
@@ -74,7 +98,7 @@ namespace Root_CAMELLIA.Module
             AddModuleRunList(new Run_Calibration(this), false, "Calibration");
             AddModuleRunList(new Run_WaferCentering(this), false, "Centering");
             AddModuleRunList(new Run_Measure(this), false, "Measurement");
-
+            AddModuleRunList(new Run_VRSTEST(this), false, "VRSTEST");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -280,6 +304,57 @@ namespace Root_CAMELLIA.Module
                     }
                     strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", i);
                     img.SaveImageSync(strVRSImageFullPath);
+                }
+                return "OK";
+            }
+        }
+        public class Run_VRSTEST : ModuleRunBase
+        {
+            Module_Camellia m_module;
+            Met.Nanoview m_NanoView;
+            MainWindow_ViewModel m_mwvm;
+            DataManager m_DataManager;
+            RPoint m_WaferCenterPos_pulse = new RPoint(); // Pulse
+            double m_dResX_um = 1;
+            double m_dResY_um = 1;
+            double m_dFocusZ_pulse = 1; // Pulse
+
+            public Run_VRSTEST(Module_Camellia module)
+            {
+                m_module = module;
+                m_NanoView = module.Nanoview;
+                m_mwvm = module.mwvm;
+                m_DataManager = module.m_DataManager;
+                InitModuleRun(module);
+            }
+            public override ModuleRunBase Clone()
+            {
+                Run_VRSTEST run = new Run_VRSTEST(m_module);
+                run.m_DataManager = m_module.m_DataManager;
+                run.m_WaferCenterPos_pulse = m_WaferCenterPos_pulse;
+                run.m_dResX_um = m_dResX_um;
+                run.m_dResY_um = m_dResY_um;
+                return run;
+            }
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_WaferCenterPos_pulse = tree.Set(m_WaferCenterPos_pulse, m_WaferCenterPos_pulse, "Wafer Center Axis Position", "Wafer Center Axis Position(Pulse)");
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)");
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)");
+                m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)");
+            }
+            public override string Run()
+            {
+                Camera_Basler VRS = m_module.m_CamVRS;
+                ImageData img = VRS.p_ImageViewer.p_ImageData;
+                string strVRSImageDir = "D:\\";
+                string strVRSImageFullPath = "";
+                RPoint MeasurePoint;
+                if (VRS.Grab() == "OK")
+                {
+                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
+                    img.SaveImageSync(strVRSImageFullPath);
+                    //Grab error
                 }
                 return "OK";
             }
