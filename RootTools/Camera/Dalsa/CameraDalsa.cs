@@ -169,7 +169,6 @@ namespace RootTools.Camera.Dalsa
 
         string m_sServer = "";
         string m_sCamFile = "";
-        int m_nResourceCnt = 0;
         void RunTreeConnect(Tree tree)
         {
             m_sServer = tree.Set(m_sServer, m_sServer, "Server", "Camera Dalsa Server Name");
