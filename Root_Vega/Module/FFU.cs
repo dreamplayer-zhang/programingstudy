@@ -244,6 +244,8 @@ namespace Root_Vega.Module
 					p_aFanPressure.Add(0);
 					m_aTempPressure.Add(0);
 
+					p_aFanState.Add(0);
+
 					m_aTempFanRun.Add(false);
 					m_aIsFanRun.Add(false);
 					p_aIsFanRun.Add(false);
