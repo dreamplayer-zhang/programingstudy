@@ -249,8 +249,8 @@ namespace Root_Vega.Module
 				p_sUnit = tree.Set(p_sUnit, p_sUnit, "Unit ID", "Unit ID");
 				m_idUnit = (byte)tree.Set((int)m_idUnit, (int)m_idUnit, "Unit Address", "Unit Address");
 				m_lFan = tree.Set(m_lFan, m_lFan, "Fan Count", "Fan Count");
+				InitFan();
 				for (int n = 0; n < m_lFan; n++) m_aFan[n].RunTree(tree.GetTree(m_aFan[n].m_id));
-				InitFan(); 
 			}
 			#endregion
 
