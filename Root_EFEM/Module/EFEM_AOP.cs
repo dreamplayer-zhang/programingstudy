@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace Root_EFEM.Module
 {
-    public class AOP : ModuleBase
+    public class EFEM_AOP : ModuleBase
     {
         #region ToolBox
         public enum eLamp
@@ -248,7 +248,7 @@ namespace Root_EFEM.Module
         public RFID m_RFID = new RFID();
         #endregion
 
-        public AOP(string id, IEngineer engineer)
+        public EFEM_AOP(string id, IEngineer engineer)
         {
             p_id = id;
             base.InitBase(id, engineer);
@@ -268,8 +268,8 @@ namespace Root_EFEM.Module
 
         public class Run_ReadRFID : ModuleRunBase
         {
-            AOP m_module;
-            public Run_ReadRFID(AOP module)
+            EFEM_AOP m_module;
+            public Run_ReadRFID(EFEM_AOP module)
             {
                 m_module = module;
                 InitModuleRun(module);
