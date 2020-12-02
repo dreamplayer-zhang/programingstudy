@@ -61,7 +61,7 @@ namespace RootTools.Inspects
 		#endregion
 
 		Thread inspThread;
-		Inspection[] InsepctionThread;
+		Inspection[] InspectionThread;
 		StopWatch sw;
 
 		int nThreadNum = 5;
@@ -82,6 +82,28 @@ namespace RootTools.Inspects
 		Dictionary<int, CPoint> refPosDictionary;
 		public DateTime NowTime;
 		bool m_bProgress;
+		int m_nPatternInspDoneNum = 0;
+		public int p_nPatternInspDoneNum
+        {
+            get { return m_nPatternInspDoneNum; }
+            set
+            {
+				if (m_nPatternInspDoneNum == value) return;
+				m_nPatternInspDoneNum = value;
+				OnPropertyChanged("p_nPatternInspDoneNum");
+            }
+        }
+		int m_nSideInspDoneNum = 0;
+		public int p_nSideInspDoneNum
+        {
+            get { return m_nSideInspDoneNum; }
+            set
+            {
+				if (m_nSideInspDoneNum == value) return;
+				m_nSideInspDoneNum = value;
+				OnPropertyChanged("p_nSideInspDoneNum");
+            }
+        }
 
 		public bool IsInitialized { get; private set; }
 		public void StartInspection()
@@ -98,8 +120,10 @@ namespace RootTools.Inspects
 			sw.Start();
 
 			IsInitialized = true;
-
-            inspThread = new Thread(DoInspection);
+			p_nPatternInspDoneNum = 0;
+			p_nSideInspDoneNum = 0;
+			
+			inspThread = new Thread(DoInspection);
 
             //if (inspThread != null)
             //{
@@ -117,14 +141,14 @@ namespace RootTools.Inspects
 				return;
 
 			int nInspDoneNum = 0;
-			InsepctionThread = new Inspection[nThreadNum];
+			InspectionThread = new Inspection[nThreadNum];
 			Parallel.For(0, nThreadNum, i =>
 			{
-				InsepctionThread[i] = new Inspection(nThreadNum);
-				InsepctionThread[i].AddChromeDefect += InspectionManager_AddChromeDefect;
-				InsepctionThread[i].AddSideDefect += InspectionManager_AddSideDefect;
-				InsepctionThread[i].AddBevelDefect += InspectionManager_AddBevelDefect;
-				InsepctionThread[i].AddEBRDefect += InspectionManager_AddEBRDefect;
+				InspectionThread[i] = new Inspection(nThreadNum);
+				InspectionThread[i].AddChromeDefect += InspectionManager_AddChromeDefect;
+				InspectionThread[i].AddSideDefect += InspectionManager_AddSideDefect;
+				InspectionThread[i].AddBevelDefect += InspectionManager_AddBevelDefect;
+				InspectionThread[i].AddEBRDefect += InspectionManager_AddEBRDefect;
 			});
 			//for (int i = 0; i < nThreadNum; i++)
 			//{
@@ -140,9 +164,9 @@ namespace RootTools.Inspects
 				{
 					for (int i = 0; i < nThreadNum; i++)
 					{
-						if (InsepctionThread[i].bState == Inspection.InspectionState.Done)
+						if (InspectionThread[i].bState == Inspection.InspectionState.Done)
 						{
-							InsepctionThread[i].bState = Inspection.InspectionState.Ready;
+							InspectionThread[i].bState = Inspection.InspectionState.Ready;
 							nInspDoneNum++;
 						}
 					}
@@ -161,8 +185,8 @@ namespace RootTools.Inspects
 					{
 						if (0 < GetWaitQueue())
 						{
-							if (InsepctionThread[i].bState == Inspection.InspectionState.Ready ||
-							InsepctionThread[i].bState == Inspection.InspectionState.None)
+							if (InspectionThread[i].bState == Inspection.InspectionState.Ready ||
+							InspectionThread[i].bState == Inspection.InspectionState.None)
 							{
 								InspectionProperty ipQueue = p_qInspection.Dequeue();
 								if ( p_qInspection.Count == 0)
@@ -171,7 +195,12 @@ namespace RootTools.Inspects
 									sw.Stop();
 									Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
 								}
-								InsepctionThread[i].StartInspection(ipQueue, i);
+								InspectionThread[i].StartInspection(ipQueue, i);
+
+								// InspectionTarget별 검사 진행 Counting
+								InspectionTarget inspTarget = GetInspectionTarget(ipQueue.m_nDefectCode);
+								if (inspTarget == InspectionTarget.Chrome || inspTarget == InspectionTarget.EBR) p_nPatternInspDoneNum++;
+								else p_nSideInspDoneNum++;
 							}
 						}
 					}
@@ -373,11 +402,11 @@ namespace RootTools.Inspects
 			//Monitor.Wait(lockObj);
 			m_bProgress = false;
 
-			for (int i = 0; i < InsepctionThread.Length; i++)
+			for (int i = 0; i < InspectionThread.Length; i++)
 			{
-				if (InsepctionThread[i] != null)
+				if (InspectionThread[i] != null)
 				{
-					InsepctionThread[i].Dispose();
+					InspectionThread[i].Dispose();
 				}
 			}
 
@@ -426,12 +455,12 @@ namespace RootTools.Inspects
 			if (!IsInitialized)
 				return;
 
-			if (InsepctionThread != null)
+			if (InspectionThread != null)
 			{
-				for (int i = 0; i < InsepctionThread.Length; i++)
+				for (int i = 0; i < InspectionThread.Length; i++)
 				{
 					//이벤트 핸들러 제거
-					InsepctionThread[i].AddChromeDefect -= InspectionManager_AddChromeDefect;
+					InspectionThread[i].AddChromeDefect -= InspectionManager_AddChromeDefect;
 					//InsepctionThread[i].Dispose();
 				}
 			}

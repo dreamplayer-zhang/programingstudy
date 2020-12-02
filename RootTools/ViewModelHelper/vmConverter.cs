@@ -316,14 +316,14 @@ namespace ViewConverter
 
     public class DoubleToPercentStringConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             double dValue = (double)value;
-            string strReturn = dValue.ToString() + "%";
-            return strReturn;
+            return dValue.ToString() + "%";
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        // No need to implement converting back on a one-way binding 
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             throw new NotImplementedException();
         }

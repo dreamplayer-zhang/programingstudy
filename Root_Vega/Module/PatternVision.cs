@@ -132,14 +132,15 @@ namespace Root_Vega.Module
                 OnPropertyChanged();
             }
         }
-        double m_dInspectionProgress = 0.0;
-        public double p_dInspectionProgress
+
+        int m_nTotalBlockCount = 0;
+        public int p_nTotalBlockCount
         {
-            get { return m_dInspectionProgress; }
+            get { return m_nTotalBlockCount; }
             set
             {
-                if (m_dInspectionProgress == value) return;
-                m_dInspectionProgress = value;
+                if (m_nTotalBlockCount == value) return;
+                m_nTotalBlockCount = value;
                 OnPropertyChanged();
             }
         }
@@ -991,7 +992,7 @@ namespace Root_Vega.Module
                 try
                 {
                     m_module.p_bRunPatternVision = true;
-                    m_module.p_dInspectionProgress = 0.0;
+                    m_module.p_nTotalBlockCount = 0;
 
                     if (m_grabMode == null) return "Grab Mode == null";
                     m_grabMode.SetLight(true);
@@ -1099,6 +1100,7 @@ namespace Root_Vega.Module
                                         // Origin 생성
                                         CPoint cptOriginStart = new CPoint(cptStandard.X + nRefStartOffsetX, cptStandard.Y + nRefStartOffsetY);
                                         roiCurrent.Origin.OriginRect = new CRect(cptOriginStart.X, cptOriginStart.Y, cptOriginStart.X + (int)roiCurrent.Strip.ParameterList[0].InspAreaWidth, cptOriginStart.Y + (int)roiCurrent.Strip.ParameterList[0].InspAreaHeight);
+                                        m_module.p_nTotalBlockCount = GetTotalBlockCountInOriginRect(roiCurrent.Origin.OriginRect, 1000);
                                         break;  // 찾았으니 중단
                                     }
                                     else
@@ -1142,10 +1144,6 @@ namespace Root_Vega.Module
                                 if (bScanned == true)
                                 {
                                     nInspectStartIndex++;
-                                    // 검사 Progress 계산
-                                    int nTotalInspectAreaSnapCount = roiCurrent.Origin.OriginRect.Width / nCamWidth;
-                                    m_module.p_dInspectionProgress = (double)(nInspectStartIndex - 1) / (double)nTotalInspectAreaSnapCount * 100;
-                                    //
                                     // 2. 생성된 검사영역과 ROI의 겹치는 Rect 추출
                                     CRect crtOverlapedRect = m_mvvm.GetOverlapedRect(crtCurrentArea, roiCurrent.Origin.OriginRect);
                                     if ((crtOverlapedRect.Width > 0) && (crtOverlapedRect.Height > 0))
@@ -1220,6 +1218,27 @@ namespace Root_Vega.Module
                         if (m_module.m_CamRADS.p_CamInfo._IsGrabbing == true) m_module.m_CamRADS.StopGrab();
                     }
                 }
+            }
+            //------------------------------------------------------
+            int GetTotalBlockCountInOriginRect(CRect crtOrigin, int nBlockSize)
+            {
+                // variable
+                int nOriginWidth = crtOrigin.Width;
+                int nOriginHeight = crtOrigin.Height;
+                int nHorizontalBlockCount = 0;
+                int nVerticalBlockCount = 0;
+                int nTotalBlockCount = 0;
+
+                // implement
+                nHorizontalBlockCount = nOriginWidth / nBlockSize;
+                if (nOriginWidth % nBlockSize != 0) nHorizontalBlockCount++;
+
+                nVerticalBlockCount = nOriginHeight / nBlockSize;
+                if (nOriginHeight % nBlockSize != 0) nVerticalBlockCount++;
+
+                nTotalBlockCount = nHorizontalBlockCount * nVerticalBlockCount;
+
+                return nTotalBlockCount;
             }
             //------------------------------------------------------
         }

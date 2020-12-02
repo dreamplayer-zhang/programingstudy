@@ -249,14 +249,17 @@
                                                 </Grid>
                                                 <Grid Grid.Row="2"
                                               Margin="0,6,0,6">
-                                                    <ProgressBar Value="{Binding p_PatternVision.p_dInspectionProgress}"
-                                                                 Maximum="100"
+                                                    <ProgressBar Maximum="100"
                                                                  Minimum="0"
+                                                                 Value="{Binding p_dPatternInspProgress}"
                                                  Background="{StaticResource DarkGray}"
-                                                 Foreground="{StaticResource Green}"/>
-                                                    <TextBlock Text="{Binding p_PatternVision.p_dInspectionProgress, Converter={StaticResource DoubleToPercentStringConverters}}"
-                                               Style="{StaticResource BasicTb}"
-                                               FontWeight="Black"/>
+                                                 Foreground="{StaticResource Green}">
+                                                    </ProgressBar>
+                                                    <TextBlock 
+                                                        Text="{Binding p_dPatternInspProgress, Converter={StaticResource DoubleToPercentStringConverters}}"
+                                                        Style="{StaticResource BasicTb}"
+                                                        FontWeight="Black">
+                                                    </TextBlock>
                                                 </Grid>
                                                 <Grid Grid.Row="3"
                                                       Margin="0,6,0,6">
@@ -265,7 +268,7 @@
                                                                  Minimum="0"
                                                                  Background="{StaticResource DarkGray}"
                                                                  Foreground="{StaticResource Green}"/>
-                                                    <TextBlock Text="33"
+                                                    <TextBlock Text="33%"
                                                                Style="{StaticResource BasicTb}"
                                                                FontWeight="Black"/>
                                                 </Grid>
