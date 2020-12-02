@@ -648,6 +648,18 @@ namespace Root_Vega.Module
         MemoryData m_memoryBevelRight;
         MemoryData m_memoryBevelBottom;
 
+        bool m_bRunSideVision = false;
+        public bool p_bRunSideVision
+        {
+            get { return m_bRunSideVision; }
+            set
+            {
+                if (m_bRunSideVision == value) return;
+                m_bRunSideVision = value;
+                OnPropertyChanged();
+            }
+        }
+
         public static ushort[] m_aHeight;
         double m_fScaleH = 0;
         public override void InitMemorys()
@@ -874,8 +886,10 @@ namespace Root_Vega.Module
             }
             public override string Run()
             {
+                m_module.p_bRunSideVision = true;
                 Thread.Sleep((int)(1000 * m_secDelay));
                 m_module.m_gem.STSSetProcessing(m_module.p_infoReticle, RootTools.Gem.GemSlotBase.eSTSProcess.Processed);
+                m_module.p_bRunSideVision = false;
                 return "OK";
             }
         }
@@ -903,12 +917,14 @@ namespace Root_Vega.Module
             }
             public override string Run()
             {
+                m_module.p_bRunSideVision = true;
                 if (EQ.p_bSimulate) Thread.Sleep(100);
                 else
                 {
                     //forget SideVision ModuleRun_Run
                 }
                 m_module.m_gem.STSSetProcessing(m_module.p_infoReticle, RootTools.Gem.GemSlotBase.eSTSProcess.Processed);
+                m_module.p_bRunSideVision = false;
                 return "OK";
             }
         }
@@ -1003,6 +1019,7 @@ namespace Root_Vega.Module
 
                 try
                 {
+                    m_module.p_bRunSideVision = true;
                     int nScanLine = 0;
                     m_grabMode.SetLight(true);
                     m_grabMode.SetLightByName("Side Coax", 700);    // SetLight로 켜지면 지워라
@@ -1058,6 +1075,7 @@ namespace Root_Vega.Module
                 }
                 finally
                 {
+                    m_module.p_bRunSideVision = false;
                     axisXY.p_axisY.RunTrigger(false);
                     m_grabMode.SetLight(false);
                 }
@@ -1153,6 +1171,7 @@ namespace Root_Vega.Module
 
                 try
                 {
+                    m_module.p_bRunSideVision = true;
                     int nScanLine = 0;
                     m_grabMode.SetLight(true);
                     m_grabMode.SetLightByName("Bevel Coax", 700);
@@ -1209,6 +1228,7 @@ namespace Root_Vega.Module
                 }
                 finally
                 {
+                    m_module.p_bRunSideVision = false;
                     axisXY.p_axisY.RunTrigger(false);
                     m_grabMode.SetLight(false);
                 }
@@ -1390,6 +1410,7 @@ namespace Root_Vega.Module
 
                 try
                 {
+                    m_module.p_bRunSideVision = true;
                     StopWatch sw = new StopWatch();
                     if (cam.p_CamInfo._OpenStatus == false) cam.Connect();
                     while (cam.p_CamInfo._OpenStatus == false)
@@ -1559,6 +1580,7 @@ namespace Root_Vega.Module
                 }
                 finally
                 {
+                    m_module.p_bRunSideVision = false;
                     m_module.SetLightByName("SideVRS Side", 0);
                 }
 
@@ -1730,6 +1752,7 @@ namespace Root_Vega.Module
 
                 try
                 {
+                    m_module.p_bRunSideVision = true;
                     if (cam.p_CamInfo._OpenStatus == false) cam.Connect();
                     StopWatch sw = new StopWatch();
                     while (cam.p_CamInfo._OpenStatus == false)
@@ -1878,6 +1901,7 @@ namespace Root_Vega.Module
                 }
                 finally
                 {
+                    m_module.p_bRunSideVision = false;
                     m_module.SetLightByName("LADS", 0);
                 }
 
@@ -1975,11 +1999,12 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
+                m_module.p_bRunSideVision = true;
                 m_sivm._dispatcher.Invoke(new Action(delegate ()
                 {
                     m_sivm._startInsp();
                 }));
-
+                m_module.p_bRunSideVision = false;
                 return "OK";
             }
         }
@@ -2015,11 +2040,12 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
+                m_module.p_bRunSideVision = true;
                 m_bevm._dispatcher.Invoke(new Action(delegate ()
                 {
                     m_bevm._startInsp();
                 }));
-
+                m_module.p_bRunSideVision = false;
                 return "OK";
             }
         }

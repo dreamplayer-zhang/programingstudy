@@ -12,6 +12,8 @@
              Background="#FF2D2D30">
     <UserControl.Resources>
         <converter:TabSizeConverter x:Key="tabSizeConverter" />
+        <converter:BoolToRunColorConverter x:Key="BoolToRunColorConverters" />
+        <converter:DoubleToPercentStringConverter x:Key="DoubleToPercentStringConverters" />
         <Style x:Key="styleTabControl" TargetType="{x:Type TabControl}">
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -221,6 +223,7 @@
                                                     <RowDefinition/>
                                                     <RowDefinition/>
                                                     <RowDefinition/>
+                                                    <RowDefinition/>
                                                 </Grid.RowDefinitions>
                                                 <Grid Grid.RowSpan="2"
                                               Background="{StaticResource TextForeGround}">
@@ -229,7 +232,7 @@
                                                 <Grid Grid.Row="0"
                                               Grid.ColumnSpan="2"
                                               Margin="6"
-                                              Background="{DynamicResource Yellow}">
+                                              Background="{Binding p_PatternVision.p_bRunPatternVision, Converter={StaticResource BoolToRunColorConverters}}">
                                                     <TextBlock Text="MAIN VISION"
                                                        FontWeight="Black"
                                                        Foreground="{StaticResource Black}"
@@ -238,7 +241,7 @@
                                                 <Grid Grid.Row="1"
                                               Grid.ColumnSpan="2"
                                               Margin="6"
-                                              Background="{DynamicResource DarkGray}">
+                                              Background="{Binding p_SideVision.p_bRunSideVision, Converter={StaticResource BoolToRunColorConverters}}">
                                                     <TextBlock Text="SIDE VISION"
                                                        FontWeight="Black"
                                                        Foreground="{StaticResource Black}"
@@ -246,12 +249,28 @@
                                                 </Grid>
                                                 <Grid Grid.Row="2"
                                               Margin="0,6,0,6">
-                                                    <ProgressBar Value="33"
+                                                    <ProgressBar Maximum="100"
+                                                                 Minimum="0"
+                                                                 Value="{Binding p_dPatternInspProgress}"
                                                  Background="{StaticResource DarkGray}"
-                                                 Foreground="{StaticResource Green}"/>
+                                                 Foreground="{StaticResource Green}">
+                                                    </ProgressBar>
+                                                    <TextBlock 
+                                                        Text="{Binding p_dPatternInspProgress, Converter={StaticResource DoubleToPercentStringConverters}}"
+                                                        Style="{StaticResource BasicTb}"
+                                                        FontWeight="Black">
+                                                    </TextBlock>
+                                                </Grid>
+                                                <Grid Grid.Row="3"
+                                                      Margin="0,6,0,6">
+                                                    <ProgressBar Value="33"
+                                                                 Maximum="100"
+                                                                 Minimum="0"
+                                                                 Background="{StaticResource DarkGray}"
+                                                                 Foreground="{StaticResource Green}"/>
                                                     <TextBlock Text="33%"
-                                               Style="{StaticResource BasicTb}"
-                                               FontWeight="Black"/>
+                                                               Style="{StaticResource BasicTb}"
+                                                               FontWeight="Black"/>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -280,11 +299,11 @@
                                                 </Grid.RowDefinitions>
                                                 <Grid Grid.RowSpan="3"
                                               Background="{StaticResource LightGray}"/>
-                                                <TextBlock Text="Required Time"
+                                                <TextBlock Text="Main Elapsed Time"
                                                 Style="{StaticResource BasicTb}"
                                                 FontWeight="Bold"
                                                 Foreground="{StaticResource Black}"/>
-                                                <TextBlock Text="Elapsed Time"
+                                                <TextBlock Text="Side Elapsed Time"
                                                    Grid.Row="1"
                                                 Style="{StaticResource BasicTb}"
                                                 FontWeight="Bold"
