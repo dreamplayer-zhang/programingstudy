@@ -243,6 +243,7 @@
     <Compile Include="Module\Aligner_ATI.cs" />
     <Compile Include="Module\Aligner_ATI_AOI.cs" />
     <Compile Include="Module\Aligner_RND.cs" />
+    <Compile Include="Module\EFEM_AOP.cs" />
     <Compile Include="Module\Loadport_Cymechs.cs" />
     <Compile Include="Module\Vision_AOP.cs" />
     <Compile Include="Module\Vision_Backside.cs" />
