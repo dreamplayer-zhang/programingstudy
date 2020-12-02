@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="Root_Vega.Module.FFU_Fan_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_Vega.Module"
+             xmlns:packicon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Margin="10" RenderTransformOrigin="0.5, 0.5">
+            <packicon:PackIconMaterial Grid.Row="0" Kind="Fan" Foreground="White"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Width="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}"
+                                       Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
+            </packicon:PackIconMaterial>
+            <Grid.RenderTransform>
+                <RotateTransform/>
+            </Grid.RenderTransform>
+            <Grid.Style>
+                <Style>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding p_bRun}" Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard x:Name="EndAnimation">
+                                    <Storyboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="(Rectangle.RenderTransform).(RotateTransform.Angle)"
+                                                             To="360" Duration="0:0:10" RepeatBehavior="Forever" />
+                                        </Storyboard>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="EndAnimation" />
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock HorizontalAlignment="Center" Grid.Column="0" Text="RPM" Foreground="White"/>
+            <TextBlock HorizontalAlignment="Center" Grid.Column="1" Text="{Binding p_nRPM}" Foreground="White"/>
+        </Grid>
+    </Grid>
+</UserControl>

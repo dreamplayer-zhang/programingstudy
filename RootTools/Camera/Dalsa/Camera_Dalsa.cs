@@ -181,7 +181,7 @@ namespace RootTools.Camera.Dalsa
         {
             p_CamInfo.p_sServer = tree.Set(p_CamInfo.p_sServer, "Dalsa", "Server", "Cam Server Name");
             p_CamInfo.p_sFile = tree.SetFile(p_CamInfo.p_sFile, p_CamInfo.p_sFile, "ccf", "CamFile", "Cam File");
-            p_CamInfo.p_nResourceCnt = tree.Set(p_CamInfo.p_nResourceCnt, p_CamInfo.p_nResourceCnt, "Resource Count", "Resource Count");
+            p_CamInfo.p_nResourceIdx = tree.Set(p_CamInfo.p_nResourceIdx, p_CamInfo.p_nResourceIdx, "Resource Count", "Resource Count");
 
             //p_CamInfo._DeviceUserID = tree.Set(p_CamInfo._DeviceUserID, "Basler", "ID", "Device User ID");
             //m_nGrabTimeout = tree.Set(m_nGrabTimeout, 2000, "Timeout", "Grab Timeout (ms)");
@@ -193,7 +193,6 @@ namespace RootTools.Camera.Dalsa
             p_CamParam.p_Height = tree.Set(p_CamParam.p_Height, 100, "Image Height", "Buffer Image Height");
             p_CamParam.p_eDeviceScanType = (DalsaParameterSet.eDeviceScanType)tree.Set(p_CamParam.p_eDeviceScanType, p_CamParam.p_eDeviceScanType, "Device Scan Type", "Device Scan Type");
             p_CamParam.p_eTriggerMode = (DalsaParameterSet.eTriggerMode)tree.Set(p_CamParam.p_eTriggerMode, p_CamParam.p_eTriggerMode, "Trigger Mode", "Trigger Mode");
-
         }
 
         #endregion 
@@ -231,14 +230,13 @@ namespace RootTools.Camera.Dalsa
                 p_sInfo = p_id + "Empty Config File Name";
                 return;
             }
-            SapLocation loc = new SapLocation(p_CamInfo.p_sServer, p_CamInfo.p_nResourceCnt);
+
+            SapLocation loc = new SapLocation(p_CamInfo.p_sServer, p_CamInfo.p_nResourceIdx);
             SapManager.GetServerName(loc);
 
-            int aa = SapManager.GetResourceCount(p_CamInfo.p_sServer, SapManager.ResourceType.Acq);
             if (SapManager.GetResourceCount(p_CamInfo.p_sServer, SapManager.ResourceType.Acq) > 0)          //"Acq" (frame-grabber) "AcqDevice" (camera)
             {
                 m_sapAcq = new SapAcquisition(loc, p_CamInfo.p_sFile);
-                //m_sapAcq = new SapAcquisition(loc);
 
                 if (!m_sapAcq.Create())
                 {
@@ -510,7 +508,7 @@ namespace RootTools.Camera.Dalsa
 
             while (iBlock < m_nGrabCount)
             {
-                if (iBlock < m_nGrabTrigger)
+                if (iBlock <= m_nGrabTrigger)
                 {
                     IntPtr ipSrc = m_pSapBuf[iBlock % p_nBuf];
                     Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>

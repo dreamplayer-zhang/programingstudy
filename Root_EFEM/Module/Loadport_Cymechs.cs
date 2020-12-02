@@ -30,7 +30,7 @@ namespace Root_EFEM.Module
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            if (m_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + m_infoCarrier.p_eState, true);
+            if (m_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + m_infoCarrier.p_eState);
             switch (m_infoCarrier.p_ePresentSensor)
             {
                 case GemCarrierBase.ePresent.Empty: m_svidPlaced.p_value = false; break;

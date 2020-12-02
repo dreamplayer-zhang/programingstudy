@@ -25,7 +25,6 @@ namespace RootTools.Memory
                 if (_fGB == 0)
                 {
                     if (m_memoryTool.m_bMaster) CreatePool(value);
-                    else InitOpenPoolTimer(); 
                 }
                 _fGB = value;
                 OnPropertyChanged(); 
@@ -47,26 +46,11 @@ namespace RootTools.Memory
             return false;
         }
 
-        string OpenPool()
+        public string OpenPool()
         {
             try { m_MMF = MemoryMappedFile.OpenExisting(p_id); }
             catch { return "Open Error"; }
             return (m_MMF != null) ? "OK" : "Error"; 
-        }
-        #endregion
-
-        #region Open Pool
-        DispatcherTimer m_timer = new DispatcherTimer(); 
-        void InitOpenPoolTimer()
-        {
-            m_timer.Interval = TimeSpan.FromSeconds(0.2);
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Start(); 
-        }
-
-        private void M_timer_Tick(object sender, EventArgs e)
-        {
-            if (OpenPool() == "OK") m_timer.Stop();
         }
         #endregion
 
@@ -182,7 +166,7 @@ namespace RootTools.Memory
         public string p_id { get; set; }
         public Log m_log;
         public Registry m_reg; 
-        MemoryMappedFile m_MMF = null;
+        public MemoryMappedFile m_MMF = null;
         public MemoryTool m_memoryTool;
         public MemoryViewer m_viewer; 
         public MemoryPool(string id, MemoryTool memoryTool, double fGB)

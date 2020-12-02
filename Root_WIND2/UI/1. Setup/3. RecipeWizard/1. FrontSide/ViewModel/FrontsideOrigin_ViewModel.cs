@@ -74,14 +74,14 @@ namespace Root_WIND2
             TRect BOX = e as TRect;
             int byteCnt = p_OriginBoxTool_VM.p_ImageData.p_nByte;
 
-            ImageData BoxImageData = new ImageData(BOX.MemoryRect.Width * byteCnt, BOX.MemoryRect.Height, byteCnt);
+            ImageData BoxImageData = new ImageData(BOX.MemoryRect.Width, BOX.MemoryRect.Height, byteCnt);
 
             BoxImageData.m_eMode = ImageData.eMode.ImageBuffer;
-            BoxImageData.SetData(p_OriginBoxTool_VM.p_ImageData.GetPtr()
-                , new CRect(BOX.MemoryRect.Left * byteCnt, BOX.MemoryRect.Top, BOX.MemoryRect.Right * byteCnt, BOX.MemoryRect.Bottom)
+            BoxImageData.SetData(p_OriginBoxTool_VM.p_ImageData
+                , new CRect(BOX.MemoryRect.Left, BOX.MemoryRect.Top, BOX.MemoryRect.Right, BOX.MemoryRect.Bottom)
                 , (int)p_OriginBoxTool_VM.p_ImageData.p_Stride, byteCnt);
 
-            p_OriginTool_VM.Offset = new CPoint(BOX.MemoryRect.Left * byteCnt, BOX.MemoryRect.Top);
+            p_OriginTool_VM.Offset = new CPoint(BOX.MemoryRect.Left, BOX.MemoryRect.Top);
             p_OriginTool_VM.p_ImageData = BoxImageData;
             p_OriginTool_VM.SetRoiRect();
 

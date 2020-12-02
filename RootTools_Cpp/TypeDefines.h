@@ -6,11 +6,14 @@
 
 // User Type Defines
 typedef struct _LabeledData
-{	
-	POINT center;
+{
+	double centerX;
+	double centerY;
 	RECT bound;
-	LONG area;
-	LONG value;
+	double width;
+	double height;
+	double area;
+	double value;
 } LabeledData;
 
 typedef struct _DefectDataStruct

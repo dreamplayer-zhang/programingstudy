@@ -1,4 +1,5 @@
 ﻿using RootTools.Trees;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -26,12 +27,8 @@ namespace RootTools.Comm
 
 		private void checkBoxConnect_Checked(object sender, RoutedEventArgs e)
 		{
-            try
-            {
-                m_modbus.Connect();
-            }
-            catch { }
-            System.Threading.Thread.Sleep(50);
+            m_modbus.p_sInfo = m_modbus.Connect();
+            Thread.Sleep(50);
             if (m_modbus.p_bConnect == false) checkBoxConnect.IsChecked = false;
         }
 

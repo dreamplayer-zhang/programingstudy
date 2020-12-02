@@ -8,27 +8,27 @@ using System;
 using System.Text;
 using System.Threading;
 
-namespace Root_Vega.Module
+namespace Root_EFEM.Module
 {
-    public class Vega : ModuleBase
+    public class EFEM_AOP : ModuleBase
     {
         #region ToolBox
         public enum eLamp
-        { 
+        {
             Red,
             Yellow,
             Green
         }
         enum eBuzzer
-        { 
+        {
             Buzzer1,
             Buzzer2,
             Buzzer3,
             Buzzer4,
             BuzzerOff
         }
-        eBuzzer m_eBuzzer = eBuzzer.BuzzerOff; 
-        string[] m_asLamp = Enum.GetNames(typeof(eLamp)); 
+        eBuzzer m_eBuzzer = eBuzzer.BuzzerOff;
+        string[] m_asLamp = Enum.GetNames(typeof(eLamp));
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
         public DIO_Os m_doLamp;
         DIO_Os m_doBuzzer;
@@ -59,8 +59,8 @@ namespace Root_Vega.Module
 
 
             p_sInfo = m_RFID.GetTools(this, bInit);
-            
-                if (bInit) InitALID(); 
+
+            if (bInit) InitALID();
         }
         #endregion
 
@@ -76,8 +76,8 @@ namespace Root_Vega.Module
 
         void InitALID()
         {
-			m_alidEMS = m_gaf.GetALID(this, "EMS", "EMS Error");
-			m_alidProtectionBar = m_gaf.GetALID(this, "ProtectionBar", "ProtectionBar Error");
+            m_alidEMS = m_gaf.GetALID(this, "EMS", "EMS Error");
+            m_alidProtectionBar = m_gaf.GetALID(this, "ProtectionBar", "ProtectionBar Error");
             m_alidMCReset = m_gaf.GetALID(this, "MC Reset", "MC Reset Error");
             m_alidIonizer = m_gaf.GetALID(this, "Ionizer", "Ionizer Error");
             m_alidCDALow = m_gaf.GetALID(this, "CDA Low", "CDA Low Error");
@@ -93,43 +93,43 @@ namespace Root_Vega.Module
         protected override void RunThread()
         {
             base.RunThread();
-           
+
             m_doLamp.Write(eLamp.Red, EQ.p_eState == EQ.eState.Error);
             m_doLamp.Write(eLamp.Yellow, EQ.p_eState == EQ.eState.Run);
             m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Ready);
-           
+
             if (m_diBuzzerOff.p_bIn)
                 m_doBuzzer.Write(eBuzzer.BuzzerOff);
 
             else if (m_eStatus != EQ.p_eState)
             {
                 m_nLamp_count = 0;
-                    switch (EQ.p_eState)
-                    {
-                        case EQ.eState.Error: m_doBuzzer.Write(eBuzzer.Buzzer2); break;
-                        case EQ.eState.Run: m_doBuzzer.Write(eBuzzer.Buzzer4); break;
-                        case EQ.eState.Home: m_doBuzzer.Write(eBuzzer.Buzzer3); break;
-                        case EQ.eState.Ready: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
-                        case EQ.eState.Init: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
-                    }
+                switch (EQ.p_eState)
+                {
+                    case EQ.eState.Error: m_doBuzzer.Write(eBuzzer.Buzzer2); break;
+                    case EQ.eState.Run: m_doBuzzer.Write(eBuzzer.Buzzer4); break;
+                    case EQ.eState.Home: m_doBuzzer.Write(eBuzzer.Buzzer3); break;
+                    case EQ.eState.Ready: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
+                    case EQ.eState.Init: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
+                }
                 m_eStatus = EQ.p_eState;
             }
             m_nLamp_count++;
-            if (m_nLamp_count>50)
+            if (m_nLamp_count > 50)
             {
                 m_doBuzzer.Write(eBuzzer.BuzzerOff);
             }
             //m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors", true);
-            
+
             m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the Emergency Buttons");
-			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
-            if (m_robot != null)
-            {
-                if (!m_diMCReset.p_bIn) m_robot.p_bDisableHomeWhenArmOpen = true; //CHECK
-            }
+            m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
+            //if (m_robot != null)
+            //{
+            //    if (!m_diMCReset.p_bIn) m_robot.p_bDisableHomeWhenArmOpen = true; //CHECK
+            //}
             m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
             m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer");
-			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA");
+            m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA");
         }
         #endregion
 
@@ -197,7 +197,7 @@ namespace Root_Vega.Module
                 return sInfo;
             }
 
-            string m_sRFID = ""; 
+            string m_sRFID = "";
             private void M_rs232_OnReceive(string sRead)
             {
                 if (sRead.Length < 14) return;
@@ -205,31 +205,31 @@ namespace Root_Vega.Module
                 if (aBuf[10] != 0x03) return;
                 if (aBuf[11] != 0x01) return;
                 if (aBuf[12] != 0x01) return;
-                m_sRFID = ""; 
+                m_sRFID = "";
                 for (int i = sRead.Length - 5; i > 12; i--) m_sRFID += sRead[i];
-                m_bOnRead = false; 
+                m_bOnRead = false;
             }
 
-            StopWatch m_swRead = new StopWatch(); 
-            bool m_bOnRead = false; 
+            StopWatch m_swRead = new StopWatch();
+            bool m_bOnRead = false;
             public string ReadRFID(byte nCh, out string sRFID)
             {
-                m_swRead.Restart(); 
-                m_bOnRead = true; 
+                m_swRead.Restart();
+                m_bOnRead = true;
                 m_aCmd[5] = nCh;
                 CalcSend();
-                m_rs232.m_sp.Write(m_aSend, 0, 15); 
+                m_rs232.m_sp.Write(m_aSend, 0, 15);
                 while (m_swRead.ElapsedMilliseconds < 10000) //CHECK
                 {
                     if (m_bOnRead == false)
                     {
                         sRFID = m_sRFID;
-                        return "OK"; 
+                        return "OK";
                     }
-                    Thread.Sleep(20); 
+                    Thread.Sleep(20);
                 }
-                sRFID = ""; 
-                return "RFID Read Fail : Timeout"; 
+                sRFID = "";
+                return "RFID Read Fail : Timeout";
             }
             #endregion
 
@@ -246,23 +246,14 @@ namespace Root_Vega.Module
             }
             #endregion
         }
-        public RFID m_RFID = new RFID(); 
+        public RFID m_RFID = new RFID();
         #endregion
 
-        #region Tree
-        public override void RunTree(Tree tree)
-        {
-            base.RunTree(tree);
-            //
-        }
-        #endregion
-
-        Robot_RND m_robot; 
-        public Vega(string id, IEngineer engineer)
+        public EFEM_AOP(string id, IEngineer engineer)
         {
             p_id = id;
             base.InitBase(id, engineer);
-            m_robot = ((Vega_Handler)engineer.ClassHandler()).m_robot; 
+            //m_robot = ((Vega_Handler)engineer.ClassHandler()).m_robot;
         }
 
         public override void ThreadStop()
@@ -273,13 +264,13 @@ namespace Root_Vega.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_ReadRFID(this), false, "Read RFID");
+            //AddModuleRunList(new Run_ReadRFID(this), false, "Read RFID");
         }
 
         public class Run_ReadRFID : ModuleRunBase
         {
-            Vega m_module;
-            public Run_ReadRFID(Vega module)
+            EFEM_AOP m_module;
+            public Run_ReadRFID(EFEM_AOP module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -310,7 +301,7 @@ namespace Root_Vega.Module
                 {
                     sResult = m_module.m_RFID.ReadRFID((byte)m_nCh, out sCarrierID);
                     m_module.m_log.Info("Read RFID : " + sCarrierID);
-                    StringBuilder sHex = new StringBuilder(); 
+                    StringBuilder sHex = new StringBuilder();
                     foreach (char ch in sCarrierID) sHex.AppendFormat("{0:x2} ", ch);
                     m_module.m_log.Info("ReaHex RFID : " + sHex.ToString());
                 }
