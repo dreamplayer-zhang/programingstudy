@@ -110,7 +110,6 @@ namespace RootTools.Memory
             m_timer.Start();
         }
 
-        int m_nChanged = 0; 
         const string c_sBusy = "Busy";
         void m_timer_Tick(object sender, EventArgs e)
         {
@@ -121,13 +120,9 @@ namespace RootTools.Memory
             string sUpdateTime = m_reg.Read("Time", c_sBusy);
             if (sUpdateTime == c_sBusy) return;
             if (sUpdateTime == m_sUpdateTime) return;
-            if (m_nChanged < 7) m_nChanged++;
-            else
-            {
-                if (UpdateMemoryData()) return;
-                m_sUpdateTime = sUpdateTime;
-                OnChangeMemoryPool();
-            }
+            if (UpdateMemoryData()) return;
+            m_sUpdateTime = sUpdateTime;
+            OnChangeMemoryPool();
         }
 
         bool UpdateMemoryData()

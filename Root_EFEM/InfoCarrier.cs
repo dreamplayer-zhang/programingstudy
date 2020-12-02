@@ -321,7 +321,7 @@ namespace Root_EFEM
             p_sCarrierID = p_sModule;
             p_sLocID = sLocID;
             m_engineer = engineer;
-            m_gem = m_engineer.ClassGem();
+            //m_gem = m_engineer.ClassGem();
             m_log = module.m_log;
             m_waferSize = new InfoWafer.WaferSize(p_sModule, true, true);
             m_treeRootWafer = new TreeRoot(p_id, m_log);

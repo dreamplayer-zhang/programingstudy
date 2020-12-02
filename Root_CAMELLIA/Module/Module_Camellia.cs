@@ -146,9 +146,9 @@ namespace Root_CAMELLIA.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_WaferLT_pulse = tree.Set(m_WaferLT_pulse, m_WaferLT_pulse,"Wafer Left Top", "Wafer Left Top (Pulse)");
-                m_WaferRT_pulse = tree.Set(m_WaferRT_pulse, m_WaferRT_pulse, "Wafer Right Top", "Wafer Right Top (Pulse)");
-                m_WaferRB_pulse = tree.Set(m_WaferRB_pulse, m_WaferRB_pulse, "Wafer Right Bottom", "Wafer Right Bottom (Pulse)");
+                m_WaferLT_pulse = tree.Set(m_WaferLT_pulse, m_WaferLT_pulse,"Wafer Left Top", "Wafer Left Top (Pulse)", false);
+                m_WaferRT_pulse = tree.Set(m_WaferRT_pulse, m_WaferRT_pulse, "Wafer Right Top", "Wafer Right Top (Pulse)", false);
+                m_WaferRB_pulse = tree.Set(m_WaferRB_pulse, m_WaferRB_pulse, "Wafer Right Bottom", "Wafer Right Bottom (Pulse)", false);
             }
 
             public override string Run()
@@ -207,13 +207,13 @@ namespace Root_CAMELLIA.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_BGIntTime_VIS = tree.Set(m_BGIntTime_VIS, m_BGIntTime_VIS, "VIS Background cal integration time", "VIS Background cal integration(exposure) time");
-                m_BGIntTime_NIR = tree.Set(m_BGIntTime_NIR, m_BGIntTime_NIR, "NIR Background cal integration time", "NIR Background cal integration(exposure) time");
-                m_Average_VIS = tree.Set(m_Average_VIS, m_Average_VIS, "VIS Spectrum Count", "VIS Spectrum Count");
-                m_Average_NIR = tree.Set(m_Average_NIR, m_Average_NIR, "NIR Spectrum Count", "NIR Spectrum Count");
-                m_InitialCal = tree.Set(m_InitialCal, m_InitialCal, "Initial Calibration", "Initial Calibration");
-                m_CalWaferCenterPos_pulse = tree.Set(m_CalWaferCenterPos_pulse, m_CalWaferCenterPos_pulse, "Calibration Wafer Center Axis Position", "Calibration Wafer Center Axis Position(Pulse)");
-                m_RefWaferCenterPos_pulse = tree.Set(m_RefWaferCenterPos_pulse, m_RefWaferCenterPos_pulse, "Reference Wafer Center Axis Position", "Reference Wafer Center Axis Position(Pulse)");
+                m_BGIntTime_VIS = tree.Set(m_BGIntTime_VIS, m_BGIntTime_VIS, "VIS Background cal integration time", "VIS Background cal integration(exposure) time", false);
+                m_BGIntTime_NIR = tree.Set(m_BGIntTime_NIR, m_BGIntTime_NIR, "NIR Background cal integration time", "NIR Background cal integration(exposure) time", false);
+                m_Average_VIS = tree.Set(m_Average_VIS, m_Average_VIS, "VIS Spectrum Count", "VIS Spectrum Count", false);
+                m_Average_NIR = tree.Set(m_Average_NIR, m_Average_NIR, "NIR Spectrum Count", "NIR Spectrum Count", false);
+                m_InitialCal = tree.Set(m_InitialCal, m_InitialCal, "Initial Calibration", "Initial Calibration", false);
+                m_CalWaferCenterPos_pulse = tree.Set(m_CalWaferCenterPos_pulse, m_CalWaferCenterPos_pulse, "Calibration Wafer Center Axis Position", "Calibration Wafer Center Axis Position(Pulse)", false);
+                m_RefWaferCenterPos_pulse = tree.Set(m_RefWaferCenterPos_pulse, m_RefWaferCenterPos_pulse, "Reference Wafer Center Axis Position", "Reference Wafer Center Axis Position(Pulse)", false);
             }
 
             public override string Run()
@@ -269,10 +269,10 @@ namespace Root_CAMELLIA.Module
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_WaferCenterPos_pulse = tree.Set(m_WaferCenterPos_pulse, m_WaferCenterPos_pulse, "Wafer Center Axis Position", "Wafer Center Axis Position(Pulse)");
-                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)");
-                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)");
-                m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)");
+                m_WaferCenterPos_pulse = tree.Set(m_WaferCenterPos_pulse, m_WaferCenterPos_pulse, "Wafer Center Axis Position", "Wafer Center Axis Position(Pulse)", false);
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)", false);
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)", false);
+                m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)", false);
             }
             public override string Run()
             {
@@ -338,10 +338,10 @@ namespace Root_CAMELLIA.Module
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_WaferCenterPos_pulse = tree.Set(m_WaferCenterPos_pulse, m_WaferCenterPos_pulse, "Wafer Center Axis Position", "Wafer Center Axis Position(Pulse)");
-                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)");
-                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)");
-                m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)");
+                m_WaferCenterPos_pulse = tree.Set(m_WaferCenterPos_pulse, m_WaferCenterPos_pulse, "Wafer Center Axis Position", "Wafer Center Axis Position(Pulse)", false);
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)", false);
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)", false);
+                m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)", false);
             }
             public override string Run()
             {
