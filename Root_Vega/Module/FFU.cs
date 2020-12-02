@@ -57,16 +57,8 @@ namespace Root_Vega.Module
 					OnPropertyChanged();
 				}
 			}
-			List<int> m_aFanState = new List<int>();
-			public List<int> p_aFanState
-			{
-				get { return m_aFanState; }
-				set
-				{
-					m_aFanState = value;
-					OnPropertyChanged();
-				}
-			}
+			public ObservableCollection<int> p_aFanState { get; set; }
+
 			List<bool> m_aTempFanRun = new List<bool>();
 			List<bool> m_aIsFanRun = new List<bool>();
 			public List<bool> p_aIsFanRun
@@ -101,14 +93,11 @@ namespace Root_Vega.Module
 				}
 			}
 
-			public class Fan : ModuleBase
+			public class Fan : NotifyProperty
 			{
 				public int p_fFanRPM
 				{
-					get
-					{
-						return (m_unit.m_aFanRPM[m_nID] < 0) ? 0 : m_unit.m_aFanRPM[m_nID];
-					}
+					get { return (m_unit.m_aFanRPM[m_nID] < 0) ? 0 : m_unit.m_aFanRPM[m_nID]; }
 					set
 					{
 						if (m_unit.m_aFanRPM[m_nID] == value) return;
@@ -118,10 +107,7 @@ namespace Root_Vega.Module
 				}
 				public int p_fFanState
 				{
-					get
-					{
-						return m_unit.m_aFanState[m_nID];
-					}
+					get{ return m_unit.m_aFanState[m_nID]; }
 					set
 					{
 						if (m_unit.m_aFanState[m_nID] == value) return;
@@ -131,10 +117,7 @@ namespace Root_Vega.Module
 				}
 				public int p_fFanPressure
 				{
-					get
-					{
-						return m_unit.m_aFanPressure[m_nID];
-					}
+					get { return m_unit.m_aFanPressure[m_nID]; }
 					set
 					{
 						if (m_unit.m_aFanPressure[m_nID] == value) return;
@@ -158,10 +141,7 @@ namespace Root_Vega.Module
 				{
 					get
 					{
-						if (m_log != null)
-						{
-							if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-						}
+						if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
 						return ((p_fFanState & 0x0200) == 0x0200);
 					}
 				}
@@ -169,10 +149,7 @@ namespace Root_Vega.Module
 				{
 					get
 					{
-						if (m_log != null)
-						{
-							if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-						}
+						if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
 						return ((p_fFanState & 0x0002) == 0);
 					}
 				}
@@ -180,10 +157,7 @@ namespace Root_Vega.Module
 				{
 					get
 					{
-						if (m_log != null)
-						{
-							if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-						}
+						if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
 						return ((p_fFanState & 0x0004) == 0);
 					}
 				}
@@ -191,10 +165,7 @@ namespace Root_Vega.Module
 				{
 					get
 					{
-						if (m_log != null)
-						{
-							if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-						}
+						if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
 						return ((p_fFanState & 0x0008) == 0);
 					}
 				}
@@ -202,10 +173,7 @@ namespace Root_Vega.Module
 				{
 					get
 					{
-						if (m_log != null)
-						{
-							if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-						}
+						if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
 						return ((p_fFanState & 0x0010) == 0);
 					}
 				}
@@ -213,10 +181,7 @@ namespace Root_Vega.Module
 				{
 					get
 					{
-						if (m_log != null)
-						{
-							if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-						}
+						if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
 						return ((p_fFanState & 0x0020) == 0);
 					}
 				}
@@ -224,10 +189,7 @@ namespace Root_Vega.Module
 				{
 					get
 					{
-						if (m_log != null)
-						{
-							if (p_fFanState == 0) { p_sInfo = "Fan Data is not corret"; }
-						}
+						if (p_fFanState == 0) { m_FFU.p_sInfo = "Fan Data is not corret"; }
 						return ((p_fFanState & 0x0040) == 0);
 					}
 				}
@@ -242,9 +204,11 @@ namespace Root_Vega.Module
 				public string p_sFan { get; set; }
 				int m_nID;
 				Unit m_unit;
+				FFU m_FFU; 
 				public Fan(Unit unit, int nID)
 				{
 					m_unit = unit;
+					m_FFU = unit.m_FFU; 
 					m_nID = nID;
 					m_id = "Fan" + nID.ToString("00");
 					p_sFan = m_id;
@@ -272,8 +236,7 @@ namespace Root_Vega.Module
 					p_aFanSet.Add(0);
 					m_aTempSet.Add(0);
 
-					p_aFanState.Add(0);
-					m_aTempState.Add(0);
+					m_aFanState.Add(0);
 
 					p_aFanReset.Add(0);
 					m_aTempReset.Add(0);
@@ -297,8 +260,9 @@ namespace Root_Vega.Module
 				for (int n = 0; n < m_lFan; n++) m_aFan[n].RunTree(tree.GetTree(m_aFan[n].m_id));
 			}
 			#endregion
+
 			List<int> m_aTempRPM = new List<int>();
-			List<int> m_aTempState = new List<int>();
+			List<int> m_aFanState = new List<int>();
 			List<int> m_aTempPressure = new List<int>();
 			List<int> m_aTempSet = new List<int>();
 			List<int> m_aTempReset = new List<int>();
@@ -307,13 +271,13 @@ namespace Root_Vega.Module
 				try
 				{
 					Thread.Sleep(10);
-					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 64, ref m_aTempState);
-					p_aFanState = m_aTempState;
+					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 64, m_aFanState);
+					OnPropertyChanged("p_aFanState"); 
 					Thread.Sleep(10);
-					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 0, ref m_aTempRPM);
+					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 0, m_aTempRPM);
 					p_aFanRPM = m_aTempRPM;
 					Thread.Sleep(10);
-					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 128, ref m_aTempPressure);
+					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 128, m_aTempPressure);
 					p_aFanPressure = m_aTempPressure;
 					if (m_bInvalidSet)
 					{
@@ -341,23 +305,21 @@ namespace Root_Vega.Module
 			public string p_sUnit { get; set; }
 			public Unit(FFU FFU, int nID)
 			{
+				p_aFanState = new ObservableCollection<int>(); 
 				m_FFU = FFU;
 				m_nID = nID;
 				m_id = "Unit" + nID.ToString();
 				p_sUnit = m_id;
 			}
 		}
-		List<Unit> m_aUnit = new List<Unit>();
+		List<Unit> _aUnit = new List<Unit>();
 		public List<Unit> p_aUnit
 		{
-			get
-			{
-				return m_aUnit;
-			}
+			get { return _aUnit; }
 			set
 			{
-				if (m_aUnit == value) return;
-				m_aUnit = value;
+				if (_aUnit == value) return;
+				_aUnit = value;
 				OnPropertyChanged();
 			}
 		}
@@ -387,7 +349,6 @@ namespace Root_Vega.Module
 			m_threadFan = new Thread(new ThreadStart(RunThreadFan));
 			m_threadFan.Start();
 		} 
-		int m_n = 0;
 		static readonly object m_csLock = new object();
 		void RunThreadFan()
 		{
@@ -399,18 +360,8 @@ namespace Root_Vega.Module
 
 				if (!m_modbus.m_client.Connected)
 				{
-					Thread.Sleep(10);
-					m_n++;
-					if (m_n > 50)
-					{
-						try
-						{
-							m_modbus.Connect();
-							m_n = 0;
-						}
-						catch (Exception e) { if (m_log != null) p_sInfo = e + "Connect Error"; }
-
-					}
+					Thread.Sleep(1000);
+					p_sInfo = m_modbus.Connect();
 				}
 				else
 				{

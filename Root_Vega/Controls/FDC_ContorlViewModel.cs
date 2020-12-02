@@ -159,8 +159,8 @@ namespace Root_Vega
 				m_CVM[index].p_SlaveNumber = m_reg.Read(Member.GetName(() => m_CVM[index].p_SlaveNumber), (int)0);
 				m_CVM[index].p_TmprtrName = m_reg.Read(Member.GetName(() => m_CVM[index].p_TmprtrName), (string)"");
 				m_CVM[index].p_EnumSelectedUnit = (FDC_Unit)(int)(m_FDC.m_aData[index].p_eUnit);
-				m_CVM[index].p_LowerValue = m_FDC.m_aData[index].m_aLimit[0];
-				m_CVM[index].p_UpperValue = m_FDC.m_aData[index].m_aLimit[1];
+				m_CVM[index].p_LowerValue = m_FDC.m_aData[index].m_mmLimit.X;
+				m_CVM[index].p_UpperValue = m_FDC.m_aData[index].m_mmLimit.Y;
 
 				//m_CVM[index].p_SlaveNumber = m_reg.Read(Member.GetName(() => m_CVM[index].p_SlaveNumber), (int)0);
 				//m_CVM[index].p_TmprtrName = m_reg.Read(Member.GetName(() => m_CVM[index].p_TmprtrName), (string)"");
@@ -203,8 +203,8 @@ namespace Root_Vega
                 m_reg.Write(Member.GetName(() => m_CVM[index].p_SlaveNumber), m_CVM[index].p_SlaveNumber);
                 m_reg.Write(Member.GetName(() => m_CVM[index].p_TmprtrName), m_CVM[index].p_TmprtrName);
 				m_FDC.m_aData[index].p_eUnit = (FDC.eUnit)(int)(m_CVM[index].p_EnumSelectedUnit);
-				m_FDC.m_aData[index].m_aLimit[0] = (int)m_CVM[index].p_LowerValue ;
-				m_FDC.m_aData[index].m_aLimit[1] = (int)m_CVM[index].p_UpperValue;
+				m_FDC.m_aData[index].m_mmLimit.X = (int)m_CVM[index].p_LowerValue ;
+				m_FDC.m_aData[index].m_mmLimit.Y = (int)m_CVM[index].p_UpperValue;
 			//	m_FDC.m_aData.RunTree(Tree.eMode.Update);
             }
 				m_FDC.RunTree(Tree.eMode.Init);

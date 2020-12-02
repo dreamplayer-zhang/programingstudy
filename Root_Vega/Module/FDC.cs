@@ -59,17 +59,11 @@ namespace Root_Vega.Module
 
             int m_nDigit = 2;
             double m_fDiv = 100;
-            public int[] m_aLimit = new int[2] { 0, 0 };
+            public CPoint m_mmLimit = new CPoint(); 
             ALID[] m_alid = new ALID[2] { null, null };
-            bool m_palid = false;
-			public bool p_alid
+			public bool p_bAlarm
 			{
-                get { return m_palid; }
-                set 
-                {
-                    m_palid = value;
-                    OnPropertyChanged();
-                }
+                get { return m_alid[0].p_bSet || m_alid[1].p_bSet; }
 			}
 
             SVID m_svValue;
@@ -87,11 +81,10 @@ namespace Root_Vega.Module
                         //if ((m_svValue.p_value != null) && (m_svValue.p_value == value)) return; 
                         m_svValue.p_value = value;
                         OnPropertyChanged();
-                        m_alid[0].p_bSet = (m_svValue.p_value < m_aLimit[0]);
-                        m_alid[1].p_bSet = (m_svValue.p_value > m_aLimit[1]);
-                        p_alid = (m_alid[0].p_bSet || m_alid[1].p_bSet);
-                        double dValue = Math.Abs(m_svValue.p_value - (m_aLimit[0] + m_aLimit[1]) / 2);
-                        int nRed = (int)(500 * dValue / (m_aLimit[1] - m_aLimit[0]));
+                        m_alid[0].p_bSet = (m_svValue.p_value < m_mmLimit.X);
+                        m_alid[1].p_bSet = (m_svValue.p_value > m_mmLimit.Y);
+                        double dValue = Math.Abs(m_svValue.p_value - (m_mmLimit.X + m_mmLimit.Y) / 2);
+                        int nRed = (int)(500 * dValue / (m_mmLimit.X - m_mmLimit.Y));
                         if (nRed > 250) nRed = 250;
                         p_color = Color.FromRgb((byte)nRed, (byte)(250 - nRed), 0);
                     }
@@ -127,8 +120,7 @@ namespace Root_Vega.Module
                 m_nDigit = tree.Set(m_nDigit, m_nDigit, "Digit", "FDC Decimal Point");
                 m_fDiv = 1;
                 for (int n = 0; n < m_nDigit; n++) m_fDiv *= 10;
-                m_aLimit[0] = tree.Set(m_aLimit[0], m_aLimit[0], "Lower Limit", "FDC Lower Limit");
-                m_aLimit[1] = tree.Set(m_aLimit[1], m_aLimit[1], "Upper Limit", "FDC Upper Limit");
+                m_mmLimit = tree.Set(m_mmLimit, m_mmLimit, "Limit", "FDC Lower & Upper Limit");
                 if (m_alid[0] == null)
                 {
                     m_alid[0] = m_module.m_gaf.GetALID(m_module, ".LowerLimit", "FDC Lower Limit");
@@ -198,7 +190,6 @@ namespace Root_Vega.Module
 
         #region Check Thread
         int m_iData = 0;
-        int m_index = 0;
         protected override void RunThread()
         {
             base.RunThread();
@@ -206,18 +197,8 @@ namespace Root_Vega.Module
 
             if (!m_modbus.m_client.Connected)
             {
-                Thread.Sleep(10);
-                m_index++;
-                if (m_index > 50)
-                {
-                    try
-                    {
-                        m_modbus.Connect();
-                        m_index = 0;
-                    }
-                    catch (Exception e) { if (m_log != null) p_sInfo = e + "Connect Error"; }
-
-                }
+                Thread.Sleep(1000);
+                p_sInfo = m_modbus.Connect();
             }
             else
             {
