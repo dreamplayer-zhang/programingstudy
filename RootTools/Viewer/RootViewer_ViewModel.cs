@@ -598,14 +598,20 @@ namespace RootTools
                                     int viewrectWidth = p_View_Rect.Width;
                                     int sizeX = p_ImageData.p_Size.X;
 
+                                    if (imageptrR == null)
+                                        return;
+                                    if (imageptrG == null)
+                                        return;
+                                    if (imageptrB == null)
+                                        return;
                                     Parallel.For(0, p_CanvasHeight, (yy) =>
+                                {
+                                    //lock (o)
                                     {
-                                        //lock (o)
+                                        long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                                        for (int xx = 0; xx < p_CanvasWidth; xx++)
                                         {
-                                            long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                                            for (int xx = 0; xx < p_CanvasWidth; xx++)
-                                            {
-                                                long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                                            long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
                                                 viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
                                                 viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];

@@ -48,15 +48,18 @@ namespace Root_Vega
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            buttonResume.IsEnabled = IsEnableResume();
-            buttonPause.IsEnabled = IsEnablePause();
-            buttonInitialization.IsEnabled = IsEnableInitialization();
-            buttonRecovery.IsEnabled = IsEnableRecovery();
-            FDCText1.Foreground = m_handler.m_FDC.m_aData[0].p_alid == true ? Brushes.Red : Brushes.Black;
-            FDCText2.Foreground = m_handler.m_FDC.m_aData[1].p_alid == true ? Brushes.Red : Brushes.Black;
-            FDCText3.Foreground = m_handler.m_FDC.m_aData[2].p_alid == true ? Brushes.Red : Brushes.Black;
-            FDCText4.Foreground = m_handler.m_FDC.m_aData[3].p_alid == true ? Brushes.Red : Brushes.Black;
-            FDCText5.Foreground = m_handler.m_FDC.m_aData[4].p_alid == true ? Brushes.Red : Brushes.Black;
+            if(m_handler.m_FDC.m_aData.Count > 0)
+            {
+                buttonResume.IsEnabled = IsEnableResume();
+                buttonPause.IsEnabled = IsEnablePause();
+                buttonInitialization.IsEnabled = IsEnableInitialization();
+                buttonRecovery.IsEnabled = IsEnableRecovery();
+                FDCText1.Foreground = m_handler.m_FDC.m_aData[0].p_bAlarm == true ? Brushes.Red : Brushes.Black;
+                //            FDCText2.Foreground = m_handler.m_FDC.m_aData[1].p_alid == true ? Brushes.Red : Brushes.Black;
+                //            FDCText3.Foreground = m_handler.m_FDC.m_aData[2].p_alid == true ? Brushes.Red : Brushes.Black;
+                //            FDCText4.Foreground = m_handler.m_FDC.m_aData[3].p_alid == true ? Brushes.Red : Brushes.Black;
+                //            FDCText5.Foreground = m_handler.m_FDC.m_aData[4].p_alid == true ? Brushes.Red : Brushes.Black;
+            }
         }
 
         #endregion

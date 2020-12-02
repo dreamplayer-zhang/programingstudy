@@ -227,6 +227,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Module\FFU.cs" />
+    <Compile Include="Module\FFU_Fan_UI.xaml.cs">
+      <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\1_3EQSM_VM.cs" />
     <Compile Include="UI\1_3EQSimulation.xaml.cs">
       <DependentUpon>1_3EQSimulation.xaml</DependentUpon>
@@ -427,6 +430,10 @@
       <DependentUpon>Vega_Recipe_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\6_LogViewModel.cs" />
+    <Page Include="Module\FFU_Fan_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1_3EQSimulation.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
