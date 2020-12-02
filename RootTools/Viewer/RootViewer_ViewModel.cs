@@ -576,43 +576,80 @@ namespace RootTools
                         {
                             if (p_eColorViewMode == eColorViewMode.All)
                             {
-                                Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
-                                IntPtr ptrMemR = p_ImageData.GetPtr(0);
-                                IntPtr ptrMemG = p_ImageData.GetPtr(1);
-                                IntPtr ptrMemB = p_ImageData.GetPtr(2);
-
-
-                                if (ptrMemR == IntPtr.Zero)
-                                    return;
-
-                                byte[,,] viewPtr = view.Data;
-                                byte* imageptrR = (byte*)ptrMemR.ToPointer();
-                                byte* imageptrG = (byte*)ptrMemG.ToPointer();
-                                byte* imageptrB = (byte*)ptrMemB.ToPointer();
-
-                                int viewrectY = p_View_Rect.Y;
-                                int viewrectX = p_View_Rect.X;
-                                int viewrectHeight = p_View_Rect.Height;
-                                int viewrectWidth = p_View_Rect.Width;
-                                int sizeX = p_ImageData.p_Size.X;
-
-                                Parallel.For(0, p_CanvasHeight, (yy) =>
+                                if(p_ImageData.m_eMode == ImageData.eMode.MemoryRead)
                                 {
-                                    //lock (o)
+                                    Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
+                                    IntPtr ptrMemR = p_ImageData.GetPtr(0);
+                                    IntPtr ptrMemG = p_ImageData.GetPtr(1);
+                                    IntPtr ptrMemB = p_ImageData.GetPtr(2);
+
+
+                                    if (ptrMemR == IntPtr.Zero)
+                                        return;
+
+                                    byte[,,] viewPtr = view.Data;
+                                    byte* imageptrR = (byte*)ptrMemR.ToPointer();
+                                    byte* imageptrG = (byte*)ptrMemG.ToPointer();
+                                    byte* imageptrB = (byte*)ptrMemB.ToPointer();
+
+                                    int viewrectY = p_View_Rect.Y;
+                                    int viewrectX = p_View_Rect.X;
+                                    int viewrectHeight = p_View_Rect.Height;
+                                    int viewrectWidth = p_View_Rect.Width;
+                                    int sizeX = p_ImageData.p_Size.X;
+
+                                    Parallel.For(0, p_CanvasHeight, (yy) =>
                                     {
-                                        long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                                        for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                        //lock (o)
                                         {
-                                            long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                                            long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                                            for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                            {
+                                                long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-                                            viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
-                                            viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];
-                                            viewPtr[yy, xx, 2] = imageptrB[pix_x + (long)pix_y * sizeX];
+                                                viewPtr[yy, xx, 0] = imageptrR[pix_x + (long)pix_y * sizeX];
+                                                viewPtr[yy, xx, 1] = imageptrG[pix_x + (long)pix_y * sizeX];
+                                                viewPtr[yy, xx, 2] = imageptrB[pix_x + (long)pix_y * sizeX];
+                                            }
                                         }
-                                    }
-                                });
+                                    });
 
-                                p_ImgSource = ImageHelper.ToBitmapSource(view);
+                                    p_ImgSource = ImageHelper.ToBitmapSource(view);
+                                }
+                                else if (p_ImageData.m_eMode == ImageData.eMode.ImageBuffer)
+                                {
+                                    Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
+
+                                    if (this.p_ImageData == null)
+                                        return;
+
+                                    byte[,,] viewPtr = view.Data;
+                                    byte* imageptr = (byte*)p_ImageData.GetPtr();
+
+                                    int viewrectY = p_View_Rect.Y;
+                                    int viewrectX = p_View_Rect.X;
+                                    int viewrectHeight = p_View_Rect.Height;
+                                    int viewrectWidth = p_View_Rect.Width;
+                                    int sizeX = p_ImageData.p_Size.X;
+
+                                    Parallel.For(0, p_CanvasHeight, (yy) =>
+                                    {
+                                        //lock (o)
+                                        {
+                                            long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                                            for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                            {
+                                                long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+
+                                                viewPtr[yy, xx, 0] = imageptr[(pix_x * this.p_ImageData.p_nByte + 0) + (long)pix_y * (sizeX * 3)];
+                                                viewPtr[yy, xx, 1] = imageptr[(pix_x * this.p_ImageData.p_nByte + 1) + (long)pix_y * (sizeX * 3)];
+                                                viewPtr[yy, xx, 2] = imageptr[(pix_x * this.p_ImageData.p_nByte + 2) + (long)pix_y * (sizeX * 3)];
+                                            }
+                                        }
+                                    });
+
+                                    p_ImgSource = ImageHelper.ToBitmapSource(view);
+                                }
                             }
                             else
                             {

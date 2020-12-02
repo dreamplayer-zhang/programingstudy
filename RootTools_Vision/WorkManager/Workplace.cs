@@ -27,6 +27,7 @@ namespace RootTools_Vision
     public enum PREWORKDATA_KEY // PreworkdataList의 index로 반드시 0부터 빈틈없이 추가
     {
         D2D_GOLDEN_IMAGE = 0,
+        D2D_SCALE_MAP = 1,
     }
 
     public delegate void EventPositionUpdated(object obj);
@@ -69,6 +70,7 @@ namespace RootTools_Vision
         private int transY;
         private int sizeX;
         private int sizeY;
+        private byte[] workplaceBuffer;
 
         private IntPtr sharedBuffer;
         private int sharedBufferWidth;
@@ -94,7 +96,8 @@ namespace RootTools_Vision
         public int TransY { get => transY; private  set => transY = value; }
         public int BufferSizeX { get => sizeX; private set => sizeX = value; }
         public int BufferSizeY { get => sizeY; private set => sizeY = value; }
-
+        
+        public byte[] WorkplaceBuffer { get => workplaceBuffer; private set => workplaceBuffer = value; }
         public IntPtr SharedBuffer
         {
             get => sharedBuffer; 
@@ -150,6 +153,7 @@ namespace RootTools_Vision
             this.sizeX = szX;
             this.sizeY = szY;
             this.index = idx;
+            this.workplaceBuffer = new byte[szX * szY];
         }
 
 
@@ -208,20 +212,20 @@ namespace RootTools_Vision
             if (this.PositionUpdated != null && bUpdate == true)
                 this.PositionUpdated(this);
         }
-        public void AddDefect(string sInspectionID, int defectCode, float defectSz, int defectVal, float defectAbsLeft, float defectAbsTop, float defectW, float defectH, int chipIdxX, int chipIdxY) // SurfaceDefectParam
+        public void AddDefect(string sInspectionID, int defectCode, float defectSz, float defectVal, float defectAbsLeft, float defectAbsTop, float defectW, float defectH, int chipIdxX, int chipIdxY) // SurfaceDefectParam
         {
             Defect defect = new Defect(sInspectionID,
-                defectCode, 
+                defectCode,
                 defectSz,
                 defectVal,
                 defectAbsLeft,
-                defectAbsTop, 
-                defectW, 
+                defectAbsTop,
+                defectW,
                 defectH,
                 chipIdxX,
                 chipIdxY);
 
-            defectList.Add(defect);             
+            defectList.Add(defect);
         }
     }
 }
