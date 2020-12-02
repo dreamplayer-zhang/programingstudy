@@ -26,7 +26,13 @@ namespace RootTools.Comm
 
 		private void checkBoxConnect_Checked(object sender, RoutedEventArgs e)
 		{
-            m_modbus.Connect();
+            try
+            {
+                m_modbus.Connect();
+            }
+            catch { }
+            System.Threading.Thread.Sleep(50);
+            if (m_modbus.p_bConnect == false) checkBoxConnect.IsChecked = false;
         }
 
         private void checkBoxConnect_Unchecked(object sender, RoutedEventArgs e)

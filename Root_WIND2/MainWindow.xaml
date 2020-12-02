@@ -13,7 +13,7 @@
         Height="1080"
         Width="1920"
         Title="Siltron"
-        Background="{StaticResource PanelBackGround}"
+        Background="Red"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
         Closing="Window_Closing">

@@ -93,14 +93,16 @@ namespace Root_Vega
 
             public void ClearInfoReticle()
             {
+                m_bIgnoreExistSensor = false; 
                 if (p_infoReticle == null) return;
                 if (IsReticleExist() == false) p_infoReticle = null; 
             }
 
+            bool m_bIgnoreExistSensor = false;
             bool IsReticleExist()
             {
-                if (m_child != null) return m_child.IsReticleExist();
-                return m_robot.IsReticleExist();
+                if (m_child != null) return m_child.IsReticleExist(m_bIgnoreExistSensor);
+                return m_robot.IsReticleExist(m_bIgnoreExistSensor);
             }
 
             public Locate(IRobotChild child)
@@ -119,6 +121,7 @@ namespace Root_Vega
             {
                 string sReticle = (p_infoReticle == null) ? "Empty" : p_infoReticle.p_sReticleID;
                 tree.GetTree("InfoReticle").Set(sReticle, sReticle, m_id, "InfoReticle ID", true, true);
+                m_bIgnoreExistSensor = tree.GetTree("Ignore Exist Sensor", false).Set(m_bIgnoreExistSensor, m_bIgnoreExistSensor, m_id, "Ignore Exist Check Sensor"); 
             }
         }
 

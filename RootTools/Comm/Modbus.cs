@@ -133,8 +133,9 @@ namespace RootTools.Comm
         #region Connect
         public string Connect()
         {
-            if (m_client.Connected) return "OK";
-            try { m_client.Connect(); }
+          if (m_client.Connected) return "OK";
+            try { m_client.Connect();
+            }
             catch (Exception) { return "Connection Error"; }
             //m_client.NumberOfRetries = 0; 
             if (m_client.Connected == false) return "Connection False";
@@ -186,7 +187,7 @@ namespace RootTools.Comm
 
         public string ReadCoils(byte nUnit, int nAddress, ref List<bool> abOn)
         {
-            if (m_client.Connected == false) return p_sInfo = "Not Connect";
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             bool[] abRead = m_client.ReadCoils(nAddress, abOn.Count);
             for (int n = 0; n < Math.Min(abRead.Length, abOn.Count); n++) abOn[n] = abRead[n]; 
@@ -195,7 +196,7 @@ namespace RootTools.Comm
 
         public string WriteCoils(byte nUnit, int nAddress, bool bOn)
         {
-            if (m_client.Connected == false) return p_sInfo = "Not Connect";
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             m_client.WriteSingleCoil(nAddress, bOn);
             return "OK";
@@ -203,7 +204,7 @@ namespace RootTools.Comm
 
         public string WriteCoils(byte nUnit, int nAddress, List<bool> abOn)
         {
-            if (m_client.Connected == false) return p_sInfo = "Not Connect";
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             m_client.WriteMultipleCoils(nAddress, abOn.ToArray());
             return "OK";
@@ -211,7 +212,7 @@ namespace RootTools.Comm
 
         public string ReadDiscreateInputs(byte nUnit, int nAddress, ref bool bOn)
         {
-            if (m_client.Connected == false) return p_sInfo = "Not Connect";
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             bool[] abRead = m_client.ReadDiscreteInputs(nAddress, 1);
             if (abRead.Length > 0) bOn = abRead[0];
@@ -220,7 +221,7 @@ namespace RootTools.Comm
 
         public string ReadDiscreateInputs(byte nUnit, int nAddress, ref List<bool> abOn)
         {
-            if (m_client.Connected == false) return p_sInfo = "Not Connect";
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             bool[] abRead = m_client.ReadDiscreteInputs(nAddress, abOn.Count);
             for (int n = 0; n < Math.Min(abRead.Length, abOn.Count); n++) abOn[n] = abRead[n];
@@ -229,7 +230,7 @@ namespace RootTools.Comm
 
         public string ReadHoldingRegister(byte nUnit, int nAddress, ref int nValue)
         {
-            if (m_client.Connected == false) return p_sInfo = "Not Connect";
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             int[] anRead = m_client.ReadHoldingRegisters(nAddress, 1);
             if (anRead.Length > 0) nValue = anRead[0];
@@ -240,10 +241,11 @@ namespace RootTools.Comm
         {
             if (m_client.Connected == false)
 			{
-				return p_sInfo = "Not Connect";
+				return "Not Connect";
 			}
-			m_client.UnitIdentifier = nUnit;
-			try
+            if (nUnit == 0) return "Invalid Unit ID"; 
+            m_client.UnitIdentifier = nUnit;
+            try
 			{
 				int[] anRead = m_client.ReadHoldingRegisters(nAddress, anValue.Count);
 				for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
@@ -258,7 +260,7 @@ namespace RootTools.Comm
 
         public string WriteHoldingRegister(byte nUnit, int nAddress, int nValue)
         {
-            if (m_client.Connected == false) return p_sInfo = "Not Connect";
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             m_client.WriteSingleRegister(nAddress, nValue);
             return "OK";
@@ -266,7 +268,7 @@ namespace RootTools.Comm
 
         public string WriteHoldingRegister(byte nUnit, int nAddress, List<int> anValue)
         {
-            if (m_client.Connected == false) return p_sInfo = "Not Connect";
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             m_client.WriteMultipleRegisters(nAddress, anValue.ToArray());
             return "OK";
@@ -275,7 +277,7 @@ namespace RootTools.Comm
         {
             if (m_client.Connected == false)
             {
-                return p_sInfo = "Not Connect"; 
+                return "Not Connect"; 
             }
             m_client.UnitIdentifier = nUnit;
             try
@@ -292,7 +294,7 @@ namespace RootTools.Comm
 
         public string ReadInputRegister(byte nUnit, int nAddress, ref List<int> anValue)
         {
-            if (m_client.Connected == false) return p_sInfo = "Not Connect";
+            if (m_client.Connected == false) return "Not Connect";
             m_client.UnitIdentifier = nUnit;
             int[] anRead = m_client.ReadInputRegisters(nAddress, anValue.Count);
             for (int n = 0; n < Math.Min(anRead.Length, anValue.Count); n++) anValue[n] = anRead[n];
@@ -338,7 +340,11 @@ namespace RootTools.Comm
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             InitClient(); 
             RunTree(Tree.eMode.RegRead);
-            Connect(); 
+            try
+            {
+                Connect();
+            }
+            catch (Exception e) { if (m_log != null) p_sInfo = e + "Connect Error"; }
         }
 
         public void ThreadStop()
