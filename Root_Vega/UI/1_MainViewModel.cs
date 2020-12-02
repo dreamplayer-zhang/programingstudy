@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using RootTools.Module;
 using Root_Vega.Module;
 using System.Security.Cryptography.X509Certificates;
+using System.Windows.Threading;
 
 namespace Root_Vega
 {

@@ -214,7 +214,7 @@ namespace RootTools.Inspects
 						if(arrDefects != null && arrDefects.Count > 0)
 						{
 							if (
-								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) >= InspectionTarget.SideInspection &&
+								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) > InspectionTarget.SideInspection &&
 								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) <= InspectionTarget.SideInspectionBottom)
 							{
 								foreach (var item in arrDefects)
@@ -229,7 +229,7 @@ namespace RootTools.Inspects
 						if (arrDefects != null && arrDefects.Count > 0)
 						{
 							if (
-								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) >= InspectionTarget.BevelInspection &&
+								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) > InspectionTarget.BevelInspection &&
 								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) <= InspectionTarget.BevelInspectionBottom)
 							{
 								foreach (var item in arrDefects)
