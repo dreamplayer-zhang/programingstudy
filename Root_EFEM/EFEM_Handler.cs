@@ -225,15 +225,15 @@ namespace Root_EFEM
         #region Module EFEM
         enum eEFEM
         {
-            AOP
+            EFEM
         };
-        eEFEM m_eEFEM = eEFEM.AOP; 
+        eEFEM m_eEFEM = eEFEM.EFEM; 
         void InitEFEM()
         {
             ModuleBase module = null;
             switch (m_eEFEM)
             {
-                case eEFEM.AOP: module = new EFEM_AOP("AOP", m_engineer); break;
+                case eEFEM.EFEM: module = new EFEM_AOP("EFEM", m_engineer); break;
             }
             if (module != null) InitModule(module);
         }
