@@ -264,7 +264,7 @@ namespace Root_EFEM.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_ReadRFID(this), false, "Read RFID");
+            //AddModuleRunList(new Run_ReadRFID(this), false, "Read RFID");
         }
 
         public class Run_ReadRFID : ModuleRunBase

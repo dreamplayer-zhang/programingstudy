@@ -186,8 +186,36 @@ namespace Root_EFEM.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
+            AddModuleRunList(new Run_ReadyPosition(this), true, "Go to ReadyPosition");
         }
 
+        public class Run_ReadyPosition : ModuleRunBase
+        {
+            Vision_AOP m_module;
+            public Run_ReadyPosition(Vision_AOP module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+            //double m_secDelay = 2;
+            public override ModuleRunBase Clone()
+            {
+                Run_ReadyPosition run = new Run_ReadyPosition(m_module);
+                //run.m_secDelay = m_secDelay;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)//
+            {
+                //m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
+            }
+
+            public override string Run()//
+            {
+                //Thread.Sleep((int)(1000 * m_secDelay));
+                return "OK";
+            }
+        }
         public class Run_Delay : ModuleRunBase
         {
             Vision_AOP m_module;
