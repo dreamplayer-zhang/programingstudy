@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools.Inspects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,138 @@ namespace Root_Vega
         public _2_9_Bevel()
         {
             InitializeComponent();
-        }
-    }
+			App.m_engineer.m_InspManager.AddBevelDefect += App_AddDefect;
+			App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
+			InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
+		}
+		~_2_9_Bevel()
+		{
+			App.m_engineer.m_InspManager.AddBevelDefect -= App_AddDefect;
+			App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
+			InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
+		}
+
+		private void InspectionManager_RefreshDefect()
+		{
+			viewer_top.Dispatcher.Invoke(new Action(delegate ()
+			{
+				viewer_top.RefreshDraw();
+			}));
+			viewer_bot.Dispatcher.Invoke(new Action(delegate ()
+			{
+				viewer_bot.RefreshDraw();
+			}));
+			viewer_left.Dispatcher.Invoke(new Action(delegate ()
+			{
+				viewer_left.RefreshDraw();
+			}));
+			viewer_right.Dispatcher.Invoke(new Action(delegate ()
+			{
+				viewer_right.RefreshDraw();
+			}));
+		}
+
+		private void _ClearDefect()
+		{
+			try
+			{
+				viewer_top.Dispatcher.Invoke(new Action(delegate ()
+				{
+					viewer_top.ClearRect();
+					viewer_top.RefreshDraw();
+				}));
+				viewer_bot.Dispatcher.Invoke(new Action(delegate ()
+				{
+					viewer_bot.ClearRect();
+					viewer_bot.RefreshDraw();
+				}));
+				viewer_left.Dispatcher.Invoke(new Action(delegate ()
+				{
+					viewer_left.ClearRect();
+					viewer_left.RefreshDraw();
+				}));
+				viewer_right.Dispatcher.Invoke(new Action(delegate ()
+				{
+					viewer_right.ClearRect();
+					viewer_right.RefreshDraw();
+				}));
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
+
+		private void App_AddDefect(RootTools.DefectDataWrapper item)
+		{
+			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
+				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.BevelInspectionTop)
+			{
+				try
+				{
+					viewer_top.Dispatcher.Invoke(new Action(delegate ()
+					{
+						int width = item.nWidth;
+						int height = item.nHeight;
+						viewer_top.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
+					}));
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine(ex.Message);
+				}
+			}
+			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
+				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.BevelInspectionBottom)
+			{
+				try
+				{
+					viewer_bot.Dispatcher.Invoke(new Action(delegate ()
+					{
+						int width = item.nWidth;
+						int height = item.nHeight;
+						viewer_bot.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
+					}));
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine(ex.Message);
+				}
+			}
+			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
+				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.BevelInspectionLeft)
+			{
+				try
+				{
+					viewer_left.Dispatcher.Invoke(new Action(delegate ()
+					{
+						int width = item.nWidth;
+						int height = item.nHeight;
+						viewer_left.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
+					}));
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine(ex.Message);
+				}
+			}
+			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
+				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.BevelInspectionRight)
+			{
+				try
+				{
+					viewer_right.Dispatcher.Invoke(new Action(delegate ()
+					{
+						int width = item.nWidth;
+						int height = item.nHeight;
+						viewer_right.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
+					}));
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine(ex.Message);
+				}
+			}
+		}
+	}
 }

@@ -1881,7 +1881,9 @@ namespace Root_Vega.Module
                 DateTime dtNow = ((Vega_Engineer)m_module.m_engineer).m_InspManager.NowTime;
                 string strNowTime = dtNow.ToString("yyyyMMdd_HHmmss");
                 List<DefectInfo> lstDefectInfo = GetDefectPosList();
-                for (int i = 0; i < lstDefectInfo.Count; i++)
+                int nCount = lstDefectInfo.Count;
+                if (nCount > 10) nCount = 10;
+                for (int i = 0; i < nCount/*lstDefectInfo.Count*/; i++)
                 {
                     // Defect 위치로 이동
                     RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectInfo[i].cptDefectPos);

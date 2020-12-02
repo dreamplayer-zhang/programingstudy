@@ -105,7 +105,7 @@ namespace Root_Vega
 					Console.WriteLine(ex.Message);
 				}
 			}
-			else if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
+			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
 				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.SideInspectionBottom)
 			{
 				try
@@ -122,7 +122,7 @@ namespace Root_Vega
 					Console.WriteLine(ex.Message);
 				}
 			}
-			else if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
+			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
 				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.SideInspectionLeft)
 			{
 				try
@@ -139,7 +139,7 @@ namespace Root_Vega
 					Console.WriteLine(ex.Message);
 				}
 			}
-			else if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
+			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
 				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.SideInspectionRight)
 			{
 				try
