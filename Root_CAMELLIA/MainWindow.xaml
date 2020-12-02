@@ -40,6 +40,13 @@
                        VerticalAlignment="Center"
                        Margin="5,0,0,0"
                        Grid.Column="1" />
+            <TextBlock Text="Recipe Name.Rcp"
+                       FontSize="12"
+                       FontWeight="Bold"
+                       Foreground="Black"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Grid.Column="1" />
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
                         Orientation="Horizontal"
                         Grid.Column="2">

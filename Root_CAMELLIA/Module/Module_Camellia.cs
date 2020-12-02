@@ -77,55 +77,6 @@ namespace Root_CAMELLIA.Module
 
         }
 
-        protected override void RunThread()
-        {
-            switch (p_eState)
-            {
-                case eState.Init:
-                    p_bEnableHome = true;
-                    p_sRun = "Initialize";
-                    break;
-                case eState.Home:
-                    p_bEnableHome = false;
-                    p_sRun = "Stop";
-                    string sStateHome = StateHome();
-                    if (sStateHome == "OK") p_eState = eState.Ready;
-                    else StopHome();
-                    break;
-                case eState.Ready:
-                    p_bEnableHome = true;
-                    p_sRun = p_sModuleRun;
-                    string sStateReady = StateReady();
-                    if (sStateReady != "OK")
-                    {
-                        p_eState = eState.Error;
-                        m_qModuleRun.Clear();
-                    }
-                    if (m_qModuleRun.Count > 0) p_eState = eState.Run;
-                    break;
-                case eState.Run:
-                    p_bEnableHome = false;
-                    p_sRun = "Stop";
-                    string sStateRun = StateRun();
-                    if (sStateRun != "OK")
-                    {
-                        p_eState = eState.Error;
-                        m_qModuleRun.Clear();
-                    }
-                    if (m_qModuleRun.Count == 0) p_eState = eState.Ready;
-                    break;
-                case eState.Error:
-                    p_bEnableHome = false;
-                    p_sRun = "Reset";
-                    break;
-                default:
-                    p_bEnableHome = true;
-                    break;
-
-            }
-        }
-
-
         public class Run_Delay : ModuleRunBase
         {
             Module_Camellia m_module;
@@ -245,19 +196,22 @@ namespace Root_CAMELLIA.Module
             {
                 AxisXY axisXY = m_module.m_axisXY;
                 RPoint MovePoint;
-                if (m_InitialCal)
-                {
-                    MovePoint = new RPoint(m_CalWaferCenterPos_pulse);
-                }
-                else
-                {
-                    MovePoint = new RPoint(m_RefWaferCenterPos_pulse);
-                }
-                if(m_module.Run(axisXY.StartMove(MovePoint)))
-                    return p_sInfo;
-                if(m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
-                m_NanoView.Calibration(m_BGIntTime_VIS,m_BGIntTime_NIR,m_Average_VIS,m_Average_NIR, m_InitialCal);
+                //if (m_InitialCal)
+                //{
+                //    MovePoint = new RPoint(m_CalWaferCenterPos_pulse);
+                //}
+                //else
+                //{
+                //    MovePoint = new RPoint(m_RefWaferCenterPos_pulse);
+                //}
+                //if(m_module.Run(axisXY.StartMove(MovePoint)))
+                //    return p_sInfo;
+                //if(m_module.Run(axisXY.WaitReady()))
+                //    return p_sInfo;
+                //m_InitalCal은 지금은 무조건 false로 쓰니깐 하드코딩해놓고 보류...
+                //centring 하면서 Cal은 동시에 진행해도 됨
+                //calibration : 지금 위치에서 그냥 바로 cal 시작
+                m_NanoView.Calibration(m_BGIntTime_VIS, m_BGIntTime_NIR, m_Average_VIS, m_Average_NIR, false); //m_InitialCal);
                 return "OK";
             }
         }
