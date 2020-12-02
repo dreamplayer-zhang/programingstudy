@@ -596,6 +596,12 @@ namespace RootTools
                                 int viewrectWidth = p_View_Rect.Width;
                                 int sizeX = p_ImageData.p_Size.X;
 
+                                if (imageptrR == null)
+                                    return;
+                                if (imageptrG == null)
+                                    return;
+                                if (imageptrB == null)
+                                    return;
                                 Parallel.For(0, p_CanvasHeight, (yy) =>
                                 {
                                     //lock (o)
