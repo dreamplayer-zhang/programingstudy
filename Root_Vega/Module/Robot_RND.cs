@@ -501,7 +501,7 @@ namespace Root_Vega.Module
             if (EQ.p_bSimulate) return "OK";
             if (p_bDisableHomeWhenArmOpen && !m_diArmClose.p_bIn)
             {
-                m_alidRTRWarningPos.Run(!m_diArmClose.p_bIn, "Please Check State of RTR Arm. if Arm is opened, Operate it manually.", true);
+                m_alidRTRWarningPos.Run(!m_diArmClose.p_bIn, "Please Check State of RTR Arm. if Arm is opened, Operate it manually.");
                 return "RTR's Arm opened";
             }
             int nReset = 0;
