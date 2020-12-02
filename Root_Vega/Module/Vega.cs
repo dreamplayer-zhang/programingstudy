@@ -88,7 +88,6 @@ namespace Root_Vega.Module
 
         #region Thread
         public EQ.eState m_eStatus = EQ.eState.Init;
-        int m_nLamp_count = 0;
 
         protected override void RunThread()
         {
@@ -98,12 +97,9 @@ namespace Root_Vega.Module
             m_doLamp.Write(eLamp.Yellow, EQ.p_eState == EQ.eState.Run);
             m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Ready);
            
-            if (m_diBuzzerOff.p_bIn)
-                m_doBuzzer.Write(eBuzzer.BuzzerOff);
-
-            else if (m_eStatus != EQ.p_eState)
+            
+            if (m_eStatus != EQ.p_eState)
             {
-                m_nLamp_count = 0;
                     switch (EQ.p_eState)
                     {
                         case EQ.eState.Error: m_doBuzzer.Write(eBuzzer.Buzzer2); break;
@@ -114,13 +110,11 @@ namespace Root_Vega.Module
                     }
                 m_eStatus = EQ.p_eState;
             }
-            m_nLamp_count++;
-            if (m_nLamp_count>50)
-            {
-                m_doBuzzer.Write(eBuzzer.BuzzerOff);
-            }
+
+			if (m_diBuzzerOff.p_bIn || (m_gaf.m_listALID.m_aALID.Count < 1))
+				m_doBuzzer.Write(eBuzzer.BuzzerOff);
+
             //m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors", true);
-            
             m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the Emergency Buttons");
 			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
             if (m_robot != null)
@@ -257,7 +251,7 @@ namespace Root_Vega.Module
         }
         #endregion
 
-        Robot_RND m_robot; 
+        Robot_RND m_robot;
         public Vega(string id, IEngineer engineer)
         {
             p_id = id;
