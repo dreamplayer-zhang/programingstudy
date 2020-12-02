@@ -45,7 +45,8 @@ namespace Root_EFEM
             InitWTR(); 
             InitLoadport();
             InitAligner();
-            InitVision(); 
+            InitVision();
+            InitEFEM(); 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
             //            m_FDC = new FDC("FDC", m_engineer);
@@ -218,6 +219,28 @@ namespace Root_EFEM
             {
                 m_aVisionType[n] = (eVision)treeType.Set(m_aVisionType[n], m_aVisionType[n], n.ToString("00"), "Vision Type");
             }
+        }
+        #endregion
+
+        #region Module EFEM
+        enum eEFEM
+        {
+            AOP
+        };
+        eEFEM m_eEFEM = eEFEM.AOP; 
+        void InitEFEM()
+        {
+            ModuleBase module = null;
+            switch (m_eEFEM)
+            {
+                case eEFEM.AOP: module = new EFEM_AOP("AOP", m_engineer); break;
+            }
+            if (module != null) InitModule(module);
+        }
+
+        public void RunTreeEFEM(Tree tree)
+        {
+            m_eEFEM = (eEFEM)tree.Set(m_eEFEM, m_eEFEM, "Type", "EFEM Type");
         }
         #endregion
 
