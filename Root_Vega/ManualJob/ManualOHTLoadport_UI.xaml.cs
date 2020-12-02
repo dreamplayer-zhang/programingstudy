@@ -29,12 +29,22 @@ namespace Root_Vega.ManualJob
 
         private void buttonAccessManual_Click(object sender, RoutedEventArgs e)
         {
-            m_loadport.m_infoPod.p_eReqAccessLP = GemCarrierBase.eAccessLP.Manual; 
+            m_loadport.m_infoPod.p_eReqAccessLP = GemCarrierBase.eAccessLP.Manual;
+            m_OHT.m_bAuto = false;
         }
 
         private void buttonAccessAuto_Click(object sender, RoutedEventArgs e)
         {
-            m_loadport.m_infoPod.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto; 
+            m_loadport.m_infoPod.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto;
+            if(!m_loadport.m_dioPlaced.p_bIn || !m_loadport.m_dioPresent.p_bIn)
+            {
+                m_OHT.m_bPODExist = true;
+            }
+            else
+            {
+                m_OHT.m_bPODExist = false;
+            }
+            m_OHT.m_bAuto = true;
         }
         #endregion
 
@@ -45,7 +55,7 @@ namespace Root_Vega.ManualJob
             SetBrush(buttonStateUnloading, m_OHT.m_doUnloadReq.p_bOn && p_bBlink);
             textBlockPlaced.Foreground = !m_loadport.m_dioPlaced.p_bIn ? Brushes.White : Brushes.Gray;
             textBlockPresent.Foreground = !m_loadport.m_dioPresent.p_bIn ? Brushes.White : Brushes.Gray;
-            bool bPodIn = p_bBlink ? m_loadport.m_dioPlaced.p_bIn : m_loadport.m_dioPresent.p_bIn;
+            bool bPodIn = p_bBlink ? !m_loadport.m_dioPlaced.p_bIn : !m_loadport.m_dioPresent.p_bIn;
             imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
             imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;
         }
@@ -78,7 +88,24 @@ namespace Root_Vega.ManualJob
             button.Background = bOn ? Brushes.Yellow : Brushes.DimGray;
         }
         #endregion
-
+        bool bOHTErr = true;
+        #region AccessMode
+        void TimerOHTErr()
+        {
+            if(m_OHT.m_bOHTErr != bOHTErr)
+            {
+                if(!m_OHT.m_bOHTErr)
+                {
+                    buttonRetry.IsEnabled = false;
+                }
+                else
+                {
+                    buttonRetry.IsEnabled = true;
+                }
+            }
+            bOHTErr = m_OHT.m_bOHTErr;
+        }
+        #endregion
         #region OHT DO
         void TimerDO()
         {
@@ -129,7 +156,8 @@ namespace Root_Vega.ManualJob
             m_OHT.m_doLoadReq.p_bOn = false;
             m_OHT.m_doUnloadReq.p_bOn = false;
             m_OHT.m_doReady.p_bOn = false;
-            m_OHT.p_sInfo = ""; 
+            m_OHT.p_sInfo = "";
+            m_OHT.m_bOHTErr = false; 
         }
         #endregion
 
@@ -144,7 +172,8 @@ namespace Root_Vega.ManualJob
             TimerLoadportState();
             TimerDI();
             TimerDO();
-            _nBlink = (_nBlink + 1) % 10;
+            TimerOHTErr();
+            //_nBlink = (_nBlink + 1) % 10;
         }
         #endregion
 

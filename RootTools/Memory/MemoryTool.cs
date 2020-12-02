@@ -124,13 +124,13 @@ namespace RootTools.Memory
             if (m_nChanged < 7) m_nChanged++;
             else
             {
-                UpdateMemoryData();
+                if (UpdateMemoryData()) return;
                 m_sUpdateTime = sUpdateTime;
                 OnChangeMemoryPool();
             }
         }
 
-        void UpdateMemoryData()
+        bool UpdateMemoryData()
         {
             p_aPool.Clear(); 
             int nPool = m_reg.Read("Count", 0); 
@@ -138,11 +138,19 @@ namespace RootTools.Memory
             {
                 string sPool = m_reg.Read("MemoryPool" + n.ToString(), "");
                 MemoryPool pool = new MemoryPool(sPool, this, 1);
+                p_aPool.Add(pool);
+            }
+            foreach (MemoryPool pool in p_aPool)
+            {
+                if (pool.m_MMF == null) return true; 
+            }
+            foreach (MemoryPool pool in p_aPool)
+            {
                 pool.UpdateMemoryData();
                 pool.RunTree(Tree.eMode.RegRead);
-                pool.RunTree(Tree.eMode.Init); 
-                p_aPool.Add(pool); 
+                pool.RunTree(Tree.eMode.Init);
             }
+            return false; 
         }
 
         string m_sUpdateTime = ""; 

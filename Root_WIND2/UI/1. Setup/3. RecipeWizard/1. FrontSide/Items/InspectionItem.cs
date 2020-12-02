@@ -8,16 +8,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using RootTools;
-using RootTools_Vision;
 
 namespace Root_WIND2
 {
-    public delegate void ComboboxItemChanged(object obj, EventArgs args);
     public class InspectionItem : ObservableObject
     {
-        public event ComboboxItemChanged ComboBoxItemChanged_Mask;
-        public event ComboboxItemChanged ComboBoxItemChanged_Method;
-
         private ObservableCollection<Mask> m_cMask;
         public ObservableCollection<Mask> p_cMask
         {
@@ -31,8 +26,8 @@ namespace Root_WIND2
             }
         }
 
-        private ObservableCollection<ParameterBase> m_cInspMethod;
-        public ObservableCollection<ParameterBase> p_cInspMethod
+        private ObservableCollection<Type> m_cInspMethod;
+        public ObservableCollection<Type> p_cInspMethod
         {
             get
             {
@@ -58,8 +53,8 @@ namespace Root_WIND2
             }
         }
 
-        private ParameterBase m_InspMethod;
-        public ParameterBase p_InspMethod
+        private Type m_InspMethod;
+        public Type p_InspMethod
         {
             get
             {
@@ -77,20 +72,7 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    if (ComboBoxItemChanged_Mask != null)
-                        ComboBoxItemChanged_Method(p_InspMethod, new EventArgs());
-                });
-            }
-        }
-
-        public ICommand ComboBoxSelectionChanged_MaskItem
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (ComboBoxItemChanged_Mask != null)
-                        ComboBoxItemChanged_Mask(p_Mask, new EventArgs());
+                    MessageBox.Show("DDD");
                 });
             }
         }

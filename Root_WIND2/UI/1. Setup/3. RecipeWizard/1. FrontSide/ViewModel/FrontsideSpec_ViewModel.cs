@@ -33,7 +33,7 @@ namespace Root_WIND2
             m_Recipe = recipe;
 
             m_cMask = new ObservableCollection<Mask>();
-            m_cInspMethod = new ObservableCollection<RootTools_Vision.ParameterBase>();
+            m_cInspMethod = new ObservableCollection<Type>();
             m_cInspItem = new ObservableCollection<InspectionItem>();
 
             p_ImageViewer_VM = new FrontsideSpecTool_ViewModel();
@@ -68,11 +68,9 @@ namespace Root_WIND2
             p_cMask.Add(mask3);
 
 
+            ObservableCollection<Type> workList = Tools.GetInheritedClasses(typeof(WorkBase));
 
-            p_cInspMethod = RootTools_Vision.ParameterBase.GetChildClass();
-
-            p_selectedMethodItem = RootTools_Vision.ParameterBase.CreateChildInstance(p_cInspMethod[0]);
-
+            p_cInspMethod = workList;
             //p_cInspMethod = workList;
         }
 
@@ -91,11 +89,12 @@ namespace Root_WIND2
             }
         }
 
-        private ObservableCollection<RootTools_Vision.ParameterBase> m_cInspMethod;
-        public ObservableCollection<RootTools_Vision.ParameterBase> p_cInspMethod
+        private ObservableCollection<Type> m_cInspMethod;
+        public ObservableCollection<Type> p_cInspMethod
         {
             get
             {
+
                 return m_cInspMethod;
             }
             set
@@ -144,17 +143,13 @@ namespace Root_WIND2
             {
                 SetProperty(ref m_selectedInspItem, value);
 
-                //if(m_selectedInspItem.p_InspMethod != null)
-                //{
-                //    var obj = Activator.CreateInstance(m_selectedInspItem.p_InspMethod) as WorkBase;
-                //    if (obj != null)
-                //        p_selectedMethodItem = obj;
-                //}
+                p_selectedMethodItem = m_selectedInspItem.p_InspMethod;
+                //m_selectedInspItem.p_cInspMethod.
             }
         }
 
-        private ParameterBase m_selectedMethodItem;
-        public ParameterBase p_selectedMethodItem
+        private Type m_selectedMethodItem;
+        public Type p_selectedMethodItem
         {
             get
             {
@@ -163,6 +158,7 @@ namespace Root_WIND2
             set
             {
                 SetProperty(ref m_selectedMethodItem, value);
+                //m_selectedInspItem.p_cInspMethod.
             }
         }
         #endregion
@@ -204,26 +200,11 @@ namespace Root_WIND2
                     InspectionItem item = new InspectionItem();
                     item.p_cMask = p_cMask;
                     item.p_cInspMethod = p_cInspMethod;
-                    item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
-                    item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
-
                     p_cInspItem.Add(item);
                 });
             }
         }
 
-        public void ComboBoxItemChanged_Mask_Callback(object obj, EventArgs args)
-        {
-            Mask mask = (Mask)obj;
-        }
-
-        public void ComboBoxItemChanged_Method_Callback(object obj, EventArgs args)
-        {
-            //ParameterBase param = obj as ParameterBase;
-            //p_selectedMethodItem = Tools.CreateInstance<ParameterBase>()/*ParameterBase.CreateChildInstance(param)*/;
-
-            p_selectedMethodItem = new D2DParameter();
-        }
 
         public ICommand btnDeleteInspItem
         {
@@ -243,7 +224,7 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    m_selectedInspItem.p_InspMethod = p_cInspMethod[0];
+                    MessageBox.Show("DDD");
                 });
             }
         }

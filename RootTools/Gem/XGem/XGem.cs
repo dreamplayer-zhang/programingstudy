@@ -429,7 +429,7 @@ namespace RootTools.Gem.XGem
             m_svValue[0] = value.ToString();
             long nError = p_bEnable ? m_xGem.GEMSetVariable(1, m_svID, m_svValue) : 0;
             LogSend(nError, "GEMSetVariable", m_svID[0], m_svValue[0]);
-            p_sInfo = "SetSV " + sv.p_sModule + "." + sv.p_id + " : " + sv.p_value.ToString() + " -> " + value.ToString(); 
+            //p_sInfo = "SetSV " + sv.p_sModule + "." + sv.p_id + " : " + sv.p_value.ToString() + " -> " + value.ToString(); 
             return nError; 
         }
         #endregion

@@ -180,6 +180,7 @@ namespace Root_Vega
             p_eReqTransfer = eTransfer.TransferBlocked;
             for (int n = 0; n < 100; n++)
             {
+                if (EQ.IsStop()) return; 
                 if (p_eTransfer != eTransfer.OutOfService) n = 200;
                 else Thread.Sleep(10);
             }

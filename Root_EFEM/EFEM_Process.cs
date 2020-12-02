@@ -103,10 +103,12 @@ namespace Root_EFEM
 
                     public void ClearInfoWafer()
                     {
+                        m_bIgnoreExistSensor = false;
                         if (p_infoWafer == null) return;
                         if (IsWaferExist() == false) p_infoWafer = null;
                     }
 
+                    bool m_bIgnoreExistSensor = false;
                     bool IsWaferExist()
                     {
                         return (m_child != null) ? m_child.IsWaferExist(0, m_bIgnoreExistSensor) : m_arm.IsWaferExist(m_bIgnoreExistSensor);
@@ -128,6 +130,7 @@ namespace Root_EFEM
                     {
                         string sInfoWafer = (p_infoWafer == null) ? "Empty" : p_infoWafer.p_id;
                         tree.GetTree("InfoWafer").Set(sInfoWafer, sInfoWafer, m_id, "InfoWafer ID", true, true);
+                        m_bIgnoreExistSensor = tree.GetTree("Ignore Exist Sensor", false).Set(m_bIgnoreExistSensor, m_bIgnoreExistSensor, m_id, "Ignore Exist Check Sensor");
                     }
                 }
 
