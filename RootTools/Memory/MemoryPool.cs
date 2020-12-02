@@ -182,7 +182,7 @@ namespace RootTools.Memory
         public string p_id { get; set; }
         public Log m_log;
         public Registry m_reg; 
-        MemoryMappedFile m_MMF = null;
+        public MemoryMappedFile m_MMF = null;
         public MemoryTool m_memoryTool;
         public MemoryViewer m_viewer; 
         public MemoryPool(string id, MemoryTool memoryTool, double fGB)

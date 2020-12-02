@@ -48,7 +48,7 @@ namespace RootTools.Module
                 _sInfo = value;
                 OnPropertyChanged();
                 if (value == "OK") return;
-                m_log.Info("Info : " + _sInfo);
+                if (m_log != null) m_log.Info("Info : " + _sInfo);
                 m_infoList.Add(_sInfo);
                 EQ.p_sInfo = p_id + " : " + value; 
             }
