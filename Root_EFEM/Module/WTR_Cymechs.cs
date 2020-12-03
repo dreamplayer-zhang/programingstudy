@@ -28,7 +28,7 @@ namespace Root_EFEM.Module
         #endregion
 
         //forget
-        #region WTR_RND_Arm
+        #region Arm
         public enum eArm
         {
             A,
@@ -41,53 +41,17 @@ namespace Root_EFEM.Module
             m_dicArm.Add(eArm.B, new Arm(id, eArm.B, this));
         }
 
-        public class Arm : NotifyProperty
+        public class Arm : WTRArm
         {
             public eArm m_eArm;
-            string m_sInfoWafer = "";
-            InfoWafer _infoWafer = null;
-            public InfoWafer p_infoWafer
-            {
-                get { return _infoWafer; }
-                set
-                {
-                    m_sInfoWafer = (value == null) ? "" : value.p_id;
-                    _infoWafer = value;
-                    m_reg.Write("sInfoWafer", m_sInfoWafer);
-                    OnPropertyChanged();
-                }
-            }
-
-            Registry m_reg;
-            public void ReadInfoWafer_Registry()
-            {
-                m_reg = new Registry(m_id);
-                m_sInfoWafer = (string)m_reg.Read("sInfoWafer", m_sInfoWafer);
-                p_infoWafer = m_module.m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
-            }
 
             public string m_id;
             WTR_Cymechs m_module;
-            InfoWafer.WaferSize m_waferSize;
             public Arm(string id, eArm arm, WTR_Cymechs module)
             {
                 m_eArm = arm;
                 m_module = module;
-                m_id = id + "." + arm.ToString();
-                m_waferSize = new InfoWafer.WaferSize(m_id, true, false);
-            }
-
-            public bool IsEnableWaferSize(InfoWafer infoWafer)
-            {
-                if (m_bEnable == false) return false;
-                return m_waferSize.GetData(infoWafer.p_eSize).m_bEnable;
-            }
-
-            public bool m_bEnable = true;
-            public void RunTree(Tree tree)
-            {
-                m_bEnable = tree.Set(m_bEnable, m_bEnable, "Enable", "Enable WTR Arm");
-                m_waferSize.RunTree(tree.GetTree("Wafer Size", false), m_bEnable);
+                Init(id + "." + arm.ToString(), module.m_engineer); 
             }
 
             //            public DIO_I m_diCheckVac;
