@@ -44,8 +44,8 @@ namespace RootTools_Vision
             this.width = featureWidth;
             this.height = featureHeight;
             this.byteCnt = byteCnt;
-            this.centerPositionX = positionX + featureWidth / 2;
-            this.centerPositionY = positionY + featureHeight / 2;
+            this.centerPositionX = positionX + this.width / 2;
+            this.centerPositionY = positionY + this.height / 2;
             this.rawData = rawData;
             this.FileName = string.Empty;
         }

@@ -7,22 +7,25 @@
 // User Type Defines
 public ref class Cpp_LabelParam
 {
-public :
-	int centerX;
-	int centerY;
-	
+public:
+	float centerX;
+	float centerY;
+
 	int boundTop;
 	int boundBottom;
 	int boundLeft;
 	int boundRight;
-	
-	LONG area;
-	LONG value;
+
+	float width;
+	float height;
+
+	float area;
+	float value;
 };
 
 public ref class Cpp_Point
 {
-public :
+public:
 	int x;
 	int y;
 };

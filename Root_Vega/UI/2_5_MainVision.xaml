@@ -17,7 +17,8 @@
         <Grid Grid.Column="0" Margin="15,15,15,15">
             <tools:ImageViewer DataContext="{Binding p_ImageViewer}"
                                Width="{PriorityBinding}"
-                               Height="{PriorityBinding}"/>
+                               Height="{PriorityBinding}"
+							   x:Name="viewer"/>
         </Grid>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto"

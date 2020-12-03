@@ -241,6 +241,14 @@ namespace Root_Vega.Module
 			{
 				while (aList.Count > m_lFan) aList.RemoveAt(aList.Count - 1);
 				while (aList.Count < m_lFan) aList.Add(0);
+
+				//p_aFanState.Add(0);
+
+				//	m_aTempFanRun.Add(false);
+				//	m_aIsFanRun.Add(false);
+				//	p_aIsFanRun.Add(false);
+				//	m_aFan.Add(new Fan(this, n));
+				//}
 			}
 
 			int m_lFan = 2;
