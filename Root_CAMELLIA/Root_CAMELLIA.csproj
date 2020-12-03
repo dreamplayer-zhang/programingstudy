@@ -183,6 +183,8 @@
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -261,6 +263,7 @@
     <Compile Include="UI_Engineer\Camellia_Hander_UI.xaml.cs">
       <DependentUpon>Camellia_Hander_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\WpfPropertyGrid.cs" />
     <Page Include="UI_Engineer\Camellia_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -277,11 +280,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Icon\AtiLogo.xaml">
+    <Page Include="Control\Icon\AtiLogo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Icon\Calendar.xaml">
+    <Page Include="Control\Icon\Calendar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -297,10 +300,10 @@
     <Compile Include="UI_Dialog\Dlg_RecipeManager.xaml.cs">
       <DependentUpon>Dlg_RecipeManager.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Icon\AtiLogo.xaml.cs">
+    <Compile Include="Control\Icon\AtiLogo.xaml.cs">
       <DependentUpon>AtiLogo.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Icon\Calendar.xaml.cs">
+    <Compile Include="Control\Icon\Calendar.xaml.cs">
       <DependentUpon>Calendar.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
@@ -340,7 +343,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icon\locked.png" />
+    <Resource Include="Resource\locked.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RootTools\RootTools.csproj">
@@ -352,6 +355,7 @@
       <Name>RootTools_CLR</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />
   <PropertyGroup>

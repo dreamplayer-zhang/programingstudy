@@ -891,7 +891,6 @@
                                                             <i:InvokeCommandAction Command="{Binding JogFinishCommand}"/>
                                                         </i:EventTrigger>
                                                     </i:Interaction.Triggers>
-                                                  
                                                 </RepeatButton>
                                                 <RepeatButton Grid.Column="1"
                                                         Margin="5"

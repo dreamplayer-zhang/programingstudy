@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Root_CAMELLIA2.Properties {
+namespace Root_CAMELLIA.Properties {
     using System;
     
     

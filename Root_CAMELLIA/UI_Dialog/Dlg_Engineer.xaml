@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:Icon="clr-namespace:Root_CAMELLIA.Icon"
+        xmlns:Icon="clr-namespace:Root_CAMELLIA.Control.Icon"
         xmlns:local="clr-namespace:Root_CAMELLIA"
-        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
@@ -56,19 +56,14 @@
                         Width="20"
                         Height="25"
                         Margin="0,0,0,0"
-                        Click="CloseButton_Click"
+                        Command="{Binding CmdClose}"
                         VerticalAlignment="Bottom">
                     <Path Style="{StaticResource CloseIconKey}" />
                 </Button>
             </StackPanel>
         </Grid>
         <TabControl Grid.Row="1">
-            <TabItem Header="Handler" Width="100">
-                <Grid>
-                    <local:Camellia_Engineer_UI x:Name="EngineerUI"/>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Engineer" Width="100">
+            <TabItem Header="Manual" Width="100">
                 <Grid>
                     <ScrollViewer Grid.Row="2" VerticalAlignment="Top">
                         <StackPanel>
@@ -194,14 +189,14 @@
                                                         <RowDefinition Height="*"/>
                                                     </Grid.RowDefinitions>
                                                     <UniformGrid Columns="4" Rows="2" Grid.Row="0" Margin="0">
-                                                        <Button Content="All Home" Margin="3" BorderBrush="{x:Null}"/>
-                                                        <Button Content="Move Pos" Margin="3" BorderBrush="{x:Null}"/>
-                                                        <Button Content="Stop" Margin="3" BorderBrush="{x:Null}"/>
-                                                        <Button Content="Save" Margin="3" BorderBrush="{x:Null}"/>
-                                                        <Button Content="Axis Home" Margin="3" BorderBrush="{x:Null}"/>
-                                                        <Button Content="Set Pos" Margin="3" BorderBrush="{x:Null}"/>
-                                                        <Button Content="Repeat" Margin="3" BorderBrush="{x:Null}"/>
-                                                        <Button Content="Load" Margin="3" BorderBrush="{x:Null}"/>
+                                                        <Button Content="All Home" Margin="3" BorderBrush="{x:Null}"  Command="{Binding CmdAllHome}"/>
+                                                        <Button Content="Move Pos" Margin="3" BorderBrush="{x:Null}"  Command="{Binding CmdMovePos}"/>
+                                                        <Button Content="Stop" Margin="3" BorderBrush="{x:Null}"      Command="{Binding CmdStop}"/>
+                                                        <Button Content="Save" Margin="3" BorderBrush="{x:Null}"      Command="{Binding CmdSave}"/>
+                                                        <Button Content="Axis Home" Margin="3" BorderBrush="{x:Null}" Command="{Binding CmdAxisHome}"/>
+                                                        <Button Content="Set Pos" Margin="3" BorderBrush="{x:Null}"   Command="{Binding CmdSetPos}"/>
+                                                        <Button Content="Repeat" Margin="3" BorderBrush="{x:Null}"    Command="{Binding CmdRepeat}"/>
+                                                        <Button Content="Load" Margin="3" BorderBrush="{x:Null}"      Command="{Binding CmdLoad}"/>
                                                     </UniformGrid>
                                                     <Grid Grid.Row="1" Margin="0,10,0,0">
                                                         <Grid.ColumnDefinitions>
@@ -209,7 +204,7 @@
                                                             <ColumnDefinition/>
                                                             <ColumnDefinition Width="2*"/>
                                                         </Grid.ColumnDefinitions>
-                                                        <Button Content="Servo" Grid.Column="0" Margin="3" BorderBrush="{x:Null}"/>
+                                                        <Button Content="Servo" Grid.Column="0" Margin="3" BorderBrush="{x:Null}" Command="{Binding CmdServoOnOff}"/>
                                                         <Button Content="Fault" Grid.Column="1" Margin="3" BorderBrush="{x:Null}"/>
                                                         <Grid Grid.Column="2" Margin="1.5">
                                                             <Grid.RowDefinitions>
@@ -226,9 +221,7 @@
                                                         </Grid>
                                                     </Grid>
                                                     <Grid Grid.Row="2" Margin="0,0" VerticalAlignment="Bottom">
-                                                        <TextBlock Text="0" FontSize="30" FontWeight="Bold"
-                                                       Margin="10"
-                                                       VerticalAlignment="Center"/>
+                                                        <TextBlock Text="{Binding SelectedAxis.p_posActual}" FontSize="30" FontWeight="Bold" Margin="10" VerticalAlignment="Center"/>
                                                     </Grid>
                                                     <Grid Grid.Row="3" Margin="0,10,0,0">
                                                         <Grid.ColumnDefinitions>
@@ -240,13 +233,69 @@
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="*"/>
                                                         </Grid.ColumnDefinitions>
-                                                        <Button Content="＜＜"  Margin="3" Grid.Column="0" BorderBrush="{x:Null}"/>
-                                                        <Button Content="＜"  Margin="3" Grid.Column="1"  BorderBrush="{x:Null}"/>
-                                                        <Button Content="|＜"  Margin="3" Grid.Column="2" BorderBrush="{x:Null}"/>
+                                                        <Button Content="＜＜"  Margin="3" Grid.Column="0" BorderBrush="{x:Null}">
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdJogMinusFast}"/>
+                                                                </i:EventTrigger>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}"/>
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </Button>
+                                                        <Button Content="＜"  Margin="3" Grid.Column="1"  BorderBrush="{x:Null}" >
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdJogMinusNormal}"/>
+                                                                </i:EventTrigger>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}"/>
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </Button>
+                                                        <Button Content="|＜"  Margin="3" Grid.Column="2" BorderBrush="{x:Null}" >
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                    <i:InvokeCommandAction Command="{Binding cmdRelMoveMinus}"/>
+                                                                </i:EventTrigger>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}"/>
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </Button>
                                                         <TextBox Text="0" TextAlignment="Center" VerticalContentAlignment="Center" Margin="3" Grid.Column="3"/>
-                                                        <Button Content="＞|"  Margin="3" Grid.Column="4" BorderBrush="{x:Null}"/>
-                                                        <Button Content="＞"  Margin="3" Grid.Column="5" BorderBrush="{x:Null}"/>
-                                                        <Button Content="＞＞"  Margin="3" Grid.Column="6" BorderBrush="{x:Null}"/>
+
+
+                                                        <Button Content="＞|"  Margin="3" Grid.Column="4" BorderBrush="{x:Null}">
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdRelMovePlus}"/>
+                                                                </i:EventTrigger>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}"/>
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </Button>
+                                                        <Button Content="＞"  Margin="3" Grid.Column="5" BorderBrush="{x:Null}">
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdJogPlusNormal}"/>
+                                                                </i:EventTrigger>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}"/>
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </Button>
+                                                        <Button Content="＞＞"  Margin="3" Grid.Column="6" BorderBrush="{x:Null}">
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdJogPlusFast}"/>
+                                                                </i:EventTrigger>
+                                                                <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
+                                                                    <i:InvokeCommandAction Command="{Binding CmdStop}"/>
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                        </Button>
                                                     </Grid>
                                                 </Grid>
                                                 <Grid Grid.Column="1">
@@ -285,7 +334,7 @@
                                                 </Grid>
                                             </Grid>
                                             <Grid Grid.Row="1" Margin="5">
-                                                <TabControl>
+                                                <TabControl SelectedIndex="{Binding SelectedIndex}">
                                                     <TabItem Header="X" Width="60" Margin="-3,0,0,0">
                                                     </TabItem>
                                                     <TabItem Header="Y" Width="60" Margin="-3,0,0,0">
@@ -339,6 +388,11 @@
                             </Grid>
                         </StackPanel>
                     </ScrollViewer>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Handler" Width="100">
+                <Grid>
+                    <local:Camellia_Engineer_UI x:Name="EngineerUI"/>
                 </Grid>
             </TabItem>
         </TabControl>

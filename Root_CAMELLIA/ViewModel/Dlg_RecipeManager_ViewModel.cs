@@ -22,8 +22,6 @@ namespace Root_CAMELLIA
 {
     public class Dlg_RecipeManager_ViewModel : ObservableObject, IDialogRequestClose
     {
-        public delegate void stageChanged(object e);
-        public event stageChanged StageChanged;
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
         private MainWindow_ViewModel MainViewModel;
         public DataManager dataManager;
