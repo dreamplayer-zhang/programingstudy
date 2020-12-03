@@ -34,10 +34,10 @@ namespace Root_EFEM.Module
             Upper,
         }
         public Dictionary<eArm, Arm> m_dicArm = new Dictionary<eArm, Arm>();
-        void InitArms(string id)
+        void InitArms(string id, IEngineer engineer)
         {
-            m_dicArm.Add(eArm.Lower, new Arm(id, eArm.Lower, this));
-            m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this));
+            m_dicArm.Add(eArm.Lower, new Arm(id, eArm.Lower, this, engineer));
+            m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this, engineer));
         }
 
         public class Arm : WTRArm
@@ -46,11 +46,11 @@ namespace Root_EFEM.Module
 
             public string m_id;
             WTR_RND m_module;
-            public Arm(string id, eArm arm, WTR_RND module)
+            public Arm(string id, eArm arm, WTR_RND module, IEngineer engineer)
             {
                 m_eArm = arm;
                 m_module = module;
-                Init(id + "." + arm.ToString(), module.m_engineer);
+                Init(id + "." + arm.ToString(), engineer);
             }
 
             public string RunGrip(bool bGrip)
@@ -599,7 +599,7 @@ namespace Root_EFEM.Module
         {
             InitCmd();
             InitMotion();
-            InitArms(id);
+            InitArms(id, engineer);
             InitBase(id, engineer);
         }
 

@@ -35,10 +35,10 @@ namespace Root_EFEM.Module
             B,
         }
         public Dictionary<eArm, Arm> m_dicArm = new Dictionary<eArm, Arm>();
-        void InitArms(string id)
+        void InitArms(string id, IEngineer engineer)
         {
-            m_dicArm.Add(eArm.A, new Arm(id, eArm.A, this));
-            m_dicArm.Add(eArm.B, new Arm(id, eArm.B, this));
+            m_dicArm.Add(eArm.A, new Arm(id, eArm.A, this, engineer));
+            m_dicArm.Add(eArm.B, new Arm(id, eArm.B, this, engineer));
         }
 
         public class Arm : WTRArm
@@ -47,11 +47,11 @@ namespace Root_EFEM.Module
 
             public string m_id;
             WTR_Cymechs m_module;
-            public Arm(string id, eArm arm, WTR_Cymechs module)
+            public Arm(string id, eArm arm, WTR_Cymechs module, IEngineer engineer)
             {
                 m_eArm = arm;
                 m_module = module;
-                Init(id + "." + arm.ToString(), module.m_engineer); 
+                Init(id + "." + arm.ToString(), engineer); 
             }
 
             //            public DIO_I m_diCheckVac;
@@ -525,7 +525,7 @@ namespace Root_EFEM.Module
         public WTR_Cymechs(string id, IEngineer engineer)
         {
             InitErrorString(); 
-            InitArms(id);
+            InitArms(id, engineer);
             InitBase(id, engineer);
             InitThread(); 
         }
