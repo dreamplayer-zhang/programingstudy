@@ -138,14 +138,14 @@ namespace Root_Vega
             if (p_SelectedMemData == null)
                 return;
             m_imagedata = new ImageData(p_SelectedMemData);
-            if (p_SelectedMemData.p_id == "Main")
-            {
-                m_arrDefectDataWraper = m_Engineer.m_handler.m_patternVision.m_arrDefectDataWraper;
-                for (int i = 0; i<m_arrDefectDataWraper.Count; i++)
-                {
-                    p_ImageViewer.SelectedTool.AddDefectInfo(m_arrDefectDataWraper[i]);
-                }
-            }
+            //if (p_SelectedMemData.p_id == "Main")
+            //{
+            //    m_arrDefectDataWraper = m_Engineer.m_handler.m_patternVision.m_arrDefectDataWraper;
+            //    for (int i = 0; i<m_arrDefectDataWraper.Count; i++)
+            //    {
+            //        p_ImageViewer.SelectedTool.AddDefectInfo(m_arrDefectDataWraper[i]);
+            //    }
+            //}
             p_ImageViewer.SetImageData(m_imagedata);
         }
 

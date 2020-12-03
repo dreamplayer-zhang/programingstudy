@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO.MemoryMappedFiles;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace RootTools.Memory
 {
@@ -19,7 +20,10 @@ namespace RootTools.Memory
             set
             {
                 if (value == _fGB) return;
-                if (_fGB == 0) CreatePool(value); 
+                if (_fGB == 0)
+                {
+                    if (m_memoryTool.m_bMaster) CreatePool(value);
+                }
                 _fGB = value;
                 OnPropertyChanged(); 
                 m_reg.Write("fGB", value);
@@ -31,13 +35,21 @@ namespace RootTools.Memory
             StopWatch sw = new StopWatch();
             long nPool = (long)Math.Ceiling(fGB * c_fGB);
             try { m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool); }
-            catch (Exception) 
+            catch (Exception e) 
             {
-                m_log.Error(p_id + " Memory Pool Allocate Error : ReStart PC");
-                return false; 
+                m_log.Error(p_id + " Memory Pool Create Error (ReStart PC) : " + e.Message);
+                return true; 
             }
-            m_log.Info(p_id + " Memory Pool Allocate Done " + sw.ElapsedMilliseconds.ToString() + " ms");
-            return true;
+            m_log.Info(p_id + " Memory Pool Create Done " + sw.ElapsedMilliseconds.ToString() + " ms");
+            return false;
+        }
+
+        public string OpenPool()
+        {
+            try { m_MMF = MemoryMappedFile.OpenExisting(p_id); }
+            catch { return "Open Error"; }
+            m_log.Info(p_id + " Memory Pool Open Done");
+            return (m_MMF != null) ? "OK" : "Error"; 
         }
         #endregion
 
@@ -101,6 +113,27 @@ namespace RootTools.Memory
         }
         #endregion
 
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer(); 
+        void InitTimer()
+        {
+            if (m_memoryTool.m_bMaster) return; 
+            m_timer.Interval = TimeSpan.FromSeconds(0.2);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start(); 
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            OpenPool();
+            if (m_MMF == null) return;
+            UpdateMemoryData();
+            RunTree(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.Init);
+            m_timer.Stop(); 
+        }
+        #endregion
+
         #region UI
         public UserControl p_ui
         {
@@ -153,7 +186,7 @@ namespace RootTools.Memory
         public string p_id { get; set; }
         public Log m_log;
         public Registry m_reg; 
-        MemoryMappedFile m_MMF = null;
+        public MemoryMappedFile m_MMF = null;
         public MemoryTool m_memoryTool;
         public MemoryViewer m_viewer; 
         public MemoryPool(string id, MemoryTool memoryTool, double fGB)
@@ -165,7 +198,8 @@ namespace RootTools.Memory
             m_viewer = new MemoryViewer(id, this, m_log);
             m_reg = new Registry(p_id, "MemoryTools");
             p_fGB = m_reg.Read("fGB", fGB);
-            InitTree(); 
+            InitTree();
+            InitTimer(); 
         }
 
         public void ThreadStop()

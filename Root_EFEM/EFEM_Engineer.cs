@@ -123,6 +123,7 @@ namespace Root_EFEM
             m_handler.RunTreeLoadport(m_treeRoot.GetTree("Loadport"));
             m_handler.RunTreeAligner(m_treeRoot.GetTree("Aligner"));
             m_handler.RunTreeVision(m_treeRoot.GetTree("Vision"));
+            m_handler.RunTreeEFEM(m_treeRoot.GetTree("EFEM"));
         }
         #endregion
 
@@ -147,6 +148,16 @@ namespace Root_EFEM
             m_toolBox.ThreadStop();
             m_login.ThreadStop();
             LogView.ThreadStop();
+        }
+
+        public string BuzzerOff()
+        {
+            return "OK";
+        }
+
+        public string Recovery()
+        {
+            return "OK";
         }
     }
 }

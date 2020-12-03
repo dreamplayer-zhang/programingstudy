@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              xmlns:local="clr-namespace:Root_WIND2"
              mc:Ignorable="d" 
              d:DesignHeight="888" d:DesignWidth="1912"
@@ -500,6 +502,132 @@
                                                     
                                                 </GroupBox>
 
+                                            </Grid>
+                                        </TabItem>
+                                        <TabItem Header="Defect">
+                                            <Grid Grid.Column="1" Margin="15,15,15,15">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="1*"/>
+                                                    <RowDefinition Height="1*"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid Grid.Row = "0">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="1*"/>
+                                                        <RowDefinition Height="0.1*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <GroupBox Grid.Column="0" Grid.Row="0">
+                                                        <GroupBox.Header>
+                                                            <TextBlock Text="Defect Intensity Distribution"/>
+                                                        </GroupBox.Header>
+                                                        <Grid Grid.Row = "0" Background="White">
+                                                            <lvc:CartesianChart Series="{Binding DefectGVHistogram}" LegendLocation="Top" DisableAnimations="true">
+                                                                <lvc:CartesianChart.AxisX>
+                                                                    <lvc:Axis Title="{Binding GVXTitle}" Labels="{Binding GVXLabel}"
+                                                                               MinValue="{Binding GVFrom}" MaxValue="{Binding GVTo}" 
+                                                                               Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
+                                                                    </lvc:Axis>
+                                                                </lvc:CartesianChart.AxisX>
+                                                                <lvc:CartesianChart.AxisY>
+                                                                    <lvc:Axis Title="{Binding GVYTitle}" MinValue= "0" LabelFormatter="{Binding GVYLabel}"
+                                                                              MaxValue="{Binding GVYMaxVal}"></lvc:Axis>
+                                                                </lvc:CartesianChart.AxisY>
+                                                            </lvc:CartesianChart>
+                                                        </Grid>
+                                                    </GroupBox>
+                                                    <Grid Grid.Row = "1">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="1*"/>
+                                                            <ColumnDefinition Width="0.2*"/>
+                                                            <ColumnDefinition Width="0.2*"/>
+                                                            <ColumnDefinition Width="0.2*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid Grid.Column = "0">
+                                                            <Slider Maximum="155" TickPlacement="BottomRight" Value="{Binding Slider_GV, Mode=TwoWay}"
+                                                                TickFrequency="2" IsSnapToTickEnabled="True" Margin="0,10,0,0" >
+                                                            </Slider>
+                                                        </Grid>
+                                                        <Grid Grid.Column = "1">
+                                                            <Viewbox Height="20" >
+                                                                <RadioButton Name="All" GroupName="GVHistogramMode"
+                                                                    IsChecked="{Binding Check_GVHistogramAll}" >All</RadioButton>
+                                                            </Viewbox>
+                                                        </Grid>
+                                                        <Grid Grid.Column = "2">
+                                                            <Viewbox Height="20" >
+                                                                <RadioButton Name="Dark" GroupName="GVHistogramMode"
+                                                                    IsChecked="{Binding Check_GVHistogramDark}">Dark</RadioButton>
+                                                            </Viewbox>
+                                                        </Grid>
+                                                        <Grid Grid.Column = "3">
+                                                            <Viewbox Height="20" >
+                                                                <RadioButton Name="Bright" GroupName="GVHistogramMode"
+                                                                    IsChecked="{Binding Check_GVHistogramBright}" >Bright</RadioButton>
+                                                            </Viewbox>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Grid.Row = "1">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="1*"/>
+                                                        <RowDefinition Height="0.1*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <GroupBox Grid.Column="0" Grid.Row="0">
+                                                        <GroupBox.Header>
+                                                            <TextBlock Text="Defect Size Distribution"/>
+                                                        </GroupBox.Header>
+                                                        <Grid Grid.Row = "0" Background="White">
+                                                            <lvc:CartesianChart Series="{Binding DefectSizeHistogram}" LegendLocation="Top" DisableAnimations="true">
+                                                                <lvc:CartesianChart.AxisX>
+                                                                    <lvc:Axis Title="{Binding SizeXTitle}" Labels="{Binding SizeXLabel}"
+                                                                              MinValue="{Binding SizeFrom}" MaxValue="{Binding SizeTo}" 
+                                                                              Separator="{x:Static lvc:DefaultAxes.CleanSeparator}"></lvc:Axis>
+                                                                </lvc:CartesianChart.AxisX>
+                                                                <lvc:CartesianChart.AxisY>
+                                                                    <lvc:Axis Title="{Binding SizeYTitle}" MinValue= "0" LabelFormatter="{Binding SizeYLabel}"
+                                                                              MaxValue="{Binding SizeYMaxVal}"></lvc:Axis>
+                                                                </lvc:CartesianChart.AxisY>
+                                                            </lvc:CartesianChart>
+                                                        </Grid>
+                                                    </GroupBox>
+                                                    <Grid Grid.Row = "1">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="1*"/>
+                                                            <ColumnDefinition Width="0.25*"/>
+                                                            <ColumnDefinition Width="0.25*"/>
+                                                            <ColumnDefinition Width="0.25*"/>
+                                                            <ColumnDefinition Width="0.25*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid Grid.Column = "0">
+                                                            <Slider Maximum="150" TickPlacement="BottomRight" Value="{Binding Slider_Size}" 
+                                                                TickFrequency="2" IsSnapToTickEnabled="True" Margin="0,10,0,0" >
+                                                            </Slider>
+                                                        </Grid>
+                                                        <Grid Grid.Column = "1">
+                                                            <Viewbox Height="20" >
+                                                                <RadioButton Name="Normal" GroupName="SizeHistogramMode"
+                                                                    IsChecked="{Binding Check_SizeHistogramAll}" >All</RadioButton>
+                                                            </Viewbox>
+                                                        </Grid>
+                                                        <Grid Grid.Column = "2">
+                                                            <Viewbox Height="20" >
+                                                                <RadioButton Name="Small" GroupName="SizeHistogramMode"
+                                                                    IsChecked="{Binding Check_SizeHistogramSmall}">Small</RadioButton>
+                                                            </Viewbox>
+                                                        </Grid>
+                                                        <Grid Grid.Column = "3">
+                                                            <Viewbox Height="20" >
+                                                                <RadioButton Name="Medium" GroupName="SizeHistogramMode"
+                                                                    IsChecked="{Binding Check_SizeHistogramMedium}" >Medium</RadioButton>
+                                                            </Viewbox>
+                                                        </Grid>
+                                                        <Grid Grid.Column = "4">
+                                                            <Viewbox Height="20" >
+                                                                <RadioButton Name="Large" GroupName="SizeHistogramMode"
+                                                                    IsChecked="{Binding Check_SizeHistogramLarge}" >Large</RadioButton>
+                                                            </Viewbox>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Grid>
                                             </Grid>
                                         </TabItem>
                                         <TabItem Header="Metrology">

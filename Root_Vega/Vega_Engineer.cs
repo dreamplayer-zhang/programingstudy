@@ -90,5 +90,14 @@ namespace Root_Vega
             LogView.ThreadStop();
         }
 
+        public string BuzzerOff()
+        {
+            return "OK";
+        }
+
+        public string Recovery()
+        {
+            return "OK";
+        }
     }
 }

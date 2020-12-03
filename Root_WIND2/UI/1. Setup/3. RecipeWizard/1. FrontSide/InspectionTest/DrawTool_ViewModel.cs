@@ -26,37 +26,30 @@ namespace Root_WIND2
     }
     public class DrawTool_ViewModel : RootViewer_ViewModel
     {
-        bool UIUpdateLock = false; 
         public DrawTool_ViewModel()
         {
             base.init(ProgramManager.Instance.Image, ProgramManager.Instance.DialogService);
             p_VisibleMenu = Visibility.Visible;
-            Shapes.CollectionChanged += Shapes_CollectionChanged;
-            InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;
+            //Shapes.CollectionChanged += Shapes_CollectionChanged;
+            //InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;
         }
 
         private void Shapes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            //if(!UIUpdateLock)
+            var shapes = sender as ObservableCollection<TShape>;
+            foreach (TShape shape in shapes)
             {
-                var shapes = sender as ObservableCollection<TShape>;
-                foreach (TShape shape in shapes)
-                {
-                    if (!p_DrawElement.Contains(shape.UIElement))
-                        p_DrawElement.Add(shape.UIElement);
-                }
-            }       
+                if (!p_DrawElement.Contains(shape.UIElement))
+                    p_DrawElement.Add(shape.UIElement);
+            }   
         }
         private void Texts_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            //if (!UIUpdateLock)
+            var infoTexts = sender as ObservableCollection<InfoTextBolck>;
+            foreach (InfoTextBolck text in infoTexts)
             {
-                var infoTexts = sender as ObservableCollection<InfoTextBolck>;
-                foreach (InfoTextBolck text in infoTexts)
-                {
-                    if (!p_DrawElement.Contains(text.grid))
-                        p_DrawElement.Add(text.grid);
-                }
+                if (!p_DrawElement.Contains(text.grid))
+                    p_DrawElement.Add(text.grid);
             }
         }
         
@@ -99,8 +92,9 @@ namespace Root_WIND2
             rect.MemoryRect.Top = LT.Y;
             rectInfo = Drawing(rectInfo, RB);
             Shapes.Add(rectInfo);
-
-            if(text != null)
+            p_DrawElement.Add(rectInfo.UIElement);
+                
+            if (text != null)
             {
                 Grid textGrid = WriteInfoText(text, rect, color, FontSz);
                 InfoTextBolcks.Add(new InfoTextBolck(textGrid, rect));
@@ -109,7 +103,6 @@ namespace Root_WIND2
         public void DrawRect(List<CRect> RectList, ColorType color, List<String> textList = null, int FontSz = 15)
         {
             int i = 0;
-            UIUpdateLock = true;
             foreach (CRect rectPoint in RectList)
             {
                 SetShapeColor(color);
@@ -120,11 +113,9 @@ namespace Root_WIND2
                 rect.MemoryRect.Top = rectPoint.Top;
                 rectInfo = Drawing(rectInfo, new CPoint(rectPoint.Right, rectPoint.Bottom));
 
-                if (RectList.IndexOf(rectPoint) == RectList.Count - 1)
-                    UIUpdateLock = false;
-
                 Shapes.Add(rectInfo);
- 
+                p_DrawElement.Add(rectInfo.UIElement);
+
                 if (textList[i] != null)
                 {
                     Grid textGrid = WriteInfoText(textList[i++], rect, color, FontSz);
@@ -134,15 +125,27 @@ namespace Root_WIND2
         }
         public override void SetRoiRect()
         {
+            Shapes.CollectionChanged += Shapes_CollectionChanged;
+            InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;
+
             base.SetRoiRect();
             RedrawShapes();
             ReWriteText();
+
+            Shapes.CollectionChanged -= Shapes_CollectionChanged;
+            InfoTextBolcks.CollectionChanged -= Texts_CollectionChanged;
         }
         public override void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
         {
+            Shapes.CollectionChanged += Shapes_CollectionChanged;
+            InfoTextBolcks.CollectionChanged += Texts_CollectionChanged;
+
             base.CanvasMovePoint_Ref(point, nX, nY);
             RedrawShapes();
             ReWriteText();
+
+            Shapes.CollectionChanged -= Shapes_CollectionChanged;
+            InfoTextBolcks.CollectionChanged -= Texts_CollectionChanged;
         }
         #endregion
 
@@ -256,6 +259,7 @@ namespace Root_WIND2
 
             tb.Text = text;
             grid.Children.Add(tb);
+            p_DrawElement.Add(grid);
             return grid;
         }
 

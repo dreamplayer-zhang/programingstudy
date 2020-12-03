@@ -28,7 +28,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using DPoint = System.Drawing.Point;
 using MBrushes = System.Windows.Media.Brushes;
-
+ 
 namespace Root_Vega.Module
 {
     public class PatternVision : ModuleBase, IRobotChild
@@ -1112,28 +1112,28 @@ namespace Root_Vega.Module
                                     CRect crtOverlapedRect = m_mvvm.GetOverlapedRect(crtCurrentArea, roiCurrent.Origin.OriginRect);
                                     if ((crtOverlapedRect.Width > 0) && (crtOverlapedRect.Height > 0))
                                     {
-                                        // 3. Overlap된 Rect영역을 검사 쓰레드로 던져라
-                                        if (m_mvvm._dispatcher != null)
-                                        {
-                                            m_mvvm._dispatcher.Invoke(new Action(delegate ()
-                                            {
-                                                // UI
-                                                var temp = new UIElementInfo(new Point(crtOverlapedRect.Left, crtOverlapedRect.Top), new Point(crtOverlapedRect.Right, crtOverlapedRect.Bottom));
-                                                System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-                                                rect.Width = crtOverlapedRect.Width;
-                                                rect.Height = crtOverlapedRect.Height;
-                                                System.Windows.Controls.Canvas.SetLeft(rect, crtOverlapedRect.Left);
-                                                System.Windows.Controls.Canvas.SetTop(rect, crtOverlapedRect.Top);
-                                                rect.StrokeThickness = 3;
-                                                rect.Stroke = MBrushes.Orange;
+                                        //// 3. Overlap된 Rect영역을 검사 쓰레드로 던져라
+                                        //if (m_mvvm._dispatcher != null)
+                                        //{
+                                        //    m_mvvm._dispatcher.Invoke(new Action(delegate ()
+                                        //    {
+                                        //        // UI
+                                        //        var temp = new UIElementInfo(new Point(crtOverlapedRect.Left, crtOverlapedRect.Top), new Point(crtOverlapedRect.Right, crtOverlapedRect.Bottom));
+                                        //        System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+                                        //        rect.Width = crtOverlapedRect.Width;
+                                        //        rect.Height = crtOverlapedRect.Height;
+                                        //        System.Windows.Controls.Canvas.SetLeft(rect, crtOverlapedRect.Left);
+                                        //        System.Windows.Controls.Canvas.SetTop(rect, crtOverlapedRect.Top);
+                                        //        rect.StrokeThickness = 3;
+                                        //        rect.Stroke = MBrushes.Orange;
 
-                                                m_mvvm.p_RefFeatureDrawer.m_ListShape.Add(rect);
-                                                m_mvvm.p_RefFeatureDrawer.m_Element.Add(rect);
-                                                m_mvvm.p_RefFeatureDrawer.m_ListRect.Add(temp);
+                                        //        m_mvvm.p_RefFeatureDrawer.m_ListShape.Add(rect);
+                                        //        m_mvvm.p_RefFeatureDrawer.m_Element.Add(rect);
+                                        //        m_mvvm.p_RefFeatureDrawer.m_ListRect.Add(temp);
 
-                                                m_mvvm.p_ImageViewer.SetRoiRect();
-                                            }));
-                                        }
+                                        //        m_mvvm.p_ImageViewer.SetRoiRect();
+                                        //    }));
+                                        //}
 
                                         int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 

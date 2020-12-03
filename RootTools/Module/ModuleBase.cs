@@ -28,7 +28,7 @@ namespace RootTools.Module
             set
             {
                 if (_eState.ToString() == value.ToString()) return;
-                m_log.Info("State : " + _eState.ToString() + " -> " + value.ToString());
+                p_sInfo = "State : " + _eState.ToString() + " -> " + value.ToString(); 
                 _eState = value;
                 EQ.p_bPause = false;
                 OnPropertyChanged(); 
@@ -48,7 +48,7 @@ namespace RootTools.Module
                 _sInfo = value;
                 OnPropertyChanged();
                 if (value == "OK") return;
-                m_log.Info("Info : " + _sInfo);
+                if (m_log != null) m_log.Info("Info : " + _sInfo);
                 m_infoList.Add(_sInfo);
                 EQ.p_sInfo = p_id + " : " + value; 
             }

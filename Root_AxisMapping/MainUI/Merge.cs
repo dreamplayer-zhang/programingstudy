@@ -25,6 +25,7 @@ namespace Root_AxisMapping.MainUI
         public void Run()
         {
             for (int ix = 0; ix < p_xArray; ix++) Run(ix);
+            //for (int ix = 11; ix < 13; ix++) Run(ix); //Test 용도
             EraseMargin(); 
         }
 
@@ -40,7 +41,7 @@ namespace Root_AxisMapping.MainUI
             int wMargin = (m_wCam - m_wCamValid) / 2;
             ImageCopy(m_wCam - wMargin - m_wCopy / 2, m_wCopy * ix);
             RunGrab(dx + (dPixel - m_wCamValid / 2) * m_pulsePerPixel - m_pulseOffset);
-            ImageCopy(wMargin, m_wCopy * ix + m_wCopy / 2); 
+            ImageCopy(wMargin , m_wCopy * ix + m_wCopy / 2); 
         }
 
         void RunTreeCam(Tree tree)

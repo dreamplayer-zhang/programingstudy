@@ -4,6 +4,7 @@ using RootTools.Camera.BaslerPylon;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using System.Collections.Generic;
 
 namespace Root.Module
 {
@@ -255,6 +256,13 @@ namespace Root.Module
             public override string Run()
             {
                 return m_module.Inspect(m_nGV);
+            }
+
+            void RunTest(ref int nV, List<int> aInt)
+            {
+                nV = 10;
+                aInt[0] = 4;
+                aInt[1] = 5; 
             }
         }
 

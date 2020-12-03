@@ -12,7 +12,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Column="0" Header="Loadport A" Foreground="White" FontSize="15" Margin="8">
-            <local:ManualOHTLoadport_UI x:Name="manualOHTA"/>
+            <local:ManualOHTLoadport_UI x:Name="manualOHTA" Height="627" VerticalAlignment="Top"/>
         </GroupBox>
         <GroupBox Grid.Column="1" Header="Loadport B" Foreground="White" FontSize="15" Margin="8">
             <local:ManualOHTLoadport_UI x:Name="manualOHTB"/>

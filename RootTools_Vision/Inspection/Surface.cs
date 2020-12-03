@@ -55,31 +55,27 @@ namespace RootTools_Vision
             //    return;
             //}
 
-            int nChipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
-            int nChipW = this.workplace.BufferSizeX;
-
-            int nMemH = this.workplace.SharedBufferHeight;
-            int nMemW = this.workplace.SharedBufferWidth;
-
+            // Inspection Param
             bool bGetDarkInsp = true; // Option
-            int nGrayLevel = 100; // Option
-            int nDefectSz = 1; // Option
-            
-            int Left = this.workplace.PositionX;
-            int Top = this.workplace.PositionY - nChipH;
-            int Right = this.workplace.PositionX + nChipW;
-            int Bottom = this.workplace.PositionY;
+            int nGrayLevel = 70; // Option
+            int nDefectSz = 1; // Option     
 
-            byte[] arrBinImg = new byte[nChipW * nChipH]; // Threashold 결과 array
-            byte[] arrCopyImg = new byte[nChipW * nChipH];
+            int chipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
+            int chipW = this.workplace.BufferSizeX;
 
-            for (int cnt = Top; cnt < Bottom; cnt++)
-                Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)nMemW + Left)), arrCopyImg, nChipW * (cnt - Top), nChipW); // << int 범위 초과 문제로 Long IntPtr로 변환
- 
+            byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
 
-            CLR_IP.Cpp_Threshold(arrCopyImg, arrBinImg, nChipW, nChipH, bGetDarkInsp, nGrayLevel);
+            // Backside Test 할 때만 추가
+            ExtractCurrentWorkplace();
+
+            // Filtering
             //CLR_IP.Cpp_Morphology(arrBinImg, arrBinImg, nChipW, nChipH, 3, "OPEN", 1);
-            var Label = CLR_IP.Cpp_Labeling(arrCopyImg, arrBinImg, nChipW, nChipH, bGetDarkInsp);
+
+            CLR_IP.Cpp_Threshold(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp, nGrayLevel);
+
+
+            //var Label = CLR_IP.Cpp_Labeling(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp);
+            var Label = CLR_IP.Cpp_Labeling_SubPix(workplace.WorkplaceBuffer, arrBinImg, chipW, chipH, bGetDarkInsp, nGrayLevel, 10);
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
@@ -92,9 +88,9 @@ namespace RootTools_Vision
                         Label[i].area,
                         Label[i].value,
                         this.workplace.PositionX + Label[i].boundLeft,
-                        this.workplace.PositionY - (nChipH - Label[i].boundTop),
-                        Math.Abs(Label[i].boundRight - Label[i].boundLeft),
-                        Math.Abs(Label[i].boundBottom - Label[i].boundTop),                        
+                        this.workplace.PositionY - (chipH - Label[i].boundTop),
+                        Label[i].width,
+                        Label[i].height,
                         this.workplace.MapPositionX,
                         this.workplace.MapPositionY
                         );
@@ -102,71 +98,6 @@ namespace RootTools_Vision
 
             }
             WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
-
-
-            //unsafe
-            //{
-            //    //float avg = CLR_IP.Cpp_Average(
-            //    //    (byte*)this.workplace.SharedBuffer.ToPointer(), 
-            //    //    nMemW, 
-            //    //    nMemH, 
-            //    //    this.workplace.PositionX + nTrasnX, 
-            //    //    this.workplace.PositionY - nChipH + nTrasnY,
-            //    //    this.workplace.PositionX + nChipW + nTrasnX,
-            //    //    this.workplace.PositionY + nTrasnY);
-
-            //    //if (bGetDarkInsp) //입력된 GrayLevel을 %로 사용하여 연산 // EX. 20이 입력되어 있다면 평균GV에서 20%감산.		
-            //    //    nGrayLevel = (int)(avg * (1.0f - nGrayLevel / 100.0f));
-            //    //else
-            //    //    nGrayLevel = (int)(avg * (1.0f + nGrayLevel / 100.0f));
-
-            //    CLR_IP.Cpp_Threshold(
-            //        (byte*)this.workplace.SharedBuffer.ToPointer(),
-            //        arrBinImg,
-            //        nMemW,
-            //        nMemH,
-            //        this.workplace.PositionX + nTrasnX,
-            //        this.workplace.PositionY - nChipH + nTrasnY,
-            //        this.workplace.PositionX + nChipW + nTrasnX,
-            //        this.workplace.PositionY + nTrasnY,
-            //        bGetDarkInsp,
-            //        nGrayLevel);
-
-            //    //CLR_IP.Cpp_Morphology(arrBinImg, arrBinImg, nChipW, nChipH, 3, "Open", 3);
-
-            //    var Label = CLR_IP.Cpp_Labeling(
-            //        (byte*)this.workplace.SharedBuffer.ToPointer(),
-            //        arrBinImg,
-            //        nMemW,
-            //        nMemH,
-            //        this.workplace.PositionX + nTrasnX,
-            //        this.workplace.PositionY - nChipH + nTrasnY,
-            //        this.workplace.PositionX + nChipW + nTrasnX,
-            //        this.workplace.PositionY + nTrasnY,
-            //        bGetDarkInsp);
-
-            //    sw.Stop();          // 종료
-
-            //    for (int i = 0; i < Label.Length; i++)
-            //    {
-            //        if (Label[i].area > nDefectSz)
-            //        {
-            //            this.workplace.AddDefect(10001,
-            //                Label[i].area,
-            //                (int)sw.ElapsedMilliseconds, //[i].value,
-            //                Math.Abs(Label[i].boundRight - Label[i].boundLeft),
-            //                Math.Abs(Label[i].boundBottom - Label[i].boundTop),
-            //                Label[i].boundLeft,
-            //                nChipH - Label[i].boundBottom, // 상대 좌표는 chip의 좌 하단을 기준으로 Buffer의 좌표계와 Y값이 반대!
-            //                this.workplace.PositionX + nTrasnX + Label[i].boundLeft,
-            //                this.workplace.PositionY + nTrasnY - (nChipH - Label[i].boundBottom),
-            //                this.workplace.MapPositionX,
-            //                this.workplace.MapPositionY
-            //                );
-            //        }
-            //    }
-            //    WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>()));
-            //}
         }
 
 
@@ -179,7 +110,24 @@ namespace RootTools_Vision
         {
             return;
         }
+        private void ExtractCurrentWorkplace()
+        {
+            // Copy 
+            int chipH = this.workplace.BufferSizeY;
+            int chipW = this.workplace.BufferSizeX;
 
+            int Left = this.workplace.PositionX;
+            int Top = this.workplace.PositionY - chipH;
+            int Right = this.workplace.PositionX + chipW;
+            int Bottom = this.workplace.PositionY;
+
+            int memH = this.workplace.SharedBufferHeight;
+            int memW = this.workplace.SharedBufferWidth;
+
+            for (int cnt = Top; cnt < Bottom; cnt++)
+                Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)memW + Left))
+                    , this.workplace.WorkplaceBuffer, chipW * (cnt - Top), chipW);
+        }
 
     }
 }

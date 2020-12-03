@@ -180,11 +180,12 @@ namespace Root_Vega
             p_eReqTransfer = eTransfer.TransferBlocked;
             for (int n = 0; n < 100; n++)
             {
+                if (EQ.IsStop()) return; 
                 if (p_eTransfer != eTransfer.OutOfService) n = 200;
                 else Thread.Sleep(10);
             }
             p_eReqTransfer = (p_ePresentSensor == ePresent.Exist) ? eTransfer.ReadyToUnload : eTransfer.ReadyToLoad;
-            if (p_ePresentSensor == ePresent.Empty) m_gem.RemoveCarrierInfo(p_sLocID);
+            if (p_ePresentSensor == ePresent.Empty && m_gem !=null) m_gem.RemoveCarrierInfo(p_sLocID);
             p_eState = InfoPod.eState.Placed;
         }
         #endregion
@@ -227,7 +228,7 @@ namespace Root_Vega
             p_sCarrierID = p_sModule; 
             p_sLocID = sLocID;
             m_engineer = engineer;
-            m_gem = m_engineer.ClassGem();
+           // m_gem = m_engineer.ClassGem();
             m_log = module.m_log;
             m_treeRootReticle = new TreeRoot(p_id, m_log);
             m_treeRootReticle.UpdateTree += M_treeRootReticle_UpdateTree;

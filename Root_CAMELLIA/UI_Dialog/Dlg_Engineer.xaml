@@ -1,0 +1,371 @@
+﻿<Window x:Class="Root_CAMELLIA.Dlg_Engineer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Icon="clr-namespace:Root_CAMELLIA.Icon"
+        xmlns:local="clr-namespace:Root_CAMELLIA"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Normal"
+        Width="1820" Height="1020"
+        BorderBrush="Black" BorderThickness="1"
+        Background="{StaticResource PanelBackGround}"
+        mc:Ignorable="d">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="260"/>
+        </Grid.RowDefinitions>
+        <!--Title Bar-->
+        <Grid Grid.Row="0"
+              Name="TitleBar"
+              Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Icon:AtiLogo Width="30"
+                          Height="21"
+                          VerticalAlignment="Center"
+                          Margin="2"/>
+            <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
+                       FontSize="11"
+                       Foreground="Black"
+                       VerticalAlignment="Center"
+                       Margin="5,0,0,0"
+                       Grid.Column="1" />
+            <TextBlock Text="ENGINEER"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="Black"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Margin="5,0,0,0"
+                       Grid.Column="1" />
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                        Orientation="Horizontal"
+                        Grid.Column="2">
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="CloseButton"
+                        Width="20"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        Click="CloseButton_Click"
+                        VerticalAlignment="Bottom">
+                    <Path Style="{StaticResource CloseIconKey}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Handler" Width="100">
+                <Grid>
+                    <local:Camellia_Engineer_UI x:Name="EngineerUI"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Engineer" Width="100">
+                <Grid>
+                    <ScrollViewer Grid.Row="2" VerticalAlignment="Top">
+                        <StackPanel>
+                            <Grid Height="40">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button FontWeight="Bold" Content="PM" Width="100" Margin="5,5"/>
+                                    <Button FontWeight="Bold" Content="VRS Viewer" Width="100" Margin="5,5"/>
+                                    <Button FontWeight="Bold" Content="Test" Width="100" Margin="5,5"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Height="610">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4*"/>
+                                    <ColumnDefinition Width="4.8*"/>
+                                    <ColumnDefinition Width="1.2*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1.5*"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <GroupBox Header="Intensity Graph" Grid.Column="0">
+
+                                        </GroupBox>
+                                        <GroupBox Header="SR Parameter" Grid.Column="1">
+                                            <Grid Margin="5,0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="0">
+                                                    <TextBlock Text="Alpha1 :" Margin="3,0"/>
+                                                    <TextBox Width="60" Margin="10,0"/>
+                                                    <CheckBox VerticalAlignment="Center" Margin="3,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1">
+                                                    <TextBlock Text="Intergration Time :" Margin="3,0"/>
+                                                    <ToggleButton Content="Vis" Width="40" Margin="67,0,3,0"/>
+                                                    <ToggleButton Content="NIR" Width="40" Margin="3,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="2">
+                                                    <TextBlock Text="Background Intergration Time:" Margin="3,0"/>
+                                                    <ToggleButton Content="Vis" Width="40" Margin="3,0"/>
+                                                    <ToggleButton Content="NIR" Width="40" Margin="3,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="3">
+                                                    <TextBlock Text="Boxcar :" Margin="3,0"/>
+                                                    <TextBox Width="60" Margin="10,0"/>
+                                                </StackPanel>
+                                                <UniformGrid Columns="2" Grid.Row="4">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <TextBlock Text="Repeat :" Margin="3,0"/>
+                                                        <TextBox Width="60" Margin="9,0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <TextBlock Text="Start No. :" Margin="3,0"/>
+                                                        <TextBox Width="60" Margin="3,0"/>
+                                                    </StackPanel>
+                                                </UniformGrid>
+                                                <UniformGrid Columns="2" Grid.Row="5">
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <TextBlock Text="Average :" Margin="3,0"/>
+                                                        <TextBox Width="60" Margin="3,0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                        <TextBlock Text="Delay :" Margin="3,0"/>
+                                                        <TextBox Width="60" Margin="20,0"/>
+                                                    </StackPanel>
+                                                </UniformGrid>
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1.5*"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <GroupBox Header="Reflectance Graph">
+                                        </GroupBox>
+                                        <Grid Grid.Column="1">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <Button Content="Wafer Centering" Margin="5" Grid.Row="0"/>
+                                            <Button Content="Init Calibration : Calibration(initcal:true)" Margin="5" Grid.Row="1"/>
+                                            <Button Content="Measure Background : Calibration(initcal:False)" Margin="5" Grid.Row="2"/>
+                                            <Button Content="Measure Sample" Margin="5" Grid.Row="3"/>
+                                            <Button Content="Repeat Measurement" Margin="5" Grid.Row="4"/>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                                <Grid Grid.Column="1">
+                                    <GroupBox Header="Motion Controller">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <Grid Grid.Row="0" Margin="5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="4*"/>
+                                                    <ColumnDefinition Width="6*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid Grid.Column="0" Margin="0,10,0,0">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="2*"/>
+                                                        <RowDefinition Height="2*"/>
+                                                        <RowDefinition Height="2*"/>
+                                                        <RowDefinition Height="*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <UniformGrid Columns="4" Rows="2" Grid.Row="0" Margin="0">
+                                                        <Button Content="All Home" Margin="3" BorderBrush="{x:Null}"/>
+                                                        <Button Content="Move Pos" Margin="3" BorderBrush="{x:Null}"/>
+                                                        <Button Content="Stop" Margin="3" BorderBrush="{x:Null}"/>
+                                                        <Button Content="Save" Margin="3" BorderBrush="{x:Null}"/>
+                                                        <Button Content="Axis Home" Margin="3" BorderBrush="{x:Null}"/>
+                                                        <Button Content="Set Pos" Margin="3" BorderBrush="{x:Null}"/>
+                                                        <Button Content="Repeat" Margin="3" BorderBrush="{x:Null}"/>
+                                                        <Button Content="Load" Margin="3" BorderBrush="{x:Null}"/>
+                                                    </UniformGrid>
+                                                    <Grid Grid.Row="1" Margin="0,10,0,0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="2*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Button Content="Servo" Grid.Column="0" Margin="3" BorderBrush="{x:Null}"/>
+                                                        <Button Content="Fault" Grid.Column="1" Margin="3" BorderBrush="{x:Null}"/>
+                                                        <Grid Grid.Column="2" Margin="1.5">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition/>
+                                                                <RowDefinition/>
+                                                            </Grid.RowDefinitions>
+                                                            <UniformGrid Columns="4" >
+                                                                <Button Content="-" Margin="1.5,1.5" BorderBrush="{x:Null}"/>
+                                                                <Button Content="H" Margin="1.5,1.5" BorderBrush="{x:Null}"/>
+                                                                <Button Content="P" Margin="1.5,1.5" BorderBrush="{x:Null}"/>
+                                                                <Button Content="+" Margin="1.5,1.5" BorderBrush="{x:Null}"/>
+                                                            </UniformGrid>
+                                                            <Button Content="Interlock" Margin="1.5,1.5" Grid.Row="1" BorderBrush="{x:Null}"/>
+                                                        </Grid>
+                                                    </Grid>
+                                                    <Grid Grid.Row="2" Margin="0,0" VerticalAlignment="Bottom">
+                                                        <TextBlock Text="0" FontSize="30" FontWeight="Bold"
+                                                       Margin="10"
+                                                       VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                    <Grid Grid.Row="3" Margin="0,10,0,0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="2*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Button Content="＜＜"  Margin="3" Grid.Column="0" BorderBrush="{x:Null}"/>
+                                                        <Button Content="＜"  Margin="3" Grid.Column="1"  BorderBrush="{x:Null}"/>
+                                                        <Button Content="|＜"  Margin="3" Grid.Column="2" BorderBrush="{x:Null}"/>
+                                                        <TextBox Text="0" TextAlignment="Center" VerticalContentAlignment="Center" Margin="3" Grid.Column="3"/>
+                                                        <Button Content="＞|"  Margin="3" Grid.Column="4" BorderBrush="{x:Null}"/>
+                                                        <Button Content="＞"  Margin="3" Grid.Column="5" BorderBrush="{x:Null}"/>
+                                                        <Button Content="＞＞"  Margin="3" Grid.Column="6" BorderBrush="{x:Null}"/>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Grid.Column="1">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="4*"/>
+                                                        <ColumnDefinition Width="1*"/>
+                                                        <ColumnDefinition Width="1*"/>
+                                                        <ColumnDefinition Width="1*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <GroupBox Header="XY" Grid.Column="0">
+                                                        <Canvas Background="{StaticResource ControlBackGround}">
+                                                            <Border Width="80" Height="80" Background="Gray" Margin="5">
+                                                                <Grid>
+                                                                    <Ellipse Width="70" Height="70" Fill="LightGray"/>
+                                                                    <TextBlock Text="Stage" 
+                                                               FontSize="9"
+                                                               VerticalAlignment="Center"
+                                                               HorizontalAlignment="Center"/>
+                                                                </Grid>
+                                                            </Border>
+                                                        </Canvas>
+                                                    </GroupBox>
+                                                    <GroupBox Header="Z" Grid.Column="1">
+                                                        <Canvas Background="LightGray">
+                                                        </Canvas>
+                                                    </GroupBox>
+                                                    <GroupBox Header="Lifter" Grid.Column="2">
+                                                        <Canvas Background="LightGray">
+                                                        </Canvas>
+                                                    </GroupBox>
+                                                    <GroupBox Header="Stage Z" Grid.Column="3">
+                                                        <Canvas Background="LightGray">
+                                                        </Canvas>
+                                                    </GroupBox>
+
+                                                </Grid>
+                                            </Grid>
+                                            <Grid Grid.Row="1" Margin="5">
+                                                <TabControl>
+                                                    <TabItem Header="X" Width="60" Margin="-3,0,0,0">
+                                                    </TabItem>
+                                                    <TabItem Header="Y" Width="60" Margin="-3,0,0,0">
+                                                    </TabItem>
+                                                    <TabItem Header="Z" Width="60" Margin="-3,0,0,0">
+                                                    </TabItem>
+                                                    <TabItem Header="Lifter" Width="60" Margin="-3,0,0,0">
+                                                    </TabItem>
+                                                    <TabItem Header="Stage Z" Width="60" Margin="-3,0,0,0">
+                                                    </TabItem>
+                                                    <TabItem Header="Tilt X" Width="60" Margin="-3,0,0,0">
+                                                    </TabItem>
+                                                    <TabItem Header="Tilt Y" Width="60" Margin="-3,0,0,0">
+                                                    </TabItem>
+                                                </TabControl>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                </Grid>
+                                <Grid Grid.Column="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="0.2*"/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="Sequence Function"
+                                   Grid.Row="0"
+                                   VerticalAlignment="Bottom"
+                                   HorizontalAlignment="Center"
+                                   FontSize="14"
+                                   FontWeight="Bold"/>
+                                    <Button Style="{StaticResource SetupPanelBtn}" Grid.Row="1"
+                                Margin="15,20"
+                                Content="Vision Pause"/>
+                                    <Button Style="{StaticResource SetupPanelBtn}" Grid.Row="2"
+                                Margin="15,20"
+                                Content="Stop"/>
+                                    <Button Style="{StaticResource SetupPanelBtn}" Grid.Row="3"
+                                Margin="15,20"
+                                Content="Run"/>
+                                    <Button Style="{StaticResource SetupPanelBtn}" Grid.Row="4"
+                                Margin="15,20"
+                                Content="Loading"/>
+                                    <Button Style="{StaticResource SetupPanelBtn}" Grid.Row="5"
+                                Margin="15,20"
+                                Content="Unloading"/>
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <!--<GridSplitter Grid.Row="3" 
+                      Height="2"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Background="{StaticResource Splitter}"
+                      ShowsPreview="True" Grid.ColumnSpan="2"/>
+        <Border Grid.Row="4" Grid.ColumnSpan="2" Panel.ZIndex="99">
+            <TabControl>
+                <TabItem Header="ALL" FontSize="10">
+                    <Grid>
+                        <TextBlock Text="Log Area" Margin="5" />
+                    </Grid>
+                </TabItem>
+                <TabItem Header="System" FontSize="10"/>
+                <TabItem Header="Inspection" FontSize="10"/>
+                <TabItem Header="I/O" FontSize="10"/>
+                <TabItem Header="Network" FontSize="10"/>
+                <TabItem Header="Result" FontSize="10"/>
+                <TabItem Header="Log" Background="DarkCyan">
+                    <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
+                </TabItem>
+            </TabControl>
+
+        </Border>-->
+    </Grid>
+
+</Window>
