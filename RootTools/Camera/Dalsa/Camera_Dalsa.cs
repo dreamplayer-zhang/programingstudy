@@ -508,7 +508,7 @@ namespace RootTools.Camera.Dalsa
 
             while (iBlock < m_nGrabCount)
             {
-                if (iBlock <= m_nGrabTrigger)
+                if (iBlock < m_nGrabTrigger)
                 {
                     IntPtr ipSrc = m_pSapBuf[iBlock % p_nBuf];
                     Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
