@@ -27,6 +27,10 @@ namespace RootTools
 
         ModuleList ClassModuleList();
 
-        MemoryData GetMemory(string sPool, string sGroup, string sMemory); 
+        MemoryData GetMemory(string sPool, string sGroup, string sMemory);
+
+        string BuzzerOff();
+
+        string Recovery(); 
     }
 }
