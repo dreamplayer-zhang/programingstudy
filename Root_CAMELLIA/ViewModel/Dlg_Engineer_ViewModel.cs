@@ -98,7 +98,6 @@ namespace Root_CAMELLIA
             }
         }
         private Module_Camellia _ModuleCamellia;
-
         #endregion
 
         private AxisXY m_AxisXY;
