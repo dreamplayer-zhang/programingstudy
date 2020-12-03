@@ -57,7 +57,15 @@ namespace Root_Vega.Module
 					OnPropertyChanged();
 				}
 			}
-			public ObservableCollection<int> p_aFanState { get; set; }
+			List<int> _aFanState= new List<int>();
+			public List<int> p_aFanState 
+			{
+				get { return _aFanState; }
+				set {
+					_aFanState = value;
+					OnPropertyChanged();
+				} 
+			}
 
 			List<bool> m_aTempFanRun = new List<bool>();
 			List<bool> m_aIsFanRun = new List<bool>();
@@ -244,6 +252,7 @@ namespace Root_Vega.Module
 					p_aFanPressure.Add(0);
 					m_aTempPressure.Add(0);
 
+					_aFanState.Add(0);
 					p_aFanState.Add(0);
 
 					m_aTempFanRun.Add(false);
@@ -274,7 +283,7 @@ namespace Root_Vega.Module
 				{
 					Thread.Sleep(10);
 					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 64, m_aFanState);
-					OnPropertyChanged("p_aFanState"); 
+					p_aFanState = m_aFanState; 
 					Thread.Sleep(10);
 					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 0, m_aTempRPM);
 					p_aFanRPM = m_aTempRPM;
@@ -307,7 +316,7 @@ namespace Root_Vega.Module
 			public string p_sUnit { get; set; }
 			public Unit(FFU FFU, int nID)
 			{
-				p_aFanState = new ObservableCollection<int>(); 
+				//p_aFanState = new ObservableCollection<int>(); 
 				m_FFU = FFU;
 				m_nID = nID;
 				m_id = "Unit" + nID.ToString();
