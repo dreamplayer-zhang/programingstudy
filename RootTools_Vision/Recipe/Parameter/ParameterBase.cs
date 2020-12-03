@@ -16,22 +16,28 @@ namespace RootTools_Vision
     [XmlInclude(typeof(SurfaceParameter))]
     [XmlInclude(typeof(PositionParameter))]
     //[XmlType(TypeName = "Parameter")]
-    public class ParameterBase : ObservableObject, IComparable<ParameterBase>, IRecipe
+    public abstract class ParameterBase : ObservableObject, IComparable<ParameterBase>, IRecipe
     {
         public ParameterBase() { }
 
 
         private readonly string name;
+        private readonly  Type inspectionType;
 
-
-        public string Name
-        { 
-            get => name;
+        public Type InspectionType
+        {
+            get => this.inspectionType;
         }
 
-        protected ParameterBase(string displayName)
+        public string Name
         {
-            this.name = displayName;
+            get => this.name;
+        }
+
+        protected ParameterBase(Type _inspectionType)
+        {
+            this.inspectionType = _inspectionType;
+            this.name = _inspectionType.Name;
         }
 
         /// <summary>
@@ -41,7 +47,7 @@ namespace RootTools_Vision
         /// <returns>class의 name 변수가 같으면 0, 다른면 -1을 리턴한다.</returns>
         public int CompareTo(ParameterBase other)
         {
-            if(this.name == other.Name)
+            if(this.InspectionType == other.InspectionType)
             {
                 return 0;
             }
@@ -59,11 +65,6 @@ namespace RootTools_Vision
         public static ObservableCollection<ParameterBase> GetChildClass()
         {
             return Tools.GetEnumerableOfType<ParameterBase>();
-        }
-
-        public static T GetChildInstance<T>()
-        {
-            return Activator.CreateInstance<T>();
         }
 
         public static ParameterBase CreateChildInstance(ParameterBase param)
@@ -85,5 +86,9 @@ namespace RootTools_Vision
         {
             return 0;
         }
+
+        // string과 같이 Value타입이 아니라 refence 타입인 경우(new로 생성되는 경우 clone 함수 작성시 따로 생성해야합니다)
+        public abstract object Clone();
+
     }
 }

@@ -244,6 +244,7 @@
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionItem_temp.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionROI.cs" />
     <Compile Include="Module\EdgeSideVision.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\TestClass.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Map\Control_Chip.xaml.cs">
       <DependentUpon>Control_Chip.xaml</DependentUpon>
     </Compile>

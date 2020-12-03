@@ -197,6 +197,114 @@ namespace RootTools_Vision
             }
         }
 
+        public static WorkplaceBundle CreateWaferMap(Recipe _recipe)
+        {
+
+            RecipeType_WaferMap mapInfo = _recipe.WaferMap;
+            OriginRecipe originRecipe = _recipe.GetRecipe<OriginRecipe>();
+
+            WorkplaceBundle bundle = new WorkplaceBundle();
+
+
+            var wafermap = mapInfo.Data;
+            int nSizeX = mapInfo.MapSizeX;
+            int nSizeY = mapInfo.MapSizeY;
+            int nMasterX = mapInfo.MasterDieX;
+            int nMasterY = mapInfo.MasterDieY;
+            int nDiePitchX = originRecipe.DiePitchX;    //DitPitch 필요없음 삭제 예정
+            int nDiePitchY = originRecipe.DiePitchY;
+
+            int nOriginAbsX = originRecipe.OriginX;
+            int nOriginAbsY = originRecipe.OriginY;
+
+            bundle.mapSizeX = nSizeX;
+            bundle.mapSizeY = nSizeY;
+
+            // Right
+            for (int x = nMasterX; x < nSizeX; x++)
+            {
+                // Top
+                for (int y = nMasterY; y >= 0; y--)
+                {
+                    if (wafermap[x + y * nSizeX] == 1)
+                    {
+                        int distX = x - nMasterX;
+                        int distY = y - nMasterY;
+                        int nDieAbsX = nOriginAbsX + distX * nDiePitchX;
+                        int nDieAbsY = nOriginAbsY + distY * nDiePitchY;
+
+                        Workplace workplace = new Workplace(x, y, nDieAbsX, nDieAbsY, nDiePitchX, nDiePitchY);
+
+                        if (y == nMasterY)
+                        {
+                            workplace.SetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP, true);
+                        }
+
+                        bundle.Add(workplace);
+                    }
+                }
+
+                // Bottom
+                for (int y = nMasterY + 1; y < nSizeY; y++)
+                {
+                    if (wafermap[x + y * nSizeX] == 1)
+                    {
+                        int distX = x - nMasterX;
+                        int distY = y - nMasterY;
+                        int nDieAbsX = nOriginAbsX + distX * nDiePitchX;
+                        int nDieAbsY = nOriginAbsY + distY * nDiePitchY;
+
+                        Workplace workplace = new Workplace(x, y, nDieAbsX, nDieAbsY, nDiePitchX, nDiePitchY);
+                        bundle.Add(workplace);
+                    }
+                }
+            }
+
+
+            // Left
+            for (int x = nMasterX - 1; x >= 0; x--)
+            {
+                // Top
+                for (int y = nMasterY; y >= 0; y--)
+                {
+                    if (wafermap[x + y * nSizeX] == 1)
+                    {
+                        int distX = x - nMasterX;
+                        int distY = y - nMasterY;
+                        int nDieAbsX = nOriginAbsX + distX * nDiePitchX;
+                        int nDieAbsY = nOriginAbsY + distY * nDiePitchY;
+
+
+                        Workplace workplace = new Workplace(x, y, nDieAbsX, nDieAbsY, nDiePitchX, nDiePitchY);
+
+                        if (y == nMasterY)
+                        {
+                            workplace.SetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP, true);
+                        }
+
+                        bundle.Add(workplace);
+                    }
+                }
+
+                // Bottom
+                for (int y = nMasterY + 1; y < nSizeY; y++)
+                {
+                    if (wafermap[x + y * nSizeX] == 1)
+                    {
+                        int distX = x - nMasterX;
+                        int distY = y - nMasterY;
+                        int nDieAbsX = nOriginAbsX + distX * nDiePitchX;
+                        int nDieAbsY = nOriginAbsY + distY * nDiePitchY;
+
+                        Workplace workplace = new Workplace(x, y, nDieAbsX, nDieAbsY, nDiePitchX, nDiePitchY);
+                        bundle.Add(workplace);
+                    }
+                }
+            }
+
+            return bundle;
+        }
+
 
         public static WorkplaceBundle CreateWaferMap(RecipeType_WaferMap mapInfo, OriginRecipe originRecipe)
         {

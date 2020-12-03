@@ -94,9 +94,6 @@
                                           BorderThickness="1"
                                           Header="Map">
                                 <local:MapControl DataContext="{Binding p_MapControl_VM}"/>
-                                <!--RootVision:MapViewer x:Name="mapViewer"></-->
-                                <!--<Image Source="/Root_WIND2;component/Resources/WaferMap.PNG"/>-->
-                                <!--<vision:MapViewer DataContext="{Binding p_MapViewer_VM}"></vision:MapViewer>-->
                             </GroupBox>
                         </Grid>
 
