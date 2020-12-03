@@ -12,14 +12,6 @@ namespace Root_EFEM.Module
     {
         #region ToolBox
         MemoryPool m_memoryPool;
-        public override void GetTools(bool bInit)
-        {
-            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-            if (bInit)
-            {
-                InitMemory();
-            }
-        }
 
         AxisXY m_axisXY;
         public AxisXY p_axisXY
@@ -38,14 +30,27 @@ namespace Root_EFEM.Module
             }
         }
 
-        Axis m_axisZ;
-        public Axis p_axisZ
+        //Axis m_axisZ;
+        //public Axis p_axisZ
+        //{
+        //    get
+        //    {
+        //        return m_axisZ;
+        //    }
+        //}
+        public override void GetTools(bool bInit)
         {
-            get
+            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Stage");
+            p_sInfo = m_toolBox.Get(ref m_axistheta, this, "Theta");
+            //p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
+            if (bInit)
             {
-                return m_axisZ;
+                InitMemory();
             }
         }
+
+        
         #endregion
 
         #region Memory
@@ -240,7 +245,7 @@ namespace Root_EFEM.Module
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)//
             {
-                m_rpReadyPos_pulse = tree.Set(m_rpReadyPos_pulse, m_rpReadyPos_pulse, " X Axis Ready Position [Pulse]", "Y Axis Ready Position [Pulse]", bVisible);
+                m_rpReadyPos_pulse = tree.Set(m_rpReadyPos_pulse, m_rpReadyPos_pulse, " X,Y Axis Ready Position [Pulse]", "X,Y Axis Ready Position [Pulse]", bVisible);
                 m_dReadyTheta_pulse = tree.Set(m_dReadyTheta_pulse, m_dReadyTheta_pulse, "Theta Axis Ready Position [Pulse]", "Theta Axis Ready Position [Pulse]", bVisible);
 
                 m_bUseInspect = tree.Set(m_bUseInspect, m_bUseInspect, "Use Inspection", "Use Inspection", bVisible);
