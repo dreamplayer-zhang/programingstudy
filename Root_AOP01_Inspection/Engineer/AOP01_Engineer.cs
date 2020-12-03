@@ -131,7 +131,7 @@ namespace Root_AOP01_Inspection
             m_login.Init();
             m_toolBox.Init(id, this);
             InitControl();
-            InitXGem();
+            //InitXGem();
             m_handler.Init(id, this);
             m_gaf.Init(id, this);
         }

@@ -30,18 +30,14 @@ namespace Root_AOP01_Inspection
         public ModuleList m_moduleList;
         public AOP01_Recipe m_recipe;
         public AOP01_Process m_process;
-        public TapePacker m_tapePacker;
-        public VacuumPacker m_vacuumPacker; 
+        public MainVision m_mainVision;
         //        public Robot_RND m_robot;
 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
-            m_tapePacker = new TapePacker("TapePacker", m_engineer);
-            InitModule(m_tapePacker);
-            m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
-            InitModule(m_vacuumPacker); 
-            //((IWTR)m_wtr).ReadInfoReticle_Registry();
+            m_mainVision = new MainVision("MainVision", m_engineer);
+            InitModule(m_mainVision);
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
             m_recipe.AddModule();
             m_process = new AOP01_Process("Process", m_engineer, this);
