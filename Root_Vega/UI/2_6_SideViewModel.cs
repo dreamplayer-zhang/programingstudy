@@ -404,6 +404,7 @@ namespace Root_Vega
 			ClearDrawList();
 
 			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
+			int nTotalBlockCount = 0;
 			for (int i = 0; i < 4; i++)
 			{
 				for (int k = 0; k < p_SideRoiList.Count; k++)
@@ -455,12 +456,10 @@ namespace Root_Vega
 						}
 						List<CRect> adjustAreaList = AdjustArea(inspAreaList[i], inspMargin, upper, center, under);
 						// 검사영역 블럭갯수 카운트
-						int nTotalBlockCount = 0;
 						for (int n = 0; n < adjustAreaList.Count; n++)
                         {
 							nTotalBlockCount += GetTotalBlockCountInSideInspArea(adjustAreaList[n], 1000);
                         }
-						((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision.p_nTotalBlockCount = nTotalBlockCount;
 						//
 						for (int n = 0; n < adjustAreaList.Count; n++)
 						{
@@ -489,6 +488,7 @@ namespace Root_Vega
 					}
 				}
 			}
+			((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision.p_nTotalBlockCount = nTotalBlockCount;
 			m_Engineer.m_InspManager.StartInspection();
 		}
 

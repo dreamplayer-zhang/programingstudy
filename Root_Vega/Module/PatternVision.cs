@@ -1170,13 +1170,6 @@ namespace Root_Vega.Module
                                                 m_mvvm.p_ImageViewer.SetRoiRect();
                                             }));
                                         }
-                                        if (m_mvm._dispatcher != null)
-                                        {
-                                            m_mvm._dispatcher.Invoke(new Action(delegate ()
-                                            {
-                                                m_mvm.TestFunction();
-                                            }));
-                                        }
 
                                         int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 
@@ -1197,6 +1190,14 @@ namespace Root_Vega.Module
 
                         nScanLine++;
                         cpMemoryOffset_pixel.X += nCamWidth;
+
+                        if (m_mvm._dispatcher != null)
+                        {
+                            m_mvm._dispatcher.Invoke(new Action(delegate ()
+                            {
+                                m_mvm.TestFunction();
+                            }));
+                        }
                     }
                     m_grabMode.m_camera.StopGrab();
                     return "OK";

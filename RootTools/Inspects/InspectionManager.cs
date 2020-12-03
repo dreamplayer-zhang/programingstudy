@@ -236,7 +236,12 @@ namespace RootTools.Inspects
 								// InspectionTarget별 검사 진행 Counting
 								InspectionTarget inspTarget = GetInspectionTarget(ipQueue.m_nDefectCode);
 								if (inspTarget == InspectionTarget.Chrome || inspTarget == InspectionTarget.EBR) p_nPatternInspDoneNum++;
-								else if (inspTarget > InspectionTarget.SideInspection && inspTarget <= InspectionTarget.SideInspectionBottom) p_nSideInspDoneNum++;
+								else if (inspTarget == InspectionTarget.SideInspectionBottom || inspTarget == InspectionTarget.SideInspectionLeft
+									|| inspTarget == InspectionTarget.SideInspectionTop || inspTarget == InspectionTarget.SideInspectionRight) p_nSideInspDoneNum++;
+								else
+								{
+
+								}
 							}
 						}
 					}

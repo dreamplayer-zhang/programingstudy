@@ -189,8 +189,8 @@ namespace Root_Vega
             if (p_PatternVision.p_nTotalBlockCount == 0) p_dPatternInspProgress = 0.0;
             else p_dPatternInspProgress = (double)p_Engineer.m_InspManager.p_nPatternInspDoneNum / (double)p_PatternVision.p_nTotalBlockCount * 100;
 
-            //if (p_SideVision.p_nTotalBlockCount == 0) p_dSideInspProgress = 0.0;
-            //else p_dSideInspProgress = (double)p_Engineer.m_InspManager.p_nSideInspDoneNum / (double)p_SideVision.p_nTotalBlockCount * 100;
+            if (p_SideVision.p_nTotalBlockCount == 0) p_dSideInspProgress = 0.0;
+            else p_dSideInspProgress = (double)p_Engineer.m_InspManager.p_nSideInspDoneNum / (double)p_SideVision.p_nTotalBlockCount * 100;
 
             p_nTotalDefectCount = p_Engineer.m_InspManager.m_nTotalDefectCount;
         }
