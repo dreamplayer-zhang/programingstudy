@@ -32,7 +32,7 @@
                 </TabControl>
             </TabItem>
         </TabControl>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+                <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <TabControl Grid.Column="2">
             <TabItem Header="Module" Background="{Binding p_brushModule}">
                 <TabControl x:Name="tabModule"/>

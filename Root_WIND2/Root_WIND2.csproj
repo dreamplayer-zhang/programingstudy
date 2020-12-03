@@ -233,6 +233,8 @@
       <DependentUpon>LoadingBlock.xaml</DependentUpon>
     </Compile>
     <Compile Include="EdgeResult.cs" />
+    <Compile Include="EventArgs.cs" />
+    <Compile Include="EventManager.cs" />
     <Compile Include="Module\BackSideVision.cs" />
     <Compile Include="Module\EBRVision.cs" />
     <Compile Include="Module\GrabMode.cs" />
