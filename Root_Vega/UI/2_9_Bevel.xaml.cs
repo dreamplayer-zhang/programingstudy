@@ -16,21 +16,29 @@ using System.Windows.Shapes;
 
 namespace Root_Vega
 {
-    /// <summary>
-    /// _2_9_Bevel.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class _2_9_Bevel : UserControl
-    {
-        public _2_9_Bevel()
-        {
-            InitializeComponent();
-			App.m_engineer.m_InspManager.AddBevelDefect += App_AddDefect;
+	/// <summary>
+	/// _2_9_Bevel.xaml에 대한 상호 작용 논리
+	/// </summary>
+	public partial class _2_9_Bevel : UserControl
+	{
+		public _2_9_Bevel()
+		{
+			InitializeComponent();
+			App.m_engineer.m_InspManager.AddTopBevelDefect += App_AddTopDefect;
+			App.m_engineer.m_InspManager.AddLeftBevelDefect += App_AddLeftDefect;
+			App.m_engineer.m_InspManager.AddRightBevelDefect += App_AddRightDefect;
+			App.m_engineer.m_InspManager.AddBotBevelDefect += App_AddBotDefect;
+
 			App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
 			InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
 		}
 		~_2_9_Bevel()
 		{
-			App.m_engineer.m_InspManager.AddBevelDefect -= App_AddDefect;
+			App.m_engineer.m_InspManager.AddTopBevelDefect -= App_AddTopDefect;
+			App.m_engineer.m_InspManager.AddLeftBevelDefect -= App_AddLeftDefect;
+			App.m_engineer.m_InspManager.AddRightBevelDefect -= App_AddRightDefect;
+			App.m_engineer.m_InspManager.AddBotBevelDefect -= App_AddBotDefect;
+
 			App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
 			InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
 		}
@@ -86,75 +94,68 @@ namespace Root_Vega
 			}
 		}
 
-		private void App_AddDefect(RootTools.DefectDataWrapper item)
+		private void App_AddTopDefect(RootTools.DefectDataWrapper item)
 		{
-			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
-				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.BevelInspectionTop)
+			try
 			{
-				try
+				viewer_top.Dispatcher.Invoke(new Action(delegate ()
 				{
-					viewer_top.Dispatcher.Invoke(new Action(delegate ()
-					{
-						int width = item.nWidth;
-						int height = item.nHeight;
-						viewer_top.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
-					}));
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine(ex.Message);
-				}
+					int width = item.nWidth;
+					int height = item.nHeight;
+					viewer_top.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
+				}));
 			}
-			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
-				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.BevelInspectionBottom)
+			catch (Exception ex)
 			{
-				try
-				{
-					viewer_bot.Dispatcher.Invoke(new Action(delegate ()
-					{
-						int width = item.nWidth;
-						int height = item.nHeight;
-						viewer_bot.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
-					}));
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine(ex.Message);
-				}
+				Console.WriteLine(ex.Message);
 			}
-			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
-				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.BevelInspectionLeft)
+		}
+		private void App_AddBotDefect(RootTools.DefectDataWrapper item)
+		{
+			try
 			{
-				try
+				viewer_bot.Dispatcher.Invoke(new Action(delegate ()
 				{
-					viewer_left.Dispatcher.Invoke(new Action(delegate ()
-					{
-						int width = item.nWidth;
-						int height = item.nHeight;
-						viewer_left.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
-					}));
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine(ex.Message);
-				}
+					int width = item.nWidth;
+					int height = item.nHeight;
+					viewer_bot.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
+				}));
 			}
-			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
-				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.BevelInspectionRight)
+			catch (Exception ex)
 			{
-				try
+				Console.WriteLine(ex.Message);
+			}
+		}
+		private void App_AddLeftDefect(RootTools.DefectDataWrapper item)
+		{
+			try
+			{
+				viewer_left.Dispatcher.Invoke(new Action(delegate ()
 				{
-					viewer_right.Dispatcher.Invoke(new Action(delegate ()
-					{
-						int width = item.nWidth;
-						int height = item.nHeight;
-						viewer_right.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
-					}));
-				}
-				catch (Exception ex)
+					int width = item.nWidth;
+					int height = item.nHeight;
+					viewer_left.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
+				}));
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
+		private void App_AddRightDefect(RootTools.DefectDataWrapper item)
+		{
+			try
+			{
+				viewer_right.Dispatcher.Invoke(new Action(delegate ()
 				{
-					Console.WriteLine(ex.Message);
-				}
+					int width = item.nWidth;
+					int height = item.nHeight;
+					viewer_right.AddBlock(item.fPosX, item.fPosY, width, height, Brushes.Red, new Pen(Brushes.Red, 1));
+				}));
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
 			}
 		}
 	}

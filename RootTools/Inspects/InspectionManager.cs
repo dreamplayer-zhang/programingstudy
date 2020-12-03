@@ -41,11 +41,35 @@ namespace RootTools.Inspects
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
-		public event ChangeDefectInfoEventHanlder AddSideDefect;
+		public event ChangeDefectInfoEventHanlder AddTopSideDefect;
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
-		public event ChangeDefectInfoEventHanlder AddBevelDefect;
+		public event ChangeDefectInfoEventHanlder AddLeftSideDefect;
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddRightSideDefect;
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddBotSideDefect;
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddTopBevelDefect;
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddLeftBevelDefect;
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddRightBevelDefect;
+		/// <summary>
+		/// UI에 Defect을 추가하기 위해 발생하는 Event
+		/// </summary>
+		public event ChangeDefectInfoEventHanlder AddBotBevelDefect;
 		/// <summary>
 		/// UI에 Defect을 추가하기 위해 발생하는 Event
 		/// </summary>
@@ -149,8 +173,17 @@ namespace RootTools.Inspects
 			{
 				InspectionThread[i] = new Inspection(nThreadNum);
 				InspectionThread[i].AddChromeDefect += InspectionManager_AddChromeDefect;
-				InspectionThread[i].AddSideDefect += InspectionManager_AddSideDefect;
-				InspectionThread[i].AddBevelDefect += InspectionManager_AddBevelDefect;
+
+				InspectionThread[i].AddTopSideDefect += InspectionManager_AddTopSideDefect;//InspectionManager_AddSideDefect;
+				InspectionThread[i].AddLeftSideDefect += InspectionManager_AddLeftSideDefect;
+				InspectionThread[i].AddRightSideDefect += InspectionManager_AddRightSideDefect;
+				InspectionThread[i].AddBotSideDefect += InspectionManager_AddBotSideDefect;
+
+				InspectionThread[i].AddTopBevelDefect += InspectionManager_AddTopBevelDefect;
+				InspectionThread[i].AddLeftBevelDefect += InspectionManager_AddLeftBevelDefect;
+				InspectionThread[i].AddRightBevelDefect += InspectionManager_AddRightBevelDefect;
+				InspectionThread[i].AddBotBevelDefect += InspectionManager_AddBotBevelDefect;
+
 				InspectionThread[i].AddEBRDefect += InspectionManager_AddEBRDefect;
 			});
 			//for (int i = 0; i < nThreadNum; i++)
@@ -212,11 +245,73 @@ namespace RootTools.Inspects
 			//여기서 완료 이벤트 발생
 		}
 
-		private void InspectionManager_AddSideDefect(DefectDataWrapper item)
+		private void InspectionManager_AddBotBevelDefect(DefectDataWrapper item)
 		{
-			if (AddSideDefect != null)
+			if (AddBotBevelDefect != null)
 			{
-				AddSideDefect(item);
+				AddBotBevelDefect(item);
+				m_nTotalDefectCount++;
+			}
+		}
+
+		private void InspectionManager_AddRightBevelDefect(DefectDataWrapper item)
+		{
+			if (AddRightBevelDefect != null)
+			{
+				AddRightBevelDefect(item);
+				m_nTotalDefectCount++;
+			}
+		}
+
+		private void InspectionManager_AddLeftBevelDefect(DefectDataWrapper item)
+		{
+			if (AddLeftBevelDefect != null)
+			{
+				AddLeftBevelDefect(item);
+				m_nTotalDefectCount++;
+			}
+		}
+
+		private void InspectionManager_AddTopBevelDefect(DefectDataWrapper item)
+		{
+			if (AddTopBevelDefect != null)
+			{
+				AddTopBevelDefect(item);
+				m_nTotalDefectCount++;
+			}
+		}
+
+		private void InspectionManager_AddBotSideDefect(DefectDataWrapper item)
+		{
+			if (AddBotSideDefect != null)
+			{
+				AddBotSideDefect(item);
+				m_nTotalDefectCount++;
+			}
+		}
+
+		private void InspectionManager_AddRightSideDefect(DefectDataWrapper item)
+		{
+			if (AddRightSideDefect != null)
+			{
+				AddRightSideDefect(item);
+				m_nTotalDefectCount++;
+			}
+		}
+
+		private void InspectionManager_AddTopSideDefect(DefectDataWrapper item)
+		{
+			if (AddTopSideDefect != null)
+			{
+				AddTopSideDefect(item);
+				m_nTotalDefectCount++;
+			}
+		}
+		private void InspectionManager_AddLeftSideDefect(DefectDataWrapper item)
+		{
+			if (AddLeftSideDefect != null)
+			{
+				AddLeftSideDefect(item);
 				m_nTotalDefectCount++;
 			}
 		}
@@ -226,15 +321,6 @@ namespace RootTools.Inspects
 			if (AddEBRDefect != null)
 			{
 				AddEBRDefect(item);
-				m_nTotalDefectCount++;
-			}
-		}
-
-		private void InspectionManager_AddBevelDefect(DefectDataWrapper item)
-		{
-			if (AddBevelDefect != null)
-			{
-				AddBevelDefect(item);
 				m_nTotalDefectCount++;
 			}
 		}

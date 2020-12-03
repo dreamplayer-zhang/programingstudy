@@ -21,8 +21,14 @@ namespace RootTools.Inspects
 		public delegate void ChangeDefectInfoEventHander(DefectDataWrapper item);
 		public event ChangeDefectInfoEventHander AddChromeDefect;
 		public event ChangeDefectInfoEventHander AddEBRDefect;
-		public event ChangeDefectInfoEventHander AddSideDefect;
-		public event ChangeDefectInfoEventHander AddBevelDefect;
+		public event ChangeDefectInfoEventHander AddTopSideDefect;
+		public event ChangeDefectInfoEventHander AddLeftSideDefect;
+		public event ChangeDefectInfoEventHander AddRightSideDefect;
+		public event ChangeDefectInfoEventHander AddBotSideDefect;
+		public event ChangeDefectInfoEventHander AddTopBevelDefect;
+		public event ChangeDefectInfoEventHander AddLeftBevelDefect;
+		public event ChangeDefectInfoEventHander AddRightBevelDefect;
+		public event ChangeDefectInfoEventHander AddBotBevelDefect;
 		public event ChangeDefectInfoEventHander AddD2DDefect;
 		#endregion
 
@@ -104,138 +110,174 @@ namespace RootTools.Inspects
 					List<DefectDataWrapper> arrDefects = new List<DefectDataWrapper>();
 					if (m_InspProp.p_InspType == InspectionType.AbsoluteSurface || m_InspProp.p_InspType == InspectionType.RelativeSurface)
 					{
-							unsafe
-							{
-								var temp = clrInsp.SurfaceInspection(
-								m_InspProp.MemoryPoolName,
-								m_InspProp.MemoryGroupName,
-								m_InspProp.MemoryName,
-								m_InspProp.MemoryOffset,
-								ThreadIndex,
-								m_InspProp.m_nDefectCode,
-								m_InspProp.p_Rect.Left,
-								m_InspProp.p_Rect.Top,
-								m_InspProp.p_Rect.Right,
-								m_InspProp.p_Rect.Bottom,
-								m_InspProp.p_TargetMemWidth,
-								m_InspProp.p_TargetMemHeight,
-								m_InspProp.p_surfaceParam.TargetGV,
-								m_InspProp.p_surfaceParam.DefectSize,
-								m_InspProp.p_surfaceParam.UseDarkInspection,
-								m_InspProp.p_surfaceParam.UseAbsoluteInspection,
-								m_InspProp.p_bDefectMerge,
-								m_InspProp.p_nMergeDistance,
-								(void*)m_InspProp.p_ptrMemory);
+						unsafe
+						{
+							var temp = clrInsp.SurfaceInspection(
+							m_InspProp.MemoryPoolName,
+							m_InspProp.MemoryGroupName,
+							m_InspProp.MemoryName,
+							m_InspProp.MemoryOffset,
+							ThreadIndex,
+							m_InspProp.m_nDefectCode,
+							m_InspProp.p_Rect.Left,
+							m_InspProp.p_Rect.Top,
+							m_InspProp.p_Rect.Right,
+							m_InspProp.p_Rect.Bottom,
+							m_InspProp.p_TargetMemWidth,
+							m_InspProp.p_TargetMemHeight,
+							m_InspProp.p_surfaceParam.TargetGV,
+							m_InspProp.p_surfaceParam.DefectSize,
+							m_InspProp.p_surfaceParam.UseDarkInspection,
+							m_InspProp.p_surfaceParam.UseAbsoluteInspection,
+							m_InspProp.p_bDefectMerge,
+							m_InspProp.p_nMergeDistance,
+							(void*)m_InspProp.p_ptrMemory);
 
-								foreach (var item in temp)
-								{
-									arrDefects.Add(new DefectDataWrapper(item));
-								}
+							foreach (var item in temp)
+							{
+								arrDefects.Add(new DefectDataWrapper(item));
 							}
-						
+						}
+
 					}
 					else if (m_InspProp.p_InspType == InspectionType.Strip)
 					{
-							unsafe
-							{
-								var temp = clrInsp.StripInspection(
-								m_InspProp.MemoryPoolName,
-								m_InspProp.MemoryGroupName,
-								m_InspProp.MemoryName,
-								m_InspProp.MemoryOffset,
-								ThreadIndex,
-								m_InspProp.m_nDefectCode,
-								m_InspProp.p_Rect.Left,
-								m_InspProp.p_Rect.Top,
-								m_InspProp.p_Rect.Right,
-								m_InspProp.p_Rect.Bottom,
-								m_InspProp.p_TargetMemWidth,
-								m_InspProp.p_TargetMemHeight,
-								m_InspProp.p_StripParam.TargetGV,
-								m_InspProp.p_StripParam.DefectSize,
-								m_InspProp.p_StripParam.Intensity,
-								m_InspProp.p_StripParam.Bandwidth,
-								m_InspProp.p_bDefectMerge,
-								m_InspProp.p_nMergeDistance,
-								(void*)m_InspProp.p_ptrMemory);
+						unsafe
+						{
+							var temp = clrInsp.StripInspection(
+							m_InspProp.MemoryPoolName,
+							m_InspProp.MemoryGroupName,
+							m_InspProp.MemoryName,
+							m_InspProp.MemoryOffset,
+							ThreadIndex,
+							m_InspProp.m_nDefectCode,
+							m_InspProp.p_Rect.Left,
+							m_InspProp.p_Rect.Top,
+							m_InspProp.p_Rect.Right,
+							m_InspProp.p_Rect.Bottom,
+							m_InspProp.p_TargetMemWidth,
+							m_InspProp.p_TargetMemHeight,
+							m_InspProp.p_StripParam.TargetGV,
+							m_InspProp.p_StripParam.DefectSize,
+							m_InspProp.p_StripParam.Intensity,
+							m_InspProp.p_StripParam.Bandwidth,
+							m_InspProp.p_bDefectMerge,
+							m_InspProp.p_nMergeDistance,
+							(void*)m_InspProp.p_ptrMemory);
 
-                                foreach (var item in temp)
-                                {
-                                    arrDefects.Add(new DefectDataWrapper(item));
-                                }
-                            }
-						
+							foreach (var item in temp)
+							{
+								arrDefects.Add(new DefectDataWrapper(item));
+							}
+						}
+
 					}
 					//if (m_InspProp.p_bDefectMerge)//TODO : 기능 개선이 필요함. UI에 표시할때의 변수가 별도로 있는 것이 좋을 것으로 보임 + Defect Clustering구현
 					//{
 					//	arrDefects = DefectDataWrapper.MergeDefect(arrDefects.ToArray(), m_InspProp.p_nMergeDistance);
 					//}
-					if (AddChromeDefect != null)
+					if (arrDefects != null && arrDefects.Count > 0)
 					{
-						if (arrDefects != null && arrDefects.Count > 0)
+						foreach (var item in arrDefects)
 						{
-							if (InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.Chrome)
+							switch (InspectionManager.GetInspectionTarget(item.nClassifyCode))
 							{
-								foreach (var item in arrDefects)
-								{
-									AddChromeDefect(item);
-								}
-							}
-						}
-					}
-					if (AddEBRDefect != null)
-					{
-						if (arrDefects != null && arrDefects.Count > 0)
-						{
-							if (InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.EBR)
-							{
-								foreach (var item in arrDefects)
-								{
-									AddEBRDefect(item);
-								}
-							}
-						}
-					}
-					if (AddD2DDefect != null)
-					{
-						if (arrDefects != null && arrDefects.Count > 0)
-						{
-							if(InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) == InspectionTarget.D2D)
-							{
-								foreach (var item in arrDefects)
-								{
-									AddD2DDefect(item);
-								}
-							}
-						}
-					}
-					if (AddSideDefect != null)
-					{
-						if(arrDefects != null && arrDefects.Count > 0)
-						{
-							if (
-								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) > InspectionTarget.SideInspection &&
-								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) <= InspectionTarget.SideInspectionBottom)
-							{
-								foreach (var item in arrDefects)
-								{
-									AddSideDefect(item);
-								}
-							}
-						}
-					}
-					if (AddBevelDefect != null )
-					{
-						if (arrDefects != null && arrDefects.Count > 0)
-						{
-							if (
-								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) > InspectionTarget.BevelInspection &&
-								InspectionManager.GetInspectionTarget(arrDefects.FirstOrDefault().nClassifyCode) <= InspectionTarget.BevelInspectionBottom)
-							{
-								foreach (var item in arrDefects)
-								{
-									AddBevelDefect(item);
-								}
+								case InspectionTarget.None:
+									break;
+								case InspectionTarget.Chrome:
+									if (AddChromeDefect != null)
+									{
+										AddChromeDefect(item);
+									}
+									break;
+								case InspectionTarget.Pellcile45:
+									break;
+								case InspectionTarget.Pellicle90:
+									break;
+								case InspectionTarget.FrameTop:
+									break;
+								case InspectionTarget.FrameLeft:
+									break;
+								case InspectionTarget.FrameBottom:
+									break;
+								case InspectionTarget.FrameRight:
+									break;
+								case InspectionTarget.Glass:
+									break;
+								case InspectionTarget.SideInspection:
+									break;
+								case InspectionTarget.SideInspectionTop:
+									if (AddTopSideDefect != null)
+									{
+										AddTopSideDefect(item);
+
+									}
+									break;
+								case InspectionTarget.SideInspectionLeft:
+									if (AddLeftSideDefect != null)
+									{
+										AddLeftSideDefect(item);
+
+									}
+									break;
+								case InspectionTarget.SideInspectionRight:
+									if (AddRightSideDefect != null)
+									{
+										AddRightSideDefect(item);
+
+									}
+									break;
+								case InspectionTarget.SideInspectionBottom:
+									if (AddBotSideDefect != null)
+									{
+										AddBotSideDefect(item);
+
+									}
+									break;
+								case InspectionTarget.BevelInspection:
+									break;
+								case InspectionTarget.BevelInspectionTop:
+									if (AddTopBevelDefect != null)
+									{
+										AddTopBevelDefect(item);
+
+									}
+									break;
+								case InspectionTarget.BevelInspectionLeft:
+									if (AddLeftBevelDefect != null)
+									{
+										AddLeftBevelDefect(item);
+
+									}
+									break;
+								case InspectionTarget.BevelInspectionRight:
+									if (AddRightBevelDefect != null)
+									{
+										AddRightBevelDefect(item);
+
+									}
+									break;
+								case InspectionTarget.BevelInspectionBottom:
+									if (AddBotBevelDefect != null)
+									{
+										AddBotBevelDefect(item);
+
+									}
+									break;
+								case InspectionTarget.D2D:
+									if (AddD2DDefect != null)
+									{
+										AddD2DDefect(item);
+
+									}
+									break;
+								case InspectionTarget.EBR:
+									if (AddEBRDefect != null)
+									{
+										AddEBRDefect(item);
+
+									}
+									break;
 							}
 						}
 					}
