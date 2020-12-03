@@ -620,8 +620,8 @@ namespace Root_WIND2
             BoxImage = new ImageData(Box.MemoryRect.Width, Box.MemoryRect.Height, byteCnt);
             
             BoxImage.m_eMode = ImageData.eMode.ImageBuffer;
-            BoxImage.SetData(p_ImageData.GetPtr()
-                , new CRect(Box.MemoryRect.Left * byteCnt, Box.MemoryRect.Top, Box.MemoryRect.Right * byteCnt, Box.MemoryRect.Bottom)
+            BoxImage.SetData(p_ImageData
+                , new CRect(Box.MemoryRect.Left, Box.MemoryRect.Top, Box.MemoryRect.Right, Box.MemoryRect.Bottom)
                 , (int)p_ImageData.p_Stride, byteCnt);
 
             Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
@@ -674,7 +674,7 @@ namespace Root_WIND2
             if (BoxImage == null)
                 return;
             //RecipeType_FeatureData rtf = new RecipeType_FeatureData(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.GetByteArray());
-            m_PositionRecipe.AddMasterFeature(m_Offset.X * BoxImage.p_nByte, m_Offset.Y, m_SizeWH.X * BoxImage.p_nByte, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
+            m_PositionRecipe.AddMasterFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset.X = m_Offset.X;
@@ -688,7 +688,7 @@ namespace Root_WIND2
             if (BoxImage == null)
                 return;
 
-            m_PositionRecipe.AddShotFeature(m_Offset.X * BoxImage.p_nByte, m_Offset.Y, m_SizeWH.X * BoxImage.p_nByte, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
+            m_PositionRecipe.AddShotFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;
@@ -701,7 +701,7 @@ namespace Root_WIND2
             if (BoxImage == null)
                 return;
 
-            m_PositionRecipe.AddChipFeature(m_Offset.X * BoxImage.p_nByte, m_Offset.Y, m_SizeWH.X * BoxImage.p_nByte, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
+            m_PositionRecipe.AddChipFeature(m_Offset.X, m_Offset.Y, m_SizeWH.X, m_SizeWH.Y, BoxImage.p_nByte, BoxImage.GetByteArray());
 
             FeatureControl fc = new FeatureControl();
             fc.p_Offset = m_Offset;

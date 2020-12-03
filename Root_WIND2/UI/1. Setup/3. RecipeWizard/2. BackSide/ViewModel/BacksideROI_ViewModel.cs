@@ -18,7 +18,7 @@ namespace Root_WIND2
         {
             base.init(image, dialogService);
             p_VisibleMenu = Visibility.Visible;
-            Shapes.CollectionChanged += Shapes_CollectionChanged;            
+            //Shapes.CollectionChanged += Shapes_CollectionChanged;            
         }
         public void init(Setup_ViewModel setup, Recipe _recipe)
         {
@@ -37,7 +37,6 @@ namespace Root_WIND2
         Polygon WAFEREDGE_UI;
         List<CPoint> PolygonPt = new List<CPoint>();
         public ObservableCollection<TShape> Shapes = new ObservableCollection<TShape>();
-        bool UIUpdateLock = false;
 
         Recipe recipe;
         BacksideRecipe backsideRecipe;
@@ -219,19 +218,16 @@ namespace Root_WIND2
                 backsideRecipe.CenterY = (int)centY;
                 backsideRecipe.Radius = (int)outRadius;
 
-                SaveContourMap((int)centX, (int)centY, (int)outRadius);
+                //SaveContourMap((int)centX, (int)centY, (int)outRadius);
             }
         }
         private void Shapes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (!UIUpdateLock)
+            var shapes = sender as ObservableCollection<TShape>;
+            foreach (TShape shape in shapes)
             {
-                var shapes = sender as ObservableCollection<TShape>;
-                foreach (TShape shape in shapes)
-                {
-                    if (!UIElements.Contains(shape.UIElement))
-                        UIElements.Add(shape.UIElement);
-                }
+                if (!UIElements.Contains(shape.UIElement))
+                    UIElements.Add(shape.UIElement);
             }
         }
         public override void PreviewMouseDown(object sender, MouseEventArgs e)
@@ -261,6 +257,8 @@ namespace Root_WIND2
 
             mapInfo = new RecipeType_WaferMap(mapX, mapY, mapData);
 
+            this.recipe.WaferMap = mapInfo;
+
             if (true) // Display Map Data Option화
                 DrawMapData(mapData, mapX, mapY, originX, originY, chipSzX, chipSzY);
         }
@@ -273,17 +271,12 @@ namespace Root_WIND2
             rect.MemoryRect.Left = LT.X;
             rect.MemoryRect.Top = LT.Y;
             rectInfo = Drawing(rectInfo, RB);
+            
             Shapes.Add(rectInfo);
-
-            //if (text != null)
-            //{
-            //    Grid textGrid = WriteInfoText(text, rect, color, FontSz);
-            //    InfoTextBolcks.Add(new InfoTextBolck(textGrid, rect));
-            //}
+            p_ViewElement.Add(rectInfo.UIElement);
         }
         private void DrawRect(List<CRect> RectList, ColorType color, List<String> textList = null, int FontSz = 15)
         {
-            UIUpdateLock = true;
             foreach (CRect rectPoint in RectList)
             {
                 SetShapeColor(color);
@@ -294,10 +287,8 @@ namespace Root_WIND2
                 rect.MemoryRect.Top = rectPoint.Top;
                 rectInfo = Drawing(rectInfo, new CPoint(rectPoint.Right, rectPoint.Bottom));
 
-                if (RectList.IndexOf(rectPoint) == RectList.Count - 1)
-                    UIUpdateLock = false;
-
                 Shapes.Add(rectInfo);
+                p_ViewElement.Add(rectInfo.UIElement);
             }
         }
         private void DrawCenterPoint(ColorType color)
@@ -557,6 +548,8 @@ namespace Root_WIND2
         }
         public override void SetRoiRect()
         {
+            Shapes.CollectionChanged += Shapes_CollectionChanged;
+
             base.SetRoiRect();
             ReDrawPolygon();
             ReDrawCircle();
@@ -564,10 +557,13 @@ namespace Root_WIND2
             if (p_ViewElement.Contains(WAFEREDGE_UI))
                 ReDrawWFCenter(ColorType.WaferCenter);
             else
-                ReDrawWFCenter(ColorType.Teaching); 
+                ReDrawWFCenter(ColorType.Teaching);
+
+            Shapes.CollectionChanged -= Shapes_CollectionChanged;
         }
         public override void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
         {
+            Shapes.CollectionChanged += Shapes_CollectionChanged;
             base.CanvasMovePoint_Ref(point, nX, nY);
             ReDrawPolygon();
             ReDrawCircle();
@@ -576,6 +572,8 @@ namespace Root_WIND2
                 ReDrawWFCenter(ColorType.WaferCenter);
             else
                 ReDrawWFCenter(ColorType.Teaching);
+
+            Shapes.CollectionChanged -= Shapes_CollectionChanged;
         }
 
         private System.Windows.Media.SolidColorBrush GetColorBrushType(ColorType color)

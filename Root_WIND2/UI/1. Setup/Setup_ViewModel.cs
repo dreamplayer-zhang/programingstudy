@@ -229,7 +229,7 @@ namespace Root_WIND2
                 if (true) // Display Option : Defect Size
                     text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
                 if (true) // Display Option : GV Value
-                    text += "GV : " + defectInfo.m_nGV.ToString() + "\n";
+                    text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
 
                 rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
                 textList.Add(text);

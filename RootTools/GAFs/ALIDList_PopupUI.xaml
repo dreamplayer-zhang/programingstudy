@@ -167,10 +167,10 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Button Content="Recovery" Margin="15" Grid.Column="1"
-                    Style="{StaticResource BasicBtn}"/>
-            <Button Content="Buzzer Off" Margin="15" Grid.Column="0"
-                    Style="{StaticResource BasicBtn}"/>
+            <Button Content="Recovery" Margin="15" Grid.Column="1" x:Name="buttonRecovery"
+                    Style="{StaticResource BasicBtn}" Click="buttonRecovery_Click"/>
+            <Button Content="Buzzer Off" Margin="15" Grid.Column="0" x:Name="buttonBuzzerOff"
+                    Style="{StaticResource BasicBtn}" Click="buttonBuzzerOff_Click"/>
             <Button Content="Continue" Margin="15" Grid.Column="2" Click="Button_Click"
                     Style="{StaticResource BasicBtn}"/>
 

@@ -723,21 +723,21 @@ namespace Root_Vega
 					//6. Start Postiion과 End Position, Inspection Offset을 이용하여 검사 영역을 생성한다. 우선은 일괄 생성을 대상으로 한다
 					var inspRect = new CRect(startPos, endPos);
 
-					var temp = new UIElementInfo(new Point(inspRect.Left, inspRect.Top), new Point(inspRect.Right, inspRect.Bottom));
+					//var temp = new UIElementInfo(new Point(inspRect.Left, inspRect.Top), new Point(inspRect.Right, inspRect.Bottom));
 
-					System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-					rect.Width = inspRect.Width;
-					rect.Height = inspRect.Height;
-					System.Windows.Controls.Canvas.SetLeft(rect, inspRect.Left);
-					System.Windows.Controls.Canvas.SetTop(rect, inspRect.Top);
-					rect.StrokeThickness = 3;
-					rect.Stroke = MBrushes.Orange;
+					//System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+					//rect.Width = inspRect.Width;
+					//rect.Height = inspRect.Height;
+					//System.Windows.Controls.Canvas.SetLeft(rect, inspRect.Left);
+					//System.Windows.Controls.Canvas.SetTop(rect, inspRect.Top);
+					//rect.StrokeThickness = 3;
+					//rect.Stroke = MBrushes.Orange;
 
-					p_RefFeatureDrawer.m_ListShape.Add(rect);
-					p_RefFeatureDrawer.m_Element.Add(rect);
-					p_RefFeatureDrawer.m_ListRect.Add(temp);
+					//p_RefFeatureDrawer.m_ListShape.Add(rect);
+					//p_RefFeatureDrawer.m_Element.Add(rect);
+					//p_RefFeatureDrawer.m_ListRect.Add(temp);
 
-					p_ImageViewer.SetRoiRect();
+					//p_ImageViewer.SetRoiRect();
 
 					int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, k);
 
