@@ -456,10 +456,10 @@ namespace Root_Vega
 						}
 						List<CRect> adjustAreaList = AdjustArea(inspAreaList[i], inspMargin, upper, center, under);
 						// 검사영역 블럭갯수 카운트
-						for (int n = 0; n < adjustAreaList.Count; n++)
-                        {
-							nTotalBlockCount += GetTotalBlockCountInSideInspArea(adjustAreaList[n], 1000);
-                        }
+						//for (int n = 0; n < adjustAreaList.Count; n++)
+      //                  {
+						//	nTotalBlockCount += GetTotalBlockCountInSideInspArea(adjustAreaList[n], 1000);
+      //                  }
 						//
 						for (int n = 0; n < adjustAreaList.Count; n++)
 						{
@@ -479,10 +479,10 @@ namespace Root_Vega
 
 							MemoryData memory = m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]);
 							IntPtr p = memory.GetPtr(0);
-							m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_sideMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).GetMBOffset(),
+							nTotalBlockCount = nTotalBlockCount + m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_sideMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).GetMBOffset(),
 								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.X,
 								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.Y,
-								adjustAreaList[n], 1000, param, nDefectCode, false, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p);
+								adjustAreaList[n], 1000, param, nDefectCode, false, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p).Count;
 						}
 						p_ImageViewer_List[i].SetRoiRect();
 					}

@@ -1100,7 +1100,7 @@ namespace Root_Vega.Module
                                         // Origin 생성
                                         CPoint cptOriginStart = new CPoint(cptStandard.X + nRefStartOffsetX, cptStandard.Y + nRefStartOffsetY);
                                         roiCurrent.Origin.OriginRect = new CRect(cptOriginStart.X, cptOriginStart.Y, cptOriginStart.X + (int)roiCurrent.Strip.ParameterList[0].InspAreaWidth, cptOriginStart.Y + (int)roiCurrent.Strip.ParameterList[0].InspAreaHeight);
-                                        m_module.p_nTotalBlockCount = GetTotalBlockCountInOriginRect(roiCurrent.Origin.OriginRect, 1000);
+                                        //m_module.p_nTotalBlockCount = GetTotalBlockCountInOriginRect(roiCurrent.Origin.OriginRect, 1000);
                                         break;  // 찾았으니 중단
                                     }
                                     else
@@ -1177,10 +1177,10 @@ namespace Root_Vega.Module
 
                                         MemoryData memory = engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem);
                                         IntPtr p = memory.GetPtr(0);
-                                        engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
+                                        m_module.p_nTotalBlockCount = m_module.p_nTotalBlockCount + engineer.m_InspManager.CreateInspArea(App.sPatternPool, App.sPatternGroup, App.sPatternmem, engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).GetMBOffset(),
                                             engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.X,
                                             engineer.GetMemory(App.sPatternPool, App.sPatternGroup, App.sPatternmem).p_sz.Y,
-                                            crtOverlapedRect, 1000, roiCurrent.Strip.ParameterList[0], nDefectCode, engineer.m_recipe.VegaRecipeData.UseDefectMerge, engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p);
+                                            crtOverlapedRect, 1000, roiCurrent.Strip.ParameterList[0], nDefectCode, engineer.m_recipe.VegaRecipeData.UseDefectMerge, engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p).Count;
                                     }
                                 }
                             }
