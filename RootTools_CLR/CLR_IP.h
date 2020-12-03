@@ -26,28 +26,38 @@ namespace RootTools_CLR
 
 		static array<Cpp_LabelParam^>^ Cpp_Labeling(array<byte>^ pSrcImg, array<byte>^ pBinImg, int  nMemW, int  nMemH, bool bDark);
 		static array<Cpp_LabelParam^>^ Cpp_Labeling(array<byte>^ pSrcImg, array<byte>^ pBinImg, int  nMemW, int  nMemH);
-		static array<Cpp_LabelParam^>^ Cpp_Labeling(byte* pSrcImg, array<byte>^ pBinImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, bool bDark);
+		static array<Cpp_LabelParam^>^ Cpp_Labeling_SubPix(array<byte>^ pSrcImg, array<byte>^ pBinImg, int  nMemW, int  nMemH, bool bDark, int thresh, float Scale);
 
-		static void Cpp_SubtractAbs(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
-		static void Cpp_FindMinDiffLoc(array<byte>^ pSrcImg, array<byte>^ pInOutTarget, int nTransX, int nTransY, int nTargetW, int nTargetH, int nTrigger);
 		// Method는 3, 5 권장 (다른 Method들은 정규화 되지 않아 Score가 100 이상 나올 수 있음) - 정확성 3 < 5, 속도 3 > 5
 		// OutPosX, OutPosY는 Matching Box의 좌상단. {CenterX, CenterY} = {OutPosX + nTempW / 2, OutPosY + nTempH / 2}
 		static float Cpp_TemplateMatching(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod);
 		static float Cpp_TemplateMatching(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod);
 
-		//static void Cpp_Labeling(array<byte>^ pSrcImg, array<byte>^ pBinImg, int  nMemWidth, int  nMemHeight, bool bDark, [Out] array<Cpp_LabelParam^>^ outLabel);
+		// ********* D2D ******** //
+		static void Cpp_SubtractAbs(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
+		static void Cpp_SelectMinDiffinArea(array<byte>^ pSrcImg1, array<array<byte>^>^ pSrcImg2, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, int nAreaSize);
+		static void Cpp_FindMinDiffLoc(array<byte>^ pSrcImg, array<byte>^ pInOutTarget, int nTransX, int nTransY, int nTargetW, int nTargetH, int nTrigger);
+
+		// Create Golden Image
+		static void Cpp_CreateGoldenImage_Avg(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH);
+		static void Cpp_CreateGoldenImage_NearAvg(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH);
+		//static void Cpp_CreateGoldenImage_Median(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH); // 구현 필요
+
+		// D2D 3.0
+		// EdgeSuppression, BrightSuppression Level은 1~10 단계, 0 = 사용 x
+		static void Cpp_CreateDiffScaleMap(array<byte>^ pSrcImg, array<float>^ pDstImg, int  nMemW, int  nMemH, int nEdgeSuppressionLev, int nBrightSuppressionLev);
+		static void Cpp_CreateHistogramWeightMap(array<byte>^ pSrcImg, array<byte>^ pGoldenImg, array<float>^ pDstImg, int  nMemW, int  nMemH, int nWeightLev);
+
+		// Elementwise Operation
+		static void Cpp_Multiply(array<byte>^ pSrcImg1, array<float>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
 
 		// Filtering
 		static void Cpp_GaussianBlur(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH, int nSig);
+		static void Cpp_AverageBlur(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH);
 		static void Cpp_MedianBlur(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH, int nFiltSz);
 		static void Cpp_Morphology(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH, int nFiltSz, System::String^ strMethod, int nIter);
 
-		static void Cpp_SplitColorChannel(BYTE* pSrcImg, BYTE* pOutImg, int nMemW, int nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nChIndex, int nDownSample);
-		static void Cpp_SplitColorChannel(BYTE* pSrcImg, array<byte>^ pOutImg, int nMemW, int nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nChIndex, int nDownSample);
-		static void Cpp_SubSampling(BYTE* pSrcImg, BYTE* pOutImg, int nMemW, int nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDownSample);
-		static void Cpp_SubSampling(BYTE* pSrcImg, array<byte>^ pOutImg, int nMemW, int nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDownSample);
 		// BackSide
-
 		// Recipe 티칭시 원본 이미지 크기 대폭 줄여서 MapData 만들기 위한 용도 > 전체 버퍼가 들어가기 때문에 DownScale 넉넉하게 줄것! ( > 10)
 		// TMA 같이 정밀한 픽셀 측정 및 반복성을 필요로하는 상황에서는 다른 함수 사용 (downScale = 1 느림...)
 		static array<Cpp_Point^>^ Cpp_FindWaferEdge(byte* pSrcImg, float& inoutCenterX, float& inoutCenterY, float& inoutRadius, int  nMemW, int  nMemH, int downScale);
@@ -56,18 +66,25 @@ namespace RootTools_CLR
 		// Map Size 넘겨주면 N * M 크기로 Map Data 생성
 		static array<int>^ Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, float& outChipSzX, float& outChipSzY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode);
 
+		// Image(Feature/Defect Image) Load/Save
 		static void Cpp_SaveBMP(System::String^ strFilePath, array<byte>^ pSrcImg, int  nMemW, int  nMemH, int nByteCnt);
-		static void Cpp_SaveDefectListBMP(System::String^ strFilePath, byte* pSrcImg, int  nMemW, int  nMemH, array<Cpp_Rect^>^ DefectRect, int nByteCnt);
-		static void Cpp_LoadBMP(System::String^ strFilePath, array<byte>^ pOutImg, int  nMemW, int  nMemH);
-	
-		static void Cpp_SobelEdgeDetection(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH, int nDerivativeX, int nDerivativeY, int nKernelSize, int nScale, int nDelta);
-		static void Cpp_SobelEdgeDetection(BYTE* pSrcImg, BYTE* pDstImg, int nW, int nH, int nDerivativeX, int nDerivativeY, int nKernelSize, int nScale, int nDelta);
-	
-		static void Cpp_Histogram(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH, int channels, int dims, int histSize, array<float>^ histRanges);
-		static void Cpp_FilEllipse(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH);
-		
+		static void Cpp_SaveDefectListBMP(System::String^ strFilePath, byte* pSrcImg, int  nMemW, int  nMemH, array<Cpp_Rect^>^ DefectRect);
+		static void Cpp_SaveDefectListBMP_Color(System::String^ strFilePath, BYTE* pRImg, BYTE* pGImg, BYTE* pBImg, int  nMemW, int  nMemH, array<Cpp_Rect^>^ DefectRect);
+		static void Cpp_LoadBMP(System::String^ strFilePath, array<byte>^ pOutImg, int  nMemW, int  nMemH, int nByteCnt);
+
+		// ETC.
+		static void Cpp_SplitColorChannel(BYTE* pSrcImg, BYTE* pOutImg, int nMemW, int nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nChIndex, int nDownSample);
+		static void Cpp_SplitColorChannel(BYTE* pSrcImg, array<byte>^ pOutImg, int nMemW, int nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nChIndex, int nDownSample);
+		static void Cpp_SubSampling(BYTE* pSrcImg, BYTE* pOutImg, int nMemW, int nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDownSample);
+		static void Cpp_SubSampling(BYTE* pSrcImg, array<byte>^ pOutImg, int nMemW, int nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDownSample);
 		static void Cpp_ConvertRGB2H(array<byte>^ pRImg, array<byte>^ pGImg, array<byte>^ pBImg, array<byte>^ pDstImg, int  nMemW, int  nMemH);
 		static void Cpp_DrawContourMap(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH);
 		static void Cpp_CutOutROI(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB);
+
+		static void Cpp_SobelEdgeDetection(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH, int nDerivativeX, int nDerivativeY, int nKernelSize, int nScale, int nDelta);
+		static void Cpp_SobelEdgeDetection(BYTE* pSrcImg, BYTE* pDstImg, int nW, int nH, int nDerivativeX, int nDerivativeY, int nKernelSize, int nScale, int nDelta);
+
+		static void Cpp_Histogram(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH, int channels, int dims, int histSize, array<float>^ histRanges);
+		static void Cpp_FilEllipse(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH);
 	};
 }

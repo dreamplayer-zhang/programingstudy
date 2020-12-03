@@ -64,5 +64,15 @@ namespace RootTools_Vision
         {
             return new Ajin();
         }
+
+        public string BuzzerOff()
+        {
+            return "OK";
+        }
+
+        public string Recovery()
+        {
+            return "OK";
+        }
     }
 }

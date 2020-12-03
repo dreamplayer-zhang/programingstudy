@@ -60,18 +60,24 @@ namespace RootTools_Vision
                 {
                     for (int i = 0; i < 256; i++)
                         palette.Entries[i] = Color.FromArgb(i, i, i);
+
+                    bmp.Palette = palette;
                 }
                 else
                 {
-                    // Color Pallete도 만들어야되나?
+                    //Color Palette 만들줄 아는사람 넣어줘
                 }
-                bmp.Palette = palette;
+              
 
                 BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, _width, _height), ImageLockMode.WriteOnly, format);
 
                 IntPtr pointer = bmpData.Scan0;
+
+                //Marshal.Copy(rawdata, 0, pointer, rawdata.Length);
+
+
                 for (int i = 0; i < _height; i++)
-                    Marshal.Copy(rawdata, i * _width, pointer + i * stride, _width);
+                    Marshal.Copy(rawdata, i * _width * _byteCount, pointer + i * bmpData.Stride, _width * _byteCount);
 
                 bmp.UnlockBits(bmpData);
 
@@ -119,12 +125,12 @@ namespace RootTools_Vision
                 }
 
                 // Raw Copy
-                rawdata = new byte[_width * _height];
+                rawdata = new byte[_width * _height * _byteCount];
                 BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, _width, _height), ImageLockMode.WriteOnly, bmp.PixelFormat);
 
                 IntPtr pointer = bmpData.Scan0;
                 for (int i = 0; i < _height; i++)
-                    Marshal.Copy(pointer + bmpData.Stride * i, rawdata, i * _width, _width);
+                    Marshal.Copy(pointer + bmpData.Stride * i, rawdata, i * _width, _width * _byteCount);
             }
             catch (Exception ex)
             {

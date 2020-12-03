@@ -24,7 +24,7 @@ namespace RootTools.Database
         public float m_fAbsX; // 상대좌표 Origin 좌 하단 <-> Defect 좌 상단
         public float m_fAbsY;
         
-        public int m_nGV;
+        public float m_fGV;
         public int m_nChipIndexX; // Chip Index
         public int m_nCHipIndexY;
         //public string sImagePath;
@@ -39,13 +39,13 @@ namespace RootTools.Database
         public Defect()
         {
         }
-        public Defect(string strInspectionID, int nDefectCode, float fDefectSz, int nDefectGV, float fDefectW, float fDefectH, float fRelX, float fRelY, float fAbsX, float fAbsY, int nChipIdxX, int nChipIdxY)
+        public Defect(string strInspectionID, int nDefectCode, float fDefectSz, float fDefectGV, float fDefectW, float fDefectH, float fRelX, float fRelY, float fAbsX, float fAbsY, int chipIdxX, int chipIdxY)
         {
             m_strInspectionID = strInspectionID;
             m_nDefectCode = nDefectCode;
 
             m_fSize = fDefectSz; // Pxl Size
-            m_nGV = nDefectGV;
+            m_fGV = fDefectGV;
             m_fRelX = fRelX; // 절대좌표 - CeterPoint
             m_fRelY = fRelY;
             m_fAbsX = fAbsX;
@@ -54,18 +54,18 @@ namespace RootTools.Database
             m_fWidth = fDefectW;
             m_fHeight = fDefectH;
 
-            m_rtDefectBox = new Rect(fAbsX - (fDefectW/2), fAbsY - (fDefectH/2), fDefectW, fDefectH);
+            m_rtDefectBox = new Rect(fAbsX - (fDefectW / 2), fAbsY - (fDefectH / 2), fDefectW, fDefectH);
 
-            m_nChipIndexX = nChipIdxX;
-            m_nCHipIndexY = nChipIdxY;
+            m_nChipIndexX = chipIdxX;
+            m_nCHipIndexY = chipIdxY;
         }
-        public Defect(string strInspectionID, int nDefectCode, float fDefectSz, int nDefectGV, float fDefectAbsLeft, float fDefectAbsTop, float fDefectW, float fDefectH, int nChipIdxX, int nChipIdxY)
+        public Defect(string strInspectionID, int nDefectCode, float fDefectSz, float fDefectGV, float fDefectAbsLeft, float fDefectAbsTop, float fDefectW, float fDefectH, int nChipIdxX, int nChipIdxY)
         {
             m_strInspectionID = strInspectionID;
             m_nDefectCode = nDefectCode;
 
             m_fSize = fDefectSz; // Pxl Size
-            m_nGV = nDefectGV;
+            m_fGV = fDefectGV;
 
             m_fAbsX = fDefectAbsLeft + fDefectW / 2;
             m_fAbsY = fDefectAbsTop + fDefectH / 2;
@@ -84,13 +84,13 @@ namespace RootTools.Database
             m_nDefectIndex = nIndex;
         }
 
-        public void SetDefectInfo(string strInsepctionID, int nDefectCode, float fDefectSz, int nDefectGV, float fDefectW, float fDefectH, float fDefectRelLeft, float fDefectRelTop, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
+        public void SetDefectInfo(string strInsepctionID, int nDefectCode, float fDefectSz, float fDefectGV, float fDefectW, float fDefectH, float fDefectRelLeft, float fDefectRelTop, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
         {
             m_strInspectionID = strInsepctionID;
             m_nDefectCode = nDefectCode;
 
             m_fSize = fDefectSz; // Pxl Size
-            m_nGV = nDefectGV;
+            m_fGV = fDefectGV;
 
             m_fWidth = fDefectW;
             m_fHeight = fDefectH;

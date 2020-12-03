@@ -74,8 +74,11 @@ namespace RootTools_CLR
 			for (int i = 0; i < vtLabeled.size(); i++)
 			{
 				local[i] = gcnew Cpp_LabelParam();
-				local[i]->centerX = vtLabeled[i].center.x;
-				local[i]->centerY = vtLabeled[i].center.y;
+				local[i]->centerX = vtLabeled[i].centerX;
+				local[i]->centerY = vtLabeled[i].centerY;
+
+				local[i]->width = vtLabeled[i].width;
+				local[i]->height = vtLabeled[i].height;
 
 				local[i]->boundTop = vtLabeled[i].bound.top;
 				local[i]->boundBottom = vtLabeled[i].bound.bottom;
@@ -95,7 +98,7 @@ namespace RootTools_CLR
 
 		std::vector<LabeledData> vtLabeled;
 
-		IP::Labeling(pSrc, pBin, vtLabeled, nMemW, nMemH, false);
+		IP::Labeling(pSrc, pBin, vtLabeled, nMemW, nMemH, true);
 
 		array<Cpp_LabelParam^>^ local = gcnew array<Cpp_LabelParam^>(vtLabeled.size());
 
@@ -109,8 +112,11 @@ namespace RootTools_CLR
 			for (int i = 0; i < vtLabeled.size(); i++)
 			{
 				local[i] = gcnew Cpp_LabelParam();
-				local[i]->centerX = vtLabeled[i].center.x;
-				local[i]->centerY = vtLabeled[i].center.y;
+				local[i]->centerX = vtLabeled[i].centerX;
+				local[i]->centerY = vtLabeled[i].centerY;
+
+				local[i]->width = vtLabeled[i].width;
+				local[i]->height = vtLabeled[i].height;
 
 				local[i]->boundTop = vtLabeled[i].bound.top;
 				local[i]->boundBottom = vtLabeled[i].bound.bottom;
@@ -123,14 +129,14 @@ namespace RootTools_CLR
 		}
 		return local;
 	}
-	array<Cpp_LabelParam^>^ CLR_IP::Cpp_Labeling(byte* pSrcImg, array<byte>^ pBinImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, bool bDark)
+	array<Cpp_LabelParam^>^ CLR_IP::Cpp_Labeling_SubPix(array<byte>^ pSrcImg, array<byte>^ pBinImg, int  nMemW, int  nMemH, bool bDark, int thresh, float Scale)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0]; // pin : 주소값 고정
 		pin_ptr<byte> pBin = &pBinImg[0];
 
 		std::vector<LabeledData> vtLabeled;
 
-		IP::Labeling(pSrc, pBin, vtLabeled, nMemW, nMemH, Point(nROIL, nROIT), Point(nROIR, nROIB), bDark);
+		IP::Labeling_SubPix(pSrc, pBin, vtLabeled, nMemW, nMemH, bDark, thresh, Scale);
 
 		array<Cpp_LabelParam^>^ local = gcnew array<Cpp_LabelParam^>(vtLabeled.size());
 
@@ -144,8 +150,11 @@ namespace RootTools_CLR
 			for (int i = 0; i < vtLabeled.size(); i++)
 			{
 				local[i] = gcnew Cpp_LabelParam();
-				local[i]->centerX = vtLabeled[i].center.x;
-				local[i]->centerY = vtLabeled[i].center.y;
+				local[i]->centerX = vtLabeled[i].centerX;
+				local[i]->centerY = vtLabeled[i].centerY;
+
+				local[i]->width = vtLabeled[i].width;
+				local[i]->height = vtLabeled[i].height;
 
 				local[i]->boundTop = vtLabeled[i].bound.top;
 				local[i]->boundBottom = vtLabeled[i].bound.bottom;
@@ -157,30 +166,6 @@ namespace RootTools_CLR
 			}
 		}
 		return local;
-	}
-
-	void CLR_IP::Cpp_SubtractAbs(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
-	{
-		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
-		pin_ptr<byte> pSrc2 = &pSrcImg2[0];
-		pin_ptr<byte> pDst = &pDstImg[0];
-
-		IP::SubtractAbs(pSrc1, pSrc2, pDst, nMemW, nMemH);
-
-		pSrc1 = nullptr;
-		pSrc2 = nullptr;
-		pDst = nullptr;
-	}
-	void CLR_IP::Cpp_FindMinDiffLoc(array<byte>^ pSrcImg, array<byte>^ pInOutTarget, int nTransX, int nTransY, int nTargetW, int nTargetH, int nTrigger)
-	{
-		pin_ptr<byte> pSrc = &pSrcImg[0];
-		pin_ptr<byte> pTarget = &pInOutTarget[0];
-
-		Point Trans = IP::FindMinDiffLoc(pSrc, pTarget, nTargetW, nTargetH, nTrigger);
-		nTransX = Trans.x;
-		nTransY = Trans.y;
-		pSrc = nullptr;
-		pTarget = nullptr;
 	}
 
 	float CLR_IP::Cpp_TemplateMatching(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod)
@@ -216,28 +201,204 @@ namespace RootTools_CLR
 		return score;
 	}
 
+	// ********* D2D ******** //
+	void CLR_IP::Cpp_SubtractAbs(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<byte> pSrc2 = &pSrcImg2[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::SubtractAbs(pSrc1, pSrc2, pDst, nMemW, nMemH);
+
+		pSrc1 = nullptr;
+		pSrc2 = nullptr;
+		pDst = nullptr;
+	}
+	void CLR_IP::Cpp_FindMinDiffLoc(array<byte>^ pSrcImg, array<byte>^ pInOutTarget, int nTransX, int nTransY, int nTargetW, int nTargetH, int nTrigger)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pTarget = &pInOutTarget[0];
+
+		Point Trans = IP::FindMinDiffLoc(pSrc, pTarget, nTargetW, nTargetH, nTrigger);
+		nTransX = Trans.x;
+		nTransY = Trans.y;
+		pSrc = nullptr;
+		pTarget = nullptr;
+	}
+	void CLR_IP::Cpp_SelectMinDiffinArea(array<byte>^ pSrcImg1, array<array<byte>^>^ pSrcImg2, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH, int nAreaSize)
+	{
+		using System::Runtime::InteropServices::GCHandle;
+		using System::Runtime::InteropServices::GCHandleType;
+
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		// pin each contained array<int>^
+		array<GCHandle>^ pins = gcnew array<GCHandle>(pSrcImg2->Length);
+		for (int i = 0, i_max = pins->Length; i != i_max; ++i)
+			pins[i] = GCHandle::Alloc(pSrcImg2[i], GCHandleType::Pinned);
+
+		try
+		{
+			// get int*s for each contained pinned array<int>^
+			array<byte*>^ arrays = gcnew array<byte*>(pins->Length);
+			for (int i = 0, i_max = arrays->Length; i != i_max; ++i)
+				arrays[i] = static_cast<byte*>(pins[i].AddrOfPinnedObject().ToPointer());
+
+			// pin outer array<int*>^
+			pin_ptr<byte*> pin = &arrays[0];
+
+			// pass outer pinned array<int*> to UNumeric::ChangeArray as an int**
+			// (note that no casts are necessary in correct code)
+			IP::SelectMinDiffinArea(pSrc1, pin, pDst, imgNum, nMemW, nMemH, nAreaSize);
+		}
+		finally
+		{
+			// unpin each contained array<int>^
+			for each (GCHandle pin in pins)
+				pin.Free();
+			pDst = nullptr;
+			pSrc1 = nullptr;
+		}
+	}
+
+	// Create Golden Image
+	void CLR_IP::Cpp_CreateGoldenImage_Avg(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH)
+	{
+		using System::Runtime::InteropServices::GCHandle;
+		using System::Runtime::InteropServices::GCHandleType;
+
+		pin_ptr<byte> pDst = &pDstImg[0];
+		// pin each contained array<int>^
+		array<GCHandle>^ pins = gcnew array<GCHandle>(pSrcImg->Length);
+		for (int i = 0, i_max = pins->Length; i != i_max; ++i)
+			pins[i] = GCHandle::Alloc(pSrcImg[i], GCHandleType::Pinned);
+
+		try
+		{
+			// get int*s for each contained pinned array<int>^
+			array<byte*>^ arrays = gcnew array<byte*>(pins->Length);
+			for (int i = 0, i_max = arrays->Length; i != i_max; ++i)
+				arrays[i] = static_cast<byte*>(pins[i].AddrOfPinnedObject().ToPointer());
+
+			// pin outer array<int*>^
+			pin_ptr<byte*> pin = &arrays[0];
+
+			// pass outer pinned array<int*> to UNumeric::ChangeArray as an int**
+			// (note that no casts are necessary in correct code)
+			IP::CreateGoldenImage_Avg(pin, pDst, imgNum, nMemW, nMemH);
+		}
+		finally
+		{
+			// unpin each contained array<int>^
+			for each (GCHandle pin in pins)
+				pin.Free();
+			pDst = nullptr;
+		}
+	}
+	void CLR_IP::Cpp_CreateGoldenImage_NearAvg(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH)
+	{
+		using System::Runtime::InteropServices::GCHandle;
+		using System::Runtime::InteropServices::GCHandleType;
+
+		pin_ptr<byte> pDst = &pDstImg[0];
+		// pin each contained array<int>^
+		array<GCHandle>^ pins = gcnew array<GCHandle>(pSrcImg->Length);
+		for (int i = 0, i_max = pins->Length; i != i_max; ++i)
+			pins[i] = GCHandle::Alloc(pSrcImg[i], GCHandleType::Pinned);
+
+		try
+		{
+			// get int*s for each contained pinned array<int>^
+			array<byte*>^ arrays = gcnew array<byte*>(pins->Length);
+			for (int i = 0, i_max = arrays->Length; i != i_max; ++i)
+				arrays[i] = static_cast<byte*>(pins[i].AddrOfPinnedObject().ToPointer());
+
+			// pin outer array<int*>^
+			pin_ptr<byte*> pin = &arrays[0];
+
+			// pass outer pinned array<int*> to UNumeric::ChangeArray as an int**
+			// (note that no casts are necessary in correct code)
+			IP::CreateGoldenImage_NearAvg(pin, pDst, imgNum, nMemW, nMemH);
+		}
+		finally
+		{
+			// unpin each contained array<int>^
+			for each (GCHandle pin in pins)
+				pin.Free();
+			pDst = nullptr;
+		}
+	}
+
+	// D2D 3.0
+	void CLR_IP::Cpp_CreateHistogramWeightMap(array<byte>^ pSrcImg, array<byte>^ pGoldenImg, array<float>^ pDstImg, int  nMemW, int  nMemH, int nWeightLev)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pGolden = &pGoldenImg[0];
+		pin_ptr<float> pDst = &pDstImg[0];
+
+		IP::CreateHistogramWeightMap(pSrc, pGolden, pDst, nMemW, nMemH, nWeightLev);
+
+		pSrc = nullptr;
+		pGolden = nullptr;
+		pDst = nullptr;
+	}
+	void CLR_IP::Cpp_CreateDiffScaleMap(array<byte>^ pSrcImg, array<float>^ pDstImg, int  nMemW, int  nMemH, int nEdgeSuppressionLev, int nBrightSuppressionLev)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<float> pDst = &pDstImg[0];
+
+		IP::CreateDiffScaleMap(pSrc, pDst, nMemW, nMemH, nEdgeSuppressionLev, nBrightSuppressionLev);
+
+		pSrc = nullptr;
+		pDst = nullptr;
+	}
+
+	// Elementwise Operation
+	void CLR_IP::Cpp_Multiply(array<byte>^ pSrcImg1, array<float>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg1[0];
+		pin_ptr<float> pGolden = &pSrcImg2[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Multiply(pSrc, pGolden, pDst, nMemW, nMemH);
+
+		pSrc = nullptr;
+		pGolden = nullptr;
+		pDst = nullptr;
+	}
+
+	// Filtering
 	void CLR_IP::Cpp_GaussianBlur(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH, int nSig)
 	{
-		pin_ptr<byte> pSrc = &pSrcImg[0]; 
+		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pDst = &pDstImg[0];
 
 		IP::GaussianBlur(pSrc, pDst, nMemW, nMemH, nSig);
 
-		pSrc = nullptr;  
+		pSrc = nullptr;
 		pDst = nullptr;
 	}
+	void CLR_IP::Cpp_AverageBlur(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
 
+		IP::AverageBlur(pSrc, pDst, nMemW, nMemH);
+
+		pSrc = nullptr;
+		pDst = nullptr;
+	}
 	void CLR_IP::Cpp_MedianBlur(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH, int nFiltSz)
 	{
-		pin_ptr<byte> pSrc = &pSrcImg[0]; 
+		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pDst = &pDstImg[0];
 
 		IP::MedianBlur(pSrc, pDst, nMemW, nMemH, nFiltSz);
 
-		pSrc = nullptr; 
+		pSrc = nullptr;
 		pDst = nullptr;
 	}
-
 	void CLR_IP::Cpp_Morphology(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH, int nFiltSz, System::String^ strMethod, int nIter)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
@@ -250,6 +411,130 @@ namespace RootTools_CLR
 		pSrc = nullptr;
 		pDst = nullptr;
 	}
+	
+	// BackSide
+	array<int>^ CLR_IP::Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode)
+	{
+		std::vector<Point> vtPoint;
+
+		for (int i = 0; i < Contour->Length; i++)
+			vtPoint.push_back(Point(Contour[i]->x / downScale, Contour[i]->y / downScale));
+
+		std::vector<byte> vtMap;
+		vtMap = IP::GenerateMapData(vtPoint, outOriginX, outOriginY, outMapX, outMapY, nW, nH, downScale, isIncludeMode);
+
+		array<int>^ map = gcnew array<int>(vtMap.size());
+		bool bResultExist = vtMap.size() > 0;
+
+		if (bResultExist)
+		{
+			for (int i = 0; i < vtMap.size(); i++)
+			{
+				map[i] = vtMap[i];
+			}
+		}
+		return map;
+	}
+	array<int>^ CLR_IP::Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, float& outChipSzX, float& outChipSzY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode)
+	{
+		std::vector<Point> vtPoint;
+
+		for (int i = 0; i < Contour->Length; i++)
+			vtPoint.push_back(Point(Contour[i]->x / downScale, Contour[i]->y / downScale));
+
+		std::vector<byte> vtMap;
+		vtMap = IP::GenerateMapData(vtPoint, outOriginX, outOriginY, outChipSzX, outChipSzY, outMapX, outMapY, nW, nH, downScale, isIncludeMode);
+
+		array<int>^ map = gcnew array<int>(outMapX * outMapY);
+		bool bResultExist = vtMap.size() > 0;
+
+		if (bResultExist)
+		{
+			for (int i = 0; i < vtMap.size(); i++)
+			{
+				map[i] = vtMap[i];
+			}
+		}
+		return map;
+	}
+	array<Cpp_Point^>^ CLR_IP::Cpp_FindWaferEdge(byte* pSrcImg, float& inoutCenterX, float& inoutCenterY, float& inoutRadius, int nMemW, int nMemH, int downScale)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+
+		std::vector<Point> vtWaferEdge;
+		vtWaferEdge = IP::FindWaferEdge(pSrc, inoutCenterX, inoutCenterY, inoutRadius, nMemW, nMemH, downScale);
+
+		pSrc = nullptr;
+
+		bool bResultExist = vtWaferEdge.size() > 0;
+		array<Cpp_Point^>^ local = gcnew array<Cpp_Point^>(vtWaferEdge.size());
+
+		if (bResultExist)
+		{
+			for (int i = 0; i < vtWaferEdge.size(); i++)
+			{
+				local[i] = gcnew Cpp_Point();
+
+				local[i]->x = vtWaferEdge[i].x;
+				local[i]->y = vtWaferEdge[i].y;
+			}
+		}
+		return local;
+	}
+
+	// Image(Feature/Defect Image) Load/Save
+	void CLR_IP::Cpp_SaveBMP(System::String^ strFilePath, array<byte>^ pSrcImg, int  nMemW, int  nMemH, int nByteCnt)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
+		IP::SaveBMP(sFilePath, pSrc, nMemW, nMemH, nByteCnt);
+		pSrc = nullptr;
+	}
+	void CLR_IP::Cpp_SaveDefectListBMP(System::String^ strFilePath, byte* pSrcImg, int  nMemW, int  nMemH, array<Cpp_Rect^>^ DefectRect)
+	{
+		if (DefectRect->Length == 0)
+			return;
+
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
+
+		std::vector<Rect> defectRect;
+		for (int i = 0; i < DefectRect->Length; i++)
+			defectRect.push_back(Rect(DefectRect[i]->x, DefectRect[i]->y, DefectRect[i]->w, DefectRect[i]->h));
+
+		IP::SaveDefectListBMP(sFilePath, pSrc, nMemW, nMemH, defectRect);
+
+		pSrc = nullptr;
+	}
+	void CLR_IP::Cpp_SaveDefectListBMP_Color(System::String^ strFilePath, BYTE* pRImg, BYTE* pGImg, BYTE* pBImg, int  nMemW, int  nMemH, array<Cpp_Rect^>^ DefectRect)
+	{
+		if (DefectRect->Length == 0)
+			return;
+
+		pin_ptr<byte> pR = &pRImg[0];
+		pin_ptr<byte> pG = &pGImg[0];
+		pin_ptr<byte> pB = &pBImg[0];
+		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
+
+		std::vector<Rect> defectRect;
+		for (int i = 0; i < DefectRect->Length; i++)
+			defectRect.push_back(Rect(DefectRect[i]->x, DefectRect[i]->y, DefectRect[i]->w, DefectRect[i]->h));
+
+		IP::SaveDefectListBMP_Color(sFilePath, pR, pG, pB, nMemW, nMemH, defectRect);
+
+		pR = nullptr;
+		pG = nullptr;
+		pB = nullptr;
+	}
+	void CLR_IP::Cpp_LoadBMP(System::String^ strFilePath, array<byte>^ pOutImg, int  nMemW, int  nMemH, int nByteCnt)
+	{
+		pin_ptr<byte> pOut = &pOutImg[0];
+		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
+		IP::LoadBMP(sFilePath, pOut, nMemW, nMemH, nByteCnt);
+		pOut = nullptr;
+	}
+
+	// ETC.
 	void CLR_IP::Cpp_SplitColorChannel(BYTE* pSrcImg, BYTE* pOutImg, int nMemW, int nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nChIndex, int nDownSample)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
@@ -290,109 +575,6 @@ namespace RootTools_CLR
 		pSrc = nullptr;
 		pDownImg = nullptr;
 	}
-	array<Cpp_Point^>^ CLR_IP::Cpp_FindWaferEdge(byte* pSrcImg, float& inoutCenterX, float& inoutCenterY, float& inoutRadius, int nMemW, int nMemH, int downScale)
-	{
-		pin_ptr<byte> pSrc = &pSrcImg[0];
-
-		std::vector<Point> vtWaferEdge;
-		vtWaferEdge = IP::FindWaferEdge(pSrc, inoutCenterX, inoutCenterY, inoutRadius, nMemW, nMemH, downScale);
-
-		pSrc = nullptr;	
-
-		bool bResultExist = vtWaferEdge.size() > 0;
-		array<Cpp_Point^>^ local = gcnew array<Cpp_Point^>(vtWaferEdge.size());
-
-		if (bResultExist)
-		{
-			for (int i = 0; i < vtWaferEdge.size(); i++)
-			{
-				local[i] = gcnew Cpp_Point();
-
-				local[i]->x = vtWaferEdge[i].x;
-				local[i]->y = vtWaferEdge[i].y;
-			}
-		}
-		return local;
-	}
-
-	array<int>^ CLR_IP::Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode)
-	{
-		std::vector<Point> vtPoint;
-		
-		for (int i = 0; i < Contour->Length; i++)
-			vtPoint.push_back(Point(Contour[i]->x / downScale, Contour[i]->y / downScale));
-
-		std::vector<int> vtMap;
-		vtMap = IP::GenerateMapData(vtPoint, outOriginX, outOriginY, outMapX, outMapY, nW, nH, downScale, isIncludeMode);
-
-		array<int>^ map = gcnew array<int>(vtMap.size());
-		bool bResultExist = vtMap.size() > 0;
-
-		if (bResultExist)
-		{
-			for (int i = 0; i < vtMap.size(); i++)
-			{
-				map[i] = vtMap[i];
-			}
-		}
-		return map;
-	}
-	array<int>^ CLR_IP::Cpp_GenerateMapData(array<Cpp_Point^>^ Contour, float& outOriginX, float& outOriginY, float& outChipSzX, float& outChipSzY, int& outMapX, int& outMapY, int nW, int nH, int downScale, bool isIncludeMode)
-	{
-		std::vector<Point> vtPoint;
-
-		for (int i = 0; i < Contour->Length; i++)
-			vtPoint.push_back(Point(Contour[i]->x / downScale, Contour[i]->y / downScale));
-
-		std::vector<int> vtMap;
-		vtMap = IP::GenerateMapData(vtPoint, outOriginX, outOriginY, outChipSzX, outChipSzY, outMapX, outMapY, nW, nH, downScale, isIncludeMode);
-
-		array<int>^ map = gcnew array<int>(outMapX * outMapY);
-		bool bResultExist = vtMap.size() > 0;
-
-		if (bResultExist)
-		{
-			for (int i = 0; i < vtMap.size(); i++)
-			{
-				map[i] = vtMap[i];
-			}
-		}
-		return map;
-	}
-
-	void CLR_IP::Cpp_SaveBMP(System::String^ strFilePath, array<byte>^ pSrcImg, int  nMemW, int  nMemH, int nByteCnt)
-	{
-		pin_ptr<byte> pSrc = &pSrcImg[0];
-		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
-		IP::SaveBMP(sFilePath, pSrc, nMemW, nMemH, nByteCnt);
-		pSrc = nullptr;
-	}
-
-	void CLR_IP::Cpp_SaveDefectListBMP(System::String^ strFilePath, byte* pSrcImg, int  nMemW, int  nMemH, array<Cpp_Rect^>^ DefectRect, int nByteCnt)
-	{
-		if (DefectRect->Length == 0)
-			return;
-
-		pin_ptr<byte> pSrc = &pSrcImg[0];
-		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
-
-		std::vector<Rect> defectRect;
-		for(int i = 0 ; i < DefectRect->Length; i++)
-			defectRect.push_back(Rect(DefectRect[i]->x, DefectRect[i]->y, DefectRect[i]->w, DefectRect[i]->h));
-
-		IP::SaveDefectListBMP(sFilePath, pSrc, nMemW, nMemH, defectRect, nByteCnt);
-
-		pSrc = nullptr;
-	}
-
-	void CLR_IP::Cpp_LoadBMP(System::String^ strFilePath, array<byte>^ pOutImg, int  nMemW, int  nMemH)
-	{
-		pin_ptr<byte> pOut = &pOutImg[0];
-		std::string sFilePath = msclr::interop::marshal_as<std::string>(strFilePath);
-		IP::LoadBMP(sFilePath, pOut, nMemW, nMemH);
-		pOut = nullptr;
-	}
-
 	void CLR_IP::Cpp_ConvertRGB2H(array<byte>^ pRImg, array<byte>^ pGImg, array<byte>^ pBImg, array<byte>^ pDstImg, int  nMemW, int  nMemH)
 	{
 		pin_ptr<byte> pR = &pRImg[0];
@@ -450,7 +632,7 @@ namespace RootTools_CLR
 		pDst = nullptr;
 	}
 
-	void CLR_IP::Cpp_Histogram(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH, int channels, int dims, int histSize, array<float>^ histRanges)	
+	void CLR_IP::Cpp_Histogram(array<byte>^ pSrcImg, array<byte>^ pDstImg, int nW, int nH, int channels, int dims, int histSize, array<float>^ histRanges)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pDst = &pDstImg[0];

@@ -18,6 +18,7 @@ namespace Root_WIND2
 
     public class InspectionManager_Vision : WorkFactory
     {
+
         public event EventMapStateChanged MapStateChanged;
 
         SolidColorBrush brushSnap = System.Windows.Media.Brushes.LightSkyBlue;
@@ -27,6 +28,11 @@ namespace Root_WIND2
         SolidColorBrush brushMeasurement = System.Windows.Media.Brushes.CornflowerBlue;
         SolidColorBrush brushComplete = System.Windows.Media.Brushes.YellowGreen;
 
+
+        #region [Member Variables]
+        WorkplaceBundle currentWorkplaceBundle;
+
+        #endregion
 
         public InspectionManager_Vision(IntPtr _sharedBuffer, int _width, int _height)
         {
@@ -38,10 +44,13 @@ namespace Root_WIND2
 
         protected override void InitWorkManager()
         {
-            this.Add(new WorkManager("Position", WORK_TYPE.PREPARISON, WORKPLACE_STATE.READY, WORKPLACE_STATE.NONE, STATE_CHECK_TYPE.CHIP));
+            this.Add(new WorkManager("Position", WORK_TYPE.PREPARISON, WORKPLACE_STATE.READY, WORKPLACE_STATE.SNAP, STATE_CHECK_TYPE.CHIP));
             this.Add(new WorkManager("Inspection", WORK_TYPE.MAINWORK, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, STATE_CHECK_TYPE.CHIP, 8));
             this.Add(new WorkManager("ProcessDefect", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION, STATE_CHECK_TYPE.CHIP));
             this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS_WAFER, WORKPLACE_STATE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
+
+
+            WIND2EventManager.SnapDone += SnapDone_Callback;
         }
 
         private Recipe recipe;
@@ -118,15 +127,15 @@ namespace Root_WIND2
 
             position.SetRecipe(recipe);
 
-            WorkplaceBundle workplaces = WorkplaceBundle.CreateWaferMap(waferMap, this.recipe.GetRecipe<OriginRecipe>());
+            currentWorkplaceBundle = WorkplaceBundle.CreateWaferMap(waferMap, this.recipe.GetRecipe<OriginRecipe>());
 
             Surface surface = new Surface();
             surface.SetRecipe(recipe);
-            surface.SetWorkplaceBundle(workplaces);
+            surface.SetWorkplaceBundle(currentWorkplaceBundle);
 
             D2D d2d = new D2D();
             d2d.SetRecipe(recipe);
-            d2d.SetWorkplaceBundle(workplaces);
+            d2d.SetWorkplaceBundle(currentWorkplaceBundle);
 
             works.Add(position);
             //works.Add(surface);
@@ -134,16 +143,34 @@ namespace Root_WIND2
 
             ProcessDefect processDefect = new ProcessDefect();
             works.Add(processDefect);
-            workplaces.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
+            currentWorkplaceBundle.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
 
             ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
             processDefect_Wafer.SetRecipe(recipe);
-            processDefect_Wafer.SetWorkplaceBundle(workplaces);
+            processDefect_Wafer.SetWorkplaceBundle(currentWorkplaceBundle);
             works.Add(processDefect_Wafer);
 
-            workplaces.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
+            currentWorkplaceBundle.SetSharedBuffer(this.SharedBuffer, this.SharedBufferWidth, this.SharedBufferHeight, this.SharedBufferByteCnt);
 
-            this.SetBundles(works, workplaces);
+            this.SetBundles(works, currentWorkplaceBundle);
+        }
+
+        public void SnapDone_Callback(object obj, SnapDoneArgs args)
+        {
+            if (this.currentWorkplaceBundle == null) return;
+
+            Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
+            
+            foreach(Workplace wp in this.currentWorkplaceBundle)
+            {
+                Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.BufferSizeY), new Point(wp.PositionX + wp.BufferSizeX, wp.PositionY));
+                
+                if(snapArea.Contains(checkArea) == true)
+                {
+                    wp.STATE = WORKPLACE_STATE.SNAP;
+                }
+            }
+
         }
 
         object lockObj = new object();

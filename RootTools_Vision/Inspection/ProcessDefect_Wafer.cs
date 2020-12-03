@@ -195,17 +195,18 @@ namespace RootTools_Vision
 
                         // Merge Defect Info
                         int nDefectCode = DefectList[j].m_nDefectCode;
-                        float fDefectSz = DefectList[i].m_fSize + DefectList[j].m_fSize;
-                        int fDefectGV = (int)(DefectList[i].m_nGV * (DefectList[i].m_fSize / fDefectSz) + DefectList[j].m_nGV * (DefectList[j].m_fSize / fDefectSz));
+                        float fDefectSz = (DefectList[i].m_fWidth + DefectList[j].m_fWidth > DefectList[i].m_fHeight + DefectList[j].m_fHeight)
+                            ? DefectList[i].m_fWidth + DefectList[j].m_fWidth : DefectList[i].m_fHeight + DefectList[j].m_fHeight;
+                        int fDefectGV = (int)(DefectList[i].m_fGV * (DefectList[i].m_fSize / fDefectSz) + DefectList[j].m_fGV * (DefectList[j].m_fSize / fDefectSz));
                         float fDefectLeft = (defectRect2.Left < defectRect1.Left + mergeDist) ? (float)defectRect2.Left : (float)defectRect1.Left + mergeDist;
                         float fDefectTop = (defectRect2.Top < defectRect1.Top + mergeDist) ? (float)defectRect2.Top : (float)defectRect1.Top + mergeDist;
-                        
+
                         float fDefectRelX = 0;
-                        float fDefectRelY = 0;               
+                        float fDefectRelY = 0;
 
                         float fDefectRight = (defectRect2.Right > defectRect1.Right - mergeDist) ? (float)defectRect2.Right : (float)defectRect1.Right - mergeDist;
                         float fDefectBottom = (defectRect2.Bottom > defectRect1.Bottom - mergeDist) ? (float)defectRect2.Bottom : (float)defectRect1.Bottom - mergeDist;
-                                   
+
                         DefectList[i].SetDefectInfo(sInspectionID, nDefectCode, fDefectSz, fDefectGV, fDefectRight - fDefectLeft, fDefectBottom - fDefectTop
                             , fDefectRelX, fDefectRelY, fDefectLeft, fDefectTop, DefectList[j].m_nChipIndexX, DefectList[j].m_nCHipIndexY);
 
@@ -245,13 +246,12 @@ namespace RootTools_Vision
                 }
 
                 CLR_IP.Cpp_SaveDefectListBMP(
-                    Path,
-                    (byte*)workplace.SharedBuffer.ToPointer(),
-                    workplace.SharedBufferWidth,
-                    workplace.SharedBufferHeight,
-                    defectArray,
-                    nByteCnt
-                    );
+                   Path,
+                   (byte*)workplace.SharedBuffer.ToPointer(),
+                   workplace.SharedBufferWidth,
+                   workplace.SharedBufferHeight,
+                   defectArray
+                   );
             }
         }
 
