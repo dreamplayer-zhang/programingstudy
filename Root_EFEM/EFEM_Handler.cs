@@ -41,8 +41,6 @@ namespace Root_EFEM
             InitVision();
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
-            //            m_FDC = new FDC("FDC", m_engineer);
-            //            InitModule(m_FDC);
             ((IWTR)m_wtr).ReadInfoReticle_Registry(); 
             m_recipe = new EFEM_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
@@ -342,6 +340,17 @@ namespace Root_EFEM
                 }
             }
         }
+        #endregion
+
+        #region Tree
+        public void RunTreeModule(Tree tree)
+        {
+            RunTreeWTR(tree.GetTree("WTR"));
+            RunTreeLoadport(tree.GetTree("Loadport"));
+            RunTreeAligner(tree.GetTree("Aligner"));
+            RunTreeVision(tree.GetTree("Vision"));
+        }
+
         #endregion
 
         string m_id;

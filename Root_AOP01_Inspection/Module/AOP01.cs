@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace Root_AOP01_Inspection.Module
 {
-    public class AOP : ModuleBase
+    public class AOP01 : ModuleBase
     {
         #region ToolBox
         public enum eLamp
@@ -249,7 +249,7 @@ namespace Root_AOP01_Inspection.Module
         public RFID m_RFID = new RFID();
         #endregion
 
-        public AOP(string id, IEngineer engineer)
+        public AOP01(string id, IEngineer engineer)
         {
             p_id = id;
             base.InitBase(id, engineer);
@@ -269,8 +269,8 @@ namespace Root_AOP01_Inspection.Module
 
         public class Run_ReadRFID : ModuleRunBase
         {
-            AOP m_module;
-            public Run_ReadRFID(AOP module)
+            AOP01 m_module;
+            public Run_ReadRFID(AOP01 module)
             {
                 m_module = module;
                 InitModuleRun(module);

@@ -30,19 +30,25 @@ namespace Root_AOP01_Inspection
 
         #region Module
         public ModuleList m_moduleList;
+        public AOP01 m_aop01; 
         public AOP01_Recipe m_recipe;
         public AOP01_Process m_process;
 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
+            m_aop01 = new AOP01("AOP01", m_engineer);
+            InitModule(m_aop01); 
             InitWTR();
             InitLoadport();
 
-            //((IWTR)m_wtr).ReadInfoReticle_Registry();
+            m_wtr.RunTree(Tree.eMode.RegRead);
+            m_wtr.RunTree(Tree.eMode.Init);
+            ((IWTR)m_wtr).ReadInfoReticle_Registry();
+
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
-            m_recipe.AddModule();
-            m_process = new AOP01_Process("Process", m_engineer, this);
+            foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
+            //m_process = new AOP01_Process("Process", m_engineer, this);
         }
 
         void InitModule(ModuleBase module)
@@ -246,6 +252,14 @@ namespace Root_AOP01_Inspection
                         break;
                 }
             }
+        }
+        #endregion
+
+        #region Tree
+        public void RunTreeModule(Tree tree)
+        {
+            RunTreeWTR(tree.GetTree("WTR"));
+            RunTreeLoadport(tree.GetTree("Loadport"));
         }
         #endregion
 
