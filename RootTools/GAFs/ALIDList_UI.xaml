@@ -24,6 +24,7 @@
                 <DataGridTextColumn Header="Name" Binding="{Binding p_id}"/>
                 <DataGridTextColumn Header="ALID" Binding="{Binding p_nID}"/>
                 <DataGridTextColumn Header="Set" Binding="{Binding p_bSet}"/>
+                <DataGridTextColumn Header="Error" Binding="{Binding p_bEQError}"/>
                 <DataGridTextColumn Header="Message" Binding="{Binding p_sMsg}"/>
                 <DataGridTextColumn Header="Desc" Binding="{Binding p_sDesc}"/>
                 <DataGridTextColumn Header="Image" Binding="{Binding p_sImageFile}"/>
