@@ -411,6 +411,8 @@ namespace Root_WIND2
                     crect.MouseLeftButtonDown += crect_MouseLeftButtonDown;
                 }
             }
+
+            SetMapData();
         }
 
         public void DrawMaps_Shot()

@@ -1,4 +1,6 @@
-﻿using RootTools;
+﻿using Root_EFEM;
+using Root_EFEM.Module;
+using RootTools;
 using RootTools.Control;
 using RootTools.Memory;
 using RootTools.Module;
@@ -6,9 +8,9 @@ using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Root_EFEM.Module
+namespace Root_AOP01_Inspection.Module
 {
-    public class Vision_AOP : ModuleBase, IWTRChild
+    public class Vision : ModuleBase, IWTRChild
     {
         #region ToolBox
         MemoryPool m_memoryPool;
@@ -50,7 +52,7 @@ namespace Root_EFEM.Module
             }
         }
 
-        
+
         #endregion
 
         #region Memory
@@ -201,7 +203,7 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-        public Vision_AOP(string id, IEngineer engineer)
+        public Vision(string id, IEngineer engineer)
         {
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
@@ -223,12 +225,12 @@ namespace Root_EFEM.Module
 
         public class Run_Ready : ModuleRunBase
         {
-            Vision_AOP m_module;
+            Vision m_module;
             public RPoint m_rpReadyPos_pulse = new RPoint();    // Vision Stage XY Ready
             public double m_dReadyTheta_pulse = 0;              // Vision Theta
 
             public bool m_bUseInspect = false;                  // 검사 유무
-            public Run_Ready(Vision_AOP module)
+            public Run_Ready(Vision module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -266,8 +268,8 @@ namespace Root_EFEM.Module
         }
         public class Run_Delay : ModuleRunBase
         {
-            Vision_AOP m_module;
-            public Run_Delay(Vision_AOP module)
+            Vision m_module;
+            public Run_Delay(Vision module)
             {
                 m_module = module;
                 InitModuleRun(module);

@@ -21,6 +21,9 @@ namespace RootTools_Vision
         Workplace workplace;
 
         byte[] GoldenImage = null;
+        float[] scaleMap = null;
+        float[] histWeightMap = null;
+        List<byte[]> GoldenImages = new List<byte[]>();
 
         public override WORK_TYPE Type => WORK_TYPE.MAINWORK;
 
@@ -82,25 +85,95 @@ namespace RootTools_Vision
             base.DoWork();
         }
 
-        public void SetGoldenImage(byte[] currentImage, int ChipW, int ChipH)
+        public void SetGoldenImage()
         {
-            if (GoldenImage == null)
+            List<byte[]> wpDatas = new List<byte[]>();
+            // Index 계산
+            List<int> mapYIdx = new List<int>();
+            foreach (Workplace wp in this.workplaceBundle)
+                if (wp.MapPositionX == this.workplace.MapPositionX)
+                    mapYIdx.Add(wp.MapPositionY);
+
+            mapYIdx.Sort();
+
+            int startY;
+            int endY;
+
+            if (mapYIdx.Count() < 5)
             {
-                GoldenImage = new byte[ChipW * ChipH];
-                currentImage.CopyTo(GoldenImage, 0);
+                startY = mapYIdx[0];
+                endY = mapYIdx[mapYIdx.Count() - 1];
             }
-            else // Update Golden Image
-            { 
+            else
+            {
+                int currentY = mapYIdx.IndexOf(this.workplace.MapPositionY);
 
+                if (mapYIdx[currentY] - 2 < mapYIdx[0])
+                {
+                    startY = mapYIdx[0];
+                    endY = mapYIdx[currentY] + 2 + (2 - (mapYIdx[currentY] - startY));
+                }
+                else if (mapYIdx[currentY] + 2 > mapYIdx[mapYIdx.Count() - 1])
+                {
+                    endY = mapYIdx[mapYIdx.Count() - 1];
+                    startY = mapYIdx[currentY] - 2 - (2 - (endY - mapYIdx[currentY]));
+                }
+                else
+                {
+                    startY = mapYIdx[currentY] - 2;
+                    endY = mapYIdx[currentY] + 2;
+                }
             }
-            
-            // Golden 
+
+            foreach (Workplace wp in this.workplaceBundle)
+                if (wp.MapPositionX == this.workplace.MapPositionX)
+                    if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
+                        if ((wp.MapPositionY >= startY) && (wp.MapPositionY <= endY) && wp.MapPositionY != this.workplace.MapPositionY)
+                            wpDatas.Add(wp.WorkplaceBuffer);
+
+            CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+            //CLR_IP.Cpp_CreateGoldenImage_NearAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
         }
+        public void SetMultipleGoldenImages()
+        {
+            // Index 계산
+            List<int> mapYIdx = new List<int>();
+            foreach (Workplace wp in this.workplaceBundle)
+                if (wp.MapPositionX == this.workplace.MapPositionX)
+                    mapYIdx.Add(wp.MapPositionY);
 
+            mapYIdx.Sort();
+
+            int startY;
+            int middleY;
+            int endY;
+
+            if (mapYIdx.Count() < 3)
+            {
+                startY = mapYIdx[0];
+                middleY = mapYIdx[1];
+                endY = mapYIdx[2];
+            }
+            else
+            {
+                int currentY = mapYIdx.IndexOf(this.workplace.MapPositionY);
+
+                startY = mapYIdx[(currentY == 0) ? 1 : 0];
+                middleY = mapYIdx[(currentY == mapYIdx.Count() / 2) ? mapYIdx.Count() / 2 + 1 : mapYIdx.Count() / 2];
+                endY = mapYIdx[(currentY == mapYIdx.Count() - 1) ? mapYIdx.Count() - 2 : mapYIdx.Count() - 1];
+            }
+
+            foreach (Workplace wp in this.workplaceBundle)
+                if (wp.MapPositionX == this.workplace.MapPositionX)
+                    if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
+                        if ((wp.MapPositionY == startY) || (wp.MapPositionY == middleY) || (wp.MapPositionY == endY))
+                            GoldenImages.Add(wp.WorkplaceBuffer);
+        }
         public override void SetWorkplace(Workplace _workplace)
         {
             this.workplace = _workplace;
         }
+        
         public void DoInspection()
         {
             if (this.workplace.Index == 0)
@@ -111,86 +184,141 @@ namespace RootTools_Vision
                 return;
             }
 
-            WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+            int memH = this.workplace.SharedBufferHeight;
+            int memW = this.workplace.SharedBufferWidth;
 
-            return;
+            // Recipe
+            int chipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
+            int chipW = this.workplace.BufferSizeX;
 
-            int nChipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
-            int nChipW = this.workplace.BufferSizeX;
+            int grayLevel = 60; // Option
+            int defectSz = 1; // Option
 
-            int nMemH = this.workplace.SharedBufferHeight;
-            int nMemW = this.workplace.SharedBufferWidth;
+            byte[] binImg = new byte[chipW * chipH];
+            byte[] diffImg = new byte[chipW * chipH];
 
-            int nGrayLevel = 160; // Option
-            int nDefectSz = 5; // Option
-            
-
-            int Left = this.workplace.PositionX;
-            int Top = this.workplace.PositionY - nChipH;
-            int Right = this.workplace.PositionX + nChipW;
-            int Bottom = this.workplace.PositionY;
-
-            byte[] arrBinImg = new byte[nChipW * nChipH];           
-            byte[] arrCopyImg = new byte[nChipW * nChipH];
-
-            int nD2DTrigger = 0;
-            int TransX = 0, TransY = 0;
-            /// Split Color Image Test
-            unsafe
+            if (true) // Chip마다 Golden Image 생성 옵션
             {
-                for (int cnt = Top; cnt < Bottom; cnt++)
-                    Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)nMemW + Left))
-                        , arrCopyImg, nChipW * (cnt - Top), nChipW);
+                SetGoldenImage();
+                // Diff Image 계산
+                CLR_IP.Cpp_SubtractAbs(GoldenImage, workplace.WorkplaceBuffer, diffImg, chipW, chipH);
 
-                if (nD2DTrigger > 0)
+                if (true) // ScaleMap Option
                 {
-                    byte[] arrTriggerImg = new byte[(nChipW + (nD2DTrigger * 2)) * (nChipH + (nD2DTrigger * 2))];
+                    if (this.workplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) != null)
+                    {
+                        this.scaleMap = this.workplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) as float[];
+                    }
 
-                    for (int cnt = Top - nD2DTrigger; cnt < Bottom + nD2DTrigger; cnt++)
-                        Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)nMemW + Left - nD2DTrigger))
-                            , arrTriggerImg, (nChipW + (nD2DTrigger * 2)) * (cnt - (Top - nD2DTrigger)), nChipW + (nD2DTrigger * 2));
+                    else
+                    {
+                        if (scaleMap == null)
+                            scaleMap = new float[chipW * chipH];
 
+                        CLR_IP.Cpp_CreateDiffScaleMap(GoldenImage, scaleMap, chipW, chipH, 10, 10);
 
-                    CLR_IP.Cpp_FindMinDiffLoc(arrTriggerImg, arrCopyImg, TransX, TransY, nChipW, nChipH, nD2DTrigger);
+                        foreach (Workplace wp in this.workplaceBundle)
+                        {
+                            //if (wp.MapPositionX == this.workplace.MapPositionX)
+                            //{
+                            wp.SetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP, (object)(scaleMap));
+                            //}
+                        }
+                    }
+
+                    CLR_IP.Cpp_Multiply(diffImg, scaleMap, diffImg, chipW, chipH);
+                }
+
+                if (false) // Histogram WeightMap
+                {
+                    histWeightMap = new float[chipW * chipH];
+                    CLR_IP.Cpp_CreateHistogramWeightMap(workplace.WorkplaceBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);        // -> 뭔가 결과가 이상함... 수정 필요
+                    CLR_IP.Cpp_Multiply(diffImg, histWeightMap, diffImg, chipW, chipH);
                 }
             }
-            SetGoldenImage(arrCopyImg, nChipW, nChipH);
+            else if (false) // Choi D2D Algorithm 
+            {
+                SetMultipleGoldenImages();
+                // Diff Image 계산
+                CLR_IP.Cpp_SelectMinDiffinArea(workplace.WorkplaceBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
 
-            // Diff Image 계산
-            CLR_IP.Cpp_SubtractAbs(GoldenImage, arrCopyImg, arrCopyImg, nChipW, nChipH);
-            // Threshold 값으로 Defect 탐색
-            CLR_IP.Cpp_Threshold(arrCopyImg, arrBinImg, nChipW, nChipH, nGrayLevel);
+            }
+
             // Filter
-            CLR_IP.Cpp_Morphology(arrBinImg, arrBinImg, nChipW, nChipH, 3, "OPEN", 1);
-            var Label = CLR_IP.Cpp_Labeling(arrCopyImg, arrBinImg, nChipW, nChipH);
+            CLR_IP.Cpp_Morphology(binImg, binImg, chipW, chipH, 3, "OPEN", 1);
+            //CLR_IP.Cpp_AverageBlur(diffImg, diffImg, chipW, chipH);
+
+            // Threshold 값으로 Defect 탐색
+            CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, grayLevel);
+            // Labeling
+            var Label = CLR_IP.Cpp_Labeling(workplace.WorkplaceBuffer, binImg, chipW, chipH);
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
             //Add Defect
             for (int i = 0; i < Label.Length; i++)
             {
-                if (Label[i].area > nDefectSz)
+                if (Label[i].area > defectSz)
                 {
                     this.workplace.AddDefect(sInspectionID,
                         10010,
                         Label[i].area,
                         Label[i].value,
                         this.workplace.PositionX + Label[i].boundLeft,
-                        this.workplace.PositionY - (nChipH - Label[i].boundTop),
-                        Math.Abs(Label[i].boundRight - Label[i].boundLeft),
-                        Math.Abs(Label[i].boundBottom - Label[i].boundTop),
+                        this.workplace.PositionY - (chipH - Label[i].boundTop),
+                        Label[i].width,
+                        Label[i].height,
                         this.workplace.MapPositionX,
                         this.workplace.MapPositionY
                         );
                 }
 
             }
+
+            GoldenImages.Clear();
             WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
 
         public void CreateGoldenImage()
         {
-            GoldenImage = new byte[this.workplace.BufferSizeX * this.workplace.BufferSizeY];
+            if(GoldenImage == null)
+                GoldenImage = new byte[this.workplace.BufferSizeX * this.workplace.BufferSizeY];
+
+            if (false) // Line 별로 GoldenImage를 만들 경우
+            {
+                List<byte[]> wpDatas = new List<byte[]>();
+                // Index 계산
+                List<int> mapYIdx = new List<int>();
+                foreach (Workplace wp in this.workplaceBundle)
+                    if (wp.MapPositionX == this.workplace.MapPositionX)
+                        mapYIdx.Add(wp.MapPositionY);
+
+                mapYIdx.Sort();
+
+                int startY = 0;
+                int endY = 0; 
+
+                if (mapYIdx.Count() < 5)
+                {
+                    startY = mapYIdx[0];
+                    endY = mapYIdx[mapYIdx.Count() - 1];
+                }
+                else // 중심에 있는 4개의 칩으로만 Golden Image 생성
+                {
+                    
+                    startY = mapYIdx[mapYIdx.Count() / 2 - 1 - 2];
+                    endY = mapYIdx[mapYIdx.Count() / 2 - 1 + 2];
+                }
+                foreach (Workplace wp in this.workplaceBundle)
+                    if (wp.MapPositionX == this.workplace.MapPositionX)
+                        if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.POSITION_SUCCESS) == true)
+                            if ((wp.MapPositionY >= startY) && (wp.MapPositionY <= endY) && wp.MapPositionY != this.workplace.MapPositionY)
+                                wpDatas.Add(wp.WorkplaceBuffer);
+
+
+                CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+                //CLR_IP.Cpp_CreateGoldenImage_NearAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+            }
         }
 
         public override WorkBase Clone()
@@ -204,7 +332,5 @@ namespace RootTools_Vision
             this.workplaceBundle = _workplaceBundle;
             return;
         }
-
-
     }
 }

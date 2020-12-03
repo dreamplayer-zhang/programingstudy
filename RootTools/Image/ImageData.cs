@@ -187,6 +187,35 @@ namespace RootTools
 				//Marshal.Copy((IntPtr)((long)ptr + nByte * (rect.Left / nByte + (stride / nByte / nByte) * ((long)i + (long)rect.Top))), m_aBuf , i * rect.Width , rect.Width);
 			}
 		}
+		public unsafe void SetData(ImageData imgData, CRect rect, int stride, int nByte = 1)
+		{
+			if (nByte == 1)
+			{
+				IntPtr ptr = imgData.GetPtr();
+				for (int i = rect.Height - 1; i >= 0; i--)
+					Marshal.Copy((IntPtr)((long)ptr + rect.Left + ((long)i + (long)rect.Top) * stride), m_aBuf, i * rect.Width, rect.Width);
+			}
+
+			else if (nByte == 3)
+			{
+				byte* Rptr = (byte*)imgData.m_MemData.GetPtr(0).ToPointer();
+				byte* Gptr = (byte*)imgData.m_MemData.GetPtr(1).ToPointer();
+				byte* Bptr = (byte*)imgData.m_MemData.GetPtr(2).ToPointer();
+
+				int idx = 0;
+				long xOffset;
+				for (int r = rect.Top; r < rect.Top + rect.Height; r++)
+				{
+					for (int c = rect.Left; c < rect.Left + rect.Width; c++, idx++)
+					{
+						xOffset = c + (long)r * stride / 3;
+						m_aBuf[nByte * idx + 2] = *(Rptr + xOffset);
+						m_aBuf[nByte * idx + 1] = *(Gptr + xOffset);
+						m_aBuf[nByte * idx + 0] = *(Bptr + xOffset);
+					}
+				}
+			}
+		}
 		public byte[] GetByteArray()
 		{
 			byte[] aBuf = new byte[p_Size.X * p_nByte * p_Size.Y];
@@ -194,7 +223,7 @@ namespace RootTools
 
 			for (int i = 0; i < p_Size.Y; i++)
 			{
-				Marshal.Copy((IntPtr)( (long)GetPtr() + (((long)i) * p_Size.X)), aBuf, position, p_Size.X * p_nByte);
+				Marshal.Copy((IntPtr)( (long)GetPtr() + (((long)i) * p_Size.X * p_nByte)), aBuf, position, p_Size.X * p_nByte);
 				position += (p_Size.X * p_nByte);
 			}
 			return aBuf;
@@ -850,13 +879,24 @@ namespace RootTools
                 System.Windows.MessageBox.Show("Memory Count Error");
                 return;
             }
-            fss.Seek(54 + 1024 + (nLowHeight - nStartHeight) * (long)nWidth * nByte, SeekOrigin.Begin);
+
+			//
+			int a = 0;
+			UInt32 b = 0;
+			BinaryReader br = new BinaryReader(fss);
+			ushort bfType = br.ReadUInt16();  //2 4 2 2 4 4 4 4 2  2 4 4 4 4 4 4 256*4 1024  54 
+			uint bfSize = br.ReadUInt32();
+			br.ReadUInt16();
+			br.ReadUInt16();
+			uint bfOffBits = br.ReadUInt32();
+
+			fss.Seek(bfOffBits + (nLowHeight - nStartHeight) * (long)nWidth * nByte, SeekOrigin.Begin);
 			for (int y = nStartHeight - 1; y >= nEndHeight; y--)
 			{
 				if (Worker_MemoryCopy.CancellationPending)
 					return;
 				fss.Read(buf, 0, nWidth * nByte);
-                for (int i = 0; i < nLowHeight * 3; i = i + 3)
+                for (int i = 0; i < nWidth * 3; i = i + 3)
                 {
                     ((byte*)(ptrB))[i / 3 + (long)y * p_Size.X] = buf[i];
                     ((byte*)(ptrG))[i / 3 + (long)y * p_Size.X] = buf[i + 1];
@@ -1464,6 +1504,7 @@ namespace RootTools
 				return bitmapSource;
 			}
 
+
 		}
 
 		public static BitmapSource GetBitmapSourceFromBitmap(Bitmap bitmap)
@@ -1481,10 +1522,10 @@ namespace RootTools
 		}
 
 
-		public static byte[] FileLoadBitmap(string sFilePath, int nW, int nH)
+		public static byte[] FileLoadBitmap(string sFilePath, int nW, int nH, int nByteCnt = 1)
 		{
 			byte[] rawdata = new byte[nW * nH];
-			CLR_IP.Cpp_LoadBMP(sFilePath, rawdata, nW, nH);
+			CLR_IP.Cpp_LoadBMP(sFilePath, rawdata, nW, nH, nByteCnt);
 			return rawdata;
 		}
 

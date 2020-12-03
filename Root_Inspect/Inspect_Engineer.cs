@@ -50,5 +50,15 @@ namespace Root_Inspect
             m_login.ThreadStop();
             LogView.ThreadStop();
         }
+
+        public string BuzzerOff()
+        {
+            return "OK";
+        }
+
+        public string Recovery()
+        {
+            return "OK";
+        }
     }
 }

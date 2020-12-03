@@ -372,9 +372,9 @@ namespace RootTools_Vision
             int memH = this.workplace.SharedBufferHeight;
             int memW = this.workplace.SharedBufferWidth;
 
-            //for (int cnt = Top; cnt < Bottom; cnt++)
-            //    Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)memW + Left))
-            //        , this.workplace.WorkplaceBuffer, chipW * (cnt - Top), chipW);
+            for (int cnt = Top; cnt < Bottom; cnt++)
+                Marshal.Copy(new IntPtr(this.workplace.SharedBuffer.ToInt64() + (cnt * (Int64)memW + Left))
+                    , this.workplace.WorkplaceBuffer, chipW * (cnt - Top), chipW);
         }
     }
 }
