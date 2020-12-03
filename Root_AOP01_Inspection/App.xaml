@@ -17,6 +17,717 @@
         <SolidColorBrush x:Key="Splitter" Color="DimGray"/>
         <SolidColorBrush x:Key="MainThema" Color="#FF2D2D50"/>
         <!--End Color-->
+        
+        
+        <!-- 베가 붙여옴-->
+        <SolidColorBrush x:Key="BtnBorderBrush"
+                         Color="Gray" />
+
+        <SolidColorBrush x:Key="BtnBackGround"
+                         Color="DimGray" />
+        <SolidColorBrush x:Key="BtnMouseOver"
+                         Color="#FF3E3E40" />
+        <SolidColorBrush x:Key="BtnPressed"
+                         Color="#FF43437A" />
+        <SolidColorBrush x:Key="BtnForeGround"
+                         Color="White" />
+        <!--#region Color Definition-->
+        <SolidColorBrush x:Key="ContorlBackGround"
+                         Color="Gainsboro" />
+        <SolidColorBrush x:Key="BackGround"
+                         Color="#FF2D2D30" />
+        <SolidColorBrush x:Key="TitleBackGround"
+                         Color="#FF43437A" />
+        <!--<SolidColorBrush x:Key="TitleBackGround" Color="#FFA4C4D1"/>-->
+        <SolidColorBrush x:Key="BorderBrush"
+                         Color="Gray" />
+        <SolidColorBrush x:Key="TabForeGround"
+                         Color="White" />
+        <SolidColorBrush x:Key="TabBackGround"
+                         Color="#FF222223" />
+        <SolidColorBrush x:Key="TabMouseOver"
+                         Color="#FF3E3E40" />
+        <SolidColorBrush x:Key="TabSelected"
+                         Color="#FF43437A" />
+        <!--<SolidColorBrush x:Key="BtnBackGround" Color="#FF222223"/>
+        <SolidColorBrush x:Key="BtnBorderBrush" Color="Black"/>
+        <SolidColorBrush x:Key="BtnMouseOver" Color="#FF3E3E40" />-->
+        <SolidColorBrush x:Key="TextForeGround"
+                         Color="White" />
+        <SolidColorBrush x:Key="Black"
+                         Color="Black" />
+        <SolidColorBrush x:Key="Blue"
+                         Color="#FF007ACC" />
+        <SolidColorBrush x:Key="Purple"
+                         Color="#FF43437A" />
+        <SolidColorBrush x:Key="Red"
+                         Color="#FFE45555" />
+        <SolidColorBrush x:Key="Yellow"
+                         Color="#FFF3CD6E" />
+        <SolidColorBrush x:Key="Green"
+                         Color="SeaGreen" />
+        <SolidColorBrush x:Key="DarkGray"
+                         Color="DimGray" />
+        <SolidColorBrush x:Key="LightGray"
+                         Color="#FFEAEAEA" />
+        <!--#endregion-->
+        <Style TargetType="{x:Type TabControl}"
+               x:Key="StackPanelTabControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid UseLayoutRounding="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="70" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="1"
+                                    Margin="0,0,0,0"
+                                    BorderThickness="2"
+                                    BorderBrush="{StaticResource BorderBrush}">
+                                <ContentPresenter ContentSource="SelectedContent" />
+                            </Border>
+                            <Border Grid.Row="0"
+                                    Margin="0,0,0,-2"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="2">
+                                <StackPanel IsItemsHost="True"
+                                            Orientation="Horizontal"
+                                            Panel.ZIndex="2"></StackPanel>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TabItem}"
+               x:Key="StackPanelTabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Border Name="Panel"
+                                Margin="5"
+                                BorderBrush="{StaticResource BorderBrush}">
+                            <TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontFamily="Arial"
+                                       FontWeight="Bold"
+                                       FontSize="25"
+                                       Margin="5,0,5,0"
+                                       Name="tb">
+                                <ContentPresenter VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected"
+                                     Value="False">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabBackGround}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabMouseOver}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabSelected}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TabForeGround}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type Label}"
+               x:Key="BasicLabel">
+            <Setter Property="Foreground"
+                    Value="{StaticResource TextForeGround}" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+            <Setter Property="FontFamily"
+                    Value="Arial" />
+        </Style>
+        <Style TargetType="{x:Type TextBlock}"
+               x:Key="BasicTb">
+            <Setter Property="TextBlock.Foreground"
+                    Value="{StaticResource TextForeGround}" />
+            <Setter Property="TextBlock.VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="TextBlock.TextAlignment"
+                    Value="Center" />
+            <Setter Property="FontFamily"
+                    Value="Arial" />
+        </Style>
+        <Style TargetType="{x:Type RepeatButton}"
+               x:Key="BasicRepeatBtn">
+            <Setter Property="Margin"
+                    Value="5" />
+            <Setter Property="Interval"
+                    Value="100" />
+            <Setter Property="Delay"
+                    Value="100" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                        <Border BorderBrush="{StaticResource BtnBorderBrush}"
+                                Background="{StaticResource BtnBackGround}"
+                                x:Name="Bdr">
+                            <TextBlock FontSize="15"
+                                       Foreground="{StaticResource BtnForeGround}"
+                                       FontFamily="Arial"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="10" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                                <Setter Property="Cursor"
+                                        Value="Hand" />
+                            </Trigger>
+                            <Trigger Property="Button.IsPressed"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnPressed}" />
+                            </Trigger>
+                            <Trigger Property="Button.IsEnabled"
+                                     Value="False">
+                                <Setter TargetName="Bdr"
+                                        Property="Opacity"
+                                        Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type Button}"
+               x:Key="BasicBtn">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderBrush="{DynamicResource BtnBorderBrush}"
+                                BorderThickness="2"
+                                Background="{StaticResource BtnBackGround}"
+                                x:Name="Bdr">
+                            <TextBlock FontSize="15"
+                                       Foreground="{StaticResource BtnForeGround}"
+                                       FontFamily="Arial"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="10" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                                <Setter Property="Cursor"
+                                        Value="Hand" />
+                            </Trigger>
+                            <Trigger Property="Button.IsPressed"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnPressed}" />
+                            </Trigger>
+                            <Trigger Property="Button.IsEnabled"
+                                     Value="False">
+                                <Setter TargetName="Bdr"
+                                        Property="Opacity"
+                                        Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type ToggleButton}"
+               x:Key="BasicToggle">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border CornerRadius="0"
+                                Background="{StaticResource BtnBackGround}"
+                                BorderBrush="{StaticResource BtnBorderBrush}"
+                                BorderThickness="0"
+                                x:Name="Bdr">
+                            <TextBlock FontSize="15"
+                                       FontFamily="Arial"
+                                       Foreground="{StaticResource TextForeGround}"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="10" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                                <Setter Property="Cursor"
+                                        Value="Hand" />
+                            </Trigger>
+                            <Trigger Property="IsChecked"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=Blue}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked"
+                                     Value="False">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnBackGround}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type ToggleButton}"
+               x:Key="LoadPortToggle">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border CornerRadius="0"
+                                Background="{StaticResource BtnBackGround}"
+                                BorderBrush="{StaticResource BtnBorderBrush}"
+                                BorderThickness="2"
+                                x:Name="Bdr">
+                            <TextBlock FontSize="15"
+                                       FontFamily="Arial"
+                                       Foreground="{StaticResource TextForeGround}"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="0" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                                <Setter Property="Cursor"
+                                        Value="Hand" />
+                            </Trigger>
+                            <Trigger Property="IsChecked"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=Blue}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked"
+                                     Value="False">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnBackGround}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type Button}" x:Key="LoadPortBtn">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderBrush="{DynamicResource BtnBorderBrush}"
+                                BorderThickness="2"
+                                Background="{StaticResource BtnBackGround}"
+                                x:Name="Bdr">
+                            <TextBlock Foreground="{StaticResource TextForeGround}"
+                                       FontFamily="Arial"
+                                       FontSize="15"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
+                                <ContentPresenter Margin="0" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Border.IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                                <Setter Property="Cursor"
+                                        Value="Hand" />
+                            </Trigger>
+                            <Trigger Property="Button.IsPressed"
+                                     Value="True">
+                                <Setter TargetName="Bdr"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=Purple}" />
+                            </Trigger>
+                            <Trigger Property="Button.IsEnabled"
+                                     Value="False">
+                                <Setter TargetName="Bdr"
+                                        Property="Opacity"
+                                        Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TabControl}"
+               x:Key="MainTabControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid UseLayoutRounding="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="88*" />
+                                <RowDefinition Height="12*" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0"
+                                    Margin="0"
+                                    BorderThickness="0,0,0,2"
+                                    BorderBrush="{StaticResource BorderBrush}">
+                                <ContentPresenter ContentSource="SelectedContent" />
+                            </Border>
+                            <Border Grid.Row="1"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="0,0,0,2"
+                                    x:Name="Navi_panel">
+                                <Grid IsItemsHost="True"
+                                      Panel.ZIndex="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <!--<ColumnDefinition />-->
+                                    </Grid.ColumnDefinitions>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TabItem}"
+               x:Key="MainTabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Panel"
+                                Margin="20,10,20,10"
+                                BorderBrush="{StaticResource BorderBrush}">
+                            <TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontFamily="Arial"
+                                       FontWeight="Bold"
+                                       FontSize="25"
+                                       Name="tb">
+                                <ContentPresenter VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected"
+                                     Value="False">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabBackGround}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TextForeGround}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TextForeGround}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnPressed}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TextForeGround}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TabControl}"
+               x:Key="RcpTabControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid UseLayoutRounding="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel IsItemsHost="True"
+                                        Panel.ZIndex="2"/>
+                            <Grid Grid.Column="1"
+                                  Margin="10,0,0,0">
+                                <ContentPresenter ContentSource="SelectedContent" />
+                            </Grid>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TabItem}"
+               x:Key="RcptabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Panel"
+                              Margin="0,0,0,10"
+                                Padding="20,3"
+                              Background="{StaticResource BtnBackGround}">
+                            <TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       Foreground="{StaticResource TextForeGround}"
+                                       FontFamily="Arial"
+                                       FontSize="20">
+                                <ContentPresenter VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header"
+                                                  Margin="10" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected"
+                                     Value="False">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=TabBackGround}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=Purple}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TabControl}"
+               x:Key="LogTabControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid UseLayoutRounding="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="10*" />
+                                <RowDefinition Height="90*" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    x:Name="Navi_panel">
+                                <Grid IsItemsHost="True"
+                                      Panel.ZIndex="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                </Grid>
+                            </Border>
+                            <Border Grid.Row="1">
+                                <ContentPresenter ContentSource="SelectedContent" />
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TabItem}"
+               x:Key="LogTabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid Name="Panel"
+                              Margin="10"
+                              Background="{StaticResource Purple}">
+                            <TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       Foreground="{StaticResource TextForeGround}"
+                                       FontFamily="Arial"
+                                       FontSize="14">
+                                <ContentPresenter VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header"
+                                                  Margin="10" /></TextBlock>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected"
+                                     Value="False">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnBackGround}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=Purple}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TabControl}"
+               x:Key="OpticPylonTab">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid UseLayoutRounding="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="70" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="1"
+                                    Margin="0"
+                                    BorderThickness="2"
+                                    BorderBrush="{StaticResource BorderBrush}">
+                                <ContentPresenter ContentSource="SelectedContent" />
+                            </Border>
+                            <Border Grid.Row="0"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="2"
+                                    x:Name="Navi_panel">
+                                <Grid IsItemsHost="True"
+                                      Panel.ZIndex="2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type TabItem}"
+               x:Key="OpticPylonTabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Panel"
+                                Margin="10"
+                                BorderBrush="{StaticResource BorderBrush}">
+                            <TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       FontFamily="Arial"
+                                       FontWeight="Bold"
+                                       FontSize="25"
+                                       Name="tb">
+                                <ContentPresenter VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header" /></TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected"
+                                     Value="False">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnBackGround}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TextForeGround}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=BtnMouseOver}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TextForeGround}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="{StaticResource ResourceKey=Purple}" />
+                                <Setter TargetName="tb"
+                                        Property="Foreground"
+                                        Value="{StaticResource ResourceKey=TextForeGround}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type GridViewColumnHeader}"
+               x:Key="BasicGridViewColumn">
+            <Setter Property="Foreground"
+                    Value="{StaticResource TextForeGround}" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Left" />
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Margin="10,0,0,0"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextForeGround}"
+                                   FontFamily="Arial"
+                                   Text="{Binding}" />
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Height"
+                    Value="20" />
+            <Setter Property="Margin"
+                    Value="-2,-1,-2,0" />
+            <Setter Property="Background"
+                    Value="{StaticResource TitleBackGround}" />
+        </Style>
+        <!--  -->
 
         <!--Control-->
         <Style TargetType="{x:Type GroupBox}">
@@ -76,17 +787,6 @@
             <Setter Property="Height" Value="40"/>
             <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
             <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
-        </Style>
-        <Style TargetType="{x:Type TextBlock}" x:Key="BasicTb">
-            <Setter Property="FontFamily" Value="Arial"/>
-            <Setter Property="TextBlock.VerticalAlignment"
-                    Value="Center" />
-            <Setter Property="TextBlock.TextAlignment"
-                    Value="Left"/>
-            <Setter Property="TextBlock.FontSize"
-                    Value="15"/>
-            <Setter Property="TextBlock.Margin"
-                    Value="20,0,0,0"/>
         </Style>
         <Style TargetType="{x:Type TextBox}" x:Key="BasicTbox">
             <Setter Property="VerticalAlignment"
