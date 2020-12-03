@@ -340,7 +340,10 @@ namespace Root_WIND2.Module
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
                     int nScanOffset_pulse = 30000;
 
-                    while(m_grabMode.m_ScanLineNum > nScanLine)
+                    int startOffsetX = cpMemoryOffset.X;
+                    int startOffsetY = 0;
+
+                    while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
                         if (EQ.IsStop())
                             return "OK";
@@ -389,6 +392,8 @@ namespace Root_WIND2.Module
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
+
+                        WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_camera.GetRoiSize().X, nWaferSizeY_px)));
 
                         nScanLine++;
                         cpMemoryOffset.X += m_grabMode.m_camera.GetRoiSize().X;
