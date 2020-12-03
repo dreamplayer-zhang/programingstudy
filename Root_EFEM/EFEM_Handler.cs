@@ -31,17 +31,10 @@ namespace Root_EFEM
         public ModuleList m_moduleList;
         public EFEM_Recipe m_recipe;
         public EFEM_Process m_process;
-       // public AOP m_aop;
-//        public EFEM m_efem;
-//        public FDC m_FDC;
 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
-            //            m_efem = new EFEM("EFEM", m_engineer);
-            //            InitModule(m_efem);
-            //m_aop = new AOP("AOP", m_engineer);
-            //InitModule(m_aop);
             InitWTR(); 
             InitLoadport();
             InitAligner();
