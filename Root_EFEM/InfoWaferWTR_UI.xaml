@@ -14,24 +14,9 @@
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="0" Orientation="Vertical">
-            <GroupBox BorderBrush="Black" BorderThickness="1" Margin="3">
-                <GroupBox.Header>
-                    <TextBlock Text="Upper Arm" Foreground="Black" FontWeight="Bold" />
-                </GroupBox.Header>
-                <StackPanel Orientation="Vertical">
-                    <Button x:Name="buttonUpperAramAdd" Content="Add" Margin="2" Click="buttonUpperAramAdd_Click"/>
-                    <Button x:Name="buttonUpperArmRemove" Content="Remove" Margin="2" Click="buttonUpperArmRemove_Click"/>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox BorderBrush="Black" BorderThickness="1" Margin="3">
-                <GroupBox.Header>
-                    <TextBlock Text="Upper Arm" Foreground="Black" FontWeight="Bold" />
-                </GroupBox.Header>
-                <StackPanel Orientation="Vertical">
-                    <Button x:Name="buttonLowerAramAdd" Content="Add" Margin="2" Click="buttonLowerAramAdd_Click"/>
-                    <Button x:Name="buttonLowerArmRemove" Content="Remove" Margin="2" Click="buttonLowerArmRemove_Click"/>
-                </StackPanel>
-            </GroupBox>
+            <ComboBox x:Name="comboArm" Margin="3"/>
+            <Button x:Name="buttonAdd" Content="Add" Margin="3" Click="buttonAdd_Click"/>
+            <Button x:Name="buttonRemove" Content="Remove" Margin="3" Click="buttonRemove_Click"/>
         </StackPanel>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <tree:TreeUI Grid.Column="2" x:Name="treeRootUI"/>
