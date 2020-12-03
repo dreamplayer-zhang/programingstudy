@@ -36,8 +36,10 @@ namespace RootTools_Vision
         public Recipe()
         {
             RecipeItemList = Tools.GetEnumerableOfType<RecipeBase>().ToList<RecipeBase>();
-            ParameterItemList = Tools.GetEnumerableOfType<ParameterBase>().ToList<ParameterBase>();
+            //ParameterItemList = Tools.GetEnumerableOfType<ParameterBase>().ToList<ParameterBase>();
             //waferInfoItemList = Tools.GetEnumerableOfType<WaferInfoBase>().ToList<WaferInfoBase>();
+
+            ParameterItemList = new List<ParameterBase>();
         }
 
         public bool Read(string recipePath)

@@ -522,12 +522,26 @@ namespace Root_EFEM.Module
         }
         #endregion
 
+        #region InfoWafer UI
+        InfoWaferWTR_UI m_ui;
+        void InitInfoWaferUI()
+        {
+            m_ui = new InfoWaferWTR_UI();
+            List<WTRArm> aArm = new List<WTRArm>();
+            aArm.Add(m_dicArm[eArm.A]);
+            aArm.Add(m_dicArm[eArm.B]);
+            m_ui.Init(p_id + ".InfoWafer", aArm, m_engineer);
+            m_aTool.Add(m_ui);
+        }
+        #endregion
+
         public WTR_Cymechs(string id, IEngineer engineer)
         {
             InitErrorString(); 
             InitArms(id, engineer);
             InitBase(id, engineer);
-            InitThread(); 
+            InitThread();
+            InitInfoWaferUI();
         }
 
         public override void ThreadStop()

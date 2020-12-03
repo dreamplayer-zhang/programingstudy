@@ -118,5 +118,15 @@ namespace Root_WIND2
             m_login.ThreadStop();
             LogView.ThreadStop();
         }
+
+        public string BuzzerOff()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public string Recovery()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

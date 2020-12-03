@@ -568,6 +568,19 @@ namespace Root_EFEM.Module
         }
         #endregion
 
+        #region InfoWafer UI
+        InfoWaferWTR_UI m_ui;
+        void InitInfoWaferUI()
+        {
+            m_ui = new InfoWaferWTR_UI();
+            List<WTRArm> aArm = new List<WTRArm>();
+            aArm.Add(m_dicArm[eArm.Upper]);
+            aArm.Add(m_dicArm[eArm.Lower]);
+            m_ui.Init(p_id + ".InfoWafer", aArm, m_engineer);
+            m_aTool.Add(m_ui); 
+        }
+        #endregion
+
         #region override
         public override void RunTree(Tree tree)
         {
@@ -601,6 +614,7 @@ namespace Root_EFEM.Module
             InitMotion();
             InitArms(id, engineer);
             InitBase(id, engineer);
+            InitInfoWaferUI(); 
         }
 
         public override void ThreadStop()
