@@ -163,14 +163,9 @@
             <Setter Property="FontFamily"
                     Value="Arial" />
         </Style>
-        <Style TargetType="{x:Type TextBlock}"
-               x:Key="BasicTb">
-            <Setter Property="TextBlock.Foreground"
-                    Value="{StaticResource TextForeGround}" />
-            <Setter Property="TextBlock.VerticalAlignment"
-                    Value="Center" />
-            <Setter Property="TextBlock.TextAlignment"
-                    Value="Center" />
+        <Style TargetType="{x:Type TextBlock}" x:Key="BasicTb">
+            <Setter Property="Margin" Value="10,0" />
+            <Setter Property="TextBlock.VerticalAlignment" Value="Center" />
             <Setter Property="FontFamily"
                     Value="Arial" />
         </Style>
@@ -801,8 +796,7 @@
         <!--End Control-->
 
         <!--Title-->
-        <Style TargetType="{x:Type Button}" 
-               x:Key="SystemButton">
+        <Style TargetType="{x:Type Button}" x:Key="SystemButton">
             <Setter Property="Width"
                     Value="34" />
             <Setter Property="Height"

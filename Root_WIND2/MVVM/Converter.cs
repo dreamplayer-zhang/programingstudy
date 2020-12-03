@@ -58,22 +58,22 @@ namespace Root_WIND2
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
 
-            if (value == null || value.GetType() != typeof(InspectionMethod))
-                return null;
+            //if (value == null || value.GetType() != typeof(InspectionMethod))
+            //    return null;
 
-            InspectionMethod item = value as InspectionMethod;
-            switch (item.p_inspMode)
-            {
-                case InspectionMode.Surface:
-                    {
-                        return item.m_Surface;
-                    }
-                case InspectionMode.D2D:
-                    {
-                        return item.m_D2D;
-                    }
+            //InspectionMethod item = value as InspectionMethod;
+            //switch (item.p_inspMode)
+            //{
+            //    case InspectionMode.Surface:
+            //        {
+            //            return item.m_Surface;
+            //        }
+            //    case InspectionMode.D2D:
+            //        {
+            //            return item.m_D2D;
+            //        }
 
-            }
+            //}
             return value;
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

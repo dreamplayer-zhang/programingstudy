@@ -206,5 +206,15 @@ namespace RootTools_Vision
 
             //return obj;
         }
+
+        public static T CreateInstance<T>()
+        {
+            return Activator.CreateInstance<T>();
+        }
+
+        public static object CreateInstance(Type type)
+        {
+            return Activator.CreateInstance(type);
+        }
     }
 }
