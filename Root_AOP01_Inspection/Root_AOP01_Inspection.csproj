@@ -186,6 +186,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Module\AOP01.cs" />
+    <Compile Include="Module\Vision.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="UI\2. REVIEW\Review_Panel.xaml.cs">
       <DependentUpon>Review_Panel.xaml</DependentUpon>

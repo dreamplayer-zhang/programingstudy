@@ -30,7 +30,8 @@ namespace Root_AOP01_Inspection
 
         #region Module
         public ModuleList m_moduleList;
-        public AOP01 m_aop01; 
+        public AOP01 m_aop01;
+        public Module.Vision m_vision; 
         public AOP01_Recipe m_recipe;
         public AOP01_Process m_process;
 
@@ -41,6 +42,8 @@ namespace Root_AOP01_Inspection
             InitModule(m_aop01); 
             InitWTR();
             InitLoadport();
+            m_vision = new Module.Vision("Vision", m_engineer);
+            InitModule(m_vision);
 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
