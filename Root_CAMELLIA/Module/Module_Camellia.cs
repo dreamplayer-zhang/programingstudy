@@ -240,7 +240,7 @@ namespace Root_CAMELLIA.Module
 
                 Camera_Basler VRS = m_module.m_CamVRS;
                 ImageData img = VRS.p_ImageViewer.p_ImageData;
-                m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel);
+                //m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel);
                 //img.p_Stride;
                 //img.GetPtr();
 
