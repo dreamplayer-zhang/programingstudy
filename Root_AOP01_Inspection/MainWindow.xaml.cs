@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using RootTools;
+using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -127,6 +128,8 @@ namespace Root_AOP01_Inspection
         #endregion
 
         public AOP01_Engineer m_engineer = new AOP01_Engineer();
+        public IDialogService dialogService;
+
 
         public MainWindow()
         {
@@ -135,6 +138,9 @@ namespace Root_AOP01_Inspection
 
         void Init()
         {
+            dialogService = new DialogService(this);
+            dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+
             m_engineer.Init("AOP01");
             
             Init_ViewModel();
