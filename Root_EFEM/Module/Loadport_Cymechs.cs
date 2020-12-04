@@ -436,10 +436,15 @@ namespace Root_EFEM.Module
                     break; 
                 case 'O':
                     if (m_protocolSend == null) p_sInfo = "Invalid Done";
-                    else m_protocolSend = null;
+                    else
+                    {
+                        m_protocolSend.m_eState = Protocol.eState.Done; 
+                        m_protocolSend = null;
+                    }
                     break;
                 case 'M':
                     if (SetLoadportMapData(sRead)) p_sInfo = "Invalid Map Data : " + sRead;
+                    m_protocolSend.m_eState = Protocol.eState.Done;
                     m_protocolSend = null; 
                     break;
             }
