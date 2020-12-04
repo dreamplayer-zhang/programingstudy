@@ -365,7 +365,7 @@ namespace Root_EFEM.Module
             try
             {
                 if (sMsgs.Length > 1) return GetErrorString(sMsgs[1]);
-                else if (sMsgs[0] == sLastCmd && sMsgs.Length == 1) return "Received Successfully : " + sLastCmd;
+                else if (sMsgs[0] == sLastCmd && sMsgs.Length == 1) return "OK"; //return "Received Successfully : " + sLastCmd;
                 else return "Cannot Receive Status Command : " + sLastCmd;
             }
             catch (Exception)
@@ -414,7 +414,7 @@ namespace Root_EFEM.Module
 
         eCmd m_eSendCmd = eCmd.None;
         string WriteCmd(eCmd cmd, params object[] objs)
-        {
+        {       
             if (EQ.IsStop()) return "EQ Stop";
             Thread.Sleep(10);
             if (m_eSendCmd != eCmd.None)
@@ -495,11 +495,11 @@ namespace Root_EFEM.Module
                 if (Run(WaitReply(m_secHome))) return p_sInfo;
                 p_eState = eState.Ready;
                 foreach (IWTRChild child in m_aChild) child.p_bLock = false;
-                return p_sInfo;
+                return "OK";
             }
             finally
             {
-                if (p_sInfo != "OK") p_eState = eState.Error;
+               // if (p_sInfo != "OK") p_eState = eState.Error;
             }
         }
         #endregion
