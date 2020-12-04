@@ -71,7 +71,6 @@ namespace Root_WIND2
                 SetProperty(ref m_Spec_VM, value);
             }
         }
-
         private FrontsideMap_ViewModel m_Map_VM;
         public FrontsideMap_ViewModel p_Map_VM
         {
@@ -105,7 +104,7 @@ namespace Root_WIND2
             p_ROI_VM.Init(setup,m_Recipe);
 
             p_Spec_VM = new FrontsideSpec_ViewModel();
-            p_Spec_VM.init(setup, m_Recipe);
+            p_Spec_VM.init(this, m_Recipe);
             
             Init();
 
