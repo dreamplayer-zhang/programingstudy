@@ -848,6 +848,7 @@ namespace Root_EFEM.Module
                     sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
                     m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot);
                 }
+                else m_nChildID = 0;
             }
 
             public override string Run()
@@ -860,7 +861,7 @@ namespace Root_EFEM.Module
                     child.SetInfoWafer(m_nChildID, null);
                     return "OK";
                 }
-                int posWTR = child.GetTeachWTR();
+                int posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (child.p_eState != eState.Ready)
                 {
@@ -944,7 +945,7 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
-                int posWTR = child.GetTeachWTR();
+                int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
