@@ -1,8 +1,10 @@
 ﻿using Root_AOP01_Inspection.Module;
+using Root_EFEM.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
@@ -28,23 +30,32 @@ namespace Root_AOP01_Inspection
 
         #region Module
         public ModuleList m_moduleList;
+        public AOP01 m_aop01;
+        public Module.Vision m_vision; 
         public AOP01_Recipe m_recipe;
         public AOP01_Process m_process;
-        public TapePacker m_tapePacker;
-        public VacuumPacker m_vacuumPacker; 
+        public MainVision m_mainVision;
         //        public Robot_RND m_robot;
 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
-            m_tapePacker = new TapePacker("TapePacker", m_engineer);
-            InitModule(m_tapePacker);
-            m_vacuumPacker = new VacuumPacker("VacuumPacker", m_engineer);
-            InitModule(m_vacuumPacker); 
-            //((IWTR)m_wtr).ReadInfoReticle_Registry();
+            m_aop01 = new AOP01("AOP01", m_engineer);
+            InitModule(m_aop01); 
+            InitWTR();
+            InitLoadport();
+            m_vision = new Module.Vision("Vision", m_engineer);
+            InitModule(m_vision);
+
+            m_wtr.RunTree(Tree.eMode.RegRead);
+            m_wtr.RunTree(Tree.eMode.Init);
+            ((IWTR)m_wtr).ReadInfoReticle_Registry();
+
+            m_mainVision = new MainVision("MainVision", m_engineer);
+            InitModule(m_mainVision);
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
-            m_recipe.AddModule();
-            m_process = new AOP01_Process("Process", m_engineer, this);
+            foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
+            //m_process = new AOP01_Process("Process", m_engineer, this);
         }
 
         void InitModule(ModuleBase module)
@@ -60,6 +71,67 @@ namespace Root_AOP01_Inspection
             //            if (m_sideVision.p_infoReticle != null) return true;
             //            if (m_patternVision.p_infoReticle != null) return true;
             return false;
+        }
+        #endregion
+
+        #region Module WTR
+        enum eWTR
+        {
+            RND
+        }
+        eWTR m_eWTR = eWTR.RND;
+        ModuleBase m_wtr;
+        void InitWTR()
+        {
+            switch (m_eWTR)
+            {
+                case eWTR.RND:
+                default: m_wtr = new WTR_RND("WTR", m_engineer); break;
+            }
+            InitModule(m_wtr);
+        }
+
+        public void RunTreeWTR(Tree tree)
+        {
+            m_eWTR = (eWTR)tree.Set(m_eWTR, m_eWTR, "Type", "WTR Type");
+        }
+        #endregion
+
+        #region Module Loadport
+        enum eLoadport
+        {
+            RND,
+            Cymechs,
+        }
+        List<eLoadport> m_aLoadportType = new List<eLoadport>();
+        int m_lLoadport = 2;
+        void InitLoadport()
+        {
+            ModuleBase module;
+            char cLP = 'A';
+            for (int n = 0; n < m_lLoadport; n++, cLP++)
+            {
+                string sID = "Loadport" + cLP;
+                switch (m_aLoadportType[n])
+                {
+                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer); break;
+                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer); break;
+                    default: module = new Loadport_RND(sID, m_engineer); break;
+                }
+                InitModule(module);
+                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+            }
+        }
+
+        public void RunTreeLoadport(Tree tree)
+        {
+            m_lLoadport = tree.Set(m_lLoadport, m_lLoadport, "Count", "Loadport Count");
+            while (m_aLoadportType.Count < m_lLoadport) m_aLoadportType.Add(eLoadport.RND);
+            Tree treeType = tree.GetTree("Type");
+            for (int n = 0; n < m_lLoadport; n++)
+            {
+                m_aLoadportType[n] = (eLoadport)treeType.Set(m_aLoadportType[n], m_aLoadportType[n], n.ToString("00"), "Loadport Type");
+            }
         }
         #endregion
 
@@ -187,6 +259,14 @@ namespace Root_AOP01_Inspection
                         break;
                 }
             }
+        }
+        #endregion
+
+        #region Tree
+        public void RunTreeModule(Tree tree)
+        {
+            RunTreeWTR(tree.GetTree("WTR"));
+            RunTreeLoadport(tree.GetTree("Loadport"));
         }
         #endregion
 

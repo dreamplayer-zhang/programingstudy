@@ -2,9 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO.MemoryMappedFiles;
-using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Threading;
 
@@ -50,6 +48,7 @@ namespace RootTools.Memory
         {
             try { m_MMF = MemoryMappedFile.OpenExisting(p_id); }
             catch { return "Open Error"; }
+            m_log.Info(p_id + " Memory Pool Open Done");
             return (m_MMF != null) ? "OK" : "Error"; 
         }
         #endregion
@@ -111,6 +110,27 @@ namespace RootTools.Memory
                 MemoryGroup group = GetGroup(sGroup, true);
                 group.UpdateMemoryData();
             }
+        }
+        #endregion
+
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer(); 
+        void InitTimer()
+        {
+            if (m_memoryTool.m_bMaster) return; 
+            m_timer.Interval = TimeSpan.FromSeconds(0.2);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start(); 
+        }
+
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            OpenPool();
+            if (m_MMF == null) return;
+            UpdateMemoryData();
+            RunTree(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.Init);
+            m_timer.Stop(); 
         }
         #endregion
 
@@ -178,7 +198,8 @@ namespace RootTools.Memory
             m_viewer = new MemoryViewer(id, this, m_log);
             m_reg = new Registry(p_id, "MemoryTools");
             p_fGB = m_reg.Read("fGB", fGB);
-            InitTree(); 
+            InitTree();
+            InitTimer(); 
         }
 
         public void ThreadStop()

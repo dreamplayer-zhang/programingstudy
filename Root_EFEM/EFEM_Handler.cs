@@ -31,26 +31,16 @@ namespace Root_EFEM
         public ModuleList m_moduleList;
         public EFEM_Recipe m_recipe;
         public EFEM_Process m_process;
-       // public AOP m_aop;
-//        public EFEM m_efem;
-//        public FDC m_FDC;
 
         void InitModule()
         {
             m_moduleList = new ModuleList(m_engineer);
-            //            m_efem = new EFEM("EFEM", m_engineer);
-            //            InitModule(m_efem);
-            //m_aop = new AOP("AOP", m_engineer);
-            //InitModule(m_aop);
             InitWTR(); 
             InitLoadport();
             InitAligner();
             InitVision();
-            InitEFEM(); 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
-            //            m_FDC = new FDC("FDC", m_engineer);
-            //            InitModule(m_FDC);
             ((IWTR)m_wtr).ReadInfoReticle_Registry(); 
             m_recipe = new EFEM_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
@@ -222,28 +212,6 @@ namespace Root_EFEM
         }
         #endregion
 
-        #region Module EFEM
-        enum eEFEM
-        {
-            EFEM
-        };
-        eEFEM m_eEFEM = eEFEM.EFEM; 
-        void InitEFEM()
-        {
-            ModuleBase module = null;
-            switch (m_eEFEM)
-            {
-                case eEFEM.EFEM: module = new EFEM_AOP("EFEM", m_engineer); break;
-            }
-            if (module != null) InitModule(module);
-        }
-
-        public void RunTreeEFEM(Tree tree)
-        {
-            m_eEFEM = (eEFEM)tree.Set(m_eEFEM, m_eEFEM, "Type", "EFEM Type");
-        }
-        #endregion
-
         #region StateHome
         public string StateHome()
         {
@@ -372,6 +340,17 @@ namespace Root_EFEM
                 }
             }
         }
+        #endregion
+
+        #region Tree
+        public void RunTreeModule(Tree tree)
+        {
+            RunTreeWTR(tree.GetTree("WTR"));
+            RunTreeLoadport(tree.GetTree("Loadport"));
+            RunTreeAligner(tree.GetTree("Aligner"));
+            RunTreeVision(tree.GetTree("Vision"));
+        }
+
         #endregion
 
         string m_id;

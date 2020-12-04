@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RootTools_Vision
+namespace Root_CAMELLIA.Control.Icon
 {
     /// <summary>
-    /// UserControl1.xaml에 대한 상호 작용 논리
+    /// AtiLogo.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class MapViewer : UserControl
+    public partial class AtiLogo : UserControl
     {
-        public MapViewer()
+        public AtiLogo()
         {
             InitializeComponent();
         }

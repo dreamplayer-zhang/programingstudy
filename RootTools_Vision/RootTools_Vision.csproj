@@ -116,20 +116,11 @@
     <Compile Include="Recipe\Recipe\PositionRecipe.cs" />
     <Compile Include="Recipe\Recipe\RecipeBase.cs" />
     <Compile Include="Recipe\Recipe\SurfaceRecipe.cs" />
-    <Compile Include="UI\GridHelper.cs" />
-    <Compile Include="UI\MapViewer.xaml.cs">
-      <DependentUpon>MapViewer.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\MapViewer_ViewModel.cs" />
-    <Compile Include="UI\NotifyProperty.cs" />
     <Compile Include="WorkManager\WorkEventManager.cs" />
-    <Compile Include="WorkManager\Inferfaces.cs" />
     <Compile Include="Inspection\ProcessDefect.cs" />
-    <Compile Include="Tools.cs" />
-    <Compile Include="WorkManager\WIND2_InspectionManager.cs" />
+    <Compile Include="Utility\Tools.cs" />
     <Compile Include="WorkManager\WorkEventManager.EvenArgs.cs" />
     <Compile Include="WorkManager\WorkFactory.cs" />
-    <Compile Include="Vision_Engineer.cs" />
     <Compile Include="WorkManager\WorkBase.cs" />
     <Compile Include="WorkManager\IWorkable.cs" />
     <Compile Include="Inspection\Position.cs" />
@@ -152,10 +143,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UI\MapViewer.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

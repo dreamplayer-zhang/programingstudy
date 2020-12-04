@@ -240,7 +240,10 @@ namespace Root_WIND2
             
             m_Setup.InspectionVision.SharedBuffer = SharedBuf;
             m_Setup.InspectionVision.SharedBufferByteCnt = p_DrawTool_VM.p_ImageData.p_nByte;
-            m_Setup.InspectionVision.CreateInspecion();
+            if(m_Setup.InspectionVision.CreateInspection() == false)
+            {
+                return;
+            }
             m_Setup.InspectionVision.Start();
 
         }

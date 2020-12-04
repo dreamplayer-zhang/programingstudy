@@ -9,6 +9,7 @@ namespace Root_CAMELLIA.Data
     public class DataManager
     {
         public RecipeDataManager recipeDM { get; set; }
+        public WaferCentering m_waferCentering;
         public MainWindow Main { get; set; }
 
         private static DataManager instance;
@@ -30,6 +31,7 @@ namespace Root_CAMELLIA.Data
         public DataManager(MainWindow main = null)
         {
             recipeDM = new RecipeDataManager(this);
+            m_waferCentering = new WaferCentering();
         }
     }
 }

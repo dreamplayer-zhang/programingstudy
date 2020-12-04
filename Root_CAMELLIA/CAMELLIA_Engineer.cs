@@ -22,7 +22,14 @@ namespace Root_CAMELLIA
                 return m_login.p_user;
             }
         }
-
+        public string BuzzerOff()
+        {
+            return "";
+        }
+        public string Recovery()
+        {
+            return "";
+        }
         public IGem ClassGem()
         {
             return m_xGem;

@@ -11,14 +11,14 @@ namespace RootTools.GAFs
     public class ALIDList : NotifyProperty
     {
         #region List ALID
-        public List<ALID> m_aALID = new List<ALID>();
+        public ObservableCollection<ALID> p_aALID { get; set; }
 
         public void SaveFile(string sFile)
         {
             try
             {
                 StreamWriter sw = new StreamWriter(new FileStream(sFile, FileMode.Create));
-                foreach (ALID alid in m_aALID)
+                foreach (ALID alid in p_aALID)
                 {
                     alid.Save(sw);
                 }
@@ -29,7 +29,7 @@ namespace RootTools.GAFs
 
         public void ClearALID()
         {
-            foreach (ALID alid in m_aALID)
+            foreach (ALID alid in p_aALID)
             {
                 alid.p_sMsg = "";
                 alid.p_bSet = false;
@@ -81,7 +81,7 @@ namespace RootTools.GAFs
         {
             if (ALIDList_PopupUI.m_bShow) return;
             ALIDList_PopupUI alidPopup = new ALIDList_PopupUI();
-            alidPopup.Init(this);
+            alidPopup.Init(this, m_engineer);
             alidPopup.Show();
         }
         #endregion 
@@ -103,7 +103,7 @@ namespace RootTools.GAFs
             {
                 if (p_aSetALID[n].p_bSet == false) p_aSetALID.RemoveAt(n);
             }
-            foreach (ALID alid in m_aALID)
+            foreach (ALID alid in p_aALID)
             {
                 if (alid.p_bSet && (IsExistSetALID(alid) == false))
                 {
@@ -151,12 +151,13 @@ namespace RootTools.GAFs
 
         string m_id;
         Log m_log;
+        IEngineer m_engineer; 
         List<GAF.Group> m_aGroup;
         public TreeRoot m_treeRoot;
         public void Init(string id, GAF gaf)
         {
-            p_aSetALID = new ObservableCollection<ALID>();
             m_id = id;
+            m_engineer = gaf.m_engineer; 
             m_log = gaf.m_log;
             m_aGroup = gaf.m_aGroup;
             m_treeRoot = new TreeRoot(id, m_log);
@@ -166,6 +167,12 @@ namespace RootTools.GAFs
             m_timerSetALID.Interval = TimeSpan.FromMilliseconds(1);
             m_timerSetALID.Tick += M_timerSetALID_Tick;
             m_timerSetALID.Start();
+        }
+
+        public ALIDList()
+        {
+            p_aALID = new ObservableCollection<ALID>();
+            p_aSetALID = new ObservableCollection<ALID>();
         }
 
         public void ThreadStop()

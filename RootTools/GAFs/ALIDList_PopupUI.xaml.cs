@@ -23,9 +23,12 @@ namespace RootTools.GAFs
 		}
 
 		ALIDList m_listALID;
-        public void Init(ALIDList listALID)
+        IEngineer m_engineer; 
+
+        public void Init(ALIDList listALID, IEngineer engineer)
         {
             m_listALID = listALID;
+            m_engineer = engineer; 
             DataContext = listALID;
             listViewALID.ItemsSource = listALID.p_aSetALID; 
         }
@@ -98,5 +101,15 @@ namespace RootTools.GAFs
             }
         }
         #endregion
+
+        private void buttonBuzzerOff_Click(object sender, RoutedEventArgs e)
+        {
+            m_engineer.BuzzerOff(); 
+        }
+
+        private void buttonRecovery_Click(object sender, RoutedEventArgs e)
+        {
+            m_engineer.Recovery(); 
+        }
     }
 }

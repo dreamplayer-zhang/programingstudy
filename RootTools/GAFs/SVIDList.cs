@@ -9,11 +9,7 @@ namespace RootTools.GAFs
     public class SVIDList
     {
         #region List SVID
-        public ObservableCollection<SVID> _aSVID = new ObservableCollection<SVID>();
-        public ObservableCollection<SVID> p_aSVID
-        {
-            get { return _aSVID; }
-        }
+        public ObservableCollection<SVID> p_aSVID { get; set; }
 
         public void SaveFile(string sFile)
         {
@@ -67,6 +63,11 @@ namespace RootTools.GAFs
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_tree_UpdateTree;
             RunTree(Tree.eMode.RegRead);
+        }
+
+        public SVIDList()
+        {
+            p_aSVID = new ObservableCollection<SVID>();
         }
 
         public void ThreadStop()

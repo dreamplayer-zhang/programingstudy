@@ -126,7 +126,7 @@ namespace Root_AOP01_Inspection
         private Run_ViewModel m_Run;
         #endregion
 
-        AOP01_Engineer m_engineer = new AOP01_Engineer();
+        public AOP01_Engineer m_engineer = new AOP01_Engineer();
 
         public MainWindow()
         {
@@ -135,10 +135,11 @@ namespace Root_AOP01_Inspection
 
         void Init()
         {
+            m_engineer.Init("AOP01");
+            
             Init_ViewModel();
             Init_UI();
-            m_engineer.Init("AOP01");
-            m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
+            //m_Setup.m_Maintenance.Maintenance.Engineer_UI.Init(m_engineer);
         }
         void Init_ViewModel()
         {
