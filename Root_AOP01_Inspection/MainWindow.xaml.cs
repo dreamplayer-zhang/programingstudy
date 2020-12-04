@@ -128,8 +128,8 @@ namespace Root_AOP01_Inspection
         #endregion
 
         public AOP01_Engineer m_engineer = new AOP01_Engineer();
+        private ProgramManager program;
         public IDialogService dialogService;
-
 
         public MainWindow()
         {
@@ -140,6 +140,14 @@ namespace Root_AOP01_Inspection
         {
             dialogService = new DialogService(this);
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+
+            if (ProgramManager.Instance.Initialize() == false)
+            {
+                MessageBox.Show("Program Initialization fail");
+                return;
+            }
+
+            ProgramManager.Instance.DialogService = this.dialogService;
 
             m_engineer.Init("AOP01");
             
