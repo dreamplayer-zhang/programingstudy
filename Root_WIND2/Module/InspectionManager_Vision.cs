@@ -197,9 +197,9 @@ namespace Root_WIND2
         //    this.SetBundles(works, currentWorkplaceBundle);
         //}
 
-        public void SnapDone_Callback(object obj, SnapDoneArgs args)
-        {
-            if (this.workplaceBundle == null) return;
+            works.Add(position);
+            //works.Add(surface);
+            //works.Add(d2d);
 
             Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
             
