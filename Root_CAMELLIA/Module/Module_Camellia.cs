@@ -13,15 +13,10 @@ using Emgu.CV.Cvb;
 using Emgu.CV.Structure;
 using RootTools.ImageProcess;
 using RootTools.Camera.Dalsa;
-using RootTools.Control;
 using RootTools.Control.Ajin;
 using RootTools.Inspects;
-using RootTools.Light;
 using RootTools.Memory;
-using RootTools.Module;
 using RootTools.RADS;
-using RootTools.Trees;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -32,6 +27,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using static RootTools.Control.Axis;
 using System.Windows.Diagnostics;
+
 namespace Root_CAMELLIA.Module
 {
     public class Module_Camellia : ModuleBase

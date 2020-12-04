@@ -6,11 +6,13 @@ using System.Collections.ObjectModel;
 using RootTools.Module;
 using Root_Vega.Module;
 using System.Security.Cryptography.X509Certificates;
+using System.Windows.Threading;
 
 namespace Root_Vega
 {
-    class _1_Mainview_ViewModel : ObservableObject
+    public class _1_Mainview_ViewModel : ObservableObject
     {
+        public Dispatcher _dispatcher;
         Vega_Engineer m_Engineer;
         public Vega_Engineer p_Engineer
         {
@@ -21,6 +23,25 @@ namespace Root_Vega
             set
             {
                 SetProperty(ref m_Engineer, value);
+            }
+        }
+        DispatcherTimer m_dispatcherTimer;
+        PatternVision m_PatternVision;        
+        public PatternVision p_PatternVision
+        {
+            get { return m_PatternVision; }
+            set
+            {
+                SetProperty(ref m_PatternVision, value);
+            }
+        }
+        SideVision m_SideVision;
+        public SideVision p_SideVision
+        {
+            get { return m_SideVision; }
+            set
+            {
+                SetProperty(ref m_SideVision, value); 
             }
         }
         Vega_Handler m_Handler;
@@ -108,13 +129,47 @@ namespace Root_Vega
             }
         }
 
+        double m_dPatternInspProgress = 0.0;
+        public double p_dPatternInspProgress
+        {
+            get { return m_dPatternInspProgress; }
+            set
+            {
+                SetProperty(ref m_dPatternInspProgress, value);
+            }
+        }
+
+        double m_dSideInspProgress = 0.0;
+        public double p_dSideInspProgress
+        {
+            get { return m_dSideInspProgress; }
+            set
+            {
+                SetProperty(ref m_dSideInspProgress, value);
+            }
+        }
+
+        int m_nTotalDefectCount = 0;
+        public int p_nTotalDefectCount
+        {
+            get { return m_nTotalDefectCount; }
+            set
+            {
+                SetProperty(ref m_nTotalDefectCount, value);
+            }
+        }
 
         private readonly IDialogService m_DialogService;
 
         public _1_Mainview_ViewModel(Vega_Engineer engineer, IDialogService dialogService)
         {
+            _dispatcher = Dispatcher.CurrentDispatcher;
             m_DialogService = dialogService;
             m_Engineer = engineer;
+            m_dispatcherTimer = new DispatcherTimer();
+            m_dispatcherTimer.Interval = TimeSpan.FromTicks(10000000);
+            m_dispatcherTimer.Tick += new EventHandler(timer_Tick);
+            m_dispatcherTimer.Start();
             p_Handler = (Vega_Handler)engineer.ClassHandler();
             p_Process = p_Handler.m_process;
             InitAlarmData();
@@ -124,6 +179,20 @@ namespace Root_Vega
             p_MiniImageViewer_Top = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideTop")), true);
             p_MiniImageViewer_Left = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideLeft")));
             p_MiniImageViewer_Right = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideRight")));
+
+            p_PatternVision = ((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision;
+            p_SideVision = ((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision;
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            if (p_PatternVision.p_nTotalBlockCount == 0) p_dPatternInspProgress = 0.0;
+            else p_dPatternInspProgress = (double)p_Engineer.m_InspManager.p_nPatternInspDoneNum / (double)p_PatternVision.p_nTotalBlockCount * 100;
+
+            if (p_SideVision.p_nTotalBlockCount == 0) p_dSideInspProgress = 0.0;
+            else p_dSideInspProgress = (double)p_Engineer.m_InspManager.p_nSideInspDoneNum / (double)p_SideVision.p_nTotalBlockCount * 100;
+
+            p_nTotalDefectCount = p_Engineer.m_InspManager.m_nTotalDefectCount;
         }
 
         void LoadLp1()
@@ -185,7 +254,7 @@ namespace Root_Vega
             }
         }
 
-        void TestFunction()
+        public void TestFunction()
         {
             p_MiniImageViewer_Left.SetRoiRect();
             p_MiniImageViewer.SetRoiRect();
@@ -195,7 +264,6 @@ namespace Root_Vega
             p_MiniImageViewer_Left.SetImageSource();
             p_MiniImageViewer_Right.SetImageSource();
             p_test = !p_test;
-
             //((GAF_Manager)m_Engineer.ClassGAFManager()).SetAlarm(this.ToString(), eAlarm.TestAlarm2);
 
             //if (EQ.p_eState == EQ.eState.Init)

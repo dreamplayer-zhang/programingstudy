@@ -169,5 +169,15 @@ namespace Root_AxisMapping
             m_login.ThreadStop();
             LogView.ThreadStop();
         }
+
+        public string BuzzerOff()
+        {
+            return "OK";
+        }
+
+        public string Recovery()
+        {
+            return "OK";
+        }
     }
 }

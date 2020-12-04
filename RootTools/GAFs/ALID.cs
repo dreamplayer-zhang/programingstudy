@@ -54,7 +54,7 @@ namespace RootTools.GAFs
                 if (m_gem != null) m_gem.SetAlarm(this, _bSet);
                 p_dateTime = DateTime.Now;
                 OnPropertyChanged();
-                if (value && m_bEQError)
+                if (value && p_bEQError)
                 {
                     m_listALID.SetALID(this);
                     m_sqALID.Insert();
@@ -64,12 +64,23 @@ namespace RootTools.GAFs
             }
         }
 
-        bool m_bEQError = false; 
+        bool _bEQError = false;
+        public bool p_bEQError
+        {
+            get { return _bEQError; }
+            set
+            {
+                if (_bEQError == value) return;
+                _bEQError = value;
+                OnPropertyChanged(); 
+            }
+        }
+
         public void Run(bool bSet, string sMsg)
         {
             p_sMsg = sMsg; 
             p_bSet = bSet;
-            if (bSet && m_bEQError)
+            if (bSet && p_bEQError)
             {
                 EQ.p_eState = EQ.eState.Error;
                 EQ.p_bStop = true; 
@@ -137,7 +148,7 @@ namespace RootTools.GAFs
             p_nID = tree.Set(p_nID, nDefaultID, "Number", "SVID Number");
             p_sImageFile = tree.SetFile(p_sImageFile, "", "jpg", "Image", "Image File Name");
             p_sDesc = tree.Set(p_sDesc, p_sDesc, "Descrition", "ALID Description");
-            m_bEQError = tree.Set(m_bEQError, m_bEQError, "EQ Error", "EQ Error when Set"); 
+            p_bEQError = tree.Set(p_bEQError, p_bEQError, "EQ Error", "EQ Error when Set"); 
         }
 
         public void Save(StreamWriter sw)

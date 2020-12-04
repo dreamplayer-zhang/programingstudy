@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace Root_AOP01_Inspection
 {
-    class Setup_ViewModel : ObservableObject
+    public class Setup_ViewModel : ObservableObject
     {
         private UserControl _CurrentPanel;
         public UserControl CurrentPanel
@@ -36,16 +36,16 @@ namespace Root_AOP01_Inspection
 
         public MainWindow m_MainWindow;
 
-        public SetupHome_ViewModel m_Home;
+        private SetupHome_ViewModel m_Home;
         public Maintenance_ViewModel m_Maintenance;
-        public GEM_ViewModel m_GEM;
+        private GEM_ViewModel m_GEM;
 
-        public RecipeWizard_ViewModel m_RecipeWizard;
-        public RecipeSpec_ViewModel m_RecipeSpec;
-        public Recipe45D_ViewModel m_Recipe45D;
-        public RecipeFrontside_ViewModel m_RecipeFrontSide;
-        public RecipeEdge_ViewModel m_RecipeEdge;
-        public RecipeLADS_ViewModel m_RecipeLADS;
+        private RecipeWizard_ViewModel m_RecipeWizard;
+        private RecipeSpec_ViewModel m_RecipeSpec;
+        private Recipe45D_ViewModel m_Recipe45D;
+        private RecipeFrontside_ViewModel m_RecipeFrontSide;
+        private RecipeEdge_ViewModel m_RecipeEdge;
+        private RecipeLADS_ViewModel m_RecipeLADS;
 
         public Setup_ViewModel(MainWindow mainwindow)
         {

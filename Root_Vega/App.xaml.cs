@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,5 +40,33 @@ namespace Root_Vega
 		public static string MainFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
 
 		public static string indexFilePath = @"C:\vsdb\init\SearchIndex.sqlite";
+		protected override void OnStartup(StartupEventArgs e)
+		{
+			base.OnStartup(e);
+			AppDomain.CurrentDomain.UnhandledException += (sender, arg) => ReportException(sender, arg.ExceptionObject as Exception);
+		}
+		public static void ReportException(object sender, Exception exception)
+		{
+			#region const
+			const string messageFormat = @"
+===========================================================
+ERROR, date = {0}, sender = {1},
+{2}
+";
+			string path = Path.Combine(MainFolder, "error.log");
+			#endregion
+
+			try
+			{
+				var message = string.Format(messageFormat, DateTimeOffset.Now, sender, exception);
+
+				Debug.WriteLine(message);
+				File.AppendAllText(path, message);
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine(ex);
+			}
+		}
 	}
 }

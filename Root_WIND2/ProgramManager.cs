@@ -36,10 +36,16 @@ namespace Root_WIND2
 
         private bool IsInitilized = false;
         //Memory
-        private string memoryPool = "pool";
-        private string memoryGroup = "group";
-        private string memoryNameImage = "mem";
+        //private string memoryPool = "pool";
+        //private string memoryGroup = "group";
+        //private string memoryNameImage = "mem";
+        //private string memoryNameROI = "ROI";
+
+        private string memoryPool = "Vision.Memory";
+        private string memoryGroup = "Vision";
+        private string memoryNameImage = "Main";
         private string memoryNameROI = "ROI";
+
 
         //Recipe
         private string recipeFolderPath = @"C:\Root\Recipe";
@@ -108,9 +114,13 @@ namespace Root_WIND2
             memoryTool = engineer.ClassMemoryTool();
 
             image = new ImageData(memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameImage));
-            roiLayer = new ImageData(memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameROI));
+            image.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameImage).p_nCount;
+
+            roiLayer = new ImageData(memoryTool.GetMemory("pool", "group", memoryNameROI));
+            //roiLayer.p_nByte = memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameROI).p_nCount;
 
             ImageEdge = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop);
+            //ImageEdge.p_nByte = engineer.m_handler.m_edgesideVision.GetMemoryData(Module.EdgeSideVision.EDGE_TYPE.EdgeTop).p_nByte;
 
             return true;
         }

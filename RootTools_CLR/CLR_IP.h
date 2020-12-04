@@ -30,8 +30,8 @@ namespace RootTools_CLR
 
 		// Method는 3, 5 권장 (다른 Method들은 정규화 되지 않아 Score가 100 이상 나올 수 있음) - 정확성 3 < 5, 속도 3 > 5
 		// OutPosX, OutPosY는 Matching Box의 좌상단. {CenterX, CenterY} = {OutPosX + nTempW / 2, OutPosY + nTempH / 2}
-		static float Cpp_TemplateMatching(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod);
-		static float Cpp_TemplateMatching(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod);
+		static float Cpp_TemplateMatching(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt);
+		static float Cpp_TemplateMatching(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt);
 
 		// ********* D2D ******** //
 		static void Cpp_SubtractAbs(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH);
@@ -41,7 +41,8 @@ namespace RootTools_CLR
 		// Create Golden Image
 		static void Cpp_CreateGoldenImage_Avg(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH);
 		static void Cpp_CreateGoldenImage_NearAvg(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH);
-		//static void Cpp_CreateGoldenImage_Median(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH); // 구현 필요
+		static void Cpp_CreateGoldenImage_MedianAvg(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH);
+		static void Cpp_CreateGoldenImage_Median(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH);
 
 		// D2D 3.0
 		// EdgeSuppression, BrightSuppression Level은 1~10 단계, 0 = 사용 x

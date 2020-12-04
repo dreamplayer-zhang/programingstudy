@@ -135,16 +135,6 @@ namespace RootTools.Memory
                 MemoryPool pool = new MemoryPool(sPool, this, 1);
                 p_aPool.Add(pool);
             }
-            foreach (MemoryPool pool in p_aPool)
-            {
-                if (pool.m_MMF == null) return true; 
-            }
-            foreach (MemoryPool pool in p_aPool)
-            {
-                pool.UpdateMemoryData();
-                pool.RunTree(Tree.eMode.RegRead);
-                pool.RunTree(Tree.eMode.Init);
-            }
             return false; 
         }
 

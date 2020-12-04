@@ -51,5 +51,25 @@ namespace RootTools_Vision
 
             return bundle;
         }
+
+        public static WorkBundle CreateWorkBundle(Recipe _recipe, WorkplaceBundle _workplaceBundle)
+        {
+            List<ParameterBase> paramList = _recipe.ParameterItemList;
+            WorkBundle bundle = new WorkBundle();
+
+            foreach(ParameterBase param in paramList)
+            {
+                WorkBase work = (WorkBase)Tools.CreateInstance(param.InspectionType);
+                work.SetRecipe(_recipe);
+                work.SetWorkplaceBundle(_workplaceBundle);
+
+                bundle.Add(work);
+            }
+
+            ProcessDefect processDefect = new ProcessDefect();
+            ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
+
+            return bundle;
+        }
     }
 }

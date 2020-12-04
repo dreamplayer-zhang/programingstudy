@@ -162,7 +162,7 @@ namespace RootTools.GAFs
             if (alid != null) return alid;
             alid = new ALID(module, m_listALID, id, sDesc);
             group.m_aALID.Add(alid);
-            m_listALID.m_aALID.Add(alid);
+            m_listALID.p_aALID.Add(alid);
             return alid;
         }
 
@@ -173,10 +173,12 @@ namespace RootTools.GAFs
         #endregion
 
         string m_id;
+        public IEngineer m_engineer; 
         public Log m_log;
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
+            m_engineer = engineer; 
             m_log = LogView.GetLog(id, "GAF");
             m_listCEID.Init(id + ".CEID", this);
             m_listSVID.Init(id + ".SVID", this);

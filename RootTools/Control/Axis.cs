@@ -336,7 +336,7 @@ namespace RootTools.Control
 
         public virtual string Jog(double fScale, string sSpeed = null)
         {
-            m_speedNow = (sSpeed != null) ? GetSpeedValue(sSpeed) : GetSpeedValue(eSpeed.Move);
+            m_speedNow = (sSpeed != null) ? GetSpeedValue(sSpeed) : GetSpeedValue(eSpeed.Jog);
             m_swMove.Start();
             if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";

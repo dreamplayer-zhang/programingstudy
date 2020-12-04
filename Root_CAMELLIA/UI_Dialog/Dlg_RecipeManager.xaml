@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
-        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Icon"
         xmlns:cp="clr-namespace:ColorPickerLib.Controls;assembly=ColorPickerLib"
@@ -86,7 +85,7 @@
                         Height="25"
                         Margin="2,0,0,0"
                         VerticalAlignment="Bottom"
-                        Command="{Binding btnClose}">
+                        Command="{Binding CmdClose}">
                     <Path Style="{StaticResource CloseIconKey}" />
                 </Button>
             </StackPanel>
@@ -94,10 +93,10 @@
         <!--Menu-->
         <Menu Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2"
               Height="25">
-            <MenuItem x:Name="RecipeNew" Header="New"  Height="25" Command="{Binding RecipeNew}"/>
-            <MenuItem x:Name="RecipeOpen" Header="Open" Command="{Binding RecipeOpen}"/>
-            <MenuItem x:Name="RecipeSave" Header="Save" Command="{Binding RecipeSave}"/>
-            <MenuItem x:Name="RecipeSaveAs" Header="Save As" Command="{Binding RecipeSaveAs}"/>
+            <MenuItem x:Name="RecipeNew" Header="New"  Height="25" Command="{Binding CmdRecipeNew}"/>
+            <MenuItem x:Name="RecipeOpen" Header="Open" Command="{Binding CmdRecipeOpen}"/>
+            <MenuItem x:Name="RecipeSave" Header="Save" Command="{Binding CmdRecipeSave}"/>
+            <MenuItem x:Name="RecipeSaveAs" Header="Save As" Command="{Binding CmdRecipeSaveAs}"/>
         </Menu>
 
         <Grid Grid.Row="2">
@@ -136,10 +135,10 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Button Content="13 Point" Grid.Column="0" Grid.Row="0" Margin="5" Command="{Binding btn13Point}"/>
-                        <Button Content="25 Point"  Grid.Column="1" Grid.Row="0" Margin="5" Command="{Binding btn25Point}"/>
-                        <Button Content="49 Point" Grid.Column="0" Grid.Row="1" Margin="5" Command="{Binding btn49Point}"/>
-                        <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding btn73Point}"/>
+                        <Button Content="13 Point" Grid.Column="0" Grid.Row="0" Margin="5" Command="{Binding Cmd13Point}"/>
+                        <Button Content="25 Point"  Grid.Column="1" Grid.Row="0" Margin="5" Command="{Binding Cmd25Point}"/>
+                        <Button Content="49 Point" Grid.Column="0" Grid.Row="1" Margin="5" Command="{Binding Cmd49Point}"/>
+                        <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding Cmd73Point}"/>
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="File Loader" Grid.Row="1">
@@ -259,18 +258,18 @@
                         </Grid.ColumnDefinitions>
                         <GroupBox Header="Point Setting">
                             <UniformGrid Columns="4" Rows="1">
-                                <Button Content="Reset" Margin="5" Command="{Binding btnReset}"/>
-                                <Button Content="Preset 1" Margin="5" Command="{Binding btnPreset1}"/>
-                                <Button Content="Preset 2" Margin="5" Command="{Binding btnPreset2}" />
-                                <Button Content="Custermize" Margin="5" Command="{Binding btnCustomize}"/>
+                                <Button Content="Reset" Margin="5" Command="{Binding CmdReset}"/>
+                                <Button Content="Preset 1" Margin="5" Command="{Binding CmdPreset1}"/>
+                                <Button Content="Preset 2" Margin="5" Command="{Binding CmdPreset2}" />
+                                <Button Content="Custermize" Margin="5" Command="{Binding CmdCustomize}"/>
                             </UniformGrid>
                         </GroupBox>
                         <GroupBox Header="Point Selector" Grid.Column="1">
                             <UniformGrid Columns="4" Rows="1">
                                 <TextBox Text="{Binding Percentage}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5"/>
-                                <Button Content="Select %" Margin="5" Command="{Binding btnSelectPercentage}"/>
-                                <Button Content="Select All" Margin="5" Command="{Binding btnSelectAll}"/>
-                                <Button Content="Delete All" Margin="5" Command="{Binding btnDeleteAll}"/>
+                                <Button Content="Select %" Margin="5" Command="{Binding CmdSelectPercentage}"/>
+                                <Button Content="Select All" Margin="5" Command="{Binding CmdSelectAll}"/>
+                                <Button Content="Delete All" Margin="5" Command="{Binding CmdDeleteAll}"/>
                             </UniformGrid>
                         </GroupBox>
                     </Grid>
@@ -395,8 +394,8 @@
                         </Grid.ColumnDefinitions>
                         <GroupBox Header="Tool Plus">
                             <UniformGrid Columns="4">
-                                <Button Margin="5" x:Name="LockBtn" Content="{Binding LockState}" Background="{Binding LockBrush}" Command="{Binding UILock}"/>
-                                <Button Margin="5" x:Name="ShowBtn" Content="ShowIndex" Background="{Binding ShowIndexBrush}" Command="{Binding ShowIndex}"/>
+                                <Button Margin="5" x:Name="LockBtn" Content="{Binding LockState}" Background="{Binding LockBrush}" Command="{Binding CmdUILock}"/>
+                                <Button Margin="5" x:Name="ShowBtn" Content="ShowIndex" Background="{Binding ShowIndexBrush}" Command="{Binding CmdShowIndex}"/>
                             </UniformGrid>
                         </GroupBox>
                         <GroupBox Header="Key State" Grid.Column="1">
@@ -463,8 +462,8 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <Button Grid.Column="0" Grid.RowSpan="2" Content="Reorder Route" Margin="5" Command="{Binding ReorderPoint}" Background="{Binding ReorderBrush}" />
-                            <Button Grid.Column="1" Grid.RowSpan="2" Margin="5" Command="{Binding RouteOptimizaion}">
+                            <Button Grid.Column="0" Grid.RowSpan="2" Content="Reorder Route" Margin="5" Command="{Binding CmdReorderPoint}" Background="{Binding ReorderBrush}" />
+                            <Button Grid.Column="1" Grid.RowSpan="2" Margin="5" Command="{Binding CmdRouteOptimizaion}">
                                 <TextBlock TextAlignment="Center">Find Nearest<LineBreak/>Next Point</TextBlock>
                             </Button>
 
