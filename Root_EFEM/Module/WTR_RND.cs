@@ -365,7 +365,7 @@ namespace Root_EFEM.Module
             try
             {
                 if (sMsgs.Length > 1) return GetErrorString(sMsgs[1]);
-                else if (sMsgs[0] == sLastCmd && sMsgs.Length == 1) return "Received Successfully : " + sLastCmd;
+                else if (sMsgs[0] == sLastCmd && sMsgs.Length == 1) return "OK"; //return "Received Successfully : " + sLastCmd;
                 else return "Cannot Receive Status Command : " + sLastCmd;
             }
             catch (Exception)
@@ -414,7 +414,7 @@ namespace Root_EFEM.Module
 
         eCmd m_eSendCmd = eCmd.None;
         string WriteCmd(eCmd cmd, params object[] objs)
-        {
+        {       
             if (EQ.IsStop()) return "EQ Stop";
             Thread.Sleep(10);
             if (m_eSendCmd != eCmd.None)
@@ -495,11 +495,11 @@ namespace Root_EFEM.Module
                 if (Run(WaitReply(m_secHome))) return p_sInfo;
                 p_eState = eState.Ready;
                 foreach (IWTRChild child in m_aChild) child.p_bLock = false;
-                return p_sInfo;
+                return "OK";
             }
             finally
             {
-                if (p_sInfo != "OK") p_eState = eState.Error;
+               // if (p_sInfo != "OK") p_eState = eState.Error;
             }
         }
         #endregion
@@ -848,6 +848,7 @@ namespace Root_EFEM.Module
                     sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
                     m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot);
                 }
+                else m_nChildID = 0;
             }
 
             public override string Run()
@@ -860,7 +861,7 @@ namespace Root_EFEM.Module
                     child.SetInfoWafer(m_nChildID, null);
                     return "OK";
                 }
-                int posWTR = child.GetTeachWTR();
+                int posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (child.p_eState != eState.Ready)
                 {
@@ -927,6 +928,7 @@ namespace Root_EFEM.Module
                     sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
                     m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot);
                 }
+                else m_nChildID = 0;
             }
 
             public override string Run()
@@ -944,7 +946,7 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
-                int posWTR = child.GetTeachWTR();
+                int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
                 if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;

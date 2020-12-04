@@ -24,13 +24,21 @@ namespace Root_Vega
         public _2_6_Side()
         {
             InitializeComponent();
-			App.m_engineer.m_InspManager.AddSideDefect += App_AddDefect;
+			App.m_engineer.m_InspManager.AddTopSideDefect += App_AddTopDefect;
+			App.m_engineer.m_InspManager.AddLeftSideDefect += App_AddLeftDefect;
+			App.m_engineer.m_InspManager.AddRightSideDefect += App_AddRightDefect;
+			App.m_engineer.m_InspManager.AddBotSideDefect += App_AddBotDefect;
+
 			App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
 			InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
 		}
 		~_2_6_Side()
 		{
-			App.m_engineer.m_InspManager.AddSideDefect -= App_AddDefect;
+			App.m_engineer.m_InspManager.AddTopSideDefect -= App_AddTopDefect;
+			App.m_engineer.m_InspManager.AddLeftSideDefect -= App_AddLeftDefect;
+			App.m_engineer.m_InspManager.AddRightSideDefect -= App_AddRightDefect;
+			App.m_engineer.m_InspManager.AddBotSideDefect -= App_AddBotDefect;
+
 			App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
 			InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
 		}
@@ -86,11 +94,8 @@ namespace Root_Vega
 			}
 		}
 
-		private void App_AddDefect(RootTools.DefectDataWrapper item)
+		private void App_AddTopDefect(RootTools.DefectDataWrapper item)
 		{
-			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
-				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.SideInspectionTop)
-			{
 				try
 				{
 					viewer_top.Dispatcher.Invoke(new Action(delegate ()
@@ -104,10 +109,9 @@ namespace Root_Vega
 				{
 					Console.WriteLine(ex.Message);
 				}
-			}
-			else if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
-				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.SideInspectionBottom)
-			{
+		}
+		private void App_AddBotDefect(RootTools.DefectDataWrapper item)
+		{
 				try
 				{
 					viewer_bot.Dispatcher.Invoke(new Action(delegate ()
@@ -121,10 +125,9 @@ namespace Root_Vega
 				{
 					Console.WriteLine(ex.Message);
 				}
-			}
-			else if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
-				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.SideInspectionLeft)
-			{
+		}
+		private void App_AddLeftDefect(RootTools.DefectDataWrapper item)
+		{
 				try
 				{
 					viewer_left.Dispatcher.Invoke(new Action(delegate ()
@@ -138,10 +141,9 @@ namespace Root_Vega
 				{
 					Console.WriteLine(ex.Message);
 				}
-			}
-			else if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
-				   InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.SideInspectionRight)
-			{
+		}
+		private void App_AddRightDefect(RootTools.DefectDataWrapper item)
+		{
 				try
 				{
 					viewer_right.Dispatcher.Invoke(new Action(delegate ()
@@ -155,7 +157,6 @@ namespace Root_Vega
 				{
 					Console.WriteLine(ex.Message);
 				}
-			}
 		}
 	}
 }

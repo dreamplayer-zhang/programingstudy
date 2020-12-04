@@ -32,7 +32,7 @@ public:
 	static void Labeling_SubPix(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nW, int nH, bool bDark, int thresh, float Scale);
 
 	// Method 참고 : https://docs.opencv.org/2.4/doc/tutorials/imgproc/histograms/template_matching/template_matching.html
-	static float TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nSrcW, int nSrcH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method = 5);
+	static float TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nSrcW, int nSrcH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt);
 
 	// ********* D2D ******** //
 	static void SubtractAbs(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH);
@@ -42,6 +42,8 @@ public:
 	// Create Golden Image
 	static void CreateGoldenImage_Avg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH);
 	static void CreateGoldenImage_NearAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH);
+	static void CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH);
+	static void CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH);
 
 	// D2D 3.0
 	// EdgeSuppression, BrightSuppression Level은 1~10 단계, 0 = 사용 x

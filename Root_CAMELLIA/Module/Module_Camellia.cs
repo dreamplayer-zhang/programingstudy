@@ -37,9 +37,31 @@ namespace Root_CAMELLIA.Module
         public MainWindow_ViewModel mwvm;
 
         #region ToolBox
-        public AxisXY m_axisXY;
-        public Axis m_axisZ;
-        public Camera_Basler m_CamVRS;
+        AxisXY m_axisXY;
+        public AxisXY p_axisXY
+        {
+            get
+            {
+                return m_axisXY;
+            }
+            set
+            {
+                m_axisXY = value;
+            }
+        }
+        Axis m_axisZ;
+        public Axis p_axisZ
+        {
+            get
+            {
+                return m_axisZ;
+            }
+            set
+            {
+                m_axisZ = value;
+            }
+        }
+        Camera_Basler m_CamVRS;
 
         #region Light
         LightSet m_lightSet;
@@ -157,7 +179,7 @@ namespace Root_CAMELLIA.Module
                 m_WaferLT_pulse = tree.Set(m_WaferLT_pulse, m_WaferLT_pulse, "Wafer Left Top", "Wafer Left Top (Pulse)");
                 m_WaferRT_pulse = tree.Set(m_WaferRT_pulse, m_WaferRT_pulse, "Wafer Right Top", "Wafer Right Top (Pulse)");
                 m_WaferRB_pulse = tree.Set(m_WaferRB_pulse, m_WaferRB_pulse, "Wafer Right Bottom", "Wafer Right Bottom (Pulse)");
-                m_EdgeSearchRange = tree.Set(m_EdgeSearchRange, m_EdgeSearchRange, "Edge Search Range" , "Edge Search Range");
+                m_EdgeSearchRange = tree.Set(m_EdgeSearchRange, m_EdgeSearchRange, "Edge Search Range", "Edge Search Range");
                 m_EdgeSearchLength = tree.Set(m_EdgeSearchLength, m_EdgeSearchLength, "Edge Search Length", "Edge Search Length");
                 m_BGIntTime_VIS = tree.Set(m_BGIntTime_VIS, m_BGIntTime_VIS, "VIS Background cal integration time", "VIS Background cal integration(exposure) time");
                 m_BGIntTime_NIR = tree.Set(m_BGIntTime_NIR, m_BGIntTime_NIR, "NIR Background cal integration time", "NIR Background cal integration(exposure) time");
@@ -208,6 +230,8 @@ namespace Root_CAMELLIA.Module
             int m_EdgeSearchRange = 20;
             int m_EdgeSearchLength = 500;
             int m_EdgeSearchLevel = 30;
+            double m_dResX_um = 1;
+            double m_dResY_um = 1;
 
             public Run_WaferCentering(Module_Camellia module)
             {
@@ -219,28 +243,94 @@ namespace Root_CAMELLIA.Module
             public override ModuleRunBase Clone()
             {
                 Run_WaferCentering run = new Run_WaferCentering(m_module);
+                run.m_DataManager = m_module.m_DataManager;
+                run.m_WaferLT_pulse = m_WaferLT_pulse;
+                run.m_WaferRT_pulse = m_WaferRT_pulse;
+                run.m_WaferRB_pulse = m_WaferRB_pulse;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_WaferLT_pulse = tree.Set(m_WaferLT_pulse, m_WaferLT_pulse,"Wafer Left Top", "Wafer Left Top (Pulse)");
+                m_WaferLT_pulse = tree.Set(m_WaferLT_pulse, m_WaferLT_pulse, "Wafer Left Top", "Wafer Left Top (Pulse)");
                 m_WaferRT_pulse = tree.Set(m_WaferRT_pulse, m_WaferRT_pulse, "Wafer Right Top", "Wafer Right Top (Pulse)");
                 m_WaferRB_pulse = tree.Set(m_WaferRB_pulse, m_WaferRB_pulse, "Wafer Right Bottom", "Wafer Right Bottom (Pulse)");
                 m_EdgeSearchRange = tree.Set(m_EdgeSearchRange, m_EdgeSearchRange, "Edge Search Range", "Edge Search Range");
                 m_EdgeSearchLength = tree.Set(m_EdgeSearchLength, m_EdgeSearchLength, "Edge Search Length", "Edge Search Length");
-                m_EdgeSearchLevel = tree.Set(m_EdgeSearchLevel, m_EdgeSearchLevel,"Edge Search Level", "Edge Search Level");
+                m_EdgeSearchLevel = tree.Set(m_EdgeSearchLevel, m_EdgeSearchLevel, "Edge Search Level", "Edge Search Level");
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)");
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)");
             }
 
             public override string Run()
             {
 
-               
+                AxisXY axisXY = m_module.m_axisXY;
+                Axis axisZ = m_module.m_axisZ;
+                string strVRSImageDir = "D:\\";
+                string strVRSImageFullPath = "";
+
                 //AxisXY axisXY = m_module.m_axisXY;
 
                 Camera_Basler VRS = m_module.m_CamVRS;
                 ImageData img = VRS.p_ImageViewer.p_ImageData;
-                m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel);
+
+
+                if (m_module.Run(axisZ.StartMove(47932)))
+                {
+                    return p_sInfo;
+                }
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
+
+
+                if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+
+
+
+
+                if (VRS.Grab() == "OK")
+                {
+                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 0);
+                    img.SaveImageSync(strVRSImageFullPath);
+                    //Grab error
+                }
+                m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.LT);
+
+
+                if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+
+                if (VRS.Grab() == "OK")
+                {
+                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
+                    img.SaveImageSync(strVRSImageFullPath);
+                    //Grab error
+                }
+                m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.RT);
+
+
+                if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+
+                if (VRS.Grab() == "OK")
+                {
+                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
+                    img.SaveImageSync(strVRSImageFullPath);
+                    //Grab error
+                }
+                m_DataManager.m_waferCentering.FindEdge(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLength, m_EdgeSearchLevel, WaferCentering.eDir.RB);
+
+
+                m_DataManager.m_waferCentering.CalCenterPoint(VRS.GetRoiSize(), m_dResX_um, m_dResY_um, m_WaferLT_pulse, m_WaferRT_pulse, m_WaferRB_pulse);
+
                 //img.p_Stride;
                 //img.GetPtr();
 
@@ -299,13 +389,13 @@ namespace Root_CAMELLIA.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_BGIntTime_VIS = tree.Set(m_BGIntTime_VIS, m_BGIntTime_VIS, "VIS Background cal integration time", "VIS Background cal integration(exposure) time", false);
-                m_BGIntTime_NIR = tree.Set(m_BGIntTime_NIR, m_BGIntTime_NIR, "NIR Background cal integration time", "NIR Background cal integration(exposure) time", false);
-                m_Average_VIS = tree.Set(m_Average_VIS, m_Average_VIS, "VIS Spectrum Count", "VIS Spectrum Count", false);
-                m_Average_NIR = tree.Set(m_Average_NIR, m_Average_NIR, "NIR Spectrum Count", "NIR Spectrum Count", false);
-                m_InitialCal = tree.Set(m_InitialCal, m_InitialCal, "Initial Calibration", "Initial Calibration", false);
-                m_CalWaferCenterPos_pulse = tree.Set(m_CalWaferCenterPos_pulse, m_CalWaferCenterPos_pulse, "Calibration Wafer Center Axis Position", "Calibration Wafer Center Axis Position(Pulse)", false);
-                m_RefWaferCenterPos_pulse = tree.Set(m_RefWaferCenterPos_pulse, m_RefWaferCenterPos_pulse, "Reference Wafer Center Axis Position", "Reference Wafer Center Axis Position(Pulse)", false);
+                m_BGIntTime_VIS = tree.Set(m_BGIntTime_VIS, m_BGIntTime_VIS, "VIS Background cal integration time", "VIS Background cal integration(exposure) time");
+                m_BGIntTime_NIR = tree.Set(m_BGIntTime_NIR, m_BGIntTime_NIR, "NIR Background cal integration time", "NIR Background cal integration(exposure) time");
+                m_Average_VIS = tree.Set(m_Average_VIS, m_Average_VIS, "VIS Spectrum Count", "VIS Spectrum Count");
+                m_Average_NIR = tree.Set(m_Average_NIR, m_Average_NIR, "NIR Spectrum Count", "NIR Spectrum Count");
+                m_InitialCal = tree.Set(m_InitialCal, m_InitialCal, "Initial Calibration", "Initial Calibration");
+                m_CalWaferCenterPos_pulse = tree.Set(m_CalWaferCenterPos_pulse, m_CalWaferCenterPos_pulse, "Calibration Wafer Center Axis Position", "Calibration Wafer Center Axis Position(Pulse)");
+                m_RefWaferCenterPos_pulse = tree.Set(m_RefWaferCenterPos_pulse, m_RefWaferCenterPos_pulse, "Reference Wafer Center Axis Position", "Reference Wafer Center Axis Position(Pulse)");
             }
 
             public override string Run()
@@ -361,16 +451,24 @@ namespace Root_CAMELLIA.Module
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_WaferCenterPos_pulse = tree.Set(m_WaferCenterPos_pulse, m_WaferCenterPos_pulse, "Wafer Center Axis Position", "Wafer Center Axis Position(Pulse)", false);
-                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)", false);
-                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)", false);
-                m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)", false);
+                m_WaferCenterPos_pulse = tree.Set(m_WaferCenterPos_pulse, m_WaferCenterPos_pulse, "Wafer Center Axis Position", "Wafer Center Axis Position(Pulse)");
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)");
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)");
+                m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)");
             }
             public override string Run()
             {
                 //m_module.p_eState = (eState)5;
                 AxisXY axisXY = m_module.m_axisXY;
                 Axis axisZ = m_module.m_axisZ;
+                // stage 48724 , wafer 47932
+                if (m_module.Run(axisZ.StartMove(m_dFocusZ_pulse)))
+                {
+                    return p_sInfo;
+                }
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
+
                 Camera_Basler VRS = m_module.m_CamVRS;
                 ImageData img = VRS.p_ImageViewer.p_ImageData;
                 string strVRSImageDir = "D:\\";
@@ -378,8 +476,10 @@ namespace Root_CAMELLIA.Module
                 RPoint MeasurePoint;
                 for (int i = 0; i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count; i++)
                 {
-                    double dX = m_WaferCenterPos_pulse.X + m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].x * 10000;
-                    double dY = m_WaferCenterPos_pulse.Y + m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].y * 10000;
+                    double dX = m_WaferCenterPos_pulse.X + (m_WaferCenterPos_pulse.X - m_DataManager.m_waferCentering.m_ptCenter.X) + 
+                        m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].x * 10000;
+                    double dY = m_WaferCenterPos_pulse.Y + (m_WaferCenterPos_pulse.Y - m_DataManager.m_waferCentering.m_ptCenter.Y) +
+                        m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].y * 10000;
                     MeasurePoint = new RPoint(dX, dY);
 
                     if (m_module.Run(axisXY.StartMove(MeasurePoint)))
@@ -387,12 +487,12 @@ namespace Root_CAMELLIA.Module
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
 
-                    
+
 
                     if (VRS.Grab() == "OK")
                     {
-                    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", i);
-                    img.SaveImageSync(strVRSImageFullPath);
+                        strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", i);
+                        img.SaveImageSync(strVRSImageFullPath);
                         //Grab error
                     }
                 }
@@ -452,5 +552,5 @@ namespace Root_CAMELLIA.Module
         }
     }
 
-    
+
 }

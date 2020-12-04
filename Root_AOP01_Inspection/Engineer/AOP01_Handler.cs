@@ -46,13 +46,14 @@ namespace Root_AOP01_Inspection
             InitLoadport();
             m_vision = new Module.Vision("Vision", m_engineer);
             InitModule(m_vision);
-
-            m_wtr.RunTree(Tree.eMode.RegRead);
-            m_wtr.RunTree(Tree.eMode.Init);
-            ((IWTR)m_wtr).ReadInfoReticle_Registry();
-
             m_mainVision = new MainVision("MainVision", m_engineer);
             InitModule(m_mainVision);
+            m_wtr.RunTree(Tree.eMode.RegRead);
+            m_wtr.RunTree(Tree.eMode.Init);
+            ((IWTR)m_wtr).AddChild(m_mainVision);
+            ((IWTR)m_wtr).ReadInfoReticle_Registry();
+
+            
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
             //m_process = new AOP01_Process("Process", m_engineer, this);

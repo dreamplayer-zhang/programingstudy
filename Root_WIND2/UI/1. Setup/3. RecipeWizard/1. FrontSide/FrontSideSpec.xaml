@@ -34,7 +34,6 @@
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0" DataContext="{Binding m_ImageViewer_VM}">
-
                         <GroupBox Header="Mask"
                               Background="{StaticResource GroupBoxBackground}">
                             <Grid>

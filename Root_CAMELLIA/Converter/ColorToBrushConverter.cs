@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace Root_CAMELLIA.ShapeDraw
+namespace Root_CAMELLIA
 {
     public class ColorToBrushConverter : IValueConverter
     {

@@ -399,11 +399,12 @@ namespace Root_Vega
 				return;
 
 			//0. 개수 초기화 및 Table Drop
-			//_clearInspReslut();
+			_clearInspReslut();
 
 			ClearDrawList();
 
 			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
+			int nTotalBlockCount = 0;
 			for (int i = 0; i < 4; i++)
 			{
 				for (int k = 0; k < p_SideRoiList.Count; k++)
@@ -454,7 +455,12 @@ namespace Root_Vega
 								break;
 						}
 						List<CRect> adjustAreaList = AdjustArea(inspAreaList[i], inspMargin, upper, center, under);
-
+						// 검사영역 블럭갯수 카운트
+						//for (int n = 0; n < adjustAreaList.Count; n++)
+      //                  {
+						//	nTotalBlockCount += GetTotalBlockCountInSideInspArea(adjustAreaList[n], 1000);
+      //                  }
+						//
 						for (int n = 0; n < adjustAreaList.Count; n++)
 						{
 							var temp = new UIElementInfo(new Point(adjustAreaList[n].Left, adjustAreaList[n].Top), new Point(adjustAreaList[n].Right, adjustAreaList[n].Bottom));
@@ -473,17 +479,39 @@ namespace Root_Vega
 
 							MemoryData memory = m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]);
 							IntPtr p = memory.GetPtr(0);
-							m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_sideMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).GetMBOffset(),
+							nTotalBlockCount = nTotalBlockCount + m_Engineer.m_InspManager.CreateInspArea(App.sSidePool, App.sSideGroup, App.m_sideMem[i], m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).GetMBOffset(),
 								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.X,
 								m_Engineer.GetMemory(App.sSidePool, App.sSideGroup, App.m_sideMem[i]).p_sz.Y,
-								adjustAreaList[n], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p);
+								adjustAreaList[n], 1000, param, nDefectCode, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance, 0, p).Count;
 						}
 						p_ImageViewer_List[i].SetRoiRect();
 					}
 				}
 			}
+			((Vega_Handler)m_Engineer.ClassHandler()).m_sideVision.p_nTotalBlockCount = nTotalBlockCount;
 			m_Engineer.m_InspManager.StartInspection();
 		}
+
+		int GetTotalBlockCountInSideInspArea(CRect crtArea, int nBlockSize)
+        {
+			// variable
+			int nOriginWidth = crtArea.Width;
+			int nOriginHeight = crtArea.Height;
+			int nHorizontalBlockCount = 0;
+			int nVerticalBlockCount = 0;
+			int nTotalBlockCount = 0;
+
+			// implement
+			nHorizontalBlockCount = nOriginWidth / nBlockSize;
+			if (nOriginWidth % nBlockSize != 0) nHorizontalBlockCount++;
+
+			nVerticalBlockCount = nOriginHeight / nBlockSize;
+			if (nOriginHeight % nBlockSize != 0) nVerticalBlockCount++;
+
+			nTotalBlockCount = nHorizontalBlockCount * nVerticalBlockCount;
+
+			return nTotalBlockCount;
+        }
 
 		private List<CRect> AdjustArea(CRect originArea, int inspMargin, int upper, int center, int under)
 		{

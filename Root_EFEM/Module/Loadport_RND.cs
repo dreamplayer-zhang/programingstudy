@@ -288,7 +288,7 @@ namespace Root_EFEM.Module
         {
             if (Run(WriteCmd(eCmd.ResetCPU))) return p_sInfo;
             if (Run(WaitReply(m_secRS232))) return p_sInfo;
-            return "OK";
+            return "OK";    
         }
 
         string CmdLoad(bool bMapping = true)
@@ -318,16 +318,15 @@ namespace Root_EFEM.Module
         string ReplyCmd(string[] sMsgs)
         {
             if (sMsgs.Length < 1) return p_id + " Reply Message Too Short";
-            if (m_dicCmd[m_eSendCmd] != sMsgs[0]) return p_id + " Commnuication Error : " + m_sLastCmd + " != " + sMsgs[0];
-            switch (m_eSendCmd)
+            //if (m_dicCmd[m_eSendCmd] != sMsgs[0]) return p_id + " Commnuication Error : " + m_sLastCmd + " != " + sMsgs[0];
+            if (m_dicCmd[eCmd.GetMapData] == sMsgs[0])
             {
-                case eCmd.GetMapData:
-                    if (Run(CheckReplyError(2, sMsgs))) return p_sInfo;
-                    if (Run(SetLoadportMapData(sMsgs[1]))) return p_sInfo;
-                    break;
-                default:
-                    if (Run(CheckReplyError(1, sMsgs))) return p_sInfo;
-                    break;
+                if (Run(CheckReplyError(2, sMsgs))) return p_sInfo;
+                if (Run(SetLoadportMapData(sMsgs[1]))) return p_sInfo;
+            }
+            else
+            {
+                if (Run(CheckReplyError(1, sMsgs))) return p_sInfo;
             }
             return "OK";
         }
