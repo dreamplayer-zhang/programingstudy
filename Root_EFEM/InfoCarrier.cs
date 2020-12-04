@@ -261,7 +261,7 @@ namespace Root_EFEM
         #region Mapping Function
         public string SetMapData(List<GemSlotBase.eState> aSlotState)
         {
-            if (p_lWafer != aSlotState.Count) return "SetMapData Lendth Error";
+            if (p_lWafer > aSlotState.Count) return "SetMapData Lendth Error";
             for (int n = 0; n < p_lWafer; n++)
             {
                 if (aSlotState[n] == GemSlotBase.eState.Exist) SetInfoWafer(n);
