@@ -22,8 +22,6 @@ namespace Root_CAMELLIA
 {
     public class Dlg_RecipeManager_ViewModel : ObservableObject, IDialogRequestClose
     {
-        public delegate void stageChanged(object e);
-        public event stageChanged StageChanged;
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
         private MainWindow_ViewModel MainViewModel;
         public DataManager dataManager;
@@ -2512,7 +2510,7 @@ namespace Root_CAMELLIA
         #region ICommand&MethodAction
 
         #region ICommand
-        public ICommand RouteOptimizaion
+        public ICommand CmdRouteOptimizaion
         {
             get
             {
@@ -2526,7 +2524,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand ReorderPoint
+        public ICommand CmdReorderPoint
         {
             get
             {
@@ -2571,7 +2569,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand ShowIndex
+        public ICommand CmdShowIndex
         {
             get
             {
@@ -2593,7 +2591,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand UILock
+        public ICommand CmdUILock
         {
             get
             {
@@ -2619,7 +2617,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btnClose
+        public ICommand CmdClose
         {
             get
             {
@@ -2646,7 +2644,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btn25Point
+        public ICommand Cmd25Point
         {
             get
             {
@@ -2663,7 +2661,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btn49Point
+        public ICommand Cmd49Point
         {
             get
             {
@@ -2679,7 +2677,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btn73Point
+        public ICommand Cmd73Point
         {
             get
             {
@@ -2696,7 +2694,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btnSelectPercentage
+        public ICommand CmdSelectPercentage
         {
             get
             {
@@ -2746,7 +2744,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btnSelectAll
+        public ICommand CmdSelectAll
         {
             get
             {
@@ -2773,7 +2771,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btnDeleteAll
+        public ICommand CmdDeleteAll
         {
             get
             {
@@ -2790,7 +2788,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btnReset
+        public ICommand CmdReset
         {
             get
             {
@@ -2810,7 +2808,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btnPreset1
+        public ICommand CmdPreset1
         {
             get
             {
@@ -2830,7 +2828,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btnPreset2
+        public ICommand CmdPreset2
         {
             get
             {
@@ -2850,7 +2848,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btnCustomize
+        public ICommand CmdCustomize
         {
             get
             {
@@ -2860,7 +2858,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand RecipeNew
+        public ICommand CmdRecipeNew
         {
             get
             {
@@ -2870,7 +2868,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand RecipeOpen
+        public ICommand CmdRecipeOpen
         {
             get
             {
@@ -2882,7 +2880,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand RecipeSave
+        public ICommand CmdRecipeSave
         {
             get
             {
@@ -2896,7 +2894,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand RecipeSaveAs
+        public ICommand CmdRecipeSaveAs
         {
             get
             {

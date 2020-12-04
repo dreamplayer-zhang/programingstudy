@@ -57,7 +57,7 @@ namespace RootTools_Vision
 
             // Inspection Param
             bool bGetDarkInsp = true; // Option
-            int nGrayLevel = 70; // Option
+            int nGrayLevel = 30; // Option
             int nDefectSz = 1; // Option     
 
             int chipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자

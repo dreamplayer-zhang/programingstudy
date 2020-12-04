@@ -82,5 +82,10 @@ namespace RootTools_Vision
         {
             this.IsWorkDone = true; // 이거 반드시 true로 바꿔줘야 다음 검사 진행
         }
+
+        public WorkBase CreateInstnace(WorkBase work)
+        {
+            return Activator.CreateInstance(work.GetType()) as WorkBase;
+        }
     }
 }

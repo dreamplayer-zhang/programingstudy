@@ -310,6 +310,18 @@ namespace Root_WIND2
             p_DrawElement.Clear();
         }
 
+        public void DefectClear()
+        {
+            foreach (TShape shape in Shapes)
+            {
+                
+
+            }
+            Shapes.Clear();
+            InfoTextBolcks.Clear();
+            p_DrawElement.Clear();
+        }
+
         public void ChangeImageData(ImageData image = null, IDialogService dialogService = null)
         {
             base.init(image, dialogService);

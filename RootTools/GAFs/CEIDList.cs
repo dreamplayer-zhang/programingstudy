@@ -9,11 +9,7 @@ namespace RootTools.GAFs
     public class CEIDList
     {
         #region List CEID
-        ObservableCollection<CEID> _aCEID = new ObservableCollection<CEID>();
-        public ObservableCollection<CEID> p_aCEID
-        {
-            get { return _aCEID; }
-        }
+        public ObservableCollection<CEID> p_aCEID { get; set; }
 
 
         public void SaveFile(string sFile)
@@ -68,6 +64,11 @@ namespace RootTools.GAFs
             m_treeRoot = new TreeRoot(id, m_log);
             m_treeRoot.UpdateTree += M_tree_UpdateTree;
             RunTree(Tree.eMode.RegRead);
+        }
+
+        public CEIDList()
+        {
+            p_aCEID = new ObservableCollection<CEID>();
         }
 
         public void ThreadStop()

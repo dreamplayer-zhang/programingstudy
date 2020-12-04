@@ -65,7 +65,7 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-        string m_id;
+        public string m_id;
         IEngineer m_engineer;
         public void Init(string id, IEngineer engineer)
         {

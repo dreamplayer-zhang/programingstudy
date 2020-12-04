@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_CAMELLIA.Icon
+namespace Root_CAMELLIA.Control.Icon
 {
     /// <summary>
-    /// AtiLogo.xaml에 대한 상호 작용 논리
+    /// Calendar.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class AtiLogo : UserControl
+    public partial class Calendar : UserControl
     {
-        public AtiLogo()
+        public Calendar()
         {
             InitializeComponent();
         }

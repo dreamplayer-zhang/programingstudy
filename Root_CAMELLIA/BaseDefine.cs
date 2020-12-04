@@ -19,7 +19,7 @@ namespace Root_CAMELLIA
         public const string Dir_StageMap = @"C:\Camellia\StageMap\";
         public const string Dir_Recipe = @"C:\Camellia\Recipe\PRD\15Line\"; // 변경해야함
         public const string Dir_StageHole = @"C:\Camellia\StageCircleHole.txt"; //변경해야함
-        public const string Dir_LockImg = "\\Icon\\locked.png";
+        public const string Dir_LockImg = "\\Resource\\locked.png";
 
     }
 }

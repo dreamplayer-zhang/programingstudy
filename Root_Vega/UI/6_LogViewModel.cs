@@ -7,6 +7,7 @@ namespace Root_Vega
     {
         Vega_Engineer m_engineer;
 		ModuleRunList m_moduleRunList;
+		//_1_2_LoadPort m_lp = ;
 		public ModuleRunList p_moduleRunList
 		{
 			get { return m_moduleRunList; }

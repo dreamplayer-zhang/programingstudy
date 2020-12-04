@@ -185,6 +185,7 @@ namespace RootTools.Camera.Dalsa
         {
             m_sServer = tree.Set(m_sServer, m_sServer, "Server", "Camera Dalsa Server Name");
             m_sCamFile = tree.SetFile(m_sCamFile, m_sCamFile, "ccf", "Cam File", "Camera Dalsa Cam File");
+            p_nCamBuf = tree.Set(p_nCamBuf, p_nCamBuf, "Buffer", "Camera Buffer Count");
         }
         #endregion
 

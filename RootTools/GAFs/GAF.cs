@@ -162,7 +162,7 @@ namespace RootTools.GAFs
             if (alid != null) return alid;
             alid = new ALID(module, m_listALID, id, sDesc);
             group.m_aALID.Add(alid);
-            m_listALID.m_aALID.Add(alid);
+            m_listALID.p_aALID.Add(alid);
             return alid;
         }
 

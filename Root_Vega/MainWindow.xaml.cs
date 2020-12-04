@@ -105,6 +105,8 @@ namespace Root_Vega
         {
             mvm = new _1_Mainview_ViewModel(App.m_engineer, dialogService);
             _Main.DataContext = mvm;
+            ((Vega_Handler)App.m_engineer.ClassHandler()).m_patternVision.m_mvm = mvm;
+            ((Vega_Handler)App.m_engineer.ClassHandler()).m_sideVision.m_mvm = mvm;
 
             _Recipe.DataContext = new _2_RecipeViewModel(App.m_engineer);
 

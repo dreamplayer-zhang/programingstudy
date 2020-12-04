@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class WorkFactory
+    public abstract class WorkFactory
     {
         private List<WorkManager> workManagers;
 
@@ -16,16 +16,16 @@ namespace RootTools_Vision
             InitWorkManager();
         }
 
-        protected virtual void InitWorkManager()
-        {
-        }
+        protected abstract void InitWorkManager();
+
+        protected abstract bool CreateInspection(Recipe _recipe);
 
         public void  Init()
         {
             workManagers = new List<WorkManager>();
         }
 
-        public void Add(WorkManager manager)
+        protected void Add(WorkManager manager)
         {
             workManagers.Add(manager);
         }
