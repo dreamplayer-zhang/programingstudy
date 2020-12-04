@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:Icon ="clr-namespace:Root_CAMELLIA.Icon"
+        xmlns:met="clr-namespace:LibSR_Met;assembly=LibSR_Met"
+        xmlns:tools="clr-namespace:RootTools.Control.ACS;assembly=RootTools"
         mc:Ignorable="d"
         WindowStyle="None"
         AllowsTransparency="False"
@@ -13,6 +15,9 @@
         Width="1920"
         Title="CAMELLIA2"
         Background="{StaticResource PanelBackGround}">
+    <Window.Resources>
+        <local:AxisConverter x:Key="AxisConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -506,12 +511,12 @@
                                 <UniformGrid Grid.Column="0" Columns="3" Background="Gainsboro" Margin="2">
                                     <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
                                     <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
-                                    <TextBlock Text="{Binding XPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
+                                    <TextBlock Text="{Binding p_Module_Camellia.p_axisXY.p_axisX.p_posActual, Converter={StaticResource AxisConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
                                 </UniformGrid>
                                 <UniformGrid Grid.Column="1" Columns="3" Background="Gainsboro" Margin="2">
                                     <TextBlock Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
                                     <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
-                                    <TextBlock Text="{Binding YPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
+                                    <TextBlock Text="{Binding p_Module_Camellia.p_axisXY.p_axisY.p_posActual, Converter={StaticResource AxisConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
                                 </UniformGrid>
                             </Grid>
                         </GroupBox>
@@ -551,9 +556,9 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <GroupBox Header="Contour Map">
-
+                            
                         </GroupBox>
-                        <GroupBox Header="Measurement Data" Grid.Row="1">
+                        <GroupBox Header="Measurement Data" Grid.Row="1" Grid.RowSpan="2">
                             <TabControl Background="Transparent">
                                 <TabItem Header="Point List">
                                     <Grid>
@@ -590,11 +595,14 @@
                                 </TabItem>
                                 <TabItem Header="Parameter">
                                 </TabItem>
+                                <TabItem Header="RT Graph">
+                              
+                                </TabItem>
                             </TabControl>
                         </GroupBox>
-                        <GroupBox Header="RT Graph" Grid.Row="2">
-
-                        </GroupBox>
+                        <!--<GroupBox Header="RT Graph" Grid.Row="2">
+                        </GroupBox>-->
+                        
                     </Grid>
                 </TabItem>
                 <TabItem Header="Log" Width="80">

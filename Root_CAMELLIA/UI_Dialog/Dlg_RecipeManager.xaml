@@ -7,7 +7,6 @@
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" 
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Icon"
-        xmlns:converter="clr-namespace:Root_CAMELLIA.ShapeDraw"
         xmlns:cp="clr-namespace:ColorPickerLib.Controls;assembly=ColorPickerLib"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -18,7 +17,7 @@
         Background="{StaticResource PanelBackGround}"
         mc:Ignorable="d">
     <Window.Resources>
-        <converter:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+        <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
