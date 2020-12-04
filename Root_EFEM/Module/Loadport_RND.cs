@@ -288,7 +288,7 @@ namespace Root_EFEM.Module
         {
             if (Run(WriteCmd(eCmd.ResetCPU))) return p_sInfo;
             if (Run(WaitReply(m_secRS232))) return p_sInfo;
-            return "OK";
+            return "OK";    
         }
 
         string CmdLoad(bool bMapping = true)

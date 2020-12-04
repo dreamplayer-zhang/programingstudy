@@ -200,8 +200,10 @@ namespace Root_EFEM.Module
             m_aCmd.Add(new Command(eCmd.GetState, "STS"));
             m_aCmd.Add(new Command(eCmd.VacuumOn, "VVN"));
             m_aCmd.Add(new Command(eCmd.VacuumOff, "VVF"));
-            m_aCmd.Add(new Command(eCmd.CheckWaferVac, "WCH VR1"));
-            m_aCmd.Add(new Command(eCmd.CheckWaferCCD, "WCHC VR1"));
+            //m_aCmd.Add(new Command(eCmd.CheckWaferVac, "WCH VR1"));
+            m_aCmd.Add(new Command(eCmd.CheckWaferVac, "WCH"));
+            //m_aCmd.Add(new Command(eCmd.CheckWaferCCD, "WCHC VR1"));
+            m_aCmd.Add(new Command(eCmd.CheckWaferCCD, "WCHC"));
             m_aCmd.Add(new Command(eCmd.Align, "ALG"));
             m_aCmd.Add(new Command(eCmd.AlignRotate, "ALX"));
             m_aCmd.Add(new Command(eCmd.SetWaferType, "WFT"));
