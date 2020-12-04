@@ -9,15 +9,6 @@
         Closing="Window_Closing"
         Title="Root EFEM" Height="1000" Width="1920" WindowState="Maximized">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="50"/>
-        </Grid.RowDefinitions>
-        <Grid>
-            <local:EFEM_Engineer_UI x:Name="engineerUI" Grid.Row="0"/>
-        </Grid>
-        <StackPanel Grid.Row="1">
-            <Button x:Name="ALIDList" Content="ALIDList" Click="ALIDList_Click" Grid.Row="1" Margin="10" Height="30" Width="1900" FontSize="18" FontWeight="Bold" />
-        </StackPanel>
+        <local:EFEM_Engineer_UI x:Name="engineerUI" Grid.Row="0"/>
     </Grid>
 </Window>

@@ -928,6 +928,7 @@ namespace Root_EFEM.Module
                     sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
                     m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot);
                 }
+                else m_nChildID = 0;
             }
 
             public override string Run()

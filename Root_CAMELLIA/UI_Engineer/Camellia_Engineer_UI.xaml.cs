@@ -1,18 +1,6 @@
 ﻿using RootTools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+using RootTools.Trees;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Root_CAMELLIA
 {
@@ -30,9 +18,11 @@ namespace Root_CAMELLIA
         {
             m_engineer = engineer;
             logViewUI.Init(LogView.m_logView);
+            treeRootUI.Init(engineer.m_treeRoot);
             loginUI.Init(engineer.m_login);
             toolBoxUI.Init(engineer.ClassToolBox());
             handlerUI.Init(engineer.m_handler);
+            engineer.RunTree(Tree.eMode.Init);
         }
     }
 }

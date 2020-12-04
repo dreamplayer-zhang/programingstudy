@@ -212,6 +212,16 @@ namespace Root_EFEM
         }
         #endregion
 
+        #region Tree
+        public void RunTreeModule(Tree tree)
+        {
+            RunTreeWTR(tree.GetTree("WTR"));
+            RunTreeLoadport(tree.GetTree("Loadport"));
+            RunTreeAligner(tree.GetTree("Aligner"));
+            RunTreeVision(tree.GetTree("Vision"));
+        }
+        #endregion
+
         #region StateHome
         public string StateHome()
         {
@@ -340,17 +350,6 @@ namespace Root_EFEM
                 }
             }
         }
-        #endregion
-
-        #region Tree
-        public void RunTreeModule(Tree tree)
-        {
-            RunTreeWTR(tree.GetTree("WTR"));
-            RunTreeLoadport(tree.GetTree("Loadport"));
-            RunTreeAligner(tree.GetTree("Aligner"));
-            RunTreeVision(tree.GetTree("Vision"));
-        }
-
         #endregion
 
         string m_id;
