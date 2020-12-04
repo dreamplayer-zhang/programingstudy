@@ -1186,25 +1186,29 @@ namespace Root_CAMELLIA
             }
 
             string fileName = BaseDefine.Dir_StageHole; //Todo 수정해야함
-            StreamReader sr = new StreamReader(fileName);
-            while (!sr.EndOfStream)
+            try
             {
-                string sLine = sr.ReadLine().Trim();
-                string sText = sLine.Substring(sLine.IndexOf(':') + 1);
-
-                if (sLine == string.Empty || sText == string.Empty)
+                StreamReader sr = new StreamReader(fileName);
+                while (!sr.EndOfStream)
                 {
-                    return;
-                }
+                    string sLine = sr.ReadLine().Trim();
+                    string sText = sLine.Substring(sLine.IndexOf(':') + 1);
 
-                if (sText.IndexOf('~') == -1)
-                {
-                    string[] str = sText.Split(',');
+                    if (sLine == string.Empty || sText == string.Empty)
+                    {
+                        return;
+                    }
 
-                    Circle circle = new Circle(double.Parse(str[0]), double.Parse(str[1]), double.Parse(str[2]), double.Parse(str[2]));
-                    dataStageCircleHole.Add(circle);
+                    if (sText.IndexOf('~') == -1)
+                    {
+                        string[] str = sText.Split(',');
+
+                        Circle circle = new Circle(double.Parse(str[0]), double.Parse(str[1]), double.Parse(str[2]), double.Parse(str[2]));
+                        dataStageCircleHole.Add(circle);
+                    }
                 }
             }
+            catch { }
         }
 
         private void RedrawStage()

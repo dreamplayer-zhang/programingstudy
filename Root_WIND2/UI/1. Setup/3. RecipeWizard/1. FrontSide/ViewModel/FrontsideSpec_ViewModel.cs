@@ -13,67 +13,16 @@ namespace Root_WIND2
     class FrontsideSpec_ViewModel : ObservableObject
     {
 
-        private FrontsideSpecTool_ViewModel m_ImageViewer_VM;
-        public FrontsideSpecTool_ViewModel p_ImageViewer_VM
-        {
-            get
-            {
-                return m_ImageViewer_VM;
-            }
-            set
-            {
-                SetProperty(ref m_ImageViewer_VM, value);
-            }
-        }
 
-
+        public Frontside_ViewModel m_front;
         public Recipe m_Recipe;
-        public void init(Setup_ViewModel setup, Recipe recipe)
+        public void init(Frontside_ViewModel front, Recipe recipe)
         {
             m_Recipe = recipe;
-
+            m_front = front;    
             m_cMask = new ObservableCollection<Mask>();
             m_cInspMethod = new ObservableCollection<ParameterBase>();
             m_cInspItem = new ObservableCollection<InspectionItem>();
-
-            p_ImageViewer_VM = new FrontsideSpecTool_ViewModel();
-            p_ImageViewer_VM.init(setup, recipe);
-
-
-            MaskDummy();
-        }
-        void MaskDummy()
-        {
-            Mask mask1 = new Mask();
-            mask1.p_sName = "Mask1";
-            mask1.p_Color = Color.Red;
-            mask1.p_dHeight = 200;
-            mask1.p_dWidth = 200;
-            mask1.p_PtMask = new System.Windows.Point(30, 30);
-            Mask mask2 = new Mask();
-            mask2.p_sName = "Mask2";
-            mask2.p_Color = Color.Blue;
-            mask2.p_dHeight = 400;
-            mask2.p_dWidth = 400;
-            mask2.p_PtMask = new System.Windows.Point(50, 50);
-            Mask mask3 = new Mask();
-            mask3.p_sName = "Mask3";
-            mask3.p_Color = Color.Green;
-            mask3.p_dHeight = 800;
-            mask3.p_dWidth = 800;
-            mask3.p_PtMask = new System.Windows.Point(100, 100);
-
-            p_cMask.Add(mask1);
-            p_cMask.Add(mask2);
-            p_cMask.Add(mask3);
-
-
-
-            p_cInspMethod = ParameterBase.GetChildClass();
-
-            p_selectedMethodItem = ParameterBase.CreateChildInstance(p_cInspMethod[0]);
-
-            //p_cInspMethod = workList;
         }
 
 
@@ -161,23 +110,6 @@ namespace Root_WIND2
         }
         #endregion
 
-        public ICommand btnAddInspItem
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    InspectionItem item = new InspectionItem();
-                    item.p_cMask = p_cMask;
-                    item.p_cInspMethod = CloneMethod();
-                    item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
-                    item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
-
-                    p_cInspItem.Add(item);
-                    SetParameter();
-                });
-            }
-        }
 
         public ObservableCollection<ParameterBase> CloneMethod()
         {
@@ -201,6 +133,38 @@ namespace Root_WIND2
             SetParameter();
         }
 
+
+
+        public void SetParameter()
+        {
+            List<ParameterBase> paramList = new List<ParameterBase>();
+            foreach(InspectionItem item in p_cInspItem)
+            {
+                paramList.Add(item.p_InspMethod);
+            }
+
+            this.m_Recipe.ParameterItemList = paramList;
+        }
+
+        #region ICommand
+        public ICommand btnAddInspItem
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    InspectionItem item = new InspectionItem();
+                    item.p_cMask = p_cMask;
+                    item.p_cInspMethod = CloneMethod();
+                    item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
+                    item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
+
+                    p_cInspItem.Add(item);
+                    SetParameter();
+                    var asdf = m_front.p_ROI_VM;
+                });
+            }
+        }
         public ICommand btnDeleteInspItem
         {
             get
@@ -213,7 +177,6 @@ namespace Root_WIND2
                 });
             }
         }
-
         public ICommand ComboBoxSelectionChanged_MethodItem
         {
             get
@@ -225,16 +188,6 @@ namespace Root_WIND2
                 });
             }
         }
-
-        public void SetParameter()
-        {
-            List<ParameterBase> paramList = new List<ParameterBase>();
-            foreach(InspectionItem item in p_cInspItem)
-            {
-                paramList.Add(item.p_InspMethod);
-            }
-
-            this.m_Recipe.ParameterItemList = paramList;
-        }
+        #endregion
     }
 }

@@ -77,7 +77,7 @@ namespace Root_WIND2
         private InspectionMode inspectionMode = InspectionMode.FRONT;
         public InspectionMode p_InspectionMode { get => inspectionMode; set => inspectionMode = value; }
 
-		public int[] mapdata = new int[14 * 14];
+        public int[] mapdata = new int[14 * 14];
 
 
         public bool CreateInspection()
@@ -105,7 +105,7 @@ namespace Root_WIND2
 
                 this.SetBundles(workBundle, workplaceBundle);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Inspection 생성에 실패하였습니다.\nDetail : " + ex.Message);
                 return false;
@@ -130,7 +130,7 @@ namespace Root_WIND2
             ProcessDefect processDefect = new ProcessDefect();
             works.Add(processDefect);
 
-            WorkplaceBundle workplaces = WorkplaceBundle.CreateWaferMap(waferMap, this.recipe.GetRecipe<OriginRecipe>());            
+            WorkplaceBundle workplaces = WorkplaceBundle.CreateWaferMap(waferMap, this.recipe.GetRecipe<OriginRecipe>());
             workplaces.WorkplaceStateChanged += ChangedWorkplaceState_Callback;
 
             ProcessDefect_Wafer processDefect_Wafer = new ProcessDefect_Wafer();
@@ -158,7 +158,7 @@ namespace Root_WIND2
         //        MessageBox.Show("Map 정보가 없습니다.");
         //        return;
         //    }
-           
+
         //    WorkBundle works = new WorkBundle();
         //    Position position = new Position();
         //    position.SetRecipe(recipe);
@@ -197,17 +197,17 @@ namespace Root_WIND2
         //    this.SetBundles(works, currentWorkplaceBundle);
         //}
 
-            works.Add(position);
-            //works.Add(surface);
-            //works.Add(d2d);
+        public void SnapDone_Callback(object obj, SnapDoneArgs args)
+        {
+            if (this.workplaceBundle == null) return;
 
             Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
-            
-            foreach(Workplace wp in this.workplaceBundle)
+
+            foreach (Workplace wp in this.workplaceBundle)
             {
                 Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.BufferSizeY), new Point(wp.PositionX + wp.BufferSizeX, wp.PositionY));
-                
-                if(snapArea.Contains(checkArea) == true)
+
+                if (snapArea.Contains(checkArea) == true)
                 {
                     wp.STATE = WORKPLACE_STATE.SNAP;
                 }
@@ -223,7 +223,7 @@ namespace Root_WIND2
                 Workplace workplace = _obj as Workplace;
 
                 if (MapStateChanged != null && workplace.MapPositionX >= 0 && workplace.MapPositionY >= 0)
-                        MapStateChanged(workplace.MapPositionX, workplace.MapPositionY, workplace.STATE);
+                    MapStateChanged(workplace.MapPositionX, workplace.MapPositionY, workplace.STATE);
             }
         }
 

@@ -43,5 +43,10 @@ namespace RootTools.GAFs
         {
             m_listALID.ClearALID();
         }
+
+        private void ALIDPopup_Click(object sender, RoutedEventArgs e)
+        {
+            m_listALID.ShowPopup();
+        }
     }
 }
