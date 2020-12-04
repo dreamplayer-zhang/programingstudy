@@ -130,7 +130,7 @@ namespace Root_WIND2
 
             works.Add(position);
             //works.Add(surface);
-            //works.Add(d2d);
+            works.Add(d2d);
 
             ProcessDefect processDefect = new ProcessDefect();
             works.Add(processDefect);

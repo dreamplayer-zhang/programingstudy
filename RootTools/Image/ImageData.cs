@@ -209,9 +209,9 @@ namespace RootTools
 					for (int c = rect.Left; c < rect.Left + rect.Width; c++, idx++)
 					{
 						xOffset = c + (long)r * stride / 3;
-						m_aBuf[nByte * idx + 2] = *(Rptr + xOffset);
+						m_aBuf[nByte * idx + 0] = *(Rptr + xOffset);
 						m_aBuf[nByte * idx + 1] = *(Gptr + xOffset);
-						m_aBuf[nByte * idx + 0] = *(Bptr + xOffset);
+						m_aBuf[nByte * idx + 2] = *(Bptr + xOffset);
 					}
 				}
 			}

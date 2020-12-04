@@ -111,7 +111,7 @@ namespace RootTools_Vision
                                 (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY, 
                                 this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                                 feature.Width, feature.Height,
-                                startX, startY, endX, endY, 5);
+                                startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
                         }
 
                         if( score > maxScore)
@@ -227,7 +227,7 @@ namespace RootTools_Vision
                                 (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
                                 this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                                 feature.Width, feature.Height,
-                                startX, startY, endX, endY, 5);
+                                startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
                         }
 
                         if (score > maxScore)
@@ -266,7 +266,7 @@ namespace RootTools_Vision
                             (byte*)this.workplace.SharedBuffer.ToPointer(), feature.RawData, &outX, &outY,
                             this.workplace.SharedBufferWidth, this.workplace.SharedBufferHeight,
                             feature.Width, feature.Height,
-                            startX, startY, endX, endY, 5);
+                            startX, startY, endX, endY, 5, this.workplace.SharedBufferByteCnt);
                     }
 
                     maxScore = score;
