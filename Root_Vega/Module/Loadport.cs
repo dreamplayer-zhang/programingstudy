@@ -28,14 +28,18 @@ namespace Root_Vega.Module
         public DIO_IO m_dioLoad;
         public DIO_IO m_dioUnload;
         public DIO_O m_doAlarm;
-//        public DIO_Os m_doPodCylinder;
+        public DIO_I m_diIonizer;
+        public DIO_O m_doIonizerOnOff;
+        //        public DIO_Os m_doPodCylinder;
         public OHT_Semi m_OHT;
+
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Z");
             p_sInfo = m_toolBox.Get(ref m_axisTheta, this, "Theta");
             p_sInfo = m_toolBox.Get(ref m_axisPodLifter, this, "Pod Lifter");
             p_sInfo = m_toolBox.Get(ref m_axisReticleLifter, this, "Reticle Lifter");
+            p_sInfo = m_toolBox.Get(ref m_diIonizer, this, "X-ray Ionizer");
             p_sInfo = m_toolBox.Get(ref m_dioPlaced, this, "Placed");
             p_sInfo = m_toolBox.Get(ref m_dioPresent, this, "Present");
             p_sInfo = m_toolBox.Get(ref m_diInnerPod, this, "InnerPod");
@@ -45,7 +49,8 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_dioLoad, this, "Load");
             p_sInfo = m_toolBox.Get(ref m_dioUnload, this, "Unload");
             p_sInfo = m_toolBox.Get(ref m_doAlarm, this, "Alarm");
-//            p_sInfo = m_toolBox.Get(ref m_doPodCylinder, this, "Alarm", Enum.GetNames(typeof(ePodCylinder)));
+            p_sInfo = m_toolBox.Get(ref m_doIonizerOnOff, this, "IonizerOnOff");
+            //            p_sInfo = m_toolBox.Get(ref m_doPodCylinder, this, "Alarm", Enum.GetNames(typeof(ePodCylinder)));
             p_sInfo = m_toolBox.Get(ref m_OHT, this, m_infoPod, "OHT");
             if (bInit)
             {
@@ -218,10 +223,29 @@ namespace Root_Vega.Module
 //            if (m_diDoorOpen.p_bIn == false) return m_id + " Door Closed";
             return m_infoPod.IsPutOK(ref posRobot);
         }
+		bool _eIonizerState = false;
+		public bool p_eIonizerState
+		{
+            get { return _eIonizerState; }
+            set
+            {
+                _eIonizerState = value;
+                OnPropertyChanged();
+             }
+		}
 
+        public bool m_bIonizerDoorlockCheck = false;
         public string BeforeGet()
-        {
-            if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Get Sequence";
+		{
+			if (m_vega.m_diDoorLock.p_bIn == true)//check
+			{
+				m_bIonizerDoorlockCheck = true;
+				m_doIonizerOnOff.Write(true);//check
+                p_eIonizerState = true;
+				Thread.Sleep(20);
+				if (m_diIonizer.p_bIn != true) return "Ionizer is not On";//check
+			}
+			if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Get Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
             if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
             if (p_infoReticle == null) return p_id + " BeforeGet : InfoWafer = null";
@@ -230,6 +254,14 @@ namespace Root_Vega.Module
 
         public string BeforePut()
         {
+            if (m_vega.m_diDoorLock.p_bIn == true)//check
+            {
+                m_bIonizerDoorlockCheck = true;
+                m_doIonizerOnOff.Write(true);//check
+                p_eIonizerState = true;
+                Thread.Sleep(20);
+                if (m_diIonizer.p_bIn != true) return "Ionizer is not On";//check
+            }
             if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
             if (m_diReticle.p_bIn == true) return "Retile is exist in Loadport";
@@ -239,12 +271,22 @@ namespace Root_Vega.Module
 
         public string AfterGet()
         {
+            m_doIonizerOnOff.Write(false);//check
+            m_bIonizerDoorlockCheck = false;
+            p_eIonizerState = false;
+            Thread.Sleep(20);
+            if (m_diIonizer.p_bIn == true) return "Ionizer is not Off";
             if (m_diReticle.p_bIn == true) return "Reticle Get Fail";
             return IsRunOK();
         }
 
         public string AfterPut()
         {
+            m_doIonizerOnOff.Write(false);//check
+            m_bIonizerDoorlockCheck = false;
+            p_eIonizerState = false;
+            Thread.Sleep(20);
+            if (m_diIonizer.p_bIn == true) return "Ionizer is not Off";
             if (m_diReticle.p_bIn == false) return "Reticle Put Fail, Reticle Sensor not Detected";
             return IsRunOK();
         }
@@ -470,6 +512,8 @@ namespace Root_Vega.Module
         CEID m_ceidOpen;
         CEID m_ceidClose; 
         ALID m_alidPlaced;
+        ALID m_alidIonizer;
+
         void InitGAF()
         {
             m_svidPlaced = m_gaf.GetSVID(this, "Placed");
@@ -478,11 +522,13 @@ namespace Root_Vega.Module
             m_ceidOpen = m_gaf.GetCEID(this, "Door Open");
             m_ceidClose = m_gaf.GetCEID(this, "Door Close");
 			m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Present Sensor Should be Checked");
-		}
-		#endregion
+            m_alidIonizer = m_gaf.GetALID(this, "Ionizer Check", "Ionizer State");
 
-		#region Tree
-		public override void RunTree(Tree tree)
+        }
+        #endregion
+
+        #region Tree
+        public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
             RunTreeAxis(tree.GetTree("Axis InPos", false));
@@ -499,11 +545,13 @@ namespace Root_Vega.Module
         #endregion
 
         public InfoPod m_infoPod;
-        public Vega.RFID m_RFID = null; 
-        public Loadport(string id, string sLocID, IEngineer engineer)
+        public Vega.RFID m_RFID = null;
+        Vega m_vega; 
+        public Loadport(string id, string sLocID, IEngineer engineer, Vega vega)
         {
             p_id = id;
             m_log = LogView.GetLog(id, id);
+            m_vega = vega; 
             m_infoPod = new InfoPod(this, sLocID, engineer);
             m_RFID = ((Vega_Engineer)engineer).m_handler.m_vega.m_RFID; 
             m_aTool.Add(m_infoPod);
@@ -614,7 +662,7 @@ namespace Root_Vega.Module
             public override string Run()
             {
                 string sRun = m_module.RunLoad();
-                if (sRun != "OK") return "RunLoad Error : " + sRun; 
+                if (sRun != "OK") return "RunLoad Error : " + sRun;
                 m_infoPod.p_eState = InfoPod.eState.Load;
                 m_module.m_ceidLoad.Send();
                 m_module.m_ceidOpen.Send();

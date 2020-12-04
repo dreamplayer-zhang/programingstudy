@@ -19,6 +19,11 @@ namespace Root_Vega.Module
             Yellow,
             Green
         }
+        public enum eIonizer
+        {
+            LP1,
+            LP2
+        }
         enum eBuzzer
         { 
             Buzzer1,
@@ -28,19 +33,21 @@ namespace Root_Vega.Module
             BuzzerOff
         }
         eBuzzer m_eBuzzer = eBuzzer.BuzzerOff; 
-        string[] m_asLamp = Enum.GetNames(typeof(eLamp)); 
+        string[] m_asLamp = Enum.GetNames(typeof(eLamp));
+        string[] m_asIonizer = Enum.GetNames(typeof(eIonizer));
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
         public DIO_Os m_doLamp;
         DIO_Os m_doBuzzer;
         DIO_I m_diEMS;
         DIO_I m_diProtectionBar;
         DIO_I m_diMCReset;
-        DIO_I m_diIonizer;
         DIO_I m_diCDALow;
-        DIO_I m_diBuzzerOff;
-        DIO_I m_diDoorLock;
+        public DIO_IO m_dioBuzzerOff;
+        public DIO_I m_diDoorLock;
         DIO_I m_diInterlock_Key;
         DIO_O m_doDoorLock_Use;
+        DIO_Is m_diIonizerAlarmCheck;
+
 
 
         public override void GetTools(bool bInit)
@@ -50,14 +57,12 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_diEMS, this, "EMS");
             p_sInfo = m_toolBox.Get(ref m_diProtectionBar, this, "ProtectionBar");
             p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
-            p_sInfo = m_toolBox.Get(ref m_diIonizer, this, "Ionizer");
             p_sInfo = m_toolBox.Get(ref m_diCDALow, this, "CDA Low");
-            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
+            p_sInfo = m_toolBox.Get(ref m_dioBuzzerOff, this, "Buzzer Off");
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
             p_sInfo = m_toolBox.Get(ref m_diInterlock_Key, this, "InterLock Key");
             p_sInfo = m_toolBox.Get(ref m_doDoorLock_Use, this, "Door Lock Use");
-
-
+            p_sInfo = m_toolBox.Get(ref m_diIonizerAlarmCheck, this, "Ionizer Alarm Check",m_asIonizer,true,true);
             p_sInfo = m_RFID.GetTools(this, bInit);
             
                 if (bInit) InitALID(); 
@@ -69,20 +74,18 @@ namespace Root_Vega.Module
         ALID m_alidEMS;
         ALID m_alidProtectionBar;
         ALID m_alidMCReset;
-        ALID m_alidIonizer;
         ALID m_alidCDALow;
         ALID m_alidDoorLock;
-        ALID m_alidInterlock_Key;
+        ALID m_alidIonizerAlarm;
 
         void InitALID()
         {
 			m_alidEMS = m_gaf.GetALID(this, "EMS", "EMS Error");
 			m_alidProtectionBar = m_gaf.GetALID(this, "ProtectionBar", "ProtectionBar Error");
             m_alidMCReset = m_gaf.GetALID(this, "MC Reset", "MC Reset Error");
-            m_alidIonizer = m_gaf.GetALID(this, "Ionizer", "Ionizer Error");
             m_alidCDALow = m_gaf.GetALID(this, "CDA Low", "CDA Low Error");
             m_alidDoorLock = m_gaf.GetALID(this, "Door Lock", "Door Lock Error");
-            m_alidInterlock_Key = m_gaf.GetALID(this, "Interlock_Key", "Interlock Key State Check");
+            m_alidIonizerAlarm = m_gaf.GetALID(this, "Ionizer State Alarm", "Ionizer State Error");
         }
         #endregion
 
@@ -111,7 +114,7 @@ namespace Root_Vega.Module
                 m_eStatus = EQ.p_eState;
             }
 
-			if (m_diBuzzerOff.p_bIn || (m_gaf.m_listALID.m_aALID.Count < 1))
+			if (m_dioBuzzerOff.p_bIn || (m_gaf.m_listALID.m_aALID.Count < 1))
 				m_doBuzzer.Write(eBuzzer.BuzzerOff);
 
             //m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors", true);
@@ -122,8 +125,8 @@ namespace Root_Vega.Module
                 if (!m_diMCReset.p_bIn) m_robot.p_bDisableHomeWhenArmOpen = true; //CHECK
             }
             m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
-            m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer");
 			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA");
+            m_alidIonizerAlarm.Run(m_diIonizerAlarmCheck.ReadDI(eIonizer.LP1) || m_diIonizerAlarmCheck.ReadDI(eIonizer.LP2), "Please Check State of X-ray Ionizer");
         }
         #endregion
 

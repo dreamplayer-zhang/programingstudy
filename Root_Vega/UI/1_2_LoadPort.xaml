@@ -56,8 +56,9 @@
                             <RowDefinition/>
                             <RowDefinition/>
                             <RowDefinition/>
+                            <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Grid Grid.RowSpan="5"
+                        <Grid Grid.RowSpan="6"
                                           Background="{StaticResource LightGray}"/>
                         <TextBlock Text="POD ID"
                                            Grid.Row="0"
@@ -81,6 +82,11 @@
                                            Foreground="{StaticResource Black}"/>
                         <TextBlock Text="STATE"
                                            Grid.Row="4"
+                                           Style="{StaticResource BasicTb}"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource Black}"/>
+                        <TextBlock Text="IONIZER STATE"
+                                           Grid.Row="5"
                                            Style="{StaticResource BasicTb}"
                                            FontWeight="Bold"
                                            Foreground="{StaticResource Black}"/>
@@ -108,6 +114,11 @@
                         <TextBlock Text="{Binding p_eState}" x:Name="textBoxState"
                                            Grid.Column="1"
                                            Grid.Row="4"
+                                           Style="{StaticResource BasicTb}"
+                                           Foreground="{StaticResource Black}"/>
+                        <TextBlock Text="{Binding p_eIonizerState}" x:Name="textBoxIonizerState"
+                                           Grid.Column="1"
+                                           Grid.Row="5"
                                            Style="{StaticResource BasicTb}"
                                            Foreground="{StaticResource Black}"/>
 

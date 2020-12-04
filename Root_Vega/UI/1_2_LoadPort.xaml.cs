@@ -35,7 +35,6 @@ namespace Root_Vega
             textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxRecipe.DataContext = loadport.m_infoPod.m_aGemSlot[0];
-            //textBoxSlotID.DataContext = loadport.p_infoReticle.p_sReticleID;
             InitButtonLoad();
             InitTimer(); 
 
@@ -65,7 +64,16 @@ namespace Root_Vega
             borderAccessManual.Background = bAuto ? null : Brushes.LightGreen;
 
             buttonLoad.IsEnabled = IsEnableLoad();
-            buttonUnload.IsEnabled = IsEnableUnload(); 
+            buttonUnload.IsEnabled = IsEnableUnload();
+            if (m_loadport.m_bIonizerDoorlockCheck == false)
+            {
+                if (m_loadport.m_diIonizer.p_bIn)
+                {
+                    m_loadport.m_doIonizerOnOff.Write(false);
+                    Thread.Sleep(20);
+                    if (m_loadport.m_diIonizer.p_bIn != false) EQ.p_bStop = true;
+                }
+            }
         }
         #endregion
 
