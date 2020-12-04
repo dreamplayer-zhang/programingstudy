@@ -209,9 +209,9 @@ namespace RootTools
 					for (int c = rect.Left; c < rect.Left + rect.Width; c++, idx++)
 					{
 						xOffset = c + (long)r * stride / 3;
-						m_aBuf[nByte * idx + 2] = *(Rptr + xOffset);
+						m_aBuf[nByte * idx + 0] = *(Rptr + xOffset);
 						m_aBuf[nByte * idx + 1] = *(Gptr + xOffset);
-						m_aBuf[nByte * idx + 0] = *(Bptr + xOffset);
+						m_aBuf[nByte * idx + 2] = *(Bptr + xOffset);
 					}
 				}
 			}
@@ -854,7 +854,15 @@ namespace RootTools
 		{
 			FileStream fss = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read, 32768, true);
 			byte[] buf = new byte[nWidth];
-			fss.Seek(54 + 1024 + (nLowHeight - nStartHeight) * (long)nWidth , SeekOrigin.Begin);
+
+			BinaryReader br = new BinaryReader(fss);
+			ushort bfType = br.ReadUInt16();  //2 4 2 2 4 4 4 4 2  2 4 4 4 4 4 4 256*4 1024  54 
+			uint bfSize = br.ReadUInt32();
+			br.ReadUInt16();
+			br.ReadUInt16();
+			uint bfOffBits = br.ReadUInt32();
+
+			fss.Seek(bfOffBits + (nLowHeight - nStartHeight) * (long)nWidth , SeekOrigin.Begin);
 			for (int i = nStartHeight -1 ; i >= nEndHeight; i--)
 			{
 				if (Worker_MemoryCopy.CancellationPending)

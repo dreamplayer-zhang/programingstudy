@@ -132,6 +132,8 @@ namespace Root_WIND2
         {
             dialogService = new DialogService(this);
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+            dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
+            
 
             if(ProgramManager.Instance.Initialize() == false)
             {

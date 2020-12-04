@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_CAMELLIA.Icon
+namespace Root_AOP01_Inspection.UI._1._SETUP._3._Maintenance
 {
     /// <summary>
-    /// Calendar.xaml에 대한 상호 작용 논리
+    /// ViewerTest.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Calendar : UserControl
+    public partial class ViewerTest : UserControl
     {
-        public Calendar()
+        public ViewerTest()
         {
             InitializeComponent();
         }

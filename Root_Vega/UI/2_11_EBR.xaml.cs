@@ -22,18 +22,18 @@ namespace Root_Vega
 	public partial class _2_11_EBR : UserControl
 	{
 		public _2_11_EBR()
-		{
-			InitializeComponent();
-			App.m_engineer.m_InspManager.AddEBRDefect += App_AddDefect;
-			App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
-			InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
-		}
-		~_2_11_EBR()
-		{
-			App.m_engineer.m_InspManager.AddEBRDefect -= App_AddDefect;
-			App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
-			InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
-		}
+        {
+            InitializeComponent();
+            App.m_engineer.m_InspManager.AddEBRDefect += App_AddDefect;
+            App.m_engineer.m_InspManager.ClearDefect += _ClearDefect;
+            InspectionManager.RefreshDefect += InspectionManager_RefreshDefect;
+        }
+        ~_2_11_EBR()
+        {
+            App.m_engineer.m_InspManager.AddEBRDefect -= App_AddDefect;
+            App.m_engineer.m_InspManager.ClearDefect -= _ClearDefect;
+            InspectionManager.RefreshDefect -= InspectionManager_RefreshDefect;
+        }
 
 		private void InspectionManager_RefreshDefect()
 		{

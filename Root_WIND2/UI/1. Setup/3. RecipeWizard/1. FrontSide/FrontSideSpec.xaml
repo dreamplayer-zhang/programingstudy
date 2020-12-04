@@ -230,7 +230,7 @@
                                                                   VerticalContentAlignment="Center">
                                                         <i:Interaction.Triggers>
                                                             <i:EventTrigger EventName="SelectionChanged">
-                                                                <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_MethodItem}" />
+                                                                <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_MaskItem}" />
                                                             </i:EventTrigger>
                                                         </i:Interaction.Triggers>
                                                     </ComboBox>
@@ -254,7 +254,13 @@
                                                                   IsSynchronizedWithCurrentItem="False"
                                                                   DisplayMemberPath="Name"
                                                                   BorderThickness="1"
-                                                                  VerticalContentAlignment="Center"/>
+                                                                  VerticalContentAlignment="Center">
+                                                        <i:Interaction.Triggers>
+                                                            <i:EventTrigger EventName="SelectionChanged">
+                                                                <i:InvokeCommandAction Command="{Binding ComboBoxSelectionChanged_MethodItem}" />
+                                                            </i:EventTrigger>
+                                                        </i:Interaction.Triggers>
+                                                    </ComboBox>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>

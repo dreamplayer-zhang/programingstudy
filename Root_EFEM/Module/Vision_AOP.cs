@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Control;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
@@ -11,14 +12,45 @@ namespace Root_EFEM.Module
     {
         #region ToolBox
         MemoryPool m_memoryPool;
+
+        AxisXY m_axisXY;
+        public AxisXY p_axisXY
+        {
+            get
+            {
+                return m_axisXY;
+            }
+        }
+        Axis m_axistheta;
+        public Axis p_axistheta
+        {
+            get
+            {
+                return m_axistheta;
+            }
+        }
+
+        //Axis m_axisZ;
+        //public Axis p_axisZ
+        //{
+        //    get
+        //    {
+        //        return m_axisZ;
+        //    }
+        //}
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Stage");
+            p_sInfo = m_toolBox.Get(ref m_axistheta, this, "Theta");
+            //p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             if (bInit)
             {
                 InitMemory();
             }
         }
+
+        
         #endregion
 
         #region Memory
@@ -186,33 +218,49 @@ namespace Root_EFEM.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
-            AddModuleRunList(new Run_ReadyPosition(this), true, "Go to ReadyPosition");
+            AddModuleRunList(new Run_Ready(this), true, "Go to ReadyPosition");
         }
 
-        public class Run_ReadyPosition : ModuleRunBase
+        public class Run_Ready : ModuleRunBase
         {
             Vision_AOP m_module;
-            public Run_ReadyPosition(Vision_AOP module)
+            public RPoint m_rpReadyPos_pulse = new RPoint();    // Vision Stage XY Ready
+            public double m_dReadyTheta_pulse = 0;              // Vision Theta
+
+            public bool m_bUseInspect = false;                  // 검사 유무
+            public Run_Ready(Vision_AOP module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
-            //double m_secDelay = 2;
             public override ModuleRunBase Clone()
             {
-                Run_ReadyPosition run = new Run_ReadyPosition(m_module);
-                //run.m_secDelay = m_secDelay;
+                Run_Ready run = new Run_Ready(m_module);
+                run.m_rpReadyPos_pulse = m_rpReadyPos_pulse;
+                run.m_dReadyTheta_pulse = m_dReadyTheta_pulse;
+
+                run.m_bUseInspect = m_bUseInspect;
+
                 return run;
             }
-
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)//
             {
-                //m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
+                m_rpReadyPos_pulse = tree.Set(m_rpReadyPos_pulse, m_rpReadyPos_pulse, " X,Y Axis Ready Position [Pulse]", "X,Y Axis Ready Position [Pulse]", bVisible);
+                m_dReadyTheta_pulse = tree.Set(m_dReadyTheta_pulse, m_dReadyTheta_pulse, "Theta Axis Ready Position [Pulse]", "Theta Axis Ready Position [Pulse]", bVisible);
+
+                m_bUseInspect = tree.Set(m_bUseInspect, m_bUseInspect, "Use Inspection", "Use Inspection", bVisible);
             }
 
             public override string Run()//
             {
-                //Thread.Sleep((int)(1000 * m_secDelay));
+                AxisXY axisXY = m_module.p_axisXY;
+                Axis axistheta = m_module.p_axistheta;
+                double dAxisPosX = m_rpReadyPos_pulse.X;
+                double dAxisPosY = m_rpReadyPos_pulse.Y;
+
+                if (m_module.Run(axisXY.StartMove(new RPoint(dAxisPosX, dAxisPosY)))) return p_sInfo;
+                if (m_module.Run(axistheta.StartMove(m_dReadyTheta_pulse))) return p_sInfo;
+
                 return "OK";
             }
         }

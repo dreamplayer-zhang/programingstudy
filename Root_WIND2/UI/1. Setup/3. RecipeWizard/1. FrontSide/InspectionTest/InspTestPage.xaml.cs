@@ -29,7 +29,7 @@ namespace Root_WIND2
 
         public void SetUIContext()
         {
-            //this.mapViewer.DataContext = vmMapView;
+
         }
 
         private void RootViewer_Loaded(object sender, RoutedEventArgs e)

@@ -119,6 +119,7 @@ namespace Root_AOP01_Inspection
             m_treeRoot.p_eMode = mode;
             RunTreeControl(m_treeRoot.GetTree("Control"));
             RunTreeXGem(m_treeRoot.GetTree("XGem"));
+            m_handler.RunTreeModule(m_treeRoot.GetTree("Module")); 
         }
         #endregion
 
@@ -131,7 +132,7 @@ namespace Root_AOP01_Inspection
             m_login.Init();
             m_toolBox.Init(id, this);
             InitControl();
-            InitXGem();
+            //InitXGem();
             m_handler.Init(id, this);
             m_gaf.Init(id, this);
         }
@@ -139,7 +140,6 @@ namespace Root_AOP01_Inspection
         public void ThreadStop()
         {
             m_gaf.ThreadStop();
-            //m_xGem.ThreadStop();
             m_handler.ThreadStop();
             m_toolBox.ThreadStop();
             m_login.ThreadStop();

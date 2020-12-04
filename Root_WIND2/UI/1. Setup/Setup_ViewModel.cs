@@ -224,9 +224,9 @@ namespace Root_WIND2
             {
                 String text = "";
 
-                if (true) // Display Option : Rel Position
+                if (false) // Display Option : Rel Position
                     text += "Pos : {" + defectInfo.m_fRelX.ToString() + ", " + defectInfo.m_fRelY.ToString() + "}" + "\n";
-                if (true) // Display Option : Defect Size
+                if (false) // Display Option : Defect Size
                     text += "Size : " + defectInfo.m_fSize.ToString() + "\n";
                 if (true) // Display Option : GV Value
                     text += "GV : " + defectInfo.m_fGV.ToString() + "\n";
