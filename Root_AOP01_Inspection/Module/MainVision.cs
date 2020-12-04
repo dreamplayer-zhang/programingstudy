@@ -1,4 +1,6 @@
-﻿using RootTools;
+﻿using Root_EFEM;
+using Root_EFEM.Module;
+using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
@@ -13,7 +15,7 @@ using System.Threading;
 
 namespace Root_AOP01_Inspection.Module
 {
-    public class MainVision : ModuleBase
+    public class MainVision : ModuleBase, IWTRChild
     {
         #region ToolBox
         Axis m_axisRotate;
@@ -113,6 +115,193 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
+        public enum eAxisPos
+        {
+            ReadyPos,
+        }
+
+        void InitPosAlign()
+        {
+            m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisRotate.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisXY.AddPos(Enum.GetNames(typeof(eAxisPos)));
+
+        }
+
+        #region InfoWafer
+        string m_sInfoWafer = "";
+        InfoWafer _infoWafer = null;
+        public InfoWafer p_infoWafer
+        {
+            get
+            {
+                return _infoWafer;
+            }
+            set
+            {
+                m_sInfoWafer = (value == null) ? "" : value.p_id;
+                _infoWafer = value;
+                if (m_reg != null)
+                    m_reg.Write("sInfoWafer", m_sInfoWafer);
+                OnPropertyChanged();
+            }
+        }
+
+        Registry m_reg = null;
+        public void ReadInfoWafer_Registry()
+        {
+            m_reg = new Registry(p_id + ".InfoWafer");
+            m_sInfoWafer = m_reg.Read("sInfoWafer", m_sInfoWafer);
+            p_infoWafer = m_engineer.ClassHandler().GetGemSlot(m_sInfoWafer);
+        }
+        #endregion
+
+        #region InfoWafer UI
+        InfoWaferChild_UI m_ui;
+        void InitInfoWaferUI()
+        {
+            m_ui = new InfoWaferChild_UI();
+            m_ui.Init(this);
+            m_aTool.Add(m_ui);
+        }
+        #endregion
+
+        #region IWTRChild
+        bool _bLock = false;
+        public bool p_bLock
+        {
+            get
+            {
+                return _bLock;
+            }
+            set
+            {
+                if (_bLock == value)
+                    return;
+                _bLock = value;
+            }
+        }
+
+        bool IsLock()
+        {
+            for (int n = 0; n < 10; n++)
+            {
+                if (p_bLock == false)
+                    return false;
+                Thread.Sleep(100);
+            }
+            return true;
+        }
+
+        public List<string> p_asChildSlot
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public InfoWafer GetInfoWafer(int nID)
+        {
+            return p_infoWafer;
+        }
+
+        public void SetInfoWafer(int nID, InfoWafer infoWafer)
+        {
+            p_infoWafer = infoWafer;
+        }
+
+        public string IsGetOK(int nID)
+        {
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
+            if (p_infoWafer == null)
+                return p_id + " IsGetOK - InfoWafer not Exist";
+            return "OK";
+        }
+
+        public string IsPutOK(InfoWafer infoWafer, int nID)
+        {
+            if (p_eState != eState.Ready)
+                return p_id + " eState not Ready";
+            if (p_infoWafer != null)
+                return p_id + " IsPutOK - InfoWafer Exist";
+            if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
+                return p_id + " not Enable Wafer Size";
+            return "OK";
+        }
+
+        public int GetTeachWTR(InfoWafer infoWafer = null)
+        {
+            if (infoWafer == null)
+                infoWafer = p_infoWafer;
+            return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
+        }
+
+        private string MoveReadyPos()
+        {
+            if (Run(m_axisXY.p_axisX.StartMove(eAxisPos.ReadyPos)))
+                return p_sInfo;
+            if (Run(m_axisXY.p_axisY.StartMove(eAxisPos.ReadyPos)))
+                return p_sInfo;
+            if (Run(m_axisZ.StartMove(eAxisPos.ReadyPos)))
+                return p_sInfo;
+            if (Run(m_axisRotate.StartMove(eAxisPos.ReadyPos)))
+                return p_sInfo;
+
+            if (Run(m_axisRotate.WaitReady()))
+                return p_sInfo;
+            if (Run(m_axisZ.WaitReady()))
+                return p_sInfo;
+            if (Run(m_axisXY.WaitReady()))
+                return p_sInfo;
+            return "OK";
+        }
+
+        public string BeforeGet(int nID)
+        {
+            string info = MoveReadyPos();
+            if (info != "OK")
+                return info;
+            return "OK";
+        }
+
+        
+
+        public string BeforePut(int nID)
+        {
+            string info = MoveReadyPos();
+            if (info != "OK")
+                return info;
+            return "OK";
+        }
+
+        public string AfterGet(int nID)
+        {
+            return "OK";
+        }
+
+        public string AfterPut(int nID)
+        {
+            return "OK";
+        }
+
+        public bool IsWaferExist(int nID, bool bIgnoreExistSensor = false)
+        {
+            if (bIgnoreExistSensor)
+                return (p_infoWafer != null);
+            //            return m_diWaferExist.p_bIn;
+            return false;
+        }
+
+        InfoWafer.WaferSize m_waferSize;
+        public void RunTreeTeach(Tree tree)
+        {
+            m_waferSize.RunTreeTeach(tree.GetTree(p_id, false));
+        }
+        #endregion
+
         #region override
         public override void InitMemorys()
         {
@@ -157,7 +346,9 @@ namespace Root_AOP01_Inspection.Module
         public MainVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
+            m_waferSize = new InfoWafer.WaferSize(id, false, false);
             InitMemorys();
+            InitPosAlign();
         }
         public class Run_Grab: ModuleRunBase
         {
