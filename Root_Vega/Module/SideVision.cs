@@ -635,11 +635,7 @@ namespace Root_Vega.Module
 
         #region Inspect
         int m_lMaxGrab = 3000;
-        CPoint m_szAlignROI = new CPoint();
-        MemoryData m_memoryGrab;
-        MemoryData m_memoryHeight;
-        MemoryData m_memoryBright;
-
+        
         MemoryData m_memorySideTop;
         MemoryData m_memorySideLeft;
         MemoryData m_memorySideRight;
@@ -673,15 +669,8 @@ namespace Root_Vega.Module
             }
         }
 
-        public static ushort[] m_aHeight;
-        double m_fScaleH = 0;
         public override void InitMemorys()
         {
-            m_szAlignROI = p_CamLADS.p_szROI;
-            m_memoryGrab = m_memoryPool.GetGroup("LADS").CreateMemory("Grab", 1, 1, 640, 480 * 1000);
-            m_memoryHeight = m_memoryPool.GetGroup("LADS").CreateMemory("Height", 1, 1, 640, 480 * 1000);
-            m_memoryBright = m_memoryPool.GetGroup("LADS").CreateMemory("Bright", 1, 1, 640, 480 * 1000);
-
             m_memorySideTop = m_memoryPool.GetGroup("Grab").CreateMemory("SideTop", 1, 1, 1000, 1000);
             m_memorySideLeft = m_memoryPool.GetGroup("Grab").CreateMemory("SideLeft", 1, 1, 1000, 1000);
             m_memorySideRight = m_memoryPool.GetGroup("Grab").CreateMemory("SideRight", 1, 1, 1000, 1000);
@@ -691,67 +680,6 @@ namespace Root_Vega.Module
             m_memoryBevelLeft = m_memoryPool.GetGroup("Grab").CreateMemory("BevelLeft", 1, 1, 1000, 1000);
             m_memoryBevelRight = m_memoryPool.GetGroup("Grab").CreateMemory("BevelRight", 1, 1, 1000, 1000);
             m_memoryBevelBottom = m_memoryPool.GetGroup("Grab").CreateMemory("BevelBottom", 1, 1, 1000, 1000);
-
-            m_aHeight = new ushort[m_szAlignROI.X * m_lMaxGrab];
-            m_fScaleH = 65535.0 / m_szAlignROI.Y;
-        }
-
-        bool m_bThreadInspect3D = false;
-        Thread m_threadInspect3D;
-        void InitThreadInspect()
-        {
-            m_threadInspect3D = new Thread(new ThreadStart(RunThreadInspect3D));
-            m_threadInspect3D.Start();
-        }
-
-        Queue<int> m_qInspect = new Queue<int>();
-        void RunThreadInspect3D()
-        {
-            m_bThreadInspect3D = true;
-            Thread.Sleep(3000);
-            while (m_bThreadInspect3D)
-            {
-                Thread.Sleep(10);
-                while (m_qInspect.Count > 0)
-                {
-                    try { RunThreadInspect(m_qInspect.Dequeue()); }
-                    catch (Exception) { m_qInspect.Clear(); }
-                }
-            }
-        }
-
-        unsafe void RunThreadInspect(int iInspect)
-        {
-            byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
-            byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
-            byte* pBright = (byte*)m_memoryBright.GetPtr(0, 0, iInspect).ToPointer();
-            for (int x = 0; x < m_szAlignROI.X; x++, pSrc++, pHeight++, pBright++)
-            {
-                byte* pSrcY = pSrc;
-                int nSum = 0;
-                int nYSum = 0;
-                for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
-                {
-                    nSum += *pSrcY;
-                    nYSum += *pSrcY * y;
-                }
-                int nAdd = x + iInspect * m_szAlignROI.X;
-                m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
-                *pHeight = (byte)(m_aHeight[nAdd] >> 8);
-                int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
-                *pBright = pSrc[x + yAve * m_szAlignROI.X];
-            }
-        }
-
-        void StartInspect(int iInspect)
-        {
-            m_qInspect.Enqueue(iInspect);
-        }
-
-
-        void RunTreeInspect(Tree tree)
-        {
-            m_lMaxGrab = tree.Set(m_lMaxGrab, m_lMaxGrab, "Max Grab", "Max Grab Count for Memory Allocate");
         }
         #endregion
 
@@ -839,34 +767,20 @@ namespace Root_Vega.Module
         {
             RunTreeDIODelay(tree.GetTree("DIO Delay", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
-            RunTreeInspect(tree.GetTree("Inspect", false));
         }
         #endregion
 
         public SideVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
-            InitThreadInspect();
             InitPosAlign();
             InitAutoFocus();
-        }
-
-        public override void ThreadStop()
-        {
-            if (m_bThreadInspect3D)
-            {
-                m_qInspect.Clear();
-                m_bThreadInspect3D = false;
-                m_threadInspect3D.Join();
-            }
-            base.ThreadStop();
         }
 
         #region ModuleRun
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
-            //            AddModuleRunList(new Run_Inspect(this), true, "3D Inspect");
             AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
             AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
             AddModuleRunList(new Run_BevelGrab(this), true, "Bevel Grab");
