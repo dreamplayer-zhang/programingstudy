@@ -34,6 +34,7 @@ namespace Root_Vega
             textBoxPodID.DataContext = loadport.m_infoPod;
             textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
+            textBoxRecipe.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             //textBoxSlotID.DataContext = loadport.p_infoReticle.p_sReticleID;
             InitButtonLoad();
             InitTimer(); 
