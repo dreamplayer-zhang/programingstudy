@@ -114,7 +114,7 @@ namespace Root_Vega.Module
                 m_eStatus = EQ.p_eState;
             }
 
-			if (m_dioBuzzerOff.p_bIn || (m_gaf.m_listALID.m_aALID.Count < 1))
+			if (m_dioBuzzerOff.p_bIn || (m_gaf.m_listALID.p_aALID.Count < 1))//check
 				m_doBuzzer.Write(eBuzzer.BuzzerOff);
 
             //m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors", true);
@@ -122,7 +122,7 @@ namespace Root_Vega.Module
 			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
             if (m_robot != null)
             {
-                if (!m_diMCReset.p_bIn) m_robot.p_bDisableHomeWhenArmOpen = true; //CHECK
+                if (!m_diMCReset.p_bIn) m_robot.p_bDisableHomeWhenArmOpen = true;
             }
             m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
 			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA");
