@@ -9,16 +9,13 @@ using System.Threading;
 
 namespace Root_EFEM.Module
 {
-    public class WTR_Cymechs : ModuleBase//, IWTR
+    public class WTR_Cymechs : ModuleBase, IWTR
     {
-        //forget
         #region ToolBox
         RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            m_dicArm[eArm.A].GetTools(m_toolBox);
-            m_dicArm[eArm.B].GetTools(m_toolBox);
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -27,7 +24,6 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-        //forget
         #region Arm
         public enum eArm
         {
@@ -45,7 +41,6 @@ namespace Root_EFEM.Module
         {
             public eArm m_eArm;
 
-            public string m_id;
             WTR_Cymechs m_module;
             public Arm(string id, eArm arm, WTR_Cymechs module, IEngineer engineer)
             {
@@ -54,19 +49,11 @@ namespace Root_EFEM.Module
                 Init(id + "." + arm.ToString(), engineer); 
             }
 
-            //            public DIO_I m_diCheckVac;
-            //            public DIO_I m_diArmClose;
-            public void GetTools(ToolBox toolBox)
+            public bool IsWaferExist()
             {
-                //                m_module.p_sInfo = toolBox.Get(ref m_diCheckVac, m_module, m_eArm.ToString() + ".CheckVac");
-                //                m_module.p_sInfo = toolBox.Get(ref m_diArmClose, m_module, m_eArm.ToString() + ".ArmClose");
-            }
-
-            public bool IsWaferExist(bool bIgnoreExistSensor = false)
-            {
-                if (bIgnoreExistSensor) return (p_infoWafer != null);
-                //                return m_diCheckVac.p_bIn;
-                return (p_infoWafer != null);
+                bool bExist = false; 
+                m_module.p_sInfo = m_module.RequestWafer(m_eArm, ref bExist);
+                return bExist;
             }
         }
         #endregion
@@ -364,113 +351,16 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-        #region Protocol
-        public enum eCmd
+        #region Timeout
+        public int m_secRS232 = 2;
+        public int m_secHome = 60;
+        public int m_secMotion = 20;
+        void RunTimeoutTree(Tree tree)
         {
-            HLLO,
-            CLEAR,
-            HOME,
-            GOTO,
-            PICK,
-            PLACE,
-            ZAXIS,
-            SERVO,
-            ESTOP
+            m_secRS232 = tree.Set(m_secRS232, m_secRS232, "RS232", "Timeout (sec)");
+            m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
+            m_secMotion = tree.Set(m_secMotion, m_secMotion, "Motion", "Timeout (sec)");
         }
-        public enum eRequest
-        {
-            WAFER,
-            SERVO,
-            POS
-        }
-
-        public class Protocol
-        {
-            public enum eType
-            {
-                Command,
-                Request
-            }
-            public eType m_eType = eType.Command;
-
-            public enum eState
-            {
-                Queue,
-                Send,
-                ACK,
-                NAK,
-                Done
-            }
-            public eState m_eState = eState.Queue;
-            string m_sCmd = "";
-
-            public bool OnReceive(string sRead)
-            {
-                if (m_eType == eType.Command)
-                {
-                    string sCode = sRead.Substring(0, 4); 
-                    switch (sCode)
-                    {
-                        case "_ACK":
-                            m_eState = eState.ACK;
-                            return false;
-                        case "_NAK":
-                            m_eState = eState.NAK;
-                            m_wtr.p_sInfo = "NAK : " + m_sCmd;
-                            return true;
-                        case "_RDY":
-                            m_eState = eState.Done; 
-                            return true;
-                        case "_ERR":
-                            m_eState = eState.Done;
-                            m_wtr.p_sInfo = "Error : " + m_wtr.GetErrorString(sRead);
-                            return true;
-                    }
-                }
-                else
-                {
-                    //forget
-                }
-                return false; 
-            }
-
-            public string SendCmd()
-            {
-                if (m_eState != eState.Queue) return "Protocol State != Queue";
-                m_wtr.SendCmd(m_sCmd);
-                m_eState = eState.Send;
-                return "OK";
-            }
-
-            public bool m_bValid = true;
-            public string WaitDone(int secWait)
-            {
-                if (EQ.IsStop()) return "EQ Stop";
-                if (m_wtr.m_rs232.p_bConnect == false) return "RS232 Connection Lost !!";
-                int nWait = 100 * secWait;
-                while (nWait > 0)
-                {
-                    if (EQ.IsStop()) return "EQ Stop";
-                    Thread.Sleep(10);
-                    if (m_eState == eState.Done) return "OK";
-                    nWait--;
-                }
-                m_bValid = false;
-                return m_sCmd + " : WaitDone Timeout !!";
-            }
-
-            public eCmd m_eCmd;
-            WTR_Cymechs m_wtr;
-            public Protocol(eCmd eCmd, WTR_Cymechs loadport, params string[] asParam)
-            {
-                m_eType = eType.Command; 
-                m_eCmd = eCmd;
-                m_wtr = loadport;
-                m_sCmd = eCmd.ToString();
-                foreach (string sParam in asParam) m_sCmd += " " + sParam;
-            }
-        }
-        Protocol m_protocolSend = null;
         #endregion
 
         #region RS232
@@ -490,7 +380,6 @@ namespace Root_EFEM.Module
             while (m_bRunSend)
             {
                 Thread.Sleep(10);
-                if ((m_protocolSend != null) && (m_protocolSend.m_bValid == false)) m_protocolSend = null;
                 if ((m_protocolSend == null) && (m_qProtocol.Count > 0))
                 {
                     m_protocolSend = m_qProtocol.Dequeue();
@@ -510,7 +399,7 @@ namespace Root_EFEM.Module
             if (m_protocolSend != null)
             {
                 bool bDone = m_protocolSend.OnReceive(sRead);
-                if (bDone) m_protocolSend = null; 
+                if (bDone) m_protocolSend = null;
             }
         }
 
@@ -519,6 +408,182 @@ namespace Root_EFEM.Module
             if (EQ.IsStop()) return "EQ Stop";
             m_log.Info(" [ Send --> " + sCmd);
             return m_rs232.Send(sCmd);
+        }
+        #endregion
+
+        #region Protocol
+        public enum eCmd
+        {
+            CLEAR,
+            HOME,
+            GOTO,
+            PICK,
+            PLACE,
+            ZAXIS,
+            SERVO,
+            ESTOP,
+            RQ_WAFER,
+        }
+        public class Protocol
+        {
+            public string m_sRead = ""; 
+            public bool OnReceive(string sRead)
+            {
+                m_sRead = sRead; 
+                return false; 
+            }
+
+            bool m_bSend = false; 
+            public string m_sCmd = "";
+            public string SendCmd()
+            {
+                m_wtr.SendCmd(m_sCmd);
+                m_bSend = true; 
+                return "OK";
+            }
+
+            public string WaitReply(int secWait)
+            {
+                while (m_bSend == false)
+                {
+                    if (EQ.IsStop()) return "EQ Stop";
+                    if (m_wtr.m_rs232.p_bConnect == false) return "RS232 Connection Lost !!";
+                    Thread.Sleep(10); 
+                }
+                m_sRead = ""; 
+                StopWatch sw = new StopWatch(); 
+                while (true)
+                {
+                    if (EQ.IsStop()) return "EQ Stop";
+                    if (m_wtr.m_rs232.p_bConnect == false) return "RS232 Connection Lost !!";
+                    if (m_sRead != "") return "OK";
+                    if (sw.Elapsed.TotalSeconds > secWait) return "Timeover"; 
+                    Thread.Sleep(10); 
+                }
+            }
+
+            public eCmd m_eCmd;
+            WTR_Cymechs m_wtr;
+            public Protocol(eCmd eCmd, WTR_Cymechs loadport, string sCmd)
+            {
+                m_eCmd = eCmd;
+                m_wtr = loadport;
+                m_sCmd = sCmd; 
+            }
+        }
+        Protocol m_protocolSend = null;
+        #endregion
+
+        #region RS232 Command
+        string IsACK(Protocol protocol)
+        {
+            if (Run(protocol.WaitReply(m_secRS232)))
+            {
+                m_protocolSend = null;
+                return p_sInfo;
+            }
+            switch (protocol.m_sRead)
+            {
+                case "_ACK": return "OK";
+                default: 
+                    m_protocolSend = null; 
+                    return "Reply is not _ACK : " + protocol.m_sRead;
+            }
+        }
+
+        string IsReady(Protocol protocol, int secDone)
+        {
+            try
+            {
+                if (Run(protocol.WaitReply(secDone))) return p_sInfo;
+                switch (protocol.m_sRead)
+                {
+                    case "_RDY": return "OK";
+                    default: return "Reply is not _RDY : " + protocol.m_sRead;
+                }
+            }
+            finally { m_protocolSend = null; }
+        }
+
+        string Cmd(eCmd eCmd, string sCmd, int secDone)
+        {
+            Protocol protocol = new Protocol(eCmd, this, sCmd);
+            m_qProtocol.Enqueue(protocol);
+            if (Run(IsACK(protocol))) return sCmd + " ACK Error : "  + p_sInfo;
+            if (Run(IsReady(protocol, secDone))) return sCmd + " READY Error : " + p_sInfo;
+            return "OK";
+        }
+
+        string CmdClear()
+        {
+            return Cmd(eCmd.CLEAR, "CLEAR", m_secRS232); 
+        }
+
+        string CmdHome()
+        {
+            return Cmd(eCmd.HOME, "HOME ALL", m_secHome); 
+        }
+
+        string CmdGoto(int nStation, int nSlot, eArm eArm, bool bExtend, bool bUp) 
+        {
+            string sEX = bExtend ? " R EX" : " R RX";
+            string sZ = bUp ? " Z UP" : " Z DN"; 
+            string sCmd = "GOTO N " + nStation.ToString() + sEX + sZ + " SLOT " + nSlot.ToString() + " ARM " + eArm.ToString();
+            return Cmd(eCmd.GOTO, sCmd, m_secMotion);
+        }
+
+        string CmdPick(int nStation, int nSlot, eArm eArm)
+        {
+            string sCmd = "PICK " + nStation.ToString() + " SLOT " + nSlot.ToString() + " ARM " + eArm.ToString();
+            return Cmd(eCmd.PICK, sCmd, m_secMotion);
+        }
+
+        string CmdPlace(int nStation, int nSlot, eArm eArm)
+        {
+            string sCmd = "PLACE " + nStation.ToString() + " SLOT " + nSlot.ToString() + " ARM " + eArm.ToString();
+            return Cmd(eCmd.PLACE, sCmd, m_secMotion);
+        }
+
+        string CmdZAxis(int nStation, int nSlot, eArm eArm, bool bUp)
+        {
+            string sZ = bUp ? " UP" : " DN";
+            string sCmd = "ZAXIS " + nStation.ToString() + " SLOT " + nSlot.ToString() + sZ + " ARM " + eArm.ToString();
+            return Cmd(eCmd.ZAXIS, sCmd, m_secMotion);
+        }
+
+        string CmdServo(bool bOn)
+        {
+            string sOn = bOn ? " ON" : " OFF";
+            return Cmd(eCmd.SERVO, "SERVO " + sOn, m_secMotion);
+        }
+
+        string CmdEStop()
+        {
+            m_qModuleRun.Clear(); 
+            return Cmd(eCmd.ESTOP, "ESTOP", m_secRS232); 
+        }
+
+        string Request(eCmd eCmd, string sCmd, ref string sRead)
+        {
+            try
+            {
+                Protocol protocol = new Protocol(eCmd, this, sCmd);
+                m_qProtocol.Enqueue(protocol);
+                if (Run(protocol.WaitReply(m_secRS232))) return p_sInfo;
+                return "OK"; 
+            }
+            finally { m_protocolSend = null; } 
+        }
+
+        string RequestWafer(eArm eArm, ref bool bExist)
+        {
+            string sRead = ""; 
+            if (Run(Request(eCmd.RQ_WAFER, "RQ WAFER ARM " + eArm.ToString(), ref sRead))) return p_sInfo;
+            if (sRead.Contains("WAFER " + eArm.ToString()) == false) return "RQ WAFER Error : " + sRead;
+            string[] asRead = sRead.Split(' ');
+            if (asRead.Length < 3) return "RQ WAFER Error : " + sRead;
+            bExist = (asRead[2] == "Y"); 
+            return "OK";
         }
         #endregion
 
@@ -532,6 +597,86 @@ namespace Root_EFEM.Module
             aArm.Add(m_dicArm[eArm.B]);
             m_ui.Init(p_id + ".InfoWafer", aArm, m_engineer);
             m_aTool.Add(m_ui);
+        }
+        #endregion
+
+        #region IWTRChild
+        public List<string> m_asChild = new List<string>();
+        public List<IWTRChild> m_aChild = new List<IWTRChild>();
+        public void AddChild(params IWTRChild[] childs)
+        {
+            foreach (IWTRChild child in childs)
+            {
+                if (child != null)
+                {
+                    child.p_bLock = true;
+                    m_aChild.Add(child);
+                    m_asChild.Add(child.p_id);
+                }
+            }
+            RunTree(Tree.eMode.Init);
+        }
+
+        IWTRChild GetChild(string sChild)
+        {
+            foreach (IWTRChild child in m_aChild)
+            {
+                if (child.p_id == sChild) return child;
+            }
+            return null;
+        }
+
+        List<string> GetChildSlotNames(string sChild)
+        {
+            IWTRChild child = GetChild(sChild);
+            if (child == null) return null;
+            return child.p_asChildSlot;
+        }
+
+        int GetChildSlotID(string sChild, string sChildSlot)
+        {
+            List<string> asChildSlot = GetChildSlotNames(sChild);
+            if (asChildSlot == null) return 0;
+            for (int n = 0; n < asChildSlot.Count; n++)
+            {
+                if (sChildSlot == asChildSlot[n]) return n;
+            }
+            return 0;
+        }
+
+        public void ReadInfoReticle_Registry()
+        {
+            m_dicArm[eArm.A].ReadInfoWafer_Registry();
+            m_dicArm[eArm.B].ReadInfoWafer_Registry();
+            foreach (IWTRChild child in m_aChild) child.ReadInfoWafer_Registry();
+        }
+        #endregion
+
+        #region override
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            RunTreeSetup(tree.GetTree("Setup", false));
+        }
+
+        void RunTreeSetup(Tree tree)
+        {
+            m_dicArm[eArm.A].RunTree(tree.GetTree("Arm A", false));
+            m_dicArm[eArm.B].RunTree(tree.GetTree("Arm B", false));
+            foreach (IWTRChild child in m_aChild) child.RunTreeTeach(tree.GetTree("Teach", false));
+            RunTimeoutTree(tree.GetTree("Timeout", false));
+        }
+
+        public override void Reset()
+        {
+            Run(CmdClear());
+            p_eState = eState.Init;
+            base.Reset();
+        }
+
+        public override void ButtonHome()
+        {
+            base.ButtonHome();
         }
         #endregion
 

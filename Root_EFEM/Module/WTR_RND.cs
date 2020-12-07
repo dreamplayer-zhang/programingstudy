@@ -44,7 +44,6 @@ namespace Root_EFEM.Module
         {
             public eArm m_eArm;
 
-            public string m_id;
             WTR_RND m_module;
             public Arm(string id, eArm arm, WTR_RND module, IEngineer engineer)
             {
@@ -558,8 +557,8 @@ namespace Root_EFEM.Module
 
         #region Timeout
         public int m_secDelayRS232 = 2;
-        public int m_secHome = 20;
-        public int m_secMotion = 15;
+        public int m_secHome = 60;
+        public int m_secMotion = 20;
         void RunTimeoutTree(Tree tree)
         {
             m_secDelayRS232 = tree.Set(m_secDelayRS232, m_secDelayRS232, "RS232", "Timeout (sec)");
