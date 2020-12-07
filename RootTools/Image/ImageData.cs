@@ -904,7 +904,7 @@ namespace RootTools
 				if (Worker_MemoryCopy.CancellationPending)
 					return;
 				fss.Read(buf, 0, nWidth * nByte);
-                for (int i = 0; i < nWidth * 3; i = i + 3)
+                for (int i = 0; i < nLowWidth * 3; i = i + 3)
                 {
                     ((byte*)(ptrB))[i / 3 + (long)y * p_Size.X] = buf[i];
                     ((byte*)(ptrG))[i / 3 + (long)y * p_Size.X] = buf[i + 1];

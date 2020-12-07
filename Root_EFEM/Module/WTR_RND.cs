@@ -44,7 +44,6 @@ namespace Root_EFEM.Module
         {
             public eArm m_eArm;
 
-            public string m_id;
             WTR_RND m_module;
             public Arm(string id, eArm arm, WTR_RND module, IEngineer engineer)
             {
@@ -335,29 +334,6 @@ namespace Root_EFEM.Module
             m_dicCmd.Add(eCmd.PutRet, "PARETA");
             m_dicCmd.Add(eCmd.PutReady, "PRDY");
         }
-        public enum eMotion
-        {
-            Get,        // Pick up the wafer with the present finger
-            GetExt,     // WTR GET 세부동작1 팔 뻗고 Z축 Get 1단계 UP 동작 까지 수행
-            GetRet,     // WTR GET 세부동작2 Grip On 이후 Get 2단계 Up 후 팔 접는 동작까지 수행
-            GetReady,
-            Put,        // Place the wafer with the present finger
-            PutExt,     // WTR PUT 세부동작1 팔 뻗고 z축 PUT 1단계 Down 동작 까지 수행
-            PutRet,     // WTR PUT 세부동작2 Grip off 이후 Z축 PUT 2단계 Down 후 팔 접는 동작까지 수행
-            PutReady,
-        }
-        Dictionary<eMotion, eCmd> m_dicMotion = new Dictionary<eMotion, eCmd>();
-        void InitMotion()
-        {
-            m_dicMotion.Add(eMotion.Get, eCmd.Get);
-            m_dicMotion.Add(eMotion.GetExt, eCmd.GetExt);
-            m_dicMotion.Add(eMotion.GetRet, eCmd.GetRet);
-            m_dicMotion.Add(eMotion.GetReady, eCmd.GetReady);
-            m_dicMotion.Add(eMotion.Put, eCmd.Put);
-            m_dicMotion.Add(eMotion.PutExt, eCmd.PutExt);
-            m_dicMotion.Add(eMotion.PutRet, eCmd.PutRet);
-            m_dicMotion.Add(eMotion.PutReady, eCmd.PutReady);
-        }
 
         string ReplyCmd(string[] sMsgs)
         {
@@ -558,8 +534,8 @@ namespace Root_EFEM.Module
 
         #region Timeout
         public int m_secDelayRS232 = 2;
-        public int m_secHome = 20;
-        public int m_secMotion = 15;
+        public int m_secHome = 60;
+        public int m_secMotion = 20;
         void RunTimeoutTree(Tree tree)
         {
             m_secDelayRS232 = tree.Set(m_secDelayRS232, m_secDelayRS232, "RS232", "Timeout (sec)");
@@ -611,7 +587,6 @@ namespace Root_EFEM.Module
         public WTR_RND(string id, IEngineer engineer)
         {
             InitCmd();
-            InitMotion();
             InitArms(id, engineer);
             InitBase(id, engineer);
             InitInfoWaferUI(); 
@@ -622,40 +597,11 @@ namespace Root_EFEM.Module
             base.ThreadStop();
         }
 
-        public ModuleRunBase GetRunMotion(ref int nID, eMotion motion, string sChild, string sChildSlot)
-        {
-            switch (motion)
-            {
-                case eMotion.Get:
-                    Run_Get runGet = (Run_Get)CloneModuleRun("Get");
-                    runGet.m_eMotion = motion;
-                    runGet.m_sChild = sChild;
-                    runGet.m_nChildID = GetChildSlotID(sChild, sChildSlot);
-                    nID++;
-                    return runGet;
-                case eMotion.Put:
-                    Run_Put runPut = (Run_Put)CloneModuleRun("Put");
-                    runPut.m_eMotion = motion;
-                    runPut.m_sChild = sChild;
-                    runPut.m_nChildID = GetChildSlotID(sChild, sChildSlot);
-                    nID++;
-                    return runPut;
-                default:
-                    Run_Motion runMotion = (Run_Motion)CloneModuleRun("Motion");
-                    runMotion.m_eMotion = motion;
-                    runMotion.m_sChild = sChild;
-                    runMotion.m_nChildID = GetChildSlotID(sChild, sChildSlot);
-                    nID++;
-                    return runMotion;
-            }
-        }
-
         #region ModuleRun
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_ResetCPU(this), false, "Reset WTR CPU");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip WTR Arm");
-            AddModuleRunList(new Run_Motion(this), false, "WTR Run Motion");
             AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
             AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
         }
@@ -720,99 +666,6 @@ namespace Root_EFEM.Module
             }
         }
 
-        public class Run_Motion : ModuleRunBase
-        {
-            WTR_RND m_module;
-            public Run_Motion(WTR_RND module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            public eMotion m_eMotion = eMotion.Get;
-            public eArm m_eArm = eArm.Upper;
-            public string m_sChild = "";
-            public int m_nChildID = 0;
-            public override ModuleRunBase Clone()
-            {
-                Run_Motion run = new Run_Motion(m_module);
-                run.m_eMotion = m_eMotion;
-                run.m_eArm = m_eArm;
-                run.m_sChild = m_sChild;
-                run.m_nChildID = m_nChildID;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_eMotion = (eMotion)tree.Set(m_eMotion, m_eMotion, "Motion", "Select WTR Motion", bVisible);
-                m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible && !bRecipe);
-                m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
-                List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild); 
-                if ((asChildSlot != null) && (asChildSlot.Count > 0))
-                {
-                    if ((m_nChildID < 0) || (m_nChildID >= asChildSlot.Count)) m_nChildID = 0; 
-                    string sChildSlot = asChildSlot[m_nChildID];
-                    sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
-                    m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot); 
-                }
-            }
-
-            public override string Run()
-            {
-                IWTRChild child = m_module.GetChild(m_sChild);
-                if (child == null) return "WTR Child not Found : " + m_sChild;
-                while (child.p_eState != eState.Ready)
-                {
-                    if (EQ.IsStop()) return "Stop";
-                    Thread.Sleep(100);
-                }
-                eCmd cmd = m_module.m_dicMotion[m_eMotion];
-                int posWTR = child.GetTeachWTR();
-                if (posWTR < 0) return "WTR Teach Position Not Defined";
-                switch (m_eMotion)
-                {
-                    case eMotion.Get:
-                    case eMotion.GetExt:
-                    case eMotion.GetRet:
-                    case eMotion.GetReady:
-                        if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
-                        if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
-                        child.p_bLock = true;
-                        if (m_module.Run(m_module.WriteCmd(cmd, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
-                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                        child.p_bLock = false;
-                        if (m_module.m_dicArm[m_eArm].IsWaferExist() == false)
-                        {
-                            m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
-                            if (child.IsWaferExist(m_nChildID)) return "WTR Get Error : Wafer Check Sensor Detected at Child = " + child.p_id;
-                            child.SetInfoWafer(m_nChildID, null);
-                            return child.AfterGet(m_nChildID);
-                        }
-                        else return "WTR Get Error : Wafer Check Sensor not Detected at Arm = " + m_eArm.ToString();
-                    case eMotion.Put:
-                    case eMotion.PutExt:
-                    case eMotion.PutRet:
-                    case eMotion.PutReady:
-                        if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
-                        if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
-                        child.p_bLock = true;
-                        if (m_module.Run(m_module.WriteCmd(cmd, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
-                        if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
-                        child.p_bLock = false;
-                        if (child.IsWaferExist(m_nChildID))
-                        {
-                            child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
-                            if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "WTR Put Error : Wafer Check Sensor Detected at Arm = " + m_eArm.ToString();
-                            m_module.m_dicArm[m_eArm].p_infoWafer = null;
-                            return child.AfterPut(m_nChildID);
-                        }
-                        else return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;
-                }
-                return "OK";
-            }
-        }
-
         public class Run_Get : ModuleRunBase
         {
             WTR_RND m_module;
@@ -822,14 +675,12 @@ namespace Root_EFEM.Module
                 InitModuleRun(module);
             }
 
-            public eMotion m_eMotion = eMotion.Get;
             public eArm m_eArm = eArm.Upper;
             public string m_sChild = "";
             public int m_nChildID = 0;
             public override ModuleRunBase Clone()
             {
                 Run_Get run = new Run_Get(m_module);
-                run.m_eMotion = m_eMotion;
                 run.m_eArm = m_eArm;
                 run.m_sChild = m_sChild;
                 run.m_nChildID = m_nChildID;
@@ -903,13 +754,11 @@ namespace Root_EFEM.Module
 
             public string m_sChild = "";
 
-            public eMotion m_eMotion = eMotion.Put;
             public eArm m_eArm = eArm.Upper;
             public int m_nChildID = 0;
             public override ModuleRunBase Clone()
             {
                 Run_Put run = new Run_Put(m_module);
-                run.m_eMotion = m_eMotion;
                 run.m_eArm = m_eArm;
                 run.m_sChild = m_sChild;
                 run.m_nChildID = m_nChildID;
@@ -928,6 +777,7 @@ namespace Root_EFEM.Module
                     sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
                     m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot);
                 }
+                else m_nChildID = 0;
             }
 
             public override string Run()

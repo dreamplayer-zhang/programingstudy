@@ -25,6 +25,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using static RootTools.Control.Axis;
 using System.Windows.Diagnostics;
+using System.Data;
 
 namespace Root_Vega.Module
 {
@@ -635,11 +636,7 @@ namespace Root_Vega.Module
 
         #region Inspect
         int m_lMaxGrab = 3000;
-        CPoint m_szAlignROI = new CPoint();
-        MemoryData m_memoryGrab;
-        MemoryData m_memoryHeight;
-        MemoryData m_memoryBright;
-
+        
         MemoryData m_memorySideTop;
         MemoryData m_memorySideLeft;
         MemoryData m_memorySideRight;
@@ -648,6 +645,8 @@ namespace Root_Vega.Module
         MemoryData m_memoryBevelLeft;
         MemoryData m_memoryBevelRight;
         MemoryData m_memoryBevelBottom;
+
+        double[] m_aLADSThetaPos;
 
         bool m_bRunSideVision = false;
         public bool p_bRunSideVision
@@ -673,15 +672,8 @@ namespace Root_Vega.Module
             }
         }
 
-        public static ushort[] m_aHeight;
-        double m_fScaleH = 0;
         public override void InitMemorys()
         {
-            m_szAlignROI = p_CamLADS.p_szROI;
-            m_memoryGrab = m_memoryPool.GetGroup("LADS").CreateMemory("Grab", 1, 1, 640, 480 * 1000);
-            m_memoryHeight = m_memoryPool.GetGroup("LADS").CreateMemory("Height", 1, 1, 640, 480 * 1000);
-            m_memoryBright = m_memoryPool.GetGroup("LADS").CreateMemory("Bright", 1, 1, 640, 480 * 1000);
-
             m_memorySideTop = m_memoryPool.GetGroup("Grab").CreateMemory("SideTop", 1, 1, 1000, 1000);
             m_memorySideLeft = m_memoryPool.GetGroup("Grab").CreateMemory("SideLeft", 1, 1, 1000, 1000);
             m_memorySideRight = m_memoryPool.GetGroup("Grab").CreateMemory("SideRight", 1, 1, 1000, 1000);
@@ -691,67 +683,6 @@ namespace Root_Vega.Module
             m_memoryBevelLeft = m_memoryPool.GetGroup("Grab").CreateMemory("BevelLeft", 1, 1, 1000, 1000);
             m_memoryBevelRight = m_memoryPool.GetGroup("Grab").CreateMemory("BevelRight", 1, 1, 1000, 1000);
             m_memoryBevelBottom = m_memoryPool.GetGroup("Grab").CreateMemory("BevelBottom", 1, 1, 1000, 1000);
-
-            m_aHeight = new ushort[m_szAlignROI.X * m_lMaxGrab];
-            m_fScaleH = 65535.0 / m_szAlignROI.Y;
-        }
-
-        bool m_bThreadInspect3D = false;
-        Thread m_threadInspect3D;
-        void InitThreadInspect()
-        {
-            m_threadInspect3D = new Thread(new ThreadStart(RunThreadInspect3D));
-            m_threadInspect3D.Start();
-        }
-
-        Queue<int> m_qInspect = new Queue<int>();
-        void RunThreadInspect3D()
-        {
-            m_bThreadInspect3D = true;
-            Thread.Sleep(3000);
-            while (m_bThreadInspect3D)
-            {
-                Thread.Sleep(10);
-                while (m_qInspect.Count > 0)
-                {
-                    try { RunThreadInspect(m_qInspect.Dequeue()); }
-                    catch (Exception) { m_qInspect.Clear(); }
-                }
-            }
-        }
-
-        unsafe void RunThreadInspect(int iInspect)
-        {
-            byte* pSrc = (byte*)m_memoryGrab.GetPtr(iInspect).ToPointer();
-            byte* pHeight = (byte*)m_memoryHeight.GetPtr(0, 0, iInspect).ToPointer();
-            byte* pBright = (byte*)m_memoryBright.GetPtr(0, 0, iInspect).ToPointer();
-            for (int x = 0; x < m_szAlignROI.X; x++, pSrc++, pHeight++, pBright++)
-            {
-                byte* pSrcY = pSrc;
-                int nSum = 0;
-                int nYSum = 0;
-                for (int y = 0; y < m_szAlignROI.Y; y++, pSrcY += m_szAlignROI.X)
-                {
-                    nSum += *pSrcY;
-                    nYSum += *pSrcY * y;
-                }
-                int nAdd = x + iInspect * m_szAlignROI.X;
-                m_aHeight[nAdd] = (nSum != 0) ? (ushort)(m_fScaleH * nYSum / nSum) : (ushort)0;
-                *pHeight = (byte)(m_aHeight[nAdd] >> 8);
-                int yAve = (nSum != 0) ? (int)Math.Round(1.0 * nYSum / nSum) : 0;
-                *pBright = pSrc[x + yAve * m_szAlignROI.X];
-            }
-        }
-
-        void StartInspect(int iInspect)
-        {
-            m_qInspect.Enqueue(iInspect);
-        }
-
-
-        void RunTreeInspect(Tree tree)
-        {
-            m_lMaxGrab = tree.Set(m_lMaxGrab, m_lMaxGrab, "Max Grab", "Max Grab Count for Memory Allocate");
         }
         #endregion
 
@@ -768,6 +699,11 @@ namespace Root_Vega.Module
         {
             m_AutoFocusModule = new AutoFocus();
             return;
+        }
+
+        void InitLADS()
+        {
+            m_aLADSThetaPos = new double[4];
         }
         #endregion
 
@@ -839,34 +775,21 @@ namespace Root_Vega.Module
         {
             RunTreeDIODelay(tree.GetTree("DIO Delay", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
-            RunTreeInspect(tree.GetTree("Inspect", false));
         }
         #endregion
 
         public SideVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
-            InitThreadInspect();
             InitPosAlign();
             InitAutoFocus();
-        }
-
-        public override void ThreadStop()
-        {
-            if (m_bThreadInspect3D)
-            {
-                m_qInspect.Clear();
-                m_bThreadInspect3D = false;
-                m_threadInspect3D.Join();
-            }
-            base.ThreadStop();
+            InitLADS();
         }
 
         #region ModuleRun
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
-            //            AddModuleRunList(new Run_Inspect(this), true, "3D Inspect");
             AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
             AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
             AddModuleRunList(new Run_BevelGrab(this), true, "Bevel Grab");
@@ -1871,6 +1794,7 @@ namespace Root_Vega.Module
 
                         double dActualPos = m_module.p_axisTheta.p_posActual;
                         if (bThetaClockwise) dScaled = -dScaled;
+                        m_module.m_aLADSThetaPos[(int)m_eScanPos] = dActualPos + dScaled;
                         m_module.p_axisTheta.StartMove(dActualPos + dScaled);
                         m_module.p_axisTheta.m_aPos["Snap"] = (int)dScaled;
 
@@ -2075,7 +1999,210 @@ namespace Root_Vega.Module
             }
         }
 
-        
+
+        #endregion
+        #region Run_SideVRSImageCapture
+        //-------------------------------------------------------------------
+        public class Run_SideVRSImageCapture : ModuleRunBase
+        {
+            //-------------------------------------------------------------------
+            SideVision m_module;
+            public RPoint m_rpReticleCenterPos = new RPoint();  // Pulse
+            public RPoint m_rpDistanceOfTDIToVRS_pulse = new RPoint();      // Pulse
+            public double m_dResY_um = 1;                       // um
+            public double m_dResX_um = 1;                       // um
+            public double m_dReticleVerticalSize_mm = 5;        // mm
+            public double m_dReticleHorizontalSize_mm = 150;    // mm
+            //-------------------------------------------------------------------
+            public Run_SideVRSImageCapture(SideVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+            //-------------------------------------------------------------------
+            public override ModuleRunBase Clone()
+            {
+                Run_SideVRSImageCapture run = new Run_SideVRSImageCapture(m_module);
+                run.m_rpReticleCenterPos = m_rpReticleCenterPos;
+                run.m_rpDistanceOfTDIToVRS_pulse = m_rpDistanceOfTDIToVRS_pulse;
+                run.m_dResY_um = m_dResY_um;
+                run.m_dResX_um = m_dResX_um;
+                run.m_dReticleVerticalSize_mm = m_dReticleVerticalSize_mm;
+                run.m_dReticleHorizontalSize_mm = m_dReticleHorizontalSize_mm;
+                return run;
+            }
+            //-------------------------------------------------------------------
+            public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+            {
+                treeRoot.p_eMode = mode;
+                RunTree(treeRoot, true);
+            }
+            //-------------------------------------------------------------------
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_rpReticleCenterPos = tree.Set(m_rpReticleCenterPos, m_rpReticleCenterPos, "Center Axis Position", "Center Axis Position (Pulse)", bVisible);
+                m_rpDistanceOfTDIToVRS_pulse = tree.Set(m_rpDistanceOfTDIToVRS_pulse, m_rpDistanceOfTDIToVRS_pulse, "Distance of TDI Camera to VRS Camera", "Distance of TDI Camera to VRS Camera (Pulse)", bVisible);
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera X Resolution", "Camera X Resolution (um)", bVisible);
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera Y Resolution", "Camera Y Resolution (um)", bVisible);
+                m_dReticleVerticalSize_mm = tree.Set(m_dReticleVerticalSize_mm, m_dReticleVerticalSize_mm, "Reticle Vertical Size", "Reticle Vertical Size (mm)", bVisible);
+                m_dReticleHorizontalSize_mm = tree.Set(m_dReticleHorizontalSize_mm, m_dReticleHorizontalSize_mm, "Reticle Horizontal Size", "Reticle Horizontal Size", bVisible);
+            }
+            //-------------------------------------------------------------------
+            public override string Run()
+            {
+                // variable
+                AxisXY axisXY = m_module.m_axisXY;
+                Axis axisZ = m_module.m_axisZ;
+                Camera_Basler cam = m_module.m_CamSideVRS;
+                ImageData img = cam.p_ImageViewer.p_ImageData;
+                string strVRSImageDirectoryPath = "C:\\vsdb\\";
+                string strVRSImageFullPath = "";
+
+                // implement
+                try
+                {
+                    m_module.p_bRunSideVision = true;
+
+                    StopWatch sw = new StopWatch();
+                    string strLightName = "VRS";
+                    m_module.SetLightByName(strLightName, 20);
+                    if (cam.p_CamInfo._OpenStatus == false) cam.Connect();
+                    while (cam.p_CamInfo._OpenStatus == false)
+                    {
+                        if (sw.ElapsedMilliseconds > 15000)
+                        {
+                            sw.Stop();
+                            return "Side VRS Camera Not Connected";
+                        }
+                    }
+                    sw.Stop();
+                    DateTime dtNow = ((Vega_Engineer)m_module.m_engineer).m_InspManager.NowTime;
+                    string strNowTime = dtNow.ToString("yyyyMMdd_HHmmss");
+                    List<DefectInfo> lstDefectInfo = GetDefectPosList();
+                    for (int i = 0; i<lstDefectInfo.Count; i++)
+                    {
+                        // Defect 위치로 이동
+                        //RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectInfo[i].cptDefectPos);
+                        //if (m_module.Run(axisXY.StartMove(rpDefectPos))) return p_sInfo;
+                        //if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        //if (m_module.Run(axisZ.StartMove(m_dVRSFocusPosZ_pulse))) return p_sInfo;
+                        //if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+
+                        // VRS 촬영 및 저장
+                        string strTemp = cam.Grab();
+
+                        strVRSImageFullPath = System.IO.Path.Combine(strVRSImageDirectoryPath, strNowTime + "_VRS_" + lstDefectInfo[i].iDefectIndex + ".bmp");
+                        img.SaveImageSync(strVRSImageFullPath);
+                    }
+                }
+                finally
+                {
+
+                }
+
+                m_module.p_bRunSideVision = false;
+                return "OK";
+            }
+            //-------------------------------------------------------------------
+            public struct DefectInfo
+            {
+                public CPoint cptDefectPos;
+                public int iDefectIndex;
+            }
+            //-------------------------------------------------------------------
+            public List<DefectInfo> GetDefectPosList()
+            {
+                // variable
+                DBConnector dbConnector = new DBConnector("localhost", "Inspections", "root", "`ati5344");
+                //List<CPoint> lstDefectPos = new List<CPoint>();
+                List<DefectInfo> lstDefectInfo = new List<DefectInfo>();
+
+                // implement
+                if (dbConnector.Open())
+                {
+                    DataSet dataSet = dbConnector.GetDataSet("tempdata");
+
+                    foreach (System.Data.DataRow item in dataSet.Tables["tempdata"].Rows)
+                    {
+                        int iIndex = Convert.ToInt32(item["idx"]);
+                        int posX = Convert.ToInt32(item["PosX"]);
+                        int posY = Convert.ToInt32(item["PosY"]);
+                        int nDefectCode = Convert.ToInt32(item["ClassifyCode"]);
+                        InspectionType eType = InspectionManager.GetInspectionType(nDefectCode);
+                        InspectionTarget eTarget = InspectionManager.GetInspectionTarget(nDefectCode);
+                        if ((eType == InspectionType.AbsoluteSurface) || (eType == InspectionType.RelativeSurface))
+                        {
+                            if (eTarget > InspectionTarget.SideInspection || eTarget <= InspectionTarget.SideInspectionBottom)
+                            {
+                                CPoint cptPos = new CPoint(posX, posY);
+                                DefectInfo diTemp = new DefectInfo();
+                                diTemp.cptDefectPos = cptPos;
+                                diTemp.iDefectIndex = iIndex;
+                                lstDefectInfo.Add(diTemp);
+                            }
+                        }
+                    }
+                }
+
+                return lstDefectInfo;
+            }
+            //-------------------------------------------------------------------
+            public RPoint GetAxisPosFromMemoryPos(CPoint cpMemory)
+            {
+                // variable
+                int nCamWidth = m_module.m_CamSide.GetRoiSize().X;
+                int nCamHeight = m_module.m_CamSide.GetRoiSize().Y;
+                int nMMPerUM = 1000;
+                double dTriggerPeriod = m_dResY_um / 10 * 100;
+                int nReticleVerticalSize_px = Convert.ToInt32(m_dReticleVerticalSize_mm * nMMPerUM / m_dResX_um);
+                int nReticleHorizontalSize_px = Convert.ToInt32(m_dReticleHorizontalSize_mm * nMMPerUM / m_dResY_um);
+                int nReticleRangePulse = Convert.ToInt32(dTriggerPeriod * nReticleHorizontalSize_px);
+                double dTriggerStartPosY = m_rpReticleCenterPos.Y + (nReticleRangePulse / 2);
+                double dTriggerEndPosY = m_rpReticleCenterPos.Y - (nReticleRangePulse / 2);
+                int nScanLine = cpMemory.X / nCamWidth;
+                int nSpareZ = cpMemory.X % nCamWidth;
+                RPoint rpAxis = new RPoint();
+                
+                // implement
+
+                return new RPoint();
+            }
+            //-------------------------------------------------------------------
+        }
+        //-------------------------------------------------------------------
+        #endregion
+        #region Run_BevelVRSImageCapture
+        public class Run_BevelVRSImageCapture : ModuleRunBase
+        {
+            SideVision m_module;
+
+            public Run_BevelVRSImageCapture(SideVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_BevelVRSImageCapture run = new Run_BevelVRSImageCapture(m_module);
+                return run;
+            }
+
+            public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+            {
+                treeRoot.p_eMode = mode;
+                RunTree(treeRoot, true);
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return "OK";
+            }
+        }
         #endregion
     }
 }

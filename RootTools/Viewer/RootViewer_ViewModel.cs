@@ -850,7 +850,7 @@ namespace RootTools
                 }
                 else
                 {
-                    p_View_Rect = new System.Drawing.Rectangle(StartPt.X, StartPt.Y, Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom * p_CanvasWidth / p_ImageData.p_nByte / p_CanvasHeight), Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom));
+                    p_View_Rect = new System.Drawing.Rectangle(StartPt.X, StartPt.Y, Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom * p_CanvasWidth / p_CanvasHeight), Convert.ToInt32(p_ImageData.p_Size.Y * p_Zoom));
                 }
                 //if (p_View_Rect.Height % 2 != 0)
                 //{

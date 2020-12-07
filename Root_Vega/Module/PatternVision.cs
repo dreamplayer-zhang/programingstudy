@@ -1919,7 +1919,6 @@ namespace Root_Vega.Module
             //--------------------------------------------------------
             public override string Run()
             {
-                m_module.p_bRunPatternVision = true;
                 // variable
                 AxisXY axisXY = m_module.m_axisXY;
                 Axis axisZ = m_module.m_axisZ;
