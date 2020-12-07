@@ -392,26 +392,27 @@ Point IP::FindMinDiffLoc(BYTE* pSrc, BYTE* pInOutTarget, int nTargetW, int nTarg
 // Create Golden Image
 void IP::CreateGoldenImage_Avg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
 {
-    Mat imgAccumlate = Mat::zeros(nH, nW, CV_32FC1);
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
 
     for (int i = 0; i < imgNum; i++)
     {
         Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
-        cv::accumulate(imgSrc, imgAccumlate);
+        imgSrc.convertTo(imgSrc, CV_16UC1);
+        imgAccumlate = imgAccumlate + imgSrc;
     }
 
     imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / imgNum);
 }
 void IP::CreateGoldenImage_NearAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
 {
-    Mat imgAccumlate = Mat::zeros(nH, nW, CV_32FC1);
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
     Mat imgAvg;
     for (int i = 0; i < imgNum; i++)
     {
         Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
-        cv::accumulate(imgSrc, imgAccumlate);
+        imgSrc.convertTo(imgSrc, CV_16UC1);
     }
 
     imgAccumlate.convertTo(imgAvg, CV_8UC1, 1. / imgNum);
@@ -438,27 +439,29 @@ void IP::CreateGoldenImage_NearAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, 
 }
 void IP::CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
 {
-    Mat imgAccumlate = Mat::zeros(nH, nW, CV_32FC1);
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
-
+    Mat imgSrc;
     if (imgNum <= 4)
     {
-        Mat minImg = Mat(nH, nW, CV_8UC1, pSrc[0]).clone();
-        Mat maxImg = Mat(nH, nW, CV_8UC1, pSrc[0]).clone();
-       
-        cv::accumulate(minImg, imgAccumlate); // pSrc[0]
+        imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
+        imgSrc.convertTo(imgSrc, CV_16UC1);
+
+        Mat minImg = imgSrc.clone();
+        Mat maxImg = imgSrc.clone();
+
+        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
+
         for (int i = 1; i < imgNum; i++)
         {
-            Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
+            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
+            imgSrc.convertTo(imgSrc, CV_16UC1);
 
             (cv::min)(imgSrc, minImg, minImg);
             (cv::max)(imgSrc, maxImg, maxImg);
 
-            cv::accumulate(imgSrc, imgAccumlate);
+            imgAccumlate = imgAccumlate + imgSrc;
         }
-
-        minImg.convertTo(minImg, CV_32FC1);
-        maxImg.convertTo(maxImg, CV_32FC1);
 
         cv::subtract(imgAccumlate, minImg, imgAccumlate);
         cv::subtract(imgAccumlate, maxImg, imgAccumlate);
@@ -467,24 +470,25 @@ void IP::CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW
     }
     else
     {
-        Mat minImg = Mat(nH, nW, CV_8UC1, pSrc[0]).clone();
-        Mat maxImg = Mat(nH, nW, CV_8UC1, pSrc[0]).clone();
+        imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
+        imgSrc.convertTo(imgSrc, CV_16UC1);
 
-        cv::accumulate(minImg, imgAccumlate); // pSrc[0]
+        Mat minImg = imgSrc.clone();
+        Mat maxImg = imgSrc.clone();
+
+        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
 
         for (int cnt = 0; cnt < imgNum / 3; cnt++)
         {
             for (int i = cnt * 3; i < cnt * 3 + 3; i++)
             {
-                Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
+                imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
+                imgSrc.convertTo(imgSrc, CV_16UC1);
 
                 (cv::min)(imgSrc, minImg, minImg);
                 (cv::max)(imgSrc, maxImg, maxImg);
 
-                cv::accumulate(imgSrc, imgAccumlate);
-
-                minImg.convertTo(minImg, CV_32FC1);
-                maxImg.convertTo(maxImg, CV_32FC1);
+                imgAccumlate = imgAccumlate + imgSrc;
 
                 cv::subtract(imgAccumlate, minImg, imgAccumlate);
                 cv::subtract(imgAccumlate, maxImg, imgAccumlate);
@@ -496,8 +500,9 @@ void IP::CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW
 }
 void IP::CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
 {
-    Mat imgAccumlate = Mat::zeros(nH, nW, CV_32FC1);
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+    Mat imgSrc;
 
     Mat minImg;
     Mat maxImg;
@@ -506,29 +511,31 @@ void IP::CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, i
     {
         if (i == 2)
         {
-            minImg = Mat(nH, nW, CV_8UC1, pSrc[0]).clone();
-            maxImg = Mat(nH, nW, CV_8UC1, pSrc[0]).clone();
+            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
+            imgSrc.convertTo(imgSrc, CV_16UC1);
 
-            cv::accumulate(minImg, imgAccumlate);
+            minImg = imgSrc.clone();
+            maxImg = imgSrc.clone();
+
+            imgAccumlate = imgAccumlate + minImg;
         }
         else
         {
-            imgAccumlate.convertTo(minImg, CV_8UC1);
-            imgAccumlate.convertTo(maxImg, CV_8UC1);
+            minImg = imgAccumlate;
+            maxImg = imgAccumlate;
         }  
 
         for (int j = i - 2; j < i; j++)
         {
             
-            Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc[j]);
+            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[j]);
+            imgSrc.convertTo(imgSrc, CV_16UC1);
 
             (cv::min)(imgSrc, minImg, minImg);
             (cv::max)(imgSrc, maxImg, maxImg);
 
-            cv::accumulate(imgSrc, imgAccumlate);
+            imgAccumlate = imgAccumlate + imgSrc;
         }
-        minImg.convertTo(minImg, CV_32FC1);
-        maxImg.convertTo(maxImg, CV_32FC1);
 
         cv::subtract(imgAccumlate, minImg, imgAccumlate);
         cv::subtract(imgAccumlate, maxImg, imgAccumlate);

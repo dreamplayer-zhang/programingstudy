@@ -143,9 +143,32 @@ namespace RootTools_Vision
                 rawdata = new byte[_width * _height * _byteCount];
                 BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, _width, _height), ImageLockMode.WriteOnly, bmp.PixelFormat);
 
-                IntPtr pointer = bmpData.Scan0;
-                for (int i = 0; i < _height; i++)
-                    Marshal.Copy(pointer + bmpData.Stride * i, rawdata, i * _width, _width * _byteCount);
+
+                if(_byteCount == 1)
+                {
+                    IntPtr pointer = bmpData.Scan0;
+                    for (int i = 0; i < _height; i++)
+                        Marshal.Copy(pointer + bmpData.Stride * i, rawdata, i * _width, _width * _byteCount);
+                }
+                else
+                {
+                    unsafe
+                    {
+                        IntPtr pointer = bmpData.Scan0;
+                        byte* pPointer = (byte*)pointer.ToPointer();
+
+                        for (int i = 0; i < _height; i++)
+                        {
+                            for (int j = 0; j < _width; j++)
+                            {
+                                rawdata[i * _width * _byteCount + j * _byteCount + 2] = pPointer[i * bmpData.Stride + j * _byteCount + 0];
+                                rawdata[i * _width * _byteCount + j * _byteCount + 1] = pPointer[i * bmpData.Stride + j * _byteCount + 1];
+                                rawdata[i * _width * _byteCount + j * _byteCount + 0] = pPointer[i * bmpData.Stride + j * _byteCount + 2];
+                            }
+                        }
+                    }
+                }
+
             }
             catch (Exception ex)
             {
