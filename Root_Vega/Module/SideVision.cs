@@ -797,6 +797,9 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_LADS(this), true, "LADS");
             AddModuleRunList(new Run_SideInspection(this), true, "Side Inspection");
             AddModuleRunList(new Run_BevelInspection(this), true, "Bevel Inspection");
+            AddModuleRunList(new Run_SideVRSImageCapture(this), true, "Side VRS Image Capture");
+            AddModuleRunList(new Run_BevelVRSImageCapture(this), true, "Bevel VRS Image Capture");
+            AddModuleRunList(new Run_InspectionComplete(this), true, "Inspection Complete");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -2008,11 +2011,12 @@ namespace Root_Vega.Module
             //-------------------------------------------------------------------
             SideVision m_module;
             public RPoint m_rpReticleCenterPos = new RPoint();  // Pulse
+            public int m_nFocusPosZ_pulse = 0;                  // pulse
             public RPoint m_rpDistanceOfTDIToVRS_pulse = new RPoint();      // Pulse
             public double m_dResY_um = 1;                       // um
             public double m_dResX_um = 1;                       // um
-            public double m_dReticleVerticalSize_mm = 5;        // mm
-            public double m_dReticleHorizontalSize_mm = 150;    // mm
+            public double m_dReticleVerticalSize_mm = 160;       // mm
+            public double m_dReticleHorizontalSize_mm = 10;    // mm
             //-------------------------------------------------------------------
             public Run_SideVRSImageCapture(SideVision module)
             {
@@ -2024,6 +2028,7 @@ namespace Root_Vega.Module
             {
                 Run_SideVRSImageCapture run = new Run_SideVRSImageCapture(m_module);
                 run.m_rpReticleCenterPos = m_rpReticleCenterPos;
+                run.m_nFocusPosZ_pulse = m_nFocusPosZ_pulse;
                 run.m_rpDistanceOfTDIToVRS_pulse = m_rpDistanceOfTDIToVRS_pulse;
                 run.m_dResY_um = m_dResY_um;
                 run.m_dResX_um = m_dResX_um;
@@ -2041,9 +2046,10 @@ namespace Root_Vega.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_rpReticleCenterPos = tree.Set(m_rpReticleCenterPos, m_rpReticleCenterPos, "Center Axis Position", "Center Axis Position (Pulse)", bVisible);
+                m_nFocusPosZ_pulse = tree.Set(m_nFocusPosZ_pulse, m_nFocusPosZ_pulse, "Focus Pos Z", "Focus Pos Z (pulse)", bVisible);
                 m_rpDistanceOfTDIToVRS_pulse = tree.Set(m_rpDistanceOfTDIToVRS_pulse, m_rpDistanceOfTDIToVRS_pulse, "Distance of TDI Camera to VRS Camera", "Distance of TDI Camera to VRS Camera (Pulse)", bVisible);
-                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera X Resolution", "Camera X Resolution (um)", bVisible);
-                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera Y Resolution", "Camera Y Resolution (um)", bVisible);
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera Y Resolution (um)", bVisible);
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera X Resolution (um)", bVisible);
                 m_dReticleVerticalSize_mm = tree.Set(m_dReticleVerticalSize_mm, m_dReticleVerticalSize_mm, "Reticle Vertical Size", "Reticle Vertical Size (mm)", bVisible);
                 m_dReticleHorizontalSize_mm = tree.Set(m_dReticleHorizontalSize_mm, m_dReticleHorizontalSize_mm, "Reticle Horizontal Size", "Reticle Horizontal Size", bVisible);
             }
@@ -2053,6 +2059,7 @@ namespace Root_Vega.Module
                 // variable
                 AxisXY axisXY = m_module.m_axisXY;
                 Axis axisZ = m_module.m_axisZ;
+                Axis axisTheta = m_module.m_axisTheta;
                 Camera_Basler cam = m_module.m_CamSideVRS;
                 ImageData img = cam.p_ImageViewer.p_ImageData;
                 string strVRSImageDirectoryPath = "C:\\vsdb\\";
@@ -2079,14 +2086,36 @@ namespace Root_Vega.Module
                     DateTime dtNow = ((Vega_Engineer)m_module.m_engineer).m_InspManager.NowTime;
                     string strNowTime = dtNow.ToString("yyyyMMdd_HHmmss");
                     List<DefectInfo> lstDefectInfo = GetDefectPosList();
-                    for (int i = 0; i<lstDefectInfo.Count; i++)
+                    InspectionTarget eOldTarget = InspectionTarget.SideInspectionBottom;
+                    for (int i = 0; i < lstDefectInfo.Count; i++)
                     {
+                        // Theta 회전
+                        double dPosTheta = 0.0;
+                        InspectionTarget eNewTarget = lstDefectInfo[i].eTarget;
+                        if (eNewTarget == InspectionTarget.SideInspectionBottom) dPosTheta = (int)eScanPos.Bottom * 360000 / 4;
+                        else if (eNewTarget == InspectionTarget.SideInspectionLeft) dPosTheta = (int)eScanPos.Left * 360000 / 4;
+                        else if (eNewTarget == InspectionTarget.SideInspectionTop) dPosTheta = (int)eScanPos.Top * 360000 / 4;
+                        else if (eNewTarget == InspectionTarget.SideInspectionRight) dPosTheta = (int)eScanPos.Right * 360000 / 4;
+                        else dPosTheta = 0.0;
+
+                        if (eNewTarget != eOldTarget)   // 이전 촬영면과 다를 경우 Theta가 돌기 때문에 X축을 안전위치로 뺀다.
+                        {
+                            if (m_module.Run(axisXY.p_axisX.StartMove(-50000)))
+                                return p_sInfo;
+                            if (m_module.Run(axisXY.p_axisX.WaitReady()))
+                                return p_sInfo;
+                        }
+                        if (m_module.Run(axisTheta.StartMove(dPosTheta)))
+                            return p_sInfo;
+                        if (m_module.Run(axisTheta.WaitReady()))
+                            return p_sInfo;
+
                         // Defect 위치로 이동
-                        //RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectInfo[i].cptDefectPos);
-                        //if (m_module.Run(axisXY.StartMove(rpDefectPos))) return p_sInfo;
-                        //if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                        //if (m_module.Run(axisZ.StartMove(m_dVRSFocusPosZ_pulse))) return p_sInfo;
-                        //if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+                        RPoint rpDefectPos = GetAxisPosFromMemoryPos(lstDefectInfo[i].cptDefectPos);    // rpDefectPos.X == Z축값, rpDefectPos.Y == Y축값
+                        if (m_module.Run(axisXY.StartMove(m_rpReticleCenterPos.X, rpDefectPos.Y))) return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                        if (m_module.Run(axisZ.StartMove(rpDefectPos.X))) return p_sInfo;
+                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
 
                         // VRS 촬영 및 저장
                         string strTemp = cam.Grab();
@@ -2108,6 +2137,7 @@ namespace Root_Vega.Module
             {
                 public CPoint cptDefectPos;
                 public int iDefectIndex;
+                public InspectionTarget eTarget;
             }
             //-------------------------------------------------------------------
             public List<DefectInfo> GetDefectPosList()
@@ -2138,12 +2168,18 @@ namespace Root_Vega.Module
                                 DefectInfo diTemp = new DefectInfo();
                                 diTemp.cptDefectPos = cptPos;
                                 diTemp.iDefectIndex = iIndex;
+                                diTemp.eTarget = eTarget;
                                 lstDefectInfo.Add(diTemp);
                             }
                         }
                     }
                 }
-
+                lstDefectInfo.Sort(delegate (DefectInfo A, DefectInfo B)
+                {
+                    if (A.eTarget > B.eTarget) return 1;
+                    else if (A.eTarget < B.eTarget) return -1;
+                    else return 0;
+                });
                 return lstDefectInfo;
             }
             //-------------------------------------------------------------------
@@ -2151,21 +2187,23 @@ namespace Root_Vega.Module
             {
                 // variable
                 int nCamWidth = m_module.m_CamSide.GetRoiSize().X;
-                int nCamHeight = m_module.m_CamSide.GetRoiSize().Y;
                 int nMMPerUM = 1000;
                 double dTriggerPeriod = m_dResY_um / 10 * 100;
-                int nReticleVerticalSize_px = Convert.ToInt32(m_dReticleVerticalSize_mm * nMMPerUM / m_dResX_um);
+                double dXScale = m_dResX_um / 10 * 100;
+                int nReticleVerticalSize_px = Convert.ToInt32(m_dReticleVerticalSize_mm * nMMPerUM / m_dResY_um);
                 int nReticleHorizontalSize_px = Convert.ToInt32(m_dReticleHorizontalSize_mm * nMMPerUM / m_dResY_um);
-                int nReticleRangePulse = Convert.ToInt32(dTriggerPeriod * nReticleHorizontalSize_px);
+                int nReticleRangePulse = Convert.ToInt32(dTriggerPeriod * nReticleVerticalSize_px);
                 double dTriggerStartPosY = m_rpReticleCenterPos.Y + (nReticleRangePulse / 2);
-                double dTriggerEndPosY = m_rpReticleCenterPos.Y - (nReticleRangePulse / 2);
                 int nScanLine = cpMemory.X / nCamWidth;
                 int nSpareZ = cpMemory.X % nCamWidth;
                 RPoint rpAxis = new RPoint();
-                
-                // implement
 
-                return new RPoint();
+                // implement
+                rpAxis.X = m_nFocusPosZ_pulse + nReticleHorizontalSize_px * dTriggerPeriod / 2 - (nScanLine * nCamWidth * dXScale) - nSpareZ * dXScale - m_rpDistanceOfTDIToVRS_pulse.X;
+                rpAxis.Y = dTriggerStartPosY - (dTriggerPeriod * cpMemory.Y) - m_rpDistanceOfTDIToVRS_pulse.Y;
+
+                // rpAxis의 X는 Z축, Y는 Y축
+                return rpAxis;
             }
             //-------------------------------------------------------------------
         }
@@ -2200,6 +2238,54 @@ namespace Root_Vega.Module
 
             public override string Run()
             {
+                return "OK";
+            }
+        }
+        #endregion
+        #region Run_InspectionComplete
+        public class Run_InspectionComplete : ModuleRunBase
+        {
+            SideVision m_module;
+            _2_6_SideViewModel m_sivm;
+
+            public Run_InspectionComplete(SideVision module)
+            {
+                m_module = module;
+                m_sivm = m_module.m_sivm;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_InspectionComplete run = new Run_InspectionComplete(m_module);
+                return run;
+            }
+
+            public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+            {
+                treeRoot.p_eMode = mode;
+                RunTree(treeRoot, true);
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                m_module.m_bRunSideVision = true;
+                while (((Vega_Engineer)m_module.m_engineer).m_InspManager.p_qInspection.Count != 0)
+                {
+                    Thread.Sleep(1000);
+                }
+
+                m_sivm._dispatcher.Invoke(new Action(delegate ()
+                {
+                    m_sivm._endInsp();
+                    m_sivm._clearInspReslut();
+                    ((Vega_Engineer)m_module.m_engineer).m_InspManager.ClearDefectList();
+                }));
+                m_module.m_bRunSideVision = false;
                 return "OK";
             }
         }
