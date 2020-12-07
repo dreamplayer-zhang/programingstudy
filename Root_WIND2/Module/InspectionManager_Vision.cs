@@ -199,7 +199,7 @@ namespace Root_WIND2
 
         public void SnapDone_Callback(object obj, SnapDoneArgs args)
         {
-            if (this.workplaceBundle == null) return;
+            if (this.workplaceBundle == null) return; // 검사 진행중인지 확인하는 조건으로 바꿔야함
 
             Rect snapArea = new Rect(new Point(args.startPosition.X, args.startPosition.Y), new Point(args.endPosition.X, args.endPosition.Y));
 
