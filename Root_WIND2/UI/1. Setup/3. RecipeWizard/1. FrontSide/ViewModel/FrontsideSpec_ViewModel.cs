@@ -23,6 +23,9 @@ namespace Root_WIND2
             m_cMask = new ObservableCollection<Mask>();
             m_cInspMethod = new ObservableCollection<ParameterBase>();
             m_cInspItem = new ObservableCollection<InspectionItem>();
+
+            p_cInspMethod = ParameterBase.GetChildClass();
+            p_selectedMethodItem = ParameterBase.CreateChildInstance(p_cInspMethod[0]);
         }
 
 

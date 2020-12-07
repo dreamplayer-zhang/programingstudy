@@ -30,12 +30,14 @@ namespace RootTools_Vision
             workManagers.Add(manager);
         }
 
-        public void SetBundles(WorkBundle workbundle, WorkplaceBundle workplacebundle)
+        public bool SetBundles(WorkBundle workbundle, WorkplaceBundle workplacebundle)
         {
             foreach (WorkManager manager in this.workManagers)
             {
-                manager.SetBundles(workbundle, workplacebundle);
+                if(manager.SetBundles(workbundle, workplacebundle) == false)
+                    return false;
             }
+            return true;
         }
 
         public void Start()
