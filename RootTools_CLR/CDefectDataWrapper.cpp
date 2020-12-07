@@ -5,7 +5,7 @@ bool CDefectDataWrapper::IsCluster()
 {
 	if (ClusterItems == nullptr)
 		return false;
-	if (ClusterItems->size() > 0)
+	else if (ClusterItems->size() > 0)
 		return true;
 	else
 		return false;
@@ -18,18 +18,16 @@ int CDefectDataWrapper::GetStartPointX()
 		int left = INT_MAX;
 		for (int i = 0; i < ClusterItems->size(); i++)
 		{
-			if (left > ClusterItems[i]->GetStartPointX())
+			if (ClusterItems[i]->fPosX < left)
 			{
-				left = ClusterItems[i]->GetStartPointX();
+				left = ClusterItems[i]->fPosX;
 			}
 		}
-		if (left != INT_MAX)
-			return left;
-		else
-			return (int)(fPosX - nWidth / 2.0);
+		return left;
 	}
 	else
 	{
+		//Cluster가 없는 경우 단순반환
 		return (int)(fPosX - nWidth / 2.0);
 	}
 }
@@ -41,18 +39,16 @@ int CDefectDataWrapper::GetStartPointY()
 		int top = INT_MAX;
 		for (int i = 0; i < ClusterItems->size(); i++)
 		{
-			if (top > ClusterItems[i]->GetStartPointY())
+			if (ClusterItems[i]->fPosY < top)
 			{
-				top = ClusterItems[i]->GetStartPointY();
+				top = ClusterItems[i]->fPosY;
 			}
 		}
-		if (top != INT_MAX)
-			return top;
-		else
-			return (int)(fPosY - nHeight / 2.0);
+		return top;
 	}
 	else
 	{
+		//Cluster가 없는 경우 단순반환
 		return (int)(fPosY - nHeight / 2.0);
 	}
 }
@@ -64,18 +60,16 @@ int CDefectDataWrapper::GetEndPointX()
 		int right = INT_MIN;
 		for (int i = 0; i < ClusterItems->size(); i++)
 		{
-			if (right < ClusterItems[i]->GetEndPointX())
+			if (ClusterItems[i]->fPosX > right)
 			{
-				right = ClusterItems[i]->GetEndPointX();
+				right = ClusterItems[i]->fPosX;
 			}
 		}
-		if (right != INT_MIN)
-			return right;
-		else
-			return (int)(fPosX + nWidth / 2.0);
+		return right;
 	}
 	else
 	{
+		//Cluster가 없는 경우 단순반환
 		return (int)(fPosX + nWidth / 2.0);
 	}
 }
@@ -87,18 +81,16 @@ int CDefectDataWrapper::GetEndPointY()
 		int bot = INT_MIN;
 		for (int i = 0; i < ClusterItems->size(); i++)
 		{
-			if (bot < ClusterItems[i]->GetEndPointY())
+			if (ClusterItems[i]->fPosY > bot)
 			{
-				bot = ClusterItems[i]->GetEndPointY();
+				bot = ClusterItems[i]->fPosY;
 			}
 		}
-		if (bot != INT_MIN)
-			return bot;
-		else
-			return (int)(fPosY + nHeight / 2.0);
+		return bot;
 	}
 	else
 	{
+		//Cluster가 없는 경우 단순반환
 		return (int)(fPosY + nHeight / 2.0);
 	}
 }
@@ -107,10 +99,14 @@ int CDefectDataWrapper::GetDrawWidth()
 {
 	if (IsCluster())
 	{
-		return GetEndPointX() - GetStartPointX();
+		//Cluster가 있는 경우 Cluster 내부의 모든 정보를 종합하여 반환
+		int left = GetStartPointX();
+		int right = GetEndPointX();
+		return right - left;
 	}
 	else
 	{
+		//Cluster가 없는 경우 단순반환
 		return nWidth;
 	}
 }
@@ -119,51 +115,53 @@ int CDefectDataWrapper::GetDrawHeight()
 {
 	if (IsCluster())
 	{
-		return GetEndPointY() - GetStartPointY();
+		//Cluster가 있는 경우 Cluster 내부의 모든 정보를 종합하여 반환
+		int top = GetStartPointY();
+		int bot = GetEndPointY();
+		return bot - top;
 	}
 	else
 	{
+		//Cluster가 없는 경우 단순반환
 		return nHeight;
 	}
 }
 
 CDefectDataWrapper::CDefectDataWrapper()
 {
-
+	ClusterItems = gcnew cliext::vector<CDefectDataWrapper^>();
 }
 
 CDefectDataWrapper::CDefectDataWrapper(DefectData item)
 {
-
+	fAreaSize = item.fAreaSize;
 	fPosX = item.fPosX;
 	fPosY = item.fPosY;
-	fAreaSize = item.fAreaSize;
 	nClassifyCode = item.nClassifyCode;
 	nFOV = item.nFOV;
-	nWidth = item.nWidth;
 	nHeight = item.nHeight;
 	nIdx = item.nIdx;
 	nLength = item.nLength;
+	nWidth = item.nWidth;
 	bMergeUsed = false;
-
 	ClusterItems = gcnew cliext::vector<CDefectDataWrapper^>();
 }
+
 CDefectDataWrapper::CDefectDataWrapper(CDefectDataWrapper^ item)
 {
+	fAreaSize = item->fAreaSize;
 	fPosX = item->fPosX;
 	fPosY = item->fPosY;
-	fAreaSize = item->fAreaSize;
 	nClassifyCode = item->nClassifyCode;
 	nFOV = item->nFOV;
-	nWidth = item->nWidth;
 	nHeight = item->nHeight;
 	nIdx = item->nIdx;
 	nLength = item->nLength;
-	bMergeUsed = false;
-	if (item->ClusterItems != nullptr)
-	{
-		ClusterItems = gcnew cliext::vector<CDefectDataWrapper^>(item->ClusterItems);//DefectData 클래스에는 Cluster가 없음
-	}
+	nWidth = item->nWidth;
+	bMergeUsed = item->bMergeUsed;
+
+	ClusterItems = gcnew cliext::vector<CDefectDataWrapper^>();
+	ClusterItems->assign(item->ClusterItems->begin(), item->ClusterItems->end());
 }
 
 void CDefectDataWrapper::AddCluster(CDefectDataWrapper^ data)
@@ -189,8 +187,8 @@ void CDefectDataWrapper::AddRangeCluster(cliext::vector<CDefectDataWrapper^>^ da
 
 void CDefectDataWrapper::RemoveCluster(int idx)
 {
-	if (ClusterItems->size() == 0)
-		return;
+	if (ClusterItems == nullptr)
+		ClusterItems = gcnew cliext::vector<CDefectDataWrapper^>();
 
 	int targetIdx = 0;
 	ClusterItems->erase(ClusterItems->begin() + (idx - 1));
@@ -199,116 +197,109 @@ void CDefectDataWrapper::RemoveCluster(int idx)
 
 void CDefectDataWrapper::MergeClusterInfo()
 {
-	if (ClusterItems->size() > 0)
+	if (ClusterItems == nullptr)
+		return;
+	if (ClusterItems->size() == 0)
+		return;
+	if (!IsCluster())
+		return;
+	float x = 0.0f, y = 0.0f, area = 0.0f;
+
+	for (int i = 0; i < ClusterItems->size(); i++)
 	{
-		float floatTemp = 0.0;
-		int intTemp = 0;
-		for (int i = 0; i < ClusterItems->size(); i++)
-		{
-			floatTemp += ClusterItems[i]->fPosX;
-		}
-		fPosX = floatTemp / ClusterItems->size();
-
-		floatTemp = 0.0;
-		for (int i = 0; i < ClusterItems->size(); i++)
-		{
-			floatTemp += ClusterItems[i]->fPosY;
-		}
-		fPosY = floatTemp / ClusterItems->size();
-
-		floatTemp = 0.0;
-		for (int i = 0; i < ClusterItems->size(); i++)
-		{
-			floatTemp += ClusterItems[i]->fAreaSize;
-		}
-		fAreaSize = floatTemp;// / ClusterItems->size();
-
-		nClassifyCode = ClusterItems[0]->nClassifyCode;
-		nFOV = ClusterItems[0]->nFOV;
-
-		nWidth = GetDrawWidth();
-		nHeight = GetDrawHeight();
-
-		nIdx = ClusterItems[0]->nIdx;
-
-		/*
-		 = ClusterItems.Sum(x = > x.nWidth);
-		nHeight = ClusterItems.Sum(x = > x.nHeight);
-		nIdx = ClusterItems.First().nIdx;*/
+		x += ClusterItems[i]->fPosX;
+		y += ClusterItems[i]->fPosY;
+		area += ClusterItems[i]->fAreaSize;
 	}
+	fPosX = x / ClusterItems->size();
+	fPosY = y / ClusterItems->size();
+	fAreaSize = area / ClusterItems->size();
+
+	nWidth = GetDrawWidth();
+	nHeight = GetDrawHeight();
+	nIdx = ClusterItems[0]->nIdx;
+	nClassifyCode = ClusterItems[0]->nClassifyCode;
+	nFOV = ClusterItems[0]->nFOV;
 }
 
 cliext::vector<CDefectDataWrapper^>^ CDefectDataWrapper::RearrangeCluster(CDefectDataWrapper^ data, int mergeDistance)
 {
-	if (data->ClusterItems == nullptr || data->ClusterItems->size() <= 1)
+	cliext::vector<CDefectDataWrapper^>^ result = gcnew cliext::vector<CDefectDataWrapper^>();
+	if (data->IsCluster())
 	{
-		//Cluster가 비이있거나 하나밖에 없는 경우 자기 자신을 list로 반환
-		cliext::vector<CDefectDataWrapper^>^ result = gcnew cliext::vector<CDefectDataWrapper^>();
+		for (int i = 0; i < data->ClusterItems->size(); i++)
+		{
+			result->push_back(data->ClusterItems[i]);
+		}
+	}
+	else
+	{
 		result->push_back(data);
-		return result;
 	}
 
 	return CreateClusterList(data->ClusterItems, mergeDistance);
 }
 
-cliext::vector<CDefectDataWrapper^>^ CDefectDataWrapper::CreateClusterList(cliext::vector<CDefectDataWrapper^>^ datas, int mergeDistance)
+cliext::vector<CDefectDataWrapper^>^ CDefectDataWrapper::CreateClusterList(cliext::vector<CDefectDataWrapper^>^ data, int mergeDistance)
 {
 	cliext::vector<CDefectDataWrapper^>^ result = gcnew cliext::vector<CDefectDataWrapper^>();
-	if (datas->size() <= 1)
+
+	if (data->size() <= 1)
 	{
-		return datas;
+		return data;
 	}
 
-	for (int i = 0; i < datas->size(); i++)
+	for (int i = 0; i < data->size(); i++)
 	{
 		bool merged = false;
-		if (datas[i]->bMergeUsed)
+		if (data[i]->bMergeUsed)
 			continue;
 
-		CDefectDataWrapper^ cluster = gcnew CDefectDataWrapper(datas[i]);
-		for (int j = i + 1; j < datas->size(); j++)
+		CDefectDataWrapper^ cluster = gcnew CDefectDataWrapper(data[i]);
+		for (int j = i + 1; j < data->size(); j++)
 		{
-			if (CheckMerge(datas[i], datas[j], mergeDistance))
+			if (CheckMerge(data[i], data[j], mergeDistance))
 			{
 				merged = true;
-				datas[j]->bMergeUsed = true;
-				cluster->AddCluster(datas[j]);
+				data[j]->bMergeUsed = true;
+				cluster->AddCluster(data[j]);
 			}
 		}
 		if (merged)
 		{
-			datas[i]->bMergeUsed = true;
-			cluster->AddCluster(datas[i]);//다 끝나고 merge가 한번이라도 되었다면 자기 자신도 넣고 끝낸다
+			data[i]->bMergeUsed = true;
+			cluster->AddCluster(data[i]);//다 끝나고 merge가 한번이라도 되었다면 자기 자신도 넣고 끝낸다
 											  //merge가 안 된 경우에는 clusteritems에 defect이 하나도 없게 됨
+
 			cluster->MergeClusterInfo();//Cluster내의 정보를 병합해서 본체에 덮어씌운다
 			result->push_back(cluster);
 		}
 		else
 		{
 			//merge에 진입하지 않은 경우, 자기 자신을 결과에 넣는다
-			result->push_back(datas[i]);
+			result->push_back(data[i]);
 		}
 	}
 	return result;
 }
 
-cliext::vector<CDefectDataWrapper^>^ CDefectDataWrapper::MergeDefect(cliext::vector<CDefectDataWrapper^>^ datas, int mergeDistance)
+cliext::vector<CDefectDataWrapper^>^ CDefectDataWrapper::MergeDefect(cliext::vector<CDefectDataWrapper^>^ data, int mergeDistance)
 {
 	cliext::vector<CDefectDataWrapper^>^ tempList = gcnew cliext::vector<CDefectDataWrapper^>();
 
-	for (int i = 0; i < datas->size(); i++)
+	for (int i = 0; i < data->size(); i++)
 	{
 		//받아온 모든 List의 ClusterItems 및 요소를 치환한다
-		if (datas[i]->IsCluster())
+		if (data[i]->IsCluster())
 		{
-			for (int j = 0; j < datas[i]->ClusterItems->size(); j++)
+			for (int i = 0; i < data[i]->ClusterItems->size(); i++)
 			{
-				tempList->push_back(datas[i]->ClusterItems[j]);
+				tempList->push_back(data[i]->ClusterItems[i]);
 			}
 		}
 		else
 		{
-			tempList->push_back(datas[i]);
+			tempList->push_back(data[i]);
 		}
 	}
 
@@ -319,29 +310,28 @@ bool CDefectDataWrapper::CheckMerge(CDefectDataWrapper^ data1, CDefectDataWrappe
 {
 	int data1Width = data1->nWidth + (distance * 2);
 	int data1Height = data1->nHeight + (distance * 2);
-
-	int data1Left = data1->fPosX - data1Width / 2.0;
-	int data1Top = data1->fPosY - data1Height / 2.0;
-	int data1Right = data1->fPosX + data1Width / 2.0;
-	int data1Bot = data1->fPosY + data1Height / 2.0;
+	System::Drawing::Rectangle^ data1Rect = gcnew System::Drawing::Rectangle(
+		(int)(data1->fPosX - data1Width / 2.0),
+		(int)(data1->fPosY - data1Height / 2.0),
+		data1Width,
+		data1Height);
 
 	int data2Width = data2->nWidth + (distance * 2);
 	int data2Height = data2->nHeight + (distance * 2);
+	System::Drawing::Rectangle^ data2Rect = gcnew System::Drawing::Rectangle(
+		(int)(data2->fPosX - data2Width / 2.0),
+		(int)(data2->fPosY - data2Height / 2.0),
+		data2Width,
+		data2Height);
 
-	int data2Left = data2->fPosX - data2Width / 2.0;
-	int data2Top = data2->fPosY - data2Height / 2.0;
-	int data2Right = data2->fPosX + data2Width / 2.0;
-	int data2Bot = data2->fPosY + data2Height / 2.0;
+	System::Drawing::Rectangle^ result = System::Drawing::Rectangle::Intersect(*data1Rect, *data2Rect);
 
-	if (data1Left < data2Right && data1Right > data2Left &&
-		data1Top > data2Bot && data1Bot < data2Top)
+	if (result->IsEmpty)
 	{
-		//겹침
-		return true;
+		return false;
 	}
 	else
 	{
-		//안겹침
-		return false;
+		return true;
 	}
 }
