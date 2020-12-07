@@ -7,6 +7,7 @@
         xmlns:Icon ="clr-namespace:Root_CAMELLIA.Control.Icon"
         xmlns:met="clr-namespace:LibSR_Met;assembly=LibSR_Met"
         xmlns:tools="clr-namespace:RootTools.Control.ACS;assembly=RootTools"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
         WindowStyle="None"
         AllowsTransparency="False"
@@ -544,6 +545,26 @@
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
                         </Viewbox>
+                        <!--<Canvas Grid.Row="1" ClipToBounds="True"  Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                            <Rectangle Fill="Red" Width="30" Height="30" Canvas.Left="50" Canvas.Top="50"></Rectangle>
+                        </Canvas>-->
+                        <!--<Viewbox Margin="3" Grid.Row="1">
+                            <ItemsControl
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Rectangle Width="50" Height="50" Fill="Red"></Rectangle> 
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Viewbox>-->
                     </Grid>
                 </GroupBox>
             </Grid>
@@ -556,7 +577,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <GroupBox Header="Contour Map">
-                            
+
                         </GroupBox>
                         <GroupBox Header="Measurement Data" Grid.Row="1" Grid.RowSpan="2">
                             <TabControl Background="Transparent">
@@ -595,17 +616,17 @@
                                 </TabItem>
                                 <TabItem Header="Parameter">
                                 </TabItem>
-                                <TabItem Header="RT Graph">
-                              
-                                </TabItem>
+
                             </TabControl>
                         </GroupBox>
-                        <!--<GroupBox Header="RT Graph" Grid.Row="2">
-                        </GroupBox>-->
-                        
                     </Grid>
                 </TabItem>
                 <TabItem Header="Log" Width="80">
+                </TabItem>
+                <TabItem Header="RT Graph">
+                    <WindowsFormsHost>
+                        <met:GraphPlot/>
+                    </WindowsFormsHost>
                 </TabItem>
             </TabControl>
 

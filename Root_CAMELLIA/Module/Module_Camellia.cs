@@ -476,10 +476,14 @@ namespace Root_CAMELLIA.Module
                 RPoint MeasurePoint;
                 for (int i = 0; i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count; i++)
                 {
+                    double x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].x;
+                    double y = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].y;
+
+
                     double dX = m_WaferCenterPos_pulse.X + (m_WaferCenterPos_pulse.X - m_DataManager.m_waferCentering.m_ptCenter.X) + 
-                        m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].x * 10000;
+                        x * 10000;
                     double dY = m_WaferCenterPos_pulse.Y + (m_WaferCenterPos_pulse.Y - m_DataManager.m_waferCentering.m_ptCenter.Y) +
-                        m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].y * 10000;
+                        y * 10000;
                     MeasurePoint = new RPoint(dX, dY);
 
                     if (m_module.Run(axisXY.StartMove(MeasurePoint)))
@@ -487,6 +491,7 @@ namespace Root_CAMELLIA.Module
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
 
+                    m_NanoView.SampleMeasure(i, x,y, 1,1,1,1);
 
 
                     if (VRS.Grab() == "OK")
