@@ -2011,7 +2011,8 @@ namespace Root_Vega.Module
             public RPoint m_rpDistanceOfTDIToVRS_pulse = new RPoint();      // Pulse
             public double m_dResY_um = 1;                       // um
             public double m_dResX_um = 1;                       // um
-            public double m_dReticleSize_mm = 150;              // mm
+            public double m_dReticleVerticalSize_mm = 5;        // mm
+            public double m_dReticleHorizontalSize_mm = 150;    // mm
             //-------------------------------------------------------------------
             public Run_SideVRSImageCapture(SideVision module)
             {
@@ -2026,7 +2027,8 @@ namespace Root_Vega.Module
                 run.m_rpDistanceOfTDIToVRS_pulse = m_rpDistanceOfTDIToVRS_pulse;
                 run.m_dResY_um = m_dResY_um;
                 run.m_dResX_um = m_dResX_um;
-                run.m_dReticleSize_mm = m_dReticleSize_mm;
+                run.m_dReticleVerticalSize_mm = m_dReticleVerticalSize_mm;
+                run.m_dReticleHorizontalSize_mm = m_dReticleHorizontalSize_mm;
                 return run;
             }
             //-------------------------------------------------------------------
@@ -2042,7 +2044,8 @@ namespace Root_Vega.Module
                 m_rpDistanceOfTDIToVRS_pulse = tree.Set(m_rpDistanceOfTDIToVRS_pulse, m_rpDistanceOfTDIToVRS_pulse, "Distance of TDI Camera to VRS Camera", "Distance of TDI Camera to VRS Camera (Pulse)", bVisible);
                 m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera X Resolution", "Camera X Resolution (um)", bVisible);
                 m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera Y Resolution", "Camera Y Resolution (um)", bVisible);
-                m_dReticleSize_mm = tree.Set(m_dReticleSize_mm, m_dReticleSize_mm, "Reticle Size", "Reticle Size (mm)", bVisible);
+                m_dReticleVerticalSize_mm = tree.Set(m_dReticleVerticalSize_mm, m_dReticleVerticalSize_mm, "Reticle Vertical Size", "Reticle Vertical Size (mm)", bVisible);
+                m_dReticleHorizontalSize_mm = tree.Set(m_dReticleHorizontalSize_mm, m_dReticleHorizontalSize_mm, "Reticle Horizontal Size", "Reticle Horizontal Size", bVisible);
             }
             //-------------------------------------------------------------------
             public override string Run()
@@ -2147,10 +2150,19 @@ namespace Root_Vega.Module
             public RPoint GetAxisPosFromMemoryPos(CPoint cpMemory)
             {
                 // variable
+                int nCamWidth = m_module.m_CamSide.GetRoiSize().X;
+                int nCamHeight = m_module.m_CamSide.GetRoiSize().Y;
                 int nMMPerUM = 1000;
                 double dTriggerPeriod = m_dResY_um / 10 * 100;
-                //int nReticleVerticalSize_px = Convert.ToInt
-
+                int nReticleVerticalSize_px = Convert.ToInt32(m_dReticleVerticalSize_mm * nMMPerUM / m_dResX_um);
+                int nReticleHorizontalSize_px = Convert.ToInt32(m_dReticleHorizontalSize_mm * nMMPerUM / m_dResY_um);
+                int nReticleRangePulse = Convert.ToInt32(dTriggerPeriod * nReticleHorizontalSize_px);
+                double dTriggerStartPosY = m_rpReticleCenterPos.Y + (nReticleRangePulse / 2);
+                double dTriggerEndPosY = m_rpReticleCenterPos.Y - (nReticleRangePulse / 2);
+                int nScanLine = cpMemory.X / nCamWidth;
+                int nSpareZ = cpMemory.X % nCamWidth;
+                RPoint rpAxis = new RPoint();
+                
                 // implement
 
                 return new RPoint();
