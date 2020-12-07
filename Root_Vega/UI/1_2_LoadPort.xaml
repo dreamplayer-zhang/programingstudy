@@ -116,12 +116,21 @@
                                            Grid.Row="4"
                                            Style="{StaticResource BasicTb}"
                                            Foreground="{StaticResource Black}"/>
-                        <TextBlock Text="{Binding p_eIonizerState}" x:Name="textBoxIonizerState"
-                                           Grid.Column="1"
-                                           Grid.Row="5"
-                                           Style="{StaticResource BasicTb}"
-                                           Foreground="{StaticResource Black}"/>
-
+                        <Grid  Grid.Row="5" Grid.Column="1" Margin="0,10,0,10" Width="40" Height="25">
+                            <Border BorderThickness="3"></Border>
+                            <Grid.Style>
+                                <Style>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding p_eIonizerState}" Value="True">
+                                            <Setter Property="Grid.Background" Value="LimeGreen"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding p_eIonizerState}" Value="False">
+                                            <Setter Property="Grid.Background" Value="Red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                        </Grid>
                     </Grid>
                 </Grid>
                 <Grid Grid.Row="1" Margin="0,0,0,0">

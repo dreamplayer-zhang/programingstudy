@@ -165,12 +165,14 @@ namespace Root_Vega
             return m_handler.IsEnableRecovery(); 
         }
 
+        public bool m_bRecovery = false; 
         private void buttonRecovery_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableRecovery() == false) return;
             m_handler.m_bIsPossible_Recovery = false;
             m_handler.m_process.CalcRecover();
-            EQ.p_eState = EQ.eState.Run; 
+            EQ.p_eState = EQ.eState.Run;
+            m_bRecovery = true;
         }
         #endregion
 

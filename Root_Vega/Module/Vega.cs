@@ -45,11 +45,13 @@ namespace Root_Vega.Module
         public DIO_IO m_dioBuzzerOff;
         public DIO_I m_diDoorLock;
         DIO_I m_diInterlock_Key;
-        DIO_O m_doDoorLock_Use;
+        public DIO_O m_doDoorLock_Use;
         DIO_Is m_diIonizerAlarmCheck;
-
-
-
+        DIO_I m_diElecPnl_1_FanAlarm;
+        DIO_I m_diElecPnl_2_FanAlarm;
+        DIO_I m_diPCPnl_FanAlarm;
+        DIO_I m_diPC_FanAlarm;
+            
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
@@ -63,6 +65,10 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_diInterlock_Key, this, "InterLock Key");
             p_sInfo = m_toolBox.Get(ref m_doDoorLock_Use, this, "Door Lock Use");
             p_sInfo = m_toolBox.Get(ref m_diIonizerAlarmCheck, this, "Ionizer Alarm Check",m_asIonizer,true,true);
+            p_sInfo = m_toolBox.Get(ref m_diElecPnl_1_FanAlarm, this, "Elec Pannl 1 Fan Alarm");
+            p_sInfo = m_toolBox.Get(ref m_diElecPnl_2_FanAlarm, this, "Elec Panel 2 Fan Alarm");
+            p_sInfo = m_toolBox.Get(ref m_diPCPnl_FanAlarm, this, "PC Panel 1 Fan Alarm");
+            p_sInfo = m_toolBox.Get(ref m_diPC_FanAlarm, this, "PC Panel 1 Fan Alarm");
             p_sInfo = m_RFID.GetTools(this, bInit);
             
                 if (bInit) InitALID(); 
@@ -75,6 +81,10 @@ namespace Root_Vega.Module
         ALID m_alidProtectionBar;
         ALID m_alidMCReset;
         ALID m_alidCDALow;
+        ALID m_alidElecPnl_1_FanAlarm;
+        ALID m_alidElecPnl_2_FanAlarm;
+        ALID m_alidPCPnl_FanAlarm;
+        ALID m_alidPC_FanAlarm;
         ALID m_alidDoorLock;
         ALID m_alidIonizerAlarm;
 
@@ -86,6 +96,10 @@ namespace Root_Vega.Module
             m_alidCDALow = m_gaf.GetALID(this, "CDA Low", "CDA Low Error");
             m_alidDoorLock = m_gaf.GetALID(this, "Door Lock", "Door Lock Error");
             m_alidIonizerAlarm = m_gaf.GetALID(this, "Ionizer State Alarm", "Ionizer State Error");
+            m_alidElecPnl_1_FanAlarm = m_gaf.GetALID(this, "ElecPanel 1 Fan Alarm", "Elect Panel 1 Fan Alarm");
+            m_alidElecPnl_2_FanAlarm = m_gaf.GetALID(this, "Elecanel 2 Fan Alarm", "Elect Panel 2 Fan Alarm");
+            m_alidPCPnl_FanAlarm = m_gaf.GetALID(this, "PCPanel Fan Alarm", "PC Panel Fan Alarm");
+            m_alidPC_FanAlarm = m_gaf.GetALID(this, "PC Fan Alarm", "PC Fan Alarm");
         }
         #endregion
 
@@ -95,43 +109,64 @@ namespace Root_Vega.Module
         protected override void RunThread()
         {
             base.RunThread();
-           
-            m_doLamp.Write(eLamp.Red, EQ.p_eState == EQ.eState.Error);
-            m_doLamp.Write(eLamp.Yellow, EQ.p_eState == EQ.eState.Run);
-            m_doLamp.Write(eLamp.Green, EQ.p_eState == EQ.eState.Ready);
-           
-            
-            if (m_eStatus != EQ.p_eState)
-            {
-                    switch (EQ.p_eState)
-                    {
-                        case EQ.eState.Error: m_doBuzzer.Write(eBuzzer.Buzzer2); break;
-                        case EQ.eState.Run: m_doBuzzer.Write(eBuzzer.Buzzer4); break;
-                        case EQ.eState.Home: m_doBuzzer.Write(eBuzzer.Buzzer3); break;
-                        case EQ.eState.Ready: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
-                        case EQ.eState.Init: m_doBuzzer.Write(eBuzzer.BuzzerOff); break;
-                    }
-                m_eStatus = EQ.p_eState;
-            }
-
+			#region Lamp & Alarm
+			if (m_eStatus != EQ.p_eState)
+			{
+				switch (EQ.p_eState)
+				{
+					case EQ.eState.Error:
+						m_doBuzzer.Write(eBuzzer.Buzzer2);
+                        m_doLamp.Write(eLamp.Red);
+						break;
+					case EQ.eState.Run: 
+                        m_doBuzzer.Write(eBuzzer.Buzzer4);
+                        m_doLamp.Write(eLamp.Green);
+                        break;
+					case EQ.eState.Home: 
+                        m_doBuzzer.Write(eBuzzer.Buzzer3);
+                        m_doLamp.Write(eLamp.Green);
+                        break;
+					case EQ.eState.Ready: 
+                        m_doBuzzer.Write(eBuzzer.BuzzerOff);
+                        m_doLamp.Write(eLamp.Yellow);
+                        break;
+					case EQ.eState.Init: 
+                        m_doBuzzer.Write(eBuzzer.BuzzerOff);
+                        m_doLamp.Write(eLamp.Yellow);
+                        break;
+				}
+				m_eStatus = EQ.p_eState;
+			}
 			if (m_dioBuzzerOff.p_bIn || (m_gaf.m_listALID.p_aALID.Count < 1))//check
 				m_doBuzzer.Write(eBuzzer.BuzzerOff);
+			#endregion
 
-            //m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors", true);
+			#region Interlock
+			if (EQ.p_eState == EQ.eState.Run)
+            {
+                m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");//check
+            }
             m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the Emergency Buttons");
-			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
+			m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar");
             if (m_robot != null)
             {
                 if (!m_diMCReset.p_bIn) m_robot.p_bDisableHomeWhenArmOpen = true;
             }
-            m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
+            m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button");
 			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA");
             m_alidIonizerAlarm.Run(m_diIonizerAlarmCheck.ReadDI(eIonizer.LP1) || m_diIonizerAlarmCheck.ReadDI(eIonizer.LP2), "Please Check State of X-ray Ionizer");
-        }
-        #endregion
+            m_alidElecPnl_1_FanAlarm.Run(m_diElecPnl_1_FanAlarm.p_bIn, "Please Check Electronic Panel 1 Fan");
+            m_alidElecPnl_2_FanAlarm.Run(m_diElecPnl_2_FanAlarm.p_bIn, "Please Check Electronic Panel 1 Fan");
+            m_alidPCPnl_FanAlarm.Run(m_diPCPnl_FanAlarm.p_bIn, "Please Check PC Panel Fan");
+            m_alidPC_FanAlarm.Run(m_diPC_FanAlarm.p_bIn, "Please Check PC Fan");
+            #endregion
 
-        #region RFID
-        public class RFID
+
+        }
+		#endregion
+
+		#region RFID
+		public class RFID
         {
             #region CRC
             ushort[] m_uCRC =
@@ -259,11 +294,13 @@ namespace Root_Vega.Module
         {
             p_id = id;
             base.InitBase(id, engineer);
-            m_robot = ((Vega_Handler)engineer.ClassHandler()).m_robot; 
+            m_robot = ((Vega_Handler)engineer.ClassHandler()).m_robot;
+            m_doDoorLock_Use.Write(true);
         }
 
         public override void ThreadStop()
         {
+            m_doDoorLock_Use.Write(false);
             base.ThreadStop();
         }
 
