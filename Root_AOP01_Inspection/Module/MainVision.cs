@@ -267,8 +267,6 @@ namespace Root_AOP01_Inspection.Module
             return "OK";
         }
 
-        
-
         public string BeforePut(int nID)
         {
             string info = MoveReadyPos();

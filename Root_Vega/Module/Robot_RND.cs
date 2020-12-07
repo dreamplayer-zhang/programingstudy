@@ -901,6 +901,7 @@ namespace Root_Vega.Module
             public override ModuleRunBase Clone()
             {
                 Run_ReadOCR run = new Run_ReadOCR(m_module);
+                run.m_nRetry = m_nRetry; 
                 return run;
             }
 

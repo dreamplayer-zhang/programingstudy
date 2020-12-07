@@ -106,21 +106,25 @@ namespace Root_CAMELLIA.Data
             //    result = stream.ToArray();
             //} 
 
-            Mat matSrc = new Mat();
-             Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
-            Image<Gray, byte> imageGray = new Image<Gray, byte>(ptROI.X, ptROI.Y, (int)ImgData.p_Stride, ImgData.GetPtr());
+            Mat matSrc = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
+            Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
+            //Image<Gray, byte> imageGray = new Image<Gray, byte>(ptROI.X, ptROI.Y, (int)ImgData.p_Stride, ImgData.GetPtr());
             Mat matInsp = new Mat(ptROI.X, ptROI.Y, DepthType.Cv8U, 3);
+
             //Image<Gray, byte> imageGray = new Image<Gray, byte>(bitmap);
-
-            //byte[] pImg = matSrc.GetRawData();
-            matSrc = imageGray.Mat;
-
             matSrc.CopyTo(matInsp);
+            CvInvoke.CvtColor(matInsp, matInsp, ColorConversion.Bgr2Gray);
+            //byte[] pImg = matSrc.GetRawData();
+            // matSrc = imageGray.Mat;
+
+
             CvInvoke.MedianBlur(matInsp, matInsp, 7);
 
 
-            //Emgu.CV.UI.ImageViewer.Show(matSrc);
-            //Emgu.CV.UI.ImageViewer.Show(matInsp);
+            // Emgu.CV.UI.ImageViewer.Show(matSrc);
+            // Emgu.CV.UI.ImageViewer.Show(matTest);
+            // Emgu.CV.UI.ImageViewer.Show(imageGray);
+            // Emgu.CV.UI.ImageViewer.Show(matInsp);
             Point vector = new Point(0, 1);
             Point edge = new Point();
 
@@ -147,8 +151,8 @@ namespace Root_CAMELLIA.Data
 
 
 
-            CvInvoke.Circle(matTest, edge, 10, new MCvScalar(0,255,0));
-            Emgu.CV.UI.ImageViewer.Show(matTest);
+            CvInvoke.Circle(matTest, edge, 10, new MCvScalar(0, 255, 0));
+            // Emgu.CV.UI.ImageViewer.Show(matTest);
             //for(int i = 0; i < nSearchLength; i++)
             //{
             //    switch (dir)
