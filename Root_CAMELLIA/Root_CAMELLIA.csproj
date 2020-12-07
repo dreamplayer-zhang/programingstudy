@@ -233,6 +233,7 @@
     </ApplicationDefinition>
     <Compile Include="BaseDefine.cs" />
     <Compile Include="Converter\AxisConverter.cs" />
+    <Compile Include="Data\Calibration.cs" />
     <Compile Include="Data\WaferCentering.cs" />
     <Compile Include="ViewModel\Dlg_PM_ViewModel.cs" />
     <Compile Include="UI_Engineer\Camellia_Engineer_UI.xaml.cs">
