@@ -78,7 +78,8 @@ namespace Root_AOP01_Inspection
         #region Module WTR
         enum eWTR
         {
-            RND
+            RND,
+            Cymechs
         }
         eWTR m_eWTR = eWTR.RND;
         ModuleBase m_wtr;
@@ -86,7 +87,7 @@ namespace Root_AOP01_Inspection
         {
             switch (m_eWTR)
             {
-                case eWTR.RND:
+                case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
                 default: m_wtr = new WTR_RND("WTR", m_engineer); break;
             }
             InitModule(m_wtr);

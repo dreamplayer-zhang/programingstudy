@@ -1,7 +1,6 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Module;
-using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -693,5 +692,193 @@ namespace Root_EFEM.Module
         {
             base.ThreadStop();
         }
+
+        #region ModuleRun
+        protected override void InitModuleRuns()
+        {
+            AddModuleRunList(new Run_Reset(this), false, "Reset WTR CPU");
+            AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
+            AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
+        }
+
+        public class Run_Reset : ModuleRunBase
+        {
+            WTR_Cymechs m_module;
+            public Run_Reset(WTR_Cymechs module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            bool m_bReset = true;
+            public override ModuleRunBase Clone()
+            {
+                Run_Reset run = new Run_Reset(m_module);
+                run.m_bReset = m_bReset;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bReset = tree.Set(m_bReset, m_bReset, "Reset", "Reset CPU", bVisible, true);
+            }
+
+            public override string Run()
+            {
+                return m_module.CmdClear();
+            }
+
+        }
+
+        public class Run_Get : ModuleRunBase
+        {
+            WTR_Cymechs m_module;
+            public Run_Get(WTR_Cymechs module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public eArm m_eArm = eArm.A;
+            public string m_sChild = "";
+            public int m_nChildID = 0;
+            public override ModuleRunBase Clone()
+            {
+                Run_Get run = new Run_Get(m_module);
+                run.m_eArm = m_eArm;
+                run.m_sChild = m_sChild;
+                run.m_nChildID = m_nChildID;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible && !bRecipe);
+                m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
+                List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild);
+                if ((asChildSlot != null) && (asChildSlot.Count > 0))
+                {
+                    if ((m_nChildID < 0) || (m_nChildID >= asChildSlot.Count)) m_nChildID = 0;
+                    string sChildSlot = asChildSlot[m_nChildID];
+                    sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
+                    m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot);
+                }
+                else m_nChildID = 0;
+            }
+
+            public override string Run()
+            {
+                IWTRChild child = m_module.GetChild(m_sChild);
+                if (child == null) return "WTR Child not Found : " + m_sChild;
+                if (EQ.p_bSimulate)
+                {
+                    m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                    child.SetInfoWafer(m_nChildID, null);
+                    return "OK";
+                }
+                int posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
+                if (posWTR < 0) return "WTR Teach Position Not Defined";
+                if (child.p_eState != eState.Ready)
+                {
+                    if (m_module.Run(m_module.CmdGoto(posWTR, m_nChildID + 1, m_eArm, false, false))) return p_sInfo;
+                }
+                while (child.p_eState != eState.Ready)
+                {
+                    if (EQ.IsStop()) return "Stop";
+                    Thread.Sleep(100);
+                }
+                if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
+                if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
+                m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                try
+                {
+                    child.p_bLock = true;
+                    if (m_module.Run(m_module.CmdPick(posWTR, m_nChildID + 1, m_eArm))) return p_sInfo;
+                    child.p_bLock = false;
+                }
+                finally
+                {
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                    else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                }
+                if (m_module.m_dicArm[m_eArm].IsWaferExist()) return "OK";
+                return "WTR Get Error : Wafer Check Sensor not Detected at Arm = " + m_eArm.ToString();
+            }
+        }
+
+        public class Run_Put : ModuleRunBase
+        {
+            WTR_Cymechs m_module;
+            public Run_Put(WTR_Cymechs module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public string m_sChild = "";
+
+            public eArm m_eArm = eArm.A;
+            public int m_nChildID = 0;
+            public override ModuleRunBase Clone()
+            {
+                Run_Put run = new Run_Put(m_module);
+                run.m_eArm = m_eArm;
+                run.m_sChild = m_sChild;
+                run.m_nChildID = m_nChildID;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible && !bRecipe);
+                m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
+                List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild);
+                if ((asChildSlot != null) && (asChildSlot.Count > 0))
+                {
+                    if ((m_nChildID < 0) || (m_nChildID >= asChildSlot.Count)) m_nChildID = 0;
+                    string sChildSlot = asChildSlot[m_nChildID];
+                    sChildSlot = tree.Set(sChildSlot, sChildSlot, asChildSlot, "Child ID", "WTR Child Slot", bVisible);
+                    m_nChildID = m_module.GetChildSlotID(m_sChild, sChildSlot);
+                }
+                else m_nChildID = 0;
+            }
+
+            public override string Run()
+            {
+                IWTRChild child = m_module.GetChild(m_sChild);
+                if (child == null) return "WTR Child not Found : " + m_sChild;
+                if (EQ.p_bSimulate)
+                {
+                    child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
+                    m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                    return "OK";
+                }
+                while (child.p_eState != eState.Ready)
+                {
+                    if (EQ.IsStop()) return "Stop";
+                    Thread.Sleep(100);
+                }
+                int posWTR = child.GetTeachWTR(m_module.m_dicArm[m_eArm].p_infoWafer);
+                if (posWTR < 0) return "WTR Teach Position Not Defined";
+                if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
+                if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
+                child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
+                try
+                {
+                    child.p_bLock = true;
+                    if (m_module.Run(m_module.CmdPlace(posWTR, m_nChildID + 1, m_eArm))) return p_sInfo;
+                    child.p_bLock = false;
+                }
+                finally
+                {
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
+                    else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                }
+                if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) return "OK";
+                return "WTR Put Error : Wafer Check Sensor not Detected at Child = " + child.p_id;
+            }
+        }
+        #endregion
+
     }
 }
