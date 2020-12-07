@@ -93,6 +93,9 @@ namespace Root_Vega
             textLastError.DataContext = App.m_engineer.m_gaf.m_listALID;
 
             _Main.Init(App.m_engineer);
+            _Log.Init(App.m_engineer);
+
+
             loginMaunUI.Init(App.m_engineer.m_login); 
 
             InitTimer(); 

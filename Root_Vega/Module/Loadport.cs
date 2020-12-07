@@ -164,8 +164,8 @@ namespace Root_Vega.Module
         {
             GemCarrierBase.ePresent present;
             if (m_dioPlaced.p_bIn != m_dioPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
-            else present = !m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
-            if (m_infoPod.CheckPlaced(present) != "OK")
+            else present = !m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;//check
+            if (m_infoPod.CheckPlaced(present) != "OK")//check
             {
                 m_alidPlaced.p_sMsg = "Placed Sensor Remain Checked while Pod State = " + m_infoPod.p_eState;
                 m_alidPlaced.p_bSet = true;
@@ -424,11 +424,11 @@ namespace Root_Vega.Module
 
             if (Run(MoveTheta(ePosTheta.Close))) return p_sInfo;
 
-
-
             m_infoPod.AfterHome();
-
-            m_infoPod.p_eState = InfoPod.eState.Placed;
+            if (m_dioPlaced.p_bIn == true)
+            {
+                m_infoPod.p_eState = InfoPod.eState.Placed; 
+            }
             return "OK";
         }
 
