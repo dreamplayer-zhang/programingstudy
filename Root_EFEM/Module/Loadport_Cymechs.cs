@@ -6,6 +6,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
+using RootTools.Control;
 
 namespace Root_EFEM.Module
 {
@@ -13,8 +14,20 @@ namespace Root_EFEM.Module
     {
         #region ToolBox
         RS232 m_rs232;
+        DIO_I m_diPlaced;
+        DIO_I m_diPresent;
+        DIO_I m_diOpen;
+        DIO_I m_diClose;
+        DIO_I m_diReady;
+        DIO_I m_diRun;
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
+            p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
+            p_sInfo = m_toolBox.Get(ref m_diOpen, this, "Open");
+            p_sInfo = m_toolBox.Get(ref m_diClose, this, "Close");
+            p_sInfo = m_toolBox.Get(ref m_diReady, this, "Ready");
+            p_sInfo = m_toolBox.Get(ref m_diRun, this, "Run");
             p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
             if (bInit)
             {
@@ -436,16 +449,25 @@ namespace Root_EFEM.Module
                     break; 
                 case 'O':
                     if (m_protocolSend == null) p_sInfo = "Invalid Done";
-                    else
+                    else 
                     {
-                        m_protocolSend.m_eState = Protocol.eState.Done; 
-                        m_protocolSend = null;
+                        if ((m_protocolSend.m_eState == Protocol.eState.ACK) || (m_protocolSend.m_eState == Protocol.eState.NAK))
+                        {
+                            m_protocolSend.m_eState = Protocol.eState.Done;
+                            m_protocolSend = null;
+                        }
                     }
                     break;
                 case 'M':
                     if (SetLoadportMapData(sRead)) p_sInfo = "Invalid Map Data : " + sRead;
-                    m_protocolSend.m_eState = Protocol.eState.Done;
-                    m_protocolSend = null; 
+                    if (m_protocolSend != null)
+                    {
+                        if ((m_protocolSend.m_eState == Protocol.eState.ACK) || (m_protocolSend.m_eState == Protocol.eState.NAK))
+                        {
+                            m_protocolSend.m_eState = Protocol.eState.Done;
+                            m_protocolSend = null;
+                        }
+                    }
                     break;
             }
         }
@@ -462,7 +484,7 @@ namespace Root_EFEM.Module
             SetLoadportMapData(aSlot, asMap[1], GemSlotBase.eState.Cross);
             SetLoadportMapData(aSlot, asMap[2], GemSlotBase.eState.Double);
             m_infoCarrier.SetMapData(aSlot); 
-            return false; 
+            return false;
         }
 
         void SetLoadportMapData(List<GemSlotBase.eState> aSlot, string sMap, GemSlotBase.eState eState)
@@ -581,7 +603,15 @@ namespace Root_EFEM.Module
                 }
             }
             p_eState = eState.Ready;
-            m_infoCarrier.p_eState = InfoCarrier.eState.Empty;
+            if(m_diPlaced.p_bIn && m_diPresent.p_bIn)
+            {
+                m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+            }
+            else
+            {
+                m_infoCarrier.p_eState = InfoCarrier.eState.Empty;
+            }
+            
             m_infoCarrier.AfterHome();
             return "OK";
         }
@@ -626,12 +656,12 @@ namespace Root_EFEM.Module
         #endregion
 
         public InfoCarrier m_infoCarrier;
-        public Loadport_Cymechs(string id, IEngineer engineer)
+        public Loadport_Cymechs(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             p_bLock = false;
             p_id = id;
             InitCmd();
-            m_infoCarrier = new InfoCarrier(this, id, engineer);
+            m_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
             m_aTool.Add(m_infoCarrier);
             InitBase(id, engineer);
             InitEvent();

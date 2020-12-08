@@ -521,8 +521,8 @@ void IP::CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, i
         }
         else
         {
-            minImg = imgAccumlate;
-            maxImg = imgAccumlate;
+            minImg = imgAccumlate.clone();
+            maxImg = imgAccumlate.clone();
         }  
 
         for (int j = i - 2; j < i; j++)

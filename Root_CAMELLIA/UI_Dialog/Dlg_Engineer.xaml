@@ -13,6 +13,9 @@
         Width="1820" Height="1020" 
         BorderBrush="Black" BorderThickness="1" 
         Background="{StaticResource PanelBackGround}" mc:Ignorable="d">
+    <Window.Resources>
+        <local:TextBoxToIntConverter x:Key="TextBoxToIntConverter" />
+    </Window.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -305,6 +308,17 @@
                                             <Grid Grid.Row="1" Margin="5">
                                                 <TabControl SelectedIndex="{Binding SelectedIndex}">
                                                     <TabItem Header="X" Width="60" Margin="-3,0,0,0">
+                                                        <DataGrid ItemsSource="{Binding WorkPoint2}" AutoGenerateColumns="False">
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="CellEditEnding">
+                                                                    <i:CallMethodAction TargetObject="{Binding}" MethodName="DataGrid_CellEditEnding" />
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="  Name"  Width="*" IsReadOnly="True" Binding="{Binding Name}"/>
+                                                                <DataGridTextColumn Header="  Value" Width="5*" Binding="{Binding Value, Converter={StaticResource TextBoxToIntConverter}}"/>
+                                                            </DataGrid.Columns>    
+                                                        </DataGrid>
                                                     </TabItem>
                                                     <TabItem Header="Y" Width="60" Margin="-3,0,0,0">
                                                     </TabItem>
@@ -347,6 +361,11 @@
             <TabItem Header="Handler" Width="100">
                 <Grid>
                     <local:Camellia_Engineer_UI x:Name="EngineerUI" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="ToolBox" Width="100">
+                <Grid>
+                    
                 </Grid>
             </TabItem>
         </TabControl>

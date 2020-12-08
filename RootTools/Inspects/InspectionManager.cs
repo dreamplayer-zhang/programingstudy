@@ -88,7 +88,7 @@ namespace RootTools.Inspects
 		Inspection[] InspectionThread;
 		StopWatch sw;
 
-		int nThreadNum = 5;
+		int nThreadNum = 10;
 		public int nInspectionCount = 0;
 		int ImageWidth = 320;
 		int ImageHeight = 240;

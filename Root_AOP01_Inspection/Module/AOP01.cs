@@ -35,11 +35,21 @@ namespace Root_AOP01_Inspection.Module
         DIO_I m_diEMS;
         DIO_I m_diProtectionBar;
         DIO_I m_diMCReset;
-        DIO_I m_diIonizer;
-        DIO_I m_diCDALow;
+        DIO_I m_diCDA1Low;
+        DIO_I m_diCDA2Low;
         DIO_I m_diBuzzerOff;
         DIO_I m_diDoorLock;
         DIO_I m_diInterlock_Key;
+        DIO_I m_diLightCurtain;
+        DIO_I m_di4CH_LED_Cont_FAN;
+        DIO_I m_di12CH_LED_Cont_FAN;
+        DIO_I m_diPC_FAN;
+        DIO_I m_diELECPNLDoor;
+        DIO_I m_diETCDoor;
+        DIO_I m_diPCDoor;
+        DIO_I m_disideDoor;
+        DIO_I m_diELECPNLDoorFan;
+        DIO_I m_diETCDoorFan;
         DIO_O m_doDoorLock_Use;
 
 
@@ -50,13 +60,23 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.Get(ref m_diEMS, this, "EMS");
             p_sInfo = m_toolBox.Get(ref m_diProtectionBar, this, "ProtectionBar");
             p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
-            p_sInfo = m_toolBox.Get(ref m_diIonizer, this, "Ionizer");
-            p_sInfo = m_toolBox.Get(ref m_diCDALow, this, "CDA Low");
+            p_sInfo = m_toolBox.Get(ref m_diCDA1Low, this, "CDA1 Low");
+            p_sInfo = m_toolBox.Get(ref m_diCDA2Low, this, "CDA2 Low");
             p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
             p_sInfo = m_toolBox.Get(ref m_diInterlock_Key, this, "InterLock Key");
+            p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
             p_sInfo = m_toolBox.Get(ref m_doDoorLock_Use, this, "Door Lock Use");
 
+            p_sInfo = m_toolBox.Get(ref m_di4CH_LED_Cont_FAN, this, "4CH LED Cont FAN");
+            p_sInfo = m_toolBox.Get(ref m_di12CH_LED_Cont_FAN, this, "12CH LED Cont FAN");
+            p_sInfo = m_toolBox.Get(ref m_diPC_FAN, this, "PC FAN");
+            p_sInfo = m_toolBox.Get(ref m_diELECPNLDoor, this, "ELEC PNL Door");
+            p_sInfo = m_toolBox.Get(ref m_diETCDoor, this, "ETC Door");
+            p_sInfo = m_toolBox.Get(ref m_diPCDoor, this, "PC Door");
+            p_sInfo = m_toolBox.Get(ref m_disideDoor, this, "Side Door");
+            p_sInfo = m_toolBox.Get(ref m_diELECPNLDoorFan, this, "ELEC PNL Door Fan");
+            p_sInfo = m_toolBox.Get(ref m_diETCDoorFan, this, "ETC Door Fan");
 
             p_sInfo = m_RFID.GetTools(this, bInit);
 
@@ -69,20 +89,40 @@ namespace Root_AOP01_Inspection.Module
         ALID m_alidEMS;
         ALID m_alidProtectionBar;
         ALID m_alidMCReset;
-        ALID m_alidIonizer;
-        ALID m_alidCDALow;
+        ALID m_alidCDA1Low;
+        ALID m_alidCDA2Low;
         ALID m_alidDoorLock;
-        ALID m_alidInterlock_Key;
+        ALID m_alidLightCurtain;
+        ALID m_alid4CH_LED_Cont_FAN;
+        ALID m_alid12CH_LED_Cont_FAN;
+        ALID m_alidPC_FAN;
+        ALID m_alidELECPNLDoor;
+        ALID m_alidETCDoor;
+        ALID m_alidPCDoor;
+        ALID m_alidsideDoor;
+        ALID m_alidELECPNLDoorFan;
+        ALID m_alidETCDoorFan;
+        ALID m_alidETCError;
 
         void InitALID()
         {
             m_alidEMS = m_gaf.GetALID(this, "EMS", "EMS Error");
             m_alidProtectionBar = m_gaf.GetALID(this, "ProtectionBar", "ProtectionBar Error");
             m_alidMCReset = m_gaf.GetALID(this, "MC Reset", "MC Reset Error");
-            m_alidIonizer = m_gaf.GetALID(this, "Ionizer", "Ionizer Error");
-            m_alidCDALow = m_gaf.GetALID(this, "CDA Low", "CDA Low Error");
+            m_alidCDA1Low = m_gaf.GetALID(this, "CDA1 Low", "CDA1 Low Error");
+            m_alidCDA2Low = m_gaf.GetALID(this, "CDA2 Low", "CDA2 Low Error");
             m_alidDoorLock = m_gaf.GetALID(this, "Door Lock", "Door Lock Error");
-            m_alidInterlock_Key = m_gaf.GetALID(this, "Interlock_Key", "Interlock Key State Check");
+            m_alidLightCurtain = m_gaf.GetALID(this, "Light Curtain", "Light Curtain Error");
+            m_alid4CH_LED_Cont_FAN = m_gaf.GetALID(this, "4CH_LED_Cont_FAN", "4CH_LED_Cont_FAN Error");
+            m_alid12CH_LED_Cont_FAN = m_gaf.GetALID(this, "12CH_LED_Cont_FAN", "12CH_LED_Cont_FAN Error");
+            m_alidPC_FAN = m_gaf.GetALID(this, "PC_FAN", "PC_FAN Error");
+            m_alidELECPNLDoor = m_gaf.GetALID(this, "ELEC PNL Door", "ELECPNLDoor Error");
+            m_alidETCDoor = m_gaf.GetALID(this, "ETC Door", "ETC Door Error");
+            m_alidPCDoor = m_gaf.GetALID(this, "PC Door", "PCDoor Error");
+            m_alidsideDoor = m_gaf.GetALID(this, "Side Door", "Side Door Error");
+            m_alidELECPNLDoorFan = m_gaf.GetALID(this, "ELEC PNL Door Fan", "ELEC PNL Door Fan Error");
+            m_alidETCDoorFan = m_gaf.GetALID(this, "ETC Door Fan", "ETC Door Fan Error");
+            m_alidETCError = m_gaf.GetALID(this, "Fan", "Fan Error");
         }
         #endregion
 
@@ -119,17 +159,50 @@ namespace Root_AOP01_Inspection.Module
             {
                 m_doBuzzer.Write(eBuzzer.BuzzerOff);
             }
-            //m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors", true);
 
-            m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the Emergency Buttons");
-            m_alidProtectionBar.Run(m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
+            //if(!m_diEMS.p_bIn)
+            //    m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the Emergency Buttons");
+            //else
+            //{
+            //    m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
+            //    m_alidProtectionBar.Run(!m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
+            //    m_alidCDA1Low.Run(m_diCDA1Low.p_bIn, "Please Check Value of CDA1");
+            //    m_alidCDA2Low.Run(m_diCDA2Low.p_bIn, "Please Check Value of CDA2");
+            //}
+            //            if(m_diInterlock_Key.p_bIn)
+            //{
+            //    m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
+            //}
+            
+            if (!m_diEMS.p_bIn && !m_diInterlock_Key.p_bIn)
+            {
+                if (m_diCDA1Low.p_bIn && m_diCDA2Low.p_bIn)
+                    m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
+                else
+                    m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMO Buttons");
+                m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
+            }            
+            else
+            {
+                m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
+                m_alidProtectionBar.Run(!m_diProtectionBar.p_bIn, "Please Check State of Protection Bar.");
+                m_alidCDA1Low.Run(m_diCDA1Low.p_bIn, "Please Check Value of CDA1");
+                m_alidCDA2Low.Run(m_diCDA2Low.p_bIn, "Please Check Value of CDA2");
+                if (!m_diELECPNLDoorFan.p_bIn || !m_diETCDoorFan.p_bIn || !m_diPC_FAN.p_bIn || !m_di12CH_LED_Cont_FAN.p_bIn || !m_di4CH_LED_Cont_FAN.p_bIn)
+                    m_alidETCDoorFan.Run(false, "Fan Error");
+                if (!m_diELECPNLDoor.p_bIn || !m_diETCDoor.p_bIn || m_diPCDoor.p_bIn || m_disideDoor.p_bIn)
+                    m_alidETCDoorFan.Run(false, "Door Error");
+                if (m_diInterlock_Key.p_bIn)
+                {
+                    m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
+                }
+                m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
+            }
+            
             //if (m_robot != null)
             //{
             //    if (!m_diMCReset.p_bIn) m_robot.p_bDisableHomeWhenArmOpen = true; //CHECK
             //}
-            m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
-            m_alidIonizer.Run(m_diIonizer.p_bIn, "Please Check State of the Ionizer");
-            m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA");
         }
         #endregion
 
