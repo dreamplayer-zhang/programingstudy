@@ -3,6 +3,8 @@ using RootTools;
 using RootTools.Control;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,16 +35,19 @@ namespace Root_CAMELLIA
                     case TabAxis.AxisX:
                         {
                             SelectedAxis = m_AxisXY.p_axisX;
+                            WorkPoint = m_AxisXY.p_axisX.m_aPos;
                             return;
                         }
                     case TabAxis.AxisY:
                         {
                             SelectedAxis = m_AxisXY.p_axisY;
+                            WorkPoint = m_AxisXY.p_axisY.m_aPos;
                             return;
                         }
                     case TabAxis.AxisZ:
                         {
                             SelectedAxis = m_AxisZ;
+                            WorkPoint = m_AxisZ.m_aPos;
                             return;
                         }
                 }
@@ -104,11 +109,52 @@ namespace Root_CAMELLIA
         private Axis m_AxisZ;
         private TabAxis eTabAxis = TabAxis.AxisX;
 
+        public Dictionary<string, double> WorkPoint
+        {
+            get
+            {
+                return _WorkPoint;
+            }
+            set
+            {
+                SetProperty(ref _WorkPoint, value);
+            }
+        }
+        private Dictionary<string, double> _WorkPoint;
+
+
+ 
+        public ObservableCollection<WorkPoints> WorkPoint2
+        {
+            get
+            {
+                return _WorkPoint2;
+            }
+            set
+            {
+                SetProperty(ref _WorkPoint2, value);
+            }
+        }
+        private ObservableCollection<WorkPoints> _WorkPoint2;
+        private ObservableCollection<WorkPoints> GetWorkPoints(Dictionary<string, double> dic)
+        {
+            ObservableCollection<WorkPoints> data = new ObservableCollection<WorkPoints>();
+            for (int i = 0; i < dic.Count; i++)
+            {
+                WorkPoints wp = new WorkPoints();
+                wp.Name = dic.Keys.ToArray()[i];
+                wp.Value = dic.Values.ToArray()[i];
+                data.Add(wp);
+            }
+            return data;
+        }
         public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
         {
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
             m_AxisXY = ModuleCamellia.p_axisXY;
             m_AxisZ = ModuleCamellia.p_axisZ;
+            WorkPoint = m_AxisXY.p_axisX.m_aPos;
+            WorkPoint2 = GetWorkPoints(m_AxisXY.p_axisX.m_aPos);
         }
 
         #region ICommand
@@ -288,6 +334,19 @@ namespace Root_CAMELLIA
         }
         #endregion
 
+        public class WorkPoints
+        {
+            public string Name
+            {
+                get;
+                set;
+            }
+            public double Value
+            {
+                get;
+                set;
+            }
+        }
         private enum TabAxis
         {
             AxisX,

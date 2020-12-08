@@ -118,6 +118,7 @@ namespace Root_AOP01_Inspection.Module
         public enum eAxisPos
         {
             ReadyPos,
+
         }
 
         void InitPosAlign()
