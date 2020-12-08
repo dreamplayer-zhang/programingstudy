@@ -15,7 +15,10 @@ namespace RootTools
 
         public void Enqueue(T item)
         {
-            queue.Enqueue(item);
+            lock(queue)
+            {
+                queue.Enqueue(item);
+            }
             //if (CollectionChanged != null)
             //    CollectionChanged(this,
             //        new NotifyCollectionChangedEventArgs(
@@ -24,14 +27,17 @@ namespace RootTools
 
         public T Dequeue()
         {
-            var item = queue.Dequeue();
+            lock(queue)
+            {
+                var item = queue.Dequeue();
+                return item;
+            }
 
             //error남
             //if (CollectionChanged != null)
             //    CollectionChanged(this,
             //        new NotifyCollectionChangedEventArgs(
             //            NotifyCollectionChangedAction.Remove, item));
-            return item;
         }
 
         public IEnumerator<T> GetEnumerator()
