@@ -313,7 +313,7 @@ namespace Root_EFEM
         }
         #endregion
 
-        public InfoCarrier(ModuleBase module, string sLocID, IEngineer engineer)
+        public InfoCarrier(ModuleBase module, string sLocID, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             m_module = module;
             p_sModule = module.p_id;
@@ -323,7 +323,7 @@ namespace Root_EFEM
             m_engineer = engineer;
             //m_gem = m_engineer.ClassGem();
             m_log = LogView.GetLog(module.p_id, module.p_id);
-            m_waferSize = new InfoWafer.WaferSize(p_sModule, true, true);
+            m_waferSize = new InfoWafer.WaferSize(p_sModule, bEnableWaferSize, bEnableWaferCount);
             m_treeRootWafer = new TreeRoot(p_id, m_log);
             m_treeRootWafer.UpdateTree += M_treeRootWafer_UpdateTree;
             InitSlot();

@@ -1428,17 +1428,12 @@ namespace Root_WIND2
             {
                 foreach (PointLine data in roi.p_Data)
                 {
-                    fPtr[(data.StartPt.Y * p_ROILayer.p_Size.X + x)] = clr;
+                    for (int x = data.StartPt.X; x < data.StartPt.X + data.Width; x++)
+                    {
+                        fPtr[(data.StartPt.Y * p_ROILayer.p_Size.X + x)] = clr;
+                    }
                 }
             }
-            foreach (PointLine data in p_SelectedROI.p_Data)
-            {
-                for (int x = data.StartPt.X; x < data.StartPt.X + data.Width; x++)
-                {
-                    fPtr[(data.StartPt.Y * p_ROILayer.p_Size.X + x)] = clr;
-                }
-            }
-
         }
 
         private void Worker_ShowAll_DoWork(object sender, DoWorkEventArgs e)

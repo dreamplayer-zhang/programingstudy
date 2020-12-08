@@ -34,10 +34,33 @@ namespace Root_EFEM.Module
             Upper,
         }
         public Dictionary<eArm, Arm> m_dicArm = new Dictionary<eArm, Arm>();
-        void InitArms(string id, IEngineer engineer)
+        protected virtual void InitArms(string id, IEngineer engineer)
         {
-            m_dicArm.Add(eArm.Lower, new Arm(id, eArm.Lower, this, engineer));
-            m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this, engineer));
+            m_dicArm.Add(eArm.Lower, new Arm(id, eArm.Lower, this, engineer, true, false));
+            m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this, engineer, true, false));
+        }
+
+        List<string> p_asArm
+        {
+            get
+            {
+                List<string> asArm = new List<string>();
+                foreach (Arm arm in m_dicArm.Values)
+                {
+                    if (arm.p_bEnable) asArm.Add(arm.m_eArm.ToString());
+                }
+                return asArm; 
+            }
+        }
+
+        void RunTreeArm(Tree tree, ref eArm eArm, bool bVisible)
+        {
+            string sArm = eArm.ToString();
+            sArm = tree.Set(sArm, sArm, p_asArm, "Arm", "Select WTR Arm", bVisible);
+            foreach (Arm arm in m_dicArm.Values)
+            {
+                if (arm.m_eArm.ToString() == sArm) eArm = arm.m_eArm; 
+            }
         }
 
         public class Arm : WTRArm
@@ -45,11 +68,11 @@ namespace Root_EFEM.Module
             public eArm m_eArm;
 
             WTR_RND m_module;
-            public Arm(string id, eArm arm, WTR_RND module, IEngineer engineer)
+            public Arm(string id, eArm arm, WTR_RND module, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
             {
                 m_eArm = arm;
                 m_module = module;
-                Init(id + "." + arm.ToString(), engineer);
+                Init(id + "." + arm.ToString(), engineer, bEnableWaferSize, bEnableWaferCount);
             }
 
             public string RunGrip(bool bGrip)
@@ -652,7 +675,7 @@ namespace Root_EFEM.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible);
+                m_module.RunTreeArm(tree, ref m_eArm, bVisible); 
                 m_bGrip = tree.Set(m_bGrip, m_bGrip, "Grip", "Grip Arm Grip", bVisible);
             }
 
@@ -685,7 +708,7 @@ namespace Root_EFEM.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible && !bRecipe);
+                m_module.RunTreeArm(tree, ref m_eArm, bVisible && !bRecipe);
                 m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
                 List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild);
                 if ((asChildSlot != null) && (asChildSlot.Count > 0))
@@ -763,7 +786,7 @@ namespace Root_EFEM.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible && !bRecipe);
+                m_module.RunTreeArm(tree, ref m_eArm, bVisible && !bRecipe);
                 m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
                 List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild);
                 if ((asChildSlot != null) && (asChildSlot.Count > 0))
