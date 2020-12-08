@@ -34,7 +34,7 @@
             <icons:AtiLogo Width="40"
                            Height="25"
                            Margin="3"/>
-            <TextBlock Text="VEGA" Foreground="White" VerticalAlignment="Center" FontSize="15" Margin="10" Grid.Column="1"/>
+            <TextBlock Text="VEGA Ver1.0" Foreground="White" VerticalAlignment="Center" FontSize="15" Margin="10" Grid.Column="1"/>
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="True" Orientation="Horizontal" Grid.Column="2">
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="MinimizeButton"
@@ -218,7 +218,7 @@
                     BorderBrush="{StaticResource BorderBrush}"
                     Margin="0,10,10,10"
                     BorderThickness="3">
-                <TextBlock x:Name="textState" Text="{Binding p_eState}"
+                <TextBlock x:Name="textState"
                            Style="{StaticResource BasicTb}"
                            FontSize="30"/>
             </Border>
