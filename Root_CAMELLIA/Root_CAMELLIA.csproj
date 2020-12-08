@@ -233,6 +233,7 @@
     </ApplicationDefinition>
     <Compile Include="BaseDefine.cs" />
     <Compile Include="Converter\AxisConverter.cs" />
+    <Compile Include="Converter\TextBoxToIntConverter.cs" />
     <Compile Include="Data\Calibration.cs" />
     <Compile Include="Data\WaferCentering.cs" />
     <Compile Include="UI_Engineer\Camellia_ToolBox.xaml.cs">
