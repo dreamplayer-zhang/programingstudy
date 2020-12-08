@@ -8,6 +8,7 @@ using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
 using RootTools.Control;
+using static Root_Vega.Module.Vega;
 
 namespace Root_Vega
 {
@@ -92,7 +93,10 @@ namespace Root_Vega
 
         public string BuzzerOff()
         {
-            m_handler.m_vega.m_dioBuzzerOff.Write(true);
+            m_handler.m_vega.m_doBuzzer.Write(eBuzzer.Buzzer1, false);
+            m_handler.m_vega.m_doBuzzer.Write(eBuzzer.Buzzer2, false);
+            m_handler.m_vega.m_doBuzzer.Write(eBuzzer.Buzzer3, false);
+            m_handler.m_vega.m_doBuzzer.Write(eBuzzer.Buzzer4, false);
             return "OK";
         }
         public string Recovery()

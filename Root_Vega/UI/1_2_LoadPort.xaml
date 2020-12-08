@@ -218,7 +218,7 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Border>
-                        <TextBlock Text="조작"
+                        <TextBlock Text="CONTROL"
                                                FontWeight="Black"
                                                FontSize="15"
                                                Style="{StaticResource BasicTb}"
