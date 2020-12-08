@@ -168,13 +168,13 @@ namespace RootTools_CLR
 		return local;
 	}
 
-	float CLR_IP::Cpp_TemplateMatching(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod)
+	float CLR_IP::Cpp_TemplateMatching(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pTemp = &pTempImg[0];
 		Point Pos;
 
-		float score = IP::TemplateMatching(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod);
+		float score = IP::TemplateMatching(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod, nByteCnt);
 
 		outPosX = Pos.x;
 		outPosY = Pos.y;
@@ -184,13 +184,13 @@ namespace RootTools_CLR
 
 		return score;
 	}
-	float CLR_IP::Cpp_TemplateMatching(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod)
+	float CLR_IP::Cpp_TemplateMatching(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
 		pin_ptr<byte> pTemp = &pTempImg[0];
 		Point Pos;
 
-		float score = IP::TemplateMatching(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod);
+		float score = IP::TemplateMatching(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod, nByteCnt);
 
 		outPosX = Pos.x;
 		outPosY = Pos.y;
@@ -263,6 +263,7 @@ namespace RootTools_CLR
 	}
 
 	// Create Golden Image
+	// pSrcImg가 3개 미만인 경우 Avg Method로 동작함
 	void CLR_IP::Cpp_CreateGoldenImage_Avg(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int nMemW, int nMemH)
 	{
 		using System::Runtime::InteropServices::GCHandle;
@@ -319,7 +320,10 @@ namespace RootTools_CLR
 
 			// pass outer pinned array<int*> to UNumeric::ChangeArray as an int**
 			// (note that no casts are necessary in correct code)
-			IP::CreateGoldenImage_NearAvg(pin, pDst, imgNum, nMemW, nMemH);
+			if (imgNum < 3)
+				IP::CreateGoldenImage_Avg(pin, pDst, imgNum, nMemW, nMemH);
+			else
+				IP::CreateGoldenImage_NearAvg(pin, pDst, imgNum, nMemW, nMemH);
 		}
 		finally
 		{
@@ -329,7 +333,80 @@ namespace RootTools_CLR
 			pDst = nullptr;
 		}
 	}
+	void CLR_IP::Cpp_CreateGoldenImage_MedianAvg(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH)
+	{
+		using System::Runtime::InteropServices::GCHandle;
+		using System::Runtime::InteropServices::GCHandleType;
 
+		pin_ptr<byte> pDst = &pDstImg[0];
+		// pin each contained array<int>^
+		array<GCHandle>^ pins = gcnew array<GCHandle>(pSrcImg->Length);
+		for (int i = 0, i_max = pins->Length; i != i_max; ++i)
+			pins[i] = GCHandle::Alloc(pSrcImg[i], GCHandleType::Pinned);
+
+		try
+		{
+			// get int*s for each contained pinned array<int>^
+			array<byte*>^ arrays = gcnew array<byte*>(pins->Length);
+			for (int i = 0, i_max = arrays->Length; i != i_max; ++i)
+				arrays[i] = static_cast<byte*>(pins[i].AddrOfPinnedObject().ToPointer());
+
+			// pin outer array<int*>^
+			pin_ptr<byte*> pin = &arrays[0];
+
+			// pass outer pinned array<int*> to UNumeric::ChangeArray as an int**
+			// (note that no casts are necessary in correct code)
+			if(imgNum < 3)
+				IP::CreateGoldenImage_Avg(pin, pDst, imgNum, nMemW, nMemH);
+			else
+				IP::CreateGoldenImage_MedianAvg(pin, pDst, imgNum, nMemW, nMemH);
+		}
+		finally
+		{
+			// unpin each contained array<int>^
+			for each (GCHandle pin in pins)
+				pin.Free();
+			pDst = nullptr;
+		}
+	}
+	void CLR_IP::Cpp_CreateGoldenImage_Median(array<array<byte>^>^ pSrcImg, array<byte>^ pDstImg, int imgNum, int  nMemW, int  nMemH)
+	{
+		{
+			using System::Runtime::InteropServices::GCHandle;
+			using System::Runtime::InteropServices::GCHandleType;
+
+			pin_ptr<byte> pDst = &pDstImg[0];
+			// pin each contained array<int>^
+			array<GCHandle>^ pins = gcnew array<GCHandle>(pSrcImg->Length);
+			for (int i = 0, i_max = pins->Length; i != i_max; ++i)
+				pins[i] = GCHandle::Alloc(pSrcImg[i], GCHandleType::Pinned);
+
+			try
+			{
+				// get int*s for each contained pinned array<int>^
+				array<byte*>^ arrays = gcnew array<byte*>(pins->Length);
+				for (int i = 0, i_max = arrays->Length; i != i_max; ++i)
+					arrays[i] = static_cast<byte*>(pins[i].AddrOfPinnedObject().ToPointer());
+
+				// pin outer array<int*>^
+				pin_ptr<byte*> pin = &arrays[0];
+
+				// pass outer pinned array<int*> to UNumeric::ChangeArray as an int**
+				// (note that no casts are necessary in correct code)
+				if (imgNum < 3)
+					IP::CreateGoldenImage_Avg(pin, pDst, imgNum, nMemW, nMemH);
+				else
+					IP::CreateGoldenImage_Median(pin, pDst, imgNum, nMemW, nMemH);
+			}
+			finally
+			{
+				// unpin each contained array<int>^
+				for each (GCHandle pin in pins)
+					pin.Free();
+				pDst = nullptr;
+			}
+		}
+	}
 	// D2D 3.0
 	void CLR_IP::Cpp_CreateHistogramWeightMap(array<byte>^ pSrcImg, array<byte>^ pGoldenImg, array<float>^ pDstImg, int  nMemW, int  nMemH, int nWeightLev)
 	{

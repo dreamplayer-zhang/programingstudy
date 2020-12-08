@@ -1,14 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Windows.Data;
 
 namespace RootTools
 {
     [Serializable]
     public abstract class ObservableObject : INotifyPropertyChanged
     {
+
         [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 

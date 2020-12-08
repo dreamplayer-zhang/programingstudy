@@ -656,6 +656,8 @@ namespace Root_Vega
 
 			ClearDrawList();
 
+			((Vega_Handler)m_Engineer.ClassHandler()).m_patternVision.p_nTotalBlockCount = 0;
+
 			//2. 획득한 영역을 기준으로 검사영역을 생성하고 검사를 시작한다
 			for (int k = 0; k < p_PatternRoiList.Count; k++)
 			{
@@ -753,6 +755,27 @@ namespace Root_Vega
 				}
 			}
 			m_Engineer.m_InspManager.StartInspection();//검사 시작!
+		}
+
+		int GetTotalBlockCountInPatternInspArea(CRect crtArea, int nBlockSize)
+		{
+			// variable
+			int nOriginWidth = crtArea.Width;
+			int nOriginHeight = crtArea.Height;
+			int nHorizontalBlockCount = 0;
+			int nVerticalBlockCount = 0;
+			int nTotalBlockCount = 0;
+
+			// implement
+			nHorizontalBlockCount = nOriginWidth / nBlockSize;
+			if (nOriginWidth % nBlockSize != 0) nHorizontalBlockCount++;
+
+			nVerticalBlockCount = nOriginHeight / nBlockSize;
+			if (nOriginHeight % nBlockSize != 0) nVerticalBlockCount++;
+
+			nTotalBlockCount = nHorizontalBlockCount * nVerticalBlockCount;
+
+			return nTotalBlockCount;
 		}
 
 		public void _endInsp()

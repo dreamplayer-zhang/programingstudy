@@ -132,7 +132,12 @@ namespace RootTools_Vision
                             wpDatas.Add(wp.WorkplaceBuffer);
 
             CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-            //CLR_IP.Cpp_CreateGoldenImage_NearAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+
+            //CLR_IP.Cpp_CreateGoldenImage_MedianAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+
+            //CLR_IP.Cpp_CreateGoldenImage_Median(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+
+            //CLR_IP.Cpp_CreateGoldenImage_NearAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);    
         }
         public void SetMultipleGoldenImages()
         {
@@ -191,8 +196,8 @@ namespace RootTools_Vision
             int chipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
             int chipW = this.workplace.BufferSizeX;
 
-            int grayLevel = 60; // Option
-            int defectSz = 1; // Option
+            int grayLevel = 70; // Option
+            int defectSz = 10; // Option
 
             byte[] binImg = new byte[chipW * chipH];
             byte[] diffImg = new byte[chipW * chipH];
@@ -236,7 +241,7 @@ namespace RootTools_Vision
                     CLR_IP.Cpp_Multiply(diffImg, histWeightMap, diffImg, chipW, chipH);
                 }
             }
-            else if (false) // Choi D2D Algorithm 
+            else if (false) // JHChoi D2D Algorithm 
             {
                 SetMultipleGoldenImages();
                 // Diff Image 계산
@@ -245,8 +250,10 @@ namespace RootTools_Vision
             }
 
             // Filter
-            CLR_IP.Cpp_Morphology(binImg, binImg, chipW, chipH, 3, "OPEN", 1);
+            CLR_IP.Cpp_Morphology(diffImg, diffImg, chipW, chipH, 3, "OPEN", 1);
+            //CLR_IP.Cpp_MedianBlur(diffImg, diffImg, chipW, chipH, 3);
             //CLR_IP.Cpp_AverageBlur(diffImg, diffImg, chipW, chipH);
+            //CLR_IP.Cpp_GaussianBlur(diffImg, diffImg, chipW, chipH, 2);
 
             // Threshold 값으로 Defect 탐색
             CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, grayLevel);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RootTools_Vision
 {
@@ -53,12 +54,13 @@ namespace RootTools_Vision
             this.workerManager = new WorkerManager(workers, _resultState, _excuteCondition, _state_check_type);
         }
 
-        public void SetBundles(WorkBundle _workbundle, WorkplaceBundle _workplacebundle)
+        public bool SetBundles(WorkBundle _workbundle, WorkplaceBundle _workplacebundle)
         {
             if (_workbundle.Count == 0 || _workplacebundle.Count == 0)
             {
                 // LOG 작업장/작업 할당 필요
-                return;
+                MessageBox.Show("Work/Workplace Bundle이 없습니다.");
+                return false;
             }
 
             this.workbundle = new WorkBundle();
@@ -77,6 +79,8 @@ namespace RootTools_Vision
             this.workplacebundle.Reset();
 
             this.workerManager.SetBundles(this.workbundle, this.workplacebundle);
+
+            return true;
         }
 
 

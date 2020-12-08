@@ -268,7 +268,7 @@ void IP::Labeling_SubPix(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOut
 }
 
 // Position
-float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method)
+float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt)
 {
     int64 roiW = (ptRB.x - (int64)ptLT.x);
     int64 roiH = (ptRB.y - (int64)ptLT.y);
@@ -281,25 +281,46 @@ float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nM
     }
 
     Mat imgSrc = Mat(roiH, roiW, CV_8UC1, imgROI);
-    
+    Mat imgTemp;
+    double chMax = 0;
 
-    //Mat imgTemp = Mat(nTempH, nTempW, CV_8UC1, pTemp);
+    if (nByteCnt == 1)
+    {
+        imgTemp = Mat(nTempH, nTempW, CV_8UC1, pTemp);
 
-    Mat imgTemp = Mat(nTempH, nTempW, CV_8UC3, pTemp);
+        Mat result;
 
-    Mat bgr[3];
-    split(imgTemp, bgr);
+        Point minLoc, maxLoc;
 
-    Mat result;
+		matchTemplate(imgSrc, imgTemp, result, method);
 
-    double minVal, maxVal;
-    Point minLoc, maxLoc;
+		minMaxLoc(result, NULL, &chMax, NULL, &outMatchPoint); // 완벽하게 매칭될 경우 1
+    }
+    else if (nByteCnt == 3)
+    {
+        imgTemp = Mat(nTempH, nTempW, CV_8UC3, pTemp);
 
-    matchTemplate(imgSrc, bgr[0], result, method);
+        Mat bgr[3];
+        split(imgTemp, bgr);
 
-    minMaxLoc(result, NULL, &maxVal, NULL, &outMatchPoint); // 완벽하게 매칭될 경우 1
+        Mat result;
 
-    return maxVal * 100; // Matching Score
+        double maxVal;
+        Point minLoc, maxLoc;
+
+        for (int i = 0; i < 3; i++)
+        {
+            matchTemplate(imgSrc, bgr[i], result, method);
+
+            minMaxLoc(result, NULL, &maxVal, NULL, &outMatchPoint); // 완벽하게 매칭될 경우 1
+
+            if (maxVal > chMax)
+                chMax = maxVal;
+        }
+    }
+
+
+    return chMax * 100; // Matching Score
 }
 
 // D2D 
@@ -371,26 +392,27 @@ Point IP::FindMinDiffLoc(BYTE* pSrc, BYTE* pInOutTarget, int nTargetW, int nTarg
 // Create Golden Image
 void IP::CreateGoldenImage_Avg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
 {
-    Mat imgAccumlate = Mat::zeros(nH, nW, CV_32FC1);
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
 
     for (int i = 0; i < imgNum; i++)
     {
         Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
-        cv::accumulate(imgSrc, imgAccumlate);
+        imgSrc.convertTo(imgSrc, CV_16UC1);
+        imgAccumlate = imgAccumlate + imgSrc;
     }
 
     imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / imgNum);
 }
 void IP::CreateGoldenImage_NearAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
 {
-    Mat imgAccumlate = Mat::zeros(nH, nW, CV_32FC1);
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
     Mat imgAvg;
     for (int i = 0; i < imgNum; i++)
     {
         Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
-        cv::accumulate(imgSrc, imgAccumlate);
+        imgSrc.convertTo(imgSrc, CV_16UC1);
     }
 
     imgAccumlate.convertTo(imgAvg, CV_8UC1, 1. / imgNum);
@@ -414,6 +436,111 @@ void IP::CreateGoldenImage_NearAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, 
         // Get the new pixels
         cv::bitwise_or(imgDst, imgSrc & ~minDiff, imgDst);
     }
+}
+void IP::CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
+{
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+    Mat imgSrc;
+    if (imgNum <= 4)
+    {
+        imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
+        imgSrc.convertTo(imgSrc, CV_16UC1);
+
+        Mat minImg = imgSrc.clone();
+        Mat maxImg = imgSrc.clone();
+
+        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
+
+        for (int i = 1; i < imgNum; i++)
+        {
+            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
+            imgSrc.convertTo(imgSrc, CV_16UC1);
+
+            (cv::min)(imgSrc, minImg, minImg);
+            (cv::max)(imgSrc, maxImg, maxImg);
+
+            imgAccumlate = imgAccumlate + imgSrc;
+        }
+
+        cv::subtract(imgAccumlate, minImg, imgAccumlate);
+        cv::subtract(imgAccumlate, maxImg, imgAccumlate);
+
+        imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / (imgNum - 2));
+    }
+    else
+    {
+        imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
+        imgSrc.convertTo(imgSrc, CV_16UC1);
+
+        Mat minImg = imgSrc.clone();
+        Mat maxImg = imgSrc.clone();
+
+        imgAccumlate = imgAccumlate + minImg;// pSrc[0]
+
+        for (int cnt = 0; cnt < imgNum / 3; cnt++)
+        {
+            for (int i = cnt * 3; i < cnt * 3 + 3; i++)
+            {
+                imgSrc = Mat(nH, nW, CV_8UC1, pSrc[i]);
+                imgSrc.convertTo(imgSrc, CV_16UC1);
+
+                (cv::min)(imgSrc, minImg, minImg);
+                (cv::max)(imgSrc, maxImg, maxImg);
+
+                imgAccumlate = imgAccumlate + imgSrc;
+
+                cv::subtract(imgAccumlate, minImg, imgAccumlate);
+                cv::subtract(imgAccumlate, maxImg, imgAccumlate);
+            }
+        }
+
+        imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / (imgNum / 3));
+    }
+}
+void IP::CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
+{
+    Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+    Mat imgSrc;
+
+    Mat minImg;
+    Mat maxImg;
+
+    for (int i = 2; i < imgNum; i++)
+    {
+        if (i == 2)
+        {
+            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[0]);
+            imgSrc.convertTo(imgSrc, CV_16UC1);
+
+            minImg = imgSrc.clone();
+            maxImg = imgSrc.clone();
+
+            imgAccumlate = imgAccumlate + minImg;
+        }
+        else
+        {
+            minImg = imgAccumlate;
+            maxImg = imgAccumlate;
+        }  
+
+        for (int j = i - 2; j < i; j++)
+        {
+            
+            imgSrc = Mat(nH, nW, CV_8UC1, pSrc[j]);
+            imgSrc.convertTo(imgSrc, CV_16UC1);
+
+            (cv::min)(imgSrc, minImg, minImg);
+            (cv::max)(imgSrc, maxImg, maxImg);
+
+            imgAccumlate = imgAccumlate + imgSrc;
+        }
+
+        cv::subtract(imgAccumlate, minImg, imgAccumlate);
+        cv::subtract(imgAccumlate, maxImg, imgAccumlate);
+    }
+    imgAccumlate.convertTo(imgDst, CV_8UC1);
 }
 
 // D2D 3.0

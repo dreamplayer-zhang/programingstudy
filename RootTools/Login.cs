@@ -51,6 +51,9 @@ namespace RootTools
         List<User> m_aAllUser = new List<User>();
         User m_userLogout = new User("Logout", eLevel.Logout); 
         User m_userATI = new User("ATI", eLevel.Admin, "TryThinkFight");
+        User m_userOperator = new User("User1", eLevel.Operator, "TryThinkFight");
+        User m_userWorker = new User("User2", eLevel.Worker, "TryThinkFight");
+
 
         void InitUser()
         {
@@ -59,6 +62,8 @@ namespace RootTools
             AddUser(new User(eLevel.Worker.ToString(), eLevel.Worker));
             m_aAllUser.Add(m_userLogout);
             m_aAllUser.Add(m_userATI);
+            m_aAllUser.Add(m_userOperator);
+            m_aAllUser.Add(m_userWorker);
             _user = m_userLogout;
         }
 

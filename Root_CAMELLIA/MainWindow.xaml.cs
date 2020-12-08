@@ -62,7 +62,6 @@ namespace Root_CAMELLIA
             {
                 NormalizeButton.Visibility = Visibility.Collapsed;
             }
-
             this.DataContext = new MainWindow_ViewModel(this);
         }
     }

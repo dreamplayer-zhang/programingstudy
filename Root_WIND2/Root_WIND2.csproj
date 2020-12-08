@@ -238,6 +238,10 @@
     <Compile Include="Module\BackSideVision.cs" />
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\InspectionManager_EFEM.cs" />
+    <Compile Include="Module\Vision\Run_Delay.cs" />
+    <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
+    <Compile Include="Module\Vision\Run_Inspect.cs" />
+    <Compile Include="Module\Vision\Run_Rotate.cs" />
     <Compile Include="ProgramManager.cs" />
     <Compile Include="UIManager.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionItem_temp.cs" />

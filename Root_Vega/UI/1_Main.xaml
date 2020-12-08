@@ -12,6 +12,8 @@
              Background="#FF2D2D30">
     <UserControl.Resources>
         <converter:TabSizeConverter x:Key="tabSizeConverter" />
+        <converter:BoolToRunColorConverter x:Key="BoolToRunColorConverters" />
+        <converter:DoubleToPercentStringConverter x:Key="DoubleToPercentStringConverters" />
         <Style x:Key="styleTabControl" TargetType="{x:Type TabControl}">
             <Setter Property="OverridesDefaultStyle" Value="True" />
             <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -221,6 +223,7 @@
                                                     <RowDefinition/>
                                                     <RowDefinition/>
                                                     <RowDefinition/>
+                                                    <RowDefinition/>
                                                 </Grid.RowDefinitions>
                                                 <Grid Grid.RowSpan="2"
                                               Background="{StaticResource TextForeGround}">
@@ -229,7 +232,7 @@
                                                 <Grid Grid.Row="0"
                                               Grid.ColumnSpan="2"
                                               Margin="6"
-                                              Background="{DynamicResource Yellow}">
+                                              Background="{Binding p_PatternVision.p_bRunPatternVision, Converter={StaticResource BoolToRunColorConverters}}">
                                                     <TextBlock Text="MAIN VISION"
                                                        FontWeight="Black"
                                                        Foreground="{StaticResource Black}"
@@ -238,7 +241,7 @@
                                                 <Grid Grid.Row="1"
                                               Grid.ColumnSpan="2"
                                               Margin="6"
-                                              Background="{DynamicResource DarkGray}">
+                                              Background="{Binding p_SideVision.p_bRunSideVision, Converter={StaticResource BoolToRunColorConverters}}">
                                                     <TextBlock Text="SIDE VISION"
                                                        FontWeight="Black"
                                                        Foreground="{StaticResource Black}"
@@ -246,12 +249,28 @@
                                                 </Grid>
                                                 <Grid Grid.Row="2"
                                               Margin="0,6,0,6">
-                                                    <ProgressBar Value="33"
+                                                    <ProgressBar Maximum="100"
+                                                                 Minimum="0"
+                                                                 Value="{Binding p_dPatternInspProgress}"
                                                  Background="{StaticResource DarkGray}"
-                                                 Foreground="{StaticResource Green}"/>
-                                                    <TextBlock Text="33%"
-                                               Style="{StaticResource BasicTb}"
-                                               FontWeight="Black"/>
+                                                 Foreground="{StaticResource Green}">
+                                                    </ProgressBar>
+                                                    <TextBlock 
+                                                        Text="{Binding p_dPatternInspProgress, Converter={StaticResource DoubleToPercentStringConverters}}"
+                                                        Style="{StaticResource BasicTb}"
+                                                        FontWeight="Black">
+                                                    </TextBlock>
+                                                </Grid>
+                                                <Grid Grid.Row="3"
+                                                      Margin="0,6,0,6">
+                                                    <ProgressBar Value="{Binding p_dSideInspProgress}"
+                                                                 Maximum="100"
+                                                                 Minimum="0"
+                                                                 Background="{StaticResource DarkGray}"
+                                                                 Foreground="{StaticResource Green}"/>
+                                                    <TextBlock Text="{Binding p_dSideInspProgress, Converter={StaticResource DoubleToPercentStringConverters}}"
+                                                               Style="{StaticResource BasicTb}"
+                                                               FontWeight="Black"/>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -280,11 +299,11 @@
                                                 </Grid.RowDefinitions>
                                                 <Grid Grid.RowSpan="3"
                                               Background="{StaticResource LightGray}"/>
-                                                <TextBlock Text="Required Time"
+                                                <TextBlock Text="Main Elapsed Time"
                                                 Style="{StaticResource BasicTb}"
                                                 FontWeight="Bold"
                                                 Foreground="{StaticResource Black}"/>
-                                                <TextBlock Text="Elapsed Time"
+                                                <TextBlock Text="Side Elapsed Time"
                                                    Grid.Row="1"
                                                 Style="{StaticResource BasicTb}"
                                                 FontWeight="Bold"
@@ -304,7 +323,7 @@
                                                    Grid.Row="1"
                                                    Style="{StaticResource BasicTb}"
                                                    Foreground="{StaticResource Black}"/>
-                                                <TextBlock Text="0"
+                                                <TextBlock Text="{Binding p_nTotalDefectCount}"
                                                    Grid.Column="1"
                                                    Grid.Row="2"
                                                    Style="{StaticResource BasicTb}"
@@ -315,7 +334,7 @@
                                         <Grid Grid.Row="0" Margin="0,0,0,0" DataContext="{Binding p_Handler.p_FDC}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="20"/>
-                                                <RowDefinition/>
+                                                <RowDefinition />
                                             </Grid.RowDefinitions>
                                             <Border>
                                                 <TextBlock Text="FDC"
@@ -327,8 +346,9 @@
                                             <Grid Grid.Row="1"
                                             Background="{StaticResource TextForeGround}">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="200*"/>
+                                                    <ColumnDefinition Width="100*"/>
+                                                    <ColumnDefinition Width="100*"/>
                                                 </Grid.ColumnDefinitions>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition/>
@@ -363,11 +383,11 @@
                                                 Style="{StaticResource BasicTb}"
                                                 FontWeight="Bold"
                                                 Foreground="{StaticResource Black}"/>
-
                                                 <!--<TextBlock Text="{Binding p_aData[0].p_fValue}"-->
                                                 <TextBlock Text="{Binding p_aData[0].p_fValue}" x:Name="FDCText1"
                                                    Grid.Column="1"
                                                    Grid.Row="0"
+                                                   HorizontalAlignment="Right"
                                                    Style="{StaticResource BasicTb}"
                                                    Foreground="{StaticResource Black}">
                                                 </TextBlock>
@@ -375,20 +395,65 @@
                                                    Foreground="{StaticResource Black}"
                                                    Grid.Column="1"
                                                    Grid.Row="1"
+                                                   HorizontalAlignment="Right"
                                                    Style="{StaticResource BasicTb}"/>
                                                 <TextBlock Text="{Binding p_aData[2].p_fValue}" x:Name="FDCText3"
                                                    Grid.Column="1"
                                                    Grid.Row="2"
+                                                   HorizontalAlignment="Right"
                                                    Foreground="{StaticResource Black}"
                                                    Style="{StaticResource BasicTb}"/>
                                                 <TextBlock Text="{Binding p_aData[3].p_fValue}" x:Name="FDCText4"
                                                    Grid.Column="1"
                                                    Grid.Row="3"
+                                                   HorizontalAlignment="Right"
                                                    Foreground="{StaticResource Black}"
                                                    Style="{StaticResource BasicTb}"/>
                                                 <TextBlock Text="{Binding p_aData[4].p_fValue}" x:Name="FDCText5"
                                                    Grid.Column="1"
                                                    Grid.Row="4"
+                                                   HorizontalAlignment="Right"
+                                                   Style="{StaticResource BasicTb}"
+                                                   Foreground="{StaticResource Black}"/>
+                                                <TextBlock Text="{Binding p_aData[0].p_sUnit}" 
+                                                   Grid.Column="2"
+                                                   Grid.Row="0"
+                                                   HorizontalAlignment="Left"
+                                                           Margin="10"
+                                                           FontSize="9"
+                                                   Style="{StaticResource BasicTb}"
+                                                   Foreground="{StaticResource Black}">
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding p_aData[1].p_sUnit}"
+                                                   Foreground="{StaticResource Black}"
+                                                   Grid.Column="2"
+                                                   Grid.Row="1"
+                                                   HorizontalAlignment="Left"
+                                                           Margin="10"
+                                                           FontSize="9"
+                                                   Style="{StaticResource BasicTb}"/>
+                                                <TextBlock Text="{Binding p_aData[2].p_sUnit}"
+                                                   Grid.Column="2"
+                                                   Grid.Row="2"
+                                                   HorizontalAlignment="Left"
+                                                           Margin="10"
+                                                           FontSize="9"
+                                                   Foreground="{StaticResource Black}"
+                                                   Style="{StaticResource BasicTb}"/>
+                                                <TextBlock Text="{Binding p_aData[3].p_sUnit}"
+                                                   Grid.Column="2"
+                                                   Grid.Row="3"
+                                                   HorizontalAlignment="Left"
+                                                           Margin="10"
+                                                           FontSize="9"
+                                                   Foreground="{StaticResource Black}"
+                                                   Style="{StaticResource BasicTb}"/>
+                                                <TextBlock Text="{Binding p_aData[4].p_sUnit}"
+                                                   Grid.Column="2"
+                                                   Grid.Row="4"
+                                                   HorizontalAlignment="Left"
+                                                           Margin="10"
+                                                           FontSize="9"
                                                    Style="{StaticResource BasicTb}"
                                                    Foreground="{StaticResource Black}"/>
                                             </Grid>

@@ -8,6 +8,7 @@ using RootTools.GAFs;
 using RootTools.ToolBoxs;
 using RootTools.Module;
 using RootTools.Control;
+using static Root_Vega.Module.Vega;
 
 namespace Root_Vega
 {
@@ -92,12 +93,45 @@ namespace Root_Vega
 
         public string BuzzerOff()
         {
+            m_handler.m_vega.m_doBuzzer.Write(eBuzzer.Buzzer1, false);
+            m_handler.m_vega.m_doBuzzer.Write(eBuzzer.Buzzer2, false);
+            m_handler.m_vega.m_doBuzzer.Write(eBuzzer.Buzzer3, false);
+            m_handler.m_vega.m_doBuzzer.Write(eBuzzer.Buzzer4, false);
             return "OK";
         }
-
         public string Recovery()
         {
+            if (IsEnableRecovery() == false) return "Recovery is impossible";
+            m_handler.m_bIsPossible_Recovery = false;
+            m_handler.m_process.CalcRecover();
+            EQ.p_eState = EQ.eState.Run;
+
+
             return "OK";
+        }
+        bool IsRunModule(ModuleBase module)
+        {
+            if (module.p_eState == ModuleBase.eState.Run) return true;
+            if (module.p_eState == ModuleBase.eState.Home) return true;
+            return (module.m_qModuleRun.Count > 0);
+        }
+        bool IsRunModule()
+        {
+            if (IsRunModule(m_handler.m_aLoadport[0])) return true;
+            if (IsRunModule(m_handler.m_aLoadport[1])) return true;
+            if (IsRunModule(m_handler.m_robot)) return true;
+            if (IsRunModule(m_handler.m_sideVision)) return true;
+            if (IsRunModule(m_handler.m_patternVision)) return true;
+            return false;
+        }
+        bool IsEnableRecovery()
+        {
+            if (IsRunModule()) return false;
+            if (m_handler.m_bIsPossible_Recovery == false) return false;
+            // Daniel check
+            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (EQ.p_bStop == true) return false;
+            return m_handler.IsEnableRecovery();
         }
     }
 }

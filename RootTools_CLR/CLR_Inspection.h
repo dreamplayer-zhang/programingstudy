@@ -75,6 +75,7 @@ namespace RootTools_CLR
 
 				bool bResultExist = vTempResult.size() > 0;
 				cliext::vector<CDefectDataWrapper^>^ local = gcnew cliext::vector<CDefectDataWrapper^>(vTempResult.size());
+				cliext::vector<CDefectDataWrapper^>^ cache = gcnew cliext::vector<CDefectDataWrapper^>();
 				if (bMerge)
 				{
 					for (int i = 0; i < vTempResult.size(); i++)
@@ -91,7 +92,11 @@ namespace RootTools_CLR
 						local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
 					}
 					local = CDefectDataWrapper::MergeDefect(local, nMergeDistance);
-				}
+					cache->assign(local->begin(), local->end());
+
+					local->clear();
+					local->assign(cache->begin(), cache->end());
+;				}
 
 
 				if (bResultExist)

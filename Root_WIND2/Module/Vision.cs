@@ -34,6 +34,22 @@ namespace Root_WIND2.Module
 
         Camera_Dalsa m_CamMain;
 
+        #region [Getter Setter]
+        public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
+        public Axis AxisZ { get => m_axisZ; private set => m_axisZ = value; }
+        public AxisXY AxisXY { get => m_axisXY; private set => m_axisXY = value; }
+        public DIO_O DoVac { get => m_doVac; private set => m_doVac = value; }
+        public DIO_O DoBlow { get => m_doBlow; private set => m_doBlow = value; }
+        public MemoryPool MemoryPool { get => m_memoryPool; private set => m_memoryPool = value; }
+        public MemoryPool MemoryPool2 { get => m_memoryPool2; private set => m_memoryPool2 = value; }
+        public MemoryGroup MemoryGroup { get => m_memoryGroup; private set => m_memoryGroup = value; }
+        public MemoryGroup MemoryGroup2 { get => m_memoryGroup2; private set => m_memoryGroup2 = value; }
+        public MemoryData MemoryMain { get => m_memoryMain; private set => m_memoryMain = value; }
+        public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
+        public RADSControl RADSControl { get => m_RADSControl; private set => m_RADSControl = value; }
+        public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
+        #endregion
+
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
@@ -140,10 +156,13 @@ namespace Root_WIND2.Module
         #endregion
 
         #region Axis
-        public int m_pulseRound = 1000;
+        private int m_pulseRound = 1000;
+        public int PulseRound { get => this.m_pulseRound; set => this.m_pulseRound = value; }
+
         void RunTreeAxis(Tree tree)
         {
-            m_pulseRound = tree.Set(m_pulseRound, m_pulseRound, "Rotate Pulse / Round", "Rotate Axis Pulse / 1 Round (pulse)");
+            m_pulseRound = tree.Set(m_pulseRound, m_pulseRound, "Rotate Pulse / Round", "Rotate" +
+                " Axis Pulse / 1 Round (pulse)");
         }
         #endregion
 
@@ -193,70 +212,8 @@ namespace Root_WIND2.Module
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
             AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
             AddModuleRunList(new Run_GrabLineScan(this), false, "Run Grab LineScan Camera");
-        }
-
-        public class Run_Delay : ModuleRunBase
-        {
-            Vision m_module;
-            public Run_Delay(Vision module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            public override ModuleRunBase Clone()
-            {
-                Run_Delay run = new Run_Delay(m_module);
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-            }
-
-            public override string Run()
-            {
-                return "OK";
-            }
-        }
-
-        public class Run_Rotate : ModuleRunBase
-        {
-            Vision m_module;
-            public Run_Rotate(Vision module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            double m_fDeg = 0;
-            public override ModuleRunBase Clone()
-            {
-                Run_Rotate run = new Run_Rotate(m_module);
-                run.m_fDeg = m_fDeg;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_fDeg = tree.Set(m_fDeg, m_fDeg, "Degree", "Rotation Degree (0 ~ 360)", bVisible);
-            }
-
-            public override string Run()
-            {
-                int pulseRound = m_module.m_pulseRound;
-                Axis axis = m_module.m_axisRotate;
-                int pulse = (int)Math.Round(m_module.m_pulseRound * m_fDeg / 360);
-                while (pulse < axis.p_posCommand)
-                    pulse += pulseRound;
-                {
-                    axis.p_posCommand -= pulseRound;
-                    axis.p_posActual -= pulseRound;
-                }
-                if (m_module.Run(axis.StartMove(pulse)))
-                    return p_sInfo;
-                return axis.WaitReady();
-            }
+            AddModuleRunList(new Run_Inspect(this), false, "Run Inspect");
+            
         }
 
         public class Run_GrabLineScan : ModuleRunBase
@@ -314,8 +271,6 @@ namespace Root_WIND2.Module
                 m_nWaferSize_mm = tree.Set(m_nWaferSize_mm, m_nWaferSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
-                p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
             }
 
             public override string Run()

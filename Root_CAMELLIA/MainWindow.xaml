@@ -5,6 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:Icon ="clr-namespace:Root_CAMELLIA.Control.Icon"
+        xmlns:met="clr-namespace:LibSR_Met;assembly=LibSR_Met"
+        xmlns:tools="clr-namespace:RootTools.Control.ACS;assembly=RootTools"
+        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         mc:Ignorable="d"
         WindowStyle="None"
         AllowsTransparency="False"
@@ -13,6 +16,9 @@
         Width="1920"
         Title="CAMELLIA2"
         Background="{StaticResource PanelBackGround}">
+    <Window.Resources>
+        <local:AxisConverter x:Key="AxisConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -506,12 +512,12 @@
                                 <UniformGrid Grid.Column="0" Columns="3" Background="Gainsboro" Margin="2">
                                     <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
                                     <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
-                                    <TextBlock Text="{Binding XPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
+                                    <TextBlock Text="{Binding p_Module_Camellia.p_axisXY.p_axisX.p_posActual, Converter={StaticResource AxisConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
                                 </UniformGrid>
                                 <UniformGrid Grid.Column="1" Columns="3" Background="Gainsboro" Margin="2">
                                     <TextBlock Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
                                     <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
-                                    <TextBlock Text="{Binding YPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
+                                    <TextBlock Text="{Binding p_Module_Camellia.p_axisXY.p_axisY.p_posActual, Converter={StaticResource AxisConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
                                 </UniformGrid>
                             </Grid>
                         </GroupBox>
@@ -539,6 +545,26 @@
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
                         </Viewbox>
+                        <!--<Canvas Grid.Row="1" ClipToBounds="True"  Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                            <Rectangle Fill="Red" Width="30" Height="30" Canvas.Left="50" Canvas.Top="50"></Rectangle>
+                        </Canvas>-->
+                        <!--<Viewbox Margin="3" Grid.Row="1">
+                            <ItemsControl
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Rectangle Width="50" Height="50" Fill="Red"></Rectangle> 
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Viewbox>-->
                     </Grid>
                 </GroupBox>
             </Grid>
@@ -553,7 +579,7 @@
                         <GroupBox Header="Contour Map">
 
                         </GroupBox>
-                        <GroupBox Header="Measurement Data" Grid.Row="1">
+                        <GroupBox Header="Measurement Data" Grid.Row="1" Grid.RowSpan="2">
                             <TabControl Background="Transparent">
                                 <TabItem Header="Point List">
                                     <Grid>
@@ -590,14 +616,17 @@
                                 </TabItem>
                                 <TabItem Header="Parameter">
                                 </TabItem>
-                            </TabControl>
-                        </GroupBox>
-                        <GroupBox Header="RT Graph" Grid.Row="2">
 
+                            </TabControl>
                         </GroupBox>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Log" Width="80">
+                </TabItem>
+                <TabItem Header="RT Graph">
+                    <WindowsFormsHost>
+                        <met:GraphPlot/>
+                    </WindowsFormsHost>
                 </TabItem>
             </TabControl>
 

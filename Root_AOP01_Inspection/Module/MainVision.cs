@@ -6,8 +6,9 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Root_EFEM;
 using Root_EFEM.Module;
+using Root_EFEM;
+using Root_EFEM.Module;
 using RootTools;
->>>>>>> Stashed changes
 using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
@@ -23,7 +24,7 @@ using System.Threading;
 
 namespace Root_AOP01_Inspection.Module
 {
-    public class MainVision : ModuleBase
+    public class MainVision : ModuleBase, IWTRChild
     {
         //Mem Vision Memory.Main
         #region ToolBox
@@ -136,11 +137,10 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
-<<<<<<< Updated upstream
-=======
         public enum eAxisPos
         {
             ReadyPos,
+
         }
 
         void InitPosAlign()
@@ -290,8 +290,6 @@ namespace Root_AOP01_Inspection.Module
             return "OK";
         }
 
-        
-
         public string BeforePut(int nID)
         {
             string info = MoveReadyPos();
@@ -325,7 +323,6 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
->>>>>>> Stashed changes
         #region override
         public override void InitMemorys()
         {
@@ -389,7 +386,9 @@ namespace Root_AOP01_Inspection.Module
         public MainVision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
+            m_waferSize = new InfoWafer.WaferSize(id, false, false);
             InitMemorys();
+            InitPosAlign();
         }
         public class Run_GrabSideScan : ModuleRunBase
         {

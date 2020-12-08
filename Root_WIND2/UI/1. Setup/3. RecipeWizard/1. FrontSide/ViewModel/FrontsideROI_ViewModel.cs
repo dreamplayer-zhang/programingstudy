@@ -1387,6 +1387,7 @@ namespace Root_WIND2
         BackgroundWorker Worker_SaveROI = new BackgroundWorker();
         BackgroundWorker Worker_ClearROI = new BackgroundWorker();
         BackgroundWorker Worker_ReadROI = new BackgroundWorker();
+        BackgroundWorker Worker_ShowAll = new BackgroundWorker();
         private void SetBackGroundWorker()
         {
             Worker_ClearROI.DoWork += Worker_ClearROI_DoWork;
@@ -1395,6 +1396,49 @@ namespace Root_WIND2
             Worker_SaveROI.RunWorkerCompleted += Worker_SaveROI_RunWorkerCompleted;
             Worker_ReadROI.DoWork += Worker_ReadROI_DoWork;
             Worker_ReadROI.RunWorkerCompleted += Worker_ReadROI_RunWorkerCompleted;
+            Worker_ShowAll.DoWork += Worker_ShowAll_DoWork;
+            Worker_ShowAll.RunWorkerCompleted += Worker_ShowAll_RunWorkerCompleted;
+        }
+
+        private unsafe void Worker_ShowAll_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            IntPtr ptrMem = p_ROILayer.GetPtr();
+            if (ptrMem == IntPtr.Zero)
+                return;
+
+            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.p_nByte];
+            for (int y = 0; y < p_ROILayer.p_Size.Y; y++)
+            {
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * y), buf.Length);
+            }
+
+
+            UInt32 clr = p_SelectedROI.p_Color.A;
+            clr = ((UInt32)clr << 8);
+            clr += p_SelectedROI.p_Color.R;
+            clr = ((UInt32)clr << 8);
+            clr += p_SelectedROI.p_Color.G;
+            clr = ((UInt32)clr << 8);
+            clr += p_SelectedROI.p_Color.B;
+
+            byte* bitmapPtr = (byte*)ptrMem.ToPointer();
+            UInt32* fPtr = (UInt32*)bitmapPtr;
+
+            foreach (InspectionROI roi in p_cInspROI)
+            {
+                foreach (PointLine data in roi.p_Data)
+                {
+                    for (int x = data.StartPt.X; x < data.StartPt.X + data.Width; x++)
+                    {
+                        fPtr[(data.StartPt.Y * p_ROILayer.p_Size.X + x)] = clr;
+                    }
+                }
+            }
+        }
+
+        private void Worker_ShowAll_DoWork(object sender, DoWorkEventArgs e)
+        {
+
         }
 
         private unsafe void Worker_ReadROI_DoWork(object sender, DoWorkEventArgs e)

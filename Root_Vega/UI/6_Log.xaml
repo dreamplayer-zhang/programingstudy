@@ -10,6 +10,7 @@
              Background="#FF2D2D30">
     <UserControl.Resources>
         <converter:SequenceStateToColorConverter x:Key="SequenceStateToColorConverters"/>
+        <converter:BoolToRunColor_2_Converter x:Key="BoolToRunColor_2_Converters"/>
     </UserControl.Resources>
     <Grid>
         <Border Grid.Column="0">
@@ -50,32 +51,31 @@
                             <Border Grid.Row="1"
                                         BorderBrush="Gray"
                                         BorderThickness="3,0,3,3">
-                                <StackPanel Margin="10">
+                                <StackPanel Margin="10" x:Name ="Loadport1">
                                     <Label Content="Wait Start"
                                            Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource Green}"
+                                           Background="{Binding m_dioPresent.p_bIn ,Converter={StaticResource SequenceStateToColorConverters}}"
                                            Height="40"/>
-                                    
                                     <Label Content="RFID Read"
                                            Style="{StaticResource BasicLabel}"
-                                               Background="{StaticResource Green}"
+                                               Background="{Binding m_runReadPodID.p_eRunState ,Converter={StaticResource SequenceStateToColorConverters}}"
                                                Height="40"/>
                                     <Label Content="Docking"
                                            Style="{StaticResource BasicLabel}"
-                                               Background="{StaticResource Green}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Open"
                                            Style="{StaticResource BasicLabel}"
-                                               Background="{StaticResource Green}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Mapping"
                                            Style="{StaticResource BasicLabel}"
-                                               Background="{StaticResource Green}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Close"
                                            Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
-                                           Height="40"/>
+                                               Background="{Binding m_runUnLoad.p_eRunState ,Converter={StaticResource SequenceStateToColorConverters}}"
+                                               Height="40"/>
                                     <Label Content="Unload Request"
                                            Style="{StaticResource BasicLabel}"
                                            Background="{StaticResource DarkGray}"
@@ -101,33 +101,33 @@
                             <Border Grid.Row="1"
                                     BorderBrush="{StaticResource BorderBrush}"
                                     BorderThickness="3,0,3,3">
-                                <StackPanel Margin="10">
+                                <StackPanel Margin="10" x:Name ="Loadport2">
                                     <Label Content="Wait Start"
                                            Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource Yellow}"
+                                           Background="{Binding m_runReadPodID.p_eRunState ,Converter={StaticResource SequenceStateToColorConverters}}"
                                            Height="40"/>
                                     <Label Content="RFID Read"
                                            Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
+                                               Background="{Binding m_runReadPodID.p_eRunState ,Converter={StaticResource SequenceStateToColorConverters}}"
                                                Height="40"/>
                                     <Label Content="Docking"
-                                               Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
+                                           Style="{StaticResource BasicLabel}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Open"
-                                               Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
+                                           Style="{StaticResource BasicLabel}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Mapping"
-                                               Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
+                                           Style="{StaticResource BasicLabel}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Close"
-                                               Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
+                                           Style="{StaticResource BasicLabel}"
+                                               Background="{Binding m_runUnLoad.p_eRunState ,Converter={StaticResource SequenceStateToColorConverters}}"
                                                Height="40"/>
                                     <Label Content="Unload Request"
-                                               Style="{StaticResource BasicLabel}"
+                                           Style="{StaticResource BasicLabel}"
                                            Background="{StaticResource DarkGray}"
                                                Height="40"/>
                                 </StackPanel>
@@ -205,7 +205,7 @@
                                         BorderBrush="Gray"
                                         BorderThickness="3,0,3,3">
                             <TabControl Style="{StaticResource LogTabControl}">
-                                <TabItem Header="Wafer1" Grid.Column="0"
+                                <TabItem Header="LOAD PORT 1" Grid.Column="0"
                                          Style="{StaticResource LogTabItem}">
                                     <ScrollViewer>
                                         <ListBox ItemsSource="{Binding p_moduleRunList.p_aModuleRun}"
@@ -223,174 +223,11 @@
                                             </ListBox.ItemTemplate>
                                         </ListBox>
                                     </ScrollViewer>
-                                    <!--<ScrollViewer>
-                                        <StackPanel Margin="0,10,0,0">
-                                            <Label Content="WTR - Get LoadPort"
-                                                   Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource Green}"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put Aligner"
-                                                       Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource Green}"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - Align"
-                                                       Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource Green}"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - EBR"
-                                                       Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource Green}"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - OCR"
-                                                       Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource Green}"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - Rotate"
-                                                       Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource Yellow}"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Get Aligner"
-                                                       Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource DarkGray}"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put Stage"
-                                                       Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource DarkGray}"
-                                                       Height="40"/>
-                                            <Label Content="Stage - Align"
-                                                           Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource DarkGray}"
-                                                       Height="40"/>
-                                            <Label Content="Stage - Scan"
-                                                       Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource DarkGray}"
-                                                       Height="40"/>
-                                            <Label Content="Stage - 2D Inspection"
-                                                           Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource DarkGray}"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Get Stage"
-                                                           Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource DarkGray}"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put LoadPort"
-                                                           Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource DarkGray}"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Get LoadPort"
-                                                          Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource DarkGray}"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put Aligner"
-                                                           Style="{StaticResource BasicLabel}"
-                                                   Background="{StaticResource DarkGray}"
-                                                       Height="40"/>
-                                        </StackPanel>
-                                    </ScrollViewer>-->
                                 </TabItem>
-                                <TabItem Header="Wafer2" Grid.Column="1"
+                                <TabItem Header="LOAD PORT 2" Grid.Column="1"
                                          Style="{StaticResource LogTabItem}">
                                     <ScrollViewer>
                                         <ListBox DataContext="{Binding p_moduleRunList}"/>
-                                        <!--<StackPanel Margin="0,10,0,0">
-                                            <Label Content="WTR - Get LoadPort"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put Aligner"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - Align"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - EBR"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - OCR"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - Rotate"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Get Aligner"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put Stage"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Stage - Align"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Stage - Scan"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Stage - 2D Inspection"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Get Stage"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put LoadPort"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Get LoadPort"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put Aligner"
-                                                       Background="SeaGreen"
-                                                       Height="40"/>
-                                        </StackPanel>-->
-                                    </ScrollViewer>
-                                </TabItem>
-                                <TabItem Header="Wafer3" Grid.Column="2"
-                                         Style="{StaticResource LogTabItem}">
-                                    <ScrollViewer>
-                                        <StackPanel Margin="0,10,0,0">
-                                            <Label Content="WTR - Get LoadPort"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put Aligner"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - Align"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - EBR"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - OCR"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Aligner - Rotate"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Get Aligner"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put Stage"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Stage - Align"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Stage - Scan"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="Stage - 2D Inspection"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Get Stage"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put LoadPort"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Get LoadPort"
-                                                       Background="DimGray"
-                                                       Height="40"/>
-                                            <Label Content="WTR - Put Aligner"
-                                                       Background="SeaGreen"
-                                                       Height="40"/>
-                                        </StackPanel>
                                     </ScrollViewer>
                                 </TabItem>
                             </TabControl>

@@ -186,7 +186,6 @@ namespace Root_Vega
             }
             p_eReqTransfer = (p_ePresentSensor == ePresent.Exist) ? eTransfer.ReadyToUnload : eTransfer.ReadyToLoad;
             if (p_ePresentSensor == ePresent.Empty && m_gem !=null) m_gem.RemoveCarrierInfo(p_sLocID);
-            p_eState = InfoPod.eState.Placed;
         }
         #endregion
 

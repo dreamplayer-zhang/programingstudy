@@ -66,7 +66,7 @@ namespace RootTools.Gem.XGem
             ONLINEREMOTE,
         }
 
-        eControl _eReqControl = eControl.NULL;
+        eControl _eReqControl = eControl.OFFLINE;
         public eControl p_eReqControl
         {
             get { return _eReqControl; }

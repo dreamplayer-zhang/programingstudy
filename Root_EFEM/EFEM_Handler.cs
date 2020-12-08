@@ -66,7 +66,8 @@ namespace Root_EFEM
         #region Module WTR
         enum eWTR
         {
-            RND
+            RND,
+            Cymechs
         }
         eWTR m_eWTR = eWTR.RND;
         ModuleBase m_wtr;
@@ -74,7 +75,7 @@ namespace Root_EFEM
         {
             switch (m_eWTR)
             {
-                case eWTR.RND:
+                case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer);break; 
                 default: m_wtr = new WTR_RND("WTR", m_engineer); break;
             }
             InitModule(m_wtr); 
@@ -103,9 +104,9 @@ namespace Root_EFEM
                 string sID = "Loadport" + cLP;
                 switch (m_aLoadportType[n])
                 {
-                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer); break;
-                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer); break; 
-                    default: module = new Loadport_RND(sID, m_engineer); break;
+                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
+                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, true); break; 
+                    default: module = new Loadport_RND(sID, m_engineer, true, true); break;
                 }
                 InitModule(module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
@@ -209,6 +210,16 @@ namespace Root_EFEM
             {
                 m_aVisionType[n] = (eVision)treeType.Set(m_aVisionType[n], m_aVisionType[n], n.ToString("00"), "Vision Type");
             }
+        }
+        #endregion
+
+        #region Tree
+        public void RunTreeModule(Tree tree)
+        {
+            RunTreeWTR(tree.GetTree("WTR"));
+            RunTreeLoadport(tree.GetTree("Loadport"));
+            RunTreeAligner(tree.GetTree("Aligner"));
+            RunTreeVision(tree.GetTree("Vision"));
         }
         #endregion
 
@@ -340,17 +351,6 @@ namespace Root_EFEM
                 }
             }
         }
-        #endregion
-
-        #region Tree
-        public void RunTreeModule(Tree tree)
-        {
-            RunTreeWTR(tree.GetTree("WTR"));
-            RunTreeLoadport(tree.GetTree("Loadport"));
-            RunTreeAligner(tree.GetTree("Aligner"));
-            RunTreeVision(tree.GetTree("Vision"));
-        }
-
         #endregion
 
         string m_id;

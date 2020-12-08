@@ -209,9 +209,9 @@ namespace RootTools
 					for (int c = rect.Left; c < rect.Left + rect.Width; c++, idx++)
 					{
 						xOffset = c + (long)r * stride / 3;
-						m_aBuf[nByte * idx + 2] = *(Rptr + xOffset);
+						m_aBuf[nByte * idx + 0] = *(Rptr + xOffset);
 						m_aBuf[nByte * idx + 1] = *(Gptr + xOffset);
-						m_aBuf[nByte * idx + 0] = *(Bptr + xOffset);
+						m_aBuf[nByte * idx + 2] = *(Bptr + xOffset);
 					}
 				}
 			}
@@ -904,7 +904,7 @@ namespace RootTools
 				if (Worker_MemoryCopy.CancellationPending)
 					return;
 				fss.Read(buf, 0, nWidth * nByte);
-                for (int i = 0; i < nWidth * 3; i = i + 3)
+                for (int i = 0; i < nLowWidth * 3; i = i + 3)
                 {
                     ((byte*)(ptrB))[i / 3 + (long)y * p_Size.X] = buf[i];
                     ((byte*)(ptrG))[i / 3 + (long)y * p_Size.X] = buf[i + 1];

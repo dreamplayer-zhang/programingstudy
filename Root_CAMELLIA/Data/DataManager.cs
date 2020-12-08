@@ -10,7 +10,8 @@ namespace Root_CAMELLIA.Data
     {
         public RecipeDataManager recipeDM { get; set; }
         public WaferCentering m_waferCentering;
-        public MainWindow Main { get; set; }
+        public Calibration m_calibration;
+        public MainWindow_ViewModel Main { get; set; }
 
         private static DataManager instance;
         public static DataManager Instance
@@ -27,11 +28,13 @@ namespace Root_CAMELLIA.Data
             {
                 instance = value;
             }
-        }
-        public DataManager(MainWindow main = null)
+}
+        public DataManager(MainWindow_ViewModel main = null)
         {
+            Main = main;
             recipeDM = new RecipeDataManager(this);
             m_waferCentering = new WaferCentering();
+            m_calibration = new Calibration();
         }
     }
 }

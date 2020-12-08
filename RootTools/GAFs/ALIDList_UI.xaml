@@ -16,6 +16,7 @@
             <CheckBox x:Name="checkBoxSetup" Content="Setup" Margin="3" VerticalAlignment="Center" Click="CheckBoxSetup_Click"/>
             <Button x:Name="buttonClear" Content="Clear" Margin="3" Width="50" Click="ButtonClear_Click"/>
             <Button x:Name="buttonSave" Content="Save" Margin="3" Width="50" Click="ButtonSave_Click"/>
+            <Button x:Name="buttonALIDPopup" Content="ALIDPopup" Margin="3" Width="80" Click="ALIDPopup_Click"/>
         </StackPanel>
         <tree:TreeUI Grid.Row="1" x:Name="treeUI" Margin="3" Visibility="Hidden"/>
         <DataGrid Grid.Row="1" x:Name="dataGrid" ItemsSource="{Binding p_aALID}" IsReadOnly="True" AutoGenerateColumns="False">

@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Root_CAMELLIA.Module;
 
 namespace Root_CAMELLIA
 {
@@ -14,6 +15,19 @@ namespace Root_CAMELLIA
         private MainWindow m_MainWindow;
         public DataManager DataManager;
         public Met.Nanoview NanoView;
+
+        Module_Camellia m_Module_Camellia;
+        public Module_Camellia p_Module_Camellia
+        {
+            get
+            {
+                return m_Module_Camellia;
+            }
+            set
+            {
+                SetProperty(ref m_Module_Camellia, value);
+            }
+        }
 
         public MainWindow_ViewModel(MainWindow mainwindow)
         {
@@ -26,12 +40,16 @@ namespace Root_CAMELLIA
         private void Init()
         {
             DataManager = DataManager.Instance;
+            //App.m_nanoView.InitializeSR();
+
             //NanoView = new Met.Nanoview();
-            //NanoView.InitializeSR(@".\Reference", 2000);
+            //NanoView.InitializeSR(@".\Reference", 2);
 
             App.m_engineer.Init("Camellia");
             ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia.Nanoview = NanoView;
             ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia.mwvm = this;
+
+            p_Module_Camellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
         }
 
         private void ViewModelInit()
