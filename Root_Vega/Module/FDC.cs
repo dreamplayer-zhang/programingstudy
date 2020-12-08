@@ -48,7 +48,25 @@ namespace Root_Vega.Module
             eUnit _eUnit = eUnit.None;
             public eUnit p_eUnit
             {
-                get { return _eUnit; }
+                get
+                {
+                    if (_eUnit == eUnit.kPa)
+                    {
+                        p_sUnit = "kPa";
+                    }
+                    if (_eUnit == eUnit.MPa)
+                    {
+                        p_sUnit = "MPa";
+                    }
+                    if (_eUnit == eUnit.Temp)
+                    {
+                        p_sUnit = "°C";
+                    }
+                    if (_eUnit == eUnit.Voltage)
+                    {
+                        p_sUnit = "V";
+                    }
+                    return _eUnit; }
                 set
                 {
                     if (_eUnit == value) return;
@@ -61,25 +79,15 @@ namespace Root_Vega.Module
 			{
                 get 
                 {
-                    if(_eUnit == eUnit.kPa)
-					{
-                        _sUnit = "kPa";
-					}
-                    if (_eUnit == eUnit.MPa)
-                    {
-                        _sUnit = "MPa";
-                    }
-                    if (_eUnit == eUnit.Temp)
-                    {
-                        _sUnit = "°C";
-                    }
-                    if (_eUnit == eUnit.Voltage)
-                    {
-                        _sUnit = "V";
-                    }
                     return _sUnit; 
                 }
-			}
+                set
+                {
+                    if (_sUnit == value) return;
+                    _sUnit = value;
+                    OnPropertyChanged();
+                }
+            }
 
             int m_nDigit = 2;
             double m_fDiv = 100;
