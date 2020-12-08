@@ -67,11 +67,11 @@ namespace Root_EFEM.Module
 
         public string m_id;
         IEngineer m_engineer;
-        public void Init(string id, IEngineer engineer)
+        public void Init(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             m_id = id;
             m_engineer = engineer;
-            m_waferSize = new InfoWafer.WaferSize(m_id, true, false);
+            m_waferSize = new InfoWafer.WaferSize(m_id, bEnableWaferSize, bEnableWaferCount);
         }
     }
 }

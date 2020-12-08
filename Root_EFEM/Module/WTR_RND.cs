@@ -34,10 +34,10 @@ namespace Root_EFEM.Module
             Upper,
         }
         public Dictionary<eArm, Arm> m_dicArm = new Dictionary<eArm, Arm>();
-        void InitArms(string id, IEngineer engineer)
+        protected virtual void InitArms(string id, IEngineer engineer)
         {
-            m_dicArm.Add(eArm.Lower, new Arm(id, eArm.Lower, this, engineer));
-            m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this, engineer));
+            m_dicArm.Add(eArm.Lower, new Arm(id, eArm.Lower, this, engineer, true, false));
+            m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this, engineer, true, false));
         }
 
         List<string> p_asArm
@@ -68,11 +68,11 @@ namespace Root_EFEM.Module
             public eArm m_eArm;
 
             WTR_RND m_module;
-            public Arm(string id, eArm arm, WTR_RND module, IEngineer engineer)
+            public Arm(string id, eArm arm, WTR_RND module, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
             {
                 m_eArm = arm;
                 m_module = module;
-                Init(id + "." + arm.ToString(), engineer);
+                Init(id + "." + arm.ToString(), engineer, bEnableWaferSize, bEnableWaferCount);
             }
 
             public string RunGrip(bool bGrip)
