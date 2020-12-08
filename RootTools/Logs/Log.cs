@@ -18,21 +18,29 @@ namespace RootTools
 
         public void Error(string str)
         {
+            EQ.p_eState = EQ.eState.Error;
+            EQ.p_bStop = true;
             m_logger.Error(str);
         }
 
         public void Error(string str, string sArgument)
         {
+            EQ.p_eState = EQ.eState.Error;
+            EQ.p_bStop = true;
             m_logger.Error(str, sArgument);
         }
 
         public void Error(Exception e, string str)
         {
+            EQ.p_eState = EQ.eState.Error;
+            EQ.p_bStop = true;
             m_logger.Error(e, str);
         }
 
         public void Fatal(string str)
         {
+            EQ.p_eState = EQ.eState.Error;
+            EQ.p_bStop = true;
             m_logger.Fatal(str);
         }
         #endregion

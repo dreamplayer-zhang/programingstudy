@@ -59,6 +59,8 @@ namespace Root_Vega
 
         void TimerUI(Login.eLevel level)
         {
+            if (EQ.p_eState != EQ.eState.Run) _Main.m_bRecovery = false; 
+            textState.Text = _Main.m_bRecovery ? "Recovery" : EQ.p_eState.ToString(); 
             _Recipe.Visibility = (level >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Hidden;
             _Maint.Visibility = (level >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Hidden; 
             _Viewer.Visibility = (level >= Login.eLevel.Worker) ? Visibility.Visible : Visibility.Hidden;
@@ -91,6 +93,9 @@ namespace Root_Vega
             textLastError.DataContext = App.m_engineer.m_gaf.m_listALID;
 
             _Main.Init(App.m_engineer);
+            _Log.Init(App.m_engineer);
+
+
             loginMaunUI.Init(App.m_engineer.m_login); 
 
             InitTimer(); 
