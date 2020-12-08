@@ -416,7 +416,8 @@ namespace Root_Vega
 						{
 							type = InspectionType.RelativeSurface;
 						}
-						int nDefectCode = InspectionManager.MakeDefectCode((InspectionTarget)(15 + i), type, 0);
+						InspectionTarget target = (InspectionTarget)((int)InspectionTarget.BevelInspectionTop + i);
+						int nDefectCode = InspectionManager.MakeDefectCode(target, type, 0);
 
 						int upper = 0;
 						int center = 0;

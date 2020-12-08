@@ -18,6 +18,14 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
+        #region Arm
+        protected override void InitArms(string id, IEngineer engineer)
+        {
+            m_dicArm.Add(eArm.Lower, new Arm(id, eArm.Lower, this, engineer, false, false));
+            m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this, engineer, false, false));
+        }
+        #endregion
+
         #region override
         public override void RunTree(Tree tree)
         {

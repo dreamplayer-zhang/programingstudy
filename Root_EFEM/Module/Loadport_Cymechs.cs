@@ -656,12 +656,12 @@ namespace Root_EFEM.Module
         #endregion
 
         public InfoCarrier m_infoCarrier;
-        public Loadport_Cymechs(string id, IEngineer engineer)
+        public Loadport_Cymechs(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             p_bLock = false;
             p_id = id;
             InitCmd();
-            m_infoCarrier = new InfoCarrier(this, id, engineer);
+            m_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
             m_aTool.Add(m_infoCarrier);
             InitBase(id, engineer);
             InitEvent();

@@ -308,8 +308,12 @@
                                             <Grid Grid.Row="1" Margin="5">
                                                 <TabControl SelectedIndex="{Binding SelectedIndex}">
                                                     <TabItem Header="X" Width="60" Margin="-3,0,0,0">
-                                                        <DataGrid ItemsSource="{Binding WorkPoint2}"
-                                                                  AutoGenerateColumns="False">
+                                                        <DataGrid ItemsSource="{Binding WorkPoint2}" AutoGenerateColumns="False">
+                                                            <i:Interaction.Triggers>
+                                                                <i:EventTrigger EventName="CellEditEnding">
+                                                                    <i:CallMethodAction TargetObject="{Binding}" MethodName="DataGrid_CellEditEnding" />
+                                                                </i:EventTrigger>
+                                                            </i:Interaction.Triggers>
                                                             <DataGrid.Columns>
                                                                 <DataGridTextColumn Header="  Name"  Width="*" IsReadOnly="True" Binding="{Binding Name}"/>
                                                                 <DataGridTextColumn Header="  Value" Width="5*" Binding="{Binding Value, Converter={StaticResource TextBoxToIntConverter}}"/>
