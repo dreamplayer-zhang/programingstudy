@@ -19,7 +19,8 @@ namespace Root_WIND2
         public void init(Frontside_ViewModel front, Recipe recipe)
         {
             m_Recipe = recipe;
-            m_front = front;    
+            m_front = front;
+            p_ROI_Viewer = m_front.p_ROI_VM;      
             m_cMask = new ObservableCollection<Mask>();
             m_cInspMethod = new ObservableCollection<ParameterBase>();
             m_cInspItem = new ObservableCollection<InspectionItem>();
@@ -29,7 +30,21 @@ namespace Root_WIND2
         }
 
 
+
         #region Property
+        private FrontsideROI_ViewModel m_ROI_Viewer;
+        public FrontsideROI_ViewModel p_ROI_Viewer
+        {
+            get
+            {
+                return m_ROI_Viewer;
+            }
+            set
+            {
+                SetProperty(ref m_ROI_Viewer, value);
+            }
+        }
+
         private ObservableCollection<Mask> m_cMask;
         public ObservableCollection<Mask> p_cMask
         {
@@ -197,6 +212,7 @@ namespace Root_WIND2
                     p_cInspItem.Add(item);
                     SetParameter();
                     var asdf = m_front.p_ROI_VM;
+                    var ff = m_front.p_ROI_VM.p_cInspROI;
                 });
             }
         }

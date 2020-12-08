@@ -25,8 +25,8 @@ namespace Root_Vega.Module
         public enum eUnit
         {
             None,
-            KPA,
-            MPA,
+            kPa,
+            MPa,
             Temp,
             Voltage,
         }
@@ -48,11 +48,43 @@ namespace Root_Vega.Module
             eUnit _eUnit = eUnit.None;
             public eUnit p_eUnit
             {
-                get { return _eUnit; }
+                get
+                {
+                    if (_eUnit == eUnit.kPa)
+                    {
+                        p_sUnit = "kPa";
+                    }
+                    if (_eUnit == eUnit.MPa)
+                    {
+                        p_sUnit = "MPa";
+                    }
+                    if (_eUnit == eUnit.Temp)
+                    {
+                        p_sUnit = "°C";
+                    }
+                    if (_eUnit == eUnit.Voltage)
+                    {
+                        p_sUnit = "V";
+                    }
+                    return _eUnit; }
                 set
                 {
                     if (_eUnit == value) return;
                     _eUnit = value;
+                    OnPropertyChanged();
+                }
+            }
+            string _sUnit = "";
+            public string p_sUnit
+			{
+                get 
+                {
+                    return _sUnit; 
+                }
+                set
+                {
+                    if (_sUnit == value) return;
+                    _sUnit = value;
                     OnPropertyChanged();
                 }
             }
@@ -123,10 +155,10 @@ namespace Root_Vega.Module
                 m_mmLimit = tree.Set(m_mmLimit, m_mmLimit, "Limit", "FDC Lower & Upper Limit");
                 if (m_alid[0] == null)
                 {
-                    m_alid[0] = m_module.m_gaf.GetALID(m_module, ".LowerLimit", "FDC Lower Limit");
-                    m_alid[0].p_sMsg = "FDC Value Smaller then Lower Limit";
-                    m_alid[1] = m_module.m_gaf.GetALID(m_module, ".UpperLimit", "FDC Upper Limit");
-                    m_alid[1].p_sMsg = "FDC Value Larger then Upper Limit";
+                    m_alid[0] = m_module.m_gaf.GetALID(m_module, ".Low Limit", "FDC Low Limit");
+                    m_alid[0].p_sMsg = "FDC" + p_id + "value is lower then Low Limit";
+                    m_alid[1] = m_module.m_gaf.GetALID(m_module, ".High Limit", "FDC High Limit");
+                    m_alid[1].p_sMsg = "FDC" + p_id + "value is higher then High Limit";
                     m_svValue = m_module.m_gaf.GetSVID(m_module, p_id); 
                 }
                 m_alid[0].p_id = "LowerLimit";

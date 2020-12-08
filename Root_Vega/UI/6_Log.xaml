@@ -10,6 +10,7 @@
              Background="#FF2D2D30">
     <UserControl.Resources>
         <converter:SequenceStateToColorConverter x:Key="SequenceStateToColorConverters"/>
+        <converter:BoolToRunColor_2_Converter x:Key="BoolToRunColor_2_Converters"/>
     </UserControl.Resources>
     <Grid>
         <Border Grid.Column="0">
@@ -50,32 +51,31 @@
                             <Border Grid.Row="1"
                                         BorderBrush="Gray"
                                         BorderThickness="3,0,3,3">
-                                <StackPanel Margin="10">
+                                <StackPanel Margin="10" x:Name ="Loadport1">
                                     <Label Content="Wait Start"
                                            Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource Green}"
+                                           Background="{Binding m_dioPresent.p_bIn ,Converter={StaticResource SequenceStateToColorConverters}}"
                                            Height="40"/>
-                                    
                                     <Label Content="RFID Read"
                                            Style="{StaticResource BasicLabel}"
-                                               Background="{StaticResource Green}"
+                                               Background="{Binding m_runReadPodID.p_eRunState ,Converter={StaticResource SequenceStateToColorConverters}}"
                                                Height="40"/>
                                     <Label Content="Docking"
                                            Style="{StaticResource BasicLabel}"
-                                               Background="{StaticResource Green}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Open"
                                            Style="{StaticResource BasicLabel}"
-                                               Background="{StaticResource Green}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Mapping"
                                            Style="{StaticResource BasicLabel}"
-                                               Background="{StaticResource Green}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Close"
                                            Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
-                                           Height="40"/>
+                                               Background="{Binding m_runUnLoad.p_eRunState ,Converter={StaticResource SequenceStateToColorConverters}}"
+                                               Height="40"/>
                                     <Label Content="Unload Request"
                                            Style="{StaticResource BasicLabel}"
                                            Background="{StaticResource DarkGray}"
@@ -101,33 +101,33 @@
                             <Border Grid.Row="1"
                                     BorderBrush="{StaticResource BorderBrush}"
                                     BorderThickness="3,0,3,3">
-                                <StackPanel Margin="10">
+                                <StackPanel Margin="10" x:Name ="Loadport2">
                                     <Label Content="Wait Start"
                                            Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource Yellow}"
+                                           Background="{Binding m_runReadPodID.p_eRunState ,Converter={StaticResource SequenceStateToColorConverters}}"
                                            Height="40"/>
                                     <Label Content="RFID Read"
                                            Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
+                                               Background="{Binding m_runReadPodID.p_eRunState ,Converter={StaticResource SequenceStateToColorConverters}}"
                                                Height="40"/>
                                     <Label Content="Docking"
-                                               Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
+                                           Style="{StaticResource BasicLabel}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Open"
-                                               Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
+                                           Style="{StaticResource BasicLabel}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Mapping"
-                                               Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
+                                           Style="{StaticResource BasicLabel}"
+                                               Background="{Binding m_runLoad.p_eRunState ,Converter={StaticResource BoolToRunColor_2_Converters}}"
                                                Height="40"/>
                                     <Label Content="Close"
-                                               Style="{StaticResource BasicLabel}"
-                                           Background="{StaticResource DarkGray}"
+                                           Style="{StaticResource BasicLabel}"
+                                               Background="{Binding m_runUnLoad.p_eRunState ,Converter={StaticResource SequenceStateToColorConverters}}"
                                                Height="40"/>
                                     <Label Content="Unload Request"
-                                               Style="{StaticResource BasicLabel}"
+                                           Style="{StaticResource BasicLabel}"
                                            Background="{StaticResource DarkGray}"
                                                Height="40"/>
                                 </StackPanel>

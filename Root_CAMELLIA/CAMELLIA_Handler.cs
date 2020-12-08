@@ -122,9 +122,9 @@ namespace Root_CAMELLIA
                 string sID = "Loadport" + cLP;
                 switch (m_aLoadportType[n])
                 {
-                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer); break;
-                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer); break;
-                    default: module = new Loadport_RND(sID, m_engineer); break;
+                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
+                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, true); break;
+                    default: module = new Loadport_RND(sID, m_engineer, true, true); break;
                 }
                 InitModule(module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);

@@ -8,21 +8,27 @@ using System.Windows.Data;
 
 namespace Root_CAMELLIA
 {
-    public class AxisConverter : IValueConverter
+    public class TextBoxToIntConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null)
-            {
-                return 0.0;
-            }
-
-            return value;
+            return value.ToString();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value;
+            int iValue = 0;
+            double fValue = 0;
+            if (Int32.TryParse(value.ToString(), out iValue))
+            {
+                return iValue;
+            }
+            else if (Double.TryParse(value.ToString(), out fValue))
+            {
+                return (int)fValue;
+            }
+            else
+                return 0;
         }
     }
 }

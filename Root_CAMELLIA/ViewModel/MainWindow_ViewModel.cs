@@ -40,8 +40,10 @@ namespace Root_CAMELLIA
         private void Init()
         {
             DataManager = DataManager.Instance;
+            //App.m_nanoView.InitializeSR();
+
             //NanoView = new Met.Nanoview();
-            //NanoView.InitializeSR(@".\Reference", 2000);
+            //NanoView.InitializeSR(@".\Reference", 2);
 
             App.m_engineer.Init("Camellia");
             ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia.Nanoview = NanoView;

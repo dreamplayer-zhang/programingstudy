@@ -30,10 +30,10 @@ namespace Root_EFEM.Module
             B,
         }
         public Dictionary<eArm, Arm> m_dicArm = new Dictionary<eArm, Arm>();
-        void InitArms(string id, IEngineer engineer)
+        protected virtual void InitArms(string id, IEngineer engineer)
         {
-            m_dicArm.Add(eArm.A, new Arm(id, eArm.A, this, engineer));
-            m_dicArm.Add(eArm.B, new Arm(id, eArm.B, this, engineer));
+            m_dicArm.Add(eArm.A, new Arm(id, eArm.A, this, engineer, true, false));
+            m_dicArm.Add(eArm.B, new Arm(id, eArm.B, this, engineer, true, false));
         }
 
         public class Arm : WTRArm
@@ -41,11 +41,11 @@ namespace Root_EFEM.Module
             public eArm m_eArm;
 
             WTR_Cymechs m_module;
-            public Arm(string id, eArm arm, WTR_Cymechs module, IEngineer engineer)
+            public Arm(string id, eArm arm, WTR_Cymechs module, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
             {
                 m_eArm = arm;
                 m_module = module;
-                Init(id + "." + arm.ToString(), engineer); 
+                Init(id + "." + arm.ToString(), engineer, bEnableWaferSize, bEnableWaferCount); 
             }
 
             public bool IsWaferExist()
@@ -690,6 +690,11 @@ namespace Root_EFEM.Module
 
         public override void ThreadStop()
         {
+            if (m_bRunSend)
+            {
+                m_bRunSend = false;
+                m_threadSend.Join(); 
+            }
             base.ThreadStop();
         }
 

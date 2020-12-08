@@ -34,10 +34,33 @@ namespace Root_EFEM.Module
             Upper,
         }
         public Dictionary<eArm, Arm> m_dicArm = new Dictionary<eArm, Arm>();
-        void InitArms(string id, IEngineer engineer)
+        protected virtual void InitArms(string id, IEngineer engineer)
         {
-            m_dicArm.Add(eArm.Lower, new Arm(id, eArm.Lower, this, engineer));
-            m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this, engineer));
+            m_dicArm.Add(eArm.Lower, new Arm(id, eArm.Lower, this, engineer, true, false));
+            m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this, engineer, true, false));
+        }
+
+        List<string> p_asArm
+        {
+            get
+            {
+                List<string> asArm = new List<string>();
+                foreach (Arm arm in m_dicArm.Values)
+                {
+                    if (arm.p_bEnable) asArm.Add(arm.m_eArm.ToString());
+                }
+                return asArm; 
+            }
+        }
+
+        void RunTreeArm(Tree tree, ref eArm eArm, bool bVisible)
+        {
+            string sArm = eArm.ToString();
+            sArm = tree.Set(sArm, sArm, p_asArm, "Arm", "Select WTR Arm", bVisible);
+            foreach (Arm arm in m_dicArm.Values)
+            {
+                if (arm.m_eArm.ToString() == sArm) eArm = arm.m_eArm; 
+            }
         }
 
         public class Arm : WTRArm
@@ -45,11 +68,11 @@ namespace Root_EFEM.Module
             public eArm m_eArm;
 
             WTR_RND m_module;
-            public Arm(string id, eArm arm, WTR_RND module, IEngineer engineer)
+            public Arm(string id, eArm arm, WTR_RND module, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
             {
                 m_eArm = arm;
                 m_module = module;
-                Init(id + "." + arm.ToString(), engineer);
+                Init(id + "." + arm.ToString(), engineer, bEnableWaferSize, bEnableWaferCount);
             }
 
             public string RunGrip(bool bGrip)
@@ -309,13 +332,11 @@ namespace Root_EFEM.Module
             MoveHome,   // 로봇 origin 위치로 이동
             Grip,       // Gripper on off
             Get,        // Pick up the wafer with the present finger
-            GetExt,     // WTR GET 세부동작1 팔 뻗고 Z축 Get 1단계 UP 동작 까지 수행
-            GetRet,     // WTR GET 세부동작2 Grip On 이후 Get 2단계 Up 후 팔 접는 동작까지 수행
             GetReady,
             Put,        // Place the wafer with the present finger
-            PutExt,     // WTR PUT 세부동작1 팔 뻗고 z축 PUT 1단계 Down 동작 까지 수행
-            PutRet,     // WTR PUT 세부동작2 Grip off 이후 Z축 PUT 2단계 Down 후 팔 접는 동작까지 수행
             PutReady,
+            Extend,
+            Retraction,
         };
         Dictionary<eCmd, string> m_dicCmd = new Dictionary<eCmd, string>();
         void InitCmd()
@@ -326,13 +347,11 @@ namespace Root_EFEM.Module
             m_dicCmd.Add(eCmd.MoveHome, "HOME");
             m_dicCmd.Add(eCmd.Grip, "GRIP");
             m_dicCmd.Add(eCmd.Get, "GET");
-            m_dicCmd.Add(eCmd.GetExt, "GAEXTA");
-            m_dicCmd.Add(eCmd.GetRet, "GARETA");
             m_dicCmd.Add(eCmd.GetReady, "GRDT");
             m_dicCmd.Add(eCmd.Put, "PUT");
-            m_dicCmd.Add(eCmd.PutExt, "PAEXTA");
-            m_dicCmd.Add(eCmd.PutRet, "PARETA");
             m_dicCmd.Add(eCmd.PutReady, "PRDY");
+            m_dicCmd.Add(eCmd.Extend, "EXTA");
+            m_dicCmd.Add(eCmd.Retraction, "RETA");
         }
 
         string ReplyCmd(string[] sMsgs)
@@ -389,7 +408,7 @@ namespace Root_EFEM.Module
         }
 
         eCmd m_eSendCmd = eCmd.None;
-        string WriteCmd(eCmd cmd, params object[] objs)
+        protected string WriteCmd(eCmd cmd, params object[] objs)
         {       
             if (EQ.IsStop()) return "EQ Stop";
             Thread.Sleep(10);
@@ -419,7 +438,7 @@ namespace Root_EFEM.Module
             return "OK";
         }
 
-        string WaitReply(int secTimeout)
+        protected string WaitReply(int secTimeout)
         {
             try
             {
@@ -497,7 +516,7 @@ namespace Root_EFEM.Module
             RunTree(Tree.eMode.Init);
         }
 
-        IWTRChild GetChild(string sChild)
+        protected IWTRChild GetChild(string sChild)
         {
             foreach (IWTRChild child in m_aChild)
             {
@@ -506,14 +525,14 @@ namespace Root_EFEM.Module
             return null;
         }
 
-        List<string> GetChildSlotNames(string sChild)
+        protected List<string> GetChildSlotNames(string sChild)
         {
             IWTRChild child = GetChild(sChild);
             if (child == null) return null;
             return child.p_asChildSlot;
         }
 
-        int GetChildSlotID(string sChild, string sChildSlot)
+        protected int GetChildSlotID(string sChild, string sChildSlot)
         {
             List<string> asChildSlot = GetChildSlotNames(sChild);
             if (asChildSlot == null) return 0;
@@ -656,7 +675,7 @@ namespace Root_EFEM.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible);
+                m_module.RunTreeArm(tree, ref m_eArm, bVisible); 
                 m_bGrip = tree.Set(m_bGrip, m_bGrip, "Grip", "Grip Arm Grip", bVisible);
             }
 
@@ -689,7 +708,7 @@ namespace Root_EFEM.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible && !bRecipe);
+                m_module.RunTreeArm(tree, ref m_eArm, bVisible && !bRecipe);
                 m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
                 List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild);
                 if ((asChildSlot != null) && (asChildSlot.Count > 0))
@@ -767,7 +786,7 @@ namespace Root_EFEM.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eArm = (eArm)tree.Set(m_eArm, m_eArm, "Arm", "Select WTR Arm", bVisible && !bRecipe);
+                m_module.RunTreeArm(tree, ref m_eArm, bVisible && !bRecipe);
                 m_sChild = tree.Set(m_sChild, m_sChild, m_module.m_asChild, "Child", "WTR Child Name", bVisible);
                 List<string> asChildSlot = m_module.GetChildSlotNames(m_sChild);
                 if ((asChildSlot != null) && (asChildSlot.Count > 0))

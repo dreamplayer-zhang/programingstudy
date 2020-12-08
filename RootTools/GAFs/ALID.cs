@@ -50,21 +50,25 @@ namespace RootTools.GAFs
                 if (_bSet == value) return;
                 if (p_nID < 0) return; 
                 _bSet = value;
-                if (m_log != null) m_log.Error(m_sID + "." + p_sMsg + " = " + _bSet.ToString());
-                if (m_gem != null) m_gem.SetAlarm(this, _bSet);
                 p_dateTime = DateTime.Now;
-                OnPropertyChanged();
-                if (value && p_bEQError)
+				OnPropertyChanged();
+				if (value && p_bEQError)
                 {
-                    m_listALID.SetALID(this);
-                    m_sqALID.Insert();
-                    EQ.p_eState = EQ.eState.Error;
-                    EQ.p_bStop = true;
-                }
-            }
-        }
+						if (m_log != null) m_log.Error(m_sID + "." + p_sMsg + " = " + _bSet.ToString());
+						if (m_gem != null) m_gem.SetAlarm(this, _bSet);
+						m_listALID.SetALID(this);
+						m_sqALID.Insert();
+						EQ.p_eState = EQ.eState.Error;
+						EQ.p_bStop = true;
+				}
+				else
+				{
+					if (m_log != null) m_log.Info(m_sID + "." + p_sMsg + " = " + _bSet.ToString());
+				}
+			}
+		}
 
-        bool _bEQError = false;
+		bool _bEQError = false;
         public bool p_bEQError
         {
             get { return _bEQError; }

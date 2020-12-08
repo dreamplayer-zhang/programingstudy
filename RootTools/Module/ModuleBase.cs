@@ -53,7 +53,6 @@ namespace RootTools.Module
                 EQ.p_sInfo = p_id + " : " + value; 
             }
         }
-
         public bool Run(string sInfo)
         {
             p_sInfo = sInfo;
@@ -205,6 +204,7 @@ namespace RootTools.Module
                     if (sStateRun != "OK")
                     {
                         p_eState = eState.Error;
+                        EQ.p_bStop = true;
                         m_qModuleRun.Clear();
                     }
                     if (m_qModuleRun.Count == 0) p_eState = eState.Ready;

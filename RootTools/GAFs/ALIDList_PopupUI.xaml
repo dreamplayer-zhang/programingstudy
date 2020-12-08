@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RootTools.GAFs"
         mc:Ignorable="d"
-        Title="Alarm" Height="900" Width="1200" 
+        Title="Alarm" Height="600" Width="900" 
         Visibility="Visible" 
         Background="{StaticResource BackGround}"
         WindowStyle="None"
@@ -48,8 +48,8 @@
             </Style>
         </Grid.Style>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="87*"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="60*"/>
             <RowDefinition Height="13*"/>
         </Grid.RowDefinitions>
         <Grid Grid.ColumnSpan="100"
@@ -97,21 +97,20 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0" Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Button Grid.Row="0" x:Name="buttonClearALID" Content="Clear All ALID" Margin="2" Click="buttonClearALID_Click"
-                    Style="{StaticResource BasicBtn}"/>
-                <ListView Grid.Row="1" x:Name="listViewALID" Margin="2"
+
+                <ListView Grid.Row="1" x:Name="listViewALID" Margin="2,2,2,0"
                       Background="Transparent"
                       Foreground="{StaticResource TextForeGround}">
                     <ListView.View>
-                        <GridView ColumnHeaderContainerStyle="{StaticResource ResourceKey=BasicGridViewColumn}">
-                            <GridViewColumn Header="Time"
+                        <GridView ColumnHeaderContainerStyle="{StaticResource ResourceKey=BasicGridViewColumn}" >
+                            <GridViewColumn Width="200" Header="Time"
                                         HeaderTemplate="{StaticResource header}">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
@@ -119,7 +118,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="ALID"
+                            <GridViewColumn Width="70" Header="ALID"
                                         HeaderTemplate="{StaticResource header}">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
@@ -139,25 +138,28 @@
                       Width="2"/>
             <Grid Grid.Column="2" Grid.Row="1">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="2*"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="0.8*"/>
+                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="6*"/>
                 </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Background="AliceBlue">
+                <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="1" Grid.RowSpan="3"/>
+                <Grid Grid.Row="0" Background="DimGray">
+                    <Label Content="Alarm Description" Foreground="White" HorizontalAlignment="Center" 
+                           VerticalAlignment="Top" FontSize="18"/>
+                </Grid>
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
                     <Label Content=" "/>
-                    <Label x:Name="lableALID" Content="{Binding p_nID}" ToolTip="ALID"/>
-                    <Label x:Name="lableModule" Content="{Binding p_sModule}" ToolTip="Module"/>
-                    <Label x:Name="lableDesc" Content="{Binding p_sDesc}" ToolTip="Description"/>
-                    <Label x:Name="lableMsg" Content="{Binding p_sMsg}" ToolTip="Message"/>
+                    <Label x:Name="lableALID" Content="{Binding p_nID}" ToolTip="ALID" Foreground="White" FontSize="20"/>
+                    <Label x:Name="lableModule" Content="{Binding p_sModule}" ToolTip="Module" Foreground="White" FontSize="20"/>
+                    <Label x:Name="lableDesc" Content="{Binding p_sDesc}" ToolTip="Description" Foreground="White" FontSize="20"/>
                 </StackPanel>
-                <Image Grid.Row="1" x:Name="imageALID" Stretch="Uniform"  Source="{Binding p_image}"/>
-                <TextBlock Text="Image"
-                           Grid.Row="1"
-                           Style="{StaticResource BasicTb}"/>
-                <Grid Grid.Row="2" Background="DimGray">
-                    <TextBlock Text="Description"
-                               Foreground="Black"
-                               Style="{StaticResource BasicTb}"/>
+                <Grid Grid.Row="2" Background="AliceBlue">
+                </Grid>
+                <Grid Grid.Row="3" >
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <Label x:Name="lableMsg" Content="{Binding p_sMsg}" ToolTip="Message" Foreground="White" FontSize="20"/>
+                    </StackPanel>
                 </Grid>
             </Grid>
         </Grid>
@@ -166,12 +168,15 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Button Content="Recovery" Margin="15" Grid.Column="1" x:Name="buttonRecovery"
+            <Button x:Name="buttonClearALID" Content="Clear All ALID" Grid.Row="0" Margin="15" Click="buttonClearALID_Click"
+                    Style="{StaticResource BasicBtn}"/>
+            <Button Content="Recovery" Margin="15" Grid.Column="2" x:Name="buttonRecovery"
                     Style="{StaticResource BasicBtn}" Click="buttonRecovery_Click"/>
-            <Button Content="Buzzer Off" Margin="15" Grid.Column="0" x:Name="buttonBuzzerOff"
+            <Button Content="Buzzer Off" Margin="15" Grid.Column="1" x:Name="buttonBuzzerOff"
                     Style="{StaticResource BasicBtn}" Click="buttonBuzzerOff_Click"/>
-            <Button Content="Continue" Margin="15" Grid.Column="2" Click="Button_Click"
+            <Button Content="Continue" Margin="15" Grid.Column="3" Click="Button_Click"
                     Style="{StaticResource BasicBtn}"/>
 
         </Grid>

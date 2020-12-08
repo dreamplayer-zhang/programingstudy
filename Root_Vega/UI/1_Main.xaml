@@ -334,7 +334,7 @@
                                         <Grid Grid.Row="0" Margin="0,0,0,0" DataContext="{Binding p_Handler.p_FDC}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="20"/>
-                                                <RowDefinition/>
+                                                <RowDefinition />
                                             </Grid.RowDefinitions>
                                             <Border>
                                                 <TextBlock Text="FDC"
@@ -346,8 +346,9 @@
                                             <Grid Grid.Row="1"
                                             Background="{StaticResource TextForeGround}">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="200*"/>
+                                                    <ColumnDefinition Width="100*"/>
+                                                    <ColumnDefinition Width="100*"/>
                                                 </Grid.ColumnDefinitions>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition/>
@@ -382,11 +383,11 @@
                                                 Style="{StaticResource BasicTb}"
                                                 FontWeight="Bold"
                                                 Foreground="{StaticResource Black}"/>
-
                                                 <!--<TextBlock Text="{Binding p_aData[0].p_fValue}"-->
                                                 <TextBlock Text="{Binding p_aData[0].p_fValue}" x:Name="FDCText1"
                                                    Grid.Column="1"
                                                    Grid.Row="0"
+                                                   HorizontalAlignment="Right"
                                                    Style="{StaticResource BasicTb}"
                                                    Foreground="{StaticResource Black}">
                                                 </TextBlock>
@@ -394,20 +395,65 @@
                                                    Foreground="{StaticResource Black}"
                                                    Grid.Column="1"
                                                    Grid.Row="1"
+                                                   HorizontalAlignment="Right"
                                                    Style="{StaticResource BasicTb}"/>
                                                 <TextBlock Text="{Binding p_aData[2].p_fValue}" x:Name="FDCText3"
                                                    Grid.Column="1"
                                                    Grid.Row="2"
+                                                   HorizontalAlignment="Right"
                                                    Foreground="{StaticResource Black}"
                                                    Style="{StaticResource BasicTb}"/>
                                                 <TextBlock Text="{Binding p_aData[3].p_fValue}" x:Name="FDCText4"
                                                    Grid.Column="1"
                                                    Grid.Row="3"
+                                                   HorizontalAlignment="Right"
                                                    Foreground="{StaticResource Black}"
                                                    Style="{StaticResource BasicTb}"/>
                                                 <TextBlock Text="{Binding p_aData[4].p_fValue}" x:Name="FDCText5"
                                                    Grid.Column="1"
                                                    Grid.Row="4"
+                                                   HorizontalAlignment="Right"
+                                                   Style="{StaticResource BasicTb}"
+                                                   Foreground="{StaticResource Black}"/>
+                                                <TextBlock Text="{Binding p_aData[0].p_sUnit}" 
+                                                   Grid.Column="2"
+                                                   Grid.Row="0"
+                                                   HorizontalAlignment="Left"
+                                                           Margin="10"
+                                                           FontSize="9"
+                                                   Style="{StaticResource BasicTb}"
+                                                   Foreground="{StaticResource Black}">
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding p_aData[1].p_sUnit}"
+                                                   Foreground="{StaticResource Black}"
+                                                   Grid.Column="2"
+                                                   Grid.Row="1"
+                                                   HorizontalAlignment="Left"
+                                                           Margin="10"
+                                                           FontSize="9"
+                                                   Style="{StaticResource BasicTb}"/>
+                                                <TextBlock Text="{Binding p_aData[2].p_sUnit}"
+                                                   Grid.Column="2"
+                                                   Grid.Row="2"
+                                                   HorizontalAlignment="Left"
+                                                           Margin="10"
+                                                           FontSize="9"
+                                                   Foreground="{StaticResource Black}"
+                                                   Style="{StaticResource BasicTb}"/>
+                                                <TextBlock Text="{Binding p_aData[3].p_sUnit}"
+                                                   Grid.Column="2"
+                                                   Grid.Row="3"
+                                                   HorizontalAlignment="Left"
+                                                           Margin="10"
+                                                           FontSize="9"
+                                                   Foreground="{StaticResource Black}"
+                                                   Style="{StaticResource BasicTb}"/>
+                                                <TextBlock Text="{Binding p_aData[4].p_sUnit}"
+                                                   Grid.Column="2"
+                                                   Grid.Row="4"
+                                                   HorizontalAlignment="Left"
+                                                           Margin="10"
+                                                           FontSize="9"
                                                    Style="{StaticResource BasicTb}"
                                                    Foreground="{StaticResource Black}"/>
                                             </Grid>
