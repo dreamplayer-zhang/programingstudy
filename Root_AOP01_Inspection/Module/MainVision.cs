@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-﻿using RootTools;
-=======
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
