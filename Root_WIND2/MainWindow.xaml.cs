@@ -126,8 +126,6 @@ namespace Root_WIND2
 
         public IDialogService dialogService;
 
-        private ProgramManager program;
-
         void Init()
         {
             dialogService = new DialogService(this);
