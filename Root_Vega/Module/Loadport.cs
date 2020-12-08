@@ -29,7 +29,6 @@ namespace Root_Vega.Module
         public DIO_IO m_dioUnload;
         public DIO_O m_doAlarm;
         public DIO_I m_diIonizer;
-        public DIO_O m_doIonizerOnOff;
         //        public DIO_Os m_doPodCylinder;
         public OHT_Semi m_OHT;
 
@@ -49,7 +48,6 @@ namespace Root_Vega.Module
             p_sInfo = m_toolBox.Get(ref m_dioLoad, this, "Load");
             p_sInfo = m_toolBox.Get(ref m_dioUnload, this, "Unload");
             p_sInfo = m_toolBox.Get(ref m_doAlarm, this, "Alarm");
-            p_sInfo = m_toolBox.Get(ref m_doIonizerOnOff, this, "IonizerOnOff");
             //            p_sInfo = m_toolBox.Get(ref m_doPodCylinder, this, "Alarm", Enum.GetNames(typeof(ePodCylinder)));
             p_sInfo = m_toolBox.Get(ref m_OHT, this, m_infoPod, "OHT");
             if (bInit)
@@ -240,7 +238,7 @@ namespace Root_Vega.Module
 			if (m_vega.m_diDoorLock.p_bIn == true)//check
 			{
 				m_bIonizerDoorlockCheck = true;
-				m_doIonizerOnOff.Write(true);//check
+				m_vega.m_doIonizerOnOff.Write(true);//check
                 p_eIonizerState = true;
 				Thread.Sleep(20);
 				if (m_diIonizer.p_bIn != true) return "Ionizer is not On";//check
@@ -254,13 +252,13 @@ namespace Root_Vega.Module
 
         public string BeforePut()
         {
-            if (m_vega.m_diDoorLock.p_bIn == true)//check
+            if (m_vega.m_diDoorLock.p_bIn == true)
             {
                 m_bIonizerDoorlockCheck = true;
-                m_doIonizerOnOff.Write(true);//check
+                m_vega.m_doIonizerOnOff.Write(true);
                 p_eIonizerState = true;
                 Thread.Sleep(20);
-                if (m_diIonizer.p_bIn != true) return "Ionizer is not On";//check
+                if (m_diIonizer.p_bIn != true) return "Ionizer is not On";
             }
             if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
@@ -271,7 +269,7 @@ namespace Root_Vega.Module
 
         public string AfterGet()
         {
-            m_doIonizerOnOff.Write(false);//check
+            m_vega.m_doIonizerOnOff.Write(false);
             m_bIonizerDoorlockCheck = false;
             p_eIonizerState = false;
             Thread.Sleep(20);
@@ -282,7 +280,7 @@ namespace Root_Vega.Module
 
         public string AfterPut()
         {
-            m_doIonizerOnOff.Write(false);//check
+            m_vega.m_doIonizerOnOff.Write(false);
             m_bIonizerDoorlockCheck = false;
             p_eIonizerState = false;
             Thread.Sleep(20);
@@ -561,7 +559,9 @@ namespace Root_Vega.Module
 
             m_axisZ.p_eState = Axis.eState.Ready;
             m_axisTheta.p_eState = Axis.eState.Ready;
-            m_doIonizerOnOff.Write(true);//check
+            m_vega.m_doIonizerOnOff.Write(false);//check
+            p_eIonizerState = false;
+
         }
 
         public override void ThreadStop()

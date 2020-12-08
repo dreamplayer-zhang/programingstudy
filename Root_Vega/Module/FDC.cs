@@ -91,7 +91,7 @@ namespace Root_Vega.Module
 
             int m_nDigit = 2;
             double m_fDiv = 100;
-            public CPoint m_mmLimit = new CPoint(); 
+            public RPoint m_mmLimit = new RPoint(); 
             ALID[] m_alid = new ALID[2] { null, null };
 			public bool p_bAlarm
 			{

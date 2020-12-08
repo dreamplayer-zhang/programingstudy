@@ -52,8 +52,8 @@ namespace Root_Vega
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            borderPlaced.Background = m_loadport.m_dioPlaced.p_bIn ? Brushes.LightGreen : null;
-            borderPresent.Background = m_loadport.m_dioPresent.p_bIn ? Brushes.LightGreen : null;
+            borderPlaced.Background = m_loadport.m_dioPlaced.p_bIn ? null : Brushes.LightGreen;
+            borderPresent.Background = m_loadport.m_dioPresent.p_bIn ? null : Brushes.LightGreen;
             borderLoad.Background = m_loadport.m_dioLoad.p_bIn ? Brushes.LightGreen : null;
             borderUnload.Background = m_loadport.m_dioUnload.p_bIn ? Brushes.LightGreen : null;
             borderAlarm.Background = (m_loadport.p_eState == ModuleBase.eState.Error) ? Brushes.Red : null;
@@ -69,7 +69,9 @@ namespace Root_Vega
             {
                 if (m_loadport.m_diIonizer.p_bIn)
                 {
-                    m_loadport.m_doIonizerOnOff.Write(false);
+                    m_handler.m_vega.m_doIonizerOnOff.Write(false);
+                    m_loadport.p_eIonizerState = false;
+
                     Thread.Sleep(20);
                     if (m_loadport.m_diIonizer.p_bIn != false) EQ.p_bStop = true;
                 }
