@@ -95,7 +95,8 @@ namespace Root_WIND2
             set
             {
                 SetProperty(ref m_selectedInspItem, value);
-                p_selectedMethodItem = m_selectedInspItem.p_cInspMethod[0];
+                if(m_selectedInspItem != null)
+                    p_selectedMethodItem = m_selectedInspItem.p_InspMethod;
             }
         }
 
@@ -136,7 +137,38 @@ namespace Root_WIND2
             SetParameter();
         }
 
+        public void LoadSpec()
+        {
+            p_cInspItem.Clear();
 
+            foreach(ParameterBase parameterBase in m_Recipe.ParameterItemList)
+            {
+                InspectionItem item = new InspectionItem();
+                item.p_cMask = p_cMask;
+                item.p_cInspMethod = CloneMethod();
+
+                int selectMethod = 0;
+                for (int i = 0; i < item.p_cInspMethod.Count; i++)
+                {
+                    if (item.p_cInspMethod[i].InspectionType.Name == parameterBase.InspectionType.Name)
+                    {
+                        item.p_cInspMethod[i] = (ParameterBase)parameterBase.Clone();
+                        selectMethod = i;
+                        break;
+                    }
+                }
+
+                item.p_InspMethod = item.p_cInspMethod[selectMethod];
+
+                item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
+                item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
+                p_cInspItem.Add(item);
+
+                p_selectedInspItem = p_cInspItem[0];
+            }
+
+            var asdf = m_front.p_ROI_VM;   
+        }
 
         public void SetParameter()
         {

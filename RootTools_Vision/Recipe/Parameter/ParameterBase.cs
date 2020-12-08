@@ -87,6 +87,11 @@ namespace RootTools_Vision
             return 0;
         }
 
+        public void CopyTo(ParameterBase other)
+        {
+            other = (ParameterBase)this.MemberwiseClone();
+        }
+
         // string과 같이 Value타입이 아니라 refence 타입인 경우(new로 생성되는 경우 clone 함수 작성시 따로 생성해야합니다)
         public abstract object Clone();
 
