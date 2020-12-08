@@ -2092,10 +2092,10 @@ namespace Root_Vega.Module
                         // Theta 회전
                         double dPosTheta = 0.0;
                         InspectionTarget eNewTarget = lstDefectInfo[i].eTarget;
-                        if (eNewTarget == InspectionTarget.SideInspectionBottom) dPosTheta = (int)eScanPos.Bottom * 360000 / 4;
-                        else if (eNewTarget == InspectionTarget.SideInspectionLeft) dPosTheta = (int)eScanPos.Left * 360000 / 4;
-                        else if (eNewTarget == InspectionTarget.SideInspectionTop) dPosTheta = (int)eScanPos.Top * 360000 / 4;
-                        else if (eNewTarget == InspectionTarget.SideInspectionRight) dPosTheta = (int)eScanPos.Right * 360000 / 4;
+                        if (eNewTarget == InspectionTarget.SideInspectionBottom) dPosTheta = m_module.m_aLADSThetaPos[0];       // Bottom
+                        else if (eNewTarget == InspectionTarget.SideInspectionLeft) dPosTheta = m_module.m_aLADSThetaPos[1];    // Left
+                        else if (eNewTarget == InspectionTarget.SideInspectionTop) dPosTheta = m_module.m_aLADSThetaPos[2];     // Top
+                        else if (eNewTarget == InspectionTarget.SideInspectionRight) dPosTheta = m_module.m_aLADSThetaPos[3];   // Right
                         else dPosTheta = 0.0;
 
                         if (eNewTarget != eOldTarget)   // 이전 촬영면과 다를 경우 Theta가 돌기 때문에 X축을 안전위치로 뺀다.
