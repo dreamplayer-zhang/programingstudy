@@ -15,6 +15,11 @@ namespace RootTools.Camera.Dalsa
     {
         public event EventHandler Grabed;
 
+        enum ResourceIdx
+        {
+            Gray=0,
+            Color,
+        }
         #region Property
         public string p_id { get; set; }
 
