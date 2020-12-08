@@ -352,6 +352,7 @@ namespace Root_Vega.Module
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // 레티클 유무 체크
+            if(m_diSideReticleExistSensor.p_bIn == false) return "Reticle Not Exist";
             StopWatch sw = new StopWatch();
             string strLightName = "Align1_1";
             SetLightByName(strLightName, 10);
@@ -443,6 +444,7 @@ namespace Root_Vega.Module
             if (Run(m_axisXY.WaitReady())) return p_sInfo;
 
             // 레티클 유무 체크
+            if (m_diSideReticleExistSensor.p_bIn == true) return "Reticle Exist";
             StopWatch sw = new StopWatch();
             string strLightName = "Align1_1";
             SetLightByName(strLightName, 10);
@@ -540,7 +542,7 @@ namespace Root_Vega.Module
             if (bIgnoreExistSensor) bExist = (p_infoReticle != null);
             else
             {
-                //bExist = m_diSideReticleExistSensor.p_bIn; //check
+                bExist = m_diSideReticleExistSensor.p_bIn; //check
             }
             p_brushReticleExist = bExist ? Brushes.Yellow : Brushes.Green;
             return bExist;
