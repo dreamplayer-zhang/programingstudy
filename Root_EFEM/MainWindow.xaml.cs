@@ -38,10 +38,5 @@ namespace Root_EFEM
         {
             m_engineer.ThreadStop();
         }
-
-        private void ALIDList_Click(object sender, RoutedEventArgs e)
-        {
-            m_engineer.m_gaf.m_listALID.ShowPopup();
-        }
     }
 }

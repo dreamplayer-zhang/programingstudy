@@ -189,6 +189,12 @@
       <HintPath>..\packages\Dirkster.NumericUpDownLib.2.4.2\lib\net40\NumericUpDownLib.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
+    <Reference Include="ScottPlot, Version=4.0.45.0, Culture=neutral, PublicKeyToken=86698dc10387c39e, processorArchitecture=MSIL">
+      <HintPath>..\packages\ScottPlot.4.0.45\lib\netstandard2.0\ScottPlot.dll</HintPath>
+    </Reference>
+    <Reference Include="ScottPlot.WinForms, Version=4.0.45.0, Culture=neutral, PublicKeyToken=5df1dfa5321e734b, processorArchitecture=MSIL">
+      <HintPath>..\packages\ScottPlot.WinForms.4.0.45\lib\net472\ScottPlot.WinForms.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Activities" />
     <Reference Include="System.Activities.Presentation" />
@@ -212,6 +218,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
     <Reference Include="WriteableBitmapEx.Wpf, Version=1.5.0.0, Culture=neutral, PublicKeyToken=50375ca6144f1c69, processorArchitecture=MSIL">
       <HintPath>..\packages\WriteableBitmapEx.1.5.1.0\lib\net40\WriteableBitmapEx.Wpf.dll</HintPath>
     </Reference>
@@ -226,6 +233,7 @@
     </ApplicationDefinition>
     <Compile Include="BaseDefine.cs" />
     <Compile Include="Converter\AxisConverter.cs" />
+    <Compile Include="Data\Calibration.cs" />
     <Compile Include="Data\WaferCentering.cs" />
     <Compile Include="ViewModel\Dlg_PM_ViewModel.cs" />
     <Compile Include="UI_Engineer\Camellia_Engineer_UI.xaml.cs">
@@ -362,6 +370,10 @@
     <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
       <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
       <Name>RootTools_CLR</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Root_EFEM\Root_EFEM.csproj">
+      <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
+      <Name>Root_EFEM</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

@@ -173,11 +173,11 @@ namespace RootTools.Gem
             get { return _sRecipe; }
             set
             {
-                _sRecipe = value;
+                string[] recipe_path = value.Split('\\');
+                _sRecipe = recipe_path[3];
                 OnPropertyChanged(); 
             }
         }
-
         public List<GemPJ> m_aPJ = new List<GemPJ>(); 
         public void AddPJ(GemPJ pj)
         {

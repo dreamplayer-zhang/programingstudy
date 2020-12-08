@@ -189,7 +189,9 @@
     <Compile Include="Module\Vision.cs" />
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\MainVision.cs" />
+    <Compile Include="Module\WTR.cs" />
     <Compile Include="MVVM\Helper.cs" />
+    <Compile Include="ProgramManager.cs" />
     <Compile Include="UI\1. SETUP\3. Maintenance\ViewerTest.xaml.cs">
       <DependentUpon>ViewerTest.xaml</DependentUpon>
     </Compile>
@@ -407,6 +409,10 @@
     <ProjectReference Include="..\RootTools\RootTools.csproj">
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RootTools_Vision\RootTools_Vision.csproj">
+      <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
+      <Name>RootTools_Vision</Name>
     </ProjectReference>
     <ProjectReference Include="..\Root_EFEM\Root_EFEM.csproj">
       <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>

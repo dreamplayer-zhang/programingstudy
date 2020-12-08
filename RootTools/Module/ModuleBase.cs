@@ -28,7 +28,7 @@ namespace RootTools.Module
             set
             {
                 if (_eState.ToString() == value.ToString()) return;
-                p_sInfo = "State : " + _eState.ToString() + " -> " + value.ToString(); 
+                m_log.Info("State : " + _eState.ToString() + " -> " + value.ToString()); 
                 _eState = value;
                 EQ.p_bPause = false;
                 OnPropertyChanged(); 
@@ -53,7 +53,6 @@ namespace RootTools.Module
                 EQ.p_sInfo = p_id + " : " + value; 
             }
         }
-
         public bool Run(string sInfo)
         {
             p_sInfo = sInfo;
@@ -205,6 +204,7 @@ namespace RootTools.Module
                     if (sStateRun != "OK")
                     {
                         p_eState = eState.Error;
+                        EQ.p_bStop = true;
                         m_qModuleRun.Clear();
                     }
                     if (m_qModuleRun.Count == 0) p_eState = eState.Ready;

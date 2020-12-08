@@ -33,7 +33,7 @@
                         <ColumnDefinition Width="25*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Grid Grid.Column="0" DataContext="{Binding m_ImageViewer_VM}">
+                    <Grid Grid.Column="0" DataContext="{Binding p_ROI_Viewer}">
                         <GroupBox Header="Mask"
                               Background="{StaticResource GroupBoxBackground}">
                             <Grid>
@@ -42,38 +42,30 @@
                                     <RowDefinition Height="85*"/>
                                 </Grid.RowDefinitions>
                                 <ScrollViewer Grid.Row="0">
-                                    <DataGrid ItemsSource="{Binding p_cMask}"
-                                              SelectionMode="Single"
-                                              IsReadOnly="True"
-                                              AutoGenerateColumns="False">
+                                    <!--<DataGrid ItemsSource="{Binding p_cInspROI}" SelectionMode="Single" IsReadOnly="True" AutoGenerateColumns="False">
                                         <DataGrid.Resources>
-                                            <CollectionViewSource Source="{Binding p_cMask}" x:Key="masks"/>
+                                            <CollectionViewSource Source="{Binding p_cInspROI}" x:Key="ROI" />
                                             <Style TargetType="DataGridColumnHeader">
-                                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                <Setter Property="HorizontalContentAlignment" Value="Center" />
                                             </Style>
-                                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
-                                                             Color="Gainsboro"/>
+                                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Gainsboro" />
                                         </DataGrid.Resources>
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="No." Width="35" 
-                                                            Binding="{Binding Converter={StaticResource IndexConverter},    
-                                                            ConverterParameter={StaticResource ResourceKey=masks}}"/>
-                                            <DataGridTextColumn Header="Mask" Width="*" Binding="{Binding p_sName}"/>
+                                            <DataGridTextColumn Header="No." Width="35" Binding="{Binding Converter={StaticResource IndexConverter},    
+                                                            ConverterParameter={StaticResource ResourceKey=ROI}}" />
+                                            <DataGridTextColumn Header="Mask" Width="*" Binding="{Binding p_sName}" />
                                             <DataGridTemplateColumn Header="Color" Width="*">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Grid Margin="1" Opacity="0.5"
-                                                          Background="{Binding p_Color, Converter={StaticResource ColorConverter}}"/>
+                                                        <Grid Margin="1" Opacity="0.5" Background="{Binding p_Color, Converter={StaticResource ColorConverter}}" />
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
 
                                         </DataGrid.Columns>
-                                    </DataGrid>
+                                    </DataGrid>-->
                                 </ScrollViewer>
-
-
                                 <tools:RootViewer Grid.Row="1"/>
                             </Grid>
                         </GroupBox>

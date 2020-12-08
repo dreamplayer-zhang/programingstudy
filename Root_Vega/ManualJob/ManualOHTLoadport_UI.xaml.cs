@@ -27,16 +27,32 @@ namespace Root_Vega.ManualJob
             SetBrush(buttonAccessAuto, m_loadport.m_infoPod.p_bAccessLP_Auto && p_bBlink);
         }
 
+        void changeLPState(GemCarrierBase.eAccessLP State)
+		{
+            if (State == GemCarrierBase.eAccessLP.Auto)
+            {
+                m_loadport.m_doAuto.Write(true);
+                m_loadport.m_doManual.Write(false);
+            }
+            else if(State == GemCarrierBase.eAccessLP.Manual)
+			{
+                m_loadport.m_doAuto.Write(false);
+                m_loadport.m_doManual.Write(true);
+            }
+		}
+
         private void buttonAccessManual_Click(object sender, RoutedEventArgs e)
         {
             m_loadport.m_infoPod.p_eReqAccessLP = GemCarrierBase.eAccessLP.Manual;
+            changeLPState(GemCarrierBase.eAccessLP.Manual);
             m_OHT.m_bAuto = false;
         }
 
         private void buttonAccessAuto_Click(object sender, RoutedEventArgs e)
         {
             m_loadport.m_infoPod.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto;
-            if(!m_loadport.m_dioPlaced.p_bIn || !m_loadport.m_dioPresent.p_bIn)
+            changeLPState(GemCarrierBase.eAccessLP.Auto);
+            if (!m_loadport.m_dioPlaced.p_bIn || !m_loadport.m_dioPresent.p_bIn)
             {
                 m_OHT.m_bPODExist = true;
             }
@@ -58,6 +74,17 @@ namespace Root_Vega.ManualJob
             bool bPodIn = p_bBlink ? !m_loadport.m_dioPlaced.p_bIn : !m_loadport.m_dioPresent.p_bIn;
             imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
             imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;
+            if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
+            {
+                m_loadport.m_dioLoad.Write(true);
+                m_loadport.m_dioUnload.Write(false);
+            }
+            else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
+            {
+                m_loadport.m_dioLoad.Write(false);
+                m_loadport.m_dioUnload.Write(true);
+            }
+
         }
 
         void SetBrush(Button button, bool bOn)
@@ -179,10 +206,12 @@ namespace Root_Vega.ManualJob
 
         Loadport m_loadport;
         OHT_Semi m_OHT; 
+        GemCarrierBase m_carrier = null;
         public void Init(Loadport loadport)
         {
             m_loadport = loadport;
-            m_OHT = loadport.m_OHT; 
+            m_OHT = loadport.m_OHT;
+            m_carrier = loadport.m_infoPod;
             DataContext = loadport.m_OHT;
 
             m_timer.Interval = TimeSpan.FromSeconds(0.1);

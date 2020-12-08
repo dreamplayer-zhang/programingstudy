@@ -2,7 +2,6 @@
 using RootTools;
 using RootTools.Memory;
 using RootTools_Vision;
-using RootTools_Vision;
 using System;
 using System.Collections.Generic;
 using System.IO;

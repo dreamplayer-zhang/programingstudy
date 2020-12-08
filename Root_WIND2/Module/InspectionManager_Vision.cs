@@ -46,7 +46,7 @@ namespace Root_WIND2
         protected override void InitWorkManager()
         {
             this.Add(new WorkManager("Position", WORK_TYPE.PREPARISON, WORKPLACE_STATE.READY, WORKPLACE_STATE.SNAP, STATE_CHECK_TYPE.CHIP));
-            this.Add(new WorkManager("Inspection", WORK_TYPE.MAINWORK, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, STATE_CHECK_TYPE.CHIP, 8));
+            this.Add(new WorkManager("Inspection", WORK_TYPE.MAINWORK, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, STATE_CHECK_TYPE.CHIP, 1));
             this.Add(new WorkManager("ProcessDefect", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION, STATE_CHECK_TYPE.CHIP));
             this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS_WAFER, WORKPLACE_STATE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
 
@@ -103,7 +103,8 @@ namespace Root_WIND2
 
                 workBundle = WorkBundle.CreateWorkBundle(_recipe, workplaceBundle);
 
-                this.SetBundles(workBundle, workplaceBundle);
+                if(this.SetBundles(workBundle, workplaceBundle) == false)
+                    return false;
             }
             catch (Exception ex)
             {
