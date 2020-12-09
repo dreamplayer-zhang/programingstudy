@@ -3,6 +3,7 @@ using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
+using System.Threading;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -78,6 +79,7 @@ namespace Root_AOP01_Inspection.Module
                 m_module.m_doClean.Write(true);
                 if (m_module.Run(m_module.WriteCmd(eCmd.Extend, teachClean, 1))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                Thread.Sleep(1000);
                 if (m_module.Run(m_module.WriteCmd(eCmd.Retraction))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 m_module.m_doClean.Write(false); 

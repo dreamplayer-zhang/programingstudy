@@ -54,7 +54,7 @@
                                 <StackPanel Margin="10" x:Name ="Loadport1">
                                     <Label Content="Wait Start"
                                            Style="{StaticResource BasicLabel}"
-                                           Background="{Binding m_runReadPodID.p_eRunState ,Converter={StaticResource SequenceStateToColorConverters}}"
+                                           Background="{Binding m_dioPresent.p_bIn ,Converter={StaticResource SequenceStateToColorConverters}}"
                                            Height="40"/>
                                     <Label Content="RFID Read"
                                            Style="{StaticResource BasicLabel}"

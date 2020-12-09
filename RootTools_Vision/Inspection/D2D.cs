@@ -131,13 +131,25 @@ namespace RootTools_Vision
                         if ((wp.MapPositionY >= startY) && (wp.MapPositionY <= endY) && wp.MapPositionY != this.workplace.MapPositionY)
                             wpDatas.Add(wp.WorkplaceBuffer);
 
-            CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-
-            //CLR_IP.Cpp_CreateGoldenImage_MedianAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-
-            //CLR_IP.Cpp_CreateGoldenImage_Median(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-
-            //CLR_IP.Cpp_CreateGoldenImage_NearAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);    
+            switch(parameter.CreateRefImage)
+            {
+                case CreateRefImageMethod.Average:
+                    CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+                    break;
+                case CreateRefImageMethod.NearAverage:
+                    CLR_IP.Cpp_CreateGoldenImage_NearAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);               
+                    break;
+                case CreateRefImageMethod.MedianAverage:
+                    CLR_IP.Cpp_CreateGoldenImage_MedianAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+                    
+                    break;
+                case CreateRefImageMethod.Median:
+                    CLR_IP.Cpp_CreateGoldenImage_Median(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+                    break;
+                default:
+                    CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+                    break;
+            }
         }
         public void SetMultipleGoldenImages()
         {
@@ -196,19 +208,16 @@ namespace RootTools_Vision
             int chipH = this.workplace.BufferSizeY; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
             int chipW = this.workplace.BufferSizeX;
 
-            int grayLevel = 70; // Option
-            int defectSz = 10; // Option
-
             byte[] binImg = new byte[chipW * chipH];
             byte[] diffImg = new byte[chipW * chipH];
 
-            if (true) // Chip마다 Golden Image 생성 옵션
+            if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
             {
                 SetGoldenImage();
                 // Diff Image 계산
                 CLR_IP.Cpp_SubtractAbs(GoldenImage, workplace.WorkplaceBuffer, diffImg, chipW, chipH);
 
-                if (true) // ScaleMap Option
+                if (parameter.ScaleMap) // ScaleMap Option
                 {
                     if (this.workplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) != null)
                     {
@@ -234,29 +243,41 @@ namespace RootTools_Vision
                     CLR_IP.Cpp_Multiply(diffImg, scaleMap, diffImg, chipW, chipH);
                 }
 
-                if (false) // Histogram WeightMap
+                if (parameter.HistWeightMap) // Histogram WeightMap
                 {
                     histWeightMap = new float[chipW * chipH];
                     CLR_IP.Cpp_CreateHistogramWeightMap(workplace.WorkplaceBuffer, GoldenImage, histWeightMap, chipW, chipH, 5);        // -> 뭔가 결과가 이상함... 수정 필요
                     CLR_IP.Cpp_Multiply(diffImg, histWeightMap, diffImg, chipW, chipH);
                 }
             }
-            else if (false) // JHChoi D2D Algorithm 
+            else if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) // JHChoi D2D Algorithm 
             {
                 SetMultipleGoldenImages();
                 // Diff Image 계산
                 CLR_IP.Cpp_SelectMinDiffinArea(workplace.WorkplaceBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
-
             }
 
             // Filter
-            CLR_IP.Cpp_Morphology(diffImg, diffImg, chipW, chipH, 3, "OPEN", 1);
-            //CLR_IP.Cpp_MedianBlur(diffImg, diffImg, chipW, chipH, 3);
-            //CLR_IP.Cpp_AverageBlur(diffImg, diffImg, chipW, chipH);
-            //CLR_IP.Cpp_GaussianBlur(diffImg, diffImg, chipW, chipH, 2);
+            switch (parameter.DiffFilter)
+            {
+                case DiffFilterMethod.Average:
+                    CLR_IP.Cpp_AverageBlur(diffImg, diffImg, chipW, chipH);
+                    break;
+                case DiffFilterMethod.Gaussian:
+                    CLR_IP.Cpp_GaussianBlur(diffImg, diffImg, chipW, chipH, 2);
+                    break;
+                case DiffFilterMethod.Median:
+                    CLR_IP.Cpp_MedianBlur(diffImg, diffImg, chipW, chipH, 3);
+                    break;
+                case DiffFilterMethod.Morphology:
+                    CLR_IP.Cpp_Morphology(diffImg, diffImg, chipW, chipH, 3, "OPEN", 1);
+                    break;
+                default:
+                    break;
+            }
 
             // Threshold 값으로 Defect 탐색
-            CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, grayLevel);
+            CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, parameter.Intensity);
             // Labeling
             var Label = CLR_IP.Cpp_Labeling(workplace.WorkplaceBuffer, binImg, chipW, chipH);
 
@@ -265,7 +286,7 @@ namespace RootTools_Vision
             //Add Defect
             for (int i = 0; i < Label.Length; i++)
             {
-                if (Label[i].area > defectSz)
+                if (Label[i].area > parameter.Size)
                 {
                     this.workplace.AddDefect(sInspectionID,
                         10010,
@@ -291,7 +312,7 @@ namespace RootTools_Vision
             if(GoldenImage == null)
                 GoldenImage = new byte[this.workplace.BufferSizeX * this.workplace.BufferSizeY];
 
-            if (false) // Line 별로 GoldenImage를 만들 경우
+            if (parameter.RefImageUpdate == RefImageUpdateFreq.Line) // Line 별로 GoldenImage를 만들 경우
             {
                 List<byte[]> wpDatas = new List<byte[]>();
                 // Index 계산
@@ -322,15 +343,36 @@ namespace RootTools_Vision
                             if ((wp.MapPositionY >= startY) && (wp.MapPositionY <= endY) && wp.MapPositionY != this.workplace.MapPositionY)
                                 wpDatas.Add(wp.WorkplaceBuffer);
 
+                switch (parameter.CreateRefImage)
+                {
+                    case CreateRefImageMethod.Average:
+                        CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+                        break;
+                    case CreateRefImageMethod.NearAverage:
+                        CLR_IP.Cpp_CreateGoldenImage_NearAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+                        break;
+                    case CreateRefImageMethod.MedianAverage:
+                        CLR_IP.Cpp_CreateGoldenImage_MedianAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
 
-                CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
-                //CLR_IP.Cpp_CreateGoldenImage_NearAvg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+                        break;
+                    case CreateRefImageMethod.Median:
+                        CLR_IP.Cpp_CreateGoldenImage_Median(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+                        break;
+                    default:
+                        CLR_IP.Cpp_CreateGoldenImage_Avg(wpDatas.ToArray(), GoldenImage, wpDatas.Count, this.workplace.BufferSizeX, this.workplace.BufferSizeY);
+                        break;
+                }
             }
         }
 
         public override WorkBase Clone()
         {
             return (WorkBase)this.MemberwiseClone();
+        }
+
+        public void CopyTo()
+        {
+            
         }
 
         public override void SetWorkplaceBundle(WorkplaceBundle _workplaceBundle)
