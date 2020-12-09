@@ -238,7 +238,9 @@ namespace Root_Vega.Module
 			if (m_vega.m_diDoorLock.p_bIn == true)//check
 			{
 				m_bIonizerDoorlockCheck = true;
-				m_vega.m_doIonizerOnOff.Write(true);//check
+                m_vega.m_doIonizerOnOff.Write(true);//check
+                Thread.Sleep(100);
+                m_vega.m_swIonizerOn.Start();
                 p_eIonizerState = true;
 				Thread.Sleep(20);
 				if (m_diIonizer.p_bIn != true) return "Ionizer is not On";//check
@@ -256,8 +258,9 @@ namespace Root_Vega.Module
             {
                 m_bIonizerDoorlockCheck = true;
                 m_vega.m_doIonizerOnOff.Write(true);
+                Thread.Sleep(100);
+                m_vega.m_swIonizerOn.Start();
                 p_eIonizerState = true;
-                Thread.Sleep(20);
                 if (m_diIonizer.p_bIn != true) return "Ionizer is not On";
             }
             if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
@@ -270,6 +273,8 @@ namespace Root_Vega.Module
         public string AfterGet()
         {
             m_vega.m_doIonizerOnOff.Write(false);
+            Thread.Sleep(100);
+            m_vega.m_swIonizerOn.Stop();
             m_bIonizerDoorlockCheck = false;
             p_eIonizerState = false;
             Thread.Sleep(20);
@@ -281,6 +286,8 @@ namespace Root_Vega.Module
         public string AfterPut()
         {
             m_vega.m_doIonizerOnOff.Write(false);
+            Thread.Sleep(100);
+            m_vega.m_swIonizerOn.Stop();
             m_bIonizerDoorlockCheck = false;
             p_eIonizerState = false;
             Thread.Sleep(20);

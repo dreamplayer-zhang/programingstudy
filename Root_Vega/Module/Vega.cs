@@ -113,7 +113,7 @@ namespace Root_Vega.Module
 
         #region Thread
         public EQ.eState m_eStatus = EQ.eState.Init;
-
+        public StopWatch m_swIonizerOn;
         protected override void RunThread()
         {
             base.RunThread();
@@ -154,6 +154,14 @@ namespace Root_Vega.Module
             #endregion
 
             #region Interlock
+            if (m_swIonizerOn.ElapsedMilliseconds > 10000)
+            {
+                m_doIonizerOnOff.Write(false);
+            }
+            else if (m_swIonizerOn.IsRunning)
+            {
+                m_alidIonizerAlarm.Run(!m_diIonizerAlarmCheck.ReadDI(eIonizer.LP1) || !m_diIonizerAlarmCheck.ReadDI(eIonizer.LP2), "Please Check State of X-ray Ionizer");
+            }
             if (EQ.p_eState == EQ.eState.Run && m_bDoorlock_Use)
             {
                 m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");//check
@@ -167,7 +175,7 @@ namespace Root_Vega.Module
             m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button");
 			m_alidCDALow.Run(m_diCDALow.p_bIn, "Please Check Value of CDA");
             m_alidVaccumLow.Run(m_diVaccumLow.p_bIn, "Please Check Value of Vaccum");
-            m_alidIonizerAlarm.Run(m_diIonizerAlarmCheck.ReadDI(eIonizer.LP1) || m_diIonizerAlarmCheck.ReadDI(eIonizer.LP2), "Please Check State of X-ray Ionizer");
+            
             m_alidElecPnl_1_FanAlarm.Run(!m_diElecPnl_1_FanAlarm.p_bIn, "Please Check Electronic Panel 1 Fan");
             m_alidElecPnl_2_FanAlarm.Run(!m_diElecPnl_2_FanAlarm.p_bIn, "Please Check Electronic Panel 1 Fan");
             m_alidPCPnl_FanAlarm.Run(!m_diPCPnl_FanAlarm.p_bIn, "Please Check PC Panel Fan");
@@ -327,6 +335,8 @@ namespace Root_Vega.Module
             base.InitBase(id, engineer);
             m_robot = ((Vega_Handler)engineer.ClassHandler()).m_robot;
             m_dioBuzzerOffButton.Write(true);//check
+            m_swIonizerOn = new StopWatch();
+            m_swIonizerOn.Stop();
         }
 
         public override void ThreadStop()
