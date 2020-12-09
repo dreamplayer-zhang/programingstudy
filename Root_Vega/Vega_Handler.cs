@@ -61,9 +61,9 @@ namespace Root_Vega
             InitModule(m_vega); 
             m_robot = new Robot_RND("Robot", m_engineer);
             InitModule(m_robot);
-            m_aLoadport[0] = new Loadport("LoadportA", "LP1", m_engineer);
+            m_aLoadport[0] = new Loadport("LoadportA", "LP1", m_engineer, m_vega);
             InitModule(m_aLoadport[0]);
-            m_aLoadport[1] = new Loadport("LoadportB", "LP2", m_engineer);
+            m_aLoadport[1] = new Loadport("LoadportB", "LP2", m_engineer, m_vega);
             InitModule(m_aLoadport[1]);
             m_sideVision = new SideVision("SideVision", m_engineer);
             InitModule(m_sideVision);

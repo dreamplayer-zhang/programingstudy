@@ -35,7 +35,6 @@ namespace Root_Vega
             textBoxLotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxSlotID.DataContext = loadport.m_infoPod.m_aGemSlot[0];
             textBoxRecipe.DataContext = loadport.m_infoPod.m_aGemSlot[0];
-            //textBoxSlotID.DataContext = loadport.p_infoReticle.p_sReticleID;
             InitButtonLoad();
             InitTimer(); 
 
@@ -53,16 +52,28 @@ namespace Root_Vega
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            borderPlaced.Background = !m_loadport.m_dioPlaced.p_bIn ? Brushes.LightGreen : null;
-            borderPresent.Background = !m_loadport.m_dioPresent.p_bIn ? Brushes.LightGreen : null;
+            borderPlaced.Background = m_loadport.m_dioPlaced.p_bIn ? Brushes.LightGreen : null;
+            borderPresent.Background = m_loadport.m_dioPresent.p_bIn ? Brushes.LightGreen : null;
             borderLoad.Background = m_loadport.m_dioLoad.p_bIn ? Brushes.LightGreen : null;
             borderUnload.Background = m_loadport.m_dioUnload.p_bIn ? Brushes.LightGreen : null;
             borderAlarm.Background = (m_loadport.p_eState == ModuleBase.eState.Error) ? Brushes.Red : null;
+
+
             bool bAuto = (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto); 
             borderAccessAuto.Background = bAuto ? Brushes.LightGreen : null;
             borderAccessManual.Background = bAuto ? null : Brushes.LightGreen;
+
             buttonLoad.IsEnabled = IsEnableLoad();
-            buttonUnload.IsEnabled = IsEnableUnload(); 
+            buttonUnload.IsEnabled = IsEnableUnload();
+            if (m_loadport.m_bIonizerDoorlockCheck == false)
+            {
+                if (m_loadport.m_diIonizer.p_bIn)
+                {
+                    m_loadport.m_doIonizerOnOff.Write(false);
+                    Thread.Sleep(20);
+                    if (m_loadport.m_diIonizer.p_bIn != false) EQ.p_bStop = true;
+                }
+            }
         }
         #endregion
 

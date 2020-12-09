@@ -194,7 +194,7 @@ namespace Root_WIND2
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Vision.Run_GrabLineScan Grab = (Vision.Run_GrabLineScan)vision.CloneModuleRun("GrabLineScan");
+            Run_GrabLineScan Grab = (Run_GrabLineScan)vision.CloneModuleRun("GrabLineScan");
             var viewModel = new Dialog_Scan_ViewModel(vision, Grab);
             Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
             if (result.HasValue)
@@ -244,7 +244,7 @@ namespace Root_WIND2
             {
                 return;
             }
-            m_Setup.InspectionVision.Start();
+            m_Setup.InspectionVision.Start(false);
 
         }
     }

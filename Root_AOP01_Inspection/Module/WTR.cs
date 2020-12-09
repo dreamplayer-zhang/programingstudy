@@ -3,6 +3,7 @@ using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
+using System.Threading;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -14,6 +15,14 @@ namespace Root_AOP01_Inspection.Module
         {
             p_sInfo = m_toolBox.Get(ref m_doClean, this, "Cleaner");
             base.GetTools(bInit);
+        }
+        #endregion
+
+        #region Arm
+        protected override void InitArms(string id, IEngineer engineer)
+        {
+            m_dicArm.Add(eArm.Lower, new Arm(id, eArm.Lower, this, engineer, false, false));
+            m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this, engineer, false, false));
         }
         #endregion
 
@@ -70,6 +79,7 @@ namespace Root_AOP01_Inspection.Module
                 m_module.m_doClean.Write(true);
                 if (m_module.Run(m_module.WriteCmd(eCmd.Extend, teachClean, 1))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                Thread.Sleep(1000);
                 if (m_module.Run(m_module.WriteCmd(eCmd.Retraction))) return p_sInfo;
                 if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
                 m_module.m_doClean.Write(false); 

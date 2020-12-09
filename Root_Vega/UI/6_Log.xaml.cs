@@ -26,5 +26,14 @@ namespace Root_Vega
             InitializeComponent();
             logView.Init(LogView.m_logView); 
         }
+        Vega_Engineer m_engineer;
+        Vega_Handler m_handler;
+        public void Init(Vega_Engineer engineer)
+        {
+            m_engineer = engineer;
+            m_handler = engineer.m_handler;
+            Loadport1.DataContext = m_handler.m_aLoadport[0];
+            Loadport2.DataContext = m_handler.m_aLoadport[1];
+        }
     }
 }

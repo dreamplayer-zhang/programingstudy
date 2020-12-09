@@ -4,10 +4,13 @@ using RootTools.Control;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_CAMELLIA
@@ -20,11 +23,11 @@ namespace Root_CAMELLIA
         /// <summary>
         /// Selected Tab Axis Index
         /// </summary>
-        public int SelectedIndex
+        public int MotionTabIndex
         {
             get
             {
-                return _SelectedIndex;
+                return _MotionTabIndex;
             }
             set
             {
@@ -34,23 +37,26 @@ namespace Root_CAMELLIA
                     case TabAxis.AxisX:
                         {
                             SelectedAxis = m_AxisXY.p_axisX;
+                            SelectedAxisWorkPoint = GetWorkPoint(m_AxisXY.p_axisX.m_aPos);
                             return;
                         }
                     case TabAxis.AxisY:
                         {
                             SelectedAxis = m_AxisXY.p_axisY;
+                            SelectedAxisWorkPoint = GetWorkPoint(m_AxisXY.p_axisY.m_aPos);
                             return;
                         }
                     case TabAxis.AxisZ:
                         {
                             SelectedAxis = m_AxisZ;
+                            SelectedAxisWorkPoint = GetWorkPoint(m_AxisZ.m_aPos);
                             return;
                         }
                 }
-                SetProperty(ref _SelectedIndex, value);
+                SetProperty(ref _MotionTabIndex, value);
             }
         }
-        private int _SelectedIndex = 0;
+        private int _MotionTabIndex = 6;
 
         /// <summary>
         /// Selected Axis Tab
@@ -67,6 +73,22 @@ namespace Root_CAMELLIA
             }
         }
         private Axis _SelectedAxis;
+
+        /// <summary>
+        /// SelectedAxis WorkPoint
+        /// </summary>
+        public ObservableCollection<WorkPoint> SelectedAxisWorkPoint
+        {
+            get
+            {
+                return _SelectedAxisWorkPoint;
+            }
+            set
+            {
+                SetProperty(ref _SelectedAxisWorkPoint, value);
+            }
+        }
+        private ObservableCollection<WorkPoint> _SelectedAxisWorkPoint;
 
         /// <summary>
         /// Input Position Value
@@ -105,11 +127,37 @@ namespace Root_CAMELLIA
         private Axis m_AxisZ;
         private TabAxis eTabAxis = TabAxis.AxisX;
 
+
+        public void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            int value = 0;
+            if (Int32.TryParse((e.EditingElement as TextBox).Text, out value))
+            {
+                m_AxisXY.p_axisX.m_aPos[m_AxisXY.p_axisX.m_asPos[e.Row.GetIndex()]] = value;
+                m_AxisXY.p_axisX.RunTree(RootTools.Trees.Tree.eMode.RegWrite);
+                m_AxisXY.p_axisX.RunTree(RootTools.Trees.Tree.eMode.Init);
+            }
+        }
+        private ObservableCollection<WorkPoint> GetWorkPoint(Dictionary<string, double> dic)
+        {
+            ObservableCollection<WorkPoint> data = new ObservableCollection<WorkPoint>();
+            for (int i = 0; i < dic.Count; i++)
+            {
+                WorkPoint wp = new WorkPoint();
+                wp.Name = dic.Keys.ToArray()[i];
+                wp.Value = dic.Values.ToArray()[i];
+                data.Add(wp);
+            }
+            return data;
+        }
+
         public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
         {
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
             m_AxisXY = ModuleCamellia.p_axisXY;
             m_AxisZ = ModuleCamellia.p_axisZ;
+            MotionTabIndex = 0;
+            //SelectedAxisWorkPoint = GetWorkPoint(m_AxisXY.p_axisX.m_aPos);
         }
 
         #region ICommand
@@ -387,6 +435,33 @@ namespace Root_CAMELLIA
         }
         #endregion
 
+        public class WorkPoint
+        {
+            private string _Name;
+            public string Name
+            {
+                get
+                {
+                    return _Name;
+                }
+                set
+                {
+                    _Name = value;
+                }
+            }
+            private double _Value;
+            public double Value
+            {
+                get
+                {
+                    return _Value;
+                }
+                set
+                {
+                    _Value = value;
+                }
+            }
+        }
         private enum TabAxis
         {
             AxisX,

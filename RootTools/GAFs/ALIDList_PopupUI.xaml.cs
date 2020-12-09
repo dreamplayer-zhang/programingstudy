@@ -56,7 +56,6 @@ namespace RootTools.GAFs
             lableModule.DataContext = alid;
             lableDesc.DataContext = alid;
             lableMsg.DataContext = alid;
-            imageALID.DataContext = alid; 
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

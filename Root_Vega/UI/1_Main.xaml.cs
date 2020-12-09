@@ -54,11 +54,15 @@ namespace Root_Vega
                 buttonPause.IsEnabled = IsEnablePause();
                 buttonInitialization.IsEnabled = IsEnableInitialization();
                 buttonRecovery.IsEnabled = IsEnableRecovery();
-                FDCText1.Foreground = m_handler.m_FDC.m_aData[0].p_bAlarm == true ? Brushes.Red : Brushes.Black;
-                //            FDCText2.Foreground = m_handler.m_FDC.m_aData[1].p_alid == true ? Brushes.Red : Brushes.Black;
-                //            FDCText3.Foreground = m_handler.m_FDC.m_aData[2].p_alid == true ? Brushes.Red : Brushes.Black;
-                //            FDCText4.Foreground = m_handler.m_FDC.m_aData[3].p_alid == true ? Brushes.Red : Brushes.Black;
-                //            FDCText5.Foreground = m_handler.m_FDC.m_aData[4].p_alid == true ? Brushes.Red : Brushes.Black;
+                try
+                {
+                    FDCText1.Foreground = m_handler.m_FDC.m_aData[0].p_bAlarm == true ? Brushes.Red : Brushes.Black;
+                    FDCText2.Foreground = m_handler.m_FDC.m_aData[1].p_bAlarm == true ? Brushes.Red : Brushes.Black;
+                    FDCText3.Foreground = m_handler.m_FDC.m_aData[2].p_bAlarm == true ? Brushes.Red : Brushes.Black;
+                    FDCText4.Foreground = m_handler.m_FDC.m_aData[3].p_bAlarm == true ? Brushes.Red : Brushes.Black;
+                    FDCText5.Foreground = m_handler.m_FDC.m_aData[4].p_bAlarm == true ? Brushes.Red : Brushes.Black;
+                }
+                catch { }
             }
         }
 
@@ -161,12 +165,14 @@ namespace Root_Vega
             return m_handler.IsEnableRecovery(); 
         }
 
+        public bool m_bRecovery = false; 
         private void buttonRecovery_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableRecovery() == false) return;
             m_handler.m_bIsPossible_Recovery = false;
             m_handler.m_process.CalcRecover();
-            EQ.p_eState = EQ.eState.Run; 
+            EQ.p_eState = EQ.eState.Run;
+            m_bRecovery = true;
         }
         #endregion
 

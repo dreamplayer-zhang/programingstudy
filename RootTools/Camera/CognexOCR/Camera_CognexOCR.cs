@@ -157,7 +157,12 @@ namespace RootTools.Camera.CognexOCR
 
                 return image;
             }
-            catch (Exception e) { p_sInfo = "Read Image Error : " + e.Message; }
+            catch (Exception e) 
+            {
+                p_sInfo = "Read Image Error : " + e.Message;
+                EQ.p_eState = EQ.eState.Error;
+                EQ.p_bStop = true;
+            }
             return null; 
         }
 

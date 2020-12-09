@@ -236,10 +236,14 @@
     <Compile Include="Converter\AxisConverter.cs" />
     <Compile Include="Converter\ImageConverter.cs" />
     <Compile Include="Converter\PathConverter.cs" />
+    <Compile Include="Converter\TextBoxToIntConverter.cs" />
     <Compile Include="Data\Calibration.cs" />
     <Compile Include="Data\ModelData.cs" />
     <Compile Include="Data\WaferCentering.cs" />
     <Compile Include="Etc\MultiSelectionBehavior.cs" />
+    <Compile Include="UI_Engineer\Camellia_ToolBox.xaml.cs">
+      <DependentUpon>Camellia_ToolBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel\Dlg_PM_ViewModel.cs" />
     <Compile Include="UI_Engineer\Camellia_Engineer_UI.xaml.cs">
       <DependentUpon>Camellia_Engineer_UI.xaml</DependentUpon>
@@ -335,6 +339,10 @@
     <Page Include="UI_Engineer\Camellia_Hander_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_Engineer\Camellia_ToolBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

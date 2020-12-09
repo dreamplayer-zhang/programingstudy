@@ -183,6 +183,7 @@ namespace Root_EFEM
 
             public void RunTree(Tree tree, bool bVisible)
             {
+                if ((m_bUseEnable && m_bUseCount) == false) return; 
                 foreach (Data data in m_aData)
                 {
                     data.RunTreeEnable(tree.GetTree("Enable"), bVisible && m_bUseEnable);
