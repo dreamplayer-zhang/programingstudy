@@ -22,11 +22,11 @@ namespace Root_CAMELLIA
         /// <summary>
         /// Selected Tab Axis Index
         /// </summary>
-        public int SelectedIndex
+        public int MotionTabIndex
         {
             get
             {
-                return _SelectedIndex;
+                return _MotionTabIndex;
             }
             set
             {
@@ -36,26 +36,26 @@ namespace Root_CAMELLIA
                     case TabAxis.AxisX:
                         {
                             SelectedAxis = m_AxisXY.p_axisX;
-                            //WorkPoint = m_AxisXY.p_axisX.m_aPos;
+                            SelectedAxisWorkPoint = GetWorkPoint(m_AxisXY.p_axisX.m_aPos);
                             return;
                         }
                     case TabAxis.AxisY:
                         {
                             SelectedAxis = m_AxisXY.p_axisY;
-                            //WorkPoint = m_AxisXY.p_axisY.m_aPos;
+                            SelectedAxisWorkPoint = GetWorkPoint(m_AxisXY.p_axisY.m_aPos);
                             return;
                         }
                     case TabAxis.AxisZ:
                         {
                             SelectedAxis = m_AxisZ;
-                            //WorkPoint = m_AxisZ.m_aPos;
+                            SelectedAxisWorkPoint = GetWorkPoint(m_AxisZ.m_aPos);
                             return;
                         }
                 }
-                SetProperty(ref _SelectedIndex, value);
+                SetProperty(ref _MotionTabIndex, value);
             }
         }
-        private int _SelectedIndex = 0;
+        private int _MotionTabIndex = 6;
 
         /// <summary>
         /// Selected Axis Tab
@@ -129,15 +129,13 @@ namespace Root_CAMELLIA
 
         public void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            var edit = e.EditingElement;
-            var text = (edit as TextBox).Text;
-            var row = e.Row.GetIndex();
-            var col = e.Column.DisplayIndex;
-            var asdf = (sender as DataGrid).ItemsSource;
-        }
-        private void SetWorkPoint()
-        {
-
+            int value = 0;
+            if (Int32.TryParse((e.EditingElement as TextBox).Text, out value))
+            {
+                m_AxisXY.p_axisX.m_aPos[m_AxisXY.p_axisX.m_asPos[e.Row.GetIndex()]] = value;
+                m_AxisXY.p_axisX.RunTree(RootTools.Trees.Tree.eMode.RegWrite);
+                m_AxisXY.p_axisX.RunTree(RootTools.Trees.Tree.eMode.Init);
+            }
         }
         private ObservableCollection<WorkPoint> GetWorkPoint(Dictionary<string, double> dic)
         {
@@ -157,7 +155,8 @@ namespace Root_CAMELLIA
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
             m_AxisXY = ModuleCamellia.p_axisXY;
             m_AxisZ = ModuleCamellia.p_axisZ;
-            AxisWorkPoint = GetWorkPoint(m_AxisXY.p_axisX.m_aPos);
+            MotionTabIndex = 0;
+            //SelectedAxisWorkPoint = GetWorkPoint(m_AxisXY.p_axisX.m_aPos);
         }
 
         #region ICommand
