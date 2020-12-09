@@ -193,7 +193,7 @@ namespace Root_WIND2
             recipe.Save(recipePath);
             
             //this.Load(sFilePath); //?
-            WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
+            //WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
         }
 
         public void ShowDialogLoadRecipe()

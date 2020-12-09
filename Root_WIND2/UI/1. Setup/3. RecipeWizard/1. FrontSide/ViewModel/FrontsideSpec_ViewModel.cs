@@ -26,7 +26,8 @@ namespace Root_WIND2
             m_cInspItem = new ObservableCollection<InspectionItem>();
 
             p_cInspMethod = ParameterBase.GetChildClass();
-            p_selectedMethodItem = ParameterBase.CreateChildInstance(p_cInspMethod[0]);
+
+            p_selectedMethodItem = null;
         }
 
 
@@ -148,7 +149,17 @@ namespace Root_WIND2
         public void ComboBoxItemChanged_Method_Callback(object obj, EventArgs args)
         {
             ParameterBase param = obj as ParameterBase;
-            p_selectedMethodItem = ParameterBase.CreateChildInstance(param);
+            p_selectedMethodItem = param;
+            SetParameter();
+        }
+
+        public void ButtonClicked_Delete_Callback(object obj, EventArgs args)
+        {
+            InspectionItem item = obj as InspectionItem;
+
+            p_cInspItem.Remove(item);
+            //p_cInspItem = p_cInspItem;
+
             SetParameter();
         }
 
@@ -173,16 +184,16 @@ namespace Root_WIND2
                     }
                 }
 
-                item.p_InspMethod = item.p_cInspMethod[selectMethod];
-
                 item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
                 item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
+                item.ButtonClicked_Delete += ButtonClicked_Delete_Callback;
+
                 p_cInspItem.Add(item);
 
-                p_selectedInspItem = p_cInspItem[0];
+                item.p_InspMethod = item.p_cInspMethod[selectMethod];
             }
 
-            var asdf = m_front.p_ROI_VM;   
+            p_selectedInspItem = p_cInspItem[0];
         }
 
         public void SetParameter()
@@ -208,6 +219,7 @@ namespace Root_WIND2
                     item.p_cInspMethod = CloneMethod();
                     item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;
                     item.ComboBoxItemChanged_Method += ComboBoxItemChanged_Method_Callback;
+                    item.ButtonClicked_Delete += ButtonClicked_Delete_Callback;
 
                     p_cInspItem.Add(item);
                     SetParameter();
@@ -216,18 +228,7 @@ namespace Root_WIND2
                 });
             }
         }
-        public ICommand btnDeleteInspItem
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    p_cInspItem.Remove(p_selectedInspItem);
-                    SetParameter();
 
-                });
-            }
-        }
         public ICommand ComboBoxSelectionChanged_MethodItem
         {
             get
