@@ -130,7 +130,7 @@ namespace RootTools.Inspects
         }
 
 		public int m_nTotalDefectCount = 0;
-		public float[] m_farrAlignMatrix = null;
+		public float[] m_farrAfineMatrix = null;
 
 		public bool IsInitialized { get; private set; }
 		public void StartInspection()
@@ -423,9 +423,9 @@ namespace RootTools.Inspects
 						//	회전보정
 						System.Drawing.PointF ptfOriginPos = new System.Drawing.PointF(posX, posY);
 						System.Drawing.PointF ptfTransformedPos = new System.Drawing.PointF(posX, posY);
-						if (m_farrAlignMatrix != null)
+						if (m_farrAfineMatrix != null)
                         {
-							ptfTransformedPos = AffineTransform(ptfOriginPos, m_farrAlignMatrix);
+							ptfTransformedPos = AffineTransform(ptfOriginPos, m_farrAfineMatrix);
 						}
 						//
 						if (refPosDictionary != null)
