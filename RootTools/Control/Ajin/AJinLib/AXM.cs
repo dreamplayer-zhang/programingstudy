@@ -1099,7 +1099,7 @@ public class CAXM
 
     //======== PCI-R1604-MLII/SIIIH, PCIe-Rxx04-SIIIH 전용 함수 ================================================================================== 
     // 위치 보정 테이블 기능에 필요한 내용을 설정한다.
-    [DllImport("AXL.dll")] public static extern uint AxmCompensationSet(int nAxisNo, int nNumEntry, double dStartPos, ref double dpPosition, ref double dpCorrection, uint uRollOver);
+    [DllImport("AXL.dll")] public static extern uint AxmCompensationSet(int nAxisNo, int nNumEntry, double dStartPos, double[] dpPosition, double[] dpCorrection, uint uRollOver);
     // 위치 보정 테이블 기능 설정 내용을 반환한다.
     [DllImport("AXL.dll")] public static extern uint AxmCompensationGet(int nAxisNo, ref int npNumEntry, ref double dpStartPos, ref double dpPosition, ref double dpCorrection, ref uint upRollOver);
 

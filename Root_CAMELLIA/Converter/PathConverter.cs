@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,27 +9,23 @@ using System.Windows.Data;
 
 namespace Root_CAMELLIA
 {
-    public class TextBoxToIntConverter : IValueConverter
+    public class PathConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value.ToString();
+            if (value == null)
+            {
+                return null;
+            }
+
+            string name = Path.GetFileNameWithoutExtension(value.ToString());
+
+            return name;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            int iValue = 0;
-            double fValue = 0;
-            if (Int32.TryParse(value.ToString(), out iValue))
-            {
-                return iValue;
-            }
-            else if (Double.TryParse(value.ToString(), out fValue))
-            {
-                return (int)fValue;
-            }
-            else
-                return null;
+            throw new NotImplementedException();
         }
     }
 }

@@ -185,6 +185,7 @@
     <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.3\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
     </Reference>
+    <Reference Include="NanoView, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="NumericUpDownLib, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.NumericUpDownLib.2.4.2\lib\net40\NumericUpDownLib.dll</HintPath>
     </Reference>
@@ -231,11 +232,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\AxisBoolToBrushConverter.cs" />
     <Compile Include="BaseDefine.cs" />
     <Compile Include="Converter\AxisConverter.cs" />
+    <Compile Include="Converter\ImageConverter.cs" />
+    <Compile Include="Converter\PathConverter.cs" />
     <Compile Include="Converter\TextBoxToIntConverter.cs" />
     <Compile Include="Data\Calibration.cs" />
+    <Compile Include="Data\ModelData.cs" />
     <Compile Include="Data\WaferCentering.cs" />
+    <Compile Include="Etc\MultiSelectionBehavior.cs" />
     <Compile Include="UI_Engineer\Camellia_ToolBox.xaml.cs">
       <DependentUpon>Camellia_ToolBox.xaml</DependentUpon>
     </Compile>
@@ -384,7 +390,12 @@
       <Name>Root_EFEM</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resource\icon_ref.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\icon_dis.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />
   <PropertyGroup>
@@ -413,6 +424,23 @@ copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\mysql_clear_pa
 copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_npipe.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_npipe.dll"
 copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_shmem.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_shmem.dll"
 copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\sha256_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\sha256_password.dll"
-copy /Y "$(SolutionDir)Lib\WibuCm64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\WibuCm64.dll"</PostBuildEvent>
+copy /Y "$(SolutionDir)Lib\WibuCm64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\WibuCm64.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\Reference" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\Reference")
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb_0.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb_0.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb_1.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb_1.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configc.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configc.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configc_org.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configc_org.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configd.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configd.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configd_0.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configd_0.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\c-Si_Set_(0.76-9.03).ref" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\c-Si_Set_(0.76-9.03).ref"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\Init_ATI_NIR.cfg" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\Init_ATI_NIR.cfg"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\Init_ATI_NIR.ini" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\Init_ATI_NIR.ini"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\ZedGraph.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\ZedGraph.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\c-Si_Set_(0.76-9.03).ref" $(SolutionDir)$(ProjectName)\$(OutDir)\c-Si_Set_(0.76-9.03).ref"
+copy /Y "$(SolutionDir)Lib\MetLib\NanoView.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NanoView.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\NETOmniDriver-NET40.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NETOmniDriver-NET40.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\OmniDriver64.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\OmniDriver64.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\r4nd_class.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\r4nd_class.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

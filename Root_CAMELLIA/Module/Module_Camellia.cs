@@ -61,6 +61,19 @@ namespace Root_CAMELLIA.Module
                 m_axisZ = value;
             }
         }
+        Axis m_axisLifter;
+        public Axis p_axisLifter
+        {
+            get
+            {
+                return m_axisLifter;
+            }
+            set
+            {
+                m_axisLifter = value;
+            }
+        }
+
         Camera_Basler m_CamVRS;
 
         #region Light
@@ -94,6 +107,7 @@ namespace Root_CAMELLIA.Module
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
+            p_sInfo = m_toolBox.Get(ref m_axisLifter, this, "StageLifter");
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
         }
