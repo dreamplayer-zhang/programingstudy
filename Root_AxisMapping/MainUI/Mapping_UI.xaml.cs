@@ -114,5 +114,10 @@ namespace Root_AxisMapping.MainUI
         {
             m_mapping.InspectAll(); 
         }
+
+        private void buttonInspectCorrection_Click(object sender, RoutedEventArgs e)
+        {
+            m_mapping.InspectCorrection();
+        }
     }
 }

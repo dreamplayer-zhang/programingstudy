@@ -18,4 +18,13 @@ namespace Root_WIND2
             this.endPosition = _endPosition;
         }
     }
+
+    public class RecipeEventArgs : EventArgs
+    {
+
+        public RecipeEventArgs()
+        {
+
+        }
+    }
 }
