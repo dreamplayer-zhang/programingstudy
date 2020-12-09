@@ -36,29 +36,45 @@ namespace Root_CAMELLIA
                     case TabAxis.AxisX:
                         {
                             SelectedAxis = m_AxisXY.p_axisX;
-                            SelectedAxisWorkPoint = GetWorkPoint(m_AxisXY.p_axisX.m_aPos);
+                            CurrentAxisWorkPoints = GetWorkPoint(m_AxisXY.p_axisX.m_aPos);
                             return;
                         }
                     case TabAxis.AxisY:
                         {
                             SelectedAxis = m_AxisXY.p_axisY;
-                            SelectedAxisWorkPoint = GetWorkPoint(m_AxisXY.p_axisY.m_aPos);
+                            CurrentAxisWorkPoints = GetWorkPoint(m_AxisXY.p_axisY.m_aPos);
                             return;
                         }
                     case TabAxis.AxisZ:
                         {
                             SelectedAxis = m_AxisZ;
-                            SelectedAxisWorkPoint = GetWorkPoint(m_AxisZ.m_aPos);
+                            CurrentAxisWorkPoints = GetWorkPoint(m_AxisZ.m_aPos);
+                            return;
+                        }
+                    case TabAxis.Lifter:
+                        {
+                            return;
+                        }
+                    case TabAxis.StageZ:
+                        {
+                            return;
+                        }
+                    case TabAxis.TiltX:
+                        {
+                            return;
+                        }
+                    case TabAxis.TiltY:
+                        {
                             return;
                         }
                 }
                 SetProperty(ref _MotionTabIndex, value);
             }
         }
-        private int _MotionTabIndex = 6;
+        private int _MotionTabIndex = 0;
 
         /// <summary>
-        /// Selected Axis Tab
+        /// Selected Tab Axis
         /// </summary>
         public Axis SelectedAxis
         {
@@ -74,20 +90,36 @@ namespace Root_CAMELLIA
         private Axis _SelectedAxis;
 
         /// <summary>
-        /// SelectedAxis WorkPoint
+        /// Selected Axis WorkPoint Collection
         /// </summary>
-        public ObservableCollection<WorkPoint> SelectedAxisWorkPoint
+        public ObservableCollection<WorkPoint> CurrentAxisWorkPoints
         {
             get
             {
-                return _SelectedAxisWorkPoint;
+                return _CurrentAxisWorkPoints;
             }
             set
             {
-                SetProperty(ref _SelectedAxisWorkPoint, value);
+                SetProperty(ref _CurrentAxisWorkPoints, value);
             }
         }
-        private ObservableCollection<WorkPoint> _SelectedAxisWorkPoint;
+        private ObservableCollection<WorkPoint> _CurrentAxisWorkPoints;
+
+        /// <summary>
+        /// Selected WorkPoint in WorkPoints Collection
+        /// </summary>
+        public int SelectedWorkPointIndex
+        {
+            get
+            {
+                return _SelectedWorkPointIndex;
+            }
+            set
+            {
+                SetProperty(ref _SelectedWorkPointIndex, value);
+            }
+        }
+        private int _SelectedWorkPointIndex;
 
         /// <summary>
         /// Input Position Value
@@ -126,15 +158,24 @@ namespace Root_CAMELLIA
         private Axis m_AxisZ;
         private TabAxis eTabAxis = TabAxis.AxisX;
 
+        public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
+        {
+            ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
+            m_AxisXY = ModuleCamellia.p_axisXY;
+            m_AxisZ = ModuleCamellia.p_axisZ;
 
+        }
+
+
+        #region Method
         public void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             int value = 0;
             if (Int32.TryParse((e.EditingElement as TextBox).Text, out value))
             {
-                m_AxisXY.p_axisX.m_aPos[m_AxisXY.p_axisX.m_asPos[e.Row.GetIndex()]] = value;
-                m_AxisXY.p_axisX.RunTree(RootTools.Trees.Tree.eMode.RegWrite);
-                m_AxisXY.p_axisX.RunTree(RootTools.Trees.Tree.eMode.Init);
+                SelectedAxis.m_aPos[SelectedAxis.m_asPos[e.Row.GetIndex()]] = value;
+                SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.RegWrite);
+                SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.Init);
             }
         }
         private ObservableCollection<WorkPoint> GetWorkPoint(Dictionary<string, double> dic)
@@ -150,14 +191,7 @@ namespace Root_CAMELLIA
             return data;
         }
 
-        public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
-        {
-            ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
-            m_AxisXY = ModuleCamellia.p_axisXY;
-            m_AxisZ = ModuleCamellia.p_axisZ;
-            MotionTabIndex = 0;
-            //SelectedAxisWorkPoint = GetWorkPoint(m_AxisXY.p_axisX.m_aPos);
-        }
+        #endregion
 
         #region ICommand
         public ICommand CmdAllHome
@@ -180,8 +214,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    
-                    // 선택한 축 위치로 Move
+                    // 선택한 작업점 위치로 Move
+                    SelectedAxis.StartMove(CurrentAxisWorkPoints[SelectedWorkPointIndex].Value);
+                    //SelectedAxis.StartMove(SelectedWorkPoint.Value);
+                    SelectedAxis.WaitReady();
                 });
             }
         }
@@ -204,6 +240,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     // Save 작업점 List
+                    // Regi 내보내기
                 });
             }
         }
@@ -226,6 +263,13 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     // 지금 축 위치 propertygrid에 set
+                    double pos = SelectedAxis.p_posActual;
+                    CurrentAxisWorkPoints[SelectedWorkPointIndex].Value = pos;
+                    SelectedAxis.m_aPos[SelectedAxis.m_asPos[SelectedWorkPointIndex]] = pos;
+                    SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.RegWrite);
+                    SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.Init);
+
+                    CurrentAxisWorkPoints = GetWorkPoint(SelectedAxis.m_aPos);
                 });
             }
         }
@@ -246,6 +290,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     // Load 작업점 List
+                    // Regi 불러와서 실행
                 });
             }
         }
@@ -255,8 +300,8 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    m_AxisXY.ServoOn(!m_AxisXY.p_axisX.p_bSeroOn);
-                    m_AxisZ.ServoOn(!m_AxisZ.p_bSeroOn);
+                    SelectedAxis.ServoOn(!m_AxisXY.p_axisX.p_bSeroOn);
+                    SelectedAxis.ServoOn(!m_AxisZ.p_bSeroOn);
                 });
             }
         }
@@ -365,6 +410,7 @@ namespace Root_CAMELLIA
         }
         private enum TabAxis
         {
+            None,
             AxisX,
             AxisY,
             AxisZ,
