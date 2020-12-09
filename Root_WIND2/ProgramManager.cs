@@ -190,8 +190,12 @@ namespace Root_WIND2
                 writer.WriteLine(time + " - SaveRecipe()");
             }
 
+
+            WIND2EventManager.OnBeforeRecipeSave(recipe, new RecipeEventArgs());
+
             recipe.Save(recipePath);
-            
+
+            WIND2EventManager.OnAfterRecipeSave(recipe, new RecipeEventArgs());
             //this.Load(sFilePath); //?
             //WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
         }
@@ -204,8 +208,13 @@ namespace Root_WIND2
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == true)
                 {
+                    WIND2EventManager.OnBeforeRecipeRead(recipe, new RecipeEventArgs());
+
                     this.LoadRecipe(dlg.FileName);
                     WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
+
+                    WIND2EventManager.OnAfterRecipeRead(recipe, new RecipeEventArgs());
+
                 }
             }
             catch (Exception ex)

@@ -28,6 +28,8 @@ namespace Root_WIND2
             p_cInspMethod = ParameterBase.GetChildClass();
 
             p_selectedMethodItem = null;
+
+            WIND2EventManager.BeforeRecipeSave += BeforeRecipeSave_Callback;
         }
 
 
@@ -160,6 +162,12 @@ namespace Root_WIND2
             p_cInspItem.Remove(item);
             //p_cInspItem = p_cInspItem;
 
+            SetParameter();
+        }
+
+
+        private void BeforeRecipeSave_Callback(object obj, RecipeEventArgs args)
+        {
             SetParameter();
         }
 
