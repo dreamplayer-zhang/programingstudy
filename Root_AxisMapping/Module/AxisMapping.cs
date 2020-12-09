@@ -13,7 +13,7 @@ namespace Root_AxisMapping.Module
     {
         #region ToolBox
         Axis m_axisRotate;
-        AxisXY m_axisXY;
+        public AxisXY m_axisXY;
         Axis m_axisZ;
         DIO_O m_doVacuum;
         public MemoryPool m_memoryPool;

@@ -72,6 +72,8 @@
                     <Button x:Name="buttonInspect" Content="Inspect" Margin="3" Click="buttonInspect_Click"/>
                     <tree:TreeUI x:Name="treeInspectUI" Height="96" Margin="3"/>
                     <Button x:Name="buttonInspectAll" Content="Inspect All" Margin="3" Click="buttonInspectAll_Click"/>
+                    <Button x:Name="buttonInspectCorrection" Content=" Inspect All with Correction" Margin="3"
+                            Click="buttonInspectCorrection_Click"/>
                 </StackPanel>
             </GroupBox>
         </StackPanel>

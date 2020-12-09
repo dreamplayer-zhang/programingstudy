@@ -700,6 +700,29 @@ namespace RootTools.Control.Ajin
         }
         #endregion
 
+        #region correction
+        public void SetCorrection(bool bSet, double[] aPos, double[] adPos)
+        {
+            AXM("AxmCompensationEnable", CAXM.AxmCompensationEnable(m_nAxis, 0));
+            if (bSet == false) return;
+            if ((aPos == null) || (adPos == null)) return;
+            if (aPos.Length != adPos.Length) return;
+            int nL = aPos.Length + 2; 
+            double[] aP = new double[nL]; 
+            double[] adP = new double[nL];
+            for (int n = 0; n < nL; n++) adP[n] = 0;
+            aP[0] = 0;
+            for (int n = 1; n < nL -1; n++)
+            {
+                aP[n] = aPos[n - 1];
+                adP[n] = adPos[n - 1]; 
+            }
+            aP[nL - 1] = aP[nL - 2] + aP[1]; 
+            AXM("AxmCompensationSet", CAXM.AxmCompensationSet(m_nAxis, nL - 1, 0, aP, adP, 1)); 
+            AXM("AxmCompensationEnable", CAXM.AxmCompensationEnable(m_nAxis, 1));
+        }
+        #endregion
+
         #region Tree
         public override void RunTree(Tree.eMode mode)
         {
