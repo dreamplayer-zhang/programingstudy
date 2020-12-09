@@ -1213,8 +1213,8 @@ namespace RootTools.Inspects
 	{
 		public Reference()
 		{
-			_PatternDistX = new Param<int>(1000, 0, int.MaxValue);
-			_PatternDistY = new Param<int>(1000, 0, int.MaxValue);
+			_PatternDistX = new Param<int>(1000, int.MinValue, int.MaxValue);
+			_PatternDistY = new Param<int>(1000, int.MinValue, int.MaxValue);
 
 			_LightCalDistX = new Param<int>(1000, int.MinValue, int.MaxValue);
 			_LightCalDistY = new Param<int>(1000, int.MinValue, int.MaxValue);
