@@ -299,7 +299,10 @@ namespace Root_Vega
 			set
 			{
 				SetProperty(ref _SelectedAlign, value);
-				if (_SelectedAlign.m_Feature != null) p_bmpAlignSrc = _SelectedAlign.m_Feature.GetBitMapSource();
+				if (_SelectedAlign != null)
+                {
+					if (_SelectedAlign.m_Feature != null) p_bmpAlignSrc = _SelectedAlign.m_Feature.GetBitMapSource();
+				}
 			}
 		}
 		#endregion
