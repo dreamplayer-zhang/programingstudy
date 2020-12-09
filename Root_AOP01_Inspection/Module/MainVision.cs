@@ -3,8 +3,6 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Root_EFEM;
 using Root_EFEM.Module;
-using Root_EFEM;
-using Root_EFEM.Module;
 using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
@@ -477,7 +475,6 @@ namespace Root_AOP01_Inspection.Module
                     CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
                     int nScanLine = 0;
                     int nMMPerUM = 1000;
-                    int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
                     int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
 
                     m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
@@ -984,7 +981,7 @@ namespace Root_AOP01_Inspection.Module
                     else
                         CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
                 }
-                CvInvoke.Imwrite(@"C:\Users\jhlee\Desktop\FocusMap.bmp", ResultMat);
+                CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
             }
         }
     }
