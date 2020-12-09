@@ -19,6 +19,9 @@
     <Window.Resources>
         <local:TextBoxToIntConverter x:Key="TextBoxToIntConverter" />
         <local:AxisBoolToBrushConverter x:Key="AxisBoolToBrushConverter" />
+        <local:AxisStateToEnableConverter x:Key="AxisStateToEnableConverter" />
+        <local:AxisStateToOpacityConverter x:Key="AxisStateToOpacityConverter" />
+        <local:AxisStateToLoadingOpacityConverter x:Key="AxisStateToLoadingOpacityConverter" />
     </Window.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -249,7 +252,9 @@
                                             </Grid.RowDefinitions>
 
                                             <Grid Grid.Row="0"
-                                                  Margin="5">
+                                                  Margin="5"
+                                                  IsEnabled="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToEnableConverter}}"
+                                                  Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToOpacityConverter}}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="4*" />
                                                     <ColumnDefinition Width="6*" />
@@ -258,16 +263,21 @@
                                                       Margin="0,5,0,0">
                                                     <Grid.RowDefinitions>
                                                         <RowDefinition Height="0.8*" />
-                                                        <RowDefinition Height="2*" />
+                                                        <RowDefinition Height="2.5*" />
                                                         <RowDefinition Height="2*" />
                                                         <RowDefinition Height="1.5*" />
                                                         <RowDefinition Height="1*" />
                                                     </Grid.RowDefinitions>
                                                     <Grid Grid.Row="0"
-                                                          Margin="5,0">
-                                                        <TextBlock Text="{Binding SelectedAxis.p_id}" 
+                                                          Margin="5,0,0,5">
+                                                        <TextBlock Text="{Binding SelectedAxis.p_id}"
                                                                    FontSize="15"
-                                                                   VerticalAlignment="Center"/>
+                                                                   VerticalAlignment="Bottom" />
+                                                        <TextBlock Text="{Binding SelectedAxis.p_eState}"
+                                                                   FontSize="12"
+                                                                   Margin="15,0"
+                                                                   VerticalAlignment="Bottom"
+                                                                   HorizontalAlignment="Right" />
                                                     </Grid>
                                                     <UniformGrid Grid.Row="1"
                                                                  Columns="4"
@@ -315,9 +325,11 @@
                                                         </Grid.ColumnDefinitions>
                                                         <Button Grid.Column="0"
                                                                 Margin="3"
-                                                                BorderThickness="0"
+                                                                BorderBrush="{x:Null}"
                                                                 Command="{Binding CmdServoOnOff}">
                                                             <Grid Background="{Binding SelectedAxis.p_bSeroOn, Converter={StaticResource AxisBoolToBrushConverter}}"
+                                                                  VerticalAlignment="Center"
+                                                                  HorizontalAlignment="Center"
                                                                   Width="{Binding ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"
                                                                   Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}">
                                                                 <TextBlock Text="Servo"
@@ -392,7 +404,7 @@
                                                                    FontSize="35"
                                                                    FontWeight="Bold"
                                                                    Margin="10,5"
-                                                                   VerticalAlignment="Bottom"/>
+                                                                   VerticalAlignment="Bottom" />
                                                     </Grid>
                                                     <Grid Grid.Row="4"
                                                           Margin="0">
@@ -533,6 +545,9 @@
                                                         </Canvas>
                                                     </GroupBox>
 
+                                                </Grid>
+                                                <Grid Grid.ColumnSpan="2">
+                                                    <local:LoadingControl Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToLoadingOpacityConverter}}" />
                                                 </Grid>
                                             </Grid>
                                             <Grid Grid.Row="1"

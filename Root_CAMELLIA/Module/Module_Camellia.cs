@@ -101,6 +101,18 @@ namespace Root_CAMELLIA.Module
         }
         #endregion
 
+        #region Axis WorkPoint
+        enum eAxisPos
+        {
+            Ready,
+        }
+        private void InitWorkPoint()
+        {
+            p_axisXY.p_axisX.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            p_axisXY.p_axisY.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            p_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+        }
+        #endregion
 
 
         public override void GetTools(bool bInit)
@@ -116,6 +128,7 @@ namespace Root_CAMELLIA.Module
         public Module_Camellia(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
+            InitWorkPoint();
             m_DataManager = DataManager.Instance;
         }
 
