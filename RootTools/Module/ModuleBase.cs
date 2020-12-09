@@ -162,7 +162,6 @@ namespace RootTools.Module
         void ThreadRun()
         {
             m_bThread = true;
-            //Thread.Sleep(2000);
             Thread.Sleep(5000);
             while (m_bThread)
             {
@@ -338,7 +337,6 @@ namespace RootTools.Module
             if (m_gaf != null)
             {
                 ALID alid = m_gaf.GetALID(this, moduleRun.m_sModuleRun, sDesc);
-                //AlarmData data = ((GAF_Manager)m_engineer.ClassGAFManager()).GetALID(p_id, moduleRun.m_sModuleRun, sDesc);
                 moduleRun.m_alid = alid;
             }
             return moduleRun; 
