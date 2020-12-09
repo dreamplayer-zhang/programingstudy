@@ -377,7 +377,7 @@ namespace Root_Vega
 				App.m_engineer.m_InspManager.ClearDefectList();
 			}
 		}
-		void _clearInspReslut()
+		public void _clearInspReslut()
 		{
 			currentTotalIdx = 0;
 
@@ -589,7 +589,7 @@ namespace Root_Vega
 			}
 		}
 
-		private void _endInsp()
+		public void _endInsp()
 		{
 			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath);
 		}

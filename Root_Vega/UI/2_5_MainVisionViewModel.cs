@@ -710,7 +710,8 @@ namespace Root_Vega
 					// 회전보정
 					if (farrCoef != null)
 					{
-						//align 탐색 성공. 좌표 보정 계산 시작
+						//align 탐색 성공. InspectionManager로 farrCoef 던져줘라
+						m_Engineer.m_InspManager.m_farrAlignMatrix = farrCoef;
 					}
 					else
 					{
@@ -1035,8 +1036,8 @@ namespace Root_Vega
 
 					// 새로 Scan된 Align Feature
 					ptfTemp = new System.Drawing.PointF();
-					ptfTemp.X = crtSearchArea.Left + (int)ptMaxRelative.X + nWidthDiff / 2;
-					ptfTemp.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + nHeightDiff / 2;
+					ptfTemp.X = crtSearchArea.Left + (float)ptMaxRelative.X + (float)nWidthDiff / 2;
+					ptfTemp.Y = crtSearchArea.Top + (float)ptMaxRelative.Y + (float)nHeightDiff / 2;
 					DrawCross(new DPoint((int)ptfTemp.X, (int)ptfTemp.Y), MBrushes.Crimson);
 					arrAlignKeyTempPointF[j] = ptfTemp;
 				}
