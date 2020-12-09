@@ -122,6 +122,7 @@ namespace Root_WIND2
             p_Map_VM.LoadMapData(); // Map
             m_Origin_VM.LoadOriginData(); // Origin
             p_Alignment_VM.LoadPositonMark(); // Position
+            p_Spec_VM.LoadSpec();
         }
 
         public void Init()

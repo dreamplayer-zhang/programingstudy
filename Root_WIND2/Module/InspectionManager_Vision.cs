@@ -85,7 +85,7 @@ namespace Root_WIND2
             return CreateInspection(this.recipe);
         }
 
-        protected override bool CreateInspection(Recipe _recipe)
+        public override bool CreateInspection(Recipe _recipe)
         {
             try
             {
@@ -175,16 +175,8 @@ namespace Root_WIND2
             }
         }
 
-        public new void Start()
+        private new void Start()
         {
-            if (this.Recipe == null && this.Recipe.WaferMap == null)
-                return;
-
-            foreach (Workplace wp in this.workplaceBundle)
-            {
-                wp.STATE = WORKPLACE_STATE.SNAP;
-            }
-
             string lotId = "Lotid";
             string partId = "Partid";
             string setupId = "SetupID";
@@ -196,6 +188,23 @@ namespace Root_WIND2
             DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
 
             base.Start();
+        }
+
+
+        public void Start(bool Snap)
+        {
+            if (this.Recipe == null && this.Recipe.WaferMap == null)
+                return;
+
+            if(Snap == false)
+            {
+                foreach (Workplace wp in this.workplaceBundle)
+                {
+                    wp.STATE = WORKPLACE_STATE.SNAP;
+                }
+            }
+
+            Start();
         }
 
         public new void Stop()
