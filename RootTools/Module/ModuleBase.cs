@@ -381,7 +381,7 @@ namespace RootTools.Module
         protected string StateRun()
         {
             if (m_qModuleRun.Count == 0) return "OK";
-            ModuleRunBase moduleRun = m_qModuleRun.Dequeue();
+            ModuleRunBase moduleRun = m_qModuleRun.Peek();
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
             m_swRun.Restart();
             m_log.Info("ModuleRun : " + moduleRun.p_id + " Start");
@@ -389,7 +389,8 @@ namespace RootTools.Module
             catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
 
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
-            m_log.Info("ModuleRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec")); 
+            m_log.Info("ModuleRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
+            m_qModuleRun.Dequeue();
             if (p_sInfo != "OK")
             {
                 EQ.p_bStop = true;
