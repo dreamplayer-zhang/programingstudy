@@ -926,7 +926,6 @@ namespace Root_AOP01_Inspection.Module
                         cpMemoryOffset.X += nCamWidth;
                     }
                     m_grabMode.m_camera.StopGrab();
-                    //nReticleSizeY_px / nCamHeight,nReticleSizeY_px / nCamWidth
                     SaveFocusMapImage(nReticleSizeY_px/nCamWidth, nReticleSizeY_px/nCamHeight);
                     return "OK";
                 }

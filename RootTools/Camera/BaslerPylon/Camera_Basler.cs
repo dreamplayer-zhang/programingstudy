@@ -693,6 +693,7 @@ namespace RootTools.Camera.BaslerPylon
                     stopWatch.Reset();
                     m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
                     // Start the grabbing of images until grabbing is stopped.
+
                     m_cam.Parameters[PLCamera.TriggerSelector].SetValue(PLCamera.TriggerSelector.AcquisitionStart);
                     m_cam.Parameters[PLCamera.TriggerMode].SetValue(PLCamera.TriggerMode.On);
                     m_cam.StreamGrabber.Start(GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
