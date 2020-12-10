@@ -113,12 +113,12 @@ namespace RootTools
 
         public static RPoint operator *(RPoint cp0, double f)
         {
-            return new RPoint((int)Math.Round(cp0.X * f), (int)Math.Round(cp0.Y * f));
+            return new RPoint(cp0.X * f, cp0.Y * f);
         }
 
         public static RPoint operator /(RPoint cp0, double f)
         {
-            return new RPoint(Math.Round(cp0.X / f), Math.Round(cp0.Y / f));
+            return new RPoint(cp0.X / f, cp0.Y / f);
         }
 
         public bool IsInside(RPoint cp)
