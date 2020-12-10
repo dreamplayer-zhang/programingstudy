@@ -42,16 +42,24 @@
                               Background="{StaticResource GroupBoxBackground}">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="40"/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <StackPanel Orientation="Horizontal" Background="{StaticResource ControlBackGround}">
-                                <ToggleButton Content="Origin Point" Width="100" Margin="0" BorderBrush="{x:Null}"
+                            <StackPanel Orientation="Vertical" Background="{StaticResource ControlBackGround}">
+                                <StackPanel Orientation="Horizontal" Background="{StaticResource ControlBackGround}">
+                                    <Button Content="Load Master Image" Width="150" Margin="0" BorderBrush="{x:Null}" Command="{Binding LoadMasterImage}"/>
+                                    <Button Content="Save Master Image" Width="150" Margin="0" BorderBrush="{x:Null}" Command="{Binding SaveMasterImage}"/>
+                                    <Button Content="Clear" Width="100" Margin="0" BorderBrush="{x:Null}" Command="{Binding ClearOrigin}"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Background="{StaticResource ControlBackGround}">
+                                    <ToggleButton Content="Origin Point" Width="100" Margin="0" BorderBrush="{x:Null}"
                                               IsChecked="{Binding p_UseOrigin, Mode=TwoWay}"/>
-                                <ToggleButton Content="Pitch Point" Width="100" Margin="0" BorderBrush="{x:Null}"
+                                    <ToggleButton Content="Pitch Point" Width="100" Margin="0" BorderBrush="{x:Null}"
                                                IsChecked="{Binding p_UsePitch, Mode=TwoWay}"/>
-                                <Button Content="Clear" Width="100" Margin="0" BorderBrush="{x:Null}" Command="{Binding ClearOrigin}"/>
+                                </StackPanel>
                             </StackPanel>
+
                             <tools:RootViewer Grid.Row="1"/>
                         </Grid>
                     </GroupBox>
