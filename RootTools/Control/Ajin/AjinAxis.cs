@@ -718,16 +718,22 @@ namespace RootTools.Control.Ajin
             if ((aPos == null) || (adPos == null)) return;
             if (aPos.Length != adPos.Length) return;
             int nL = aPos.Length + 2; 
-            double[] aP = new double[nL]; 
+            double[] aP = new double[nL-1]; 
             double[] adP = new double[nL];
             for (int n = 0; n < nL; n++) adP[n] = 0;
             aP[0] = 0;
-            for (int n = 1; n < nL -1; n++)
+
+            for (int n = nL - 1, nIdx = 1; n > 1; n--, nIdx++)
             {
-                aP[n] = aPos[n - 1];
-                adP[n] = adPos[n - 1]; 
+                //aP[n] = aPos[n - 1];
+                adP[nIdx] = adPos[n - 2]; 
             }
-            aP[nL - 1] = aP[nL - 2] + aP[1]; 
+            for (int n = nL - 2  , nIdx = 1; n > 0; n-- , nIdx++)
+            {
+                aP[nIdx] = aPos[n - 1];
+                //adP[n] = adPos[n - 1];
+            }
+            //aP[nL - 2] = aP[nL - 2] + aP[1]; 
             AXM("AxmCompensationSet", CAXM.AxmCompensationSet(m_nAxis, nL - 1, 0, aP, adP, 1)); 
             AXM("AxmCompensationEnable", CAXM.AxmCompensationEnable(m_nAxis, 1));
         }

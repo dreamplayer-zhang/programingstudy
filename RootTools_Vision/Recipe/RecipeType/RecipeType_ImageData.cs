@@ -9,10 +9,8 @@ using System.Xml.Serialization;
 
 namespace RootTools_Vision
 { 
-    public class RecipeType_FeatureData
+    public class RecipeType_ImageData
     {
-
-        Bitmap featureBitmap;
         byte[] rawData = new byte[0];
         int positionX;
         int positionY;
@@ -23,7 +21,7 @@ namespace RootTools_Vision
         int byteCnt;
         string fileName = string.Empty;
 
-        [XmlIgnore] public Bitmap FeatureBitmap { get => featureBitmap; set => featureBitmap = value; }
+
         [XmlIgnore] public byte[] RawData { get => rawData; set => rawData = value; }
         public int PositionX { get => positionX; set => positionX = value; }
         public int PositionY { get => positionY; set => positionY = value; }
@@ -33,11 +31,11 @@ namespace RootTools_Vision
         public int Height { get => height; set => height = value; }
         public int ByteCnt { get => byteCnt; set => byteCnt = value; }
         public string FileName { get => this.fileName; set => this.fileName = value; }
-        public RecipeType_FeatureData()
+        public RecipeType_ImageData()
         {
             this.FileName = string.Empty;
         }
-        public RecipeType_FeatureData(int positionX, int positionY, int featureWidth, int featureHeight, int byteCnt, byte[] rawData)
+        public RecipeType_ImageData(int positionX, int positionY, int featureWidth, int featureHeight, int byteCnt, byte[] rawData)
         {
             this.positionX = positionX;
             this.positionY = positionY;
@@ -52,12 +50,6 @@ namespace RootTools_Vision
 
         public void SetRawData(byte[] rawData)
         {
-            this.RawData = rawData;
-        }
-
-        public void SetImageData(byte[] rawData, Bitmap bitmap)
-        {
-            this.FeatureBitmap = bitmap;
             this.RawData = rawData;
         }
 

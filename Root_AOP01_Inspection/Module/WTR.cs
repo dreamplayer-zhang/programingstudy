@@ -30,13 +30,15 @@ namespace Root_AOP01_Inspection.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeClean(tree.GetTree("Setup", false).GetTree("Teach", false));
+            RunTreeClean(tree.GetTree("Setup", false).GetTree("Teach", false).GetTree("Clean Uint",false));
         }
 
-        public int m_teachClean = 0;
+        public int m_teachClean = -1;
+        public int m_extentionlength = 0;
         void RunTreeClean(Tree tree)
         {
-            m_teachClean = tree.Set(m_teachClean, m_teachClean, "Clean", "WTR Clean Position");
+            m_teachClean = tree.Set(m_teachClean, m_teachClean, "Clean Teach", "RTR Clean Index");
+            m_extentionlength = tree.Set(m_extentionlength, m_extentionlength, "Extention length", "RTR Clean Extention Length");
         }
         #endregion
 
