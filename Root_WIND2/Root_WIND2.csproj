@@ -253,6 +253,7 @@
     </Compile>
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Map\FrontsideMap_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSpecTool_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSummary_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\MaskTool_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\ViewModel\FrontsideSpec_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionItem.cs" />
@@ -671,6 +672,9 @@
       <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
       <Name>RootTools_Vision</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image1.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

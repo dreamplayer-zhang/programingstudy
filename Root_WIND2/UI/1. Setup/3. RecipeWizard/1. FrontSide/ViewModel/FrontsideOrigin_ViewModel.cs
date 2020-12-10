@@ -91,12 +91,12 @@ namespace Root_WIND2
         {
             //여기머야
             TRect InspAreaBuf = e as TRect;           
-            p_OriginBoxTool_VM.AddInspArea(InspAreaBuf);
-            OriginImageData = new ImageData(InspAreaBuf.MemoryRect.Width, InspAreaBuf.MemoryRect.Height);
-            OriginImageData.m_eMode = ImageData.eMode.ImageBuffer;
-            OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData.GetPtr(), InspAreaBuf.MemoryRect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride);
+            //p_OriginBoxTool_VM.AddInspArea(InspAreaBuf);
+            //OriginImageData = new ImageData(InspAreaBuf.MemoryRect.Width, InspAreaBuf.MemoryRect.Height);
+            //OriginImageData.m_eMode = ImageData.eMode.ImageBuffer;
+            //OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData.GetPtr(), InspAreaBuf.MemoryRect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride);
 
-            InspAreaBuf.Tag = OriginImageData;
+            //InspAreaBuf.Tag = OriginImageData;
 
             SetOrigin(InspAreaBuf);
 
