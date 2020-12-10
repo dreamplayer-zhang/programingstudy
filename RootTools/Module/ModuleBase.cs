@@ -162,7 +162,6 @@ namespace RootTools.Module
         void ThreadRun()
         {
             m_bThread = true;
-            //Thread.Sleep(2000);
             Thread.Sleep(5000);
             while (m_bThread)
             {
@@ -338,7 +337,6 @@ namespace RootTools.Module
             if (m_gaf != null)
             {
                 ALID alid = m_gaf.GetALID(this, moduleRun.m_sModuleRun, sDesc);
-                //AlarmData data = ((GAF_Manager)m_engineer.ClassGAFManager()).GetALID(p_id, moduleRun.m_sModuleRun, sDesc);
                 moduleRun.m_alid = alid;
             }
             return moduleRun; 
@@ -381,7 +379,7 @@ namespace RootTools.Module
         protected string StateRun()
         {
             if (m_qModuleRun.Count == 0) return "OK";
-            ModuleRunBase moduleRun = m_qModuleRun.Dequeue();
+            ModuleRunBase moduleRun = m_qModuleRun.Peek();
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
             m_swRun.Restart();
             m_log.Info("ModuleRun : " + moduleRun.p_id + " Start");
@@ -389,7 +387,8 @@ namespace RootTools.Module
             catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
 
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
-            m_log.Info("ModuleRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec")); 
+            m_log.Info("ModuleRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
+            m_qModuleRun.Dequeue();
             if (p_sInfo != "OK")
             {
                 EQ.p_bStop = true;

@@ -84,7 +84,6 @@ namespace Root_WIND2
             p_OriginTool_VM.Offset = new CPoint(BOX.MemoryRect.Left, BOX.MemoryRect.Top);
             p_OriginTool_VM.p_ImageData = BoxImageData;
             p_OriginTool_VM.SetRoiRect();
-
         }
 
         private void P_OriginTool_VM_DelegateInspArea(object e)

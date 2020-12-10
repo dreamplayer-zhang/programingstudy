@@ -98,18 +98,27 @@ namespace RootTools_Vision
             set
             {
                 string[] map = value;
-
-                mapSizeX = map[0].Length;
-                mapSizeY = map.Length;
-
-                mapdata = new int[mapSizeX * mapSizeY];
-                for (int i = 0; i < mapSizeY; i++)
+                if(map.Length == 0)
                 {
-                    for (int j = 0; j < mapSizeX; j++)
+                    mapSizeX = 0;
+                    mapSizeY = 0;
+                }
+                else
+                {
+                    mapSizeX = map[0].Length;
+                    mapSizeY = map.Length;
+                    mapdata = new int[mapSizeX * mapSizeY];
+
+                    for (int i = 0; i < mapSizeY; i++)
                     {
-                        mapdata[i * mapSizeX + j] = int.Parse(map[i][j].ToString());   
+                        for (int j = 0; j < mapSizeX; j++)
+                        {
+                            mapdata[i * mapSizeX + j] = int.Parse(map[i][j].ToString());
+                        }
                     }
                 }
+
+               
             }
         }
 

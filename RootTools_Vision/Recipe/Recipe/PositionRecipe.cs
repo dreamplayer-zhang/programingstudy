@@ -11,9 +11,9 @@ namespace RootTools_Vision
     public class PositionRecipe : RecipeBase
     {
         #region [Parameter]
-        private List<RecipeType_FeatureData> listMasterFeature;
-        private List<RecipeType_FeatureData> listShotFeature;
-        private List<RecipeType_FeatureData> listChipFeature;
+        private List<RecipeType_ImageData> listMasterFeature;
+        private List<RecipeType_ImageData> listShotFeature;
+        private List<RecipeType_ImageData> listChipFeature;
 
         private int indexMaxScoreMasterFeature;
         private int indexMaxScoreShotFeature;
@@ -24,17 +24,17 @@ namespace RootTools_Vision
         //[XmlArray("FeatureMaster")]
         //[XmlArrayItem("Feature")]
         //[XmlIgnore]
-        public List<RecipeType_FeatureData> ListMasterFeature { get => listMasterFeature; set => listMasterFeature = value; }
+        public List<RecipeType_ImageData> ListMasterFeature { get => listMasterFeature; set => listMasterFeature = value; }
 
         //[XmlArray("FeatureShot")]
         //[XmlArrayItem("Feature")]
         //[XmlIgnore]
-        public List<RecipeType_FeatureData> ListShotFeature { get => listShotFeature; set => listShotFeature = value; }
+        public List<RecipeType_ImageData> ListShotFeature { get => listShotFeature; set => listShotFeature = value; }
 
         //[XmlArray("FeatureChip")]
         //[XmlArrayItem("Feature")]
         //[XmlIgnore]
-        public List<RecipeType_FeatureData> ListDieFeature { get => listChipFeature; set => listChipFeature = value; }
+        public List<RecipeType_ImageData> ListDieFeature { get => listChipFeature; set => listChipFeature = value; }
 
         public int IndexMaxScoreMasterFeature { get => indexMaxScoreMasterFeature; set => indexMaxScoreMasterFeature = value; }
         public int IndexMaxScoreShotFeature { get => indexMaxScoreShotFeature; set => indexMaxScoreShotFeature = value; }
@@ -43,9 +43,9 @@ namespace RootTools_Vision
 
         public PositionRecipe()
         {
-            listMasterFeature = new List<RecipeType_FeatureData>();
-            listShotFeature = new List<RecipeType_FeatureData>();
-            listChipFeature = new List<RecipeType_FeatureData>();
+            listMasterFeature = new List<RecipeType_ImageData>();
+            listShotFeature = new List<RecipeType_ImageData>();
+            listChipFeature = new List<RecipeType_ImageData>();
 
             indexMaxScoreMasterFeature = -1;
             indexMaxScoreShotFeature = -1;
@@ -54,24 +54,24 @@ namespace RootTools_Vision
 
         public void AddMasterFeature(int positionX, int positionY, int featureWidth, int featureHeight, int byteCnt, byte[] rawData)
         {
-            listMasterFeature.Add(new RecipeType_FeatureData(positionX, positionY, featureWidth, featureHeight, byteCnt, rawData));
+            listMasterFeature.Add(new RecipeType_ImageData(positionX, positionY, featureWidth, featureHeight, byteCnt, rawData));
         }
 
         public void AddShotFeature(int positionX, int positionY, int featureWidth, int featureHeight, int byteCnt, byte[] rawData)
         {
-            listShotFeature.Add(new RecipeType_FeatureData(positionX, positionY, featureWidth, featureHeight, byteCnt, rawData));
+            listShotFeature.Add(new RecipeType_ImageData(positionX, positionY, featureWidth, featureHeight, byteCnt, rawData));
         }
 
         public void AddChipFeature(int positionX, int positionY, int featureWidth, int featureHeight, int byteCnt, byte[] rawData)
         {
-            listChipFeature.Add(new RecipeType_FeatureData(positionX, positionY, featureWidth, featureHeight, byteCnt, rawData));
+            listChipFeature.Add(new RecipeType_ImageData(positionX, positionY, featureWidth, featureHeight, byteCnt, rawData));
         }
 
 
         public override bool Save(string recipePath)
         {
             bool rst = true;
-            foreach (RecipeType_FeatureData featureData in listMasterFeature)
+            foreach (RecipeType_ImageData featureData in listMasterFeature)
             {
                 // FileName Setting
                 if (featureData.FileName == "")
@@ -94,7 +94,7 @@ namespace RootTools_Vision
                 }
             }
 
-            foreach (RecipeType_FeatureData featureData in listShotFeature)
+            foreach (RecipeType_ImageData featureData in listShotFeature)
             {
                 // FileName Setting
                 if (featureData.FileName == "")
@@ -117,7 +117,7 @@ namespace RootTools_Vision
                 }
             }
 
-            foreach (RecipeType_FeatureData featureData in listChipFeature)
+            foreach (RecipeType_ImageData featureData in listChipFeature)
             {
                 // FileName Setting
                 if (featureData.FileName == "")
@@ -146,7 +146,7 @@ namespace RootTools_Vision
         public override bool Read(string recipePath)
         {
             bool rst = true;
-            foreach(RecipeType_FeatureData featureData in listMasterFeature)
+            foreach(RecipeType_ImageData featureData in listMasterFeature)
             {
                 // Load
                 if(!featureData.Read(recipePath))
@@ -156,7 +156,7 @@ namespace RootTools_Vision
                 }
             }
 
-            foreach (RecipeType_FeatureData featureData in listShotFeature)
+            foreach (RecipeType_ImageData featureData in listShotFeature)
             {
                 // Load
                 if (!featureData.Read(recipePath))
@@ -166,7 +166,7 @@ namespace RootTools_Vision
                 }
             }
 
-            foreach (RecipeType_FeatureData featureData in listChipFeature)
+            foreach (RecipeType_ImageData featureData in listChipFeature)
             {
                 // Load
                 if (!featureData.Read(recipePath))

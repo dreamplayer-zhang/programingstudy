@@ -299,7 +299,10 @@ namespace Root_Vega
 			set
 			{
 				SetProperty(ref _SelectedAlign, value);
-				if (_SelectedAlign.m_Feature != null) p_bmpAlignSrc = _SelectedAlign.m_Feature.GetBitMapSource();
+				if (_SelectedAlign != null)
+                {
+					if (_SelectedAlign.m_Feature != null) p_bmpAlignSrc = _SelectedAlign.m_Feature.GetBitMapSource();
+				}
 			}
 		}
 		#endregion
@@ -699,25 +702,6 @@ namespace Root_Vega
 					}
 					#endregion
 
-					#region Align Key
-					//3. 등록된 Align Key 3개를 탐색한다. feature의 위치 정보도 참조하여 회전 보정 시에 들어갈 값을 준비해둔다
-					float[] farrCoef = null;
-					if (roiCurrent.Position.AlignList.Count == 3)
-                    {
-						farrCoef = GetAffineArray(roiCurrent);
-                    }
-
-					// 회전보정
-					if (farrCoef != null)
-					{
-						//align 탐색 성공. 좌표 보정 계산 시작
-					}
-					else
-					{
-						// align 실패
-					}
-					#endregion
-
 					//4. 저장된 좌표를 기준으로 PatternDistX, PatternDistY만큼 더한다. 이 좌표가 Start Position이 된다
 					var startPos = new Point(cptStandard.X + nRefStartOffsetX, cptStandard.Y + nRefStartOffsetY);
 					//5. Start Position에 InspAreaWidth와 InspAreaHeight만큼 더해준다. 이 좌표가 End Position이 된다
@@ -780,6 +764,26 @@ namespace Root_Vega
 
 		public void _endInsp()
 		{
+			#region Align Key
+			// 등록된 Align Key 3개를 탐색한다. feature의 위치 정보도 참조하여 회전 보정 시에 들어갈 값을 준비해둔다
+			float[] farrAffineMatrix = null;
+			var roiCurrent = p_PatternRoiList[0];
+			if (roiCurrent.Position.AlignList.Count == 3)
+			{
+				farrAffineMatrix = GetAffineArray(roiCurrent);
+			}
+
+			// 회전보정
+			if (farrAffineMatrix != null)
+			{
+				//align 탐색 성공. InspectionManager로 farrCoef 던져줘라
+				m_Engineer.m_InspManager.m_farrAfineMatrix = farrAffineMatrix;
+			}
+			else
+			{
+				// align 실패
+			}
+			#endregion
 			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath);
 		}
 
@@ -1035,8 +1039,8 @@ namespace Root_Vega
 
 					// 새로 Scan된 Align Feature
 					ptfTemp = new System.Drawing.PointF();
-					ptfTemp.X = crtSearchArea.Left + (int)ptMaxRelative.X + nWidthDiff / 2;
-					ptfTemp.Y = crtSearchArea.Top + (int)ptMaxRelative.Y + nHeightDiff / 2;
+					ptfTemp.X = crtSearchArea.Left + (float)ptMaxRelative.X + (float)nWidthDiff / 2;
+					ptfTemp.Y = crtSearchArea.Top + (float)ptMaxRelative.Y + (float)nHeightDiff / 2;
 					DrawCross(new DPoint((int)ptfTemp.X, (int)ptfTemp.Y), MBrushes.Crimson);
 					arrAlignKeyTempPointF[j] = ptfTemp;
 				}
