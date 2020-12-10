@@ -701,7 +701,6 @@ namespace RootTools.Control.Ajin
             }
         }
 
-        bool testbool = false;
         void RunTreeSensor(Tree tree, int iIndex)
         {
             m_aSensors[iIndex].m_bHome = tree.Set(m_aSensors[iIndex].m_bHome, m_aSensors[iIndex].m_bHome, "Home", "Home Sensor");
@@ -745,10 +744,10 @@ namespace RootTools.Control.Ajin
             m_treeRoot.p_eMode = mode;
             RunTreeSpeed(m_treeRoot.GetTree("Speed"), m_sUnit);
             RunTreePos(m_treeRoot.GetTree("Position"), m_sUnit);
-            m_trigger.RunTree(m_treeRoot.GetTree("Trigger"), m_sUnit);
+            m_trigger.RunTree(m_treeRoot.GetTree("Trigger",false), m_sUnit);
 
-            bool bVisible = m_aDIO_I.Count > 0;
-            RunTreeIOLock(m_treeRoot.GetTree("I/O Lock", false, bVisible), m_sUnit);
+            bool bIOVisible = m_aDIO_I.Count > 0;
+            RunTreeIOLock(m_treeRoot.GetTree("I/O Lock", true, bIOVisible), m_sUnit);
         }
 
         public override void RunTreeSetting(Tree.eMode mode)

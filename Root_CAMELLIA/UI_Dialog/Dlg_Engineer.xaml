@@ -252,9 +252,9 @@
                                             </Grid.RowDefinitions>
 
                                             <Grid Grid.Row="0"
-                                                  Margin="5"
-                                                  IsEnabled="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToEnableConverter}}"
-                                                  Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToOpacityConverter}}">
+                                                  Margin="5">
+                                                <!--IsEnabled="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToEnableConverter}}"
+                                                  Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToOpacityConverter}}">-->
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="4*" />
                                                     <ColumnDefinition Width="6*" />
@@ -547,7 +547,7 @@
 
                                                 </Grid>
                                                 <Grid Grid.ColumnSpan="2">
-                                                    <local:LoadingControl Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToLoadingOpacityConverter}}" />
+                                                    <!--<local:LoadingControl Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToLoadingOpacityConverter}}" />-->
                                                 </Grid>
                                             </Grid>
                                             <Grid Grid.Row="1"
