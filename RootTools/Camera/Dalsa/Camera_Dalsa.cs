@@ -252,9 +252,9 @@ namespace RootTools.Camera.Dalsa
 
                 SapFormat bufformat = m_sapAcq.XferParams.Format;
 
-                if (bufformat > 0)
+                if (bufformat == SapFormat.RGB8888 || bufformat == SapFormat.RGBP8)
                     m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq.XferParams.Width, m_sapAcq.XferParams.Height, bufformat, SapBuffer.MemoryType.ScatterGather);
-                else 
+                else if(bufformat == SapFormat.Mono8)
                     m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq, SapBuffer.MemoryType.ScatterGather);
 
                 m_sapXfer = new SapAcqToBuf(m_sapAcq, m_sapBuf);

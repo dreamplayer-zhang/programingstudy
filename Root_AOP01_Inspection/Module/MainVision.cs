@@ -25,6 +25,7 @@ namespace Root_AOP01_Inspection.Module
         #region ToolBox
         Axis m_axisRotate;
         Axis m_axisZ;
+        Axis m_axisSideZ;
         AxisXY m_axisXY;
         DIO_O m_doVac;
         DIO_O m_doBlow;
@@ -41,12 +42,14 @@ namespace Root_AOP01_Inspection.Module
         LightSet m_lightSet;
         Camera_Dalsa m_CamTDI90;
         Camera_Dalsa m_CamTDI45;
+        Camera_Dalsa m_CamTDISide;
         Camera_Basler m_CamLADS;
 
 
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
+            p_sInfo = m_toolBox.Get(ref m_axisSideZ, this, "Axis Side Z");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
@@ -55,6 +58,7 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_CamTDI90, this, "TDI 90");
             p_sInfo = m_toolBox.Get(ref m_CamTDI45, this, "TDI 45");
+            p_sInfo = m_toolBox.Get(ref m_CamTDISide, this, "TDI Side");
             p_sInfo = m_toolBox.Get(ref m_CamLADS, this, "LADS");
             m_axisRotate.StartMove(1000);
         }
@@ -142,7 +146,7 @@ namespace Root_AOP01_Inspection.Module
         {
             m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisRotate.AddPos(Enum.GetNames(typeof(eAxisPos)));
-            m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisSideZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisXY.AddPos(Enum.GetNames(typeof(eAxisPos)));
 
         }
@@ -348,10 +352,14 @@ namespace Root_AOP01_Inspection.Module
                 m_CamTDI90.Connect();
             if (m_CamTDI45 != null && m_CamTDI45.p_CamInfo.p_eState == eCamState.Init)
                 m_CamTDI45.Connect();
-            if (m_CamLADS != null && m_CamTDI90.p_CamInfo.p_eState == eCamState.Init)
-                m_CamTDI90.Connect();
-            if (m_CamTDI90 != null && m_CamTDI90.p_CamInfo.p_eState == eCamState.Init)
-                m_CamTDI90.Connect();
+            if (m_CamLADS.p_CamInfo._OpenStatus == false)
+                m_CamLADS.Connect();
+            if (m_CamTDISide != null && m_CamTDISide.p_CamInfo.p_eState == eCamState.Init)
+                m_CamTDISide.Connect();
+
+            m_axisSideZ.StartHome();
+            if (m_axisSideZ.WaitReady() != "OK")
+                return "Error";
 
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
@@ -469,7 +477,7 @@ namespace Root_AOP01_Inspection.Module
                     m_grabMode.SetLight(true);
 
                     AxisXY axisXY = m_module.m_axisXY;
-                    Axis axisZ = m_module.m_axisZ;
+                    Axis axisSizeZ = m_module.m_axisSideZ;
                     Axis axisRotate = m_module.m_axisRotate;
 
                     CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
@@ -494,9 +502,7 @@ namespace Root_AOP01_Inspection.Module
 
                         double dPosX = m_rpAxisCenter.X;
 
-                        if (m_module.Run(axisRotate.StartMove(m_nRotatePulse * (p_dDegree * nScanLine) / 360)))
-                            return p_sInfo;
-                        if (m_module.Run(axisZ.StartMove(m_nFocusPosZ)))
+                        if (m_module.Run(axisSizeZ.StartMove(m_nFocusPosZ)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
                             return p_sInfo;
@@ -504,7 +510,7 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                        if (m_module.Run(axisZ.WaitReady()))
+                        if (m_module.Run(axisSizeZ.WaitReady()))
                             return p_sInfo;
 
                         double dTriggerStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2;
@@ -526,6 +532,17 @@ namespace Root_AOP01_Inspection.Module
                         axisXY.p_axisY.RunTrigger(false);
 
                         nScanLine++;
+
+                        if (m_module.Run(axisXY.p_axisY.StartMove(2249700)))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady()))
+                            return p_sInfo;
+                        double nRotate = m_nRotatePulse * (p_dDegree * nScanLine);
+                        if (m_module.Run(axisRotate.StartMove(nRotate)))
+                            return p_sInfo;
+                        if (m_module.Run(axisRotate.WaitReady()))
+                            return p_sInfo;
+
                     }
                     m_grabMode.m_camera.StopGrab();
                     return "OK";
@@ -830,7 +847,7 @@ namespace Root_AOP01_Inspection.Module
             }
             public override ModuleRunBase Clone()
             {
-                Run_Grab run = new Run_Grab(m_module);
+                Run_LADS run = new Run_LADS(m_module);
                 run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
                 run.m_cpMemoryOffset = new CPoint(m_cpMemoryOffset);
                 run.m_dResX_um = m_dResX_um;
@@ -904,7 +921,7 @@ namespace Root_AOP01_Inspection.Module
 
                         double dTriggerStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2;
                         double dTriggerEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
-                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
+                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, 40, true);
 
                         string strPool = m_grabMode.m_memoryPool.p_id;
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
@@ -920,13 +937,13 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
-                        CalculateHeight(nScanLine, mem,nReticleSizeY_px);
+                        //CalculateHeight(nScanLine, mem,nReticleSizeY_px);
 
                         nScanLine++;
                         cpMemoryOffset.X += nCamWidth;
                     }
                     m_grabMode.m_camera.StopGrab();
-                    SaveFocusMapImage(nReticleSizeY_px/nCamWidth, nReticleSizeY_px/nCamHeight);
+                    //SaveFocusMapImage(nReticleSizeY_px/nCamWidth, nReticleSizeY_px/nCamHeight);
                     return "OK";
                 }
                 finally
@@ -940,7 +957,7 @@ namespace Root_AOP01_Inspection.Module
                 int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
                 int nHeight = ReticleHeight / nCamHeight;
-                byte* ptr =(byte*) mem.GetPtr().ToPointer(); //color로 들어오는지 Gray인지
+                byte* ptr =(byte*) mem.GetPtr().ToPointer(); //Gray
                 for(int i=0;i<nHeight;i++)
                 {
                     int s=0, e=0,cur=0; //레이저 시작, 끝위치 정보
