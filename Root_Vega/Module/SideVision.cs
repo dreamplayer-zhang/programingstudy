@@ -2302,6 +2302,13 @@ namespace Root_Vega.Module
         {
             //-------------------------------------------------------------------
             SideVision m_module;
+            public GrabMode m_grabMode = null;
+            string _sGrabMode = "";
+            public string p_sGrabMode
+            {
+                get { return _sGrabMode; }
+                set { _sGrabMode = value; }
+            }
             public RPoint m_rpSpecimenCenterPos_pulse = new RPoint();
             public CPoint m_cpMemoryOffset_pixel = new CPoint();
             public double m_dResY_um = 1;
@@ -2321,6 +2328,7 @@ namespace Root_Vega.Module
             public override ModuleRunBase Clone()
             {
                 Run_GrabSpecimen run = new Run_GrabSpecimen(m_module);
+                run.p_sGrabMode = p_sGrabMode;
                 run.m_rpSpecimenCenterPos_pulse = new RPoint(m_rpSpecimenCenterPos_pulse);
                 run.m_cpMemoryOffset_pixel = new CPoint(m_cpMemoryOffset_pixel);
                 run.m_dResY_um = m_dResY_um;
@@ -2330,6 +2338,8 @@ namespace Root_Vega.Module
                 run.m_dSpecimenHorizontalSize_mm = m_dSpecimenHorizontalSize_mm;
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanRate = m_nScanRate;
+                run.m_grabMode = m_module.GetGrabMode(p_sGrabMode);
+
                 return run;
             }
             //-------------------------------------------------------------------
@@ -2350,10 +2360,78 @@ namespace Root_Vega.Module
                 m_dSpecimenHorizontalSize_mm = tree.Set(m_dSpecimenHorizontalSize_mm, m_dSpecimenHorizontalSize_mm, "Specimen Horizontal Size [mm]", "Specimen Horizontal Size [mm]", bVisible);
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "Camera Frame 사용률 1 ~ 100 %", bVisible);
+
+                string strTemp = p_sGrabMode;
+                p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+                if (strTemp != p_sGrabMode)
+                {
+                    m_grabMode = m_module.GetGrabMode(p_sGrabMode);
+                }
             }
             //-------------------------------------------------------------------
             public override string Run()
             {
+                // variable
+                AxisXY axisXY = m_module.p_axisXY;
+                Axis axisZ = m_module.p_axisZ;
+                int nCamWidth = m_module.m_CamSide.GetRoiSize().X;
+                int nCamHeight = m_module.m_CamSide.GetRoiSize().Y;
+                int nMMPerUM = 1000;
+
+                // implement
+                try
+                {
+                    m_module.p_bRunSideVision = true;
+                    int nScanLine = 0;
+                    m_grabMode.SetLight(true);
+                    //m_grabMode.SetLightByName("Side Coax", 700);
+                    double dTriggerPeriod = m_dResY_um / 10 * 100;
+                    double dXScale = m_dResX_um / 10 * 100;
+                    int nSpecimenVerticalSize_px = Convert.ToInt32(m_dSpecimenVerticalSize_mm * nMMPerUM / m_dResY_um);
+                    int nSpecimenHorizontalSize_px = Convert.ToInt32(m_dSpecimenHorizontalSize_mm * nMMPerUM / m_dResX_um);
+                    CPoint cptMemoryOffset_pixel = new CPoint(m_cpMemoryOffset_pixel);
+                    cptMemoryOffset_pixel.X += (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth;
+
+                    while(m_grabMode.m_ScanLineNum > nScanLine)
+                    {
+                        if (EQ.IsStop())
+                            return "OK";
+
+                        double dSpecimenRangePulse = m_grabMode.m_dTrigger * nSpecimenVerticalSize_px;
+                        double dStartAxisPos = m_rpSpecimenCenterPos_pulse.Y + dSpecimenRangePulse / 2 + m_grabMode.m_intervalAcc;
+                        double dEndAxisPos = m_rpSpecimenCenterPos_pulse.Y - dSpecimenRangePulse / 2 - m_grabMode.m_intervalAcc;
+                        double dPosZ = m_nFocusPosZ_pulse + nSpecimenHorizontalSize_px * dTriggerPeriod / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
+
+                        m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
+
+                        if (m_module.Run(axisXY.p_axisX.StartMove(-50000))) return p_sInfo;
+                        if (m_module.Run(axisXY.p_axisX.WaitReady())) return p_sInfo;
+                        if (m_module.Run(axisZ.StartMove(dPosZ))) return p_sInfo;
+                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+                        if (m_module.Run(axisXY.p_axisY.StartMove(dStartAxisPos))) return p_sInfo;
+                        if (m_module.Run(axisXY.p_axisY.WaitReady())) return p_sInfo;
+                        double dStartTriggerPos = m_rpSpecimenCenterPos_pulse.Y + dSpecimenRangePulse / 2;
+                        double dEndTriggerPos = m_rpSpecimenCenterPos_pulse.Y - dSpecimenRangePulse / 2;
+                        axisXY.p_axisY.SetTrigger(dStartTriggerPos, dEndTriggerPos, dTriggerPeriod, true);
+                        string strPool = m_grabMode.m_memoryPool.p_id;
+                        string strGroup = m_grabMode.m_memoryGroup.p_id;
+                        string strMem = m_grabMode.m_eScanPos.ToString();
+                        MemoryData mem = m_module.m_engineer.ClassMemoryTool().GetMemory(strPool, strGroup, "Side" + strMem);
+                        int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * dTriggerPeriod * nCamHeight * (double)m_nScanRate / 100);
+                        m_grabMode.StartGrab(mem, cptMemoryOffset_pixel, nSpecimenVerticalSize_px);
+                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndAxisPos, nScanSpeed))) return p_sInfo;
+                        if (m_module.Run(axisXY.p_axisY.WaitReady())) return p_sInfo;
+                        axisXY.p_axisY.RunTrigger(false);
+
+                        nScanLine++;
+                        cptMemoryOffset_pixel.X += nCamWidth;
+                    }
+                }
+                finally
+                {
+                    m_module.p_bRunSideVision = false;
+                }
+
                 return "OK";
             }
             //-------------------------------------------------------------------
