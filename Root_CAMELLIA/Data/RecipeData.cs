@@ -14,10 +14,13 @@ namespace Root_CAMELLIA.Data
         public float LowerWaveLength { get; set; } = 350;
         public float UpperWaveLength { get; set; }
         public int LMIteration { get; set; }
+        public float DampingFactor { get; set; }
         public List<double> WaveLengthReflectance { get; set; } = new List<double>();
         public List<double> WaveLengthTransmittance { get; set; } = new List<double>();
         public int VISIntegrationTime { get; set; } = 20;
         public int NIRIntegrationTime { get; set; } = 150;
+        //public List<string> MaterialList = new List<string>();
+        public string ModelRecipePath = "";
         public void ClearPoint()
         {
             DataCandidatePoint.Clear();
@@ -61,10 +64,13 @@ namespace Root_CAMELLIA.Data
             data.LowerWaveLength = LowerWaveLength;
             data.UpperWaveLength = UpperWaveLength;
             data.LMIteration = LMIteration;
+            data.DampingFactor = DampingFactor;
             data.WaveLengthReflectance = new List<double>(WaveLengthReflectance.ToArray());
             data.WaveLengthTransmittance = new List<double>(WaveLengthTransmittance.ToArray());
             data.VISIntegrationTime = VISIntegrationTime;
             data.NIRIntegrationTime = NIRIntegrationTime;
+            //data.MaterialList = new List<string>(MaterialList.ToArray());
+            data.ModelRecipePath = ModelRecipePath;
         }
 
         public bool ContainsData(List<CCircle> list, CCircle circle, out int nIndex)

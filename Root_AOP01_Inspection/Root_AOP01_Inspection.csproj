@@ -197,7 +197,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Module\AOP01.cs" />
-    <Compile Include="Module\Vision.cs" />
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\MainVision.cs" />
     <Compile Include="Module\WTR.cs" />

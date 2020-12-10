@@ -452,6 +452,67 @@ namespace Root_CAMELLIA
         }
         private DataTable _PointListItem = new DataTable();
 
+        public ObservableCollection<double> ReflectanceListItem
+        {
+            get
+            {
+                return _ReflectanceListItem;
+            }
+            set
+            {
+                _ReflectanceListItem = value;
+                RaisePropertyChanged("ReflectanceListItem");
+            }
+        }
+
+        private ObservableCollection<double> _ReflectanceListItem = new ObservableCollection<double>();
+
+        public ObservableCollection<double> TransmittanceListItem
+        {
+            get
+            {
+                return _TransmittanceListItem;
+            }
+            set
+            {
+                _TransmittanceListItem = value;
+                RaisePropertyChanged("TransmittanceListItem");
+            }
+        }
+
+        private ObservableCollection<double> _TransmittanceListItem = new ObservableCollection<double>();
+
+        public ObservableCollection<string> MaterialListItem
+        {
+            get
+            {
+                return _MaterialListItem;
+            }
+            set
+            {
+                _MaterialListItem = value;
+                RaisePropertyChanged("MaterialListItem");
+            }
+        }
+
+        private ObservableCollection<string> _MaterialListItem = new ObservableCollection<string>();
+
+        public ObservableCollection<string> SelectedModels
+        {
+            get
+            {
+                return _SelectedModels;
+            }
+            set
+            {
+                _SelectedModels = value;
+                RaisePropertyChanged("SelectedModels");
+            }
+        }
+
+        private ObservableCollection<string> _SelectedModels = new ObservableCollection<string>();
+
+
         public string PointAddMode
         {
             get
@@ -464,8 +525,198 @@ namespace Root_CAMELLIA
                 RaisePropertyChanged("PointAddMode");
             }
         }
+
         private string pointAddMode = "Normal";
 
+        private int _VISIntegrationTime = 20;
+        public int VISIntegrationTime
+        {
+            get
+            {
+                return _VISIntegrationTime;
+            }
+            set
+            {
+                _VISIntegrationTime = value;
+                dataManager.recipeDM.TeachingRD.VISIntegrationTime = _VISIntegrationTime;
+                RaisePropertyChanged("VISIntegrationTime");
+            }
+        }
+
+        private int _NIRIntegrationTime = 150;
+        public int NIRIntegrationTime
+        {
+            get
+            {
+                return _NIRIntegrationTime;
+            }
+            set
+            {
+                _NIRIntegrationTime = value;
+                dataManager.recipeDM.TeachingRD.NIRIntegrationTime = _NIRIntegrationTime;
+                RaisePropertyChanged("NIRIntegrationTime");
+            }
+        }
+
+        private float _LowerWaveLength = 350.0f;
+        public float LowerWaveLength
+        {
+            get
+            {
+                return _LowerWaveLength;
+            }
+            set
+            {
+                _LowerWaveLength = value;
+                dataManager.recipeDM.TeachingRD.LowerWaveLength = _LowerWaveLength;
+                RaisePropertyChanged("LowerWaveLength");
+            }
+        }
+
+        private float _UpperWaveLength = 0.0f;
+        public float UpperWaveLength
+        {
+            get
+            {
+                return _UpperWaveLength;
+            }
+            set
+            {
+                _UpperWaveLength = value;
+                dataManager.recipeDM.TeachingRD.UpperWaveLength = _UpperWaveLength;
+                RaisePropertyChanged("UpperWaveLength");
+            }
+        }
+
+        private int _ThicknessLMIteration = 0;
+        public int ThicknessLMIteration
+        {
+            get
+            {
+                return _ThicknessLMIteration;
+            }
+            set
+            {
+                _ThicknessLMIteration = value;
+                dataManager.recipeDM.TeachingRD.LMIteration = _ThicknessLMIteration;
+                RaisePropertyChanged("ThicknessLMIteration");
+            }
+        }
+
+        private float _DampingFactor = 0.0f;
+        public float DampingFactor
+        {
+            get
+            {
+                return _DampingFactor;
+            }
+            set
+            {
+                _DampingFactor = value;
+                dataManager.recipeDM.TeachingRD.DampingFactor = _DampingFactor;
+                RaisePropertyChanged("DampingFactor");
+            }
+        }
+
+        private bool _IsReflectanceCheck = true;
+        public bool IsReflectanceCheck
+        {
+            get
+            {
+                return _IsReflectanceCheck;
+            }
+            set
+            {
+                TransmittanceSelectedIndex = -1;
+                _IsReflectanceCheck = value;
+                RaisePropertyChanged("IsReflectanceCheck");
+            }
+        }
+
+        private bool _IsTransmittanceCheck = false;
+        public bool IsTransmittanceCheck
+        {
+            get
+            {
+                return _IsTransmittanceCheck;
+            }
+            set
+            {
+                ReflectanceSelectedIndex = -1;
+                _IsTransmittanceCheck = value;
+                RaisePropertyChanged("IsTransmittanceCheck");
+            }
+        }
+
+        private double _WaveLengthValue = 0.0f;
+        public double WaveLengthValue
+        {
+            get
+            {
+                return _WaveLengthValue;
+            }
+            set
+            {
+                _WaveLengthValue = value;
+                RaisePropertyChanged("WaveLengthValue");
+            }
+        }
+
+        private int _ReflectanceSelectedIndex = -1;
+        public int ReflectanceSelectedIndex
+        {
+            get
+            {
+                return _ReflectanceSelectedIndex;
+            }
+            set
+            {
+                _ReflectanceSelectedIndex = value;
+                RaisePropertyChanged("ReflectanceSelectedIndex");
+            }
+        }
+
+        private int _TransmittanceSelectedIndex = -1;
+        public int TransmittanceSelectedIndex
+        {
+            get
+            {
+                return _TransmittanceSelectedIndex;
+            }
+            set
+            {
+                _TransmittanceSelectedIndex = value;
+                RaisePropertyChanged("TransmittanceSelectedIndex");
+            }
+        }
+
+        private string _ModelPath = "";
+        public string ModelPath
+        {
+            get
+            {
+                return _ModelPath;
+            }
+            set
+            {
+                _ModelPath = value;
+                RaisePropertyChanged("ModelPath");
+            }
+        }
+
+        private int _MatarialSelectIndex = -1;
+        public int MatarialSelectIndex
+        {
+            get
+            {
+                return _MatarialSelectIndex;
+            }
+            set
+            {
+                _MatarialSelectIndex = value;
+                RaisePropertyChanged("MatarialSelectIndex");
+            }
+        }
         #endregion
 
         #region DataStage     
@@ -1538,6 +1789,8 @@ namespace Root_CAMELLIA
 
             ViewRectGeometry.Clear();
             SetViewRect();
+
+            UpdateParameter();
         }
 
         public void UpdateListView(bool MeasurementLoad = false)
@@ -1575,9 +1828,56 @@ namespace Root_CAMELLIA
                 row["ListY"] = Math.Round(c.y, 3).ToString();
                 row["ListRoute"] = (nRoute + 1).ToString();
                 PointListItem.Rows.Add(row);
-
             }
             PointCount = PointListItem.Rows.Count.ToString();
+
+            WaveLengthValue = 0;
+            ReflectanceListItem.Clear();
+            ReflectanceSelectedIndex = -1;
+            for(int i = 0; i < dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Count; i++)
+            {
+                ReflectanceListItem.Add(dataManager.recipeDM.TeachingRD.WaveLengthReflectance[i]);
+            }
+
+            TransmittanceListItem.Clear();
+            TransmittanceSelectedIndex = -1;
+            for (int i = 0; i < dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Count; i++)
+            {
+                TransmittanceListItem.Add(dataManager.recipeDM.TeachingRD.WaveLengthTransmittance[i]);
+            }
+
+            MaterialListItem.Clear();
+            if(dataManager.recipeDM.TeachingRD.ModelRecipePath != "")
+            {
+                dataManager.recipeDM.LoadModel();
+               // MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.TeachingRD.MaterialList.ToArray());
+                ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+            }
+            //App.m_nanoView.m_Model.m_MaterialList.Clear();
+            //for(int i = 0; i < dataManager.recipeDM.TeachingRD.MaterialList.Count; i++)
+            //{
+            //    App.m_nanoView.m_Model.LoadMaterialFile(dataManager.recipeDM.TeachingRD.MaterialList[i]);
+            //    MaterialListItem.Add(dataManager.recipeDM.TeachingRD.MaterialList[i]);
+            //}
+        }
+
+        private void UpdateParameter()
+        {
+            UpdateMeasurementParameter();
+            UpdateThicknessParameter();
+        }
+
+        private void UpdateMeasurementParameter()
+        {
+            NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime;
+            VISIntegrationTime = dataManager.recipeDM.TeachingRD.VISIntegrationTime;
+        }
+        private void UpdateThicknessParameter()
+        {
+            LowerWaveLength = dataManager.recipeDM.TeachingRD.LowerWaveLength;
+            UpperWaveLength = dataManager.recipeDM.TeachingRD.UpperWaveLength;
+            ThicknessLMIteration = dataManager.recipeDM.TeachingRD.LMIteration;
+            DampingFactor = dataManager.recipeDM.TeachingRD.DampingFactor;
         }
 
         private void SetViewRect()
@@ -2631,7 +2931,7 @@ namespace Root_CAMELLIA
                 });
             }
         }
-        public ICommand btn13Point
+        public ICommand Cmd13Point
         {
             get
             {
@@ -2880,6 +3180,7 @@ namespace Root_CAMELLIA
                 {
                     dataManager.recipeDM.RecipeOpen();
                     UpdateListView();
+                    UpdateParameter();
                     UpdateView();
                 });
             }
@@ -2908,9 +3209,120 @@ namespace Root_CAMELLIA
                 });
             }
         }
+
+        public ICommand CmdAddWaveLength
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (IsReflectanceCheck)
+                    {
+                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Add(WaveLengthValue);
+                        ReflectanceListItem.Add(WaveLengthValue);
+                    }
+                    else if(IsTransmittanceCheck)
+                    {
+                        dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Add(WaveLengthValue);
+                        TransmittanceListItem.Add(WaveLengthValue);
+                    }
+                });
+            }
+        }
+
+        public ICommand CmdDeleteWaveLength
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (IsReflectanceCheck)
+                    {
+                        if(ReflectanceSelectedIndex == -1)
+                        {
+                            return;
+                        }
+                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.RemoveAt(ReflectanceSelectedIndex);
+                        ReflectanceListItem.RemoveAt(ReflectanceSelectedIndex);
+                        ReflectanceSelectedIndex = -1;
+                    }
+                    else if (IsTransmittanceCheck)
+                    {
+                        if (TransmittanceSelectedIndex == -1)
+                        {
+                            return;
+                        }
+                        dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.RemoveAt(TransmittanceSelectedIndex);
+                        TransmittanceListItem.RemoveAt(TransmittanceSelectedIndex);
+                        TransmittanceSelectedIndex = -1;
+                    }
+                });
+            }
+        }
+
+        public ICommand CmdAddMaterial
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //MaterialListItem.Clear();
+                    int res = dataManager.recipeDM.AddMaterial();
+                    if(res == 0)
+                    {
+                       // MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.TeachingRD.MaterialList.ToList());
+                    }
+                    
+                    //for(int i = 0; i < dataManager.recipeDM.TeachingRD.MaterialList.Count; i++)
+                    //{
+                    //    MaterialListItem.Add(dataManager.recipeDM.TeachingRD.MaterialList[i]);
+                    //}
+                });
+            }
+        }
+
+        public ICommand CmdDeleteMaterial
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //MaterialListItem.Clear();
+                    int res = dataManager.recipeDM.AddMaterial();
+                    if (res == 0)
+                    {
+                     //   MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.TeachingRD.MaterialList.ToList());
+                    }
+                    //for(int i = 0; i < dataManager.recipeDM.TeachingRD.MaterialList.Count; i++)
+                    //{
+                    //    MaterialListItem.Add(dataManager.recipeDM.TeachingRD.MaterialList[i]);
+                    //}
+                });
+            }
+        }
+
+        public ICommand CmdOpenModel
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    dataManager.recipeDM.OpenModel();
+                  //  MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.TeachingRD.MaterialList.ToList());
+                    ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                });
+            }
+        }
+
+
         #endregion
 
         #region MethodAction
+        public void OnListViewMouseButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MatarialSelectIndex = -1;
+        }
+
         public void OnCheckboxChange(object sender, RoutedEventArgs e)
         {
             UpdateView();

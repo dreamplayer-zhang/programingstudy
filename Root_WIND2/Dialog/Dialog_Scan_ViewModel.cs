@@ -13,7 +13,7 @@ namespace Root_WIND2
     {
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
         Vision m_Vision;
-        Vision.Run_GrabLineScan m_RunGrab;
+        Run_GrabLineScan m_RunGrab;
 
         #region Property
         int m_nStartLine = 0;
@@ -83,7 +83,7 @@ namespace Root_WIND2
         }
         #endregion
 
-        public Dialog_Scan_ViewModel(Vision vision, Vision.Run_GrabLineScan grab)
+        public Dialog_Scan_ViewModel(Vision vision, Run_GrabLineScan grab)
         {
             m_Vision = vision;
             m_RunGrab = grab;
