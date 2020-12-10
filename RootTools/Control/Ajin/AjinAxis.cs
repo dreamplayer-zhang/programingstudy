@@ -657,6 +657,15 @@ namespace RootTools.Control.Ajin
 
         string CheckInterlock()
         {
+            for (int i = 0; i < m_aDIO_I.Count; i++)
+            {
+                if (!m_aDIO_I[i].p_bIn)
+                {
+                    string[] id = m_aDIO_I[i].m_id.Split('.');
+                    return " : " + id[1] + " Interlock Error";
+                }
+            }
+            // IOList for true
             for (int i = 0; i < m_aSensors.Count; i++)
             {
                 if (m_aSensors[i].m_bHome == true)
@@ -680,7 +689,7 @@ namespace RootTools.Control.Ajin
             m_treeRootInterlock.p_eMode = mode;
             RunTreeInterlockAxis(m_treeRootInterlock.GetTree("Axis"));
         }
-
+        
         void RunTreeInterlockAxis(Tree tree)
         {
             for (int i = 0; i < m_listAxis.m_aAxis.Count; i++)
@@ -692,6 +701,7 @@ namespace RootTools.Control.Ajin
             }
         }
 
+        bool testbool = false;
         void RunTreeSensor(Tree tree, int iIndex)
         {
             m_aSensors[iIndex].m_bHome = tree.Set(m_aSensors[iIndex].m_bHome, m_aSensors[iIndex].m_bHome, "Home", "Home Sensor");
@@ -736,6 +746,9 @@ namespace RootTools.Control.Ajin
             RunTreeSpeed(m_treeRoot.GetTree("Speed"), m_sUnit);
             RunTreePos(m_treeRoot.GetTree("Position"), m_sUnit);
             m_trigger.RunTree(m_treeRoot.GetTree("Trigger"), m_sUnit);
+
+            bool bVisible = m_aDIO_I.Count > 0;
+            RunTreeIOLock(m_treeRoot.GetTree("I/O Lock", false, bVisible), m_sUnit);
         }
 
         public override void RunTreeSetting(Tree.eMode mode)
