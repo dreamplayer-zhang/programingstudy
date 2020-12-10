@@ -235,6 +235,9 @@
     <Compile Include="Converter\AxisBoolToBrushConverter.cs" />
     <Compile Include="BaseDefine.cs" />
     <Compile Include="Converter\AxisConverter.cs" />
+    <Compile Include="Converter\AxisStateToEnableConverter.cs" />
+    <Compile Include="Converter\AxisStateToLoadingOpacityConverter.cs" />
+    <Compile Include="Converter\AxisStateToOpacityConverter.cs" />
     <Compile Include="Converter\ImageConverter.cs" />
     <Compile Include="Converter\PathConverter.cs" />
     <Compile Include="Converter\TextBoxToIntConverter.cs" />
@@ -242,6 +245,12 @@
     <Compile Include="Data\ModelData.cs" />
     <Compile Include="Data\WaferCentering.cs" />
     <Compile Include="Etc\MultiSelectionBehavior.cs" />
+    <Compile Include="Control\LoadingBlock.xaml.cs">
+      <DependentUpon>LoadingBlock.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\LoadingControl.xaml.cs">
+      <DependentUpon>LoadingControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_Engineer\Camellia_ToolBox.xaml.cs">
       <DependentUpon>Camellia_ToolBox.xaml</DependentUpon>
     </Compile>
@@ -291,6 +300,14 @@
       <DependentUpon>Camellia_Hander_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\WpfPropertyGrid.cs" />
+    <Page Include="Control\LoadingBlock.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\LoadingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI_Engineer\Camellia_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

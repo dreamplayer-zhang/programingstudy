@@ -169,7 +169,7 @@ namespace RootTools
 		public byte[] GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
 		{
 			//m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight);
-			return new byte[5];
+			return new byte[5];  // 이게 머여??
 		}
 		public unsafe void SetData(IntPtr ptr, CRect rect)
 		{
@@ -181,12 +181,13 @@ namespace RootTools
 		}
 		public unsafe void SetData(IntPtr ptr, CRect rect, int stride, int nByte = 1)
 		{
-			for (int i = rect.Height-1; i >= 0; i--)
-			{
-				Marshal.Copy((IntPtr)((long)ptr + rect.Left * nByte + ((long)i + (long)rect.Top) * stride) , m_aBuf, i * rect.Width * nByte, rect.Width * nByte);
-				//Marshal.Copy((IntPtr)((long)ptr + nByte * (rect.Left / nByte + (stride / nByte / nByte) * ((long)i + (long)rect.Top))), m_aBuf , i * rect.Width , rect.Width);
-			}
+			ReAllocate(new CPoint(rect.Width, rect.Height), nByte);
+
+			for (int i = rect.Height - 1; i >= 0; i--)
+				Marshal.Copy((IntPtr)((long)ptr + rect.Left * nByte + ((long)i + (long)rect.Top) * stride * (long)nByte * (long)rect.Width) , m_aBuf, i * rect.Width * nByte, rect.Width * nByte);
+
 		}
+
 		public unsafe void SetData(ImageData imgData, CRect rect, int stride, int nByte = 1)
 		{
 			if (nByte == 1)
