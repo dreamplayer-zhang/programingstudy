@@ -361,7 +361,7 @@ namespace Root_AxisMapping.MainUI
             {
                 m_aPos[x] = x0 + m_dx * (m_xSetup - x);
                 double dx = m_aArray[x, yc].m_rpCenter.X - xCenter;
-                m_adPos[x] = 12 * dx; //forget
+                m_adPos[x] = -12 * dx; //forget
             }
         }
 

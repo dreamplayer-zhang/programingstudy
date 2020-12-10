@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace Root_ASIS.AOI
 {
-    public class AOI_StripID : IAOI
+    public class AOI_StripID : IAOI //forget
     {
         #region StringTable
         static string[] m_asStringTable =
@@ -27,7 +27,8 @@ namespace Root_ASIS.AOI
 
             public void RunTree(Tree tree)
             {
-                m_sz = tree.Set(m_sz, m_sz, "szROI", "szROI", false);
+                m_sz.X = tree.Set(m_sz.X, m_sz.X, "szROIX", "szROI", false);
+                m_sz.Y = tree.Set(m_sz.Y, m_sz.Y, "szROIY", "szROI", false);
                 m_aoiData.RunTree(tree);
             }
 
@@ -43,7 +44,9 @@ namespace Root_ASIS.AOI
         UnitID m_unit; 
         void InitUnit()
         {
-            m_unit = new UnitID(p_id, this); 
+            m_unit = new UnitID(p_id, this);
+            p_aROI.Clear();
+            p_aROI.Add(m_unit.m_aoiData); 
         }
 
         void RunTreeUnit(Tree tree)

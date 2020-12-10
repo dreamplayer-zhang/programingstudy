@@ -165,6 +165,7 @@ namespace Root_CAMELLIA
             m_AxisXY = ModuleCamellia.p_axisXY;
             m_AxisZ = ModuleCamellia.p_axisZ;
 
+            MotionTabIndex = 1;
         }
 
 
@@ -194,7 +195,7 @@ namespace Root_CAMELLIA
 
         #endregion
 
-        #region ICommand
+        #region Motion Command
         public ICommand CmdAllHome
         {
             get
