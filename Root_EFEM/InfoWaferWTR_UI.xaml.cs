@@ -94,7 +94,7 @@ namespace Root_EFEM
         {
             int iArm = comboArm.SelectedIndex;
             if ((iArm < 0) || (iArm >= m_aArm.Count)) return;
-            m_aArm[iArm].p_infoWafer = new InfoWafer(m_aArm[iArm].m_id + ".Recover", m_engineer); 
+            m_aArm[iArm].p_infoWafer = new InfoWafer(m_aArm[iArm].m_id, -1, m_engineer); 
         }
 
         private void buttonRemove_Click(object sender, RoutedEventArgs e)

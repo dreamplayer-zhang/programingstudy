@@ -1,4 +1,5 @@
 ﻿using Root_AOP01_Inspection.Module;
+using Root_EFEM;
 using Root_EFEM.Module;
 using RootTools;
 using RootTools.GAFs;
@@ -32,7 +33,7 @@ namespace Root_AOP01_Inspection
         public ModuleList m_moduleList;
         public AOP01 m_aop01;
         public AOP01_Recipe m_recipe;
-        public AOP01_Process m_process;
+        public EFEM_Process m_process;
         public MainVision m_mainVision;
 
         void InitModule()
@@ -44,14 +45,15 @@ namespace Root_AOP01_Inspection
             InitLoadport();
             m_mainVision = new MainVision("MainVision", m_engineer);
             InitModule(m_mainVision);
-            ((IWTR)m_wtr).AddChild(m_mainVision);
+            IWTR iWTR = (IWTR)m_wtr;
+            iWTR.AddChild(m_mainVision);
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
-            ((IWTR)m_wtr).ReadInfoReticle_Registry();
+            iWTR.ReadInfoReticle_Registry();
 
             m_recipe = new AOP01_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            //m_process = new AOP01_Process("Process", m_engineer, this);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR);
         }
 
         void InitModule(ModuleBase module)
@@ -63,10 +65,12 @@ namespace Root_AOP01_Inspection
 
         public bool IsEnableRecovery()
         {
-            //            if (m_robot.p_infoReticle != null) return true;
-            //            if (m_sideVision.p_infoReticle != null) return true;
-            //            if (m_patternVision.p_infoReticle != null) return true;
-            return false;
+            IWTR iWTR = (IWTR)m_wtr; 
+            foreach (IWTRChild child in iWTR.p_aChild)
+            {
+                if (child.p_infoWafer != null) return true; 
+            }
+            return iWTR.IsEnableRecovery(); 
         }
         #endregion
 
@@ -195,15 +199,18 @@ namespace Root_AOP01_Inspection
         #endregion
 
         #region Calc Sequence
+        public int m_nRnR = 1;
+        dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
-            //            m_process.AddInfoWafer(infoSlot);
+            m_infoRnRSlot = infoSlot;
+            m_process.p_sInfo = m_process.AddInfoWafer(infoSlot); 
             return "OK";
         }
 
         public void CalcSequence()
         {
-            //            m_process.ReCalcSequence(null);
+            m_process.ReCalcSequence();
         }
         #endregion
 
@@ -211,7 +218,7 @@ namespace Root_AOP01_Inspection
         public void CheckFinish()
         {
             if (m_gem.p_cjRun == null) return;
-            //            if (m_process.m_qSequence.Count > 0) return;
+            if (m_process.m_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
                 if (m_gem != null) m_gem.SendPJComplete(pj.m_sPJobID);
@@ -221,13 +228,13 @@ namespace Root_AOP01_Inspection
 
         public dynamic GetGemSlot(string sSlot)
         {
-            //            foreach (Loadport loadport in m_aLoadport)
-            //            {
-            //                foreach (GemSlotBase slot in loadport.m_infoPod.m_aGemSlot)
-            //                {
-            //                    if (slot.p_id == sSlot) return slot;
-            //                }
-            //            }
+            foreach (Loadport loadport in m_aLoadport)
+            {
+                foreach (GemSlotBase slot in loadport.m_infoPod.m_aGemSlot)
+                {
+                    if (slot.p_id == sSlot) return slot;
+                }
+            }
             return null;
         }
         #endregion
@@ -252,7 +259,17 @@ namespace Root_AOP01_Inspection
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
-                        //                        m_process.p_sInfo = m_process.RunNextSequence();
+                        if (m_moduleList.m_qModuleRun.Count == 0)
+                        {
+                            m_process.p_sInfo = m_process.RunNextSequence();
+                            if ((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            {
+                                m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
+                                m_process.ReCalcSequence();
+                                m_nRnR--;
+                                EQ.p_eState = EQ.eState.Run;
+                            }
+                        }
                         break;
                 }
             }

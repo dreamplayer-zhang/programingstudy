@@ -601,7 +601,8 @@ namespace Root_EFEM.Module
 
         #region IWTRChild
         public List<string> m_asChild = new List<string>();
-        public List<IWTRChild> m_aChild = new List<IWTRChild>();
+        List<IWTRChild> _aChild = new List<IWTRChild>();
+        public List<IWTRChild> p_aChild { get { return _aChild; } }
         public void AddChild(params IWTRChild[] childs)
         {
             foreach (IWTRChild child in childs)
@@ -609,7 +610,7 @@ namespace Root_EFEM.Module
                 if (child != null)
                 {
                     child.p_bLock = true;
-                    m_aChild.Add(child);
+                    p_aChild.Add(child);
                     m_asChild.Add(child.p_id);
                 }
             }
@@ -618,7 +619,7 @@ namespace Root_EFEM.Module
 
         IWTRChild GetChild(string sChild)
         {
-            foreach (IWTRChild child in m_aChild)
+            foreach (IWTRChild child in p_aChild)
             {
                 if (child.p_id == sChild) return child;
             }
@@ -643,11 +644,18 @@ namespace Root_EFEM.Module
             return 0;
         }
 
+        public bool IsEnableRecovery()
+        {
+            if (m_dicArm[eArm.A].p_infoWafer != null) return true;
+            if (m_dicArm[eArm.B].p_infoWafer != null) return true;
+            return false; 
+        }
+
         public void ReadInfoReticle_Registry()
         {
             m_dicArm[eArm.A].ReadInfoWafer_Registry();
             m_dicArm[eArm.B].ReadInfoWafer_Registry();
-            foreach (IWTRChild child in m_aChild) child.ReadInfoWafer_Registry();
+            foreach (IWTRChild child in p_aChild) child.ReadInfoWafer_Registry();
         }
         #endregion
 
@@ -662,7 +670,7 @@ namespace Root_EFEM.Module
         {
             m_dicArm[eArm.A].RunTree(tree.GetTree("Arm A", false));
             m_dicArm[eArm.B].RunTree(tree.GetTree("Arm B", false));
-            foreach (IWTRChild child in m_aChild) child.RunTreeTeach(tree.GetTree("Teach", false));
+            foreach (IWTRChild child in p_aChild) child.RunTreeTeach(tree.GetTree("Teach", false));
             RunTimeoutTree(tree.GetTree("Timeout", false));
         }
 
@@ -699,11 +707,30 @@ namespace Root_EFEM.Module
         }
 
         #region ModuleRun
+        public ModuleRunBase CloneRunGet(string sChild, int nSlot)
+        {
+            Run_Get run = (Run_Get)m_runGet.Clone();
+            run.m_sChild = sChild;
+            run.m_nChildID = nSlot;
+            return run;
+        }
+
+        public ModuleRunBase CloneRunPut(string sChild, int nSlot)
+        {
+            Run_Put run = (Run_Put)m_runPut.Clone();
+            run.m_sChild = sChild;
+            run.m_nChildID = nSlot;
+            return run;
+        }
+
+        ModuleRunBase m_runGet;
+        ModuleRunBase m_runPut;
+
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Reset(this), false, "Reset WTR CPU");
-            AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
-            AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
+            m_runGet = AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
+            m_runPut = AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
         }
 
         public class Run_Reset : ModuleRunBase

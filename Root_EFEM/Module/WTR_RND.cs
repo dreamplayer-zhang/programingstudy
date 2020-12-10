@@ -477,7 +477,7 @@ namespace Root_EFEM.Module
                     if (nReset > c_nReset) return "Reset CPU Error";
                     Thread.Sleep(100);
                 }
-                foreach (IWTRChild child in m_aChild) child.p_bLock = true;
+                foreach (IWTRChild child in p_aChild) child.p_bLock = true;
                 if (m_bNeedHome)
                 {
                     if (Run(WriteCmd(eCmd.FindHome))) return p_sInfo;
@@ -489,7 +489,7 @@ namespace Root_EFEM.Module
                 m_bNeedHome = false;
                 if (Run(WaitReply(m_secHome))) return p_sInfo;
                 p_eState = eState.Ready;
-                foreach (IWTRChild child in m_aChild) child.p_bLock = false;
+                foreach (IWTRChild child in p_aChild) child.p_bLock = false;
                 return "OK";
             }
             finally
@@ -501,7 +501,8 @@ namespace Root_EFEM.Module
 
         #region IWTRChild
         public List<string> m_asChild = new List<string>();
-        public List<IWTRChild> m_aChild = new List<IWTRChild>();
+        List<IWTRChild> _aChild = new List<IWTRChild>();
+        public List<IWTRChild> p_aChild { get { return _aChild; } }
         public void AddChild(params IWTRChild[] childs)
         {
             foreach (IWTRChild child in childs)
@@ -509,7 +510,7 @@ namespace Root_EFEM.Module
                 if (child != null)
                 {
                     child.p_bLock = true;
-                    m_aChild.Add(child);
+                    p_aChild.Add(child);
                     m_asChild.Add(child.p_id);
                 }
             }
@@ -518,7 +519,7 @@ namespace Root_EFEM.Module
 
         protected IWTRChild GetChild(string sChild)
         {
-            foreach (IWTRChild child in m_aChild)
+            foreach (IWTRChild child in p_aChild)
             {
                 if (child.p_id == sChild) return child;
             }
@@ -543,11 +544,18 @@ namespace Root_EFEM.Module
             return 0;
         }
 
+        public bool IsEnableRecovery()
+        {
+            if (m_dicArm[eArm.Lower].p_infoWafer != null) return true;
+            if (m_dicArm[eArm.Upper].p_infoWafer != null) return true;
+            return false; 
+        }
+
         public void ReadInfoReticle_Registry()
         {
             m_dicArm[eArm.Lower].ReadInfoWafer_Registry();
             m_dicArm[eArm.Upper].ReadInfoWafer_Registry();
-            foreach (IWTRChild child in m_aChild) child.ReadInfoWafer_Registry();
+            foreach (IWTRChild child in p_aChild) child.ReadInfoWafer_Registry();
         }
         #endregion
 
@@ -587,7 +595,7 @@ namespace Root_EFEM.Module
         {
             m_dicArm[eArm.Upper].RunTree(tree.GetTree("Upper Arm", false));
             m_dicArm[eArm.Lower].RunTree(tree.GetTree("Lower Arm", false));
-            foreach (IWTRChild child in m_aChild) child.RunTreeTeach(tree.GetTree("Teach", false));
+            foreach (IWTRChild child in p_aChild) child.RunTreeTeach(tree.GetTree("Teach", false));
             RunTimeoutTree(tree.GetTree("Timeout", false));
         }
 
@@ -617,12 +625,30 @@ namespace Root_EFEM.Module
         }
 
         #region ModuleRun
+        public ModuleRunBase CloneRunGet(string sChild, int nSlot)
+        {
+            Run_Get run = (Run_Get)m_runGet.Clone();
+            run.m_sChild = sChild;
+            run.m_nChildID = nSlot;
+            return run; 
+        }
+
+        public ModuleRunBase CloneRunPut(string sChild, int nSlot)
+        {
+            Run_Put run = (Run_Put)m_runPut.Clone();
+            run.m_sChild = sChild;
+            run.m_nChildID = nSlot;
+            return run;
+        }
+
+        ModuleRunBase m_runGet;
+        ModuleRunBase m_runPut; 
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_ResetCPU(this), false, "Reset WTR CPU");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip WTR Arm");
-            AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
-            AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
+            m_runGet = AddModuleRunList(new Run_Get(this), true, "WTR Run Get Motion");
+            m_runPut = AddModuleRunList(new Run_Put(this), true, "WTR Run Put Motion");
         }
 
         public class Run_ResetCPU : ModuleRunBase

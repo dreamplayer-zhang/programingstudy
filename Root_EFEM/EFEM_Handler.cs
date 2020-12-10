@@ -41,10 +41,11 @@ namespace Root_EFEM
             InitVision();
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
-            ((IWTR)m_wtr).ReadInfoReticle_Registry(); 
+            IWTR iWTR = (IWTR)m_wtr;
+            iWTR.ReadInfoReticle_Registry(); 
             m_recipe = new EFEM_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-//            m_process = new EFEM_Process("Process", m_engineer, this);
+            m_process = new EFEM_Process("Process", m_engineer, iWTR);
         }
 
         void InitModule(ModuleBase module)
@@ -56,10 +57,12 @@ namespace Root_EFEM
 
         public bool IsEnableRecovery()
         {
-//            if (m_robot.p_infoReticle != null) return true;
-//            if (m_sideVision.p_infoReticle != null) return true;
-//            if (m_patternVision.p_infoReticle != null) return true;
-            return false;
+            IWTR iWTR = (IWTR)m_wtr;
+            foreach (IWTRChild child in iWTR.p_aChild)
+            {
+                if (child.p_infoWafer != null) return true;
+            }
+            return iWTR.IsEnableRecovery();
         }
         #endregion
 
