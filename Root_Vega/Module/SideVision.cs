@@ -100,7 +100,6 @@ namespace Root_Vega.Module
             }
         }
         #endregion
-
         public RADSControl m_RADSControl;
         MemoryPool m_memoryPool;
         InspectTool m_inspectTool;
@@ -160,7 +159,6 @@ namespace Root_Vega.Module
                 return m_CamLADS;
             }
         }
-
         #region GrabMode
         int m_lGrabMode = 0;
         public ObservableCollection<GrabMode> m_aGrabMode = new ObservableCollection<GrabMode>();
@@ -201,7 +199,6 @@ namespace Root_Vega.Module
                 grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
         }
         #endregion
-
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "AxisXY");
@@ -802,8 +799,9 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_SideVRSImageCapture(this), true, "Side VRS Image Capture");
             AddModuleRunList(new Run_BevelVRSImageCapture(this), true, "Bevel VRS Image Capture");
             AddModuleRunList(new Run_InspectionComplete(this), true, "Inspection Complete");
+            AddModuleRunList(new Run_GrabSpecimen(this), true, "Specimen Grab");
         }
-
+        #region Run_Delay
         public class Run_Delay : ModuleRunBase
         {
             SideVision m_module;
@@ -834,7 +832,8 @@ namespace Root_Vega.Module
                 return "OK";
             }
         }
-
+        #endregion
+        #region Run_Run
         public class Run_Run : ModuleRunBase
         {
             SideVision m_module;
@@ -869,7 +868,8 @@ namespace Root_Vega.Module
                 return "OK";
             }
         }
-
+        #endregion
+        #region Run_SideGrab
         public class Run_SideGrab : ModuleRunBase
         {
             _1_Mainview_ViewModel m_mvm;
@@ -899,8 +899,7 @@ namespace Root_Vega.Module
             public int m_nMaxFrame = 100;  // Camera max Frame 스펙
             public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
             public double m_dThetaOffset = 0.0;
-            public double m_dXOffset = 0.0;
-
+            
             public Run_SideGrab(SideVision module)
             {
                 m_module = module;
@@ -922,7 +921,6 @@ namespace Root_Vega.Module
                 run.m_dReticleHorizontalSize_mm = m_dReticleHorizontalSize_mm;
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_dThetaOffset = m_dThetaOffset;
-                run.m_dXOffset = m_dXOffset;
                 run.m_grabMode = m_module.GetGrabMode(p_sGrabMode);
 
                 return run;
@@ -1034,7 +1032,8 @@ namespace Root_Vega.Module
                 }
             }
         }
-
+        #endregion
+        #region Run_BevelGrab
         public class Run_BevelGrab : ModuleRunBase
         {
             SideVision m_module;
@@ -1187,7 +1186,8 @@ namespace Root_Vega.Module
                 }
             }
         }
-
+        #endregion
+        #region Run_AutoFocus
         #region CStepInfo
         public class CStepInfo : ObservableObject
         {
@@ -1235,7 +1235,6 @@ namespace Root_Vega.Module
             }
         }
         #endregion
-
         public class Run_AutoFocus : ModuleRunBase
         {
             public Dispatcher _dispatcher;
@@ -1554,7 +1553,6 @@ namespace Root_Vega.Module
             }
         }
         #endregion
-
         #region Run_LADS
         public class Run_LADS : ModuleRunBase
         {
@@ -1921,7 +1919,6 @@ namespace Root_Vega.Module
             }
         }
         #endregion
-
         #region Run_SideInspection
         public class Run_SideInspection : ModuleRunBase
         {
@@ -2212,67 +2209,73 @@ namespace Root_Vega.Module
         //-------------------------------------------------------------------
         #endregion
         #region Run_BevelVRSImageCapture
+        //-------------------------------------------------------------------
         public class Run_BevelVRSImageCapture : ModuleRunBase
         {
+            //-------------------------------------------------------------------
             SideVision m_module;
-
+            //-------------------------------------------------------------------
             public Run_BevelVRSImageCapture(SideVision module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
-
+            //-------------------------------------------------------------------
             public override ModuleRunBase Clone()
             {
                 Run_BevelVRSImageCapture run = new Run_BevelVRSImageCapture(m_module);
                 return run;
             }
-
+            //-------------------------------------------------------------------
             public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
             {
                 treeRoot.p_eMode = mode;
                 RunTree(treeRoot, true);
             }
-
+            //-------------------------------------------------------------------
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
             }
-
+            //-------------------------------------------------------------------
             public override string Run()
             {
                 return "OK";
             }
+            //-------------------------------------------------------------------
         }
+        //-------------------------------------------------------------------
         #endregion
         #region Run_InspectionComplete
+        //-------------------------------------------------------------------
         public class Run_InspectionComplete : ModuleRunBase
         {
+            //-------------------------------------------------------------------
             SideVision m_module;
             _2_6_SideViewModel m_sivm;
-
+            //-------------------------------------------------------------------
             public Run_InspectionComplete(SideVision module)
             {
                 m_module = module;
                 m_sivm = m_module.m_sivm;
                 InitModuleRun(module);
             }
-
+            //-------------------------------------------------------------------
             public override ModuleRunBase Clone()
             {
                 Run_InspectionComplete run = new Run_InspectionComplete(m_module);
                 return run;
             }
-
+            //-------------------------------------------------------------------
             public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
             {
                 treeRoot.p_eMode = mode;
                 RunTree(treeRoot, true);
             }
-
+            //-------------------------------------------------------------------
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
             }
-
+            //-------------------------------------------------------------------
             public override string Run()
             {
                 m_module.m_bRunSideVision = true;
@@ -2290,7 +2293,72 @@ namespace Root_Vega.Module
                 m_module.m_bRunSideVision = false;
                 return "OK";
             }
+            //-------------------------------------------------------------------
         }
+        //-------------------------------------------------------------------
+        #endregion
+        #region Run_GrabSpecimen
+        public class Run_GrabSpecimen : ModuleRunBase
+        {
+            //-------------------------------------------------------------------
+            SideVision m_module;
+            public RPoint m_rpSpecimenCenterPos_pulse = new RPoint();
+            public CPoint m_cpMemoryOffset_pixel = new CPoint();
+            public double m_dResY_um = 1;
+            public double m_dResX_um = 1;
+            public int m_nFocusPosZ_pulse = 0;
+            public double m_dSpecimenVerticalSize_mm = 100;
+            public double m_dSpecimenHorizontalSize_mm = 100;
+            public int m_nMaxFrame = 100;
+            public int m_nScanRate = 100;
+            //-------------------------------------------------------------------
+            public Run_GrabSpecimen(SideVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+            //-------------------------------------------------------------------
+            public override ModuleRunBase Clone()
+            {
+                Run_GrabSpecimen run = new Run_GrabSpecimen(m_module);
+                run.m_rpSpecimenCenterPos_pulse = new RPoint(m_rpSpecimenCenterPos_pulse);
+                run.m_cpMemoryOffset_pixel = new CPoint(m_cpMemoryOffset_pixel);
+                run.m_dResY_um = m_dResY_um;
+                run.m_dResX_um = m_dResX_um;
+                run.m_nFocusPosZ_pulse = m_nFocusPosZ_pulse;
+                run.m_dSpecimenVerticalSize_mm = m_dSpecimenVerticalSize_mm;
+                run.m_dSpecimenHorizontalSize_mm = m_dSpecimenHorizontalSize_mm;
+                run.m_nMaxFrame = m_nMaxFrame;
+                run.m_nScanRate = m_nScanRate;
+                return run;
+            }
+            //-------------------------------------------------------------------
+            public void RunTree(TreeRoot treeRoot, Tree.eMode mode)
+            {
+                treeRoot.p_eMode = mode;
+                RunTree(treeRoot, true);
+            }
+            //-------------------------------------------------------------------
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_rpSpecimenCenterPos_pulse = tree.Set(m_rpSpecimenCenterPos_pulse, m_rpSpecimenCenterPos_pulse, "Center Axis Position [pulse]", "Center Axis Position [pulse]", bVisible);
+                m_cpMemoryOffset_pixel = tree.Set(m_cpMemoryOffset_pixel, m_cpMemoryOffset_pixel, "Memory Position Offset [pixel]", "Memory Position Offset [pixel]", bVisible);
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam Resolution X [um]", "Cam Resolution X [um]", bVisible);
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Resolution Y [um]", "Cam Resolution Y [um]", bVisible);
+                m_nFocusPosZ_pulse = tree.Set(m_nFocusPosZ_pulse, m_nFocusPosZ_pulse, "Focus Z Pos [pulse]", "Focus Z Pos [pulse]", bVisible);
+                m_dSpecimenVerticalSize_mm = tree.Set(m_dSpecimenVerticalSize_mm, m_dSpecimenVerticalSize_mm, "Specimen Vertical Size [mm]", "Specimen Vertical Size [mm]", bVisible);
+                m_dSpecimenHorizontalSize_mm = tree.Set(m_dSpecimenHorizontalSize_mm, m_dSpecimenHorizontalSize_mm, "Specimen Horizontal Size [mm]", "Specimen Horizontal Size [mm]", bVisible);
+                m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
+                m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "Camera Frame 사용률 1 ~ 100 %", bVisible);
+            }
+            //-------------------------------------------------------------------
+            public override string Run()
+            {
+                return "OK";
+            }
+            //-------------------------------------------------------------------
+        }
+        #endregion
         #endregion
     }
 }
