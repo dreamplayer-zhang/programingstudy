@@ -16,7 +16,6 @@ namespace RootTools_Vision.Inspection
 		WorkplaceBundle workplaceBundle;
 		Workplace workplace;
 
-
 		public override WORK_TYPE Type => WORK_TYPE.MAINWORK;
 
 		public override WorkBase Clone()
@@ -24,10 +23,23 @@ namespace RootTools_Vision.Inspection
 			return (WorkBase)this.MemberwiseClone();
 		}
 
+		public override bool DoPrework()
+		{
+			if (this.workplace.Index == 0)
+				return base.DoPrework();
+
+			if (this.workplace.GetSubState(WORKPLACE_SUB_STATE.EDGE_TOP)
+				&& this.IsPreworkDone == false)
+			{
+			
+			}
+			return false;
+		}
+
 		public override void DoWork()
 		{
 			DoInspection();
-			//base.DoWork();
+			base.DoWork();
 		}
 
 		public override void SetRecipe(Recipe _recipe)
