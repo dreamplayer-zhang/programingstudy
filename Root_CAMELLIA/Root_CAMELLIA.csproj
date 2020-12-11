@@ -241,7 +241,6 @@
     <Compile Include="Data\Calibration.cs" />
     <Compile Include="Data\ModelData.cs" />
     <Compile Include="Data\WaferCentering.cs" />
-    <Compile Include="Etc\MultiSelectionBehavior.cs" />
     <Compile Include="UI_Engineer\Camellia_ToolBox.xaml.cs">
       <DependentUpon>Camellia_ToolBox.xaml</DependentUpon>
     </Compile>

@@ -594,10 +594,10 @@
                                         <UniformGrid Grid.Row="0" Margin="3" Background="Gainsboro" Columns="3" Grid.ColumnSpan="2">
                                             <TextBlock Text="Count" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                            <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                            <TextBlock Text="{Binding RecipeViewModel.PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                                         </UniformGrid>
-                                        <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
-                                  EnableRowVirtualization="True" Grid.ColumnSpan="2">
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding RecipeViewModel.PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                                  EnableRowVirtualization="True" Grid.ColumnSpan="2" SelectionMode="Single">
                                             <DataGrid.Resources>
                                                 <Style TargetType="DataGridColumnHeader">
                                                     <Setter Property="HorizontalAlignment" Value="Stretch"/>
