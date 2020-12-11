@@ -53,7 +53,7 @@ namespace Root_WIND2
 				return;
 			}
 
-			EdgeSideVision.Run_GrabEdge grab = (EdgeSideVision.Run_GrabEdge)edgeSideVision.CloneModuleRun("GrabEdge");
+			Run_GrabEdge grab = (Run_GrabEdge)edgeSideVision.CloneModuleRun("GrabEdge");
 			edgeSideVision.StartRun(grab);
 		}
 
