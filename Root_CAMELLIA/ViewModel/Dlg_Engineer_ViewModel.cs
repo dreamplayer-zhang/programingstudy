@@ -1,6 +1,7 @@
 ﻿using Root_CAMELLIA.Module;
 using RootTools;
 using RootTools.Control;
+using RootTools.Module;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_CAMELLIA
@@ -21,11 +23,11 @@ namespace Root_CAMELLIA
         /// <summary>
         /// Selected Tab Axis Index
         /// </summary>
-        public int SelectedIndex
+        public int MotionTabIndex
         {
             get
             {
-                return _SelectedIndex;
+                return _MotionTabIndex;
             }
             set
             {
@@ -35,29 +37,45 @@ namespace Root_CAMELLIA
                     case TabAxis.AxisX:
                         {
                             SelectedAxis = m_AxisXY.p_axisX;
-                            WorkPoint = m_AxisXY.p_axisX.m_aPos;
+                            CurrentAxisWorkPoints = GetWorkPoint(m_AxisXY.p_axisX.m_aPos);
                             return;
                         }
                     case TabAxis.AxisY:
                         {
                             SelectedAxis = m_AxisXY.p_axisY;
-                            WorkPoint = m_AxisXY.p_axisY.m_aPos;
+                            CurrentAxisWorkPoints = GetWorkPoint(m_AxisXY.p_axisY.m_aPos);
                             return;
                         }
                     case TabAxis.AxisZ:
                         {
                             SelectedAxis = m_AxisZ;
-                            WorkPoint = m_AxisZ.m_aPos;
+                            CurrentAxisWorkPoints = GetWorkPoint(m_AxisZ.m_aPos);
+                            return;
+                        }
+                    case TabAxis.Lifter:
+                        {
+                            return;
+                        }
+                    case TabAxis.StageZ:
+                        {
+                            return;
+                        }
+                    case TabAxis.TiltX:
+                        {
+                            return;
+                        }
+                    case TabAxis.TiltY:
+                        {
                             return;
                         }
                 }
-                SetProperty(ref _SelectedIndex, value);
+                SetProperty(ref _MotionTabIndex, value);
             }
         }
-        private int _SelectedIndex = 0;
+        private int _MotionTabIndex = 0;
 
         /// <summary>
-        /// Selected Axis Tab
+        /// Selected Tab Axis
         /// </summary>
         public Axis SelectedAxis
         {
@@ -71,6 +89,38 @@ namespace Root_CAMELLIA
             }
         }
         private Axis _SelectedAxis;
+
+        /// <summary>
+        /// Selected Axis WorkPoint Collection
+        /// </summary>
+        public ObservableCollection<WorkPoint> CurrentAxisWorkPoints
+        {
+            get
+            {
+                return _CurrentAxisWorkPoints;
+            }
+            set
+            {
+                SetProperty(ref _CurrentAxisWorkPoints, value);
+            }
+        }
+        private ObservableCollection<WorkPoint> _CurrentAxisWorkPoints;
+
+        /// <summary>
+        /// Selected WorkPoint in WorkPoints Collection
+        /// </summary>
+        public int SelectedWorkPointIndex
+        {
+            get
+            {
+                return _SelectedWorkPointIndex;
+            }
+            set
+            {
+                SetProperty(ref _SelectedWorkPointIndex, value);
+            }
+        }
+        private int _SelectedWorkPointIndex;
 
         /// <summary>
         /// Input Position Value
@@ -109,55 +159,43 @@ namespace Root_CAMELLIA
         private Axis m_AxisZ;
         private TabAxis eTabAxis = TabAxis.AxisX;
 
-        public Dictionary<string, double> WorkPoint
+        public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
         {
-            get
-            {
-                return _WorkPoint;
-            }
-            set
-            {
-                SetProperty(ref _WorkPoint, value);
-            }
+            ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
+            m_AxisXY = ModuleCamellia.m_axisXY;
+            m_AxisZ = ModuleCamellia.m_axisZ;
+
+            MotionTabIndex = 1;
         }
-        private Dictionary<string, double> _WorkPoint;
 
 
- 
-        public ObservableCollection<WorkPoints> WorkPoint2
+        #region Method
+        public void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            get
+            int value = 0;
+            if (Int32.TryParse((e.EditingElement as TextBox).Text, out value))
             {
-                return _WorkPoint2;
-            }
-            set
-            {
-                SetProperty(ref _WorkPoint2, value);
+                SelectedAxis.m_aPos[SelectedAxis.m_asPos[e.Row.GetIndex()]] = value;
+                SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.RegWrite);
+                SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.Init);
             }
         }
-        private ObservableCollection<WorkPoints> _WorkPoint2;
-        private ObservableCollection<WorkPoints> GetWorkPoints(Dictionary<string, double> dic)
+        private ObservableCollection<WorkPoint> GetWorkPoint(Dictionary<string, double> dic)
         {
-            ObservableCollection<WorkPoints> data = new ObservableCollection<WorkPoints>();
+            ObservableCollection<WorkPoint> data = new ObservableCollection<WorkPoint>();
             for (int i = 0; i < dic.Count; i++)
             {
-                WorkPoints wp = new WorkPoints();
+                WorkPoint wp = new WorkPoint();
                 wp.Name = dic.Keys.ToArray()[i];
                 wp.Value = dic.Values.ToArray()[i];
                 data.Add(wp);
             }
             return data;
         }
-        public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
-        {
-            ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
-            m_AxisXY = ModuleCamellia.p_axisXY;
-            m_AxisZ = ModuleCamellia.p_axisZ;
-            WorkPoint = m_AxisXY.p_axisX.m_aPos;
-            WorkPoint2 = GetWorkPoints(m_AxisXY.p_axisX.m_aPos);
-        }
 
-        #region ICommand
+        #endregion
+
+        #region Motion Command
         public ICommand CmdAllHome
         {
             get
@@ -178,8 +216,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    
-                    // 선택한 축 위치로 Move
+                    // 선택한 작업점 위치로 Move
+                    SelectedAxis.StartMove(CurrentAxisWorkPoints[SelectedWorkPointIndex].Value);
+                    //SelectedAxis.StartMove(SelectedWorkPoint.Value);
+                    SelectedAxis.WaitReady();
                 });
             }
         }
@@ -202,6 +242,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     // Save 작업점 List
+                    // Regi 내보내기
                 });
             }
         }
@@ -224,6 +265,13 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     // 지금 축 위치 propertygrid에 set
+                    double pos = SelectedAxis.p_posActual;
+                    CurrentAxisWorkPoints[SelectedWorkPointIndex].Value = pos;
+                    SelectedAxis.m_aPos[SelectedAxis.m_asPos[SelectedWorkPointIndex]] = pos;
+                    SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.RegWrite);
+                    SelectedAxis.RunTree(RootTools.Trees.Tree.eMode.Init);
+
+                    CurrentAxisWorkPoints = GetWorkPoint(SelectedAxis.m_aPos);
                 });
             }
         }
@@ -244,6 +292,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     // Load 작업점 List
+                    // Regi 불러와서 실행
                 });
             }
         }
@@ -253,8 +302,8 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    m_AxisXY.ServoOn(!m_AxisXY.p_axisX.p_bSeroOn);
-                    m_AxisZ.ServoOn(!m_AxisZ.p_bSeroOn);
+                    SelectedAxis.ServoOn(!m_AxisXY.p_axisX.p_bSeroOn);
+                    SelectedAxis.ServoOn(!m_AxisZ.p_bSeroOn);
                 });
             }
         }
@@ -332,23 +381,136 @@ namespace Root_CAMELLIA
                 });
             }
         }
+        public ICommand CmdCentering
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    Centering();
+                });
+            }
+        }
+        public ICommand CmdInitCal
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    InitCalibration();
+                });
+            }
+        }
+        public ICommand CmdMeasureBack
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    Calibration();
+                });
+            }
+        }
+        public ICommand CmdMeasureSample
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    MeasureSample();
+                });
+            }
+        }
+        public ICommand CmdRepeatMeasure
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
+                });
+            }
+        }
+
         #endregion
 
-        public class WorkPoints
+        #region Function
+        private void MeasureSample()
         {
+            EQ.p_bStop = false;
+            if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
+            {
+                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                return;
+            }
+            Module_Camellia.Run_Measure measure = (Module_Camellia.Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+            measure.Run();
+        }
+        private void Calibration()
+        {
+            EQ.p_bStop = false;
+            if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
+            {
+                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                return;
+            }
+            Module_Camellia.Run_Calibration calibration = (Module_Camellia.Run_Calibration)ModuleCamellia.CloneModuleRun("Calibration");
+            calibration.Run();
+        }
+        private void InitCalibration()
+        {
+            EQ.p_bStop = false;
+            if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
+            {
+                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                return;
+            }
+            Module_Camellia.Run_InitCalWaferCentering initCalibration = (Module_Camellia.Run_InitCalWaferCentering)ModuleCamellia.CloneModuleRun("InitCalWaferCentering");
+            initCalibration.Run();
+        }
+        private void Centering()
+        {
+            EQ.p_bStop = false;
+            if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
+            {
+                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                return;
+            }
+            Module_Camellia.Run_WaferCentering centering = (Module_Camellia.Run_WaferCentering)ModuleCamellia.CloneModuleRun("WaferCentering");
+            centering.Run();
+        }
+        #endregion
+
+        public class WorkPoint
+        {
+            private string _Name;
             public string Name
             {
-                get;
-                set;
+                get
+                {
+                    return _Name;
+                }
+                set
+                {
+                    _Name = value;
+                }
             }
+            private double _Value;
             public double Value
             {
-                get;
-                set;
+                get
+                {
+                    return _Value;
+                }
+                set
+                {
+                    _Value = value;
+                }
             }
         }
         private enum TabAxis
         {
+            None,
             AxisX,
             AxisY,
             AxisZ,

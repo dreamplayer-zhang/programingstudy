@@ -37,30 +37,13 @@ namespace Root_CAMELLIA.Module
         public MainWindow_ViewModel mwvm;
 
         #region ToolBox
-        AxisXY m_axisXY;
-        public AxisXY p_axisXY
-        {
-            get
-            {
-                return m_axisXY;
-            }
-            set
-            {
-                m_axisXY = value;
-            }
-        }
-        Axis m_axisZ;
-        public Axis p_axisZ
-        {
-            get
-            {
-                return m_axisZ;
-            }
-            set
-            {
-                m_axisZ = value;
-            }
-        }
+
+        public AxisXY m_axisXY;
+        public Axis m_axisZ;
+        public Axis m_axisLifter;
+        DIO_I m_axisXReady;
+        DIO_I m_axisYReady;
+
         Camera_Basler m_CamVRS;
 
         #region Light
@@ -88,20 +71,38 @@ namespace Root_CAMELLIA.Module
         }
         #endregion
 
+        #region Axis WorkPoint
+        enum eAxisPos
+        {
+            Ready,
+        }
+        private void InitWorkPoint()
+        {
+            m_axisXY.p_axisX.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisXY.p_axisY.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisLifter.AddIO(m_axisXReady);
+            m_axisLifter.AddIO(m_axisYReady);
+        }
+        #endregion
 
 
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
             p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
+            p_sInfo = m_toolBox.Get(ref m_axisLifter, this, "StageLifter");
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
+            p_sInfo = m_toolBox.Get(ref m_axisXReady, this, "Stage X Ready");
+            p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");
         }
         #endregion
 
         public Module_Camellia(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
+            InitWorkPoint();
             m_DataManager = DataManager.Instance;
         }
 

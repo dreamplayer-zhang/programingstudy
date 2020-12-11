@@ -12,11 +12,13 @@ using RootTools_Vision;
 
 namespace Root_WIND2
 {
+    public delegate void ButtonClicked(object obj, EventArgs args);
     public delegate void ComboboxItemChanged(object obj, EventArgs args);
     public class InspectionItem : ObservableObject
     {
         public event ComboboxItemChanged ComboBoxItemChanged_Mask;
         public event ComboboxItemChanged ComboBoxItemChanged_Method;
+        public event ButtonClicked ButtonClicked_Delete;
 
         private ObservableCollection<Mask> m_cMask;
         public ObservableCollection<Mask> p_cMask
@@ -95,5 +97,18 @@ namespace Root_WIND2
             }
         }
 
+
+        public ICommand btnDeleteInspItem
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (ButtonClicked_Delete != null)
+                        ButtonClicked_Delete(this, new EventArgs());
+
+                });
+            }
+        }
     }
 }

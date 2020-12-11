@@ -717,7 +717,7 @@ namespace Root_WIND2
             m_PositionRecipe = m_Recipe.GetRecipe<PositionRecipe>();
 
             //List<ImageData> listMasterFeautreimage = m_PositionRecipe.ListMasterImageFeatures;
-            List<RecipeType_FeatureData> listMasterFeature = m_PositionRecipe.ListMasterFeature;
+            List<RecipeType_ImageData> listMasterFeature = m_PositionRecipe.ListMasterFeature;
             for(int i = 0; i < listMasterFeature.Count; i ++)
             {
                 FeatureControl fc = new FeatureControl();
@@ -732,7 +732,7 @@ namespace Root_WIND2
             }
 
             //List<ImageData> listShotFeautreimage = m_PositionRecipe.ListShotImageFeatures;
-            List<RecipeType_FeatureData> listShotFeature = m_PositionRecipe.ListShotFeature;
+            List<RecipeType_ImageData> listShotFeature = m_PositionRecipe.ListShotFeature;
             for (int i = 0; i < listShotFeature.Count; i++)
             {
                 FeatureControl fc = new FeatureControl();
@@ -747,7 +747,7 @@ namespace Root_WIND2
             }
 
             //List<ImageData> listDieFeautreimage = m_PositionRecipe.ListDieImageFeatures;
-            List<RecipeType_FeatureData> listDieFeature = m_PositionRecipe.ListDieFeature;
+            List<RecipeType_ImageData> listDieFeature = m_PositionRecipe.ListDieFeature;
             for (int i = 0; i < listDieFeature.Count; i++)
             {
                 FeatureControl fc = new FeatureControl();

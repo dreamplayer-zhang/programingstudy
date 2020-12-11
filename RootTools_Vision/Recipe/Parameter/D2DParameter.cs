@@ -10,6 +10,29 @@ using RootTools_Vision;
 
 namespace RootTools_Vision
 {
+
+    public enum DiffFilterMethod
+    {
+        Average = 0,
+        Gaussian,
+        Median,
+        Morphology,
+        None,
+    }
+    public enum CreateRefImageMethod
+    {
+        Average = 0,
+        NearAverage,
+        MedianAverage,
+        Median,
+    }
+    public enum RefImageUpdateFreq
+    {
+        Chip = 0,
+        Chip_Trigger,
+        Line,
+        BeforeInsp,
+    }
     public class D2DParameter : ParameterBase
     {
         public  D2DParameter() : base(typeof(D2D))
@@ -24,6 +47,11 @@ namespace RootTools_Vision
         private int intensity = 0;
         private int size = 0;
         private bool isBright = false;
+        private bool scaleMap = false;
+        private bool histWeightMap = false;
+        private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
+        private CreateRefImageMethod createRefImage = CreateRefImageMethod.Average;
+        private RefImageUpdateFreq refImageUpdateFreq = RefImageUpdateFreq.Chip;
         #endregion
 
         #region [Getter Setter]
@@ -54,8 +82,52 @@ namespace RootTools_Vision
                 SetProperty<bool>(ref this.isBright, value);
             }
         }
-
-        
+        [Category("Option")]
+        public bool ScaleMap
+        {
+            get => this.scaleMap;
+            set
+            {
+                SetProperty<bool>(ref this.scaleMap, value);
+            }
+        }
+        [Category("Option")]
+        [DisplayName("Use Weight Map")]
+        public bool HistWeightMap
+        {
+            get => this.histWeightMap;
+            set
+            {
+                SetProperty<bool>(ref this.histWeightMap, value);
+            }
+        }
+        [Category("Option")]
+        public DiffFilterMethod DiffFilter
+        {
+            get => this.diffFilter;
+            set
+            {
+                SetProperty<DiffFilterMethod>(ref this.diffFilter, value);
+            }
+        }
+        [Category("Option")]
+        public CreateRefImageMethod CreateRefImage
+        {
+            get => this.createRefImage;
+            set
+            {
+                SetProperty<CreateRefImageMethod>(ref this.createRefImage, value);
+            }
+        }
+        [Category("Option")]
+        public RefImageUpdateFreq RefImageUpdate
+        {
+            get => this.refImageUpdateFreq;
+            set
+            {
+                SetProperty<RefImageUpdateFreq>(ref this.refImageUpdateFreq, value);
+            }
+        }
         #endregion
 
         public bool Save()
@@ -72,7 +144,7 @@ namespace RootTools_Vision
         {
             // string과 같이 new로 생성되는 변수가 있으면 MemberwiseClone을 사용하면안됩니다.
             // 현재 타입의 클래스를 생성해서 새로 값(객체)을 할당해주어야합니다.
-            return this.MemberwiseClone(); ;
+            return this.MemberwiseClone();
         }
     }
 }

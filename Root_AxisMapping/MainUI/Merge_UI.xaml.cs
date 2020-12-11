@@ -22,6 +22,7 @@ namespace Root_AxisMapping.MainUI
             m_merge = merge;
             DataContext = merge;
             memoryViewerUI.Init(merge.m_axisMapping.m_memoryPoolMerge.m_viewer, false);
+            checkBoxCorrect.DataContext = m_merge.m_mapping; 
             treeUI.Init(merge.m_treeRoot);
             merge.RunTree(Tree.eMode.Init);
             InitBackgroundWorker(); 

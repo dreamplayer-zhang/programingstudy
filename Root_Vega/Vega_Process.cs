@@ -4,6 +4,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Root_Vega
 {
@@ -288,30 +289,22 @@ namespace Root_Vega
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
         public string RunNextSequence()
         {
-            //if (m_qSequence.Count == 0) return "OK"; //check
-            //Sequence sequence = m_qSequence.Peek();  //check
             if (!EQ.p_bSimulate && (EQ.p_eState != EQ.eState.Run)) return "EQ not Run";
             if (EQ.IsStop()) return "EQ Stop";
             if (m_qSequence.Count == 0)
             {
-                //if (GetPodState(sequence.m_infoReticle.m_sLoadport).m_eState != InfoPod.eState.Placed && m_handler.m_nRnR == 0)// check
-                //{
-                //    return "OK";
-                //}
                 EQ.p_eState = EQ.eState.Ready;
                 ClearInfoReticle();
                 return "OK";
             }
             Sequence sequence = m_qSequence.Peek();
-            p_sInfo = sequence.m_moduleRun.Run();
+            ModuleBase module = sequence.m_moduleRun.m_moduleBase; 
+            p_sInfo = sequence.m_moduleRun.StartRun();
+            while ((module.m_qModuleRun.Count > 0) || (module.p_eState == ModuleBase.eState.Run)) Thread.Sleep(10); 
             m_handler.m_bIsPossible_Recovery = false;
-            if (p_sInfo != "OK") EQ.p_bStop = true;
-            else
-            {
-                m_qSequence.Dequeue();
-                if (sequence.m_infoReticle.m_qProcess.Count > 0) sequence.m_infoReticle.m_qProcess.Dequeue(); 
-                if (m_qSequence.Count == 0) ClearInfoReticle(); 
-            }
+            m_qSequence.Dequeue();
+            if (sequence.m_infoReticle.m_qProcess.Count > 0) sequence.m_infoReticle.m_qProcess.Dequeue();
+            if (m_qSequence.Count == 0) ClearInfoReticle();
             RunTree(Tree.eMode.Init);
             return p_sInfo;
         }

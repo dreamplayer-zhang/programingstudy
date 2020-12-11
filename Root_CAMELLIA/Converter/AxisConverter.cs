@@ -17,9 +17,6 @@ namespace Root_CAMELLIA
                 return 0.0;
             }
 
-
-
-
             return value;
         }
 

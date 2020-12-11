@@ -79,6 +79,7 @@ namespace Root_Vega
         private void buttonResume_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableResume() == false) return;
+            EQ.p_bStop = false; 
             EQ.p_eState = EQ.eState.Run; 
         }
         #endregion
@@ -171,6 +172,7 @@ namespace Root_Vega
             if (IsEnableRecovery() == false) return;
             m_handler.m_bIsPossible_Recovery = false;
             m_handler.m_process.CalcRecover();
+            EQ.p_bStop = false; 
             EQ.p_eState = EQ.eState.Run;
             m_bRecovery = true;
         }

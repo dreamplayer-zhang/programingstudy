@@ -1110,26 +1110,6 @@ namespace Root_Vega.Module
                                 }
                             }
                             #endregion
-                            #region Align Key
-                            ////  등록된 Align Key 3개를 탐색하여 AffineCoef를 구한다.
-                            //if (bFoundFeature)
-                            //{
-                            //    float[] farrCoef = null;
-                            //    if (roiCurrent.Position.AlignList.Count == 3)
-                            //    {
-                            //        farrCoef = m_mvvm.GetAffineArray(roiCurrent);
-                            //    }
-                            //    // 회전보정에 사용할 Coef
-                            //    if (farrCoef != null)
-                            //    {
-                            //        // align 탐색 성공. 좌표 보정 계산 시작
-                            //    }
-                            //    else
-                            //    {
-                            //        // align 실패
-                            //    }
-                            //}
-                            #endregion
                             #region Inspect Area
                             if (bFoundFeature)
                             {

@@ -46,7 +46,7 @@ namespace Root_WIND2
         protected override void InitWorkManager()
         {
             this.Add(new WorkManager("Position", WORK_TYPE.PREPARISON, WORKPLACE_STATE.READY, WORKPLACE_STATE.SNAP, STATE_CHECK_TYPE.CHIP));
-            this.Add(new WorkManager("Inspection", WORK_TYPE.MAINWORK, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, STATE_CHECK_TYPE.CHIP, 1));
+            this.Add(new WorkManager("Inspection", WORK_TYPE.MAINWORK, WORKPLACE_STATE.INSPECTION, WORKPLACE_STATE.READY, STATE_CHECK_TYPE.CHIP, 4));
             this.Add(new WorkManager("ProcessDefect", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS, WORKPLACE_STATE.INSPECTION, STATE_CHECK_TYPE.CHIP));
             this.Add(new WorkManager("ProcessDefect_Wafer", WORK_TYPE.FINISHINGWORK, WORKPLACE_STATE.DEFECTPROCESS_WAFER, WORKPLACE_STATE.DEFECTPROCESS, STATE_CHECK_TYPE.WAFER));
 
@@ -85,7 +85,7 @@ namespace Root_WIND2
             return CreateInspection(this.recipe);
         }
 
-        protected override bool CreateInspection(Recipe _recipe)
+        public override bool CreateInspection(Recipe _recipe)
         {
             try
             {
@@ -175,16 +175,8 @@ namespace Root_WIND2
             }
         }
 
-        public new void Start()
+        private new void Start()
         {
-            if (this.Recipe == null && this.Recipe.WaferMap == null)
-                return;
-
-            foreach (Workplace wp in this.workplaceBundle)
-            {
-                wp.STATE = WORKPLACE_STATE.SNAP;
-            }
-
             string lotId = "Lotid";
             string partId = "Partid";
             string setupId = "SetupID";
@@ -196,6 +188,23 @@ namespace Root_WIND2
             DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
 
             base.Start();
+        }
+
+
+        public void Start(bool Snap)
+        {
+            if (this.Recipe == null && this.Recipe.WaferMap == null)
+                return;
+
+            if(Snap == false)
+            {
+                foreach (Workplace wp in this.workplaceBundle)
+                {
+                    wp.STATE = WORKPLACE_STATE.SNAP;
+                }
+            }
+
+            Start();
         }
 
         public new void Stop()
