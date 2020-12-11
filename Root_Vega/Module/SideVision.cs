@@ -772,7 +772,6 @@ namespace Root_Vega.Module
 
         void RunTreeSetup(Tree tree)
         {
-            RunTreeDIODelay(tree.GetTree("DIO Delay", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
         }
         #endregion
@@ -788,8 +787,6 @@ namespace Root_Vega.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
-            AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
             AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
             AddModuleRunList(new Run_BevelGrab(this), true, "Bevel Grab");
             AddModuleRunList(new Run_AutoFocus(this), true, "Auto Focus");
@@ -802,74 +799,6 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_GrabSideSpecimen(this), true, "Side Specimen Grab");
             AddModuleRunList(new Run_GrabBevelSpecimen(this), true, "Bevel Specimen Grab");
         }
-        #region Run_Delay
-        public class Run_Delay : ModuleRunBase
-        {
-            SideVision m_module;
-            public Run_Delay(SideVision module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            double m_secDelay = 2;
-            public override ModuleRunBase Clone()
-            {
-                Run_Delay run = new Run_Delay(m_module);
-                run.m_secDelay = m_secDelay;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
-            }
-            public override string Run()
-            {
-                m_module.p_bRunSideVision = true;
-                Thread.Sleep((int)(1000 * m_secDelay));
-                m_module.m_gem.STSSetProcessing(m_module.p_infoReticle, RootTools.Gem.GemSlotBase.eSTSProcess.Processed);
-                m_module.p_bRunSideVision = false;
-                return "OK";
-            }
-        }
-        #endregion
-        #region Run_Run
-        public class Run_Run : ModuleRunBase
-        {
-            SideVision m_module;
-            public Run_Run(SideVision module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            double m_secDelay = 2;
-            public override ModuleRunBase Clone()
-            {
-                Run_Run run = new Run_Run(m_module);
-                run.m_secDelay = m_secDelay;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
-            }
-            public override string Run()
-            {
-                m_module.p_bRunSideVision = true;
-                if (EQ.p_bSimulate) Thread.Sleep(100);
-                else
-                {
-                    //forget SideVision ModuleRun_Run
-                }
-                m_module.m_gem.STSSetProcessing(m_module.p_infoReticle, RootTools.Gem.GemSlotBase.eSTSProcess.Processed);
-                m_module.p_bRunSideVision = false;
-                return "OK";
-            }
-        }
-        #endregion
         #region Run_SideGrab
         public class Run_SideGrab : ModuleRunBase
         {
@@ -1018,7 +947,7 @@ namespace Root_Vega.Module
                         {
                             m_mvm._dispatcher.Invoke(new Action(delegate ()
                             {
-                                m_mvm.TestFunction();
+                                m_mvm.UpdateMiniViewer();
                             }));
                         }
                     }
@@ -1608,7 +1537,6 @@ namespace Root_Vega.Module
             SideVision m_module;
 
             public RPoint m_rpCenterAxisPos = new RPoint();
-            public double m_dRes = 1;       //단위 um
             public double m_dReticleSizeX = 150;    // 단위 mm
             public double m_dInnerOffsetMM = 25;    // 단위 mm
 
@@ -1616,10 +1544,7 @@ namespace Root_Vega.Module
             public bool m_bFindXPos = false;
 
             public double m_dFocusHeight = 71.3;
-            public double m_nVerticalPixelPerPulse = 100;
             public double m_dPixelPerPulse = 387.0967;
-
-            public int m_nTestCheck = 0;
 
             public Run_LADS(SideVision module)
             {
@@ -1635,18 +1560,12 @@ namespace Root_Vega.Module
             {
                 Run_LADS run = new Run_LADS(m_module);
                 run.m_rpCenterAxisPos = new RPoint(m_rpCenterAxisPos);
-                run.m_dRes = m_dRes;
                 run.m_dReticleSizeX = m_dReticleSizeX;
                 run.m_dInnerOffsetMM = m_dInnerOffsetMM;
-
                 run.m_eScanPos = m_eScanPos;
                 run.m_bFindXPos = m_bFindXPos;
-
                 run.m_dFocusHeight = m_dFocusHeight;
-                run.m_nVerticalPixelPerPulse = m_nVerticalPixelPerPulse;
                 run.m_dPixelPerPulse = m_dPixelPerPulse;
-
-                run.m_nTestCheck = m_nTestCheck;
 
                 return run;
             }
@@ -1659,17 +1578,13 @@ namespace Root_Vega.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_rpCenterAxisPos = tree.Set(m_rpCenterAxisPos, m_rpCenterAxisPos, "Center Axis Position", "Center Axis Position (mm ?)", bVisible);
-                m_dRes = tree.Set(m_dRes, m_dRes, "Cam Resolution", "Resolution  um", bVisible);
                 m_dReticleSizeX = tree.Set(m_dReticleSizeX, m_dReticleSizeX, "Reticle Size X", "Reticle Size X (mm)", bVisible);
                 m_dInnerOffsetMM = tree.Set(m_dInnerOffsetMM, m_dInnerOffsetMM, "Inner Offset X", "Inner Offset X (mm)", bVisible);
                 m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible);
                 m_bFindXPos = tree.Set(m_bFindXPos, m_bFindXPos, "Find X Position Again", "Find X Position Again", bVisible);
 
                 m_dFocusHeight = tree.Set(m_dFocusHeight, m_dFocusHeight, "TDI Camera Focus Hitting Height", "TDI Camera Focus Hitting Height", bVisible);
-                m_nVerticalPixelPerPulse = tree.Set(m_nVerticalPixelPerPulse, m_nVerticalPixelPerPulse, "Height(1) per Pulse", "Height(1) per Pulse", bVisible);
-                m_dPixelPerPulse = tree.Set(m_dPixelPerPulse, m_dPixelPerPulse, "Constant", "Constant", bVisible);
-
-                m_nTestCheck = tree.Set(m_nTestCheck, m_nTestCheck, "Test", "Test", bVisible);
+                m_dPixelPerPulse = tree.Set(m_dPixelPerPulse, m_dPixelPerPulse, "1 Pixel per Pulse", "1 Pixel per Pulse", bVisible);
                 
                 base.RunTree(tree, bVisible, bRecipe);
             }
@@ -1686,8 +1601,6 @@ namespace Root_Vega.Module
                 double dLeftHeight = 0;
                 double dRightHeight = 0;
                 double dCenterHeight = 0;
-                //double dFocusHeight = 177;
-                //int nVerticalPixelPerPulse = 105;
                 double dPulsePerMM = 10000;
                 double dLeftSnapPosY = m_rpCenterAxisPos.Y + (m_dReticleSizeX / 2 * dPulsePerMM) - (m_dInnerOffsetMM * dPulsePerMM);
                 double dRightSnapPosY = m_rpCenterAxisPos.Y - (m_dReticleSizeX / 2 * dPulsePerMM) + (m_dInnerOffsetMM * dPulsePerMM);
@@ -1718,138 +1631,124 @@ namespace Root_Vega.Module
                     sw.Stop();
                     m_module.SetLightByName("LADS", 50);
 
-                    if (m_nTestCheck == 0)
+                    // 0. 스캔 포지션으로 Theta 돌리기
+                    double dPosTheta = (int)m_eScanPos * 360000 / 4;
+                    if (m_module.Run(axisXY.p_axisX.StartMove(-50000)))
+                        return p_sInfo;
+                    if (m_module.Run(axisXY.p_axisX.WaitReady()))
+                        return p_sInfo;
+                    if (m_module.Run(axisTheta.StartMove(dPosTheta)))
+                        return p_sInfo;
+                    if (m_module.Run(axisTheta.WaitReady()))
+                        return p_sInfo;
+
+                    // 1.Reticle 좌측 위치로 이동
+                    p_afs.p_strStatus = "Left Side Snap...";
+                    if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dLeftSnapPosY)))) return p_sInfo;
+                    if (m_module.Run(axisZ.StartMove(axisZ.GetPosValue(eAxisPosZ.LADS)))) return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+                    string strRet = cam.Grab();
+                    dLeftHeight = CalculatingHeight(img);
+                    if (dLeftHeight > 102 || dLeftHeight < 0) return "Left LADS Fail";
+                    System.Drawing.Bitmap bmpLeft = null;
+                    bmpLeft = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    if (_dispatcher != null)
                     {
-                        // 0. 스캔 포지션으로 Theta 돌리기
-                        double dPosTheta = (int)m_eScanPos * 360000 / 4;
-                        if (m_module.Run(axisXY.p_axisX.StartMove(-50000)))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.p_axisX.WaitReady()))
-                            return p_sInfo;
-                        if (m_module.Run(axisTheta.StartMove(dPosTheta)))
-                            return p_sInfo;
-                        if (m_module.Run(axisTheta.WaitReady()))
-                            return p_sInfo;
-
-                        // 1.Reticle 좌측 위치로 이동
-                        p_afs.p_strStatus = "Left Side Snap...";
-                        if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dLeftSnapPosY)))) return p_sInfo;
-                        if (m_module.Run(axisZ.StartMove(axisZ.GetPosValue(eAxisPosZ.LADS)))) return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
-                        string strRet = cam.Grab();
-                        dLeftHeight = CalculatingHeight(img);
-                        img.SaveImageSync($"D:/BottomLeft.bmp");
-                        if (dLeftHeight > 102 || dLeftHeight < 0) return "Left LADS Fail";
-                        System.Drawing.Bitmap bmpLeft = null;
-                        bmpLeft = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                        if (_dispatcher != null)
+                        _dispatcher.Invoke(new Action(delegate ()
                         {
-                            _dispatcher.Invoke(new Action(delegate ()
-                            {
-                                string strTemp = String.Format("Left Laser Height = {0}", dLeftHeight);
-                                BitmapSource bmpSrc = GetBitmapSource(bmpLeft);
-                                p_bmpSrcLeftViewer = bmpSrc;
-                                p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                            }));
-                        }
-
-                        // 2. Reticle 우측 위치로 이동
-                        p_afs.p_strStatus = "Right Side Snap...";
-                        if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dRightSnapPosY)))) return p_sInfo;
-                        if (m_module.Run(axisZ.StartMove(axisZ.GetPosValue(eAxisPosZ.LADS)))) return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                        if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
-                        strRet = cam.Grab();
-                        dRightHeight = CalculatingHeight(img);
-                        img.SaveImageSync($"D:/BottomRight.bmp");
-                        if (dRightHeight > 102 || dRightHeight < 0) return "Right LADS Fail";
-                        System.Drawing.Bitmap bmpRight = null;
-                        bmpRight = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                        if (_dispatcher != null)
-                        {
-                            _dispatcher.Invoke(new Action(delegate ()
-                            {
-                                string strTemp = String.Format("Right Laser Height = {0}", dRightHeight);
-                                BitmapSource bmpSrc = GetBitmapSource(bmpRight);
-                                p_bmpSrcRightViewer = bmpSrc;
-                                p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                            }));
-                        }
-
-                        // 3. 좌우측 높이차 구하기   
-                        double dDiff = dLeftHeight - dRightHeight;
-                        if ((dDiff < -102) || (dDiff > 102)) return "LADS Fail...";    // 높이측정 잘못 될 경우 Theta 계속 회전하는 문제 인터락
-                        double dConvertingDiffHeightToPulse = dDiff * m_dPixelPerPulse;
-                        double dDistanceOfLeftToRight = Math.Abs(dLeftSnapPosY - dRightSnapPosY);
-                        double dThetaRadian = Math.Atan2(dConvertingDiffHeightToPulse, dDistanceOfLeftToRight);
-                        double dThetaDegree = dThetaRadian * (180 / Math.PI);
-
-                        bool bThetaClockwise = true;    // Theta+ = Anticlockwise
-                                                        // Theta- = Clockwise
-                        if (dLeftHeight > dRightHeight) bThetaClockwise = false;
-
-                        // 5. Radian 값을 Theta 모터 포지션 값으로 Scaling
-                        double dMinValue = 0.0;
-                        double dMaxValue = 2 * Math.PI;
-                        double dMinScaleValue = 0.0;
-                        double dMaxScaleValue = 360000.0;
-                        double dScaled = dMinScaleValue + (Math.Abs(dThetaRadian) - dMinValue) / (dMaxValue - dMinValue) * (dMaxScaleValue - dMinScaleValue);
-
-                        double dActualPos = m_module.p_axisTheta.p_posActual;
-                        if (bThetaClockwise) dScaled = -dScaled;
-                        m_module.m_aLADSThetaPos[(int)m_eScanPos] = dActualPos + dScaled;
-                        m_module.p_axisTheta.StartMove(dActualPos + dScaled);
-                        m_module.p_axisTheta.m_aPos["Snap"] = (int)dScaled;
-
-                        // 6. Y축 Center 위치에서 Laser의 높이가 LineScan카메라 Focus가 맞는 위치에 맞도록 X위치 찾기
-                        p_afs.p_strStatus = "Center Snap...";
-                        if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, m_rpCenterAxisPos.Y)))) return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                        strRet = cam.Grab();
-                        dCenterHeight = CalculatingHeight(img);
-                        if (dCenterHeight > 102 || dCenterHeight < 0) return "Center LADS Fail";
-                        System.Drawing.Bitmap bmpCenter = null;
-                        bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                        if (_dispatcher != null)
-                        {
-                            _dispatcher.Invoke(new Action(delegate ()
-                            {
-                                string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
-                                BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
-                                p_bmpSrcCenterViewer = bmpSrc;
-                                p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                            }));
-                        }
-                        m_module.m_dMaxScorePosX = m_rpCenterAxisPos.X + ((dCenterHeight - m_dFocusHeight) * m_dPixelPerPulse);
-
-                        // 6. 찾은 위치로 이동해서 한번 더 촬영
-                        if (m_module.Run(axisXY.StartMove(new RPoint(m_module.m_dMaxScorePosX, m_rpCenterAxisPos.Y)))) return p_sInfo;
-                        if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
-                        strRet = cam.Grab();
-                        dCenterHeight = CalculatingHeight(img);
-                        if (dCenterHeight > 102 || dCenterHeight < 0) return "Center LADS Fail";
-                        bmpCenter = null;
-                        bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
-                        if (_dispatcher != null)
-                        {
-                            _dispatcher.Invoke(new Action(delegate ()
-                            {
-                                string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
-                                BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
-                                p_bmpSrcCenterViewer = bmpSrc;
-                                p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
-                            }));
-                        }
+                            string strTemp = String.Format("Left Laser Height = {0}", dLeftHeight);
+                            BitmapSource bmpSrc = GetBitmapSource(bmpLeft);
+                            p_bmpSrcLeftViewer = bmpSrc;
+                            p_lstLeftStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                        }));
                     }
-                    else
+
+                    // 2. Reticle 우측 위치로 이동
+                    p_afs.p_strStatus = "Right Side Snap...";
+                    if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, dRightSnapPosY)))) return p_sInfo;
+                    if (m_module.Run(axisZ.StartMove(axisZ.GetPosValue(eAxisPosZ.LADS)))) return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady())) return p_sInfo;
+                    strRet = cam.Grab();
+                    dRightHeight = CalculatingHeight(img);
+                    if (dRightHeight > 102 || dRightHeight < 0) return "Right LADS Fail";
+                    System.Drawing.Bitmap bmpRight = null;
+                    bmpRight = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    if (_dispatcher != null)
                     {
-                        Thread.Sleep(1000);
-                        string strRet = cam.Grab();
-                        Thread.Sleep(1000);
-                        double dHeight = CalculatingHeight(img);
-                        if (dHeight > 102 || dHeight < 0) return "LADS Fail";
-                        MessageBox.Show(dHeight.ToString());
+                        _dispatcher.Invoke(new Action(delegate ()
+                        {
+                            string strTemp = String.Format("Right Laser Height = {0}", dRightHeight);
+                            BitmapSource bmpSrc = GetBitmapSource(bmpRight);
+                            p_bmpSrcRightViewer = bmpSrc;
+                            p_lstRightStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                        }));
+                    }
+
+                    // 3. 좌우측 높이차 구하기   
+                    double dDiff = dLeftHeight - dRightHeight;
+                    if ((dDiff < -102) || (dDiff > 102)) return "LADS Fail...";    // 높이측정 잘못 될 경우 Theta 계속 회전하는 문제 인터락
+                    double dConvertingDiffHeightToPulse = dDiff * m_dPixelPerPulse;
+                    double dDistanceOfLeftToRight = Math.Abs(dLeftSnapPosY - dRightSnapPosY);
+                    double dThetaRadian = Math.Atan2(dConvertingDiffHeightToPulse, dDistanceOfLeftToRight);
+                    double dThetaDegree = dThetaRadian * (180 / Math.PI);
+
+                    bool bThetaClockwise = true;    // Theta+ = Anticlockwise
+                                                    // Theta- = Clockwise
+                    if (dLeftHeight > dRightHeight) bThetaClockwise = false;
+
+                    // 5. Radian 값을 Theta 모터 포지션 값으로 Scaling
+                    double dMinValue = 0.0;
+                    double dMaxValue = 2 * Math.PI;
+                    double dMinScaleValue = 0.0;
+                    double dMaxScaleValue = 360000.0;
+                    double dScaled = dMinScaleValue + (Math.Abs(dThetaRadian) - dMinValue) / (dMaxValue - dMinValue) * (dMaxScaleValue - dMinScaleValue);
+
+                    double dActualPos = m_module.p_axisTheta.p_posActual;
+                    if (bThetaClockwise) dScaled = -dScaled;
+                    m_module.m_aLADSThetaPos[(int)m_eScanPos] = dActualPos + dScaled;
+                    m_module.p_axisTheta.StartMove(dActualPos + dScaled);
+                    m_module.p_axisTheta.m_aPos["Snap"] = (int)dScaled;
+
+                    // 6. Y축 Center 위치에서 Laser의 높이가 LineScan카메라 Focus가 맞는 위치에 맞도록 X위치 찾기
+                    p_afs.p_strStatus = "Center Snap...";
+                    if (m_module.Run(axisXY.StartMove(new RPoint(m_rpCenterAxisPos.X, m_rpCenterAxisPos.Y)))) return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    strRet = cam.Grab();
+                    dCenterHeight = CalculatingHeight(img);
+                    if (dCenterHeight > 102 || dCenterHeight < 0) return "Center LADS Fail";
+                    System.Drawing.Bitmap bmpCenter = null;
+                    bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    if (_dispatcher != null)
+                    {
+                        _dispatcher.Invoke(new Action(delegate ()
+                        {
+                            string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
+                            BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
+                            p_bmpSrcCenterViewer = bmpSrc;
+                            p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                        }));
+                    }
+                    m_module.m_dMaxScorePosX = m_rpCenterAxisPos.X + ((dCenterHeight - m_dFocusHeight) * m_dPixelPerPulse);
+
+                    // 6. 찾은 위치로 이동해서 한번 더 촬영
+                    if (m_module.Run(axisXY.StartMove(new RPoint(m_module.m_dMaxScorePosX, m_rpCenterAxisPos.Y)))) return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady())) return p_sInfo;
+                    strRet = cam.Grab();
+                    dCenterHeight = CalculatingHeight(img);
+                    if (dCenterHeight > 102 || dCenterHeight < 0) return "Center LADS Fail";
+                    bmpCenter = null;
+                    bmpCenter = img.GetRectImage(new CRect(0, 0, img.p_Size.X, img.p_Size.Y));
+                    if (_dispatcher != null)
+                    {
+                        _dispatcher.Invoke(new Action(delegate ()
+                        {
+                            string strTemp = String.Format("Center Laser Height = {0}", dCenterHeight);
+                            BitmapSource bmpSrc = GetBitmapSource(bmpCenter);
+                            p_bmpSrcCenterViewer = bmpSrc;
+                            p_lstCenterStepInfo.Add(new CStepInfo(strTemp, bmpSrc));
+                        }));
                     }
                 }
                 finally
