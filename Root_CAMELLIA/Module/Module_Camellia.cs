@@ -37,42 +37,12 @@ namespace Root_CAMELLIA.Module
         public MainWindow_ViewModel mwvm;
 
         #region ToolBox
-        AxisXY m_axisXY;
-        public AxisXY p_axisXY
-        {
-            get
-            {
-                return m_axisXY;
-            }
-            set
-            {
-                m_axisXY = value;
-            }
-        }
-        Axis m_axisZ;
-        public Axis p_axisZ
-        {
-            get
-            {
-                return m_axisZ;
-            }
-            set
-            {
-                m_axisZ = value;
-            }
-        }
-        Axis m_axisLifter;
-        public Axis p_axisLifter
-        {
-            get
-            {
-                return m_axisLifter;
-            }
-            set
-            {
-                m_axisLifter = value;
-            }
-        }
+
+        public AxisXY m_axisXY;
+        public Axis m_axisZ;
+        public Axis m_axisLifter;
+        DIO_I m_axisXReady;
+        DIO_I m_axisYReady;
 
         Camera_Basler m_CamVRS;
 
@@ -108,9 +78,11 @@ namespace Root_CAMELLIA.Module
         }
         private void InitWorkPoint()
         {
-            p_axisXY.p_axisX.AddPos(Enum.GetNames(typeof(eAxisPos)));
-            p_axisXY.p_axisY.AddPos(Enum.GetNames(typeof(eAxisPos)));
-            p_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisXY.p_axisX.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisXY.p_axisY.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisLifter.AddIO(m_axisXReady);
+            m_axisLifter.AddIO(m_axisYReady);
         }
         #endregion
 
@@ -122,6 +94,8 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.Get(ref m_axisLifter, this, "StageLifter");
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
+            p_sInfo = m_toolBox.Get(ref m_axisXReady, this, "Stage X Ready");
+            p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");
         }
         #endregion
 
