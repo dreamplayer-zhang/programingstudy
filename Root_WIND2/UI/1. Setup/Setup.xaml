@@ -129,6 +129,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
+                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0">
                         <Button FontWeight="Bold" FontSize="13" 
@@ -156,17 +157,31 @@
                     </Grid>
                     <Grid Grid.Column="2">
                         <Button FontWeight="Bold" FontSize="13" 
+                                    ToolTip="New Recipe"
+                                    BorderThickness="0"
+                                    Background="{StaticResource ControlBackGround}"
+                                    Command="{Binding btnNewRecipe}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <!--<TextBlock Text="Save"/>-->
+                                    <material:PackIcon Kind="FilePlusOutline"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+                    <Grid Grid.Column="3">
+                        <Button FontWeight="Bold" FontSize="13" 
                                     BorderThickness="0,0,0,0"
                                     ToolTip="Load Recipe"
                                     Background="{StaticResource ControlBackGround}"
                                     Command="{Binding btnLoadRecipe}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Load"/>-->
-                                <material:PackIcon Kind="FileUpload"/>
+                                <material:PackIcon Kind="FolderOpen"/>
                             </StackPanel>
                         </Button>
                     </Grid>
-                    <Grid Grid.Column="3">
+                    <Grid Grid.Column="4">
                         <Button FontWeight="Bold" FontSize="13" 
                                     ToolTip="Save Recipe"
                                     BorderThickness="0"

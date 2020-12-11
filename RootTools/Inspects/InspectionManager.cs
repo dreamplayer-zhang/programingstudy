@@ -130,6 +130,7 @@ namespace RootTools.Inspects
         }
 
 		public int m_nTotalDefectCount = 0;
+		public float[] m_farrAfineMatrix = null;
 
 		public bool IsInitialized { get; private set; }
 		public void StartInspection()
@@ -419,18 +420,28 @@ namespace RootTools.Inspects
 						dataRow["FOV"] = item["FOV"];
 						int posX = Convert.ToInt32(item["PosX"]);
 						int posY = Convert.ToInt32(item["PosY"]);
-
+						//	회전보정
+						System.Drawing.PointF ptfOriginPos = new System.Drawing.PointF(posX, posY);
+						System.Drawing.PointF ptfTransformedPos = new System.Drawing.PointF(posX, posY);
+						if (m_farrAfineMatrix != null)
+                        {
+							ptfTransformedPos = AffineTransform(ptfOriginPos, m_farrAfineMatrix);
+						}
+						//
 						if (refPosDictionary != null)
 						{
 							if (refPosDictionary.ContainsKey(Convert.ToInt32(item["ClassifyCode"])))
 							{
 								//보정 기본 좌표가 있는 경우 보정 기준 좌표를 적용한다
-								posX -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].X;
-								posY -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].Y;
+								ptfTransformedPos.X -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].X;
+								ptfTransformedPos.Y -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].Y;
 							}
 						}
 						dataRow["PosX"] = posX;
 						dataRow["PosY"] = posY;
+
+						dataRow["TransformPosX"] = ptfTransformedPos.X;
+						dataRow["TransformPosY"] = ptfTransformedPos.Y;
 
 						dataRow["TdiImageExist"] = 1;
 						dataRow["VrsImageExist"] = 0;
@@ -494,7 +505,15 @@ namespace RootTools.Inspects
 
 				result = connector.SendNonQuery("INSERT INTO inspections.inspstatus (idx, inspStatusNum) VALUES ('0', '1') ON DUPLICATE KEY UPDATE idx='0', inspStatusNum='1';");
 			}
-			
+
+			System.Drawing.PointF AffineTransform(System.Drawing.PointF ptSrc, float[] Coef)
+			{
+				System.Drawing.PointF ptRst = new System.Drawing.PointF();
+				ptRst.X = (int)Math.Ceiling(ptSrc.X * Coef[0] + ptSrc.Y * Coef[1] + Coef[2]);
+				ptRst.Y = (int)Math.Ceiling(ptSrc.X * Coef[3] + ptSrc.Y * Coef[4] + Coef[5]);
+				return ptRst;
+			}
+
 			connector.Close();
 
 			//Monitor.Wait(lockObj);

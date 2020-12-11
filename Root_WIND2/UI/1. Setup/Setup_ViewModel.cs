@@ -380,13 +380,33 @@ namespace Root_WIND2
                 return new RelayCommand(SetHome);
             }
         }
-        public ICommand btnSaveRecipe
+        public ICommand btnNewRecipe
         {
             get
             {
                 return new RelayCommand(ProgramManager.Instance.ShowDialogSaveRecipe);
             }
+
         }
+
+        public ICommand btnSaveRecipe
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.Recipe.RecipePath == "")
+                    {
+                        ProgramManager.Instance.ShowDialogSaveRecipe();
+                    }
+                    else
+                    {
+                        ProgramManager.Instance.SaveRecipe(this.Recipe.RecipePath);
+                    }
+                });
+            }
+        }
+
         public ICommand btnLoadRecipe
         {
             get

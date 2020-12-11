@@ -162,9 +162,10 @@ namespace Root_CAMELLIA
         public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
         {
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
-            m_AxisXY = ModuleCamellia.p_axisXY;
-            m_AxisZ = ModuleCamellia.p_axisZ;
+            m_AxisXY = ModuleCamellia.m_axisXY;
+            m_AxisZ = ModuleCamellia.m_axisZ;
 
+            MotionTabIndex = 1;
         }
 
 
@@ -194,7 +195,7 @@ namespace Root_CAMELLIA
 
         #endregion
 
-        #region ICommand
+        #region Motion Command
         public ICommand CmdAllHome
         {
             get

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace RootTools_Vision
 {
@@ -15,6 +16,8 @@ namespace RootTools_Vision
         private int diePitchY;
         private int inspectionBufferOffsetX;
         private int inspectionBufferOffsetY;
+
+        private RecipeType_ImageData masterImage;
         #endregion
 
         #region [Getter Setter]
@@ -71,7 +74,15 @@ namespace RootTools_Vision
                 SetProperty<int>(ref this.inspectionBufferOffsetY, value);
             }
         }
-        #endregion 
+
+        //[XmlIgnore]
+        public RecipeType_ImageData MasterImage
+        { 
+            get => masterImage; 
+            set => masterImage = value;
+        }
+
+        #endregion
 
         public OriginRecipe()
         {
@@ -80,12 +91,17 @@ namespace RootTools_Vision
 
         public override bool Read(string recipePath)
         {
+            //return masterImage.Read(recipePath);
+
             return true;
         }
 
         public override bool Save(string recipePath)
         {
+
             return true;
+            //masterImage.FileName = "MasterImage.bmp";
+            //return masterImage.Save(recipePath);
         }
     }
 }

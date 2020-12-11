@@ -1231,7 +1231,6 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <Button Grid.Column="0"
                                             Margin="5"
@@ -1255,19 +1254,6 @@
                                                     
                                                     <TextBlock Style="{StaticResource BasicTb}"
                                                            Text="LADS"
-                                                           FontSize="15"></TextBlock>
-                                                </StackPanel>
-                                            </Button.Content>
-                                        </Button>
-                                        <Button Grid.Column="2"
-                                                Margin="5"
-                                                Command="{Binding CommandTest}"
-                                                Style="{StaticResource BasicBtn}">
-                                            <Button.Content>
-                                                <StackPanel Orientation="Vertical">
-                                                    
-                                                    <TextBlock Style="{StaticResource BasicTb}"
-                                                           Text="TEST"
                                                            FontSize="15"></TextBlock>
                                                 </StackPanel>
                                             </Button.Content>

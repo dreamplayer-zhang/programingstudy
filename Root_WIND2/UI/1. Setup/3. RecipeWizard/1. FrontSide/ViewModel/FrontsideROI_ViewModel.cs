@@ -49,16 +49,16 @@ namespace Root_WIND2
         {
             TRect InspAreaBuf = e as TRect;
             BoxOffset = new CPoint(InspAreaBuf.MemoryRect.Left, InspAreaBuf.MemoryRect.Top);
-            ImageData OriginImageData = InspAreaBuf.Tag as ImageData;
-            if (OriginImageData.p_Size.X == 0 || OriginImageData.p_Size.Y == 0)
-            {
-                p_ImgSource = null;
-            }
-            else
-            {
-                p_ImageData = OriginImageData;
-                base.SetRoiRect();
-            }          
+            //ImageData OriginImageData = InspAreaBuf.Tag as ImageData;
+            //if (OriginImageData.p_Size.X == 0 || OriginImageData.p_Size.Y == 0)
+            //{
+            //    p_ImgSource = null;
+            //}
+            //else
+            //{
+            //    p_ImageData = OriginImageData;
+            //    base.SetRoiRect();
+            //}          
         }
 
         #region Property
