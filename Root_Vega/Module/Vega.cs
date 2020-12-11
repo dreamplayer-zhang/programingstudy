@@ -162,7 +162,7 @@ namespace Root_Vega.Module
             {
                 m_alidIonizerAlarm.Run(!m_diIonizerAlarmCheck.ReadDI(eIonizer.LP1) || !m_diIonizerAlarmCheck.ReadDI(eIonizer.LP2), "Please Check State of X-ray Ionizer");
             }
-            if (EQ.p_eState == EQ.eState.Run && m_bDoorlock_Use)
+            if (m_bDoorlock_Use && m_diInterlock_Key.p_bIn)
             {
                 m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");//check
             }
@@ -180,7 +180,6 @@ namespace Root_Vega.Module
             m_alidElecPnl_2_FanAlarm.Run(!m_diElecPnl_2_FanAlarm.p_bIn, "Please Check Electronic Panel 1 Fan");
             m_alidPCPnl_FanAlarm.Run(!m_diPCPnl_FanAlarm.p_bIn, "Please Check PC Panel Fan");
             m_alidPC_FanAlarm.Run(!m_diPC_FanAlarm.p_bIn, "Please Check PC Fan");
-            m_alidInterlockkey.Run(m_diInterlock_Key.p_bIn, "Please Check Interlock Key");
             #endregion
 
 
