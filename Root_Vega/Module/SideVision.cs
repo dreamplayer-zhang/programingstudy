@@ -799,7 +799,8 @@ namespace Root_Vega.Module
             AddModuleRunList(new Run_SideVRSImageCapture(this), true, "Side VRS Image Capture");
             AddModuleRunList(new Run_BevelVRSImageCapture(this), true, "Bevel VRS Image Capture");
             AddModuleRunList(new Run_InspectionComplete(this), true, "Inspection Complete");
-            AddModuleRunList(new Run_GrabSideSpecimen(this), true, "Specimen Grab");
+            AddModuleRunList(new Run_GrabSideSpecimen(this), true, "Side Specimen Grab");
+            AddModuleRunList(new Run_GrabBevelSpecimen(this), true, "Bevel Specimen Grab");
         }
         #region Run_Delay
         public class Run_Delay : ModuleRunBase
