@@ -11,6 +11,7 @@
         mc:Ignorable="d"
         WindowStyle="None"
         AllowsTransparency="False"
+        WindowStartupLocation="CenterScreen"
         ResizeMode="CanResizeWithGrip"
         Height="1080"
         Width="1920"

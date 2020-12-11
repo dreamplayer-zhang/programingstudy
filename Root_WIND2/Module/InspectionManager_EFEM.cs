@@ -96,7 +96,7 @@ namespace Root_WIND2
 			base.Stop();
 		}
 
-        protected override bool CreateInspection(Recipe _recipe)
+        public override bool CreateInspection(Recipe _recipe)
         {
             throw new NotImplementedException();
         }

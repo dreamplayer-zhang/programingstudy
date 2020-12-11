@@ -210,7 +210,7 @@ namespace Root_AxisMapping.MainUI
         #endregion
 
         string m_id;
-        Mapping m_mapping;
+        public Mapping m_mapping;
         Result m_result; 
         AxisMapping_Engineer m_engineer;
         public AxisMapping m_axisMapping;

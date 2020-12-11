@@ -84,19 +84,18 @@ namespace Root_WIND2
             p_OriginTool_VM.Offset = new CPoint(BOX.MemoryRect.Left, BOX.MemoryRect.Top);
             p_OriginTool_VM.p_ImageData = BoxImageData;
             p_OriginTool_VM.SetRoiRect();
-
         }
 
         private void P_OriginTool_VM_DelegateInspArea(object e)
         {
             //여기머야
             TRect InspAreaBuf = e as TRect;           
-            p_OriginBoxTool_VM.AddInspArea(InspAreaBuf);
-            OriginImageData = new ImageData(InspAreaBuf.MemoryRect.Width, InspAreaBuf.MemoryRect.Height);
-            OriginImageData.m_eMode = ImageData.eMode.ImageBuffer;
-            OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData.GetPtr(), InspAreaBuf.MemoryRect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride);
+            //p_OriginBoxTool_VM.AddInspArea(InspAreaBuf);
+            //OriginImageData = new ImageData(InspAreaBuf.MemoryRect.Width, InspAreaBuf.MemoryRect.Height);
+            //OriginImageData.m_eMode = ImageData.eMode.ImageBuffer;
+            //OriginImageData.SetData(p_OriginBoxTool_VM.p_ImageData.GetPtr(), InspAreaBuf.MemoryRect, (int)p_OriginBoxTool_VM.p_ImageData.p_Stride);
 
-            InspAreaBuf.Tag = OriginImageData;
+            //InspAreaBuf.Tag = OriginImageData;
 
             SetOrigin(InspAreaBuf);
 

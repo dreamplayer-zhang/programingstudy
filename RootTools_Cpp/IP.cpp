@@ -521,8 +521,8 @@ void IP::CreateGoldenImage_Median(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, i
         }
         else
         {
-            minImg = imgAccumlate;
-            maxImg = imgAccumlate;
+            minImg = imgAccumlate.clone();
+            maxImg = imgAccumlate.clone();
         }  
 
         for (int j = i - 2; j < i; j++)
@@ -563,7 +563,7 @@ void IP::CreateDiffScaleMap(BYTE* pSrc, float* pDst, int nW, int nH, int nEdgeSu
         cv::erode(fImgSrc, imgMin, dirElement, cv::Point(-1, -1), 2);
 
         cv::absdiff(imgMax, imgMin, imgEdgeScale);
-        cv::multiply(Scalar(2.0 / (11 - nEdgeSuppressionLev)), imgEdgeScale, imgEdgeScale);
+        cv::multiply(Scalar(1.0 / (11 - nEdgeSuppressionLev)), imgEdgeScale, imgEdgeScale);
         cv::subtract(Scalar(1.0), imgEdgeScale, imgEdgeScale);
     }
 

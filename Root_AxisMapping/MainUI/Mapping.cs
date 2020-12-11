@@ -1,6 +1,7 @@
 ﻿using Root_ASIS.AOI;
 using Root_AxisMapping.Module;
 using RootTools;
+using RootTools.Control.Ajin;
 using RootTools.Memory;
 using RootTools.Trees;
 using System;
@@ -309,6 +310,7 @@ namespace Root_AxisMapping.MainUI
 
         public void InspectAll()
         {
+            p_bCorrection = false;
             if (m_axisMapping.m_qModuleRun.Count > 0) return; 
             int xActive = m_xActive; 
             for (m_xActive = 0; m_xActive < p_xArray; m_xActive++)
@@ -316,7 +318,21 @@ namespace Root_AxisMapping.MainUI
                 RunGrab();
                 Inspect(); 
             }
-            m_xActive = xActive; 
+            m_xActive = xActive;
+            CalcCorrection(); 
+        }
+
+        public void InspectCorrection()
+        {
+            p_bCorrection  = true;
+            if (m_axisMapping.m_qModuleRun.Count > 0) return;
+            int xActive = m_xActive;
+            for (m_xActive = 0; m_xActive < p_xArray; m_xActive++)
+            {
+                RunGrab();
+                Inspect();
+            }
+            m_xActive = xActive;
         }
 
         public double m_dx = 2.3;
@@ -324,6 +340,42 @@ namespace Root_AxisMapping.MainUI
         {
             m_dx = tree.Set(m_dx, m_dx, "dX", "dX (unit)"); 
             m_mmGV = tree.Set(m_mmGV, m_mmGV, "GV", "Gray Value Range (0~255)");
+        }
+        #endregion
+
+        #region Correction
+        double[] m_aPos = new double[1];
+        double[] m_adPos = new double[1];
+        void CalcCorrection()
+        {
+            if (m_aPos.Length != p_xArray)
+            {
+                m_aPos = new double[p_xArray];
+                m_adPos = new double[p_xArray];
+            }
+            AxisMapping.Run_Grab runGrab = (AxisMapping.Run_Grab)m_runGrab.Clone();
+            double x0 = runGrab.m_xStart;
+            int yc = p_yArray / 2; 
+            double xCenter = m_aArray[p_xArray / 2, yc].m_rpCenter.X;
+            for (int x = 0; x < p_xArray; x++)
+            {
+                m_aPos[x] = x0 + m_dx * (m_xSetup - x);
+                double dx = m_aArray[x, yc].m_rpCenter.X - xCenter;
+                m_adPos[x] = -12 * dx; //forget
+            }
+        }
+
+        bool _bCorrection = false; 
+        public bool p_bCorrection
+        {
+            get { return _bCorrection; }
+            set
+            {
+                _bCorrection = value;
+                OnPropertyChanged();
+                AjinAxis axis = (AjinAxis)m_axisMapping.m_axisXY.p_axisX;
+                axis.SetCorrection(value, m_aPos, m_adPos);
+            }
         }
         #endregion
 

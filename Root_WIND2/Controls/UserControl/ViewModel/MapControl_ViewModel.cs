@@ -107,10 +107,40 @@ namespace Root_WIND2
 
                     p_MapItems.Add(chip);
                 }
-            
-
         }
+        public void CreateMapUI(SolidColorBrush color, int[] map = null, CPoint mapsize = null)
+        {
+            if (map == null)
+            {
+                map = Map;
+                mapsize = MapSize;
+            }
 
+            double chipWidth = p_width / mapsize.X;
+            double chipHeight = p_height / mapsize.Y;
+
+
+            p_MapItems.Clear();
+
+            for (int i = 0; i < mapsize.X; i++)
+                for (int j = 0; j < mapsize.Y; j++)
+                {
+                    Grid chip = new Grid();
+                    chip.Width = chipWidth * 0.9;
+                    chip.Height = chipHeight * 0.9;
+                    chip.Margin = new Thickness(3);
+                    chip.Tag = new CPoint(i, j);
+
+                    Canvas.SetTop(chip, j * chipHeight);
+                    Canvas.SetLeft(chip, i * chipWidth);
+                    if (map[i + (j * mapsize.X)] == 0)
+                        chip.Background = Brushes.LightGray;
+                    else
+                        chip.Background = color;
+
+                    p_MapItems.Add(chip);
+                }
+        }
         public void SetMap(int[] map = null, CPoint mapsize = null)
         {
             if (map == null)
@@ -125,6 +155,21 @@ namespace Root_WIND2
 
             CreateMapUI();
             
+        }
+        public void SetMap(SolidColorBrush color, int[] map = null, CPoint mapsize = null)
+        {
+            if (map == null)
+            {
+                map = Map;
+                mapsize = MapSize;
+            }
+
+            MapSize = new CPoint(mapsize.X, mapsize.Y);
+            Map = new int[mapsize.X * mapsize.Y];
+            Map = map;
+
+            CreateMapUI(color);
+
         }
         public int[] GetMap()
         {

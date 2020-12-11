@@ -108,7 +108,7 @@
     <Compile Include="Recipe\Parameter\PositionParameter.cs" />
     <Compile Include="Recipe\Parameter\SurfaceParameter.cs" />
     <Compile Include="Recipe\Recipe.cs" />
-    <Compile Include="Recipe\RecipeType\RecipeType_FeatureData.cs" />
+    <Compile Include="Recipe\RecipeType\RecipeType_ImageData.cs" />
     <Compile Include="Recipe\RecipeType\RecipeType_WaferMap.cs" />
     <Compile Include="Recipe\Recipe\BacksideRecipe.cs" />
     <Compile Include="Recipe\Recipe\D2DRecipe.cs" />

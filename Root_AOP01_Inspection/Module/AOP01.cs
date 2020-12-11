@@ -176,7 +176,10 @@ namespace Root_AOP01_Inspection.Module
             
             if (!m_diEMS.p_bIn && !m_diInterlock_Key.p_bIn)
             {
-                m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the Emergency Buttons");
+                if (m_diCDA1Low.p_bIn && m_diCDA2Low.p_bIn)
+                    m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMS Buttons");
+                else
+                    m_alidEMS.Run(!m_diEMS.p_bIn, "Please Check the EMO Buttons");
                 m_alidMCReset.Run(!m_diMCReset.p_bIn, "Please Check State of the M/C Reset Button.");
             }            
             else
@@ -193,6 +196,7 @@ namespace Root_AOP01_Inspection.Module
                 {
                     m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");
                 }
+                m_alidLightCurtain.Run(m_diLightCurtain.p_bIn, "Please Check LightCurtain");
             }
             
             //if (m_robot != null)

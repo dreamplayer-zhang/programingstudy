@@ -109,7 +109,6 @@ namespace Root_WIND2
 
         private bool InitMemory()
         {
-
             memoryTool = engineer.ClassMemoryTool();
 
             image = new ImageData(memoryTool.GetMemory(memoryPool, memoryGroup, memoryNameImage));
@@ -137,16 +136,16 @@ namespace Root_WIND2
                 Directory.CreateDirectory(recipeFolderPath);
 
             // Vision
-            this.InspectionVision = new InspectionManager_Vision(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
-            this.InspectionVision.Recipe = this.recipe;
+            this.engineer.InspectionVision = new InspectionManager_Vision(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
+            this.engineer.InspectionVision.Recipe = this.recipe;
+
+            this.InspectionVision = this.engineer.InspectionVision;
 
             // EFEM
-            this.InspectionEFEM = new InspectionManager_EFEM(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
-            this.InspectionEFEM.Recipe = this.recipe;
+            this.engineer.InspectionEFEM = new InspectionManager_EFEM(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
+            this.engineer.InspectionEFEM.Recipe = this.recipe;
 
-
-            this.engineer.InspectionEFEM = this.InspectionEFEM;
-            this.engineer.InspectionVision = this.InspectionVision;
+            this.InspectionEFEM = this.engineer.InspectionEFEM;
 
             return true;
         }
@@ -191,10 +190,14 @@ namespace Root_WIND2
                 writer.WriteLine(time + " - SaveRecipe()");
             }
 
+
+            WIND2EventManager.OnBeforeRecipeSave(recipe, new RecipeEventArgs());
+
             recipe.Save(recipePath);
-            
+
+            WIND2EventManager.OnAfterRecipeSave(recipe, new RecipeEventArgs());
             //this.Load(sFilePath); //?
-            WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
+            //WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
         }
 
         public void ShowDialogLoadRecipe()
@@ -205,8 +208,13 @@ namespace Root_WIND2
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == true)
                 {
+                    WIND2EventManager.OnBeforeRecipeRead(recipe, new RecipeEventArgs());
+
                     this.LoadRecipe(dlg.FileName);
                     WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
+
+                    WIND2EventManager.OnAfterRecipeRead(recipe, new RecipeEventArgs());
+
                 }
             }
             catch (Exception ex)
