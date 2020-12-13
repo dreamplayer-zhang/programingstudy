@@ -518,6 +518,7 @@ namespace Root_Vega.Module
         CEID m_ceidClose; 
         ALID m_alidPlaced;
         ALID m_alidIonizer;
+        public ALID m_alidInforeticle;
 
         void InitGAF()
         {
@@ -528,6 +529,7 @@ namespace Root_Vega.Module
             m_ceidClose = m_gaf.GetCEID(this, "Door Close");
 			m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Present Sensor Should be Checked");
             m_alidIonizer = m_gaf.GetALID(this, "Ionizer Check", "Ionizer State");
+            m_alidInforeticle = m_gaf.GetALID(this, "Info Reticle Error", "Info Reticle Error");
 
         }
         #endregion
