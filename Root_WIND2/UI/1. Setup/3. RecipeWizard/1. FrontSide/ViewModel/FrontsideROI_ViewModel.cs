@@ -49,16 +49,16 @@ namespace Root_WIND2
         {
             TRect InspAreaBuf = e as TRect;
             BoxOffset = new CPoint(InspAreaBuf.MemoryRect.Left, InspAreaBuf.MemoryRect.Top);
-            //ImageData OriginImageData = InspAreaBuf.Tag as ImageData;
-            //if (OriginImageData.p_Size.X == 0 || OriginImageData.p_Size.Y == 0)
-            //{
-            //    p_ImgSource = null;
-            //}
-            //else
-            //{
-            //    p_ImageData = OriginImageData;
-            //    base.SetRoiRect();
-            //}          
+            ImageData OriginImageData = InspAreaBuf.Tag as ImageData;
+            if (OriginImageData.p_Size.X == 0 || OriginImageData.p_Size.Y == 0)
+            {
+                p_ImgSource = null;
+            }
+            else
+            {
+                p_ImageData = OriginImageData;
+                base.SetRoiRect();
+            }
         }
 
         #region Property
@@ -1400,7 +1400,15 @@ namespace Root_WIND2
             Worker_ShowAll.RunWorkerCompleted += Worker_ShowAll_RunWorkerCompleted;
         }
 
-        private unsafe void Worker_ShowAll_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private  void Worker_ShowAll_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            p_PageEnable = true;
+            p_PageOpacity = 1;
+            p_LoadingOpacity = 0;
+            SetLayerSource();
+        }
+
+        private unsafe void Worker_ShowAll_DoWork(object sender, DoWorkEventArgs e)
         {
             IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
@@ -1413,19 +1421,26 @@ namespace Root_WIND2
             }
 
 
-            UInt32 clr = p_SelectedROI.p_Color.A;
-            clr = ((UInt32)clr << 8);
-            clr += p_SelectedROI.p_Color.R;
-            clr = ((UInt32)clr << 8);
-            clr += p_SelectedROI.p_Color.G;
-            clr = ((UInt32)clr << 8);
-            clr += p_SelectedROI.p_Color.B;
+            //UInt32 clr = p_SelectedROI.p_Color.A;
+            //clr = ((UInt32)clr << 8);
+            //clr += p_SelectedROI.p_Color.R;
+            //clr = ((UInt32)clr << 8);
+            //clr += p_SelectedROI.p_Color.G;
+            //clr = ((UInt32)clr << 8);
+            //clr += p_SelectedROI.p_Color.B;
 
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
             UInt32* fPtr = (UInt32*)bitmapPtr;
 
             foreach (InspectionROI roi in p_cInspROI)
             {
+                UInt32 clr = roi.p_Color.A;
+                clr = ((UInt32)clr << 8);
+                clr += roi.p_Color.R;
+                clr = ((UInt32)clr << 8);
+                clr += roi.p_Color.G;
+                clr = ((UInt32)clr << 8);
+                clr += roi.p_Color.B;
                 foreach (PointLine data in roi.p_Data)
                 {
                     for (int x = data.StartPt.X; x < data.StartPt.X + data.Width; x++)
@@ -1434,11 +1449,6 @@ namespace Root_WIND2
                     }
                 }
             }
-        }
-
-        private void Worker_ShowAll_DoWork(object sender, DoWorkEventArgs e)
-        {
-
         }
 
         private unsafe void Worker_ReadROI_DoWork(object sender, DoWorkEventArgs e)
@@ -1599,6 +1609,27 @@ namespace Root_WIND2
             p_LoadingOpacity = 1;
             Worker_ReadROI.RunWorkerAsync();
         }
+
+        private void _ShowAll()
+        {
+            if (Worker_ShowAll.IsBusy)
+                return;
+
+            if (p_ImageData == null)
+                return;
+            p_PageEnable = false;
+            p_PageOpacity = 0.3;
+            p_LoadingOpacity = 1;
+            Worker_ShowAll.RunWorkerAsync();
+        }
+        public ICommand ShowAll
+        {
+            get
+            {
+                return new RelayCommand(_ShowAll);
+            }
+        }
+
         public ICommand DeleteROI
         {
             get
