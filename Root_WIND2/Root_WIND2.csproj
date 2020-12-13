@@ -233,15 +233,17 @@
       <DependentUpon>LoadingBlock.xaml</DependentUpon>
     </Compile>
     <Compile Include="EdgeResult.cs" />
+    <Compile Include="Module\EdgeSideVision\Run_GrabEBR.cs" />
+    <Compile Include="Module\EdgeSideVision\Run_GrabEdge.cs" />
     <Compile Include="WIND2EventArgs.cs" />
     <Compile Include="WIND2EventManager.cs" />
     <Compile Include="Module\BackSideVision.cs" />
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\InspectionManager_EFEM.cs" />
-    <Compile Include="Module\Vision\Run_Delay.cs" />
+    <Compile Include="Module\Common\Run_Delay.cs" />
     <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
     <Compile Include="Module\Vision\Run_Inspect.cs" />
-    <Compile Include="Module\Vision\Run_Rotate.cs" />
+    <Compile Include="Module\Common\Run_Rotate.cs" />
     <Compile Include="ProgramManager.cs" />
     <Compile Include="UIManager.cs" />
     <Compile Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\Items\InspectionROI.cs" />
