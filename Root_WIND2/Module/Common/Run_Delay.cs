@@ -10,8 +10,8 @@ namespace Root_WIND2.Module
 {
     public class Run_Delay : ModuleRunBase
     {
-        Vision m_module;
-        public Run_Delay(Vision module)
+        ModuleBase m_module;
+        public Run_Delay(ModuleBase module)
         {
             m_module = module;
             InitModuleRun(module);

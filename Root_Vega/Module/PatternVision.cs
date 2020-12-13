@@ -704,7 +704,6 @@ namespace Root_Vega.Module
 
         void RunTreeSetup(Tree tree)
         {
-            RunTreeDIODelay(tree.GetTree("DIO Delay", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
         }
         #endregion
@@ -786,99 +785,14 @@ namespace Root_Vega.Module
             base.ThreadStop();
         }
 
-        public void SetLightMainCam1(int nPower)
-        {  
-            m_lightSet.m_aLight[0].m_light.p_fSetPower = nPower;
-        }
-        public void SetLightMainCam2(int nPower)
-        {
-            m_lightSet.m_aLight[1].m_light.p_fSetPower = nPower;
-        }
-        public void SetLightVRS(int nPower)
-        {
-            m_lightSet.m_aLight[2].m_light.p_fSetPower = nPower;
-        }
-        public void SetLightINC1(int nPower)
-        {
-            m_lightSet.m_aLight[3].m_light.p_fSetPower = nPower;
-            m_lightSet.m_aLight[4].m_light.p_fSetPower = nPower;
-        }
-        public void SetLightINC2(int nPower)
-        {
-            m_lightSet.m_aLight[5].m_light.p_fSetPower = nPower;
-            m_lightSet.m_aLight[6].m_light.p_fSetPower = nPower;
-        }
-
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
-            AddModuleRunList(new Run_Run(this), true, "Run Side Vision");
             AddModuleRunList(new Run_Grab(this), true, "Run Grab");
             AddModuleRunList(new Run_EBRInspection(this), true, "Run EBR Inspection");
             AddModuleRunList(new Run_InspectionComplete(this), true, "Run Inspection Complete");
             AddModuleRunList(new Run_AutoIllumination(this), true, "Run AutoIllumination");
             AddModuleRunList(new Run_VRSReviewImagCapture(this), true, "Run VRSReviewImageCapture");
-        }
-
-        public class Run_Delay : ModuleRunBase
-        {
-            PatternVision m_module;
-            public Run_Delay(PatternVision module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            double m_secDelay = 2;
-            public override ModuleRunBase Clone()
-            {
-                Run_Delay run = new Run_Delay(m_module);
-                run.m_secDelay = m_secDelay;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
-            }
-            public override string Run()
-            {
-                m_module.p_bRunPatternVision = true;
-                Thread.Sleep((int)(1000 * m_secDelay));
-                m_module.p_bRunPatternVision = false;
-                return "OK";
-            }
-        }
-
-        public class Run_Run : ModuleRunBase
-        {
-            PatternVision m_module;
-            public Run_Run(PatternVision module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            double m_secDelay = 2;
-            public override ModuleRunBase Clone()
-            {
-                Run_Run run = new Run_Run(m_module);
-                run.m_secDelay = m_secDelay;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
-            }
-            public override string Run()
-            {
-                m_module.p_bRunPatternVision = true;
-                Thread.Sleep((int)(1000 * m_secDelay));
-                m_module.p_bRunPatternVision = false;
-                return "OK";
-            }
         }
         //------------------------------------------------------
         public class Run_Grab : ModuleRunBase
@@ -1100,7 +1014,6 @@ namespace Root_Vega.Module
                                         // Origin 생성
                                         CPoint cptOriginStart = new CPoint(cptStandard.X + nRefStartOffsetX, cptStandard.Y + nRefStartOffsetY);
                                         roiCurrent.Origin.OriginRect = new CRect(cptOriginStart.X, cptOriginStart.Y, cptOriginStart.X + (int)roiCurrent.Strip.ParameterList[0].InspAreaWidth, cptOriginStart.Y + (int)roiCurrent.Strip.ParameterList[0].InspAreaHeight);
-                                        //m_module.p_nTotalBlockCount = GetTotalBlockCountInOriginRect(roiCurrent.Origin.OriginRect, 1000);
                                         break;  // 찾았으니 중단
                                     }
                                     else
@@ -1128,29 +1041,6 @@ namespace Root_Vega.Module
                                     CRect crtOverlapedRect = m_mvvm.GetOverlapedRect(crtCurrentArea, roiCurrent.Origin.OriginRect);
                                     if ((crtOverlapedRect.Width > 0) && (crtOverlapedRect.Height > 0))
                                     {
-                                        //// 3. Overlap된 Rect영역을 검사 쓰레드로 던져라
-                                        //if (m_mvvm._dispatcher != null)
-                                        //{
-                                        //    m_mvvm._dispatcher.Invoke(new Action(delegate ()
-                                        //    {
-                                        //        // UI
-                                        //        var temp = new UIElementInfo(new Point(crtOverlapedRect.Left, crtOverlapedRect.Top), new Point(crtOverlapedRect.Right, crtOverlapedRect.Bottom));
-                                        //        System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-                                        //        rect.Width = crtOverlapedRect.Width;
-                                        //        rect.Height = crtOverlapedRect.Height;
-                                        //        System.Windows.Controls.Canvas.SetLeft(rect, crtOverlapedRect.Left);
-                                        //        System.Windows.Controls.Canvas.SetTop(rect, crtOverlapedRect.Top);
-                                        //        rect.StrokeThickness = 3;
-                                        //        rect.Stroke = MBrushes.Orange;
-
-                                        //        m_mvvm.p_RefFeatureDrawer.m_ListShape.Add(rect);
-                                        //        m_mvvm.p_RefFeatureDrawer.m_Element.Add(rect);
-                                        //        m_mvvm.p_RefFeatureDrawer.m_ListRect.Add(temp);
-
-                                        //        m_mvvm.p_ImageViewer.SetRoiRect();
-                                        //    }));
-                                        //}
-
                                         int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.Strip, 0);
 
                                         engineer.m_InspManager.SetStandardPos(nDefectCode, cptStandard);
@@ -1175,7 +1065,7 @@ namespace Root_Vega.Module
                         {
                             m_mvm._dispatcher.Invoke(new Action(delegate ()
                             {
-                                m_mvm.TestFunction();
+                                m_mvm.UpdateMiniViewer();
                             }));
                         }
                     }
@@ -1198,27 +1088,6 @@ namespace Root_Vega.Module
                         if (m_module.m_CamRADS.p_CamInfo._IsGrabbing == true) m_module.m_CamRADS.StopGrab();
                     }
                 }
-            }
-            //------------------------------------------------------
-            int GetTotalBlockCountInOriginRect(CRect crtOrigin, int nBlockSize)
-            {
-                // variable
-                int nOriginWidth = crtOrigin.Width;
-                int nOriginHeight = crtOrigin.Height;
-                int nHorizontalBlockCount = 0;
-                int nVerticalBlockCount = 0;
-                int nTotalBlockCount = 0;
-
-                // implement
-                nHorizontalBlockCount = nOriginWidth / nBlockSize;
-                if (nOriginWidth % nBlockSize != 0) nHorizontalBlockCount++;
-
-                nVerticalBlockCount = nOriginHeight / nBlockSize;
-                if (nOriginHeight % nBlockSize != 0) nVerticalBlockCount++;
-
-                nTotalBlockCount = nHorizontalBlockCount * nVerticalBlockCount;
-
-                return nTotalBlockCount;
             }
             //------------------------------------------------------
         }

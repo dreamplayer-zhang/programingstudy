@@ -50,14 +50,28 @@ namespace Root_Vega
             m_timer.Start();
         }
 
+
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            borderPlaced.Background = m_loadport.m_dioPlaced.p_bIn ? null : Brushes.LightGreen;
-            borderPresent.Background = m_loadport.m_dioPresent.p_bIn ? null : Brushes.LightGreen;
-            borderLoad.Background = m_loadport.m_dioLoad.p_bIn ? Brushes.LightGreen : null;
-            borderUnload.Background = m_loadport.m_dioUnload.p_bIn ? Brushes.LightGreen : null;
-            borderAlarm.Background = (m_loadport.p_eState == ModuleBase.eState.Error) ? Brushes.Red : null;
+			borderPlaced.Background = m_loadport.m_dioPlaced.p_bIn ? null : Brushes.LightGreen;
+            if (m_loadport.m_dioPlaced.p_bIn){m_loadport.m_dioPlaced.Write(false);}
+            else{m_loadport.m_dioPlaced.Write(true);}
 
+            borderPresent.Background = m_loadport.m_dioPresent.p_bIn ? null : Brushes.LightGreen;
+            if (m_loadport.m_dioPresent.p_bIn) { m_loadport.m_dioPresent.Write(false); }
+            else { m_loadport.m_dioPresent.Write(true); }
+            
+            borderLoad.Background = m_loadport.m_bLoadCheck ? Brushes.LightGreen : null;
+            if (m_loadport.m_bLoadCheck) { m_loadport.m_doLoad.Write(true);}
+            else { m_loadport.m_doLoad.Write(false); }
+
+            borderUnload.Background = m_loadport.m_bUnLoadCheck ? Brushes.LightGreen : null;
+            if (m_loadport.m_bUnLoadCheck) { m_loadport.m_doUnload.Write(true); }
+            else { m_loadport.m_doUnload.Write(false); }
+
+            borderAlarm.Background = (m_loadport.p_eState == ModuleBase.eState.Error) ? Brushes.Red : null;
+            if (m_loadport.p_eState == ModuleBase.eState.Error) { m_loadport.m_doAlarm.Write(true); }
+            else { m_loadport.m_doAlarm.Write(false); }
 
             bool bAuto = (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto); 
             borderAccessAuto.Background = bAuto ? Brushes.LightGreen : null;
@@ -70,7 +84,7 @@ namespace Root_Vega
                 if (m_loadport.m_diIonizer.p_bIn)
                 {
                     m_handler.m_vega.m_doIonizerOnOff.Write(false);
-                    m_loadport.p_eIonizerState = false;
+                    m_loadport.m_vega.p_eIonizerState = false;
 
                     Thread.Sleep(20);
                     if (m_loadport.m_diIonizer.p_bIn != false) EQ.p_bStop = true;

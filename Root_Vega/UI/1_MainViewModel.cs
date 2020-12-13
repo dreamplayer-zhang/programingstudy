@@ -174,7 +174,6 @@ namespace Root_Vega
             p_Process = p_Handler.m_process;
             InitAlarmData();
             p_MiniImageViewer = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("PatternVision.Memory", "PatternVision", "Main")));
-            //p_MiniImageViewer = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideTop")), false, true);
             p_MiniImageViewer_Btm = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideBottom")), true);
             p_MiniImageViewer_Top = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideTop")), true);
             p_MiniImageViewer_Left = new MiniViewer_ViewModel(new ImageData(p_Engineer.GetMemory("SideVision.Memory", "Grab", "SideLeft")));
@@ -254,7 +253,7 @@ namespace Root_Vega
             }
         }
 
-        public void TestFunction()
+        public void UpdateMiniViewer()
         {
             p_MiniImageViewer_Left.SetRoiRect();
             p_MiniImageViewer.SetRoiRect();
@@ -264,35 +263,13 @@ namespace Root_Vega
             p_MiniImageViewer_Left.SetImageSource();
             p_MiniImageViewer_Right.SetImageSource();
             p_test = !p_test;
-            //((GAF_Manager)m_Engineer.ClassGAFManager()).SetAlarm(this.ToString(), eAlarm.TestAlarm2);
-
-            //if (EQ.p_eState == EQ.eState.Init)
-            //    EQ.p_eState = EQ.eState.Error;
-            //else
-            //    EQ.p_eState = EQ.eState.Init;
-        }
-
-        void TestFunction2()
-        {
-            //((GAF_Manager)m_Engineer.ClassGAFManager()).SetAlarm(this.ToString(), eAlarm.TestAlarm1);
-            //if (EQ.p_eState == EQ.eState.Init)
-            //    EQ.p_eState = EQ.eState.Error;
-            //else
-            //    EQ.p_eState = EQ.eState.Init;
         }
 
         public RelayCommand TestCommand
         {
             get
             {
-                return new RelayCommand(TestFunction);
-            }
-        }
-        public RelayCommand TestCommand2
-        {
-            get
-            {
-                return new RelayCommand(TestFunction2);
+                return new RelayCommand(UpdateMiniViewer);
             }
         }
 

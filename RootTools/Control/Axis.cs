@@ -571,7 +571,7 @@ namespace RootTools.Control
             {
                 if (_sensorInPos == value) return;
                 _sensorInPos = value;
-                p_sInfo = "Sensor InPosition = " + value.ToString();
+                //p_sInfo = "Sensor InPosition = " + value.ToString();
                 OnPropertyChanged();
             }
         }
