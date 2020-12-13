@@ -72,7 +72,7 @@ namespace Root_AOP01_Inspection.Module
                 m_module = module;
                 InitModuleRun(module);
             }
-
+            string m_sCleanPellicle = "PellicleClean";
             public override ModuleRunBase Clone()
             {
                 Run_CleanPellicle run = new Run_CleanPellicle(m_module);
@@ -81,6 +81,7 @@ namespace Root_AOP01_Inspection.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_sCleanPellicle = tree.Set(m_sCleanPellicle, m_sCleanPellicle, "PellicleClean", "PellicleClean", bVisible, true);
             }
 
             public override string Run()
@@ -134,7 +135,7 @@ namespace Root_AOP01_Inspection.Module
                 m_module = module;
                 InitModuleRun(module);
             }
-
+            string m_sCleanGlass = "GlassClean";
             public override ModuleRunBase Clone()
             {
                 Run_CleanGlass run = new Run_CleanGlass(m_module);
@@ -143,6 +144,7 @@ namespace Root_AOP01_Inspection.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_sCleanGlass = tree.Set(m_sCleanGlass, m_sCleanGlass, "GlassClean", "GlassClean", bVisible, true);
             }
 
             public override string Run()
