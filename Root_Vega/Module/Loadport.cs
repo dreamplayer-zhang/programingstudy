@@ -163,7 +163,8 @@ namespace Root_Vega.Module
             GemCarrierBase.ePresent present;
             if (m_dioPlaced.p_bIn != m_dioPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
             else present = !m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;//check
-            if (m_infoPod.CheckPlaced(present) != "OK")//check
+
+            if (m_infoPod.CheckPlaced(present, m_axisZ.IsInPos(ePosZ.Load,m_dInposZ)) != "OK")//check
             {
                 m_alidPlaced.p_sMsg = "Placed Sensor Remain Checked while Pod State = " + m_infoPod.p_eState;
                 m_alidPlaced.p_bSet = true;
@@ -544,6 +545,7 @@ namespace Root_Vega.Module
         public Vega m_vega;
         public bool m_bLoadCheck = false;
         public bool m_bUnLoadCheck = false;
+        public StopWatch m_swLotTime;
         public Loadport(string id, string sLocID, IEngineer engineer, Vega vega)
         {
             p_id = id;
@@ -552,6 +554,8 @@ namespace Root_Vega.Module
             m_infoPod = new InfoPod(this, sLocID, engineer);
             m_RFID = ((Vega_Engineer)engineer).m_handler.m_vega.m_RFID; 
             m_aTool.Add(m_infoPod);
+            m_swLotTime = new StopWatch();
+            m_swLotTime.Stop();
             base.InitBase(id, engineer);
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
@@ -665,6 +669,7 @@ namespace Root_Vega.Module
                 m_infoPod.p_eState = InfoPod.eState.Load;
                 m_module.m_ceidLoad.Send();
                 m_module.m_ceidOpen.Send();
+                m_module.m_swLotTime.Start();
                 if (m_module.m_diReticle.p_bIn == true)
                 {
                     m_module.m_infoPod.SetInfoReticleExist();
@@ -702,6 +707,7 @@ namespace Root_Vega.Module
                 m_infoPod.p_eState = InfoPod.eState.Placed;
                 m_module.m_ceidClose.Send();
                 m_module.m_ceidUnload.Send();
+                m_module.m_swLotTime.Stop();
                 return "OK";
             }
         }

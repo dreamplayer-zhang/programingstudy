@@ -106,6 +106,8 @@ namespace Root_Vega
             bReadyToLoad = true; 
             bool bReadyState =  (m_loadport.m_qModuleRun.Count == 0);
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
+            if (m_loadport.m_infoPod.p_eState != InfoPod.eState.Placed) return false;
+
             if (m_handler.IsEnableRecovery() == true) return false;
             return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && !m_loadport.m_dioPresent.p_bIn; //forget 조건
         }
