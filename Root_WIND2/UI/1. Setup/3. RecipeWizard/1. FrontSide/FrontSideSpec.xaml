@@ -42,29 +42,62 @@
                                     <RowDefinition Height="85*"/>
                                 </Grid.RowDefinitions>
                                 <ScrollViewer Grid.Row="0">
-                                    <!--<DataGrid ItemsSource="{Binding p_cInspROI}" SelectionMode="Single" IsReadOnly="True" AutoGenerateColumns="False">
+                                    <DataGrid ItemsSource="{Binding p_cInspROI}"
+                                              SelectedItem="{Binding p_SelectedROI}"
+                                              SelectionMode="Single"
+                                              IsReadOnly="True"
+                                              RowHeaderWidth="0"
+                                              AutoGenerateColumns="False">
                                         <DataGrid.Resources>
-                                            <CollectionViewSource Source="{Binding p_cInspROI}" x:Key="ROI" />
+                                            <CollectionViewSource Source="{Binding p_cInspROI}"
+                                                                  x:Key="items" />
                                             <Style TargetType="DataGridColumnHeader">
-                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                                <Setter Property="HorizontalAlignment"
+                                                        Value="Stretch" />
+                                                <Setter Property="HorizontalContentAlignment"
+                                                        Value="Center" />
                                             </Style>
-                                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Gainsboro" />
+                                            <Style x:Key="TextInCellCenter"
+                                                   TargetType="{x:Type TextBlock}">
+                                                <Setter Property="TextAlignment"
+                                                        Value="Center" />
+                                                <Setter Property="VerticalAlignment"
+                                                        Value="Center" />
+                                            </Style>
+                                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                                             Color="Gainsboro" />
                                         </DataGrid.Resources>
+
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="No." Width="35" Binding="{Binding Converter={StaticResource IndexConverter},    
-                                                            ConverterParameter={StaticResource ResourceKey=ROI}}" />
-                                            <DataGridTextColumn Header="Mask" Width="*" Binding="{Binding p_sName}" />
-                                            <DataGridTemplateColumn Header="Color" Width="*">
+                                            <DataGridTextColumn Header="Index"
+                                                                Width="100"
+                                                                ElementStyle="{StaticResource TextInCellCenter}"
+                                                                Binding="{Binding Converter={StaticResource IndexConverter},  
+                                                                ConverterParameter={StaticResource ResourceKey=items}}" />
+
+
+                                            <DataGridTemplateColumn Width="*"
+                                                                    Header="Color">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Grid Margin="1" Opacity="0.5" Background="{Binding p_Color, Converter={StaticResource ColorConverter}}" />
+                                                        <Grid Background="{Binding p_Color, Converter={StaticResource ColorConverter}}" Margin="2"/>
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
 
+                                            <!--<DataGridTemplateColumn Width="60"
+                                                                    Header="-">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Button Content="Delete"
+                                                                Margin="1"
+                                                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, 
+                                                                      Path=DataContext.DeleteROI}" />
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>-->
                                         </DataGrid.Columns>
-                                    </DataGrid>-->
+                                    </DataGrid>
                                 </ScrollViewer>
                                 <tools:RootViewer Grid.Row="1"/>
                             </Grid>

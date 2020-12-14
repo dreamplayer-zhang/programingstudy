@@ -605,11 +605,11 @@ namespace Root_EFEM.Module
             p_eState = eState.Ready;
             if(m_diPlaced.p_bIn && m_diPresent.p_bIn)
             {
-                m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_bPlaced= true;
             }
             else
             {
-                m_infoCarrier.p_eState = InfoCarrier.eState.Empty;
+                m_bPlaced = false;
             }
             
             m_infoCarrier.AfterHome();

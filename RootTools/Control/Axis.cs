@@ -177,7 +177,6 @@ namespace RootTools.Control
             }
             RunTree(Tree.eMode.RegRead);
         }
-
         public void RunTreePos(Tree tree, string sUnit)
         {
             RunTreePosLimit(tree.GetTree("SW Limit", false));
@@ -326,6 +325,26 @@ namespace RootTools.Control
         public void RunTreeSpeed(Tree tree, string sUnit)
         {
             foreach (Speed speed in m_aSpeed) speed.RunTree(tree.GetTree(speed.m_id, false), sUnit);
+        }
+        #endregion
+
+        #region I/O Interlock
+        public List<DIO_I> m_aDIO_I = new List<DIO_I>();
+        public List<bool> m_bDIO_I = new List<bool>();
+        public void AddIO(DIO_I io)
+        {
+            m_aDIO_I.Add(io);
+            m_bDIO_I.Add(false);
+            RunTree(Tree.eMode.RegRead);
+            RunTree(Tree.eMode.Init);
+        }
+        public void RunTreeIOLock(Tree tree, string sUnit)
+        {
+            for (int i = 0; i < m_aDIO_I.Count; i++)
+            {
+                string[] id = m_aDIO_I[i].m_id.Split('.');
+                m_bDIO_I[i] = tree.Set(m_bDIO_I[i], m_bDIO_I[i], id[1], id[1] + " in Ready Position");
+            }
         }
         #endregion
 
@@ -552,7 +571,7 @@ namespace RootTools.Control
             {
                 if (_sensorInPos == value) return;
                 _sensorInPos = value;
-                p_sInfo = "Sensor InPosition = " + value.ToString();
+                //p_sInfo = "Sensor InPosition = " + value.ToString();
                 OnPropertyChanged();
             }
         }
@@ -582,6 +601,7 @@ namespace RootTools.Control
                 OnPropertyChanged();
             }
         }
+      
         #endregion
 
         #region Trigger
