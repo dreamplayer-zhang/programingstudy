@@ -154,7 +154,7 @@ namespace Root_Vega.Module
             #endregion
 
             #region Interlock
-            if (m_swIonizerOn.ElapsedMilliseconds > 10000 || m_swIonizerOn.IsRunning)
+            if (m_swIonizerOn.ElapsedMilliseconds > 10000)
             {
                 m_doIonizerOnOff.Write(false);
             }
