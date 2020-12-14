@@ -395,8 +395,9 @@ namespace RootTools.Camera.Silicon
             m_Memory = memory;
             m_nGrab = -1;
             m_lGrab = nLine/m_Height;
-            int nFlag = (int)FgAcquisitionFlags.ACQ_STANDARD;
-            fgErrorType rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, nFlag, m_pBufGrab); //snap과 동일
+
+            fgErrorType rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
+
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
             m_GrabThread.Start();
         }
@@ -404,28 +405,18 @@ namespace RootTools.Camera.Silicon
         {
             while(m_nFrameCnt < m_nGrab)
             {
-                IntPtr ipSrc = m_fgSiso.FgGetImagePtrEx(m_nFrameCnt,(uint)p_nDeviceIndex,m_pBufGrab);
-
-                //for(int y=0;y<m_Height;y++)
-                //{
-                //    //reverse option
-                //    int nY = y + m_nFrameCnt * m_Height;
-                //    IntPtr srcPtr = ipSrc + m_Height * y;
-                //    IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (nY + m_cpScanOffset.Y) * (long)m_Memory.W);
-                //    Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, m_Width, m_Height);
-                //}
-
                 int nY = m_nFrameCnt * m_Height;
-                IntPtr srcPtr = ipSrc + m_Height;
-                IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (nY + m_cpScanOffset.Y) * (long)m_Memory.W);
 
-                //memcpy(m_DM.Acquired3DImage + (m_szBuf.X * m_szBuf.Y) * nGrab, (byte*)pBuf.ToPointer(), m_szBuf.X * m_szBuf.Y);
+                IntPtr srcPtr = m_fgSiso.FgGetImagePtrEx(m_nFrameCnt, (uint)p_nDeviceIndex, m_pBufGrab) + m_Height;
+                IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (nY + m_cpScanOffset.Y) * m_Memory.W);
 
-                memcpy(srcptr.)
+                memcpy((byte*)srcPtr.ToPointer(), (byte*)dstPtr.ToPointer(), m_Height * m_Width);
+
                 m_LastROI.Left = m_cpScanOffset.X;
                 m_LastROI.Right = m_cpScanOffset.X + m_Width;
                 m_LastROI.Top = m_cpScanOffset.Y;
                 m_LastROI.Bottom = m_cpScanOffset.Y + m_Height;
+
                 GrabEvent();
             }
         }
