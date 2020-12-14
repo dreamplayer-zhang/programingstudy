@@ -113,8 +113,8 @@ namespace Root_Vega.Module
                         //if ((m_svValue.p_value != null) && (m_svValue.p_value == value)) return; 
                         m_svValue.p_value = value;
                         OnPropertyChanged();
-                        m_alid[0].Run(m_svValue.p_value < m_mmLimit.X," value is lower then Low Limit");
-                        m_alid[1].Run(m_svValue.p_value > m_mmLimit.Y, " value is lower then High Limit");
+                        m_alid[0].Run(m_svValue.p_value < m_mmLimit.X, p_id + "'s Value is lower than Low Limit");
+                        m_alid[1].Run(m_svValue.p_value > m_mmLimit.Y, p_id + "'s Value is Higher than High Limit");
                         double dValue = Math.Abs(m_svValue.p_value - (m_mmLimit.X + m_mmLimit.Y) / 2);
                         int nRed = (int)(500 * dValue / (m_mmLimit.X - m_mmLimit.Y));
                         if (nRed > 250) nRed = 250;

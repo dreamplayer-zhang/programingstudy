@@ -112,7 +112,7 @@ namespace Root_Vega.Module
         #endregion
 
         #region Thread
-        public EQ.eState m_eStatus = EQ.eState.Init;
+        public EQ.eState m_eStatus = EQ.eState.Null;
         public StopWatch m_swIonizerOn;
         protected override void RunThread()
         {
@@ -132,7 +132,8 @@ namespace Root_Vega.Module
                         //m_doBuzzer.Write(eBuzzer.Buzzer4);
                         m_doLamp.Write(eLamp.Green);
                         break;
-					case EQ.eState.Home: 
+					case EQ.eState.Home:
+                        m_swIonizerOn.Stop();
                         //m_doBuzzer.Write(eBuzzer.Buzzer3);
                         m_doLamp.Write(eLamp.Green);
                         break;
@@ -154,14 +155,15 @@ namespace Root_Vega.Module
             #endregion
 
             #region Interlock
-            if (m_swIonizerOn.ElapsedMilliseconds > 10000 || m_swIonizerOn.IsRunning)
+            if (m_swIonizerOn.ElapsedMilliseconds > 10000 && m_swIonizerOn.IsRunning)
             {
                 m_doIonizerOnOff.Write(false);
             }
-            else if (m_swIonizerOn.IsRunning)
+            else if (m_swIonizerOn.ElapsedMilliseconds > 1000 && m_swIonizerOn.IsRunning)
             {
                 m_alidIonizerAlarm.Run(!m_diIonizerAlarmCheck.ReadDI(eIonizer.LP1) || !m_diIonizerAlarmCheck.ReadDI(eIonizer.LP2), "Please Check State of X-ray Ionizer");
             }
+
             if (m_bDoorlock_Use && m_diInterlock_Key.p_bIn)
             {
                 m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check the Doors");//check
