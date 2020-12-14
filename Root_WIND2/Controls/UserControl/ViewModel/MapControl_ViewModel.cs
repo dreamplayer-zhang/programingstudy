@@ -151,7 +151,8 @@ namespace Root_WIND2
                         chip.MouseLeftButtonDown += MAP_MouseLeftButtonDown;
                 }
 
-            p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Purple;
+            if(p_MapItems.Count > 0)
+                p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Purple;
         }
         public void SetMap(int[] map = null, CPoint mapsize = null)
         {
