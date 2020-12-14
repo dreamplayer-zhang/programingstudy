@@ -1,5 +1,4 @@
-﻿using RootTools.Control;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -9,19 +8,75 @@ using System.Windows.Data;
 
 namespace Root_CAMELLIA
 {
-    class AxisToMotionUIConverter : IValueConverter
+    public class AxisXToMotionUIConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            Axis axis = value as Axis;
-            // now pos : max pos = canvas left : 10000
-            // 10000 * now pos / max pos = canvas left
+            double actPos = (double)value;
+            double canvasPos = (7000 * actPos / 5290000);
             if (value == null)
             {
                 return 0.0;
             }
 
-            return 0;
+            return canvasPos;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+    }
+    public class AxisYToMotionUIConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double actPos = (double)value;
+            double canvasPos = 7000 * actPos / 2830000;
+            if (value == null)
+            {
+                return 0.0;
+            }
+
+            return canvasPos;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+    }
+    public class AxisZToMotionUIConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double actPos = (double)value;
+            double canvasPos = 9500 * actPos / 64000;
+            if (value == null)
+            {
+                return 0.0;
+            }
+
+            return canvasPos;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+        }
+    }
+    public class AxisLifterToMotionUIConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double actPos = (double)value;
+            double canvasPos = 9500 - (10000 * actPos / 103500);
+            if (value == null)
+            {
+                return 0.0;
+            }
+
+            return canvasPos;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
