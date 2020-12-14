@@ -41,7 +41,7 @@
             <TextBlock Text="FrontSide Summary" 
                            HorizontalAlignment="Left"
                            FontSize="30"
-                           Margin="10,10,10,10"
+                           Margin="10"
                            FontWeight="Bold"/>
         </Grid>
 
@@ -58,19 +58,49 @@
                 <ColumnDefinition Width="0.8*"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <GroupBox Grid.Column="0"
+
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="0.1*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0"
                           Background="{StaticResource GroupBoxBackground}"
-                          Header="Master Image">
-                <Grid >
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition Height="0.1*"/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Background="Black">
-                        <Image Name="MasterImageViewer"/>
+                          Header="Master Image" >
+                    <Grid Grid.Row="0" Margin="10" Background="Black">
+                        <Image Source="{Binding MasterImg}"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Row="1"
+                          Background="{StaticResource GroupBoxBackground}"
+                          Header="Display Option" >
+                <Grid Grid.Row = "1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column = "0">
+                        <Viewbox Height="20" >
+                            <RadioButton Name="None" GroupName="DisplayOption"
+                                    IsChecked="{Binding Check_DisplayNone}" >None</RadioButton>
+                        </Viewbox>
+                    </Grid>
+                    <Grid Grid.Column = "1">
+                        <Viewbox Height="20" >
+                            <RadioButton Name="Dark" GroupName="DisplayOption"
+                                    IsChecked="{Binding Check_DisplayPosition}">Position</RadioButton>
+                        </Viewbox>
+                    </Grid>
+                    <Grid Grid.Column = "2">
+                        <Viewbox Height="20" >
+                            <RadioButton Name="Bright" GroupName="DisplayOption"
+                                    IsChecked="{Binding Check_DisplayROI}" >ROI</RadioButton>
+                        </Viewbox>
                     </Grid>
                 </Grid>
-            </GroupBox>
+                </GroupBox>
+            </Grid>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="2*"/>
@@ -78,7 +108,7 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
-                    <GroupBox Grid.Column="1"
+                    <GroupBox Grid.Column="1"      
                           Background="#FFF0F0F0"
                           Header="Map">
                         <Grid Grid.Row="0">
@@ -86,7 +116,7 @@
                                 <ColumnDefinition Width="0.8*"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0" Margin="20,20,20,20">
+                            <Grid Grid.Column="0" Margin="20">
                                 <local:MapControl DataContext="{Binding MapControl_VM}"/>
                             </Grid>
                             <Grid Grid.Column="1">
@@ -112,12 +142,12 @@
                                    Margin="10,10,10,0"
                                    FontWeight="Bold"/>
                                 <Rectangle Height="2" Margin="10,30,50,10" Fill="{StaticResource Splitter}" Grid.ColumnSpan="4"/>
-                                <TextBlock Text="Map Size X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="1"/>
-                                <TextBlock Text="Map Size Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="1" Grid.Column="2"/>
-                                <TextBlock Text="Origin Die X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="2"/>
-                                <TextBlock Text="Origin Die Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="2" Grid.Column="2"/>
-                                <TextBlock Text="Chip Size[um] X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="3"/>
-                                <TextBlock Text="Chip Size[um] Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="3" Grid.Column="2"/>
+                                <TextBlock Text="Map Size X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="1"/>
+                                <TextBlock Text="Map Size Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="1" Grid.Column="2"/>
+                                <TextBlock Text="Origin Die X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="2"/>
+                                <TextBlock Text="Origin Die Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="2" Grid.Column="2"/>
+                                <TextBlock Text="Chip Size[um] X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="3"/>
+                                <TextBlock Text="Chip Size[um] Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="3" Grid.Column="2"/>
                                 <TextBlock Text="{Binding MapSzX}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="1" Grid.Column="1"/>
                                 <TextBlock Text="{Binding MapSzY}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="1" Grid.Column="3"/>
                                 <TextBlock Text="{Binding OriginDieX}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="2" Grid.Column="1"/>
@@ -132,12 +162,12 @@
                                        FontWeight="Bold" Grid.Row="4"/>
                                 <Rectangle Height="2" Margin="10,30,50,10" Fill="{StaticResource Splitter}" Grid.Row="4" Grid.ColumnSpan="4"/>
 
-                                <TextBlock Text="Origin X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="5"/>
-                                <TextBlock Text="Origin Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="5" Grid.Column="2"/>
-                                <TextBlock Text="Matrix X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="6"/>
-                                <TextBlock Text="Matrix Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="6" Grid.Column="2"/>
-                                <TextBlock Text="Size[um] X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="7"/>
-                                <TextBlock Text="Size[um] Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1,1,1,1" Grid.Row="7" Grid.Column="2"/>
+                                <TextBlock Text="Origin X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="5"/>
+                                <TextBlock Text="Origin Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="5" Grid.Column="2"/>
+                                <TextBlock Text="Matrix X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="6"/>
+                                <TextBlock Text="Matrix Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="6" Grid.Column="2"/>
+                                <TextBlock Text="Size[um] X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="7"/>
+                                <TextBlock Text="Size[um] Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="7" Grid.Column="2"/>
                                 <TextBlock Text="{Binding ShotOriginX}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="5" Grid.Column="1"/>
                                 <TextBlock Text="{Binding ShotOriginY}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="5" Grid.Column="3"/>
                                 <TextBlock Text="{Binding ShotMatrixX}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="6" Grid.Column="1"/>

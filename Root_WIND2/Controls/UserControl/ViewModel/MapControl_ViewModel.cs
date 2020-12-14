@@ -19,10 +19,16 @@ namespace Root_WIND2
     {
         InspectionManager_Vision m_InspectionManger;
         Recipe m_Recipe;
+
+        public delegate void setMasterDie(object e);
+        public event setMasterDie SetMasterDie;
         public int[] Map;
         CPoint MapSize;
-        public MapControl_ViewModel(InspectionManager_Vision inspectionManger)
+        public MapControl_ViewModel(InspectionManager_Vision inspectionManger, Recipe recipe = null)
         {
+            if(recipe != null)
+                m_Recipe = recipe;
+
             m_InspectionManger = inspectionManger;
             m_InspectionManger.MapStateChanged += MapStateChanged_Callback;
         }
@@ -108,7 +114,7 @@ namespace Root_WIND2
                     p_MapItems.Add(chip);
                 }
         }
-        public void CreateMapUI(SolidColorBrush color, int[] map = null, CPoint mapsize = null)
+        public void CreateMap_OriginToolUI(bool addEvent = false, int[] map = null, CPoint mapsize = null)
         {
             if (map == null)
             {
@@ -133,13 +139,19 @@ namespace Root_WIND2
 
                     Canvas.SetTop(chip, j * chipHeight);
                     Canvas.SetLeft(chip, i * chipWidth);
-                    if (map[i + (j * mapsize.X)] == 0)
+                    if (map[i + (j * mapsize.X)] == (int)CHIP_TYPE.NO_CHIP)
                         chip.Background = Brushes.LightGray;
-                    else
-                        chip.Background = color;
+                    else // (int)CHIP_TYPE.NORMAL
+                        chip.Background = Brushes.Green;
+
 
                     p_MapItems.Add(chip);
+
+                    if(addEvent)
+                        chip.MouseLeftButtonDown += MAP_MouseLeftButtonDown;
                 }
+
+            p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Purple;
         }
         public void SetMap(int[] map = null, CPoint mapsize = null)
         {
@@ -156,7 +168,7 @@ namespace Root_WIND2
             CreateMapUI();
             
         }
-        public void SetMap(SolidColorBrush color, int[] map = null, CPoint mapsize = null)
+        public void SetMap(bool addEvent, int[] map = null, CPoint mapsize = null)
         {
             if (map == null)
             {
@@ -168,14 +180,36 @@ namespace Root_WIND2
             Map = new int[mapsize.X * mapsize.Y];
             Map = map;
 
-            CreateMapUI(color);
+            CreateMap_OriginToolUI(addEvent);
+        }
+        private void MAP_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Grid selected = (Grid)sender;
+            CPoint pos = (CPoint)selected.Tag;
 
+            if (this.Map[this.MapSize.X * pos.Y + pos.X] != (int)CHIP_TYPE.NO_CHIP)
+            {
+                p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Green;             
+                selected.Background = Brushes.Purple;
+
+                m_Recipe.WaferMap.MasterDieX = pos.X;
+                m_Recipe.WaferMap.MasterDieY = pos.Y;
+
+                SetMasterDie(pos);
+            }
+        }
+        public void ChangeMasterImage(int dieX, int dieY)
+        {
+            if(this.Map[this.MapSize.X * dieY + dieX] != (int)CHIP_TYPE.NO_CHIP)
+            {
+                p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Green;
+                p_MapItems[this.MapSize.Y * dieX + dieY].Background = Brushes.Purple;
+            }
         }
         public int[] GetMap()
         {
             return Map;
         }
-
 
         private ObservableCollection<Grid> m_MapItems = new ObservableCollection<Grid>();
         public ObservableCollection<Grid> p_MapItems
@@ -221,8 +255,5 @@ namespace Root_WIND2
 
             }
         }
-
-
-
     }
 }
