@@ -38,14 +38,18 @@ namespace Root_WIND2
     }
     public class ColorConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object value,  Type targetType, object parameter, CultureInfo culture)
         {
-            var a = ((System.Drawing.Color)value).A;
-            var r = ((System.Drawing.Color)value).R;
-            var g = ((System.Drawing.Color)value).G;
-            var b = ((System.Drawing.Color)value).B;
+           
+            var a = ((Color)value).A;
+            var r = ((Color)value).R;
+            var g = ((Color)value).G;
+            var b = ((Color)value).B;
+            //var a = ((System.Drawing.Color)_color).A;
+            //var r = ((System.Drawing.Color)_color).R;
+            //var g = ((System.Drawing.Color)_color).G;
+            //var b = ((System.Drawing.Color)_color).B;
             Color color = Color.FromArgb(a, r, g, b);
-
             return new SolidColorBrush(color);
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
