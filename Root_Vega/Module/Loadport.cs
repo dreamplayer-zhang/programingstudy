@@ -232,14 +232,13 @@ namespace Root_Vega.Module
 			{
 				m_bIonizerDoorlockCheck = true;
                 m_vega.m_doIonizerOnOff.Write(true);//check
-                Thread.Sleep(100);
+                Thread.Sleep(2000);
                 m_vega.m_swIonizerOn.Start();
-				Thread.Sleep(20);
-				if (m_diIonizer.p_bIn != true) return "Ionizer is not On";//check
+				m_alidIonizer.Run(!m_diIonizer.p_bIn,"Ionizer is not on");//check
 			}
 			if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Get Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
-            if (m_diReticle.p_bIn == false) return "Reticle Sensor not Detected";
+            m_alidReticleTransferFail.Run(!m_diReticle.p_bIn, " Reticle Sensor not Detected");
             if (p_infoReticle == null) return p_id + " BeforeGet : InfoWafer = null";
             return IsRunOK();
         }
@@ -250,13 +249,13 @@ namespace Root_Vega.Module
             {
                 m_bIonizerDoorlockCheck = true;
                 m_vega.m_doIonizerOnOff.Write(true);
-                Thread.Sleep(100);
+                Thread.Sleep(2000);
                 m_vega.m_swIonizerOn.Start();
-                if (m_diIonizer.p_bIn != true) return "Ionizer is not On";
+                m_alidIonizer.Run(!m_diIonizer.p_bIn, "Ionizer is not on");//check
             }
             if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
             if (m_axisReticleLifter.IsInPos(ePosReticleLifter.Lifting, m_dInposReticle) == false) return "AxisReticleLifter Position not Lifting";
-            if (m_diReticle.p_bIn == true) return "Retile is exist in Loadport";
+            m_alidReticleTransferFail.Run(m_diReticle.p_bIn, "Retile is exist in Loadport");
             if (p_infoReticle != null) return p_id + " BeforePut : InfoWafer != null";
             return IsRunOK();
         }
@@ -264,24 +263,22 @@ namespace Root_Vega.Module
         public string AfterGet()
         {
             m_vega.m_doIonizerOnOff.Write(false);
-            Thread.Sleep(100);
+            Thread.Sleep(1000);
             m_vega.m_swIonizerOn.Stop();
             m_bIonizerDoorlockCheck = false;
-            Thread.Sleep(20);
-            if (m_diIonizer.p_bIn == true) return "Ionizer is not Off";
-            if (m_diReticle.p_bIn == true) return "Reticle Get Fail";
+            m_alidIonizer.Run(m_diIonizer.p_bIn, "Ionizer is on");//check
+            m_alidReticleTransferFail.Run(m_diReticle.p_bIn, "Reticle Get Fail");
             return IsRunOK();
         }
 
         public string AfterPut()
         {
             m_vega.m_doIonizerOnOff.Write(false);
-            Thread.Sleep(100);
+            Thread.Sleep(1000);
             m_vega.m_swIonizerOn.Stop();
             m_bIonizerDoorlockCheck = false;
-            Thread.Sleep(20);
-            if (m_diIonizer.p_bIn == true) return "Ionizer is not Off";
-            if (m_diReticle.p_bIn == false) return "Reticle Put Fail, Reticle Sensor not Detected";
+            m_alidIonizer.Run(m_diIonizer.p_bIn, "Ionizer is on");//check
+            m_alidReticleTransferFail.Run(!m_diReticle.p_bIn, "Reticle Put Fail, Reticle Sensor not Detected");
             return IsRunOK();
         }
 
@@ -507,6 +504,7 @@ namespace Root_Vega.Module
         CEID m_ceidClose; 
         ALID m_alidPlaced;
         ALID m_alidIonizer;
+        ALID m_alidReticleTransferFail;
         public ALID m_alidInforeticle;
 
         void InitGAF()
@@ -519,6 +517,7 @@ namespace Root_Vega.Module
 			m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Present Sensor Should be Checked");
             m_alidIonizer = m_gaf.GetALID(this, "Ionizer Check", "Ionizer State");
             m_alidInforeticle = m_gaf.GetALID(this, "Info Reticle Error", "Info Reticle Error");
+            m_alidReticleTransferFail = m_gaf.GetALID(this, "Reticle Transfer Fail", "Reticle Transfer Fail");
 
         }
         #endregion
