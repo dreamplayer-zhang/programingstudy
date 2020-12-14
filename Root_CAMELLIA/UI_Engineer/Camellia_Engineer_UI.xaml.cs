@@ -18,10 +18,10 @@ namespace Root_CAMELLIA
         {
             m_engineer = engineer;
             logViewUI.Init(LogView.m_logView);
-            treeRootUI.Init(engineer.m_treeRoot);
+            handlerUI.Init(engineer.m_handler);
             loginUI.Init(engineer.m_login);
             toolBoxUI.Init(engineer.ClassToolBox());
-            handlerUI.Init(engineer.m_handler);
+            treeRootUI.Init(engineer.m_treeRoot);
             engineer.RunTree(Tree.eMode.Init);
         }
     }

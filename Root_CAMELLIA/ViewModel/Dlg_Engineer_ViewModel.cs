@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,20 +37,24 @@ namespace Root_CAMELLIA
                 {
                     case TabAxis.AxisX:
                         {
-                            SelectedAxis = m_AxisXY.p_axisX;
-                            CurrentAxisWorkPoints = GetWorkPoint(m_AxisXY.p_axisX.m_aPos);
+                            //SelectedAxis = m_AxisXY.p_axisX;
+                            //CurrentAxisWorkPoints = GetWorkPoint(m_AxisXY.p_axisX.m_aPos);
+                            SelectedAxis = AxisX;
+                            CurrentAxisWorkPoints = GetWorkPoint(AxisX.m_aPos);
                             return;
                         }
                     case TabAxis.AxisY:
                         {
-                            SelectedAxis = m_AxisXY.p_axisY;
-                            CurrentAxisWorkPoints = GetWorkPoint(m_AxisXY.p_axisY.m_aPos);
+                            //SelectedAxis = m_AxisXY.p_axisY;
+                            //CurrentAxisWorkPoints = GetWorkPoint(m_AxisXY.p_axisY.m_aPos);
+                            SelectedAxis = AxisY;
+                            CurrentAxisWorkPoints = GetWorkPoint(AxisY.m_aPos);
                             return;
                         }
                     case TabAxis.AxisZ:
                         {
-                            SelectedAxis = m_AxisZ;
-                            CurrentAxisWorkPoints = GetWorkPoint(m_AxisZ.m_aPos);
+                            SelectedAxis = AxisZ;
+                            CurrentAxisWorkPoints = GetWorkPoint(AxisZ.m_aPos);
                             return;
                         }
                     case TabAxis.Lifter:
@@ -138,36 +143,105 @@ namespace Root_CAMELLIA
         }
         private int _PosValue = 0;
 
-        /// <summary>
-        /// Module Camellia
-        /// </summary>
-        public Module_Camellia ModuleCamellia
+        public bool EnableBtn
         {
             get
             {
-                return _ModuleCamellia;
+                return _EnableBtn;
             }
             set
             {
-                SetProperty(ref _ModuleCamellia, value);
+                SetProperty(ref _EnableBtn, value);
             }
         }
-        private Module_Camellia _ModuleCamellia;
+        private bool _EnableBtn = false;
+
+        /// <summary>
+        /// Module Camellia
+        /// </summary>
+        //public Module_Camellia ModuleCamellia
+        //{
+        //    get
+        //    {
+        //        return _ModuleCamellia;
+        //    }
+        //    set
+        //    {
+        //        SetProperty(ref _ModuleCamellia, value);
+        //    }
+        //}
+        //private Module_Camellia _ModuleCamellia;
+
+
+        public Axis AxisX
+        {
+            get
+            {
+                return _AxisX;
+            }
+            set
+            {
+                SetProperty(ref _AxisX, value);
+            }
+        }
+        private Axis _AxisX;
+        public Axis AxisY
+        {
+            get
+            {
+                return _AxisY;
+            }
+            set
+            {
+                SetProperty(ref _AxisY, value);
+            }
+        }
+        private Axis _AxisY;
+        public Axis AxisZ
+        {
+            get
+            {
+                return _AxisZ;
+            }
+            set
+            {
+                SetProperty(ref _AxisZ, value);
+            }
+        }
+        private Axis _AxisZ;
+        public Axis AxisLifter
+        {
+            get
+            {
+                return _AxisLifter;
+            }
+            set
+            {
+                SetProperty(ref _AxisLifter, value);
+            }
+        }
+        private Axis _AxisLifter;
+
+
         #endregion
 
-        private AxisXY m_AxisXY;
-        private Axis m_AxisZ;
+        private Module_Camellia ModuleCamellia;
+        //private AxisXY m_AxisXY;
+        //private Axis m_AxisZ;
+        
         private TabAxis eTabAxis = TabAxis.AxisX;
 
         public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
         {
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
-            m_AxisXY = ModuleCamellia.m_axisXY;
-            m_AxisZ = ModuleCamellia.m_axisZ;
+            //m_AxisXY = ModuleCamellia.m_axisXY;
+            //m_AxisZ = ModuleCamellia.m_axisZ;
+            AxisX = ModuleCamellia.m_axisXY.p_axisX;
+            AxisY = ModuleCamellia.m_axisXY.p_axisY;
+            AxisZ = ModuleCamellia.m_axisZ;
 
             MotionTabIndex = 1;
         }
-
 
         #region Method
         public void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -193,6 +267,8 @@ namespace Root_CAMELLIA
             return data;
         }
 
+
+
         #endregion
 
         #region Motion Command
@@ -202,11 +278,24 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    m_AxisXY.p_axisX.StartHome();
-                    m_AxisXY.p_axisY.StartHome();
-                    m_AxisZ.StartHome();
-                    m_AxisXY.WaitReady();
-                    m_AxisZ.WaitReady();
+                    Thread thread = new Thread(()=> 
+                    {
+                        EnableBtn = false;
+                        //m_AxisXY.p_axisX.StartHome();
+                        //m_AxisXY.p_axisY.StartHome();
+                        //m_AxisZ.StartHome();
+                        //m_AxisXY.WaitReady();
+                        //m_AxisZ.WaitReady();
+                        AxisX.StartHome();
+                        AxisY.StartHome();
+                        AxisZ.StartHome();
+                        AxisX.WaitReady();
+                        AxisY.WaitReady();
+                        AxisZ.WaitReady();
+                    });
+                    thread.Start();
+                    thread.Join();
+                    EnableBtn = true;
                 });
             }
         }
@@ -217,9 +306,15 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     // 선택한 작업점 위치로 Move
-                    SelectedAxis.StartMove(CurrentAxisWorkPoints[SelectedWorkPointIndex].Value);
-                    //SelectedAxis.StartMove(SelectedWorkPoint.Value);
-                    SelectedAxis.WaitReady();
+                    Thread thread = new Thread(() =>
+                    {
+                        EnableBtn = false;
+                        SelectedAxis.StartMove(CurrentAxisWorkPoints[SelectedWorkPointIndex].Value);
+                        SelectedAxis.WaitReady();
+                    });
+                    thread.Start();
+                    thread.Join();
+                    EnableBtn = true;
                 });
             }
         }
@@ -229,9 +324,9 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    m_AxisXY.p_axisX.StopAxis();
-                    m_AxisXY.p_axisY.StopAxis();
-                    m_AxisZ.StopAxis();
+                    AxisX.StopAxis();
+                    AxisY.StopAxis();
+                    AxisZ.StopAxis();
                 });
             }
         }
@@ -253,8 +348,15 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     // Select Axis Home
-                    SelectedAxis.StartHome();
-                    SelectedAxis.WaitReady();
+                    Thread thread = new Thread(() =>
+                    {
+                        EnableBtn = false;
+                        SelectedAxis.StartHome();
+                        SelectedAxis.WaitReady();
+                    });
+                    thread.Start();
+                    thread.Join();
+                    EnableBtn = true;
                 });
             }
         }
@@ -302,8 +404,8 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    SelectedAxis.ServoOn(!m_AxisXY.p_axisX.p_bSeroOn);
-                    SelectedAxis.ServoOn(!m_AxisZ.p_bSeroOn);
+                    SelectedAxis.ServoOn(!AxisX.p_bSeroOn);
+                    SelectedAxis.ServoOn(!AxisY.p_bSeroOn);
                 });
             }
         }
@@ -334,6 +436,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    
                     SelectedAxis.StartMove(-PosValue);
                     SelectedAxis.WaitReady();
                 });
