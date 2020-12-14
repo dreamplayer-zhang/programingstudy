@@ -136,22 +136,50 @@ namespace Root_WIND2
                 Directory.CreateDirectory(recipeFolderPath);
 
             // Vision
-            this.engineer.InspectionVision = new InspectionManager_Vision(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
-            this.engineer.InspectionVision.Recipe = this.recipe;
-
-            this.InspectionVision = this.engineer.InspectionVision;
+            this.InspectionVision = new InspectionManager_Vision(image.GetPtr(), image.p_Size.X, image.p_Size.Y);
+            
+            this.Engineer.InspectionVision = this.InspectionVision;
+            this.Engineer.InspectionVision.Recipe = this.recipe;
 
             // EFEM
-            this.engineer.InspectionEFEM = new InspectionManager_EFEM(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
-            this.engineer.InspectionEFEM.Recipe = this.recipe;
+            this.InspectionEFEM = new InspectionManager_EFEM(ImageEdge.GetPtr(), ImageEdge.p_Size.X, ImageEdge.p_Size.Y, 3);
 
-            this.InspectionEFEM = this.engineer.InspectionEFEM;
+            this.Engineer.InspectionEFEM = this.InspectionEFEM;
+            this.Engineer.InspectionEFEM.Recipe = this.recipe;
+
+           
 
             return true;
         }
 
-
         #region [Recipe Method]
+        public void NewRecipe()
+        {
+            try
+            {
+                if (MessageBox.Show("작성 중인 레시피(Recipe)를 저장하시겠습니까?", "YesOrNo", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    if(this.Recipe.RecipePath == "")
+                    {
+                        ShowDialogSaveRecipe();
+                    }
+                    else
+                    {
+                        this.Recipe.Save(this.Recipe.RecipePath);
+                    }
+                }
+                
+                this.Recipe.Clear();
+                ShowDialogSaveRecipe();
+
+                WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Save Recipe : " + ex.Message);
+            }
+        }
+
         public void ShowDialogSaveRecipe()
         {
             try
@@ -208,6 +236,8 @@ namespace Root_WIND2
                 dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
                 if (dlg.ShowDialog() == true)
                 {
+
+                    // 레시피 전/후처리 이벤트 Recipe 클래스 안쪽에 넣어야할 수 도?
                     WIND2EventManager.OnBeforeRecipeRead(recipe, new RecipeEventArgs());
 
                     this.LoadRecipe(dlg.FileName);

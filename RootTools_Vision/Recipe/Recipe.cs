@@ -44,10 +44,29 @@ namespace RootTools_Vision
         public Recipe()
         {
             RecipeItemList = Tools.GetEnumerableOfType<RecipeBase>().ToList<RecipeBase>();
-            //ParameterItemList = Tools.GetEnumerableOfType<ParameterBase>().ToList<ParameterBase>();
-            //waferInfoItemList = Tools.GetEnumerableOfType<WaferInfoBase>().ToList<WaferInfoBase>();
-
             ParameterItemList = new List<ParameterBase>();
+        }
+
+        public void Clear()
+        {
+            name = "";
+            recipePath = "";
+            recipeFolderPath = "";
+
+            waferMap = new RecipeType_WaferMap();
+
+            RecipeItemList = Tools.GetEnumerableOfType<RecipeBase>().ToList<RecipeBase>();
+            ParameterItemList = new List<ParameterBase>();
+        }
+
+        public bool Read(string recipePath, bool bUpdateUI)
+        {
+            bool bRst = Read(recipePath);
+
+            if(bUpdateUI == true)
+                WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
+
+            return bRst;
         }
 
         public bool Read(string recipePath)
