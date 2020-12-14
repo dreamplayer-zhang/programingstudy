@@ -2,11 +2,9 @@
 using RootTools.Memory;
 using RootTools.Trees;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -25,6 +23,7 @@ namespace RootTools.Camera.Matrox
         private MIL_ID m_MilSystem;                          // 프레임그래버
         private MIL_ID m_MilDigitizer;                       // 카메라
         private MIL_ID m_MilDisplay;                         // 디스플레이
+        //private MIL_ID m_MilImage = MIL.M_NULL;              // MIL Image buffer identifier.
         private MIL_ID[] m_MilBuffers = new MIL_ID[c_nBuf];  // 버퍼
         
         int m_nWidth = 0;
@@ -207,7 +206,8 @@ namespace RootTools.Camera.Matrox
             p_treeRoot = new TreeRoot(id, m_log);
             bgw_Connect.DoWork += bgw_Connect_Dowork;
             bgw_Connect.RunWorkerCompleted += bgw_Connect_RunWorkerCompleted;
-            m_ImageLive = new ImageData(1920, 1080, 1);
+            //m_ImageLive = new ImageData(1920, 1080, 1);
+            m_ImageLive = new ImageData(6560, 1080, 1);
             p_ImageViewer = new ImageViewer_ViewModel(m_ImageLive, null, _dispatcher);
             p_CamInfo = new MatroxCamInfo(m_log);
             RunTree(Tree.eMode.RegRead);
@@ -242,8 +242,9 @@ namespace RootTools.Camera.Matrox
             // Display
             if (m_MilDisplay == MIL.M_NULL)
                 MIL.MdispAlloc(m_MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref m_MilDisplay);
+
             // Set dafault values for the image buffer in case no digitizer can be allocated
-            long lImgAttributes = MIL.M_IMAGE | MIL.M_DISP | MIL.M_PROC;
+            long lImgAttributes = MIL.M_IMAGE + MIL.M_DISP;
             // Inquire the number of digitizers for the system
             if (m_MilSystem != MIL.M_NULL)
             {
@@ -253,25 +254,40 @@ namespace RootTools.Camera.Matrox
                     // Digitizer
                     if (m_MilDigitizer == MIL.M_NULL)
                     {
-                        MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile/*"M_DEFAULT"*/, MIL.M_DEFAULT, ref m_MilDigitizer);
+                        MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_DEFAULT, ref m_MilDigitizer);
 
-                        // Inquire the digitizer to determine the image buffer size
                         p_nImgBand = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_BAND, MIL.M_NULL);
                         p_nWidth = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_X, MIL.M_NULL);
                         p_nHeight = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_Y, MIL.M_NULL);
 
-                        // Add the M_GRAB attribute to the image buffer
+                        // Add M_GRAB attribute if a digitizer is allocated.
                         lImgAttributes |= MIL.M_GRAB;
                     }
                 }
             }
-            // Buffer
-            for (int i = 0; i<p_nBuf; i++)
+            //MIL.MbufAllocColor(m_MilSystem, p_nImgBand, p_nWidth, p_nHeight, 8 + MIL.M_UNSIGNED, lImgAttributes, ref m_MilImage);
+            //MIL.MbufClear(m_MilImage, 0);
+
+            // Allocate the grab buffers and clear them.
+            for (int i = 0; i < p_nBuf; i++)
             {
                 MIL.MbufAlloc2d(m_MilSystem, (MIL_INT)p_nWidth, (MIL_INT)p_nHeight, 8 + MIL.M_UNSIGNED, lImgAttributes, ref m_MilBuffers[i]);
+
+                if (m_MilBuffers[i] != MIL.M_NULL)
+                {
+                    MIL.MbufClear(m_MilBuffers[i], 0xFF);
+                }
+            }
+            MIL.MappControl(MIL.M_DEFAULT, MIL.M_ERROR, MIL.M_PRINT_DISABLE);
+
+            // Free buffers to leave space for possible temporary buffers.
+            for (int n = 0; n < 2 && p_nBuf > 0; n++)
+            {
+                p_nBuf--;
+                MIL.MbufFree(m_MilBuffers[p_nBuf]);
             }
 
-            m_ImageLive.ReAllocate(new CPoint(p_nWidth, p_nHeight), 1);
+            //m_ImageLive.ReAllocate(new CPoint(p_nWidth, p_nHeight), 1);
             return;
         }
 
@@ -311,14 +327,6 @@ namespace RootTools.Camera.Matrox
             // variable
             UserDataObject userObject = new UserDataObject();
 
-            int nbFrames = 0;
-            int n = 0;
-            int nbFramesReplayed = 0;
-            double frameRate = 0;
-            double timeWait = 0;
-            double totalReplay = 0;
-            double grabScale = 1.0;
-
             MIL_INT licenseModules = 0;
             MIL_INT frameCount = 0;
             MIL_INT frameMissed = 0;
@@ -339,11 +347,10 @@ namespace RootTools.Camera.Matrox
 
             MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(ArchiveFunction);
             MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_END, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
-
             MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
 
             int iBlock = 0;
-            while (iBlock < 10000)
+            while (iBlock < 10)
             {
                 Thread.Sleep(100);
                 MIL.MdigGrab(m_MilDigitizer, m_MilBuffers[(iBlock) % p_nBuf]);
@@ -351,7 +358,6 @@ namespace RootTools.Camera.Matrox
             }
 
             MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_END + MIL.M_UNHOOK, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
-
             userObjectHandle.Free();
         }
 
@@ -399,6 +405,8 @@ namespace RootTools.Camera.Matrox
         IntPtr m_MemPtr = IntPtr.Zero;
         CPoint m_cpScanOffset = new CPoint();
         GCHandle userObjectHandle;
+        MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(LineScanArchiveFunction);
+        //private const int BUFFERING_SIZE_MAX = 20;
 
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0)
         {
@@ -438,15 +446,40 @@ namespace RootTools.Camera.Matrox
                     return;
             }
 
-            userObject.NbGrabStart = 0;
-            userObjectHandle = GCHandle.Alloc(userObject);
+            /*
+			// Sets the maximum time to wait for a frame before generating an error.
+			// MIL.M_DEFAULT is same as MIL.M_INFINITE (msec)
+			MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, 1000);
+			// Sets the maximum amount of time to wait for MdigProcess() to complete the current grab (M_STOP) or all the queued grabs (M_STOP + M_WAIT), before generating an error.
+			// MIL.M_DEFAULT is same as MIL.M_INFINITE (msec)
+			MIL.MdigControl(m_MilDigitizer, MIL.M_PROCESS_TIMEOUT, MIL.M_DEFAULT);
+			// Create an internal grab monitoring thread. The internal grab monitoring thread will produce an error if there is no longer any grab activity.
+			MIL.MdigControl(m_MilDigitizer, MIL.M_PROCESS_GRAB_MONITOR, MIL.M_ENABLE);
 
-            MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(LineScanArchiveFunction);
-            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, p_nBuf, MIL.M_STOP, MIL.M_DEFAULT, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
-            //MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_END, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+			// Sets the signal transition upon which to generate a grab trigger.
+		    MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_ACTIVATION, MIL.M_DEFAULT);
+			// Sets the signal source of the grab trigger when there are multiple sources available.
+			MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_SOURCE, MIL.M_DEFAULT);
+			// Sets whether, when a grab command is issued (for example, MdigGrab()) to wait for a trigger before grabbing.
+			MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TRIGGER_STATE, MIL.M_DEFAULT);
+            */
 
-            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_FRAME_NUM, m_nGrabCount);
-            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, p_nBuf, MIL.M_START, MIL.M_DEFAULT, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            //userObject.NbGrabStart = 0;
+            //userObject.MilDigitizer = m_MilDigitizer;
+            //userObject.MilImageDisp = m_MilImage;
+			userObjectHandle = GCHandle.Alloc(this);
+           
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, MIL.M_INFINITE);
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
+
+            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, 90, MIL.M_SEQUENCE + MIL.M_COUNT(90), MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+
+            //MIL_DIG_HOOK_FUNCTION_PTR grabStartDelegate = new MIL_DIG_HOOK_FUNCTION_PTR(LineScanArchiveFunction);
+            ////MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_START, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            ////MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_END, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            ////MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_START + MIL.M_UNHOOK, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+            //MIL.MdigHookFunction(m_MilDigitizer, MIL.M_GRAB_FRAME_START, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
             m_GrabThread.Start();
             return;
@@ -460,22 +493,24 @@ namespace RootTools.Camera.Matrox
 
             int lY = m_nGrabCount * Convert.ToInt32(p_nHeight);
             int iBlock = 0;
-            while (iBlock < m_nGrabCount)
+            while (iBlock < 90/*m_nGrabCount*/)
             {
                 if (iBlock < m_nGrabTrigger)
                 {   
+                    Debug.WriteLine("block " + iBlock);
                     MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarray);
                     Parallel.For(0, p_nHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
                     {
                         int yp = y + (iBlock) * p_nHeight;
                         fixed (byte* p = srcarray)
-                        {   
+                        {
                             IntPtr srcPtr = (IntPtr)p + p_nWidth * y;
                             IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
                             Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
                         }
                     });
                     iBlock++;
+                    Debug.WriteLine("block" + iBlock);
                     if (m_nGrabCount != 0)
                         p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
@@ -484,11 +519,15 @@ namespace RootTools.Camera.Matrox
             userObjectHandle.Free();
         }
 
-        MIL_INT LineScanArchiveFunction(MIL_INT HookType, MIL_ID EventId, IntPtr UserDataPtr)
+        public static MIL_INT LineScanArchiveFunction(MIL_INT HookType, MIL_ID EventId, IntPtr UserDataPtr)
         {
             if (UserDataPtr != IntPtr.Zero)
-            {   
-                m_nGrabTrigger++;
+            {
+                GCHandle handle = (GCHandle)(UserDataPtr);
+                Camera_Matrox cam = handle.Target as Camera_Matrox;
+
+                cam.m_nGrabTrigger++;
+                Debug.WriteLine(cam.m_nGrabTrigger);
             }
             return 0;
         }
