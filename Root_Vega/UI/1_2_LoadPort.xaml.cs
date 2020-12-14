@@ -84,8 +84,6 @@ namespace Root_Vega
                 if (m_loadport.m_diIonizer.p_bIn)
                 {
                     m_handler.m_vega.m_doIonizerOnOff.Write(false);
-                    m_loadport.m_vega.p_eIonizerState = false;
-
                     Thread.Sleep(20);
                     if (m_loadport.m_diIonizer.p_bIn != false) EQ.p_bStop = true;
                 }

@@ -32,15 +32,7 @@ namespace Root_Vega.Module
             Buzzer4,
         }
         bool _eIonizerState = false;
-        public bool p_eIonizerState
-        {
-            get { return _eIonizerState; }
-            set
-            {
-                _eIonizerState = value;
-                OnPropertyChanged();
-            }
-        }
+
         string[] m_asLamp = Enum.GetNames(typeof(eLamp));
         string[] m_asIonizer = Enum.GetNames(typeof(eIonizer));
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
