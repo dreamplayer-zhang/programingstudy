@@ -106,7 +106,7 @@ namespace Root_WIND2
                     inspTestVM.p_MapControl_VM.SetMap(mapdata.Data, new CPoint(nMapX, nMapY));
                     inspTestVM.p_MapControl_VM.CreateMapUI();
                 }
-                else
+                else if (p_CurrentPanel == backsideInspTestVM.Main)
                 {
                     backsideInspTestVM.p_MapControl_VM.SetMap(mapdata.Data, new CPoint(nMapX, nMapY));
                     backsideInspTestVM.p_MapControl_VM.CreateMapUI();
@@ -384,7 +384,7 @@ namespace Root_WIND2
         {
             get
             {
-                return new RelayCommand(ProgramManager.Instance.ShowDialogSaveRecipe);
+                return new RelayCommand(ProgramManager.Instance.NewRecipe);
             }
 
         }

@@ -238,6 +238,7 @@
     <Compile Include="Converter\AxisBoolToBrushConverter.cs" />
     <Compile Include="BaseDefine.cs" />
     <Compile Include="Converter\AxisConverter.cs" />
+    <Compile Include="Converter\AxisToMotionUIConverter.cs" />
     <Compile Include="Converter\AxisStateToEnableConverter.cs" />
     <Compile Include="Converter\AxisStateToLoadingOpacityConverter.cs" />
     <Compile Include="Converter\AxisStateToOpacityConverter.cs" />

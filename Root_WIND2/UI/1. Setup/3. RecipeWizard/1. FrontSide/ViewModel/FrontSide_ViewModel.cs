@@ -123,6 +123,7 @@ namespace Root_WIND2
             p_Spec_VM.init(this, m_Recipe);
 
             Init();
+            p_Origin_VM.MapControl_VM.SetMasterDie += P_Origin_VM_SetMasterDie;
             
             m_Map_VM = new FrontsideMap_ViewModel();
             m_Map_VM.Init(setup, Map, m_Recipe);
@@ -134,7 +135,10 @@ namespace Root_WIND2
         {
             p_ROI_VM.SetOrigin(e);
         }
-
+        private void P_Origin_VM_SetMasterDie(object e)
+        {
+            p_Origin_VM.SetMasterDie(e);
+        }
         public void UI_Redraw()
         {
             p_Map_VM.LoadMapData(); // Map
@@ -175,6 +179,7 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     SetPage(Summary);
+                    p_Summary_VM.SetPage();
                 });
             }
         }
@@ -195,6 +200,7 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     SetPage(Origin);
+                    p_Origin_VM.SetPage();
                 });
             }
         }

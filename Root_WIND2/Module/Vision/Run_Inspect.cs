@@ -50,6 +50,12 @@ namespace Root_WIND2.Module
                 m_grabMode = m_module.GetGrabMode(value);
             }
         }
+
+        public InspectionManager_Vision InspectionVision 
+        {  
+            get => inspectionVision;
+            set => inspectionVision = value;
+        }
         #endregion
 
         public Run_Inspect(Vision module)
@@ -62,25 +68,44 @@ namespace Root_WIND2.Module
         public override ModuleRunBase Clone()
         {
             Run_Inspect run = new Run_Inspect(m_module);
+            run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
+            run.m_cpMemoryOffset = new CPoint(m_cpMemoryOffset);
+            run.m_dResX_um = m_dResX_um;
+            run.m_dResY_um = m_dResY_um;
+            run.m_nFocusPosZ = m_nFocusPosZ;
+            run.m_nWaferSize_mm = m_nWaferSize_mm;
+            run.m_nMaxFrame = m_nMaxFrame;
+            run.m_nScanRate = m_nScanRate;
+            run.p_sGrabMode = p_sGrabMode;
+
+            run.InspectionVision = ProgramManager.Instance.InspectionVision;
+
+            run.RecipeName = this.RecipeName;
             return run;
         }
 
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
             m_sRecipeName = tree.SetFile(m_sRecipeName, m_sRecipeName, "rcp", "Recipe", "Recipe Name", bVisible);
+            m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
+            m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
+            m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam X Resolution", "X Resolution (um)", bVisible);
+            m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Y Resolution", "Y Resolution (um)", bVisible);
+            m_nFocusPosZ = tree.Set(m_nFocusPosZ, m_nFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
+            m_nWaferSize_mm = tree.Set(m_nWaferSize_mm, m_nWaferSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
+            m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
+            m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-            if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
         }
 
         public override string Run()
         {
             if (m_grabMode == null) return "Grab Mode == null";
 
-            Recipe recipe = new Recipe();
-            if (recipe.Read(m_sRecipeName) == false)
+            if(this.inspectionVision.Recipe.Read(m_sRecipeName, true) == false)
                 return "Recipe Open Fail";
 
-            if(this.inspectionVision.CreateInspection(recipe) == false)
+            if (this.inspectionVision.CreateInspection() == false)
                 return "Create Inspection Fail";
 
             this.inspectionVision.Start(true);
