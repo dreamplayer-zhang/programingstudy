@@ -29,6 +29,32 @@ namespace Root_CAMELLIA
             }
         }
 
+        Module_Camellia.Run_Measure m_Run_Measure;
+        public Module_Camellia.Run_Measure p_Run_Measure
+        {
+            get
+            {
+                return m_Run_Measure;
+            }
+            set
+            {
+                SetProperty(ref m_Run_Measure, value);
+            }
+        }
+
+        RPoint m_StageCenterPulse = new RPoint();
+        public RPoint p_StageCenterPulse
+        {
+            get
+            {
+                return m_StageCenterPulse;
+            }
+            set
+            {
+                m_StageCenterPulse = value;
+            }
+        }
+
         public MainWindow_ViewModel(MainWindow mainwindow)
         {
             m_MainWindow = mainwindow;
@@ -37,6 +63,20 @@ namespace Root_CAMELLIA
             ViewModelInit();
             DialogInit(mainwindow);
         }
+
+        public ObservableCollection<UIElement> p_MeasurePointElement
+        {
+            get
+            {
+                return m_MeasurePointElement;
+            }
+            set
+            {
+                m_MeasurePointElement = value;
+            }
+        }
+        private ObservableCollection<UIElement> m_MeasurePointElement = new ObservableCollection<UIElement>();
+
         private void Init()
         {
             DataManager = DataManager.Instance;

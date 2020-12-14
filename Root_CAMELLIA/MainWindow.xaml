@@ -513,12 +513,29 @@
                                 <UniformGrid Grid.Column="0" Columns="3" Background="Gainsboro" Margin="2">
                                     <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
                                     <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
-                                    <TextBlock Text="{Binding p_Module_Camellia.p_axisXY.p_axisX.p_posActual, Converter={StaticResource AxisConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource AxisConverter}" ConverterParameter="AxisX">
+                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisX"/>
+                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisX.p_posActual"/>
+                                                <Binding Path="p_Run_Measure.m_StageCenterPos_pulse"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
                                 </UniformGrid>
                                 <UniformGrid Grid.Column="1" Columns="3" Background="Gainsboro" Margin="2">
                                     <TextBlock Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
                                     <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
-                                    <TextBlock Text="{Binding p_Module_Camellia.p_axisXY.p_axisY.p_posActual, Converter={StaticResource AxisConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource AxisConverter}" ConverterParameter="AxisY">
+                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisY"/>
+                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisY.p_posActual"/>
+                                                <Binding Path="p_StageCenterPulse.Y"/>
+                                                <!--Text="{Binding p_Module_Camellia.m_axisXY.p_axisY.p_posActual, Converter={StaticResource AxisConverter}}"--> 
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
                                 </UniformGrid>
                             </Grid>
                         </GroupBox>
@@ -541,6 +558,18 @@
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                        <Viewbox Margin="3" Grid.Row="1">
+                            <ItemsControl ItemsSource="{Binding p_MeasurePointElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"  Background="#01FFFFFF" Focusable="true">
                                         </Canvas>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
@@ -616,8 +645,172 @@
                                     </Grid>
                                 </TabItem>
                                 <TabItem Header="Parameter">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="2.5*"/>
+                                            <RowDefinition Height="1.5*"/>
+                                            <RowDefinition Height="1*"/>
+                                        </Grid.RowDefinitions>
+                                        <GroupBox Header="Measurement Parameter">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="2*"/>
+                                                    <RowDefinition Height="0.4*"/>
+                                                </Grid.RowDefinitions>
+                                                <DataGrid Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding RecipeViewModel.GridLayerData}" IsReadOnly="True">
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True"/>
+                                                        <DataGridComboBoxColumn Header="Host" Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}">
+                                                            <DataGridComboBoxColumn.ElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    <Setter Property="IsReadOnly" Value="True"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.ElementStyle>
+                                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                                        </DataGridComboBoxColumn>
+                                                        <DataGridComboBoxColumn Header="Guest1" Width="*"  SelectedValueBinding="{Binding SelectedGuest1, UpdateSourceTrigger=PropertyChanged}">
+                                                            <DataGridComboBoxColumn.ElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    <Setter Property="IsReadOnly" Value="True"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.ElementStyle>
+                                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                                        </DataGridComboBoxColumn>
+                                                        <DataGridTextColumn Header="fv1" Width="40" Binding="{Binding Fv1, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                                        <DataGridCheckBoxColumn Header="fit" Width="25" Binding="{Binding Fv1Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                                        <DataGridComboBoxColumn Header="Guest2" Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}">
+                                                            <DataGridComboBoxColumn.ElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    <Setter Property="IsReadOnly" Value="True"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.ElementStyle>
+                                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                                        </DataGridComboBoxColumn>
+                                                        <DataGridTextColumn Header="fv2" Width="40" Binding="{Binding Fv2, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                                        <DataGridCheckBoxColumn Header="fit" Width="25" Binding="{Binding Fv2Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                                        <DataGridComboBoxColumn Header="Emm" Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
+                                                            <DataGridComboBoxColumn.ElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    <Setter Property="IsReadOnly" Value="True"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.ElementStyle>
+                                                            <DataGridComboBoxColumn.EditingElementStyle>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                </Style>
+                                                            </DataGridComboBoxColumn.EditingElementStyle>
+                                                        </DataGridComboBoxColumn>
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
+                                                <UniformGrid Columns="2" Grid.Row="1">
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Integration Time (VIS)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.VISIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                                    </Grid>
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Integration Time (NIR)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                                    </Grid>
+                                                </UniformGrid>
+                                            </Grid>
+                                        </GroupBox>
+                                        <GroupBox Header="WaveLength Data" Grid.Row="1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid Margin="5">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="0.2*"/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
+                                                            <TextBlock Grid.Row="0" Text="Reflectance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
+                                                        </Border>
+                                                        <ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center"/>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Grid.Column="1" Margin="5">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="0.2*"/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
+                                                            <TextBlock Grid.Row="0" Text="Transmittance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
+                                                        </Border>
+                                                        <ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.TransmittanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center" />
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </GroupBox>
+                                        <GroupBox Header="Thickness Parameter" Grid.Row="2">
+                                            <Grid>
+                                                <UniformGrid Columns="2" Rows="2">
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Lower WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.LowerWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                    </Grid>
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Upper WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.UpperWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                    </Grid>
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Thickness LM Iteration" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.ThicknessLMIteration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                    </Grid>
+                                                    <Grid Margin="5" Background="Gainsboro">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="18*"/>
+                                                            <ColumnDefinition Width="12*"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="Damping Factor" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.DampingFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                    </Grid>
+                                                </UniformGrid>
+                                            </Grid>
+                                        </GroupBox>
+                                    </Grid>
                                 </TabItem>
-
                             </TabControl>
                         </GroupBox>
                     </Grid>
