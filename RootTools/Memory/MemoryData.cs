@@ -132,14 +132,7 @@ namespace RootTools.Memory
             if (p_sInfo != "OK") return;
             try
             {
-                MemoryMappedFile mmf = m_group.m_pool.m_MMF;
-                long pAddress = 0; 
-                unsafe
-                {
-                    byte* p = null;
-                    mmf.CreateViewAccessor().SafeMemoryMappedViewHandle.AcquirePointer(ref p);
-                    pAddress = (long)(IntPtr)p;
-                }
+                long pAddress = m_group.m_pool.m_pAddress; 
                 pAddress += (long)Math.Ceiling(p_mbOffset * c_fMB);
                 for (int n = 0; n < p_nCount; n++)
                 {

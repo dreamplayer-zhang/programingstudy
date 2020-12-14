@@ -96,7 +96,7 @@ namespace RootTools
 		}
 
 		public IntPtr m_ptrImg;
-		MemoryData m_MemData;
+		public MemoryData m_MemData;
 		public byte[] m_aBuf;
 		byte[] m_aBufFileOpen;
 

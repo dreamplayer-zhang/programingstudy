@@ -75,7 +75,11 @@ namespace Root_Vega
 
             bool bAuto = (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto); 
             borderAccessAuto.Background = bAuto ? Brushes.LightGreen : null;
+            if (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto)
+            { m_loadport.m_doAuto.Write(true); m_loadport.m_doManual.Write(false); }
             borderAccessManual.Background = bAuto ? null : Brushes.LightGreen;
+            if (m_loadport.m_infoPod.p_eReqAccessLP == GemCarrierBase.eAccessLP.Manual)
+            { m_loadport.m_doAuto.Write(false); m_loadport.m_doManual.Write(true); }
 
             buttonLoad.IsEnabled = IsEnableLoad();
             buttonUnload.IsEnabled = IsEnableUnload();

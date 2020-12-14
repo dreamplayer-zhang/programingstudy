@@ -156,31 +156,30 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Border Grid.Column="0" x:Name="borderAccessAuto"
-                                Margin="5,10,5,10">
-                            <TextBlock Text="AUTO"
-                                       Foreground="{StaticResource Black}"
-                                       Style="{StaticResource BasicTb}"/>
-                        </Border>
-                        <Border Grid.Column="1" x:Name="borderAccessManual"
+                        <Border Grid.Column="0" x:Name="borderAccessManual"
                                 Margin="5,10,5,10">
                             <TextBlock Text="MANUAL"
                                        Foreground="{StaticResource Black}"
                                        Style="{StaticResource BasicTb}"/>
                         </Border>
-                        <Border Grid.Column="2" x:Name="borderPlaced"
-                                                Margin="5,10,5,10">
-                            <TextBlock Text="PLACED"
-                                               Foreground="{StaticResource Black}"
-                                               Style="{StaticResource BasicTb}"/>
+                        <Border Grid.Column="1" x:Name="borderAccessAuto"
+                                Margin="5,10,5,10">
+                            <TextBlock Text="AUTO"
+                                       Foreground="{StaticResource Black}"
+                                       Style="{StaticResource BasicTb}"/>
                         </Border>
-                        <Border Grid.Column="3" x:Name="borderPresent"
+                        <Border Grid.Column="2" x:Name="borderPresent"
                                                 Margin="5,10,5,10">
                             <TextBlock Text="PRESENT"
                                                Foreground="{StaticResource Black}"
                                                Style="{StaticResource BasicTb}"/>
                         </Border>
-
+                        <Border Grid.Column="3" x:Name="borderPlaced"
+                                                Margin="5,12,5,8">
+                            <TextBlock Text="PLACED"
+                                               Foreground="{StaticResource Black}"
+                                               Style="{StaticResource BasicTb}"/>
+                        </Border>
                         <Border Grid.Column="0" x:Name="borderLoad"
                                 Grid.Row="1"
                                                 Margin="5,10,5,10">

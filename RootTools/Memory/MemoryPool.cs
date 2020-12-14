@@ -34,7 +34,14 @@ namespace RootTools.Memory
         {
             StopWatch sw = new StopWatch();
             long nPool = (long)Math.Ceiling(fGB * c_fGB);
-            try { if (m_MMF == null) m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool); }
+            try 
+            {
+                if (m_MMF == null)
+                {
+                    m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool);
+                    GetAddress();
+                }
+            }
             catch (Exception e) 
             {
                 m_log.Error(p_id + " Memory Pool Create Error (ReStart PC) : " + e.Message);
@@ -48,11 +55,26 @@ namespace RootTools.Memory
         {
             try
             {
-                if (m_MMF == null) m_MMF = MemoryMappedFile.OpenExisting(p_id);
+                if (m_MMF == null)
+                {
+                    m_MMF = MemoryMappedFile.OpenExisting(p_id);
+                    GetAddress();
+                }
             }
             catch { return "Open Error"; }
             m_log.Info(p_id + " Memory Pool Open Done");
             return (m_MMF != null) ? "OK" : "Error"; 
+        }
+
+        public long m_pAddress = 0; 
+        void GetAddress()
+        {
+            unsafe
+            {
+                byte* p = null;
+                m_MMF.CreateViewAccessor().SafeMemoryMappedViewHandle.AcquirePointer(ref p);
+                m_pAddress = (long)(IntPtr)p; 
+            }
         }
         #endregion
 
