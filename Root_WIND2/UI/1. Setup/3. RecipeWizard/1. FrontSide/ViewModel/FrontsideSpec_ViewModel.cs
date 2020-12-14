@@ -205,7 +205,8 @@ namespace Root_WIND2
                 item.p_InspMethod = item.p_cInspMethod[selectMethod];
             }
 
-            p_selectedInspItem = p_cInspItem[0];
+            if(p_cInspItem.Count > 0)
+                p_selectedInspItem = p_cInspItem[0];
         }
 
         public void SetParameter()
