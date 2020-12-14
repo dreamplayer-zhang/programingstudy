@@ -32,15 +32,7 @@ namespace Root_Vega.Module
             Buzzer4,
         }
         bool _eIonizerState = false;
-        public bool p_eIonizerState
-        {
-            get { return _eIonizerState; }
-            set
-            {
-                _eIonizerState = value;
-                OnPropertyChanged();
-            }
-        }
+
         string[] m_asLamp = Enum.GetNames(typeof(eLamp));
         string[] m_asIonizer = Enum.GetNames(typeof(eIonizer));
         string[] m_asBuzzer = Enum.GetNames(typeof(eBuzzer));
@@ -101,7 +93,6 @@ namespace Root_Vega.Module
         ALID m_alidPC_FanAlarm;
         ALID m_alidDoorLock;
         ALID m_alidIonizerAlarm;
-        ALID m_alidInterlockkey;
 
 
         void InitALID()
@@ -117,7 +108,6 @@ namespace Root_Vega.Module
             m_alidElecPnl_2_FanAlarm = m_gaf.GetALID(this, "Elecanel 2 Fan Alarm", "Elect Panel 2 Fan Alarm");
             m_alidPCPnl_FanAlarm = m_gaf.GetALID(this, "PCPanel Fan Alarm", "PC Panel Fan Alarm");
             m_alidPC_FanAlarm = m_gaf.GetALID(this, "PC Fan Alarm", "PC Fan Alarm");
-            m_alidInterlockkey = m_gaf.GetALID(this, "Interlock Key Alarm", "Interlock Key Alarm");
         }
         #endregion
 
@@ -164,7 +154,7 @@ namespace Root_Vega.Module
             #endregion
 
             #region Interlock
-            if (m_swIonizerOn.ElapsedMilliseconds > 10000)
+            if (m_swIonizerOn.ElapsedMilliseconds > 10000 || m_swIonizerOn.IsRunning)
             {
                 m_doIonizerOnOff.Write(false);
             }

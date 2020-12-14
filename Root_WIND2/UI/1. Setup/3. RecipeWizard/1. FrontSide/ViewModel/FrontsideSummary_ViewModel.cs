@@ -5,22 +5,25 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace Root_WIND2
 {
-    class FrontsideSummary_ViewModel : ObservableObject
+    class FrontsideSummary_ViewModel : RootViewer_ViewModel
     {
         public void init(Setup_ViewModel _setup, Recipe _recipe)
         {
             this.setup = _setup;
             this.recipe = _recipe;
 
-            MapControl_VM = new MapControl_ViewModel(this.setup.InspectionVision);
+            MapControl_VM = new MapControl_ViewModel(this.setup.InspectionVision, recipe);
             MapControl_VM.SetMap(setup.InspectionVision.mapdata, new CPoint(14, 14));
             
             timer.Interval = TimeSpan.FromSeconds(1);    
@@ -36,7 +39,8 @@ namespace Root_WIND2
         #region [Member Variables]
         Setup_ViewModel setup;
         Recipe recipe;
-        DispatcherTimer timer = new DispatcherTimer();    //객체생성
+        DispatcherTimer timer = new DispatcherTimer();
+        ImageData masterImageData;
         #endregion
 
         #region GET/SET
@@ -174,6 +178,56 @@ namespace Root_WIND2
             }
         }
 
+        public bool Check_DisplayNone
+        {
+            get
+            {
+                return displayOption == DisplayOption.None;
+            }
+            set
+            {
+                displayOption = value ? DisplayOption.None : displayOption;
+
+                if (displayOption == DisplayOption.None)
+                {
+                    OriginRecipe originRecipe = this.recipe.GetRecipe<OriginRecipe>();
+                    Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
+                    {
+                        MasterImg = masterImageData.GetBitMapSource(originRecipe.MasterImage.ByteCnt);
+                    }));
+                }
+            }
+
+        }
+        public bool Check_DisplayPosition
+        {
+            get
+            {
+                return displayOption == DisplayOption.Position;
+            }
+            set
+            {
+                displayOption = value ? DisplayOption.Position : displayOption;
+                if (displayOption == DisplayOption.Position)
+                {
+                }
+            }
+        }
+        public bool Check_DisplayROI
+        {
+            get
+            {
+                return displayOption == DisplayOption.ROI;
+            }
+            set
+            {
+                displayOption = value ? DisplayOption.ROI : displayOption;
+                if (displayOption == DisplayOption.ROI)
+                {
+                }
+            }
+        }
+
         private MapControl_ViewModel mapControl_VM;
         public MapControl_ViewModel MapControl_VM
         {
@@ -199,6 +253,29 @@ namespace Root_WIND2
                 SetProperty(ref inspItem, value);
             }
         }
+
+        private BitmapSource masterImg;
+        public BitmapSource MasterImg
+        {
+            get
+            {
+                return masterImg;
+            }
+            set
+            {
+                SetProperty(ref masterImg, value);
+            }
+        }
+        #endregion
+
+        #region DataTypeEnum
+        private DisplayOption displayOption = DisplayOption.None;
+        private enum DisplayOption
+        {
+            None,
+            Position,
+            ROI,
+        }
         #endregion
 
         private void DateTimeUpdate(object sender, EventArgs e)
@@ -213,11 +290,11 @@ namespace Root_WIND2
                 int nMapX = mapdata.MapSizeX;
                 int nMapY = mapdata.MapSizeY;
 
-                MapControl_VM.SetMap(Brushes.Green, mapdata.Data, new CPoint(nMapX, nMapY));
+                MapControl_VM.SetMap(false, mapdata.Data, new CPoint(nMapX, nMapY));
             }
             else
             {
-                MapControl_VM.SetMap(Brushes.Green, setup.InspectionVision.mapdata, new CPoint(14, 14));
+                MapControl_VM.SetMap(false, setup.InspectionVision.mapdata, new CPoint(14, 14));
             }
         }
         private void SetMapData()
@@ -240,11 +317,40 @@ namespace Root_WIND2
             //ShotSizeX = recipe.WaferMap.;
             //ShotSizeY = recipe.WaferMap.;
         }
+        public void SetPage()
+        {
+            SetMapData();
+            DrawMapData();
+            LoadMasterImage();
+        }
+        public void LoadMasterImage()
+        {
+            this.recipe.LoadMasterImage();
 
+            OriginRecipe originRecipe = this.recipe.GetRecipe<OriginRecipe>();
+            if (originRecipe.MasterImage != null)
+            {
+                masterImageData = new ImageData(originRecipe.MasterImage.Width, originRecipe.MasterImage.Height, originRecipe.MasterImage.ByteCnt);
+
+                if(masterImageData != null)
+                {
+                    masterImageData.m_eMode = ImageData.eMode.ImageBuffer;
+                    masterImageData.SetData(Marshal.UnsafeAddrOfPinnedArrayElement(originRecipe.MasterImage.RawData, 0)
+                        , new CRect(0, 0, originRecipe.MasterImage.Width, originRecipe.MasterImage.Height)
+                        , 1, originRecipe.MasterImage.ByteCnt);
+
+                    Dispatcher.CurrentDispatcher.BeginInvoke(new ThreadStart(() =>
+                    {
+                        MasterImg = masterImageData.GetBitMapSource(originRecipe.MasterImage.ByteCnt);
+                    }));
+                }
+            }
+        }
         public void LoadSummaryData()
         {
-            DrawMapData();
             SetMapData();
+            DrawMapData();
+            LoadMasterImage();
         }
     }
 }

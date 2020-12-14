@@ -295,37 +295,27 @@
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition/>
                                                     <RowDefinition/>
-                                                    <RowDefinition/>
                                                 </Grid.RowDefinitions>
                                                 <Grid Grid.RowSpan="3"
                                               Background="{StaticResource LightGray}"/>
-                                                <TextBlock Text="Main Elapsed Time"
-                                                Style="{StaticResource BasicTb}"
-                                                FontWeight="Bold"
-                                                Foreground="{StaticResource Black}"/>
-                                                <TextBlock Text="Side Elapsed Time"
-                                                   Grid.Row="1"
+                                                <TextBlock Text="Lot Elapsed Time"
+                                                   Grid.Row="0"
                                                 Style="{StaticResource BasicTb}"
                                                 FontWeight="Bold"
                                                 Foreground="{StaticResource Black}"/>
                                                 <TextBlock Text="Defect Cnt"
-                                                   Grid.Row="2"
+                                                   Grid.Row="1"
                                                 Style="{StaticResource BasicTb}"
                                                 FontWeight="Bold"
                                                 Foreground="{StaticResource Black}"/>
-                                                <TextBlock Text="00:00:00"
+                                                <TextBlock Text="{Binding p_sLotElapsedTime}"
                                                    Grid.Column="1"
                                                    Grid.Row="0"
                                                    Style="{StaticResource BasicTb}"
                                                    Foreground="{StaticResource Black}"/>
-                                                <TextBlock Text="00:00:00"
-                                                   Grid.Column="1"
-                                                   Grid.Row="1"
-                                                   Style="{StaticResource BasicTb}"
-                                                   Foreground="{StaticResource Black}"/>
                                                 <TextBlock Text="{Binding p_nTotalDefectCount}"
                                                    Grid.Column="1"
-                                                   Grid.Row="2"
+                                                   Grid.Row="1"
                                                    Style="{StaticResource BasicTb}"
                                                    Foreground="{StaticResource Black}"/>
                                             </Grid>
@@ -914,6 +904,10 @@
                         Style="{StaticResource BasicBtn}"
                         Margin="0,0,0,10"
                         Click="buttonRecovery_Click"/>
+                <Button Content="Buzzer Off" x:Name="buttonBuzzerOff"
+                        Style="{StaticResource BasicBtn}"
+                        Margin="0,0,0,10"
+                        Click="buttonBuzzerOff_Click"/>
                 <Button Content="Test" 
                         Style="{StaticResource BasicBtn}"
                         Margin="0,0,0,10"

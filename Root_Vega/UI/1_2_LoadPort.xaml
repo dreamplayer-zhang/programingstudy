@@ -121,10 +121,10 @@
                             <Grid.Style>
                                 <Style>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding p_eIonizerState}" Value="True">
+                                        <DataTrigger Binding="{Binding m_diIonizer.p_bIn}" Value="True">
                                             <Setter Property="Grid.Background" Value="LimeGreen"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding p_eIonizerState}" Value="False">
+                                        <DataTrigger Binding="{Binding m_diIonizer.p_bIn}" Value="False">
                                             <Setter Property="Grid.Background" Value="Red"/>
                                         </DataTrigger>
                                     </Style.Triggers>

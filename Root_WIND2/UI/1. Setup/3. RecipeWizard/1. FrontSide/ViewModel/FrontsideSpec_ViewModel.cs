@@ -20,7 +20,11 @@ namespace Root_WIND2
         {
             m_Recipe = recipe;
             m_front = front;
-            p_ROI_Viewer = m_front.p_ROI_VM;      
+            p_ROI_Viewer = m_front.p_ROI_VM;
+            p_ROI_Viewer.SetRoiRect();
+            p_ROI_Viewer.SetLayerSource();
+            //p_ROI_Viewer.p_LayerSource = m_front.p_ROI_VM.p_LayerSource;
+            //p_ROI_Viewer.SetLayerSource();
             m_cMask = new ObservableCollection<Mask>();
             m_cInspMethod = new ObservableCollection<ParameterBase>();
             m_cInspItem = new ObservableCollection<InspectionItem>();
@@ -201,7 +205,8 @@ namespace Root_WIND2
                 item.p_InspMethod = item.p_cInspMethod[selectMethod];
             }
 
-            p_selectedInspItem = p_cInspItem[0];
+            if(p_cInspItem.Count > 0)
+                p_selectedInspItem = p_cInspItem[0];
         }
 
         public void SetParameter()

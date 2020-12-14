@@ -88,8 +88,6 @@ namespace Root_Vega
                 if (m_loadport.m_diIonizer.p_bIn)
                 {
                     m_handler.m_vega.m_doIonizerOnOff.Write(false);
-                    m_loadport.m_vega.p_eIonizerState = false;
-
                     Thread.Sleep(20);
                     if (m_loadport.m_diIonizer.p_bIn != false) EQ.p_bStop = true;
                 }
@@ -112,6 +110,8 @@ namespace Root_Vega
             bReadyToLoad = true; 
             bool bReadyState =  (m_loadport.m_qModuleRun.Count == 0);
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
+            if (m_loadport.m_infoPod.p_eState != InfoPod.eState.Placed) return false;
+
             if (m_handler.IsEnableRecovery() == true) return false;
             return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && !m_loadport.m_dioPresent.p_bIn; //forget 조건
         }

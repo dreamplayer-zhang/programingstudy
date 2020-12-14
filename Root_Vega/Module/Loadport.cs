@@ -163,7 +163,8 @@ namespace Root_Vega.Module
             GemCarrierBase.ePresent present;
             if (m_dioPlaced.p_bIn != m_dioPresent.p_bIn) present = GemCarrierBase.ePresent.Unknown;
             else present = !m_dioPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;//check
-            if (m_infoPod.CheckPlaced(present) != "OK")//check
+
+            if (m_infoPod.CheckPlaced(present, m_axisZ.IsInPos(ePosZ.Load,m_dInposZ)) != "OK")//check
             {
                 m_alidPlaced.p_sMsg = "Placed Sensor Remain Checked while Pod State = " + m_infoPod.p_eState;
                 m_alidPlaced.p_bSet = true;
@@ -222,15 +223,7 @@ namespace Root_Vega.Module
             return m_infoPod.IsPutOK(ref posRobot);
         }
 		bool _eIonizerState = false;
-		public bool p_eIonizerState
-		{
-            get { return _eIonizerState; }
-            set
-            {
-                _eIonizerState = value;
-                OnPropertyChanged();
-             }
-		}
+
 
         public bool m_bIonizerDoorlockCheck = false;
         public string BeforeGet()
@@ -241,7 +234,6 @@ namespace Root_Vega.Module
                 m_vega.m_doIonizerOnOff.Write(true);//check
                 Thread.Sleep(100);
                 m_vega.m_swIonizerOn.Start();
-                p_eIonizerState = true;
 				Thread.Sleep(20);
 				if (m_diIonizer.p_bIn != true) return "Ionizer is not On";//check
 			}
@@ -260,7 +252,6 @@ namespace Root_Vega.Module
                 m_vega.m_doIonizerOnOff.Write(true);
                 Thread.Sleep(100);
                 m_vega.m_swIonizerOn.Start();
-                p_eIonizerState = true;
                 if (m_diIonizer.p_bIn != true) return "Ionizer is not On";
             }
             if (m_axisZ.IsInPos(ePosZ.Load, m_dInposZ) == false) return "AxisZ Position not Ready to RTR Put Sequence";
@@ -276,7 +267,6 @@ namespace Root_Vega.Module
             Thread.Sleep(100);
             m_vega.m_swIonizerOn.Stop();
             m_bIonizerDoorlockCheck = false;
-            p_eIonizerState = false;
             Thread.Sleep(20);
             if (m_diIonizer.p_bIn == true) return "Ionizer is not Off";
             if (m_diReticle.p_bIn == true) return "Reticle Get Fail";
@@ -289,7 +279,6 @@ namespace Root_Vega.Module
             Thread.Sleep(100);
             m_vega.m_swIonizerOn.Stop();
             m_bIonizerDoorlockCheck = false;
-            p_eIonizerState = false;
             Thread.Sleep(20);
             if (m_diIonizer.p_bIn == true) return "Ionizer is not Off";
             if (m_diReticle.p_bIn == false) return "Reticle Put Fail, Reticle Sensor not Detected";
@@ -554,8 +543,9 @@ namespace Root_Vega.Module
         public InfoPod m_infoPod;
         public Vega.RFID m_RFID = null;
         public Vega m_vega;
-        public bool m_bUnLoadCheck = false;
         public bool m_bLoadCheck = false;
+        public bool m_bUnLoadCheck = false;
+        public StopWatch m_swLotTime;
         public Loadport(string id, string sLocID, IEngineer engineer, Vega vega)
         {
             p_id = id;
@@ -564,6 +554,8 @@ namespace Root_Vega.Module
             m_infoPod = new InfoPod(this, sLocID, engineer);
             m_RFID = ((Vega_Engineer)engineer).m_handler.m_vega.m_RFID; 
             m_aTool.Add(m_infoPod);
+            m_swLotTime = new StopWatch();
+            m_swLotTime.Stop();
             base.InitBase(id, engineer);
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
@@ -571,7 +563,6 @@ namespace Root_Vega.Module
             m_axisZ.p_eState = Axis.eState.Ready;
             m_axisTheta.p_eState = Axis.eState.Ready;
             m_vega.m_doIonizerOnOff.Write(false);//check
-            p_eIonizerState = false;
 
         }
 
@@ -678,6 +669,7 @@ namespace Root_Vega.Module
                 m_infoPod.p_eState = InfoPod.eState.Load;
                 m_module.m_ceidLoad.Send();
                 m_module.m_ceidOpen.Send();
+                m_module.m_swLotTime.Start();
                 if (m_module.m_diReticle.p_bIn == true)
                 {
                     m_module.m_infoPod.SetInfoReticleExist();
@@ -715,6 +707,7 @@ namespace Root_Vega.Module
                 m_infoPod.p_eState = InfoPod.eState.Placed;
                 m_module.m_ceidClose.Send();
                 m_module.m_ceidUnload.Send();
+                m_module.m_swLotTime.Stop();
                 return "OK";
             }
         }
