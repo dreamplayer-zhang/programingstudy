@@ -148,7 +148,6 @@ namespace Root_AOP01_Inspection.Module
             m_axisRotate.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisSideZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisXY.AddPos(Enum.GetNames(typeof(eAxisPos)));
-
         }
 
         #region InfoWafer

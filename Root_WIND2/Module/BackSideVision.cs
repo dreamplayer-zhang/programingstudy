@@ -11,6 +11,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using RootTools.Camera;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
 
 namespace Root_WIND2.Module
 {
@@ -318,6 +321,8 @@ namespace Root_WIND2.Module
             public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
             public GrabMode m_grabMode = null;
             string m_sGrabMode = "";
+            private int[,] m_Heightinfo;
+
             public string p_sGrabMode
             {
                 get { return m_sGrabMode; }
@@ -385,6 +390,8 @@ namespace Root_WIND2.Module
                     int nWaferSizeY_px = Convert.ToInt32(m_nWaferSize_mm * nMMPerUM / m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                     int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
                     int nScanOffset_pulse = 10000;
+                    m_Heightinfo = new int[nWaferSizeY_px / nCamHeight, nWaferSizeY_px / nCamWidth];
+
 
                     while (m_grabMode.m_ScanLineNum > nScanLine)
                     {
@@ -411,7 +418,7 @@ namespace Root_WIND2.Module
 
                         double dTriggerStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2;
                         double dTriggerEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2;
-                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY + 90000, m_grabMode.m_dTrigger, true);
+                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
                         string strPool = m_grabMode.m_memoryPool.p_id;
                         string strGroup = m_grabMode.m_memoryGroup.p_id;
@@ -421,22 +428,72 @@ namespace Root_WIND2.Module
                         int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
                         m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
 
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY + 90000, nScanSpeed)))
+                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
                         axisXY.p_axisY.RunTrigger(false);
 
+                        //CalculateHeight(nScanSpeed, mem, nWaferSizeY_px);
                         nScanLine++;
                         cpMemoryOffset.X += nCamWidth;
                     }
                     m_grabMode.m_camera.StopGrab();
+
+                    //SaveFocusMapImage(nWaferSizeY_px / nCamWidth, nWaferSizeY_px / nCamHeight);
                     return "OK";
                 }
                 finally
                 {
                     m_grabMode.SetLight(false);
                 }
+            }
+            unsafe void CalculateHeight(int nCurLine, MemoryData mem, int ReticleHeight)
+            {
+                int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
+                int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+                int nHeight = ReticleHeight / nCamHeight;
+                byte* ptr = (byte*)mem.GetPtr().ToPointer(); //Gray
+                for (int i = 0; i < nHeight; i++)
+                {
+                    int s = 0, e = 0, cur = 0; //레이저 시작, 끝위치 정보
+                    //탐색시작 y지점
+                    int nY = i * nCamHeight;
+                    for (int j = 0; j < nCamHeight; j++)
+                    {
+                        if (ptr[(int)((nY + j) * mem.W + nCamWidth * (nCurLine + 0.5))] > 230)
+                        {
+                            e = Math.Max(e, cur);
+                            s = Math.Min(s, cur);
+                        }
+                    }
+                    m_Heightinfo[i, nCurLine] = (s + e) / 2;
+                }
+            }
+            private void SaveFocusMapImage(int nX, int nY)
+            {
+                int thumsize = 30;
+                int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+                Mat ResultMat = new Mat();
+                for (int y = 0; y < nY; y++)
+                {
+                    Mat Vmat = new Mat();
+                    for (int x = 0; x < nX; x++)
+                    {
+                        Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
+                        int nScalednum = m_Heightinfo[nY, nX] * 255 / nCamHeight;
+                        ColorImg.SetTo(new MCvScalar(nScalednum));
+                        if (y == 0 && x == 0)
+                            Vmat = ColorImg;
+                        else
+                            CvInvoke.VConcat(ColorImg, Vmat, Vmat);
+                    }
+                    if (y == 0)
+                        ResultMat = Vmat;
+                    else
+                        CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
+                }
+                CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
             }
         }
     }

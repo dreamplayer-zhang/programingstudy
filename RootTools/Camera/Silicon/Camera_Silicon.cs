@@ -393,9 +393,10 @@ namespace RootTools.Camera.Silicon
 
             m_cpScanOffset = cpScanOffset;
             m_Memory = memory;
+            m_MemPtr = memory.GetPtr();
             m_nGrab = -1;
             m_lGrab = nLine/m_Height;
-
+            m_LastROI = new CRect();
             fgErrorType rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
 
             m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));

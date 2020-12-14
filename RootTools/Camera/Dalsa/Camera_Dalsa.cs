@@ -460,6 +460,8 @@ namespace RootTools.Camera.Dalsa
             int lY = m_nGrabCount * Convert.ToInt32(p_CamParam.p_Height);
             int iBlock = 0;
             int nByteCnt = m_sapBuf.BytesPerPixel;
+
+
             while (iBlock < m_nGrabCount)
             {
                 if (iBlock < m_nGrabTrigger)
