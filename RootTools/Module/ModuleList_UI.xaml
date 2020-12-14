@@ -21,6 +21,7 @@
             <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="2"/>
             <CheckBox x:Name="checkBoxPause" Content="EQ.Pause" IsChecked="{Binding p_bPause}" Margin="2"/>
             <CheckBox x:Name="checkBoxSimulate" Content="EQ.Simulate" IsChecked="{Binding p_bSimulate}" Margin="2"/>
+            <Button x:Name="buttonHome" Content="Home" Margin="2,22,2,2" Click="buttonHome_Click"/>
             <Button x:Name="buttonRun" Content="{Binding p_sRun}" Margin="2,22,2,2" Click="ButtonRun_Click"/>
             <ComboBox x:Name="comboBoxRunStep" Margin="2" SelectionChanged="ComboBoxRunStep_SelectionChanged"/>
             <Button x:Name="buttonRunStep" Content="{Binding p_sRunStep}" IsEnabled="{Binding p_bEnableRun}" Margin="2" Click="ButtonRunStep_Click"/>
