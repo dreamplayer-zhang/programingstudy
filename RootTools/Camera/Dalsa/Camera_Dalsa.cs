@@ -460,38 +460,37 @@ namespace RootTools.Camera.Dalsa
             int lY = m_nGrabCount * Convert.ToInt32(p_CamParam.p_Height);
             int iBlock = 0;
             int nByteCnt = m_sapBuf.BytesPerPixel;
-            int nCamHeight = p_CamParam.p_Height;
-            int nCamWidth = p_CamParam.p_Width;
-            DalsaParameterSet.eDir eDir = p_CamParam.p_eDir;
-            long lMemoryWidth = (long)m_Memory.W;
-            int nMemoryOffsetX = m_cpScanOffset.X;
-            int nMemoryOffsetY = m_cpScanOffset.Y;
+
+
             while (iBlock < m_nGrabCount)
             {
                 if (iBlock < m_nGrabTrigger)
                 {
-                    IntPtr ipSrc = m_pSapBuf[(iBlock) % c_nBuf];
-                    Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
-                    {
-                        int yp;
-                        if (eDir == DalsaParameterSet.eDir.Reverse)
-                            yp = lY - (y + (iBlock) * nCamHeight) + m_nInverseYOffset;
-                        else
-                            yp = y + (iBlock) * nCamHeight;
-                        IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt;
-                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + nMemoryOffsetX + (yp + nMemoryOffsetY) * lMemoryWidth);
-                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, nCamWidth, nCamWidth);
-                    });
+                    IntPtr ipSrc = m_pSapBuf[(iBlock) % p_nBuf];
+                    Parallel.For(0, p_CamParam.p_Height, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
+                        {
+                            int yp;
+
+                            if (p_CamParam.p_eDir == DalsaParameterSet.eDir.Reverse)
+                                yp = lY - (y + (iBlock) * p_CamParam.p_Height) + m_nInverseYOffset;
+                            else
+                                yp = y + (iBlock) * p_CamParam.p_Height;
+
+
+                            IntPtr srcPtr = ipSrc + p_CamParam.p_Width * y * nByteCnt;
+                            IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * (long)m_Memory.W);
+                            Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_CamParam.p_Width, p_CamParam.p_Width);
+                        });
                     iBlock++;
 
-                    m_LastROI.Left = nMemoryOffsetX;
-                    m_LastROI.Right = nMemoryOffsetX + nCamWidth;
-                    m_LastROI.Top = nMemoryOffsetY;
-                    m_LastROI.Bottom = nMemoryOffsetY + nCamHeight;
+                    m_LastROI.Left = m_cpScanOffset.X;
+                    m_LastROI.Right = m_cpScanOffset.X + p_CamParam.p_Width;
+                    m_LastROI.Top = m_cpScanOffset.Y;
+                    m_LastROI.Bottom = m_cpScanOffset.Y + p_CamParam.p_Height;
                     GrabEvent();
 
-                    //if (m_nGrabCount != 0)
-                    //    p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+                    if (m_nGrabCount != 0)
+                        p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;
