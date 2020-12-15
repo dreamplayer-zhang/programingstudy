@@ -205,6 +205,7 @@ namespace RootTools.Module
                         p_eState = eState.Error;
                         EQ.p_bStop = true;
                         m_qModuleRun.Clear();
+                        return;
                     }
                     if (m_qModuleRun.Count == 0) p_eState = eState.Ready;
                     break;
