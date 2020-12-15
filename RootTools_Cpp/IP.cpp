@@ -792,6 +792,7 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOr
 
     bool isOrigin = true;
     for (int c = 0; c < mapX; c++) {
+        int checkEmptyLine = 0;
         for (int r = 0; r < mapY; r++) {
             bool condition = (isIncludeMode) ? countNonZero(Mat(GridMapMask, Rect(c * nChipSzX + bounding_rect.x, r * nChipSzY + bounding_rect.y, nChipSzX, nChipSzY))) // WF 영역이 조금이라도 있으면 Map에 추가
                 : countNonZero(Mat(GridMapMask, Rect(c * nChipSzX + bounding_rect.x, r * nChipSzY + bounding_rect.y, nChipSzX, nChipSzY))) == (nChipSzX * nChipSzY);
@@ -801,12 +802,6 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOr
                 if (isOrigin)
                 {
                     //circle(GridMapMask, Point(c * nChipSzX + bounding_rect.x, r * nChipSzY + nChipSzY + bounding_rect.y), 10, 125, -1); // Debug > Image Watch
-                    if (r != 0) // 좌측 첫 번재 열에는 Origin이 있어야함
-                    {
-                        pMapData.erase(pMapData.begin(), pMapData.begin() + mapY * c);
-                        outMapX -= c;
-                    }
-
                     outOriginX = (c * nChipSzX + bounding_rect.x) * downScale;
                     outOriginY = (r * nChipSzY + nChipSzY + bounding_rect.y) * downScale; // 좌'하'단
                     isOrigin = false;
@@ -816,13 +811,33 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOr
                 //rectangle(GridMapMask, Rect(c * nChipSzX + bounding_rect.x, r * nChipSzY + bounding_rect.y, nChipSzX, nChipSzY), 125, 1); // Debug > Image Watch
             }
             else
+            {
                 pMapData.push_back(0);
+                checkEmptyLine++;
+            }
+        }
+        if (checkEmptyLine == mapY) // chip이 없는 빈 라인일 경우 삭제
+        {
+            pMapData.erase(pMapData.end() - mapY, pMapData.end());
+            outMapX--;
         }
     }
-
-    for (int r = 0; r < outMapY; r++) // Transpose
+    mapY = outMapY;
+    for (int r = 0; r < mapY; r++) // Transpose
+    {
+        int checkEmptyLine = 0;
         for (int c = 0; c < outMapX; c++)
-            pMapData_Trans.push_back(pMapData[c * outMapY + r]);
+        {
+            pMapData_Trans.push_back(pMapData[c * mapY + r]);
+            if (pMapData[c * mapY + r] == 0)
+                checkEmptyLine++;
+        }
+        if (checkEmptyLine == outMapX)
+        {
+            pMapData_Trans.erase(pMapData_Trans.end() - outMapX, pMapData_Trans.end());
+            outMapY--;
+        }
+    }
 
     return pMapData_Trans;
 }
