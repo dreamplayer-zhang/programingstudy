@@ -235,9 +235,9 @@ namespace RootTools.Control
         {
             double fPos = p_posActual;
             bool bSWLimit0 = m_bSWLimit[0] && (fPos > m_aPos[p_asPos[0]]);
-            if (bSWLimit0) p_sInfo = p_id + ": Servo SW limit(-) !!";
+            if (bSWLimit0) p_log.Info(p_id + ": Servo SW limit(-) !!");
             bool bSWLimit1 = m_bSWLimit[1] && (fPos > m_aPos[p_asPos[1]]);
-            if (bSWLimit1) p_sInfo = p_id + ": Servo SW limit(+) !!";
+            if (bSWLimit1) p_log.Info(p_id + ": Servo SW limit(+) !!");
             if (bSWLimit0 || bSWLimit1) StopAxis();
         }
 
@@ -421,7 +421,7 @@ namespace RootTools.Control
                         {
                             dPos = m_posDst - p_posCommand;
                             if (Math.Abs(dPos) < dInPos) return "OK"; 
-                            p_sInfo = "WaitReady InPosition Error #" + n.ToString() + " : " + dPos.ToString();
+                            p_log.Info("WaitReady InPosition Error #" + n.ToString() + " : " + dPos.ToString());
                             Thread.Sleep(100); 
                         }
                         if (Math.Abs(dPos) > dInPos) return "WaitReady InPosition Error : " + dPos.ToString();
@@ -478,7 +478,7 @@ namespace RootTools.Control
             {
                 if (_sensorHome == value) return;
                 _sensorHome = value;
-                p_sInfo = "Sensor Home = " + value.ToString();
+                p_log.Info("Sensor Home = " + value.ToString());
                 OnPropertyChanged(); 
             }
         }
@@ -507,7 +507,7 @@ namespace RootTools.Control
             {
                 if (_bServoOn == value) return;
                 _bServoOn = value;
-                p_sInfo = p_id + " Servo On = " + value.ToString();
+                p_log.Info(p_id + " Servo On = " + value.ToString());
                 OnPropertyChanged(); 
             }
         }
@@ -526,7 +526,7 @@ namespace RootTools.Control
             {
                 if (_sensorMinusLimit == value) return;
                 _sensorMinusLimit = value;
-                p_sInfo = "Sensor Minus Limit = " + value.ToString();
+                p_log.Info("Sensor Minus Limit = " + value.ToString());
                 OnPropertyChanged();
             }
         }
@@ -539,7 +539,7 @@ namespace RootTools.Control
             {
                 if (_sensorPlusLimit == value) return;
                 _sensorPlusLimit = value;
-                p_sInfo = "Sensor Plus Limit = " + value.ToString();
+                p_log.Info("Sensor Plus Limit = " + value.ToString());
                 OnPropertyChanged();
             }
         }
@@ -552,7 +552,7 @@ namespace RootTools.Control
             {
                 if (_sensorInPos == value) return;
                 _sensorInPos = value;
-                p_sInfo = "Sensor InPosition = " + value.ToString();
+                p_log.Info("Sensor InPosition = " + value.ToString());
                 OnPropertyChanged();
             }
         }
@@ -565,7 +565,7 @@ namespace RootTools.Control
             {
                 if (_sensorAlarm == value) return;
                 _sensorAlarm = value;
-                p_sInfo = "Sensor Alarm = " + value.ToString();
+                p_log.Info("Sensor Alarm = " + value.ToString());
                 OnPropertyChanged();
             }
         }
@@ -578,7 +578,7 @@ namespace RootTools.Control
             {
                 if (_sensorEmergency == value) return;
                 _sensorEmergency = value;
-                p_sInfo = "Sensor Emergency = " + value.ToString();
+                p_log.Info("Sensor Emergency = " + value.ToString());
                 OnPropertyChanged();
             }
         }

@@ -11,6 +11,8 @@ namespace Root_EFEM.Module
 
         List<IWTRChild> p_aChild { get; }
 
+        List<WTRArm> p_aArm { get; }
+
         bool IsEnableRecovery();
 
         void ReadInfoReticle_Registry();
@@ -18,5 +20,10 @@ namespace Root_EFEM.Module
         ModuleRunBase CloneRunGet(string sChild, int nSlot);
 
         ModuleRunBase CloneRunPut(string sChild, int nSlot);
+
+        string GetArmID(ModuleRunBase runGet, WTRArm armPut);
+
+        string GetChildID(ModuleRunBase runPut, WTRArm armPut);
     }
+
 }

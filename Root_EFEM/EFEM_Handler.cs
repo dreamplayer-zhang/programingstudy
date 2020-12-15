@@ -28,13 +28,13 @@ namespace Root_EFEM
         #endregion 
 
         #region Module
-        public ModuleList m_moduleList;
+        public ModuleList p_moduleList { get; set; }
         public EFEM_Recipe m_recipe;
         public EFEM_Process m_process;
 
         void InitModule()
         {
-            m_moduleList = new ModuleList(m_engineer);
+            p_moduleList = new ModuleList(m_engineer);
             InitWTR(); 
             InitLoadport();
             InitAligner();
@@ -44,7 +44,7 @@ namespace Root_EFEM
             IWTR iWTR = (IWTR)m_wtr;
             iWTR.ReadInfoReticle_Registry(); 
             m_recipe = new EFEM_Recipe("Recipe", m_engineer);
-            foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
+            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
             m_process = new EFEM_Process("Process", m_engineer, iWTR);
         }
 
@@ -52,7 +52,7 @@ namespace Root_EFEM
         {
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
-            m_moduleList.AddModule(module, ui);
+            p_moduleList.AddModule(module, ui);
         }
 
         public bool IsEnableRecovery()
@@ -229,7 +229,7 @@ namespace Root_EFEM
         #region StateHome
         public string StateHome()
         {
-            string sInfo = StateHome(m_moduleList.m_aModule);
+            string sInfo = StateHome(p_moduleList.m_aModule);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
@@ -277,7 +277,7 @@ namespace Root_EFEM
         #region Reset
         public string Reset()
         {
-            Reset(m_gaf, m_moduleList);
+            Reset(m_gaf, p_moduleList);
             return "OK";
         }
 
@@ -346,7 +346,7 @@ namespace Root_EFEM
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
-                        if (m_moduleList.m_qModuleRun.Count == 0)
+                        if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             //m_process.p_sInfo = m_process.RunNextSequence();
                         }
@@ -380,8 +380,8 @@ namespace Root_EFEM
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            m_moduleList.ThreadStop();
-            foreach (ModuleBase module in m_moduleList.m_aModule.Keys) module.ThreadStop();
+            p_moduleList.ThreadStop();
+            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
         }
     }
 }
