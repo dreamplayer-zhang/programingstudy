@@ -34,6 +34,13 @@ namespace RootTools.Module
                 OnPropertyChanged(); 
             }
         }
+
+        public bool IsBusy()
+        {
+            if (p_eState == eState.Run) return true;
+            if (p_eState == eState.Home) return true;
+            return m_qModuleRun.Count > 0; 
+        }
         #endregion
 
         #region Property

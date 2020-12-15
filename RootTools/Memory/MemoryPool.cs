@@ -22,7 +22,11 @@ namespace RootTools.Memory
                 if (value == _fGB) return;
                 if (_fGB == 0)
                 {
-                    if (m_memoryTool.m_bMaster) CreatePool(value);
+                    if (m_memoryTool.m_bMaster)
+                    {
+                        OpenPool();
+                        if (m_MMF == null) CreatePool(value);
+                    }
                 }
                 _fGB = value;
                 OnPropertyChanged(); 
@@ -34,18 +38,15 @@ namespace RootTools.Memory
         {
             StopWatch sw = new StopWatch();
             long nPool = (long)Math.Ceiling(fGB * c_fGB);
-            try 
+            try
             {
-                if (m_MMF == null)
-                {
-                    m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool);
-                    GetAddress();
-                }
+                m_MMF = MemoryMappedFile.CreateOrOpen(p_id, nPool);
+                GetAddress();
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 m_log.Error(p_id + " Memory Pool Create Error (ReStart PC) : " + e.Message);
-                return true; 
+                return true;
             }
             m_log.Info(p_id + " Memory Pool Create Done " + sw.ElapsedMilliseconds.ToString() + " ms");
             return false;
