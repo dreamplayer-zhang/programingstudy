@@ -23,10 +23,7 @@
         <local:AxisStateToEnableConverter x:Key="AxisStateToEnable" />
         <local:AxisStateToOpacityConverter x:Key="AxisStateToOpacity" />
         <local:AxisStateToLoadingOpacityConverter x:Key="AxisStateToLoadingOpacity" />
-        <local:AxisXToMotionUIConverter x:Key="AxisXToMotionUI"/>
-        <local:AxisYToMotionUIConverter x:Key="AxisYToMotionUI"/>
-        <local:AxisZToMotionUIConverter x:Key="AxisZToMotionUI"/>
-        <local:AxisLifterToMotionUIConverter x:Key="AxisLifterToMotionUI"/>
+        <local:AxisToMotionUIConverter x:Key="AxisToMotionUI"/>
     </Window.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -523,11 +520,10 @@
                                                                     Width="10000" Height="10000">
                                                                 <Border Width="3000"
                                                                         Height="3000"
-                                                                        Canvas.Left="{Binding AxisX.p_posActual, Converter={StaticResource AxisXToMotionUI}}"
-                                                                        Canvas.Top="{Binding AxisY.p_posActual, Converter={StaticResource AxisYToMotionUI}}"
+                                                                        Canvas.Left="{Binding AxisX, Converter={StaticResource AxisToMotionUI}}"
+                                                                        Canvas.Top="{Binding AxisY, Converter={StaticResource AxisToMotionUI}}"
                                                                         Background="Gray"
                                                                         Margin="5">
-                                                                    
                                                                     <Grid>
                                                                         <Ellipse Width="2800"
                                                                                  Height="2800"
@@ -548,7 +544,7 @@
                                                                     Width="2000" Height="10000">
                                                                 <Border Width="2000"
                                                                         Height="500"
-                                                                        Canvas.Top="{Binding AxisZ.p_posActual, Converter={StaticResource AxisZToMotionUI}}"
+                                                                        Canvas.Top="{Binding AxisZ, Converter={StaticResource AxisToMotionUI}}"
                                                                         Background="Gray"
                                                                         Margin="5" />
                                                             </Canvas>
@@ -562,7 +558,7 @@
                                                                     Height="10000">
                                                                 <Border Width="2000"
                                                                         Height="500"
-                                                                        Canvas.Top="{Binding AxisLifter.p_posActual, Converter={StaticResource AxisLifterToMotionUI}}"
+                                                                        Canvas.Top="9500"
                                                                         Background="Gray"
                                                                         Margin="5" />
                                                             </Canvas>
@@ -576,6 +572,7 @@
                                                                     Height="10000">
                                                                 <Border Width="2000"
                                                                         Height="500"
+                                                                        Canvas.Top="9500"
                                                                         Background="Gray"
                                                                         Margin="5" />
                                                             </Canvas>
@@ -585,13 +582,13 @@
                                                 </Grid>
                                                 <Grid Grid.Column="1">
                                                     <!--<local:LoadingControl Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToLoadingOpacityConverter}}" />-->
-                                                    <local:LoadingControl Opacity="{Binding SelectedAxis, Converter={StaticResource AxisStateToLoadingOpacity}}" />
+                                                    <local:LoadingControl Opacity="{Binding SelectedAxis.p_eState, Converter={StaticResource AxisStateToLoadingOpacity}}" />
                                                 </Grid>
                                             </Grid>
                                             <Grid Grid.Row="1"
                                                   Margin="5">
                                                 <TabControl SelectedIndex="{Binding MotionTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                                    <TabItem Width="0"/>
+                                                    <TabItem Width="0" />
                                                     <TabItem Header="X"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
@@ -696,7 +693,7 @@
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
-                                                    <!--<TabItem Header="Stage Z"
+                                                    <TabItem Header="Stage Z"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
                                                         <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
@@ -773,7 +770,7 @@
                                                                                     Binding="{Binding Value, Converter={StaticResource TextBoxToInt}}" />
                                                             </DataGrid.Columns>
                                                         </DataGrid>
-                                                    </TabItem>-->
+                                                    </TabItem>
                                                 </TabControl>
                                             </Grid>
                                         </Grid>
@@ -803,7 +800,7 @@
                                             Grid.Row="2"
                                             Margin="15,20"
                                             Content="Stop"
-                                            Command="{Binding CmdSeqStop}" />
+                                            Command="{Binding CmdStop}" />
                                     <Button Style="{StaticResource SetupPanelBtn}"
                                             Grid.Row="3"
                                             Margin="15,20"

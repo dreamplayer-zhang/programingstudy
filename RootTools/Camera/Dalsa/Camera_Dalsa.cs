@@ -15,6 +15,11 @@ namespace RootTools.Camera.Dalsa
     {
         public event EventHandler Grabed;
 
+        enum ResourceIdx
+        {
+            Gray=0,
+            Color,
+        }
         #region Property
         public string p_id { get; set; }
 
@@ -247,9 +252,9 @@ namespace RootTools.Camera.Dalsa
 
                 SapFormat bufformat = m_sapAcq.XferParams.Format;
 
-                if (bufformat > 0)
+                if (bufformat == SapFormat.RGB8888 || bufformat == SapFormat.RGBP8)
                     m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq.XferParams.Width, m_sapAcq.XferParams.Height, bufformat, SapBuffer.MemoryType.ScatterGather);
-                else 
+                else if(bufformat == SapFormat.Mono8)
                     m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq, SapBuffer.MemoryType.ScatterGather);
 
                 m_sapXfer = new SapAcqToBuf(m_sapAcq, m_sapBuf);
@@ -455,6 +460,8 @@ namespace RootTools.Camera.Dalsa
             int lY = m_nGrabCount * Convert.ToInt32(p_CamParam.p_Height);
             int iBlock = 0;
             int nByteCnt = m_sapBuf.BytesPerPixel;
+
+
             while (iBlock < m_nGrabCount)
             {
                 if (iBlock < m_nGrabTrigger)

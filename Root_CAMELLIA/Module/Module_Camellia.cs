@@ -37,6 +37,7 @@ namespace Root_CAMELLIA.Module
         public MainWindow_ViewModel mwvm;
 
         #region ToolBox
+
         AxisXY m_axisXY;
         public AxisXY p_axisXY
         {
@@ -62,17 +63,8 @@ namespace Root_CAMELLIA.Module
             }
         }
         Axis m_axisLifter;
-        public Axis p_axisLifter
-        {
-            get
-            {
-                return m_axisLifter;
-            }
-            set
-            {
-                m_axisLifter = value;
-            }
-        }
+        DIO_I m_axisXReady;
+        DIO_I m_axisYReady;
 
         Camera_Basler m_CamVRS;
 
@@ -108,9 +100,11 @@ namespace Root_CAMELLIA.Module
         }
         private void InitWorkPoint()
         {
-            p_axisXY.p_axisX.AddPos(Enum.GetNames(typeof(eAxisPos)));
-            p_axisXY.p_axisY.AddPos(Enum.GetNames(typeof(eAxisPos)));
-            p_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisXY.p_axisX.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisXY.p_axisY.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisLifter.AddIO(m_axisXReady);
+            m_axisLifter.AddIO(m_axisYReady);
         }
         #endregion
 
@@ -122,6 +116,8 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.Get(ref m_axisLifter, this, "StageLifter");
             p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
+            p_sInfo = m_toolBox.Get(ref m_axisXReady, this, "Stage X Ready");
+            p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");
         }
         #endregion
 
@@ -527,10 +523,13 @@ namespace Root_CAMELLIA.Module
             Met.Nanoview m_NanoView;
             MainWindow_ViewModel m_mwvm;
             DataManager m_DataManager;
-            RPoint m_WaferCenterPos_pulse = new RPoint(); // Pulse
+            public RPoint m_StageCenterPos_pulse = new RPoint(); // Pulse
             double m_dResX_um = 1;
             double m_dResY_um = 1;
             double m_dFocusZ_pulse = 1; // Pulse
+
+            int m_Average_VIS = 5;
+            int m_Average_NIR = 3;
 
             public Run_Measure(Module_Camellia module)
             {
@@ -545,18 +544,22 @@ namespace Root_CAMELLIA.Module
                 Run_Measure run = new Run_Measure(m_module);
                 run.m_DataManager = m_module.m_DataManager;
                 run.m_NanoView = m_module.Nanoview;
-                run.m_WaferCenterPos_pulse = m_WaferCenterPos_pulse;
+                run.m_StageCenterPos_pulse = m_StageCenterPos_pulse;
                 run.m_dResX_um = m_dResX_um;
                 run.m_dResY_um = m_dResY_um;
                 run.m_dFocusZ_pulse = m_dFocusZ_pulse;
+                run.m_Average_NIR = m_Average_NIR;
+                run.m_Average_VIS = m_Average_VIS;
                 return run;
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_WaferCenterPos_pulse = tree.Set(m_WaferCenterPos_pulse, m_WaferCenterPos_pulse, "Wafer Center Axis Position", "Wafer Center Axis Position(Pulse)", bVisible);
+                m_StageCenterPos_pulse = tree.Set(m_StageCenterPos_pulse, m_StageCenterPos_pulse, "Stage Center Axis Position", "Stage Center Axis Position(Pulse)", bVisible);
                 m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Camera X Resolution", "Camera X Resolution(um)", bVisible);
                 m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Camera Y Resolution", "Camera Y Resolution(um)", bVisible);
                 m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)", bVisible);
+                m_Average_VIS = tree.Set(m_Average_VIS, m_Average_VIS, "VIS Spectrum Count", "VIS Spectrum Count", bVisible);
+                m_Average_NIR = tree.Set(m_Average_NIR, m_Average_NIR, "NIR Spectrum Count", "NIR Spectrum Count", bVisible);
             }
             public override string Run()
             {
@@ -577,15 +580,17 @@ namespace Root_CAMELLIA.Module
                 string strVRSImageDir = "D:\\";
                 string strVRSImageFullPath = "";
                 RPoint MeasurePoint;
+
+                double centerX = m_StageCenterPos_pulse.X - (m_DataManager.m_waferCentering.m_ptCenter.X - m_StageCenterPos_pulse.X);
+                double centerY = m_StageCenterPos_pulse.Y - (m_DataManager.m_waferCentering.m_ptCenter.Y - m_StageCenterPos_pulse.Y);
+
                 for (int i = 0; i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count; i++)
                 {
                     double x = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].x;
                     double y = m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]].y;
 
-
-                    double dX = m_DataManager.m_waferCentering.m_ptCenter.X + (m_DataManager.m_waferCentering.m_ptCenter.X - m_WaferCenterPos_pulse.X) + x * 10000 ;
-                    double dY = m_WaferCenterPos_pulse.Y - m_WaferCenterPos_pulse.Y + m_DataManager.m_waferCentering.m_ptCenter.Y +
-                        y * 10000;
+                    double dX = centerX + x * 10000;
+                    double dY = centerY + y * 10000;
                     MeasurePoint = new RPoint(dX, dY);
 
                     if (m_module.Run(axisXY.StartMove(MeasurePoint)))
@@ -593,7 +598,7 @@ namespace Root_CAMELLIA.Module
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
 
-                    m_NanoView.SampleMeasure(i, x, y, 20, 20, 20, 20);
+                    m_NanoView.SampleMeasure(i, x, y, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_Average_VIS, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, m_Average_NIR);
 
 
                     if (VRS.Grab() == "OK")
@@ -602,28 +607,6 @@ namespace Root_CAMELLIA.Module
                         img.SaveImageSync(strVRSImageFullPath);
                         //Grab error
                     }
-
-                    //dX = m_DataManager.m_waferCentering.m_ptCenter.X +
-                    //  x * 10000;
-                    //dY = m_DataManager.m_waferCentering.m_ptCenter.Y +
-                    //   y * 10000;
-                    //MeasurePoint = new RPoint(dX, dY);
-
-                    //if (m_module.Run(axisXY.StartMove(MeasurePoint)))
-                    //    return p_sInfo;
-                    //if (m_module.Run(axisXY.WaitReady()))
-                    //    return p_sInfo;
-
-                    //dX = m_WaferCenterPos_pulse.X  +
-                    //   x * 10000;
-                    // dY = m_WaferCenterPos_pulse.Y  +
-                    //    y * 10000;
-                    //MeasurePoint = new RPoint(dX, dY);
-
-                    //if (m_module.Run(axisXY.StartMove(MeasurePoint)))
-                    //    return p_sInfo;
-                    //if (m_module.Run(axisXY.WaitReady()))
-                    //    return p_sInfo;
                 }
                 return "OK";
             }

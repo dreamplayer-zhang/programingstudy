@@ -19,10 +19,16 @@ namespace Root_WIND2
     {
         InspectionManager_Vision m_InspectionManger;
         Recipe m_Recipe;
+
+        public delegate void setMasterDie(object e);
+        public event setMasterDie SetMasterDie;
         public int[] Map;
         CPoint MapSize;
-        public MapControl_ViewModel(InspectionManager_Vision inspectionManger)
+        public MapControl_ViewModel(InspectionManager_Vision inspectionManger, Recipe recipe = null)
         {
+            if(recipe != null)
+                m_Recipe = recipe;
+
             m_InspectionManger = inspectionManger;
             m_InspectionManger.MapStateChanged += MapStateChanged_Callback;
         }
@@ -107,10 +113,47 @@ namespace Root_WIND2
 
                     p_MapItems.Add(chip);
                 }
-            
-
         }
+        public void CreateMap_OriginToolUI(bool addEvent = false, int[] map = null, CPoint mapsize = null)
+        {
+            if (map == null)
+            {
+                map = Map;
+                mapsize = MapSize;
+            }
 
+            double chipWidth = p_width / mapsize.X;
+            double chipHeight = p_height / mapsize.Y;
+
+
+            p_MapItems.Clear();
+
+            for (int i = 0; i < mapsize.X; i++)
+                for (int j = 0; j < mapsize.Y; j++)
+                {
+                    Grid chip = new Grid();
+                    chip.Width = chipWidth * 0.9;
+                    chip.Height = chipHeight * 0.9;
+                    chip.Margin = new Thickness(3);
+                    chip.Tag = new CPoint(i, j);
+
+                    Canvas.SetTop(chip, j * chipHeight);
+                    Canvas.SetLeft(chip, i * chipWidth);
+                    if (map[i + (j * mapsize.X)] == (int)CHIP_TYPE.NO_CHIP)
+                        chip.Background = Brushes.LightGray;
+                    else // (int)CHIP_TYPE.NORMAL
+                        chip.Background = Brushes.Green;
+
+
+                    p_MapItems.Add(chip);
+
+                    if(addEvent)
+                        chip.MouseLeftButtonDown += MAP_MouseLeftButtonDown;
+                }
+
+            if(p_MapItems.Count > 0)
+                p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Purple;
+        }
         public void SetMap(int[] map = null, CPoint mapsize = null)
         {
             if (map == null)
@@ -126,11 +169,50 @@ namespace Root_WIND2
             CreateMapUI();
             
         }
+        public void SetMap(bool addEvent, int[] map = null, CPoint mapsize = null)
+        {
+            if (map == null)
+            {
+                map = Map;
+                mapsize = MapSize;
+            }
+
+            MapSize = new CPoint(mapsize.X, mapsize.Y);
+            Map = new int[mapsize.X * mapsize.Y];
+            Map = map;
+
+            CreateMap_OriginToolUI(addEvent);
+        }
+        private void MAP_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Grid selected = (Grid)sender;
+            CPoint pos = (CPoint)selected.Tag;
+
+            if (this.Map[this.MapSize.X * pos.Y + pos.X] != (int)CHIP_TYPE.NO_CHIP)
+            {
+                p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Green;             
+                selected.Background = Brushes.Purple;
+
+                m_Recipe.WaferMap.MasterDieX = pos.X;
+                m_Recipe.WaferMap.MasterDieY = pos.Y;
+
+                SetMasterDie(pos);
+            }
+        }
+        public void ChangeMasterImage(int dieX, int dieY)
+        {
+            if (this.Map.Length == 0) return;
+
+            if(this.Map[this.MapSize.X * dieY + dieX] != (int)CHIP_TYPE.NO_CHIP)
+            {
+                p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Green;
+                p_MapItems[this.MapSize.Y * dieX + dieY].Background = Brushes.Purple;
+            }
+        }
         public int[] GetMap()
         {
             return Map;
         }
-
 
         private ObservableCollection<Grid> m_MapItems = new ObservableCollection<Grid>();
         public ObservableCollection<Grid> p_MapItems
@@ -176,8 +258,5 @@ namespace Root_WIND2
 
             }
         }
-
-
-
     }
 }

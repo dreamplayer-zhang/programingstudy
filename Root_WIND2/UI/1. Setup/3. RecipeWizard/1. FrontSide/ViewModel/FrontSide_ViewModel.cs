@@ -23,6 +23,19 @@ namespace Root_WIND2
         public FrontSideROI         ROI;
         public FrontSideSpec        Spec;
 
+        private FrontsideSummary_ViewModel m_Summary_VM;
+        public FrontsideSummary_ViewModel p_Summary_VM
+        {
+            get
+            {
+                return m_Summary_VM;
+            }
+            set
+            {
+                SetProperty(ref m_Summary_VM, value);
+            }
+        }
+
         private FrontsideOrigin_ViewModel m_Origin_VM;
         public FrontsideOrigin_ViewModel p_Origin_VM
         {
@@ -93,6 +106,9 @@ namespace Root_WIND2
             m_Setup = setup;
             m_Recipe = setup.Recipe;
 
+            p_Summary_VM = new FrontsideSummary_ViewModel();
+            p_Summary_VM.init(setup, m_Recipe);
+            
             p_Origin_VM = new FrontsideOrigin_ViewModel();
             p_Origin_VM.SetOrigin += P_Origin_VM_SetOrigin;
             p_Origin_VM.init(setup, m_Recipe);
@@ -105,24 +121,31 @@ namespace Root_WIND2
 
             p_Spec_VM = new FrontsideSpec_ViewModel();
             p_Spec_VM.init(this, m_Recipe);
-            
-            Init();
 
+            Init();
+            p_Origin_VM.MapControl_VM.SetMasterDie += P_Origin_VM_SetMasterDie;
+            
             m_Map_VM = new FrontsideMap_ViewModel();
             m_Map_VM.Init(setup, Map, m_Recipe);
+
+            p_Summary_VM.ConnectInspItemDataGrid(p_Spec_VM);
         }
 
         private void P_Origin_VM_SetOrigin(object e)
         {
             p_ROI_VM.SetOrigin(e);
         }
-
+        private void P_Origin_VM_SetMasterDie(object e)
+        {
+            p_Origin_VM.SetMasterDie(e);
+        }
         public void UI_Redraw()
         {
             p_Map_VM.LoadMapData(); // Map
             m_Origin_VM.LoadOriginData(); // Origin
             p_Alignment_VM.LoadPositonMark(); // Position
             p_Spec_VM.LoadSpec();
+            p_Summary_VM.LoadSummaryData();
         }
 
         public void Init()
@@ -156,6 +179,7 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     SetPage(Summary);
+                    p_Summary_VM.SetPage();
                 });
             }
         }
@@ -176,6 +200,7 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     SetPage(Origin);
+                    p_Origin_VM.SetPage();
                 });
             }
         }

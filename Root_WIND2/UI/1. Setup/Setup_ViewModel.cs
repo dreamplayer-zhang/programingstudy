@@ -106,7 +106,7 @@ namespace Root_WIND2
                     inspTestVM.p_MapControl_VM.SetMap(mapdata.Data, new CPoint(nMapX, nMapY));
                     inspTestVM.p_MapControl_VM.CreateMapUI();
                 }
-                else
+                else if (p_CurrentPanel == backsideInspTestVM.Main)
                 {
                     backsideInspTestVM.p_MapControl_VM.SetMap(mapdata.Data, new CPoint(nMapX, nMapY));
                     backsideInspTestVM.p_MapControl_VM.CreateMapUI();
@@ -380,13 +380,33 @@ namespace Root_WIND2
                 return new RelayCommand(SetHome);
             }
         }
+        public ICommand btnNewRecipe
+        {
+            get
+            {
+                return new RelayCommand(ProgramManager.Instance.NewRecipe);
+            }
+
+        }
+
         public ICommand btnSaveRecipe
         {
             get
             {
-                return new RelayCommand(ProgramManager.Instance.ShowDialogSaveRecipe);
+                return new RelayCommand(() =>
+                {
+                    if (this.Recipe.RecipePath == "")
+                    {
+                        ProgramManager.Instance.ShowDialogSaveRecipe();
+                    }
+                    else
+                    {
+                        ProgramManager.Instance.SaveRecipe(this.Recipe.RecipePath);
+                    }
+                });
             }
         }
+
         public ICommand btnLoadRecipe
         {
             get

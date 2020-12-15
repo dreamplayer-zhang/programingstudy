@@ -211,9 +211,16 @@ namespace RootTools_Vision
             byte[] binImg = new byte[chipW * chipH];
             byte[] diffImg = new byte[chipW * chipH];
 
-            if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
+            if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) // JHChoi D2D Algorithm 
             {
-                SetGoldenImage();
+                SetMultipleGoldenImages();
+                // Diff Image 계산
+                CLR_IP.Cpp_SelectMinDiffinArea(workplace.WorkplaceBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
+            }
+            else
+            {
+                if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip) // Chip마다 Golden Image 생성 옵션
+                    SetGoldenImage();
                 // Diff Image 계산
                 CLR_IP.Cpp_SubtractAbs(GoldenImage, workplace.WorkplaceBuffer, diffImg, chipW, chipH);
 
@@ -232,12 +239,7 @@ namespace RootTools_Vision
                         CLR_IP.Cpp_CreateDiffScaleMap(GoldenImage, scaleMap, chipW, chipH, 10, 10);
 
                         foreach (Workplace wp in this.workplaceBundle)
-                        {
-                            //if (wp.MapPositionX == this.workplace.MapPositionX)
-                            //{
                             wp.SetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP, (object)(scaleMap));
-                            //}
-                        }
                     }
 
                     CLR_IP.Cpp_Multiply(diffImg, scaleMap, diffImg, chipW, chipH);
@@ -250,12 +252,7 @@ namespace RootTools_Vision
                     CLR_IP.Cpp_Multiply(diffImg, histWeightMap, diffImg, chipW, chipH);
                 }
             }
-            else if (parameter.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) // JHChoi D2D Algorithm 
-            {
-                SetMultipleGoldenImages();
-                // Diff Image 계산
-                CLR_IP.Cpp_SelectMinDiffinArea(workplace.WorkplaceBuffer, GoldenImages.ToArray(), diffImg, GoldenImages.Count(), chipW, chipH, 1);
-            }
+            
 
             // Filter
             switch (parameter.DiffFilter)

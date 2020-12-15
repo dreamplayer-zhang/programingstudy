@@ -347,6 +347,8 @@ namespace Root_EFEM.Module
             PutReady,
             Extend,
             Retraction,
+            SetSpeed,
+            ManualMove,
         };
         Dictionary<eCmd, string> m_dicCmd = new Dictionary<eCmd, string>();
         void InitCmd()
@@ -362,6 +364,8 @@ namespace Root_EFEM.Module
             m_dicCmd.Add(eCmd.PutReady, "PRDY");
             m_dicCmd.Add(eCmd.Extend, "EXTA");
             m_dicCmd.Add(eCmd.Retraction, "RETA");
+            m_dicCmd.Add(eCmd.SetSpeed, "TSPD");
+            m_dicCmd.Add(eCmd.ManualMove, "MMI");
         }
 
         string ReplyCmd(string[] sMsgs)
@@ -447,6 +451,47 @@ namespace Root_EFEM.Module
             m_rs232.Send(str);
             return "OK";
         }
+        protected string WriteCmdSetSpeed(eCmd cmd, string sSpeed)
+        {
+            if (EQ.IsStop()) return "EQ Stop";
+            Thread.Sleep(10);
+            if (m_eSendCmd != eCmd.None)
+            {
+                if (EQ.IsStop()) return "EQ Stop";
+                Thread.Sleep(200);
+                if (m_eSendCmd != eCmd.None) return "RS232 Communication Error !!";
+            }
+            if (EQ.IsStop()) return "EQ Stop";
+
+            string str = m_dicCmd[cmd];
+            str += " " + sSpeed;           
+            m_log.Info(" [ Send --> " + str);
+            m_eSendCmd = cmd;
+            m_rs232.Send(str);
+            return "OK";
+        }
+
+        protected string WriteCmdManualMove(eCmd cmd, string sRMove, string sTMove, string sFMove, string sZMove, string sVMove)
+        {
+            if (EQ.IsStop()) return "EQ Stop";
+            Thread.Sleep(10);
+            if (m_eSendCmd != eCmd.None)
+            {
+                if (EQ.IsStop()) return "EQ Stop";
+                Thread.Sleep(200);
+                if (m_eSendCmd != eCmd.None) return "RS232 Communication Error !!";
+            }
+            if (EQ.IsStop()) return "EQ Stop";
+
+            string str = m_dicCmd[cmd];
+            string sMove = String.Format("{0},{1},{2},{3},{4}", sRMove, sTMove, sFMove, sZMove, sVMove);
+            str += " " + sMove;
+            m_log.Info(" [ Send --> " + str);
+            m_eSendCmd = cmd;
+            m_rs232.Send(str);
+            return "OK";
+        }
+
 
         protected string WaitReply(int secTimeout)
         {

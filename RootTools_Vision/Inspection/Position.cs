@@ -97,7 +97,7 @@ namespace RootTools_Vision
                     int i = 0;
                     int maxIndex = -1;
 
-                    foreach(RecipeType_FeatureData feature in this.positionRecipe.ListMasterFeature)
+                    foreach(RecipeType_ImageData feature in this.positionRecipe.ListMasterFeature)
                     {
                         CPoint absPos = ConvertRelToAbs_Wafer(new CPoint(feature.PositionX, feature.PositionY));
                         int startX = (absPos.X - this.parameter.SearchRangeX) < 0 ? 0 : (absPos.X - this.parameter.SearchRangeX);
@@ -212,7 +212,7 @@ namespace RootTools_Vision
                 if (this.positionRecipe.IndexMaxScoreChipFeature == -1) // Feature가 셋팅이 안되어 있는 경우 전체 Feature 사용
                 {
 
-                    foreach (RecipeType_FeatureData feature in this.positionRecipe.ListDieFeature)
+                    foreach (RecipeType_ImageData feature in this.positionRecipe.ListDieFeature)
                     {
                         CPoint absPos = ConvertRelToAbs_Chip(new CPoint(feature.PositionX, feature.PositionY));
 
@@ -251,7 +251,7 @@ namespace RootTools_Vision
                 {
                     maxIndex = this.positionRecipe.IndexMaxScoreChipFeature;
 
-                    RecipeType_FeatureData feature = this.positionRecipe.ListDieFeature[maxIndex];
+                    RecipeType_ImageData feature = this.positionRecipe.ListDieFeature[maxIndex];
 
                     CPoint absPos = ConvertRelToAbs_Chip(new CPoint(feature.PositionX, feature.PositionY));
 

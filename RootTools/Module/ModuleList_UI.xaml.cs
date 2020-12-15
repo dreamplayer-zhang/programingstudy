@@ -17,6 +17,12 @@ namespace RootTools.Module
         }
 
         #region Run
+        private void buttonHome_Click(object sender, RoutedEventArgs e)
+        {
+            m_moduleList.p_visibleRnR = Visibility.Hidden;
+            EQ.p_eState = EQ.eState.Home;
+        }
+
         private void ButtonRun_Click(object sender, RoutedEventArgs e)
         {
             m_moduleList.p_visibleRnR = Visibility.Hidden;

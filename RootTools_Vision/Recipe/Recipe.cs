@@ -13,6 +13,8 @@ namespace RootTools_Vision
     {
         #region [Member Variables]
         private string name = "";
+        private string recipePath = "";
+        private string recipeFolderPath = "";
 
         RecipeType_WaferMap waferMap = new RecipeType_WaferMap();
 
@@ -29,6 +31,12 @@ namespace RootTools_Vision
 
         [XmlIgnore]
         public List<ParameterBase> ParameterItemList { get => parameterItemList; set => parameterItemList = value; }
+
+        [XmlIgnore]
+        public string RecipePath { get => recipePath; set => recipePath = value; }
+
+        [XmlIgnore]
+        public string RecipeFolderPath { get => recipeFolderPath; set => recipeFolderPath = value; }
         #endregion
         //private List<WaferInfoBase> waferInfoItemList;
 
@@ -36,10 +44,29 @@ namespace RootTools_Vision
         public Recipe()
         {
             RecipeItemList = Tools.GetEnumerableOfType<RecipeBase>().ToList<RecipeBase>();
-            //ParameterItemList = Tools.GetEnumerableOfType<ParameterBase>().ToList<ParameterBase>();
-            //waferInfoItemList = Tools.GetEnumerableOfType<WaferInfoBase>().ToList<WaferInfoBase>();
-
             ParameterItemList = new List<ParameterBase>();
+        }
+
+        public void Clear()
+        {
+            name = "";
+            recipePath = "";
+            recipeFolderPath = "";
+
+            waferMap = new RecipeType_WaferMap();
+
+            RecipeItemList = Tools.GetEnumerableOfType<RecipeBase>().ToList<RecipeBase>();
+            ParameterItemList = new List<ParameterBase>();
+        }
+
+        public bool Read(string recipePath, bool bUpdateUI)
+        {
+            bool bRst = Read(recipePath);
+
+            if(bUpdateUI == true)
+                WorkEventManager.OnUIRedraw(this, new UIRedrawEventArgs());
+
+            return bRst;
         }
 
         public bool Read(string recipePath)
@@ -59,6 +86,9 @@ namespace RootTools_Vision
             }
             else
                 return false;
+
+            this.RecipePath = recipePath;
+            this.RecipeFolderPath = recipeFolderPath;
 
             try
             {
@@ -115,6 +145,9 @@ namespace RootTools_Vision
             string recipeName = recipePath.Substring(recipePath.LastIndexOf("\\") + 1);
             string recipeFolderPath = recipePath.Substring(0 ,recipePath.LastIndexOf("\\") + 1);
 
+            this.RecipePath = recipePath;
+            this.RecipeFolderPath = recipeFolderPath;
+
             // Xml 파일을 읽은 뒤 이미지나 ROI 등을 불러오기 위해서 각 class에 대한 Save 함수를 호출한다.
             foreach (ParameterBase param in this.ParameterItemList)
             {
@@ -153,6 +186,26 @@ namespace RootTools_Vision
             }
 
             return rst;
+        }
+
+        public void SaveMasterImage(int _posX, int _posY, int _width, int _height, int _byteCnt, byte[] _rawData)
+        {
+            OriginRecipe recipe = this.GetRecipe<OriginRecipe>();
+
+            recipe.MasterImage = new RecipeType_ImageData(_posX, _posY, _width, _height, _byteCnt, _rawData);
+            recipe.MasterImage.FileName = "MasterImage.bmp";
+            recipe.MasterImage.Save(this.RecipeFolderPath);
+        }
+
+        public void LoadMasterImage()
+        {
+            if (this.RecipeFolderPath == "") return;
+
+            OriginRecipe recipe = this.GetRecipe<OriginRecipe>();
+
+            recipe.MasterImage = new RecipeType_ImageData();
+            recipe.MasterImage.FileName = "MasterImage.bmp";
+            recipe.MasterImage.Read(this.RecipeFolderPath);
         }
 
         public T GetRecipe<T>()

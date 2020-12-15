@@ -3,227 +3,271 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:local="clr-namespace:Root_WIND2"
              mc:Ignorable="d" 
-             d:DesignHeight="1818" d:DesignWidth="1683" 
+             d:DesignHeight="838" d:DesignWidth="1683" 
              Background="{StaticResource PanelBackGround}">
-    <!--d:DesignHeight="818" d:DesignWidth="1683">-->
-
-    <ScrollViewer VerticalScrollBarVisibility="Visible">
-        <StackPanel Margin="20">
-            <!--Title-->
-            <Grid>
-                <TextBlock Text="2020-07-06 16:23:55"
+    <!--d:DesignHeight="1818" d:DesignWidth="1683">-->
+    <UserControl.Resources>
+        <converter:TextBoxToIntConverter x:Key="TextBoxToInt"/>
+        <local:StringConverter x:Key="StringConverter"/>
+        <local:ColorConverter x:Key="ColorConverter"/>
+        <local:IndexConverter x:Key="IndexConverter"/>
+        <Style TargetType="{x:Type DataGridCell}">
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="Foreground" Value="Black" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid Height="838" DataContext="{Binding p_Summary_VM}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height ="0.08*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <!--Title-->
+        <Grid Grid.Row ="0">
+            <TextBlock Text="{Binding CurDateTime}"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Right"
                            FontSize="20"
+                           Margin="10,10,30,10"
                            FontWeight="Bold"/>
-                <TextBlock Text="FrontSide Summary" 
+            <TextBlock Text="FrontSide Summary" 
                            HorizontalAlignment="Left"
                            FontSize="30"
-                           Margin="0,10,10,10"
+                           Margin="10"
                            FontWeight="Bold"/>
-            </Grid>
+        </Grid>
 
 
-            <!--Alignment-->
-            <TextBlock Text="Alignment"
+        <!--Alignment-->
+        <!--TextBlock Text="Alignment"
                        HorizontalAlignment="Right"
                        FontSize="25"
                        Margin="0,10,10,0"
                        FontWeight="Bold"/>
-            <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
-            <Grid Height="500">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0"
-                          Background="#FFF0F0F0"
-                          Header="Map">
-                    <Grid>
-                        <Image Source="/Root_WIND2;component/Resources/WaferMap.PNG"/>
-                    </Grid>
-                </GroupBox>
-                <GroupBox Grid.Column="1"
-                          Background="{StaticResource GroupBoxBackground}"
-                          Header="Origin Position Image">
-                    <Grid Background="Black">
-                        <Viewbox>
-                            <Grid>
-                                <Image Source="/Root_WIND2;component/Resources/Origin.PNG"
-                                        Margin="15"/>
-                                <Canvas>
-                                    <TextBlock Canvas.Left="335" Canvas.Top="30"
-                                           Text="Die Position 1" Foreground="Red"/>
-                                    <Rectangle Canvas.Left="325" Canvas.Top="20"
-                                           Width="110" Height="195"
-                                           StrokeThickness="1"
-                                           Stroke="Red" />
-                                    <TextBlock Canvas.Left="30" Canvas.Top="220"
-                                           Text="Die Position 0" Foreground="Red"/>
-                                    <Rectangle Canvas.Left="20" Canvas.Top="210"
-                                           Width="110" Height="195"
-                                           StrokeThickness="1"
-                                           Stroke="Red" />
-                                </Canvas>
-                            </Grid>
-                        </Viewbox>
-                    </Grid>
-                </GroupBox>
-                <Grid Grid.Column="2">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition Height="1.2*"/>
-                    </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0"
-                              Background="{StaticResource GroupBoxBackground}"
-                              Header="Origin">
-                        <Grid Margin="10,0,10,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
+        <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/-->
+        <Grid Grid.Row ="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.8*"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
 
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="X" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                            <TextBlock Text="Y" Style="{StaticResource BasicTb}" Grid.Row="1"/>
-                            <TextBlock Text="Width" Style="{StaticResource BasicTb}" Grid.Row="2"/>
-                            <TextBlock Text="Height" Style="{StaticResource BasicTb}" Grid.Row="3"/>
-                            <TextBlock Text="Pitch X" Style="{StaticResource BasicTb}" Grid.Row="4"/>
-                            <TextBlock Text="Pitch Y" Style="{StaticResource BasicTb}" Grid.Row="5"/>
-                            <TextBlock Text="245000" Style="{StaticResource BasicTb}" Grid.Row="0" Grid.Column="1"/>
-                            <TextBlock Text="820000" Style="{StaticResource BasicTb}" Grid.Row="1" Grid.Column="1"/>
-                            <TextBlock Text="24000" Style="{StaticResource BasicTb}" Grid.Row="2" Grid.Column="1"/>
-                            <TextBlock Text="18000" Style="{StaticResource BasicTb}" Grid.Row="3" Grid.Column="1"/>
-                            <TextBlock Text="30000" Style="{StaticResource BasicTb}" Grid.Row="4" Grid.Column="1"/>
-                            <TextBlock Text="20000" Style="{StaticResource BasicTb}" Grid.Row="5" Grid.Column="1"/>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Grid.Row="1"
-                          Background="{StaticResource GroupBoxBackground}"
-                          Header="Feature">
-                        <Grid Margin="0,0,0,0">
-                            <DataGrid IsReadOnly="True">
-                                <DataGrid.Resources>
-                                    <Style TargetType="DataGridColumnHeader">
-                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                    </Style>
-                                </DataGrid.Resources>
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="No." Binding="{Binding Path=no}" Width="35"/>
-                                    <DataGridTextColumn Header="X" Binding="{Binding Path=x}" Width="*"/>
-                                    <DataGridTextColumn Header="Y" Binding="{Binding Path=y}" Width="*"/>
-                                    <DataGridTextColumn Header="Width" Binding="{Binding Path=width}" Width="*"/>
-                                    <DataGridTextColumn Header="Height" Binding="{Binding Path=height}" Width="*"/>
-                                </DataGrid.Columns>
-                                <local:DummyMask no="0" x="74" y="146" width="69" height="136"/>
-                                <local:DummyMask no="1" x="257" y="18" width="68" height="124"/>
-
-                            </DataGrid>
-                        </Grid>
-                    </GroupBox>
-                </Grid>
-            </Grid>
-
-            <!--General-->
-            <TextBlock Text="General"
-                       HorizontalAlignment="Right"
-                       FontSize="25"
-                       Margin="0,10,10,0"
-                       FontWeight="Bold"/>
-            <Rectangle Height="2" Margin="0,0,0,10" Fill="{StaticResource Splitter}"/>
-            <Grid>
+            <Grid >
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="300"/>
-                    <RowDefinition Height="500"/>
+                    <RowDefinition />
+                    <RowDefinition Height="0.1*"/>
                 </Grid.RowDefinitions>
-                <GroupBox Header="Inspection Items">
-                    <DataGrid>
-                        <DataGrid.Resources>
-                            <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            </Style>
-                        </DataGrid.Resources>
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="No." Width="35" Binding="{Binding Path=no}"/>
-                            <DataGridTextColumn Header="Mask" Width="*" Binding="{Binding Path=mask}"/>
-                            <DataGridTextColumn Header="Color" Width="*" Binding="{Binding Path=color}"/>
-                            <DataGridTextColumn Header="Inspection Item" Width="*" Binding="{Binding item}"/>
-                            <DataGridTextColumn Header="Mode" Width="*" Binding="{Binding Path=mode}"/>
-                        </DataGrid.Columns>
-                        <local:DummyGeneral no="0"  color="Blue" item="NN001_70" mask="Mask1" mode="Surface"/>
-                        <local:DummyGeneral no="1"  color="Blue" item="NN001_D2D" mask="Mask1" mode="D2D"/>
-                        <local:DummyGeneral no="2" color="Red" item="NN001_40" mask="Mask2" mode="Surface"/>
-                        <local:DummyGeneral no="3" color="Greed" item="NN001_120" mask="Mask3" mode="Surface"/>
-                    </DataGrid>
+                <GroupBox Grid.Row="0"
+                          Background="{StaticResource GroupBoxBackground}"
+                          Header="Master Image" >
+                    <Grid Grid.Row="0" Margin="10" Background="Black">
+                        <Image Source="{Binding MasterImg}"/>
+                    </Grid>
                 </GroupBox>
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
+                <GroupBox Grid.Row="1"
+                          Background="{StaticResource GroupBoxBackground}"
+                          Header="Display Option" >
+                <Grid Grid.Row = "1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0"                                        
-                          Background="{StaticResource GroupBoxBackground}"
-                          Header="Mask">
-                        <Grid Background="Black">
-                            <Viewbox>
-                                <Grid>
-                                    <Image Source="/Root_WIND2;component/Resources/Origin.PNG" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-                                    <Canvas Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                                        Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
-                                        <Rectangle Canvas.Left="10" Canvas.Top="10"
-                                               Width="350" Height="305"
-                                               Stroke="Blue" Fill="SkyBlue"
-                                               Opacity="0.4"
-                                               StrokeThickness="1"/>
-                                        <Rectangle Canvas.Left="365" Canvas.Top="15"
-                                               Width="50" Height="335"
-                                               Opacity="0.3"
-                                               Stroke="Red" Fill="Crimson"/>
-                                        <Rectangle Canvas.Left="20" Canvas.Top="320"
-                                               Width="360" Height="60"
-                                               Opacity="0.3"
-                                               Stroke="Green" Fill="SeaGreen"/>
+                    <Grid Grid.Column = "0">
+                        <Viewbox Height="20" >
+                            <RadioButton Name="None" GroupName="DisplayOption"
+                                    IsChecked="{Binding Check_DisplayNone}" >None</RadioButton>
+                        </Viewbox>
+                    </Grid>
+                    <Grid Grid.Column = "1">
+                        <Viewbox Height="20" >
+                            <RadioButton Name="Dark" GroupName="DisplayOption"
+                                    IsChecked="{Binding Check_DisplayPosition}">Position</RadioButton>
+                        </Viewbox>
+                    </Grid>
+                    <Grid Grid.Column = "2">
+                        <Viewbox Height="20" >
+                            <RadioButton Name="Bright" GroupName="DisplayOption"
+                                    IsChecked="{Binding Check_DisplayROI}" >ROI</RadioButton>
+                        </Viewbox>
+                    </Grid>
+                </Grid>
+                </GroupBox>
+            </Grid>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <GroupBox Grid.Column="1"      
+                          Background="#FFF0F0F0"
+                          Header="Map">
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.8*"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0" Margin="20">
+                                <local:MapControl DataContext="{Binding MapControl_VM}"/>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="Map Info"
+                                   HorizontalAlignment="Left"
+                                   FontSize="15"
+                                   Margin="10,10,10,0"
+                                   FontWeight="Bold"/>
+                                <Rectangle Height="2" Margin="10,30,50,10" Fill="{StaticResource Splitter}" Grid.ColumnSpan="4"/>
+                                <TextBlock Text="Map Size X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="1"/>
+                                <TextBlock Text="Map Size Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="1" Grid.Column="2"/>
+                                <TextBlock Text="Origin Die X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="2"/>
+                                <TextBlock Text="Origin Die Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="2" Grid.Column="2"/>
+                                <TextBlock Text="Chip Size[um] X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="3"/>
+                                <TextBlock Text="Chip Size[um] Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="3" Grid.Column="2"/>
+                                <TextBlock Text="{Binding MapSzX}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="1" Grid.Column="1"/>
+                                <TextBlock Text="{Binding MapSzY}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="1" Grid.Column="3"/>
+                                <TextBlock Text="{Binding OriginDieX}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="2" Grid.Column="1"/>
+                                <TextBlock Text="{Binding OriginDieY}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="2" Grid.Column="3"/>
+                                <TextBlock Text="{Binding ChipSizeX}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="3" Grid.Column="1"/>
+                                <TextBlock Text="{Binding ChipSizeY}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="3" Grid.Column="3"/>
 
-                                    </Canvas>
-                                </Grid>
-                            </Viewbox>
+                                <TextBlock Text="Shot Info"
+                                       HorizontalAlignment="Left"
+                                       FontSize="15"
+                                       Margin="10,10,10,0"
+                                       FontWeight="Bold" Grid.Row="4"/>
+                                <Rectangle Height="2" Margin="10,30,50,10" Fill="{StaticResource Splitter}" Grid.Row="4" Grid.ColumnSpan="4"/>
+
+                                <TextBlock Text="Origin X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="5"/>
+                                <TextBlock Text="Origin Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="5" Grid.Column="2"/>
+                                <TextBlock Text="Matrix X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="6"/>
+                                <TextBlock Text="Matrix Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="6" Grid.Column="2"/>
+                                <TextBlock Text="Size[um] X" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="7"/>
+                                <TextBlock Text="Size[um] Y" HorizontalAlignment="Center" Style="{StaticResource BasicTb}" Margin="1" Grid.Row="7" Grid.Column="2"/>
+                                <TextBlock Text="{Binding ShotOriginX}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="5" Grid.Column="1"/>
+                                <TextBlock Text="{Binding ShotOriginY}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="5" Grid.Column="3"/>
+                                <TextBlock Text="{Binding ShotMatrixX}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="6" Grid.Column="1"/>
+                                <TextBlock Text="{Binding ShotMatrixY}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="6" Grid.Column="3"/>
+                                <TextBlock Text="{Binding ShotSizeX}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="7" Grid.Column="1"/>
+                                <TextBlock Text="{Binding ShotSizeY}" Style="{StaticResource BasicTb}" Margin="5,5,1,1" Grid.Row="7" Grid.Column="3"/>
+                            </Grid>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="Inspection Method" Grid.Column="1">
-                        <DataGrid IsReadOnly="True">
+                </Grid>
+                <Grid Grid.Row="1">
+                    <GroupBox Header="Inspection Item"
+                                      Background="{StaticResource GroupBoxBackground}">
+                        <DataGrid ItemsSource="{Binding InspItem}"
+                                              IsReadOnly="True"
+                                              AutoGenerateColumns="False">
                             <DataGrid.Resources>
+                                <CollectionViewSource Source="{Binding InspItem}" x:Key="items"/>
                                 <Style TargetType="DataGridColumnHeader">
                                     <Setter Property="HorizontalAlignment" Value="Stretch"/>
                                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                                 </Style>
+                                <Style x:Key="TextInCellCenter" TargetType="{x:Type TextBlock}" >
+                                    <Setter Property="TextAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                </Style>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                                                             Color="Gainsboro"/>
                             </DataGrid.Resources>
+
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="No." Width="35" Binding="{Binding Path=no}"/>
-                                <DataGridTextColumn Header="Mode" Width="*" Binding="{Binding Path=x}"/>
-                                <DataGridTextColumn Header="Intensity" Width="*" Binding="{Binding Path=y}"/>
-                                <DataGridTextColumn Header="Size(Px)" Width="*" Binding="{Binding Path=width}"/>
-                                <DataGridTextColumn Header="Use Abs GV" Width="*" Binding="{Binding Path=height}"/>
-                                <DataGridTextColumn Header="Abs GV" Width="*" Binding="{Binding Path=color}"/>
+                                <DataGridTextColumn Header="No." Width="35"
+                                                                ElementStyle="{StaticResource TextInCellCenter}"
+                                                                Binding="{Binding Converter={StaticResource IndexConverter}, 
+                                                                ConverterParameter={StaticResource ResourceKey=items}}"/>
+
+                                <DataGridTemplateColumn Header="Mask" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox     ItemsSource="{Binding p_cMask}"
+                                                                  SelectedItem="{Binding p_Mask, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  IsEnabled="False"
+                                                                  IsSynchronizedWithCurrentItem="False"
+                                                                  DisplayMemberPath="p_sName"
+                                                                  BorderThickness="1"
+                                                                  VerticalContentAlignment="Center">
+                                            </ComboBox>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Color" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="2" Opacity="0.5" 
+                                                              Background="{Binding p_Mask.p_Color, 
+                                                              Converter={StaticResource ColorConverter}}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Inspection Method" Width="1.5*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding p_cInspMethod}"
+                                                                  SelectedItem="{Binding p_InspMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                                  IsEnabled="False"
+                                                                  IsSynchronizedWithCurrentItem="False"
+                                                                  DisplayMemberPath="Name"
+                                                                  BorderThickness="1"
+                                                                  VerticalContentAlignment="Center">
+                                            </ComboBox>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="Value" Width="*"
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding p_InspMethod.Name, 
+                                                                    Converter={StaticResource StringConverter}}"/>
+                                <DataGridTextColumn Header="Size(Pxl)" Width="*" 
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding p_InspMethod.p_nSize, 
+                                                                    Converter={StaticResource StringConverter}}"/>
+                                <DataGridTextColumn Header="Mode" Width="*" 
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding p_InspMethod.p_inspMode, 
+                                                                    Converter={StaticResource StringConverter}}"/>
                             </DataGrid.Columns>
-                            <local:DummyMask no="0" x="Surface" y="15" width="40" height="False" color="-"/>
-                            <local:DummyMask no="1" x="Surface" y="-" width="20" height="True" color="55"/>
-                            <local:DummyMask no="2" x="D2D" y="60" width="15" height="False" color="-"/>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <GroupBox Header="Feature Info">
+                        <DataGrid>
+                            <DataGrid IsReadOnly="True">
+
+                            </DataGrid>
                         </DataGrid>
                     </GroupBox>
                 </Grid>
             </Grid>
-        </StackPanel>
-    </ScrollViewer>
+        </Grid>
+    </Grid>
 </UserControl>

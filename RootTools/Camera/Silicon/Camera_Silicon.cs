@@ -58,14 +58,12 @@ namespace RootTools.Camera.Silicon
                 SetProperty(ref m_sMCF, value);
             }
         }
-
-
         public int m_lBufGrab = 10;
-        public IntPtr m_pBufGrab = IntPtr.Zero;
+        public IntPtr m_pBufGrab = IntPtr.Zero; //여기로 이미지 버퍼 땡겨오는거
         public System.Drawing.Point m_szBuf = new System.Drawing.Point(0, 0);
 
-        public int m_nGrab = -1;
-        public int m_lGrab = 0;
+        public int m_nGrab = -1; //버퍼에서 몇번째 이미지 가져올건지 
+        public int m_lGrab = 0; //그랩 몇번할건지?
         public int m_nImgToGrab = 1;
 
         public bool IsLIVE = false;
@@ -165,6 +163,12 @@ namespace RootTools.Camera.Silicon
         void bgw_Connect_DoWork(object sender, DoWorkEventArgs e)
         {
             ConnectCamera();
+        }
+
+        public void Connect()
+        {
+            if (!bgw_Connect.IsBusy)
+                bgw_Connect.RunWorkerAsync();
         }
 
         void bgw_Connect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -283,14 +287,15 @@ namespace RootTools.Camera.Silicon
             fgErrorType rc = m_fgSiso.FgRegisterAPCHandler(this, ApcEventHandler, (uint)p_nDeviceIndex, flags, ctrlFlags, m_pBufGrab);
         }
 
-        unsafe public int ApcEventHandler(object sender, APCEvent ev)
+        unsafe public int ApcEventHandler(object sender, APCEvent ev)//xfercallback
         {
-            unsafe
-            {
-                m_nGrab = (int)ev.imageNo;
-                IntPtr pBuf = m_fgSiso.FgGetImagePtrEx(ev.imageNo, (uint)p_nDeviceIndex, m_pBufGrab);
-                GrabDone((int)ev.imageNo - 1, pBuf); //forget
-            }
+            //unsafe
+            //{
+            //    m_nGrab = (int)ev.imageNo;
+            //    IntPtr pBuf = m_fgSiso.FgGetImagePtrEx(ev.imageNo, (uint)p_nDeviceIndex, m_pBufGrab);
+            //    GrabDone((int)ev.imageNo - 1, pBuf); //forget
+            //}
+            m_nFrameCnt = (int)ev.imageNo;
             return 0;
         }
 
@@ -370,14 +375,62 @@ namespace RootTools.Camera.Silicon
 
         public CPoint GetRoiSize()
         {
-            throw new NotImplementedException();
+            return new CPoint(m_Width, m_Height);
         }
 
+        MemoryData m_Memory;
+        IntPtr m_MemPtr;
+        CPoint m_cpScanOffset;
+        int m_nFrameCnt;
+        CRect m_LastROI;
+        Thread m_GrabThread;
         public void GrabLineScan(MemoryData memory, CPoint cpScanOffset, int nLine, bool bInvY = false, int ReserveOffsetY = 0)
         {
-            throw new NotImplementedException();
-        }
+            SetSisoParam();
+            AllocateGrabberMem(szBuf);
 
+            PylonC.NET.Pylon.DeviceFeatureFromString(m_hDev, "TriggerMode", "On");
+
+            m_cpScanOffset = cpScanOffset;
+            m_Memory = memory;
+            m_MemPtr = memory.GetPtr();
+            m_nGrab = -1;
+            m_lGrab = nLine/m_Height;
+            m_LastROI = new CRect();
+            fgErrorType rc = m_fgSiso.FgAcquireEx((uint)p_nDeviceIndex, m_lGrab, (int)FgAcquisitionFlags.ACQ_STANDARD, m_pBufGrab);
+
+            m_GrabThread = new Thread(new ThreadStart(RunGrabLineScanThread));
+            m_GrabThread.Start();
+        }
+        unsafe void RunGrabLineScanThread()
+        {
+            while(m_nFrameCnt < m_nGrab)
+            {
+                int nY = m_nFrameCnt * m_Height;
+
+                IntPtr srcPtr = m_fgSiso.FgGetImagePtrEx(m_nFrameCnt, (uint)p_nDeviceIndex, m_pBufGrab) + m_Height;
+                IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (nY + m_cpScanOffset.Y) * m_Memory.W);
+
+                memcpy((byte*)srcPtr.ToPointer(), (byte*)dstPtr.ToPointer(), m_Height * m_Width);
+
+                m_LastROI.Left = m_cpScanOffset.X;
+                m_LastROI.Right = m_cpScanOffset.X + m_Width;
+                m_LastROI.Top = m_cpScanOffset.Y;
+                m_LastROI.Bottom = m_cpScanOffset.Y + m_Height;
+
+                GrabEvent();
+            }
+        }
+        void GrabEvent()
+        {
+            if (Grabed != null)
+                OnGrabed(new GrabedArgs(m_Memory, m_nFrameCnt, m_LastROI));
+        }
+        protected virtual void OnGrabed(GrabedArgs e)
+        {
+            if (Grabed != null)
+                Grabed.Invoke(this, e);
+        }
         public string StopGrab()
         {
             unsafe

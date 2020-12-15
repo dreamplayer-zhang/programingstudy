@@ -27,138 +27,58 @@ namespace Root_WIND2.Module
 	public class EdgeSideVision : ModuleBase
 	{
 		#region ToolBox
-		Axis m_axisRotate;
-		Axis m_axisEdgeSideX;
-		AxisXY m_axisXZ;
-		DIO_O m_doVac;
-		DIO_O m_doBlow;
-		MemoryPool m_memoryPool;
-		MemoryGroup m_memoryGroup;
-		LightSet m_lightSet;
-		Camera_Dalsa m_camEdgeTop;
-		Camera_Dalsa m_camEdgeSide;
-		Camera_Dalsa m_camEdgeBottom;
-		Camera_Basler m_camNotchTop;
-		Camera_Basler m_camNotchSide;
-		Camera_Basler m_camNotchBottom;
-		Camera_Matrox m_camEBR;
+		Axis axisRotate;
+		Axis axisEdgeX;
+		AxisXY axisXZ;
+		DIO_O doVac;
+		DIO_O doBlow;
+
+		MemoryPool memoryPool;
+		MemoryGroup memoryGroup;
+		MemoryData memoryEdgeTop;
+		MemoryData memoryEdgeSide;
+		MemoryData memoryEdgeBtm;
+		MemoryData memoryEBR;
+
+		LightSet lightSet;
+		Camera_Dalsa camEdgeTop;
+		Camera_Dalsa camEdgeSide;
+		Camera_Dalsa camEdgeBtm;
+		Camera_Matrox camEBR;
+
+		#region Getter/Setter
+		public Axis AxisRotate { get => axisRotate; private set => axisRotate = value; }
+		public Axis AxisEdgeX { get => axisEdgeX; private set => axisEdgeX = value; }
+		public AxisXY AxisXZ { get => axisXZ; private set => axisXZ = value; }
+		public DIO_O DoVac { get => doVac; private set => doVac = value; }
+		public DIO_O DoBlow { get => doBlow; private set => doBlow = value; }
+		public MemoryPool MemoryPool { get => memoryPool; private set => memoryPool = value; }
+		public MemoryGroup MemoryGroup { get => memoryGroup; private set => memoryGroup = value; }
+		public MemoryData MemoryEdgeTop { get => memoryEdgeTop; private set => memoryEdgeTop = value; }
+		public MemoryData MemoryEdgeSide { get => memoryEdgeSide; private set => memoryEdgeSide = value; }
+		public MemoryData MemoryEdgeBtm { get => memoryEdgeBtm; private set => memoryEdgeBtm = value; }
+		public MemoryData MemoryEBR { get => memoryEBR; private set => memoryEBR = value; }
+		public LightSet LightSet { get => lightSet; private set => lightSet = value; }
+		public Camera_Dalsa CamEdgeTop { get => camEdgeTop; private set => camEdgeTop = value; }
+		public Camera_Dalsa CamEdgeSide { get => camEdgeSide; private set => camEdgeSide = value; }
+		public Camera_Dalsa CamEdgeBtm { get => camEdgeBtm; private set => camEdgeBtm = value; }
+		public Camera_Matrox CamEBR { get => CamEBR; private set => CamEBR = value; }
+		#endregion
 
 		public override void GetTools(bool bInit)
 		{
-			p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
-			p_sInfo = m_toolBox.Get(ref m_axisEdgeSideX, this, "Axis EdgeSideX");
-			p_sInfo = m_toolBox.Get(ref m_axisXZ, this, "Axis NotchXZ");
-			p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
-			p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
-			p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-			p_sInfo = m_toolBox.Get(ref m_camEdgeTop, this, "Cam EdgeTop");
-			p_sInfo = m_toolBox.Get(ref m_camEdgeSide, this, "Cam EdgeSide");
-			p_sInfo = m_toolBox.Get(ref m_camEdgeBottom, this, "Cam EdgeBottom");
-			p_sInfo = m_toolBox.Get(ref m_camNotchTop, this, "Cam NotchTop");
-			p_sInfo = m_toolBox.Get(ref m_camNotchSide, this, "Cam NotchSide");
-			p_sInfo = m_toolBox.Get(ref m_camNotchBottom, this, "Cam NotchBottom");
-			p_sInfo = m_toolBox.Get(ref m_camEBR, this, "Cam EBR");
-			p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-			m_memoryGroup = m_memoryPool.GetGroup(p_id);
-		}
-		#endregion
-
-		#region DIO
-		public bool p_bStageVac
-		{
-			get { return m_doVac.p_bOut; }
-			set
-			{
-				if (m_doVac.p_bOut == value) return;
-				m_doVac.Write(value);
-			}
-		}
-
-		public bool p_bStageBlow
-		{
-			get { return m_doBlow.p_bOut; }
-			set
-			{
-				if (m_doBlow.p_bOut == value) return;
-				m_doBlow.Write(value);
-			}
-		}
-
-		public void RunBlow(int msDelay)
-		{
-			m_doBlow.DelayOff(msDelay);
-		}
-		#endregion
-
-		#region override
-		public override void Reset()
-		{
-			base.Reset();
-		}
-
-		public override void InitMemorys()
-		{
-			m_memoryGroup = m_memoryPool.GetGroup(p_id);
-		}
-		#endregion
-
-		#region Axis
-		public int m_pulseRound = 1000;
-		void RunTreeAxis(Tree tree)
-		{
-			m_pulseRound = tree.Set(m_pulseRound, m_pulseRound, "Rotate Pulse / Round", "Rotate Axis Pulse / 1 Round (pulse)");
-		}
-		#endregion
-
-		#region State Home
-		public string OpenCamera()
-		{
-			if (m_camEdgeTop.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
-				m_camEdgeTop.Connect();
-			if (m_camEdgeSide.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
-				m_camEdgeSide.Connect();
-			if (m_camEdgeBottom.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
-				m_camEdgeBottom.Connect();
-			if (m_camEBR.p_CamInfo.p_eState == RootTools.Camera.Matrox.eCamState.Init)
-				m_camEBR.Connect();
-			if (m_camNotchTop.p_CamInfo._OpenStatus == false)
-				m_camNotchTop.Connect();
-			if (m_camNotchSide.p_CamInfo._OpenStatus == false)
-				m_camNotchSide.Connect();
-			if (m_camNotchBottom.p_CamInfo._OpenStatus == false)
-				m_camNotchBottom.Connect();
-			
-			return "OK";
-		}
-
-		public override string StateHome()
-		{
-			if (EQ.p_bSimulate) return "OK";
-			//            p_bStageBlow = false;
-			//            p_bStageVac = true;
-
-			OpenCamera();
-			p_bStageVac = true;
-			m_axisEdgeSideX.StartHome();
-			if (m_axisEdgeSideX.WaitReady() != "OK")
-			{
-				p_bStageVac = false;
-				p_eState = eState.Error;
-				return "OK";
-			}
-
-			Thread.Sleep(200);
-			m_axisRotate.StartHome();
-			if (m_axisRotate.WaitReady() == "OK")
-			{
-				p_eState = eState.Ready;
-				return "OK";
-			}
-			//p_sInfo = base.StateHome();
-			//p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-			p_eState = eState.Error;
-			p_bStageVac = false;
-			return "Home Error";
+			p_sInfo = m_toolBox.Get(ref axisRotate, this, "Axis Rotate");
+			p_sInfo = m_toolBox.Get(ref axisEdgeX, this, "Axis EdgeSideX");
+			p_sInfo = m_toolBox.Get(ref axisXZ, this, "Axis NotchXZ");
+			p_sInfo = m_toolBox.Get(ref doVac, this, "Stage Vacuum");
+			p_sInfo = m_toolBox.Get(ref doBlow, this, "Stage Blow");
+			p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
+			p_sInfo = m_toolBox.Get(ref camEdgeTop, this, "Cam EdgeTop");
+			p_sInfo = m_toolBox.Get(ref camEdgeSide, this, "Cam EdgeSide");
+			p_sInfo = m_toolBox.Get(ref camEdgeBtm, this, "Cam EdgeBottom");
+            p_sInfo = m_toolBox.Get(ref camEBR, this, "Cam EBR");
+            p_sInfo = m_toolBox.Get(ref lightSet, this);
+			memoryGroup = memoryPool.GetGroup(p_id);
 		}
 		#endregion
 
@@ -193,7 +113,7 @@ namespace Root_WIND2.Module
 			while (m_aGrabMode.Count < m_lGrabMode)
 			{
 				string id = "Mode." + m_aGrabMode.Count.ToString("00");
-				GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool);
+				GrabMode grabMode = new GrabMode(id, m_cameraSet, lightSet, memoryPool);
 				m_aGrabMode.Add(grabMode);
 			}
 			while (m_aGrabMode.Count > m_lGrabMode)
@@ -205,6 +125,111 @@ namespace Root_WIND2.Module
 		}
 		#endregion
 
+		#region DIO
+		public bool p_bStageVac
+		{
+			get { return doVac.p_bOut; }
+			set
+			{
+				if (doVac.p_bOut == value) return;
+				doVac.Write(value);
+			}
+		}
+
+		public bool p_bStageBlow
+		{
+			get { return doBlow.p_bOut; }
+			set
+			{
+				if (doBlow.p_bOut == value) return;
+				doBlow.Write(value);
+			}
+		}
+
+		public void RunBlow(int msDelay)
+		{
+			doBlow.DelayOff(msDelay);
+		}
+		#endregion
+
+		#region override
+		public override void Reset()
+		{
+			base.Reset();
+		}
+
+		double pulse360 = 360000;
+		public double Pulse360 { get => pulse360; set => pulse360 = value; }
+		double triggerRatio = 1.5; //캠익에서 트리거 분주비
+		public double TriggerRatio { get => triggerRatio; set => triggerRatio = value; }
+		double margin = 36000;
+		public double Margin { get => margin; set => margin = value; }
+		public override void InitMemorys()
+		{
+			int nImageY = (int)(pulse360 * triggerRatio + margin);
+			int nImageX = 3000;
+			memoryGroup = memoryPool.GetGroup(p_id);
+			memoryEdgeTop = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeTop.ToString(), 1, 1, nImageX, nImageY);
+			memoryEdgeSide = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeSide.ToString(), 1, 1, nImageX, nImageY);
+			memoryEdgeBtm = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeBottom.ToString(), 1, 1, nImageX, nImageY);
+			memoryEBR = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EBR.ToString(), 1, 1, nImageX, nImageY);
+		}
+		#endregion
+
+		#region Axis
+		private int pulseRound = 1000;
+		public int PulseRound { get => pulseRound; set => pulseRound = value; }
+		void RunTreeAxis(Tree tree)
+		{
+			pulseRound = tree.Set(pulseRound, pulseRound, "Rotate Pulse / Round", "Rotate Axis Pulse / 1 Round (pulse)");
+		}
+		#endregion
+
+		#region State Home
+		public string OpenCamera()
+		{
+			if (camEdgeTop.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
+				camEdgeTop.Connect();
+			if (camEdgeSide.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
+				camEdgeSide.Connect();
+			if (camEdgeBtm.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
+				camEdgeBtm.Connect();
+			if (camEBR.p_CamInfo.p_eState == RootTools.Camera.Matrox.eCamState.Init)
+				camEBR.Connect();
+			return "OK";
+		}
+
+		public override string StateHome()
+		{
+			if (EQ.p_bSimulate) return "OK";
+			//            p_bStageBlow = false;
+			//            p_bStageVac = true;
+
+			OpenCamera();
+			p_bStageVac = true;
+			axisEdgeX.StartHome();
+			if (axisEdgeX.WaitReady() != "OK")
+			{
+				p_bStageVac = false;
+				p_eState = eState.Error;
+				return "OK";
+			}
+
+			Thread.Sleep(200);
+			axisRotate.StartHome();
+			if (axisRotate.WaitReady() == "OK")
+			{
+				p_eState = eState.Ready;
+				return "OK";
+			}
+			//p_sInfo = base.StateHome();
+			//p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+			p_eState = eState.Error;
+			p_bStageVac = false;
+			return "Home Error";
+		}
+		#endregion
+
 		#region Tree
 		public override void RunTree(Tree tree)
 		{
@@ -213,68 +238,20 @@ namespace Root_WIND2.Module
 		}
 		#endregion
 
-		public EdgeSideVision(string id, IEngineer engineer)
-		{ 
-			base.InitBase(id, engineer);
-			InitMemory();
-		}
-
-		MemoryData m_memoryEdgeTop;
-		MemoryData m_memoryEdgeSide;
-		MemoryData m_memoryEdgeBottom;
-		MemoryData m_memoryNotch;
-		MemoryData[] m_memoryNotchSide;
-		MemoryData[] m_memoryNotchTop;
-		MemoryData[] m_memoryNotchBottom;
-		double dPulse360 = 360000;
-		double dTriggerratio = 1.5; //캠익에서 트리거 분주비
-		double dMargin = 36000;
-		int nBaslerX = 2048;
-		int nBaslerY = 1080;
-
 		public enum EDGE_TYPE
 		{
 			EdgeTop,
 			EdgeSide,
 			EdgeBottom,
+			EBR,
 		}
 
-		void InitMemory()
-		{
-			int nImageY = (int)(dPulse360 * dTriggerratio + dMargin);
-			int nImageX = 3000;
-			m_memoryEdgeTop = m_memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeTop.ToString(), 1, 1, nImageX, nImageY);
-            m_memoryEdgeSide = m_memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeSide.ToString(), 1, 1, nImageX, nImageY);
-            m_memoryEdgeBottom = m_memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeBottom.ToString(), 1, 1, nImageX, nImageY);
-            //m_memoryNotch = m_memoryPool.GetGroup(p_id).CreateMemory("Notch", 1, 1, nBaslerX * 9, nBaslerY * 40);
-			//InitStackMemory(3, 20, 3, 20, 3, 20);
+		public EdgeSideVision(string id, IEngineer engineer)
+		{ 
+			base.InitBase(id, engineer);
 		}
 
-        public ImageData GetMemoryData(EDGE_TYPE data)
-		{
-			ImageData result = new ImageData(m_memoryPool.GetMemory(p_id, data.ToString()));
-			return result;
-		}
-
-		void InitStackMemory(int nSide, int nFrameSide, int nTop, int nFrameTop, int nBottom, int nFrameBottom)
-		{
-			m_memoryNotchSide = new MemoryData[nSide];
-			for (int n = 0; n < nSide; n++)
-			{
-				m_memoryNotchSide[n] = m_memoryPool.GetGroup(p_id).CreateMemory("NotchSide" + n, 1, 1, nBaslerX, nBaslerY * nFrameSide);
-			}
-			m_memoryNotchTop = new MemoryData[nTop];
-			for (int n = 0; n < nTop; n++)
-			{
-				m_memoryNotchSide[n] = m_memoryPool.GetGroup(p_id).CreateMemory("NotchTop" + n, 1, 1, nBaslerX, nBaslerY * nFrameTop);
-			}
-			m_memoryNotchBottom = new MemoryData[nBottom];
-			for (int n = 0; n < nBottom; n++)
-			{
-				m_memoryNotchSide[n] = m_memoryPool.GetGroup(p_id).CreateMemory("NotchBottom" + n, 1, 1, nBaslerX, nBaslerY * nFrameBottom);
-			}
-		}
-
+		
 		public override void ThreadStop()
 		{
 			base.ThreadStop();
@@ -284,446 +261,18 @@ namespace Root_WIND2.Module
 		protected override void InitModuleRuns()
 		{
 			AddModuleRunList(new Run_GrabEdge(this), false, "Run Grab Edge");
-			AddModuleRunList(new Run_GrabNotch(this), false, "Run Grab Notch");
-			AddModuleRunList(new Run_GrabAreaLine(this), false, "Run Grab Area Line");
 			AddModuleRunList(new Run_GrabEBR(this), false, "Run Grab EBR");
-			//AddModuleRunList(new Run_Delay(this), false, "Time Delay");
-			//AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
+			//AddModuleRunList(new Run_GrabNotch(this), false, "Run Grab Notch");
+			//AddModuleRunList(new Run_GrabAreaLine(this), false, "Run Grab Area Line");
 		}
 
-		public class Run_GrabEdge : ModuleRunBase
+		public ImageData GetMemoryData(EDGE_TYPE data)
 		{
-			EdgeSideVision m_module;
-			public GrabMode m_gmTop = null;
-			public GrabMode m_gmSide = null;
-			public GrabMode m_gmBtm = null;
-
-			string _sGrabModeTop = "";
-			string p_sGrabModeTop
-			{
-				get { return _sGrabModeTop; }
-				set
-				{
-					_sGrabModeTop = value;
-					m_gmTop = m_module.GetGrabMode(value);
-				}
-			}
-			string _sGrabModeSide = "";
-			string p_sGrabModeSide
-			{
-				get { return _sGrabModeSide; }
-				set
-				{
-					_sGrabModeSide = value;
-					m_gmSide = m_module.GetGrabMode(value);
-				}
-			}
-			string _sGrabModeBtm = "";
-			string p_sGrabModeBtm
-			{
-				get { return _sGrabModeBtm; }
-				set
-				{
-					_sGrabModeBtm = value;
-					m_gmBtm = m_module.GetGrabMode(value);
-				}
-			}
-
-			public double m_fRes = 1.7; // 단위 um
-			public double m_fStartDegree = 0;
-			public double m_fScanDegree = 360;
-			public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
-			public double m_fScanAcc = 1; //sec
-			public int m_nMaxFrame = 100;
-			public int m_nSobelHeight = 10;
-			public int m_nSobelThreshold = 90;
-			public int m_nSobelCnt = 10;
-			public int m_nSideFocusAxis = 26809;
-			public double m_nSideCamResoultion = 1.7;
-			public int m_nInspHeight = 200;
-			public int m_nDefectSize = 5;
-			public int m_nMergeDist = 5;
-			public int m_nInspThreshhold = 12;
-
-			public Run_GrabEdge(EdgeSideVision module)
-			{
-				m_module = module;
-				InitModuleRun(module);
-			}
-
-			public override ModuleRunBase Clone()
-			{
-				Run_GrabEdge run = new Run_GrabEdge(m_module);
-				run.p_sGrabModeTop = p_sGrabModeTop;
-				run.p_sGrabModeSide = p_sGrabModeSide;
-				run.p_sGrabModeBtm = p_sGrabModeBtm;
-
-				run.m_fRes = m_fRes;
-				run.m_fStartDegree = m_fStartDegree;
-				run.m_fScanDegree = m_fScanDegree;
-				run.m_nScanRate = m_nScanRate;
-				run.m_fScanAcc = m_fScanAcc;
-				run.m_nMaxFrame = m_nMaxFrame;
-				run.m_nSobelHeight = m_nSobelHeight;
-				run.m_nSobelThreshold = m_nSobelThreshold;
-				run.m_nSobelCnt = m_nSobelCnt;
-				run.m_nSideFocusAxis = m_nSideFocusAxis;
-				run.m_nSideCamResoultion = m_nSideCamResoultion;
-				run.m_nInspHeight = m_nInspHeight;
-				run.m_nDefectSize = m_nDefectSize;
-				run.m_nMergeDist = m_nMergeDist;
-				run.m_nInspThreshhold = m_nInspThreshhold;
-				return run;
-			}
-
-			public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-			{
-				m_fStartDegree = tree.Set(m_fStartDegree, m_fStartDegree, "Start Angle", "Degree", bVisible);
-				m_fScanDegree = tree.Set(m_fScanDegree, m_fScanDegree, "Scan Angle", "Degree", bVisible);
-				m_nScanRate = tree.Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100%", bVisible);
-				m_nMaxFrame = tree.Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
-				m_fScanAcc = tree.Set(m_fScanAcc, m_fScanAcc, "Scan Acc", "스캔 축 가속도 (sec)", bVisible);
-
-				m_nSobelHeight = (tree.GetTree("Side Focus", false, bVisible)).Set(m_nSobelHeight, m_nSobelHeight, "Sobel Start Height", "", bVisible);
-				m_nSobelThreshold = (tree.GetTree("Side Focus", false, bVisible)).Set(m_nSobelThreshold, m_nSobelThreshold, "Edge Detect GV Threshold", "Sobel Edge 검출 시 GV Threshold", bVisible);
-				m_nSobelCnt = (tree.GetTree("Side Focus", false, bVisible)).Set(m_nSobelCnt, m_nSobelCnt, "Edge Detect Count", "Sobel Edge 검출 시 Threshold 이상의 Count. Count 이상 발견 시 Edge", bVisible);
-				m_nSideFocusAxis = (tree.GetTree("Side Focus", false, bVisible)).Set(m_nSideFocusAxis, m_nSideFocusAxis, "Side Focus Axis", "Side 카메라 Focus 축 값", bVisible);
-				m_nSideCamResoultion = (tree.GetTree("Side Focus", false, bVisible)).Set(m_nSideCamResoultion, m_nSideCamResoultion, "Side Cam Resolution", "Side 카메라 해상도", bVisible);
-
-				m_nInspHeight = tree.Set(m_nInspHeight, m_nInspHeight, "Inspection ROI Height", "", bVisible);
-				m_nDefectSize = tree.Set(m_nDefectSize, m_nDefectSize, "Defect Size", "pixel", bVisible);
-				m_nMergeDist = tree.Set(m_nMergeDist, m_nMergeDist, "Merge Distance", "pixel", bVisible);
-				m_nInspThreshhold = tree.Set(m_nInspThreshhold, m_nInspThreshhold, "Inspection Theshold", "", bVisible);
-
-				p_sGrabModeTop = tree.Set(p_sGrabModeTop, p_sGrabModeTop, m_module.p_asGrabMode, "Grab Mode : Top", "Select GrabMode", bVisible);
-				if (m_gmTop != null) m_gmTop.RunTree(tree.GetTree("Grab Mode : Top", false), bVisible, true);
-				p_sGrabModeSide = tree.Set(p_sGrabModeSide, p_sGrabModeSide, m_module.p_asGrabMode, "Grab Mode : Side", "Select GrabMode", bVisible);
-				if (m_gmSide != null) m_gmTop.RunTree(tree.GetTree("Grab Mode : Side", false), bVisible, true);
-				p_sGrabModeBtm = tree.Set(p_sGrabModeBtm, p_sGrabModeBtm, m_module.p_asGrabMode, "Grab Mode : Bottom", "Select GrabMode", bVisible);
-				if (m_gmBtm != null) m_gmTop.RunTree(tree.GetTree("Grab Mode : Bottom", false), bVisible, true);
-			}
-
-			public override string Run()
-			{
-				string sRstCam = m_module.OpenCamera();
-				if (sRstCam != "OK")
-				{
-					return sRstCam;
-				}
-				m_module.p_bStageVac = true;
-
-				string sRst = "None";
-				sRst = GrabEdge();
-				if (sRst != "OK")
-					return sRst;
-
-				/*
-				string sRst = "None";
-				if (m_module.m_bGrabEdge)
-				{
-					sRst = GrabEdge();
-					if (sRst != "OK")
-						return sRst;
-				}
-				if (m_module.m_bGrabNotch)
-				{
-					sRst = GrabNotch();
-					if (sRst != "OK")
-						return sRst;
-					//RootTools.ImageProcess.FocusStacking FS = new RootTools.ImageProcess.FocusStacking(m_module.m_memoryNotch.p_sz);
-					//FS.SaveAll(m_module.m_memoryNotch.GetPtr());
-					// FS.Run(0, m_module.m_memoryNotch.GetPtr());
-				}
-				if (m_module.m_bGrabAreaSide)
-				{
-					sRst = GrabAreaSide();
-					if (sRst != "OK")
-						return sRst;
-				}
-				*/
-				return sRst;
-			}
-
-			private string GrabEdge()
-			{
-				Axis axisR = m_module.m_axisRotate;
-				Axis axisEdgeX = m_module.m_axisEdgeSideX;
-
-				try
-				{
-					m_gmTop.SetLight(true);
-
-					double PulsePerDegree = m_module.dPulse360 / 360;
-					double fCurr = axisR.p_posActual - axisR.p_posActual % m_module.dPulse360;
-					double fTriggerStart = fCurr + m_fStartDegree * PulsePerDegree;
-					double fTriggerDest = fTriggerStart + m_fScanDegree * PulsePerDegree;
-					int dTrigger = 1;
-					int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * dTrigger * (double)m_nScanRate / 100);
-					double fMoveStart = fTriggerStart - m_fScanAcc * nScanSpeed;   //y 축 이동 시작 지점 
-					double fMoveEnd = fTriggerDest + m_fScanAcc * nScanSpeed;  // Y 축 이동 끝 지점.
-					int nGrabCount = Convert.ToInt32(m_fScanDegree * PulsePerDegree * m_module.dTriggerratio);
-
-					axisEdgeX.StartMove(m_nSideFocusAxis);
-					if (m_module.Run(axisEdgeX.WaitReady()))
-						return p_sInfo;
-
-					if (m_module.Run(axisR.StartMove(fMoveStart)))
-						return p_sInfo;
-					if (m_module.Run(axisR.WaitReady()))
-						return p_sInfo;
-					axisR.SetTrigger(fTriggerStart, fTriggerDest, dTrigger, true);
-
-					m_gmTop.StartGrab(m_gmTop.m_memoryData, new CPoint(0, 0), nGrabCount);
-					m_gmTop.Grabed += m_gmTop_Grabed;
-					m_gmSide.StartGrab(m_gmSide.m_memoryData, new CPoint(0, 0), nGrabCount);
-					m_gmBtm.StartGrab(m_gmBtm.m_memoryData, new CPoint(0, 0), nGrabCount);
-
-					if (m_module.Run(axisR.StartMove(fMoveEnd, nScanSpeed, m_fScanAcc, m_fScanAcc)))
-						return p_sInfo;
-					if (m_module.Run(axisR.WaitReady()))
-						return p_sInfo;
-
-					/*
-					gmBevelSide.StopGrab();
-					//arr = "_focus_";
-					//k_side = 0;
-
-					//CalcAxisOffset();
-					//RearrangeArray((int)m_fScanDegree);
-					if (m_module.Run(axisR.StartMove(0)))
-						return p_sInfo;
-					if (m_module.Run(axisR.WaitReady()))
-						return p_sInfo;
-
-					axisEdgeX.StartMove((int)(m_module.EdgeXOfffset[0] * 1.7 * 10) - 26809 - 8868);
-					if (m_module.Run(axisEdgeX.WaitReady()))
-						return p_sInfo;
-
-					gmBevelSide.StartGrab(m_module.m_memoryEdgeTop, new CPoint(4000, 0), nGrabCount);
-					gmBevelSide.Grabed += gmBevelSide_Grabed;
-					if (m_module.Run(axisR.StartMove(fMoveEnd, nScanSpeed, m_fScanAcc, m_fScanAcc)))
-						return p_sInfo;
-
-					//System.IO.StreamWriter sw = new System.IO.StreamWriter(new System.IO.FileStream(@"D:\axis.txt", System.IO.FileMode.Append));
-					//sw.WriteLine(time);
-					//sw.WriteLine("index , pixel , 축 좌표");
-					int axis = 0;
-					int nAxisDiff = 0;
-					for (int i = 0; i < m_module.EdgeXOfffset.Count; i++)
-					{
-						axis = (int)(m_module.EdgeXOfffset[i] * 1.7 * 10);
-						nAxisDiff = (axis - 26809) - 8868;
-						//sw.WriteLine(i.ToString() + " , " + m_module.EdgeXOfffset[i].ToString() + " , " + nAxisDiff.ToString());
-
-						axisEdgeX.StartMove(nAxisDiff);
-						Thread.Sleep(7);
-					}
-					//sw.Close();
-
-					if (m_module.Run(axisR.WaitReady()))
-						return p_sInfo;
-					*/
-
-					axisR.RunTrigger(false);
-					m_gmTop.StopGrab();
-					m_gmSide.StopGrab();
-					m_gmBtm.StopGrab();
-					m_gmTop.SetLight(false);
-
-					return "OK";
-				}
-				finally
-				{
-					axisR.RunTrigger(false);
-					m_gmTop.SetLight(false);
-				}
-			}
-
-			private void m_gmTop_Grabed(object sender, EventArgs e)
-			{
-				GrabedArgs ga = (GrabedArgs)e;
-				int memW = Convert.ToInt32(ga.mdMemoryData.W);
-				int memH = ga.mdMemoryData.p_sz.Y;
-
-				IntPtr ptrSrc = (IntPtr)((long)ga.mdMemoryData.GetPtr() + ga.rtRoi.Left + ((long)memW * ga.rtRoi.Top));
-
-				int nSobelSize = m_nSobelHeight;
-				byte[] arrSrc = new byte[nSobelSize * memW];
-				byte[] arrDst = new byte[nSobelSize * memW];
-				Marshal.Copy(arrSrc, (memH / 2 - nSobelSize) * memW , ptrSrc, (memW * nSobelSize * 2));
-
-				int nDerivativeX = 1;
-				int nDerivativeY = 0;
-				int nKernelSize = 5;
-				int nScale = 1;
-				int nDelta = 1;
-
-				CLR_IP.Cpp_SobelEdgeDetection(arrSrc, arrDst, memW, memH, nDerivativeX, nDerivativeY, nKernelSize, nScale, nDelta);
-				
-				object o = new object();
-				List<int> edgeDetect = new List<int>();
-				edgeDetect.Clear();
-				System.Threading.Tasks.Parallel.For(0, (nSobelSize * 2), i =>
-				{
-					//lock (o)
-					//{
-						CalcSobelEdge(arrDst, memW, i, edgeDetect);
-					//}
-				});
-
-				if (edgeDetect.Count == 0 
-					|| edgeDetect.Average() == 0 
-					|| edgeDetect.Average() > 100)
-					return;
-
-				m_module.m_axisEdgeSideX.StartMove((int)(edgeDetect.Average() * m_nSideCamResoultion * 10) - m_nSideFocusAxis);
-				if (m_module.Run(m_module.m_axisEdgeSideX.WaitReady()))
-					return;
-			}
-
-			public void CalcSobelEdge(byte[] arrSobel, int nWidth, int nHeight, List<int> edgeDetect)
-			{
-				for (int i = 0; i < nWidth; i++)
-				{
-					if (arrSobel[i + (i * nHeight)] > m_nSobelThreshold)
-					{
-						int nGVCnt = 0;
-						int nStartGV = i;
-						while (arrSobel[i + (i * nHeight)] > m_nSobelThreshold)
-						{
-							nGVCnt++;
-							i++;
-						}
-						if (nGVCnt > m_nSobelCnt)
-						{
-							edgeDetect.Add(nStartGV);
-							break;
-						}
-					}
-				}
-			}
-
-			/*
-            public void CalcAxisOffset()
-            {
-                m_module.EdgeXOfffset.Clear();
-                for (int n = 0; n < k_top; n++)
-                {
-                    String path = n.ToString() + ".bmp";
-                    Emgu.CV.Mat matSrc = new Mat(@"D:\slot7\top\" + time + "_" + path, Emgu.CV.CvEnum.ImreadModes.Grayscale);
-                    Emgu.CV.Mat matSobel = new Mat();
-                    Emgu.CV.Mat matAbsGradX = new Mat();
-
-                    int nScale = 1;
-                    int nDelta = 1;
-                    MCvScalar color = new MCvScalar(20, 100, 100);
-
-                    Emgu.CV.CvInvoke.Sobel(matSrc, matSobel, Emgu.CV.CvEnum.DepthType.Cv8U, 1, 0, 5, nScale, nDelta, Emgu.CV.CvEnum.BorderType.Default);
-                    Emgu.CV.CvInvoke.ConvertScaleAbs(matSobel, matAbsGradX, nScale, nDelta);
-
-                    byte[] arrSobel = matAbsGradX.GetRawData();
-
-                    List<int> listPixelX = new List<int>();
-                    List<Rectangle> listRect = new List<Rectangle>();
-                    for (int j = 0; j < matAbsGradX.Height; j += 5)
-                    {
-                        for (int i = 0; i < matAbsGradX.Width; i++)
-                        {
-                            if (arrSobel[(j * matAbsGradX.Width) + i] > 90)
-                            {
-                                int nGVCnt = 0;
-                                int nStartGV = i;
-                                while (arrSobel[(j * matAbsGradX.Width) + i] > 90)
-                                {
-                                    nGVCnt++;
-                                    i++;
-                                }
-                                if (nGVCnt > 10)
-                                {
-                                    listPixelX.Add(nStartGV);
-                                    listRect.Add(new Rectangle(nStartGV, j, i - nStartGV, 30));
-                                    //Emgu.CV.CvInvoke.Rectangle(matAbsGradX, new Rectangle(nStartGV, k, i - nStartGV, 30), color);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    int nStartGVAvg = 0;
-                    if (listPixelX.Count != 0)
-                        nStartGVAvg = (int)listPixelX.Average();
-
-                    int nLTAvg = 0;
-                    int nWidthAvg = 0;
-                    if (listRect.Count != 0)
-                    {
-                        nLTAvg = (int)listRect.Average(x => x.Left);
-                        nWidthAvg = (int)listRect.Average(x => x.Width);
-                        Emgu.CV.CvInvoke.Rectangle(matAbsGradX, new Rectangle(nLTAvg, 0, nWidthAvg, matAbsGradX.Height), color);
-                        matAbsGradX.Save(@"D:\slot7\sobel\" + time + "_" + path);
-                    }
-
-                    if (nStartGVAvg <= 0)
-                        m_module.EdgeXOfffset.Add(0);
-                    else
-                        m_module.EdgeXOfffset.Add(nStartGVAvg);
-                }
-
-                // 앞에 이미지 없는거 처리
-                for (int i = 0; i < 4; i++)
-                {
-                    m_module.EdgeXOfffset[i] = m_module.EdgeXOfffset[4];
-                }
-            }
-
-            string time = DateTime.Now.ToString("HH-mm-ss");
-            public void RearrangeArray(int degree)
-            {
-                if (m_module.EdgeXOfffset.Count == 0)
-                    return;
-
-                try
-                {
-                    System.IO.StreamWriter sw = new System.IO.StreamWriter(new System.IO.FileStream(@"D:\axis_top.txt", System.IO.FileMode.Append));
-                    sw.WriteLine(time);
-                    sw.WriteLine("index , top rect left");
-                    for (int i = 0; i < m_module.EdgeXOfffset.Count; i++)
-                    {
-                        sw.WriteLine(i.ToString() + " , " + m_module.EdgeXOfffset[i].ToString());
-                    }
-                    sw.Close();
-
-                    int nExtraDegree = degree - 360;
-                    int nCntPer45Degree = m_module.EdgeXOfffset.Count * 45 / degree;
-                    int nCntExtraAdd = m_module.EdgeXOfffset.Count * nExtraDegree / degree;
-
-                    List<int> insertList = new List<int>();
-                    for (int i = m_module.EdgeXOfffset.Count - nCntPer45Degree - nCntExtraAdd; i < m_module.EdgeXOfffset.Count - nCntPer45Degree; i++)
-                    {
-                        insertList.Add(m_module.EdgeXOfffset[i]);
-                    }
-                    for (int i = 0; i < m_module.EdgeXOfffset.Count - nCntExtraAdd; i++)
-                    {
-                        insertList.Add(m_module.EdgeXOfffset[i]);
-                    }
-
-                    m_module.EdgeXOfffset.Clear();
-                    m_module.EdgeXOfffset = insertList;
-
-                    for (int i = 1; i < m_module.EdgeXOfffset.Count; i++)
-                    {
-                        if (Math.Abs(m_module.EdgeXOfffset[i - 1] - m_module.EdgeXOfffset[i]) > 2000)
-                            m_module.EdgeXOfffset[i] = m_module.EdgeXOfffset[i - 1];
-                    }
-                }
-                catch
-                {
-
-                }
-            }
-            */
+			ImageData result = new ImageData(memoryPool.GetMemory(p_id, data.ToString()));
+			return result;
 		}
-
+		#endregion
+		/* TO-DO 옮길거임
 		public class Run_GrabNotch : ModuleRunBase
 		{
 			EdgeSideVision m_module;
@@ -949,7 +498,6 @@ namespace Root_WIND2.Module
 
 			private string GrabNotch()
 			{
-				/*
 				Axis axisR = m_module.m_axisRotate;
 				AxisXY axisXZ = m_module.m_axisXZ;
 
@@ -989,7 +537,7 @@ namespace Root_WIND2.Module
 				MoveStackPos(m_nPosOffsetEdge2Side + m_nPosOffsetSide2Bottom - m_nStackStepRBottom, "Position_2");
 				StackProc(axisXZ.p_axisY, gmBottom, m_module.m_memoryNotch, new CPoint(m_module.nBaslerX * 8, 0), m_nStackStepBottom, m_nStackRangeBottom, m_fResAxisBottom, m_nStackSpeedBottom, m_fScanAccBottom);
 				gmBottom.SetLight(false);
-				*/
+				
 				return "OK";
 			}
 
@@ -1036,10 +584,10 @@ namespace Root_WIND2.Module
 
 			private string MoveStackPos(int nR, string strXY, int nOffsetX = 0)
 			{
-				Axis axisR = m_module.m_axisRotate;
-				AxisXY axisXZ = m_module.m_axisXZ;
+				Axis axisR = m_module.axisRotate;
+				AxisXY axisXZ = m_module.axisXZ;
 
-				double fCurrR = axisR.p_posActual - axisR.p_posActual % m_module.dPulse360;
+				double fCurrR = axisR.p_posActual - axisR.p_posActual % m_module.pulse360;
 
 				if (m_module.Run(axisXZ.p_axisY.StartMove(strXY)))
 					return p_sInfo;
@@ -1125,7 +673,6 @@ namespace Root_WIND2.Module
 
 			private string GrabAreaSide()
 			{
-				/*
 				Axis axisR = m_module.m_axisRotate;
 				AxisXY axisXZ = m_module.m_axisXZ;
 				GrabMode gmTop = m_module.GetGrabMode("NotchTop");
@@ -1163,204 +710,9 @@ namespace Root_WIND2.Module
 				gmSide.StopGrab();
 
 				gmSide.SetLight(false);
-				*/
-				return "OK";
-
-			}
-		}
-
-		public class Run_Delay : ModuleRunBase
-		{
-			EdgeSideVision m_module;
-
-			public Run_Delay(EdgeSideVision module)
-			{
-				m_module = module;
-				InitModuleRun(module);
-			}
-
-			public override ModuleRunBase Clone()
-			{
-				Run_Delay run = new Run_Delay(m_module);
-				return run;
-			}
-
-			public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-			{
-			}
-
-			public override string Run()
-			{
 				return "OK";
 			}
 		}
-
-		public class Run_Rotate : ModuleRunBase
-		{
-			EdgeSideVision m_module;
-			public Run_Rotate(EdgeSideVision module)
-			{
-				m_module = module;
-				InitModuleRun(module);
-			}
-
-			double m_fDeg = 0;
-			public override ModuleRunBase Clone()
-			{
-				Run_Rotate run = new Run_Rotate(m_module);
-				run.m_fDeg = m_fDeg;
-				return run;
-			}
-
-			public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-			{
-				m_fDeg = tree.Set(m_fDeg, m_fDeg, "Degree", "Rotation Degree (0 ~ 360)", bVisible);
-			}
-
-			public override string Run()
-			{
-				int pulseRound = m_module.m_pulseRound;
-				Axis axis = m_module.m_axisRotate;
-				int pulse = (int)Math.Round(m_module.m_pulseRound * m_fDeg / 360);
-				while (pulse < axis.p_posCommand)
-					pulse += pulseRound;
-				{
-					axis.p_posCommand -= pulseRound;
-					axis.p_posActual -= pulseRound;
-				}
-				if (m_module.Run(axis.StartMove(pulse)))
-					return p_sInfo;
-				return axis.WaitReady();
-			}
-		}
-
-
-		public class Run_GrabEBR : ModuleRunBase
-		{
-			EdgeSideVision m_module;
-			public GrabMode m_gmEBR = null;
-			string _sGrabModeEBR= "";
-			string p_sGrabModeEBR
-			{
-				get
-				{
-					return _sGrabModeEBR;
-				}
-				set
-				{
-					_sGrabModeEBR = value;
-					m_gmEBR= m_module.GetGrabMode(value);
-				}
-			}
-
-			public double m_fRes = 1.7; // 단위 um
-			public double m_fStartDegree = 0;
-			public double m_fScanDegree = 360;
-			public int m_nScanRate = 100;   // Camera Frame Spec 사용률 ? 1~100 %
-			public double m_fScanAcc = 0.1; //sec
-			public int m_nMaxFrame = 100;
-			public int m_nSideFocusAxis = 26809;
-			public double m_nSideCamResoultion = 1.7;
-
-			public Run_GrabEBR(EdgeSideVision module)
-			{
-				m_module = module;
-				InitModuleRun(module);
-			}
-
-			public override ModuleRunBase Clone()
-			{
-				Run_GrabEBR run = new Run_GrabEBR(m_module);
-				run.p_sGrabModeEBR = p_sGrabModeEBR;
-				run.m_fRes = m_fRes;
-				run.m_fStartDegree = m_fStartDegree;
-				run.m_fScanDegree = m_fScanDegree;
-				run.m_nScanRate = m_nScanRate;
-				run.m_fScanAcc = m_fScanAcc;
-				run.m_nMaxFrame = m_nMaxFrame;
-				run.m_nSideFocusAxis = m_nSideFocusAxis;
-				run.m_nSideCamResoultion = m_nSideCamResoultion;
-				return run;
-			}
-
-			public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-			{
-				m_fStartDegree = tree.Set(m_fStartDegree, m_fStartDegree, "Start Angle", "Degree", bVisible);
-				m_fScanDegree = tree.Set(m_fScanDegree, m_fScanDegree, "Scan Angle", "Degree", bVisible);
-				m_nScanRate = tree.Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100%", bVisible);
-				m_nMaxFrame = tree.Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
-				m_fScanAcc = tree.Set(m_fScanAcc, m_fScanAcc, "Scan Acc", "스캔 축 가속도 (sec)", bVisible);
-
-				m_nSideFocusAxis = (tree.GetTree("Side Focus", false, bVisible)).Set(m_nSideFocusAxis, m_nSideFocusAxis, "Side Focus Axis", "Side 카메라 Focus 축 값", bVisible);
-				m_nSideCamResoultion = (tree.GetTree("Side Focus", false, bVisible)).Set(m_nSideCamResoultion, m_nSideCamResoultion, "Side Cam Resolution", "Side 카메라 해상도", bVisible);
-				
-				p_sGrabModeEBR = tree.Set(p_sGrabModeEBR, p_sGrabModeEBR, m_module.p_asGrabMode, "Grab Mode : EBR", "Select GrabMode", bVisible);
-				if (m_gmEBR != null)
-					m_gmEBR.RunTree(tree.GetTree("Grab Mode : Top", false), bVisible, true);
-			}
-
-			public override string Run()
-			{
-				string sRstCam = m_module.OpenCamera();
-				if (sRstCam != "OK")
-				{
-					return sRstCam;
-				}
-				m_module.p_bStageVac = true;
-
-				string sRst = "None";
-				sRst = GrabEBR();
-				if (sRst != "OK")
-					return sRst;
-				return sRst;
-			}
-
-			private string GrabEBR()
-			{
-				Axis axisR = m_module.m_axisRotate;
-				Axis axisEdgeX = m_module.m_axisEdgeSideX;
-
-				try
-				{
-					m_gmEBR.SetLight(true);
-
-					double PulsePerDegree = m_module.dPulse360 / 360;
-					double fCurr = axisR.p_posActual - axisR.p_posActual % m_module.dPulse360;
-					double fTriggerStart = fCurr + m_fStartDegree * PulsePerDegree;
-					double fTriggerDest = fTriggerStart + m_fScanDegree * PulsePerDegree;
-					int dTrigger = 1;
-					int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * dTrigger * (double)m_nScanRate / 100);
-					double fMoveStart = fTriggerStart - m_fScanAcc * nScanSpeed;   //y 축 이동 시작 지점 
-					double fMoveEnd = fTriggerDest + m_fScanAcc * nScanSpeed;  // Y 축 이동 끝 지점.
-					int nGrabCount = Convert.ToInt32(m_fScanDegree * PulsePerDegree * m_module.dTriggerratio);
-
-					axisEdgeX.StartMove(m_nSideFocusAxis);
-					if (m_module.Run(axisEdgeX.WaitReady()))
-						return p_sInfo;
-
-					if (m_module.Run(axisR.StartMove(fMoveStart)))
-						return p_sInfo;
-					if (m_module.Run(axisR.WaitReady()))
-						return p_sInfo;
-					axisR.SetTrigger(fTriggerStart, fTriggerDest, dTrigger, true);
-
-					m_gmEBR.StartGrab(m_gmEBR.m_memoryData, new CPoint(0, 0), nGrabCount);
-					
-					if (m_module.Run(axisR.StartMove(fMoveEnd, nScanSpeed, m_fScanAcc, m_fScanAcc)))
-						return p_sInfo;
-					if (m_module.Run(axisR.WaitReady()))
-						return p_sInfo;
-					return "OK";
-				}
-				finally
-				{
-					m_gmEBR.SetLight(false);
-					axisR.RunTrigger(false);
-					m_gmEBR.StopGrab();
-				}
-			}
-		}
-		#endregion
-
+		*/
 	}
 }
