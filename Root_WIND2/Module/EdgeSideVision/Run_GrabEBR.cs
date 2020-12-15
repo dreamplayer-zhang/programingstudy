@@ -42,6 +42,7 @@ namespace Root_WIND2.Module
 		double scanAcc = 0.1;       // sec
 		int scanRate = 100;         // Camera Frame Spec 사용률 ? 1~100 %
 		int maxFrame = 100;
+		//double triggerRatio = 1.5;
 
 		public override ModuleRunBase Clone()
 		{
@@ -54,6 +55,7 @@ namespace Root_WIND2.Module
 			run.scanAcc = scanAcc;
 			run.scanRate = scanRate;
 			run.maxFrame = maxFrame;
+			//run.triggerRatio = triggerRatio;
 			return run;
 		}
 
@@ -100,9 +102,10 @@ namespace Root_WIND2.Module
 				double triggerDest = triggerStart + (scanDegree * pulsePerDegree);
 
 				int trigger = 1;
-				int scanSpeed = 5000;//Convert.ToInt32((double)m_nMaxFrame * trigger * (double)m_nScanRate / 100);
-				double moveStart = triggerStart - scanAcc * scanSpeed;   //y 축 이동 시작 지점 
-				double moveEnd = triggerDest + scanAcc * scanSpeed;  // Y 축 이동 끝 지점.
+				int scanSpeed = 5000;
+				//int scanSpeed = Convert.ToInt32((double)maxFrame * trigger * (double)scanRate / 100);
+				double moveStart = triggerStart - scanAcc * scanSpeed;   // y축 이동 시작 지점 
+				double moveEnd = triggerDest + scanAcc * scanSpeed;  // y축 이동 끝 지점
 				int grabCount = Convert.ToInt32(scanDegree * pulsePerDegree * module.TriggerRatio);
 
 				if (module.Run(axisR.StartMove(moveStart)))

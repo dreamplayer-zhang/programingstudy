@@ -76,8 +76,8 @@ namespace Root_WIND2.Module
 			p_sInfo = m_toolBox.Get(ref camEdgeTop, this, "Cam EdgeTop");
 			p_sInfo = m_toolBox.Get(ref camEdgeSide, this, "Cam EdgeSide");
 			p_sInfo = m_toolBox.Get(ref camEdgeBtm, this, "Cam EdgeBottom");
-			p_sInfo = m_toolBox.Get(ref camEBR, this, "Cam EBR");
-			p_sInfo = m_toolBox.Get(ref lightSet, this);
+            p_sInfo = m_toolBox.Get(ref camEBR, this, "Cam EBR");
+            p_sInfo = m_toolBox.Get(ref lightSet, this);
 			memoryGroup = memoryPool.GetGroup(p_id);
 		}
 		#endregion

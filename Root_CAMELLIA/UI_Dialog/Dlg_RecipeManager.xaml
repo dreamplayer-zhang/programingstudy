@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Control.Icon"
         xmlns:cp="clr-namespace:ColorPickerLib.Controls;assembly=ColorPickerLib"
+        xmlns:data="clr-namespace:Root_CAMELLIA.Data"
         WindowStyle="None"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
@@ -159,16 +160,66 @@
                             <RowDefinition Height="1.0*"/>
                             <RowDefinition Height="0.3*"/>
                         </Grid.RowDefinitions>
-                        <DataGrid Margin="2">
+                        <DataGrid Margin="2" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding GridLayerData}" SelectedIndex="{Binding GridLayerIndex}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="" Width="*"/>
-                                <DataGridTextColumn Header="Host" Width="*"/>
-                                <DataGridTextColumn Header="Guest1" Width="*"/>
-                                <DataGridTextColumn Header="fv1" Width="*"/>
-                                <DataGridCheckBoxColumn Header="fit" Width="*"/>
-                                <DataGridTextColumn Header="Guest2" Width="*"/>
-                                <DataGridTextColumn Header="fv2" Width="*"/>
-                                <DataGridCheckBoxColumn Header="fit" Width="*"/>
+                                <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True"/>
+                                <DataGridComboBoxColumn Header="Host" Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}">
+                                    <DataGridComboBoxColumn.ElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Setter Property="IsReadOnly" Value="True"/>
+                                        </Style>
+                                    </DataGridComboBoxColumn.ElementStyle>
+                                    <DataGridComboBoxColumn.EditingElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </Style>
+                                    </DataGridComboBoxColumn.EditingElementStyle>
+                                </DataGridComboBoxColumn>
+                                <DataGridComboBoxColumn Header="Guest1" Width="*"  SelectedValueBinding="{Binding SelectedGuest1, UpdateSourceTrigger=PropertyChanged}">
+                                    <DataGridComboBoxColumn.ElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Setter Property="IsReadOnly" Value="True"/>
+                                        </Style>
+                                    </DataGridComboBoxColumn.ElementStyle>
+                                    <DataGridComboBoxColumn.EditingElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </Style>
+                                    </DataGridComboBoxColumn.EditingElementStyle>
+                                </DataGridComboBoxColumn>
+                                <DataGridTextColumn Header="fv1" Width="40" Binding="{Binding Fv1, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <DataGridCheckBoxColumn Header="fit" Width="25" Binding="{Binding Fv1Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <DataGridComboBoxColumn Header="Guest2" Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}">
+                                    <DataGridComboBoxColumn.ElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Setter Property="IsReadOnly" Value="True"/>
+                                        </Style>
+                                    </DataGridComboBoxColumn.ElementStyle>
+                                    <DataGridComboBoxColumn.EditingElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </Style>
+                                    </DataGridComboBoxColumn.EditingElementStyle>
+                                </DataGridComboBoxColumn>
+                                <DataGridTextColumn Header="fv2" Width="40" Binding="{Binding Fv2, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <DataGridCheckBoxColumn Header="fit" Width="25" Binding="{Binding Fv2Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                <DataGridComboBoxColumn Header="Emm" Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
+                                    <DataGridComboBoxColumn.ElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Setter Property="IsReadOnly" Value="True"/>
+                                        </Style>
+                                    </DataGridComboBoxColumn.ElementStyle>
+                                    <DataGridComboBoxColumn.EditingElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </Style>
+                                    </DataGridComboBoxColumn.EditingElementStyle>
+                                </DataGridComboBoxColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                         <Grid Grid.Row="1">
@@ -188,7 +239,7 @@
                                     <RowDefinition/>
                                     <RowDefinition Height="30"/>
                                 </Grid.RowDefinitions>
-                                <ListView SelectionMode="Single" x:Name="MaterialListView" ItemsSource="{Binding MaterialListItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="2" Grid.RowSpan="2" Grid.ColumnSpan="2" SelectedItem="{Binding ReflectanceListItem, RelativeSource={RelativeSource AncestorType=Window}}" SelectedIndex="{Binding MatarialSelectIndex}" >
+                                <ListView SelectionMode="Single" x:Name="MaterialListView" ItemsSource="{Binding MaterialListItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="2" Grid.RowSpan="2" Grid.ColumnSpan="2" SelectedIndex="{Binding MaterialSelectIndex}" >
                                     <ListView.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <WrapPanel/>
@@ -197,14 +248,13 @@
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
                                             <DockPanel Background="Transparent">
-                                                <TextBlock Width="55" DockPanel.Dock="Bottom" Text="{Binding Converter={StaticResource PathConverter}}" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                <TextBlock Width="50" DockPanel.Dock="Bottom" Text="{Binding Converter={StaticResource PathConverter}}" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 <Image Width="30" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" Source="{Binding Converter={StaticResource ImageConverter}}" RenderTransformOrigin="0.5, 0.5"></Image>
                                             </DockPanel>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
                                     <ListView.ItemContainerStyle>
                                         <Style TargetType="ListViewItem">
-                                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
                                             <Setter Property="Margin" Value="5,5,5,5"/>
                                             <Setter Property="Padding" Value="0,0,0,0"/>
                                             <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -566,8 +616,8 @@
                             <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                             <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                         </UniformGrid>
-                        <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True">
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True" 
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Index" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
                                 <DataGridTextColumn Header="X (mm)" Width="*" Binding="{Binding ListX}" IsReadOnly="True"/>

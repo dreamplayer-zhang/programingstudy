@@ -1,4 +1,6 @@
-﻿namespace RootTools
+﻿using RootTools.Module;
+
+namespace RootTools
 {
     public interface IHandler
     {
@@ -13,5 +15,7 @@
         void CheckFinish();
 
         dynamic GetGemSlot(string sSlot);
+
+        ModuleList p_moduleList { get; set; }
     }
 }

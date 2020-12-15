@@ -11,6 +11,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using RootTools.Camera;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
 
 namespace Root_WIND2.Module
 {
@@ -134,6 +137,8 @@ namespace Root_WIND2.Module
             Thread.Sleep(200);
             if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == eCamState.Init)
                 m_CamMain.Connect();
+            if (m_CamLADS != null)
+                m_CamLADS.Connect();
 
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
@@ -154,6 +159,7 @@ namespace Root_WIND2.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Grab(this), false, "Run Grab");
+            AddModuleRunList(new Run_LADS(this), false, "Run LADS");
         }
         #endregion
 
@@ -166,7 +172,6 @@ namespace Root_WIND2.Module
         public class Run_Grab : ModuleRunBase
         {
             BackSideVision m_module;
-            Camera_Silicon m_CamLADS;
 
             // Member
             public RPoint m_rpAxisCenter = new RPoint();    // Wafer Center Position
@@ -192,7 +197,6 @@ namespace Root_WIND2.Module
             public Run_Grab(BackSideVision module)
             {
                 m_module = module;
-                m_CamLADS = m_module.m_CamLADS;
                 InitModuleRun(module);
             }
 
@@ -208,7 +212,6 @@ namespace Root_WIND2.Module
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanRate = m_nScanRate;
                 run.p_sGrabMode = p_sGrabMode;
-                run.m_CamLADS = m_CamLADS;
                 return run;
             }
 
@@ -300,6 +303,197 @@ namespace Root_WIND2.Module
                 {
                     m_grabMode.SetLight(false);
                 }
+            }
+        }
+
+        public class Run_LADS : ModuleRunBase
+        {
+            BackSideVision m_module;
+
+            // Member
+            public RPoint m_rpAxisCenter = new RPoint();    // Wafer Center Position
+            public CPoint m_cpMemoryOffset = new CPoint();  // Memory Offset
+            public double m_dResX_um = 1;                   // Camera Resolution X
+            public double m_dResY_um = 1;                   // Camera Resolution Y
+            public int m_nFocusPosZ = 0;                    // Focus Position Z
+            public int m_nWaferSize_mm = 1000;              // Wafer Size (mm)
+            public int m_nMaxFrame = 100;                   // Camera max Frame 스펙
+            public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
+            public GrabMode m_grabMode = null;
+            string m_sGrabMode = "";
+            private int[,] m_Heightinfo;
+
+            public string p_sGrabMode
+            {
+                get { return m_sGrabMode; }
+                set
+                {
+                    m_sGrabMode = value;
+                    m_grabMode = m_module.GetGrabMode(value);
+                }
+            }
+
+            public Run_LADS(BackSideVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_LADS run = new Run_LADS(m_module);
+                run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
+                run.m_cpMemoryOffset = new CPoint(m_cpMemoryOffset);
+                run.m_dResX_um = m_dResX_um;
+                run.m_dResY_um = m_dResY_um;
+                run.m_nFocusPosZ = m_nFocusPosZ;
+                run.m_nWaferSize_mm = m_nWaferSize_mm;
+                run.m_nMaxFrame = m_nMaxFrame;
+                run.m_nScanRate = m_nScanRate;
+                run.p_sGrabMode = p_sGrabMode;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
+                m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
+                m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam X Resolution", "X Resolution (um)", bVisible);
+                m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Y Resolution", "Y Resolution (um)", bVisible);
+                m_nFocusPosZ = tree.Set(m_nFocusPosZ, m_nFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
+                m_nWaferSize_mm = tree.Set(m_nWaferSize_mm, m_nWaferSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
+                m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
+                m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+                p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+                if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
+            }
+
+            public override string Run()
+            {
+                if (m_grabMode == null) return "Grab Mode == null";
+
+                try
+                {
+                    m_grabMode.SetLight(true);
+
+                    AxisXY axisXY = m_module.m_axisXY;
+                    Axis axisZ = m_module.m_axisZ;
+                    CPoint cpMemoryOffset = new CPoint(m_cpMemoryOffset);
+                    int nScanLine = 0;
+                    int nMMPerUM = 1000;
+                    int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
+                    int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+
+                    double dXScale = m_dResX_um * 10;
+                    cpMemoryOffset.X += (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth;
+                    m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
+                    int nWaferSizeY_px = Convert.ToInt32(m_nWaferSize_mm * nMMPerUM / m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
+                    int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
+                    int nScanOffset_pulse = 10000;
+                    m_Heightinfo = new int[nWaferSizeY_px / nCamHeight, nWaferSizeY_px / nCamWidth];
+
+
+                    while (m_grabMode.m_ScanLineNum > nScanLine)
+                    {
+                        if (EQ.IsStop())
+                            return "OK";
+
+                        double dStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
+                        double dEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
+
+                        m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
+
+
+                        double dPosX = m_rpAxisCenter.X - nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2
+                            + (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth * dXScale;
+
+                        if (m_module.Run(axisZ.StartMove(m_nFocusPosZ)))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady()))
+                            return p_sInfo;
+                        if (m_module.Run(axisZ.WaitReady()))
+                            return p_sInfo;
+
+                        double dTriggerStartPosY = m_rpAxisCenter.Y - nTotalTriggerCount / 2;
+                        double dTriggerEndPosY = m_rpAxisCenter.Y + nTotalTriggerCount / 2;
+                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
+
+                        string strPool = m_grabMode.m_memoryPool.p_id;
+                        string strGroup = m_grabMode.m_memoryGroup.p_id;
+                        string strMemory = m_grabMode.m_memoryData.p_id;
+
+                        MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                        int nScanSpeed = Convert.ToInt32((double)m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_nScanRate / 100);
+                        m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_eGrabDirection == eGrabDirection.BackWard);
+
+                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady()))
+                            return p_sInfo;
+                        axisXY.p_axisY.RunTrigger(false);
+
+                        //CalculateHeight(nScanSpeed, mem, nWaferSizeY_px);
+                        nScanLine++;
+                        cpMemoryOffset.X += nCamWidth;
+                    }
+                    m_grabMode.m_camera.StopGrab();
+
+                    //SaveFocusMapImage(nWaferSizeY_px / nCamWidth, nWaferSizeY_px / nCamHeight);
+                    return "OK";
+                }
+                finally
+                {
+                    m_grabMode.SetLight(false);
+                }
+            }
+            unsafe void CalculateHeight(int nCurLine, MemoryData mem, int ReticleHeight)
+            {
+                int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
+                int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+                int nHeight = ReticleHeight / nCamHeight;
+                byte* ptr = (byte*)mem.GetPtr().ToPointer(); //Gray
+                for (int i = 0; i < nHeight; i++)
+                {
+                    int s = 0, e = 0, cur = 0; //레이저 시작, 끝위치 정보
+                    //탐색시작 y지점
+                    int nY = i * nCamHeight;
+                    for (int j = 0; j < nCamHeight; j++)
+                    {
+                        if (ptr[(int)((nY + j) * mem.W + nCamWidth * (nCurLine + 0.5))] > 230)
+                        {
+                            e = Math.Max(e, cur);
+                            s = Math.Min(s, cur);
+                        }
+                    }
+                    m_Heightinfo[i, nCurLine] = (s + e) / 2;
+                }
+            }
+            private void SaveFocusMapImage(int nX, int nY)
+            {
+                int thumsize = 30;
+                int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+                Mat ResultMat = new Mat();
+                for (int y = 0; y < nY; y++)
+                {
+                    Mat Vmat = new Mat();
+                    for (int x = 0; x < nX; x++)
+                    {
+                        Mat ColorImg = new Mat(thumsize, thumsize, DepthType.Cv8U, 1);
+                        int nScalednum = m_Heightinfo[nY, nX] * 255 / nCamHeight;
+                        ColorImg.SetTo(new MCvScalar(nScalednum));
+                        if (y == 0 && x == 0)
+                            Vmat = ColorImg;
+                        else
+                            CvInvoke.VConcat(ColorImg, Vmat, Vmat);
+                    }
+                    if (y == 0)
+                        ResultMat = Vmat;
+                    else
+                        CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
+                }
+                CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
             }
         }
     }

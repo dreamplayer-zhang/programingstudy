@@ -201,6 +201,8 @@ namespace Root_WIND2
         }
         public void ChangeMasterImage(int dieX, int dieY)
         {
+            if (this.Map.Length == 0) return;
+
             if(this.Map[this.MapSize.X * dieY + dieX] != (int)CHIP_TYPE.NO_CHIP)
             {
                 p_MapItems[this.MapSize.Y * m_Recipe.WaferMap.MasterDieX + m_Recipe.WaferMap.MasterDieY].Background = Brushes.Green;

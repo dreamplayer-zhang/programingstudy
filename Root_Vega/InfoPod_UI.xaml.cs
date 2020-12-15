@@ -48,5 +48,11 @@ namespace Root_Vega
             m_infoPod.StartProcess();
             m_infoPod.RunTreeReticle(Tree.eMode.Init);
         }
+
+        private void buttonRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            m_infoPod.RunTreeReticle(Tree.eMode.Init);
+            m_infoPod.RunTree(Tree.eMode.Init);
+        }
     }
 }

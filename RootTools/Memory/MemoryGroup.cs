@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace RootTools.Memory
 {
@@ -66,7 +67,13 @@ namespace RootTools.Memory
             if (memory != null) DeleteMemory(id); 
             memory = new MemoryData(this, id, nCount, nByte, xSize, ySize, ref _mbOffset);
             p_mbOffset = _mbOffset;
-            if (p_mbOffset > mbPool) m_log.Error("Memory Size Overrun"); 
+            if (p_mbOffset > mbPool)
+            {
+                //MessageBox.Show("Memory Pool Size Error\n ID : " + id
+                //    + "  AllocMemory : " + (int)Math.Ceiling((double)mbPool / 1000)
+                //    + "[GB]  Required Memory : " + (int)Math.Ceiling((double)p_mbOffset / 1000 + 1) + "[GB]");
+                m_log.Error("Memory Size Overrun");
+            }
             p_aMemory.Add(memory);
             m_pool.RunTree(Tree.eMode.RegRead);
             m_pool.RunTree(Tree.eMode.Init); 
