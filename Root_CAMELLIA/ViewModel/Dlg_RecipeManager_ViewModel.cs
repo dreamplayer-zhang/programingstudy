@@ -38,6 +38,8 @@ namespace Root_CAMELLIA
             SetSelectRect();
             SetStage(true);
             SetViewRect();
+            InitLayer();
+            //InitLayerGrid();
         }
         public void Init()
         {
@@ -82,7 +84,6 @@ namespace Root_CAMELLIA
             timer.Tick += new EventHandler(MouseHover);          //이벤트 추가
 
             timer.Start();
-
         }
 
         #region Collection Stage Canvas 
@@ -157,6 +158,7 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Property
+
         public double RatioX
         {
             get; set;
@@ -512,6 +514,22 @@ namespace Root_CAMELLIA
 
         private ObservableCollection<string> _SelectedModels = new ObservableCollection<string>();
 
+        public ObservableCollection<ModelData.LayerData> GridLayerData
+        {
+            get
+            {
+                return _GridLayerData;
+            }
+            set
+            {
+                _GridLayerData = value;
+                SetProperty(ref _GridLayerData, value);
+            }
+        }
+
+        private ObservableCollection<ModelData.LayerData> _GridLayerData = new ObservableCollection<ModelData.LayerData>();
+
+
 
         public string PointAddMode
         {
@@ -704,17 +722,31 @@ namespace Root_CAMELLIA
             }
         }
 
-        private int _MatarialSelectIndex = -1;
-        public int MatarialSelectIndex
+        private int _MaterialSelectIndex = -1;
+        public int MaterialSelectIndex
         {
             get
             {
-                return _MatarialSelectIndex;
+                return _MaterialSelectIndex;
             }
             set
             {
-                _MatarialSelectIndex = value;
-                RaisePropertyChanged("MatarialSelectIndex");
+                _MaterialSelectIndex = value;
+                RaisePropertyChanged("MaterialSelectIndex");
+            }
+        }
+
+        private int _GridLayerIndex = -1;
+        public int GridLayerIndex
+        {
+            get
+            {
+                return _GridLayerIndex;
+            }
+            set
+            {
+                _GridLayerIndex = value;
+                RaisePropertyChanged("GridLayerIndex");
             }
         }
         #endregion
@@ -758,6 +790,7 @@ namespace Root_CAMELLIA
         ShapeManager dataPoint;
         ShapeManager dataRoute;
         GeometryManager selectRectangle;
+        System.Windows.Controls.Image LockImage = new System.Windows.Controls.Image();
         #endregion
 
         #region RouteOrder        
@@ -1596,6 +1629,24 @@ namespace Root_CAMELLIA
 
             index++;
 
+
+            CustomRectangleGeometry lockRect = Geometry[index] as CustomRectangleGeometry;
+
+            Rect shadeRect;
+            if (IsLockUI)
+            {
+                shadeRect = new Rect(0, 0, 1000, 1000);
+            }
+            else
+            {
+                shadeRect = new Rect(0, 0, 0, 0);
+            }
+            lockRect.SetData(shadeRect, 100);
+            Geometry[index] = lockRect;
+            index++;
+
+
+
             int shapeIndex = 0;
             for (int i = 0; i < dataManager.recipeDM.TeachingRD.DataCandidatePoint.Count; i++)
             {
@@ -1743,6 +1794,15 @@ namespace Root_CAMELLIA
             stageShade.SetGroupData(RightRect, 3);
             ViewRectGeometry[0] = stageShade;
 
+            if (IsLockUI)
+            {
+                LockImage.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                LockImage.Visibility = Visibility.Hidden;
+            }
+
             // select Rect
             CustomRectangleGeometry select = SelectGeometry[0] as CustomRectangleGeometry;
             Rect selectRect = new Rect(Math.Min(SelectStartPoint.X, SelectEndPoint.X), Math.Min(SelectStartPoint.Y, SelectEndPoint.Y),
@@ -1846,19 +1906,40 @@ namespace Root_CAMELLIA
                 TransmittanceListItem.Add(dataManager.recipeDM.TeachingRD.WaveLengthTransmittance[i]);
             }
 
+            UpdateLayerGridView();
+
+        }
+
+        public void UpdateLayerGridView()
+        {
             MaterialListItem.Clear();
-            if(dataManager.recipeDM.TeachingRD.ModelRecipePath != "")
+            GridLayerData.Clear();
+            LayerCount = 2;
+            if (dataManager.recipeDM.TeachingRD.ModelRecipePath != "")
             {
-                dataManager.recipeDM.LoadModel();
-               // MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.TeachingRD.MaterialList.ToArray());
+                dataManager.recipeDM.LoadModel(dataManager.recipeDM.TeachingRD.ModelRecipePath);
+                MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.ModelData.MaterialList.ToArray());
                 ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
             }
-            //App.m_nanoView.m_Model.m_MaterialList.Clear();
-            //for(int i = 0; i < dataManager.recipeDM.TeachingRD.MaterialList.Count; i++)
-            //{
-            //    App.m_nanoView.m_Model.LoadMaterialFile(dataManager.recipeDM.TeachingRD.MaterialList[i]);
-            //    MaterialListItem.Add(dataManager.recipeDM.TeachingRD.MaterialList[i]);
-            //}
+            else
+            {
+                dataManager.recipeDM.ModelData.MaterialList.Clear();
+                App.m_nanoView.m_Model.m_MaterialList.Clear();
+                App.m_nanoView.m_Model.m_LayerList.Clear();
+                InitLayer();
+            }
+            InitLayerGrid();    
+
+            DeleteGridCombo();
+            UpdateGridCombo();
+
+            UpdateLayerGrid();
+        }
+
+        public void InitLayer()
+        {
+            dataManager.recipeDM.ModelData.AddLayer();
+            dataManager.recipeDM.ModelData.AddLayer();
         }
 
         private void UpdateParameter()
@@ -2323,34 +2404,24 @@ namespace Root_CAMELLIA
                 p_PreviewDrawElement.Add(stageEdge.path);
             }
 
-
-
-            if (IsLockUI)
+         
+            if (!preview)
             {
                 stage = new CustomRectangleGeometry(GeneralTools.StageShadeBrush, GeneralTools.StageShadeBrush);
                 CustomRectangleGeometry lockRect = stage as CustomRectangleGeometry;
-                Rect shadeRect = new Rect(0, 0, 1000, 1000);
-                lockRect.SetData(shadeRect,100);
+                Rect shadeRect = new Rect(0, 0, 0, 0);
+                lockRect.SetData(shadeRect, 100);
+                Geometry.Add(lockRect);
+                p_DrawElement.Add(lockRect.path);
 
-                if (!preview)
-                {
-                    Geometry.Add(lockRect);
-                    p_DrawElement.Add(lockRect.path);
-                }
-                else
-                {
-                    //PreviewGeometry.Add(lockRect);
-                }
 
-                System.Windows.Controls.Image myImage = new System.Windows.Controls.Image();
-                myImage.Source = new BitmapImage(new Uri(BaseDefine.Dir_LockImg, UriKind.RelativeOrAbsolute));
-                myImage.Width = 100;
-                Canvas.SetLeft(myImage, 850);
-                Canvas.SetTop(myImage, 50);
-                m_DrawElement.Add(myImage);
-
+                LockImage.Source = new BitmapImage(new Uri(BaseDefine.Dir_LockImg, UriKind.RelativeOrAbsolute));
+                LockImage.Width = 100;
+                LockImage.Visibility = Visibility.Hidden;
+                Canvas.SetLeft(LockImage, 850);
+                Canvas.SetTop(LockImage, 50);
+                m_DrawElement.Add(LockImage);
             }
-
         }
 
         public void RouteOptimizaionFunc()
@@ -2809,6 +2880,126 @@ namespace Root_CAMELLIA
             CurrentTheta = Math.Round((Math.Atan2(mouseY, mouseX) * 180 / Math.PI), 3).ToString("0.###") + " °";
             CurrentRadius = Math.Round((Math.Sqrt(Math.Pow(mouseX, 2) + Math.Pow(mouseY, 2))), 3).ToString("0.###") + " mm";
         }
+
+        public void UpdateGridCombo()
+        {
+            string Material = "None";
+            bool exist = false;
+
+            foreach (string str in MaterialListItem)
+            {
+                exist = false;
+                Material = Path.GetFileNameWithoutExtension(str);
+                for (int i = 0; i < GridLayerData[0].Host1.Count; i++)
+                {
+                    if (GridLayerData[0].Host1[i] == Material)
+                    {
+                        exist = true;
+                    }
+                }
+
+                if (!exist)
+                {
+                    for (int i = 0; i < GridLayerData.Count; i++)
+                    {
+
+                        GridLayerData[i].Host1.Add(Material);
+                        GridLayerData[i].Guest1.Add(Material);
+                        GridLayerData[i].Guest2.Add(Material);
+                    }
+                }
+            }
+        }
+
+        public void DeleteGridCombo()
+        {
+            int cnt = GridLayerData[0].Host1.Count;
+            for (int i = 0; i < GridLayerData.Count; i++)
+            {
+                for (int j = cnt - 1; j > 0; j--)
+                {
+                    GridLayerData[i].Host1.RemoveAt(j);
+                    GridLayerData[i].Guest1.RemoveAt(j);
+                    GridLayerData[i].Guest2.RemoveAt(j);
+                }
+            }
+        }
+
+        public bool CheckMaterialUse()
+        {
+            if (MaterialSelectIndex == -1)
+            {
+                return true;
+            }
+            string material = Path.GetFileNameWithoutExtension(MaterialListItem[MaterialSelectIndex]);
+            for (int i = 0; i < GridLayerData.Count; i++)
+            {
+                if (GridLayerData[i].SelectedHost1 == material || GridLayerData[i].SelectedGuest1 == material || GridLayerData[i].SelectedGuest2 == material)
+                {
+                    MessageBox.Show("The material is in use, can't delete", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void UpdateLayerGrid()
+        {
+            int cnt = LayerCount - 1;
+            for (int i = 0; i < GridLayerData.Count; i++)
+            {
+                GridLayerData[i].UpdateGridLayer(cnt);
+                cnt--;
+            }
+        }
+
+        private void UpdateLayerModel()
+        {
+            int cnt = LayerCount - 1;
+            for (int i = 0; i < GridLayerData.Count; i++)
+            {
+                GridLayerData[i].UpdateModelLayer(cnt);
+                cnt--;
+            }
+        }
+
+        private int _layerCount = 2;
+        public int LayerCount
+        {
+            get
+            {
+                return _layerCount;
+            }
+            set
+            {
+                _layerCount = value;
+            }
+        }
+
+        public void InitLayerGrid()
+        {
+            LayerCount = dataManager.recipeDM.ModelData.GetLayerCount();
+            if (LayerCount == 0)
+            {
+                LayerCount = 2;
+            }
+            string[] strHeader = { "Sub.", "1st L.", "2nd L.", "3rd L.", "4th L.", "5th L.", "6th L.", "7th L.", "8th L.", "9th L.", "10th L." };
+
+            int rows = LayerCount - 1;
+            for (int i = 0; i < LayerCount; i++)
+            {
+                if (i == 0)
+                {
+                    GridLayerData.Add(new ModelData.LayerData("Amb."));
+                }
+                else
+                {
+                    GridLayerData.Add(new ModelData.LayerData(strHeader[rows]));
+                }
+
+                rows--;
+            }
+        }
         #endregion
 
         #region ICommand&MethodAction
@@ -2917,7 +3108,8 @@ namespace Root_CAMELLIA
                         //RedrawStage();
                     }
                     InitKeyButton();
-                    UpdateView();
+                    RedrawStage();
+                    //UpdateView();
                 });
             }
         }
@@ -3267,12 +3459,15 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     //MaterialListItem.Clear();
+                    //DeleteGridCombo();
                     int res = dataManager.recipeDM.AddMaterial();
                     if(res == 0)
                     {
+                        MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.ModelData.MaterialList.ToArray());
                        // MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.TeachingRD.MaterialList.ToList());
                     }
-                    
+
+                    UpdateGridCombo();
                     //for(int i = 0; i < dataManager.recipeDM.TeachingRD.MaterialList.Count; i++)
                     //{
                     //    MaterialListItem.Add(dataManager.recipeDM.TeachingRD.MaterialList[i]);
@@ -3288,15 +3483,16 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     //MaterialListItem.Clear();
-                    int res = dataManager.recipeDM.AddMaterial();
-                    if (res == 0)
+                    if(CheckMaterialUse() == false)
                     {
-                     //   MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.TeachingRD.MaterialList.ToList());
+                        UpdateLayerModel();
+                        dataManager.recipeDM.DeleteMaterial(MaterialSelectIndex);
+                        MaterialListItem.RemoveAt(MaterialSelectIndex);
+                        DeleteGridCombo();
+                        UpdateGridCombo();
+
+                        UpdateLayerGrid();
                     }
-                    //for(int i = 0; i < dataManager.recipeDM.TeachingRD.MaterialList.Count; i++)
-                    //{
-                    //    MaterialListItem.Add(dataManager.recipeDM.TeachingRD.MaterialList[i]);
-                    //}
                 });
             }
         }
@@ -3307,9 +3503,102 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    dataManager.recipeDM.OpenModel();
-                  //  MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.TeachingRD.MaterialList.ToList());
-                    ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                  
+                    if(dataManager.recipeDM.OpenModel() == true)
+                    {
+                        GridLayerData.Clear();
+                        MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.ModelData.MaterialList.ToArray());
+                        ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+
+                        InitLayerGrid();
+
+                        DeleteGridCombo();
+                        UpdateGridCombo();
+
+                        UpdateLayerGrid();
+                    }
+                });
+            }
+        }
+
+        public ICommand CmdSaveModel
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    UpdateLayerModel();
+                    dataManager.recipeDM.SaveModel();
+                });
+            }
+        }
+
+        public ICommand CmdInsertLayer
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (GridLayerIndex == -1)
+                    {
+                        MessageBox.Show("Select Layer row");
+                        return;
+                    }
+                    if(GridLayerData.Count == 12)
+                    {
+                        MessageBox.Show("Cannot add any more.");
+                        return;
+                    }
+                    int selIdx = GridLayerIndex;
+
+                    UpdateLayerModel();
+                    int index = GridLayerData.Count - GridLayerIndex;
+                    dataManager.recipeDM.ModelData.AddLayer(index);
+
+                    GridLayerData.Clear();
+                    InitLayerGrid();
+
+                    DeleteGridCombo();
+                    UpdateGridCombo();
+
+                    UpdateLayerGrid();
+
+                    GridLayerIndex = selIdx;
+
+                });
+            }
+        }
+
+        public ICommand CmdDeleteLayer
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (GridLayerIndex == -1)
+                    {
+                        MessageBox.Show("Select Layer row");
+                        return;
+                    }
+                    if (GridLayerData.Count == 2)
+                    {
+                        MessageBox.Show("Cannot delete any more.");
+                        return;
+                    }
+                    int selIdx = GridLayerIndex;
+                    UpdateLayerModel();
+                    int index = GridLayerData.Count - GridLayerIndex - 1;
+                    dataManager.recipeDM.ModelData.DeleteLayer(index);
+
+                    GridLayerData.Clear();
+                    InitLayerGrid();
+
+                    DeleteGridCombo();
+                    UpdateGridCombo();
+
+                    UpdateLayerGrid();
+
+                    GridLayerIndex = selIdx;
                 });
             }
         }
@@ -3320,7 +3609,7 @@ namespace Root_CAMELLIA
         #region MethodAction
         public void OnListViewMouseButtonDown(object sender, MouseButtonEventArgs e)
         {
-            MatarialSelectIndex = -1;
+            MaterialSelectIndex = -1;
         }
 
         public void OnCheckboxChange(object sender, RoutedEventArgs e)

@@ -158,6 +158,15 @@ namespace Root_Vega
                 SetProperty(ref m_nTotalDefectCount, value);
             }
         }
+        string m_sLotElapsedTime = "";
+        public string p_sLotElapsedTime
+        {
+            get { return m_sLotElapsedTime; }
+            set
+            {
+                SetProperty(ref m_sLotElapsedTime, value);
+            }
+        }
 
         private readonly IDialogService m_DialogService;
 
@@ -192,6 +201,11 @@ namespace Root_Vega
             else p_dSideInspProgress = (double)p_Engineer.m_InspManager.p_nSideInspDoneNum / (double)p_SideVision.p_nTotalBlockCount * 100;
 
             p_nTotalDefectCount = p_Engineer.m_InspManager.m_nTotalDefectCount;
+
+            for (int i = 0; i < p_Engineer.m_handler.m_aLoadport.Length; i++)
+            {
+                if(p_Engineer.m_handler.m_aLoadport[i].m_swLotTime.IsRunning) p_sLotElapsedTime = p_Engineer.m_handler.m_aLoadport[i].m_swLotTime.ElapsedMilliseconds.ToString(); 
+            }
         }
 
         void LoadLp1()

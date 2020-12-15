@@ -248,7 +248,7 @@ namespace Root_Vega
         {
             PodState podState = GetPodState(infoReticle.m_sLoadport); 
             if (podState.m_eState == InfoPod.eState.Load) return; 
-            Loadport loadport = (Loadport)m_handler.m_moduleList.GetModule(infoReticle.m_sLoadport);
+            Loadport loadport = (Loadport)m_handler.p_moduleList.GetModule(infoReticle.m_sLoadport);
             if (loadport.m_infoPod.p_eState == InfoPod.eState.Empty) EQ.p_eState = EQ.eState.Error; 
             m_qSequence.Enqueue(new Sequence(loadport.m_runLoad.Clone(), infoReticle));
             podState.m_eState = InfoPod.eState.Load; 
@@ -261,7 +261,7 @@ namespace Root_Vega
             {
                 if (info.m_sLoadport == infoReticle.m_sLoadport) return; 
             }
-            Loadport loadport = (Loadport)m_handler.m_moduleList.GetModule(infoReticle.m_sLoadport);
+            Loadport loadport = (Loadport)m_handler.p_moduleList.GetModule(infoReticle.m_sLoadport);
             m_qSequence.Enqueue(new Sequence(loadport.m_runUnLoad.Clone(), infoReticle));
             podState.m_eState = InfoPod.eState.Placed; 
         }
@@ -278,7 +278,7 @@ namespace Root_Vega
             {
                 if (state.m_sLoadport == sLoadport) return state;
             }
-            Loadport loadport = (Loadport)m_handler.m_moduleList.GetModule(sLoadport);
+            Loadport loadport = (Loadport)m_handler.p_moduleList.GetModule(sLoadport);
             PodState podState = new PodState();
             podState.m_sLoadport = sLoadport;
             podState.m_eState = loadport.m_infoPod.p_eState;

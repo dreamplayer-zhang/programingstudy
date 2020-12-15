@@ -71,7 +71,7 @@ namespace Root_CAMELLIA.Data
                     dataManager.recipeDM.MeasurementRD.CheckCircleSize();
                     if (dataManager.recipeDM.MeasurementRD.ModelRecipePath != "")
                     {
-                        LoadModel();
+                        LoadModel(dataManager.recipeDM.MeasurementRD.ModelRecipePath);
                     }
                     dataManager.recipeDM.MeasurementRD.Clone(dataManager.recipeDM.TeachingRD);
 
@@ -178,7 +178,7 @@ namespace Root_CAMELLIA.Data
 
             fileDlg.Multiselect = true;
             fileDlg.Title = "Choose material file";
-            //fileDlg.InitialDirectory = "..\\MaterialRef";
+            //fileDlg.InitialDirectory = "..\\MaterialRef"; // 변경필요
             fileDlg.Filter = "material reference files (*.dis;*.ref)|*.dis;*.ref|All files (*.*)|*.*";
             fileDlg.FilterIndex = 0;
 
@@ -189,18 +189,7 @@ namespace Root_CAMELLIA.Data
                     res = App.m_nanoView.m_Model.LoadMaterialFile(filename);
                     if (res == 0)
                     {
-                       // dataManager.recipeDM.TeachingRD.MaterialList.Add(filename);
-                        //name = Path.GetFileNameWithoutExtension(filename);
-                        //ext = Path.GetExtension(filename);
-                        //if (".ref" == ext) ///////// ref 파일 일때 
-                        //{
-                        //    index = 1; ;
-                        //}
-                        //else if (".dis" == ext) ////// dis 파일 일때 
-                        //{
-                        //    index = 0;
-                        //}
-                        //AddMaterialListItem(name, index);
+                        dataManager.recipeDM.ModelData.MaterialList.Add(filename);
                     }
                     else
                     {
@@ -215,40 +204,47 @@ namespace Root_CAMELLIA.Data
             return -1;
         }
 
-        public void LoadModel()
+        public void DeleteMaterial(int nIndex)
         {
-            int bl;
+            App.m_nanoView.m_Model.m_MaterialList.RemoveAt(nIndex);
+            dataManager.recipeDM.ModelData.MaterialList.RemoveAt(nIndex);
+        }
 
-            bl = App.m_nanoView.m_Model.FillFromFile(dataManager.recipeDM.MeasurementRD.ModelRecipePath);
+        public void LoadModel(string path)
+        {
+            App.m_nanoView.LoadModel(path);
+            //int bl;
 
-            if (bl != 0)
-            {
-                foreach (Material m in App.m_nanoView.m_Model.m_MaterialList)
-                {
-                    App.m_nanoView.m_Model.m_MaterialList.Remove(m);
-                }
-                return;
-            }
+            //bl = App.m_nanoView.m_Model.FillFromFile(dataManager.recipeDM.MeasurementRD.ModelRecipePath);   
 
-          //  dataManager.recipeDM.MeasurementRD.MaterialList.Clear();
-            // delete and add material list control
-            //foreach (ListViewItem item in materialList.Items)
+            //if (bl != 0)
             //{
-            //    item.Remove();
+            //    foreach (Material m in App.m_nanoView.m_Model.m_MaterialList)
+            //    {
+            //        App.m_nanoView.m_Model.m_MaterialList.Remove(m);
+            //    }
+            //    return;
             //}
-            // DeleteComboStrings();
+
+            dataManager.recipeDM.ModelData.MaterialList.Clear();
+            //// delete and add material list control
+            ////foreach (ListViewItem item in materialList.Items)
+            ////{
+            ////    item.Remove();
+            ////}
+            //// DeleteComboStrings();
             foreach (Material m in App.m_nanoView.m_Model.m_MaterialList)
             {
                 //if (m.m_Type == NanoView.Material.MaterialType.DISPERSION) index = 0;
                 //else index = 1;
                 //AddMaterialListItem(m.m_Name, index);
-               // dataManager.recipeDM.MeasurementRD.MaterialList.Add(m.m_Path);
+                // dataManager.recipeDM.MeasurementRD.MaterialList.Add(m.m_Path);
+                dataManager.recipeDM.ModelData.MaterialList.Add(m.m_Path);
             }
         }
 
-        public void OpenModel()
+        public bool OpenModel()
         {
-            int index = 0;
             string path = "..\\Recipe";
             OpenFileDialog fileDlg = new OpenFileDialog();
 
@@ -271,31 +267,67 @@ namespace Root_CAMELLIA.Data
                     {
                         App.m_nanoView.m_Model.m_MaterialList.Remove(m);
                     }
-                    return;
+                    return false;
                 }
 
-              //  dataManager.recipeDM.TeachingRD.MaterialList.Clear();
-                // delete and add material list control
-                //foreach (ListViewItem item in materialList.Items)
-                //{
-                //    item.Remove();
-                //}
-                // DeleteComboStrings();
+                dataManager.recipeDM.ModelData.MaterialList.Clear();
                 foreach (Material m in App.m_nanoView.m_Model.m_MaterialList)
                 {
-                    //if (m.m_Type == NanoView.Material.MaterialType.DISPERSION) index = 0;
-                    //else index = 1;
-                    //AddMaterialListItem(m.m_Name, index);
-                 //   dataManager.recipeDM.TeachingRD.MaterialList.Add(m.m_Path);
+                    dataManager.recipeDM.ModelData.MaterialList.Add(m.m_Path);
                 }
-                //modelGrid.RowCount = m_Model.m_LayerList.Count;
-                //InitModelGrid();
-                //PopulateGridCombo();
-                //UpdateGrid();
-
-                //modelFilePath.Text = fileDlg.FileName;
                 dataManager.recipeDM.TeachingRD.ModelRecipePath = fileDlg.FileName;
+                return true;
             }
+            return false;
         }
+
+        public void SaveModel()
+        {
+            SaveFileDialog fileDlg = new SaveFileDialog();
+
+            fileDlg.Filter = "Model files (*.rcp)|*.rcp|All files(*.*)|*.*";
+            fileDlg.RestoreDirectory = true;
+            fileDlg.AddExtension = true;
+
+            if (fileDlg.ShowDialog() == true)
+            {
+                App.m_nanoView.SaveModel(fileDlg.FileName);
+            }
+            dataManager.recipeDM.TeachingRD.ModelRecipePath = fileDlg.FileName;
+            //if(dataManager.recipeDM.TeachingRD.ModelRecipePath == "")
+            //{
+            //    SaveAsModel();
+            //}
+            ////SaveFileDialog fileDlg = new SaveFileDialog();
+
+            ////fileDlg.Filter = "Model files (*.rcp)|*.rcp|All files(*.*)|*.*";
+            ////fileDlg.RestoreDirectory = true;
+            ////fileDlg.AddExtension = true;
+
+            ////if (fileDlg.ShowDialog() == true)
+            ////{
+            //if(MessageBox.Show("Are you sure?", "Save", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+            //{
+            //    File.WriteAllLines(dataManager.recipeDM.TeachingRD.ModelRecipePath, App.m_nanoView.m_Model.m_LayerList.ToString());
+            //}
+            ////}
+        }
+
+        //public bool SaveAsModel()
+        //{
+        //    SaveFileDialog fileDlg = new SaveFileDialog();
+
+        //    fileDlg.Filter = "Model files (*.rcp)|*.rcp|All files(*.*)|*.*";
+        //    fileDlg.RestoreDirectory = true;
+        //    fileDlg.AddExtension = true;
+
+        //    if (fileDlg.ShowDialog() == true)
+        //    {
+        //        File.WriteAllLines(fileDlg.FileName, App.m_nanoView.m_Model.m_LayerList.ToString());
+        //        dataManager.recipeDM.TeachingRD.ModelRecipePath = fileDlg.FileName;
+        //        return true;
+        //    }
+        //    return false;
+        //}
     }
 }

@@ -26,10 +26,11 @@ namespace Root_CAMELLIA.Data
         protected eDir _eDir = eDir.LT;
         public eDir p_Dir { get; set; }
 
-        public Point m_ptLT = new Point();
-        public Point m_ptRT = new Point();
-        public Point m_ptRB = new Point();
+        public List<Point> m_ptLT = new List<Point>();
+        public List<Point> m_ptRT = new List<Point>();
+        public List<Point> m_ptRB = new List<Point>();
         public RPoint m_ptCenter = new RPoint();
+        public RPoint m_ptStageCenter = new RPoint();
         //public void FindEdge(byte[] imgBuf, ePos pos)
         //{
         //    Mat matSrc = new Mat("emgutest.bmp");
@@ -39,14 +40,44 @@ namespace Root_CAMELLIA.Data
         //public void FindEdge(byte[] ImgBuf, ePos pos, CPoint ptROI)
         public void CalCenterPoint(CPoint ptROI, double resolutionX, double resolutionY, RPoint ptLTPulse, RPoint ptRTPulse, RPoint ptRBPulse)
         {
-            double LTX = ptLTPulse.X - (((ptROI.X / 2) + m_ptLT.X) * resolutionX * 10);
-            double LTY = ptLTPulse.Y + (((ptROI.Y / 2) - m_ptLT.Y) * resolutionY * 10);
+            Point ptAvgLT = new Point();
+            Point ptAvgRT = new Point();
+            Point ptAvgRB = new Point();
+            int sumX = 0;
+            int sumY = 0;
+            for (int i = 0; i < m_ptLT.Count; i++)
+            {
+                sumX += m_ptLT[i].X;
+                sumY += m_ptLT[i].Y;
+            }
+            ptAvgLT = new Point(sumX / m_ptLT.Count, sumY / m_ptLT.Count);
 
-            double RTX = ptRTPulse.X - (((ptROI.X / 2) + m_ptRT.X) * resolutionX * 10);
-            double RTY = ptRTPulse.Y + (((ptROI.Y / 2) - m_ptRT.Y) * resolutionY * 10);
+            sumX = 0;
+            sumY = 0;
+            for (int i = 0; i < m_ptRT.Count; i++)
+            {
+                sumX += m_ptRT[i].X;
+                sumY += m_ptRT[i].Y;
+            }
+            ptAvgRT = new Point(sumX / m_ptRT.Count, sumY / m_ptRT.Count);
 
-            double RBX = ptRBPulse.X - (((ptROI.X / 2) + m_ptRB.X) * resolutionX * 10);
-            double RBY = ptRBPulse.Y + (((ptROI.Y / 2) - m_ptRB.Y) * resolutionY * 10);
+            sumX = 0;
+            sumY = 0;
+            for (int i = 0; i < m_ptRB.Count; i++)
+            {
+                sumX += m_ptRB[i].X;
+                sumY += m_ptRB[i].Y;
+            }
+            ptAvgRB = new Point(sumX / m_ptRB.Count, sumY / m_ptRB.Count);
+
+            double LTX = ptLTPulse.X - (((ptROI.X / 2) + ptAvgLT.X) * resolutionX * 10);
+            double LTY = ptLTPulse.Y + (((ptROI.Y / 2) - ptAvgLT.Y) * resolutionY * 10);
+
+            double RTX = ptRTPulse.X - (((ptROI.X / 2) + ptAvgRT.X) * resolutionX * 10);
+            double RTY = ptRTPulse.Y + (((ptROI.Y / 2) - ptAvgRT.Y) * resolutionY * 10);
+
+            double RBX = ptRBPulse.X - (((ptROI.X / 2) + ptAvgRB.X) * resolutionX * 10);
+            double RBY = ptRBPulse.Y + (((ptROI.Y / 2) - ptAvgRB.Y) * resolutionY * 10);
 
             PointF ptLT = new PointF((float)LTX, (float)LTY);
             PointF ptRT = new PointF((float)RTX, (float)RTY);
@@ -95,151 +126,56 @@ namespace Root_CAMELLIA.Data
         public void FindEdge(ImageData ImgData, CPoint ptROI, int nSearchRange, int nSearchLength, int nSearchLevel, eDir dir)
         {
 
-            //            Bitmap bitmap = new Bitmap(@"C:\Users\cgkim\Desktop\ttt\tttt.bmp"); //This is your bitmap
-
-
-            //byte[] result = null;
-            //if (bitmap != null)
-            //{
-            //    MemoryStream stream = new MemoryStream();
-            //    bitmap.Save(stream, bitmap.RawFormat);
-            //    result = stream.ToArray();
-            //} 
 
             Mat matSrc = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
             Mat matTest = new Mat(new Size(ptROI.X, ptROI.Y), DepthType.Cv8U, 3, ImgData.GetPtr(), (int)ImgData.p_Stride);
-            //Image<Gray, byte> imageGray = new Image<Gray, byte>(ptROI.X, ptROI.Y, (int)ImgData.p_Stride, ImgData.GetPtr());
             Mat matInsp = new Mat(ptROI.X, ptROI.Y, DepthType.Cv8U, 3);
 
-            //Image<Gray, byte> imageGray = new Image<Gray, byte>(bitmap);
             matSrc.CopyTo(matInsp);
             CvInvoke.CvtColor(matInsp, matInsp, ColorConversion.Bgr2Gray);
-            //byte[] pImg = matSrc.GetRawData();
-            // matSrc = imageGray.Mat;
-
 
             CvInvoke.MedianBlur(matInsp, matInsp, 7);
 
-
-            // Emgu.CV.UI.ImageViewer.Show(matSrc);
-            // Emgu.CV.UI.ImageViewer.Show(matTest);
-            // Emgu.CV.UI.ImageViewer.Show(imageGray);
-            // Emgu.CV.UI.ImageViewer.Show(matInsp);
-            Point vector = new Point(0, 1);
+            Point vector = new Point();
             Point edge = new Point();
-
+            var tempList = new List<Point>();
+            PointF startPt = new PointF();
             switch (dir)
             {
                 case eDir.LT:
                     vector = new Point(0, 1);
-                    edge = GetEdgePoint(matInsp, new PointF(ptROI.X / 2, 0), vector, nSearchRange, ptROI.Y, nSearchLevel);
-                    m_ptLT = edge;
+                    //edge = GetEdgePoint(matInsp, new PointF(ptROI.X / 2, ptROI.Y / 2), vector, nSearchRange, nSearchLength, nSearchLevel);
+                    //m_ptLT = edge;
+                    tempList = m_ptLT;
+                    startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y / 2 - (nSearchLength / 2));
                     break;
                 case eDir.RT:
                     vector = new Point(0, 1);
-                    edge = GetEdgePoint(matInsp, new PointF(ptROI.X / 2, 0), vector, nSearchRange, ptROI.Y, nSearchLevel);
-                    m_ptRT = edge;
+                    //edge = GetEdgePoint(matInsp, new PointF(ptROI.X / 2, ptROI.Y / 2), vector, nSearchRange, nSearchLength, nSearchLevel);
+                    //m_ptRT = edge;
+                    tempList = m_ptRT;
+                    startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y / 2 - (nSearchLength / 2));
                     break;
                 case eDir.RB:
                     vector = new Point(0, -1);
-                    edge = GetEdgePoint(matInsp, new PointF(ptROI.X / 2, ptROI.Y), vector, nSearchRange, ptROI.Y, nSearchLevel);
-                    m_ptRB = edge;
+                    //edge = GetEdgePoint(matInsp, new PointF(ptROI.X / 2, ptROI.Y / 2), vector, nSearchRange, nSearchLength, nSearchLevel);
+                    //m_ptRB = edge;
+                    tempList = m_ptRB;
+                    startPt = new PointF(ptROI.X / 2 - (nSearchRange / 2), ptROI.Y / 2 + (nSearchLength / 2));
                     break;
             }
-
-
-
-
-
-            CvInvoke.Circle(matTest, edge, 10, new MCvScalar(0, 255, 0));
-            // Emgu.CV.UI.ImageViewer.Show(matTest);
-            //for(int i = 0; i < nSearchLength; i++)
-            //{
-            //    switch (dir)
-            //    {
-            //        case eDir.LT:
-
-            //            break;
-            //        case eDir.RT:
-            //            break;
-            //        case eDir.RB:
-            //            break;
-            //    }
-            //}
-
-
-            // Emgu.CV.UI.ImageViewer.Show(matInsp, "ttt");
-
-            //Image<Gray, byte> imageGray = new Image<Gray, byte>(,);
-
-
-
-
-
-
-            //Image<Gray, byte> imageGray = new Image<Gray, byte>(ptROI.X, ptROI.Y);
-            //imageGray.Bytes = 
-            //Image<Gray, byte> imageGray = new Image<Gray, byte>(bitmap);
-
-            //Mat matSrc = imageGray.Mat;
-            //Emgu.CV.UI.ImageViewer.Show(matSrc);
-
-            //VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
-            ////imageGray = imageGray.SmoothMedian(3);
-            ////matSrc = imageGray.Mat;
-            ////Emgu.CV.UI.ImageViewer.Show(matSrc, "ttt");
-            //imageGray = imageGray.ThresholdAdaptive(new Gray(255), AdaptiveThresholdType.GaussianC, ThresholdType.Otsu, 11, new Gray(0.5));
-
-            //matSrc = imageGray.Mat;
-            //Emgu.CV.UI.ImageViewer.Show(matSrc, "ttt");
-            //CvInvoke.FindContours(imageGray, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
-
-            //for (int i = 0; i < contours.Size; i++)
-            //{
-
-            //    CvInvoke.DrawContours(imageGray, contours, i, new MCvScalar(255, i, 0));
-
-            //}
-            //VectorOfPoint contour = contours[0];
-            //for(int i = 0; i < contour.Size; i++)
-            //{
-            //    Console.WriteLine(contour[i]);
-            //}
-
-            ////Mat matdst = colorImage.Mat;
-
-            //Emgu.CV.UI.ImageViewer.Show(matSrc, "ttt");
-
-            //switch(p_ePos)
-            //{
-            //    case ePos.LT :
-            //        m_ptLT = contour[contour.Size / 2];
-            //        break;
-            //    case ePos.RT :
-            //        m_ptRT = contour[contour.Size / 2];
-            //        break;
-            //    case ePos.RB :
-            //        m_ptRB = contour[contour.Size / 2];
-            //        break;
-            //}
-
-            //for (Contour<Point> contours = grayImage.FindContours(Emgu.CV.CvEnum.CHAIN_APPROX_METHOD.CV_CHAIN_APPROX_SIMPLE, Emgu.CV.CvEnum.RETR_TYPE.CV_RETR_LIST, storage); contours != null; contours = contours.HNext)
-            //{
-            //    Contour<Point> currentContour = contours.ApproxPoly(contours.Perimeter * 0.015, storage);
-            //    if (currentContour.BoundingRectangle.Width > 20)
-            //    {
-            //        CvInvoke.cvDrawContours(color, contours, new MCvScalar(255), new MCvScalar(255), -1, 1, Emgu.CV.CvEnum.LINE_TYPE.EIGHT_CONNECTED, new Point(0, 0));
-            //        color.Draw(currentContour.BoundingRectangle, new Bgr(0, 255, 0), 1);
-            //    }
-
-            //    Point[] pts = currentContour.ToArray();
-            //    foreach (Point p in pts)
-            //    {
-            //        //add points to listbox
-            //        listBox1.Items.Add(p);
-            //    }
-            //}
-
+            tempList.Clear();
+            for (int i = 0; i < nSearchRange; i++)
+            {
+                edge = GetEdgePoint(matInsp, new PointF(startPt.X + (i * nSearchRange / 2), startPt.Y), vector, nSearchRange, nSearchLength, nSearchLevel);
+                tempList.Add(edge);
+            }
+            //m_ptLT = edge;
+            for (int i = 0; i < tempList.Count; i++)
+            {
+                CvInvoke.Circle(matTest, tempList[i], 5, new MCvScalar(0, 255, 0));
+            }
+            Emgu.CV.UI.ImageViewer.Show(matTest);
         }
 
         public Point GetEdgePoint(Mat Image, PointF ptStart, Point vector, int nSearchRange, int nSearchLength, int nSearchLevel)
@@ -269,20 +205,14 @@ namespace Root_CAMELLIA.Data
 
             int x = 0;
             int y = 0;
-            for (int i = 0; i < nSearchRange; i++)
-            {
-                x = (int)(point.X + positionX + 0.5);
-                y = (int)(point.Y + positionY + 0.5);
 
-                CheckPointRange(Image, ref x, ref y);
-                prev += pImg[y * Image.Width + x];
-
-                positionX += vectorX;
-                positionY += vectorY;
-            }
+            x = (int)(point.X + 0.5);
+            y = (int)(point.Y + 0.5);
+            CheckPointRange(Image, ref x, ref y);
 
 
-            prev /= (byte)nSearchRange;
+            //prev /= (byte)nSearchRange;
+            prev = pImg[y * Image.Width + x];
 
             SetDirection(vector, out positionX, out positionY, out vectorX, out vectorY);
 
@@ -352,7 +282,7 @@ namespace Root_CAMELLIA.Data
                 int LineSum = 0;
                 for (int j = 0; j < nSearchRange; j++)
                 {
-                    int x = (int)(point.X + j + 0.5);
+                    int x = (int)(point.X - (nSearchRange / 2) + j + 0.5);
                     int y = (int)(point.Y + vectorY + 0.5);
                     CheckPointRange(Image, ref x, ref y);
                     LineSum += pImg[y * Image.Width + x];
@@ -366,27 +296,10 @@ namespace Root_CAMELLIA.Data
                 {
                     max = LineAvg;
                 }
-                vectorX += vector.X;
+                vectorX += vector.X + nSearchRange;
                 vectorY += vector.Y;
             }
 
-            //double vectorX = 0;
-            //double vectorY = 0;
-            //for(int i = 0; i < nSearchRange; i++)
-            //{
-            //    int x = (int)(point.X + vectorX + 0.5);
-            //    int y = (int)(point.Y + vectorY + 0.5);
-            //    CheckPointRange(Image, ref x, ref y);
-
-            //    byte pix = pImg[y * Image.Width + x];
-            //    if (pix < min)
-            //        min = pix;
-            //    if (pix > max)
-            //        max = pix;
-
-            //    vectorX += vector.X;
-            //    vectorY += vector.Y;
-            //}
         }
 
         public void CheckPointRange(Mat Image, ref int x, ref int y)
