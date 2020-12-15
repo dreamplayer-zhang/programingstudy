@@ -369,7 +369,7 @@ namespace Root_WIND2
                 return new RelayCommand(() =>
                 {
                     SetHome();
-                    UIManager.Instance.ChangUIMode();
+                    UIManager.Instance.ChangeUIMode();
                 });
             }
         }
