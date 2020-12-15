@@ -14,6 +14,7 @@ namespace Root_CAMELLIA
         {
             double actPos = (double)value;
             double canvasPos = (7000 * actPos / 5290000);
+            // actPos : maxPos = canvasleft : 10000
             if (value == null)
             {
                 return 0.0;
