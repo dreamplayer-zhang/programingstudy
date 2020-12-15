@@ -258,7 +258,7 @@ namespace RootTools_Vision
                     defectArray[i] = rect;
                 }
 
-                if (nByteCnt == 1)
+                //if (nByteCnt == 1)
                     CLR_IP.Cpp_SaveDefectListBMP(
                        Path,
                        (byte*)workplace.SharedBuffer.ToPointer(),
@@ -266,15 +266,15 @@ namespace RootTools_Vision
                        workplace.SharedBufferHeight,
                        defectArray
                        );
-                else if (nByteCnt == 3)
-                    CLR_IP.Cpp_SaveDefectListBMP_Color(
-                        Path,
-                       (byte*)workplaceBundle.SharedBufferR.ToPointer(),
-                       (byte*)workplace.SharedBufferG.ToPointer(),
-                       (byte*)workplace.SharedBufferB.ToPointer(),
-                       workplace.SharedBufferWidth,
-                       workplace.SharedBufferHeight,
-                       defectArray);
+                //else if (nByteCnt == 3)
+                //    CLR_IP.Cpp_SaveDefectListBMP_Color(
+                //        Path,
+                //       (byte*)workplaceBundle.SharedBufferR.ToPointer(),
+                //       (byte*)workplace.SharedBufferG.ToPointer(),
+                //       (byte*)workplace.SharedBufferB.ToPointer(),
+                //       workplace.SharedBufferWidth,
+                //       workplace.SharedBufferHeight,
+                //       defectArray);
             }
         }
 
